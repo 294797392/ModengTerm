@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using XTerminal.Terminal.AnsiEscapeSequencesCommands;
 using XTerminal.Base;
+using System.Text.RegularExpressions;
 
 namespace XTerminal.Terminal
 {
     /// <summary>
-    /// ANSI终端转义序列，又称VT100终端转义序列
+    /// ANSI终端转义序列解析器，又称VT100终端转义序列
     /// 使用ASCII码定义了终端显示的方式，比如哪些字符要显示什么颜色等等
     /// 所有的VT100控制符以\033（即ESC的ASCII码）打头
     /// 格式具体有两种：
@@ -20,7 +21,9 @@ namespace XTerminal.Terminal
     /// </summary>
     public class AnsiEscapeSequencesParser : IEscapeSequencesParser
     {
-        private ParserStatusEnum status = ParserStatusEnum.Normal;
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("AnsiEscapeSequencesParser");
+
+        private static char[] CSISplitter = { (char)27 };
 
         private static Dictionary<int, TextDecorationEnum> TextDecorationsMap = new Dictionary<int, TextDecorationEnum>()
         {
@@ -42,12 +45,10 @@ namespace XTerminal.Terminal
         /// <param name="chars"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        private IEscapeSequencesCommand ParseColorizedTextCommand(List<byte> chars, List<byte> content)
+        private IEscapeSequencesCommand ParseColorizedTextCommand(string attrTxt, string text)
         {
-            ColorizedTextCommand textCmd = new ColorizedTextCommand();
-            textCmd.Text = Encoding.ASCII.GetString(content.ToArray());
-            string text = Encoding.ASCII.GetString(chars.ToArray());
-            string[] attrs = text.Split(';');
+            ColorizedTextCommand textCmd = new ColorizedTextCommand(text);
+            string[] attrs = attrTxt.Trim('[', 'm').Split(';');
             foreach (string attr in attrs)
             {
                 int iattr = int.Parse(attr);
@@ -72,21 +73,20 @@ namespace XTerminal.Terminal
         /// </summary>
         /// <param name="chars"></param>
         /// <returns></returns>
-        private IEscapeSequencesCommand ParseCursorActionCommand(List<byte> chars, CursorDirectionEnum direction)
+        private IEscapeSequencesCommand ParseCursorActionCommand(string attrTxt, CursorDirectionEnum direction)
         {
             CursorActionCommand actionCmd = new CursorActionCommand();
             actionCmd.Direction = direction;
             if (direction == CursorDirectionEnum.Auto)
             {
-                if (chars.Count == 0)
+                if (attrTxt.Length == 0)
                 {
                     actionCmd.X = 0;
                     actionCmd.Y = 0;
                 }
                 else
                 {
-                    string text = Encoding.ASCII.GetString(chars.ToArray());
-                    string[] xy = text.Split(';');
+                    string[] xy = attrTxt.Trim('[').Split(';');
                     if (xy.Count() == 0)
                     {
                         actionCmd.X = 0;
@@ -101,8 +101,7 @@ namespace XTerminal.Terminal
             }
             else
             {
-                string text = Encoding.ASCII.GetString(chars.ToArray());
-                actionCmd.MoveLength = int.Parse(text);
+                actionCmd.MoveLength = int.Parse(attrTxt);
             }
             return actionCmd;
         }
@@ -112,11 +111,10 @@ namespace XTerminal.Terminal
         /// </summary>
         /// <param name="chars"></param>
         /// <returns></returns>
-        private IEscapeSequencesCommand ParseScrollActionCommand(List<byte> chars)
+        private IEscapeSequencesCommand ParseScrollActionCommand(string attr)
         {
             ScrollActionCommand scrollCmd = new ScrollActionCommand();
-            string text = Encoding.ASCII.GetString(chars.ToArray());
-            string[] xy = text.Split(';');
+            string[] xy = attr.Trim('[').Split(';');
             scrollCmd.StartRow = int.Parse(xy[0]);
             scrollCmd.EndRow = int.Parse(xy[1]);
             return scrollCmd;
@@ -125,409 +123,145 @@ namespace XTerminal.Terminal
         public List<IEscapeSequencesCommand> Parse(byte[] chars)
         {
             List<IEscapeSequencesCommand> commands = new List<IEscapeSequencesCommand>();
-            List<byte> attr = new List<byte>();
-            List<byte> content = new List<byte>();
-
-            IEnumerator enumtor = chars.GetEnumerator();
-            while (enumtor.MoveNext())
+            string text = Encoding.ASCII.GetString(chars);
+            if (text.Contains((char)27))
             {
-                byte c = (byte)enumtor.Current;
-                switch (this.status)
+                string[] csis = text.Split(CSISplitter, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string csi in csis)
                 {
-                    case ParserStatusEnum.Normal:
-                        if (c == 27) //esc
-                        {
-                            attr.Clear();
-                            content.Clear();
-                            this.status = ParserStatusEnum.Csi;
-                            continue;
-                        }
-                        else
-                        {
-                            content.Add(c);
-                        }
-                        break;
-
-                    case ParserStatusEnum.Csi:
-                        if (c == '[')
-                        {
-                            attr.Add(c);
-                            continue;
-                        }
-                        if (c == 'm')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            attr.RemoveAt(0);
-                            commands.Add(this.ParseColorizedTextCommand(attr, content));
-                            continue;
-                        }
-                        if (c == 'A')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            attr.RemoveAt(0);
-                            commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Top));
-                            continue;
-                        }
-                        if (c == 'B')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            attr.RemoveAt(0);
-                            commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Bottom));
-                            continue;
-                        }
-                        if (c == 'C')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            attr.RemoveAt(0);
-                            commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Right));
-                            continue;
-                        }
-                        if (c == 'D')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            attr.RemoveAt(0);
-                            commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Left));
-                            continue;
-                        }
-                        if (c == 'E')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.NewLine);
-                            continue;
-                        }
-                        if (attr.EqualsEx("H"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            attr.RemoveAt(0);
-                            commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Auto));
-                            continue;
-                        }
-                        if (attr.EqualsEx("[J"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.EraseDown);
-                            continue;
-                        }
-                        if (attr.EqualsEx("[K"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.EraseEndOfLine);
-                            continue;
-                        }
-                        if (attr.EqualsEx("1K"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.EraseStartOfLine);
-                            continue;
-                        }
-                        if (attr.EqualsEx("2K"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.EraseLine);
-                            continue;
-                        }
-                        if (attr.EqualsEx("1J"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.EraseUp);
-                            continue;
-                        }
-                        if (attr.EqualsEx("[2J"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.EraseScreen);
-                            continue;
-                        }
-                        if (attr.EqualsEx("?25l"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.HiddenCursor);
-                            continue;
-                        }
-                        if (attr.EqualsEx("?25h"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.VisibleCursor);
-                            continue;
-                        }
-                        if (attr.EqualsEx("[H"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.SetTab);
-                            continue;
-                        }
-                        if (attr.EqualsEx("[g"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.ClearTab);
-                            continue;
-                        }
-                        if (attr.EqualsEx("3g"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.ClearAllTabs);
-                            continue;
-                        }
-                        if (attr.EqualsEx("[r"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.ScrollScreen);
-                            continue;
-                        }
-                        if (attr.EqualsEx("D"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.ScrollDown);
-                            continue;
-                        }
-                        if (attr.EqualsEx("M"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.ScrollUp);
-                            continue;
-                        }
-                        if (attr.EqualsEx("r"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            attr.RemoveAt(0);
-                            commands.Add(this.ParseScrollActionCommand(attr));
-                            continue;
-                        }
-                        if (attr.EqualsEx("[7h"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.EnableLineWrap);
-                            continue;
-                        }
-                        if (attr.EqualsEx("[7l"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.DisableLineWrap);
-                            continue;
-                        }
-                        if (c == '(')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.SetDefaultFont);
-                            continue;
-                        }
-                        if (c == ')')
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            commands.Add(PredefineCommands.SetAlternateFont);
-                            continue;
-                        }
-                        if (attr.EqualsEx("]0") || attr.EqualsEx("]1") || attr.EqualsEx("]2") || attr.EqualsEx("]4") || attr.EqualsEx("]10"))
-                        {
-                            this.status = ParserStatusEnum.Normal;
-                            continue;
-                        }
-                        attr.Add(c);
-                        break;
+                    commands.Add(this.ProcessCSI(csi));
                 }
-
+            }
+            else
+            {
+                commands.Add(new PlainTextCommand(text));
             }
 
-            #region ...
-
-            //foreach (byte c in chars)
-            //{
-            //    switch (this.status)
-            //    {
-            //        case ParserStatusEnum.Normal:
-            //            content.Add(c);
-            //            if (c == 27) //esc
-            //            {
-            //                attr.Clear();
-            //                content.Clear();
-            //                this.status = ParserStatusEnum.Csi;
-            //                continue;
-            //            }
-            //            break;
-
-            //        case ParserStatusEnum.Csi:
-            //            if (c == '[')
-            //            {
-            //                attr.Add(c);
-            //                continue;
-            //            }
-            //            if (c == 'm')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                attr.RemoveAt(0);
-            //                commands.Add(this.ParseColorizedTextCommand(attr, content));
-            //                continue;
-            //            }
-            //            if (c == 'A')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                attr.RemoveAt(0);
-            //                commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Top));
-            //                continue;
-            //            }
-            //            if (c == 'B')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                attr.RemoveAt(0);
-            //                commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Bottom));
-            //                continue;
-            //            }
-            //            if (c == 'C')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                attr.RemoveAt(0);
-            //                commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Right));
-            //                continue;
-            //            }
-            //            if (c == 'D')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                attr.RemoveAt(0);
-            //                commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Left));
-            //                continue;
-            //            }
-            //            if (c == 'E')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.NewLine);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("H"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                attr.RemoveAt(0);
-            //                commands.Add(this.ParseCursorActionCommand(attr, CursorDirectionEnum.Auto));
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[J"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.EraseDown);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[K"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.EraseEndOfLine);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("1K"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.EraseStartOfLine);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("2K"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.EraseLine);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("1J"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.EraseUp);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[2J"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.EraseScreen);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("?25l"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.HiddenCursor);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("?25h"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.VisibleCursor);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[H"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.SetTab);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[g"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.ClearTab);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("3g"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.ClearAllTabs);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[r"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.ScrollScreen);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("D"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.ScrollDown);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("M"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.ScrollUp);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("r"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                attr.RemoveAt(0);
-            //                commands.Add(this.ParseScrollActionCommand(attr));
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[7h"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.EnableLineWrap);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("[7l"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.DisableLineWrap);
-            //                continue;
-            //            }
-            //            if (c == '(')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.SetDefaultFont);
-            //                continue;
-            //            }
-            //            if (c == ')')
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                commands.Add(PredefineCommands.SetAlternateFont);
-            //                continue;
-            //            }
-            //            if (attr.EqualsEx("]0") || attr.EqualsEx("]1") || attr.EqualsEx("]2") || attr.EqualsEx("]4") || attr.EqualsEx("]10"))
-            //            {
-            //                this.status = ParserStatusEnum.Normal;
-            //                continue;
-            //            }
-            //            attr.Add(c);
-            //            break;
-            //    }
-
-            //}
-
-            #endregion
-
             return commands;
+        }
+
+        private IEscapeSequencesCommand ProcessCSI(string csiText)
+        {
+            Match match = null;
+
+            match = Regex.Match(csiText, @"\[.+m");
+            if (match.Success)
+            {
+                string text = csiText.Substring(match.Length, csiText.Length - match.Length);
+                return this.ParseColorizedTextCommand(match.Value, text);
+            }
+            if ((match = Regex.Match(csiText, @"\[\d+A")).Success)
+            {
+                return this.ParseCursorActionCommand(match.Value, CursorDirectionEnum.Top);
+            }
+            if ((match = Regex.Match(csiText, @"\[\d+B")).Success)
+            {
+                return this.ParseCursorActionCommand(match.Value, CursorDirectionEnum.Bottom);
+            }
+            if ((match = Regex.Match(csiText, @"\[\d+C")).Success)
+            {
+                return this.ParseCursorActionCommand(match.Value, CursorDirectionEnum.Right);
+            }
+            if ((match = Regex.Match(csiText, @"\[\d+D")).Success)
+            {
+                return this.ParseCursorActionCommand(match.Value, CursorDirectionEnum.Left);
+            }
+            if (csiText[0] == 'E')
+            {
+                return PredefineCommands.NewLine;
+            }
+            if ((match = Regex.Match(csiText, @"\[.+H")).Success)
+            {
+                return this.ParseCursorActionCommand(match.Value, CursorDirectionEnum.Auto);
+            }
+            if ((match = Regex.Match(csiText, @"\[J")).Success)
+            {
+                return PredefineCommands.EraseDown;
+            }
+            if ((match = Regex.Match(csiText, @"\[K")).Success)
+            {
+                return PredefineCommands.EraseEndOfLine;
+            }
+            if ((match = Regex.Match(csiText, @"\[1K")).Success)
+            {
+                return PredefineCommands.EraseStartOfLine;
+            }
+            if ((match = Regex.Match(csiText, @"\[2K")).Success)
+            {
+                return PredefineCommands.EraseLine;
+            }
+            if ((match = Regex.Match(csiText, @"\[1J")).Success)
+            {
+                return PredefineCommands.EraseUp;
+            }
+            if ((match = Regex.Match(csiText, @"\[2J")).Success)
+            {
+                return PredefineCommands.EraseScreen;
+            }
+            if ((match = Regex.Match(csiText, @"\?25l")).Success)
+            {
+                return PredefineCommands.HiddenCursor;
+            }
+            if ((match = Regex.Match(csiText, @"\?25h")).Success)
+            {
+                return PredefineCommands.VisibleCursor;
+            }
+            if (csiText[0] == 'H')
+            {
+                return PredefineCommands.SetTab;
+            }
+            if ((match = Regex.Match(csiText, @"\[g")).Success)
+            {
+                return PredefineCommands.ClearTab;
+            }
+            if ((match = Regex.Match(csiText, @"\[3g")).Success)
+            {
+                return PredefineCommands.ClearAllTabs;
+            }
+            if ((match = Regex.Match(csiText, @"\[r")).Success)
+            {
+                return PredefineCommands.ScrollScreen;
+            }
+            if (csiText[0] == 'D')
+            {
+                return PredefineCommands.ScrollDown;
+            }
+            if (csiText[0] == 'M')
+            {
+                return PredefineCommands.ScrollUp;
+            }
+            if (csiText[0] == 'M')
+            {
+                return PredefineCommands.ScrollUp;
+            }
+            if ((match = Regex.Match(csiText, @"\[.+r")).Success)
+            {
+                return this.ParseScrollActionCommand(match.Value);
+            }
+            if ((match = Regex.Match(csiText, @"\[7h")).Success)
+            {
+                return PredefineCommands.EnableLineWrap;
+            }
+            if ((match = Regex.Match(csiText, @"\[71")).Success)
+            {
+                return PredefineCommands.DisableLineWrap;
+            }
+            if (csiText[0] == '(')
+            {
+                return PredefineCommands.SetDefaultFont;
+            }
+            if (csiText[0] == ')')
+            {
+                return PredefineCommands.SetAlternateFont;
+            }
+            if ((match = Regex.Match(csiText, @"\]0")).Success || (match = Regex.Match(csiText, @"\]1")).Success || (match = Regex.Match(csiText, @"\]2")).Success || (match = Regex.Match(csiText, @"\]4")).Success || (match = Regex.Match(csiText, @"\]10")).Success)
+            {
+                string text = csiText.Substring(match.Length, csiText.Length - match.Length);
+                return new PlainTextCommand(text);
+            }
+
+            logger.ErrorFormat("不识别的命令:{0}", csiText);
+            return null;
         }
     }
 }

@@ -125,7 +125,11 @@ namespace XTerminal.Terminal
             {
                 this.DataReceived(this, e.Data, e.Line);
             }
-            //var list = this.parser.Parse(e.Data);
+            var list = this.parser.Parse(e.Data);
+            if (list.Count > 2)
+            {
+                Console.WriteLine("s");
+            }
 
             Console.WriteLine();
         }

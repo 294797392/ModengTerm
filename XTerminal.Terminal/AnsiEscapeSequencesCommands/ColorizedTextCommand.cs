@@ -30,6 +30,12 @@ namespace XTerminal.Terminal.AnsiEscapeSequencesCommands
         /// </summary>
         public string Background { get; set; }
 
+        public ColorizedTextCommand(string txt)
+        {
+            this.Decorations = new List<TextDecorationEnum>();
+            this.Text = txt;
+        }
+
         public ColorizedTextCommand()
         {
             this.Decorations = new List<TextDecorationEnum>();

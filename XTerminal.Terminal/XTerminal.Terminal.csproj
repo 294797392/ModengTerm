@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnsiEscapeSequencesCommands\ColorizedTextCommand.cs" />
+    <Compile Include="AnsiEscapeSequencesCommands\PlainTextCommand.cs" />
     <Compile Include="AnsiEscapeSequencesCommands\ScrollActionCommand.cs" />
     <Compile Include="PredefineCommands.cs" />
     <Compile Include="IEscapeSequencesCommand.cs" />
