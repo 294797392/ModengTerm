@@ -1,0 +1,36 @@
+﻿<Window x:Class="XTerminal.UnitTest.TestSSHClientWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XTerminal.UnitTest"
+        mc:Ignorable="d"
+        Title="TestSSHClientWindow" Height="600" Width="700">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="命令：" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBox Grid.Column="1" x:Name="TextBoxCmd"/>
+            <Button Grid.Column="2" Content="发送" Click="ButtonSend_Click"/>
+            <Button Grid.Column="3" Content="连接" Click="ButtonConnect_Click"/>
+
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" x:Name="ScrollViewer">
+            <TextBox x:Name="TextBoxMessage"/>
+        </ScrollViewer>
+        
+    </Grid>
+</Window>
