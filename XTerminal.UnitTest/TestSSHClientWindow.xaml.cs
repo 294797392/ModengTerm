@@ -38,24 +38,23 @@ namespace XTerminal.UnitTest
                     UserName = "lizuo",
                     Password = "18612538605"
                 };
-                this.xtermTerminal.DataReceived += this.XtermTerminal_DataReceived;
+                this.xtermTerminal.CommandReceived += this.XtermTerminal_CommandReceived;
             }
 
             this.xtermTerminal.Connect();
         }
-
 
         private void ButtonSend_Click(object sender, RoutedEventArgs e)
         {
             this.xtermTerminal.Send(TextBoxCmd.Text + "\r");
         }
 
-        private void XtermTerminal_DataReceived(object sender, byte[] data, string text)
+        private void XtermTerminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)
         {
             base.Dispatcher.Invoke(new Action(() => 
             {
-                TextBoxMessage.AppendText(Encoding.ASCII.GetString(data));
-                ScrollViewer.ScrollToEnd();
+                //TextBoxMessage.AppendText(Encoding.ASCII.GetString(data));
+                //ScrollViewer.ScrollToEnd();
             }));
         }
     }

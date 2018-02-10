@@ -17,7 +17,7 @@ namespace XTerminal.Terminal
 
         #region 事件
 
-        public event Action<object, byte[], string> DataReceived;
+        public event Action<object, IEnumerable<IEscapeSequencesCommand>> CommandReceived;
 
         #endregion
 
@@ -38,14 +38,6 @@ namespace XTerminal.Terminal
         #endregion
 
         #region 实例方法
-
-        protected void NotifyDataReceived(byte[] data, string line)
-        {
-            if (this.DataReceived != null)
-            {
-                this.DataReceived(this, data, line);
-            }
-        }
 
         #endregion
 
@@ -121,17 +113,14 @@ namespace XTerminal.Terminal
 
         private void ShellStream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
         {
-            if (this.DataReceived != null)
+            var commands = this.parser.Parse(e.Data);
+            if (commands != null && commands.Count > 0)
             {
-                this.DataReceived(this, e.Data, e.Line);
+                if (this.CommandReceived != null)
+                {
+                    this.CommandReceived(sender, commands);
+                }
             }
-            var list = this.parser.Parse(e.Data);
-            if (list.Count > 2)
-            {
-                Console.WriteLine("s");
-            }
-
-            Console.WriteLine();
         }
 
         #endregion

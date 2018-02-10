@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using XTerminal.Terminal;
 
 namespace XTerminal.Client.TerminalConsole
 {
@@ -90,36 +91,24 @@ namespace XTerminal.Client.TerminalConsole
             this.renderThread.Start();
         }
 
-        internal void HandleText(string txt)
+        internal void HandleCommand(IEnumerable<IEscapeSequencesCommand> cmds)
         {
-            if (txt.Equals("\r") || this.currentLine == null)
-            {
-                double offsetY = this.GetLastLineOffsetY();
-                TerminalLine line = new TerminalLine();
-                line.Offset = new Vector(0.0, offsetY);
-                line.Margin = this.LineMargin;
-                this.lines.Add(line);
-                base.AddVisualChild(line);
-                this.currentLine = line;
-            }
+            //if (txt.Equals("\r") || this.currentLine == null)
+            //{
+            //    double offsetY = this.GetLastLineOffsetY();
+            //    TerminalLine line = new TerminalLine();
+            //    line.Offset = new Vector(0.0, offsetY);
+            //    line.Margin = this.LineMargin;
+            //    this.lines.Add(line);
+            //    base.AddVisualChild(line);
+            //    this.currentLine = line;
+            //}
 
-            Typeface face = new Typeface(new FontFamily(), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            TerminalText text = new TerminalText(txt, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, face, this.FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Ideal);
-            this.currentLine.AddText(text);
+            //Typeface face = new Typeface(new FontFamily(), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            //TerminalText text = new TerminalText(txt, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, face, this.FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Ideal);
+            //this.currentLine.AddText(text);
 
-            this.renderEvt.Set();
-        }
-
-        private void RenderThreadProcess(object state)
-        {
-            while (true)
-            {
-                this.renderEvt.WaitOne(); // 等待渲染通知
-
-                Console.WriteLine("渲染");
-
-                base.Dispatcher.Invoke(new Action(this.currentLine.Draw));
-            }
+            //this.renderEvt.Set();
         }
 
         /// <summary>
@@ -155,6 +144,22 @@ namespace XTerminal.Client.TerminalConsole
             }
 
             return this.lines[index];
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        private void RenderThreadProcess(object state)
+        {
+            while (true)
+            {
+                this.renderEvt.WaitOne(); // 等待渲染通知
+
+                Console.WriteLine("渲染");
+
+                base.Dispatcher.Invoke(new Action(this.currentLine.Draw));
+            }
         }
 
         #endregion

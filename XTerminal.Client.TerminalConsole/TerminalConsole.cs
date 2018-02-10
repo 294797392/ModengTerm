@@ -112,7 +112,7 @@ namespace XTerminal.Client.TerminalConsole
 
         private void InitializeTerminalEngine(ITerminal terminal)
         {
-            terminal.DataReceived += Terminal_DataReceived;
+            terminal.CommandReceived += Terminal_CommandReceived;
             terminal.Initialize();
             terminal.Connect();
         }
@@ -121,7 +121,7 @@ namespace XTerminal.Client.TerminalConsole
         {
             terminal.Disconnect();
             terminal.Release();
-            terminal.DataReceived -= Terminal_DataReceived;
+            terminal.CommandReceived -= Terminal_CommandReceived;
         }
 
         #endregion
@@ -144,16 +144,14 @@ namespace XTerminal.Client.TerminalConsole
 
         #region 事件处理器
 
-        private void Terminal_DataReceived(object sender, byte[] data, string text)
+        private void Terminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)
         {
-            this.textLayer.HandleText(text);
+            this.textLayer.HandleCommand(cmds);
         }
 
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             base.OnPreviewTextInput(e);
-
-            this.textLayer.HandleText(e.Text);
 
             Console.WriteLine("Text={0}, ControlText={1}, SystemText={2}", e.Text, e.ControlText, e.SystemText);
         }

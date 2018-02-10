@@ -7,7 +7,7 @@ namespace XTerminal.Terminal
 {
     public interface ITerminal
     {
-        event Action<object, byte[], string> DataReceived;
+        event Action<object, IEnumerable<IEscapeSequencesCommand>> CommandReceived;
 
         ITerminalAuthorition Authorition { get; set; }
 
