@@ -50,8 +50,10 @@ namespace XTerminal.Client.TerminalConsole
     {
         #region 实例变量
 
+        private Grid grid;
         private ScrollViewer scrollViewer;
-        private TerminalTextLayer textLayer;
+        private RenderLayer renderLayer;
+        private CaretLayer caretLayer;
 
         #endregion
 
@@ -107,7 +109,8 @@ namespace XTerminal.Client.TerminalConsole
 
         private void InitializeConsole()
         {
-            this.textLayer = new TerminalTextLayer();
+            this.renderLayer = new RenderLayer();
+            this.caretLayer = new CaretLayer();
         }
 
         private void InitializeTerminalEngine(ITerminal terminal)
@@ -135,8 +138,14 @@ namespace XTerminal.Client.TerminalConsole
             this.scrollViewer = base.Template.FindName("PART_ScrollViewer", this) as ScrollViewer;
             if (this.scrollViewer != null)
             {
-                scrollViewer.Content = this.textLayer;
+                scrollViewer.Content = this.renderLayer;
                 scrollViewer.CanContentScroll = true;
+            }
+
+            this.grid = base.Template.FindName("PART_Grid", this) as Grid;
+            if (this.grid != null)
+            {
+                this.grid.Children.Add(this.caretLayer);
             }
         }
 
@@ -146,12 +155,20 @@ namespace XTerminal.Client.TerminalConsole
 
         private void Terminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)
         {
-            this.textLayer.HandleCommand(cmds);
+            this.renderLayer.HandleCommandInput(cmds);
+            double caretY = this.renderLayer.GetLastLineOffsetY();
+            double caretX = this.renderLayer.GetLastLineLastCharOffsetX();
+            this.caretLayer.CaretPosition = new Vector(caretX, caretY);
         }
 
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             base.OnPreviewTextInput(e);
+
+            this.renderLayer.HandleTextInput(e.Text);
+            double caretY = this.renderLayer.GetLastLineOffsetY();
+            double caretX = this.renderLayer.GetLastLineLastCharOffsetX();
+            this.caretLayer.CaretPosition = new Vector(caretX, caretY);
 
             Console.WriteLine("Text={0}, ControlText={1}, SystemText={2}", e.Text, e.ControlText, e.SystemText);
         }

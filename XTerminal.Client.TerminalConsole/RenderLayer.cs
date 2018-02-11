@@ -23,7 +23,7 @@ namespace XTerminal.Client.TerminalConsole
     /// 
     /// TODO:如何计算最后一行相对于控件最上方的位置？目前使用的方法是：GetLastLineOffsetY()
     /// </summary>
-    public class TerminalTextLayer : FrameworkElement
+    public class RenderLayer : FrameworkElement
     {
         #region 类变量
 
@@ -37,12 +37,14 @@ namespace XTerminal.Client.TerminalConsole
         private Thread renderThread;
         private List<TerminalLine> lines;
         private TerminalLine currentLine;
+        private int previewMeasuredTotalLines; // 上次测量控件应该占据的空间大小的时候的行数
+        private ScrollViewer scrollViewer;
 
         #endregion
 
         #region 属性
 
-        public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register("FontSize", typeof(double), typeof(TerminalTextLayer), new PropertyMetadata(12d));
+        public static readonly DependencyProperty FontSizeProperty = DependencyProperty.Register("FontSize", typeof(double), typeof(RenderLayer), new PropertyMetadata(12d));
         public double FontSize
         {
             get
@@ -55,7 +57,7 @@ namespace XTerminal.Client.TerminalConsole
             }
         }
 
-        public static readonly DependencyProperty LineMarginProperty = DependencyProperty.Register("LineMargin", typeof(Thickness), typeof(TerminalTextLayer), new PropertyMetadata(DefaultValues.LineMargin));
+        public static readonly DependencyProperty LineMarginProperty = DependencyProperty.Register("LineMargin", typeof(Thickness), typeof(RenderLayer), new PropertyMetadata(DefaultValues.LineMargin));
         public Thickness LineMargin
         {
             get
@@ -72,7 +74,7 @@ namespace XTerminal.Client.TerminalConsole
 
         #region 构造方法
 
-        public TerminalTextLayer()
+        public RenderLayer()
         {
             this.InitializeLayer();
         }
@@ -83,6 +85,9 @@ namespace XTerminal.Client.TerminalConsole
 
         private void InitializeLayer()
         {
+            base.HorizontalAlignment = HorizontalAlignment.Left;
+            base.VerticalAlignment = VerticalAlignment.Top;
+
             this.lines = new List<TerminalLine>();
             this.renderEvt = new AutoResetEvent(false);
 
@@ -91,31 +96,35 @@ namespace XTerminal.Client.TerminalConsole
             this.renderThread.Start();
         }
 
-        internal void HandleCommand(IEnumerable<IEscapeSequencesCommand> cmds)
+        internal void HandleCommandInput(IEnumerable<IEscapeSequencesCommand> cmds)
         {
-            //if (txt.Equals("\r") || this.currentLine == null)
-            //{
-            //    double offsetY = this.GetLastLineOffsetY();
-            //    TerminalLine line = new TerminalLine();
-            //    line.Offset = new Vector(0.0, offsetY);
-            //    line.Margin = this.LineMargin;
-            //    this.lines.Add(line);
-            //    base.AddVisualChild(line);
-            //    this.currentLine = line;
-            //}
+        }
 
-            //Typeface face = new Typeface(new FontFamily(), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            //TerminalText text = new TerminalText(txt, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, face, this.FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Ideal);
-            //this.currentLine.AddText(text);
+        internal void HandleTextInput(string txt)
+        {
+            if (txt.Equals("\r") || this.currentLine == null)
+            {
+                double offsetY = this.GetLastLineOffsetY();
+                TerminalLine line = new TerminalLine();
+                line.Offset = new Vector(0.0, offsetY);
+                line.Margin = this.LineMargin;
+                this.lines.Add(line);
+                base.AddVisualChild(line);
+                this.currentLine = line;
+            }
 
-            //this.renderEvt.Set();
+            Typeface face = new Typeface(new FontFamily(), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            TerminalText text = new TerminalText(txt, CultureInfo.CurrentUICulture, FlowDirection.LeftToRight, face, this.FontSize, Brushes.Black, new NumberSubstitution(), TextFormattingMode.Ideal);
+            this.currentLine.AddText(text);
+            this.renderEvt.Set();
+            this.MeasureSize();
         }
 
         /// <summary>
         /// 获取最后一行的Y坐标偏移
         /// </summary>
         /// <returns></returns>
-        private double GetLastLineOffsetY()
+        internal double GetLastLineOffsetY()
         {
             double offsetY = 0;
             foreach (TerminalLine line in this.lines)
@@ -125,6 +134,49 @@ namespace XTerminal.Client.TerminalConsole
                 offsetY += line.Margin.Bottom;
             }
             return offsetY;
+        }
+
+        /// <summary>
+        /// 获取最后一行的最后一个字符的X坐标偏移量
+        /// </summary>
+        /// <returns></returns>
+        internal double GetLastLineLastCharOffsetX()
+        {
+            TerminalLine lastLine = this.lines.LastOrDefault();
+            if (lastLine == null)
+            {
+                return 0;
+            }
+
+            return lastLine.Width;
+        }
+
+        /// <summary>
+        /// 根据当前所显示的文本，计算出控件应该占据的空间大小
+        /// </summary>
+        private void MeasureSize()
+        {
+            if (this.previewMeasuredTotalLines != this.lines.Count)
+            {
+                this.previewMeasuredTotalLines = this.lines.Count;
+                double width = 0, height = 0;
+                foreach (TerminalLine line in this.lines)
+                {
+                    height += line.Height;
+                    height += line.Margin.Top;
+                    height += line.Margin.Bottom;
+                }
+                base.Height = height;
+
+                if (this.scrollViewer == null)
+                {
+                    this.scrollViewer = base.Parent as ScrollViewer;
+                }
+                if (this.scrollViewer != null)
+                {
+                    this.scrollViewer.ScrollToEnd();
+                }
+            }
         }
 
         #endregion

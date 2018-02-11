@@ -19,6 +19,7 @@ namespace XTerminal.Client.TerminalConsole
         #region 实例变量
 
         private List<TerminalText> texts;
+        private double width;
 
         #endregion
 
@@ -32,6 +33,17 @@ namespace XTerminal.Client.TerminalConsole
             get
             {
                 return this.texts.Count == 0 ? 0 : this.texts[0].Height;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前行的宽度
+        /// </summary>
+        public double Width
+        {
+            get
+            {
+                return this.width + this.Margin.Left;
             }
         }
 
@@ -77,6 +89,7 @@ namespace XTerminal.Client.TerminalConsole
         public void AddText(TerminalText text)
         {
             this.texts.Add(text);
+            this.width += text.WidthIncludingTrailingWhitespace;
         }
 
         #endregion
