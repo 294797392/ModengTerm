@@ -51,21 +51,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnsiEscapeSequencesCommands\ColorizedTextCommand.cs" />
-    <Compile Include="AnsiEscapeSequencesCommands\PlainTextCommand.cs" />
-    <Compile Include="AnsiEscapeSequencesCommands\ScrollActionCommand.cs" />
+    <Compile Include="EscapeSequences\EscapeSequencesCommand.cs" />
     <Compile Include="PredefineCommands.cs" />
-    <Compile Include="IEscapeSequencesCommand.cs" />
-    <Compile Include="AnsiEscapeSequencesCommands\CursorActionCommand.cs" />
+    <Compile Include="EscapeSequences\IEscapeSequencesCommand.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="IEscapeSequencesParser.cs" />
+    <Compile Include="EscapeSequences\IEscapeSequencesParser.cs" />
     <Compile Include="ITerminal.cs" />
     <Compile Include="ITerminalAuthorition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SSHTerminal.cs" />
     <Compile Include="SSHTerminalAuthorition.cs" />
     <Compile Include="TerminalNames.cs" />
-    <Compile Include="AnsiEscapeSequencesParser.cs" />
+    <Compile Include="EscapeSequences\AnsiEscapeSequencesParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">

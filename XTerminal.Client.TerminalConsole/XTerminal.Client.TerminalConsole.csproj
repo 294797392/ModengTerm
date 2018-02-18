@@ -58,9 +58,15 @@
   <ItemGroup>
     <Compile Include="CaretLayer.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="TerminalLine.cs" />
+    <Compile Include="Rendering\LinuxTitleTextRunProperties.cs" />
+    <Compile Include="Rendering\TerminalLineElement.cs" />
+    <Compile Include="Rendering\TerminalLineTextElement.cs" />
+    <Compile Include="Rendering\TerminalTextParagraphProperties.cs" />
+    <Compile Include="Rendering\TerminalTextRunProperties.cs" />
+    <Compile Include="Rendering\TerminalLineTextSource.cs" />
+    <Compile Include="Rendering\TerminalLine.cs" />
     <Compile Include="TerminalText.cs" />
-    <Compile Include="RenderLayer.cs" />
+    <Compile Include="Rendering\TerminalTextPanel.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -98,6 +104,9 @@
       <Project>{e99f65d2-896a-43ba-b733-36e3f2e0e9d8}</Project>
       <Name>XTerminal.Terminal</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utils\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

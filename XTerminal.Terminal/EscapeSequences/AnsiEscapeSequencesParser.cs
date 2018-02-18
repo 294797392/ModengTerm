@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using XTerminal.Terminal.AnsiEscapeSequencesCommands;
 using XTerminal.Base;
 using System.Text.RegularExpressions;
+using static XTerminal.Terminal.EscapeSequences.ColorizedTextCommand;
+using XTerminal.Terminal.EscapeSequences;
+using static XTerminal.Terminal.EscapeSequences.CursorActionCommand;
 
 namespace XTerminal.Terminal
 {

@@ -15,7 +15,6 @@ namespace XTerminal.Client.TerminalConsole
         public TerminalText(string textToFormat, CultureInfo culture, FlowDirection flowDirection, Typeface typeface, double emSize, Brush foreground)
             : base(textToFormat, culture, flowDirection, typeface, emSize, foreground)
         {
-
         }
         public TerminalText(string textToFormat, CultureInfo culture, FlowDirection flowDirection, Typeface typeface, double emSize, Brush foreground, NumberSubstitution numberSubstitution)
             : base(textToFormat, culture, flowDirection, typeface, emSize, foreground, numberSubstitution)

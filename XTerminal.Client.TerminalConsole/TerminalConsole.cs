@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using XTerminal.Client.TerminalConsole.Rendering;
 using XTerminal.Terminal;
 
 namespace XTerminal.Client.TerminalConsole
@@ -45,6 +46,8 @@ namespace XTerminal.Client.TerminalConsole
     ///
     ///     <MyNamespace:CustomControl1/>
     ///
+    /// 1.选中单词：通过空格去判断一个完整的单词并选中
+    /// 
     /// </summary>
     public class TerminalConsole : Control
     {
@@ -52,7 +55,7 @@ namespace XTerminal.Client.TerminalConsole
 
         private Grid grid;
         private ScrollViewer scrollViewer;
-        private RenderLayer renderLayer;
+        private TerminalTextPanel textPanel;
         private CaretLayer caretLayer;
 
         #endregion
@@ -109,7 +112,7 @@ namespace XTerminal.Client.TerminalConsole
 
         private void InitializeConsole()
         {
-            this.renderLayer = new RenderLayer();
+            this.textPanel = new TerminalTextPanel();
             this.caretLayer = new CaretLayer();
         }
 
@@ -138,7 +141,7 @@ namespace XTerminal.Client.TerminalConsole
             this.scrollViewer = base.Template.FindName("PART_ScrollViewer", this) as ScrollViewer;
             if (this.scrollViewer != null)
             {
-                scrollViewer.Content = this.renderLayer;
+                scrollViewer.Content = this.textPanel;
                 scrollViewer.CanContentScroll = true;
             }
 
@@ -155,22 +158,16 @@ namespace XTerminal.Client.TerminalConsole
 
         private void Terminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)
         {
-            this.renderLayer.HandleCommandInput(cmds);
-            double caretY = this.renderLayer.GetLastLineOffsetY();
-            double caretX = this.renderLayer.GetLastLineLastCharOffsetX();
-            this.caretLayer.CaretPosition = new Vector(caretX, caretY);
+
         }
 
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             base.OnPreviewTextInput(e);
 
-            this.renderLayer.HandleTextInput(e.Text);
-            double caretY = this.renderLayer.GetLastLineOffsetY();
-            double caretX = this.renderLayer.GetLastLineLastCharOffsetX();
-            this.caretLayer.CaretPosition = new Vector(caretX, caretY);
-
             Console.WriteLine("Text={0}, ControlText={1}, SystemText={2}", e.Text, e.ControlText, e.SystemText);
+
+            this.textPanel.HandleTextInput(e);
         }
 
         #endregion

@@ -40,19 +40,19 @@ namespace XTerminal.Terminal.AnsiEscapeSequencesCommands
         {
             this.Decorations = new List<TextDecorationEnum>();
         }
-    }
 
-    /// <summary>
-    /// 文字装饰
-    /// </summary>
-    public enum TextDecorationEnum
-    {
-        Bright,
-        Dim,
-        Underscore,
-        Blink,
-        Reverse,
-        Hidden,
-        ResetAllAttributes
+        /// <summary>
+        /// 文字装饰
+        /// </summary>
+        public enum TextDecorationEnum
+        {
+            Bright,
+            Dim,
+            Underscore,
+            Blink,
+            Reverse,
+            Hidden,
+            ResetAllAttributes
+        }
     }
 }

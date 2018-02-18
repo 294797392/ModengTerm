@@ -12,17 +12,4 @@ namespace XTerminal.Terminal
     {
         List<IEscapeSequencesCommand> Parse(byte[] data);
     }
-
-    public enum ParserStatusEnum
-    {
-        /// <summary>
-        /// 普通模式
-        /// </summary>
-        Normal,
-
-        /// <summary>
-        /// 当前处于控制字符中（\x1b, esc的ascii码）
-        /// </summary>
-        Csi,
-    }
 }

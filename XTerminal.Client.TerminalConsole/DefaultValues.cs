@@ -17,5 +17,11 @@ namespace XTerminal.Client.TerminalConsole
         public static double CaretWidth = SystemParameters.CaretWidth;
         public static double CaretHeight = 12;
         public static Brush CaretBrush = Brushes.Red;
+
+        public static FontFamily FontFamily = new FontFamily("宋体");
+        public static FontWeight FontWeight = FontWeights.Normal;
+        public static FontStyle FontStyle = FontStyles.Normal;
+        public static FontStretch FontStretch = FontStretches.Normal;
+        public static double FontSize = 12;
     }
 }
