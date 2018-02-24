@@ -18,44 +18,12 @@ using XTerminal.Terminal;
 
 namespace XTerminal.Client.TerminalConsole
 {
-    /// <summary>
-    /// 按照步骤 1a 或 1b 操作，然后执行步骤 2 以在 XAML 文件中使用此自定义控件。
-    ///
-    /// 步骤 1a) 在当前项目中存在的 XAML 文件中使用该自定义控件。
-    /// 将此 XmlNamespace 特性添加到要使用该特性的标记文件的根 
-    /// 元素中: 
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:XTerminal.Client.Controls.TerminalConsole"
-    ///
-    ///
-    /// 步骤 1b) 在其他项目中存在的 XAML 文件中使用该自定义控件。
-    /// 将此 XmlNamespace 特性添加到要使用该特性的标记文件的根 
-    /// 元素中: 
-    ///
-    ///     xmlns:MyNamespace="clr-namespace:XTerminal.Client.Controls.TerminalConsole;assembly=XTerminal.Client.Controls.TerminalConsole"
-    ///
-    /// 您还需要添加一个从 XAML 文件所在的项目到此项目的项目引用，
-    /// 并重新生成以避免编译错误: 
-    ///
-    ///     在解决方案资源管理器中右击目标项目，然后依次单击
-    ///     “添加引用”->“项目”->[选择此项目]
-    ///
-    ///
-    /// 步骤 2)
-    /// 继续操作并在 XAML 文件中使用控件。
-    ///
-    ///     <MyNamespace:CustomControl1/>
-    ///
-    /// 1.选中单词：通过空格去判断一个完整的单词并选中
-    /// 
-    /// </summary>
     public class TerminalConsole : Control
     {
         #region 实例变量
 
         private Grid grid;
-        private ScrollViewer scrollViewer;
-        private TerminalTextPanel textPanel;
+        private TerminalTextList textPanel;
         private CaretLayer caretLayer;
 
         #endregion
@@ -112,7 +80,7 @@ namespace XTerminal.Client.TerminalConsole
 
         private void InitializeConsole()
         {
-            this.textPanel = new TerminalTextPanel();
+            this.textPanel = new TerminalTextList();
             this.caretLayer = new CaretLayer();
         }
 
@@ -137,13 +105,6 @@ namespace XTerminal.Client.TerminalConsole
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-
-            this.scrollViewer = base.Template.FindName("PART_ScrollViewer", this) as ScrollViewer;
-            if (this.scrollViewer != null)
-            {
-                scrollViewer.Content = this.textPanel;
-                scrollViewer.CanContentScroll = true;
-            }
 
             this.grid = base.Template.FindName("PART_Grid", this) as Grid;
             if (this.grid != null)

@@ -22,6 +22,8 @@ namespace XTerminal.UnitTest
         public MainWindow()
         {
             InitializeComponent();
+
+            TerminalTextList.ItemsSource = new List<string>() { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() };
         }
     }
 }

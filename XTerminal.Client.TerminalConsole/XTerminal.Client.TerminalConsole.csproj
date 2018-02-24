@@ -58,15 +58,10 @@
   <ItemGroup>
     <Compile Include="CaretLayer.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="Rendering\LinuxTitleTextRunProperties.cs" />
-    <Compile Include="Rendering\TerminalLineElement.cs" />
-    <Compile Include="Rendering\TerminalLineTextElement.cs" />
-    <Compile Include="Rendering\TerminalTextParagraphProperties.cs" />
-    <Compile Include="Rendering\TerminalTextRunProperties.cs" />
-    <Compile Include="Rendering\TerminalLineTextSource.cs" />
-    <Compile Include="Rendering\TerminalLine.cs" />
+    <Compile Include="Rendering\TerminalLineItem.cs" />
+    <Compile Include="Rendering\TerminalLineText.cs" />
     <Compile Include="TerminalText.cs" />
-    <Compile Include="Rendering\TerminalTextPanel.cs" />
+    <Compile Include="Rendering\TerminalTextList.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

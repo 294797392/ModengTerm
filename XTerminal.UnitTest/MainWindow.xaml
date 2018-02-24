@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XTerminal.UnitTest"
         xmlns:console="clr-namespace:XTerminal.Client.TerminalConsole;assembly=XTerminal.Client.TerminalConsole"
+        xmlns:rendering="clr-namespace:XTerminal.Client.TerminalConsole.Rendering;assembly=XTerminal.Client.TerminalConsole"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
 
@@ -18,7 +19,7 @@
     
     <Grid>
 
-        <console:TerminalConsole />
+        <rendering:TerminalTextList x:Name="TerminalTextList"/>
 
     </Grid>
 </Window>

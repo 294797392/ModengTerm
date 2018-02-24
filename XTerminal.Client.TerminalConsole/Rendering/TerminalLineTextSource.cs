@@ -9,7 +9,7 @@ namespace XTerminal.Client.TerminalConsole.Rendering
 {
     public class TerminalLineTextSource : TextSource
     {
-        internal List<TerminalLineElement> lineElements = null;
+        internal List<TerminalLineText> lineElements = null;
 
         public override TextSpan<CultureSpecificCharacterBufferRange> GetPrecedingText(int textSourceCharacterIndexLimit)
         {
@@ -29,7 +29,7 @@ namespace XTerminal.Client.TerminalConsole.Rendering
                 return new TextEndOfParagraph(1);
             }
 
-            foreach (TerminalLineElement element in this.lineElements)
+            foreach (TerminalLineText element in this.lineElements)
             {
                 if (textSourceCharacterIndex >= element.ColumnIndex)
                 {
