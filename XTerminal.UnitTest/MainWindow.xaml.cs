@@ -22,8 +22,13 @@ namespace XTerminal.UnitTest
         public MainWindow()
         {
             InitializeComponent();
+        }
 
-            TerminalTextList.ItemsSource = new List<string>() { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() };
+        protected override void OnTextInput(TextCompositionEventArgs e)
+        {
+            base.OnTextInput(e);
+
+            TerminalTextList.HandleTextInput(e);
         }
     }
 }

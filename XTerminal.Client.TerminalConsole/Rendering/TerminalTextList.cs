@@ -26,8 +26,6 @@ namespace XTerminal.Client.TerminalConsole.Rendering
 
         private ObservableCollection<TerminalLineItem> lines;
         private TerminalLineItem currentLine;
-        private int previewMeasuredTotalLines; // 上次测量控件应该占据的空间大小的时候的行数
-        private ScrollViewer scrollViewer;
 
         #endregion
 
@@ -77,23 +75,48 @@ namespace XTerminal.Client.TerminalConsole.Rendering
             base.HorizontalAlignment = HorizontalAlignment.Stretch;
             base.VerticalAlignment = VerticalAlignment.Stretch;
             base.Background = Brushes.Transparent;
-
             this.lines = new ObservableCollection<TerminalLineItem>();
+            //base.ItemsSource = this.lines;
         }
 
         internal void HandleCommandInput(IEnumerable<IEscapeSequencesCommand> cmds)
         {
         }
 
-        internal void HandleTextInput(TextCompositionEventArgs e)
+        public void HandleTextInput(TextCompositionEventArgs e)
         {
-            if (e.Text == "\n" || e.Text == "\r" || e.Text == "\r\n" || this.currentLine == null)
+            if (e.Text.Length == 1)
             {
-                // 处理换行符
+                char c = e.Text[0];
+                if (c == '\n' || c == '\r' || this.currentLine == null)
+                {
+                    this.currentLine = new TerminalLineItem();
+                    this.lines.Add(this.currentLine);
+                    base.Items.Add(this.currentLine);
+                }
+                else
+                {
+                    TerminalLineText text = null;
+                    int textCount = this.currentLine.TextList.Count;
+                    if (textCount == 0)
+                    {
+                        Typeface face = new Typeface("宋体");
+                        text = new TerminalLineText(e.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
+                        this.currentLine.TextList.Add(text);
+                    }
+                    else
+                    {
+                        Typeface face = new Typeface("宋体");
+                        var exitText = this.currentLine.TextList[textCount - 1];
+                        text = new TerminalLineText(exitText.Text + e.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
+                        this.currentLine.TextList[textCount - 1] = text;
+                    }
+                    this.currentLine.Draw();
+                }
             }
             else
             {
-                // 处理普通字符
+
             }
         }
 

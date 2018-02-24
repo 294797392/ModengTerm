@@ -19,7 +19,10 @@
     
     <Grid>
 
-        <rendering:TerminalTextList x:Name="TerminalTextList"/>
+        <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <rendering:TerminalTextList x:Name="TerminalTextList"/>
+        </ScrollViewer>
 
     </Grid>
 </Window>

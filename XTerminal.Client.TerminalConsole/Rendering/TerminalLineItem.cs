@@ -15,14 +15,21 @@ namespace XTerminal.Client.TerminalConsole.Rendering
         private DrawingVisual textVisual;
         private List<TerminalLineText> textList;
 
+        public List<TerminalLineText> TextList
+        {
+            get
+            {
+                return this.textList;
+            }
+        }
+
         public TerminalLineItem()
         {
-            base.Height = 100;
+            base.HorizontalAlignment = HorizontalAlignment.Left;
+            base.VerticalAlignment = VerticalAlignment.Top;
+
             this.textVisual = new DrawingVisual();
             this.textList = new List<TerminalLineText>();
-            var context = this.textVisual.RenderOpen();
-            context.DrawLine(new Pen(Brushes.Black, 20), new Point(0, 0), new Point(100, 0));
-            context.Close();
             base.AddVisualChild(this.textVisual);
         }
 
@@ -52,12 +59,16 @@ namespace XTerminal.Client.TerminalConsole.Rendering
 
         internal void Draw()
         {
-            //DrawingContext context = this.textVisual.RenderOpen();
-            //foreach (TerminalLineText text in this.textList)
-            //{
-            //    context.DrawText(text, new Point(0, 0));
-            //}
-            //context.Close();
+            DrawingContext context = this.textVisual.RenderOpen();
+            foreach (TerminalLineText text in this.textList)
+            {
+                context.DrawText(text, new Point(0, 0));
+                Console.WriteLine("draw");
+            }
+            context.Close();
+
+            base.Height = this.textList.Max(t => t.Height);
+            base.Width = this.textList.Sum(t => t.WidthIncludingTrailingWhitespace);
         }
     }
 }

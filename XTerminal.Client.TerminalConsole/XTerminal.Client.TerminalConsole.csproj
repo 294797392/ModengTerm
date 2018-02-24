@@ -60,7 +60,6 @@
     <Compile Include="DefaultValues.cs" />
     <Compile Include="Rendering\TerminalLineItem.cs" />
     <Compile Include="Rendering\TerminalLineText.cs" />
-    <Compile Include="TerminalText.cs" />
     <Compile Include="Rendering\TerminalTextList.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
