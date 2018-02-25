@@ -14,7 +14,7 @@ using XTerminal.Terminal;
 
 namespace XTerminal.Client.TerminalConsole.Rendering
 {
-    public class TerminalTextList : ItemsControl
+    public class TextList : ItemsControl
     {
         #region 类变量
 
@@ -24,14 +24,13 @@ namespace XTerminal.Client.TerminalConsole.Rendering
 
         #region 实例变量
 
-        private ObservableCollection<TerminalLineItem> lines;
-        private TerminalLineItem currentLine;
+        private TextLine currentLine;
 
         #endregion
 
         #region 属性
 
-        public static readonly DependencyProperty LineMarginProperty = DependencyProperty.Register("LineMargin", typeof(Thickness), typeof(TerminalTextList), new PropertyMetadata(DefaultValues.LineMargin));
+        public static readonly DependencyProperty LineMarginProperty = DependencyProperty.Register("LineMargin", typeof(Thickness), typeof(TextList), new PropertyMetadata(DefaultValues.LineMargin));
         public Thickness LineMargin
         {
             get
@@ -44,24 +43,11 @@ namespace XTerminal.Client.TerminalConsole.Rendering
             }
         }
 
-        public static readonly DependencyProperty TerminalLinesProperty = DependencyProperty.Register("TerminalLines", typeof(IEnumerable<TerminalLineItem>), typeof(TerminalTextList), new PropertyMetadata());
-        public IEnumerable<TerminalLineItem> TerminalLines
-        {
-            get
-            {
-                return (IEnumerable<TerminalLineItem>)base.GetValue(TerminalLinesProperty);
-            }
-            set
-            {
-                base.SetValue(TerminalLinesProperty, value);
-            }
-        }
-
         #endregion
 
         #region 构造方法
 
-        public TerminalTextList()
+        public TextList()
         {
             this.InitializePanel();
         }
@@ -75,12 +61,7 @@ namespace XTerminal.Client.TerminalConsole.Rendering
             base.HorizontalAlignment = HorizontalAlignment.Stretch;
             base.VerticalAlignment = VerticalAlignment.Stretch;
             base.Background = Brushes.Transparent;
-            this.lines = new ObservableCollection<TerminalLineItem>();
             //base.ItemsSource = this.lines;
-        }
-
-        internal void HandleCommandInput(IEnumerable<IEscapeSequencesCommand> cmds)
-        {
         }
 
         public void HandleTextInput(TextCompositionEventArgs e)
@@ -90,25 +71,24 @@ namespace XTerminal.Client.TerminalConsole.Rendering
                 char c = e.Text[0];
                 if (c == '\n' || c == '\r' || this.currentLine == null)
                 {
-                    this.currentLine = new TerminalLineItem();
-                    this.lines.Add(this.currentLine);
+                    this.currentLine = new TextLine();
                     base.Items.Add(this.currentLine);
                 }
                 else
                 {
-                    TerminalLineText text = null;
+                    TextItem text = null;
                     int textCount = this.currentLine.TextList.Count;
                     if (textCount == 0)
                     {
                         Typeface face = new Typeface("宋体");
-                        text = new TerminalLineText(e.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
+                        text = new TextItem(e.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
                         this.currentLine.TextList.Add(text);
                     }
                     else
                     {
                         Typeface face = new Typeface("宋体");
                         var exitText = this.currentLine.TextList[textCount - 1];
-                        text = new TerminalLineText(exitText.Text + e.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
+                        text = new TextItem(exitText.Text + e.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
                         this.currentLine.TextList[textCount - 1] = text;
                     }
                     this.currentLine.Draw();
@@ -118,6 +98,45 @@ namespace XTerminal.Client.TerminalConsole.Rendering
             {
 
             }
+        }
+
+        internal TextLine GetCurrentTextLine()
+        {
+            if (this.currentLine != null)
+            {
+                return this.currentLine;
+            }
+
+            this.currentLine = new TextLine();
+            base.Items.Add(this.currentLine);
+            return this.currentLine;
+        }
+
+        internal void CreateTextLine()
+        {
+            var line = new TextLine();
+            base.Items.Add(line);
+            this.currentLine = line;
+        }
+
+        internal void AppendPlainText(TextLine line, string plainText)
+        {
+            TextItem text = null;
+            int textCount = line.TextList.Count;
+            if (textCount == 0)
+            {
+                Typeface face = new Typeface("宋体");
+                text = new TextItem(plainText, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
+                line.TextList.Add(text);
+            }
+            else
+            {
+                Typeface face = new Typeface("宋体");
+                var exitText = this.currentLine.TextList[textCount - 1];
+                text = new TextItem(exitText.Text + plainText, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, face, 12, Brushes.Black);
+                line.TextList[textCount - 1] = text;
+            }
+            line.Draw();
         }
 
         #endregion
@@ -135,12 +154,12 @@ namespace XTerminal.Client.TerminalConsole.Rendering
 
         protected override bool IsItemItsOwnContainerOverride(object item)
         {
-            return item is TerminalLineItem;
+            return item is TextLine;
         }
 
         protected override DependencyObject GetContainerForItemOverride()
         {
-            return new TerminalLineItem();
+            return new TextLine();
         }
 
         #endregion

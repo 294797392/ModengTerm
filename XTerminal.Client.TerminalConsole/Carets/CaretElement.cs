@@ -7,9 +7,9 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace XTerminal.Client.TerminalConsole
+namespace XTerminal.Client.TerminalConsole.Carets
 {
-    public class CaretLayer : FrameworkElement
+    public class CaretElement : FrameworkElement
     {
         #region 实例变量
 
@@ -20,7 +20,7 @@ namespace XTerminal.Client.TerminalConsole
 
         #region 属性
 
-        public static readonly DependencyProperty CaretWidthProperty = DependencyProperty.Register("CaretWidth", typeof(double), typeof(CaretLayer), new PropertyMetadata(DefaultValues.CaretWidth));
+        public static readonly DependencyProperty CaretWidthProperty = DependencyProperty.Register("CaretWidth", typeof(double), typeof(CaretElement), new PropertyMetadata(DefaultValues.CaretWidth));
         public double CaretWidth
         {
             get
@@ -33,7 +33,7 @@ namespace XTerminal.Client.TerminalConsole
             }
         }
 
-        public static readonly DependencyProperty CaretHeightProperty = DependencyProperty.Register("CaretHeight", typeof(double), typeof(CaretLayer), new PropertyMetadata(DefaultValues.CaretHeight));
+        public static readonly DependencyProperty CaretHeightProperty = DependencyProperty.Register("CaretHeight", typeof(double), typeof(CaretElement), new PropertyMetadata(DefaultValues.CaretHeight));
         public double CaretHeight
         {
             get
@@ -46,7 +46,7 @@ namespace XTerminal.Client.TerminalConsole
             }
         }
 
-        public static readonly DependencyProperty CaretPositionProperty = DependencyProperty.Register("CaretPosition", typeof(Vector), typeof(CaretLayer), new PropertyMetadata(new Vector(), new PropertyChangedCallback(CaretPositionPropertyChangedCallback)));
+        public static readonly DependencyProperty CaretPositionProperty = DependencyProperty.Register("CaretPosition", typeof(Vector), typeof(CaretElement), new PropertyMetadata(new Vector(), new PropertyChangedCallback(CaretPositionPropertyChangedCallback)));
         public Vector CaretPosition
         {
             get
@@ -63,7 +63,7 @@ namespace XTerminal.Client.TerminalConsole
 
         #region 构造方法
 
-        public CaretLayer()
+        public CaretElement()
         {
             this.InitializeLayer();
         }
@@ -108,12 +108,11 @@ namespace XTerminal.Client.TerminalConsole
 
         #endregion
 
-
         #region 事件处理器
 
         private static void CaretPositionPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            (d as CaretLayer).OnCaretPositionChanged(e.NewValue, e.OldValue);
+            (d as CaretElement).OnCaretPositionChanged(e.NewValue, e.OldValue);
         }
         protected void OnCaretPositionChanged(object newValue, object oldValue)
         {

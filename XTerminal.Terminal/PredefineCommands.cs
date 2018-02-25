@@ -11,9 +11,14 @@ namespace XTerminal.Terminal
     public class PredefineCommands : IEscapeSequencesCommand
     {
         /// <summary>
-        /// Newline
+        /// 换行
         /// </summary>
         public static PredefineCommands NewLine { get; private set; }
+
+        /// <summary>
+        /// 回车
+        /// </summary>
+        public static PredefineCommands Enter { get; private set; }
 
         /// <summary>
         /// Set alternate font.
@@ -136,6 +141,9 @@ namespace XTerminal.Terminal
             ScrollScreen = new PredefineCommands();
             ScrollDown = new PredefineCommands();
             ScrollUp = new PredefineCommands();
+
+            NewLine = new PredefineCommands();
+            Enter = new PredefineCommands();
         }
     }
 }

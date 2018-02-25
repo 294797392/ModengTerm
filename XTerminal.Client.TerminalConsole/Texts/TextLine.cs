@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -10,12 +11,24 @@ using System.Windows.Media.TextFormatting;
 
 namespace XTerminal.Client.TerminalConsole.Rendering
 {
-    public class TerminalLineItem : FrameworkElement
+    public class TextLine : FrameworkElement
     {
-        private DrawingVisual textVisual;
-        private List<TerminalLineText> textList;
+        #region 事件
 
-        public List<TerminalLineText> TextList
+        public event Action<object, TextItem> TextSelected;
+
+        #endregion
+
+        #region 实例变量
+
+        private DrawingVisual textVisual;
+        private List<TextItem> textList;
+
+        #endregion
+
+        #region 属性
+
+        public List<TextItem> TextList
         {
             get
             {
@@ -23,15 +36,25 @@ namespace XTerminal.Client.TerminalConsole.Rendering
             }
         }
 
-        public TerminalLineItem()
+        #endregion
+
+        #region 构造方法
+
+        public TextLine()
         {
             base.HorizontalAlignment = HorizontalAlignment.Left;
             base.VerticalAlignment = VerticalAlignment.Top;
+            base.Height = DefaultValues.FontSize;
+            base.Margin = DefaultValues.LineMargin;
 
             this.textVisual = new DrawingVisual();
-            this.textList = new List<TerminalLineText>();
+            this.textList = new List<TextItem>();
             base.AddVisualChild(this.textVisual);
         }
+
+        #endregion
+
+        #region 重写方法
 
         protected override Visual GetVisualChild(int index)
         {
@@ -50,17 +73,30 @@ namespace XTerminal.Client.TerminalConsole.Rendering
         {
             base.OnMouseLeftButtonDown(e);
 
-            HitTestResult result = VisualTreeHelper.HitTest(this.textVisual, e.GetPosition(this));
-            if (result != null)
+            //HitTestResult result = VisualTreeHelper.HitTest(this.textVisual, e.GetPosition(this));
+            //if (result != null)
+            //{
+
+            //}
+
+            if (e.ClickCount == 2)
+            {
+
+            }
+            else
             {
 
             }
         }
 
+        #endregion
+
+        #region 实例方法
+
         internal void Draw()
         {
             DrawingContext context = this.textVisual.RenderOpen();
-            foreach (TerminalLineText text in this.textList)
+            foreach (TextItem text in this.textList)
             {
                 context.DrawText(text, new Point(0, 0));
                 Console.WriteLine("draw");
@@ -70,5 +106,7 @@ namespace XTerminal.Client.TerminalConsole.Rendering
             base.Height = this.textList.Max(t => t.Height);
             base.Width = this.textList.Sum(t => t.WidthIncludingTrailingWhitespace);
         }
+
+        #endregion
     }
 }

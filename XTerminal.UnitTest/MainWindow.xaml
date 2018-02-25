@@ -6,8 +6,9 @@
         xmlns:local="clr-namespace:XTerminal.UnitTest"
         xmlns:console="clr-namespace:XTerminal.Client.TerminalConsole;assembly=XTerminal.Client.TerminalConsole"
         xmlns:rendering="clr-namespace:XTerminal.Client.TerminalConsole.Rendering;assembly=XTerminal.Client.TerminalConsole"
+        xmlns:carets="clr-namespace:XTerminal.Client.TerminalConsole.Carets;assembly=XTerminal.Client.TerminalConsole"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -19,10 +20,13 @@
     
     <Grid>
 
-        <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto"
+        <!--<ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto"
                       ScrollViewer.VerticalScrollBarVisibility="Auto">
-            <rendering:TerminalTextList x:Name="TerminalTextList"/>
-        </ScrollViewer>
+            <rendering:TextList x:Name="TextList"/>
+        </ScrollViewer>-->
+
+        <!--<carets:CaretPanel/>-->
+        <console:ShellControl x:Name="ShellControl"/>
 
     </Grid>
 </Window>

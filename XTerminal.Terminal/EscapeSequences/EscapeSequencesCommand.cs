@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -15,11 +16,11 @@ namespace XTerminal.Terminal.EscapeSequences
         public int EndRow { get; set; }
     }
 
-    public class PlainTextCommand : IEscapeSequencesCommand
+    public class NormalTextCommand : IEscapeSequencesCommand
     {
         public string Text { get; set; }
 
-        public PlainTextCommand(string txt)
+        public NormalTextCommand(string txt)
         {
             this.Text = txt;
         }

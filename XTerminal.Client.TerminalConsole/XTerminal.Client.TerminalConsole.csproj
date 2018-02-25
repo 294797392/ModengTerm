@@ -56,16 +56,20 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CaretLayer.cs" />
+    <Compile Include="Carets\CaretPanel.cs" />
+    <Compile Include="Carets\CaretElement.cs" />
+    <Compile Include="Carets\ICaretContext.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="Rendering\TerminalLineItem.cs" />
-    <Compile Include="Rendering\TerminalLineText.cs" />
-    <Compile Include="Rendering\TerminalTextList.cs" />
+    <Compile Include="Texts\TextLine.cs" />
+    <Compile Include="Texts\TextItem.cs" />
+    <Compile Include="Texts\TextList.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="TerminalConsole.cs">
+    <Compile Include="Selections\ISelectionContext.cs" />
+    <Compile Include="Selections\SelectionPanel.cs" />
+    <Compile Include="ShellControl.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

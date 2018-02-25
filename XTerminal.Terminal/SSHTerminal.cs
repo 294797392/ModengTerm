@@ -83,12 +83,12 @@ namespace XTerminal.Terminal
 
         public bool Initialize()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool Release()
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public bool Send(string text)

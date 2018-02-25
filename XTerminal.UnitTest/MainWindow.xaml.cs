@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using XTerminal.Terminal;
 
 namespace XTerminal.UnitTest
 {
@@ -22,13 +23,30 @@ namespace XTerminal.UnitTest
         public MainWindow()
         {
             InitializeComponent();
+
         }
 
         protected override void OnTextInput(TextCompositionEventArgs e)
         {
             base.OnTextInput(e);
 
-            TerminalTextList.HandleTextInput(e);
+            //TextList.HandleTextInput(e);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (ShellControl.Terminal == null)
+            {
+                SSHTerminal terminal = new SSHTerminal();
+                terminal.Authorition = new SSHTerminalAuthorition()
+                {
+                    UserName = "zyf",
+                    Password = "18612538605",
+                    ServerAddress = "192.168.2.215",
+                    ServerPort = 22
+                };
+                ShellControl.Terminal = terminal;
+            }
         }
     }
 }

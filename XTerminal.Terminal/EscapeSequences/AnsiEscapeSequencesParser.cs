@@ -125,9 +125,9 @@ namespace XTerminal.Terminal
         public List<IEscapeSequencesCommand> Parse(byte[] chars)
         {
             List<IEscapeSequencesCommand> commands = new List<IEscapeSequencesCommand>();
-            string text = Encoding.ASCII.GetString(chars);
-            if (text.Contains((char)27))
+            if (chars[0] == 27)
             {
+                string text = Encoding.ASCII.GetString(chars);
                 string[] csis = text.Split(CSISplitter, StringSplitOptions.RemoveEmptyEntries);
                 foreach (string csi in csis)
                 {
@@ -136,7 +136,35 @@ namespace XTerminal.Terminal
             }
             else
             {
-                commands.Add(new PlainTextCommand(text));
+                if (chars.Length == 1)
+                {
+                    commands.Add(new NormalTextCommand(Encoding.ASCII.GetString(chars)));
+                }
+                else
+                {
+                    List<byte> cs = new List<byte>();
+                    foreach (byte c in chars)
+                    {
+                        if (c == '\r')
+                        {
+                            // 回车
+                            commands.Add(new NormalTextCommand(Encoding.ASCII.GetString(cs.ToArray())));
+                            commands.Add(PredefineCommands.Enter);
+                            cs.Clear();
+                        }
+                        else if (c == '\n')
+                        {
+                            // 换行
+                            commands.Add(new NormalTextCommand(Encoding.ASCII.GetString(cs.ToArray())));
+                            commands.Add(PredefineCommands.NewLine);
+                            cs.Clear();
+                        }
+                        else
+                        {
+                            cs.Add(c);
+                        }
+                    }
+                }
             }
 
             return commands;
@@ -259,7 +287,7 @@ namespace XTerminal.Terminal
             if ((match = Regex.Match(csiText, @"\]0")).Success || (match = Regex.Match(csiText, @"\]1")).Success || (match = Regex.Match(csiText, @"\]2")).Success || (match = Regex.Match(csiText, @"\]4")).Success || (match = Regex.Match(csiText, @"\]10")).Success)
             {
                 string text = csiText.Substring(match.Length, csiText.Length - match.Length);
-                return new PlainTextCommand(text);
+                return new NormalTextCommand(text);
             }
 
             logger.ErrorFormat("不识别的命令:{0}", csiText);

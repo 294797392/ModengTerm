@@ -31,7 +31,7 @@ namespace XTerminal.UnitTest
             TextFormatter formatter = TextFormatter.Create();
             CustomTextSource textSource = new CustomTextSource();
             CustomTextParagraphProperties paragraphProperties = new CustomTextParagraphProperties();
-            TextLine line = formatter.FormatLine(textSource, 0, 100, paragraphProperties, null);
+            System.Windows.Media.TextFormatting.TextLine line = formatter.FormatLine(textSource, 0, 100, paragraphProperties, null);
             line.Draw(drawingContext, new Point(0, 0), InvertAxes.None);
 
             base.OnRender(drawingContext);
