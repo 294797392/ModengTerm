@@ -4,20 +4,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using XTerminal.Terminal;
 
-namespace XTerminal.Terminal
+namespace XTerminal.Connections
 {
-    public class SSHTerminal : ITerminal
+    public class SshConnection : IConnection
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("SSHTerminal");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("SshConnection");
 
         #endregion
 
         #region 事件
 
-        public event Action<object, IEnumerable<IEscapeSequencesCommand>> CommandReceived;
+        public event Action<object, TerminalConnectionStatus> StatusChanged;
 
         public event Action<object, byte[]> DataReceived;
 
@@ -35,7 +36,18 @@ namespace XTerminal.Terminal
 
         #region 属性
 
-        public ITerminalAuthorition Authorition { get; set; }
+        public TerminalConnectionStatus Status
+        {
+            get;
+            private set;
+        }
+
+        public ConnectionProtocols Protocol
+        {
+            get { return ConnectionProtocols.Ssh; }
+        }
+
+        public IConnectionAuthorition Authorition { get; set; }
 
         #endregion
 
@@ -71,7 +83,7 @@ namespace XTerminal.Terminal
             }
             catch (Exception ex)
             {
-                logger.Error("初始化SSHClient异常", ex);
+                logger.Error("初始化SshConnection异常", ex);
                 return false;
             }
 
@@ -93,18 +105,17 @@ namespace XTerminal.Terminal
             return true;
         }
 
-        public bool Send(string text)
+        public bool SendData(byte[] data)
         {
             try
             {
-                byte[] data = Encoding.UTF8.GetBytes(text);
                 this.writer.Write(data);
                 this.writer.Flush();
                 return true;
             }
             catch (Exception ex)
             {
-                logger.Error("SSHTerminal Send异常", ex);
+                logger.Error("SshConnection Send异常", ex);
                 return false;
             }
         }
@@ -115,14 +126,14 @@ namespace XTerminal.Terminal
 
         private void ShellStream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
         {
-            var commands = this.parser.Parse(e.Data);
-            if (commands != null && commands.Count > 0)
-            {
-                if (this.CommandReceived != null)
-                {
-                    this.CommandReceived(sender, commands);
-                }
-            }
+            //var commands = this.parser.Parse(e.Data);
+            //if (commands != null && commands.Count > 0)
+            //{
+            //    if (this.CommandReceived != null)
+            //    {
+            //        this.CommandReceived(sender, commands);
+            //    }
+            //}
 
             if (this.DataReceived != null)
             {

@@ -9,6 +9,8 @@ namespace XTerminal.Terminal
     {
         event Action<object, IEnumerable<IEscapeSequencesCommand>> CommandReceived;
 
+        event Action<object, byte[]> DataReceived;
+
         ITerminalAuthorition Authorition { get; set; }
 
         bool Initialize();

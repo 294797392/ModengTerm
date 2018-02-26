@@ -35,18 +35,18 @@ namespace XTerminal.UnitTest
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ShellControl.Terminal == null)
-            {
-                SSHTerminal terminal = new SSHTerminal();
-                terminal.Authorition = new SSHTerminalAuthorition()
-                {
-                    UserName = "zyf",
-                    Password = "18612538605",
-                    ServerAddress = "192.168.2.215",
-                    ServerPort = 22
-                };
-                ShellControl.Terminal = terminal;
-            }
+            //if (ShellControl.Terminal == null)
+            //{
+            //    SSHTerminal terminal = new SSHTerminal();
+            //    terminal.Authorition = new SSHTerminalAuthorition()
+            //    {
+            //        UserName = "zyf",
+            //        Password = "18612538605",
+            //        ServerAddress = "192.168.2.215",
+            //        ServerPort = 22
+            //    };
+            //    ShellControl.Terminal = terminal;
+            //}
         }
     }
 }

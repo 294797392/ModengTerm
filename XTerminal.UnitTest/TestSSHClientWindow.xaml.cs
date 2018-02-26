@@ -34,14 +34,25 @@ namespace XTerminal.UnitTest
                 this.xtermTerminal.Authorition = new SSHTerminalAuthorition()
                 {
                     ServerPort = 22,
-                    ServerAddress = "lizuo",
-                    UserName = "lizuo",
+                    ServerAddress = "192.168.2.215",
+                    UserName = "zyf",
                     Password = "18612538605"
                 };
                 this.xtermTerminal.CommandReceived += this.XtermTerminal_CommandReceived;
+                this.xtermTerminal.DataReceived += XtermTerminal_DataReceived;
             }
 
             this.xtermTerminal.Connect();
+        }
+
+        private void XtermTerminal_DataReceived(object arg1, byte[] arg2)
+        {
+            base.Dispatcher.Invoke(new Action(() =>
+            {
+                string text = Encoding.ASCII.GetString(arg2);
+                TextBoxMessage.AppendText(text);
+                ScrollViewer.ScrollToEnd();
+            }));
         }
 
         private void ButtonSend_Click(object sender, RoutedEventArgs e)
