@@ -48,6 +48,20 @@ namespace XTerminal.Simulators
 
         public abstract void HandleUserInput(string key);
 
+        public abstract void ProcessReceivedData(byte[] data);
+
+        #endregion
+
+        #region 受保护方法
+
+        protected void NotifyCommandReceived(IEnumerable<AbstractTerminalCommand> commands)
+        {
+            if (this.CommandReceived != null)
+            {
+                this.CommandReceived(this, commands);
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -58,6 +72,7 @@ namespace XTerminal.Simulators
 
         private void Connection_DataReceived(object sender, byte[] data)
         {
+            this.ProcessReceivedData(data);
         }
 
         #endregion
