@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
 using XTerminal.Connections;
 using XTerminal.Terminal;
 
@@ -47,7 +48,7 @@ namespace XTerminal.Simulators
             return ResponseCode.Success;
         }
 
-        public abstract void HandleUserInput(KeyInfo key);
+        public abstract void ProcessKeyDown(PressedKey key);
 
         public abstract void ProcessReceivedData(byte[] data);
 

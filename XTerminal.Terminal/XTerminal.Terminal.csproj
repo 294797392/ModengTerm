@@ -51,6 +51,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="KeyInfo.cs" />
     <Compile Include="ResponseCode.cs" />
     <Compile Include="Connections\ConnectionFactory.cs" />
     <Compile Include="Connections\ConnectionProtocols.cs" />
@@ -74,12 +75,6 @@
     <Compile Include="Simulators\ITerminalSimulator.cs" />
     <Compile Include="Simulators\TerminalCommands.cs" />
     <Compile Include="Simulators\VT100Simulator.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
-      <Project>{8e15fa5b-4f0e-4185-91fe-c8eb0f507d04}</Project>
-      <Name>XTerminal.Base</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

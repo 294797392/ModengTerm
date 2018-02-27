@@ -5,10 +5,10 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>XTerminal.Client</RootNamespace>
-    <AssemblyName>XTerminal.Client</AssemblyName>
+    <RootNamespace>XTerminal</RootNamespace>
+    <AssemblyName>XTerminal</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -33,7 +33,19 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\Dependencies\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Renci.SshNet">
+      <HintPath>..\Dependencies\Renci.SshNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -44,6 +56,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="Utility.Misc">
+      <HintPath>..\Dependencies\Utility.Misc.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -53,6 +68,32 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\PredefineCommands.cs" />
+    <Compile Include="Connections\ConnectionFactory.cs" />
+    <Compile Include="Connections\ConnectionProtocols.cs" />
+    <Compile Include="Connections\IConnection.cs" />
+    <Compile Include="Connections\IConnectionAuthorition.cs" />
+    <Compile Include="Connections\SshConnection.cs" />
+    <Compile Include="Connections\SshConnectionAuthorition.cs" />
+    <Compile Include="DefaultValues.cs" />
+    <Compile Include="EscapeSequences\AnsiEscapeSequencesParser.cs" />
+    <Compile Include="EscapeSequences\EscapeSequencesCommand.cs" />
+    <Compile Include="EscapeSequences\IEscapeSequencesCommand.cs" />
+    <Compile Include="EscapeSequences\IEscapeSequencesParser.cs" />
+    <Compile Include="PressedKey.cs" />
+    <Compile Include="ResponseCode.cs" />
+    <Compile Include="Selections\ISelectionContext.cs" />
+    <Compile Include="Selections\SelectionPanel.cs" />
+    <Compile Include="ShellControl.cs" />
+    <Compile Include="Simulators\AbstractSimulator.cs" />
+    <Compile Include="Simulators\ITerminalSimulator.cs" />
+    <Compile Include="Simulators\TerminalCommands.cs" />
+    <Compile Include="Simulators\VT100Simulator.cs" />
+    <Compile Include="TerminalConnectionStatus.cs" />
+    <Compile Include="TerminalNames.cs" />
+    <Compile Include="Texts\TextItem.cs" />
+    <Compile Include="Texts\TextLine.cs" />
+    <Compile Include="Texts\TextList.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -61,10 +102,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Carets\CaretElement.cs" />
+    <Compile Include="Carets\CaretPanel.cs" />
+    <Compile Include="Carets\ICaretContext.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -89,6 +137,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Utils\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

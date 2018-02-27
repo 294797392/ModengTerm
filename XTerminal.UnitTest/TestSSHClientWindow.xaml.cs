@@ -10,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using XTerminal.Terminal;
+using XTerminal.Connections;
 
 namespace XTerminal.UnitTest
 {
@@ -19,7 +19,7 @@ namespace XTerminal.UnitTest
     /// </summary>
     public partial class TestSSHClientWindow : Window
     {
-        private SSHTerminal xtermTerminal;
+        private SshConnection xtermTerminal;
 
         public TestSSHClientWindow()
         {
@@ -30,15 +30,14 @@ namespace XTerminal.UnitTest
         {
             if (this.xtermTerminal == null)
             {
-                this.xtermTerminal = new SSHTerminal();
-                this.xtermTerminal.Authorition = new SSHTerminalAuthorition()
+                this.xtermTerminal = new SshConnection();
+                this.xtermTerminal.Authorition = new SshConnectionAuthorition()
                 {
                     ServerPort = 22,
                     ServerAddress = "192.168.2.215",
                     UserName = "zyf",
                     Password = "18612538605"
                 };
-                this.xtermTerminal.CommandReceived += this.XtermTerminal_CommandReceived;
                 this.xtermTerminal.DataReceived += XtermTerminal_DataReceived;
             }
 
@@ -57,16 +56,21 @@ namespace XTerminal.UnitTest
 
         private void ButtonSend_Click(object sender, RoutedEventArgs e)
         {
-            this.xtermTerminal.Send(TextBoxCmd.Text + "\r");
+            //byte[] data = Encoding.ASCII.GetBytes("q");
+            int ascii = Convert.ToByte("040", 8);
+            this.xtermTerminal.SendData(new byte[] { (byte)ascii });
+
+            //byte[] ascii = Encoding.ASCII.GetBytes("A");
+            //this.xtermTerminal.SendData(ascii);
         }
 
-        private void XtermTerminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)
-        {
-            base.Dispatcher.Invoke(new Action(() => 
-            {
-                //TextBoxMessage.AppendText(Encoding.ASCII.GetString(data));
-                //ScrollViewer.ScrollToEnd();
-            }));
-        }
+        //private void XtermTerminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)
+        //{
+        //    base.Dispatcher.Invoke(new Action(() => 
+        //    {
+        //        //TextBoxMessage.AppendText(Encoding.ASCII.GetString(data));
+        //        //ScrollViewer.ScrollToEnd();
+        //    }));
+        //}
     }
 }

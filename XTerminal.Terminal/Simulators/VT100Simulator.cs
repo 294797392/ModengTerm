@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using XTerminal.Terminal;
 
 namespace XTerminal.Simulators
 {
@@ -12,8 +13,16 @@ namespace XTerminal.Simulators
     /// </summary>
     public class VT100Simulator : AbstractSimulator
     {
-        public override void HandleUserInput(string key)
+        public override void HandleUserInput(KeyInfo key)
         {
+            if (key.IsCtrlPressed)
+            {
+
+            }
+            else
+            {
+
+            }
         }
 
         public override void ProcessReceivedData(byte[] data)

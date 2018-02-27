@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
 using XTerminal.Connections;
 using XTerminal.Terminal;
 
@@ -30,6 +31,8 @@ namespace XTerminal.Simulators
         /// 处理用户从键盘输入的原始字符
         /// 做处理，并发送到远程终端
         /// </summary>
-        void HandleUserInput(KeyInfo key);
+        void ProcessKeyDown(PressedKey key);
+        
+        void ProcessReceivedData(byte[] data);
     }
 }

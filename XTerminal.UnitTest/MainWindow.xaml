@@ -10,13 +10,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
 
-    <Window.Resources>
+    <!--<Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/XTerminal.Client.TerminalConsole;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-    </Window.Resources>
+    </Window.Resources>-->
     
     <Grid>
 
@@ -26,7 +26,7 @@
         </ScrollViewer>-->
 
         <!--<carets:CaretPanel/>-->
-        <console:ShellControl x:Name="ShellControl"/>
+        <!--<console:ShellControl x:Name="ShellControl"/>-->
 
     </Grid>
 </Window>

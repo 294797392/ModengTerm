@@ -23,5 +23,12 @@ namespace XTerminalClient
         {
             InitializeComponent();
         }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            Console.WriteLine(e.Key.ToString());
+        }
     }
 }

@@ -112,13 +112,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\XTerminal.Client.TerminalConsole\XTerminal.Client.TerminalConsole.csproj">
-      <Project>{67e7468d-e574-41d4-b955-66f7fb989b6d}</Project>
-      <Name>XTerminal.Client.TerminalConsole</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XTerminal.Terminal\XTerminal.Terminal.csproj">
-      <Project>{e99f65d2-896a-43ba-b733-36e3f2e0e9d8}</Project>
-      <Name>XTerminal.Terminal</Name>
+    <ProjectReference Include="..\XTerminal.Client\XTerminal.csproj">
+      <Project>{6dd46c6e-e3b3-4f5a-bea0-e03893a1cee4}</Project>
+      <Name>XTerminal</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
