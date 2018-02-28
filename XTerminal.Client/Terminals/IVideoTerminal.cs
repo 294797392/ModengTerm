@@ -6,16 +6,16 @@ using System.Windows.Input;
 using XTerminal.Connections;
 using XTerminal.Terminal;
 
-namespace XTerminal.Simulators
+namespace XTerminal.Terminals
 {
     /// <summary>
-    /// 终端模拟器
+    /// 表示一个视频终端
     /// 1.解析用户从键盘输入的字符
     /// 2.发送数据到真正的远程终端
     /// 3.接收终端响应的信息并解析成客户端可执行的命令
     /// 4.连接远程终端
     /// </summary>
-    public interface ITerminalSimulator
+    public interface IVideoTerminal
     {
         event Action<object, IEnumerable<AbstractTerminalCommand>> CommandReceived;
 

@@ -56,9 +56,9 @@ namespace XTerminal.UnitTest
 
         private void ButtonSend_Click(object sender, RoutedEventArgs e)
         {
-            //byte[] data = Encoding.ASCII.GetBytes("q");
-            int ascii = Convert.ToByte("040", 8);
-            this.xtermTerminal.SendData(new byte[] { (byte)ascii });
+            byte[] data = Encoding.ASCII.GetBytes("vim\n");
+            //int ascii = Convert.ToByte("040", 8);
+            this.xtermTerminal.SendData(data);
 
             //byte[] ascii = Encoding.ASCII.GetBytes("A");
             //this.xtermTerminal.SendData(ascii);

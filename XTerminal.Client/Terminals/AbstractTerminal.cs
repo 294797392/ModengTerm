@@ -6,9 +6,9 @@ using System.Windows.Input;
 using XTerminal.Connections;
 using XTerminal.Terminal;
 
-namespace XTerminal.Simulators
+namespace XTerminal.Terminals
 {
-    public abstract class AbstractSimulator : ITerminalSimulator
+    public abstract class AbstractTerminal : IVideoTerminal
     {
         #region 事件
 

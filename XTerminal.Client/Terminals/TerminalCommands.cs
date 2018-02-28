@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Simulators
+namespace XTerminal.Terminals
 {
     public abstract class AbstractTerminalCommand
     {

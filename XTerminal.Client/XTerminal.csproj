@@ -85,10 +85,10 @@
     <Compile Include="Selections\ISelectionContext.cs" />
     <Compile Include="Selections\SelectionPanel.cs" />
     <Compile Include="ShellControl.cs" />
-    <Compile Include="Simulators\AbstractSimulator.cs" />
-    <Compile Include="Simulators\ITerminalSimulator.cs" />
-    <Compile Include="Simulators\TerminalCommands.cs" />
-    <Compile Include="Simulators\VT100Simulator.cs" />
+    <Compile Include="Terminals\AbstractTerminal.cs" />
+    <Compile Include="Terminals\IVideoTerminal.cs" />
+    <Compile Include="Terminals\TerminalCommands.cs" />
+    <Compile Include="Terminals\VT100Terminal.cs" />
     <Compile Include="TerminalConnectionStatus.cs" />
     <Compile Include="TerminalNames.cs" />
     <Compile Include="Texts\TextItem.cs" />
