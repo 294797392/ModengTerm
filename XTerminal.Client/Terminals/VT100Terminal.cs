@@ -9,8 +9,7 @@ namespace XTerminal.Terminals
 {
     /// <summary>
     /// VT100类型的终端模拟器
-    /// 1.解析用户输入的原始字符，解析成VT100字符或控制字符，并发送给终端
-    /// 2.解析终端发送过来的控制字符或普通字符，并转转成客户端可识别的命令
+    /// VT100中的ControlSequenceIntroducer字符是ESC[
     /// </summary>
     public class VT100Terminal : AbstractTerminal
     {
@@ -21,6 +20,27 @@ namespace XTerminal.Terminals
         public override void ProcessReceivedData(byte[] data)
         {
         }
+
+        #region 收到数据之后对字符的预处理
+
+        /// <summary>
+        /// 处理控制字符
+        /// VT100的控制字符列表
+        /// 参考：
+        ///     xterminal/Dependencies/VT100 User Guide/table3-10.html
+        /// </summary>
+        /// <param name="character"></param>
+        //private AbstractTerminalCommand ProcessControlCharacter(byte character)
+        //{
+        //    switch (character)
+        //    {
+
+        //    }
+        //}
+
+        #endregion
+
+        #region 发送之前对输入字符的预处理
 
         /// <summary>
         /// 把按住Control+Key的组合键转换成VT100的命令字符
@@ -217,5 +237,7 @@ namespace XTerminal.Terminals
 
             }
         }
+
+        #endregion
     }
 }

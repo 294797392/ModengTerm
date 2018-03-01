@@ -86,14 +86,15 @@
     <Compile Include="Selections\SelectionPanel.cs" />
     <Compile Include="ShellControl.cs" />
     <Compile Include="Terminals\AbstractTerminal.cs" />
+    <Compile Include="Terminals\ControlCharacters.cs" />
     <Compile Include="Terminals\IVideoTerminal.cs" />
-    <Compile Include="Terminals\TerminalCommands.cs" />
+    <Compile Include="Terminals\TerminalActions.cs" />
     <Compile Include="Terminals\VT100Terminal.cs" />
     <Compile Include="TerminalConnectionStatus.cs" />
     <Compile Include="TerminalNames.cs" />
-    <Compile Include="Texts\TextItem.cs" />
-    <Compile Include="Texts\TextLine.cs" />
-    <Compile Include="Texts\TextList.cs" />
+    <Compile Include="TextRendering\TextItem.cs" />
+    <Compile Include="TextRendering\TextLine.cs" />
+    <Compile Include="TextRendering\TextList.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

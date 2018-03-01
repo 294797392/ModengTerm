@@ -12,12 +12,12 @@ namespace XTerminal.Terminals
     /// 表示一个视频终端
     /// 1.解析用户从键盘输入的字符
     /// 2.发送数据到真正的远程终端
-    /// 3.接收终端响应的信息并解析成客户端可执行的命令
+    /// 3.接收远程主机响应的信息并解析成终端可执行的动作
     /// 4.连接远程终端
     /// </summary>
     public interface IVideoTerminal
     {
-        event Action<object, IEnumerable<AbstractTerminalCommand>> CommandReceived;
+        event Action<object, IEnumerable<AbstractTerminalAction>> CommandReceived;
 
         event Action<object, TerminalConnectionStatus> StatusChanged;
 

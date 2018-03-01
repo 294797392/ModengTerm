@@ -19,6 +19,8 @@ namespace XTerminal.UnitTest
             if (File.Exists(log4netPath))
             {
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(log4netPath));
+
+                MessageBox.Show(((int)'R').ToString());
             }
         }
     }

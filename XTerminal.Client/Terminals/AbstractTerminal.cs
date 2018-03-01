@@ -8,11 +8,15 @@ using XTerminal.Terminal;
 
 namespace XTerminal.Terminals
 {
+    /// <summary>
+    /// 1.解析用户输入的原始字符，解析成VT100字符或控制字符，并发送给终端
+    /// 2.解析远程主机发送过来的控制字符或普通字符，并转转成客户端可识别的动作
+    /// </summary>
     public abstract class AbstractTerminal : IVideoTerminal
     {
         #region 事件
 
-        public event Action<object, IEnumerable<AbstractTerminalCommand>> CommandReceived;
+        public event Action<object, IEnumerable<AbstractTerminalAction>> CommandReceived;
         public event Action<object, TerminalConnectionStatus> StatusChanged;
 
         #endregion
@@ -56,7 +60,7 @@ namespace XTerminal.Terminals
 
         #region 受保护方法
 
-        protected void NotifyCommandReceived(IEnumerable<AbstractTerminalCommand> commands)
+        protected void NotifyCommandReceived(IEnumerable<AbstractTerminalAction> commands)
         {
             if (this.CommandReceived != null)
             {
