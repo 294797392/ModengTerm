@@ -10,12 +10,24 @@ namespace XTerminal.Terminals
     /// </summary>
     public enum Keys
     {
+        /// <summary>
+        /// 未键入字符
+        /// </summary>
+        Null,
+
         Space,
         Esc,
         Tab,
         CapsLock,
-        Shift,
-        Ctrl,
+
+
+        LeftShift,
+        RightShift,
+
+
+        LeftCtrl,
+        RightCtrl,
+
         Backspace,
         Enter,
         CusorUp,

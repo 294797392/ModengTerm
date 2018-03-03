@@ -21,7 +21,7 @@ namespace XTerminal.UnitTest
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(new FileInfo(log4netPath));
 
                 //MessageBox.Show(Convert.ToInt32("10011011", 2).ToString());
-                //MessageBox.Show(((int)'R').ToString());
+                //MessageBox.Show(((int)'A').ToString());
             }
         }
     }

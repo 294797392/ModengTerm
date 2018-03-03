@@ -18,7 +18,7 @@ namespace XTerminal.Terminals
 
         #region 事件
 
-        public event Action<object, IEnumerable<AbstractTerminalAction>> CommandReceived;
+        public event Action<object, IEnumerable<AbstractTerminalAction>, byte[]> CommandReceived;
         public event Action<object, TerminalConnectionStatus> StatusChanged;
 
         #endregion
@@ -59,28 +59,36 @@ namespace XTerminal.Terminals
             return ResponseCode.Success;
         }
 
-        public abstract byte TranslateKey(PressedKey key);
+        /// <summary>
+        /// 把用户按下的按键按照每种终端的规范转换成终端要发送的ascii码
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        protected abstract byte[] TranslateKey(PressedKey key);
 
-        public void ProcessKeyDown(PressedKey key)
+        public void ProcessInputKey(PressedKey key)
         {
-            byte translatedByte = this.TranslateKey(key);
-            if (!this.connection.SendData(translatedByte))
+            byte[] translatedByte = this.TranslateKey(key);
+            if (translatedByte != null && translatedByte.Length > 0)
             {
-                logger.Error("向主机发送数据失败");
+                if (!this.connection.SendData(translatedByte))
+                {
+                    logger.Error("向主机发送数据失败");
+                }
             }
         }
 
-        public abstract void ProcessReceivedData(byte[] data);
+        protected abstract void ProcessReceivedData(byte[] data);
 
         #endregion
 
         #region 受保护方法
 
-        protected void NotifyCommandReceived(IEnumerable<AbstractTerminalAction> commands)
+        protected void NotifyCommandReceived(IEnumerable<AbstractTerminalAction> commands, byte[] data)
         {
             if (this.CommandReceived != null)
             {
-                this.CommandReceived(this, commands);
+                this.CommandReceived(this, commands, data);
             }
         }
 
@@ -95,6 +103,7 @@ namespace XTerminal.Terminals
         private void Connection_DataReceived(object sender, byte[] data)
         {
             this.ProcessReceivedData(data);
+            this.NotifyCommandReceived(null, data);
         }
 
         #endregion

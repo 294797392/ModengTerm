@@ -17,7 +17,7 @@ namespace XTerminal.Terminals
     /// </summary>
     public interface IVideoTerminal
     {
-        event Action<object, IEnumerable<AbstractTerminalAction>> CommandReceived;
+        event Action<object, IEnumerable<AbstractTerminalAction>, byte[]> CommandReceived;
 
         event Action<object, TerminalConnectionStatus> StatusChanged;
 
@@ -31,8 +31,6 @@ namespace XTerminal.Terminals
         /// 处理用户从键盘输入的原始字符
         /// 做处理，并发送到远程终端
         /// </summary>
-        void ProcessKeyDown(PressedKey key);
-        
-        void ProcessReceivedData(byte[] data);
+        void ProcessInputKey(PressedKey key);
     }
 }

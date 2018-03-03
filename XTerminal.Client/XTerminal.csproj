@@ -68,6 +68,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnsiCharacrers\AnsiChars.cs" />
     <Compile Include="AnsiCharacrers\CSI.cs" />
     <Compile Include="AnsiCharacrers\Fe.cs" />
     <Compile Include="CharacterCodedBits.cs" />
@@ -91,7 +92,6 @@
     <Compile Include="Selections\SelectionPanel.cs" />
     <Compile Include="ShellControl.cs" />
     <Compile Include="Terminals\AbstractTerminal.cs" />
-    <Compile Include="Terminals\ControlCharacters.cs" />
     <Compile Include="Terminals\IVideoTerminal.cs" />
     <Compile Include="Terminals\Keys.cs" />
     <Compile Include="Terminals\XtermTerminal.cs" />
@@ -102,6 +102,7 @@
     <Compile Include="TextRendering\TextItem.cs" />
     <Compile Include="TextRendering\TextLine.cs" />
     <Compile Include="TextRendering\TextList.cs" />
+    <Compile Include="Utils\Utils.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -146,9 +147,7 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utils\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
