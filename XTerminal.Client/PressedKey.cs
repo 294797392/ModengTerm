@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
+using XTerminal.Terminals;
 
 namespace XTerminal
 {
@@ -19,7 +20,7 @@ namespace XTerminal
         /// <summary>
         /// 按下的键
         /// </summary>
-        public Key Key;
+        public Keys Key;
 
         /// <summary>
         /// 是否按下了Control键

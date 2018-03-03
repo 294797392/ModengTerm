@@ -68,6 +68,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AnsiCharacrers\CSI.cs" />
+    <Compile Include="AnsiCharacrers\Fe.cs" />
+    <Compile Include="CharacterCodedBits.cs" />
+    <Compile Include="AnsiCharacrers\CharacterUtils.cs" />
+    <Compile Include="AnsiCharacrers\ControlFunctions.cs" />
     <Compile Include="Commands\PredefineCommands.cs" />
     <Compile Include="Connections\ConnectionFactory.cs" />
     <Compile Include="Connections\ConnectionProtocols.cs" />
@@ -88,6 +93,8 @@
     <Compile Include="Terminals\AbstractTerminal.cs" />
     <Compile Include="Terminals\ControlCharacters.cs" />
     <Compile Include="Terminals\IVideoTerminal.cs" />
+    <Compile Include="Terminals\Keys.cs" />
+    <Compile Include="Terminals\XtermTerminal.cs" />
     <Compile Include="Terminals\TerminalActions.cs" />
     <Compile Include="Terminals\VT100Terminal.cs" />
     <Compile Include="TerminalConnectionStatus.cs" />
@@ -95,7 +102,6 @@
     <Compile Include="TextRendering\TextItem.cs" />
     <Compile Include="TextRendering\TextLine.cs" />
     <Compile Include="TextRendering\TextList.cs" />
-    <Compile Include="Utils\CharacterUtilis.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -140,7 +146,9 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Utils\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

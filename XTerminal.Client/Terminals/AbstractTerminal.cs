@@ -14,6 +14,8 @@ namespace XTerminal.Terminals
     /// </summary>
     public abstract class AbstractTerminal : IVideoTerminal
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("AbstractTerminal");
+
         #region 事件
 
         public event Action<object, IEnumerable<AbstractTerminalAction>> CommandReceived;
@@ -30,6 +32,11 @@ namespace XTerminal.Terminals
         #region 属性
 
         public ConnectionProtocols Protocols { get; set; }
+
+        /// <summary>
+        /// 设置主机使用的编码方式
+        /// </summary>
+        public virtual CharacterCodedBits CodedBits { get { return CharacterCodedBits._8Bit; } }
 
         #endregion
 
@@ -52,7 +59,16 @@ namespace XTerminal.Terminals
             return ResponseCode.Success;
         }
 
-        public abstract void ProcessKeyDown(PressedKey key);
+        public abstract byte TranslateKey(PressedKey key);
+
+        public void ProcessKeyDown(PressedKey key)
+        {
+            byte translatedByte = this.TranslateKey(key);
+            if (!this.connection.SendData(translatedByte))
+            {
+                logger.Error("向主机发送数据失败");
+            }
+        }
 
         public abstract void ProcessReceivedData(byte[] data);
 

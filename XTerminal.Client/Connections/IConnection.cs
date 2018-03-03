@@ -31,5 +31,7 @@ namespace XTerminal.Connections
         bool Disconnect();
 
         bool SendData(byte[] data);
+
+        bool SendData(byte value);
     }
 }

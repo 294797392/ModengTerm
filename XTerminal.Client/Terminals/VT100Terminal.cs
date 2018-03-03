@@ -13,34 +13,67 @@ namespace XTerminal.Terminals
     /// </summary>
     public class VT100Terminal : AbstractTerminal
     {
-        public override void ProcessKeyDown(PressedKey key)
+        #region 非字符ascii码转换
+
+        /*
+            把按住shift键和没按住shift键的非字母字符转换成VT100识别的sdcii码
+            参考:
+                xterminal/Dependencies/VT100 User Guide/chapter3.html#S3.3.1
+                xterminal/Dependencies/VT100 User Guide/table3-3.html
+        */
+
+        private static Dictionary<Keys, byte> ShiftNonalphabeticKeyCode = new Dictionary<Keys, byte>()
         {
-        }
-
-        public override void ProcessReceivedData(byte[] data)
+            { Keys.D1, Convert.ToByte("061", 8) },
+            { Keys.D2, Convert.ToByte("062", 8) },
+            { Keys.D3, Convert.ToByte("063", 8) },
+            { Keys.D4, Convert.ToByte("064", 8) },
+            { Keys.D5, Convert.ToByte("065", 8) },
+            { Keys.D6, Convert.ToByte("066", 8) },
+            { Keys.D7, Convert.ToByte("067", 8) },
+            { Keys.D8, Convert.ToByte("070", 8) },
+            { Keys.D9, Convert.ToByte("071", 8) },
+            { Keys.D0, Convert.ToByte("060", 8) },
+            { Keys.OemMinus, Convert.ToByte("055", 8) },
+            { Keys.OemPlus, Convert.ToByte("075", 8) },
+            { Keys.OemOpenBrackets, Convert.ToByte("133", 8) },
+            { Keys.Oem1, Convert.ToByte("073", 8) },
+            { Keys.OemQuotes, Convert.ToByte("047", 8) },
+            { Keys.OemComma, Convert.ToByte("054", 8) },
+            { Keys.OemPeriod, Convert.ToByte("056", 8) },
+            { Keys.OemQuestion, Convert.ToByte("057", 8) },
+            { Keys.Oem5, Convert.ToByte("134", 8) },
+            { Keys.Oem3, Convert.ToByte("140", 8) },
+            { Keys.Oem6, Convert.ToByte("135", 8) },
+        };
+        private static Dictionary<Keys, byte> NonalphabeticKeyCode = new Dictionary<Keys, byte>()
         {
-        }
-
-        #region 收到数据之后对字符的预处理
-
-        /// <summary>
-        /// 处理控制字符
-        /// VT100的控制字符列表
-        /// 参考：
-        ///     xterminal/Dependencies/VT100 User Guide/table3-10.html
-        /// </summary>
-        /// <param name="character"></param>
-        //private AbstractTerminalCommand ProcessControlCharacter(byte character)
-        //{
-        //    switch (character)
-        //    {
-
-        //    }
-        //}
+            { Keys.D1, Convert.ToByte("041", 8) },
+            { Keys.D2, Convert.ToByte("100", 8) },
+            { Keys.D3, Convert.ToByte("043", 8) },
+            { Keys.D4, Convert.ToByte("044", 8) },
+            { Keys.D5, Convert.ToByte("045", 8) },
+            { Keys.D6, Convert.ToByte("136", 8) },
+            { Keys.D7, Convert.ToByte("046", 8) },
+            { Keys.D8, Convert.ToByte("052", 8) },
+            { Keys.D9, Convert.ToByte("050", 8) },
+            { Keys.D0, Convert.ToByte("051", 8) },
+            { Keys.OemMinus, Convert.ToByte("137", 8) },
+            { Keys.OemPlus, Convert.ToByte("053", 8) },
+            { Keys.OemOpenBrackets, Convert.ToByte("173", 8) },
+            { Keys.Oem1, Convert.ToByte("072", 8) },
+            { Keys.OemQuotes, Convert.ToByte("042", 8) },
+            { Keys.OemComma, Convert.ToByte("074", 8) },
+            { Keys.OemPeriod, Convert.ToByte("076", 8) },
+            { Keys.OemQuestion, Convert.ToByte("077", 8) },
+            { Keys.Oem5, Convert.ToByte("174", 8) },
+            { Keys.Oem3, Convert.ToByte("176", 8) },
+            { Keys.Oem6, Convert.ToByte("175", 8) },
+        };
 
         #endregion
 
-        #region 发送之前对输入字符的预处理
+        #region 把按住Control+Key的组合键转换成VT100的命令字符
 
         /// <summary>
         /// 把按住Control+Key的组合键转换成VT100的命令字符
@@ -48,196 +81,167 @@ namespace XTerminal.Terminals
         ///     xterminal/Dependencies/VT100 User Guide/chapter3.html#S3.3.1
         ///     xterminal/Dependencies/VT100 User Guide/table3-5.html
         /// </summary>
-        private byte Key2ControlCode(Key key)
+        private static Dictionary<Keys, byte> ControlKeyCode = new Dictionary<Keys, byte>()
         {
-            switch (key)
-            {
-                case Key.Space: return Convert.ToByte("000", 8); // Space Bar NUL
-                case Key.OemOpenBrackets: return Convert.ToByte("033", 8); //[ ESC
-                case Key.Oem5: return Convert.ToByte("034", 8); // \ FS
-                case Key.Oem6: return Convert.ToByte("035", 8); // ] GS
-                case Key.Oem3: return Convert.ToByte("036", 8); // ~ RS
-                case Key.OemQuestion: return Convert.ToByte("037", 8); // ? US
+            { Keys.A, Convert.ToByte("001", 8) },// SOH
+            { Keys.B, Convert.ToByte("002", 8) },// STX
+            { Keys.C, Convert.ToByte("003", 8) },// ETX
+            { Keys.D, Convert.ToByte("004", 8) },// EOT
+            { Keys.E, Convert.ToByte("005", 8) },// ENQ
+            { Keys.F, Convert.ToByte("006", 8) },// ACK
+            { Keys.G, Convert.ToByte("007", 8) },// BELL
+            { Keys.H, Convert.ToByte("010", 8) },// BS
+            { Keys.I, Convert.ToByte("011", 8) },// HT
+            { Keys.J, Convert.ToByte("012", 8) },// LF
+            { Keys.K, Convert.ToByte("013", 8) },// VT
+            { Keys.L, Convert.ToByte("014", 8) },// FF
+            { Keys.M, Convert.ToByte("015", 8) },// CR
+            { Keys.N, Convert.ToByte("016", 8) },// SO
+            { Keys.O, Convert.ToByte("017", 8) },// SI
+            { Keys.P, Convert.ToByte("020", 8) },// DLE
+            { Keys.Q, Convert.ToByte("021", 8) },// DC1 or XON
+            { Keys.R, Convert.ToByte("022", 8) },// DC2
+            { Keys.S, Convert.ToByte("023", 8) },// DC3 or XOFF
+            { Keys.T, Convert.ToByte("024", 8) },// DC4
+            { Keys.U, Convert.ToByte("025", 8) },// NAK
+            { Keys.V, Convert.ToByte("026", 8) },// SYN
+            { Keys.W, Convert.ToByte("027", 8) },// ETB
+            { Keys.X, Convert.ToByte("030", 8) },// CAN
+            { Keys.Y, Convert.ToByte("031", 8) },// EM
+            { Keys.Z, Convert.ToByte("032", 8) },// SUB
 
-                case Key.A: return Convert.ToByte("001", 8); // SOH
-                case Key.B: return Convert.ToByte("002", 8); // STX
-                case Key.C: return Convert.ToByte("003", 8); // ETX
-                case Key.D: return Convert.ToByte("004", 8); // EOT
-                case Key.E: return Convert.ToByte("005", 8); // ENQ
-                case Key.F: return Convert.ToByte("006", 8); // ACK
-                case Key.G: return Convert.ToByte("007", 8); // BELL
-                case Key.H: return Convert.ToByte("010", 8); // BS
-                case Key.I: return Convert.ToByte("011", 8); // HT
-                case Key.J: return Convert.ToByte("012", 8); // LF
-                case Key.K: return Convert.ToByte("013", 8); // VT
-                case Key.L: return Convert.ToByte("014", 8); // FF
-                case Key.M: return Convert.ToByte("015", 8); // CR
-                case Key.N: return Convert.ToByte("016", 8); // SO
-                case Key.O: return Convert.ToByte("017", 8); // SI
-                case Key.P: return Convert.ToByte("020", 8); // DLE
-                case Key.Q: return Convert.ToByte("021", 8); // DC1 or XON
-                case Key.R: return Convert.ToByte("022", 8); // DC2
-                case Key.S: return Convert.ToByte("023", 8); // DC3 or XOFF
-                case Key.T: return Convert.ToByte("024", 8); // DC4
-                case Key.U: return Convert.ToByte("025", 8); // NAK
-                case Key.V: return Convert.ToByte("026", 8); // SYN
-                case Key.W: return Convert.ToByte("027", 8); // ETB
-                case Key.X: return Convert.ToByte("030", 8); // CAN
-                case Key.Y: return Convert.ToByte("031", 8); // EM
-                case Key.Z: return Convert.ToByte("032", 8); // SUB
+            { Keys.Space, Convert.ToByte("000", 8) },// Space Bar NUL
+            { Keys.OemOpenBrackets, Convert.ToByte("033", 8) }, //[ ESC
+            { Keys.Oem5, Convert.ToByte("034", 8) },// \ FS
+            { Keys.Oem6, Convert.ToByte("035", 8) },// ] GS
+            { Keys.Oem3, Convert.ToByte("036", 8) },// ~ RS
+            { Keys.OemQuestion, Convert.ToByte("037", 8) },// ? US
+        };
 
-                default:
-                    return byte.MaxValue;
-            }
-        }
+        #endregion
+
+        #region 大小写字母字符转ascii码
 
         /// <summary>
-        /// 把大写或小写字母转成VT100识别的代码（其实就是字符的ascii码）
+        /// 把大小写字母转成VT100识别的ASCII码
         /// 参考:
         ///     xterminal/Dependencies/VT100 User Guide/chapter3.html#S3.3.1
         ///     xterminal/Dependencies/VT100 User Guide/table3-2.html
         /// </summary>
-        private byte Key2CharacterCode(PressedKey key)
-        {
-            if (key.IsUpperCase)
-            {
-                switch (key.Key)
-                {
-                    case Key.A: return Convert.ToByte("101", 8); // SOH
-                    case Key.B: return Convert.ToByte("102", 8); // STX
-                    case Key.C: return Convert.ToByte("103", 8); // ETX
-                    case Key.D: return Convert.ToByte("104", 8); // EOT
-                    case Key.E: return Convert.ToByte("105", 8); // ENQ
-                    case Key.F: return Convert.ToByte("106", 8); // ACK
-                    case Key.G: return Convert.ToByte("107", 8); // BELL
-                    case Key.H: return Convert.ToByte("110", 8); // BS
-                    case Key.I: return Convert.ToByte("111", 8); // HT
-                    case Key.J: return Convert.ToByte("112", 8); // LF
-                    case Key.K: return Convert.ToByte("113", 8); // VT
-                    case Key.L: return Convert.ToByte("114", 8); // FF
-                    case Key.M: return Convert.ToByte("115", 8); // CR
-                    case Key.N: return Convert.ToByte("116", 8); // SO
-                    case Key.O: return Convert.ToByte("117", 8); // SI
-                    case Key.P: return Convert.ToByte("120", 8); // DLE
-                    case Key.Q: return Convert.ToByte("121", 8); // DC1 or XON
-                    case Key.R: return Convert.ToByte("122", 8); // DC2
-                    case Key.S: return Convert.ToByte("123", 8); // DC3 or XOFF
-                    case Key.T: return Convert.ToByte("124", 8); // DC4
-                    case Key.U: return Convert.ToByte("125", 8); // NAK
-                    case Key.V: return Convert.ToByte("126", 8); // SYN
-                    case Key.W: return Convert.ToByte("127", 8); // ETB
-                    case Key.X: return Convert.ToByte("130", 8); // CAN
-                    case Key.Y: return Convert.ToByte("131", 8); // EM
-                    case Key.Z: return Convert.ToByte("132", 8); // SUB
-                    default:
-                        return byte.MaxValue;
-                }
-            }
-            else
-            {
-                switch (key.Key)
-                {
-                    case Key.A: return Convert.ToByte("141", 8); // SOH
-                    case Key.B: return Convert.ToByte("142", 8); // STX
-                    case Key.C: return Convert.ToByte("143", 8); // ETX
-                    case Key.D: return Convert.ToByte("144", 8); // EOT
-                    case Key.E: return Convert.ToByte("145", 8); // ENQ
-                    case Key.F: return Convert.ToByte("146", 8); // ACK
-                    case Key.G: return Convert.ToByte("147", 8); // BELL
-                    case Key.H: return Convert.ToByte("150", 8); // BS
-                    case Key.I: return Convert.ToByte("151", 8); // HT
-                    case Key.J: return Convert.ToByte("152", 8); // LF
-                    case Key.K: return Convert.ToByte("153", 8); // VT
-                    case Key.L: return Convert.ToByte("154", 8); // FF
-                    case Key.M: return Convert.ToByte("155", 8); // CR
-                    case Key.N: return Convert.ToByte("156", 8); // SO
-                    case Key.O: return Convert.ToByte("157", 8); // SI
-                    case Key.P: return Convert.ToByte("160", 8); // DLE
-                    case Key.Q: return Convert.ToByte("161", 8); // DC1 or XON
-                    case Key.R: return Convert.ToByte("162", 8); // DC2
-                    case Key.S: return Convert.ToByte("163", 8); // DC3 or XOFF
-                    case Key.T: return Convert.ToByte("164", 8); // DC4
-                    case Key.U: return Convert.ToByte("165", 8); // NAK
-                    case Key.V: return Convert.ToByte("166", 8); // SYN
-                    case Key.W: return Convert.ToByte("167", 8); // ETB
-                    case Key.X: return Convert.ToByte("170", 8); // CAN
-                    case Key.Y: return Convert.ToByte("171", 8); // EM
-                    case Key.Z: return Convert.ToByte("172", 8); // SUB
-                    default:
-                        return byte.MaxValue;
-                }
-            }
-        }
 
-        /// <summary>
-        /// 把按住shift键和没按住shift键的非字母字符转换成VT100识别的sdcii码
-        /// 参考:
-        ///     xterminal/Dependencies/VT100 User Guide/chapter3.html#S3.3.1
-        ///     xterminal/Dependencies/VT100 User Guide/table3-3.html
-        /// </summary>
-        private byte Key2NonalphabeticKeyCode(PressedKey key)
+        private static Dictionary<Keys, byte> UpperCaseKeyCode = new Dictionary<Keys, byte>()
         {
-            if (key.IsShiftPressed)
-            {
-                switch (key.Key)
-                {
-                    case Key.D1: return Convert.ToByte("061", 8);
-                    case Key.D2: return Convert.ToByte("062", 8);
-                    case Key.D3: return Convert.ToByte("063", 8);
-                    case Key.D4: return Convert.ToByte("064", 8);
-                    case Key.D5: return Convert.ToByte("065", 8);
-                    case Key.D6: return Convert.ToByte("066", 8);
-                    case Key.D7: return Convert.ToByte("067", 8);
-                    case Key.D8: return Convert.ToByte("070", 8);
-                    case Key.D9: return Convert.ToByte("071", 8);
-                    case Key.D0: return Convert.ToByte("060", 8);
-                    case Key.OemMinus: return Convert.ToByte("055", 8); // -
-                    case Key.OemPlus: return Convert.ToByte("075", 8); // =
-                    case Key.OemOpenBrackets: return Convert.ToByte("133", 8); // [
-                    case Key.Oem1: return Convert.ToByte("073", 8);// ;
-                    case Key.OemQuotes: return Convert.ToByte("047", 8);// '
-                    case Key.OemComma: return Convert.ToByte("054", 8);// ,
-                    case Key.OemPeriod: return Convert.ToByte("056", 8);// .
-                    case Key.OemQuestion: return Convert.ToByte("057", 8);// /
-                    case Key.Oem5: return Convert.ToByte("134", 8); // \
-                    case Key.Oem3: return Convert.ToByte("140", 8);// `
-                    case Key.Oem6: return Convert.ToByte("135", 8);// ]
-                    default:
-                        return byte.MaxValue;
-                }
-            }
-            else
-            {
-                switch (key.Key)
-                {
-                    case Key.D1: return Convert.ToByte("041", 8);
-                    case Key.D2: return Convert.ToByte("100", 8);
-                    case Key.D3: return Convert.ToByte("043", 8);
-                    case Key.D4: return Convert.ToByte("044", 8);
-                    case Key.D5: return Convert.ToByte("045", 8);
-                    case Key.D6: return Convert.ToByte("136", 8);
-                    case Key.D7: return Convert.ToByte("046", 8);
-                    case Key.D8: return Convert.ToByte("052", 8);
-                    case Key.D9: return Convert.ToByte("050", 8);
-                    case Key.D0: return Convert.ToByte("051", 8);
-                    case Key.OemMinus: return Convert.ToByte("137", 8); // -
-                    case Key.OemPlus: return Convert.ToByte("053", 8); // =
-                    case Key.OemOpenBrackets: return Convert.ToByte("173", 8); // [
-                    case Key.Oem1: return Convert.ToByte("072", 8);// ;
-                    case Key.OemQuotes: return Convert.ToByte("042", 8);// '
-                    case Key.OemComma: return Convert.ToByte("074", 8);// ,
-                    case Key.OemPeriod: return Convert.ToByte("076", 8);// .
-                    case Key.OemQuestion: return Convert.ToByte("077", 8);// /
-                    case Key.Oem5: return Convert.ToByte("174", 8); // \
-                    case Key.Oem3: return Convert.ToByte("176", 8);// `
-                    case Key.Oem6: return Convert.ToByte("175", 8);// ]
-                    default:
-                        return byte.MaxValue;
-                }
-
-            }
-        }
+            { Keys.A, Convert.ToByte("101", 8) },// SOH
+            { Keys.B, Convert.ToByte("102", 8) },// STX
+            { Keys.C, Convert.ToByte("103", 8) },// ETX
+            { Keys.D, Convert.ToByte("104", 8) },// EOT
+            { Keys.E, Convert.ToByte("105", 8) },// ENQ
+            { Keys.F, Convert.ToByte("106", 8) },// ACK
+            { Keys.G, Convert.ToByte("107", 8) },// BELL
+            { Keys.H, Convert.ToByte("110", 8) },// BS
+            { Keys.I, Convert.ToByte("111", 8) },// HT
+            { Keys.J, Convert.ToByte("112", 8) },// LF
+            { Keys.K, Convert.ToByte("113", 8) },// VT
+            { Keys.L, Convert.ToByte("114", 8) },// FF
+            { Keys.M, Convert.ToByte("115", 8) },// CR
+            { Keys.N, Convert.ToByte("116", 8) },// SO
+            { Keys.O, Convert.ToByte("117", 8) },// SI
+            { Keys.P, Convert.ToByte("120", 8) },// DLE
+            { Keys.Q, Convert.ToByte("121", 8) },// DC1 or XON
+            { Keys.R, Convert.ToByte("122", 8) },// DC2
+            { Keys.S, Convert.ToByte("123", 8) },// DC3 or XOFF
+            { Keys.T, Convert.ToByte("124", 8) },// DC4
+            { Keys.U, Convert.ToByte("125", 8) },// NAK
+            { Keys.V, Convert.ToByte("126", 8) },// SYN
+            { Keys.W, Convert.ToByte("127", 8) },// ETB
+            { Keys.X, Convert.ToByte("130", 8) },// CAN
+            { Keys.Y, Convert.ToByte("131", 8) },// EM
+            { Keys.Z, Convert.ToByte("132", 8) },// SUB
+        };
+        private static Dictionary<Keys, byte> LowerCaseKeyCode = new Dictionary<Keys, byte>()
+        {
+            { Keys.A, Convert.ToByte("141", 8) },// SOH
+            { Keys.B, Convert.ToByte("142", 8) },// STX
+            { Keys.C, Convert.ToByte("143", 8) },// ETX
+            { Keys.D, Convert.ToByte("144", 8) },// EOT
+            { Keys.E, Convert.ToByte("145", 8) },// ENQ
+            { Keys.F, Convert.ToByte("146", 8) },// ACK
+            { Keys.G, Convert.ToByte("147", 8) },// BELL
+            { Keys.H, Convert.ToByte("150", 8) },// BS
+            { Keys.I, Convert.ToByte("151", 8) },// HT
+            { Keys.J, Convert.ToByte("152", 8) },// LF
+            { Keys.K, Convert.ToByte("153", 8) },// VT
+            { Keys.L, Convert.ToByte("154", 8) },// FF
+            { Keys.M, Convert.ToByte("155", 8) },// CR
+            { Keys.N, Convert.ToByte("156", 8) },// SO
+            { Keys.O, Convert.ToByte("157", 8) },// SI
+            { Keys.P, Convert.ToByte("160", 8) },// DLE
+            { Keys.Q, Convert.ToByte("161", 8) },// DC1 or XON
+            { Keys.R, Convert.ToByte("162", 8) },// DC2
+            { Keys.S, Convert.ToByte("163", 8) },// DC3 or XOFF
+            { Keys.T, Convert.ToByte("164", 8) },// DC4
+            { Keys.U, Convert.ToByte("165", 8) },// NAK
+            { Keys.V, Convert.ToByte("166", 8) },// SYN
+            { Keys.W, Convert.ToByte("167", 8) },// ETB
+            { Keys.X, Convert.ToByte("170", 8) },// CAN
+            { Keys.Y, Convert.ToByte("171", 8) },// EM
+            { Keys.Z, Convert.ToByte("172", 8) },// SUB
+        };
 
         #endregion
+
+        public override byte TranslateKey(PressedKey key)
+        {
+            byte translatedByte = 0;
+
+            // 检测非字母Shift键按下
+            if (key.IsShiftPressed)
+            {
+                if (ShiftNonalphabeticKeyCode.TryGetValue(key.Key, out translatedByte))
+                {
+                    return translatedByte;
+                }
+            }
+            // 检测字母+Shift键按下
+            else
+            {
+                if (NonalphabeticKeyCode.TryGetValue(key.Key, out translatedByte))
+                {
+                    return translatedByte;
+                }
+            }
+
+            // 检测Control键按下
+            if (key.IsControlPressed)
+            {
+                if (ControlKeyCode.TryGetValue(key.Key, out translatedByte))
+                {
+                    return translatedByte;
+                }
+            }
+
+            // 检测大写字母
+            if (key.IsUpperCase)
+            {
+                if (UpperCaseKeyCode.TryGetValue(key.Key, out translatedByte))
+                {
+                    return translatedByte;
+                }
+            }
+            // 检测小写字母
+            else
+            {
+                if (LowerCaseKeyCode.TryGetValue(key.Key, out translatedByte))
+                {
+                    return translatedByte;
+                }
+            }
+
+            return translatedByte;
+        }
+
+        public override void ProcessReceivedData(byte[] data)
+        {
+        }
     }
 }

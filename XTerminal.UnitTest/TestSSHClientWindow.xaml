@@ -20,12 +20,16 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="60"/>
                 <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="60"/>
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" Text="命令：" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <TextBox Grid.Column="1" x:Name="TextBoxCmd"/>
             <Button Grid.Column="2" Content="发送" Click="ButtonSend_Click"/>
             <Button Grid.Column="3" Content="连接" Click="ButtonConnect_Click"/>
+            <Button Grid.Column="4" Content="下键" Click="ButtonDown_Click"/>
+            <Button Grid.Column="5" Content="上键" Click="ButtonUp_Click"/>
 
         </Grid>
 

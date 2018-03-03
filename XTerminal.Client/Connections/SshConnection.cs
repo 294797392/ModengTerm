@@ -120,6 +120,21 @@ namespace XTerminal.Connections
             }
         }
 
+        public bool SendData(byte value)
+        {
+            try
+            {
+                this.writer.Write(value);
+                this.writer.Flush();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("SshConnection Send异常", ex);
+                return false;
+            }
+        }
+
         #endregion
 
         #region 事件处理器
