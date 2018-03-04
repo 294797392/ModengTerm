@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using XTerminal.CharacterParsers;
 using XTerminal.Connections;
+using XTerminal.ControlFunctions;
 using XTerminal.Terminal;
 using XTerminal.Terminals;
 
@@ -96,22 +97,27 @@ namespace XTerminal.UnitTest
         {
             base.OnPreviewKeyDown(e);
 
-            PressedKey key;
-            key.Key = Utils.Utils.WPFKey2TerminalKey(e.Key);
-            key.IsControlPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
-            key.IsShiftPressed = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
-            key.IsUpperCase = false;
+            //PressedKey key;
+            //key.Key = Utils.Utils.WPFKey2TerminalKey(e.Key);
+            //key.IsControlPressed = (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+            //key.IsShiftPressed = (Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift;
+            //key.IsUpperCase = false;
 
-            if (key.Key != Keys.Null)
-            {
-                this.terminal.ProcessInputKey(key);
-            }
-            else
-            {
-                Console.WriteLine("未处理的按键:{0}", e.Key);
-            }
+            //if (key.Key != Keys.Null)
+            //{
+            //    this.terminal.ProcessInputKey(key);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("未处理的按键:{0}", e.Key);
+            //}
 
-            e.Handled = true;
+            //e.Handled = true;
+        }
+
+        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
+        {
+            base.OnPreviewTextInput(e);
         }
 
         //private void XtermTerminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)

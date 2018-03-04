@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.CharacterParsers
+namespace XTerminal.ControlFunctions
 {
     public class CharacterUtils
     {

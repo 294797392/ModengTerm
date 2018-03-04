@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.AnsiCharacrers
+namespace XTerminal.ControlFunctions
 {
     public class AnsiChars
     {

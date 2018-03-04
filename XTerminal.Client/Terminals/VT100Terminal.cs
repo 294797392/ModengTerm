@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Input;
-using XTerminal.AnsiCharacrers;
-using XTerminal.CharacterParsers;
+using XTerminal.ControlFunctions;
 using XTerminal.Terminal;
 
 namespace XTerminal.Terminals
@@ -62,10 +61,10 @@ namespace XTerminal.Terminals
             { Keys.Backspace, new byte[] { AnsiChars.BS } },
             { Keys.Tab, new byte[] { AnsiChars.Tab } },
 
-            { Keys.CusorUp, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.A } },
-            { Keys.CursorDown, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.B } },
-            { Keys.CursorLeft, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.D } },
-            { Keys.CursorRight, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.C } },
+            { Keys.CusorUp, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.A } },
+            { Keys.CursorDown, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.B } },
+            { Keys.CursorLeft, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.D } },
+            { Keys.CursorRight, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.C } },
 
             { Keys.D1, new byte[]{ Convert.ToByte("041", 8) } },
             { Keys.D2, new byte[]{ Convert.ToByte("100", 8) } },
@@ -97,21 +96,21 @@ namespace XTerminal.Terminals
             { Keys.Backspace, new byte[] { AnsiChars.BS } },
             { Keys.Tab, new byte[] { AnsiChars.Tab } },
 
-            { Keys.CusorUp, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.A } },
-            { Keys.CursorDown, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.B } },
-            { Keys.CursorLeft, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.D } },
-            { Keys.CursorRight, new byte[] { ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.C } },
+            { Keys.CusorUp, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.A } },
+            { Keys.CursorDown, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.B } },
+            { Keys.CursorLeft, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.D } },
+            { Keys.CursorRight, new byte[] { ControlFunctions.ControlFunctions.ESC, Fe.CSI_7BIT, AnsiChars.C } },
 
             { Keys.D1, new byte[]{ Convert.ToByte("061", 8) } },
             { Keys.D2, new byte[]{ Convert.ToByte("062", 8) } },
             { Keys.D3, new byte[]{ Convert.ToByte("063", 8) } },
             { Keys.D4, new byte[]{ Convert.ToByte("064", 8) } },
             { Keys.D5, new byte[]{ Convert.ToByte("065", 8) } },
-            { Keys.D6, new byte[]{  Convert.ToByte("066", 8) } },
+            { Keys.D6, new byte[]{ Convert.ToByte("066", 8) } },
             { Keys.D7, new byte[]{ Convert.ToByte("067", 8) } },
-            { Keys.D8, new byte[]{  Convert.ToByte("070", 8) } },
-            { Keys.D9, new byte[]{  Convert.ToByte("071", 8) } },
-            { Keys.D0, new byte[]{  Convert.ToByte("060", 8) } },
+            { Keys.D8, new byte[]{ Convert.ToByte("070", 8) } },
+            { Keys.D9, new byte[]{ Convert.ToByte("071", 8) } },
+            { Keys.D0, new byte[]{ Convert.ToByte("060", 8) } },
             { Keys.OemMinus, new byte[]{ Convert.ToByte("055", 8) } },
             { Keys.OemPlus, new byte[]{ Convert.ToByte("075", 8) } },
             { Keys.OemOpenBrackets,  new byte[] { Convert.ToByte("133", 8) } },
