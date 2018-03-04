@@ -181,7 +181,6 @@ namespace XTerminal.Terminals
         ///     xterminal/Dependencies/VT100 User Guide/chapter3.html#S3.3.1
         ///     xterminal/Dependencies/VT100 User Guide/table3-2.html
         /// </summary>
-
         private static Dictionary<Keys, byte[]> UpperCaseKeyCode = new Dictionary<Keys, byte[]>()
         {
             { Keys.A, new byte[] { Convert.ToByte("101", 8) } },// SOH

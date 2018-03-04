@@ -69,7 +69,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ControlFunctions\AnsiChars.cs" />
-    <Compile Include="ControlFunctions\Fe.cs" />
     <Compile Include="CharacterCodedBits.cs" />
     <Compile Include="ControlFunctions\CharacterUtils.cs" />
     <Compile Include="ControlFunctions\ControlFunctions.cs" />
@@ -80,6 +79,7 @@
     <Compile Include="Connections\IConnectionAuthorition.cs" />
     <Compile Include="Connections\SshConnection.cs" />
     <Compile Include="Connections\SshConnectionAuthorition.cs" />
+    <Compile Include="ControlFunctions\Fe.cs" />
     <Compile Include="DefaultValues.cs" />
     <Compile Include="EscapeSequences\AnsiEscapeSequencesParser.cs" />
     <Compile Include="EscapeSequences\EscapeSequencesCommand.cs" />

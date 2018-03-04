@@ -7,11 +7,12 @@ using XTerminal.ControlFunctions.CSI;
 namespace XTerminal.ControlFunctions
 {
     /// <summary>
-    /// Fe表示跟在ControlFunction后面的一个字符
-    /// 可以认为是控制函数的命令类型
+    /// 对于7位ascii编码：
+    ///     Fe表示跟在ControlFunction后面的一个字符
+    ///     可以认为是控制函数的命令类型
+    /// 对于8位ascii编码：
+    ///     Fe表示ControlFunction
     /// 
-    /// Ansi8位编码和Ansi7位编码所使用的Fe字符码不一样，但是含义都是一样的，可能稍有不同
-    /// 目前终端用的似乎都是Ansi7位编码，所以使用7 bit code Fe就可以了
     /// 参考：
     ///     xterminal\Dependencies\Control Functions for Coded Character Sets Ecma-048.pdf 5.4章节
     /// </summary>
@@ -84,12 +85,49 @@ namespace XTerminal.ControlFunctions
         public static byte APC_8BIT = CharacterUtils.BitCombinations(09, 15);
 
         #endregion
+
+        private static Dictionary<byte, byte> _7BitFeMap = new Dictionary<byte, byte>()
+        {
+            { BPH_7BIT, BPH_7BIT },
+            { NBH_7BIT, NBH_7BIT },
+            { NEL_7BIT, NEL_7BIT },
+            { SSA_7BIT, SSA_7BIT },
+            { ESA_7BIT, ESA_7BIT },
+            { HTS_7BIT, HTS_7BIT },
+            { HTJ_7BIT, HTJ_7BIT },
+            { VTS_7BIT, VTS_7BIT },
+            { PLD_7BIT, PLD_7BIT },
+            { PLU_7BIT, PLU_7BIT },
+            { R1_7BIT, R1_7BIT },
+            { SS2_7BIT, SS2_7BIT },
+            { SS3_7BIT, SS3_7BIT },
+
+            { DCS_7BIT, DCS_7BIT },
+            { PU1_7BIT, PU1_7BIT },
+            { PU2_7BIT, PU2_7BIT },
+            { STS_7BIT, STS_7BIT },
+            { CCH_7BIT, CCH_7BIT },
+            { MW_7BIT, MW_7BIT },
+            { SPA_7BIT, SPA_7BIT },
+            { EPA_7BIT, EPA_7BIT },
+            { SOS_7BIT, SOS_7BIT },
+            { SCI_7BIT, SCI_7BIT },
+            { CSI_7BIT, CSI_7BIT },
+            { ST_7BIT, ST_7BIT },
+            { OSC_7BIT, OSC_7BIT },
+            { PM_7BIT, PM_7BIT },
+            { APC_7BIT, APC_7BIT },
+        };
+
+        public static bool Is7bitFe(byte feByte)
+        {
+            return _7BitFeMap.ContainsKey(feByte);
+        }
     }
 
     #region CSI数据结构定义
 
     // CSI是Fe的一种
-
     namespace CSI
     {
         /// <summary>
@@ -98,8 +136,13 @@ namespace XTerminal.ControlFunctions
         /// </summary>
         public struct ParameterBytes
         {
-            public static byte StartChar = CharacterUtils.BitCombinations(03, 00);
-            public static byte EndChar = CharacterUtils.BitCombinations(03, 15);
+            public static readonly byte MinimumValue = CharacterUtils.BitCombinations(03, 00);
+            public static readonly byte MaximumValue = CharacterUtils.BitCombinations(03, 15);
+
+            public static bool IsParameterByte(byte c)
+            {
+                return c > MinimumValue && c < MaximumValue;
+            }
         }
 
         /// <summary>
@@ -109,7 +152,13 @@ namespace XTerminal.ControlFunctions
         /// </summary>
         public struct IntermediateBytes
         {
+            public static readonly byte MinimumValue = CharacterUtils.BitCombinations(02, 00);
+            public static readonly byte MaximumValue = CharacterUtils.BitCombinations(02, 15);
 
+            public static bool IsIntermediateByte(byte c)
+            {
+                return c > MinimumValue && c < MaximumValue;
+            }
         }
 
         /// <summary>
@@ -120,7 +169,7 @@ namespace XTerminal.ControlFunctions
         /// combinations 07/00 to 07/14 are available as Final Bytes of control sequences for private (or
         /// experimental) use.
         /// </summary>
-        public struct FinalBytes
+        public struct FinalByte
         {
             #region Without Intermediate Bytes 
 
@@ -224,6 +273,168 @@ namespace XTerminal.ControlFunctions
             public static byte SCP = CharacterUtils.BitCombinations(06, 11);
 
             #endregion
+
+            public static byte MinimumValue = CharacterUtils.BitCombinations(04, 00);
+            public static byte MaximumValue = CharacterUtils.BitCombinations(06, 15);
+            public static byte PrivateUse_MinimumValue = CharacterUtils.BitCombinations(07, 00);
+            public static byte PrivateUse_MaximumValue = CharacterUtils.BitCombinations(07, 14);
+
+            private static Dictionary<byte, byte> FinalByteMap = new Dictionary<byte, byte>()
+            {
+                { FinalByte.ICH, FinalByte.ICH },
+                { FinalByte.CUU, FinalByte.ICH },
+                { FinalByte.CUD, FinalByte.ICH },
+                { FinalByte.CUF, FinalByte.ICH },
+                { FinalByte.CUB, FinalByte.ICH },
+                { FinalByte.CNL, FinalByte.ICH },
+                { FinalByte.CPL, FinalByte.ICH },
+                { FinalByte.CHA, FinalByte.ICH },
+                { FinalByte.CUP, FinalByte.ICH },
+                { FinalByte.CHT, FinalByte.ICH },
+                { FinalByte.ED, FinalByte.ICH },
+                { FinalByte.EL, FinalByte.ICH },
+                { FinalByte.IL, FinalByte.ICH },
+                { FinalByte.DL, FinalByte.ICH },
+                { FinalByte.EF, FinalByte.ICH },
+                { FinalByte.EA, FinalByte.ICH },
+
+                { FinalByte.DCH, FinalByte.ICH },
+                { FinalByte.SSE, FinalByte.ICH },
+                { FinalByte.CPR, FinalByte.ICH },
+                { FinalByte.SU, FinalByte.ICH },
+                { FinalByte.SD, FinalByte.ICH },
+                { FinalByte.NP, FinalByte.ICH },
+                { FinalByte.PP, FinalByte.ICH },
+                { FinalByte.CTC, FinalByte.ICH },
+                { FinalByte.ECH, FinalByte.ICH },
+                { FinalByte.CVT, FinalByte.ICH },
+                { FinalByte.CBT, FinalByte.ICH },
+                { FinalByte.SRS, FinalByte.ICH },
+                { FinalByte.PTX, FinalByte.ICH },
+                { FinalByte.SDS, FinalByte.ICH },
+                { FinalByte.SIMD, FinalByte.ICH },
+
+                { FinalByte.HPA, FinalByte.ICH },
+                { FinalByte.HPR, FinalByte.ICH },
+                { FinalByte.REP, FinalByte.ICH },
+                { FinalByte.DA, FinalByte.ICH },
+                { FinalByte.VPA, FinalByte.ICH },
+                { FinalByte.VPR, FinalByte.ICH },
+                { FinalByte.HVP, FinalByte.ICH },
+                { FinalByte.TBC, FinalByte.ICH },
+                { FinalByte.SM, FinalByte.ICH },
+                { FinalByte.MC, FinalByte.ICH },
+                { FinalByte.HPB, FinalByte.ICH },
+                { FinalByte.VPB, FinalByte.ICH },
+                { FinalByte.RM, FinalByte.ICH },
+                { FinalByte.SGR, FinalByte.ICH },
+                { FinalByte.DSR, FinalByte.ICH },
+                { FinalByte.DAQ, FinalByte.ICH },
+
+            };
+            private static Dictionary<byte, byte> FinalByteWithIntermediateBytes0200Map = new Dictionary<byte, byte>()
+            {
+                { FinalByte.SL, FinalByte.ICH },
+                { FinalByte.SR, FinalByte.ICH },
+                { FinalByte.GSM, FinalByte.ICH },
+                { FinalByte.GSS, FinalByte.ICH },
+                { FinalByte.FNT, FinalByte.ICH },
+                { FinalByte.TSS, FinalByte.ICH },
+                { FinalByte.JFY, FinalByte.ICH },
+                { FinalByte.SPI, FinalByte.ICH },
+                { FinalByte.QUAD, FinalByte.ICH },
+                { FinalByte.SSU, FinalByte.ICH },
+                { FinalByte.PFS, FinalByte.ICH },
+                { FinalByte.SHS, FinalByte.ICH },
+                { FinalByte.SVS, FinalByte.ICH },
+                { FinalByte.IGS, FinalByte.ICH },
+                { FinalByte.IDCS, FinalByte.ICH },
+
+                { FinalByte.PPA, FinalByte.ICH },
+                { FinalByte.PPR, FinalByte.ICH },
+                { FinalByte.PPB, FinalByte.ICH },
+                { FinalByte.SPD, FinalByte.ICH },
+                { FinalByte.DTA, FinalByte.ICH },
+                { FinalByte.SHL, FinalByte.ICH },
+                { FinalByte.SLL, FinalByte.ICH },
+                { FinalByte.FNK, FinalByte.ICH },
+                { FinalByte.SPQR, FinalByte.ICH },
+                { FinalByte.SEF, FinalByte.ICH },
+                { FinalByte.PEC, FinalByte.ICH },
+                { FinalByte.SSW, FinalByte.ICH },
+                { FinalByte.SACS, FinalByte.ICH },
+                { FinalByte.SAPV, FinalByte.ICH },
+                { FinalByte.STAB, FinalByte.ICH },
+                { FinalByte.GCC, FinalByte.ICH },
+
+                { FinalByte.TATE, FinalByte.ICH },
+                { FinalByte.TALE, FinalByte.ICH },
+                { FinalByte.TAC, FinalByte.ICH },
+                { FinalByte.TCC, FinalByte.ICH },
+                { FinalByte.TSR, FinalByte.ICH },
+                { FinalByte.SCO, FinalByte.ICH },
+                { FinalByte.SRCS, FinalByte.ICH },
+                { FinalByte.SCS, FinalByte.ICH },
+                { FinalByte.SLS, FinalByte.ICH },
+                { FinalByte.SCP, FinalByte.ICH },
+            };
+
+            public byte Char;
+            public bool PrivateUse;
+            public bool WithIntermediateByte0200;
+
+            public static bool IsFinalByte(byte c, out bool privateUse, out bool withIntermediateBytes)
+            {
+                privateUse = false;
+                withIntermediateBytes = false;
+                if (FinalByteMap.ContainsKey(c))
+                {
+                    privateUse = c > PrivateUse_MinimumValue && c < PrivateUse_MaximumValue;
+                    withIntermediateBytes = false;
+                    return true;
+                }
+
+                if (FinalByteWithIntermediateBytes0200Map.ContainsKey(c))
+                {
+                    privateUse = c > PrivateUse_MinimumValue && c < PrivateUse_MaximumValue;
+                    withIntermediateBytes = true;
+                    return true;
+                }
+
+                return false;
+            }
+        }
+    }
+
+    #endregion
+
+    #region OSC数据结构定义
+
+    /*
+     * OSC is used as the opening delimiter of a control string for operating system use. The command string 
+     * following may consist of a sequence of bit combinations in the range 00/08 to 00/13 and 02/00 to 07/14. 
+     * The control string is closed by the terminating delimiter STRING TERMINATOR (ST). The 
+     * interpretation of the command string depends on the relevant operating system. 
+     * 参考：
+     *      xterminal\Dependencies\Control Functions for Coded Character Sets Ecma-048.pdf 8.3.89章节
+     */
+
+    public class OSC
+    {
+        /// <summary>
+        /// 每种终端可能使用不同的STRING_TERMINATOR分隔符
+        /// 需要在界面做相应配置
+        /// 经过测试，在ubuntu上，使用ascii码的32，是一个空字符
+        /// </summary>
+        public static readonly byte STRING_TERMINATOR = CharacterUtils.BitCombinations(02, 00);
+
+        /// <summary>
+        /// 检测是否是OSC结束符
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsTerminatedChar(byte c)
+        {
+            return c == STRING_TERMINATOR;
         }
     }
 
@@ -235,21 +446,67 @@ namespace XTerminal.ControlFunctions
     public static class FeParser
     {
         /// <summary>
-        /// 从一串字符中解析出parameter，intermediate，final数据
+        /// 从一串字符中解析出CSI的parameter，intermediate，final数据
         /// </summary>
         /// <param name="bytes">要解析的bytes</param>
         /// <param name="parameter"></param>
         /// <param name="intermediate"></param>
         /// <param name="final"></param>
         /// <returns></returns>
-        public static bool ParseCSI(byte[] chars, out ParameterBytes parameter, out IntermediateBytes intermediate, FinalBytes final)
+        public static bool ParseCSI(byte[] chars, out ParameterBytes parameter, out IntermediateBytes intermediate, out FinalByte final)
         {
+            final.PrivateUse = false;
+            final.Char = 0;
+            final.WithIntermediateByte0200 = false;
+
+            bool isCsiStart = false;
+            bool is7BitAscii = true;
+            int length = chars.Length;
             List<byte> pBytes = new List<byte>(); // parameterBytes
             List<byte> iBytes = new List<byte>(); // intermediateBytes
-            List<byte> fBytes = new List<byte>(); // finalBytes
 
+            for (int idx = 0; idx < length; idx++)
+            {
+                byte c = chars[idx];
+                if (isCsiStart)
+                {
+                    if (ParameterBytes.IsParameterByte(c))
+                    {
+                        pBytes.Add(c);
+                    }
 
-            throw new NotImplementedException();
+                    if (IntermediateBytes.IsIntermediateByte(c))
+                    {
+                        iBytes.Add(c);
+                    }
+
+                    if (FinalByte.IsFinalByte(c, out final.PrivateUse, out final.WithIntermediateByte0200))
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (c == Fe.CSI_8BIT)
+                    {
+                        is7BitAscii = false;
+                        isCsiStart = true;
+                        continue;
+                    }
+
+                    if (c != ControlFunctions.ESC)
+                    {
+                        continue;
+                    }
+
+                    if (chars[idx + 1] == Fe.CSI_7BIT)
+                    {
+                        isCsiStart = true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

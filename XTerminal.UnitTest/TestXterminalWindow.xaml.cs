@@ -10,7 +10,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using XTerminal.CharacterParsers;
 using XTerminal.Connections;
 using XTerminal.ControlFunctions;
 using XTerminal.Terminal;
@@ -21,11 +20,11 @@ namespace XTerminal.UnitTest
     /// <summary>
     /// TestSSHClientWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class TestSSHClientWindow : Window
+    public partial class TestXterminalWindow : Window
     {
         private AbstractTerminal terminal;
 
-        public TestSSHClientWindow()
+        public TestXterminalWindow()
         {
             InitializeComponent();
         }
@@ -38,9 +37,9 @@ namespace XTerminal.UnitTest
                 IConnectionAuthorition authorition = new SshConnectionAuthorition()
                 {
                     ServerPort = 22,
-                    ServerAddress = "192.168.2.200",
-                    UserName = "zyf",
-                    Password = "18612538605",
+                    ServerAddress = TextBoxIPAddress.Text,
+                    UserName = TextBoxUserName.Text,
+                    Password = TextBoxPassword.Text,
                     TerminalName = TerminalNames.TerminalXTerm
                 };
                 this.terminal.CommandReceived += Terminal_CommandReceived;
@@ -118,6 +117,18 @@ namespace XTerminal.UnitTest
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             base.OnPreviewTextInput(e);
+        }
+
+        private void ButtonParse_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime start = DateTime.Now;
+            byte[] data = Encoding.ASCII.GetBytes(TextBoxMessage.Text);
+            List<ControlFunctionParserResult> result;
+            if (ControlFunctions.ControlFunctions.Parse(data, out result))
+            {
+                double time = (DateTime.Now - start).TotalMilliseconds;
+                Console.WriteLine("解析成功, {0}", time);
+            }
         }
 
         //private void XtermTerminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)
