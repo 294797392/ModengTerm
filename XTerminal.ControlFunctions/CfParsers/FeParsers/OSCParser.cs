@@ -33,6 +33,11 @@ namespace AsciiControlFunctions.FeParsers
         /// 不包括OSC字符
         /// </summary>
         public byte[] CommandString;
+
+        public int GetSize()
+        {
+            return this.CommandString.Length;
+        }
     }
 
     public class OSCParser : FeParser

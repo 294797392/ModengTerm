@@ -16,6 +16,5 @@ namespace AsciiControlFunctions.CfInvocations
     /// </summary>
     public interface ICfInvocation
     {
-
     }
 }

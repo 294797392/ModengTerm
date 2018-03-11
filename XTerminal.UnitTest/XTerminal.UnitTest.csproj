@@ -116,6 +116,10 @@
       <Project>{6dd46c6e-e3b3-4f5a-bea0-e03893a1cee4}</Project>
       <Name>XTerminal</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XTerminal.ControlFunctions\AsciiControlFunctions.csproj">
+      <Project>{8f9bd573-1f86-453b-81c7-1344f1f09725}</Project>
+      <Name>AsciiControlFunctions</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

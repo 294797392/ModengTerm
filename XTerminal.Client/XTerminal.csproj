@@ -68,10 +68,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ControlFunctions\AnsiChars.cs" />
     <Compile Include="CharacterCodedBits.cs" />
-    <Compile Include="ControlFunctions\CharacterUtils.cs" />
-    <Compile Include="ControlFunctions\ControlFunctions.cs" />
     <Compile Include="Commands\PredefineCommands.cs" />
     <Compile Include="Connections\ConnectionFactory.cs" />
     <Compile Include="Connections\ConnectionProtocols.cs" />
@@ -79,7 +76,6 @@
     <Compile Include="Connections\IConnectionAuthorition.cs" />
     <Compile Include="Connections\SshConnection.cs" />
     <Compile Include="Connections\SshConnectionAuthorition.cs" />
-    <Compile Include="ControlFunctions\Fe.cs" />
     <Compile Include="DefaultValues.cs" />
     <Compile Include="EscapeSequences\AnsiEscapeSequencesParser.cs" />
     <Compile Include="EscapeSequences\EscapeSequencesCommand.cs" />
@@ -146,7 +142,12 @@
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\XTerminal.ControlFunctions\AsciiControlFunctions.csproj">
+      <Project>{8f9bd573-1f86-453b-81c7-1344f1f09725}</Project>
+      <Name>AsciiControlFunctions</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

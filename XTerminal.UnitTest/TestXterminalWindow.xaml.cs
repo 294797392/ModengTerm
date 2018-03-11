@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AsciiControlFunctions;
+using AsciiControlFunctions.CfInvocations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +13,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using XTerminal.Connections;
-using XTerminal.ControlFunctions;
 using XTerminal.Terminal;
 using XTerminal.Terminals;
 
@@ -123,8 +124,8 @@ namespace XTerminal.UnitTest
         {
             DateTime start = DateTime.Now;
             byte[] data = Encoding.ASCII.GetBytes(TextBoxMessage.Text);
-            List<ControlFunctionParserResult> result;
-            if (ControlFunctions.ControlFunctions.Parse(data, out result))
+            List<ICfInvocation> result;
+            if (ControlFunctions.Parse(data, out result))
             {
                 double time = (DateTime.Now - start).TotalMilliseconds;
                 Console.WriteLine("解析成功, {0}", time);

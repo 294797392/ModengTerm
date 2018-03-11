@@ -6,6 +6,9 @@ using System.Text;
 
 namespace AsciiControlFunctions.FeParsers
 {
+    /// <summary>
+    /// 解析ControlFunction是ESC类型的的字符串
+    /// </summary>
     public abstract class FeParser
     {
         /// <summary>

@@ -170,14 +170,14 @@ namespace AsciiControlFunctions
                         throw new NotImplementedException(string.Format("未实现ControlFunction'{0}'的解析器", c));
                     }
 
-                    int endIdx;
+                    int dataSize;
                     ICfInvocation invocation;
-                    if (!parser.Parse(chars, idx, out invocation, out endIdx))
+                    if (!parser.Parse(chars, idx, out invocation, out dataSize))
                     {
                         logger.ErrorFormat("解析ControlFunction'{0}'失败", c);
                         return false;
                     }
-                    idx = endIdx;
+                    idx += dataSize;
                     invocations.Add(invocation);
                 }
             }

@@ -27,7 +27,7 @@ namespace AsciiControlFunctions
         /// </summary>
         private static Dictionary<byte, ICfInvocation> FunctionContentMap = new Dictionary<byte, ICfInvocation>();
 
-        public override bool Parse(byte[] chars, int cfIndex, out ICfInvocation invocation, out int funcEndIdx)
+        public override bool Parse(byte[] chars, int cfIndex, out ICfInvocation invocation, out int dataSize)
         {
             if (!FunctionContentMap.TryGetValue(chars[cfIndex], out invocation))
             {
@@ -36,7 +36,8 @@ namespace AsciiControlFunctions
                 FunctionContentMap[chars[cfIndex]] = scInvocation;
                 invocation = scInvocation;
             }
-            funcEndIdx = cfIndex;
+
+            dataSize = 1;
 
             return true;
         }

@@ -21,13 +21,17 @@ namespace AsciiControlFunctions.CfInvocationConverters
     /// 参考：
     ///     http://invisible-island.net/xterm/ctlseqs/ctlseqs.html
     /// </summary>
-    public class VT100InvocationConverter : IInvocationConverter
+    public class XtermInvocationConverter : IInvocationConverter
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VT100InvocationConverter");
 
-        private static readonly Dictionary<Guid, IConverter> ConvertersMap = new Dictionary<Guid, IConverter>()
+        /// <summary>
+        /// FormattedCf -> FormattedCfConverter
+        /// </summary>
+        private static readonly Dictionary<string, IConverter> ConvertersMap = new Dictionary<string, IConverter>()
         {
-            { typeof(OSCConverter).GUID, new OSCConverter() }
+            { typeof(FormattedCSI).Name, new CSIConverter() },
+            { typeof(FormattedOSC).Name, new OSCConverter() }
         };
 
         /// <summary>
@@ -35,19 +39,11 @@ namespace AsciiControlFunctions.CfInvocationConverters
         /// </summary>
         private static readonly byte Delimiter = (byte)';';
 
-        /// <summary>
-        /// String Terminator：字符串终结符
-        /// 每种终端可能使用不同的String Terminator
-        /// 需要在界面做相应配置
-        /// VT100使用ascii码的7，是\a
-        /// </summary>
-        private static readonly byte ST = CharacterUtils.BitCombinations(02, 00);
-
         public bool Convert(IFormattedCf cf, out ICfInvocation invocation)
         {
             invocation = null;
             IConverter converter;
-            if (!ConvertersMap.TryGetValue(cf.GetType().GUID, out converter))
+            if (!ConvertersMap.TryGetValue(cf.GetType().Name, out converter))
             {
                 logger.ErrorFormat("未实现{0}的Convert", cf);
                 return false;
@@ -69,7 +65,7 @@ namespace AsciiControlFunctions.CfInvocationConverters
                 #region 解析Ps
 
                 int delimiterIdx = 0;
-                if (!cmd.IndexOf(VT100InvocationConverter.Delimiter, out delimiterIdx))
+                if (!cmd.IndexOf(XtermInvocationConverter.Delimiter, out delimiterIdx))
                 {
                     logger.ErrorFormat("解析OSC Ps失败, 未找到分隔符");
                     return false;

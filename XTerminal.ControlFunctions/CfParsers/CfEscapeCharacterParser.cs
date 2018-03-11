@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AsciiControlFunctions.CfInvocations;
+using AsciiControlFunctions.CfInvocationConverters;
 
 namespace AsciiControlFunctions
 {
@@ -14,74 +15,47 @@ namespace AsciiControlFunctions
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("EscControlFunctionParser");
 
-        //public override bool Parse(byte[] chars, int offset, out ControlFunctionParserResult result, out int funcEndIdx)
-        //{
-        //    result.FeChar = 0;
-        //    result.FunctionContent = null;
-        //    result.ControlFunction = 0;
-        //    funcEndIdx = 0;
-        //    int length = chars.Length;
-        //    byte fe = chars[offset + 1];
+        private IInvocationConverter InvocationConverter = new XtermInvocationConverter();
 
-        //    if (!Fe.Is7bitFe(fe))
-        //    {
-        //        return false;
-        //    }
-
-        //    if (fe == Fe.CSI_7BIT)
-        //    {
-        //        #region 解析CSI命令
-
-        //        if (fe == Fe.CSI_7BIT)
-        //        {
-        //            int charsSize = 0;
-        //            bool privateUse = false;
-        //            bool withIntermediateByte0200 = false;
-        //            for (int idx = offset + 1; idx < length; idx++)
-        //            {
-        //                charsSize++;
-        //                if (FinalByte.IsFinalByte(chars[idx], out privateUse, out withIntermediateByte0200))
-        //                {
-        //                    result.FeChar = fe;
-        //                    result.FunctionContent = new byte[charsSize];
-        //                    Array.Copy(chars, offset + 1, result.FunctionContent, 0, result.FunctionContent.Length);
-        //                    funcEndIdx = idx;
-        //                    return true;
-        //                }
-        //            }
-        //        }
-
-        //        #endregion
-        //    }
-        //    else if (fe == Fe.OSC_7BIT)
-        //    {
-        //        #region 解析OSC命令
-
-        //        int charsSize = 0;
-        //        for (int idx = offset + 1; idx < length; idx++)
-        //        {
-        //            charsSize++;
-        //            if (OSCStructures.IsTerminatedChar(chars[idx]))
-        //            {
-        //                result.FeChar = fe;
-        //                result.FunctionContent = new byte[charsSize];
-        //                Array.Copy(chars, offset + 1, result.FunctionContent, 0, result.FunctionContent.Length);
-        //                funcEndIdx = idx;
-        //                return true;
-        //            }
-        //        }
-
-        //        #endregion
-        //    }
-
-        //    logger.ErrorFormat("解析7位编码Fe'{0}'失败", fe);
-
-        //    return false;
-        //}
-
-        public override bool Parse(byte[] chars, int offset, out ICfInvocation result, out int funcEndIdx)
+        /// <summary>
+        /// Fe Code -> FeParser
+        /// </summary>
+        private static Dictionary<byte, FeParser> FeParserMap = new Dictionary<byte, FeParser>()
         {
-            throw new NotImplementedException();
+            { Fe.CSI_7BIT, new CSIParser() },
+            { Fe.OSC_7BIT, new OSCParser() }
+        };
+
+        public override bool Parse(byte[] chars, int cfIndex, out ICfInvocation invocation, out int dataSize)
+        {
+            invocation = null;
+            dataSize = 0;
+
+            FeParser feParser;
+            if (!FeParserMap.TryGetValue(chars[cfIndex+1], out feParser))
+            {
+                throw new NotImplementedException(string.Format("未实现Fe:{0}的Parser", chars[cfIndex + 1]));
+            }
+
+            byte[] buffer = new byte[chars.Length - 1];
+            Buffer.BlockCopy(chars, 1, buffer, 0, buffer.Length);
+
+            IFormattedCf formattedCf;
+            if (!feParser.Parse(buffer, out formattedCf))
+            {
+                logger.ErrorFormat("转换IFormattedCf失败, Fe:{0}", chars[cfIndex + 1]);
+                return false;
+            }
+
+            if (!this.InvocationConverter.Convert(formattedCf, out invocation))
+            {
+                logger.ErrorFormat("转换CfInvocation失败, Fe:{0}", chars[cfIndex + 1]);
+                return false;
+            }
+
+            dataSize = formattedCf.GetSize();
+
+            return true;
         }
     }
 }

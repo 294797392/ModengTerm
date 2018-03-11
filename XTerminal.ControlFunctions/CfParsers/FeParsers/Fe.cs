@@ -1,10 +1,9 @@
-﻿using AsciiControlFunctions.FeParsers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions
+namespace AsciiControlFunctions.FeParsers
 {
     /// <summary>
     /// 对于7位ascii编码：
@@ -123,75 +122,5 @@ namespace AsciiControlFunctions
         {
             return _7BitFeMap.ContainsKey(feByte);
         }
-    }
-
-    /// <summary>
-    /// 解析控制函数的类型
-    /// </summary>
-    public static class FeParser
-    {
-        /// <summary>
-        /// 从一串字符中解析出CSI的parameter，intermediate，final数据
-        /// </summary>
-        /// <param name="bytes">要解析的bytes</param>
-        /// <param name="parameter"></param>
-        /// <param name="intermediate"></param>
-        /// <param name="final"></param>
-        /// <returns></returns>
-        //public static bool ParseCSI(byte[] chars, out ParameterBytes parameter, out IntermediateBytes intermediate, out FinalByte final)
-        //{
-        //    final.PrivateUse = false;
-        //    final.Char = 0;
-        //    final.WithIntermediateByte0200 = false;
-
-        //    bool isCsiStart = false;
-        //    bool is7BitAscii = true;
-        //    int length = chars.Length;
-        //    List<byte> pBytes = new List<byte>(); // parameterBytes
-        //    List<byte> iBytes = new List<byte>(); // intermediateBytes
-
-        //    for (int idx = 0; idx < length; idx++)
-        //    {
-        //        byte c = chars[idx];
-        //        if (isCsiStart)
-        //        {
-        //            if (ParameterBytes.IsParameterByte(c))
-        //            {
-        //                pBytes.Add(c);
-        //            }
-
-        //            if (IntermediateBytes.IsIntermediateByte(c))
-        //            {
-        //                iBytes.Add(c);
-        //            }
-
-        //            if (FinalByte.IsFinalByte(c, out final.PrivateUse, out final.WithIntermediateByte0200))
-        //            {
-        //                return true;
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if (c == Fe.CSI_8BIT)
-        //            {
-        //                is7BitAscii = false;
-        //                isCsiStart = true;
-        //                continue;
-        //            }
-
-        //            if (c != ControlFunctions.ESC)
-        //            {
-        //                continue;
-        //            }
-
-        //            if (chars[idx + 1] == Fe.CSI_7BIT)
-        //            {
-        //                isCsiStart = true;
-        //            }
-        //        }
-        //    }
-
-        //    return false;
-        //}
     }
 }

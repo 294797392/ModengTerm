@@ -308,6 +308,11 @@ namespace AsciiControlFunctions.FeParsers
         public byte[] ParameterBytes;
         public byte[] IntermediateBytes;
         public FinalByte FinalByte;
+
+        public int GetSize()
+        {
+            return this.ParameterBytes.Length + this.IntermediateBytes.Length + 1;
+        }
     }
 
     public class CSIParser : FeParser

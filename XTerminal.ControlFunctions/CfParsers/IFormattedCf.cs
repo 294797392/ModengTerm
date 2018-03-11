@@ -10,5 +10,6 @@ namespace AsciiControlFunctions
     /// </summary>
     public interface IFormattedCf
     {
+        int GetSize();
     }
 }

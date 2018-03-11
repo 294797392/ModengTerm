@@ -14,8 +14,8 @@ namespace AsciiControlFunctions
         /// <param name="chars"></param>
         /// <param name="cfIndex">ControlFunction的索引位置</param>
         /// <param name="result"></param>
-        /// <param name="funcEndIdx">ControlFunction在chars里的最后一个字符的索引，下一次应该从funcEndIdx处开始解析</param>
+        /// <param name="dataSize">IFormattedCf数据结构的大小</param>
         /// <returns></returns>
-        public abstract bool Parse(byte[] chars, int cfIndex, out ICfInvocation invocation, out int funcEndIdx);
+        public abstract bool Parse(byte[] chars, int cfIndex, out ICfInvocation invocation, out int dataSize);
     }
 }
