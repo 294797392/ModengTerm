@@ -15,6 +15,8 @@ namespace XTerminal.UnitTest
     {
         App()
         {
+            //MessageBox.Show(((int)';').ToString());
+
             string log4netPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.xml");
             if (File.Exists(log4netPath))
             {
