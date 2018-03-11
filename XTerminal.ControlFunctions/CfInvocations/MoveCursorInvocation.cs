@@ -15,31 +15,33 @@ namespace AsciiControlFunctions.CfInvocations
         /// </summary>
         public enum CursorDirectionEnum
         {
-            Auto,
-            Top,
+            Custom,
+            Up,
             Left,
             Right,
-            Bottom
+            Down
         }
 
         /// <summary>
         /// 当Direction为Auto的时候，要设置的光标X坐标
+        /// Row
         /// </summary>
-        public int X { get; set; }
+        public int X;
 
         /// <summary>
         /// 当Direction为Auto的时候，要设置的光标Y坐标
+        /// Column
         /// </summary>
-        public int Y { get; set; }
+        public int Y;
 
         /// <summary>
         /// 光标移动的次数
         /// </summary>
-        public int Times { get; set; }
+        public int Times;
 
         /// <summary>
         /// 光标移动方向
         /// </summary>
-        public CursorDirectionEnum Direction { get; set; }
+        public CursorDirectionEnum Direction;
     }
 }

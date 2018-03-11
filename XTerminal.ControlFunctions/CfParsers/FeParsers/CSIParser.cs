@@ -281,6 +281,13 @@ namespace AsciiControlFunctions.FeParsers
         public bool PrivateUse;
         public bool WithIntermediateByte0200;
 
+        /// <summary>
+        /// 判断是否是CSI命令里的结束符
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="privateUse"></param>
+        /// <param name="withIntermediateBytes"></param>
+        /// <returns></returns>
         public static bool IsFinalByte(byte c, out bool privateUse, out bool withIntermediateBytes)
         {
             privateUse = false;

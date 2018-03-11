@@ -39,6 +39,18 @@ namespace AsciiControlFunctions.CfInvocationConverters
         /// </summary>
         private static readonly byte Delimiter = (byte)';';
 
+        /// <summary>
+        /// String Terminator
+        /// 终端定义的字符串结束符
+        /// </summary>
+        private static readonly byte ST = DefaultValues.ST;
+
+        private static readonly Encoding Encoding = Encoding.ASCII;
+
+        public XtermInvocationConverter()
+        {
+        }
+
         public bool Convert(IFormattedCf cf, out ICfInvocation invocation)
         {
             invocation = null;
@@ -141,7 +153,100 @@ namespace AsciiControlFunctions.CfInvocationConverters
         {
             public bool Convert(IFormattedCf cf, out ICfInvocation invocation)
             {
-                throw new NotImplementedException();
+                invocation = null;
+                var csi = (FormattedCSI)cf;
+
+                byte finalByte = csi.FinalByte.Content;
+
+                if (csi.FinalByte.PrivateUse)
+                {
+                    throw new NotImplementedException(string.Format("未实现, FormattedCSI Private Use, FinalByte:{0}", finalByte));
+                }
+
+                if (csi.FinalByte.WithIntermediateByte0200)
+                {
+                    throw new NotImplementedException(string.Format("未实现, FormattedCSI WithIntermediateByte0200, FinalByte:{0}", finalByte));
+                }
+
+                if (finalByte == FinalByte.CUU || finalByte == FinalByte.CUD ||
+                    finalByte == FinalByte.CUB || finalByte == FinalByte.CUF)
+                {
+                    #region 移动光标操作
+
+                    int times = 1;
+                    MoveCursorInvocation mcInvocation;
+                    mcInvocation.Direction = FinalByte2Direction(finalByte);
+                    mcInvocation.X = 0;
+                    mcInvocation.Y = 0;
+                    if (csi.ParameterBytes.Length > 0)
+                    {
+                        if (!csi.ParameterBytes.Numberic(out times))
+                        {
+                            logger.ErrorFormat("解析光标操作失败");
+                            return false;
+                        }
+                    }
+                    mcInvocation.Times = times;
+                    invocation = mcInvocation;
+
+                    #endregion
+                }
+                else if (finalByte == FinalByte.CUP)
+                {
+                    #region 设置光标位置
+
+                    int row = 1, column = 1;
+                    if (csi.ParameterBytes.Length > 0)
+                    {
+                        string parameter = Encoding.GetString(csi.ParameterBytes);
+                        string[] items = parameter.Split((char)Delimiter);
+                        if (items.Length != 2)
+                        {
+                            logger.ErrorFormat("解析设置光标位置失败, parameter:{0}", parameter);
+                            return false;
+                        }
+                        if (!int.TryParse(items[0], out row) || !int.TryParse(items[1], out column))
+                        {
+                            logger.ErrorFormat("解析设置光标位置失败, parameter:{0}", parameter);
+                            return false;
+                        }
+                    }
+
+                    MoveCursorInvocation mvInvocation;
+                    mvInvocation.Direction = MoveCursorInvocation.CursorDirectionEnum.Custom;
+                    mvInvocation.X = row;
+                    mvInvocation.Y = column;
+                    mvInvocation.Times = 0;
+                    invocation = mvInvocation;
+
+                    #endregion
+                }
+                else
+                {
+                    throw new NotImplementedException(string.Format("未实现FinalByte:{0}", finalByte));
+                }
+
+                return true;
+            }
+
+            private static MoveCursorInvocation.CursorDirectionEnum FinalByte2Direction(byte finalByte)
+            {
+                if (finalByte == FinalByte.CUU)
+                {
+                    return MoveCursorInvocation.CursorDirectionEnum.Up;
+                }
+                else if (finalByte == FinalByte.CUD)
+                {
+                    return MoveCursorInvocation.CursorDirectionEnum.Down;
+                }
+                else if (finalByte == FinalByte.CUB)
+                {
+                    return MoveCursorInvocation.CursorDirectionEnum.Left;
+                }
+                else
+                {
+                    return MoveCursorInvocation.CursorDirectionEnum.Right;
+                }
             }
         }
 

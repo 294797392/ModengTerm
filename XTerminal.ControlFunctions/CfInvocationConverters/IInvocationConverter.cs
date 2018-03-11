@@ -14,12 +14,6 @@ namespace AsciiControlFunctions.CfInvocationConverters
     /// </summary>
     public interface IInvocationConverter
     {
-        /// <summary>
-        /// String Terminator
-        /// 该终端定义的字符串结束符
-        /// </summary>
-        //byte ST { get; }
-
         bool Convert(IFormattedCf cf, out ICfInvocation invocation);
     }
 }
