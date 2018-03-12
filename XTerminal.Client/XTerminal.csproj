@@ -83,8 +83,8 @@
     <Compile Include="EscapeSequences\IEscapeSequencesParser.cs" />
     <Compile Include="PressedKey.cs" />
     <Compile Include="ResponseCode.cs" />
-    <Compile Include="Selections\ISelectionContext.cs" />
-    <Compile Include="Selections\SelectionPanel.cs" />
+    <Compile Include="TextSelections\ISelectionContext.cs" />
+    <Compile Include="TextSelections\SelectionPanel.cs" />
     <Compile Include="ShellControl.cs" />
     <Compile Include="Terminals\AbstractTerminal.cs" />
     <Compile Include="Terminals\IVideoTerminal.cs" />
@@ -143,9 +143,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\XTerminal.ControlFunctions\AsciiControlFunctions.csproj">
+    <ProjectReference Include="..\XTerminal.ControlFunctions\ControlFunctions.csproj">
       <Project>{8f9bd573-1f86-453b-81c7-1344f1f09725}</Project>
-      <Name>AsciiControlFunctions</Name>
+      <Name>ControlFunctions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -69,7 +69,10 @@ namespace XTerminal.UnitTest
 
         private void ButtonSend_Click(object sender, RoutedEventArgs e)
         {
+            TextBoxMessage.Clear();
+
             byte[] data = Encoding.ASCII.GetBytes(string.Format("{0}\n", TextBoxCmd.Text));
+            this.terminal.SendData(data);
             //int ascii = Convert.ToByte("040", 8);
             //this.terminal.ProcessKeyDown(data);
 
@@ -125,7 +128,7 @@ namespace XTerminal.UnitTest
             DateTime start = DateTime.Now;
             byte[] data = Encoding.ASCII.GetBytes(TextBoxMessage.Text);
             List<ICfInvocation> result;
-            if (ControlFunctions.Parse(data, out result))
+            if (ControlFunctions.ControlFunctions.Parse(data, out result))
             {
                 double time = (DateTime.Now - start).TotalMilliseconds;
                 Console.WriteLine("解析成功, {0}", time);

@@ -37,8 +37,8 @@ namespace AsciiControlFunctions
                 throw new NotImplementedException(string.Format("未实现Fe:{0}的Parser", chars[cfIndex + 1]));
             }
 
-            byte[] buffer = new byte[chars.Length - 1];
-            Buffer.BlockCopy(chars, 1, buffer, 0, buffer.Length);
+            byte[] buffer = new byte[chars.Length - cfIndex - 1];
+            Buffer.BlockCopy(chars, cfIndex + 1, buffer, 0, buffer.Length);
 
             IFormattedCf formattedCf;
             if (!feParser.Parse(buffer, out formattedCf))

@@ -1,9 +1,11 @@
 ﻿using AsciiControlFunctions.CfInvocations;
 using AsciiControlFunctions.FeParsers;
+using ControlFunctions.CfInvocations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static ControlFunctions.CfInvocations.SGRInvocation;
 
 namespace AsciiControlFunctions.CfInvocationConverters
 {
@@ -15,7 +17,7 @@ namespace AsciiControlFunctions.CfInvocationConverters
     /// C   A single(required) character.
     /// Ps  A single(usually optional) numeric parameter, composed of one of more digits.
     /// Pm  A multiple numeric parameter composed of any number of single numeric parameters, 
-    ///     separated by;  character(s).  Individual values for the parameters are listed with Ps.
+    ///     separated by ;  character(s).  Individual values for the parameters are listed with Ps.
     /// Pt  A text parameter composed of printable characters.
     /// 
     /// 参考：
@@ -45,7 +47,7 @@ namespace AsciiControlFunctions.CfInvocationConverters
         /// </summary>
         private static readonly byte ST = DefaultValues.ST;
 
-        private static readonly Encoding Encoding = Encoding.ASCII;
+        private static readonly Encoding Encoding = DefaultValues.DefaultEncoding;
 
         public XtermInvocationConverter()
         {
@@ -82,7 +84,7 @@ namespace AsciiControlFunctions.CfInvocationConverters
                     logger.ErrorFormat("解析OSC Ps失败, 未找到分隔符");
                     return false;
                 }
-                byte[] psBytes = new byte[delimiterIdx + 1];
+                byte[] psBytes = new byte[delimiterIdx];
                 Array.Copy(cmd, 0, psBytes, 0, psBytes.Length);
                 string strPs = Encoding.ASCII.GetString(psBytes);
                 int Ps = 0;
@@ -151,6 +153,20 @@ namespace AsciiControlFunctions.CfInvocationConverters
 
         private class CSIConverter : IConverter
         {
+            private static Dictionary<int, TextDecorationEnum> TextDecorationsMap = new Dictionary<int, TextDecorationEnum>()
+            {
+                { 0, TextDecorationEnum.ResetAllAttributes }, { 1, TextDecorationEnum.Bright }, { 2,  TextDecorationEnum.Dim},
+                { 4, TextDecorationEnum.Underscore}, { 5,TextDecorationEnum.Blink }, {7,TextDecorationEnum.Reverse },{ 8,TextDecorationEnum.Hidden}
+            };
+            private static Dictionary<int, string> ForegroundColorsMap = new Dictionary<int, string>()
+            {
+                {30, "Black" }, { 31,"Red"}, {32 ,"Green"}, {33,"Yellow" }, { 34,"Blue"}, { 35,"Magenta"},{ 36,"Cyan"}, { 37,"White"}
+            };
+            private static Dictionary<int, string> BackgroundColorsMap = new Dictionary<int, string>()
+            {
+                {40, "Black" }, { 41,"Red"}, {42 ,"Green"}, {43,"Yellow" }, { 44,"Blue"}, { 45,"Magenta"},{ 46,"Cyan"}, { 47,"White"}
+            };
+
             public bool Convert(IFormattedCf cf, out ICfInvocation invocation)
             {
                 invocation = null;
@@ -174,10 +190,10 @@ namespace AsciiControlFunctions.CfInvocationConverters
                     #region 移动光标操作
 
                     int times = 1;
-                    MoveCursorInvocation mcInvocation;
-                    mcInvocation.Direction = FinalByte2Direction(finalByte);
-                    mcInvocation.X = 0;
-                    mcInvocation.Y = 0;
+                    CursorInvocation cuInvocation;
+                    cuInvocation.Direction = FinalByte2Direction(finalByte);
+                    cuInvocation.X = 0;
+                    cuInvocation.Y = 0;
                     if (csi.ParameterBytes.Length > 0)
                     {
                         if (!csi.ParameterBytes.Numberic(out times))
@@ -186,8 +202,8 @@ namespace AsciiControlFunctions.CfInvocationConverters
                             return false;
                         }
                     }
-                    mcInvocation.Times = times;
-                    invocation = mcInvocation;
+                    cuInvocation.Times = times;
+                    invocation = cuInvocation;
 
                     #endregion
                 }
@@ -212,14 +228,59 @@ namespace AsciiControlFunctions.CfInvocationConverters
                         }
                     }
 
-                    MoveCursorInvocation mvInvocation;
-                    mvInvocation.Direction = MoveCursorInvocation.CursorDirectionEnum.Custom;
-                    mvInvocation.X = row;
-                    mvInvocation.Y = column;
-                    mvInvocation.Times = 0;
-                    invocation = mvInvocation;
+                    CursorInvocation cuInvocation;
+                    cuInvocation.Direction = CursorInvocation.CursorDirectionEnum.Custom;
+                    cuInvocation.X = row;
+                    cuInvocation.Y = column;
+                    cuInvocation.Times = 0;
+                    invocation = cuInvocation;
 
                     #endregion
+                }
+                else if (finalByte == FinalByte.SGR)
+                {
+                    #region 设置文本属性
+
+                    string parameters = Encoding.GetString(csi.ParameterBytes);
+                    string[] items = parameters.Split((char)Delimiter);
+                    SGRInvocation sgrInvocation;
+                    sgrInvocation.Decorations = new List<TextDecorationEnum>();
+                    sgrInvocation.Background = null;
+                    sgrInvocation.Foreground = null;
+                    sgrInvocation.Text = null;
+                    foreach (string item in items)
+                    {
+                        int attr;
+                        if (!int.TryParse(item, out attr))
+                        {
+                            logger.ErrorFormat("解析SGR失败, parameters:{0}, attr:{1}", parameters, item);
+                            return false;
+                        }
+                        if (attr >= 0 && attr <= 8)
+                        {
+                            sgrInvocation.Decorations.Add(TextDecorationsMap[attr]);
+                        }
+                        if (attr >= 30 && attr <= 37)
+                        {
+                            sgrInvocation.Foreground = ForegroundColorsMap[attr];
+                        }
+                        if (attr >= 40 && attr <= 47)
+                        {
+                            sgrInvocation.Background = BackgroundColorsMap[attr];
+                        }
+                    }
+                    invocation = sgrInvocation;
+
+                    #endregion
+                }
+                else if (finalByte == FinalByte.VPR)
+                {
+                    // 在不改变列的情况下，将光标向下移动x = 1行。
+                    string parameter = Encoding.ASCII.GetString(csi.ParameterBytes);
+                }
+                else if (finalByte == FinalByte.SRS)
+                {
+
                 }
                 else
                 {
@@ -229,23 +290,23 @@ namespace AsciiControlFunctions.CfInvocationConverters
                 return true;
             }
 
-            private static MoveCursorInvocation.CursorDirectionEnum FinalByte2Direction(byte finalByte)
+            private static CursorInvocation.CursorDirectionEnum FinalByte2Direction(byte finalByte)
             {
                 if (finalByte == FinalByte.CUU)
                 {
-                    return MoveCursorInvocation.CursorDirectionEnum.Up;
+                    return CursorInvocation.CursorDirectionEnum.Up;
                 }
                 else if (finalByte == FinalByte.CUD)
                 {
-                    return MoveCursorInvocation.CursorDirectionEnum.Down;
+                    return CursorInvocation.CursorDirectionEnum.Down;
                 }
                 else if (finalByte == FinalByte.CUB)
                 {
-                    return MoveCursorInvocation.CursorDirectionEnum.Left;
+                    return CursorInvocation.CursorDirectionEnum.Left;
                 }
                 else
                 {
-                    return MoveCursorInvocation.CursorDirectionEnum.Right;
+                    return CursorInvocation.CursorDirectionEnum.Right;
                 }
             }
         }

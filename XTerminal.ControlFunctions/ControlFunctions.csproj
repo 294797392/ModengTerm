@@ -7,8 +7,8 @@
     <ProjectGuid>{8F9BD573-1F86-453B-81C7-1344F1F09725}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AsciiControlFunctions</RootNamespace>
-    <AssemblyName>AsciiControlFunctions</AssemblyName>
+    <RootNamespace>ControlFunctions</RootNamespace>
+    <AssemblyName>ControlFunctions</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -52,7 +52,8 @@
     <Compile Include="CfInvocationConverters\IConverter.cs" />
     <Compile Include="CfInvocations\ICfInvocation.cs" />
     <Compile Include="CfInvocations\ModifyWindowInfomationInvocation.cs" />
-    <Compile Include="CfInvocations\MoveCursorInvocation.cs" />
+    <Compile Include="CfInvocations\CursorInvocation.cs" />
+    <Compile Include="CfInvocations\SGRInvocation.cs" />
     <Compile Include="CfInvocations\SingleCharacterInvocation.cs" />
     <Compile Include="CfParsers\IFormattedCf.cs" />
     <Compile Include="CharacterUtils.cs" />

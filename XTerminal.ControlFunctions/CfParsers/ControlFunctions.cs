@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions
+namespace ControlFunctions
 {
     #region 弃用注释，请不要相信这里所说的，没删掉是因为要做一个记录
 
@@ -177,7 +177,8 @@ namespace AsciiControlFunctions
                         logger.ErrorFormat("解析ControlFunction'{0}'失败", c);
                         return false;
                     }
-                    idx += dataSize;
+                    logger.InfoFormat("解析成功:{0}", invocation);
+                    idx += dataSize - 1;
                     invocations.Add(invocation);
                 }
             }

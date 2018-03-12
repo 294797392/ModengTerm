@@ -8,7 +8,7 @@ namespace AsciiControlFunctions.CfInvocations
     /// <summary>
     /// 移动光标调用
     /// </summary>
-    public struct MoveCursorInvocation : ICfInvocation
+    public struct CursorInvocation : ICfInvocation
     {
         /// <summary>
         /// 光标移动的方向

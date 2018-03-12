@@ -28,7 +28,7 @@ namespace AsciiControlFunctions.FeParsers
         /// <summary>
         /// 把一串带有控制功能的字符转换成一个格式化之后的控制功能结构体
         /// </summary>
-        /// <param name="chars">以Fe开头的字符串</param>
+        /// <param name="chars">第一个字符是Fe Code的字符串</param>
         /// <param name="cf">格式化之后的ControlFunction</param>
         /// <returns></returns>
         public abstract bool Parse(byte[] chars, out IFormattedCf cf);

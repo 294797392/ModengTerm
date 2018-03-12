@@ -99,6 +99,9 @@ namespace AsciiControlFunctions.FeParsers
         public static byte ECH = CharacterUtils.BitCombinations(05, 08);
         public static byte CVT = CharacterUtils.BitCombinations(05, 09);
         public static byte CBT = CharacterUtils.BitCombinations(05, 10);
+        /// <summary>
+        /// START REVERSED STRING
+        /// </summary>
         public static byte SRS = CharacterUtils.BitCombinations(05, 11);
         public static byte PTX = CharacterUtils.BitCombinations(05, 12);
         public static byte SDS = CharacterUtils.BitCombinations(05, 13);
@@ -109,6 +112,9 @@ namespace AsciiControlFunctions.FeParsers
         public static byte REP = CharacterUtils.BitCombinations(06, 02);
         public static byte DA = CharacterUtils.BitCombinations(06, 03);
         public static byte VPA = CharacterUtils.BitCombinations(06, 04);
+        /// <summary>
+        /// LINE POSITION FORWARD 
+        /// </summary>
         public static byte VPR = CharacterUtils.BitCombinations(06, 05);
         public static byte HVP = CharacterUtils.BitCombinations(06, 06);
         public static byte TBC = CharacterUtils.BitCombinations(06, 07);
@@ -117,6 +123,9 @@ namespace AsciiControlFunctions.FeParsers
         public static byte HPB = CharacterUtils.BitCombinations(06, 10);
         public static byte VPB = CharacterUtils.BitCombinations(06, 11);
         public static byte RM = CharacterUtils.BitCombinations(06, 12);
+        /// <summary>
+        /// SELECT GRAPHIC RENDITION
+        /// </summary>
         public static byte SGR = CharacterUtils.BitCombinations(06, 13);
         public static byte DSR = CharacterUtils.BitCombinations(06, 14);
         public static byte DAQ = CharacterUtils.BitCombinations(06, 15);

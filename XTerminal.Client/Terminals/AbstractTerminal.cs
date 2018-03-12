@@ -59,6 +59,11 @@ namespace XTerminal.Terminals
             return ResponseCode.Success;
         }
 
+        public void SendData(byte[] data)
+        {
+            this.connection.SendData(data);
+        }
+
         /// <summary>
         /// 把用户按下的按键按照每种终端的规范转换成终端要发送的ascii码
         /// </summary>

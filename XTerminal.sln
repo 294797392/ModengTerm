@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminal", "XTerminal.Clie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminal.UnitTest", "XTerminal.UnitTest\XTerminal.UnitTest.csproj", "{2DA6C832-D16D-473F-AF7F-1F5335B86E30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiControlFunctions", "XTerminal.ControlFunctions\AsciiControlFunctions.csproj", "{8F9BD573-1F86-453B-81C7-1344F1F09725}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlFunctions", "XTerminal.ControlFunctions\ControlFunctions.csproj", "{8F9BD573-1F86-453B-81C7-1344F1F09725}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
