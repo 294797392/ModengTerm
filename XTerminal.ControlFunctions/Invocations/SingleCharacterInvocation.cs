@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions.CfInvocations
+namespace ControlFunctions.CfInvocations
 {
     /// <summary>
     /// 执行单字符ControlFunction所需的信息

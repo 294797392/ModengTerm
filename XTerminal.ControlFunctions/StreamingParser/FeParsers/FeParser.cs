@@ -1,10 +1,10 @@
-﻿using AsciiControlFunctions.CfInvocations;
+﻿using ControlFunctions.CfInvocations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions.FeParsers
+namespace ControlFunctions.FeParsers
 {
     /// <summary>
     /// 解析ControlFunction是ESC类型的的字符串

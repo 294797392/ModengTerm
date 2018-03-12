@@ -49,26 +49,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnsiChars.cs" />
-    <Compile Include="CfInvocationConverters\IConverter.cs" />
-    <Compile Include="CfInvocations\ICfInvocation.cs" />
-    <Compile Include="CfInvocations\ModifyWindowInfomationInvocation.cs" />
-    <Compile Include="CfInvocations\CursorInvocation.cs" />
-    <Compile Include="CfInvocations\SGRInvocation.cs" />
-    <Compile Include="CfInvocations\SingleCharacterInvocation.cs" />
-    <Compile Include="CfParsers\IFormattedCf.cs" />
+    <Compile Include="InvocationConverters\IConverter.cs" />
+    <Compile Include="InvocationConverters\Modes.cs" />
+    <Compile Include="Invocations\ICfInvocation.cs" />
+    <Compile Include="Invocations\ModifyWindowInfomationInvocation.cs" />
+    <Compile Include="Invocations\CursorInvocation.cs" />
+    <Compile Include="Invocations\SGRInvocation.cs" />
+    <Compile Include="Invocations\SingleCharacterInvocation.cs" />
+    <Compile Include="StreamingParser\IFormattedCf.cs" />
     <Compile Include="CharacterUtils.cs" />
-    <Compile Include="CfParsers\ICfParser.cs" />
-    <Compile Include="CfParsers\ControlFunctions.cs" />
-    <Compile Include="CfParsers\CfEscapeCharacterParser.cs" />
-    <Compile Include="CfParsers\CfSingleCharacterParser.cs" />
+    <Compile Include="StreamingParser\ICfParser.cs" />
+    <Compile Include="StreamingParser\ControlFunctions.cs" />
+    <Compile Include="StreamingParser\CfEscapeCharacterParser.cs" />
+    <Compile Include="StreamingParser\CfSingleCharacterParser.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="CfParsers\FeParsers\Fe.cs" />
-    <Compile Include="CfParsers\FeParsers\CSIParser.cs" />
-    <Compile Include="CfParsers\FeParsers\FeParser.cs" />
-    <Compile Include="CfParsers\FeParsers\OSCParser.cs" />
-    <Compile Include="CfInvocationConverters\IInvocationConverter.cs" />
-    <Compile Include="CfInvocationConverters\XtermInvocationConverter.cs" />
+    <Compile Include="StreamingParser\FeParsers\Fe.cs" />
+    <Compile Include="StreamingParser\FeParsers\CSIParser.cs" />
+    <Compile Include="StreamingParser\FeParsers\FeParser.cs" />
+    <Compile Include="StreamingParser\FeParsers\OSCParser.cs" />
+    <Compile Include="InvocationConverters\IInvocationConverter.cs" />
+    <Compile Include="InvocationConverters\XtermInvocationConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StreamingParser\StreamParser.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup />

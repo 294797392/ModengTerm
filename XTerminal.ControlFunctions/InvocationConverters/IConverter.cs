@@ -1,10 +1,10 @@
-﻿using AsciiControlFunctions.CfInvocations;
+﻿using ControlFunctions.CfInvocations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions.CfInvocationConverters
+namespace ControlFunctions.CfInvocationConverters
 {
     /// <summary>
     /// 用于把ControlFunction转换成Invocation的类

@@ -1,10 +1,10 @@
-﻿using AsciiControlFunctions.CfInvocations;
+﻿using ControlFunctions.CfInvocations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions.CfInvocationConverters
+namespace ControlFunctions.CfInvocationConverters
 {
     /// <summary>
     /// 每种终端对ControlFunction里内容的定义可能不同，这里通过一个接口去解析不同终端里的ControlFunction

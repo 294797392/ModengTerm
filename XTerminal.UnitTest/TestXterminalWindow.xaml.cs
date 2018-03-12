@@ -1,5 +1,6 @@
-﻿using AsciiControlFunctions;
-using AsciiControlFunctions.CfInvocations;
+﻿using ControlFunctions;
+using ControlFunctions.CfInvocations;
+using ControlFunctions.StreamingParser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -128,7 +129,7 @@ namespace XTerminal.UnitTest
             DateTime start = DateTime.Now;
             byte[] data = Encoding.ASCII.GetBytes(TextBoxMessage.Text);
             List<ICfInvocation> result;
-            if (ControlFunctions.ControlFunctions.Parse(data, out result))
+            if (StreamParser.Parse(data, out result))
             {
                 double time = (DateTime.Now - start).TotalMilliseconds;
                 Console.WriteLine("解析成功, {0}", time);

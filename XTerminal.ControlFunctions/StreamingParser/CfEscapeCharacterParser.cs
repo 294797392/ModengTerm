@@ -1,12 +1,12 @@
-﻿using AsciiControlFunctions.FeParsers;
+﻿using ControlFunctions.FeParsers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AsciiControlFunctions.CfInvocations;
-using AsciiControlFunctions.CfInvocationConverters;
+using ControlFunctions.CfInvocations;
+using ControlFunctions.CfInvocationConverters;
 
-namespace AsciiControlFunctions
+namespace ControlFunctions
 {
     /// <summary>
     /// 解析Esc ControlFunction数据
@@ -23,7 +23,7 @@ namespace AsciiControlFunctions
         private static Dictionary<byte, FeParser> FeParserMap = new Dictionary<byte, FeParser>()
         {
             { Fe.CSI_7BIT, new CSIParser() },
-            { Fe.OSC_7BIT, new OSCParser() }
+            { Fe.OSC_7BIT, new OSCParser() },
         };
 
         public override bool Parse(byte[] chars, int cfIndex, out ICfInvocation invocation, out int dataSize)
@@ -32,7 +32,7 @@ namespace AsciiControlFunctions
             dataSize = 0;
 
             FeParser feParser;
-            if (!FeParserMap.TryGetValue(chars[cfIndex+1], out feParser))
+            if (!FeParserMap.TryGetValue(chars[cfIndex + 1], out feParser))
             {
                 throw new NotImplementedException(string.Format("未实现Fe:{0}的Parser", chars[cfIndex + 1]));
             }

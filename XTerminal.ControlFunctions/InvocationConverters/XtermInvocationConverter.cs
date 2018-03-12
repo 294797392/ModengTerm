@@ -1,13 +1,12 @@
-﻿using AsciiControlFunctions.CfInvocations;
-using AsciiControlFunctions.FeParsers;
-using ControlFunctions.CfInvocations;
+﻿using ControlFunctions.CfInvocations;
+using ControlFunctions.FeParsers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using static ControlFunctions.CfInvocations.SGRInvocation;
 
-namespace AsciiControlFunctions.CfInvocationConverters
+namespace ControlFunctions.CfInvocationConverters
 {
     /// <summary>
     /// 根据VT100终端的规则把ControlFunction的内容转换成一个Invocation
@@ -25,7 +24,7 @@ namespace AsciiControlFunctions.CfInvocationConverters
     /// </summary>
     public class XtermInvocationConverter : IInvocationConverter
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("VT100InvocationConverter");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("XtermInvocationConverter");
 
         /// <summary>
         /// FormattedCf -> FormattedCfConverter
@@ -277,10 +276,19 @@ namespace AsciiControlFunctions.CfInvocationConverters
                 {
                     // 在不改变列的情况下，将光标向下移动x = 1行。
                     string parameter = Encoding.ASCII.GetString(csi.ParameterBytes);
+                    logger.Error("VPR");
                 }
                 else if (finalByte == FinalByte.SRS)
                 {
-
+                    logger.Error("SRS");
+                }
+                else if (finalByte == FinalByte.TBC)
+                {
+                    logger.Error("TBC");
+                }
+                else if (finalByte == FinalByte.SM)
+                {
+                    logger.Error("SM");
                 }
                 else
                 {

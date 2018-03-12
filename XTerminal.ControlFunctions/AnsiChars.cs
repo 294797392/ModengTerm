@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions
+namespace ControlFunctions
 {
     public class AnsiChars
     {

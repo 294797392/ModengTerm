@@ -1,10 +1,10 @@
-﻿using AsciiControlFunctions.CfInvocations;
+﻿using ControlFunctions.CfInvocations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions
+namespace ControlFunctions
 {
     public abstract class ICfParser
     {

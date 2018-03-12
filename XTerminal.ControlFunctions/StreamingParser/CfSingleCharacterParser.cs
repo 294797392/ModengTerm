@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AsciiControlFunctions.CfInvocations;
+using ControlFunctions.CfInvocations;
 
-namespace AsciiControlFunctions
+namespace ControlFunctions
 {
     /// <summary>
     /// 单字符的ControlFunction：

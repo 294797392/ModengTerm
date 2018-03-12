@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AsciiControlFunctions.CfInvocations;
+using ControlFunctions.CfInvocations;
 
-namespace AsciiControlFunctions.FeParsers
+namespace ControlFunctions.FeParsers
 {
     /*
      * OSC is used as the opening delimiter of a control string for operating system use. The command string 

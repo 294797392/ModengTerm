@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using AsciiControlFunctions.CfInvocations;
+using ControlFunctions.CfInvocations;
 
-namespace AsciiControlFunctions.FeParsers
+namespace ControlFunctions.FeParsers
 {
     // CSI是Fe的一种
 
@@ -21,7 +21,7 @@ namespace AsciiControlFunctions.FeParsers
 
         public static bool IsParameterByte(byte c)
         {
-            return c > MinimumValue && c < MaximumValue;
+            return c >= MinimumValue && c <= MaximumValue;
         }
     }
 
@@ -39,7 +39,7 @@ namespace AsciiControlFunctions.FeParsers
 
         public static bool IsIntermediateByte(byte c)
         {
-            return c > MinimumValue && c < MaximumValue;
+            return c >= MinimumValue && c <= MaximumValue;
         }
     }
 
@@ -117,7 +117,13 @@ namespace AsciiControlFunctions.FeParsers
         /// </summary>
         public static byte VPR = CharacterUtils.BitCombinations(06, 05);
         public static byte HVP = CharacterUtils.BitCombinations(06, 06);
+        /// <summary>
+        /// TABULATION CLEAR 
+        /// </summary>
         public static byte TBC = CharacterUtils.BitCombinations(06, 07);
+        /// <summary>
+        /// SET MODE
+        /// </summary>
         public static byte SM = CharacterUtils.BitCombinations(06, 08);
         public static byte MC = CharacterUtils.BitCombinations(06, 09);
         public static byte HPB = CharacterUtils.BitCombinations(06, 10);
@@ -348,7 +354,7 @@ namespace AsciiControlFunctions.FeParsers
 
             #region 解析CSI命令各组成部分的数据
 
-            for (int index = 0; index < chars.Length; index++)
+            for (int index = 1; index < chars.Length; index++)
             {
                 byte c = chars[index];
                 if (ParameterBytes.IsParameterByte(c))
@@ -378,7 +384,7 @@ namespace AsciiControlFunctions.FeParsers
 
             FormattedCSI csi;
             csi.ParameterBytes = parameterBytes.ToArray();
-            csi.IntermediateBytes = parameterBytes.ToArray();
+            csi.IntermediateBytes = intermediateBytes.ToArray();
             csi.FinalByte.Content = finalByte;
             csi.FinalByte.PrivateUse = privateUse;
             csi.FinalByte.WithIntermediateByte0200 = withIntermediateByte0200;

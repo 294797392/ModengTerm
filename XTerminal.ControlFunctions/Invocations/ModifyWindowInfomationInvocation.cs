@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace AsciiControlFunctions.CfInvocations
+namespace ControlFunctions.CfInvocations
 {
     public struct ModifyWindowInfomationInvocation : ICfInvocation
     {
