@@ -49,21 +49,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnsiChars.cs" />
+    <Compile Include="Constants\DECPrivateControls.cs" />
     <Compile Include="InvocationConverters\IConverter.cs" />
-    <Compile Include="InvocationConverters\Modes.cs" />
+    <Compile Include="Constants\Modes.cs" />
     <Compile Include="Invocations\ICfInvocation.cs" />
     <Compile Include="Invocations\ModifyWindowInfomationInvocation.cs" />
     <Compile Include="Invocations\CursorInvocation.cs" />
     <Compile Include="Invocations\SGRInvocation.cs" />
     <Compile Include="Invocations\SingleCharacterInvocation.cs" />
+    <Compile Include="StreamingParser\FeParsers\DECPrivateControlParser.cs" />
     <Compile Include="StreamingParser\IFormattedCf.cs" />
     <Compile Include="CharacterUtils.cs" />
     <Compile Include="StreamingParser\ICfParser.cs" />
-    <Compile Include="StreamingParser\ControlFunctions.cs" />
+    <Compile Include="Constants\ControlFunctions.cs" />
     <Compile Include="StreamingParser\CfEscapeCharacterParser.cs" />
     <Compile Include="StreamingParser\CfSingleCharacterParser.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="StreamingParser\FeParsers\Fe.cs" />
+    <Compile Include="Constants\Fe.cs" />
     <Compile Include="StreamingParser\FeParsers\CSIParser.cs" />
     <Compile Include="StreamingParser\FeParsers\FeParser.cs" />
     <Compile Include="StreamingParser\FeParsers\OSCParser.cs" />
