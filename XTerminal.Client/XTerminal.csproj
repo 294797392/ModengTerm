@@ -143,9 +143,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\XTerminal.ControlFunctions\ControlFunctions.csproj">
+    <ProjectReference Include="..\XTerminalCore\XTerminalCore.csproj">
       <Project>{8f9bd573-1f86-453b-81c7-1344f1f09725}</Project>
-      <Name>ControlFunctions</Name>
+      <Name>XTerminalCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

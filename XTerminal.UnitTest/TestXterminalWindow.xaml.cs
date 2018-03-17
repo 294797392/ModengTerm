@@ -1,7 +1,4 @@
-﻿using ControlFunctions;
-using ControlFunctions.CfInvocations;
-using ControlFunctions.StreamingParser;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +13,8 @@ using System.Windows.Shapes;
 using XTerminal.Connections;
 using XTerminal.Terminal;
 using XTerminal.Terminals;
+using XTerminalCore;
+using XTerminalCore.Invocations;
 
 namespace XTerminal.UnitTest
 {
