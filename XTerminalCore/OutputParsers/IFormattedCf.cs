@@ -10,6 +10,10 @@ namespace XTerminalCore
     /// </summary>
     public interface IFormattedCf
     {
+        /// <summary>
+        /// 获取ControlFunction内容所占的字节数
+        /// </summary>
+        /// <returns></returns>
         int GetSize();
     }
 }

@@ -8,7 +8,7 @@ namespace XTerminalCore.Invocations
     /// <summary>
     /// 移动光标调用
     /// </summary>
-    public struct CursorInvocation : ICfInvocation
+    public struct CursorInvocation : IInvocation
     {
         /// <summary>
         /// 光标移动的方向

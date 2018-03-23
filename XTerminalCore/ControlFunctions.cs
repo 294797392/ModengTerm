@@ -103,7 +103,7 @@ namespace XTerminalCore
         /// <summary>
         /// ControlFunctionCode -> ControlFunctionParser
         /// </summary>
-        private static Dictionary<byte, ICfParser> _7bitControlFunctionMap = new Dictionary<byte, ICfParser>()
+        private static Dictionary<byte, IControlFunctionParser> _7bitControlFunctionMap = new Dictionary<byte, IControlFunctionParser>()
         {
             { ControlFunctions.NUL, null },
             { ControlFunctions.SOH, null },
@@ -112,13 +112,13 @@ namespace XTerminalCore
             { ControlFunctions.EOT, null },
             { ControlFunctions.ENQ, null },
             { ControlFunctions.ACK, null },
-            { ControlFunctions.BEL, new CfSingleCharacterParser() },
+            { ControlFunctions.BEL, SingleCharacterParser.Instance },
             { ControlFunctions.BS, null },
             { ControlFunctions.HT, null },
-            { ControlFunctions.LF, new CfSingleCharacterParser() },
+            { ControlFunctions.LF, SingleCharacterParser.Instance },
             { ControlFunctions.VT, null },
             { ControlFunctions.FF, null },
-            { ControlFunctions.CR, new CfSingleCharacterParser() },
+            { ControlFunctions.CR, SingleCharacterParser.Instance },
             { ControlFunctions.SOorLS1, null },
             { ControlFunctions.S1orLS0, null },
             { ControlFunctions.DLE, null },
@@ -132,14 +132,14 @@ namespace XTerminalCore
             { ControlFunctions.CAN, null },
             { ControlFunctions.EM, null },
             { ControlFunctions.SUB, null },
-            { ControlFunctions.ESC, new CfEscapeCharacterParser() },
+            { ControlFunctions.ESC, new EscapeParser() },
             { ControlFunctions.IS4, null },
             { ControlFunctions.IS3, null },
             { ControlFunctions.IS2, null },
             { ControlFunctions.IS1, null },
         };
 
-        public static bool IsControlFunction(byte c, out ICfParser parser)
+        public static bool IsControlFunction(byte c, out IControlFunctionParser parser)
         {
             return _7bitControlFunctionMap.TryGetValue(c, out parser);
         }

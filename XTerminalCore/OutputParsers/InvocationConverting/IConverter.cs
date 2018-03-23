@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using XTerminalCore.Invocations;
 
-namespace XTerminalCore.InvocationConverters
+namespace XTerminalCore.InvocationConverting
 {
     /// <summary>
     /// 用于把ControlFunction转换成Invocation的类
@@ -13,6 +13,6 @@ namespace XTerminalCore.InvocationConverters
     /// </summary>
     public interface IConverter
     {
-        bool Convert(IFormattedCf cf, out ICfInvocation invocation);
+        bool Convert(IFormattedCf cf, out IInvocation invocation);
     }
 }

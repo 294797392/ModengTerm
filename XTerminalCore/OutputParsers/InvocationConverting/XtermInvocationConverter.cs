@@ -5,7 +5,7 @@ using System.Text;
 using XTerminalCore.Invocations;
 using static XTerminalCore.Invocations.SGRInvocation;
 
-namespace XTerminalCore.InvocationConverters
+namespace XTerminalCore.InvocationConverting
 {
     /// <summary>
     /// 根据VT100终端的规则把ControlFunction的内容转换成一个Invocation
@@ -51,7 +51,7 @@ namespace XTerminalCore.InvocationConverters
         {
         }
 
-        public bool Convert(IFormattedCf cf, out ICfInvocation invocation)
+        public bool Convert(IFormattedCf cf, out IInvocation invocation)
         {
             invocation = null;
             IConverter converter;
@@ -68,7 +68,7 @@ namespace XTerminalCore.InvocationConverters
 
         private class OSCConverter : IConverter
         {
-            public bool Convert(IFormattedCf cf, out ICfInvocation invocation)
+            public bool Convert(IFormattedCf cf, out IInvocation invocation)
             {
                 invocation = null;
                 var osc = (FormattedOSC)cf;
@@ -165,7 +165,7 @@ namespace XTerminalCore.InvocationConverters
                 {40, "Black" }, { 41,"Red"}, {42 ,"Green"}, {43,"Yellow" }, { 44,"Blue"}, { 45,"Magenta"},{ 46,"Cyan"}, { 47,"White"}
             };
 
-            public bool Convert(IFormattedCf cf, out ICfInvocation invocation)
+            public bool Convert(IFormattedCf cf, out IInvocation invocation)
             {
                 invocation = null;
                 var csi = (FormattedCSI)cf;

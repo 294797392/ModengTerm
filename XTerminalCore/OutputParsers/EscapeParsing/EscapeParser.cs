@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using XTerminalCore.InvocationConverters;
+using XTerminalCore.InvocationConverting;
 using XTerminalCore.Invocations;
 
 namespace XTerminalCore
@@ -10,11 +10,9 @@ namespace XTerminalCore
     /// <summary>
     /// 解析Esc ControlFunction数据
     /// </summary>
-    public class CfEscapeCharacterParser : ICfParser
+    public class EscapeParser : IControlFunctionParser
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("EscControlFunctionParser");
-
-        private IInvocationConverter InvocationConverter = new XtermInvocationConverter();
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("EscapeParser");
 
         /// <summary>
         /// Fe Code -> FeParser
@@ -25,11 +23,8 @@ namespace XTerminalCore
             { Fe.OSC_7BIT, new OSCParser() },
         };
 
-        public override bool Parse(byte[] chars, int cfIndex, out ICfInvocation invocation, out int dataSize)
+        public override bool Parse(byte[] chars, int cfIndex, out IFormattedCf controlFunc)
         {
-            invocation = null;
-            dataSize = 0;
-
             FeParser feParser;
             if (!FeParserMap.TryGetValue(chars[cfIndex + 1], out feParser))
             {
@@ -39,20 +34,11 @@ namespace XTerminalCore
             byte[] buffer = new byte[chars.Length - cfIndex - 1];
             Buffer.BlockCopy(chars, cfIndex + 1, buffer, 0, buffer.Length);
 
-            IFormattedCf formattedCf;
-            if (!feParser.Parse(buffer, out formattedCf))
+            if (!feParser.Parse(buffer, out controlFunc))
             {
                 logger.ErrorFormat("转换IFormattedCf失败, Fe:{0}", chars[cfIndex + 1]);
                 return false;
             }
-
-            if (!this.InvocationConverter.Convert(formattedCf, out invocation))
-            {
-                logger.ErrorFormat("转换CfInvocation失败, Fe:{0}", chars[cfIndex + 1]);
-                return false;
-            }
-
-            dataSize = formattedCf.GetSize();
 
             return true;
         }

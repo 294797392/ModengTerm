@@ -11,7 +11,7 @@ namespace XTerminalCore.Invocations
     /// aspects remain in effect until the next occurrence of SGR in the data stream, depending on the setting of
     /// the GRAPHIC RENDITION COMBINATION MODE(GRCM)
     /// </summary>
-    public struct SGRInvocation : ICfInvocation
+    public struct SGRInvocation : IInvocation
     {
         /// <summary>
         /// 文本装饰

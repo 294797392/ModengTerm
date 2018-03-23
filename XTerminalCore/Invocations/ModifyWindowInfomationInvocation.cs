@@ -5,7 +5,7 @@ using System.Text;
 
 namespace XTerminalCore.Invocations
 {
-    public struct ModifyWindowInfomationInvocation : ICfInvocation
+    public struct ModifyWindowInfomationInvocation : IInvocation
     {
         public string WindowTitle;
         public string IconName;

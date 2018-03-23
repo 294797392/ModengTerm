@@ -24,6 +24,7 @@ namespace XTerminal.UnitTest
     public partial class TestXterminalWindow : Window
     {
         private AbstractTerminal terminal;
+        private OutputParser outputParser = new OutputParser();
 
         public TestXterminalWindow()
         {
@@ -127,8 +128,8 @@ namespace XTerminal.UnitTest
         {
             DateTime start = DateTime.Now;
             byte[] data = Encoding.ASCII.GetBytes(TextBoxMessage.Text);
-            List<ICfInvocation> result;
-            if (StreamParser.Parse(data, out result))
+            List<IInvocation> result;
+            if (this.outputParser.Parse(data, out result))
             {
                 double time = (DateTime.Now - start).TotalMilliseconds;
                 Console.WriteLine("解析成功, {0}", time);

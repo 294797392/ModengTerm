@@ -49,33 +49,35 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnsiChars.cs" />
-    <Compile Include="StreamParsers\FeParsers\DECPrivateControls.cs" />
-    <Compile Include="InvocationConverters\IConverter.cs" />
-    <Compile Include="StreamParsers\FeParsers\Modes.cs" />
-    <Compile Include="Invocations\ICfInvocation.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\FeParsers\DECPrivateControls.cs" />
+    <Compile Include="OutputParsers\InvocationConverting\IConverter.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\FeParsers\Modes.cs" />
+    <Compile Include="Invocations\IInvocation.cs" />
     <Compile Include="Invocations\ModifyWindowInfomationInvocation.cs" />
     <Compile Include="Invocations\CursorInvocation.cs" />
     <Compile Include="Invocations\SGRInvocation.cs" />
     <Compile Include="Invocations\SingleCharacterInvocation.cs" />
-    <Compile Include="StreamParsers\FeParsers\DECPrivateControlParser.cs" />
-    <Compile Include="StreamParsers\IFormattedCf.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\FeParsers\DECPrivateControlParser.cs" />
+    <Compile Include="OutputParsers\IFormattedCf.cs" />
     <Compile Include="CharacterUtils.cs" />
-    <Compile Include="StreamParsers\ICfParser.cs" />
+    <Compile Include="OutputParsers\IControlFunctionParser.cs" />
     <Compile Include="ControlFunctions.cs" />
-    <Compile Include="StreamParsers\CfEscapeCharacterParser.cs" />
-    <Compile Include="StreamParsers\CfSingleCharacterParser.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\EscapeParser.cs" />
+    <Compile Include="OutputParsers\SingleCharacterParser.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="StreamParsers\FeParsers\Fe.cs" />
-    <Compile Include="StreamParsers\FeParsers\CSIParser.cs" />
-    <Compile Include="StreamParsers\FeParsers\FeParser.cs" />
-    <Compile Include="StreamParsers\FeParsers\OSCParser.cs" />
-    <Compile Include="InvocationConverters\IInvocationConverter.cs" />
-    <Compile Include="InvocationConverters\XtermInvocationConverter.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\FeParsers\Fe.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\FeParsers\CSIParser.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\FeParsers\FeParser.cs" />
+    <Compile Include="OutputParsers\EscapeParsing\FeParsers\OSCParser.cs" />
+    <Compile Include="OutputParsers\InvocationConverting\IInvocationConverter.cs" />
+    <Compile Include="OutputParsers\InvocationConverting\XtermInvocationConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StreamParsers\StreamParser.cs" />
+    <Compile Include="OutputParsers\OutputParser.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="InputParsers\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
