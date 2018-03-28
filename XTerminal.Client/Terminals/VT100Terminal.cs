@@ -242,55 +242,55 @@ namespace XTerminal.Terminals
 
         #endregion
 
-        protected override byte[] TranslateKey(PressedKey key)
-        {
-            byte[] translatedByte = { };
+        //protected override byte[] TranslateKey(PressedKey key)
+        //{
+        //    byte[] translatedByte = { };
 
-            // 检测非字母Shift键按下
-            if (key.IsShiftPressed)
-            {
-                if (ShiftNonalphabeticKeyCode.TryGetValue(key.Key, out translatedByte))
-                {
-                    return translatedByte;
-                }
-            }
-            // 检测非字母+Shift键没按下
-            else
-            {
-                if (NonalphabeticKeyCode.TryGetValue(key.Key, out translatedByte))
-                {
-                    return translatedByte;
-                }
-            }
+        //    // 检测非字母Shift键按下
+        //    if (key.IsShiftPressed)
+        //    {
+        //        if (ShiftNonalphabeticKeyCode.TryGetValue(key.Key, out translatedByte))
+        //        {
+        //            return translatedByte;
+        //        }
+        //    }
+        //    // 检测非字母+Shift键没按下
+        //    else
+        //    {
+        //        if (NonalphabeticKeyCode.TryGetValue(key.Key, out translatedByte))
+        //        {
+        //            return translatedByte;
+        //        }
+        //    }
 
-            // 检测Control键按下
-            if (key.IsControlPressed)
-            {
-                if (ControlKeyCode.TryGetValue(key.Key, out translatedByte))
-                {
-                    return translatedByte;
-                }
-            }
+        //    // 检测Control键按下
+        //    if (key.IsControlPressed)
+        //    {
+        //        if (ControlKeyCode.TryGetValue(key.Key, out translatedByte))
+        //        {
+        //            return translatedByte;
+        //        }
+        //    }
 
-            // 检测大写字母
-            if (key.IsUpperCase)
-            {
-                if (UpperCaseKeyCode.TryGetValue(key.Key, out translatedByte))
-                {
-                    return translatedByte;
-                }
-            }
-            // 检测小写字母
-            else
-            {
-                if (LowerCaseKeyCode.TryGetValue(key.Key, out translatedByte))
-                {
-                    return translatedByte;
-                }
-            }
+        //    // 检测大写字母
+        //    if (key.IsUpperCase)
+        //    {
+        //        if (UpperCaseKeyCode.TryGetValue(key.Key, out translatedByte))
+        //        {
+        //            return translatedByte;
+        //        }
+        //    }
+        //    // 检测小写字母
+        //    else
+        //    {
+        //        if (LowerCaseKeyCode.TryGetValue(key.Key, out translatedByte))
+        //        {
+        //            return translatedByte;
+        //        }
+        //    }
 
-            return translatedByte;
-        }
+        //    return translatedByte;
+        //}
 
         protected override void ProcessReceivedData(byte[] data)
         {

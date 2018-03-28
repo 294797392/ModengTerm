@@ -69,19 +69,19 @@ namespace XTerminal.Terminals
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        protected abstract byte[] TranslateKey(PressedKey key);
+        //protected abstract byte[] TranslateKey(PressedKey key);
 
-        public void ProcessInputKey(PressedKey key)
-        {
-            byte[] translatedByte = this.TranslateKey(key);
-            if (translatedByte != null && translatedByte.Length > 0)
-            {
-                if (!this.connection.SendData(translatedByte))
-                {
-                    logger.Error("向主机发送数据失败");
-                }
-            }
-        }
+        //public void ProcessInputKey(PressedKey key)
+        //{
+        //    byte[] translatedByte = this.TranslateKey(key);
+        //    if (translatedByte != null && translatedByte.Length > 0)
+        //    {
+        //        if (!this.connection.SendData(translatedByte))
+        //        {
+        //            logger.Error("向主机发送数据失败");
+        //        }
+        //    }
+        //}
 
         protected abstract void ProcessReceivedData(byte[] data);
 

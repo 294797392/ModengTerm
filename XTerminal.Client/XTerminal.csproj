@@ -69,35 +69,43 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CharacterCodedBits.cs" />
-    <Compile Include="Commands\PredefineCommands.cs" />
     <Compile Include="Connections\ConnectionFactory.cs" />
     <Compile Include="Connections\ConnectionProtocols.cs" />
     <Compile Include="Connections\IConnection.cs" />
     <Compile Include="Connections\IConnectionAuthorition.cs" />
     <Compile Include="Connections\SshConnection.cs" />
     <Compile Include="Connections\SshConnectionAuthorition.cs" />
+    <Compile Include="Controls\TermLine.cs" />
+    <Compile Include="Controls\TermText.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="EscapeSequences\AnsiEscapeSequencesParser.cs" />
-    <Compile Include="EscapeSequences\EscapeSequencesCommand.cs" />
-    <Compile Include="EscapeSequences\IEscapeSequencesCommand.cs" />
-    <Compile Include="EscapeSequences\IEscapeSequencesParser.cs" />
-    <Compile Include="PressedKey.cs" />
     <Compile Include="ResponseCode.cs" />
+    <Compile Include="Terminals\AbstractTerminal.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Terminals\ControlCharacters.cs" />
+    <Compile Include="Terminals\IVideoTerminal.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Terminals\Keys.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Terminals\TerminalActions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Terminals\VT100Terminal.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Terminals\XtermTerminal.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="TextSelections\ISelectionContext.cs" />
     <Compile Include="TextSelections\SelectionPanel.cs" />
-    <Compile Include="ShellControl.cs" />
-    <Compile Include="Terminals\AbstractTerminal.cs" />
-    <Compile Include="Terminals\IVideoTerminal.cs" />
-    <Compile Include="Terminals\Keys.cs" />
-    <Compile Include="Terminals\XtermTerminal.cs" />
-    <Compile Include="Terminals\TerminalActions.cs" />
-    <Compile Include="Terminals\VT100Terminal.cs" />
     <Compile Include="TerminalConnectionStatus.cs" />
     <Compile Include="TerminalNames.cs" />
     <Compile Include="TextRendering\TextItem.cs" />
     <Compile Include="TextRendering\TextLine.cs" />
     <Compile Include="TextRendering\TextList.cs" />
-    <Compile Include="Utils\Utils.cs" />
+    <Compile Include="Controls\TermScreen.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

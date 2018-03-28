@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using static XTerminal.Terminal.EscapeSequences.ColorizedTextCommand;
 using XTerminal.Terminal.EscapeSequences;
-using static XTerminal.Terminal.EscapeSequences.CursorActionCommand;
 using XTerminal.Commands;
 
 namespace XTerminal.Terminal
@@ -29,7 +27,7 @@ namespace XTerminal.Terminal
 
         private static Dictionary<int, TextDecorationEnum> TextDecorationsMap = new Dictionary<int, TextDecorationEnum>()
         {
-            { 0, TextDecorationEnum.ResetAllAttributes }, { 1, TextDecorationEnum.Bright }, { 2,  TextDecorationEnum.Dim},
+            { 0, XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.ResetAllAttributes }, { 1, TextDecorationEnum.Bright }, { 2,  TextDecorationEnum.Dim},
             { 4, TextDecorationEnum.Underscore}, { 5,TextDecorationEnum.Blink }, {7,TextDecorationEnum.Reverse },{ 8,TextDecorationEnum.Hidden}
         };
         private static Dictionary<int, string> ForegroundColorsMap = new Dictionary<int, string>()

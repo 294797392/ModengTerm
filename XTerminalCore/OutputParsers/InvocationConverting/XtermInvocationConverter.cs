@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using XTerminalCore.Invocations;
-using static XTerminalCore.Invocations.SGRInvocation;
 
 namespace XTerminalCore.InvocationConverting
 {
@@ -151,10 +150,10 @@ namespace XTerminalCore.InvocationConverting
 
         private class CSIConverter : IConverter
         {
-            private static Dictionary<int, TextDecorationEnum> TextDecorationsMap = new Dictionary<int, TextDecorationEnum>()
+            private static Dictionary<int, XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum> TextDecorationsMap = new Dictionary<int, XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum>()
             {
-                { 0, TextDecorationEnum.ResetAllAttributes }, { 1, TextDecorationEnum.Bright }, { 2,  TextDecorationEnum.Dim},
-                { 4, TextDecorationEnum.Underscore}, { 5,TextDecorationEnum.Blink }, {7,TextDecorationEnum.Reverse },{ 8,TextDecorationEnum.Hidden}
+                { 0, XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.ResetAllAttributes }, { 1, XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.Bright }, { 2,  XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.Dim},
+                { 4, XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.Underscore}, { 5,XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.Blink }, {7,XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.Reverse },{ 8,XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum.Hidden}
             };
             private static Dictionary<int, string> ForegroundColorsMap = new Dictionary<int, string>()
             {
@@ -242,7 +241,7 @@ namespace XTerminalCore.InvocationConverting
                     string parameters = Encoding.GetString(csi.ParameterBytes);
                     string[] items = parameters.Split((char)Delimiter);
                     SGRInvocation sgrInvocation;
-                    sgrInvocation.Decorations = new List<TextDecorationEnum>();
+                    sgrInvocation.Decorations = new List<XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum>();
                     sgrInvocation.Background = null;
                     sgrInvocation.Foreground = null;
                     sgrInvocation.Text = null;

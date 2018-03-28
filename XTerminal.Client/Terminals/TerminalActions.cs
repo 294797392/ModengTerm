@@ -18,11 +18,11 @@ namespace XTerminal.Terminals
     /// </summary>
     public abstract class AbstractTerminalAction
     {
-        public TerminalActions Type { get; }
+        public abstract TerminalActions Type { get; }
     }
 
-    public class PredefinedAction : AbstractTerminalAction
-    {
+    //public class PredefinedAction : AbstractTerminalAction
+    //{
 
-    }
+    //}
 }

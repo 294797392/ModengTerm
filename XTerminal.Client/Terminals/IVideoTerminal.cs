@@ -31,6 +31,6 @@ namespace XTerminal.Terminals
         /// 处理用户从键盘输入的原始字符
         /// 做处理，并发送到远程终端
         /// </summary>
-        void ProcessInputKey(PressedKey key);
+        //void ProcessInputKey(PressedKey key);
     }
 }

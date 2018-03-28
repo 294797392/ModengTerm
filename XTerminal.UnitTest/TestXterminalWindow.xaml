@@ -45,7 +45,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="IP地址：" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxIPAddress" Text="192.168.2.200" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxIPAddress" Text="192.168.135.129" VerticalAlignment="Center"/>
 
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="用户名：" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                 <TextBox Grid.Row="0" Grid.Column="3" x:Name="TextBoxUserName" Text="zyf" VerticalAlignment="Center"/>

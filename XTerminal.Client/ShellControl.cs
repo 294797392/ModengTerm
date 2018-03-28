@@ -103,26 +103,26 @@ namespace XTerminal.Client.TerminalConsole
         //    terminal.CommandReceived -= Terminal_CommandReceived;
         //}
 
-        private void HandleCommand(IEnumerable<IEscapeSequencesCommand> commands)
-        {
-            foreach (var command in commands)
-            {
-                //if (command == PredefineCommands.Enter)
-                //{
+        //private void HandleCommand(IEnumerable<IEscapeSequencesCommand> commands)
+        //{
+        //    foreach (var command in commands)
+        //    {
+        //        //if (command == PredefineCommands.Enter)
+        //        //{
 
-                //}
-                //else if (command == PredefineCommands.NewLine)
-                //{
-                //    this.textList.CreateTextLine();
-                //}
-                //else if (command is NormalTextCommand)
-                //{
-                //    var text = (command as NormalTextCommand).Text;
-                //    var textLine = this.textList.GetCurrentTextLine();
-                //    this.textList.AppendPlainText(textLine, text);
-                //}
-            }
-        }
+        //        //}
+        //        //else if (command == PredefineCommands.NewLine)
+        //        //{
+        //        //    this.textList.CreateTextLine();
+        //        //}
+        //        //else if (command is NormalTextCommand)
+        //        //{
+        //        //    var text = (command as NormalTextCommand).Text;
+        //        //    var textLine = this.textList.GetCurrentTextLine();
+        //        //    this.textList.AppendPlainText(textLine, text);
+        //        //}
+        //    }
+        //}
 
         #endregion
 
@@ -139,13 +139,13 @@ namespace XTerminal.Client.TerminalConsole
 
         #region 事件处理器
 
-        private void Terminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> commands)
-        {
-            base.Dispatcher.Invoke(new Action(() =>
-            {
-                this.HandleCommand(commands);
-            }));
-        }
+        //private void Terminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> commands)
+        //{
+        //    base.Dispatcher.Invoke(new Action(() =>
+        //    {
+        //        //this.HandleCommand(commands);
+        //    }));
+        //}
 
         protected override void OnKeyDown(KeyEventArgs e)
         {

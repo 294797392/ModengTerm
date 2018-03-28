@@ -30,7 +30,7 @@ namespace XTerminal.Connections
         private ShellStream shellStream;
         private SshConnectionAuthorition authorition;
         private BinaryWriter writer;
-        private IEscapeSequencesParser parser;
+        //private IEscapeSequencesParser parser;
 
         #endregion
 
@@ -70,7 +70,7 @@ namespace XTerminal.Connections
             authentications.Add(new PasswordAuthenticationMethod(this.authorition.UserName, this.authorition.Password));
             ConnectionInfo connectionInfo = new ConnectionInfo(this.authorition.ServerAddress, this.authorition.ServerPort, this.authorition.UserName, authentications.ToArray());
 
-            this.parser = new AnsiEscapeSequencesParser();
+            //this.parser = new AnsiEscapeSequencesParser();
 
             try
             {
