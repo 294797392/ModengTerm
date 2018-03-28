@@ -3,31 +3,32 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:XTerminal.Client.TerminalConsole"
     xmlns:control="clr-namespace:XTerminal.Controls">
-
+    
     <Style x:Key="StyleTermScreen" TargetType="{x:Type control:TermScreen}">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type control:TermScreen}">
                     
                     <ControlTemplate.Resources>
+                        
+                        <Style x:Key="StyleVisualLine" TargetType="{x:Type ListBoxItem}">
+                            <Setter Property="Height" Value="30"/>
+                            <Setter Property="Margin" Value="0,0,0,0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                        <Grid>
+                                            <Border Background="{TemplateBinding Background}"/>
+                                            <ContentPresenter/>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        
                         <Style x:Key="StylePART_VisualLines" TargetType="{x:Type ListBox}">
                             <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                            <Setter Property="ItemContainerStyle">
-                                <Setter.Value>
-                                    <Style TargetType="{x:Type ListBoxItem}">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                    <Grid>
-                                                        <ContentPresenter/>
-                                                    </Grid>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </Setter.Value>
-                            </Setter>
                             <Setter Property="ItemsPanel">
                                 <Setter.Value>
                                     <ItemsPanelTemplate>
@@ -35,20 +36,13 @@
                                     </ItemsPanelTemplate>
                                 </Setter.Value>
                             </Setter>
-                            <!--<Setter Property="ItemTemplate">
-                                <Setter.Value>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <TextBlock Text="asdadasd"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </Setter.Value>
-                            </Setter>-->
                         </Style>
+                        
                     </ControlTemplate.Resources>
                     
                     <Grid>
-                        <ListBox x:Name="PART_VisualLines" Style="{StaticResource ResourceKey=StylePART_VisualLines}"/>
+                        <ListBox x:Name="PART_VisualLines" Style="{StaticResource ResourceKey=StylePART_VisualLines}"
+                                 ItemContainerStyle="{StaticResource ResourceKey=StyleVisualLine}"/>
                     </Grid>
                     
                 </ControlTemplate>

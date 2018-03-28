@@ -31,8 +31,6 @@ namespace XTerminal.Controls
         {
             base.HorizontalAlignment = HorizontalAlignment.Left;
             base.VerticalAlignment = VerticalAlignment.Top;
-            base.Height = DefaultValues.FontSize;
-            base.Margin = DefaultValues.LineMargin;
 
             this.textVisual = new DrawingVisual();
             this.textList = new List<TermText>();
@@ -91,6 +89,9 @@ namespace XTerminal.Controls
                 Console.WriteLine("draw");
             }
             context.Close();
+
+            Console.WriteLine(this.textVisual.ContentBounds.Height);
+            Console.WriteLine(this.textVisual.ContentBounds.Width);
 
             //base.Height = this.textList.Max(t => t.Height);
             //base.Width = this.textList.Sum(t => t.WidthIncludingTrailingWhitespace);
