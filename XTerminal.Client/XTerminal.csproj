@@ -76,6 +76,7 @@
     <Compile Include="Connections\SshConnection.cs" />
     <Compile Include="Connections\SshConnectionAuthorition.cs" />
     <Compile Include="Controls\TermLine.cs" />
+    <Compile Include="Controls\TermLineList.cs" />
     <Compile Include="Controls\TermText.cs" />
     <Compile Include="DefaultValues.cs" />
     <Compile Include="ResponseCode.cs" />

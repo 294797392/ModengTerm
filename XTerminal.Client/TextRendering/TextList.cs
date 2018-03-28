@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,7 @@ namespace XTerminal.Client.TerminalConsole.Rendering
 
         #region 实例变量
 
+        private ObservableCollection<object> lineObjects;
         private TextLine currentLine;
 
         #endregion
@@ -49,19 +51,20 @@ namespace XTerminal.Client.TerminalConsole.Rendering
 
         public TextList()
         {
-            this.InitializePanel();
+            this.InitializeTextList();
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializePanel()
+        private void InitializeTextList()
         {
-            base.HorizontalAlignment = HorizontalAlignment.Stretch;
-            base.VerticalAlignment = VerticalAlignment.Stretch;
-            base.Background = Brushes.Transparent;
             //base.ItemsSource = this.lines;
+            this.lineObjects = new ObservableCollection<object>();
+            base.ItemsSource = this.lineObjects;
+
+            this.lineObjects.Add(new object());
         }
 
         public void HandleTextInput(TextCompositionEventArgs e)
@@ -137,6 +140,16 @@ namespace XTerminal.Client.TerminalConsole.Rendering
                 line.TextList[textCount - 1] = text;
             }
             line.Draw();
+        }
+
+        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+        {
+            base.OnItemsChanged(e);
+
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                Console.WriteLine(e.NewItems[0]);
+            }
         }
 
         #endregion

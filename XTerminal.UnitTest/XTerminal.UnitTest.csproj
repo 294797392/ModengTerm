@@ -69,9 +69,6 @@
     <Compile Include="TestXterminalWindow.xaml.cs">
       <DependentUpon>TestXterminalWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TestTextRenderingWindow.xaml.cs">
-      <DependentUpon>TestTextRenderingWindow.xaml</DependentUpon>
-    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -93,10 +90,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TestXterminalWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TestTextRenderingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

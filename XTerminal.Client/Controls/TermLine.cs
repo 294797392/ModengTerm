@@ -4,13 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using XTerminal.Client.TerminalConsole;
 
 namespace XTerminal.Controls
 {
-    public class TermLine : FrameworkElement
+    internal class TermLine : Control
     {
         #region 事件
 
@@ -20,7 +21,6 @@ namespace XTerminal.Controls
 
         #region 实例变量
 
-        private DrawingVisual textVisual;
         private List<TermText> textList;
 
         #endregion
@@ -29,30 +29,12 @@ namespace XTerminal.Controls
 
         public TermLine()
         {
-            base.HorizontalAlignment = HorizontalAlignment.Left;
-            base.VerticalAlignment = VerticalAlignment.Top;
-
-            this.textVisual = new DrawingVisual();
             this.textList = new List<TermText>();
-            base.AddVisualChild(this.textVisual);
         }
 
         #endregion
 
         #region 重写方法
-
-        protected override Visual GetVisualChild(int index)
-        {
-            return this.textVisual;
-        }
-
-        protected override int VisualChildrenCount
-        {
-            get
-            {
-                return 1;
-            }
-        }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
@@ -74,27 +56,35 @@ namespace XTerminal.Controls
             }
         }
 
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
+
+            Console.WriteLine("OnRender");
+
+            Typeface face = new Typeface("宋体");
+            drawingContext.DrawText(new FormattedText("asdasdasd", System.Globalization.CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, face, 50, Brushes.Red), new Point(0, 0));
+            foreach (TermText text in this.textList)
+            {
+                drawingContext.DrawText(text, new Point(0, 0));
+                Console.WriteLine("draw");
+            }
+        }
+
         #endregion
 
         #region 实例方法
 
         public void Draw()
         {
-            DrawingContext context = this.textVisual.RenderOpen();
-            Typeface face = new Typeface("宋体");
-            context.DrawText(new FormattedText("asdasdasd", System.Globalization.CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, face, 14, Brushes.Red), new Point(0, 0));
-            foreach (TermText text in this.textList)
-            {
-                context.DrawText(text, new Point(0, 0));
-                Console.WriteLine("draw");
-            }
-            context.Close();
-
-            Console.WriteLine(this.textVisual.ContentBounds.Height);
-            Console.WriteLine(this.textVisual.ContentBounds.Width);
-
             //base.Height = this.textList.Max(t => t.Height);
             //base.Width = this.textList.Sum(t => t.WidthIncludingTrailingWhitespace);
+        }
+
+        public void SetTermTextList(IEnumerable<TermText> textList)
+        {
+            this.textList.Clear();
+            this.textList.AddRange(textList);
         }
 
         #endregion
