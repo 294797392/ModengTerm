@@ -10,9 +10,12 @@ namespace XTerminalCore
     /// <summary>
     /// 终端数据流解析器
     /// </summary>
-    public class OutputParser
+    public class OutputStreamParser
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("OutputParser");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("OutputStreamParser");
+
+        public event Action<char> CharParsed;
+        public event Action<IInvocation> InvocationParsed;
 
         private IInvocationConverter InvocationConverter = new XtermInvocationConverter();
 
@@ -21,12 +24,9 @@ namespace XTerminalCore
         /// 7位编码和8位编码通用
         /// </summary>
         /// <param name="chars">要解析的字符</param>
-        /// <param name="invocations"></param>
         /// <returns></returns>
-        public bool Parse(byte[] chars, out List<IInvocation> invocations)
+        public bool Parse(byte[] chars)
         {
-            invocations = new List<IInvocation>();
-
             int length = chars.Length;
 
             for (int idx = 0; idx < length; idx++)
@@ -40,13 +40,13 @@ namespace XTerminalCore
                         throw new NotImplementedException(string.Format("未实现ControlFunction'{0}'的解析器", c));
                     }
 
-                    IInvocation invocation;
+                    IInvocation currentInvocation;
                     if (parser == SingleCharacterParser.Instance)
                     {
                         // 单字节ControlFunction
                         SingleCharacterInvocation scInvocation;
                         scInvocation.Action = chars[idx];
-                        invocation = scInvocation;
+                        currentInvocation = scInvocation;
                     }
                     else
                     {
@@ -58,14 +58,24 @@ namespace XTerminalCore
                         }
                         logger.InfoFormat("解析成功:{0}", controlFunc);
 
-                        if (!this.InvocationConverter.Convert(controlFunc, out invocation))
+                        if (!this.InvocationConverter.Convert(controlFunc, out currentInvocation))
                         {
                             logger.ErrorFormat("ControlFunc转Invocation失败");
                             return false;
                         }
                         idx += controlFunc.GetSize() - 1;
                     }
-                    invocations.Add(invocation);
+                    if (this.InvocationParsed != null)
+                    {
+                        this.InvocationParsed(currentInvocation);
+                    }
+                }
+                else
+                {
+                    if (this.CharParsed != null)
+                    {
+                        this.CharParsed((char)c);
+                    }
                 }
             }
 

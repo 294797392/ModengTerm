@@ -24,11 +24,18 @@ namespace XTerminal.UnitTest
     public partial class TestXterminalWindow : Window
     {
         private AbstractTerminal terminal;
-        private OutputParser outputParser = new OutputParser();
+        private OutputStreamParser outputParser;
 
         public TestXterminalWindow()
         {
             InitializeComponent();
+        }
+
+        private void InitializeWindow()
+        {
+            this.outputParser = new OutputStreamParser();
+            this.outputParser.CharParsed += OutputParser_CharParsed;
+            this.outputParser.InvocationParsed += OutputParser_InvocationParsed;
         }
 
         private void ButtonConnect_Click(object sender, RoutedEventArgs e)
@@ -128,12 +135,21 @@ namespace XTerminal.UnitTest
         {
             DateTime start = DateTime.Now;
             byte[] data = Encoding.ASCII.GetBytes(TextBoxMessage.Text);
-            List<IInvocation> result;
-            if (this.outputParser.Parse(data, out result))
+            if (this.outputParser.Parse(data))
             {
                 double time = (DateTime.Now - start).TotalMilliseconds;
                 Console.WriteLine("解析成功, {0}", time);
             }
+        }
+
+        private void OutputParser_InvocationParsed(IInvocation invocation)
+        {
+            TermDisplayer.ExecInvocation(invocation);
+        }
+
+        private void OutputParser_CharParsed(char c)
+        {
+            TermDisplayer.ProcessChar(c);
         }
 
         //private void XtermTerminal_CommandReceived(object sender, IEnumerable<IEscapeSequencesCommand> cmds)

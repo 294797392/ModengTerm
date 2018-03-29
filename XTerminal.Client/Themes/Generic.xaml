@@ -32,10 +32,10 @@
         </Setter>
     </Style>
 
-    <Style x:Key="StyleTermScreen" TargetType="{x:Type control:TermScreen}">
+    <Style x:Key="StyleTermScreen" TargetType="{x:Type control:TermDisplayer}">
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type control:TermScreen}">
+                <ControlTemplate TargetType="{x:Type control:TermDisplayer}">
                     
                     <ControlTemplate.Resources>
                         

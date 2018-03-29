@@ -244,7 +244,6 @@ namespace XTerminalCore.InvocationConverting
                     sgrInvocation.Decorations = new List<XTerminalCore.Invocations.SGRInvocation.TextDecorationEnum>();
                     sgrInvocation.Background = null;
                     sgrInvocation.Foreground = null;
-                    sgrInvocation.Text = null;
                     foreach (string item in items)
                     {
                         int attr;

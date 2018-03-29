@@ -19,11 +19,6 @@ namespace XTerminalCore.Invocations
         public List<TextDecorationEnum> Decorations;
 
         /// <summary>
-        /// 要显示的文本
-        /// </summary>
-        public string Text;
-
-        /// <summary>
         /// 前景色
         /// </summary>
         public string Foreground;

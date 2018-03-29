@@ -60,10 +60,10 @@ namespace XTerminal.Controls
         {
             base.OnRender(drawingContext);
 
-            Console.WriteLine("OnRender");
+            //Console.WriteLine("OnRender");
 
-            Typeface face = new Typeface("宋体");
-            drawingContext.DrawText(new FormattedText("asdasdasd", System.Globalization.CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, face, 50, Brushes.Red), new Point(0, 0));
+            //Typeface face = new Typeface("宋体");
+            //drawingContext.DrawText(new FormattedText("asdasdasd", System.Globalization.CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, face, 50, Brushes.Red), new Point(0, 0));
             foreach (TermText text in this.textList)
             {
                 drawingContext.DrawText(text, new Point(0, 0));

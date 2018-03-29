@@ -13,6 +13,6 @@
     </Window.Resources>
     
     <Grid>
-        <control:TermScreen Style="{StaticResource ResourceKey=StyleTermScreen}"/>
+        <control:TermDisplayer Style="{StaticResource ResourceKey=StyleTermScreen}"/>
     </Grid>
 </Window>

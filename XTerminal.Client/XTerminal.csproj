@@ -106,7 +106,7 @@
     <Compile Include="TextRendering\TextItem.cs" />
     <Compile Include="TextRendering\TextLine.cs" />
     <Compile Include="TextRendering\TextList.cs" />
-    <Compile Include="Controls\TermScreen.cs" />
+    <Compile Include="Controls\TermDisplayer.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
