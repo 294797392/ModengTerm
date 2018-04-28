@@ -24,7 +24,7 @@ namespace XTerminal.UnitTest
     public partial class TestXterminalWindow : Window
     {
         private AbstractTerminal terminal;
-        private OutputStreamParser outputParser;
+        private TerminalStreamParser outputParser;
 
         public TestXterminalWindow()
         {
@@ -33,7 +33,7 @@ namespace XTerminal.UnitTest
 
         private void InitializeWindow()
         {
-            this.outputParser = new OutputStreamParser();
+            this.outputParser = new TerminalStreamParser();
             this.outputParser.CharParsed += OutputParser_CharParsed;
             this.outputParser.InvocationParsed += OutputParser_InvocationParsed;
         }

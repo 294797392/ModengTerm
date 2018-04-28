@@ -143,5 +143,6 @@ namespace XTerminalCore
         {
             return _7bitControlFunctionMap.TryGetValue(c, out parser);
         }
+
     }
 }

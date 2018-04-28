@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -25,11 +26,11 @@ namespace XTerminalCore
         }
 
         /// <summary>
-        /// 把一串带有控制功能的字符转换成一个格式化之后的控制功能结构体
+        /// 从数据流中解析出一个结构化的ControlFunction
         /// </summary>
-        /// <param name="chars">第一个字符是Fe Code的字符串</param>
+        /// <param name="reader">要解析的数据流</param>
         /// <param name="cf">格式化之后的ControlFunction</param>
         /// <returns></returns>
-        public abstract bool Parse(byte[] chars, out IFormattedCf cf);
+        public abstract bool Parse(StreamReader reader, out IFormattedCf cf);
     }
 }

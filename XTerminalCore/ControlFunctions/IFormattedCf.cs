@@ -6,6 +6,7 @@ using System.Text;
 namespace XTerminalCore
 {
     /// <summary>
+    /// IFormattedControlFunction
     /// 存储ControlFunction里的信息
     /// </summary>
     public interface IFormattedCf

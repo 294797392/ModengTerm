@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using XTerminalCore.Invocations;
@@ -28,7 +29,7 @@ namespace XTerminalCore
         {
         }
 
-        public override bool Parse(byte[] chars, int cfIndex, out IFormattedCf controlFunc)
+        public override bool Parse(StreamReader reader, out IFormattedCf controlFunc)
         {
             controlFunc = null;
             return true;
