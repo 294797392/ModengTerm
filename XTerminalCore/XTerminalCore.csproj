@@ -59,7 +59,6 @@
     <Compile Include="Invocations\CursorInvocation.cs" />
     <Compile Include="Invocations\SGRInvocation.cs" />
     <Compile Include="Invocations\SingleCharacterInvocation.cs" />
-    <Compile Include="StreamParser\EscapeParsing\FeParsers\DECPrivateControlParser.cs" />
     <Compile Include="ControlFunctions\IFormattedCf.cs" />
     <Compile Include="CharacterUtils.cs" />
     <Compile Include="StreamParser\IControlFunctionParser.cs" />
@@ -68,7 +67,6 @@
     <Compile Include="StreamParser\SingleCharacterParser.cs" />
     <Compile Include="DefaultValues.cs" />
     <Compile Include="StreamParser\EscapeParsing\FeParsers\Fe.cs" />
-    <Compile Include="StreamParser\EscapeParsing\FeParsers\CSIParser.cs" />
     <Compile Include="StreamParser\EscapeParsing\FeParsers\FeParser.cs" />
     <Compile Include="StreamParser\EscapeParsing\FeParsers\OSCParser.cs" />
     <Compile Include="StreamParser\InvocationConverting\IInvocationConverter.cs" />
