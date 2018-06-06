@@ -14,6 +14,11 @@ namespace GTerminalControl
 
         bool OnKeyDown(KeyEventArgs key, out byte[] data);
 
-        bool ParseTerminalStream(byte[] stream);
+        /// <summary>
+        /// 解析终端数据流
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        bool Parse(byte[] stream);
     }
 }

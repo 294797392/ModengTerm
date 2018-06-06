@@ -8,6 +8,8 @@ namespace GTerminalControl
 {
     public class VT100 : IVideoTerminal
     {
+        public event Action<object, byte, byte[]> Action;
+
         public VTTypeEnum Type
         {
             get
@@ -17,6 +19,11 @@ namespace GTerminalControl
         }
 
         public bool OnKeyDown(KeyEventArgs key, out byte[] data)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Parse(byte[] stream)
         {
             throw new NotImplementedException();
         }

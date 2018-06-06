@@ -57,7 +57,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IRemoteHost.cs" />
+    <Compile Include="StateTable.cs" />
     <Compile Include="VT100.cs" />
+    <Compile Include="VTAction.cs" />
+    <Compile Include="VTState.cs" />
     <Compile Include="VTTypeEnum.cs" />
     <Page Include="VTConsole.xaml">
       <Generator>MSBuild:Compile</Generator>

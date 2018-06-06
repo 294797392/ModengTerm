@@ -92,6 +92,10 @@ namespace GTerminalControl
 
         private void VT_Action(object sender, byte controlFunc, byte[] data)
         {
+            switch (controlFunc)
+            {
+
+            }
         }
 
         #endregion
