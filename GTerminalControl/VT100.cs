@@ -17,7 +17,6 @@ namespace GTerminalControl
 
         #region 实例变量
 
-        private ParseState psrState;
 
         #endregion
 
@@ -37,8 +36,6 @@ namespace GTerminalControl
 
         public VT100()
         {
-            this.psrState = new ParseState();
-            this.psrState.StateTable = VTPrsTbl.AnsiTable;
         }
 
         #endregion
@@ -50,30 +47,9 @@ namespace GTerminalControl
             throw new NotImplementedException();
         }
 
-        public override void StartParsing(IVTStream stream)
-        {
-            Task.Factory.StartNew(this.Parse, stream);
-        }
-
         #endregion
 
         #region 实例方法
-
-        private void Parse(object state)
-        {
-            IVTStream stream = state as IVTStream;
-
-            while (!stream.EOF)
-            {
-                //int lastState = this.psrState.State;
-                //int nextState = this.psrState.State;
-
-                //switch (nextState)
-                //{
-
-                //}
-            }
-        }
 
         #endregion
     }

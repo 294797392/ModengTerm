@@ -79,7 +79,7 @@ namespace GTerminalControl
             {
                 if (!this.VTStream.Write(data))
                 {
-                    logger.ErrorFormat("发送数据失败");
+                    logger.ErrorFormat("向终端发送数据失败");
                 }
             }
         }
@@ -100,9 +100,9 @@ namespace GTerminalControl
             }
         }
 
-        private void VideoTerminal_Action(object vt, byte act, byte[] data)
+        private void VideoTerminal_Action(object sender, VTAction action, ParseState state)
         {
-            switch (act)
+            switch (action)
             {
 
             }

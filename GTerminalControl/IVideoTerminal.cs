@@ -8,7 +8,7 @@ namespace GTerminalControl
 {
     public interface IVideoTerminal
     {
-        event Action<object, byte, byte[]> Action;
+        event Action<object, VTAction, ParseState> Action;
 
         VTTypeEnum Type { get; }
 

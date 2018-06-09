@@ -41,6 +41,7 @@ namespace GTerminalControl
 
         /// <summary>
         /// EOF为True时，VideoTerminal会停止解析
+        /// 在与远程主机断开连接的时候，应该把这个值设为True，否则为False
         /// </summary>
         bool EOF { get; }
     }
