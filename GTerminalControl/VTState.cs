@@ -6,7 +6,7 @@ using System.Text;
 namespace GTerminalControl
 {
     /// <summary>
-    /// 定义解析器当前状态
+    /// 定义解析器状态
     /// 
     /// https://www.vt100.net/emu/dec_ansi_parser
     /// </summary>
@@ -22,6 +22,7 @@ namespace GTerminalControl
         /// <summary>
         /// This state is entered whenever the C0 control ESC is received. This will immediately cancel any escape sequence, control sequence or control string in progress. If an escape sequence or control sequence was in progress, “cancel” means that the sequence will have no effect, because the final character that determines the control function (in conjunction with any intermediates) will not have been received. However, the ESC that cancels a control string may occur after the control function has been determined and the following string has had some effect on terminal state. For example, some soft characters may already have been defined. Cancelling a control string does not undo these effects.
         /// A control string that started with DCS, OSC, PM or APC is usually terminated by the C1 control ST (String Terminator). In a 7-bit environment, ST will be represented by ESC \ (1B 5C). However, receiving the ESC character will “cancel” the control string, so the ST control function that is invoked by the arrival of the following “\” is essentially a “no-op” function. Does this point seem like pure trivia? Maybe, but I worried for ages about whether the control string recogniser needed a one character lookahead in order to know whether ESC \ was going to terminate it. The actual solution became clear when I was using ReGIS on a VT330: sending ESC immediately caused the graphics output cursor to disappear from the screen, so I knew that the control string had already finished before the “\” arrived. Many of the clues that enabled me to derive this state diagram have been as subtle as that.
+        /// 收到ESC字符时进入这个状态。这个状态会立即取消所有的控制序列
         /// </summary>
         Escape,
 

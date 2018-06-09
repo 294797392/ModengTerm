@@ -34,7 +34,7 @@ namespace GTerminalControl
 
         #region 属性
 
-        public IRemoteHost Host { get; set; }
+        public IVTStream VTStream { get; set; }
 
         public IVideoTerminal VT { get; set; }
 
@@ -62,9 +62,8 @@ namespace GTerminalControl
             RichTextBox.Document = new FlowDocument(_paragraph);
             RichTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
 
-            this.Host.DataReceived += Host_DataReceived;
-
-            this.VT.Action += VT_Action;
+            this.VTStream.StatusChanged += VTStream_StatusChanged;
+            this.VT.Action += this.VideoTerminal_Action;
         }
 
         #endregion
@@ -78,21 +77,32 @@ namespace GTerminalControl
             byte[] data;
             if (this.VT.OnKeyDown(e, out data))
             {
-                if (!this.Host.SendData(data))
+                if (!this.VTStream.Write(data))
                 {
                     logger.ErrorFormat("发送数据失败");
                 }
             }
         }
 
-        private void Host_DataReceived(object sender, byte[] stream)
+        private void VTStream_StatusChanged(object stream, VTStreamState status)
         {
-            this.VT.ParseTerminalStream(stream);
+            logger.InfoFormat("VTStream Status Changed：{0}", status);
+
+            switch (status)
+            {
+                case VTStreamState.Init:
+                    break;
+
+                case VTStreamState.Ready:
+                    this.VT.StartParsing(this.VTStream);
+                    logger.InfoFormat("开始读取并解析终端数据流...");
+                    break;
+            }
         }
 
-        private void VT_Action(object sender, byte controlFunc, byte[] data)
+        private void VideoTerminal_Action(object vt, byte act, byte[] data)
         {
-            switch (controlFunc)
+            switch (act)
             {
 
             }

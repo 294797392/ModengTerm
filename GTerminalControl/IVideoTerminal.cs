@@ -19,6 +19,6 @@ namespace GTerminalControl
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        bool Parse(byte[] stream);
+        void StartParsing(IVTStream stream);
     }
 }
