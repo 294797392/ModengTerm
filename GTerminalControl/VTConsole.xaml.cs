@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GTerminalCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,6 @@ namespace GTerminalControl
             {
                 this.vt = value;
                 this.vt.Action += this.VideoTerminal_Action;
-                this.vt.Stream.StatusChanged += this.VTStream_StatusChanged;
             }
         }
 
@@ -89,22 +89,6 @@ namespace GTerminalControl
                 {
                     logger.ErrorFormat("向终端发送数据失败");
                 }
-            }
-        }
-
-        private void VTStream_StatusChanged(object stream, VTStreamState status)
-        {
-            logger.InfoFormat("VTStream Status Changed：{0}", status);
-
-            switch (status)
-            {
-                case VTStreamState.Init:
-                    break;
-
-                case VTStreamState.Ready:
-                    this.VT.StartParsing();
-                    logger.InfoFormat("开始读取并解析终端数据流...");
-                    break;
             }
         }
 

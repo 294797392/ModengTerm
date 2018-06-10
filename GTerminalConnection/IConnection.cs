@@ -1,4 +1,4 @@
-﻿using GTerminalControl;
+﻿using GTerminalCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿using GTerminalControl;
+﻿using GTerminalCore;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
@@ -123,10 +123,10 @@ namespace GTerminalConnection
         {
             get
             {
-                return this.shellStream != null
-                    && this.sshClient != null
-                    && this.sshClient.IsConnected
-                    //&& this.shellStream.CanRead &&
+                return this.shellStream == null
+                    || this.sshClient == null
+                    || !this.sshClient.IsConnected
+                    //|| !this.shellStream.CanRead
                     ;
             }
         }

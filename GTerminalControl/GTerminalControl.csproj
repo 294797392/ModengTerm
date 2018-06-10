@@ -56,23 +56,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GVideoTerminal.cs" />
-    <Compile Include="GVTStream.cs" />
-    <Compile Include="ParseState.cs" />
-    <Compile Include="VTStreamState.cs" />
-    <Compile Include="VideoTerminal.cs" />
-    <Compile Include="VTParseDef.cs" />
-    <Compile Include="VTPrsTbl.cs" />
-    <Compile Include="VT100.cs" />
-    <Compile Include="VTAction.cs" />
-    <Compile Include="VTState.cs" />
-    <Compile Include="VTStream.cs" />
-    <Compile Include="VTTypeEnum.cs" />
     <Page Include="VTConsole.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="IVideoTerminal.cs" />
     <Compile Include="VTConsole.xaml.cs">
       <DependentUpon>VTConsole.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -101,6 +88,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GTerminalCore\GTerminalCore.csproj">
+      <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
+      <Name>GTerminalCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

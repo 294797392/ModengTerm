@@ -98,9 +98,17 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GTerminalConnection\GTerminalConnection.csproj">
+      <Project>{a91a51b7-ed2a-4837-928b-9bd34f9ffde3}</Project>
+      <Name>GTerminalConnection</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GTerminalControl\GTerminalControl.csproj">
       <Project>{e7de3287-f5f2-4a1c-a6e0-a3b9e064adbd}</Project>
       <Name>GTerminalControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GTerminalCore\GTerminalCore.csproj">
+      <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
+      <Name>GTerminalCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
