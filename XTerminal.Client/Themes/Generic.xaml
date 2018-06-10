@@ -4,7 +4,7 @@
     xmlns:local="clr-namespace:XTerminal.Client.TerminalConsole"
     xmlns:control="clr-namespace:XTerminal.Controls">
 
-    <Style x:Key="StyleTermLine" TargetType="{x:Type control:TermLine}">
+    <!--<Style x:Key="StyleTermLine" TargetType="{x:Type control:TermLine}">
         <Setter Property="Height" Value="50"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -48,7 +48,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
+    </Style>-->
 
     <!--<Style x:Key="StyleTextList" TargetType="{x:Type texts:TextList}">
         <Setter Property="ItemsPanel">

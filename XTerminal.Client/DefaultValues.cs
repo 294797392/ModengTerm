@@ -10,10 +10,6 @@ namespace XTerminal.Client.TerminalConsole
 {
     public static class DefaultValues
     {
-        public const uint TerminalColumns = 160;
-        public const uint TerminalRows = 40;
-        public const string TerminalName = TerminalNames.TerminalXTerm;
-
         /// <summary>
         /// 默认的每一行的间距
         /// </summary>

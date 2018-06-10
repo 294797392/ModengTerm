@@ -10,6 +10,9 @@ namespace GTerminalControl
      */
     public static class VTPrsTbl
     {
+        /// <summary>
+        /// 当收到CASE_CSI_IGNORE指令的时候，解析器使用的状态表
+        /// </summary>
         public static readonly byte[] CIgTable =
         {
             /*	NUL		SOH		STX		ETX	*/

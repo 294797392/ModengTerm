@@ -4,9 +4,35 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XTerminalClient"
+        xmlns:gterm="clr-namespace:GTerminalControl;assembly=GTerminalControl"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
+    
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Menu Background="Transparent">
+                <MenuItem Header="文件">
+                    <MenuItem Header="新建"/>
+                </MenuItem>
+            </Menu>
+        </StackPanel>
+
+        <ContentControl Grid.Row="1">
+            <TabControl>
+                <TabItem Header="connection">
+                    <gterm:VTConsole x:Name="VTConsole"/>
+                </TabItem>
+                <TabItem Header="connection2">
+                    <gterm:VTConsole x:Name="VTConsole2"/>
+                </TabItem>
+            </TabControl>
+        </ContentControl>
+
     </Grid>
+    
 </Window>

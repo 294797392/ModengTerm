@@ -29,14 +29,25 @@ namespace GTerminalControl
 
         private Paragraph _paragraph;
         private Run _promptInline;
+        private IVideoTerminal vt;
 
         #endregion
 
         #region 属性
 
-        public IVTStream VTStream { get; set; }
-
-        public IVideoTerminal VT { get; set; }
+        public IVideoTerminal VT
+        {
+            get
+            {
+                return this.vt;
+            }
+            set
+            {
+                this.vt = value;
+                this.vt.Action += this.VideoTerminal_Action;
+                this.vt.Stream.StatusChanged += this.VTStream_StatusChanged;
+            }
+        }
 
         #endregion
 
@@ -61,9 +72,6 @@ namespace GTerminalControl
             RichTextBox.IsUndoEnabled = false;
             RichTextBox.Document = new FlowDocument(_paragraph);
             RichTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
-
-            this.VTStream.StatusChanged += VTStream_StatusChanged;
-            this.VT.Action += this.VideoTerminal_Action;
         }
 
         #endregion
@@ -77,7 +85,7 @@ namespace GTerminalControl
             byte[] data;
             if (this.VT.OnKeyDown(e, out data))
             {
-                if (!this.VTStream.Write(data))
+                if (!this.vt.Stream.Write(data))
                 {
                     logger.ErrorFormat("向终端发送数据失败");
                 }
@@ -94,7 +102,7 @@ namespace GTerminalControl
                     break;
 
                 case VTStreamState.Ready:
-                    this.VT.StartParsing(this.VTStream);
+                    this.VT.StartParsing();
                     logger.InfoFormat("开始读取并解析终端数据流...");
                     break;
             }

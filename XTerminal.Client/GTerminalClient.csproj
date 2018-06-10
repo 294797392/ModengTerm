@@ -7,8 +7,8 @@
     <ProjectGuid>{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>XTerminal</RootNamespace>
-    <AssemblyName>XTerminal</AssemblyName>
+    <RootNamespace>GTerminalClient</RootNamespace>
+    <AssemblyName>GTerm</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -69,44 +69,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="CharacterCodedBits.cs" />
-    <Compile Include="Connections\ConnectionFactory.cs" />
-    <Compile Include="Connections\ConnectionProtocols.cs" />
-    <Compile Include="Connections\IConnection.cs" />
-    <Compile Include="Connections\IConnectionAuthorition.cs" />
-    <Compile Include="Connections\SshConnection.cs" />
-    <Compile Include="Connections\SshConnectionAuthorition.cs" />
-    <Compile Include="Controls\TermLine.cs" />
-    <Compile Include="Controls\TermLineList.cs" />
-    <Compile Include="Controls\TermText.cs" />
     <Compile Include="DefaultValues.cs" />
     <Compile Include="ResponseCode.cs" />
-    <Compile Include="Terminals\AbstractTerminal.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Terminals\ControlCharacters.cs" />
-    <Compile Include="Terminals\IVideoTerminal.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Terminals\Keys.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Terminals\TerminalActions.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Terminals\VT100Terminal.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Terminals\XtermTerminal.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="TextSelections\ISelectionContext.cs" />
-    <Compile Include="TextSelections\SelectionPanel.cs" />
     <Compile Include="TerminalConnectionStatus.cs" />
     <Compile Include="TerminalNames.cs" />
-    <Compile Include="TextRendering\TextItem.cs" />
-    <Compile Include="TextRendering\TextLine.cs" />
-    <Compile Include="TextRendering\TextList.cs" />
-    <Compile Include="Controls\TermDisplayer.cs" />
+    <Compile Include="Windows\ConfigurationParameterWindow.xaml.cs">
+      <DependentUpon>ConfigurationParameterWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -115,9 +84,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Carets\CaretElement.cs" />
-    <Compile Include="Carets\CaretPanel.cs" />
-    <Compile Include="Carets\ICaretContext.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -125,6 +91,10 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ConfigurationParameterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -152,11 +122,12 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\XTerminalCore\XTerminalCore.csproj">
-      <Project>{8f9bd573-1f86-453b-81c7-1344f1f09725}</Project>
-      <Name>XTerminalCore</Name>
+    <ProjectReference Include="..\GTerminalControl\GTerminalControl.csproj">
+      <Project>{e7de3287-f5f2-4a1c-a6e0-a3b9e064adbd}</Project>
+      <Name>GTerminalControl</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

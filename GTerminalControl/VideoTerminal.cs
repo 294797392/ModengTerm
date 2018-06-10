@@ -70,6 +70,8 @@ namespace GTerminalControl
 
         public abstract VTTypeEnum Type { get; }
 
+        public IVTStream Stream { get; protected set; }
+
         #endregion
 
         #region 构造方法
@@ -91,9 +93,9 @@ namespace GTerminalControl
 
         #region 公开接口
 
-        public void StartParsing(IVTStream stream)
+        public void StartParsing()
         {
-            Task.Factory.StartNew(this.Parse, stream);
+            Task.Factory.StartNew(this.Parse, this.Stream);
         }
 
         #endregion

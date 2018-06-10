@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GTerminalControl
+namespace GTerminalConnection
 {
-    public enum VTTypeEnum
+    public interface IConnectionAuthorition
     {
-        VT100,
-        Xterm,
-        GVT
     }
 }

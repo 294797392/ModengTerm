@@ -12,6 +12,8 @@ namespace GTerminalControl
 
         VTTypeEnum Type { get; }
 
+        IVTStream Stream { get; }
+
         bool OnKeyDown(KeyEventArgs key, out byte[] data);
 
         /// <summary>
@@ -19,6 +21,6 @@ namespace GTerminalControl
         /// </summary>
         /// <param name="stream"></param>
         /// <returns></returns>
-        void StartParsing(IVTStream stream);
+        void StartParsing();
     }
 }

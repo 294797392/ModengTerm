@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace GTerminalControl
 {
     /// <summary>
-    /// 定义了控制终端数据流的接口
+    /// 管理虚拟终端与远程主机通信的接口
     /// </summary>
     public interface IVTStream
     {

@@ -4,32 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace XTerminalClient
+namespace GTerminalClient.Windows
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// 配置参数窗口
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ConfigurationParameterWindow : Window
     {
-        public MainWindow()
+        public ConfigurationParameterWindow()
         {
             InitializeComponent();
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-
-            Console.WriteLine(e.Key.ToString());
         }
     }
 }

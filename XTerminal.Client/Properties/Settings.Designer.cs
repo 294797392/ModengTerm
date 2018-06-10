@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace XTerminal.Properties {
+namespace GTerminalClient.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
