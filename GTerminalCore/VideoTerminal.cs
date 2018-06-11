@@ -95,6 +95,8 @@ namespace GTerminalCore
             }
         }
 
+        public IVTKeyboard Keyboard { get; set; }
+
         #endregion
 
         #region 构造方法
