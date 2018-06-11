@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -59,6 +60,16 @@ namespace GTerminalCore
 
         #region 属性
 
+        public bool CapsLocked
+        {
+            get
+            {
+                byte[] bs = new byte[256];
+                GetKeyboardState(bs);
+                return (bs[0x14] == 1);
+            }
+        }
+
         /// <summary>
         /// 是否支持8位ascii字符
         /// </summary>
@@ -97,13 +108,49 @@ namespace GTerminalCore
 
         #endregion
 
-        #region 抽象接口
-
-        public abstract bool OnKeyDown(KeyEventArgs key, out byte[] data);
-
-        #endregion
-
         #region 公开接口
+
+        [DllImport("user32.dll", EntryPoint = "GetKeyboardState")]
+        public static extern int GetKeyboardState(byte[] pbKeyState);
+
+        public bool HandleKeyDown(KeyEventArgs key, out byte[] data)
+        {
+            data = null;
+            Dictionary<Key, byte[]> iptTbl = null;
+
+            // 按下了Control键
+            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            {
+                iptTbl = VTInputTbl.ControlTable;
+                goto Translate;
+            }
+
+            // 按下了Shift
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            {
+                iptTbl = VTInputTbl.ShiftTable;
+                goto Translate;
+            }
+
+            // 打开了大写锁定
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift || this.CapsLocked)
+            {
+                iptTbl = VTInputTbl.AnsiUpperTable;
+                goto Translate;
+            }
+            
+            // 小写
+            iptTbl = VTInputTbl.AnsiLowerTable;
+
+            Translate:
+            if (!iptTbl.TryGetValue(key.Key, out data))
+            {
+                logger.ErrorFormat("未定义按键{0}", key.Key);
+                return false;
+            }
+
+            return true;
+        }
 
         #endregion
 
@@ -141,34 +188,34 @@ namespace GTerminalCore
                 switch (nextState)
                 {
                     // 在每个状态下，接收到的不用处理的字符。
-                    case VTParseDef.CASE_IGNORE:
+                    case VTPsrDef.CASE_IGNORE:
                         {
                         }
                         continue;
 
                     // 向屏幕输出终端数据流
-                    case VTParseDef.CASE_PRINT:
+                    case VTPsrDef.CASE_PRINT:
                         {
                             this.NotifyAction(VTAction.Print, this.psrState);
                         }
                         break;
 
                     // ANSI状态下收到ESC控制字符。
-                    case VTParseDef.CASE_ESC:
+                    case VTPsrDef.CASE_ESC:
                         {
                             this.psrState.StateTable = VTPrsTbl.EscTable;
                         }
                         break;
 
                     // ESC状态下收到CSI控制字符。
-                    case VTParseDef.CASE_CSI_STATE:
+                    case VTPsrDef.CASE_CSI_STATE:
                         {
                             this.psrState.StateTable = VTPrsTbl.CsiTable;
                         }
                         break;
 
                     /* ESC状态下收到数字字符。在CSI子状态下，属于参数字段；在DEC子状态下，？ */
-                    case VTParseDef.CASE_ESC_DIGIT:
+                    case VTPsrDef.CASE_ESC_DIGIT:
                         {
                             /*
                              * CASE_CSI_STATE模式下:
@@ -187,7 +234,7 @@ namespace GTerminalCore
                         break;
 
                     // ESC状态下接收到了分号
-                    case VTParseDef.CASE_ESC_SEMI:
+                    case VTPsrDef.CASE_ESC_SEMI:
                         {
                             this.psrState.ParameterBytes.Add(c);
                             if (this.psrState.StateTable == VTPrsTbl.CsiTable)
@@ -198,14 +245,14 @@ namespace GTerminalCore
                         break;
 
                     // CSI状态下收到了IntermediateBytes（位组合是02/00的字符），该字符后面紧跟一个FinalByte
-                    case VTParseDef.CASE_CSI_SPACE_STATE:
+                    case VTPsrDef.CASE_CSI_SPACE_STATE:
                         {
                             // 进入FinalByte状态表
                             this.psrState.StateTable = VTPrsTbl.CsiSpTable;
                         }
                         break;
 
-                    case VTParseDef.CASE_CSI_IGNORE:
+                    case VTPsrDef.CASE_CSI_IGNORE:
                         {
                             // from xterm-331 charproc.c 4409行
                             this.psrState.StateTable = VTPrsTbl.CIgTable;
@@ -213,7 +260,7 @@ namespace GTerminalCore
                         break;
 
                     // CSI状态下收到了FinalByte是SGR的字符。
-                    case VTParseDef.CASE_SGR:
+                    case VTPsrDef.CASE_SGR:
                         {
                             // 重置为ANSI状态
                             this.psrState.StateTable = VTPrsTbl.AnsiTable;

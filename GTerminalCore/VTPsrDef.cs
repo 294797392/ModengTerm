@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GTerminalCore
 {
-    public class VTParseDef
+    public class VTPsrDef
     {
         public const byte CASE_GROUND_STATE = 0;
         public const byte CASE_IGNORE = 1;

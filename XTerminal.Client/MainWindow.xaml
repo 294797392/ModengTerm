@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     
-    <Grid>
+    <Grid Visibility="Collapsed">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
@@ -25,10 +25,10 @@
         <ContentControl Grid.Row="1">
             <TabControl>
                 <TabItem Header="connection">
-                    <gterm:VTConsole x:Name="VTConsole"/>
+                    <!--<gterm:VTConsole x:Name="VTConsole"/>-->
                 </TabItem>
                 <TabItem Header="connection2">
-                    <gterm:VTConsole x:Name="VTConsole2"/>
+                    <!--<gterm:VTConsole x:Name="VTConsole2"/>-->
                 </TabItem>
             </TabControl>
         </ContentControl>

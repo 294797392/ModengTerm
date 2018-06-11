@@ -83,7 +83,7 @@ namespace GTerminalControl
             e.Handled = true;
 
             byte[] data;
-            if (this.VT.OnKeyDown(e, out data))
+            if (this.VT.HandleKeyDown(e, out data))
             {
                 if (!this.vt.Stream.Write(data))
                 {

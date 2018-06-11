@@ -42,11 +42,6 @@ namespace GTerminalCore
 
         #region 公开接口
 
-        public override bool OnKeyDown(KeyEventArgs key, out byte[] data)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
 
         #region 实例方法

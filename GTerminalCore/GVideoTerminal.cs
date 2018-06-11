@@ -15,11 +15,5 @@ namespace GTerminalCore
                 return VTTypeEnum.GVT;
             }
         }
-
-        public override bool OnKeyDown(KeyEventArgs key, out byte[] data)
-        {
-            data = new byte[] { };
-            return false;
-        }
     }
 }
