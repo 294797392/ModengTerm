@@ -96,7 +96,6 @@ namespace GTerminalControl
         {
             switch (action)
             {
-
             }
         }
 

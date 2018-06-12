@@ -14,7 +14,7 @@ namespace GTerminalCore
 
         IVTStream Stream { get; }
 
-        IVTKeyboard Keyboard { get; }
+        //IVTKeyboard Keyboard { get; }
 
         bool HandleKeyDown(KeyEventArgs key, out byte[] data);
     }

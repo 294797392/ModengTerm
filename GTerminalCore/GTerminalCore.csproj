@@ -54,6 +54,7 @@
     <Compile Include="GVideoTerminal.cs" />
     <Compile Include="GVTStream.cs" />
     <Compile Include="IVideoTerminal.cs" />
+    <Compile Include="IVTKeyboard.cs" />
     <Compile Include="ParseState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VideoTerminal.cs" />
@@ -64,7 +65,7 @@
     <Compile Include="VTPsrDef.cs" />
     <Compile Include="VTPrsTbl.cs" />
     <Compile Include="VTState.cs" />
-    <Compile Include="VTStream.cs" />
+    <Compile Include="IVTStream.cs" />
     <Compile Include="VTStreamState.cs" />
     <Compile Include="VTTypeEnum.cs" />
   </ItemGroup>

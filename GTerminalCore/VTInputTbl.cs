@@ -70,20 +70,15 @@ namespace GTerminalCore
             { Key.D9, new byte[] { '9'.Byte() } },
 
             /* 方向键 */
-            { Key.Up, new byte[] { '0'.Byte() } },
-            { Key.Down, new byte[] { '1'.Byte() } },
-            { Key.Left, new byte[] { '2'.Byte() } },
-            { Key.Right, new byte[] { '3'.Byte() } },
+            { Key.Up, new byte[] { 27, 91, 65 } }, /* esc,csi,a */
+            { Key.Down, new byte[] { 27, 91, 66 } }, /* esc,csi,b */
+            { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
+            { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
 
             { Key.Enter, new byte[] { VTInputDef.ANSI_CR } },
             { Key.Space, new byte[] { VTInputDef.ANSI_SPACE } },
             { Key.Back, new byte[] { VTInputDef.ANSI_BS } },
             { Key.Tab, new byte[] { VTInputDef.ANSI_TAB } },
-
-            { Key.Up, new byte[] { 27, 91, 65 } }, /* esc,csi,a */
-            { Key.Down, new byte[] { 27, 91, 66 } }, /* esc,csi,b */
-            { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
-            { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
         };
 
 
@@ -142,20 +137,16 @@ namespace GTerminalCore
             { Key.D9, new byte[] { '9'.Byte() } },
 
             /* 方向键 */
-            { Key.Up, new byte[] { '0'.Byte() } },
-            { Key.Down, new byte[] { '1'.Byte() } },
-            { Key.Left, new byte[] { '2'.Byte() } },
-            { Key.Right, new byte[] { '3'.Byte() } },
+            { Key.Up, new byte[] { 27, 91, 65 } }, /* esc,csi,a */
+            { Key.Down, new byte[] { 27, 91, 66 } }, /* esc,csi,b */
+            { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
+            { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
 
             { Key.Enter, new byte[] { VTInputDef.ANSI_CR } },
             { Key.Space, new byte[] { VTInputDef.ANSI_SPACE } },
             { Key.Back, new byte[] { VTInputDef.ANSI_BS } },
             { Key.Tab, new byte[] { VTInputDef.ANSI_TAB } },
 
-            { Key.Up, new byte[] { 27, 91, 65 } }, /* esc,csi,a */
-            { Key.Down, new byte[] { 27, 91, 66 } }, /* esc,csi,b */
-            { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
-            { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
         };
 
         public static Dictionary<Key, byte[]> AnsiUpperTable = new Dictionary<Key, byte[]>
@@ -213,20 +204,15 @@ namespace GTerminalCore
             { Key.D9, new byte[] { '9'.Byte() } },
 
             /* 方向键 */
-            { Key.Up, new byte[] { '0'.Byte() } },
-            { Key.Down, new byte[] { '1'.Byte() } },
-            { Key.Left, new byte[] { '2'.Byte() } },
-            { Key.Right, new byte[] { '3'.Byte() } },
+            { Key.Up, new byte[] { 27, 91, 65 } }, /* esc,csi,a */
+            { Key.Down, new byte[] { 27, 91, 66 } }, /* esc,csi,b */
+            { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
+            { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
 
             { Key.Enter, new byte[] { VTInputDef.ANSI_CR } },
             { Key.Space, new byte[] { VTInputDef.ANSI_SPACE } },
             { Key.Back, new byte[] { VTInputDef.ANSI_BS } },
             { Key.Tab, new byte[] { VTInputDef.ANSI_TAB } },
-
-            { Key.Up, new byte[] { 27, 91, 65 } }, /* esc,csi,a */
-            { Key.Down, new byte[] { 27, 91, 66 } }, /* esc,csi,b */
-            { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
-            { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
         };
     }
 }

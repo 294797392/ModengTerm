@@ -56,6 +56,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes.Ubuntu.Ambiance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="VTConsole.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

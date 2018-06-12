@@ -95,7 +95,7 @@ namespace GTerminalCore
             }
         }
 
-        public IVTKeyboard Keyboard { get; set; }
+        //public IVTKeyboard Keyboard { get; set; }
 
         #endregion
 
@@ -182,6 +182,8 @@ namespace GTerminalCore
             while (!stream.EOF)
             {
                 byte c = stream.Read();
+
+                Console.Write(c);
 
                 int lastState = this.psrState.NextState;
                 this.psrState.NextState = this.psrState.StateTable[(int)c];

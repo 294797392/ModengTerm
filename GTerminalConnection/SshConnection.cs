@@ -1,10 +1,9 @@
 ﻿using GTerminalCore;
+using ICare.Utility.Misc.DS;
 using Renci.SshNet;
+using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace GTerminalConnection
 {
@@ -27,7 +26,7 @@ namespace GTerminalConnection
         private SshClient sshClient;
         private ShellStream shellStream;
         private SshConnectionAuthorition authorition;
-        private BinaryWriter writer;
+        private BufferQueue<byte> stremQueue;
 
         #endregion
 
@@ -69,13 +68,15 @@ namespace GTerminalConnection
                 this.sshClient.Connect();
                 this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
                 this.shellStream = this.sshClient.CreateShellStream(this.authorition.TerminalName, this.authorition.TerminalColumns, this.authorition.TerminalRows, 0, 0, 1000);
-                this.writer = new BinaryWriter(this.shellStream, Encoding.UTF8);
+                this.shellStream.DataReceived += this.ShellStream_DataReceived;
             }
             catch (Exception ex)
             {
                 logger.Error("初始化SshConnection异常", ex);
                 return false;
             }
+
+            this.stremQueue = new BufferQueue<byte>(4096);
 
             this.NotifyVTStreamStatus(VTStreamState.Ready);
 
@@ -102,7 +103,8 @@ namespace GTerminalConnection
 
         public byte Read()
         {
-            return (byte)this.shellStream.ReadByte();
+            //return (byte)this.shellStream.ReadByte();
+            return this.stremQueue.Dequeue();
         }
 
         public bool Write(byte data)
@@ -136,6 +138,18 @@ namespace GTerminalConnection
             if (this.StatusChanged != null)
             {
                 this.StatusChanged(this, state);
+            }
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void ShellStream_DataReceived(object sender, ShellDataEventArgs e)
+        {
+            foreach (byte c in e.Data)
+            {
+                this.stremQueue.Enqueue(c);
             }
         }
 

@@ -6,9 +6,20 @@
              xmlns:local="clr-namespace:GTerminalControl"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes.Ubuntu.Ambiance.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <Grid>
 
-        <RichTextBox x:Name="RichTextBox"></RichTextBox>
+        <Border Background="{DynamicResource ResourceKey=BrushMainBackground}"/>
+        <RichTextBox x:Name="RichTextBox" Background="Transparent"
+                     CaretBrush="{DynamicResource ResourceKey=BrushCaret}"></RichTextBox>
 
     </Grid>
 </UserControl>
