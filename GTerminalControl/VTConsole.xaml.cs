@@ -94,6 +94,7 @@ namespace GTerminalControl
 
         private void VideoTerminal_Action(object sender, VTAction action, ParseState state)
         {
+            RichTextBox.IsReadOnlyCaretVisible
             switch (action)
             {
             }
