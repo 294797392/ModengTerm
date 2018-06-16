@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
 
 namespace GTerminalCore
 {
@@ -27,6 +28,6 @@ namespace GTerminalCore
         /// 当前键盘的输入数据
         /// 失败或者无输入返回null
         /// </returns>
-        byte[] GetCurrentInputData();
+        byte[] GetCurrentInputData(KeyEventArgs key);
     }
 }

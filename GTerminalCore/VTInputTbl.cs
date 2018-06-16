@@ -75,10 +75,10 @@ namespace GTerminalCore
             { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
             { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
 
-            { Key.Enter, new byte[] { VTInputDef.ANSI_CR } },
-            { Key.Space, new byte[] { VTInputDef.ANSI_SPACE } },
-            { Key.Back, new byte[] { VTInputDef.ANSI_BS } },
-            { Key.Tab, new byte[] { VTInputDef.ANSI_TAB } },
+            { Key.Enter, new byte[] { ANSI.ANSI_CR } },
+            { Key.Space, new byte[] { ANSI.ANSI_SPACE } },
+            { Key.Back, new byte[] { ANSI.ANSI_BS } },
+            { Key.Tab, new byte[] { ANSI.ANSI_TAB } },
         };
 
 
@@ -142,10 +142,10 @@ namespace GTerminalCore
             { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
             { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
 
-            { Key.Enter, new byte[] { VTInputDef.ANSI_CR } },
-            { Key.Space, new byte[] { VTInputDef.ANSI_SPACE } },
-            { Key.Back, new byte[] { VTInputDef.ANSI_BS } },
-            { Key.Tab, new byte[] { VTInputDef.ANSI_TAB } },
+            { Key.Enter, new byte[] { ANSI.ANSI_CR } },
+            { Key.Space, new byte[] { ANSI.ANSI_SPACE } },
+            { Key.Back, new byte[] { ANSI.ANSI_BS } },
+            { Key.Tab, new byte[] { ANSI.ANSI_TAB } },
 
         };
 
@@ -209,10 +209,10 @@ namespace GTerminalCore
             { Key.Left, new byte[] { 27, 91, 68 } }, /* esc,csi,d */
             { Key.Right, new byte[] { 27, 91, 67 } }, /* esc,csi,c */
 
-            { Key.Enter, new byte[] { VTInputDef.ANSI_CR } },
-            { Key.Space, new byte[] { VTInputDef.ANSI_SPACE } },
-            { Key.Back, new byte[] { VTInputDef.ANSI_BS } },
-            { Key.Tab, new byte[] { VTInputDef.ANSI_TAB } },
+            { Key.Enter, new byte[] { ANSI.ANSI_CR } },
+            { Key.Space, new byte[] { ANSI.ANSI_SPACE } },
+            { Key.Back, new byte[] { ANSI.ANSI_BS } },
+            { Key.Tab, new byte[] { ANSI.ANSI_TAB } },
         };
     }
 }

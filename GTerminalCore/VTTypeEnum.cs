@@ -5,6 +5,9 @@ using System.Text;
 
 namespace GTerminalCore
 {
+    /// <summary>
+    /// 定义终端类型枚举
+    /// </summary>
     public enum VTTypeEnum
     {
         VT100,

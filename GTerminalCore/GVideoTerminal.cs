@@ -8,6 +8,10 @@ namespace GTerminalCore
 {
     public class GVideoTerminal : VideoTerminal
     {
+        public GVideoTerminal(IVTStream stream) : base(stream)
+        {
+        }
+
         public override VTTypeEnum Type
         {
             get

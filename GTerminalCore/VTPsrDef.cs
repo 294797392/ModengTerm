@@ -11,6 +11,11 @@ namespace GTerminalCore
         public const byte CASE_IGNORE = 1;
         public const byte CASE_BELL = 2;
         public const byte CASE_BS = 3;
+
+        /// <summary>
+        /// CarriageReturn
+        /// 回车，把光标移动到第一列
+        /// </summary>
         public const byte CASE_CR = 4;
         public const byte CASE_ESC = 5;
         public const byte CASE_VMOT = 6;
@@ -61,7 +66,11 @@ namespace GTerminalCore
         public const byte CASE_SS2 = 51;
         public const byte CASE_SS3 = 52;
         public const byte CASE_CSI_STATE = 53;
+
+        #region ESC子状态
         public const byte CASE_OSC = 54;
+        #endregion
+
         public const byte CASE_RIS = 55;
         public const byte CASE_LS2 = 56;
         public const byte CASE_LS3 = 57;
@@ -97,6 +106,10 @@ namespace GTerminalCore
         public const byte CASE_DCS = 87;
         public const byte CASE_PM = 88;
         public const byte CASE_SOS = 89;
+
+        /// <summary>
+        /// String Terminator
+        /// </summary>
         public const byte CASE_ST = 90;
         public const byte CASE_APC = 91;
         public const byte CASE_EPA = 92;
@@ -169,5 +182,35 @@ namespace GTerminalCore
         public const byte CASE_SCS_PERCENT = 159;
         public const byte CASE_GSETS_PERCENT = 160;
         public const byte CASE_GRAPHICS_ATTRIBUTES = 161;
+
+
+
+
+        /// <summary>
+        /// 换行
+        /// 创建一个新行
+        /// </summary>
+        public const byte CASE_LF = 162;
+
+        /// <summary>
+        /// 垂直制表符
+        /// 它的作用是让‘\v’后面的字符从下一行开始输出，且开始的列数为“\v”前一个字符所在列后面一列。
+        /// 例如：puts("01\v2345");
+        /// 01在第一行，占用两列。2345在第二行，并且2在第三列
+        /// 
+        /// 8.3.161 VT - LINE TABULATION
+        /// </summary>
+        public const byte CASE_VT = 163;
+
+        /// <summary>
+        /// 换页（‘\f’）       
+        /// 换页符的在终端的中的效果相当于*nix中clear命令。
+        /// 终端在输出‘\f’之后内容之前，会将整个终端屏幕清空空，然后在输出内容。
+        /// 给人的该觉是在clear命令后的输出字符串。 最后我想说明一点，‘\r’‘\t’‘\v’‘\f’也是控制字符，它们会控制字符的输出方式。
+        /// 它们在终端输出时会有上面的表现，但如果写入文本文件，一般文本编辑器（vi或记事本）对‘\r’‘\v’‘\f’的显示是没有控制效果的。
+        /// 
+        /// 8.3.51 FF - FORM FEED
+        /// </summary>
+        public const byte CASE_FF = 164;
     }
 }

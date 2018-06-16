@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICare.Utility.Misc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -36,6 +37,11 @@ namespace GTerminalCore
     ///             P..P：参数字符串（ParameterBytes），由03/00（48） - 03/15（63）之间的字符组成
     ///             I..I：中间字符串（IntermediateBytes），由02/00（32） - 02/15（47）之间的字符组成，后面会跟一个字符串终结字符（F）
     ///             F：结束字符（FinalByte），由04/00（64） - 07/14（126）之间的某个字符表示。07/00 - 07/14之间的字符也是结束符，但是这是留给厂商做实验使用的。注意，带有中间字符串和不带有中间字符串的结束符的含义不一样
+    ///             
+    /// 
+    /// UTF8：用UTF-8就有复杂点.因为此时程序是把一个字节一个字节的来读取,然后再根据字节中开头的bit标志来识别是该把1个还是两个或三个字节做为一个单元来处理.
+    /// UTF16：UTF-16就把两个字节当成一个单元来解析.这个很简单.
+    /// UTF32：UTF-32就把四个字节当成一个单元来解析.这个很简单.
     /// </summary>
     public abstract class VideoTerminal : IVideoTerminal
     {
@@ -54,21 +60,10 @@ namespace GTerminalCore
         #region 实例变量
 
         private ParseState psrState;
-        private IVTStream stream;
 
         #endregion
 
         #region 属性
-
-        public bool CapsLocked
-        {
-            get
-            {
-                byte[] bs = new byte[256];
-                GetKeyboardState(bs);
-                return (bs[0x14] == 1);
-            }
-        }
 
         /// <summary>
         /// 是否支持8位ascii字符
@@ -82,76 +77,45 @@ namespace GTerminalCore
 
         public abstract VTTypeEnum Type { get; }
 
-        public IVTStream Stream
-        {
-            get
-            {
-                return this.stream;
-            }
-            set
-            {
-                this.stream = value;
-                this.stream.StatusChanged += this.VTStream_StatusChanged;
-            }
-        }
+        public virtual IVTStream Stream { get; protected set; }
 
-        //public IVTKeyboard Keyboard { get; set; }
+        public virtual IVTKeyboard Keyboard { get; protected set; }
+
+        /// <summary>
+        /// 设置终端字符编码方式
+        /// </summary>
+        public virtual Encoding CharacherEncoding { get; protected set; }
 
         #endregion
 
         #region 构造方法
 
-        public VideoTerminal()
+        public VideoTerminal(IVTStream stream)
         {
             this.psrState = new ParseState();
             this.psrState.StateTable = VTPrsTbl.AnsiTable;
             this.psrState.NextState = VTPrsTbl.AnsiTable[0];
+
+            this.Stream = stream;
+            this.Stream.StatusChanged += this.VTStream_StatusChanged;
+            this.Keyboard = new GVTKeyboard();
+            this.CharacherEncoding = DefaultValues.DefaultEncoding;
         }
 
         #endregion
 
         #region 公开接口
 
-        [DllImport("user32.dll", EntryPoint = "GetKeyboardState")]
-        public static extern int GetKeyboardState(byte[] pbKeyState);
-
-        public bool HandleKeyDown(KeyEventArgs key, out byte[] data)
+        public bool HandleInputWideChar(string wideChar, out byte[] data)
         {
-            data = null;
-            Dictionary<Key, byte[]> iptTbl = null;
+            data = this.CharacherEncoding.GetBytes(wideChar);
+            return false;
+        }
 
-            // 按下了Control键
-            if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
-            {
-                iptTbl = VTInputTbl.ControlTable;
-                goto Translate;
-            }
-
-            // 按下了Shift
-            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
-            {
-                iptTbl = VTInputTbl.ShiftTable;
-                goto Translate;
-            }
-
-            // 打开了大写锁定
-            if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift || this.CapsLocked)
-            {
-                iptTbl = VTInputTbl.AnsiUpperTable;
-                goto Translate;
-            }
-            
-            // 小写
-            iptTbl = VTInputTbl.AnsiLowerTable;
-
-            Translate:
-            if (!iptTbl.TryGetValue(key.Key, out data))
-            {
-                logger.ErrorFormat("未定义按键{0}", key.Key);
-                return false;
-            }
-
-            return true;
+        public bool HandleInputChar(KeyEventArgs key, out byte[] data)
+        {
+            data = this.Keyboard.GetCurrentInputData(key);
+            return data != null;
         }
 
         #endregion
@@ -162,17 +126,49 @@ namespace GTerminalCore
         /// 解析终端数据流
         /// </summary>
         /// <returns></returns>
-        protected void StartParsing()
+        private void StartParsing()
         {
             Task.Factory.StartNew(this.Parse, this.Stream);
         }
 
-        protected virtual void NotifyAction(VTAction action, ParseState state)
+        private void HandleUTF8Charactor(IVTStream stream, byte unicode_start, ParseState psrState)
         {
-            if (this.Action != null)
+            // https://www.cnblogs.com/fnlingnzb-learner/p/6163205.html
+
+            bool bit6 = MiscUtility.GetBit(unicode_start, 5);
+            bool bit7 = MiscUtility.GetBit(unicode_start, 6);
+            byte nextByte = unicode_start;
+
+            do
             {
-                this.Action(this, action, state);
-            }
+                if (!this.psrState.ParsingUnicode)
+                {
+                    this.psrState.ParsingUnicode = true;
+                    // 如果第6位是1，那么7，8位肯定都是1，3字节编码一个字，否则2字节编码一个字
+                    this.psrState.UnicodeSize = bit6 ? 3 : 2;
+                    this.psrState.UnicodeRemainSize = this.psrState.UnicodeSize;
+                    this.psrState.UnicodeBuff = new byte[this.psrState.UnicodeSize];
+                }
+
+                this.psrState.UnicodeBuff[this.psrState.UnicodeSize - this.psrState.UnicodeRemainSize] = nextByte;
+                this.psrState.UnicodeRemainSize -= 1;
+
+                if (this.psrState.UnicodeRemainSize == 0)
+                {
+                    // Unicode字符接收完毕
+                    this.psrState.ParsingUnicode = false;
+                    this.psrState.Text = this.CharacherEncoding.GetString(this.psrState.UnicodeBuff);
+                    break;
+                }
+                else
+                {
+                    // 继续解析
+                    nextByte = stream.Read();
+                }
+
+            } while (true);
+
+            psrState.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
         }
 
         private void Parse(object state)
@@ -183,11 +179,20 @@ namespace GTerminalCore
             {
                 byte c = stream.Read();
 
-                Console.Write(c);
-
+                this.psrState.Char = c;
                 int lastState = this.psrState.NextState;
                 this.psrState.NextState = this.psrState.StateTable[(int)c];
                 int nextState = this.psrState.NextState;
+
+                if (this.psrState.StateTable == VTPrsTbl.SosTable)
+                {
+                    this.psrState.ParameterBytes.Add(c);
+                }
+                else if (this.psrState.StateTable != VTPrsTbl.EscTable)
+                {
+                    // 退出了ESC状态，重置ControlFunction
+                    this.psrState.ControlFunction = 0;
+                }
 
                 switch (nextState)
                 {
@@ -197,19 +202,98 @@ namespace GTerminalCore
                         }
                         continue;
 
+                    #region 单字节指令（SingleCharactor ControlFunction）
+                    case VTPsrDef.CASE_CR:
+                        {
+                            this.NotifyAction(VTAction.MoveCursor, this.psrState);
+                        }
+                        break;
+                    case VTPsrDef.CASE_LF:
+                        {
+                            this.NotifyAction(VTAction.NewLine, this.psrState);
+                        }
+                        break;
+                    case VTPsrDef.CASE_VT:
+                        { }
+                        break;
+                    case VTPsrDef.CASE_FF:
+                        { }
+                        break;
+                    #endregion
+
+                    #region 打印终端数据流
                     // 向屏幕输出终端数据流
                     case VTPsrDef.CASE_PRINT:
                         {
-                            this.NotifyAction(VTAction.Print, this.psrState);
+                            bool bit8 = MiscUtility.GetBit(c, 7);
+                            if (!bit8)
+                            {
+                                /* 
+                                 * 第八位没用到，7位编码方式，1字节代表一个字，直接输出ascii码
+                                 */
+                                this.psrState.Text = ((char)c).ToString();
+                                this.NotifyAction(VTAction.Print, this.psrState);
+                                continue;
+                            }
+
+                            if (this.CharacherEncoding == Encoding.UTF8)
+                            {
+                                this.HandleUTF8Charactor(stream, c, this.psrState);
+                                this.NotifyAction(VTAction.Print, this.psrState);
+                            }
+                            else
+                            {
+                                logger.ErrorFormat("不支持的编码方式");
+                                throw new NotImplementedException();
+                            }
                         }
                         break;
+                    #endregion
 
                     // ANSI状态下收到ESC控制字符。
                     case VTPsrDef.CASE_ESC:
                         {
                             this.psrState.StateTable = VTPrsTbl.EscTable;
+                            logger.Debug("CASE_ESC");
                         }
                         break;
+
+                    #region ESC子状态
+                    case VTPsrDef.CASE_OSC:
+                        {
+                            this.psrState.StateTable = VTPrsTbl.SosTable;
+                            this.psrState.ControlFunction = ANSI.ANSI_OSC;
+                            logger.Debug("CASE_OSC");
+                        }
+                        break;
+                    #endregion
+
+
+                    case VTPsrDef.CASE_ST:
+                        {
+                            /* 收到String Terminaotr状态，所有的参数都接收完了，开始处理 */
+                            logger.DebugFormat("CASE_ST, parameters:{0}", this.CharacherEncoding.GetString(this.psrState.ParameterBytes.ToArray()));
+
+                            switch (this.psrState.ControlFunction)
+                            {
+                                case ANSI.ANSI_OSC:
+                                    {
+                                        /* 之前是CASE_OSC状态 */
+                                    }
+                                    break;
+                            }
+
+                            this.psrState.ParameterBytes.Clear();
+                        }
+                        break;
+
+
+                    case VTPsrDef.CASE_BELL:
+                        {
+                            logger.Debug("CASE_BELL");
+                        }
+                        break;
+
 
                     // ESC状态下收到CSI控制字符。
                     case VTPsrDef.CASE_CSI_STATE:
@@ -270,7 +354,21 @@ namespace GTerminalCore
                             this.psrState.StateTable = VTPrsTbl.AnsiTable;
                         }
                         break;
+
+                    default:
+                        {
+                            logger.ErrorFormat("未解析的字符:{0}, StateTable:{1}", c, this.psrState.StateTable);
+                        }
+                        break;
                 }
+            }
+        }
+
+        protected virtual void NotifyAction(VTAction action, ParseState state)
+        {
+            if (this.Action != null)
+            {
+                this.Action(this, action, state);
             }
         }
 

@@ -19,7 +19,8 @@
 
         <Border Background="{DynamicResource ResourceKey=BrushMainBackground}"/>
         <RichTextBox x:Name="RichTextBox" Background="Transparent"
-                     CaretBrush="{DynamicResource ResourceKey=BrushCaret}"></RichTextBox>
+                     CaretBrush="{DynamicResource ResourceKey=BrushCaret}"
+                     Foreground="{DynamicResource ResourceKey=BrushDefaultForeground}"></RichTextBox>
 
     </Grid>
 </UserControl>

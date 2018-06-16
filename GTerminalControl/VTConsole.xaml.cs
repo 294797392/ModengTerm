@@ -66,24 +66,47 @@ namespace GTerminalControl
 
         private void InitializeConsole()
         {
-            _paragraph = new Paragraph
+            _paragraph = new Paragraph()
             {
             };
             RichTextBox.IsUndoEnabled = false;
             RichTextBox.Document = new FlowDocument(_paragraph);
             RichTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
+            RichTextBox.PreviewTextInput += RichTextBox_PreviewTextInput;
+        }
+
+        ///// <summary>
+        ///// TextPointer
+        ///// </summary>
+        ///// <param name="column"></param>
+        ///// <returns></returns>
+        //private TextPointer GetTextPointer(int row, int column)
+        //{
+        //    RichTextBox.CaretPosition.GetLineStartPosition
+        //    RichTextBox.CaretPosition.GetPositionAtOffset(column);
+        //}
+
+        private void AppendText(string text)
+        {
+            Inline lastInline = this._paragraph.Inlines.LastInline;
+            if (lastInline == null)
+            {
+                Run runInline = new Run();
+                this._paragraph.Inlines.Add(runInline);
+            }
+
+            RichTextBox.CaretPosition.InsertTextInRun(text);
+            RichTextBox.CaretPosition = RichTextBox.CaretPosition.GetPositionAtOffset(text.Length, LogicalDirection.Forward);
         }
 
         #endregion
 
         #region 事件处理器
 
-        private void RichTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void RichTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = true;
-
             byte[] data;
-            if (this.VT.HandleKeyDown(e, out data))
+            if (this.VT.HandleInputWideChar(e.Text, out data))
             {
                 if (!this.vt.Stream.Write(data))
                 {
@@ -92,11 +115,52 @@ namespace GTerminalControl
             }
         }
 
+        private void RichTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.ImeProcessed)
+            {
+            }
+            else
+            {
+                byte[] data;
+                if (this.VT.HandleInputChar(e, out data))
+                {
+                    if (!this.vt.Stream.Write(data))
+                    {
+                        logger.ErrorFormat("向终端发送数据失败");
+                    }
+                }
+
+                e.Handled = true;
+            }
+        }
+
         private void VideoTerminal_Action(object sender, VTAction action, ParseState state)
         {
-            RichTextBox.IsReadOnlyCaretVisible
             switch (action)
             {
+                case VTAction.Print:
+                    {
+                        base.Dispatcher.Invoke(new Action(() =>
+                        {
+                            this.AppendText(state.Text);
+                        }));
+                    }
+                    break;
+
+                case VTAction.MoveCursor:
+                    {
+                    }
+                    break;
+
+                case VTAction.NewLine:
+                    {
+                        base.Dispatcher.Invoke(new Action(() =>
+                        {
+
+                        }));
+                    }
+                    break;
             }
         }
 

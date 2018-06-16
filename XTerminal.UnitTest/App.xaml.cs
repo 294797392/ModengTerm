@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows;
 
 namespace XTerminal.UnitTest
@@ -28,6 +29,12 @@ namespace XTerminal.UnitTest
 
         App()
         {
+            byte[] buffer = Encoding.UTF8.GetBytes("黑");
+            bool flag1= ICare.Utility.Misc.MiscUtility.GetBit(buffer[0], 5);
+            bool flag2 = ICare.Utility.Misc.MiscUtility.GetBit(buffer[0], 6);
+            bool flag3 = ICare.Utility.Misc.MiscUtility.GetBit(buffer[0], 7);
+            string text = Encoding.UTF8.GetString(new byte[] { 229, 147 });
+
             //MessageBox.Show(((int)';').ToString());
 
             string log4netPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log4net.xml");

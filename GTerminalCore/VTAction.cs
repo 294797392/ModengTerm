@@ -10,7 +10,20 @@ namespace GTerminalCore
     /// </summary>
     public enum VTAction
     {
-        Print
+        /// <summary>
+        /// 向终端输出字符
+        /// </summary>
+        Print,
+
+        /// <summary>
+        /// 移动光标
+        /// </summary>
+        MoveCursor,
+
+        /// <summary>
+        /// 创建一个新行
+        /// </summary>
+        NewLine
 
         ///// <summary>
         ///// The character or control is not processed. No observable difference in the terminal’s state would occur if the character that caused this action was not present in the input stream. (Therefore, this action can only occur within a state.)

@@ -120,6 +120,19 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-B.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-BI.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-C.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-L.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-LI.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-M.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-MI.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-R.ttf" />
+    <Resource Include="UbuntuFontFamily\Ubuntu-RI.ttf" />
+    <Resource Include="UbuntuFontFamily\UbuntuMono-B.ttf" />
+    <Resource Include="UbuntuFontFamily\UbuntuMono-BI.ttf" />
+    <Resource Include="UbuntuFontFamily\UbuntuMono-R.ttf" />
+    <Resource Include="UbuntuFontFamily\UbuntuMono-RI.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\GTerminalConnection\GTerminalConnection.csproj">
@@ -135,7 +148,15 @@
       <Name>GTerminalCore</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="UbuntuFontFamily\CONTRIBUTING.txt" />
+    <Resource Include="UbuntuFontFamily\copyright.txt" />
+    <Resource Include="UbuntuFontFamily\FONTLOG.txt" />
+    <Resource Include="UbuntuFontFamily\LICENCE-FAQ.txt" />
+    <Resource Include="UbuntuFontFamily\LICENCE.txt" />
+    <Resource Include="UbuntuFontFamily\README.txt" />
+    <Resource Include="UbuntuFontFamily\TRADEMARKS.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

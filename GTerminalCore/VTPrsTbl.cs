@@ -10,6 +10,344 @@ namespace GTerminalCore
      */
     public static class VTPrsTbl
     {
+        #region Sos_Table
+
+        /// <summary>
+        /// xterm-331 VTPrsTbl.c 6578行
+        /// 
+        /// 在OSC模式下，收集控制命令参数字符串，每一个CASE_IGNORE都是一个参数字符
+        /// The CASE_IGNORE entries correspond to the
+        /// characters that can be accumulated for the string function(e.g., OSC).
+        /// </summary>
+        public static readonly byte[] SosTable =
+        {
+            /*	NUL		SOH		STX		ETX	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	EOT		ENQ		ACK		BEL	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_BELL,
+            /*	BS		HT		NL		VT	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	FF		CR		SO		SI	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	DLE		DC1		DC2		DC3	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	DC4		NAK		SYN		ETB	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	CAN		EM		SUB		ESC	*/
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_ESC,
+            /*	FS		GS		RS		US	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	SP		!		"		#	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	$		%		&		'	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	(		)		*		+	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	,		-		.		/	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	0		1		2		3	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	4		5		6		7	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	8		9		:		;	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	<		=		>		?	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	@		A		B		C	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	D		E		F		G	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	H		I		J		K	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	L		M		N		O	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	P		Q		R		S	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	T		U		V		W	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	X		Y		Z		[	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	\		]		^		_	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	`		a		b		c	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	d		e		f		g	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	h		i		j		k	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	l		m		n		o	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	p		q		r		s	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	t		u		v		w	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	x		y		z		{	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*	|		}		~		DEL	*/
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      0x80            0x81            0x82            0x83    */
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            /*      0x84            0x85            0x86            0x87    */
+            VTPsrDef.CASE_IND,
+            VTPsrDef.CASE_NEL,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            /*      0x88            0x89            0x8a            0x8b    */
+            VTPsrDef.CASE_HTS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            /*      0x8c            0x8d            0x8e            0x8f    */
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_RI,
+            VTPsrDef.CASE_SS2,
+            VTPsrDef.CASE_SS3,
+            /*      0x90            0x91            0x92            0x93    */
+            VTPsrDef.CASE_DCS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            /*      0x94            0x95            0x96            0x97    */
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_SPA,
+            VTPsrDef.CASE_EPA,
+            /*      0x98            0x99            0x9a            0x9b    */
+            VTPsrDef.CASE_SOS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DECID,
+            VTPsrDef.CASE_CSI_STATE,
+            /*      0x9c            0x9d            0x9e            0x9f    */
+            VTPsrDef.CASE_ST,
+            VTPsrDef.CASE_OSC,
+            VTPsrDef.CASE_PM,
+            VTPsrDef.CASE_APC,
+            /*      nobreakspace    exclamdown      cent            sterling        */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      currency        yen             brokenbar       section         */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      diaeresis       copyright       ordfeminine     guillemotleft   */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      notsign         hyphen          registered      macron          */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      degree          plusminus       twosuperior     threesuperior   */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      acute           mu              paragraph       periodcentered  */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      cedilla         onesuperior     masculine       guillemotright  */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      onequarter      onehalf         threequarters   questiondown    */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Agrave          Aacute          Acircumflex     Atilde          */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Adiaeresis      Aring           AE              Ccedilla        */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Egrave          Eacute          Ecircumflex     Ediaeresis      */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Igrave          Iacute          Icircumflex     Idiaeresis      */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Eth             Ntilde          Ograve          Oacute          */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Ocircumflex     Otilde          Odiaeresis      multiply        */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Ooblique        Ugrave          Uacute          Ucircumflex     */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      Udiaeresis      Yacute          Thorn           ssharp          */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      agrave          aacute          acircumflex     atilde          */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      adiaeresis      aring           ae              ccedilla        */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      egrave          eacute          ecircumflex     ediaeresis      */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      igrave          iacute          icircumflex     idiaeresis      */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      eth             ntilde          ograve          oacute          */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      ocircumflex     otilde          odiaeresis      division        */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      oslash          ugrave          uacute          ucircumflex     */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            /*      udiaeresis      yacute          thorn           ydiaeresis      */
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IGNORE,
+
+        };
+
+        #endregion
+
+        #region CigTable
+
         /// <summary>
         /// 当收到CASE_CSI_IGNORE指令的时候，解析器使用的状态表
         /// </summary>
@@ -335,8 +673,11 @@ namespace GTerminalCore
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_IGNORE,
-
         };
+
+        #endregion
+
+        #region CsiSpTable
 
         /// <summary>
         /// ascii字符和CSI的FinalByte字符的映射表
@@ -666,6 +1007,10 @@ namespace GTerminalCore
 
         };
 
+        #endregion
+
+        #region Csi2Table
+
         public static readonly byte[] Csi2Table =
         {
             /*	NUL		SOH		STX		ETX	*/
@@ -990,6 +1335,10 @@ namespace GTerminalCore
             VTPsrDef.CASE_IGNORE,
 
         };
+
+        #endregion
+
+        #region CsiTable
 
         /// <summary>
         /// ascii码与csi控制指令的映射关系表
@@ -1318,6 +1667,10 @@ namespace GTerminalCore
             VTPsrDef.CASE_IGNORE,
         };
 
+        #endregion
+
+        #region EscTable
+
         /// <summary>
         /// ascii码与Esc控制指令的映射关系表
         /// </summary>
@@ -1341,8 +1694,8 @@ namespace GTerminalCore
             /*	FF		CR		SO		SI	*/
             VTPsrDef.CASE_VMOT,
             VTPsrDef.CASE_CR,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_SO,
+            VTPsrDef.CASE_SI,
             /*	DLE		DC1		DC2		DC3	*/
             VTPsrDef.CASE_IGNORE,
             VTPsrDef.CASE_IGNORE,
@@ -1364,25 +1717,25 @@ namespace GTerminalCore
             VTPsrDef.CASE_IGNORE,
             VTPsrDef.CASE_IGNORE,
             /*	SP		!		"		#	*/
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
+            VTPsrDef.CASE_ESC_SP_STATE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_SCR_STATE,
             /*	$		%		&		'	*/
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_ESC_PERCENT,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
             /*	(		)		*		+	*/
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
+            VTPsrDef.CASE_SCS0_STATE,
+            VTPsrDef.CASE_SCS1_STATE,
+            VTPsrDef.CASE_SCS2_STATE,
+            VTPsrDef.CASE_SCS3_STATE,
             /*	,		-		.		/	*/
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
-            VTPsrDef.CASE_VT52_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_SCS1A_STATE,
+            VTPsrDef.CASE_SCS2A_STATE,
+            VTPsrDef.CASE_SCS3A_STATE,
             /*	0		1		2		3	*/
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
@@ -1391,63 +1744,63 @@ namespace GTerminalCore
             /*	4		5		6		7	*/
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DECBI,
+            VTPsrDef.CASE_DECSC,
             /*	8		9		:		;	*/
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DECRC,
+            VTPsrDef.CASE_DECFI,
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
             /*	<		=		>		?	*/
-            VTPsrDef.CASE_VT52_FINISH,
+            VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_DECKPAM,
             VTPsrDef.CASE_DECKPNM,
             VTPsrDef.CASE_GROUND_STATE,
             /*	@		A		B		C	*/
             VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_CUU,
-            VTPsrDef.CASE_CUD,
-            VTPsrDef.CASE_CUF,
-            /*	D		E		F		G	*/
-            VTPsrDef.CASE_CUB,
             VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_SO,
-            VTPsrDef.CASE_SI,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            /*	D		E		F		G	*/
+            VTPsrDef.CASE_IND,
+            VTPsrDef.CASE_NEL,
+            VTPsrDef.CASE_HP_BUGGY_LL,
+            VTPsrDef.CASE_GROUND_STATE,
             /*	H		I		J		K	*/
-            VTPsrDef.CASE_CUP,
-            VTPsrDef.CASE_RI,
-            VTPsrDef.CASE_ED,
-            VTPsrDef.CASE_EL,
+            VTPsrDef.CASE_HTS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*	L		M		N		O	*/
             VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_RI,
+            VTPsrDef.CASE_SS2,
+            VTPsrDef.CASE_SS3,
             /*	P		Q		R		S	*/
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DCS,
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
             /*	T		U		V		W	*/
+            VTPsrDef.CASE_XTERM_TITLE,
             VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_SPA,
+            VTPsrDef.CASE_EPA,
             /*	X		Y		Z		[	*/
+            VTPsrDef.CASE_SOS,
             VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_VT52_CUP,
             VTPsrDef.CASE_DECID,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_CSI_STATE,
             /*	\		]		^		_	*/
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_ST,
+            VTPsrDef.CASE_OSC,
+            VTPsrDef.CASE_PM,
+            VTPsrDef.CASE_APC,
             /*	`		a		b		c	*/
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_RIS,
             /*	d		e		f		g	*/
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
@@ -1459,10 +1812,10 @@ namespace GTerminalCore
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
             /*	l		m		n		o	*/
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_HP_MEM_LOCK,
+            VTPsrDef.CASE_HP_MEM_UNLOCK,
+            VTPsrDef.CASE_LS2,
+            VTPsrDef.CASE_LS3,
             /*	p		q		r		s	*/
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
@@ -1479,171 +1832,175 @@ namespace GTerminalCore
             VTPsrDef.CASE_GROUND_STATE,
             VTPsrDef.CASE_GROUND_STATE,
             /*	|		}		~		DEL	*/
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
-            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_LS3R,
+            VTPsrDef.CASE_LS2R,
+            VTPsrDef.CASE_LS1R,
             VTPsrDef.CASE_IGNORE,
             /*      0x80            0x81            0x82            0x83    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      0x84            0x85            0x86            0x87    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IND,
+            VTPsrDef.CASE_NEL,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      0x88            0x89            0x8a            0x8b    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_HTS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      0x8c            0x8d            0x8e            0x8f    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_RI,
+            VTPsrDef.CASE_SS2,
+            VTPsrDef.CASE_SS3,
             /*      0x90            0x91            0x92            0x93    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_DCS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      0x94            0x95            0x96            0x97    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_SPA,
+            VTPsrDef.CASE_EPA,
             /*      0x98            0x99            0x9a            0x9b    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_SOS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DECID,
+            VTPsrDef.CASE_CSI_STATE,
             /*      0x9c            0x9d            0x9e            0x9f    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_ST,
+            VTPsrDef.CASE_OSC,
+            VTPsrDef.CASE_PM,
+            VTPsrDef.CASE_APC,
             /*      nobreakspace    exclamdown      cent            sterling        */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_ESC_SP_STATE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_SCR_STATE,
             /*      currency        yen             brokenbar       section         */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_ESC_PERCENT,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
             /*      diaeresis       copyright       ordfeminine     guillemotleft   */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_SCS0_STATE,
+            VTPsrDef.CASE_SCS1_STATE,
+            VTPsrDef.CASE_SCS2_STATE,
+            VTPsrDef.CASE_SCS3_STATE,
             /*      notsign         hyphen          registered      macron          */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_ESC_IGNORE,
+            VTPsrDef.CASE_SCS1A_STATE,
+            VTPsrDef.CASE_SCS2A_STATE,
+            VTPsrDef.CASE_SCS3A_STATE,
             /*      degree          plusminus       twosuperior     threesuperior   */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      acute           mu              paragraph       periodcentered  */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DECBI,
+            VTPsrDef.CASE_DECSC,
             /*      cedilla         onesuperior     masculine       guillemotright  */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_DECRC,
+            VTPsrDef.CASE_DECFI,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      onequarter      onehalf         threequarters   questiondown    */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DECKPAM,
+            VTPsrDef.CASE_DECKPNM,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      Agrave          Aacute          Acircumflex     Atilde          */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      Adiaeresis      Aring           AE              Ccedilla        */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_IND,
+            VTPsrDef.CASE_NEL,
+            VTPsrDef.CASE_HP_BUGGY_LL,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      Egrave          Eacute          Ecircumflex     Ediaeresis      */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_HTS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      Igrave          Iacute          Icircumflex     Idiaeresis      */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_RI,
+            VTPsrDef.CASE_SS2,
+            VTPsrDef.CASE_SS3,
             /*      Eth             Ntilde          Ograve          Oacute          */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_DCS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      Ocircumflex     Otilde          Odiaeresis      multiply        */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_XTERM_TITLE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_SPA,
+            VTPsrDef.CASE_EPA,
             /*      Ooblique        Ugrave          Uacute          Ucircumflex     */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_SOS,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_DECID,
+            VTPsrDef.CASE_CSI_STATE,
             /*      Udiaeresis      Yacute          Thorn           ssharp          */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_ST,
+            VTPsrDef.CASE_OSC,
+            VTPsrDef.CASE_PM,
+            VTPsrDef.CASE_APC,
             /*      agrave          aacute          acircumflex     atilde          */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_RIS,
             /*      adiaeresis      aring           ae              ccedilla        */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      egrave          eacute          ecircumflex     ediaeresis      */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      igrave          iacute          icircumflex     idiaeresis      */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_HP_MEM_LOCK,
+            VTPsrDef.CASE_HP_MEM_UNLOCK,
+            VTPsrDef.CASE_LS2,
+            VTPsrDef.CASE_LS3,
             /*      eth             ntilde          ograve          oacute          */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      ocircumflex     otilde          odiaeresis      division        */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      oslash          ugrave          uacute          ucircumflex     */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
+            VTPsrDef.CASE_GROUND_STATE,
             /*      udiaeresis      yacute          thorn           ydiaeresis      */
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
-            VTPsrDef.CASE_IGNORE,
+            VTPsrDef.CASE_LS3R,
+            VTPsrDef.CASE_LS2R,
+            VTPsrDef.CASE_LS1R,
+            VTPsrDef.CASE_IGNORE
         };
+
+        #endregion
+
+        #region AnsiTable
 
         /// <summary>
         /// Ansi字符与控制功能之间的映射关系表
@@ -1661,14 +2018,14 @@ namespace GTerminalCore
             VTPsrDef.CASE_ENQ,
             VTPsrDef.CASE_IGNORE,
             VTPsrDef.CASE_BELL,
-            /*	BS		HT		NL		VT	*/
+            /*	BS		HT		LF		VT	*/
             VTPsrDef.CASE_BS,
             VTPsrDef.CASE_TAB,
-            VTPsrDef.CASE_VMOT,
-            VTPsrDef.CASE_VMOT,
+            VTPsrDef.CASE_PRINT,
+            VTPsrDef.CASE_VT,
             /*	FF		CR		SO		SI	*/
-            VTPsrDef.CASE_VMOT,
-            VTPsrDef.CASE_CR,
+            VTPsrDef.CASE_FF,
+            VTPsrDef.CASE_PRINT,
             VTPsrDef.CASE_SO,
             VTPsrDef.CASE_SI,
             /*	DLE		DC1		DC2		DC3	*/
@@ -1971,7 +2328,8 @@ namespace GTerminalCore
             VTPsrDef.CASE_PRINT,
             VTPsrDef.CASE_PRINT,
             VTPsrDef.CASE_PRINT,
-
         };
+
+        #endregion
     }
 }

@@ -14,8 +14,15 @@ namespace GTerminalCore
 
         IVTStream Stream { get; }
 
-        //IVTKeyboard Keyboard { get; }
+        IVTKeyboard Keyboard { get; }
 
-        bool HandleKeyDown(KeyEventArgs key, out byte[] data);
+        /// <summary>
+        /// 设置终端字符编码方式
+        /// </summary>
+        Encoding CharacherEncoding { get; }
+
+        bool HandleInputChar(KeyEventArgs key, out byte[] data);
+
+        bool HandleInputWideChar(string wideChar, out byte[] data);
     }
 }

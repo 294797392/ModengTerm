@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GTerminalCore
 {
-    public class VTInputDef
+    public class ANSI
     {
         public const byte ANSI_CR = 13; // carriage return，回车，0x0D
         public const byte ANSI_TAB = 9;  // horizontal tab，制表符，0x09

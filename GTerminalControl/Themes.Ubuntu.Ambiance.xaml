@@ -4,5 +4,7 @@
 
     <SolidColorBrush x:Key="BrushMainBackground" Color="#300a24"/>
     <SolidColorBrush x:Key="BrushCaret" Color="White"/>
+    <SolidColorBrush x:Key="BrushDefaultForeground" Color="White"/>
+
 
 </ResourceDictionary>

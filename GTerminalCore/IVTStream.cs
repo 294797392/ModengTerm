@@ -7,7 +7,7 @@ using System.Threading;
 namespace GTerminalCore
 {
     /// <summary>
-    /// 管理虚拟终端与远程主机通信的接口
+    /// 管理终端数据流的接口
     /// </summary>
     public interface IVTStream
     {

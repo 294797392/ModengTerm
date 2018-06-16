@@ -34,7 +34,7 @@ namespace GTerminalCore
 
         #region 构造方法
 
-        public VT100()
+        public VT100(IVTStream stream) : base(stream)
         {
         }
 
