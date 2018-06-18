@@ -68,6 +68,9 @@ namespace GTerminalCore
         public const byte CASE_CSI_STATE = 53;
 
         #region ESC子状态
+        /// <summary>
+        /// Operating System Commands
+        /// </summary>
         public const byte CASE_OSC = 54;
         #endregion
 
@@ -109,6 +112,8 @@ namespace GTerminalCore
 
         /// <summary>
         /// String Terminator
+        /// ST is used as the closing delimiter of a control string opened by APPLICATION PROGRAM COMMAND (APC), DEVICE CONTROL STRING (DCS), OPERATING SYSTEM COMMAND 
+        /// (OSC), PRIVACY MESSAGE(PM), or START OF STRING(SOS).
         /// </summary>
         public const byte CASE_ST = 90;
         public const byte CASE_APC = 91;

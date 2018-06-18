@@ -131,7 +131,7 @@ namespace GTerminalCore
             Task.Factory.StartNew(this.Parse, this.Stream);
         }
 
-        private void HandleUTF8Charactor(IVTStream stream, byte unicode_start, ParseState psrState)
+        private void ReceiveUTF8String(IVTStream stream, byte unicode_start, ParseState psrState)
         {
             // https://www.cnblogs.com/fnlingnzb-learner/p/6163205.html
 
@@ -157,7 +157,7 @@ namespace GTerminalCore
                 {
                     // Unicode字符接收完毕
                     this.psrState.ParsingUnicode = false;
-                    this.psrState.Text = this.CharacherEncoding.GetString(this.psrState.UnicodeBuff);
+                    this.psrState.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
                     break;
                 }
                 else
@@ -169,6 +169,16 @@ namespace GTerminalCore
             } while (true);
 
             psrState.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
+        }
+
+        private void HandleOSC(List<byte> oscData)
+        {
+
+        }
+
+        private void HandleSGR(List<byte> sgrs)
+        {
+
         }
 
         private void Parse(object state)
@@ -191,7 +201,7 @@ namespace GTerminalCore
                 else if (this.psrState.StateTable != VTPrsTbl.EscTable)
                 {
                     // 退出了ESC状态，重置ControlFunction
-                    this.psrState.ControlFunction = 0;
+                    this.psrState.ControlString = 0;
                 }
 
                 switch (nextState)
@@ -205,12 +215,14 @@ namespace GTerminalCore
                     #region 单字节指令（SingleCharactor ControlFunction）
                     case VTPsrDef.CASE_CR:
                         {
-                            this.NotifyAction(VTAction.MoveCursor, this.psrState);
+                            this.psrState.Text = "\r";
+                            this.NotifyAction(VTAction.Print, this.psrState);
                         }
                         break;
                     case VTPsrDef.CASE_LF:
                         {
-                            this.NotifyAction(VTAction.NewLine, this.psrState);
+                            this.psrState.Text = "\n";
+                            this.NotifyAction(VTAction.Print, this.psrState);
                         }
                         break;
                     case VTPsrDef.CASE_VT:
@@ -218,6 +230,20 @@ namespace GTerminalCore
                         break;
                     case VTPsrDef.CASE_FF:
                         { }
+                        break;
+                    case VTPsrDef.CASE_BELL:
+                        {
+                            /* OSC状态有两种结束模式，一种是以CASE_BELL结束，一种是以CASE_ST结束 */
+                            logger.Debug("CASE_BELL");
+                            if (this.psrState.ControlString == ANSI.ANSI_OSC)
+                            {
+                                this.psrState.ResetState();
+                            }
+                            else
+                            {
+                                /* 响铃 */
+                            }
+                        }
                         break;
                     #endregion
 
@@ -238,7 +264,7 @@ namespace GTerminalCore
 
                             if (this.CharacherEncoding == Encoding.UTF8)
                             {
-                                this.HandleUTF8Charactor(stream, c, this.psrState);
+                                this.ReceiveUTF8String(stream, c, this.psrState);
                                 this.NotifyAction(VTAction.Print, this.psrState);
                             }
                             else
@@ -250,6 +276,22 @@ namespace GTerminalCore
                         break;
                     #endregion
 
+                    #region ControlString
+                    case VTPsrDef.CASE_OSC:
+                        {
+                            /* 
+                             * OSC状态有两种结束模式：
+                             * Xterm支持以CASE_BELL结束
+                             * 另外一种是以CASE_ST（ 09/13 or ESC 05/13）结束 
+                             */
+                            this.psrState.StateTable = VTPrsTbl.SosTable;
+                            this.psrState.ControlString = ANSI.ANSI_OSC;
+                            logger.Debug("CASE_OSC");
+                        }
+                        break;
+                    #endregion
+
+                    #region ESC控制指令相关
                     // ANSI状态下收到ESC控制字符。
                     case VTPsrDef.CASE_ESC:
                         {
@@ -258,23 +300,106 @@ namespace GTerminalCore
                         }
                         break;
 
-                    #region ESC子状态
-                    case VTPsrDef.CASE_OSC:
+                    // ESC状态下收到CSI控制字符。
+                    case VTPsrDef.CASE_CSI_STATE:
                         {
-                            this.psrState.StateTable = VTPrsTbl.SosTable;
-                            this.psrState.ControlFunction = ANSI.ANSI_OSC;
-                            logger.Debug("CASE_OSC");
+                            this.psrState.StateTable = VTPrsTbl.CsiTable;
+                            logger.Debug("CASE_CSI_STATE");
+                        }
+                        break;
+                    
+                    /* 
+                     * 在ESC模式下收到了数字。通常，这是ESC指令的参数。每个数字都代表了一个不同的含义
+                     */
+                    case VTPsrDef.CASE_ESC_DIGIT:
+                        {
+                            /*
+                             * 存储ESCDigits，收到FinalByte的时候会用到，不同的FinalByte，ParameterBytes有不同的含义
+                             * FinalByte代表了CSI命令的功能类型
+                             */
+                            this.psrState.EscDigits.Add(c);
+                            if (this.psrState.StateTable == VTPrsTbl.CsiTable)
+                            {
+                                this.psrState.StateTable = VTPrsTbl.Csi2Table; // xterm-331 charproc.c 2497, TODO:Csi2Table和CsiTable的区别
+                            }
+                        }
+                        break;
+                     
+                    /*
+                     * 在ESC模式下收到了分号（;）。通常，这用来分割ESC控制指令的参数，暂时不做处理
+                     */
+                    case VTPsrDef.CASE_ESC_SEMI:
+                        {
+                            if (this.psrState.StateTable == VTPrsTbl.CsiTable)
+                            {
+                                this.psrState.StateTable = VTPrsTbl.Csi2Table; // xterm-331 charproc.c 2509
+                            }
+                        }
+                        break;
+
+                    #region FinalBytes
+                    
+                    /*
+                     * 在ESC模式下收到了FinalByte（结束符），FinalByte表示ESC指令的类型，一个ESC指令由FinalByte结束
+                     */
+
+                    case VTPsrDef.CASE_CUU:
+                        {
+                            // 光标上移
+                            logger.Debug("CASE_CUU - cursor up");
+                            this.psrState.EscReset();
+                        }
+                        break;
+                    case VTPsrDef.CASE_CUD:
+                        {
+                            // 光标下移
+                            logger.Debug("CASE_CUD - cursor down");
+                            this.psrState.EscReset();
+                        }
+                        break;
+                    case VTPsrDef.CASE_CUF:
+                        {
+                            // 光标左移
+                            logger.Debug("CASE_CUF - cursor forward");
+                            this.psrState.EscReset();
+                        }
+                        break;
+                    case VTPsrDef.CASE_CUB:
+                        {
+                            // 光标右移
+                            logger.Debug("CASE_CUB - cursor backward");
+                            this.psrState.EscReset();
+                        }
+                        break;
+                    case VTPsrDef.CASE_CUP:
+                        {
+                            // 设置光标位置
+                            logger.Debug("CASE_CUP - cursor position");
+                            this.psrState.EscReset();
+                        }
+                        break;
+                    /*
+                     * CSI状态下收到了FinalByte是SGR的字符。
+                     * SGR：SELECT GRAPHIC RENDITION  
+                     */
+                    case VTPsrDef.CASE_SGR:
+                        {
+                            logger.Debug("CASE_SGR");
+                            this.HandleSGR(this.psrState.EscDigits);
+                            this.psrState.EscReset();
                         }
                         break;
                     #endregion
 
+                    #endregion
 
+                    /* 字符串结束符 */
                     case VTPsrDef.CASE_ST:
                         {
                             /* 收到String Terminaotr状态，所有的参数都接收完了，开始处理 */
-                            logger.DebugFormat("CASE_ST, parameters:{0}", this.CharacherEncoding.GetString(this.psrState.ParameterBytes.ToArray()));
+                            logger.DebugFormat("CASE_ST, ControlString:{0}", this.psrState.ControlString);
 
-                            switch (this.psrState.ControlFunction)
+                            switch (this.psrState.ControlString)
                             {
                                 case ANSI.ANSI_OSC:
                                     {
@@ -282,53 +407,7 @@ namespace GTerminalCore
                                     }
                                     break;
                             }
-
-                            this.psrState.ParameterBytes.Clear();
-                        }
-                        break;
-
-
-                    case VTPsrDef.CASE_BELL:
-                        {
-                            logger.Debug("CASE_BELL");
-                        }
-                        break;
-
-
-                    // ESC状态下收到CSI控制字符。
-                    case VTPsrDef.CASE_CSI_STATE:
-                        {
-                            this.psrState.StateTable = VTPrsTbl.CsiTable;
-                        }
-                        break;
-
-                    /* ESC状态下收到数字字符。在CSI子状态下，属于参数字段；在DEC子状态下，？ */
-                    case VTPsrDef.CASE_ESC_DIGIT:
-                        {
-                            /*
-                             * CASE_CSI_STATE模式下:
-                             *      ParameterBytes
-                             * DEC模式下：
-                             * 
-                             * 存储ParameterBytes，收到FinalByte的时候会用到，不同的FinalByte，ParameterBytes有不同的含义
-                             * FinalByte代表了CSI命令的功能类型
-                             */
-                            this.psrState.ParameterBytes.Add(c);
-                            if (this.psrState.StateTable == VTPrsTbl.CsiTable)
-                            {
-                                this.psrState.StateTable = VTPrsTbl.Csi2Table; // TODO:Csi2Table和CsiTable的区别
-                            }
-                        }
-                        break;
-
-                    // ESC状态下接收到了分号
-                    case VTPsrDef.CASE_ESC_SEMI:
-                        {
-                            this.psrState.ParameterBytes.Add(c);
-                            if (this.psrState.StateTable == VTPrsTbl.CsiTable)
-                            {
-                                this.psrState.StateTable = VTPrsTbl.Csi2Table;
-                            }
+                            this.psrState.ResetState();
                         }
                         break;
 
@@ -344,14 +423,6 @@ namespace GTerminalCore
                         {
                             // from xterm-331 charproc.c 4409行
                             this.psrState.StateTable = VTPrsTbl.CIgTable;
-                        }
-                        break;
-
-                    // CSI状态下收到了FinalByte是SGR的字符。
-                    case VTPsrDef.CASE_SGR:
-                        {
-                            // 重置为ANSI状态
-                            this.psrState.StateTable = VTPrsTbl.AnsiTable;
                         }
                         break;
 

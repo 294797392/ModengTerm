@@ -10,6 +10,7 @@ namespace GTerminalCore
         public ParseState()
         {
             this.ParameterBytes = new List<byte>();
+            this.EscDigits = new List<byte>();
         }
 
         #region 解析Unicode字符用
@@ -56,7 +57,7 @@ namespace GTerminalCore
         /// <summary>
         /// 当前控制模式
         /// </summary>
-        public byte ControlFunction { get; set; }
+        public byte ControlString { get; set; }
 
         /// <summary>
         /// 存储CSI, OSC或DEC模式下的控制指令的参数
@@ -64,6 +65,12 @@ namespace GTerminalCore
         public List<byte> ParameterBytes { get; private set; }
 
         #endregion
+
+        /// <summary>
+        /// 在ESC状态下收到的数字参数
+        /// digit in csi or dec mode
+        /// </summary>
+        public List<byte> EscDigits { get; private set; }
 
         /// <summary>
         /// 光标所在列
@@ -76,14 +83,23 @@ namespace GTerminalCore
         public string Text { get; set; }
 
         /// <summary>
-        /// 把存储Unicode字节的缓冲区重置为0
+        /// 重置为Ansi状态表
+        /// 清空接收到的参数
         /// </summary>
-        public void ResetUnicodeBuff()
+        public void ResetState()
         {
-            for (int i = 0; i < 4; i++)
-            {
-                this.UnicodeBuff[i] = 0;
-            }
+            this.ParameterBytes.Clear();
+            this.ControlString = 0;
+            this.StateTable = VTPrsTbl.AnsiTable;
+        }
+
+        /// <summary>
+        /// 清除Esc状态
+        /// </summary>
+        public void EscReset()
+        {
+            this.EscDigits.Clear();
+            this.StateTable = VTPrsTbl.AnsiTable;
         }
     }
 }

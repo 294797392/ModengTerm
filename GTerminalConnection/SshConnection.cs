@@ -103,7 +103,6 @@ namespace GTerminalConnection
 
         public byte Read()
         {
-            //return (byte)this.shellStream.ReadByte();
             return this.stremQueue.Dequeue();
         }
 

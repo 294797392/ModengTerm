@@ -2021,11 +2021,11 @@ namespace GTerminalCore
             /*	BS		HT		LF		VT	*/
             VTPsrDef.CASE_BS,
             VTPsrDef.CASE_TAB,
-            VTPsrDef.CASE_PRINT,
-            VTPsrDef.CASE_VT,
+            VTPsrDef.CASE_LF,
+            VTPsrDef.CASE_VMOT,
             /*	FF		CR		SO		SI	*/
             VTPsrDef.CASE_FF,
-            VTPsrDef.CASE_PRINT,
+            VTPsrDef.CASE_CR,
             VTPsrDef.CASE_SO,
             VTPsrDef.CASE_SI,
             /*	DLE		DC1		DC2		DC3	*/
