@@ -178,7 +178,12 @@ namespace GTerminalCore
 
         private void HandleSGR(List<byte> sgrs)
         {
-
+            foreach (byte c in sgrs)
+            {
+                switch (c)
+                {
+                }
+            }
         }
 
         private void Parse(object state)

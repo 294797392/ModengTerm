@@ -59,6 +59,7 @@
     <Compile Include="IVTKeyboard.cs" />
     <Compile Include="ParseState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SGRDefines.cs" />
     <Compile Include="Unicode.cs" />
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="VT100.cs" />
