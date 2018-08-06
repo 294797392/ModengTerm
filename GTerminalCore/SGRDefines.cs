@@ -60,7 +60,7 @@ namespace GTerminalCore
         public const byte SixthAlternativeFont = 16;
 
         public const byte SeventhAlternativeFont = 17;
-        System.Diagnostics.Process
+
         public const byte EighthAlternativeFont = 18;
 
         public const byte NinthAlternativeFont = 19;
