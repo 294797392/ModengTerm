@@ -23,7 +23,12 @@ namespace GTerminalCore
         /// <summary>
         /// 创建一个新行
         /// </summary>
-        NewLine
+        NewLine,
+
+        /// <summary>
+        /// 退格
+        /// </summary>
+        Backspace,
 
         ///// <summary>
         ///// The character or control is not processed. No observable difference in the terminal’s state would occur if the character that caused this action was not present in the input stream. (Therefore, this action can only occur within a state.)

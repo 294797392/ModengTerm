@@ -1,5 +1,4 @@
-﻿using GTerminalCore;
-using ICare.Utility.Misc.DS;
+﻿using ICare.Utility.Misc.DS;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
@@ -7,7 +6,7 @@ using System.Collections.Generic;
 
 namespace GTerminalConnection
 {
-    public class SshConnection : IConnection
+    public class SSHConnection : IConnection
     {
         #region 类变量
 
@@ -34,7 +33,7 @@ namespace GTerminalConnection
 
         public ConnectionProtocols Protocol
         {
-            get { return ConnectionProtocols.Ssh; }
+            get { return ConnectionProtocols.SSH; }
         }
 
         public IConnectionAuthorition Authorition { get; set; }

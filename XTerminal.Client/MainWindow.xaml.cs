@@ -26,12 +26,12 @@ namespace XTerminalClient
         {
             InitializeComponent();
 
-            SshConnection connection = new SshConnection();
+            SSHConnection connection = new SSHConnection();
             connection.Authorition = new SshConnectionAuthorition()
             {
                 UserName = "zyf",
                 Password = "18612538605",
-                ServerAddress = "192.168.42.243",
+                ServerAddress = "192.168.2.200",
                 ServerPort = 22
             };
             GVideoTerminal gvt = new GVideoTerminal(connection);

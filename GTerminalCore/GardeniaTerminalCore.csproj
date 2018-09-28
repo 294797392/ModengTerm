@@ -7,8 +7,8 @@
     <ProjectGuid>{7909EA37-1524-415A-9CB8-DBE3274F4152}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GTerminalCore</RootNamespace>
-    <AssemblyName>GTerminalCore</AssemblyName>
+    <RootNamespace>GardeniaTerminalCore</RootNamespace>
+    <AssemblyName>GardeniaTerminalCore</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -52,17 +52,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="GVideoTerminal.cs" />
-    <Compile Include="GVTKeyboard.cs" />
-    <Compile Include="GVTStream.cs" />
-    <Compile Include="IVideoTerminal.cs" />
-    <Compile Include="IVTKeyboard.cs" />
+    <Compile Include="VideoTerminal\VTKeyboard.cs" />
+    <Compile Include="VideoTerminal\IVideoTerminal.cs" />
+    <Compile Include="VideoTerminal\IVTKeyboard.cs" />
+    <Compile Include="VideoTerminal\IVTScreen.cs" />
     <Compile Include="ParseState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SGRDefines.cs" />
-    <Compile Include="Unicode.cs" />
-    <Compile Include="VideoTerminal.cs" />
-    <Compile Include="VT100.cs" />
+    <Compile Include="VideoTerminal\VideoTerminal.cs" />
     <Compile Include="VTAction.cs" />
     <Compile Include="ANSI.cs" />
     <Compile Include="VTInputTbl.cs" />

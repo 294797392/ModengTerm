@@ -39,7 +39,7 @@ namespace GTerminalCore
             }
         }
 
-        public byte[] GetCurrentInputData(KeyEventArgs key)
+        public byte[] ConvertKey(KeyEventArgs key)
         {
             Dictionary<Key, byte[]> iptTbl = null;
 

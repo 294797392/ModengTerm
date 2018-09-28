@@ -5,6 +5,11 @@ using System.Text;
 
 namespace GTerminalCore
 {
+    public class WideCharBuffer
+    {
+
+    }
+
     public class ParseState
     {
         public ParseState()
@@ -55,7 +60,7 @@ namespace GTerminalCore
         public byte[] StateTable = null;
 
         /// <summary>
-        /// 当前控制模式
+        /// 当前处于的控制字符状态
         /// </summary>
         public byte ControlString { get; set; }
 

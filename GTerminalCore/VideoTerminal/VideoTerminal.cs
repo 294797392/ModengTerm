@@ -77,20 +77,24 @@ namespace GTerminalCore
 
         public abstract VTTypeEnum Type { get; }
 
-        public virtual IVTStream Stream { get; protected set; }
-
-        public virtual IVTKeyboard Keyboard { get; protected set; }
-
         /// <summary>
         /// 设置终端字符编码方式
         /// </summary>
         public virtual Encoding CharacherEncoding { get; protected set; }
 
+
+
+        public virtual IVTStream Stream { get; protected set; }
+
+        public virtual IVTKeyboard Keyboard { get; protected set; }
+
+        public virtual IVTScreen Screen { get; protected set; }
+
         #endregion
 
         #region 构造方法
 
-        public VideoTerminal(IVTStream stream)
+        public VideoTerminal()
         {
             this.psrState = new ParseState();
             this.psrState.StateTable = VTPrsTbl.AnsiTable;
@@ -106,6 +110,16 @@ namespace GTerminalCore
 
         #region 公开接口
 
+        public void Open()
+        {
+            
+        }
+
+        public void Close()
+        {
+
+        }
+
         public bool HandleInputWideChar(string wideChar, out byte[] data)
         {
             data = this.CharacherEncoding.GetBytes(wideChar);
@@ -114,7 +128,7 @@ namespace GTerminalCore
 
         public bool HandleInputChar(KeyEventArgs key, out byte[] data)
         {
-            data = this.Keyboard.GetCurrentInputData(key);
+            data = this.Keyboard.ConvertKey(key);
             return data != null;
         }
 
@@ -196,7 +210,7 @@ namespace GTerminalCore
 
                 this.psrState.Char = c;
                 int lastState = this.psrState.NextState;
-                this.psrState.NextState = this.psrState.StateTable[(int)c];
+                this.psrState.NextState = this.psrState.StateTable[c];
                 int nextState = this.psrState.NextState;
 
                 if (this.psrState.StateTable == VTPrsTbl.SosTable)
@@ -248,6 +262,11 @@ namespace GTerminalCore
                             {
                                 /* 响铃 */
                             }
+                        }
+                        break;
+                    case VTPsrDef.CASE_BS:
+                        {
+                            this.NotifyAction(VTAction.Backspace, this.psrState);
                         }
                         break;
                     #endregion
@@ -433,7 +452,7 @@ namespace GTerminalCore
 
                     default:
                         {
-                            logger.ErrorFormat("未解析的字符:{0}, StateTable:{1}", c, this.psrState.StateTable);
+                            logger.ErrorFormat("未处理的字符:{0}, StateTable:{1}", c, this.psrState.StateTable);
                         }
                         break;
                 }

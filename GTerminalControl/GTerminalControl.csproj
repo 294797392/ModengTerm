@@ -94,9 +94,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GTerminalCore\GTerminalCore.csproj">
+    <ProjectReference Include="..\GTerminalCore\GardeniaTerminalCore.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
-      <Name>GTerminalCore</Name>
+      <Name>GardeniaTerminalCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

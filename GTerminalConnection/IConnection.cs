@@ -7,7 +7,7 @@ using System.Text;
 namespace GTerminalConnection
 {
     /// <summary>
-    /// 管理虚拟终端与远程主机连接的接口
+    /// 管理与远程主机的连接
     /// </summary>
     public interface IConnection : IVTStream
     {

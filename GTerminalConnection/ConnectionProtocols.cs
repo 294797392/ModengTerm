@@ -7,7 +7,7 @@ namespace GTerminalConnection
 {
     public enum ConnectionProtocols
     {
-        Ssh,
+        SSH,
         SerialPort
     }
 }

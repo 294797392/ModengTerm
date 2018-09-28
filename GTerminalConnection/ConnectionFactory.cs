@@ -11,8 +11,8 @@ namespace GTerminalConnection
         {
             switch (protocol)
             {
-                case ConnectionProtocols.Ssh:
-                    return new SshConnection();
+                case ConnectionProtocols.SSH:
+                    return new SSHConnection();
 
                 default:
                     throw new NotImplementedException();
