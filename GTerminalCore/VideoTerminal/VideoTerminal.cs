@@ -1,14 +1,18 @@
 ﻿using ICare.Utility.Misc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
+    internal class VideoTerminalImpl : VideoTerminal
+    {
+        internal VideoTerminalImpl()
+        { }
+    }
+
     /// <summary>
     /// 参考Control Functions for Coded Character Sets Ecma-048.pdf标准
     /// 这是一个解释ASCII转义字符所表示的意义的标准
@@ -43,7 +47,7 @@ namespace GTerminalCore
     /// UTF16：UTF-16就把两个字节当成一个单元来解析.这个很简单.
     /// UTF32：UTF-32就把四个字节当成一个单元来解析.这个很简单.
     /// </summary>
-    public abstract class VideoTerminal : IVideoTerminal
+    public abstract class VideoTerminal
     {
         #region 事件
 
@@ -75,36 +79,16 @@ namespace GTerminalCore
         /// </summary>
         public virtual bool SupportC1Characters { get { return false; } }
 
-        public abstract VTTypeEnum Type { get; }
-
         /// <summary>
         /// 设置终端字符编码方式
         /// </summary>
         public virtual Encoding CharacherEncoding { get; protected set; }
 
+        public virtual SocketBase Socket { get; protected set; }
 
+        public virtual VTKeyboard Keyboard { get; protected set; }
 
-        public virtual IVTStream Stream { get; protected set; }
-
-        public virtual IVTKeyboard Keyboard { get; protected set; }
-
-        public virtual IVTScreen Screen { get; protected set; }
-
-        #endregion
-
-        #region 构造方法
-
-        public VideoTerminal()
-        {
-            this.psrState = new ParseState();
-            this.psrState.StateTable = VTPrsTbl.AnsiTable;
-            this.psrState.NextState = VTPrsTbl.AnsiTable[0];
-
-            this.Stream = stream;
-            this.Stream.StatusChanged += this.VTStream_StatusChanged;
-            this.Keyboard = new GVTKeyboard();
-            this.CharacherEncoding = DefaultValues.DefaultEncoding;
-        }
+        public virtual VTScreen Screen { get; protected set; }
 
         #endregion
 
@@ -112,7 +96,21 @@ namespace GTerminalCore
 
         public void Open()
         {
-            
+            this.psrState = new ParseState();
+            this.psrState.StateTable = VTPrsTbl.AnsiTable;
+            this.psrState.NextState = VTPrsTbl.AnsiTable[0];
+
+            this.Socket = SocketBase.Create(SocketProtocols.SSH);
+            this.Socket.Authorition = new SSHSocketAuthorition()
+            {
+                UserName = "zyf",
+                Password = "18612538605",
+                ServerAddress = "192.168.2.200",
+                ServerPort = 22
+            };
+            this.Socket.StatusChanged += this.Socket_StatusChanged;
+            this.Keyboard = VTKeyboard.Create();
+            this.CharacherEncoding = DefaultValues.DefaultEncoding;
         }
 
         public void Close()
@@ -142,10 +140,10 @@ namespace GTerminalCore
         /// <returns></returns>
         private void StartParsing()
         {
-            Task.Factory.StartNew(this.Parse, this.Stream);
+            Task.Factory.StartNew(this.Parse, this.Socket);
         }
 
-        private void ReceiveUTF8String(IVTStream stream, byte unicode_start, ParseState psrState)
+        private void ReceiveUTF8String(SocketBase socket, byte unicode_start, ParseState psrState)
         {
             // https://www.cnblogs.com/fnlingnzb-learner/p/6163205.html
 
@@ -177,7 +175,7 @@ namespace GTerminalCore
                 else
                 {
                     // 继续解析
-                    nextByte = stream.Read();
+                    nextByte = socket.Read();
                 }
 
             } while (true);
@@ -202,11 +200,11 @@ namespace GTerminalCore
 
         private void Parse(object state)
         {
-            IVTStream stream = state as IVTStream;
+            SocketBase socket = state as SocketBase;
 
-            while (!stream.EOF)
+            while (!socket.EOF)
             {
-                byte c = stream.Read();
+                byte c = socket.Read();
 
                 this.psrState.Char = c;
                 int lastState = this.psrState.NextState;
@@ -288,7 +286,7 @@ namespace GTerminalCore
 
                             if (this.CharacherEncoding == Encoding.UTF8)
                             {
-                                this.ReceiveUTF8String(stream, c, this.psrState);
+                                this.ReceiveUTF8String(socket, c, this.psrState);
                                 this.NotifyAction(VTAction.Print, this.psrState);
                             }
                             else
@@ -471,16 +469,16 @@ namespace GTerminalCore
 
         #region 事件处理器
 
-        private void VTStream_StatusChanged(object stream, VTStreamState status)
+        private void Socket_StatusChanged(object stream, SocketState status)
         {
             logger.InfoFormat("VTStream Status Changed：{0}", status);
 
             switch (status)
             {
-                case VTStreamState.Init:
+                case SocketState.Init:
                     break;
 
-                case VTStreamState.Ready:
+                case SocketState.Ready:
                     this.StartParsing();
                     logger.InfoFormat("开始读取并解析终端数据流...");
                     break;
@@ -488,5 +486,10 @@ namespace GTerminalCore
         }
 
         #endregion
+
+        public static VideoTerminal Create()
+        {
+            return new VideoTerminalImpl();
+        }
     }
 }

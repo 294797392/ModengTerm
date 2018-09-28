@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
     public class VTPsrDef
     {
         public const byte CASE_GROUND_STATE = 0;
         public const byte CASE_IGNORE = 1;
+
+        /// <summary>
+        /// 响铃
+        /// </summary>
         public const byte CASE_BELL = 2;
+
+        /// <summary>
+        /// 退格
+        /// </summary>
         public const byte CASE_BS = 3;
 
         /// <summary>

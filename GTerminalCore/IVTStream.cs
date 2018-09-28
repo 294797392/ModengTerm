@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
     /// <summary>
     /// 管理终端数据流的接口

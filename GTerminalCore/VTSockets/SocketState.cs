@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
-    public enum VTStreamState
+    public enum SocketState
     {
         /// <summary>
         /// 数据流处于初始化状态

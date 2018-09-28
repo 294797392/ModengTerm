@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
     /// <summary>
     /// 管理虚拟终端键盘信息

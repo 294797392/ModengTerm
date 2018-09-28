@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
     /*
      * 参考xterm-331 VTPsrTbl.c

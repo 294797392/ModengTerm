@@ -4,9 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
-    public class GVTKeyboard : IVTKeyboard
+    internal class VTKeyboardInstance : VTKeyboard
+    {
+        internal VTKeyboardInstance()
+        {
+
+        }
+    }
+
+    public abstract class VTKeyboard
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("GVTKeyboard");
 
@@ -75,6 +83,11 @@ namespace GTerminalCore
             }
 
             return data;
+        }
+
+        public static VTKeyboard Create()
+        {
+            return new VTKeyboardInstance();
         }
     }
 }

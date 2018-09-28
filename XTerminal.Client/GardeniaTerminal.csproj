@@ -120,25 +120,21 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-B.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-BI.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-C.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-L.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-LI.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-M.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-MI.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-R.ttf" />
-    <Resource Include="UbuntuFontFamily\Ubuntu-RI.ttf" />
-    <Resource Include="UbuntuFontFamily\UbuntuMono-B.ttf" />
-    <Resource Include="UbuntuFontFamily\UbuntuMono-BI.ttf" />
-    <Resource Include="UbuntuFontFamily\UbuntuMono-R.ttf" />
-    <Resource Include="UbuntuFontFamily\UbuntuMono-RI.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-B.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-BI.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-C.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-L.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-LI.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-M.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-MI.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-R.ttf" />
+    <Resource Include="UbuntuFonts\Ubuntu-RI.ttf" />
+    <Resource Include="UbuntuFonts\UbuntuMono-B.ttf" />
+    <Resource Include="UbuntuFonts\UbuntuMono-BI.ttf" />
+    <Resource Include="UbuntuFonts\UbuntuMono-R.ttf" />
+    <Resource Include="UbuntuFonts\UbuntuMono-RI.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GTerminalConnection\GTerminalConnection.csproj">
-      <Project>{a91a51b7-ed2a-4837-928b-9bd34f9ffde3}</Project>
-      <Name>GTerminalConnection</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GTerminalControl\GTerminalControl.csproj">
       <Project>{e7de3287-f5f2-4a1c-a6e0-a3b9e064adbd}</Project>
       <Name>GTerminalControl</Name>
@@ -149,13 +145,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="UbuntuFontFamily\CONTRIBUTING.txt" />
-    <Resource Include="UbuntuFontFamily\copyright.txt" />
-    <Resource Include="UbuntuFontFamily\FONTLOG.txt" />
-    <Resource Include="UbuntuFontFamily\LICENCE-FAQ.txt" />
-    <Resource Include="UbuntuFontFamily\LICENCE.txt" />
-    <Resource Include="UbuntuFontFamily\README.txt" />
-    <Resource Include="UbuntuFontFamily\TRADEMARKS.txt" />
+    <Resource Include="UbuntuFonts\CONTRIBUTING.txt" />
+    <Resource Include="UbuntuFonts\copyright.txt" />
+    <Resource Include="UbuntuFonts\FONTLOG.txt" />
+    <Resource Include="UbuntuFonts\LICENCE-FAQ.txt" />
+    <Resource Include="UbuntuFonts\LICENCE.txt" />
+    <Resource Include="UbuntuFonts\README.txt" />
+    <Resource Include="UbuntuFonts\TRADEMARKS.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

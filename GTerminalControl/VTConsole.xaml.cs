@@ -1,4 +1,4 @@
-﻿using GTerminalCore;
+﻿using GardeniaTerminalCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,13 +30,13 @@ namespace GTerminalControl
 
         private Paragraph _paragraph;
         private Run _promptInline;
-        private IVideoTerminal vt;
+        private VideoTerminal vt;
 
         #endregion
 
         #region 属性
 
-        public IVideoTerminal VT
+        public VideoTerminal VT
         {
             get
             {
@@ -108,7 +108,7 @@ namespace GTerminalControl
             byte[] data;
             if (this.VT.HandleInputWideChar(e.Text, out data))
             {
-                if (!this.vt.Stream.Write(data))
+                if (!this.vt.Socket.Write(data))
                 {
                     logger.ErrorFormat("向终端发送数据失败");
                 }
@@ -125,7 +125,7 @@ namespace GTerminalControl
                 byte[] data;
                 if (this.VT.HandleInputChar(e, out data))
                 {
-                    if (!this.vt.Stream.Write(data))
+                    if (!this.vt.Socket.Write(data))
                     {
                         logger.ErrorFormat("向终端发送数据失败");
                     }

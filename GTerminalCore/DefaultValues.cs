@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace GTerminalCore
+namespace GardeniaTerminalCore
 {
     public static class DefaultValues
     {
         public static Encoding DefaultEncoding = Encoding.UTF8;
+        public const uint TerminalColumns = 160;
+        public const uint TerminalRows = 40;
+        public const string TerminalName = "xterm-256color";
     }
 }
