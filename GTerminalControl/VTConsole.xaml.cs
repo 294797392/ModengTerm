@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -29,9 +30,10 @@ namespace GTerminalControl
 
         #region 实例变量
 
-        private Paragraph _paragraph;
-        private Run _promptInline;
+        private VisualParagraph _paragraph;
         private VideoTerminal vt;
+        private int cursorRow = 0;
+        private int cursorColumn = 0;
 
         #endregion
 
@@ -57,6 +59,10 @@ namespace GTerminalControl
             }
         }
 
+        public int CursorRow { get { return this.cursorRow; } set { this.cursorRow = value; } }
+
+        public int CursorColumn { get { return this.cursorColumn; } set { this.cursorColumn = value; } }
+
         #endregion
 
         #region 构造方法
@@ -74,15 +80,21 @@ namespace GTerminalControl
 
         private void InitializeConsole()
         {
-            _paragraph = new Paragraph()
-            {
-            };
+            this._paragraph = new VisualParagraph();
+            this._paragraph.CreateVisualLine();
             RichTextBox.IsUndoEnabled = false;
             RichTextBox.IsReadOnlyCaretVisible = false;
             RichTextBox.IsReadOnly = true;
-            RichTextBox.Document = new FlowDocument(_paragraph);
+            RichTextBox.Document = new FlowDocument(this._paragraph);
+            RichTextBox.Document.IsEnabled = false;
             RichTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
             RichTextBox.PreviewTextInput += RichTextBox_PreviewTextInput;
+            Task.Factory.StartNew(this.CursorThreadProcess);
+
+            //System.Windows.Documents.List lis;
+            //ListItem item;
+
+            Run run;
         }
 
         ///// <summary>
@@ -96,25 +108,31 @@ namespace GTerminalControl
         //    RichTextBox.CaretPosition.GetPositionAtOffset(column);
         //}
 
-        private void InsertTextAtCurrentCaretPosition(string text)
+        private void InsertTextAtPosition(string text, int column, int row)
         {
-            Inline lastInline = this._paragraph.Inlines.LastInline;
-            if (lastInline == null)
-            {
-                Run runInline = new Run();
-                this._paragraph.Inlines.Add(runInline);
-            }
-            RichTextBox.CaretPosition.InsertTextInRun(text);
-            RichTextBox.CaretPosition = RichTextBox.CaretPosition.GetPositionAtOffset(text.Length, LogicalDirection.Forward);
+            this._paragraph.InsertTextAtPosition(text, column, row);
+
+            //TextPointer textPosition = this._paragraph.ContentStart;
+            //textPosition = textPosition.GetLineStartPosition(row);
+            //textPosition = textPosition.GetPositionAtOffset(column, LogicalDirection.Forward);
+            //textPosition.InsertTextInRun(text);
         }
 
         /// <summary>
         /// 设置相对于当前光标位置的光标位置
         /// </summary>
         /// <param name="offset">要移动的距离，正数往右移动，负数往左移动</param>
-        private void MoveCaretPositionRelativeCurrent(int offset)
+        private void MoveCursorPositionRelativeCurrent(int col, int row)
         {
 
+        }
+
+        private void CursorThreadProcess()
+        {
+            while (true)
+            {
+                Thread.Sleep(1000);
+            }
         }
 
         #endregion
@@ -159,16 +177,30 @@ namespace GTerminalControl
 
         public void PrintText(string text)
         {
-            RichTextBox.CaretPosition = RichTextBox.Document.ContentEnd;
-            this.InsertTextAtCurrentCaretPosition(text);
+            this.InsertTextAtPosition(text, this.CursorColumn, this.CursorRow);
+
+            if (text == "\r")
+            {
+                this.CursorColumn = 0;
+                return;
+            }
+            if (text == "\n")
+            {
+                this.CursorRow += 1;
+                this._paragraph.CreateVisualLine();
+            }
+            else
+            {
+                this.CursorColumn += text.Length;
+            }
         }
 
-        public void Backspace()
+        public void MoveCursor(int col, int row)
         {
-            this.MoveCaretPositionRelativeCurrent(-1);
+            this.MoveCursorPositionRelativeCurrent(col, row);
         }
 
-        public void EraseCharAtCaretPosition(int count, TextPointer position)
+        public void EraseLine(int startCol, int count)
         {
             if (count == 0)
             {
@@ -177,8 +209,8 @@ namespace GTerminalControl
             }
             else
             {
-                position.DeleteTextInRun(count);
-                this.MoveCaretPositionRelativeCurrent(count);
+                //position.DeleteTextInRun(count);
+                this.MoveCursorPositionRelativeCurrent(-1, 0);
             }
         }
 

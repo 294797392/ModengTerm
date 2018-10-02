@@ -9,9 +9,14 @@ namespace GardeniaTerminalCore
     public interface VTScreen
     {
         /// <summary>
-        /// 获取当前光标的位置
+        /// 获取或设置光标所在行
         /// </summary>
-        TextPointer CurrentCaretPosition { get; }
+        int CursorRow { get; set; }
+
+        /// <summary>
+        /// 获取或设置光标所在列
+        /// </summary>
+        int CursorColumn { get; set; }
 
         /// <summary>
         /// 打印字符/字符串
@@ -20,15 +25,15 @@ namespace GardeniaTerminalCore
         void PrintText(string text);
 
         /// <summary>
-        /// 执行退格操作
+        /// 设置光标位置，相对于当前的位置
         /// </summary>
-        void Backspace();
+        void MoveCursor(int col, int row);
 
         /// <summary>
-        /// 删除一个字符
+        /// 删除一行数据
         /// </summary>
-        /// <param name="direction">要删除的字符数量</param>
-        /// <param name="position">要删除的字符的位置</param>
-        void EraseCharAtCaretPosition(int count, TextPointer position);
+        /// <param name="startCol">开始行数</param>
+        /// <param name="count">要删除的符号个数</param>
+        void EraseLine(int startCol, int count);
     }
 }

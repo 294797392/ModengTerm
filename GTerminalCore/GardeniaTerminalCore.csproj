@@ -66,6 +66,7 @@
     <Compile Include="VideoTerminal\VTWindow.cs" />
     <Compile Include="VTAction.cs" />
     <Compile Include="States.cs" />
+    <Compile Include="VTPresentation.cs" />
     <Compile Include="VTPsrDef.cs" />
     <Compile Include="VTPrsTbl.cs" />
     <Compile Include="VTSockets\SocketProtocols.cs" />

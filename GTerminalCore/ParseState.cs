@@ -82,15 +82,20 @@ namespace GardeniaTerminalCore
         ///// </summary>
         //public List<byte> EscDigits { get; private set; }
 
-        /// <summary>
-        /// 光标所在列
-        /// </summary>
-        public int CursorColumn { get; set; }
+        ///// <summary>
+        ///// 光标所在列
+        ///// </summary>
+        //public int CursorColumn { get; set; }
 
-        /// <summary>
-        /// 要在终端显示的文本
-        /// </summary>
-        public string Text { get; set; }
+        ///// <summary>
+        ///// 光标所在行
+        ///// </summary>
+        //public int CursorRow { get; set; }
+
+        ///// <summary>
+        ///// 要在终端显示的文本
+        ///// </summary>
+        //public string Text { get; set; }
 
         /// <summary>
         /// 重置状态
@@ -99,7 +104,7 @@ namespace GardeniaTerminalCore
         {
             this.ParameterBytes.Clear();
             this.State = 0;
-            this.StateTable = VTPrsTbl.AnsiTable;
+            this.StateTable = VTPrsTbl.ANSITable;
         }
     }
 }

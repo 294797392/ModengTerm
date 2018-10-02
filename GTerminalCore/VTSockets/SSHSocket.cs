@@ -76,6 +76,11 @@ namespace GardeniaTerminalCore
             throw new NotImplementedException();
         }
 
+        public override string Execute(string command)
+        {
+            return this.sshClient.RunCommand(command).Execute();
+        }
+
         public override byte[] Read(int size)
         {
             byte[] buff = new byte[size];

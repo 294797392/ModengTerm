@@ -16,7 +16,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <Grid>
+    <Grid Margin="0,100,0,0">
 
         <Border Background="{DynamicResource ResourceKey=BrushMainBackground}"/>
         <RichTextBox x:Name="RichTextBox" Background="Transparent"

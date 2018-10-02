@@ -2010,7 +2010,7 @@ namespace GardeniaTerminalCore
         /// Ansi字符与控制功能之间的映射关系表
         /// 数组的索引代表Ansi字符的值，索引的值代表Ansi字符的控制功能
         /// </summary>
-        public static readonly byte[] AnsiTable =
+        public static readonly byte[] ANSITable =
         {
             /*	NUL		SOH		STX		ETX	*/
             VTPsrDef.CASE_IGNORE,

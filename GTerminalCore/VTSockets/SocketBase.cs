@@ -20,6 +20,8 @@ namespace GardeniaTerminalCore
 
         public abstract bool Disconnect();
 
+        public abstract string Execute(string command);
+
         /// <summary>
         /// 从Socket中读取一段数据
         /// </summary>

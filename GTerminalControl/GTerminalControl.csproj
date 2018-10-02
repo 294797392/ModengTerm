@@ -64,6 +64,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="VisualLine.cs" />
+    <Compile Include="VisualParagraph.cs" />
     <Compile Include="VTConsole.xaml.cs">
       <DependentUpon>VTConsole.xaml</DependentUpon>
       <SubType>Code</SubType>

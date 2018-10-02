@@ -67,10 +67,11 @@ namespace GardeniaTerminalCore
         #region 实例变量
 
         private ParseState psrState;
+        private VTPresentation presentation;
         private SynchronizationContext uiThreadContext;
 
         private SendOrPostCallback printTextAction;
-        private SendOrPostCallback backSpaceAction;
+        private SendOrPostCallback moveCursorAction;
         private SendOrPostCallback operationSystemCommandsAction;
         private SendOrPostCallback eraseLineAction;
 
@@ -107,15 +108,19 @@ namespace GardeniaTerminalCore
 
         public void Open()
         {
+            this.presentation = new VTPresentation();
+            this.CharacherEncoding = DefaultValues.DefaultEncoding;
+            this.Keyboard = VTKeyboard.Create();
+
             this.uiThreadContext = SynchronizationContext.Current;
             this.printTextAction = new SendOrPostCallback(this.InvokePrintText);
-            this.backSpaceAction = new SendOrPostCallback(this.InvokeBackspace);
+            this.moveCursorAction = new SendOrPostCallback(this.InvokeMoveCursor);
             this.operationSystemCommandsAction = new SendOrPostCallback(this.InvokeOperationSystemCommands);
             this.eraseLineAction = new SendOrPostCallback(this.InvokeEraseLine);
 
             this.psrState = new ParseState();
-            this.psrState.StateTable = VTPrsTbl.AnsiTable;
-            this.psrState.NextState = VTPrsTbl.AnsiTable[0];
+            this.psrState.StateTable = VTPrsTbl.ANSITable;
+            this.psrState.NextState = VTPrsTbl.ANSITable[0];
 
             this.Socket = SocketBase.Create(SocketProtocols.SSH);
             this.Socket.Authorition = new SSHSocketAuthorition()
@@ -127,8 +132,6 @@ namespace GardeniaTerminalCore
             };
             this.Socket.StatusChanged += this.Socket_StatusChanged;
             this.Socket.Connect();
-            this.Keyboard = VTKeyboard.Create();
-            this.CharacherEncoding = DefaultValues.DefaultEncoding;
         }
 
         public void Close()
@@ -154,7 +157,7 @@ namespace GardeniaTerminalCore
 
         private void InvokeOperationSystemCommands(object state)
         {
-            ParseState psrState = (ParseState)state;
+            ParseState psrState = this.psrState;
             string text = this.CharacherEncoding.GetString(psrState.ParameterBytes.ToArray());
             logger.DebugFormat("OSC:{0}", text);
 
@@ -221,7 +224,7 @@ namespace GardeniaTerminalCore
 
         private void InvokeEraseLine(object state)
         {
-            ParseState psrState = (ParseState)state;
+            ParseState psrState = this.psrState;
             int parameter = 0;
             if (psrState.ParameterBytes.Count > 0)
             {
@@ -238,21 +241,21 @@ namespace GardeniaTerminalCore
                 // Erase to Right (default)
                 case 0:
                     {
-                        this.Screen.EraseCharAtCaretPosition(-1, this.Screen.CurrentCaretPosition);
+                        //this.Screen.EraseCharAtCaretPosition(-1, this.Screen.CurrentCaretPosition);
                     }
                     break;
 
                 // Erase to Left
                 case 1:
                     {
-                        this.Screen.EraseCharAtCaretPosition(1, this.Screen.CurrentCaretPosition);
+                        //this.Screen.EraseCharAtCaretPosition(1, this.Screen.CurrentCaretPosition);
                     }
                     break;
 
                 // Erase All
                 case 2:
                     {
-                        this.Screen.EraseCharAtCaretPosition(0, this.Screen.CurrentCaretPosition);
+                        //this.Screen.EraseCharAtCaretPosition(0, this.Screen.CurrentCaretPosition);
                     }
                     break;
 
@@ -264,20 +267,22 @@ namespace GardeniaTerminalCore
 
         private void InvokePrintText(object state)
         {
-            ParseState psrState = (ParseState)state;
-            this.Screen.PrintText(psrState.Text);
+            VTPresentation presentation = (VTPresentation)state;
+            this.Screen.PrintText(presentation.Text);
         }
 
-        private void InvokeBackspace(object state)
+        private void InvokeMoveCursor(object state)
         {
-            ParseState psrState = (ParseState)state;
-            this.Screen.Backspace();
+            VTPresentation presentation = (VTPresentation)state;
+            this.Screen.CursorColumn = presentation.CursorColumn;
+            this.Screen.CursorRow = presentation.CursorRow;
         }
 
         private void InvokeAction(SendOrPostCallback action, object userData)
         {
             this.uiThreadContext.Send(action, userData);
         }
+
 
         /// <summary>
         /// 解析终端数据流
@@ -314,7 +319,7 @@ namespace GardeniaTerminalCore
                 {
                     // Unicode字符接收完毕
                     this.psrState.ParsingUnicode = false;
-                    this.psrState.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
+                    this.presentation.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
                     break;
                 }
                 else
@@ -325,17 +330,7 @@ namespace GardeniaTerminalCore
 
             } while (true);
 
-            psrState.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
-        }
-
-        private void HandleSGR(List<byte> sgrs)
-        {
-            foreach (byte c in sgrs)
-            {
-                switch (c)
-                {
-                }
-            }
+            this.presentation.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
         }
 
         private void Parse(object state)
@@ -372,14 +367,14 @@ namespace GardeniaTerminalCore
                     #region SingleCharactor ControlFunction（单字节指令）
                     case VTPsrDef.CASE_CR:
                         {
-                            this.psrState.Text = "\r";
-                            this.InvokeAction(this.printTextAction, this.psrState);
+                            this.presentation.Text = "\r";
+                            this.InvokeAction(this.printTextAction, this.presentation);
                         }
                         break;
                     case VTPsrDef.CASE_LF:
                         {
-                            this.psrState.Text = "\n";
-                            this.InvokeAction(this.printTextAction, this.psrState);
+                            this.presentation.Text = "\n";
+                            this.InvokeAction(this.printTextAction, this.presentation);
                         }
                         break;
                     case VTPsrDef.CASE_VT:
@@ -395,7 +390,7 @@ namespace GardeniaTerminalCore
                             if (this.psrState.State == States.ANSI_OSC)
                             {
                                 this.psrState.ParameterBytes.RemoveLast();
-                                this.InvokeAction(this.operationSystemCommandsAction, this.psrState);
+                                this.InvokeAction(this.operationSystemCommandsAction, this.presentation);
                                 this.psrState.ResetState();
                             }
                             else
@@ -408,7 +403,8 @@ namespace GardeniaTerminalCore
                     case VTPsrDef.CASE_BS:
                         {
                             logger.Debug("CASE_BS");
-                            this.InvokeAction(this.backSpaceAction, this.psrState);
+                            this.presentation.CursorColumn -= 1;
+                            this.InvokeAction(this.moveCursorAction, this.presentation);
                         }
                         break;
                     #endregion
@@ -423,15 +419,15 @@ namespace GardeniaTerminalCore
                                 /* 
                                  * 第八位没用到，7位编码方式，1字节代表一个字，直接输出ascii码
                                  */
-                                this.psrState.Text = ((char)c).ToString();
-                                this.InvokeAction(this.printTextAction, this.psrState);
+                                this.presentation.Text = ((char)c).ToString();
+                                this.InvokeAction(this.printTextAction, this.presentation);
                                 continue;
                             }
 
                             if (this.CharacherEncoding == Encoding.UTF8)
                             {
                                 this.ReceiveUTF8String(socket, c, this.psrState);
-                                this.InvokeAction(this.printTextAction, this.psrState);
+                                this.InvokeAction(this.printTextAction, this.presentation);
                             }
                             else
                             {
@@ -480,7 +476,7 @@ namespace GardeniaTerminalCore
                                     {
                                         /* 之前是CASE_OSC状态 */
                                         this.psrState.ParameterBytes.RemoveLast();
-                                        this.InvokeAction(this.operationSystemCommandsAction, this.psrState);
+                                        this.InvokeAction(this.operationSystemCommandsAction, this.presentation);
                                         this.psrState.ResetState();
                                     }
                                     break;
@@ -593,7 +589,7 @@ namespace GardeniaTerminalCore
                         {
                             logger.Debug("CASE_EL");
                             this.psrState.ParameterBytes.RemoveLast();
-                            this.InvokeAction(this.eraseLineAction, this.psrState);
+                            this.InvokeAction(this.eraseLineAction, this.presentation);
                             this.psrState.ResetState();
                         }
                         break;
