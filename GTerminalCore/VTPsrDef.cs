@@ -12,11 +12,16 @@ namespace GardeniaTerminalCore
 
         /// <summary>
         /// 响铃
+        /// BEL is used when there is a need to call for attention; it may control alarm or attention devices. 
         /// </summary>
         public const byte CASE_BELL = 2;
 
         /// <summary>
         /// 退格
+        /// BS causes the active data position to be moved one character position in the data component in the 
+        /// direction opposite to that of the implicit movement.
+        /// The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT 
+        /// MOVEMENT DIRECTION(SIMD). 
         /// </summary>
         public const byte CASE_BS = 3;
 

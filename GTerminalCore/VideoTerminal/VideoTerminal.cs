@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Threading;
+using System.Linq;
+using GardeniaTerminalCore;
 
 namespace GardeniaTerminalCore
 {
@@ -51,7 +54,7 @@ namespace GardeniaTerminalCore
     {
         #region 事件
 
-        public event Action<object, VTAction, ParseState> Action;
+        //public event Action<object, VTAction, ParseState> Action;
 
         #endregion
 
@@ -64,6 +67,12 @@ namespace GardeniaTerminalCore
         #region 实例变量
 
         private ParseState psrState;
+        private SynchronizationContext uiThreadContext;
+
+        private SendOrPostCallback printTextAction;
+        private SendOrPostCallback backSpaceAction;
+        private SendOrPostCallback operationSystemCommandsAction;
+        private SendOrPostCallback eraseLineAction;
 
         #endregion
 
@@ -88,7 +97,9 @@ namespace GardeniaTerminalCore
 
         public virtual VTKeyboard Keyboard { get; protected set; }
 
-        public virtual VTScreen Screen { get; protected set; }
+        public virtual VTScreen Screen { get; set; }
+
+        public virtual VTWindow Window { get; set; }
 
         #endregion
 
@@ -96,6 +107,12 @@ namespace GardeniaTerminalCore
 
         public void Open()
         {
+            this.uiThreadContext = SynchronizationContext.Current;
+            this.printTextAction = new SendOrPostCallback(this.InvokePrintText);
+            this.backSpaceAction = new SendOrPostCallback(this.InvokeBackspace);
+            this.operationSystemCommandsAction = new SendOrPostCallback(this.InvokeOperationSystemCommands);
+            this.eraseLineAction = new SendOrPostCallback(this.InvokeEraseLine);
+
             this.psrState = new ParseState();
             this.psrState.StateTable = VTPrsTbl.AnsiTable;
             this.psrState.NextState = VTPrsTbl.AnsiTable[0];
@@ -105,10 +122,11 @@ namespace GardeniaTerminalCore
             {
                 UserName = "zyf",
                 Password = "18612538605",
-                ServerAddress = "192.168.2.200",
+                ServerAddress = "192.168.42.243",
                 ServerPort = 22
             };
             this.Socket.StatusChanged += this.Socket_StatusChanged;
+            this.Socket.Connect();
             this.Keyboard = VTKeyboard.Create();
             this.CharacherEncoding = DefaultValues.DefaultEncoding;
         }
@@ -133,6 +151,133 @@ namespace GardeniaTerminalCore
         #endregion
 
         #region 实例方法
+
+        private void InvokeOperationSystemCommands(object state)
+        {
+            ParseState psrState = (ParseState)state;
+            string text = this.CharacherEncoding.GetString(psrState.ParameterBytes.ToArray());
+            logger.DebugFormat("OSC:{0}", text);
+
+            int action;
+            if (!int.TryParse(text[0].ToString(), out action))
+            {
+                logger.WarnFormat("OSC参数不合法");
+                return;
+            }
+
+            string[] pair = text.Split(';');
+            if (pair.Length != 2)
+            {
+                logger.ErrorFormat("OSC参数不合法, action={0}", action);
+                return;
+            }
+
+            string name = pair[1];
+            switch (action)
+            {
+                /* Change Icon Name and Window Title to Pt */
+                case 0:
+                    {
+                        this.Window.SetTitle(name);
+                        this.Window.SetIconName(name);
+                    }
+                    break;
+
+                /* Change Icon Name to Pt */
+                case 1:
+                    {
+                        this.Window.SetIconName(name);
+                    }
+                    break;
+
+                /* Change Window Title to Pt */
+                case 2:
+                    {
+                        this.Window.SetTitle(name);
+                    }
+                    break;
+
+                /* Set top-level Window Property */
+                case 3:
+                    {
+                        logger.WarnFormat("未处理的OSC参数3");
+                    }
+                    break;
+
+                /* TODO:... */
+                case 4:
+                    {
+                        logger.WarnFormat("未处理的OSC参数4");
+                    }
+                    break;
+
+                default:
+                    {
+                        logger.WarnFormat("未知的OSC参数,{0}", action);
+                    }
+                    break;
+            }
+        }
+
+        private void InvokeEraseLine(object state)
+        {
+            ParseState psrState = (ParseState)state;
+            int parameter = 0;
+            if (psrState.ParameterBytes.Count > 0)
+            {
+                string text = this.CharacherEncoding.GetString(psrState.ParameterBytes.ToArray());
+                if (!int.TryParse(psrState.PrevChar.ToString(), out parameter))
+                {
+                    logger.ErrorFormat("EraseLine参数不合法,{0}", psrState.PrevChar);
+                    return;
+                }
+            }
+
+            switch (parameter)
+            {
+                // Erase to Right (default)
+                case 0:
+                    {
+                        this.Screen.EraseCharAtCaretPosition(-1, this.Screen.CurrentCaretPosition);
+                    }
+                    break;
+
+                // Erase to Left
+                case 1:
+                    {
+                        this.Screen.EraseCharAtCaretPosition(1, this.Screen.CurrentCaretPosition);
+                    }
+                    break;
+
+                // Erase All
+                case 2:
+                    {
+                        this.Screen.EraseCharAtCaretPosition(0, this.Screen.CurrentCaretPosition);
+                    }
+                    break;
+
+                default:
+                    logger.WarnFormat("未知的EL参数,{0}", parameter);
+                    break;
+            }
+        }
+
+        private void InvokePrintText(object state)
+        {
+            ParseState psrState = (ParseState)state;
+            this.Screen.PrintText(psrState.Text);
+        }
+
+        private void InvokeBackspace(object state)
+        {
+            ParseState psrState = (ParseState)state;
+            this.Screen.Backspace();
+        }
+
+        private void InvokeAction(SendOrPostCallback action, object userData)
+        {
+            this.uiThreadContext.Send(action, userData);
+        }
 
         /// <summary>
         /// 解析终端数据流
@@ -183,11 +328,6 @@ namespace GardeniaTerminalCore
             psrState.Text = Encoding.UTF8.GetString(this.psrState.UnicodeBuff);
         }
 
-        private void HandleOSC(List<byte> oscData)
-        {
-
-        }
-
         private void HandleSGR(List<byte> sgrs)
         {
             foreach (byte c in sgrs)
@@ -206,19 +346,19 @@ namespace GardeniaTerminalCore
             {
                 byte c = socket.Read();
 
+                this.psrState.PrevChar = this.psrState.Char;
                 this.psrState.Char = c;
-                int lastState = this.psrState.NextState;
+                int prevState = this.psrState.NextState;
                 this.psrState.NextState = this.psrState.StateTable[c];
                 int nextState = this.psrState.NextState;
 
-                if (this.psrState.StateTable == VTPrsTbl.SosTable)
+                if (this.psrState.State == States.ANSI_OSC)
                 {
                     this.psrState.ParameterBytes.Add(c);
                 }
-                else if (this.psrState.StateTable != VTPrsTbl.EscTable)
+                else if (this.psrState.State == States.ANSI_CSI)
                 {
-                    // 退出了ESC状态，重置ControlFunction
-                    this.psrState.ControlString = 0;
+                    this.psrState.ParameterBytes.Add(c);
                 }
 
                 switch (nextState)
@@ -229,17 +369,17 @@ namespace GardeniaTerminalCore
                         }
                         continue;
 
-                    #region 单字节指令（SingleCharactor ControlFunction）
+                    #region SingleCharactor ControlFunction（单字节指令）
                     case VTPsrDef.CASE_CR:
                         {
                             this.psrState.Text = "\r";
-                            this.NotifyAction(VTAction.Print, this.psrState);
+                            this.InvokeAction(this.printTextAction, this.psrState);
                         }
                         break;
                     case VTPsrDef.CASE_LF:
                         {
                             this.psrState.Text = "\n";
-                            this.NotifyAction(VTAction.Print, this.psrState);
+                            this.InvokeAction(this.printTextAction, this.psrState);
                         }
                         break;
                     case VTPsrDef.CASE_VT:
@@ -252,24 +392,28 @@ namespace GardeniaTerminalCore
                         {
                             /* OSC状态有两种结束模式，一种是以CASE_BELL结束，一种是以CASE_ST结束 */
                             logger.Debug("CASE_BELL");
-                            if (this.psrState.ControlString == ANSI.ANSI_OSC)
+                            if (this.psrState.State == States.ANSI_OSC)
                             {
+                                this.psrState.ParameterBytes.RemoveLast();
+                                this.InvokeAction(this.operationSystemCommandsAction, this.psrState);
                                 this.psrState.ResetState();
                             }
                             else
                             {
                                 /* 响铃 */
+                                System.Media.SystemSounds.Beep.Play();
                             }
                         }
                         break;
                     case VTPsrDef.CASE_BS:
                         {
-                            this.NotifyAction(VTAction.Backspace, this.psrState);
+                            logger.Debug("CASE_BS");
+                            this.InvokeAction(this.backSpaceAction, this.psrState);
                         }
                         break;
                     #endregion
 
-                    #region 打印终端数据流
+                    #region Print
                     // 向屏幕输出终端数据流
                     case VTPsrDef.CASE_PRINT:
                         {
@@ -280,14 +424,14 @@ namespace GardeniaTerminalCore
                                  * 第八位没用到，7位编码方式，1字节代表一个字，直接输出ascii码
                                  */
                                 this.psrState.Text = ((char)c).ToString();
-                                this.NotifyAction(VTAction.Print, this.psrState);
+                                this.InvokeAction(this.printTextAction, this.psrState);
                                 continue;
                             }
 
                             if (this.CharacherEncoding == Encoding.UTF8)
                             {
                                 this.ReceiveUTF8String(socket, c, this.psrState);
-                                this.NotifyAction(VTAction.Print, this.psrState);
+                                this.InvokeAction(this.printTextAction, this.psrState);
                             }
                             else
                             {
@@ -298,7 +442,9 @@ namespace GardeniaTerminalCore
                         break;
                     #endregion
 
-                    #region ControlString
+                    #region C1 (8-Bit) Control Characters
+
+                    #region Operation System Commands(OSC ESC ])
                     case VTPsrDef.CASE_OSC:
                         {
                             /* 
@@ -306,14 +452,47 @@ namespace GardeniaTerminalCore
                              * Xterm支持以CASE_BELL结束
                              * 另外一种是以CASE_ST（ 09/13 or ESC 05/13）结束 
                              */
-                            this.psrState.StateTable = VTPrsTbl.SosTable;
-                            this.psrState.ControlString = ANSI.ANSI_OSC;
+                            this.psrState.StateTable = VTPrsTbl.SOSTable;
+                            this.psrState.State = States.ANSI_OSC;
                             logger.Debug("CASE_OSC");
                         }
                         break;
                     #endregion
 
-                    #region ESC控制指令相关
+                    // ESC状态下收到CSI控制字符。
+                    case VTPsrDef.CASE_CSI_STATE:
+                        {
+                            this.psrState.StateTable = VTPrsTbl.CSITable;
+                            this.psrState.State = States.ANSI_CSI;
+                            logger.Debug("CASE_CSI_STATE");
+                        }
+                        break;
+
+                    /* 字符串结束符 */
+                    case VTPsrDef.CASE_ST:
+                        {
+                            /* 收到String Terminaotr状态，所有的参数都接收完了，开始处理 */
+                            logger.DebugFormat("CASE_ST, ControlString:{0}", this.psrState.State);
+
+                            switch (this.psrState.State)
+                            {
+                                case States.ANSI_OSC:
+                                    {
+                                        /* 之前是CASE_OSC状态 */
+                                        this.psrState.ParameterBytes.RemoveLast();
+                                        this.InvokeAction(this.operationSystemCommandsAction, this.psrState);
+                                        this.psrState.ResetState();
+                                    }
+                                    break;
+                            }
+                            this.psrState.ResetState();
+                        }
+                        break;
+
+                    #endregion
+
+                    #region ESCAPE(ESC)
+
                     // ANSI状态下收到ESC控制字符。
                     case VTPsrDef.CASE_ESC:
                         {
@@ -322,14 +501,6 @@ namespace GardeniaTerminalCore
                         }
                         break;
 
-                    // ESC状态下收到CSI控制字符。
-                    case VTPsrDef.CASE_CSI_STATE:
-                        {
-                            this.psrState.StateTable = VTPrsTbl.CsiTable;
-                            logger.Debug("CASE_CSI_STATE");
-                        }
-                        break;
-                    
                     /* 
                      * 在ESC模式下收到了数字。通常，这是ESC指令的参数。每个数字都代表了一个不同的含义
                      */
@@ -339,20 +510,20 @@ namespace GardeniaTerminalCore
                              * 存储ESCDigits，收到FinalByte的时候会用到，不同的FinalByte，ParameterBytes有不同的含义
                              * FinalByte代表了CSI命令的功能类型
                              */
-                            this.psrState.EscDigits.Add(c);
-                            if (this.psrState.StateTable == VTPrsTbl.CsiTable)
+                            //this.psrState.ParameterBytes.Add(c);
+                            if (this.psrState.StateTable == VTPrsTbl.CSITable)
                             {
                                 this.psrState.StateTable = VTPrsTbl.Csi2Table; // xterm-331 charproc.c 2497, TODO:Csi2Table和CsiTable的区别
                             }
                         }
                         break;
-                     
+
                     /*
                      * 在ESC模式下收到了分号（;）。通常，这用来分割ESC控制指令的参数，暂时不做处理
                      */
                     case VTPsrDef.CASE_ESC_SEMI:
                         {
-                            if (this.psrState.StateTable == VTPrsTbl.CsiTable)
+                            if (this.psrState.StateTable == VTPrsTbl.CSITable)
                             {
                                 this.psrState.StateTable = VTPrsTbl.Csi2Table; // xterm-331 charproc.c 2509
                             }
@@ -360,7 +531,7 @@ namespace GardeniaTerminalCore
                         break;
 
                     #region FinalBytes
-                    
+
                     /*
                      * 在ESC模式下收到了FinalByte（结束符），FinalByte表示ESC指令的类型，一个ESC指令由FinalByte结束
                      */
@@ -369,35 +540,35 @@ namespace GardeniaTerminalCore
                         {
                             // 光标上移
                             logger.Debug("CASE_CUU - cursor up");
-                            this.psrState.EscReset();
+                            this.psrState.ResetState();
                         }
                         break;
                     case VTPsrDef.CASE_CUD:
                         {
                             // 光标下移
                             logger.Debug("CASE_CUD - cursor down");
-                            this.psrState.EscReset();
+                            this.psrState.ResetState();
                         }
                         break;
                     case VTPsrDef.CASE_CUF:
                         {
                             // 光标左移
                             logger.Debug("CASE_CUF - cursor forward");
-                            this.psrState.EscReset();
+                            this.psrState.ResetState();
                         }
                         break;
                     case VTPsrDef.CASE_CUB:
                         {
                             // 光标右移
                             logger.Debug("CASE_CUB - cursor backward");
-                            this.psrState.EscReset();
+                            this.psrState.ResetState();
                         }
                         break;
                     case VTPsrDef.CASE_CUP:
                         {
                             // 设置光标位置
                             logger.Debug("CASE_CUP - cursor position");
-                            this.psrState.EscReset();
+                            this.psrState.ResetState();
                         }
                         break;
                     /*
@@ -407,28 +578,22 @@ namespace GardeniaTerminalCore
                     case VTPsrDef.CASE_SGR:
                         {
                             logger.Debug("CASE_SGR");
-                            this.HandleSGR(this.psrState.EscDigits);
-                            this.psrState.EscReset();
+                            //this.HandleSGR(this.psrState.EscDigits);
+                            this.psrState.ResetState();
                         }
                         break;
                     #endregion
 
                     #endregion
 
-                    /* 字符串结束符 */
-                    case VTPsrDef.CASE_ST:
-                        {
-                            /* 收到String Terminaotr状态，所有的参数都接收完了，开始处理 */
-                            logger.DebugFormat("CASE_ST, ControlString:{0}", this.psrState.ControlString);
+                    #region CSI Functions
 
-                            switch (this.psrState.ControlString)
-                            {
-                                case ANSI.ANSI_OSC:
-                                    {
-                                        /* 之前是CASE_OSC状态 */
-                                    }
-                                    break;
-                            }
+                    // CSI状态下收到了EL，该字符属于FinalByte，但是该字符前不存在IntermediateBytes
+                    case VTPsrDef.CASE_EL:
+                        {
+                            logger.Debug("CASE_EL");
+                            this.psrState.ParameterBytes.RemoveLast();
+                            this.InvokeAction(this.eraseLineAction, this.psrState);
                             this.psrState.ResetState();
                         }
                         break;
@@ -438,6 +603,7 @@ namespace GardeniaTerminalCore
                         {
                             // 进入FinalByte状态表
                             this.psrState.StateTable = VTPrsTbl.CsiSpTable;
+                            logger.Debug("CASE_CSI_SPACE_STATE");
                         }
                         break;
 
@@ -448,20 +614,14 @@ namespace GardeniaTerminalCore
                         }
                         break;
 
+                    #endregion
+
                     default:
                         {
-                            logger.ErrorFormat("未处理的字符:{0}, StateTable:{1}", c, this.psrState.StateTable);
+                            logger.ErrorFormat("未处理的字符:{0}, State:{1}", c, this.psrState.State);
                         }
                         break;
                 }
-            }
-        }
-
-        protected virtual void NotifyAction(VTAction action, ParseState state)
-        {
-            if (this.Action != null)
-            {
-                this.Action(this, action, state);
             }
         }
 

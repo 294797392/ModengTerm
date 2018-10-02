@@ -15,7 +15,7 @@ namespace GardeniaTerminalCore
         public ParseState()
         {
             this.ParameterBytes = new List<byte>();
-            this.EscDigits = new List<byte>();
+            //this.EscDigits = new List<byte>();
         }
 
         #region 解析Unicode字符用
@@ -50,6 +50,11 @@ namespace GardeniaTerminalCore
         public byte Char { get; set; }
 
         /// <summary>
+        /// 上一次收到的字符
+        /// </summary>
+        public byte PrevChar { get; set; }
+
+        /// <summary>
         /// 当前模式下，接收到的字符的控制功能
         /// </summary>
         public byte NextState;
@@ -62,7 +67,7 @@ namespace GardeniaTerminalCore
         /// <summary>
         /// 当前处于的控制字符状态
         /// </summary>
-        public byte ControlString { get; set; }
+        public byte State { get; set; }
 
         /// <summary>
         /// 存储CSI, OSC或DEC模式下的控制指令的参数
@@ -71,11 +76,11 @@ namespace GardeniaTerminalCore
 
         #endregion
 
-        /// <summary>
-        /// 在ESC状态下收到的数字参数
-        /// digit in csi or dec mode
-        /// </summary>
-        public List<byte> EscDigits { get; private set; }
+        ///// <summary>
+        ///// 在ESC状态下收到的数字参数
+        ///// digit in csi or dec mode
+        ///// </summary>
+        //public List<byte> EscDigits { get; private set; }
 
         /// <summary>
         /// 光标所在列
@@ -88,22 +93,12 @@ namespace GardeniaTerminalCore
         public string Text { get; set; }
 
         /// <summary>
-        /// 重置为Ansi状态表
-        /// 清空接收到的参数
+        /// 重置状态
         /// </summary>
         public void ResetState()
         {
             this.ParameterBytes.Clear();
-            this.ControlString = 0;
-            this.StateTable = VTPrsTbl.AnsiTable;
-        }
-
-        /// <summary>
-        /// 清除Esc状态
-        /// </summary>
-        public void EscReset()
-        {
-            this.EscDigits.Clear();
+            this.State = 0;
             this.StateTable = VTPrsTbl.AnsiTable;
         }
     }

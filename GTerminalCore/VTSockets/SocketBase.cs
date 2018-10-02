@@ -64,5 +64,13 @@ namespace GardeniaTerminalCore
                     throw new NotImplementedException();
             }
         }
+
+        protected void NotifyStatusChanged(SocketState state)
+        {
+            if (this.StatusChanged != null)
+            {
+                this.StatusChanged(this, state);
+            }
+        }
     }
 }

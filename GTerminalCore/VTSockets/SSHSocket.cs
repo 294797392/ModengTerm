@@ -10,15 +10,11 @@ namespace GardeniaTerminalCore
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("SshConnection");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("SSHSocket");
 
         #endregion
 
         #region 事件
-
-        public event Action<object, byte[]> DataReceived;
-
-        public event Action<object, SocketState> StatusChanged;
 
         #endregion
 
@@ -33,13 +29,6 @@ namespace GardeniaTerminalCore
 
         #region 属性
 
-        public SocketProtocols Protocol
-        {
-            get { return SocketProtocols.SSH; }
-        }
-
-        public SocketAuthorition Authorition { get; set; }
-
         #endregion
 
         #region 实例方法
@@ -50,10 +39,10 @@ namespace GardeniaTerminalCore
 
         public override bool Connect()
         {
-            this.NotifyVTStreamStatus(SocketState.Init);
+            this.NotifyStatusChanged(SocketState.Init);
 
+            this.stremQueue = new BufferQueue<byte>(4096);
             this.authorition = this.Authorition as SSHSocketAuthorition;
-
             var authentications = new List<AuthenticationMethod>();
             if (!string.IsNullOrEmpty(this.authorition.KeyFilePath))
             {
@@ -77,9 +66,7 @@ namespace GardeniaTerminalCore
                 return false;
             }
 
-            this.stremQueue = new BufferQueue<byte>(4096);
-
-            this.NotifyVTStreamStatus(SocketState.Ready);
+            this.NotifyStatusChanged(SocketState.Ready);
 
             return true;
         }
@@ -130,14 +117,6 @@ namespace GardeniaTerminalCore
         #endregion
 
         #region 实例方法
-
-        private void NotifyVTStreamStatus(SocketState state)
-        {
-            if (this.StatusChanged != null)
-            {
-                this.StatusChanged(this, state);
-            }
-        }
 
         private void ShellStream_DataReceived(object sender, ShellDataEventArgs e)
         {

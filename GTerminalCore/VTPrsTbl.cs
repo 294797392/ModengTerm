@@ -10,16 +10,20 @@ namespace GardeniaTerminalCore
      */
     public static class VTPrsTbl
     {
-        #region Sos_Table
+        #region SOSTable
 
         /// <summary>
         /// xterm-331 VTPrsTbl.c 6578行
         /// 
+        /// 进入OSC状态后切换此状态表
+        /// 
         /// 在OSC模式下，收集控制命令参数字符串，每一个CASE_IGNORE都是一个参数字符
         /// The CASE_IGNORE entries correspond to the
         /// characters that can be accumulated for the string function(e.g., OSC).
+        /// 
+        /// Start of String Table??
         /// </summary>
-        public static readonly byte[] SosTable =
+        public static readonly byte[] SOSTable =
         {
             /*	NUL		SOH		STX		ETX	*/
             VTPsrDef.CASE_IGNORE,
@@ -1343,7 +1347,7 @@ namespace GardeniaTerminalCore
         /// <summary>
         /// ascii码与csi控制指令的映射关系表
         /// </summary>
-        public static readonly byte[] CsiTable =
+        public static readonly byte[] CSITable =
         {
             /*	NUL		SOH		STX		ETX	*/
             VTPsrDef.CASE_IGNORE,

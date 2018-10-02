@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,7 +19,7 @@ namespace GTerminalControl
     /// <summary>
     /// UserControl1.xaml 的交互逻辑
     /// </summary>
-    public partial class VTConsole : UserControl
+    public partial class VTConsole : UserControl, VTScreen
     {
         #region 类变量
 
@@ -45,7 +46,14 @@ namespace GTerminalControl
             set
             {
                 this.vt = value;
-                this.vt.Action += this.VideoTerminal_Action;
+            }
+        }
+
+        public TextPointer CurrentCaretPosition
+        {
+            get
+            {
+                return RichTextBox.CaretPosition;
             }
         }
 
@@ -70,6 +78,8 @@ namespace GTerminalControl
             {
             };
             RichTextBox.IsUndoEnabled = false;
+            RichTextBox.IsReadOnlyCaretVisible = false;
+            RichTextBox.IsReadOnly = true;
             RichTextBox.Document = new FlowDocument(_paragraph);
             RichTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
             RichTextBox.PreviewTextInput += RichTextBox_PreviewTextInput;
@@ -86,7 +96,7 @@ namespace GTerminalControl
         //    RichTextBox.CaretPosition.GetPositionAtOffset(column);
         //}
 
-        private void AppendText(string text)
+        private void InsertTextAtCurrentCaretPosition(string text)
         {
             Inline lastInline = this._paragraph.Inlines.LastInline;
             if (lastInline == null)
@@ -94,9 +104,17 @@ namespace GTerminalControl
                 Run runInline = new Run();
                 this._paragraph.Inlines.Add(runInline);
             }
-
             RichTextBox.CaretPosition.InsertTextInRun(text);
             RichTextBox.CaretPosition = RichTextBox.CaretPosition.GetPositionAtOffset(text.Length, LogicalDirection.Forward);
+        }
+
+        /// <summary>
+        /// 设置相对于当前光标位置的光标位置
+        /// </summary>
+        /// <param name="offset">要移动的距离，正数往右移动，负数往左移动</param>
+        private void MoveCaretPositionRelativeCurrent(int offset)
+        {
+
         }
 
         #endregion
@@ -135,32 +153,32 @@ namespace GTerminalControl
             }
         }
 
-        private void VideoTerminal_Action(object sender, VTAction action, ParseState state)
+        #endregion
+
+        #region VTScreen
+
+        public void PrintText(string text)
         {
-            switch (action)
+            RichTextBox.CaretPosition = RichTextBox.Document.ContentEnd;
+            this.InsertTextAtCurrentCaretPosition(text);
+        }
+
+        public void Backspace()
+        {
+            this.MoveCaretPositionRelativeCurrent(-1);
+        }
+
+        public void EraseCharAtCaretPosition(int count, TextPointer position)
+        {
+            if (count == 0)
             {
-                case VTAction.Print:
-                    {
-                        base.Dispatcher.Invoke(new Action(() =>
-                        {
-                            this.AppendText(state.Text);
-                        }));
-                    }
-                    break;
-
-                case VTAction.MoveCursor:
-                    {
-                    }
-                    break;
-
-                case VTAction.NewLine:
-                    {
-                        base.Dispatcher.Invoke(new Action(() =>
-                        {
-
-                        }));
-                    }
-                    break;
+                throw new NotImplementedException();
+                //TextPointer lineStart = position.GetLineStartPosition(0);
+            }
+            else
+            {
+                position.DeleteTextInRun(count);
+                this.MoveCaretPositionRelativeCurrent(count);
             }
         }
 

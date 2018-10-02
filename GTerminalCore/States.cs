@@ -5,7 +5,10 @@ using System.Text;
 
 namespace GardeniaTerminalCore
 {
-    public class ANSI
+    /// <summary>
+    /// Ascii码转移字符定义
+    /// </summary>
+    public class States
     {
         public const byte ANSI_CR = 13; // carriage return，回车，0x0D
         public const byte ANSI_TAB = 9;  // horizontal tab，制表符，0x09
@@ -33,6 +36,10 @@ namespace GardeniaTerminalCore
         public const byte ANSI_SOS = 0x98;
         public const byte ANSI_CSI = 0x9B;
         public const byte ANSI_ST = 0x9C;
+
+        /// <summary>
+        /// Operation System Commands
+        /// </summary>
         public const byte ANSI_OSC = 0x9D;
         public const byte ANSI_PM = 0x9E;
         public const byte ANSI_APC = 0x9F;
