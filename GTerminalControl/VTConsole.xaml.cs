@@ -85,7 +85,8 @@ namespace GTerminalControl
             RichTextBox.IsUndoEnabled = false;
             RichTextBox.IsReadOnlyCaretVisible = false;
             RichTextBox.IsReadOnly = true;
-            RichTextBox.Document = new FlowDocument(this._paragraph);
+            RichTextBox.Document.Blocks.Clear();
+            RichTextBox.Document.Blocks.Add(this._paragraph);
             RichTextBox.Document.IsEnabled = false;
             RichTextBox.PreviewKeyDown += RichTextBox_PreviewKeyDown;
             RichTextBox.PreviewTextInput += RichTextBox_PreviewTextInput;
@@ -111,20 +112,10 @@ namespace GTerminalControl
         private void InsertTextAtPosition(string text, int column, int row)
         {
             this._paragraph.InsertTextAtPosition(text, column, row);
-
             //TextPointer textPosition = this._paragraph.ContentStart;
             //textPosition = textPosition.GetLineStartPosition(row);
             //textPosition = textPosition.GetPositionAtOffset(column, LogicalDirection.Forward);
             //textPosition.InsertTextInRun(text);
-        }
-
-        /// <summary>
-        /// 设置相对于当前光标位置的光标位置
-        /// </summary>
-        /// <param name="offset">要移动的距离，正数往右移动，负数往左移动</param>
-        private void MoveCursorPositionRelativeCurrent(int col, int row)
-        {
-
         }
 
         private void CursorThreadProcess()
@@ -133,6 +124,11 @@ namespace GTerminalControl
             {
                 Thread.Sleep(1000);
             }
+        }
+
+        private void EraseText(int row, int startCol, int endCol)
+        {
+
         }
 
         #endregion
@@ -177,8 +173,6 @@ namespace GTerminalControl
 
         public void PrintText(string text)
         {
-            this.InsertTextAtPosition(text, this.CursorColumn, this.CursorRow);
-
             if (text == "\r")
             {
                 this.CursorColumn = 0;
@@ -191,13 +185,15 @@ namespace GTerminalControl
             }
             else
             {
+                this.InsertTextAtPosition(text, this.CursorColumn, this.CursorRow);
                 this.CursorColumn += text.Length;
             }
         }
 
         public void MoveCursor(int col, int row)
         {
-            this.MoveCursorPositionRelativeCurrent(col, row);
+            this.CursorColumn += col;
+            this.CursorRow += row;
         }
 
         public void EraseLine(int startCol, int count)
@@ -210,7 +206,6 @@ namespace GTerminalControl
             else
             {
                 //position.DeleteTextInRun(count);
-                this.MoveCursorPositionRelativeCurrent(-1, 0);
             }
         }
 

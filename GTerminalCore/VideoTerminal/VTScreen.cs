@@ -25,7 +25,15 @@ namespace GardeniaTerminalCore
         void PrintText(string text);
 
         /// <summary>
-        /// 设置光标位置，相对于当前的位置
+        /// 以当前光标位置为原点移动光标
+        /// Column：
+        ///     正：向右移动
+        ///     负：向左移动
+        ///     0 ：不移动
+        /// Row：
+        ///     正：向上移动
+        ///     负：向下移动
+        ///     0 ：不移动
         /// </summary>
         void MoveCursor(int col, int row);
 

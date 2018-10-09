@@ -15,9 +15,8 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    
-    <Grid Margin="0,100,0,0">
 
+    <Grid>
         <Border Background="{DynamicResource ResourceKey=BrushMainBackground}"/>
         <RichTextBox x:Name="RichTextBox" Background="Transparent"
                      CaretBrush="{DynamicResource ResourceKey=BrushCaret}"

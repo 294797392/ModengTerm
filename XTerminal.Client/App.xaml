@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:XTerminalClient"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style TargetType="{x:Type Paragraph}">
+        <!--<Style TargetType="{x:Type Paragraph}">
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Background" Value="Red"/>
@@ -22,7 +22,7 @@
             <Setter Property="Margin" Value="0"/>
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Background" Value="Red"/>
-        </Style>
+        </Style>-->
 
     </Application.Resources>
 </Application>

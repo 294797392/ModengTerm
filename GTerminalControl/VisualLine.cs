@@ -6,30 +6,25 @@ using System.Windows.Documents;
 
 namespace GTerminalControl
 {
-    public class VisualLine
+    public class VisualLine : ListItem
     {
-        private Span span;
-        private List<Run> textSegements;
+        private Run textRun;
+        private Paragraph container;
 
-        public VisualLine(Span span)
+        public VisualLine()
         {
-            this.textSegements = new List<Run>();
-            this.span = span;
-        }
-
-        public void CreateTextSegement()
-        {
-            Run run = new Run();
-            this.span.Inlines.Add(run);
-            this.textSegements.Add(run);
+            this.textRun = new Run();
+            this.container = new Paragraph();
+            this.container.Inlines.Add(this.textRun);
+            base.Blocks.Add(this.container);
         }
 
         public void InsertTextAtPosition(string text, int column)
         {
-            string curText = this.textSegements.Last().Text;
+            string curText = this.textRun.Text;
             string start = curText.Substring(0, column);
             string end = curText.Substring(column, curText.Length - column);
-            this.textSegements.Last().Text = string.Format("{0}{1}{2}", start, text, end);
+            this.textRun.Text = string.Format("{0}{1}{2}", start, text, end);
         }
     }
 }

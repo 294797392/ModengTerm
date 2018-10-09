@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="VideoTerminal\TerminalModes.cs" />
     <Compile Include="VideoTerminal\VTKeyboard.cs" />
     <Compile Include="VideoTerminal\VTScreen.cs" />
     <Compile Include="ParseState.cs" />

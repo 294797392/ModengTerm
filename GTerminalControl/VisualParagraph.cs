@@ -6,22 +6,24 @@ using System.Windows.Documents;
 
 namespace GTerminalControl
 {
-    public class VisualParagraph : Paragraph
+    public class VisualParagraph : List
     {
         private List<VisualLine> visualLines;
-        private Span span;
 
         public VisualParagraph()
         {
             this.visualLines = new List<VisualLine>();
-            this.span = new Span();
-            base.Inlines.Add(this.span);
+            base.MarkerStyle = System.Windows.TextMarkerStyle.None;
+            base.MarkerOffset = 0;
+            base.TextAlignment = System.Windows.TextAlignment.Left;
+            base.Margin = new System.Windows.Thickness(0);
+            base.Padding = new System.Windows.Thickness(0);
         }
 
         public void CreateVisualLine()
         {
-            VisualLine line = new VisualLine(this.span);
-            line.CreateTextSegement();
+            VisualLine line = new VisualLine();
+            base.ListItems.Add(line);
             this.visualLines.Add(line);
         }
 

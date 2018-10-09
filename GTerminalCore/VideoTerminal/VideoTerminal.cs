@@ -79,6 +79,8 @@ namespace GardeniaTerminalCore
 
         #region 属性
 
+        public int DCMS { get; set; }
+
         /// <summary>
         /// 是否支持8位ascii字符
         /// </summary>
@@ -108,6 +110,8 @@ namespace GardeniaTerminalCore
 
         public void Open()
         {
+            this.DCMS = TerminalModes.DCSM_PRESENTATION;
+
             this.presentation = new VTPresentation();
             this.CharacherEncoding = DefaultValues.DefaultEncoding;
             this.Keyboard = VTKeyboard.Create();
@@ -274,8 +278,15 @@ namespace GardeniaTerminalCore
         private void InvokeMoveCursor(object state)
         {
             VTPresentation presentation = (VTPresentation)state;
-            this.Screen.CursorColumn = presentation.CursorColumn;
-            this.Screen.CursorRow = presentation.CursorRow;
+
+            if (this.DCMS == TerminalModes.DCSM_PRESENTATION)
+            {
+                this.Screen.MoveCursor(presentation.CursorColumn, 0);
+            }
+            else
+            {
+                throw new NotImplementedException("InvokeMoveCursor TerminalModes.DCSM_DATA");
+            }
         }
 
         private void InvokeAction(SendOrPostCallback action, object userData)
@@ -347,6 +358,7 @@ namespace GardeniaTerminalCore
                 this.psrState.NextState = this.psrState.StateTable[c];
                 int nextState = this.psrState.NextState;
 
+                // 如果当前模式是OSC或者CSI控制指令模式，则收集参数序列
                 if (this.psrState.State == States.ANSI_OSC)
                 {
                     this.psrState.ParameterBytes.Add(c);
@@ -403,7 +415,7 @@ namespace GardeniaTerminalCore
                     case VTPsrDef.CASE_BS:
                         {
                             logger.Debug("CASE_BS");
-                            this.presentation.CursorColumn -= 1;
+                            this.presentation.CursorColumn = -1;
                             this.InvokeAction(this.moveCursorAction, this.presentation);
                         }
                         break;
@@ -487,7 +499,7 @@ namespace GardeniaTerminalCore
 
                     #endregion
 
-                    #region ESCAPE(ESC)
+                    #region ESC Functions
 
                     // ANSI状态下收到ESC控制字符。
                     case VTPsrDef.CASE_ESC:
