@@ -1,0 +1,28 @@
+﻿<Application x:Class="KaguraTerminal.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:KaguraTerminal"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!--<Style TargetType="{x:Type Paragraph}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Red"/>
+            <Setter Property="MinOrphanLines" Value="0"/>
+            <Setter Property="MinWidowLines" Value="0"/>
+            <Setter Property="KeepWithNext" Value="False"/>
+            <Setter Property="KeepTogether" Value="False"/>
+        </Style>
+        <Style TargetType="{x:Type List}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Red"/>
+        </Style>
+        <Style TargetType="{x:Type ListItem}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Background" Value="Red"/>
+        </Style>-->
+
+    </Application.Resources>
+</Application>

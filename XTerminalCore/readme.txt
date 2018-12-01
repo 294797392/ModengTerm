@@ -1,5 +1,0 @@
-
-
-Cf：ControlFunction
-
-CfParser:ControlFunctionParser，因ControlFunctionParser名字太长，又有很多类会使用ControlFunction这个名字，所以改成简写CF。为了和Fe保持一致，把大写的F改成小写的f，所以最后的名字叫做CfParser

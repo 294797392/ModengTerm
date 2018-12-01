@@ -1,9 +1,0 @@
-﻿<Application x:Class="XTerminal.UnitTest.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:GTerminalControl;assembly=GTerminalControl"
-             StartupUri="pack://application:,,,/GTerminalControl;component/VTConsole.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
-</Application>
