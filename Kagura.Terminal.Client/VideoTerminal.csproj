@@ -4,17 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E7DE3287-F5F2-4A1C-A6E0-A3B9E064ADBD}</ProjectGuid>
-    <OutputType>library</OutputType>
+    <ProjectGuid>{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Kagura.Terminal.Controls</RootNamespace>
-    <AssemblyName>Kagura.Terminal.Controls</AssemblyName>
+    <RootNamespace>VideoTerminal</RootNamespace>
+    <AssemblyName>VideoTerminal</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,12 +33,18 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\Dependencies\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Renci.SshNet">
+      <HintPath>..\Dependencies\Renci.SshNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -56,20 +64,38 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Themes.Ubuntu.Ambiance.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="VTConsole.xaml">
+    <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="CharacterCodedBits.cs" />
+    <Compile Include="DefaultValues.cs" />
+    <Compile Include="ResponseCode.cs" />
+    <Compile Include="TerminalConnectionStatus.cs" />
+    <Compile Include="TerminalNames.cs" />
+    <Compile Include="Windows\ConfigurationParameterWindow.xaml.cs">
+      <DependentUpon>ConfigurationParameterWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Compile Include="VisualLine.cs" />
-    <Compile Include="VisualParagraph.cs" />
-    <Compile Include="VTConsole.xaml.cs">
-      <DependentUpon>VTConsole.xaml</DependentUpon>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ConfigurationParameterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -94,11 +120,28 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <Resource Include="Fonts\Ubuntu-B.ttf" />
+    <Resource Include="Fonts\Ubuntu-BI.ttf" />
+    <Resource Include="Fonts\Ubuntu-C.ttf" />
+    <Resource Include="Fonts\Ubuntu-L.ttf" />
+    <Resource Include="Fonts\Ubuntu-LI.ttf" />
+    <Resource Include="Fonts\Ubuntu-M.ttf" />
+    <Resource Include="Fonts\Ubuntu-MI.ttf" />
+    <Resource Include="Fonts\Ubuntu-R.ttf" />
+    <Resource Include="Fonts\Ubuntu-RI.ttf" />
+    <Resource Include="Fonts\UbuntuMono-B.ttf" />
+    <Resource Include="Fonts\UbuntuMono-BI.ttf" />
+    <Resource Include="Fonts\UbuntuMono-R.ttf" />
+    <Resource Include="Fonts\UbuntuMono-RI.ttf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kagura.Terminal.Base\VideoTerminal.Base.csproj">
       <Project>{5b0f8597-cc89-46e2-bf2d-b4772b7f454f}</Project>
       <Name>VideoTerminal.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Kagura.Terminal.Controls\Kagura.Terminal.Controls.csproj">
+      <Project>{e7de3287-f5f2-4a1c-a6e0-a3b9e064adbd}</Project>
+      <Name>Kagura.Terminal.Controls</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kagura.Terminal.Parser\VideoTerminal.Parser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
@@ -108,6 +151,15 @@
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
       <Name>VideoTerminal.Sockets</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\CONTRIBUTING.txt" />
+    <Resource Include="Fonts\copyright.txt" />
+    <Resource Include="Fonts\FONTLOG.txt" />
+    <Resource Include="Fonts\LICENCE-FAQ.txt" />
+    <Resource Include="Fonts\LICENCE.txt" />
+    <Resource Include="Fonts\README.txt" />
+    <Resource Include="Fonts\TRADEMARKS.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

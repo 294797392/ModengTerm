@@ -4,15 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E7DE3287-F5F2-4A1C-A6E0-A3B9E064ADBD}</ProjectGuid>
-    <OutputType>library</OutputType>
+    <ProjectGuid>{7909EA37-1524-415A-9CB8-DBE3274F4152}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Kagura.Terminal.Controls</RootNamespace>
-    <AssemblyName>Kagura.Terminal.Controls</AssemblyName>
+    <RootNamespace>VideoTerminal.Parser</RootNamespace>
+    <AssemblyName>VideoTerminal.Parser</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,71 +36,48 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="Renci.SshNet">
+      <HintPath>..\Dependencies\Renci.SshNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Presentation" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
     <Reference Include="Utility.Misc">
       <HintPath>..\Dependencies\Utility.Misc.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Themes.Ubuntu.Ambiance.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="VTConsole.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="VisualLine.cs" />
-    <Compile Include="VisualParagraph.cs" />
-    <Compile Include="VTConsole.xaml.cs">
-      <DependentUpon>VTConsole.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <AppDesigner Include="Properties\" />
+    <Compile Include="DefaultValues.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="VideoTerminal\TerminalModes.cs" />
+    <Compile Include="VideoTerminal\VTKeyboard.cs" />
+    <Compile Include="VideoTerminal\VTScreen.cs" />
+    <Compile Include="ParseState.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SGRDefines.cs" />
+    <Compile Include="VideoTerminal\VideoTerminal.cs" />
+    <Compile Include="VideoTerminal\VTWindow.cs" />
+    <Compile Include="VTAction.cs" />
+    <Compile Include="States.cs" />
+    <Compile Include="VTPresentation.cs" />
+    <Compile Include="VTPsrDef.cs" />
+    <Compile Include="VTPrsTbl.cs" />
+    <Compile Include="VTState.cs" />
+    <Compile Include="VTTypeEnum.cs" />
+    <Compile Include="WindowsAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kagura.Terminal.Base\VideoTerminal.Base.csproj">
       <Project>{5b0f8597-cc89-46e2-bf2d-b4772b7f454f}</Project>
       <Name>VideoTerminal.Base</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Kagura.Terminal.Parser\VideoTerminal.Parser.csproj">
-      <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
-      <Name>VideoTerminal.Parser</Name>
     </ProjectReference>
     <ProjectReference Include="..\Kagura.Terminal.Sockets\VideoTerminal.Sockets.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>

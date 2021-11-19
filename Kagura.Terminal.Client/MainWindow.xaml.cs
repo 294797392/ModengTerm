@@ -19,16 +19,16 @@ namespace Kagura.Terminal.Client
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window, VTWindow
+    public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
-            VideoTerminal terminal = VideoTerminal.Create();
-            terminal.Screen = VTConsole;
-            terminal.Window = this;
-            terminal.Open();
-            VTConsole.VT = terminal;
+            //VideoTerminal terminal = VideoTerminal.Create();
+            //terminal.Screen = VTConsole;
+            //terminal.Window = this;
+            //terminal.Open();
+            //VTConsole.VT = terminal;
         }
 
         public void SetIconName(string name)
