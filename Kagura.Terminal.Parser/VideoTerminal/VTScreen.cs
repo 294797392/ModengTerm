@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Documents;
 
-namespace Kagura.Terminal.Controls
+namespace VideoTerminal.Parser
 {
     public interface VTScreen
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Kagura.Terminal.Controls
+namespace VideoTerminal.Parser
 {
     public static class WindowsAPI
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kagura.Terminal.Client
+namespace VideoTerminal
 {
     /// <summary>
     /// Ascii编码方式

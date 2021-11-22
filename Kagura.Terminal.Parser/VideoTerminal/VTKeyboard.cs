@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace Kagura.Terminal.Controls
+namespace VideoTerminal.Parser
 {
     internal class VTKeyboardInstance : VTKeyboard
     {

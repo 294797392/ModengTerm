@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kagura.Terminal.Controls
+namespace VideoTerminal.Parser
 {
     public class WideCharBuffer
     {
@@ -104,7 +104,7 @@ namespace Kagura.Terminal.Controls
         {
             this.ParameterBytes.Clear();
             this.State = 0;
-            this.StateTable = VTPrsTbl.ANSITable;
+            this.StateTable = VTStateTables.GroundTable;
         }
     }
 }

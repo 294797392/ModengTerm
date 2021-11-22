@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kagura.Terminal.Controls
+namespace VideoTerminal.Parser
 {
     /// <summary>
     /// 定义解析器状态
-    /// 
+    /// 每种状态都对应一个StateTable
     /// https://www.vt100.net/emu/dec_ansi_parser
     /// </summary>
-    public enum VTState
+    public enum VTStates
     {
         /// <summary>
         /// This is the initial state of the parser, and the state used to consume all characters other than components of escape and control sequences.
@@ -38,18 +38,18 @@ namespace Kagura.Terminal.Controls
         /// C0 controls are executed immediately during the recognition of a control sequence. C1 controls will cancel the sequence and then be executed. I imagine this treatment of C1 controls is prompted by the consideration that the 7-bit (ESC Fe) and 8-bit representations of C1 controls should act in the same way. When the first character of the 7-bit representation, ESC, is received, it will cancel the control sequence, so the 8-bit representation should do so as well.
         /// 收到CSI控制指令时进入这个状态
         /// </summary>
-        CsiEntry,
+        CSIEntry,
 
         /// <summary>
         /// This state is entered when a parameter character is recognised in a control sequence. It then recognises other parameter characters until an intermediate or final character appears. Further occurrences of the private-marker characters 3C-3F or the character 3A, which has no standardised meaning, will cause transition to the csi ignore state.
         /// </summary>
-        CsiParam,
+        CSIParam,
 
         /// <summary>
         /// This state is entered when an intermediate character is recognised in a control sequence. It then recognises other intermediate characters until a final character appears. If any more parameter characters appear, this is an error condition which will cause a transition to the csi ignore state.
         /// Neither X3.64 nor Digital defined any control sequences with more than one intermediate character, although X3.64 doesn’t place any limit on the possible number.
         /// </summary>
-        CsiIntermediate,
+        CSIIntermediate,
 
         /// <summary>
         /// This state is used to consume remaining characters of a control sequence that is still being recognised, but has already been disregarded as malformed. This state will only exit when a final character is recognised, at which point it transitions to ground state without dispatching the control function. This state may be entered because:
@@ -58,7 +58,12 @@ namespace Kagura.Terminal.Controls
         /// a parameter character 30-3F occurs after an intermediate character has been recognised.
         /// C0 controls will still be executed while a control sequence is being ignored.
         /// </summary>
-        CsiIgnore,
+        CSIIgnore,
+
+        /// <summary>
+        /// 收集OSC参数
+        /// </summary>
+        OSC,
 
         /// <summary>
         /// This state is entered when the control function DCS is recognised, in 7-bit or 8-bit form. X3.64 doesn’t define any structure for device control strings, but Digital made them appear like control sequences followed by a data string, with a form and length dependent on the control function. This state is only used to recognise the first character of the control string, mirroring the csi entry state.
@@ -90,12 +95,6 @@ namespace Kagura.Terminal.Controls
         /// These conditions are only errors in the first part of the control string, until a final character has been recognised. The data string that follows is not checked by this parser.
         /// </summary>
         DcsIgnore,
-
-        /// <summary>
-        /// This state is entered when the control function OSC (Operating System Command) is recognised. On entry it prepares an external parser for OSC strings and passes all printable characters to a handler function. C0 controls other than CAN, SUB and ESC are ignored during reception of the control string.
-        /// The only control functions invoked by OSC strings are DECSIN (Set Icon Name) and DECSWT (Set Window Title), present on the multisession VT520 and VT525 terminals. Earlier terminals treat OSC in the same way as PM and APC, ignoring the entire control string.
-        /// </summary>
-        OscString,
 
         /// <summary>
         /// The VT500 doesn’t define any function for these control strings, so this state ignores all received characters until the control function ST is recognised.

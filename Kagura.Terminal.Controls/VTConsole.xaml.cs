@@ -13,8 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using VideoTerminal.Parser;
 
-namespace Kagura.Terminal.Controls
+namespace VideoTerminal
 {
     /// <summary>
     /// UserControl1.xaml 的交互逻辑

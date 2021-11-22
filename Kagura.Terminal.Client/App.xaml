@@ -1,7 +1,6 @@
-﻿<Application x:Class="KaguraTerminal.App"
+﻿<Application x:Class="VideoTerminal.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:KaguraTerminal"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <!--<Style TargetType="{x:Type Paragraph}">

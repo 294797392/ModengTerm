@@ -1,14 +1,14 @@
-﻿<Window x:Class="Kagura.Terminal.Client.MainWindow"
+﻿<Window x:Class="VideoTerminal.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:gterm="clr-namespace:Kagura.Terminal.Controls;assembly=Kagura.Terminal.Controls"
+        xmlns:vt="clr-namespace:VideoTerminal"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
 
     <Grid>
-        <gterm:VTConsole x:Name="VTConsole"/>
+        <vt:VTConsole x:Name="VTConsole"/>
     </Grid>
-    
+
 </Window>

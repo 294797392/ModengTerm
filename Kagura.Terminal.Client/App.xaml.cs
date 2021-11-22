@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace KaguraTerminal
+namespace VideoTerminal
 {
     /// <summary>
     /// App.xaml 的交互逻辑

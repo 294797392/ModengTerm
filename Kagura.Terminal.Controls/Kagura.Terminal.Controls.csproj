@@ -96,10 +96,6 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kagura.Terminal.Base\VideoTerminal.Base.csproj">
-      <Project>{5b0f8597-cc89-46e2-bf2d-b4772b7f454f}</Project>
-      <Name>VideoTerminal.Base</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Kagura.Terminal.Parser\VideoTerminal.Parser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>VideoTerminal.Parser</Name>

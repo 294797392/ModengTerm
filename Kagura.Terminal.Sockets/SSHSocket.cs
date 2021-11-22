@@ -4,7 +4,7 @@ using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
 
-namespace Kagura.Terminal.Sockets
+namespace VideoTerminal.Sockets
 {
     public class SSHSocket : SocketBase
     {
@@ -21,9 +21,8 @@ namespace Kagura.Terminal.Sockets
         #region 实例变量
 
         private SshClient sshClient;
-        private ShellStream shellStream;
+        private ShellStream stream;
         private SSHSocketAuthorition authorition;
-        private BufferQueue<byte> stremQueue;
 
         #endregion
 
@@ -41,7 +40,6 @@ namespace Kagura.Terminal.Sockets
         {
             this.NotifyStatusChanged(SocketState.Init);
 
-            this.stremQueue = new BufferQueue<byte>(4096);
             this.authorition = this.Authorition as SSHSocketAuthorition;
             var authentications = new List<AuthenticationMethod>();
             if (!string.IsNullOrEmpty(this.authorition.KeyFilePath))
@@ -52,19 +50,11 @@ namespace Kagura.Terminal.Sockets
             authentications.Add(new PasswordAuthenticationMethod(this.authorition.UserName, this.authorition.Password));
             ConnectionInfo connectionInfo = new ConnectionInfo(this.authorition.ServerAddress, this.authorition.ServerPort, this.authorition.UserName, authentications.ToArray());
 
-            try
-            {
-                this.sshClient = new SshClient(connectionInfo);
-                this.sshClient.Connect();
-                this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
-                this.shellStream = this.sshClient.CreateShellStream(this.authorition.TerminalName, this.authorition.TerminalColumns, this.authorition.TerminalRows, 0, 0, 1000);
-                this.shellStream.DataReceived += this.ShellStream_DataReceived;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("初始化SshConnection异常", ex);
-                return false;
-            }
+            this.sshClient = new SshClient(connectionInfo);
+            this.sshClient.Connect();
+            this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
+            this.stream = this.sshClient.CreateShellStream(this.authorition.TerminalName, 0, 0, 0, 0, 4096);
+            this.stream.DataReceived += this.Stream_DataReceived;
 
             this.NotifyStatusChanged(SocketState.Ready);
 
@@ -81,29 +71,42 @@ namespace Kagura.Terminal.Sockets
             return this.sshClient.RunCommand(command).Execute();
         }
 
-        public override byte[] Read(int size)
+        public override int Read(byte[] bytes)
         {
-            byte[] buff = new byte[size];
-            this.shellStream.Read(buff, 0, size);
-            return buff;
+            long left = bytes.Length;
+            int readed = 0;
+
+            while (left > 0)
+            {
+                int readLen = left > DefaultReadBufferSize ? DefaultReadBufferSize : (int)left;
+                int size = this.stream.Read(bytes, readed, readLen);
+                if (size == 0)
+                {
+                    return readed;
+                }
+                readed += size;
+                left -= readed;
+            }
+
+            return readed;
         }
 
         public override byte Read()
         {
-            return this.stremQueue.Dequeue();
+            throw new NotImplementedException();
         }
 
         public override bool Write(byte data)
         {
-            this.shellStream.WriteByte(data);
-            this.shellStream.Flush();
+            this.stream.WriteByte(data);
+            this.stream.Flush();
             return true;
         }
 
         public override bool Write(byte[] data)
         {
-            this.shellStream.Write(data, 0, data.Length);
-            this.shellStream.Flush();
+            this.stream.Write(data, 0, data.Length);
+            this.stream.Flush();
             return true;
         }
 
@@ -111,7 +114,7 @@ namespace Kagura.Terminal.Sockets
         {
             get
             {
-                return this.shellStream == null
+                return this.stream == null
                     || this.sshClient == null
                     || !this.sshClient.IsConnected
                     //|| !this.shellStream.CanRead
@@ -123,12 +126,9 @@ namespace Kagura.Terminal.Sockets
 
         #region 实例方法
 
-        private void ShellStream_DataReceived(object sender, ShellDataEventArgs e)
+        private void Stream_DataReceived(object sender, ShellDataEventArgs e)
         {
-            foreach (byte c in e.Data)
-            {
-                this.stremQueue.Enqueue(c);
-            }
+            base.NotifyDataReceived(e.Data);
         }
 
         #endregion

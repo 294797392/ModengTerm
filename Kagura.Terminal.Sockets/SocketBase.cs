@@ -1,20 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 
-namespace Kagura.Terminal.Sockets
+namespace VideoTerminal.Sockets
 {
     /// <summary>
     /// 管理与远程主机的连接
     /// </summary>
     public abstract class SocketBase
     {
+        /// <summary>
+        /// 默认的接收缓冲区大小
+        /// </summary>
+        public const int DefaultReadBufferSize = 256;
+
+        #region 公开事件
+
         public event Action<object, SocketState> StatusChanged;
 
-        public SocketProtocols Protocol { get; }
+        /// <summary>
+        /// 当收到数据流的时候触发
+        /// </summary>
+        public event Action<SocketBase, byte[]> DataReceived;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// EOF为True时，VideoTerminal会停止解析
+        /// 在与远程主机断开连接的时候，应该把这个值设为True，否则为False
+        /// </summary>
+        public abstract bool EOF { get; }
+
+        public SocketTypes Protocol { get; }
 
         public SocketAuthorition Authorition { get; set; }
+
+        #endregion
+
+        #region 公开接口
 
         public abstract bool Connect();
 
@@ -25,9 +52,9 @@ namespace Kagura.Terminal.Sockets
         /// <summary>
         /// 从Socket中读取一段数据
         /// </summary>
-        /// <param name="size">要读取的数据大小</param>
-        /// <returns></returns>
-        public abstract byte[] Read(int size);
+        /// <param name="bytes">保存读取的数据的缓冲区</param>
+        /// <returns>读取的数据长度</returns>
+        public abstract int Read(byte[] bytes);
 
         /// <summary>
         /// 从Socket中读取一个字节的数据
@@ -49,17 +76,15 @@ namespace Kagura.Terminal.Sockets
         /// <returns></returns>
         public abstract bool Write(byte[] data);
 
-        /// <summary>
-        /// EOF为True时，VideoTerminal会停止解析
-        /// 在与远程主机断开连接的时候，应该把这个值设为True，否则为False
-        /// </summary>
-        public abstract bool EOF { get; }
+        #endregion
 
-        public static SocketBase Create(SocketProtocols protocol)
+        #region 实例方法
+
+        public static SocketBase Create(SocketTypes protocol)
         {
             switch (protocol)
             {
-                case SocketProtocols.SSH:
+                case SocketTypes.SSH:
                     return new SSHSocket();
 
                 default:
@@ -74,5 +99,15 @@ namespace Kagura.Terminal.Sockets
                 this.StatusChanged(this, state);
             }
         }
+
+        protected void NotifyDataReceived(byte[] bytes)
+        {
+            if (this.DataReceived != null)
+            {
+                this.DataReceived(this, bytes);
+            }
+        }
+
+        #endregion
     }
 }

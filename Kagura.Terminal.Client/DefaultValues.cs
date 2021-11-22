@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Kagura.Terminal.Client
+namespace VideoTerminal
 {
     public static class DefaultValues
     {

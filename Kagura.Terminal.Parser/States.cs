@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Kagura.Terminal.Controls
+namespace VideoTerminal.Parser
 {
     /// <summary>
     /// Ascii码转移字符定义
