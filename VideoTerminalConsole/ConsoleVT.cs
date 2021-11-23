@@ -8,8 +8,13 @@ namespace VideoTerminalConsole
 {
     public class ConsoleVT : IVideoTerminal
     {
+        private ConsoleColor defaultForeground;
+        private ConsoleColor defaultBackground;
+
         public ConsoleVT()
         {
+            this.defaultForeground = Console.ForegroundColor;
+            this.defaultBackground = Console.BackgroundColor;
         }
 
         public void CarriageReturn()
@@ -49,7 +54,6 @@ namespace VideoTerminalConsole
 
         public void SetBold(bool bold)
         {
-            throw new NotImplementedException();
         }
 
         public void SetCrossedOut(bool crossedOut)
@@ -59,17 +63,16 @@ namespace VideoTerminalConsole
 
         public void SetDefaultAttributes()
         {
-            throw new NotImplementedException();
         }
 
         public void SetDefaultBackground()
         {
-            Console.ResetColor();
+            Console.BackgroundColor = this.defaultBackground;
         }
 
         public void SetDefaultForeground()
         {
-            throw new NotImplementedException();
+            Console.ForegroundColor = this.defaultForeground;
         }
 
         public void SetDoublyUnderlined(bool underline)
@@ -84,12 +87,36 @@ namespace VideoTerminalConsole
 
         public void SetIndexedBackground(TextColor color)
         {
-            throw new NotImplementedException();
+            switch (color)
+            {
+                case TextColor.DARK_BLACK: Console.BackgroundColor = ConsoleColor.Black; break;
+                case TextColor.DARK_BLUE: Console.BackgroundColor = ConsoleColor.DarkBlue; break;
+                case TextColor.DARK_CYAN: Console.BackgroundColor = ConsoleColor.DarkCyan; break;
+                case TextColor.DARK_GREEN: Console.BackgroundColor = ConsoleColor.DarkGreen; break;
+                case TextColor.DARK_MAGENTA: Console.BackgroundColor = ConsoleColor.DarkMagenta; break;
+                case TextColor.DARK_RED: Console.BackgroundColor = ConsoleColor.DarkRed; break;
+                case TextColor.DARK_WHITE: Console.BackgroundColor = ConsoleColor.White; break;
+                case TextColor.DARK_YELLOW: Console.BackgroundColor = ConsoleColor.DarkYellow; break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public void SetIndexedForeground(TextColor color)
         {
-            throw new NotImplementedException();
+            switch (color)
+            {
+                case TextColor.DARK_BLACK: Console.ForegroundColor = ConsoleColor.Black; break;
+                case TextColor.DARK_BLUE: Console.ForegroundColor = ConsoleColor.DarkBlue; break;
+                case TextColor.DARK_CYAN: Console.ForegroundColor = ConsoleColor.DarkCyan; break;
+                case TextColor.DARK_GREEN: Console.ForegroundColor = ConsoleColor.DarkGreen; break;
+                case TextColor.DARK_MAGENTA: Console.ForegroundColor = ConsoleColor.DarkMagenta; break;
+                case TextColor.DARK_RED: Console.ForegroundColor = ConsoleColor.DarkRed; break;
+                case TextColor.DARK_WHITE: Console.ForegroundColor = ConsoleColor.White; break;
+                case TextColor.DARK_YELLOW: Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public void SetInvisible(bool invisible)

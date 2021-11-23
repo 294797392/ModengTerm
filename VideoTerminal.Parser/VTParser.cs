@@ -87,7 +87,7 @@ namespace VideoTerminal.Parser
         private StringBuilder oscString;
 
         private List<byte> intermediate;
-        private List<byte> csiParameter;
+        private List<int> csiParameters;
 
         private List<byte> unicodeText;
 
@@ -120,7 +120,7 @@ namespace VideoTerminal.Parser
             this.oscParam = 0;
 
             this.intermediate = new List<byte>();
-            this.csiParameter = new List<byte>();
+            this.csiParameters = new List<int>();
 
             this.supportAnsi = true;
 
@@ -162,7 +162,7 @@ namespace VideoTerminal.Parser
             this.oscString.Clear();
 
             this.intermediate.Clear();
-            this.csiParameter.Clear();
+            this.csiParameters.Clear();
 
             this.unicodeText.Clear();
         }
@@ -288,7 +288,7 @@ namespace VideoTerminal.Parser
         /// <param name="ch">Final Byte</param>
         private void ActionCSIDispatch(byte ch)
         {
-            this.Dispatch.ActionCSIDispatch(ch, this.csiParameter);
+            this.Dispatch.ActionCSIDispatch(ch, this.csiParameters);
         }
 
         /// <summary>
@@ -299,7 +299,20 @@ namespace VideoTerminal.Parser
         /// <param name="ch"></param>
         private void ActionParam(byte ch)
         {
-            this.csiParameter.Add(ch);
+            if (this.csiParameters.Count == 0)
+            {
+                this.csiParameters.Add(0);
+            }
+
+            if (ASCIIChars.IsParameterDelimiter(ch))
+            {
+                this.csiParameters.Add(0);
+            }
+            else
+            {
+                int last = this.csiParameters.Last();
+                this.csiParameters[this.csiParameters.Count - 1] = this.AccumulateTo(ch, last);
+            }
         }
 
         /// <summary>

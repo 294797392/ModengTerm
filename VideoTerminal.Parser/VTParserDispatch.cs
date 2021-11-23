@@ -86,7 +86,7 @@ namespace VideoTerminal.Parser
             }
         }
 
-        public void ActionCSIDispatch(int id, List<byte> parameters)
+        public void ActionCSIDispatch(int id, List<int> parameters)
         {
             CSIActionCodes code = (CSIActionCodes)id;
 
@@ -102,7 +102,7 @@ namespace VideoTerminal.Parser
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex);       
+                            Console.WriteLine(ex);
                         }
                         break;
                     }
@@ -114,10 +114,14 @@ namespace VideoTerminal.Parser
 
         #region 实例方法
 
-        private void DispatchSetGraphicsRendition(List<byte> bytes)
+        private void DispatchSetGraphicsRendition(List<int> bytes)
         {
-            foreach (byte option in bytes)
+            int size = bytes.Count;
+
+            for (int i = 0; i < size; i++)
             {
+                byte option = (byte)bytes[i];
+
                 switch ((GraphicsOptions)option)
                 {
                     case GraphicsOptions.Off:
@@ -394,6 +398,10 @@ namespace VideoTerminal.Parser
                         break;
 
                     case GraphicsOptions.ForegroundExtended:
+                        {
+                            break;
+                        }
+
                     case GraphicsOptions.BackgroundExtended:
                         {
                             break;
