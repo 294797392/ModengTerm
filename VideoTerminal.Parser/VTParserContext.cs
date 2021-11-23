@@ -11,12 +11,6 @@ namespace VideoTerminal.Parser
     public class VTParserContext
     {
         /// <summary>
-        /// 状态机当前所处于的状态
-        /// 由该状态指定状态机下一次要使用的转换状态图
-        /// </summary>
-        public VTStates State { get; set; }
-
-        /// <summary>
         /// 记录上一个解析的字符
         /// </summary>
         public byte PreviousChar { get; set; }

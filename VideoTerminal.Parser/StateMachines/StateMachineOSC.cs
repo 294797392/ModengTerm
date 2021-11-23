@@ -54,26 +54,24 @@ namespace VideoTerminal.Parser.StateMachines
 
         #endregion
 
-        public override int Run()
+        public override VTStates Run()
         {
             byte ch = this.Context.CurrentChar;
 
-            this.Context.State = VTStates.OSC;
-
             if (this.oscParamState)
             {
-                this.ProcessParamState(ch);
+                return this.ProcessParamState(ch);
             }
             else if (this.oscStringState)
             {
-                this.ProcessStringState(ch);
+                return this.ProcessStringState(ch);
             }
             else if (this.oscTerminationState)
             {
-                this.ProcessTerminationState(ch);
+                return this.ProcessTerminationState(ch);
             }
 
-            return ParserCode.SUCCESS;
+            return VTStates.OSC;
         }
 
         /// <summary>
@@ -81,7 +79,7 @@ namespace VideoTerminal.Parser.StateMachines
         /// 该状态是进入OSC之后的第一个状态
         /// </summary>
         /// <param name="ch"></param>
-        private void ProcessParamState(byte ch)
+        private VTStates ProcessParamState(byte ch)
         {
             // 还没出现分隔符，那么收集的参数类型是数字
             if (this.IsNumericValue(ch))
@@ -100,9 +98,12 @@ namespace VideoTerminal.Parser.StateMachines
                 // 还没出现分隔符OSC状态就结束了，什么时候会出现这个状态?
                 // 这里照搬terminal的做法，直接进入Ground状态并重置上下文信息
                 //this.NotifyAction(ParserActions.OSCCompleted);  // 是否需要通知事件？terminal没有分发该事件
-                this.Reset(VTStates.Ground);
+                this.Reset();
                 logger.WarnFormat("还没出现分隔符，OSC状态就结束了");
+                return VTStates.Ground;
             }
+
+            return VTStates.OSC;
         }
 
         /// <summary>
@@ -110,14 +111,15 @@ namespace VideoTerminal.Parser.StateMachines
         /// 该状态是OSC的第二个状态
         /// </summary>
         /// <param name="ch"></param>
-        private void ProcessStringState(byte ch)
+        private VTStates ProcessStringState(byte ch)
         {
             // 已经遇到了分隔符，那么收集的参数类型是字符串
             if (this.IsTerminator(ch))
             {
                 // 此处OSC是以BEL字符作为结束符
-                this.NotifyAction(ParserActions.OSCCompleted);
-                this.Reset(VTStates.Ground);
+                this.NotifyEvent(ParserEvents.OSCCompleted);
+                this.Reset();
+                return VTStates.Ground;
             }
             else if (ch == ASCIIChars.ESC)
             {
@@ -137,6 +139,8 @@ namespace VideoTerminal.Parser.StateMachines
                 // 收集OSC字符串参数
                 this.Context.OSCString.Append((char)ch);
             }
+
+            return VTStates.OSC;
         }
 
         /// <summary>
@@ -144,7 +148,7 @@ namespace VideoTerminal.Parser.StateMachines
         /// 该状态是OSC最后一个状态
         /// </summary>
         /// <param name="ch"></param>
-        private void ProcessTerminationState(byte ch)
+        private VTStates ProcessTerminationState(byte ch)
         {
             // 这里照搬terminal的代码
             // stateMachine.cpp _EventOscTermination函数
@@ -152,16 +156,19 @@ namespace VideoTerminal.Parser.StateMachines
             if (this.IsStringTerminator(ch))
             {
                 // ESC后面紧跟着ST，说明要执行OSC操作，然后进入Ground状态
-                this.NotifyAction(ParserActions.OSCAction);
-                this.Reset(VTStates.Ground);
+                this.NotifyEvent(ParserEvents.OSCCompleted);
+                this.Reset();
+                return VTStates.Ground;
             }
             else
             {
                 // ESC后面没有ST，当做普通的ESC状态做处理
-                this.Reset(VTStates.Escape);
+                this.Reset();
 
                 // 此时已经是ESC状态了，需要执行一次ESC状态机的逻辑
                 throw new NotImplementedException();
+
+                return VTStates.Escape;
             }
         }
 
@@ -226,9 +233,9 @@ namespace VideoTerminal.Parser.StateMachines
         /// <summary>
         /// 重置该状态机的状态
         /// </summary>
-        private void Reset(VTStates contextState)
+        /// <param name="vtState">状态机的下一个状态</param>
+        private void Reset()
         {
-            this.Context.State = contextState;
             this.Context.Reset();
 
             this.oscParamState = true;

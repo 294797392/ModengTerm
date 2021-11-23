@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\Dependencies\DotNEToolkit.dll</HintPath>
+    </Reference>
     <Reference Include="log4net">
       <HintPath>..\Dependencies\log4net.dll</HintPath>
     </Reference>
@@ -56,33 +59,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASCIIChars.cs" />
+    <Compile Include="CSIActionCodes.cs" />
     <Compile Include="DefaultValues.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IVideoTerminal.cs" />
+    <Compile Include="IVTParserDispatch.cs" />
     <Compile Include="ParserActions.cs" />
     <Compile Include="ParserCode.cs" />
-    <Compile Include="StateMachine.cs" />
-    <Compile Include="StateMachineFactory.cs" />
-    <Compile Include="StateMachines\StateMachineCSIEntry.cs" />
-    <Compile Include="StateMachines\StateMachineCSIIgnore.cs" />
-    <Compile Include="StateMachines\StateMachineCSIIntermediate.cs" />
-    <Compile Include="StateMachines\StateMachineCSIParam.cs" />
-    <Compile Include="StateMachines\StateMachineEscape.cs" />
-    <Compile Include="StateMachines\StateMachineEscapeIntermediate.cs" />
-    <Compile Include="StateMachines\StateMachineGround.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SGRDefines.cs" />
-    <Compile Include="StateMachines\StateMachineIgnore.cs" />
-    <Compile Include="StateMachines\StateMachineOSC.cs" />
-    <Compile Include="StateMachines\StateMachinePrint.cs" />
+    <Compile Include="SGRDefinitions.cs" />
     <Compile Include="VTParserContext.cs" />
     <Compile Include="VTParser.cs" />
-    <Compile Include="StateMachineID.cs" />
-    <Compile Include="StateTable.cs" />
     <Compile Include="VTStates.cs" />
     <Compile Include="WindowsAPI.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kagura.Terminal.Sockets\VideoTerminal.Sockets.csproj">
+    <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Sockets.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
       <Name>VideoTerminal.Sockets</Name>
     </ProjectReference>

@@ -15,7 +15,7 @@ namespace VideoTerminal.Parser
         /// <summary>
         /// 状态机的事件
         /// </summary>
-        public event Action<StateMachine, ParserActions> Action;
+        internal event Action<StateMachine, ParserEvents> Event;
 
         /// <summary>
         /// 当前状态机的上下文信息
@@ -25,14 +25,14 @@ namespace VideoTerminal.Parser
         /// <summary>
         /// 运行该状态机
         /// </summary>
-        /// <returns></returns>
-        public abstract int Run();
+        /// <returns>下次要转换到的状态</returns>
+        public abstract VTStates Run();
 
-        protected void NotifyAction(ParserActions action)
+        internal void NotifyEvent(ParserEvents evt)
         {
-            if (this.Action != null)
+            if (this.Event != null)
             {
-                this.Action(this, action);
+                this.Event(this, evt);
             }
         }
     }

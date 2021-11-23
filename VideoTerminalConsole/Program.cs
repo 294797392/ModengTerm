@@ -36,9 +36,9 @@ namespace VideoTerminalConsole
 
             while (true)
             {
-                string line = Console.ReadLine();
-                socket.Write(Encoding.ASCII.GetBytes(line));
-                socket.Write((byte)'\n');
+                ConsoleKeyInfo key = Console.ReadKey(true);
+                byte ch = (byte)key.KeyChar;
+                socket.Write(ch);
             }
         }
 
@@ -50,8 +50,10 @@ namespace VideoTerminalConsole
             {
                 case SocketState.Ready:
                     {
-                        VTParser main = new VTParser();
-                        main.Run(sender as SSHSocket);
+                        VTParser parser = new VTParser();
+                        parser.Socket = sender as SocketBase;
+                        parser.VideoTermianl = new ConsoleVT();
+                        parser.Run();
                         break;
                     }
             }

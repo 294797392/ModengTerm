@@ -63,29 +63,33 @@ namespace VideoTerminal.Parser
         /// <summary>
         /// 收集OSC参数
         /// </summary>
-        OSC,
+        OSCParam,
+
+        OSCString,
+
+        OSCTermination,
 
         /// <summary>
         /// This state is entered when the control function DCS is recognised, in 7-bit or 8-bit form. X3.64 doesn’t define any structure for device control strings, but Digital made them appear like control sequences followed by a data string, with a form and length dependent on the control function. This state is only used to recognise the first character of the control string, mirroring the csi entry state.
         /// C0 controls other than CAN, SUB and ESC are not executed while recognising the first part of a device control string.
         /// </summary>
-        DcsEntry,
+        DCSEntry,
 
         /// <summary>
         /// This state is entered when a parameter character is recognised in a device control string. It then recognises other parameter characters until an intermediate or final character appears. Occurrences of the private-marker characters 3C-3F or the undefined character 3A will cause a transition to the dcs ignore state.
         /// </summary>
-        DcsParam,
+        DCSParam,
 
         /// <summary>
         /// This state is entered when an intermediate character is recognised in a device control string. It then recognises other intermediate characters until a final character appears. If any more parameter characters appear, this is an error condition which will cause a transition to the dcs ignore state.
         /// </summary>
-        DcsIntermediate,
+        DCSIntermediate,
 
         /// <summary>
         /// This state is a shortcut for writing state machines for all possible device control strings into the main parser. When a final character has been recognised in a device control string, this state will establish a channel to a handler for the appropriate control function, and then pass all subsequent characters through to this alternate handler, until the data string is terminated (usually by recognising the ST control function).
         /// This state has an exit action so that the control function handler can be informed when the data string has come to an end. This is so that the last soft character in a DECDLD string can be completed when there is no other means of knowing that its definition has ended, for example.
         /// </summary>
-        DcsPassthrough,
+        DCSPassthrough,
 
         /// <summary>
         /// This state is used to consume remaining characters of a device control string that is still being recognised, but has already been disregarded as malformed. This state will only exit when the control function ST is recognised, at which point it transitions to ground state. This state may be entered because:
@@ -94,7 +98,7 @@ namespace VideoTerminal.Parser
         /// a parameter character 30-3F occurs after an intermediate character has been recognised.
         /// These conditions are only errors in the first part of the control string, until a final character has been recognised. The data string that follows is not checked by this parser.
         /// </summary>
-        DcsIgnore,
+        DCSIgnore,
 
         /// <summary>
         /// The VT500 doesn’t define any function for these control strings, so this state ignores all received characters until the control function ST is recognised.

@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\Dependencies\DotNEToolkit.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Dependencies\log4net.dll</HintPath>
@@ -48,15 +51,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleVT.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kagura.Terminal.Parser\VideoTerminal.Parser.csproj">
+    <ProjectReference Include="..\VideoTerminal.Parser\VideoTerminal.Parser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>VideoTerminal.Parser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Kagura.Terminal.Sockets\VideoTerminal.Sockets.csproj">
+    <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Sockets.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
       <Name>VideoTerminal.Sockets</Name>
     </ProjectReference>

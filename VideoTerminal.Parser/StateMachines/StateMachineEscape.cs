@@ -15,11 +15,21 @@ namespace VideoTerminal.Parser.StateMachines
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("StateMachineEscape");
 
-        public override int Run()
+        public override VTStates Run()
         {
-            this.Context.State = VTStates.Escape;
+            byte ch = this.Context.CurrentChar;
 
-            return ParserCode.SUCCESS;
+            if (ASCIIChars.IsC0Code(ch))
+            {
+            }
+            else if (ASCIIChars.IsDelete(ch))
+            {
+                // 忽略Delete字符
+            }
+
+
+
+            return VTStates.Escape;
         }
     }
 }

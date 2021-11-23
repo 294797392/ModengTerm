@@ -7,7 +7,10 @@ namespace VideoTerminal.Parser
 {
     public enum StateMachineID
     {
-        CASE_GROUND_STATE = 0,
+        /// <summary>
+        /// 基态
+        /// </summary>
+        SMID_GROUND = 0,
         CASE_IGNORE = 1,
 
         /// <summary>
@@ -30,7 +33,7 @@ namespace VideoTerminal.Parser
         /// 回车，把光标移动到第一列
         /// </summary>
         CASE_CR = 4,
-        CASE_ESC = 5,
+        SMID_ESC = 5,
         CASE_VMOT = 6,
         CASE_TAB = 7,
         CASE_SI = 8,
