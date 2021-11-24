@@ -175,7 +175,6 @@ namespace VideoTerminalConsole
 
         public void SetDoublyUnderlined(bool underline)
         {
-            logger.WarnFormat("未实现SetDoublyUnderlined");
         }
 
         public void SetFaint(bool faint)

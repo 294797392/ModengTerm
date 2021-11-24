@@ -171,4 +171,43 @@ namespace VideoTerminal.Parser
         XTERM_BracketedPasteMode = 2004,
         W32IM_Win32InputMode = 9001
     }
+
+    /// <summary>
+    /// 定义8位转义字符命令
+    /// </summary>
+    internal enum EscActionCodes
+    {
+        DECSC_CursorSave = '7',
+        DECRC_CursorRestore = '8',
+
+        /// <summary>
+        /// ApplicationMode可以把数字键盘当成上下左右键使用
+        /// </summary>
+        DECKPAM_KeypadApplicationMode = '=',
+
+        /// <summary>
+        /// NumericMode模式下，数字键盘的功能就是输入数字
+        /// </summary>
+        DECKPNM_KeypadNumericMode = '>',
+        IND_Index = 'D',
+        NEL_NextLine = 'E',
+        HTS_HorizontalTabSet = 'H',
+        RI_ReverseLineFeed = 'M',
+        SS2_SingleShift = 'N',
+        SS3_SingleShift = 'O',
+        DECID_IdentifyDevice = 'Z',
+        ST_StringTerminator = '\\',
+        RIS_ResetToInitialState = 'c',
+        LS2_LockingShift = 'n',
+        LS3_LockingShift = 'o',
+        LS1R_LockingShift = '~',
+        LS2R_LockingShift = '}',
+        LS3R_LockingShift = '|',
+        //DECAC1_AcceptC1Controls = ' 7',
+        //DECDHL_DoubleHeightLineTop = '#3',
+        //DECDHL_DoubleHeightLineBottom = '#4',
+        //DECSWL_SingleWidthLine = '#5',
+        //DECDWL_DoubleWidthLine = '#6',
+        //DECALN_ScreenAlignmentPattern = '#8'
+    }
 }

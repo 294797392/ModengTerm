@@ -313,6 +313,7 @@ namespace VideoTerminal.Parser
         /// <param name="ch">Final Byte</param>
         private void ActionCSIDispatch(byte ch)
         {
+            //logger.InfoFormat("执行CSI事件, {0}, {1}", ch, this.parameters.Count);
             this.Dispatch.ActionCSIDispatch(ch, this.parameters);
         }
 
@@ -347,7 +348,7 @@ namespace VideoTerminal.Parser
         /// <param name="ch">Final Byte</param>
         private void ActionEscDispatch(byte ch)
         {
-            Console.WriteLine("分发ESC事件");
+            this.Dispatch.ActionEscDispatch(ch);
         }
 
         /// <summary>
@@ -447,6 +448,11 @@ namespace VideoTerminal.Parser
                 {
                     // 0x50，进入到了dcs状态
                     this.EnterDCSEntry();
+                }
+                else
+                {
+                    this.ActionEscDispatch(ch);
+                    this.EnterGround();
                 }
             }
             else

@@ -95,7 +95,8 @@ namespace VideoTerminal.Parser
                 case ASCIIChars.SO:
                     {
                         // 这两个不知道是什么意思
-                        throw new NotImplementedException();
+                        logger.WarnFormat("未处理的SI和SI");
+                        break;
                     }
 
                 default:
@@ -148,7 +149,6 @@ namespace VideoTerminal.Parser
                         break;
                     }
 
-
                 case CSIActionCodes.DTTERM_WindowManipulation:
                     {
                         WindowManipulationType wmt = (WindowManipulationType)parameters[0];
@@ -160,7 +160,6 @@ namespace VideoTerminal.Parser
                     {
                         int topMargin = parameters[0];
                         int bottomMargin = parameters[1];
-
                         break;
                     }
 
@@ -179,6 +178,24 @@ namespace VideoTerminal.Parser
         public DCSStringHandlerDlg ActionDCSDispatch(int id, List<int> parameters)
         {
             throw new NotImplementedException();
+        }
+
+        public void ActionEscDispatch(byte ch)
+        {
+            EscActionCodes code = (EscActionCodes)ch;
+
+            switch (code)
+            {
+                case EscActionCodes.DECKPAM_KeypadApplicationMode:
+                    {
+                        // TODO：实现
+                        break;
+                    }
+
+                default:
+                    logger.WarnFormat("未实现EscAction, {0}", code);
+                    break;
+            }
         }
 
         #endregion
@@ -644,6 +661,7 @@ namespace VideoTerminal.Parser
         /// <param name="parameters"></param>
         private void PerformEraseLine(List<int> parameters)
         {
+            //logger.InfoFormat("PerformEraseLine, num paramters = {0}", parameters.Count);
             foreach (int eraseType in parameters)
             {
 
