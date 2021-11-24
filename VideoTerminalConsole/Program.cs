@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNEToolkit.Extentions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,11 +35,13 @@ namespace VideoTerminalConsole
             socket.StatusChanged += Socket_StatusChanged;
             socket.Connect();
 
+            char[] chars = new char[1];
             while (true)
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);
-                byte ch = (byte)key.KeyChar;
-                socket.Write(ch);
+                chars[0] = key.KeyChar;
+                byte[] bytes = Encoding.UTF8.GetBytes(chars);
+                socket.Write(bytes);
             }
         }
 

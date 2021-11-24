@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using VideoTerminal.Sockets;
+using VTInterface;
 
 namespace VideoTerminal.Parser
 {
@@ -87,11 +88,13 @@ namespace VideoTerminal.Parser
         private StringBuilder oscString;
 
         private List<byte> intermediate;
-        private List<int> csiParameters;
+        private List<int> parameters;
 
         private List<byte> unicodeText;
 
         private bool supportAnsi;
+
+        private DCSStringHandlerDlg dcsStringHandler;
 
         #endregion
 
@@ -120,7 +123,7 @@ namespace VideoTerminal.Parser
             this.oscParam = 0;
 
             this.intermediate = new List<byte>();
-            this.csiParameters = new List<int>();
+            this.parameters = new List<int>();
 
             this.supportAnsi = true;
 
@@ -162,9 +165,11 @@ namespace VideoTerminal.Parser
             this.oscString.Clear();
 
             this.intermediate.Clear();
-            this.csiParameters.Clear();
+            this.parameters.Clear();
 
             this.unicodeText.Clear();
+
+            this.dcsStringHandler = null;
         }
 
         /// <summary>
@@ -230,6 +235,26 @@ namespace VideoTerminal.Parser
             this.ActionClear();
         }
 
+        private void EnterDCSIgnore()
+        {
+            this.state = VTStates.DCSIgnore;
+        }
+
+        private void EnterDCSParam()
+        {
+            this.state = VTStates.DCSParam;
+        }
+
+        private void EnterDCSIntermediate()
+        {
+            this.state = VTStates.DCSIntermediate;
+        }
+
+        private void EnterDCSPassThrough()
+        {
+            this.state = VTStates.DCSPassthrough;
+        }
+
         #region Action - An event may cause one of these actions to occur with or without a change of state
 
         /// <summary>
@@ -288,7 +313,7 @@ namespace VideoTerminal.Parser
         /// <param name="ch">Final Byte</param>
         private void ActionCSIDispatch(byte ch)
         {
-            this.Dispatch.ActionCSIDispatch(ch, this.csiParameters);
+            this.Dispatch.ActionCSIDispatch(ch, this.parameters);
         }
 
         /// <summary>
@@ -299,19 +324,19 @@ namespace VideoTerminal.Parser
         /// <param name="ch"></param>
         private void ActionParam(byte ch)
         {
-            if (this.csiParameters.Count == 0)
+            if (this.parameters.Count == 0)
             {
-                this.csiParameters.Add(0);
+                this.parameters.Add(0);
             }
 
             if (ASCIIChars.IsParameterDelimiter(ch))
             {
-                this.csiParameters.Add(0);
+                this.parameters.Add(0);
             }
             else
             {
-                int last = this.csiParameters.Last();
-                this.csiParameters[this.csiParameters.Count - 1] = this.AccumulateTo(ch, last);
+                int last = this.parameters.Last();
+                this.parameters[this.parameters.Count - 1] = this.AccumulateTo(ch, last);
             }
         }
 
@@ -323,6 +348,28 @@ namespace VideoTerminal.Parser
         private void ActionEscDispatch(byte ch)
         {
             Console.WriteLine("分发ESC事件");
+        }
+
+        /// <summary>
+        /// When a final character has been recognised in a device control string, this state will establish a channel to a handler for the appropriate control function, and then pass all subsequent characters through to this alternate handler, until the data string is terminated
+        /// 当在设备控制字符串中识别出最后一个字符时，此状态将建立通向适当控制功能的处理程序的通道，然后将所有后续字符传递给此备用处理程序，直到数据字符串终止
+        /// </summary>
+        /// <param name="ch">final byte</param>
+        private void ActionDCSDispatch(byte ch)
+        {
+            // 根据最后一个字符判断要使用的DCS的事件处理器
+            this.dcsStringHandler = this.Dispatch.ActionDCSDispatch(ch, this.parameters);
+
+            if (this.dcsStringHandler != null)
+            {
+                // 获取到了该DCS事件处理器，那么要进入收集DCS后续字符的状态
+                this.EnterDCSPassThrough();
+            }
+            else
+            {
+                // 没获取到该DCS事件处理器（通常情况是没实现该处理器，不支持处理该事件），那么直接进入忽略DCS事件状态
+                this.EnterDCSIgnore();
+            }
         }
 
         #endregion
@@ -347,7 +394,7 @@ namespace VideoTerminal.Parser
             }
             else
             {
-                // 不是可见字符，是多字节字符，目前当做UTF8处理
+                // 不是可见字符，当多字节字符处理，用UTF8编码
                 // UTF8参考：https://www.cnblogs.com/fnlingnzb-learner/p/6163205.html
                 if (this.unicodeText.Count == 0)
                 {
@@ -398,6 +445,7 @@ namespace VideoTerminal.Parser
                 }
                 else if (ASCIIChars.IsDCSIndicator(ch))
                 {
+                    // 0x50，进入到了dcs状态
                     this.EnterDCSEntry();
                 }
             }
@@ -689,6 +737,158 @@ namespace VideoTerminal.Parser
             }
         }
 
+        /// <summary>
+        /// - Processes a character event into an Action that occurs while in the DcsEntry state.
+        ///   Events in this state will:
+        ///   1. Ignore C0 control characters
+        ///   2. Ignore Delete characters
+        ///   3. Begin to ignore all remaining characters when an invalid character is detected (DcsIgnore)
+        ///   4. Store parameter data
+        ///   5. Collect Intermediate characters
+        ///   6. Dispatch the Final character in preparation for parsing the data string
+        ///  DCS sequences are structurally almost the same as CSI sequences, just with an
+        ///      extra data string. It's safe to reuse CSI functions for
+        ///      determining if a character is a parameter, delimiter, or invalid.
+        /// </summary>
+        /// <param name="ch"></param>
+        private void EventDCSEntry(byte ch)
+        {
+            if (ASCIIChars.IsC0Code(ch))
+            {
+                this.ActionIgnore(ch);
+            }
+            else if (ASCIIChars.IsDelete(ch))
+            {
+                this.ActionIgnore(ch);
+            }
+            else if (ASCIIChars.IsCSIInvalid(ch))
+            {
+                this.EnterDCSIgnore();
+            }
+            else if (ASCIIChars.IsNumericParamValue(ch) || ASCIIChars.IsParameterDelimiter(ch))
+            {
+                this.ActionParam(ch);
+                this.EnterDCSParam();
+            }
+            else if (ASCIIChars.IsIntermediate(ch))
+            {
+                this.ActionCollect(ch);
+                this.EnterDCSIntermediate();
+            }
+            else
+            {
+                this.ActionDCSDispatch(ch);
+            }
+        }
+
+        /// <summary>
+        /// - Processes a character event into an Action that occurs while in the DcsIgnore state.
+        ///   In this state the entire DCS string is considered invalid and we will ignore everything.
+        ///   The termination state is handled outside when an ESC is seen.
+        /// </summary>
+        /// <param name="ch"></param>
+        private void EventDCSIgnore(byte ch)
+        {
+            this.ActionIgnore(ch);
+        }
+
+        /// <summary>
+        /// - Processes a character event into an Action that occurs while in the DcsIntermediate state.
+        ///   Events in this state will:
+        ///   1. Ignore C0 control characters
+        ///   2. Ignore Delete characters
+        ///   3. Collect intermediate data.
+        ///   4. Begin to ignore all remaining intermediates when an invalid character is detected (DcsIgnore)
+        ///   5. Dispatch the Final character in preparation for parsing the data string
+        /// </summary>
+        /// <param name="ch"></param>
+        private void EventDCSIntermediate(byte ch)
+        {
+            if (ASCIIChars.IsC0Code(ch))
+            {
+                this.ActionIgnore(ch);
+            }
+            else if (ASCIIChars.IsDelete(ch))
+            {
+                this.ActionIgnore(ch);
+            }
+            else if (ASCIIChars.IsIntermediate(ch))
+            {
+                this.ActionCollect(ch);
+            }
+            else if (ASCIIChars.IsIntermediateInvalid(ch))
+            {
+                this.EnterDCSIgnore();
+            }
+            else
+            {
+                this.ActionDCSDispatch(ch);
+            }
+        }
+
+        /// <summary>
+        /// - Processes a character event into an Action that occurs while in the DcsParam state.
+        ///   Events in this state will:
+        ///   1. Ignore C0 control characters
+        ///   2. Ignore Delete characters
+        ///   3. Collect DCS parameter data
+        ///   4. Enter DcsIntermediate if we see an intermediate
+        ///   5. Begin to ignore all remaining parameters when an invalid character is detected (DcsIgnore)
+        ///   6. Dispatch the Final character in preparation for parsing the data string
+        /// </summary>
+        /// <param name="ch"></param>
+        private void EventDCSParam(byte ch)
+        {
+            if (ASCIIChars.IsC0Code(ch))
+            {
+                this.ActionIgnore(ch);
+            }
+            else if (ASCIIChars.IsDelete(ch))
+            {
+                this.ActionIgnore(ch);
+            }
+            else if (ASCIIChars.IsNumericParamValue(ch) || ASCIIChars.IsParameterDelimiter(ch))
+            {
+                this.ActionParam(ch);
+            }
+            else if (ASCIIChars.IsIntermediate(ch))
+            {
+                this.ActionCollect(ch);
+                this.EnterDCSIntermediate();
+            }
+            else if (ASCIIChars.IsParameterInvalid(ch))
+            {
+                this.EnterDCSIgnore();
+            }
+            else
+            {
+                this.ActionDCSDispatch(ch);
+            }
+        }
+
+        /// <summary>
+        /// - Processes a character event into an Action that occurs while in the DcsPassThrough state.
+        ///   Events in this state will:
+        ///   1. Pass through if character is valid.
+        ///   2. Ignore everything else.
+        ///   The termination state is handled outside when an ESC is seen.
+        /// </summary>
+        /// <param name="ch"></param>
+        private void EventDCSPassThrough(byte ch)
+        {
+            if (ASCIIChars.IsC0Code(ch) || ASCIIChars.IsDCSPassThroughValid(ch))
+            {
+                if (!this.dcsStringHandler(ch))
+                {
+                    this.EnterDCSIgnore();
+                }
+            }
+            else
+            {
+                this.ActionIgnore(ch);
+            }
+        }
+
         #endregion
 
         #endregion
@@ -769,6 +969,36 @@ namespace VideoTerminal.Parser
                         case VTStates.CSIParam:
                             {
                                 this.EventCSIParam(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSEntry:
+                            {
+                                this.EventDCSEntry(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSIgnore:
+                            {
+                                this.EventDCSIgnore(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSIntermediate:
+                            {
+                                this.EventDCSIntermediate(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSParam:
+                            {
+                                this.EventDCSParam(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSPassthrough:
+                            {
+                                this.EventDCSPassThrough(ch);
                                 break;
                             }
                     }

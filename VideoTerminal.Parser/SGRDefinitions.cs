@@ -14,7 +14,15 @@ namespace VideoTerminal.Parser
         RGBColorOrFaint = 2, // 2 is also Faint, decreased intensity (ISO 6429).
         Italics = 3,
         Underline = 4,
+
+        /// <summary>
+        /// slowly blinking（less then 150 per minute）
+        /// </summary>
         BlinkOrXterm256Index = 5, // 5 is also Blink (appears as Bold).
+
+        /// <summary>
+        /// rapidly blinking（150 per minute or more）
+        /// </summary>
         RapidBlink = 6,
         Negative = 7,
         Invisible = 8,
@@ -65,25 +73,5 @@ namespace VideoTerminal.Parser
         BrightBackgroundMagenta = 105,
         BrightBackgroundCyan = 106,
         BrightBackgroundWhite = 107,
-    }
-
-    public enum TextColor
-    {
-        DARK_BLACK,
-        DARK_RED,
-        DARK_GREEN,
-        DARK_YELLOW,
-        DARK_BLUE,
-        DARK_MAGENTA,
-        DARK_CYAN,
-        DARK_WHITE,
-        BRIGHT_BLACK,
-        BRIGHT_RED,
-        BRIGHT_GREEN,
-        BRIGHT_YELLOW,
-        BRIGHT_BLUE,
-        BRIGHT_MAGENTA,
-        BRIGHT_CYAN,
-        BRIGHT_WHITE
     }
 }

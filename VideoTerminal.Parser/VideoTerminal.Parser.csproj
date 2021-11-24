@@ -52,17 +52,13 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Utility.Misc">
-      <HintPath>..\Dependencies\Utility.Misc.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASCIIChars.cs" />
-    <Compile Include="CSIActionCodes.cs" />
-    <Compile Include="DefaultValues.cs" />
+    <Compile Include="Definitions.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="IVideoTerminal.cs" />
+    <Compile Include="Keyboard.cs" />
     <Compile Include="VTParserDispatch.cs" />
     <Compile Include="ParserActions.cs" />
     <Compile Include="ParserCode.cs" />
@@ -70,11 +66,20 @@
     <Compile Include="SGRDefinitions.cs" />
     <Compile Include="VTParser.cs" />
     <Compile Include="VTStates.cs" />
+    <Compile Include="Xterm256ColorTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Sockets.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
       <Name>VideoTerminal.Sockets</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VideoTerminalInterface\VideoTerminalInterface.csproj">
+      <Project>{36e7e864-dae0-4b79-92e9-4d784edb14c0}</Project>
+      <Name>VideoTerminalInterface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VTBase\VideoTerminal.Base.csproj">
+      <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
+      <Name>VideoTerminal.Base</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

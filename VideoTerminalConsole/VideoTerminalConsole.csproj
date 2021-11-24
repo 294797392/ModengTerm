@@ -64,6 +64,14 @@
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
       <Name>VideoTerminal.Sockets</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VideoTerminalInterface\VideoTerminalInterface.csproj">
+      <Project>{36e7e864-dae0-4b79-92e9-4d784edb14c0}</Project>
+      <Name>VideoTerminalInterface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VTBase\VideoTerminal.Base.csproj">
+      <Project>{B5AF0539-2902-4C1A-9386-7517C4E335BD}</Project>
+      <Name>VideoTerminal.Base</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -2,20 +2,66 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VideoTerminal.Base;
 using VideoTerminal.Parser;
+using VTInterface;
 
 namespace VideoTerminalConsole
 {
-    public class ConsoleVT : IVideoTerminal
+    public class ConsolePresentationDevice : IPresentationDevice
     {
+        /// <summary>
+        /// 屏幕左上角的X坐标
+        /// </summary>
+        public int X { get; set; }
+
+        /// <summary>
+        /// 屏幕右上角的X坐标
+        /// </summary>
+        public int Y { get; set; }
+    }
+
+    public class ConsoleVT : IVideoTerminal, ICursorState
+    {
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ConsoleVT");
+
+        #endregion
+
+        #region 实例变量
+
         private ConsoleColor defaultForeground;
         private ConsoleColor defaultBackground;
+
+        private bool reversed;
+        private ConsoleColor originalForeground;
+        private ConsoleColor originalBackground;
+
+        private ConsolePresentationDevice mainDevice;
+        private IPresentationDevice activeDevice;
+
+        #endregion
+
+        #region 构造方法
 
         public ConsoleVT()
         {
             this.defaultForeground = Console.ForegroundColor;
             this.defaultBackground = Console.BackgroundColor;
+
+            Console.TreatControlCAsInput = true;
+
+            this.mainDevice = new ConsolePresentationDevice();
+            this.activeDevice = this.mainDevice;
+
+            Console.WindowHeight = 25;
+            Console.BufferHeight = 25;
+            Console.WindowWidth = 80;
+            Console.BufferWidth = 80;
         }
+
+        #endregion
 
         public void CarriageReturn()
         {
@@ -24,12 +70,79 @@ namespace VideoTerminalConsole
 
         public void CursorBackward(int distance)
         {
-            throw new NotImplementedException();
+            Console.CursorLeft -= distance;
         }
+
+        public void CursorForward(int distance)
+        {
+            Console.CursorLeft += distance;
+        }
+
+        #region CursorState
+
+        public void CursorPosition(int row, int column)
+        {
+            Console.SetCursorPosition(column, row);
+        }
+
+        public void CursorRestoreState(ICursorState state)
+        {
+        }
+
+        public ICursorState CursorSaveState()
+        {
+            return this;
+        }
+
+        public bool CursorVisibility(bool visible)
+        {
+            Console.CursorVisible = visible;
+            return true;
+        }
+
+        #endregion
+
+        #region IPresentationDevice
+
+        public void DeletePresentationDevice(IPresentationDevice device)
+        {
+        }
+
+        public IPresentationDevice GetActivePresentationDevice()
+        {
+            return this.activeDevice;
+        }
+
+        public IPresentationDevice CreatePresentationDevice()
+        {
+            return new ConsolePresentationDevice();
+        }
+
+        public bool SwitchPresentationDevice(IPresentationDevice activeDevice)
+        {
+            //if (this.mainDevice == activeDevice)
+            //{
+            //    // 切换到主屏幕
+            //    Console.MoveBufferArea(this.mainDevice.X, this.mainDevice.Y, Console.BufferWidth, Console.BufferHeight, 0, 0);
+            //}
+            //else
+            //{
+            //    // 切换到副屏幕
+            //    Console.MoveBufferArea(0, 0, Console.BufferWidth, Console.BufferHeight, 1024, 0);
+            //    this.mainDevice.X = 1024;
+            //    this.mainDevice.Y = 0;
+            //}
+
+            //this.activeDevice = activeDevice;
+
+            return true;
+        }
+
+        #endregion
 
         public void ForwardTab()
         {
-            throw new NotImplementedException();
+            logger.WarnFormat("未实现ForwardTab");
         }
 
         public void LineFeed()
@@ -49,7 +162,7 @@ namespace VideoTerminalConsole
 
         public void SetBlinking(bool blinking)
         {
-            throw new NotImplementedException();
+            Console.CursorVisible = blinking;
         }
 
         public void SetBold(bool bold)
@@ -58,7 +171,6 @@ namespace VideoTerminalConsole
 
         public void SetCrossedOut(bool crossedOut)
         {
-            throw new NotImplementedException();
         }
 
         public void SetDefaultAttributes()
@@ -77,12 +189,11 @@ namespace VideoTerminalConsole
 
         public void SetDoublyUnderlined(bool underline)
         {
-            throw new NotImplementedException();
+            logger.WarnFormat("未实现SetDoublyUnderlined");
         }
 
         public void SetFaint(bool faint)
         {
-            throw new NotImplementedException();
         }
 
         public void SetIndexedBackground(TextColor color)
@@ -121,32 +232,56 @@ namespace VideoTerminalConsole
 
         public void SetInvisible(bool invisible)
         {
-            throw new NotImplementedException();
+            logger.WarnFormat("未实现SetInvisible");
         }
 
         public void SetItalics(bool italics)
         {
-            throw new NotImplementedException();
         }
 
         public void SetOverlined(bool overline)
         {
-            throw new NotImplementedException();
+            logger.WarnFormat("未实现SetOverlined");
         }
 
         public void SetReverseVideo(bool reverse)
         {
-            throw new NotImplementedException();
+            if (reverse && !this.reversed)
+            {
+                this.reversed = true;
+
+                this.originalBackground = Console.BackgroundColor;
+                this.originalForeground = Console.ForegroundColor;
+
+                Console.BackgroundColor = this.originalForeground;
+                Console.ForegroundColor = this.originalBackground;
+            }
+            else
+            {
+                this.reversed = false;
+
+                Console.BackgroundColor = this.originalBackground;
+                Console.ForegroundColor = this.originalForeground;
+            }
         }
 
         public void SetUnderline(bool underline)
         {
-            throw new NotImplementedException();
         }
 
         public void WarningBell()
         {
             Console.Beep();
+        }
+
+        public void SetForeground(byte r, byte g, byte b)
+        {
+            this.SetIndexedForeground(TextColor.DARK_YELLOW);
+        }
+
+        public void SetBackground(byte r, byte g, byte b)
+        {
+            this.SetIndexedBackground(TextColor.DARK_MAGENTA);
         }
     }
 }

@@ -205,7 +205,7 @@ namespace VideoTerminal.Parser
 
         public static bool IsCSIInvalid(byte ch)
         {
-            return ch == ':';
+            return ch == ':';   // 0x3A
         }
 
         public static bool IsParameterDelimiter(byte ch)
@@ -252,6 +252,16 @@ namespace VideoTerminal.Parser
         public static bool IsDCSIndicator(byte ch)
         {
             return ch == 'P';
+        }
+
+        /// <summary>
+        /// Determines if a character is valid for a DCS pass through sequence
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
+        public static bool IsDCSPassThroughValid(byte ch)
+        {
+            return ch >= ASCIIChars.SPC && ch < ASCIIChars.DEL;
         }
     }
 }

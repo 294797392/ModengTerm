@@ -3,6 +3,7 @@ using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
+using VideoTerminal.Base;
 
 namespace VideoTerminal.Sockets
 {
@@ -53,7 +54,7 @@ namespace VideoTerminal.Sockets
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.Connect();
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
-            this.stream = this.sshClient.CreateShellStream(this.authorition.TerminalName, 0, 0, 0, 0, 4096);
+            this.stream = this.sshClient.CreateShellStream(this.authorition.TerminalName, DefaultValues.TerminalColumns, DefaultValues.TerminalRows, 0, 0, 4096);
             this.stream.DataReceived += this.Stream_DataReceived;
 
             this.NotifyStatusChanged(SocketState.Ready);
