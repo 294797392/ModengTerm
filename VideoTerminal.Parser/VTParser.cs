@@ -451,7 +451,7 @@ namespace VideoTerminal.Parser
             }
             else
             {
-                throw new NotImplementedException();
+                logger.WarnFormat("未处理的Escape状态, {0}", ch);
             }
         }
 

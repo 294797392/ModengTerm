@@ -120,21 +120,7 @@ namespace VideoTerminalConsole
 
         public bool SwitchPresentationDevice(IPresentationDevice activeDevice)
         {
-            //if (this.mainDevice == activeDevice)
-            //{
-            //    // 切换到主屏幕
-            //    Console.MoveBufferArea(this.mainDevice.X, this.mainDevice.Y, Console.BufferWidth, Console.BufferHeight, 0, 0);
-            //}
-            //else
-            //{
-            //    // 切换到副屏幕
-            //    Console.MoveBufferArea(0, 0, Console.BufferWidth, Console.BufferHeight, 1024, 0);
-            //    this.mainDevice.X = 1024;
-            //    this.mainDevice.Y = 0;
-            //}
-
-            //this.activeDevice = activeDevice;
-
+            Console.Clear();
             return true;
         }
 
@@ -208,8 +194,17 @@ namespace VideoTerminalConsole
                 case TextColor.DARK_RED: Console.BackgroundColor = ConsoleColor.DarkRed; break;
                 case TextColor.DARK_WHITE: Console.BackgroundColor = ConsoleColor.White; break;
                 case TextColor.DARK_YELLOW: Console.BackgroundColor = ConsoleColor.DarkYellow; break;
+                case TextColor.BRIGHT_BLACK: Console.BackgroundColor = ConsoleColor.Black; break;
+                case TextColor.BRIGHT_BLUE: Console.BackgroundColor = ConsoleColor.Blue; break;
+                case TextColor.BRIGHT_CYAN: Console.BackgroundColor = ConsoleColor.Cyan; break;
+                case TextColor.BRIGHT_GREEN: Console.BackgroundColor = ConsoleColor.Green; break;
+                case TextColor.BRIGHT_MAGENTA: Console.BackgroundColor = ConsoleColor.Magenta; break;
+                case TextColor.BRIGHT_RED: Console.BackgroundColor = ConsoleColor.Red; break;
+                case TextColor.BRIGHT_WHITE: Console.BackgroundColor = ConsoleColor.White; break;
+                case TextColor.BRIGHT_YELLOW: Console.BackgroundColor = ConsoleColor.Yellow; break;
                 default:
-                    throw new NotImplementedException();
+                    logger.WarnFormat("未实现IndexedBackground, {0}", color);
+                    break;
             }
         }
 
@@ -225,8 +220,17 @@ namespace VideoTerminalConsole
                 case TextColor.DARK_RED: Console.ForegroundColor = ConsoleColor.DarkRed; break;
                 case TextColor.DARK_WHITE: Console.ForegroundColor = ConsoleColor.White; break;
                 case TextColor.DARK_YELLOW: Console.ForegroundColor = ConsoleColor.DarkYellow; break;
+                case TextColor.BRIGHT_BLACK: Console.ForegroundColor = ConsoleColor.Black; break;
+                case TextColor.BRIGHT_BLUE: Console.ForegroundColor = ConsoleColor.Blue; break;
+                case TextColor.BRIGHT_CYAN: Console.ForegroundColor = ConsoleColor.Cyan; break;
+                case TextColor.BRIGHT_GREEN: Console.ForegroundColor = ConsoleColor.Green; break;
+                case TextColor.BRIGHT_MAGENTA: Console.ForegroundColor = ConsoleColor.Magenta; break;
+                case TextColor.BRIGHT_RED: Console.ForegroundColor = ConsoleColor.Red; break;
+                case TextColor.BRIGHT_WHITE: Console.ForegroundColor = ConsoleColor.White; break;
+                case TextColor.BRIGHT_YELLOW: Console.ForegroundColor = ConsoleColor.Yellow; break;
                 default:
-                    throw new NotImplementedException();
+                    logger.WarnFormat("未实现IndexedForeground, {0}", color);
+                    break;
             }
         }
 
