@@ -8,7 +8,9 @@
         Title="MainWindow" Height="350" Width="525">
 
     <Grid>
-        <vt:VTConsole x:Name="VTConsole"/>
+        <vt:VTConsole x:Name="VTConsole" Visibility="Collapsed"/>
+
+        <vt:Test Background="Red"/>
     </Grid>
 
 </Window>

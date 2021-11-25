@@ -85,7 +85,7 @@ namespace VideoTerminal
             RichTextBox.Document.Blocks.Clear();
             RichTextBox.Document.Blocks.Add(this.paragraph);
             RichTextBox.Document.IsEnabled = true;
-            RichTextBox.PreviewTextInput += RichTextBox_PreviewTextInput;
+            //RichTextBox.PreviewTextInput += RichTextBox_PreviewTextInput;
         }
 
         ///// <summary>

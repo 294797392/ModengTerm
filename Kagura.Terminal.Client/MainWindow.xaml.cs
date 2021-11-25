@@ -17,6 +17,22 @@ using VideoTerminal.Sockets;
 
 namespace VideoTerminal
 {
+    public class Test : RichTextBox 
+    {
+        public Test()
+        {
+        }
+
+        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
+        {
+            base.OnPreviewTextInput(e);
+
+            Console.WriteLine(e.Text);
+
+            e.Handled = true;
+        }
+    }
+
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
@@ -53,20 +69,6 @@ namespace VideoTerminal
         private void Socket_StatusChanged(object sender, SocketState state)
         {
             logger.InfoFormat("Socket状态改变, {0}", state);
-        }
-
-        protected override void OnTextInput(TextCompositionEventArgs e)
-        {
-            base.OnTextInput(e);
-
-            Console.WriteLine("TextInput, " + e.Text);
-        }
-
-        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
-        {
-            base.OnPreviewTextInput(e);
-
-            Console.WriteLine("PreviewTextInput, " + e.Text);
         }
     }
 }
