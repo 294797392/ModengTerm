@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoTerminalInterface", "V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoTerminal.Base", "VTBase\VideoTerminal.Base.csproj", "{B5AF0539-2902-4C1A-9386-7517C4E335BD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VideoTerminal", "Kagura.Terminal.Client\VideoTerminal.csproj", "{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,18 @@ Global
 		{B5AF0539-2902-4C1A-9386-7517C4E335BD}.Release|x64.Build.0 = Release|Any CPU
 		{B5AF0539-2902-4C1A-9386-7517C4E335BD}.Release|x86.ActiveCfg = Release|Any CPU
 		{B5AF0539-2902-4C1A-9386-7517C4E335BD}.Release|x86.Build.0 = Release|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Debug|x64.Build.0 = Debug|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Debug|x86.Build.0 = Debug|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Release|x64.ActiveCfg = Release|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Release|x64.Build.0 = Release|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Release|x86.ActiveCfg = Release|Any CPU
+		{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

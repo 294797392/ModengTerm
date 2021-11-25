@@ -44,6 +44,7 @@
     <Compile Include="IPresentationDevice.cs" />
     <Compile Include="IVideoTerminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VTAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VTBase\VideoTerminal.Base.csproj">

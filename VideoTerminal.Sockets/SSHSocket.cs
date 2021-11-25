@@ -15,10 +15,6 @@ namespace VideoTerminal.Sockets
 
         #endregion
 
-        #region 事件
-
-        #endregion
-
         #region 实例变量
 
         private SshClient sshClient;
@@ -28,6 +24,17 @@ namespace VideoTerminal.Sockets
         #endregion
 
         #region 属性
+
+        public override SocketTypes Protocol { get { return SocketTypes.SSH; } }
+
+        #endregion
+
+        #region 构造方法
+
+        public SSHSocket(SocketAuthorition authorition) : 
+            base(authorition)
+        {
+        }
 
         #endregion
 
@@ -39,7 +46,7 @@ namespace VideoTerminal.Sockets
 
         public override bool Connect()
         {
-            this.NotifyStatusChanged(SocketState.Init);
+            this.NotifyStatusChanged(SocketState.Connecting);
 
             this.authorition = this.Authorition as SSHSocketAuthorition;
             var authentications = new List<AuthenticationMethod>();
@@ -57,7 +64,7 @@ namespace VideoTerminal.Sockets
             this.stream = this.sshClient.CreateShellStream(this.authorition.TerminalName, DefaultValues.TerminalColumns, DefaultValues.TerminalRows, 0, 0, 4096);
             this.stream.DataReceived += this.Stream_DataReceived;
 
-            this.NotifyStatusChanged(SocketState.Ready);
+            this.NotifyStatusChanged(SocketState.Connected);
 
             return true;
         }
@@ -109,18 +116,6 @@ namespace VideoTerminal.Sockets
             this.stream.Write(data, 0, data.Length);
             this.stream.Flush();
             return true;
-        }
-
-        public override bool EOF
-        {
-            get
-            {
-                return this.stream == null
-                    || this.sshClient == null
-                    || !this.sshClient.IsConnected
-                    //|| !this.shellStream.CanRead
-                    ;
-            }
         }
 
         #endregion

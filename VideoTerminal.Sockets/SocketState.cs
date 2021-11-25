@@ -10,11 +10,11 @@ namespace VideoTerminal.Sockets
         /// <summary>
         /// 数据流处于初始化状态
         /// </summary>
-        Init,
+        Connecting,
 
         /// <summary>
         /// 所有准备工作已就绪，可以开始解析终端数据流了
         /// </summary>
-        Ready
+        Connected
     }
 }

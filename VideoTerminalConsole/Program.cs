@@ -25,17 +25,7 @@ namespace VideoTerminalConsole
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(configFile);
             }
 
-            SSHSocket socket = new SSHSocket()
-            {
-                Authorition = new SSHSocketAuthorition()
-                {
-                    ServerAddress = "10.0.8.99",
-                    UserName = "oheiheiheiheihei",
-                    Password = "18612538605",
-                    ServerPort = 22,
-                    TerminalName = "xterm-256color"
-                }
-            };
+            SocketBase socket = SocketFactory.CreateSSHSocket("10.0.8.99", 22, "oheiheiheiheihei", "18612538605");
             socket.StatusChanged += Socket_StatusChanged;
             socket.Connect();
 
@@ -59,13 +49,13 @@ namespace VideoTerminalConsole
 
             switch (state)
             {
-                case SocketState.Ready:
+                case SocketState.Connected:
                     {
                         VTParser parser = new VTParser();
                         parser.Socket = sender as SocketBase;
                         parser.VideoTermianl = new ConsoleVT();
                         keyboard = parser.Keyboard;
-                        parser.Run();
+                        parser.Initialize();
                         break;
                     }
             }

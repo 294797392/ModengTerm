@@ -15,6 +15,8 @@ namespace VideoTerminal
     {
         private static string ExternalLog4netConfig = "log4net.xml";
 
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("App");
+
         static App()
         {
             FileInfo configFile = new FileInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ExternalLog4netConfig));
@@ -22,6 +24,16 @@ namespace VideoTerminal
             {
                 log4net.Config.XmlConfigurator.ConfigureAndWatch(configFile);
             }
+        }
+
+        public App()
+        {
+            Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+        }
+
+        private static void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            logger.Error(e.Exception);
         }
     }
 }

@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using VideoTerminal.Parser;
+using VideoTerminal.Sockets;
 
 namespace VideoTerminal
 {
@@ -20,30 +22,51 @@ namespace VideoTerminal
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("MainWindow");
+
+        #endregion
+
+        #region 实例变量
+
+        private SocketBase socket;
+        private VTParser parser;
+
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
-            //VideoTerminal terminal = VideoTerminal.Create();
-            //terminal.Screen = VTConsole;
-            //terminal.Window = this;
-            //terminal.Open();
-            //VTConsole.VT = terminal;
+
+            this.socket = SocketFactory.CreateSSHSocket("10.0.8.99", 22, "oheiheiheiheihei", "18612538605");
+            this.socket.StatusChanged += this.Socket_StatusChanged;
+
+            this.parser = new VTParser();
+            this.parser.Socket = this.socket;
+            this.parser.VideoTermianl = VTConsole;
+            this.parser.Initialize();
+
+            this.socket.Connect();
         }
 
-        public void SetIconName(string name)
+        private void Socket_StatusChanged(object sender, SocketState state)
         {
+            logger.InfoFormat("Socket状态改变, {0}", state);
         }
 
-        public void SetTitle(string title)
+        protected override void OnTextInput(TextCompositionEventArgs e)
         {
-            Title = title;
+            base.OnTextInput(e);
+
+            Console.WriteLine("TextInput, " + e.Text);
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
-            base.OnKeyDown(e);
+            base.OnPreviewTextInput(e);
 
-            Console.WriteLine(e.Key.ToString());
+            Console.WriteLine("PreviewTextInput, " + e.Text);
         }
     }
 }

@@ -127,9 +127,9 @@ namespace VideoTerminal.Parser
         #region 公开接口
 
         /// <summary>
-        /// 运行终端解析器
+        /// 初始化终端解析器
         /// </summary>
-        public void Run()
+        public void Initialize()
         {
             this.isAnsiMode = true;
             this.isApplicationMode = false;

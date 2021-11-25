@@ -48,12 +48,13 @@ namespace VideoTerminal.Parser
 
         public void ActionPrint(byte ch)
         {
-            this.terminal.Print((char)ch);
+            this.ActionPrint(char.ToString((char)ch));
         }
 
         public void ActionPrint(string text)
         {
-            this.terminal.Print(text);
+            VTAction.PrintAction.Data = text;
+            this.terminal.PerformAction(VTAction.PrintAction);
         }
 
         public void ActionExecute(byte ch)
@@ -69,7 +70,7 @@ namespace VideoTerminal.Parser
                 case ASCIIChars.BEL:
                     {
                         // 响铃
-                        this.terminal.WarningBell();
+                        this.terminal.PerformAction(VTAction.PlayBellAction);
                         break;
                     }
 
@@ -113,7 +114,8 @@ namespace VideoTerminal.Parser
                 default:
                     {
                         //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
-                        this.terminal.Print((char)ch);
+                        VTAction.PrintAction.Data = char.ToString((char)ch);
+                        this.terminal.PerformAction(VTAction.PrintAction);
                         break;
                     }
             }
@@ -215,11 +217,14 @@ namespace VideoTerminal.Parser
 
         /// <summary>
         /// 代码从terminal里复制
+        /// AdaptDispatch::SetGraphicsRendition
         /// </summary>
         /// <param name="parameters"></param>
         private void PerformSetGraphicsRendition(List<int> parameters)
         {
             int size = parameters.Count;
+
+            List<VTAction> actions = new List<VTAction>();
 
             for (int i = 0; i < size; i++)
             {
@@ -230,281 +235,93 @@ namespace VideoTerminal.Parser
                     case GraphicsOptions.Off:
                         {
                             // 关闭字体效果
-                            this.terminal.SetDefaultAttributes();
-                            this.terminal.SetDefaultBackground();
-                            this.terminal.SetDefaultForeground();
+                            actions.Add(VTAction.DefaultAttributeAction);
+                            actions.Add(VTAction.DefaultBackgroundAction);
+                            actions.Add(VTAction.DefaultForegroundAction);
                             break;
                         }
 
-                    case GraphicsOptions.ForegroundDefault:
-                        {
-                            this.terminal.SetDefaultForeground();
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundDefault:
-                        {
-                            this.terminal.SetDefaultBackground();
-                            break;
-                        }
-
-                    case GraphicsOptions.BoldBright:
-                        {
-                            this.terminal.SetBold(true);
-                            break;
-                        }
-
-                    case GraphicsOptions.RGBColorOrFaint:
-                        {
-                            // 降低颜色强度
-                            this.terminal.SetFaint(true);
-                            break;
-                        }
-
+                    case GraphicsOptions.ForegroundDefault: actions.Add(VTAction.DefaultForegroundAction); break;
+                    case GraphicsOptions.BackgroundDefault: actions.Add(VTAction.DefaultBackgroundAction); break;
+                    case GraphicsOptions.BoldBright: actions.Add(VTAction.BoldAction); break;
+                    case GraphicsOptions.RGBColorOrFaint: actions.Add(VTAction.FaintAction); break;// 降低颜色强度
                     case GraphicsOptions.NotBoldOrFaint:
                         {
                             // 还原颜色强度和粗细
-                            this.terminal.SetBold(false);
-                            this.terminal.SetFaint(false);
+                            actions.Add(VTAction.BoldUnsetAction);
+                            actions.Add(VTAction.FaintUnsetAction);
                             break;
                         }
 
-                    case GraphicsOptions.Italics:
-                        {
-                            this.terminal.SetItalics(true);
-                            break;
-                        }
-
-                    case GraphicsOptions.NotItalics:
-                        {
-                            this.terminal.SetItalics(false);
-                            break;
-                        }
-
+                    case GraphicsOptions.Italics: actions.Add(VTAction.ItalicsAction); break;
+                    case GraphicsOptions.NotItalics: actions.Add(VTAction.ItalicsUnsetAction); break;
                     case GraphicsOptions.BlinkOrXterm256Index:
-                    case GraphicsOptions.RapidBlink:
-                        {
-                            this.terminal.SetBlinking(true);
-                            break;
-                        }
-
-                    case GraphicsOptions.Steady:
-                        {
-                            this.terminal.SetBlinking(false);
-                            break;
-                        }
-
-                    case GraphicsOptions.Invisible:
-                        {
-                            // 隐藏字符
-                            this.terminal.SetInvisible(true);
-                            break;
-                        }
-
-                    case GraphicsOptions.Visible:
-                        {
-                            // 显示字符
-                            this.terminal.SetInvisible(false);
-                            break;
-                        }
-
-                    case GraphicsOptions.CrossedOut:
-                        {
-                            // characters still legible but marked as to be deleted
-                            // 仍可读但标记为可删除的字符
-                            this.terminal.SetCrossedOut(true);
-                            break;
-                        }
-
-                    case GraphicsOptions.NotCrossedOut:
-                        {
-                            this.terminal.SetCrossedOut(false);
-                            break;
-                        }
-
-                    case GraphicsOptions.Negative:
-                        {
-                            // negative image
-                            // 图像反色？
-                            this.terminal.SetReverseVideo(true);
-                            break;
-                        }
-
-                    case GraphicsOptions.Positive:
-                        {
-                            this.terminal.SetReverseVideo(false);
-                            break;
-                        }
-
-                    case GraphicsOptions.Underline:
-                        {
-                            this.terminal.SetUnderline(true);
-                            break;
-                        }
-
-                    case GraphicsOptions.DoublyUnderlined:
-                        {
-                            this.terminal.SetDoublyUnderlined(true);
-                            break;
-                        }
-
+                    case GraphicsOptions.RapidBlink: actions.Add(VTAction.BlinkAction); break;
+                    case GraphicsOptions.Steady: actions.Add(VTAction.BlinkUnsetAction); break;
+                    case GraphicsOptions.Invisible: actions.Add(VTAction.InvisibleAction); break;
+                    case GraphicsOptions.Visible: actions.Add(VTAction.InvisibleUnsetAction); break;
+                    case GraphicsOptions.CrossedOut: actions.Add(VTAction.CrossedOutAction); break;
+                    case GraphicsOptions.NotCrossedOut: actions.Add(VTAction.CrossedOutUnsetAction); break;
+                    case GraphicsOptions.Negative: actions.Add(VTAction.ReverseVideoAction); break;
+                    case GraphicsOptions.Positive: actions.Add(VTAction.ReverseVideoUnsetAction); break;
+                    case GraphicsOptions.Underline: actions.Add(VTAction.UnderlineAction); break;
+                    case GraphicsOptions.DoublyUnderlined: actions.Add(VTAction.DoublyUnderlinedAction); break;
                     case GraphicsOptions.NoUnderline:
                         {
-                            this.terminal.SetUnderline(false);
-                            this.terminal.SetDoublyUnderlined(false);
+                            actions.Add(VTAction.UnderlineUnsetAction);
+                            actions.Add(VTAction.DoublyUnderlinedUnsetAction);
                             break;
                         }
 
-                    case GraphicsOptions.Overline:
-                        {
-                            this.terminal.SetOverlined(true);
-                            break;
-                        }
+                    case GraphicsOptions.Overline: actions.Add(VTAction.OverlinedAction); break;
+                    case GraphicsOptions.NoOverline: actions.Add(VTAction.OverlinedUnsetAction); break;
 
-                    case GraphicsOptions.NoOverline:
-                        {
-                            this.terminal.SetOverlined(false);
-                            break;
-                        }
+                    case GraphicsOptions.ForegroundBlack: actions.Add(VTAction.ForegroundDarkBlackAction); break;
+                    case GraphicsOptions.ForegroundBlue: actions.Add(VTAction.ForegroundDarkBlueAction); break;
+                    case GraphicsOptions.ForegroundGreen: actions.Add(VTAction.ForegroundDarkGreenAction); break;
+                    case GraphicsOptions.ForegroundCyan: actions.Add(VTAction.ForegroundDarkCyanAction); break;
+                    case GraphicsOptions.ForegroundRed: actions.Add(VTAction.ForegroundDarkRedAction); break;
+                    case GraphicsOptions.ForegroundMagenta: actions.Add(VTAction.ForegroundDarkMagentaAction); break;
+                    case GraphicsOptions.ForegroundYellow: actions.Add(VTAction.ForegroundDarkYellowAction); break;
+                    case GraphicsOptions.ForegroundWhite: actions.Add(VTAction.ForegroundDarkWhiteAction); break;
 
-                    case GraphicsOptions.ForegroundBlack:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_BLACK);
-                            break;
-                        }
+                    case GraphicsOptions.BackgroundBlack: actions.Add(VTAction.BackgroundDarkBlackAction); break;
+                    case GraphicsOptions.BackgroundBlue: actions.Add(VTAction.BackgroundDarkBlueAction); break;
+                    case GraphicsOptions.BackgroundGreen: actions.Add(VTAction.BackgroundDarkGreenAction); break;
+                    case GraphicsOptions.BackgroundCyan: actions.Add(VTAction.BackgroundDarkCyanAction); break;
+                    case GraphicsOptions.BackgroundRed: actions.Add(VTAction.BackgroundDarkRedAction); break;
+                    case GraphicsOptions.BackgroundMagenta: actions.Add(VTAction.BackgroundDarkMagentaAction); break;
+                    case GraphicsOptions.BackgroundYellow: actions.Add(VTAction.BackgroundDarkYellowAction); break;
+                    case GraphicsOptions.BackgroundWhite: actions.Add(VTAction.BackgroundDarkWhiteAction); break;
 
-                    case GraphicsOptions.ForegroundBlue:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_BLUE);
-                            break;
-                        }
+                    case GraphicsOptions.BrightForegroundBlack: actions.Add(VTAction.ForegroundLightBlackAction); break;
+                    case GraphicsOptions.BrightForegroundBlue: actions.Add(VTAction.ForegroundLightBlueAction); break;
+                    case GraphicsOptions.BrightForegroundGreen: actions.Add(VTAction.ForegroundLightGreenAction); break;
+                    case GraphicsOptions.BrightForegroundCyan: actions.Add(VTAction.ForegroundLightCyanAction); break;
+                    case GraphicsOptions.BrightForegroundRed: actions.Add(VTAction.ForegroundLightRedAction); break;
+                    case GraphicsOptions.BrightForegroundMagenta: actions.Add(VTAction.ForegroundLightMagentaAction); break;
+                    case GraphicsOptions.BrightForegroundYellow: actions.Add(VTAction.ForegroundLightYellowAction); break;
+                    case GraphicsOptions.BrightForegroundWhite: actions.Add(VTAction.ForegroundLightWhiteAction); break;
 
-                    case GraphicsOptions.ForegroundGreen:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_GREEN);
-                            break;
-                        }
-
-                    case GraphicsOptions.ForegroundCyan:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_CYAN);
-                            break;
-                        }
-
-                    case GraphicsOptions.ForegroundRed:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_RED);
-                            break;
-                        }
-
-                    case GraphicsOptions.ForegroundMagenta:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_MAGENTA);
-                            break;
-                        }
-
-                    case GraphicsOptions.ForegroundYellow:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_YELLOW);
-                            break;
-                        }
-
-                    case GraphicsOptions.ForegroundWhite:
-                        {
-                            this.terminal.SetIndexedForeground(TextColor.DARK_WHITE);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundBlack:
-                        {
-                            this.terminal.SetIndexedBackground(TextColor.DARK_BLACK);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundBlue:
-                        {
-                            this.terminal.SetIndexedBackground(TextColor.DARK_BLUE);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundGreen:
-                        {
-                            this.terminal.SetIndexedBackground(TextColor.DARK_GREEN);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundCyan:
-                        {
-                            this.terminal.SetIndexedBackground(TextColor.DARK_CYAN);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundRed:
-                        this.terminal.SetIndexedBackground(TextColor.DARK_RED);
-                        break;
-                    case GraphicsOptions.BackgroundMagenta:
-                        this.terminal.SetIndexedBackground(TextColor.DARK_MAGENTA);
-                        break;
-                    case GraphicsOptions.BackgroundYellow:
-                        this.terminal.SetIndexedBackground(TextColor.DARK_YELLOW);
-                        break;
-                    case GraphicsOptions.BackgroundWhite:
-                        this.terminal.SetIndexedBackground(TextColor.DARK_WHITE);
-                        break;
-                    case GraphicsOptions.BrightForegroundBlack:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_BLACK);
-                        break;
-                    case GraphicsOptions.BrightForegroundBlue:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_BLUE);
-                        break;
-                    case GraphicsOptions.BrightForegroundGreen:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_GREEN);
-                        break;
-                    case GraphicsOptions.BrightForegroundCyan:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_CYAN);
-                        break;
-                    case GraphicsOptions.BrightForegroundRed:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_RED);
-                        break;
-                    case GraphicsOptions.BrightForegroundMagenta:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_MAGENTA);
-                        break;
-                    case GraphicsOptions.BrightForegroundYellow:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_YELLOW);
-                        break;
-                    case GraphicsOptions.BrightForegroundWhite:
-                        this.terminal.SetIndexedForeground(TextColor.BRIGHT_WHITE);
-                        break;
-                    case GraphicsOptions.BrightBackgroundBlack:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_BLACK);
-                        break;
-                    case GraphicsOptions.BrightBackgroundBlue:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_BLUE);
-                        break;
-                    case GraphicsOptions.BrightBackgroundGreen:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_GREEN);
-                        break;
-                    case GraphicsOptions.BrightBackgroundCyan:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_CYAN);
-                        break;
-                    case GraphicsOptions.BrightBackgroundRed:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_RED);
-                        break;
-                    case GraphicsOptions.BrightBackgroundMagenta:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_MAGENTA);
-                        break;
-                    case GraphicsOptions.BrightBackgroundYellow:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_YELLOW);
-                        break;
-                    case GraphicsOptions.BrightBackgroundWhite:
-                        this.terminal.SetIndexedBackground(TextColor.BRIGHT_WHITE);
-                        break;
+                    case GraphicsOptions.BrightBackgroundBlack: actions.Add(VTAction.BackgroundLightBlackAction); break;
+                    case GraphicsOptions.BrightBackgroundBlue: actions.Add(VTAction.BackgroundLightBlueAction); break;
+                    case GraphicsOptions.BrightBackgroundGreen: actions.Add(VTAction.BackgroundLightGreenAction); break;
+                    case GraphicsOptions.BrightBackgroundCyan: actions.Add(VTAction.BackgroundLightCyanAction); break;
+                    case GraphicsOptions.BrightBackgroundRed: actions.Add(VTAction.BackgroundLightRedAction); break;
+                    case GraphicsOptions.BrightBackgroundMagenta: actions.Add(VTAction.BackgroundLightMagentaAction); break;
+                    case GraphicsOptions.BrightBackgroundYellow: actions.Add(VTAction.BackgroundLightYellowAction); break;
+                    case GraphicsOptions.BrightBackgroundWhite: actions.Add(VTAction.BackgroundLightWhiteAction); break;
 
                     case GraphicsOptions.ForegroundExtended:
                         {
                             byte r, g, b;
                             i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), true, out r, out g, out b);
-                            this.terminal.SetForeground(r, g, b);
+
+                            VTAction.ForegroundRGBAction.R = r;
+                            VTAction.ForegroundRGBAction.G = g;
+                            VTAction.ForegroundRGBAction.B = b;
+
+                            actions.Add(VTAction.ForegroundRGBAction);
                             break;
                         }
 
@@ -512,7 +329,12 @@ namespace VideoTerminal.Parser
                         {
                             byte r, g, b;
                             i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), false, out r, out g, out b);
-                            this.terminal.SetBackground(r, g, b);
+
+                            VTAction.BackgroundRGBAction.R = r;
+                            VTAction.BackgroundRGBAction.G = g;
+                            VTAction.BackgroundRGBAction.B = b;
+
+                            actions.Add(VTAction.BackgroundRGBAction);
                             break;
                         }
 
@@ -521,6 +343,8 @@ namespace VideoTerminal.Parser
                         break;
                 }
             }
+
+            this.terminal.PerformAction(actions);
         }
 
         /// <summary>

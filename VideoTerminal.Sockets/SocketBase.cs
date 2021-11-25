@@ -11,10 +11,14 @@ namespace VideoTerminal.Sockets
     /// </summary>
     public abstract class SocketBase
     {
+        #region 常量
+
         /// <summary>
         /// 默认的接收缓冲区大小
         /// </summary>
         public const int DefaultReadBufferSize = 256;
+
+        #endregion
 
         #region 公开事件
 
@@ -29,15 +33,21 @@ namespace VideoTerminal.Sockets
 
         #region 属性
 
+        public abstract SocketTypes Protocol { get; }
+
         /// <summary>
-        /// EOF为True时，VideoTerminal会停止解析
-        /// 在与远程主机断开连接的时候，应该把这个值设为True，否则为False
+        /// 连接Socket所需要的验证信息
         /// </summary>
-        public abstract bool EOF { get; }
+        public SocketAuthorition Authorition { get; private set; }
 
-        public SocketTypes Protocol { get; }
+        #endregion
 
-        public SocketAuthorition Authorition { get; set; }
+        #region 构造方法
+
+        public SocketBase(SocketAuthorition authorition)
+        {
+            this.Authorition = authorition;
+        }
 
         #endregion
 
@@ -79,18 +89,6 @@ namespace VideoTerminal.Sockets
         #endregion
 
         #region 实例方法
-
-        public static SocketBase Create(SocketTypes protocol)
-        {
-            switch (protocol)
-            {
-                case SocketTypes.SSH:
-                    return new SSHSocket();
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
 
         protected void NotifyStatusChanged(SocketState state)
         {
