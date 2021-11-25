@@ -1,4 +1,5 @@
-﻿using DotNEToolkit.Extentions;
+﻿using DotNEToolkit;
+using DotNEToolkit.Extentions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,9 +10,12 @@ using VideoTerminal.Sockets;
 
 namespace VideoTerminalConsole
 {
+
     class Program
     {
         private static string ExternalLog4netConfig = "log4net.xml";
+
+        private static VideoTerminal.Parser.Keyboard keyboard;
 
         static void Main(string[] args)
         {
@@ -39,8 +43,12 @@ namespace VideoTerminalConsole
             while (true)
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);
-                chars[0] = key.KeyChar;
-                byte[] bytes = Encoding.UTF8.GetBytes(chars);
+
+                VTKeys vtKey = VTKeyConverter.ConvertConsoleKey(key.Key);
+                byte[] bytes = keyboard.TranslateKey(vtKey, VTModifierKeys.None);
+                //chars[0] = key.KeyChar;
+                //byte[] bytes = Encoding.UTF8.GetBytes(chars);
+
                 socket.Write(bytes);
             }
         }
@@ -56,6 +64,7 @@ namespace VideoTerminalConsole
                         VTParser parser = new VTParser();
                         parser.Socket = sender as SocketBase;
                         parser.VideoTermianl = new ConsoleVT();
+                        keyboard = parser.Keyboard;
                         parser.Run();
                         break;
                     }

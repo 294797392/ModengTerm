@@ -15,6 +15,17 @@ namespace VideoTerminal.Parser
 
         #endregion
 
+        #region 公开事件
+
+        /// <summary>
+        /// VTParserDispatch：触发事件的对象
+        /// DECSETPrivateModeSet：要设置的DECPrivateMode
+        /// bool：是否启用该设置
+        /// </summary>
+        public event Action<VTParserDispatch, DECPrivateMode, bool> DECPrivateModeSet;
+
+        #endregion
+
         #region 实例变量
 
         private ICursorState cursorState;
@@ -595,39 +606,44 @@ namespace VideoTerminal.Parser
         /// 设置DECPrivateMode模式
         /// </summary>
         /// <param name="privateModes">要设置的模式列表</param>
-        /// <param name="set">启用或者禁用</param>
-        private bool PerformDECPrivateMode(List<int> privateModes, bool set)
+        /// <param name="enable">启用或者禁用</param>
+        private bool PerformDECPrivateMode(List<int> privateModes, bool enable)
         {
             bool success = false;
 
             foreach (int mode in privateModes)
             {
-                switch ((DECSETPrivateModeSet)mode)
+                switch ((DECPrivateMode)mode)
                 {
-                    case DECSETPrivateModeSet.DECCKM_CursorKeysMode:
+                    case Parser.DECPrivateMode.DECANM_AnsiMode:
+                        {
+                            break;
+                        }
+
+                    case Parser.DECPrivateMode.DECCKM_CursorKeysMode:
                         {
                             // set - Enable Application Mode, reset - Normal mode
                             break;
                         }
 
-                    case DECSETPrivateModeSet.ASB_AlternateScreenBuffer:
+                    case Parser.DECPrivateMode.ASB_AlternateScreenBuffer:
                         {
-                            success = set ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
+                            success = enable ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
                             break;
                         }
 
-                    case DECSETPrivateModeSet.DECTCEM_TextCursorEnableMode:
+                    case Parser.DECPrivateMode.DECTCEM_TextCursorEnableMode:
                         {
-                            success = this.terminal.CursorVisibility(set);
+                            success = this.terminal.CursorVisibility(enable);
                             break;
                         }
 
-                    case DECSETPrivateModeSet.XTERM_BracketedPasteMode:
+                    case Parser.DECPrivateMode.XTERM_BracketedPasteMode:
                         {
                             break;
                         }
 
-                    case DECSETPrivateModeSet.ATT610_StartCursorBlink:
+                    case Parser.DECPrivateMode.ATT610_StartCursorBlink:
                         {
                             break;
                         }
@@ -635,6 +651,11 @@ namespace VideoTerminal.Parser
                     default:
                         logger.WarnFormat("未实现DECSETPrivateMode, {0}", mode);
                         break;
+                }
+
+                if (this.DECPrivateModeSet != null)
+                {
+                    this.DECPrivateModeSet(this, (DECPrivateMode)mode, enable);
                 }
             }
 

@@ -1,0 +1,19 @@
+﻿{
+    "CursorKeyNormal": {
+        "UpArrow": "\\x1b[A",
+        "DownArrow": "\\x1b[B",
+        "RightArrow": "\\x1b[C",
+        "LeftArrow": "\\x1b[D",
+        "Home": "\\x1b[H",
+        "End": "\\x1b[F"
+    },
+
+    "CursorKeyApplication": {
+        "UpArrow": "\\x1bOA",
+        "DownArrow": "\\x1bOB",
+        "RightArrow": "\\x1bOC",
+        "LeftArrow": "\\x1bOD",
+        "Home": "\\x1bOH",
+        "End": "\\x1bOF"
+    }
+}

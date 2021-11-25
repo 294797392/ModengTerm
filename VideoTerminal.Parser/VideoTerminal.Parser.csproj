@@ -59,6 +59,8 @@
     <Compile Include="Definitions.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Keyboard.cs" />
+    <Compile Include="Keymap.cs" />
+    <Compile Include="Keys.cs" />
     <Compile Include="VTParserDispatch.cs" />
     <Compile Include="ParserActions.cs" />
     <Compile Include="ParserCode.cs" />
@@ -66,7 +68,7 @@
     <Compile Include="SGRDefinitions.cs" />
     <Compile Include="VTParser.cs" />
     <Compile Include="VTStates.cs" />
-    <Compile Include="Xterm256ColorTable.cs" />
+    <Compile Include="Xterm256Color.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Sockets.csproj">
@@ -81,6 +83,11 @@
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
       <Name>VideoTerminal.Base</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="keymap.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

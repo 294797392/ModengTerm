@@ -92,7 +92,15 @@ namespace VideoTerminal.Parser
 
         private List<byte> unicodeText;
 
-        private bool supportAnsi;
+        /// <summary>
+        /// 当前解析器的数据流是否是ANSI模式的数据流
+        /// </summary>
+        private bool isAnsiMode;
+
+        /// <summary>
+        /// 当前Keypad的模式是否是Application模式
+        /// </summary>
+        private bool isApplicationMode;
 
         private DCSStringHandlerDlg dcsStringHandler;
 
@@ -100,7 +108,15 @@ namespace VideoTerminal.Parser
 
         #region 属性
 
+        /// <summary>
+        /// 解析器事件分发对象
+        /// </summary>
         internal VTParserDispatch Dispatch { get; private set; }
+
+        /// <summary>
+        /// 表示终端键盘
+        /// </summary>
+        public Keyboard Keyboard { get; private set; }
 
         public SocketBase Socket { get; set; }
 
@@ -115,7 +131,15 @@ namespace VideoTerminal.Parser
         /// </summary>
         public void Run()
         {
+            this.isAnsiMode = true;
+            this.isApplicationMode = false;
+
+            this.Keyboard = new Keyboard();
+            this.Keyboard.SetAnsiMode(true);
+            this.Keyboard.SetKeypadMode(false);
+
             this.Dispatch = new VTParserDispatch(this.VideoTermianl);
+            this.Dispatch.DECPrivateModeSet += this.Dispatch_DECPrivateModeSet;
 
             this.unicodeText = new List<byte>();
 
@@ -124,8 +148,6 @@ namespace VideoTerminal.Parser
 
             this.intermediate = new List<byte>();
             this.parameters = new List<int>();
-
-            this.supportAnsi = true;
 
             this.Socket.DataReceived += this.Socket_DataReceived;
             this.state = VTStates.Ground;   // 状态机默认设置为基态
@@ -432,7 +454,7 @@ namespace VideoTerminal.Parser
                 this.ActionCollect(ch);
                 this.EnterEscapeIntermediate();
             }
-            else if (this.supportAnsi)
+            else if (this.isAnsiMode)
             {
                 if (ASCIIChars.IsCSIIndicator(ch))
                 {
@@ -457,6 +479,7 @@ namespace VideoTerminal.Parser
             }
             else
             {
+                // 这里不是ANSI模式，那么是VT52模式
                 logger.WarnFormat("未处理的Escape状态, {0}", ch);
             }
         }
@@ -484,7 +507,7 @@ namespace VideoTerminal.Parser
             {
                 this.ActionIgnore(ch);
             }
-            else if (this.supportAnsi)
+            else if (this.isAnsiMode)
             {
                 this.ActionEscDispatch(ch);
                 this.EnterGround();
@@ -1009,6 +1032,33 @@ namespace VideoTerminal.Parser
                             }
                     }
                 }
+            }
+        }
+
+        private void Dispatch_DECPrivateModeSet(VTParserDispatch dispatch, DECPrivateMode privateMode, bool enable)
+        {
+            switch (privateMode)
+            {
+                case DECPrivateMode.DECCKM_CursorKeysMode:
+                    {
+                        // true表示ApplicationMode
+                        // false表示NormalMode
+                        this.isApplicationMode = enable;
+                        this.Keyboard.SetKeypadMode(enable);
+                        break;
+                    }
+
+                case DECPrivateMode.DECANM_AnsiMode:
+                    {
+                        this.isAnsiMode = enable;
+                        this.Keyboard.SetAnsiMode(enable);
+                        break;
+                    }
+
+                default:
+                    {
+                        break;
+                    }
             }
         }
 

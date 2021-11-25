@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -16,5 +17,7 @@ namespace VideoTerminal.Base
         /// 每次读取的数据缓冲区大小
         /// </summary>
         public const int ReadBufferSize = 256;
+
+        public static readonly string KeymapFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "keymap.json");
     }
 }

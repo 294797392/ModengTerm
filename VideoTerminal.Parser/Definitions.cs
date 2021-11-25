@@ -124,10 +124,21 @@ namespace VideoTerminal.Parser
     /// <summary>
     /// CSI参数下DECSET命令的DECPrivateMode类型
     /// </summary>
-    internal enum DECSETPrivateModeSet
+    internal enum DECPrivateMode
     {
+        /// <summary>
+        /// 设置光标键操作模式为ApplicationMode或者NormalMode
+        /// ApplicationMode和NormalMode下，小键盘的每个按键的功能不一样，也就是要发送的字符序列不一样
+        /// DECCKM:Cursor keys
+        /// 光标键就是上下左右键
+        /// </summary>
         DECCKM_CursorKeysMode = 1,
+
+        /// <summary>
+        /// 设置终端的数据流解析模式为ANSI或者VT52模式
+        /// </summary>
         DECANM_AnsiMode = 2,
+
         DECCOLM_SetNumberOfColumns = 3,
         DECSCNM_ScreenMode = 5,
         DECOM_OriginMode = 6,
