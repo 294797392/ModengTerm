@@ -4,7 +4,7 @@
 一个终端模拟器，类似于XShell，putty和微软开源的terminal，代码参考了xterm和terminal的源码  
 
 
-## 支持连接的远程主机类型
+## 支持的连接类型
 1. SSH服务器
 2. 串口 - 正在实现
 
