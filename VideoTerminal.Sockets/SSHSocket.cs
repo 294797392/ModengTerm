@@ -74,11 +74,6 @@ namespace VideoTerminal.Sockets
             throw new NotImplementedException();
         }
 
-        public override string Execute(string command)
-        {
-            return this.sshClient.RunCommand(command).Execute();
-        }
-
         public override int Read(byte[] bytes)
         {
             long left = bytes.Length;

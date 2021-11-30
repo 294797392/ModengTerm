@@ -28,17 +28,6 @@ namespace VTInterface
         /// </summary>
         void ForwardTab();
 
-        /// <summary>
-        /// CR - Performs a carriage return.
-        /// Moves the cursor to the leftmost column
-        /// </summary>
-        void CarriageReturn();
-
-        /// <summary>
-        /// 换行
-        /// </summary>
-        void LineFeed();
-
         /// <summary> 
         /// 执行动作
         /// </summary>

@@ -90,7 +90,7 @@ namespace VideoTerminal.Parser
 
                 case ASCIIChars.CR:
                     {
-                        this.terminal.CarriageReturn();
+                        this.terminal.PerformAction(VTAction.CarriageReturnAction);
                         break;
                     }
 
@@ -99,7 +99,7 @@ namespace VideoTerminal.Parser
                 case ASCIIChars.VT:
                     {
                         // 这三个都是LF
-                        this.terminal.LineFeed();
+                        this.terminal.PerformAction(VTAction.LineFeedAction);
                         break;
                     }
 
@@ -207,6 +207,25 @@ namespace VideoTerminal.Parser
 
                 default:
                     logger.WarnFormat("未实现EscAction, {0}", code);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// - Triggers the Vt52EscDispatch action to indicate that the listener should handle
+        ///      a VT52 escape sequence. These sequences start with ESC and a single letter,
+        ///      sometimes followed by parameters.
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <param name="parameters"></param>
+        public void ActionVt52EscDispatch(byte ch, List<int> parameters)
+        {
+            VT52ActionCodes code = (VT52ActionCodes)ch;
+
+            switch (code)
+            {
+                default:
+                    logger.WarnFormat("未实现VT52ActionCodes:{0}", code);
                     break;
             }
         }

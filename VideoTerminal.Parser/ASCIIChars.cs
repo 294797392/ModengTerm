@@ -263,5 +263,18 @@ namespace VideoTerminal.Parser
         {
             return ch >= ASCIIChars.SPC && ch < ASCIIChars.DEL;
         }
+
+        /// <summary>
+        /// 判断字符是否是VT52模式下移动光标的字符
+        /// 
+        /// Parameters for cursor movement are at the end of the ESC Y  escape sequence
+        ///   Each ordinate is encoded in a single character as value+32.For example, !  is 1.  The screen coordinate system is 0-based
+        /// </summary>
+        /// <param name="ch"></param>
+        /// <returns></returns>
+        public static bool IsVt52CursorAddress(byte ch)
+        {
+            return ch == 'Y'; // 0x59
+        }
     }
 }

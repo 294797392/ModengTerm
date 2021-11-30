@@ -111,6 +111,8 @@ namespace VideoTerminal.Parser
         /// All C1 controls cancel any escape sequence, control sequence or control string in progress and are executed. Control functions special to this parser, i.e. DCS, SOS, CSI, OSC, PM and APC, cause a transition to their appropriate states. All other C1 control functions (even those with no defined meaning), cause a transition to ground state.
         /// On terminals earlier than the VT500, there would have been one other invariant action: the C0 control NUL was ignored on input to the terminal and would not take part in any processing. Its only purpose was as a time-fill character. However, the VT500 defines a control function DECNULM (Null Mode), which allows NUL to be passed to an attached printer. So in this parser, NUL is treated the same as other C0 controls.
         /// </summary>
-        Anywhere
+        Anywhere,
+
+        Vt52Param
     }
 }

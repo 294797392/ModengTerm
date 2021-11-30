@@ -15,7 +15,7 @@ namespace VideoTerminalConsole
     {
         private static string ExternalLog4netConfig = "log4net.xml";
 
-        private static VideoTerminal.Parser.Keyboard keyboard;
+        private static VideoTerminal.Parser.VTKeyboard keyboard;
 
         static void Main(string[] args)
         {

@@ -82,6 +82,9 @@ namespace VTInterface
         public static readonly VTAction PlayBellAction = new VTAction(VTActions.PlayBell);
         public static readonly VTAction PrintAction = new VTAction(VTActions.Print);
 
+        public static readonly VTAction CarriageReturnAction = new VTAction(VTActions.CarriageReturn);
+        public static readonly VTAction LineFeedAction = new VTAction(VTActions.LineFeed);
+
         public VTActions Type { get; set; }
 
         public byte R { get; set; }
@@ -102,6 +105,11 @@ namespace VTInterface
         {
             this.Type = type;
             this.Data = data;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}", this.Type);
         }
     }
 
@@ -205,6 +213,13 @@ namespace VTInterface
         /// <summary>
         /// 用RGB表示背景色
         /// </summary>
-        BackgroundRGB
+        BackgroundRGB,
+
+        /// <summary>
+        /// CR - Performs a carriage return.
+        /// Moves the cursor to the leftmost column
+        /// </summary>
+        CarriageReturn,
+        LineFeed
     }
 }

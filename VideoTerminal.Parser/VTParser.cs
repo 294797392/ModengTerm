@@ -22,19 +22,17 @@ namespace VideoTerminal.Parser
     /// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
     /// Dependencies/Control Functions for Coded Character Sets Ecma-048.pdf
     /// 
-    /// 
-    /// 
     /// 控制字符集分两种：
     /// C0控制字符：C0控制字符就是ASCII码，一个ASCII码表示一个控制字符，范围是0x00-0x1F（十进制是0-31）
     /// C1控制字符：范围是0x80-0x9F（十进制是128-159）。C1控制字符集有两个区间，如果系统只支持7位ASCII码字符集，那么C1控制字符的范围是0x4F-0x5F(十进制是79-95)；如果系统支持8位ASCII码字符集，那么C1控制字符的范围是0x8F-0x9F（十进制是143-159）
     /// 作为一个终端模拟器，那么必须要同时支持7位字符集的C1控制字符和8位字符集的C1控制字符
     /// ASCII码为0x80-0xFF（十进制是143-255）的字符又称为扩充ASCII码字符集
     /// 
-    /// 
     /// 控制序列：
-    ///     对于7位ascii编码系统：
+    ///     控制序列可能由7位ASCII码或者8位ASCII码表示
+    ///     对于7位ascii编码：
     ///         由两个字符开头。第一个字符是01/11，第二个是Fe。Fe可以看作成命令类型，Fe的范围在04/00（64） - 05/15（95）之间
-    ///     对于8位ascii编码系统：
+    ///     对于8位ascii编码：
     ///         由一个字符开头。范围在08/00 - 09/15之间
     /// 
     /// 完整的控制序列格式：
@@ -116,7 +114,7 @@ namespace VideoTerminal.Parser
         /// <summary>
         /// 表示终端键盘
         /// </summary>
-        public Keyboard Keyboard { get; private set; }
+        public VTKeyboard Keyboard { get; private set; }
 
         public SocketBase Socket { get; set; }
 
@@ -134,7 +132,7 @@ namespace VideoTerminal.Parser
             this.isAnsiMode = true;
             this.isApplicationMode = false;
 
-            this.Keyboard = new Keyboard();
+            this.Keyboard = new VTKeyboard();
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
 
@@ -277,6 +275,11 @@ namespace VideoTerminal.Parser
             this.state = VTStates.DCSPassthrough;
         }
 
+        private void EnterVt52Param()
+        {
+            this.state = VTStates.Vt52Param;
+        }
+
         #region Action - An event may cause one of these actions to occur with or without a change of state
 
         /// <summary>
@@ -395,6 +398,17 @@ namespace VideoTerminal.Parser
             }
         }
 
+        /// <summary>
+        /// - Triggers the Vt52EscDispatch action to indicate that the listener should handle
+        ///      a VT52 escape sequence. These sequences start with ESC and a single letter,
+        ///      sometimes followed by parameters.
+        /// </summary>
+        /// <param name="ch"></param>
+        private void ActionVT52EscDispatch(byte ch)
+        {
+            this.Dispatch.ActionVt52EscDispatch(ch, this.parameters);
+        }
+
         #endregion
 
         #region Event - 处理状态机的逻辑
@@ -477,10 +491,17 @@ namespace VideoTerminal.Parser
                     this.EnterGround();
                 }
             }
+            else if (ASCIIChars.IsVt52CursorAddress(ch))
+            {
+                // 判断是否是VT52模式下的移动光标指令, 当进入了VT52模式下才会触发
+                // 在VT52模式下只有移动光标的指令有参数，所以这里把移动光标的指令单独做处理
+                this.EnterVt52Param();
+            }
             else
             {
-                // 这里不是ANSI模式，那么是VT52模式
-                logger.WarnFormat("未处理的Escape状态, {0}", ch);
+                // 这里是其他的不带参数的VT52控制字符
+                this.ActionVT52EscDispatch(ch);
+                this.EnterGround();
             }
         }
 
@@ -512,9 +533,14 @@ namespace VideoTerminal.Parser
                 this.ActionEscDispatch(ch);
                 this.EnterGround();
             }
+            else if (ASCIIChars.IsVt52CursorAddress(ch))
+            {
+                this.EnterVt52Param();
+            }
             else
             {
-                throw new NotImplementedException();
+                this.ActionVT52EscDispatch(ch);
+                this.EnterGround();
             }
         }
 
@@ -918,6 +944,40 @@ namespace VideoTerminal.Parser
             }
         }
 
+        /// <summary>
+        /// - Processes a character event into an Action that occurs while in the Vt52Param state.
+        ///   Events in this state will:
+        ///   1. Execute C0 control characters
+        ///   2. Ignore Delete characters
+        ///   3. Store exactly two parameter characters
+        ///   4. Dispatch a control sequence with parameters for action (always Direct Cursor Address)
+        /// </summary>
+        /// <param name="ch"></param>
+        private void EventVt52Param(byte ch)
+        {
+            if (ASCIIChars.IsC0Code(ch))
+            {
+                this.ActionExecute(ch);
+            }
+            else if (ASCIIChars.IsDelete(ch))
+            {
+                this.ActionIgnore(ch);
+            }
+            else
+            {
+                this.parameters.Add(ch);
+                if(this.parameters.Count ==2)
+                {
+                    // The command character is processed before the parameter values,
+                    // but it will always be 'Y', the Direct Cursor Address command.
+
+                    // 到了这里说明Y指令的参数收集完了，可以执行了，因为Y指令是移动光标指令，有且只有两个参数
+                    this.ActionVT52EscDispatch((byte)'Y');
+                    this.EnterGround();
+                }
+            }
+        }
+
         #endregion
 
         #endregion
@@ -1028,6 +1088,12 @@ namespace VideoTerminal.Parser
                         case VTStates.DCSPassthrough:
                             {
                                 this.EventDCSPassThrough(ch);
+                                break;
+                            }
+
+                        case VTStates.Vt52Param:
+                            {
+                                this.EventVt52Param(ch);
                                 break;
                             }
                     }
