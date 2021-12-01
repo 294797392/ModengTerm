@@ -3,25 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Parser
+namespace VideoTerminal.Interface
 {
-    public enum VTModifierKeys
-    {
-        None,
-
-        //
-        // 摘要:
-        //     左侧或右侧的 Alt 修改键。
-        Alt = 1,
-        //
-        // 摘要:
-        //     左侧或右侧的 Shift 修改键。
-        Shift = 2,
-        //
-        // 摘要:
-        //     左侧或右侧的 Ctrl 修改键。
-        Control = 4
-    }
 
     public enum VTKeys
     {

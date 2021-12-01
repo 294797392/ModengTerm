@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Sockets
+namespace VideoTerminal.Clients
 {
-    public enum SocketState
+    /// <summary>
+    /// 表示客户端的连接状态
+    /// </summary>
+    public enum ClientState
     {
         /// <summary>
         /// 数据流处于初始化状态

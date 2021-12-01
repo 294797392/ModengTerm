@@ -70,9 +70,6 @@
     </ApplicationDefinition>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="ResponseCode.cs" />
-    <Compile Include="VTConsole.xaml.cs">
-      <DependentUpon>VTConsole.xaml</DependentUpon>
-    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -90,10 +87,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Themes.Ubuntu.Ambiance.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="VTConsole.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -145,13 +138,13 @@
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>VideoTerminal.Parser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Sockets.csproj">
+    <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Clients.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
-      <Name>VideoTerminal.Sockets</Name>
+      <Name>VideoTerminal.Clients</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VideoTerminalInterface\VideoTerminalInterface.csproj">
+    <ProjectReference Include="..\VideoTerminalInterface\VideoTerminal.Interface.csproj">
       <Project>{36e7e864-dae0-4b79-92e9-4d784edb14c0}</Project>
-      <Name>VideoTerminalInterface</Name>
+      <Name>VideoTerminal.Interface</Name>
     </ProjectReference>
     <ProjectReference Include="..\VTBase\VideoTerminal.Base.csproj">
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using VideoTerminal.Base;
+using VideoTerminal.Parser;
 
-namespace VTInterface
+namespace VideoTerminal.Interface
 {
     /// <summary>
     /// 定义视频终端的标准接口
@@ -12,29 +13,16 @@ namespace VTInterface
     public interface IVideoTerminal
     {
         /// <summary>
-        /// 光标向左移动distance个距离
+        /// 当用户按下按键的时候要触发这个事件
         /// </summary>
-        /// <param name="distance">要移动的距离</param>
-        void CursorBackward(int distance);
+        event Action<IVideoTerminal, VTInputEventArgs> InputEvent;
 
         /// <summary>
-        /// 光标向右边移动distance个距离
+        /// 执行一个虚拟终端的动作
         /// </summary>
-        /// <param name="distance"></param>
-        void CursorForward(int distance);
-
-        /// <summary>
-        /// Tab
-        /// </summary>
-        void ForwardTab();
-
-        /// <summary> 
-        /// 执行动作
-        /// </summary>
-        /// <param name="vtActions">要执行的动作列表</param>
-        void PerformAction(List<VTAction> vtActions);
-
-        void PerformAction(VTAction vtAction);
+        /// <param name="vtAction"></param>
+        /// <param name="param"></param>
+        void PerformAction(VTActions vtAction, params object[] param);
 
         #region CursorState
 
@@ -49,19 +37,6 @@ namespace VTInterface
         /// </summary>
         /// <param name="state">要还原的状态</param>
         void CursorRestoreState(ICursorState state);
-
-        /// <summary>
-        /// 隐藏或者显示光标
-        /// </summary>
-        bool CursorVisibility(bool visible);
-
-        /// <summary>
-        /// 移动光标到某行某列
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        void CursorPosition(int row, int column);
 
         #endregion
 

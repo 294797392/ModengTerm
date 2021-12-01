@@ -56,26 +56,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASCIIChars.cs" />
-    <Compile Include="Definitions.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="VTDefinitions.cs" />
     <Compile Include="Keymap.cs" />
-    <Compile Include="Keys.cs" />
+    <Compile Include="VTActions.cs" />
+    <Compile Include="VTBackground.cs" />
+    <Compile Include="VTForeground.cs" />
     <Compile Include="VTKeyboard.cs" />
+    <Compile Include="VTKeys.cs" />
+    <Compile Include="VTModifierKeys.cs" />
     <Compile Include="VTParserDispatch.cs" />
-    <Compile Include="ParserActions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VTParser.cs" />
+    <Compile Include="VTParserEventDlg.cs" />
     <Compile Include="VTStates.cs" />
     <Compile Include="Xterm256Color.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Sockets.csproj">
+    <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Clients.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
-      <Name>VideoTerminal.Sockets</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VideoTerminalInterface\VideoTerminalInterface.csproj">
-      <Project>{36e7e864-dae0-4b79-92e9-4d784edb14c0}</Project>
-      <Name>VideoTerminalInterface</Name>
+      <Name>VideoTerminal.Clients</Name>
     </ProjectReference>
     <ProjectReference Include="..\VTBase\VideoTerminal.Base.csproj">
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>

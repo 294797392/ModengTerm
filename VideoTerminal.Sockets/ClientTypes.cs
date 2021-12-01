@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Sockets
+namespace VideoTerminal.Clients
 {
     /// <summary>
-    /// 标识Socket的类型
+    /// 标识客户端的类型
     /// </summary>
-    public enum SocketTypes
+    public enum ClientTypes
     {
         /// <summary>
         /// 是一个SSH远程主机

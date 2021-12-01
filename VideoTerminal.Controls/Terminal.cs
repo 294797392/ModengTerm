@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using VideoTerminal.Interface;
 using VideoTerminal.Parser;
-using VTInterface;
 
 namespace VideoTerminal.Controls
 {
@@ -19,6 +19,12 @@ namespace VideoTerminal.Controls
         #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ConsoleHostInput");
+
+        #endregion
+
+        #region 公开事件
+
+        public event Action<IVideoTerminal, VTInputEventArgs> InputEvent;
 
         #endregion
 
@@ -35,6 +41,7 @@ namespace VideoTerminal.Controls
         {
             this.visualContainer = new TerminalVisualContainer();
             this.Content = this.visualContainer;
+            this.keyboard = new VTKeyboard();
         }
 
         #endregion
@@ -89,176 +96,11 @@ namespace VideoTerminal.Controls
 
         #region IVideoTerminal
 
-        public void PerformAction(List<VTAction> vtActions)
-        {
-            //this.Dispatcher.Invoke(new Action(() =>
-            //{
-            //    this.lastInline = this.CreateRun();
-
-            //    foreach (VTAction vtAction in vtActions)
-            //    {
-            //        switch (vtAction.Type)
-            //        {
-            //            case VTActions.Foreground:
-            //                {
-            //                    this.lastInline.Foreground = this.TextColor2Brush((TextColor)vtAction.Data);
-            //                    break;
-            //                }
-
-            //            case VTActions.Background:
-            //                {
-            //                    this.lastInline.Background = this.TextColor2Brush((TextColor)vtAction.Data);
-            //                    break;
-            //                }
-
-            //            case VTActions.ForegroundRGB:
-            //                {
-            //                    this.lastInline.Foreground = this.CreateBrush(vtAction.R, vtAction.G, vtAction.B);
-            //                    break;
-            //                }
-
-            //            case VTActions.BackgroundRGB:
-            //                {
-            //                    this.lastInline.Background = this.CreateBrush(vtAction.R, vtAction.G, vtAction.B);
-            //                    break;
-            //                }
-
-            //            case VTActions.Blink:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.BlinkUnset:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.Bold:
-            //                {
-            //                    this.lastInline.FontWeight = FontWeights.Bold;
-            //                    break;
-            //                }
-
-            //            case VTActions.BoldUnset:
-            //                {
-            //                    this.lastInline.FontWeight = FontWeights.Normal;
-            //                    break;
-            //                }
-
-            //            case VTActions.CrossedOut:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.CrossedOutUnset:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.DefaultAttributes:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.DefaultBackground:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.DefaultForeground:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.DoublyUnderlined:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.DoublyUnderlinedUnset:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.Faint:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.FaintUnset:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.Invisible:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.InvisibleUnset:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.Italics:
-            //                {
-            //                    this.lastInline.FontStyle = FontStyles.Italic;
-            //                    break;
-            //                }
-
-            //            case VTActions.ItalicsUnset:
-            //                {
-            //                    this.lastInline.FontStyle = FontStyles.Normal;
-            //                    break;
-            //                }
-
-            //            case VTActions.Overlined:
-            //                {
-            //                    this.lastInline.TextDecorations = TextDecorations.OverLine;
-            //                    break;
-            //                }
-
-            //            case VTActions.OverlinedUnset:
-            //                {
-            //                    this.lastInline.TextDecorations = null;
-            //                    break;
-            //                }
-
-            //            case VTActions.ReverseVideo:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.ReverseVideoUnset:
-            //                {
-            //                    break;
-            //                }
-
-            //            case VTActions.Underline:
-            //                {
-            //                    this.lastInline.TextDecorations = TextDecorations.Underline;
-            //                    break;
-            //                }
-
-            //            case VTActions.UnderlineUnset:
-            //                {
-            //                    this.lastInline.TextDecorations = null;
-            //                    break;
-            //                }
-
-            //            default:
-            //                logger.WarnFormat("未实现VTAction, {0}", vtAction.Type);
-            //                break;
-            //        }
-            //    }
-            //}));
-        }
-
-        public void PerformAction(VTAction vtAction)
+        public void PerformAction(VTActions vtAction, params object[] param)
         {
             this.Dispatcher.Invoke(new Action(() =>
             {
-                switch (vtAction.Type)
+                switch (vtAction)
                 {
                     case VTActions.PlayBell:
                         {
@@ -268,26 +110,11 @@ namespace VideoTerminal.Controls
 
                     default:
                         {
-                            this.visualContainer.PerformAction(vtAction);
+                            this.visualContainer.PerformAction(vtAction, param);
                             break;
                         }
                 }
             }));
-        }
-
-        public void CursorBackward(int distance)
-        {
-            logger.WarnFormat("CursorBackward");
-        }
-
-        public void CursorForward(int distance)
-        {
-            logger.WarnFormat("CursorForward");
-        }
-
-        public void ForwardTab()
-        {
-            logger.WarnFormat("ForwardTab");
         }
 
         public ICursorState CursorSaveState()
@@ -299,17 +126,6 @@ namespace VideoTerminal.Controls
         public void CursorRestoreState(ICursorState state)
         {
             logger.WarnFormat("CursorRestoreState");
-        }
-
-        public bool CursorVisibility(bool visible)
-        {
-            logger.WarnFormat("CursorVisibility");
-            return false;
-        }
-
-        public void CursorPosition(int row, int column)
-        {
-            logger.WarnFormat("CursorPosition");
         }
 
         public IPresentationDevice CreatePresentationDevice()

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Sockets
+namespace VideoTerminal.Clients
 {
-    public class SSHSocketAuthorition : SocketAuthorition
+    public class SSHClientAuthorition : ClientAuthorition
     {
         public string KeyFilePath { get; set; }
 
@@ -25,7 +25,7 @@ namespace VideoTerminal.Sockets
 
         public uint TerminalRows { get; set; }
 
-        public SSHSocketAuthorition()
+        public SSHClientAuthorition()
         {
             //this.TerminalColumns = DefaultValues.TerminalColumns;
             //this.TerminalRows = DefaultValues.TerminalRows;

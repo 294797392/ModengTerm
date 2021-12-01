@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Sockets
+namespace VideoTerminal.Clients
 {
     /// <summary>
     /// 实现与串口的通信
     /// </summary>
-    public class SerialPortSocket : SocketBase
+    public class SerialPortClient : ClientBase
     {
-        public override SocketTypes Protocol
+        public override ClientTypes Protocol
         {
             get
             {
-                return SocketTypes.SerialPort;
+                return ClientTypes.SerialPort;
             }
         }
 
-        public SerialPortSocket(SocketAuthorition authorition) : base(authorition)
+        public SerialPortClient(ClientAuthorition authorition) : base(authorition)
         {
 
         }

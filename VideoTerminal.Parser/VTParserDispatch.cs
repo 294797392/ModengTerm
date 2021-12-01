@@ -3,62 +3,57 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using VideoTerminal.Base;
-using VTInterface;
 
 namespace VideoTerminal.Parser
 {
-    internal class VTParserDispatch
+    /// <summary>
+    /// 负责分发VTParser的事件
+    /// </summary>
+    public partial class VTParser
     {
         #region 类变量
-
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTParserDispatch");
 
         #endregion
 
         #region 公开事件
 
-        /// <summary>
-        /// VTParserDispatch：触发事件的对象
-        /// DECSETPrivateModeSet：要设置的DECPrivateMode
-        /// bool：是否启用该设置
-        /// </summary>
-        public event Action<VTParserDispatch, DECPrivateMode, bool> DECPrivateModeSet;
-
         #endregion
 
         #region 实例变量
 
-        private ICursorState cursorState;
-        private IPresentationDevice presentationDevice;     // 保存主屏幕
-
-        protected IVideoTerminal terminal;
+        //private ICursorState cursorState;
+        //private IPresentationDevice presentationDevice;     // 保存主屏幕
 
         #endregion
 
         #region 构造方法
 
-        public VTParserDispatch(IVideoTerminal terminal)
+        public VTParser()
         {
-            this.terminal = terminal;
         }
 
         #endregion
 
         #region 公开接口
 
-        public void ActionPrint(byte ch)
+        private void ActionPrint(byte ch)
         {
-            this.ActionPrint(char.ToString((char)ch));
+            this.NotifyActionEvent(VTActions.Print, char.ToString((char)ch));
         }
 
-        public void ActionPrint(string text)
+        private void ActionPrint(string text)
         {
-            VTAction.PrintAction.Data = text;
-            this.terminal.PerformAction(VTAction.PrintAction);
+            this.NotifyActionEvent(VTActions.Print, text);
         }
 
-        public void ActionExecute(byte ch)
+        /// <summary>
+        /// 执行C0字符集的控制字符
+        /// </summary>
+        /// <param name="ch"></param>
+        private void ActionExecute(byte ch)
         {
+            //logger.InfoFormat("执行CSI事件, {0}, {1}", ch, this.parameters.Count);
+
             switch (ch)
             {
                 case ASCIIChars.NUL:
@@ -70,27 +65,27 @@ namespace VideoTerminal.Parser
                 case ASCIIChars.BEL:
                     {
                         // 响铃
-                        this.terminal.PerformAction(VTAction.PlayBellAction);
+                        this.NotifyActionEvent(VTActions.PlayBell);
                         break;
                     }
 
                 case ASCIIChars.BS:
                     {
                         // Backspace，退格，光标向前移动一位
-                        this.terminal.CursorBackward(1);
+                        this.NotifyActionEvent(VTActions.CursorBackward, 1);
                         break;
                     }
 
                 case ASCIIChars.TAB:
                     {
                         // tab键
-                        this.terminal.ForwardTab();
+                        this.NotifyActionEvent(VTActions.ForwardTab);
                         break;
                     }
 
                 case ASCIIChars.CR:
                     {
-                        this.terminal.PerformAction(VTAction.CarriageReturnAction);
+                        this.NotifyActionEvent(VTActions.CarriageReturn);
                         break;
                     }
 
@@ -99,7 +94,7 @@ namespace VideoTerminal.Parser
                 case ASCIIChars.VT:
                     {
                         // 这三个都是LF
-                        this.terminal.PerformAction(VTAction.LineFeedAction);
+                        this.NotifyActionEvent(VTActions.LineFeed);
                         break;
                     }
 
@@ -114,14 +109,17 @@ namespace VideoTerminal.Parser
                 default:
                     {
                         //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
-                        VTAction.PrintAction.Data = char.ToString((char)ch);
-                        this.terminal.PerformAction(VTAction.PrintAction);
+                        this.NotifyActionEvent(VTActions.Print, char.ToString((char)ch));
                         break;
                     }
             }
         }
 
-        public void ActionCSIDispatch(int finalByte, List<int> parameters)
+        /// <summary>
+        /// CSI状态解析完毕，开始执行CSI对应的动作
+        /// </summary>
+        /// <param name="ch">Final Byte</param>
+        private void ActionCSIDispatch(int finalByte, List<int> parameters)
         {
             CSIActionCodes code = (CSIActionCodes)finalByte;
 
@@ -152,13 +150,13 @@ namespace VideoTerminal.Parser
                     {
                         int row = parameters[0];
                         int col = parameters[1];
-                        this.terminal.CursorPosition(row, col);
+                        this.NotifyActionEvent(VTActions.CursorPosition, row, col);
                         break;
                     }
 
                 case CSIActionCodes.CUF_CursorForward:
                     {
-                        this.terminal.CursorForward(parameters[0]);
+                        this.NotifyActionEvent(VTActions.CursorForword, parameters[0]);
                         break;
                     }
 
@@ -188,12 +186,17 @@ namespace VideoTerminal.Parser
             }
         }
 
-        public DCSStringHandlerDlg ActionDCSDispatch(int id, List<int> parameters)
+        private DCSStringHandlerDlg ActionDCSDispatch(int id, List<int> parameters)
         {
             throw new NotImplementedException();
         }
 
-        public void ActionEscDispatch(byte ch)
+        /// <summary>
+        ///  - Triggers the EscDispatch action to indicate that the listener should handle a simple escape sequence.
+        ///   These sequences traditionally start with ESC and a simple letter. No complicated parameters.
+        /// </summary>
+        /// <param name="ch">Final Byte</param>
+        private void ActionEscDispatch(byte ch)
         {
             EscActionCodes code = (EscActionCodes)ch;
 
@@ -218,7 +221,7 @@ namespace VideoTerminal.Parser
         /// </summary>
         /// <param name="ch"></param>
         /// <param name="parameters"></param>
-        public void ActionVt52EscDispatch(byte ch, List<int> parameters)
+        private void ActionVt52EscDispatch(byte ch, List<int> parameters)
         {
             VT52ActionCodes code = (VT52ActionCodes)ch;
 
@@ -243,8 +246,6 @@ namespace VideoTerminal.Parser
         {
             int size = parameters.Count;
 
-            List<VTAction> actions = new List<VTAction>();
-
             for (int i = 0; i < size; i++)
             {
                 byte option = (byte)parameters[i];
@@ -254,93 +255,88 @@ namespace VideoTerminal.Parser
                     case GraphicsOptions.Off:
                         {
                             // 关闭字体效果
-                            actions.Add(VTAction.DefaultAttributeAction);
-                            actions.Add(VTAction.DefaultBackgroundAction);
-                            actions.Add(VTAction.DefaultForegroundAction);
+                            this.NotifyActionEvent(VTActions.DefaultAttributes);
+                            this.NotifyActionEvent(VTActions.DefaultBackground);
+                            this.NotifyActionEvent(VTActions.DefaultForeground);
                             break;
                         }
 
-                    case GraphicsOptions.ForegroundDefault: actions.Add(VTAction.DefaultForegroundAction); break;
-                    case GraphicsOptions.BackgroundDefault: actions.Add(VTAction.DefaultBackgroundAction); break;
-                    case GraphicsOptions.BoldBright: actions.Add(VTAction.BoldAction); break;
-                    case GraphicsOptions.RGBColorOrFaint: actions.Add(VTAction.FaintAction); break;// 降低颜色强度
+                    case GraphicsOptions.ForegroundDefault: this.NotifyActionEvent(VTActions.DefaultForeground); break;
+                    case GraphicsOptions.BackgroundDefault: this.NotifyActionEvent(VTActions.DefaultBackground); break;
+                    case GraphicsOptions.BoldBright: this.NotifyActionEvent(VTActions.Bold); break;
+                    case GraphicsOptions.RGBColorOrFaint: this.NotifyActionEvent(VTActions.Faint); break;// 降低颜色强度
                     case GraphicsOptions.NotBoldOrFaint:
                         {
                             // 还原颜色强度和粗细
-                            actions.Add(VTAction.BoldUnsetAction);
-                            actions.Add(VTAction.FaintUnsetAction);
+                            this.NotifyActionEvent(VTActions.BoldUnset);
+                            this.NotifyActionEvent(VTActions.FaintUnset);
                             break;
                         }
 
-                    case GraphicsOptions.Italics: actions.Add(VTAction.ItalicsAction); break;
-                    case GraphicsOptions.NotItalics: actions.Add(VTAction.ItalicsUnsetAction); break;
+                    case GraphicsOptions.Italics: this.NotifyActionEvent(VTActions.Italics); break;
+                    case GraphicsOptions.NotItalics: this.NotifyActionEvent(VTActions.ItalicsUnset); break;
                     case GraphicsOptions.BlinkOrXterm256Index:
-                    case GraphicsOptions.RapidBlink: actions.Add(VTAction.BlinkAction); break;
-                    case GraphicsOptions.Steady: actions.Add(VTAction.BlinkUnsetAction); break;
-                    case GraphicsOptions.Invisible: actions.Add(VTAction.InvisibleAction); break;
-                    case GraphicsOptions.Visible: actions.Add(VTAction.InvisibleUnsetAction); break;
-                    case GraphicsOptions.CrossedOut: actions.Add(VTAction.CrossedOutAction); break;
-                    case GraphicsOptions.NotCrossedOut: actions.Add(VTAction.CrossedOutUnsetAction); break;
-                    case GraphicsOptions.Negative: actions.Add(VTAction.ReverseVideoAction); break;
-                    case GraphicsOptions.Positive: actions.Add(VTAction.ReverseVideoUnsetAction); break;
-                    case GraphicsOptions.Underline: actions.Add(VTAction.UnderlineAction); break;
-                    case GraphicsOptions.DoublyUnderlined: actions.Add(VTAction.DoublyUnderlinedAction); break;
+                    case GraphicsOptions.RapidBlink: this.NotifyActionEvent(VTActions.Blink); break;
+                    case GraphicsOptions.Steady: this.NotifyActionEvent(VTActions.BlinkUnset); break;
+                    case GraphicsOptions.Invisible: this.NotifyActionEvent(VTActions.Invisible); break;
+                    case GraphicsOptions.Visible: this.NotifyActionEvent(VTActions.InvisibleUnset); break;
+                    case GraphicsOptions.CrossedOut: this.NotifyActionEvent(VTActions.CrossedOut); break;
+                    case GraphicsOptions.NotCrossedOut: this.NotifyActionEvent(VTActions.CrossedOutUnset); break;
+                    case GraphicsOptions.Negative: this.NotifyActionEvent(VTActions.ReverseVideo); break;
+                    case GraphicsOptions.Positive: this.NotifyActionEvent(VTActions.ReverseVideoUnset); break;
+                    case GraphicsOptions.Underline: this.NotifyActionEvent(VTActions.Underline); break;
+                    case GraphicsOptions.DoublyUnderlined: this.NotifyActionEvent(VTActions.DoublyUnderlined); break;
                     case GraphicsOptions.NoUnderline:
                         {
-                            actions.Add(VTAction.UnderlineUnsetAction);
-                            actions.Add(VTAction.DoublyUnderlinedUnsetAction);
+                            this.NotifyActionEvent(VTActions.UnderlineUnset);
+                            this.NotifyActionEvent(VTActions.DoublyUnderlinedUnset);
                             break;
                         }
 
-                    case GraphicsOptions.Overline: actions.Add(VTAction.OverlinedAction); break;
-                    case GraphicsOptions.NoOverline: actions.Add(VTAction.OverlinedUnsetAction); break;
+                    case GraphicsOptions.Overline: this.NotifyActionEvent(VTActions.Overlined); break;
+                    case GraphicsOptions.NoOverline: this.NotifyActionEvent(VTActions.OverlinedUnset); break;
 
-                    case GraphicsOptions.ForegroundBlack: actions.Add(VTAction.ForegroundDarkBlackAction); break;
-                    case GraphicsOptions.ForegroundBlue: actions.Add(VTAction.ForegroundDarkBlueAction); break;
-                    case GraphicsOptions.ForegroundGreen: actions.Add(VTAction.ForegroundDarkGreenAction); break;
-                    case GraphicsOptions.ForegroundCyan: actions.Add(VTAction.ForegroundDarkCyanAction); break;
-                    case GraphicsOptions.ForegroundRed: actions.Add(VTAction.ForegroundDarkRedAction); break;
-                    case GraphicsOptions.ForegroundMagenta: actions.Add(VTAction.ForegroundDarkMagentaAction); break;
-                    case GraphicsOptions.ForegroundYellow: actions.Add(VTAction.ForegroundDarkYellowAction); break;
-                    case GraphicsOptions.ForegroundWhite: actions.Add(VTAction.ForegroundDarkWhiteAction); break;
+                    case GraphicsOptions.ForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkBlack); break;
+                    case GraphicsOptions.ForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkBlue); break;
+                    case GraphicsOptions.ForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkGreen); break;
+                    case GraphicsOptions.ForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkCyan); break;
+                    case GraphicsOptions.ForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkRed); break;
+                    case GraphicsOptions.ForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkMagenta); break;
+                    case GraphicsOptions.ForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkYellow); break;
+                    case GraphicsOptions.ForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTForeground.DarkWhite); break;
 
-                    case GraphicsOptions.BackgroundBlack: actions.Add(VTAction.BackgroundDarkBlackAction); break;
-                    case GraphicsOptions.BackgroundBlue: actions.Add(VTAction.BackgroundDarkBlueAction); break;
-                    case GraphicsOptions.BackgroundGreen: actions.Add(VTAction.BackgroundDarkGreenAction); break;
-                    case GraphicsOptions.BackgroundCyan: actions.Add(VTAction.BackgroundDarkCyanAction); break;
-                    case GraphicsOptions.BackgroundRed: actions.Add(VTAction.BackgroundDarkRedAction); break;
-                    case GraphicsOptions.BackgroundMagenta: actions.Add(VTAction.BackgroundDarkMagentaAction); break;
-                    case GraphicsOptions.BackgroundYellow: actions.Add(VTAction.BackgroundDarkYellowAction); break;
-                    case GraphicsOptions.BackgroundWhite: actions.Add(VTAction.BackgroundDarkWhiteAction); break;
+                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkWhite); break;
+                    case GraphicsOptions.BackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkBlue); break;
+                    case GraphicsOptions.BackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkGreen); break;
+                    case GraphicsOptions.BackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkCyan); break;
+                    case GraphicsOptions.BackgroundRed: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkRed); break;
+                    case GraphicsOptions.BackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkMagenta); break;
+                    case GraphicsOptions.BackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkYellow); break;
+                    case GraphicsOptions.BackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTForeground.DarkWhite); break;
 
-                    case GraphicsOptions.BrightForegroundBlack: actions.Add(VTAction.ForegroundLightBlackAction); break;
-                    case GraphicsOptions.BrightForegroundBlue: actions.Add(VTAction.ForegroundLightBlueAction); break;
-                    case GraphicsOptions.BrightForegroundGreen: actions.Add(VTAction.ForegroundLightGreenAction); break;
-                    case GraphicsOptions.BrightForegroundCyan: actions.Add(VTAction.ForegroundLightCyanAction); break;
-                    case GraphicsOptions.BrightForegroundRed: actions.Add(VTAction.ForegroundLightRedAction); break;
-                    case GraphicsOptions.BrightForegroundMagenta: actions.Add(VTAction.ForegroundLightMagentaAction); break;
-                    case GraphicsOptions.BrightForegroundYellow: actions.Add(VTAction.ForegroundLightYellowAction); break;
-                    case GraphicsOptions.BrightForegroundWhite: actions.Add(VTAction.ForegroundLightWhiteAction); break;
+                    case GraphicsOptions.BrightForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightWhite); break;
+                    case GraphicsOptions.BrightForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightBlue); break;
+                    case GraphicsOptions.BrightForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightGreen); break;
+                    case GraphicsOptions.BrightForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightCyan); break;
+                    case GraphicsOptions.BrightForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightRed); break;
+                    case GraphicsOptions.BrightForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightMagenta); break;
+                    case GraphicsOptions.BrightForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightYellow); break;
+                    case GraphicsOptions.BrightForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTForeground.BrightWhite); break;
 
-                    case GraphicsOptions.BrightBackgroundBlack: actions.Add(VTAction.BackgroundLightBlackAction); break;
-                    case GraphicsOptions.BrightBackgroundBlue: actions.Add(VTAction.BackgroundLightBlueAction); break;
-                    case GraphicsOptions.BrightBackgroundGreen: actions.Add(VTAction.BackgroundLightGreenAction); break;
-                    case GraphicsOptions.BrightBackgroundCyan: actions.Add(VTAction.BackgroundLightCyanAction); break;
-                    case GraphicsOptions.BrightBackgroundRed: actions.Add(VTAction.BackgroundLightRedAction); break;
-                    case GraphicsOptions.BrightBackgroundMagenta: actions.Add(VTAction.BackgroundLightMagentaAction); break;
-                    case GraphicsOptions.BrightBackgroundYellow: actions.Add(VTAction.BackgroundLightYellowAction); break;
-                    case GraphicsOptions.BrightBackgroundWhite: actions.Add(VTAction.BackgroundLightWhiteAction); break;
+                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightWhite); break;
+                    case GraphicsOptions.BrightBackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightBlue); break;
+                    case GraphicsOptions.BrightBackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightGreen); break;
+                    case GraphicsOptions.BrightBackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightCyan); break;
+                    case GraphicsOptions.BrightBackgroundRed: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightRed); break;
+                    case GraphicsOptions.BrightBackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightMagenta); break;
+                    case GraphicsOptions.BrightBackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightYellow); break;
+                    case GraphicsOptions.BrightBackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTForeground.BrightWhite); break;
 
                     case GraphicsOptions.ForegroundExtended:
                         {
                             byte r, g, b;
                             i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), true, out r, out g, out b);
-
-                            VTAction.ForegroundRGBAction.R = r;
-                            VTAction.ForegroundRGBAction.G = g;
-                            VTAction.ForegroundRGBAction.B = b;
-
-                            actions.Add(VTAction.ForegroundRGBAction);
+                            this.NotifyActionEvent(VTActions.ForegroundRGB, r, g, b);
                             break;
                         }
 
@@ -348,22 +344,15 @@ namespace VideoTerminal.Parser
                         {
                             byte r, g, b;
                             i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), false, out r, out g, out b);
-
-                            VTAction.BackgroundRGBAction.R = r;
-                            VTAction.BackgroundRGBAction.G = g;
-                            VTAction.BackgroundRGBAction.B = b;
-
-                            actions.Add(VTAction.BackgroundRGBAction);
+                            this.NotifyActionEvent(VTActions.BackgroundRGB, r, g, b);
                             break;
                         }
 
                     default:
-                        //logger.WarnFormat("未实现的SGRCode = {0}", option);
+                        logger.WarnFormat("未实现的SGRCode = {0}", option);
                         break;
                 }
             }
-
-            this.terminal.PerformAction(actions);
         }
 
         /// <summary>
@@ -408,41 +397,43 @@ namespace VideoTerminal.Parser
 
         private bool UseMainScreenBuffer()
         {
-            // 先获取子显示屏
-            IPresentationDevice subDevice = this.terminal.GetActivePresentationDevice();
+            //// 先获取子显示屏
+            //IPresentationDevice subDevice = this.terminal.GetActivePresentationDevice();
 
-            // 切换主屏幕
-            if (!this.terminal.SwitchPresentationDevice(this.presentationDevice))
-            {
-                logger.Error("切换主显示屏失败");
-                return false;
-            }
+            //// 切换主屏幕
+            //if (!this.terminal.SwitchPresentationDevice(this.presentationDevice))
+            //{
+            //    logger.Error("切换主显示屏失败");
+            //    return false;
+            //}
 
-            // 还原鼠标状态
-            this.terminal.CursorRestoreState(this.cursorState);
+            //// 还原鼠标状态
+            //this.terminal.CursorRestoreState(this.cursorState);
 
-            // 删除子显示屏
-            this.terminal.DeletePresentationDevice(subDevice);
+            //// 删除子显示屏
+            //this.terminal.DeletePresentationDevice(subDevice);
 
-            return true;
+            //return true;
+            throw new NotImplementedException();
         }
 
         private bool UseAlternateScreenBuffer()
         {
-            this.cursorState = this.terminal.CursorSaveState();
+            //this.cursorState = this.terminal.CursorSaveState();
 
-            // 首先保存主屏幕设备
-            this.presentationDevice = this.terminal.GetActivePresentationDevice();
+            //// 首先保存主屏幕设备
+            //this.presentationDevice = this.terminal.GetActivePresentationDevice();
 
-            // 再创建一个新的屏幕设备
-            IPresentationDevice device = this.terminal.CreatePresentationDevice();
-            if (device == null)
-            {
-                logger.Error("创建显示屏失败");
-                return false;
-            }
+            //// 再创建一个新的屏幕设备
+            //IPresentationDevice device = this.terminal.CreatePresentationDevice();
+            //if (device == null)
+            //{
+            //    logger.Error("创建显示屏失败");
+            //    return false;
+            //}
 
-            return this.terminal.SwitchPresentationDevice(device);
+            //return this.terminal.SwitchPresentationDevice(device);
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -458,14 +449,21 @@ namespace VideoTerminal.Parser
             {
                 switch ((DECPrivateMode)mode)
                 {
-                    case Parser.DECPrivateMode.DECANM_AnsiMode:
+                    case DECPrivateMode.DECCKM_CursorKeysMode:
                         {
+                            // set - Enable Application Mode, reset - Normal mode
+
+                            // true表示ApplicationMode
+                            // false表示NormalMode
+                            this.isApplicationMode = enable;
+                            this.Keyboard.SetKeypadMode(enable);
                             break;
                         }
 
-                    case Parser.DECPrivateMode.DECCKM_CursorKeysMode:
+                    case DECPrivateMode.DECANM_AnsiMode:
                         {
-                            // set - Enable Application Mode, reset - Normal mode
+                            this.isAnsiMode = enable;
+                            this.Keyboard.SetAnsiMode(enable);
                             break;
                         }
 
@@ -477,7 +475,14 @@ namespace VideoTerminal.Parser
 
                     case Parser.DECPrivateMode.DECTCEM_TextCursorEnableMode:
                         {
-                            success = this.terminal.CursorVisibility(enable);
+                            if (enable)
+                            {
+                                this.NotifyActionEvent(VTActions.CursorVisible);
+                            }
+                            else
+                            {
+                                this.NotifyActionEvent(VTActions.CursorHiden);
+                            }
                             break;
                         }
 
@@ -494,11 +499,6 @@ namespace VideoTerminal.Parser
                     default:
                         logger.WarnFormat("未实现DECSETPrivateMode, {0}", mode);
                         break;
-                }
-
-                if (this.DECPrivateModeSet != null)
-                {
-                    this.DECPrivateModeSet(this, (DECPrivateMode)mode, enable);
                 }
             }
 

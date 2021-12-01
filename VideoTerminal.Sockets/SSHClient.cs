@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using VideoTerminal.Base;
 
-namespace VideoTerminal.Sockets
+namespace VideoTerminal.Clients
 {
-    public class SSHSocket : SocketBase
+    public class SSHClient : ClientBase
     {
         #region 类变量
 
@@ -19,19 +19,19 @@ namespace VideoTerminal.Sockets
 
         private SshClient sshClient;
         private ShellStream stream;
-        private SSHSocketAuthorition authorition;
+        private SSHClientAuthorition authorition;
 
         #endregion
 
         #region 属性
 
-        public override SocketTypes Protocol { get { return SocketTypes.SSH; } }
+        public override ClientTypes Protocol { get { return ClientTypes.SSH; } }
 
         #endregion
 
         #region 构造方法
 
-        public SSHSocket(SocketAuthorition authorition) : 
+        public SSHClient(ClientAuthorition authorition) : 
             base(authorition)
         {
         }
@@ -46,9 +46,9 @@ namespace VideoTerminal.Sockets
 
         public override bool Connect()
         {
-            this.NotifyStatusChanged(SocketState.Connecting);
+            this.NotifyStatusChanged(ClientState.Connecting);
 
-            this.authorition = this.Authorition as SSHSocketAuthorition;
+            this.authorition = this.Authorition as SSHClientAuthorition;
             var authentications = new List<AuthenticationMethod>();
             if (!string.IsNullOrEmpty(this.authorition.KeyFilePath))
             {
@@ -64,7 +64,7 @@ namespace VideoTerminal.Sockets
             this.stream = this.sshClient.CreateShellStream(this.authorition.TerminalName, DefaultValues.TerminalColumns, DefaultValues.TerminalRows, 0, 0, 4096);
             this.stream.DataReceived += this.Stream_DataReceived;
 
-            this.NotifyStatusChanged(SocketState.Connected);
+            this.NotifyStatusChanged(ClientState.Connected);
 
             return true;
         }

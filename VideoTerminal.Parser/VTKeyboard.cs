@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using VideoTerminal.Base;
@@ -48,6 +49,12 @@ namespace VideoTerminal.Parser
     /// </summary>
     public class VTKeyboard
     {
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTKeyboard");
+
+        #endregion
+
         #region 实例变量
 
         /// <summary>
@@ -71,7 +78,7 @@ namespace VideoTerminal.Parser
 
         public VTKeyboard()
         {
-            this.keymap = JSONHelper.ParseFile<Keymap>(DefaultValues.KeymapFile);
+            this.InitializeKeymap();
         }
 
         #endregion
@@ -85,6 +92,30 @@ namespace VideoTerminal.Parser
         public bool IsCursorKey(VTKeys key)
         {
             return key == VTKeys.UpArrow || key == VTKeys.DownArrow || key == VTKeys.LeftArrow || key == VTKeys.RightArrow;
+        }
+
+        private void InitializeKeymap()
+        {
+            if (!File.Exists(DefaultValues.KeymapFile))
+            {
+                this.UseHardcodeKeymap();
+                return;
+            }
+
+            try
+            {
+                this.keymap = JSONHelper.ParseFile<Keymap>(DefaultValues.KeymapFile);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("加载keymap配置文件异常", ex);
+                this.UseHardcodeKeymap();
+            }
+        }
+
+        private void UseHardcodeKeymap()
+        {
+            logger.Info("加载默认keymap配置");
         }
 
         #endregion

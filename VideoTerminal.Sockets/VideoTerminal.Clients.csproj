@@ -7,8 +7,8 @@
     <ProjectGuid>{42CF1646-ADC6-4988-9477-3BE696108711}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VideoTerminal.Sockets</RootNamespace>
-    <AssemblyName>VideoTerminal.Sockets</AssemblyName>
+    <RootNamespace>VideoTerminal.Clients</RootNamespace>
+    <AssemblyName>VideoTerminal.Clients</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -52,14 +52,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SerialPortSocket.cs" />
-    <Compile Include="SocketAuthorition.cs" />
-    <Compile Include="SocketBase.cs" />
-    <Compile Include="SocketFactory.cs" />
-    <Compile Include="SocketTypes.cs" />
-    <Compile Include="SocketState.cs" />
-    <Compile Include="SSHSocket.cs" />
-    <Compile Include="SSHSocketAuthorition.cs" />
+    <Compile Include="SerialPortClient.cs" />
+    <Compile Include="ClientAuthorition.cs" />
+    <Compile Include="ClientBase.cs" />
+    <Compile Include="ClientFactory.cs" />
+    <Compile Include="ClientTypes.cs" />
+    <Compile Include="ClientState.cs" />
+    <Compile Include="SSHClient.cs" />
+    <Compile Include="SSHClientAuthorition.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VTBase\VideoTerminal.Base.csproj">

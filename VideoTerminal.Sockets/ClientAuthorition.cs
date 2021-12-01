@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Interface
+namespace VideoTerminal.Clients
 {
     /// <summary>
-    /// 表示一个显示设备
-    /// 就是终端屏幕
+    /// 表示远程主机的验证信息
     /// </summary>
-    public interface IPresentationDevice
+    public interface ClientAuthorition
     {
-
     }
 }

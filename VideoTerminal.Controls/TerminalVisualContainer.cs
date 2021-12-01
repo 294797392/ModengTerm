@@ -10,7 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
-using VTInterface;
+using VideoTerminal.Interface;
+using VideoTerminal.Parser;
 
 namespace VideoTerminal.Controls
 {
@@ -126,13 +127,13 @@ namespace VideoTerminal.Controls
             //this.RenderLine("789");
         }
 
-        public void PerformAction(VTAction vtAction)
+        public void PerformAction(VTActions vtAction, params object[] param)
         {
-            switch (vtAction.Type)
+            switch (vtAction)
             {
                 case VTActions.Print:
                     {
-                        string text = vtAction.Data.ToString();
+                        string text = param[0].ToString();
 
                         this.currentLine.AppendText(text);
                         this.currentLine.PerformRender();

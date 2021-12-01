@@ -4,12 +4,12 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
-namespace VideoTerminal.Sockets
+namespace VideoTerminal.Clients
 {
     /// <summary>
     /// 管理与远程主机的连接
     /// </summary>
-    public abstract class SocketBase
+    public abstract class ClientBase
     {
         #region 常量
 
@@ -22,29 +22,29 @@ namespace VideoTerminal.Sockets
 
         #region 公开事件
 
-        public event Action<object, SocketState> StatusChanged;
+        public event Action<object, ClientState> StatusChanged;
 
         /// <summary>
         /// 当收到数据流的时候触发
         /// </summary>
-        public event Action<SocketBase, byte[]> DataReceived;
+        public event Action<ClientBase, byte[]> DataReceived;
 
         #endregion
 
         #region 属性
 
-        public abstract SocketTypes Protocol { get; }
+        public abstract ClientTypes Protocol { get; }
 
         /// <summary>
         /// 连接Socket所需要的验证信息
         /// </summary>
-        public SocketAuthorition Authorition { get; private set; }
+        public ClientAuthorition Authorition { get; private set; }
 
         #endregion
 
         #region 构造方法
 
-        public SocketBase(SocketAuthorition authorition)
+        public ClientBase(ClientAuthorition authorition)
         {
             this.Authorition = authorition;
         }
@@ -88,7 +88,7 @@ namespace VideoTerminal.Sockets
 
         #region 实例方法
 
-        protected void NotifyStatusChanged(SocketState state)
+        protected void NotifyStatusChanged(ClientState state)
         {
             if (this.StatusChanged != null)
             {

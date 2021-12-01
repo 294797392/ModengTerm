@@ -5,14 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using VideoTerminal.Sockets;
-using VTInterface;
 
 namespace VideoTerminal.Parser
 {
     /// <summary>
     /// 模块名称：终端数据流解析器
-    /// 
+    /// 负责解析数据流
     /// 模块描述：对从终端获取到的数据流进行解析操作，并抛对应的事件给外部模块
     /// 
     /// 参考资料：
@@ -64,7 +62,7 @@ namespace VideoTerminal.Parser
     /// UTF16：UTF-16就把两个字节当成一个单元来解析.这个很简单.
     /// UTF32：UTF-32就把四个字节当成一个单元来解析.这个很简单.
     /// </summary>
-    public class VTParser
+    public partial class VTParser
     {
         // The DEC STD 070 reference recommends supporting up to at least 16384 for
         // parameter values, so 32767 should be more than enough. At most we might
@@ -75,6 +73,12 @@ namespace VideoTerminal.Parser
         #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTParser");
+
+        #endregion
+
+        #region 公开事件
+
+        public event VTParserEventDlg ActionEvent;
 
         #endregion
 
@@ -107,18 +111,9 @@ namespace VideoTerminal.Parser
         #region 属性
 
         /// <summary>
-        /// 解析器事件分发对象
-        /// </summary>
-        internal VTParserDispatch Dispatch { get; private set; }
-
-        /// <summary>
         /// 表示终端键盘
         /// </summary>
-        public VTKeyboard Keyboard { get; private set; }
-
-        public SocketBase Socket { get; set; }
-
-        public IVideoTerminal VideoTermianl { get; set; }
+        private VTKeyboard Keyboard { get; set; }
 
         #endregion
 
@@ -127,6 +122,7 @@ namespace VideoTerminal.Parser
         /// <summary>
         /// 初始化终端解析器
         /// </summary>
+        /// <param name="eventDlg">终端事件回调</param>
         public void Initialize()
         {
             this.isAnsiMode = true;
@@ -136,9 +132,6 @@ namespace VideoTerminal.Parser
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
 
-            this.Dispatch = new VTParserDispatch(this.VideoTermianl);
-            this.Dispatch.DECPrivateModeSet += this.Dispatch_DECPrivateModeSet;
-
             this.unicodeText = new List<byte>();
 
             this.oscString = new StringBuilder();
@@ -147,8 +140,128 @@ namespace VideoTerminal.Parser
             this.intermediate = new List<byte>();
             this.parameters = new List<int>();
 
-            this.Socket.DataReceived += this.Socket_DataReceived;
             this.state = VTStates.Ground;   // 状态机默认设置为基态
+        }
+
+        /// <summary>
+        /// 解析终端字节流
+        /// </summary>
+        /// <param name="bytes">要解析的字节流</param>
+        public void ProcessCharacters(byte[] bytes)
+        {
+            int length = bytes.Length;
+
+            for (int i = 0; i < length; i++)
+            {
+                byte ch = bytes[i];
+
+                // 在OSCString的状态下，ESC转义字符可以用作OSC状态的结束符，所以在这里不进入ESC状态
+                if (ASCIIChars.IsEscape(ch) && this.state != VTStates.OSCString)
+                {
+                    this.EnterEscape();
+                }
+                else
+                {
+                    switch (this.state)
+                    {
+                        case VTStates.Ground:
+                            {
+                                this.EventGround(ch);
+                                break;
+                            }
+
+                        case VTStates.Escape:
+                            {
+                                this.EventEscape(ch);
+                                break;
+                            }
+
+                        case VTStates.EscapeIntermediate:
+                            {
+                                this.EventEscapeIntermediate(ch);
+                                break;
+                            }
+
+                        case VTStates.OSCParam:
+                            {
+                                this.EventOSCParam(ch);
+                                break;
+                            }
+
+                        case VTStates.OSCString:
+                            {
+                                this.EventOSCString(ch);
+                                break;
+                            }
+
+                        case VTStates.OSCTermination:
+                            {
+                                this.EventOSCTermination(ch);
+                                break;
+                            }
+
+                        case VTStates.CSIEntry:
+                            {
+                                this.EventCSIEntry(ch);
+                                break;
+                            }
+
+                        case VTStates.CSIIntermediate:
+                            {
+                                this.EventCSIIntermediate(ch);
+                                break;
+                            }
+
+                        case VTStates.CSIIgnore:
+                            {
+                                this.EventCSIIgnore(ch);
+                                break;
+                            }
+
+                        case VTStates.CSIParam:
+                            {
+                                this.EventCSIParam(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSEntry:
+                            {
+                                this.EventDCSEntry(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSIgnore:
+                            {
+                                this.EventDCSIgnore(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSIntermediate:
+                            {
+                                this.EventDCSIntermediate(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSParam:
+                            {
+                                this.EventDCSParam(ch);
+                                break;
+                            }
+
+                        case VTStates.DCSPassthrough:
+                            {
+                                this.EventDCSPassThrough(ch);
+                                break;
+                            }
+
+                        case VTStates.Vt52Param:
+                            {
+                                this.EventVt52Param(ch);
+                                break;
+                            }
+                    }
+                }
+            }
         }
 
         #endregion
@@ -282,28 +395,14 @@ namespace VideoTerminal.Parser
 
         #region Action - An event may cause one of these actions to occur with or without a change of state
 
-        /// <summary>
-        /// 执行C0字符集的控制字符
-        /// </summary>
-        /// <param name="ch"></param>
-        private void ActionExecute(byte ch)
-        {
-            this.Dispatch.ActionExecute(ch);
-        }
-
-        private void ActionPrint(byte ch)
-        {
-            this.Dispatch.ActionPrint(ch);
-        }
-
-        private void ActionPrint(string text)
-        {
-            this.Dispatch.ActionPrint(text);
-        }
-
         private void ActionIgnore(byte ch)
         {
 
+        }
+
+        private void ActionCSIDispatch(byte ch)
+        {
+            this.ActionCSIDispatch(ch, this.parameters);
         }
 
         /// <summary>
@@ -333,16 +432,6 @@ namespace VideoTerminal.Parser
         }
 
         /// <summary>
-        /// CSI状态解析完毕，开始执行CSI对应的动作
-        /// </summary>
-        /// <param name="ch">Final Byte</param>
-        private void ActionCSIDispatch(byte ch)
-        {
-            //logger.InfoFormat("执行CSI事件, {0}, {1}", ch, this.parameters.Count);
-            this.Dispatch.ActionCSIDispatch(ch, this.parameters);
-        }
-
-        /// <summary>
         /// 收集CSI状态下的Parameter字符
         ///  - Triggers the Param action to indicate that the state machine should store this character as a part of a parameter
         ///   to a control sequence.
@@ -367,16 +456,6 @@ namespace VideoTerminal.Parser
         }
 
         /// <summary>
-        ///  - Triggers the EscDispatch action to indicate that the listener should handle a simple escape sequence.
-        ///   These sequences traditionally start with ESC and a simple letter. No complicated parameters.
-        /// </summary>
-        /// <param name="ch">Final Byte</param>
-        private void ActionEscDispatch(byte ch)
-        {
-            this.Dispatch.ActionEscDispatch(ch);
-        }
-
-        /// <summary>
         /// When a final character has been recognised in a device control string, this state will establish a channel to a handler for the appropriate control function, and then pass all subsequent characters through to this alternate handler, until the data string is terminated
         /// 当在设备控制字符串中识别出最后一个字符时，此状态将建立通向适当控制功能的处理程序的通道，然后将所有后续字符传递给此备用处理程序，直到数据字符串终止
         /// </summary>
@@ -384,7 +463,7 @@ namespace VideoTerminal.Parser
         private void ActionDCSDispatch(byte ch)
         {
             // 根据最后一个字符判断要使用的DCS的事件处理器
-            this.dcsStringHandler = this.Dispatch.ActionDCSDispatch(ch, this.parameters);
+            this.dcsStringHandler = this.ActionDCSDispatch(ch, this.parameters);
 
             if (this.dcsStringHandler != null)
             {
@@ -404,9 +483,9 @@ namespace VideoTerminal.Parser
         ///      sometimes followed by parameters.
         /// </summary>
         /// <param name="ch"></param>
-        private void ActionVT52EscDispatch(byte ch)
+        private void ActionVt52EscDispatch(byte ch)
         {
-            this.Dispatch.ActionVt52EscDispatch(ch, this.parameters);
+            this.ActionVt52EscDispatch(ch, this.parameters);
         }
 
         #endregion
@@ -500,7 +579,7 @@ namespace VideoTerminal.Parser
             else
             {
                 // 这里是其他的不带参数的VT52控制字符
-                this.ActionVT52EscDispatch(ch);
+                this.ActionVt52EscDispatch(ch);
                 this.EnterGround();
             }
         }
@@ -539,7 +618,7 @@ namespace VideoTerminal.Parser
             }
             else
             {
-                this.ActionVT52EscDispatch(ch);
+                this.ActionVt52EscDispatch(ch);
                 this.EnterGround();
             }
         }
@@ -966,13 +1045,13 @@ namespace VideoTerminal.Parser
             else
             {
                 this.parameters.Add(ch);
-                if(this.parameters.Count ==2)
+                if (this.parameters.Count == 2)
                 {
                     // The command character is processed before the parameter values,
                     // but it will always be 'Y', the Direct Cursor Address command.
 
                     // 到了这里说明Y指令的参数收集完了，可以执行了，因为Y指令是移动光标指令，有且只有两个参数
-                    this.ActionVT52EscDispatch((byte)'Y');
+                    this.ActionVt52EscDispatch((byte)'Y');
                     this.EnterGround();
                 }
             }
@@ -980,153 +1059,17 @@ namespace VideoTerminal.Parser
 
         #endregion
 
+        private void NotifyActionEvent(VTActions vtAction, params object[] param)
+        {
+            if (this.ActionEvent != null)
+            {
+                this.ActionEvent(vtAction, param);
+            }
+        }
+
         #endregion
 
         #region 事件处理器
-
-        private void Socket_DataReceived(SocketBase sender, byte[] bytes)
-        {
-            int length = bytes.Length;
-
-            for (int i = 0; i < length; i++)
-            {
-                byte ch = bytes[i];
-
-                // 在OSCString的状态下，ESC转义字符可以用作OSC状态的结束符，所以在这里不进入ESC状态
-                if (ASCIIChars.IsEscape(ch) && this.state != VTStates.OSCString)
-                {
-                    this.EnterEscape();
-                }
-                else
-                {
-                    switch (this.state)
-                    {
-                        case VTStates.Ground:
-                            {
-                                this.EventGround(ch);
-                                break;
-                            }
-
-                        case VTStates.Escape:
-                            {
-                                this.EventEscape(ch);
-                                break;
-                            }
-
-                        case VTStates.EscapeIntermediate:
-                            {
-                                this.EventEscapeIntermediate(ch);
-                                break;
-                            }
-
-                        case VTStates.OSCParam:
-                            {
-                                this.EventOSCParam(ch);
-                                break;
-                            }
-
-                        case VTStates.OSCString:
-                            {
-                                this.EventOSCString(ch);
-                                break;
-                            }
-
-                        case VTStates.OSCTermination:
-                            {
-                                this.EventOSCTermination(ch);
-                                break;
-                            }
-
-                        case VTStates.CSIEntry:
-                            {
-                                this.EventCSIEntry(ch);
-                                break;
-                            }
-
-                        case VTStates.CSIIntermediate:
-                            {
-                                this.EventCSIIntermediate(ch);
-                                break;
-                            }
-
-                        case VTStates.CSIIgnore:
-                            {
-                                this.EventCSIIgnore(ch);
-                                break;
-                            }
-
-                        case VTStates.CSIParam:
-                            {
-                                this.EventCSIParam(ch);
-                                break;
-                            }
-
-                        case VTStates.DCSEntry:
-                            {
-                                this.EventDCSEntry(ch);
-                                break;
-                            }
-
-                        case VTStates.DCSIgnore:
-                            {
-                                this.EventDCSIgnore(ch);
-                                break;
-                            }
-
-                        case VTStates.DCSIntermediate:
-                            {
-                                this.EventDCSIntermediate(ch);
-                                break;
-                            }
-
-                        case VTStates.DCSParam:
-                            {
-                                this.EventDCSParam(ch);
-                                break;
-                            }
-
-                        case VTStates.DCSPassthrough:
-                            {
-                                this.EventDCSPassThrough(ch);
-                                break;
-                            }
-
-                        case VTStates.Vt52Param:
-                            {
-                                this.EventVt52Param(ch);
-                                break;
-                            }
-                    }
-                }
-            }
-        }
-
-        private void Dispatch_DECPrivateModeSet(VTParserDispatch dispatch, DECPrivateMode privateMode, bool enable)
-        {
-            switch (privateMode)
-            {
-                case DECPrivateMode.DECCKM_CursorKeysMode:
-                    {
-                        // true表示ApplicationMode
-                        // false表示NormalMode
-                        this.isApplicationMode = enable;
-                        this.Keyboard.SetKeypadMode(enable);
-                        break;
-                    }
-
-                case DECPrivateMode.DECANM_AnsiMode:
-                    {
-                        this.isAnsiMode = enable;
-                        this.Keyboard.SetAnsiMode(enable);
-                        break;
-                    }
-
-                default:
-                    {
-                        break;
-                    }
-            }
-        }
 
         #endregion
     }
