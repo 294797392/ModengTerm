@@ -27,7 +27,6 @@ namespace VideoTerminalConsole
             SSHClientAuthorition authorition = ClientFactory.CreateSSHClientAuthorition("10.0.8.99", 22, "oheiheiheiheihei", "18612538605");
             VTApplication vtApp = VTApplication.Run(authorition, vt);
 
-            char[] chars = new char[1];
             while (true)
             {
                 ConsoleKeyInfo key = Console.ReadKey(true);

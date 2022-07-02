@@ -78,6 +78,7 @@ namespace VideoTerminal.Interface
         /// <param name="input">输入数据</param>
         private void Terminal_InputEvent(IVideoTerminal terminal, VTInputEventArgs input)
         {
+            // todo:translate and send to remote host
         }
 
         private void VtParser_ActionEvent(VTActions action, params object[] param)
