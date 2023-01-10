@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace VideoTerminal.Controls
+namespace XTerminal.Render
 {
     public static class TerminalLineFactory
     {

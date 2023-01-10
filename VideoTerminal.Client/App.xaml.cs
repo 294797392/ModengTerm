@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace VideoTerminal
+namespace XTerminal
 {
     /// <summary>
     /// App.xaml 的交互逻辑

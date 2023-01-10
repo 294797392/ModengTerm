@@ -56,17 +56,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VideoTerminal.Parser\VideoTerminal.Parser.csproj">
+    <ProjectReference Include="..\VideoTerminal.Parser\XTerminal.Parser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
-      <Name>VideoTerminal.Parser</Name>
+      <Name>XTerminal.Parser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VideoTerminal.Sockets\VideoTerminal.Clients.csproj">
+    <ProjectReference Include="..\VideoTerminal.Sockets\XTerminal.Clients.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
-      <Name>VideoTerminal.Clients</Name>
+      <Name>XTerminal.Clients</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VideoTerminalInterface\VideoTerminal.Interface.csproj">
-      <Project>{36e7e864-dae0-4b79-92e9-4d784edb14c0}</Project>
-      <Name>VideoTerminal.Interface</Name>
+    <ProjectReference Include="..\VTBase\XTerminal.Base.csproj">
+      <Project>{B5AF0539-2902-4C1A-9386-7517C4E335BD}</Project>
+      <Name>XTerminal.Base</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

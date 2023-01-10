@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.TextFormatting;
 
-namespace VideoTerminal.Controls
+namespace XTerminal.Render
 {
     /// <summary>
     /// 参考：

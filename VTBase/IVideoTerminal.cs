@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using VideoTerminal.Base;
-using VideoTerminal.Parser;
 
-namespace VideoTerminal.Interface
+namespace XTerminal.Base
 {
     /// <summary>
     /// 定义视频终端的标准接口

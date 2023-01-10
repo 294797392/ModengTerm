@@ -10,10 +10,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
-using VideoTerminal.Interface;
 using VideoTerminal.Parser;
 
-namespace VideoTerminal.Controls
+namespace XTerminal.Render
 {
     public class TerminalVisualContainer : FrameworkElement
     {

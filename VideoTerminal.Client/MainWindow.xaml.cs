@@ -15,10 +15,9 @@ using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using VideoTerminal.Clients;
-using VideoTerminal.Interface;
 using VideoTerminal.Parser;
 
-namespace VideoTerminal
+namespace XTerminal
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑

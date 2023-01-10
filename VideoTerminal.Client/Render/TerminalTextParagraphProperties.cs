@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.TextFormatting;
 
-namespace VideoTerminal.Controls
+namespace XTerminal.Render
 {
     public class TerminalTextParagraphProperties : TextParagraphProperties
     {

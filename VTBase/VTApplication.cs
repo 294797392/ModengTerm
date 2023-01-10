@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VideoTerminal.Clients;
-using VideoTerminal.Parser;
 
-namespace VideoTerminal.Interface
+namespace XTerminal.Base
 {
     /// <summary>
     /// 第三方用户通过这个类来启动终端

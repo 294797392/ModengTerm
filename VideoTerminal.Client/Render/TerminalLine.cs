@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
 
-namespace VideoTerminal.Controls
+namespace XTerminal.Render
 {
     public class TerminalLine : TerminalVisual
     {

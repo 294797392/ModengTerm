@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using VideoTerminal.Interface;
 using VideoTerminal.Parser;
+using XTerminal.Base;
 
-namespace VideoTerminal.Controls
+namespace XTerminal.Render
 {
     /// <summary>
     /// 终端控件

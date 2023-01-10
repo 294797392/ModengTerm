@@ -53,15 +53,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TerminalLineFactory.cs" />
-    <Compile Include="TerminalVisual.cs" />
-    <Compile Include="TerminalVisualContainer.cs" />
-    <Compile Include="Terminal.cs" />
-    <Compile Include="TerminalTextParagraphProperties.cs" />
-    <Compile Include="TerminalTextRunProperties.cs" />
-    <Compile Include="TerminalTextSource.cs" />
-    <Compile Include="TerminalCaret.cs" />
-    <Compile Include="TerminalLine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -75,7 +66,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="TerminalLineSegement.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -86,13 +76,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VideoTerminal.Parser\VideoTerminal.Parser.csproj">
+    <ProjectReference Include="..\VideoTerminal.Parser\XTerminal.Parser.csproj">
       <Project>{7909EA37-1524-415A-9CB8-DBE3274F4152}</Project>
-      <Name>VideoTerminal.Parser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VideoTerminalInterface\VideoTerminal.Interface.csproj">
-      <Project>{36e7e864-dae0-4b79-92e9-4d784edb14c0}</Project>
-      <Name>VideoTerminal.Interface</Name>
+      <Name>XTerminal.Parser</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
