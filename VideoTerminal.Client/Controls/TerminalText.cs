@@ -9,7 +9,7 @@ using System.Windows.Media.TextFormatting;
 
 namespace XTerminal.Controls
 {
-    public class TerminalLine : TerminalVisual
+    public class TerminalText : TerminalVisual
     {
         /// <summary>
         /// 默认的段落宽度
@@ -25,11 +25,6 @@ namespace XTerminal.Controls
         #endregion
 
         #region 属性
-
-        /// <summary>
-        /// 该行所有的文本段
-        /// </summary>
-        public List<TerminalLineSegement> SegementList { get; private set; }
 
         /// <summary>
         /// 该行字符串
@@ -55,25 +50,25 @@ namespace XTerminal.Controls
 
         #region 构造方法
 
-        public TerminalLine()
-        {
-            this.textFormatter = TextFormatter.Create(TextFormattingMode.Display);
-            this.textSource = new TerminalTextSource();
-            this.textParagraphProperties = new TerminalTextParagraphProperties();
-        }
+        //public TerminalText()
+        //{
+        //    this.textFormatter = TextFormatter.Create(TextFormattingMode.Display);
+        //    this.textSource = new TerminalTextSource();
+        //    this.textParagraphProperties = new TerminalTextParagraphProperties();
+        //}
 
-        public TerminalLine(double offsetX, double offsetY) : 
-            this()
-        {
-            this.OffsetX = offsetX;
-            this.OffsetY = offsetY;
-        }
+        //public TerminalText(double offsetX, double offsetY) : 
+        //    this()
+        //{
+        //    this.OffsetX = offsetX;
+        //    this.OffsetY = offsetY;
+        //}
 
-        public TerminalLine(double offsetX, double offsetY, string text) :
-            this(offsetX, offsetY)
-        {
-            this.Text = text;
-        }
+        //public TerminalText(double offsetX, double offsetY, string text) :
+        //    this(offsetX, offsetY)
+        //{
+        //    this.Text = text;
+        //}
 
         #endregion
 
@@ -101,6 +96,8 @@ namespace XTerminal.Controls
 
                 //while (textSourcePosition < this.textSource.Text.Length)
                 {
+                    TextRun textrun = this.textFormatter
+
                     TextLine textLine = this.textFormatter.FormatLine(this.textSource, textSourcePosition, DefaultParagraphWidth, this.textParagraphProperties, null);
 
                     textLine.Draw(dc, lineOrigin, InvertAxes.None);

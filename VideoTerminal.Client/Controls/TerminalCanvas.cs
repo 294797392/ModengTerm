@@ -14,7 +14,7 @@ using XTerminalParser;
 
 namespace XTerminal.Controls
 {
-    public class TerminalVisualContainer : FrameworkElement
+    public class TerminalCanvas : FrameworkElement
     {
         #region 类变量
 
@@ -29,7 +29,7 @@ namespace XTerminal.Controls
         /// <summary>
         /// 所有的行
         /// </summary>
-        private List<TerminalLine> termLines;
+        private List<TerminalText> termLines;
 
         /// <summary>
         /// 闪烁的光标
@@ -37,9 +37,9 @@ namespace XTerminal.Controls
         private TerminalCaret termCaret;
 
         /// <summary>
-        /// 当前正在编辑的行
+        /// 当前正在编辑的文本
         /// </summary>
-        private TerminalLine currentLine;
+        private TerminalText currentText;
 
         /// <summary>
         /// 闪烁光标的线程
@@ -52,6 +52,8 @@ namespace XTerminal.Controls
         private double linesHeight;
 
         private bool selectionState;
+
+        private TextFormatter textFormatter;
 
         #endregion
 
@@ -67,24 +69,26 @@ namespace XTerminal.Controls
 
         #region 构造方法
 
-        public TerminalVisualContainer()
+        public TerminalCanvas()
         {
-            this.InitializeContainer();
+            this.InitializeCanvas();
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeContainer()
+        private void InitializeCanvas()
         {
-            this.termLines = new List<TerminalLine>();
+            this.textFormatter = TextFormatter.Create(TextFormattingMode.Ideal);
+
+            this.termLines = new List<TerminalText>();
             this.termCaret = new TerminalCaret();
 
             this.visualList = new VisualCollection(this);
             this.visualList.Add(this.termCaret);
 
-            this.currentLine = this.RenderLine(string.Empty);
+            this.currentText = this.RenderLine(string.Empty);
 
             if (!DesignerProperties.GetIsInDesignMode(this))
             {
@@ -104,9 +108,9 @@ namespace XTerminal.Controls
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        private TerminalLine RenderLine(string text)
+        private TerminalText RenderLine(string text)
         {
-            TerminalLine line = TerminalLineFactory.Render(0, this.linesHeight, text);
+            TerminalText line = TerminalLineFactory.Render(0, this.linesHeight, text);
             this.termLines.Add(line);
             this.visualList.Add(line);
 
@@ -115,15 +119,22 @@ namespace XTerminal.Controls
             return line;
         }
 
+        private TerminalText CreateText()
+        {
+            TerminalTextSource textSource = new TerminalTextSource();
+            TerminalTextRunProperties textProperties = new TerminalTextRunProperties();
+
+        }
+
         #endregion
 
         #region 公开接口
 
         public void TestRender()
         {
-            //this.RenderLine("123");
-            //this.RenderLine("456");
-            //this.RenderLine("789");
+            this.RenderLine("123");
+            this.RenderLine("456");
+            this.RenderLine("789");
         }
 
         public void PerformAction(VTActions vtAction, params object[] param)
@@ -134,8 +145,8 @@ namespace XTerminal.Controls
                     {
                         string text = param[0].ToString();
 
-                        this.currentLine.AppendText(text);
-                        this.currentLine.PerformRender();
+                        this.currentText.AppendText(text);
+                        this.currentText.PerformRender();
 
                         break;
                     }
@@ -147,7 +158,7 @@ namespace XTerminal.Controls
 
                 case VTActions.LineFeed:
                     {
-                        this.currentLine = this.RenderLine(string.Empty);
+                        this.currentText = this.RenderLine(string.Empty);
                         break;
                     }
 

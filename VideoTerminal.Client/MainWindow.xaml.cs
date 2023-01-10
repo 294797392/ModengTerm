@@ -34,19 +34,27 @@ namespace XTerminal
 
         #endregion
 
+        #region 构造方法
+
         public MainWindow()
         {
             InitializeComponent();
 
-            //Terminal.TestRender();
+            Terminal.TestRender();
 
             this.InitializeWindow();
         }
 
+        #endregion
+
+        #region 实例方法
+
         private void InitializeWindow()
         {
             SSHClientAuthorition authorition = ClientFactory.CreateSSHClientAuthorition("10.0.8.99", 22, "oheiheiheiheihei", "18612538605");
-            VTApplication vtApp = VTApplication.Run(authorition, Terminal);
+            //VTApplication vtApp = VTApplication.Run(authorition, Terminal);
         }
+
+        #endregion
     }
 }

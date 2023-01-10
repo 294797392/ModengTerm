@@ -70,14 +70,13 @@
     </ApplicationDefinition>
     <Compile Include="Controls\Terminal.cs" />
     <Compile Include="Controls\TerminalCaret.cs" />
-    <Compile Include="Controls\TerminalLine.cs" />
-    <Compile Include="Controls\TerminalLineFactory.cs" />
-    <Compile Include="Controls\TerminalLineSegement.cs" />
+    <Compile Include="Controls\TerminalText.cs" />
+    <Compile Include="Controls\TerminalTextFactory.cs" />
     <Compile Include="Controls\TerminalTextParagraphProperties.cs" />
     <Compile Include="Controls\TerminalTextRunProperties.cs" />
     <Compile Include="Controls\TerminalTextSource.cs" />
     <Compile Include="Controls\TerminalVisual.cs" />
-    <Compile Include="Controls\TerminalVisualContainer.cs" />
+    <Compile Include="Controls\TerminalCanvas.cs" />
     <Compile Include="ResponseCode.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

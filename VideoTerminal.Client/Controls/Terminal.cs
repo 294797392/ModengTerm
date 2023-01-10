@@ -31,7 +31,7 @@ namespace XTerminal.Controls
 
         #region 实例方法
 
-        private TerminalVisualContainer visualContainer;
+        private TerminalCanvas visualContainer;
         private VTKeyboard keyboard;
 
         #endregion
@@ -40,7 +40,7 @@ namespace XTerminal.Controls
 
         public Terminal()
         {
-            this.visualContainer = new TerminalVisualContainer();
+            this.visualContainer = new TerminalCanvas();
             this.Content = this.visualContainer;
             this.keyboard = new VTKeyboard();
         }
