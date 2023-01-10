@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VideoTerminal.Base;
 
-namespace VideoTerminal.Parser
+namespace XTerminalParser
 {
     public enum VTActions
     {

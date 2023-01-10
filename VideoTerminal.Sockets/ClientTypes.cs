@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Clients
+namespace XTerminalClient
 {
     /// <summary>
     /// 标识客户端的类型

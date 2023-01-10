@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Parser
+namespace XTerminalParser
 {
     /// <summary>
     /// 修饰键

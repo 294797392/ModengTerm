@@ -14,8 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using VideoTerminal.Clients;
-using VideoTerminal.Parser;
+using XTerminalApplication;
+using XTerminalClient;
 
 namespace XTerminal
 {

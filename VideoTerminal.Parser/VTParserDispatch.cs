@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VideoTerminal.Base;
 
-namespace VideoTerminal.Parser
+namespace XTerminalParser
 {
     /// <summary>
     /// 负责分发VTParser的事件
@@ -467,13 +466,13 @@ namespace VideoTerminal.Parser
                             break;
                         }
 
-                    case Parser.DECPrivateMode.ASB_AlternateScreenBuffer:
+                    case DECPrivateMode.ASB_AlternateScreenBuffer:
                         {
                             success = enable ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
                             break;
                         }
 
-                    case Parser.DECPrivateMode.DECTCEM_TextCursorEnableMode:
+                    case DECPrivateMode.DECTCEM_TextCursorEnableMode:
                         {
                             if (enable)
                             {
@@ -486,12 +485,12 @@ namespace VideoTerminal.Parser
                             break;
                         }
 
-                    case Parser.DECPrivateMode.XTERM_BracketedPasteMode:
+                    case DECPrivateMode.XTERM_BracketedPasteMode:
                         {
                             break;
                         }
 
-                    case Parser.DECPrivateMode.ATT610_StartCursorBlink:
+                    case DECPrivateMode.ATT610_StartCursorBlink:
                         {
                             break;
                         }

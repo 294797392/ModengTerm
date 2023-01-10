@@ -1,11 +1,10 @@
-﻿using ICare.Utility.Misc.DS;
-using Renci.SshNet;
+﻿using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
-using VideoTerminal.Base;
+using XTerminalBase;
 
-namespace VideoTerminal.Clients
+namespace XTerminalClient
 {
     public class SSHClient : ClientBase
     {

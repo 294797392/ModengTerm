@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace VideoTerminal.Parser
+namespace XTerminalParser
 {
     /// <summary>
     /// 模块名称：终端数据流解析器

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VideoTerminal.Parser
+namespace XTerminalParser
 {
     /// <summary>
     /// 提供Xterm颜色索引值到RGB值的转换

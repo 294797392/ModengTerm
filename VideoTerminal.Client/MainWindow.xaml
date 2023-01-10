@@ -3,13 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vt="clr-namespace:VideoTerminal"
-        xmlns:vtctrl="clr-namespace:VideoTerminal.Controls;assembly=VideoTerminal.Controls"
+        xmlns:control="clr-namespace:XTerminal.Controls"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
 
     <Grid>
-        <vtctrl:Terminal x:Name="Terminal"/>
+        <control:Terminal x:Name="Terminal"/>
     </Grid>
 
 </Window>

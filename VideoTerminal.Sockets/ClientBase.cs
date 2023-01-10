@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
-namespace VideoTerminal.Clients
+namespace XTerminalClient
 {
     /// <summary>
     /// 管理与远程主机的连接

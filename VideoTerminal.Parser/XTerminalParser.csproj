@@ -7,10 +7,11 @@
     <ProjectGuid>{7909EA37-1524-415A-9CB8-DBE3274F4152}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VideoTerminal.Parser</RootNamespace>
-    <AssemblyName>VideoTerminal.Parser</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>XTerminalParser</RootNamespace>
+    <AssemblyName>XTerminalParser</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNEToolkit">
@@ -72,13 +75,13 @@
     <Compile Include="Xterm256Color.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VideoTerminal.Sockets\XTerminal.Clients.csproj">
+    <ProjectReference Include="..\VideoTerminal.Sockets\XTerminalClient.csproj">
       <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
-      <Name>XTerminal.Clients</Name>
+      <Name>XTerminalClient</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VTBase\XTerminal.Base.csproj">
+    <ProjectReference Include="..\VTBase\XTerminalBase.csproj">
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
-      <Name>XTerminal.Base</Name>
+      <Name>XTerminalBase</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

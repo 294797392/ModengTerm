@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VideoTerminal.Base;
+using XTerminalBase;
+using XTerminalParser;
 
-namespace XTerminal.Base
+namespace XTerminalApplication
 {
     /// <summary>
     /// 定义视频终端的标准接口

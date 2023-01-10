@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using VideoTerminal.Base;
+using XTerminalBase;
 
-namespace VideoTerminal.Parser
+namespace XTerminalParser
 {
     public enum KeyboardMaps
     {
