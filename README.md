@@ -33,12 +33,14 @@ C语言版本的终端数据流解析器，目的是封装成一个库，可以�
 
 ## 实现原理
 参考：  
-* https://vt100.net/emu/dec_ansi_parser
-* https://invisible-island.net/xterm/
 * https://github.com/microsoft/terminal.git
-* https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 * https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/
 * Control Functions for Coded Character Sets Ecma-048.pdf
+* 终端字符解析：
+https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
+https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+https://invisible-island.net/xterm/
+https://vt100.net/emu/dec_ansi_parser
 
 后面会把实现原理的讲解补充到这上面
 
