@@ -96,7 +96,7 @@ namespace XTerminal.Controls
 
                 //while (textSourcePosition < this.textSource.Text.Length)
                 {
-                    TextRun textrun = this.textFormatter
+                    //TextRun textrun = this.textFormatter
 
                     TextLine textLine = this.textFormatter.FormatLine(this.textSource, textSourcePosition, DefaultParagraphWidth, this.textParagraphProperties, null);
 

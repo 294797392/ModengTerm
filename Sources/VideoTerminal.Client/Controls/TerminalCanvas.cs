@@ -110,20 +110,22 @@ namespace XTerminal.Controls
         /// <returns></returns>
         private TerminalText RenderLine(string text)
         {
-            TerminalText line = TerminalLineFactory.Render(0, this.linesHeight, text);
-            this.termLines.Add(line);
-            this.visualList.Add(line);
+            //TerminalText line = TerminalLineFactory.Render(0, this.linesHeight, text);
+            //this.termLines.Add(line);
+            //this.visualList.Add(line);
 
-            this.linesHeight += line.Height;
+            //this.linesHeight += line.Height;
 
-            return line;
+            //return line;
+            return new TerminalText();
         }
 
         private TerminalText CreateText()
         {
-            TerminalTextSource textSource = new TerminalTextSource();
-            TerminalTextRunProperties textProperties = new TerminalTextRunProperties();
+            //TerminalTextSource textSource = new TerminalTextSource();
+            //TerminalTextRunProperties textProperties = new TerminalTextRunProperties();
 
+            return new TerminalText();
         }
 
         #endregion
