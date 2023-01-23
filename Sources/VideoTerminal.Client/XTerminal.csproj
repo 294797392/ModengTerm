@@ -40,18 +40,17 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotNEToolkit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="DotNEToolkit">
       <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
-      <HintPath>..\Dependencies\log4net.dll</HintPath>
+      <HintPath>..\..\Dependence\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Dependencies\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Renci.SshNet">
-      <HintPath>..\Dependencies\Renci.SshNet.dll</HintPath>
+      <HintPath>..\..\Dependence\Renci.SshNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -145,10 +144,6 @@
     <ProjectReference Include="..\VideoTerminal.Parser\XTerminalParser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>XTerminalParser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VideoTerminal.Sockets\XTerminalClient.csproj">
-      <Project>{42cf1646-adc6-4988-9477-3be696108711}</Project>
-      <Name>XTerminalClient</Name>
     </ProjectReference>
     <ProjectReference Include="..\VTBase\XTerminalBase.csproj">
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>

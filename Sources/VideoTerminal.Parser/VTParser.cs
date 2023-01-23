@@ -514,7 +514,7 @@ namespace XTerminalParser
                 // UTF8参考：https://www.cnblogs.com/fnlingnzb-learner/p/6163205.html
                 if (this.unicodeText.Count == 0)
                 {
-                    bool bit6 = BytesExtentions.GetBit(ch, 5);
+                    bool bit6 = DotNEToolkit.Utility.ByteUtils.GetBit(ch, 5);
                     this.unicodeText.Capacity = bit6 ? 3 : 2;
                 }
 

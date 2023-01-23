@@ -454,11 +454,6 @@
             <param name="g"></param>
             <param name=""></param>
         </member>
-        <member name="T:DotNEToolkit.Media.Video.VideoDecodeType">
-            <summary>
-            视频解码器类型
-            </summary>
-        </member>
         <member name="T:DotNEToolkit.Media.Video.libvlcPlay">
             <summary>
             封装vlc视频播放器
@@ -627,17 +622,23 @@
             定义音视频格式
             </summary>
         </member>
-        <member name="F:DotNEToolkit.Media.AVFormats.AV_FORMAT_H264">
+        <member name="F:DotNEToolkit.Media.AVFormats.Unkown">
+            <summary>
+            未知格式
+            播放器会自动检测
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Media.AVFormats.H264">
             <summary>
             H264视频格式
             </summary>
         </member>
-        <member name="F:DotNEToolkit.Media.AVFormats.AV_FORMAT_PCM">
+        <member name="F:DotNEToolkit.Media.AVFormats.PCM">
             <summary>
             PCM音频原始数据格式
             </summary>
         </member>
-        <member name="F:DotNEToolkit.Media.AVFormats.AV_FORMAT_G711_ALAW">
+        <member name="F:DotNEToolkit.Media.AVFormats.G711_ALAW">
             <summary>
             G711音频编码方式
             </summary>
@@ -1057,6 +1058,46 @@
             <param name="sheetName"></param>
             <param name="version"></param>
             <returns></returns>
+        </member>
+        <member name="F:DotNEToolkit.Utility.HexNumberOptions.None">
+            <summary>
+            没有选项
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Utility.HexNumberOptions.WithPrefix">
+            <summary>
+            带有0x前缀
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Utility.ByteUtils">
+            <summary>
+            操作字节数组的帮助类
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Utility.ByteUtils.JoinHexNumber(System.Byte[],System.String,DotNEToolkit.Utility.HexNumberOptions)">
+            <summary>
+            把一个字节数组转成十六进制字符串
+            不带0x前缀
+            </summary>
+            <param name="source"></param>
+            <param name="separator">每个字节之间的分隔符</param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Utility.ByteUtils.SplitBytes(System.String,System.String)">
+            <summary>
+            把一个十六进制的字符串分隔成byte数组
+            </summary>
+            <param name="hex">要分隔的字符串</param>
+            <param name="separator">分隔符</param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Utility.ByteUtils.Compare(System.Byte[],System.Byte[])">
+            <summary>
+            对两个字节数组进行比较操作
+            </summary>
+            <param name="array1">要比较的第一个字节数组</param>
+            <param name="array2">要比较的第二个字节数组</param>
+            <returns>每个字节是否相等</returns>
         </member>
         <member name="T:DotNEToolkit.Utility.NetworkUtils">
             <summary>
@@ -3575,81 +3616,6 @@
             <param name="args"></param>
             <returns></returns>
         </member>
-        <member name="F:DotNEToolkit.Extentions.HexNumberOptions.None">
-            <summary>
-            没有选项
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Extentions.HexNumberOptions.WithPrefix">
-            <summary>
-            带有0x前缀
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Extentions.Bytes">
-            <summary>
-            操作字节数组的帮助类
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Extentions.Bytes.JoinHexNumber(System.Byte[],System.String,DotNEToolkit.Extentions.HexNumberOptions)">
-            <summary>
-            把一个字节数组转成十六进制字符串
-            不带0x前缀
-            </summary>
-            <param name="source"></param>
-            <param name="separator">每个字节之间的分隔符</param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Extentions.Bytes.SplitBytes(System.String,System.String)">
-            <summary>
-            把一个十六进制的字符串分隔成byte数组
-            </summary>
-            <param name="hex">要分隔的字符串</param>
-            <param name="separator">分隔符</param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Extentions.Bytes.Compare(System.Byte[],System.Byte[])">
-            <summary>
-            对两个字节数组进行比较操作
-            </summary>
-            <param name="array1">要比较的第一个字节数组</param>
-            <param name="array2">要比较的第二个字节数组</param>
-            <returns>每个字节是否相等</returns>
-        </member>
-        <member name="T:DotNEToolkit.Extentions.EnumMember">
-            <summary>
-            描述一个枚举成员
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Extentions.EnumMember.Name">
-            <summary>
-            枚举的名字
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Extentions.EnumMember.Value">
-            <summary>
-            枚举的值
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Extentions.EnumMember.Description">
-            <summary>
-            枚举的描述信息
-            使用Attribute指定
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Extentions.Enumerations.GetMemberList``1">
-            <summary>
-            把一个枚举类型转换成实体集合
-            </summary>
-            <typeparam name="T">要转换的枚举类型</typeparam>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Extentions.Enumerations.ParseDescription(System.Reflection.FieldInfo)">
-            <summary>
-            解析枚举字段上的DescriptionAttribute特性
-            </summary>
-            <param name="enumField"></param>
-            <returns></returns>
-        </member>
         <member name="T:DotNEToolkit.DirectoryExtentions">
             <summary>
             对目录的扩展类
@@ -3697,6 +3663,41 @@
             </summary>
             <param name="sourceDir">要拷贝的目录</param>
             <param name="destDir">拷贝到的目标目录</param>
+        </member>
+        <member name="T:DotNEToolkit.Extentions.EnumMember">
+            <summary>
+            描述一个枚举成员
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Extentions.EnumMember.Name">
+            <summary>
+            枚举的名字
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Extentions.EnumMember.Value">
+            <summary>
+            枚举的值
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Extentions.EnumMember.Description">
+            <summary>
+            枚举的描述信息
+            使用Attribute指定
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Extentions.Enumerations.GetMemberList``1">
+            <summary>
+            把一个枚举类型转换成实体集合
+            </summary>
+            <typeparam name="T">要转换的枚举类型</typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Extentions.Enumerations.ParseDescription(System.Reflection.FieldInfo)">
+            <summary>
+            解析枚举字段上的DescriptionAttribute特性
+            </summary>
+            <param name="enumField"></param>
+            <returns></returns>
         </member>
         <member name="T:DotNEToolkit.StreamUtils">
             <summary>
@@ -5659,12 +5660,12 @@
             <param name="filePath"></param>
             <returns></returns>
         </member>
-        <member name="T:DotNEToolkit.User32">
+        <member name="T:DotNEToolkit.WinUser">
             <summary>
             WinUser.h
             </summary>
         </member>
-        <member name="M:DotNEToolkit.User32.RegisterDeviceNotification(System.IntPtr,System.IntPtr,System.Int32)">
+        <member name="M:DotNEToolkit.WinUser.RegisterDeviceNotification(System.IntPtr,System.IntPtr,System.Int32)">
             <summary>
             
             </summary>
@@ -5675,7 +5676,7 @@
             </param>
             <returns></returns>
         </member>
-        <member name="M:DotNEToolkit.User32.UnregisterDeviceNotification(System.IntPtr)">
+        <member name="M:DotNEToolkit.WinUser.UnregisterDeviceNotification(System.IntPtr)">
             <summary>
             Closes the specified device notification handle.
             </summary>

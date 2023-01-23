@@ -34,8 +34,20 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\Dependence\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="Renci.SshNet">
+      <HintPath>..\..\Dependence\Renci.SshNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,6 +61,14 @@
     <Compile Include="ICursorState.cs" />
     <Compile Include="IPresentationDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Terminals\TermAuthorition.cs" />
+    <Compile Include="Terminals\TermBase.cs" />
+    <Compile Include="Terminals\TermFactory.cs" />
+    <Compile Include="Terminals\TermState.cs" />
+    <Compile Include="Terminals\TermTypes.cs" />
+    <Compile Include="Terminals\SerialPortClient.cs" />
+    <Compile Include="Terminals\SSHClient.cs" />
+    <Compile Include="Terminals\SSHClientAuthorition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
