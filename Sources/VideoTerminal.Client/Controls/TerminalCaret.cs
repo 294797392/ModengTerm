@@ -28,6 +28,7 @@ namespace XTerminal.Controls
             {
                 if (this.blinkState)
                 {
+                    //dc.DrawText()
                     dc.DrawLine(this.caretPen, new Point(10, 10), new Point(10, 20));
                 }
             }

@@ -19,7 +19,6 @@ namespace XTerminal
         static App()
         {
             DotNEToolkit.Log4net.InitializeLog4net();
-            Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
 
         public App()
@@ -29,6 +28,11 @@ namespace XTerminal
         private static void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             logger.Error(e.Exception);
+        }
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
     }
 }

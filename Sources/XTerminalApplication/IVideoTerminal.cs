@@ -5,7 +5,7 @@ using System.Text;
 using XTerminalBase;
 using XTerminalParser;
 
-namespace XTerminalApplication
+namespace XTerminalController
 {
     /// <summary>
     /// 定义视频终端的标准接口
@@ -23,6 +23,14 @@ namespace XTerminalApplication
         /// <param name="vtAction"></param>
         /// <param name="param"></param>
         void PerformAction(VTActions vtAction, params object[] param);
+
+        /// <summary>
+        /// 渲染文本块
+        /// </summary>
+        /// <param name="textBlocks"></param>
+        void DrawText(List<VTextBlock> textBlocks);
+
+        void DrawText(VTextBlock textBlock);
 
         #region CursorState
 

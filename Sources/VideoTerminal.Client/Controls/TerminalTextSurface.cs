@@ -14,7 +14,7 @@ using XTerminalParser;
 
 namespace XTerminal.Controls
 {
-    public class TerminalCanvas : FrameworkElement
+    public class TerminalTextSurface : FrameworkElement
     {
         #region 类变量
 
@@ -69,7 +69,7 @@ namespace XTerminal.Controls
 
         #region 构造方法
 
-        public TerminalCanvas()
+        public TerminalTextSurface()
         {
             this.InitializeCanvas();
         }
@@ -80,6 +80,9 @@ namespace XTerminal.Controls
 
         private void InitializeCanvas()
         {
+            //FormattedText formattedText = new FormattedText()
+            //formattedText.MaxTextWidth
+
             this.textFormatter = TextFormatter.Create(TextFormattingMode.Ideal);
 
             this.termLines = new List<TerminalText>();

@@ -5,7 +5,7 @@ using System.Text;
 using XTerminalClient;
 using XTerminalParser;
 
-namespace XTerminalApplication
+namespace XTerminalController
 {
     /// <summary>
     /// 第三方用户通过这个类来启动终端
@@ -25,12 +25,18 @@ namespace XTerminalApplication
         private IVideoTerminal terminal;
         private VTParser vtParser;
 
+        private VTextBlock textBlock;
+        private double textOffsetX;
+        private double textOffsetY;
+        private List<VTextBlock> textBlocks;
+
         #endregion
 
         #region 构造方法
 
         private VTApplication()
-        { 
+        {
+            this.textBlocks = new List<VTextBlock>();
         }
 
         #endregion
@@ -83,11 +89,72 @@ namespace XTerminalApplication
 
         private void VtParser_ActionEvent(VTActions action, params object[] param)
         {
-            this.terminal.PerformAction(action, param);
+            switch (action)
+            {
+                case VTActions.Print:
+                    {
+                        char ch = (char)param[0];
+
+                        switch (ch)
+                        {
+                            case ' ':
+                                {
+                                    // 遇到空格就创建一个新的文本块
+                                    if (this.textBlock != null)
+                                    {
+                                        this.terminal.DrawText(this.textBlock);
+                                        this.textBlocks.Add(this.textBlock);
+
+                                        this.textOffsetX = this.textBlock.X;
+                                        this.textOffsetY = this.textBlock.Y;
+
+                                        this.textBlock = null;
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                    break;
+                                }
+
+                            default:
+                                {
+                                    if (this.textBlock == null)
+                                    {
+                                        this.textBlock = new VTextBlock();
+                                    }
+                                    this.textBlock.AppendText(ch);
+                                    break;
+                                }
+                        }
+
+                        break;
+                    }
+
+                case VTActions.CarriageReturn:
+                    {
+                        // CR
+                        break;
+                    }
+
+                case VTActions.LineFeed:
+                    {
+                        // LF
+                        break;
+                    }
+
+                default:
+                    {
+                        break;
+                    }
+            }
+
+            //this.videoTerminal.PerformAction(action, param);
         }
 
         private void Client_DataReceived(ClientBase client, byte[] bytes)
         {
+            logger.InfoFormat("Received");
             this.vtParser.ProcessCharacters(bytes);
         }
 

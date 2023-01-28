@@ -15,6 +15,11 @@ namespace XTerminal.Controls
     {
         public string Text { get; set; }
 
+        public TerminalTextSource()
+        {
+            
+        }
+
         public override TextSpan<CultureSpecificCharacterBufferRange> GetPrecedingText(int textSourceCharacterIndexLimit)
         {
             //CharacterBufferRange cbr = new CharacterBufferRange();

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using XTerminalParser;
 
-namespace XTerminalApplication
+namespace XTerminalController
 {
     /// <summary>
     /// 你需要把你使用的GUI框架（WPF,Winform...etc）的键盘事件转换成VTInputEventArgs

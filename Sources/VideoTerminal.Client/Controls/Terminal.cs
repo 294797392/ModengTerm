@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using XTerminalApplication;
+using System.Windows.Media.TextFormatting;
 using XTerminalBase;
+using XTerminalController;
 using XTerminalParser;
 
 namespace XTerminal.Controls
@@ -19,7 +20,7 @@ namespace XTerminal.Controls
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("ConsoleHostInput");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("Terminal");
 
         #endregion
 
@@ -29,9 +30,9 @@ namespace XTerminal.Controls
 
         #endregion
 
-        #region 实例方法
+        #region 实例变量
 
-        private TerminalCanvas visualContainer;
+        private TerminalTextSurface textSurface;
         private VTKeyboard keyboard;
 
         #endregion
@@ -40,8 +41,8 @@ namespace XTerminal.Controls
 
         public Terminal()
         {
-            this.visualContainer = new TerminalCanvas();
-            this.Content = this.visualContainer;
+            this.textSurface = new TerminalTextSurface();
+            this.Content = this.textSurface;
             this.keyboard = new VTKeyboard();
         }
 
@@ -49,7 +50,7 @@ namespace XTerminal.Controls
 
         public void TestRender()
         {
-            this.visualContainer.TestRender();
+            this.textSurface.TestRender();
         }
 
         #region 事件处理器
@@ -97,6 +98,18 @@ namespace XTerminal.Controls
 
         #region IVideoTerminal
 
+        public void DrawText(List<VTextBlock> textBlocks)
+        {
+            foreach (VTextBlock textBlock in textBlocks)
+            {
+                this.DrawText(textBlock);
+            }
+        }
+
+        public void DrawText(VTextBlock textBlock)
+        {
+        }
+
         public void PerformAction(VTActions vtAction, params object[] param)
         {
             this.Dispatcher.Invoke(new Action(() =>
@@ -111,7 +124,7 @@ namespace XTerminal.Controls
 
                     default:
                         {
-                            this.visualContainer.PerformAction(vtAction, param);
+                            this.textSurface.PerformAction(vtAction, param);
                             break;
                         }
                 }

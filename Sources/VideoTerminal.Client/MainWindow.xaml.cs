@@ -15,8 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using XTerminalApplication;
 using XTerminalClient;
+using XTerminalController;
 
 namespace XTerminal
 {
@@ -41,7 +41,7 @@ namespace XTerminal
         {
             InitializeComponent();
 
-            Terminal.TestRender();
+            //Terminal.TestRender();
 
             this.InitializeWindow();
         }
@@ -52,8 +52,8 @@ namespace XTerminal
 
         private void InitializeWindow()
         {
-            SSHClientAuthorition authorition = ClientFactory.CreateSSHClientAuthorition("10.0.8.99", 22, "oheiheiheiheihei", "18612538605");
-            //VTApplication vtApp = VTApplication.Run(authorition, Terminal);
+            SSHClientAuthorition authorition = ClientFactory.CreateSSHClientAuthorition("192.168.229.128", 22, "zyf", "18612538605");
+            VTApplication vtApp = VTApplication.Run(authorition, Terminal);
         }
 
         #endregion

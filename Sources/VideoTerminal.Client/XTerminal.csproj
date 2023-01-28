@@ -79,7 +79,7 @@
     <Compile Include="Controls\TerminalTextRunProperties.cs" />
     <Compile Include="Controls\TerminalTextSource.cs" />
     <Compile Include="Controls\TerminalVisual.cs" />
-    <Compile Include="Controls\TerminalCanvas.cs" />
+    <Compile Include="Controls\TerminalTextSurface.cs" />
     <Compile Include="ResponseCode.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -149,9 +149,9 @@
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
       <Name>XTerminalBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\XTerminalApplication\XTerminalApplication.csproj">
+    <ProjectReference Include="..\XTerminalApplication\XTerminalController.csproj">
       <Project>{c236bd15-c63c-45bd-b576-2caa49acaba2}</Project>
-      <Name>XTerminalApplication</Name>
+      <Name>XTerminalController</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

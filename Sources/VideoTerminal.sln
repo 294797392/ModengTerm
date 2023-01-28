@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminalBase", "VTBase\XTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminal", "VideoTerminal.Client\XTerminal.csproj", "{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminalApplication", "XTerminalApplication\XTerminalApplication.csproj", "{C236BD15-C63C-45BD-B576-2CAA49ACABA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminalController", "XTerminalApplication\XTerminalController.csproj", "{C236BD15-C63C-45BD-B576-2CAA49ACABA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
