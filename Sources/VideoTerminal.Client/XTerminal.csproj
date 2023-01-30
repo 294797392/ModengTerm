@@ -71,15 +71,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Controls\Terminal.cs" />
-    <Compile Include="Controls\TerminalCaret.cs" />
-    <Compile Include="Controls\TerminalText.cs" />
-    <Compile Include="Controls\TerminalTextFactory.cs" />
-    <Compile Include="Controls\TerminalTextParagraphProperties.cs" />
-    <Compile Include="Controls\TerminalTextRunProperties.cs" />
-    <Compile Include="Controls\TerminalTextSource.cs" />
-    <Compile Include="Controls\TerminalVisual.cs" />
-    <Compile Include="Controls\TerminalTextSurface.cs" />
+    <Compile Include="VideoTerminal\Terminal.cs" />
+    <Compile Include="VideoTerminal\TerminalCaret.cs" />
+    <Compile Include="VideoTerminal\TerminalText.cs" />
+    <Compile Include="VideoTerminal\TerminalTextFactory.cs" />
+    <Compile Include="VideoTerminal\TerminalTextParagraphProperties.cs" />
+    <Compile Include="VideoTerminal\TerminalTextRunProperties.cs" />
+    <Compile Include="VideoTerminal\TerminalTextSource.cs" />
+    <Compile Include="VideoTerminal\TerminalVisual.cs" />
+    <Compile Include="VideoTerminal\TerminalTextSurface.cs" />
     <Compile Include="ResponseCode.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

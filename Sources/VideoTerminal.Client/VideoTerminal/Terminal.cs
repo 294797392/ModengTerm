@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows;
 using System.Windows.Media.TextFormatting;
 using XTerminalBase;
 using XTerminalController;
@@ -34,6 +36,10 @@ namespace XTerminal.Controls
 
         private TerminalTextSurface textSurface;
         private VTKeyboard keyboard;
+        private Typeface typeface;
+        private double fontSize;
+        private Brush fontColor;
+        private double pixelPerDip;
 
         #endregion
 
@@ -44,6 +50,10 @@ namespace XTerminal.Controls
             this.textSurface = new TerminalTextSurface();
             this.Content = this.textSurface;
             this.keyboard = new VTKeyboard();
+            this.typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+            this.fontSize = 12;
+            this.fontColor = Brushes.Black;
+            this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         }
 
         #endregion
@@ -108,6 +118,7 @@ namespace XTerminal.Controls
 
         public void DrawText(VTextBlock textBlock)
         {
+            this.textSurface.add
         }
 
         public void PerformAction(VTActions vtAction, params object[] param)
