@@ -52,7 +52,8 @@ namespace XTerminal
 
         private void InitializeWindow()
         {
-            SSHClientAuthorition authorition = ClientFactory.CreateSSHClientAuthorition("192.168.229.128", 22, "zyf", "18612538605");
+            //SSHClientAuthorition authorition = ClientFactory.CreateSSHClientAuthorition("192.168.229.128", 22, "zyf", "18612538605");
+            SSHClientAuthorition authorition = ClientFactory.CreateSSHClientAuthorition("192.168.1.6", 22, "oheiheiheiheihei", "18612538605");
             VTApplication vtApp = VTApplication.Run(authorition, Terminal);
         }
 
