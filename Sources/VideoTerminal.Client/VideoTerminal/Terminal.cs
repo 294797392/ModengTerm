@@ -12,6 +12,7 @@ using System.Windows.Media.TextFormatting;
 using XTerminalBase;
 using XTerminalController;
 using XTerminalParser;
+using VideoTerminal.Utility;
 
 namespace XTerminal.VideoTerminal
 {
@@ -37,9 +38,11 @@ namespace XTerminal.VideoTerminal
         private TextCanvas textCanvas;
         private VTKeyboard keyboard;
         private Typeface typeface;
-        private double fontSize;
-        private Brush fontColor;
         private double pixelPerDip;
+
+        #endregion
+
+        #region 属性
 
         #endregion
 
@@ -49,14 +52,10 @@ namespace XTerminal.VideoTerminal
         {
             this.keyboard = new VTKeyboard();
             this.typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
-            this.fontSize = 12;
-            this.fontColor = Brushes.Black;
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
             this.textCanvas = new TextCanvas();
             this.textCanvas.Typeface = this.typeface;
-            this.textCanvas.FontSize = this.fontSize;
-            this.textCanvas.Foreground = this.fontColor;
             this.textCanvas.PixelsPerDip = this.pixelPerDip;
             this.Content = this.textCanvas;
         }
@@ -118,7 +117,17 @@ namespace XTerminal.VideoTerminal
 
         public void DrawText(VTextBlock textBlock)
         {
-            this.textCanvas.DrawText(textBlock);
+            Dispatcher.Invoke(() =>
+            {
+                this.textCanvas.DrawText(textBlock);
+            });
+        }
+
+        public TextMetrics MeasureText(VTextBlock textBlock)
+        {
+            FormattedText formattedText = TerminalUtils.CreateFormattedText(textBlock, this.typeface, this.pixelPerDip);
+            TerminalUtils.UpdateTextMetrics(textBlock, formattedText);
+            return textBlock.Metrics;
         }
 
         public void PerformAction(VTActions vtAction, params object[] param)

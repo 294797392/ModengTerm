@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminalClient
+namespace XTerminalBase.Channels
 {
     /// <summary>
     /// 标识客户端的类型
     /// </summary>
-    public enum ClientTypes
+    public enum VTChannelTypes
     {
         /// <summary>
         /// 是一个SSH远程主机

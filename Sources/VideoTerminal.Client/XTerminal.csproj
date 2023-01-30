@@ -71,6 +71,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Utility\TerminalUtils.cs" />
     <Compile Include="VideoTerminal\Terminal.cs" />
     <Compile Include="VideoTerminal\TerminalVisual.cs" />
     <Compile Include="VideoTerminal\TextCanvas.cs" />

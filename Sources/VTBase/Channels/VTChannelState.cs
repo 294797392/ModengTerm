@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminalClient
+namespace XTerminalBase.Channels
 {
     /// <summary>
     /// 表示客户端的连接状态
     /// </summary>
-    public enum ClientState
+    public enum VTChannelState
     {
         /// <summary>
         /// 数据流处于初始化状态

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using VideoTerminal.Utility;
 using XTerminalController;
 
 namespace XTerminal.VideoTerminal
@@ -18,14 +19,15 @@ namespace XTerminal.VideoTerminal
 
         public Typeface Typeface { get; set; }
 
-        public double FontSize { get; set; }
-
-        public Brush Foreground { get; set; }
-
         /// <summary>
         /// 要渲染的文本
         /// </summary>
         public VTextBlock TextBlock { get; private set; }
+
+        /// <summary>
+        /// 渲染的文本测量信息
+        /// </summary>
+        public TextMetrics Metrics { get { return this.TextBlock.Metrics; } }
 
         #endregion
 
@@ -44,11 +46,9 @@ namespace XTerminal.VideoTerminal
         {
             this.Offset = new Vector(this.TextBlock.X, this.TextBlock.Y);
 
-            FormattedText formattedText = new FormattedText(this.TextBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, this.Typeface, this.FontSize, this.Foreground, this.PixelsPerDip);
-            dc.DrawText(formattedText, new System.Windows.Point(0, 0));
-
-            this.TextBlock.Width = formattedText.Width;
-            this.TextBlock.Height = formattedText.Height;
+            FormattedText formattedText = TerminalUtils.CreateFormattedText(this.TextBlock, this.Typeface, this.PixelsPerDip);
+            TerminalUtils.UpdateTextMetrics(this.TextBlock, formattedText);
+            dc.DrawText(formattedText, new Point());
         }
 
         #endregion

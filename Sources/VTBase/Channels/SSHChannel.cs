@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using XTerminalBase;
 
-namespace XTerminalClient
+namespace XTerminalBase.Channels
 {
-    public class SSHClient : ClientBase
+    public class SSHChannel : VTChannel
     {
         #region 类变量
 
@@ -18,19 +18,19 @@ namespace XTerminalClient
 
         private SshClient sshClient;
         private ShellStream stream;
-        private SSHClientAuthorition authorition;
+        private SSHChannelAuthorition authorition;
 
         #endregion
 
         #region 属性
 
-        public override ClientTypes Protocol { get { return ClientTypes.SSH; } }
+        public override VTChannelTypes Type { get { return VTChannelTypes.SSH; } }
 
         #endregion
 
         #region 构造方法
 
-        public SSHClient(ClientAuthorition authorition) : 
+        public SSHChannel(SSHChannelAuthorition authorition) : 
             base(authorition)
         {
         }
@@ -45,9 +45,9 @@ namespace XTerminalClient
 
         public override bool Connect()
         {
-            this.NotifyStatusChanged(ClientState.Connecting);
+            this.NotifyStatusChanged(VTChannelState.Connecting);
 
-            this.authorition = this.Authorition as SSHClientAuthorition;
+            this.authorition = this.Authorition as SSHChannelAuthorition;
             var authentications = new List<AuthenticationMethod>();
             if (!string.IsNullOrEmpty(this.authorition.KeyFilePath))
             {
@@ -63,7 +63,7 @@ namespace XTerminalClient
             this.stream = this.sshClient.CreateShellStream(this.authorition.TerminalName, DefaultValues.TerminalColumns, DefaultValues.TerminalRows, 0, 0, 4096);
             this.stream.DataReceived += this.Stream_DataReceived;
 
-            this.NotifyStatusChanged(ClientState.Connected);
+            this.NotifyStatusChanged(VTChannelState.Connected);
 
             return true;
         }

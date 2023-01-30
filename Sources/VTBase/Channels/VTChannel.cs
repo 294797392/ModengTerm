@@ -4,12 +4,12 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
-namespace XTerminalClient
+namespace XTerminalBase.Channels
 {
     /// <summary>
     /// 管理与远程主机的连接
     /// </summary>
-    public abstract class ClientBase
+    public abstract class VTChannel
     {
         #region 常量
 
@@ -22,29 +22,32 @@ namespace XTerminalClient
 
         #region 公开事件
 
-        public event Action<object, ClientState> StatusChanged;
+        public event Action<object, VTChannelState> StatusChanged;
 
         /// <summary>
         /// 当收到数据流的时候触发
         /// </summary>
-        public event Action<ClientBase, byte[]> DataReceived;
+        public event Action<VTChannel, byte[]> DataReceived;
 
         #endregion
 
         #region 属性
 
-        public abstract ClientTypes Protocol { get; }
+        /// <summary>
+        /// 通道类型
+        /// </summary>
+        public abstract VTChannelTypes Type { get; }
 
         /// <summary>
         /// 连接Socket所需要的验证信息
         /// </summary>
-        public ClientAuthorition Authorition { get; private set; }
+        public ChannelAuthorition Authorition { get; private set; }
 
         #endregion
 
         #region 构造方法
 
-        public ClientBase(ClientAuthorition authorition)
+        public VTChannel(ChannelAuthorition authorition)
         {
             this.Authorition = authorition;
         }
@@ -88,7 +91,7 @@ namespace XTerminalClient
 
         #region 实例方法
 
-        protected void NotifyStatusChanged(ClientState state)
+        protected void NotifyStatusChanged(VTChannelState state)
         {
             if (this.StatusChanged != null)
             {

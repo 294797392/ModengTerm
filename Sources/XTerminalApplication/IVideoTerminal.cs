@@ -8,10 +8,16 @@ using XTerminalParser;
 namespace XTerminalController
 {
     /// <summary>
-    /// 定义视频终端的标准接口
+    /// 视频终端渲染器
     /// </summary>
     public interface IVideoTerminal
     {
+        #region 属性
+
+        #endregion
+
+        #region 公开接口
+
         /// <summary>
         /// 当用户按下按键的时候要触发这个事件
         /// </summary>
@@ -31,6 +37,15 @@ namespace XTerminalController
         void DrawText(List<VTextBlock> textBlocks);
 
         void DrawText(VTextBlock textBlock);
+
+        /// <summary>
+        /// 测量某个文本块的属性
+        /// </summary>
+        /// <param name="textBlock"></param>
+        /// <returns></returns>
+        TextMetrics MeasureText(VTextBlock textBlock);
+
+        #endregion
 
         #region CursorState
 

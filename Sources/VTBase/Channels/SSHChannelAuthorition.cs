@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminalClient
+namespace XTerminalBase.Channels
 {
-    public class SSHClientAuthorition : ClientAuthorition
+    public class SSHChannelAuthorition : ChannelAuthorition
     {
         public string KeyFilePath { get; set; }
 
@@ -25,7 +25,7 @@ namespace XTerminalClient
 
         public uint TerminalRows { get; set; }
 
-        public SSHClientAuthorition()
+        public SSHChannelAuthorition()
         {
             //this.TerminalColumns = DefaultValues.TerminalColumns;
             //this.TerminalRows = DefaultValues.TerminalRows;

@@ -34,10 +34,6 @@ namespace XTerminal.VideoTerminal
 
         public Typeface Typeface { get; set; }
 
-        public double FontSize { get; set; }
-
-        public Brush Foreground { get; set; }
-
         public double PixelsPerDip { get; set; }
 
         // Provide a required override for the VisualChildrenCount property.
@@ -68,8 +64,6 @@ namespace XTerminal.VideoTerminal
             TextVisual textVisual = new TextVisual(textBlock);
             textVisual.PixelsPerDip = this.PixelsPerDip;
             textVisual.Typeface = this.Typeface;
-            textVisual.FontSize = this.FontSize;
-            textVisual.Foreground = this.Foreground;
 
             this.textVisuals.Add(textVisual);
 

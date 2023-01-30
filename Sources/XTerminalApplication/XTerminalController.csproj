@@ -53,8 +53,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultValues.cs" />
     <Compile Include="IVideoTerminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextMetrics.cs" />
+    <Compile Include="VTextOptions.cs" />
     <Compile Include="VTApplication.cs" />
     <Compile Include="VTextBlock.cs" />
     <Compile Include="VTInputEventArgs.cs" />
