@@ -99,20 +99,19 @@ namespace XTerminalController
                         {
                             case ' ':
                                 {
-                                    // 遇到空格就创建一个新的文本块
+                                    // 遇到空格就渲染当前的文本
                                     if (this.textBlock != null)
                                     {
                                         this.terminal.DrawText(this.textBlock);
                                         this.textBlocks.Add(this.textBlock);
 
-                                        this.textOffsetX = this.textBlock.X;
-                                        this.textOffsetY = this.textBlock.Y;
+                                        this.textOffsetX += this.textBlock.Width;
 
                                         this.textBlock = null;
                                     }
                                     else
                                     {
-
+                                        this.textOffsetX += 1;
                                     }
                                     break;
                                 }
@@ -122,6 +121,8 @@ namespace XTerminalController
                                     if (this.textBlock == null)
                                     {
                                         this.textBlock = new VTextBlock();
+                                        this.textBlock.X = this.textOffsetX;
+                                        this.textBlock.Y = this.textOffsetY;
                                     }
                                     this.textBlock.AppendText(ch);
                                     break;
@@ -140,6 +141,8 @@ namespace XTerminalController
                 case VTActions.LineFeed:
                     {
                         // LF
+                        this.textBlock = null;
+                        this.textOffsetY += 20;
                         break;
                     }
 

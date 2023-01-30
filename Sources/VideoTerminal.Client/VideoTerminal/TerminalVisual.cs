@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace XTerminal.Controls
+namespace XTerminal.VideoTerminal
 {
     /// <summary>
     /// 表示终端上的一个可视化对象（光标，文本块...）
@@ -14,6 +14,17 @@ namespace XTerminal.Controls
     {
         public TerminalVisual()
         {
+        }
+
+        protected abstract void Draw(DrawingContext dc);
+
+        public void Draw()
+        {
+            DrawingContext dc = this.RenderOpen();
+
+            this.Draw(dc);
+
+            dc.Close();
         }
     }
 }

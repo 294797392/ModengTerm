@@ -13,7 +13,7 @@ using XTerminalBase;
 using XTerminalController;
 using XTerminalParser;
 
-namespace XTerminal.Controls
+namespace XTerminal.VideoTerminal
 {
     /// <summary>
     /// 终端控件
@@ -34,7 +34,7 @@ namespace XTerminal.Controls
 
         #region 实例变量
 
-        private TerminalTextSurface textSurface;
+        private TextCanvas textCanvas;
         private VTKeyboard keyboard;
         private Typeface typeface;
         private double fontSize;
@@ -47,21 +47,21 @@ namespace XTerminal.Controls
 
         public Terminal()
         {
-            this.textSurface = new TerminalTextSurface();
-            this.Content = this.textSurface;
             this.keyboard = new VTKeyboard();
             this.typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
             this.fontSize = 12;
             this.fontColor = Brushes.Black;
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
+
+            this.textCanvas = new TextCanvas();
+            this.textCanvas.Typeface = this.typeface;
+            this.textCanvas.FontSize = this.fontSize;
+            this.textCanvas.Foreground = this.fontColor;
+            this.textCanvas.PixelsPerDip = this.pixelPerDip;
+            this.Content = this.textCanvas;
         }
 
         #endregion
-
-        public void TestRender()
-        {
-            this.textSurface.TestRender();
-        }
 
         #region 事件处理器
 
@@ -118,7 +118,7 @@ namespace XTerminal.Controls
 
         public void DrawText(VTextBlock textBlock)
         {
-            this.textSurface.add
+            this.textCanvas.DrawText(textBlock);
         }
 
         public void PerformAction(VTActions vtAction, params object[] param)
@@ -135,7 +135,7 @@ namespace XTerminal.Controls
 
                     default:
                         {
-                            this.textSurface.PerformAction(vtAction, param);
+                            //this.textCanvas.PerformAction(vtAction, param);
                             break;
                         }
                 }

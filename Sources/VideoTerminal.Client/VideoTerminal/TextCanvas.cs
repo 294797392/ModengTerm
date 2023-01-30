@@ -14,72 +14,50 @@ using System.Windows.Media.TextFormatting;
 using XTerminalController;
 using XTerminalParser;
 
-namespace XTerminal.Controls
+namespace XTerminal.VideoTerminal
 {
-    public class TerminalTextSurface : FrameworkElement
+    public class TextCanvas : Canvas
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("TerminalVisuals");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("TextCanvas");
 
         #endregion
 
         #region 实例方法
 
-        private VisualCollection textList;
+        private List<TextVisual> textVisuals;
 
         #endregion
 
         #region 属性
 
+        public Typeface Typeface { get; set; }
+
+        public double FontSize { get; set; }
+
+        public Brush Foreground { get; set; }
+
+        public double PixelsPerDip { get; set; }
+
         // Provide a required override for the VisualChildrenCount property.
         protected override int VisualChildrenCount
         {
-            get { return this.textList.Count; }
+            get { return this.textVisuals.Count; }
         }
 
         #endregion
 
         #region 构造方法
 
-        public TerminalTextSurface()
+        public TextCanvas()
         {
-            this.InitializeCanvas();
+            this.textVisuals = new List<TextVisual>();
         }
 
         #endregion
 
         #region 实例方法
-
-        private void InitializeCanvas()
-        {
-            this.textList = new VisualCollection(this);
-        }
-
-        /// <summary>
-        /// 创建一个新的行，然后渲染，最后返回
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        private TerminalText RenderLine(string text)
-        {
-            //TerminalText line = TerminalLineFactory.Render(0, this.linesHeight, text);
-            //this.termLines.Add(line);
-            //this.visualList.Add(line);
-
-            //this.linesHeight += line.Height;
-
-            //return line;
-            return new TerminalText();
-        }
-
-        private TerminalText CreateText()
-        {
-            //TerminalTextSource textSource = new TerminalTextSource();
-            //TerminalTextRunProperties textProperties = new TerminalTextRunProperties();
-
-            return new TerminalText();
-        }
 
         #endregion
 
@@ -87,8 +65,17 @@ namespace XTerminal.Controls
 
         public void DrawText(VTextBlock textBlock)
         {
-            FormattedText text = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, this.typeface, this.fontSize, this.fontColor, this.pixelPerDip);
-            this.textList.Add(text);
+            TextVisual textVisual = new TextVisual(textBlock);
+            textVisual.PixelsPerDip = this.PixelsPerDip;
+            textVisual.Typeface = this.Typeface;
+            textVisual.FontSize = this.FontSize;
+            textVisual.Foreground = this.Foreground;
+
+            this.textVisuals.Add(textVisual);
+
+            this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
+
+            textVisual.Draw();
         }
 
         #endregion
@@ -120,13 +107,7 @@ namespace XTerminal.Controls
         // Provide a required override for the GetVisualChild method.
         protected override Visual GetVisualChild(int index)
         {
-            //Console.WriteLine(string.Format("GetVisualChild, {0}", Guid.NewGuid().ToString()));
-            if (index < 0 || index >= this.textList.Count)
-            {
-                throw new ArgumentOutOfRangeException();
-            }
-
-            return this.textList[index];
+            return this.textVisuals[index];
         }
 
         #endregion
