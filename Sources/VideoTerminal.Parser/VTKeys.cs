@@ -7,6 +7,11 @@ namespace XTerminalParser
 {
     public enum VTKeys
     {
+        /// <summary>
+        /// 表示什么都没输入
+        /// </summary>
+        None,
+
         //
         // 摘要:
         //     BACKSPACE 键。

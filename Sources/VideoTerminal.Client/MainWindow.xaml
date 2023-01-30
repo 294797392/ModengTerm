@@ -5,10 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:control="clr-namespace:XTerminal.VideoTerminal"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525" WindowState="Maximized">
 
     <Grid>
-        <control:Terminal x:Name="Terminal"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Button Grid.Row="0" Content="连接" Click="Button_Click"/>
+
+        <control:Terminal Grid.Row="1" x:Name="Terminal"/>
     </Grid>
 
 </Window>

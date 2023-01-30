@@ -60,7 +60,6 @@
     <Compile Include="VTextOptions.cs" />
     <Compile Include="VTApplication.cs" />
     <Compile Include="VTextBlock.cs" />
-    <Compile Include="VTInputEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VideoTerminal.Parser\XTerminalParser.csproj">

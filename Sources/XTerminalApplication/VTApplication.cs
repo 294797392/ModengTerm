@@ -73,7 +73,7 @@ namespace XTerminalController
             this.vtParser.ActionEvent += VtParser_ActionEvent;
             this.vtParser.Initialize();
 
-            VTextBlock spaceText = new VTextBlock() 
+            VTextBlock spaceText = new VTextBlock()
             {
                 Size = this.TextOptions.FontSize,
                 Foreground = VTForeground.DarkBlack,
@@ -109,6 +109,31 @@ namespace XTerminalController
             this.client.Disconnect();
         }
 
+        /// <summary>
+        /// 打印TextBlock文本
+        /// </summary>
+        /// <param name="textBlock"></param>
+        private void FlushText(VTextBlock textBlock)
+        {
+            // 遇到空格就渲染当前的文本
+            this.terminal.DrawText(textBlock);
+            this.textBlocks.Add(textBlock);
+            this.textOffsetX += textBlock.Width;
+            this.textLineHeight = Math.Max(this.textLineHeight, textBlock.Height);
+        }
+
+        /// <summary>
+        /// 打印当前的TextBlock（如果存在未打印的TextBlock）
+        /// </summary>
+        private void FlushText()
+        {
+            if (this.textBlock != null)
+            {
+                this.FlushText(this.textBlock);
+                this.textBlock = null;
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -117,8 +142,7 @@ namespace XTerminalController
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        /// <param name="input">输入数据</param>
-        private void VideoTerminal_InputEvent(IVideoTerminal terminal, VTInputEventArgs input)
+        private void VideoTerminal_InputEvent(IVideoTerminal terminal, VTKeys key, VTModifierKeys mkey, string text)
         {
             // todo:translate and send to remote host
         }
@@ -135,16 +159,7 @@ namespace XTerminalController
                         {
                             case ' ':
                                 {
-                                    // 遇到空格就渲染当前的文本
-                                    if (this.textBlock != null)
-                                    {
-                                        this.terminal.DrawText(this.textBlock);
-                                        this.textBlocks.Add(this.textBlock);
-                                        this.textOffsetX += this.textBlock.Width;
-                                        this.textLineHeight = Math.Max(this.textLineHeight, this.textBlock.Height);
-                                        this.textBlock = null;
-                                    }
-
+                                    this.FlushText();
                                     this.textOffsetX += this.whitespaceWidth;
                                     break;
                                 }
@@ -178,7 +193,7 @@ namespace XTerminalController
                 case VTActions.LineFeed:
                     {
                         // LF
-                        this.textBlock = null;
+                        this.FlushText();
                         this.textOffsetY += this.textLineHeight;
                         this.textOffsetX = 0;
                         break;

@@ -29,14 +29,13 @@ namespace XTerminal.VideoTerminal
 
         #region 公开事件
 
-        public event Action<IVideoTerminal, VTInputEventArgs> InputEvent;
+        public event Action<IVideoTerminal, VTKeys, VTModifierKeys, string> InputEvent;
 
         #endregion
 
         #region 实例变量
 
         private TextCanvas textCanvas;
-        private VTKeyboard keyboard;
         private Typeface typeface;
         private double pixelPerDip;
 
@@ -50,7 +49,6 @@ namespace XTerminal.VideoTerminal
 
         public Terminal()
         {
-            this.keyboard = new VTKeyboard();
             this.typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
@@ -62,27 +60,50 @@ namespace XTerminal.VideoTerminal
 
         #endregion
 
+        #region 实例方法
+
+        private void NotifyInputEvent(VTKeys key, VTModifierKeys mkey, string text)
+        {
+            if (this.InputEvent != null)
+            {
+                this.InputEvent(this, key, mkey, text);
+            }
+        }
+
+        #endregion
+
         #region 事件处理器
 
+        /// <summary>
+        /// 输入中文的时候会触发该事件
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
             base.OnPreviewTextInput(e);
 
+            this.NotifyInputEvent(VTKeys.None, VTModifierKeys.None, e.Text);
+
             Console.WriteLine(e.Text);
         }
 
+        /// <summary>
+        /// 从键盘上按下按键的时候会触发
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             base.OnPreviewKeyDown(e);
 
-            //if (e.Key == Key.ImeProcessed)
-            //{
-            //    // 这些字符交给输入法处理了
-            //}
-            //else
-            //{
-            //    e.Handled = true;
-            //}
+            if (e.Key == Key.ImeProcessed)
+            {
+                // 这些字符交给输入法处理了
+            }
+            else
+            {
+                //this.NotifyInputEvent(VTKeys)
+                //e.Handled = true;
+            }
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)

@@ -53,5 +53,7 @@ namespace VideoTerminal.Utility
             textBlock.Metrics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
             textBlock.Metrics.Height = formattedText.Height;
         }
+
+        //public static void WPFKey2VTKey(Keymap)
     }
 }
