@@ -72,11 +72,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Utility\TerminalUtils.cs" />
-    <Compile Include="VideoTerminal\Terminal.cs" />
-    <Compile Include="VideoTerminal\TerminalVisual.cs" />
-    <Compile Include="VideoTerminal\TextCanvas.cs" />
+    <Compile Include="Render\Terminal.cs" />
+    <Compile Include="Render\TerminalVisual.cs" />
+    <Compile Include="Render\TextCanvas.cs" />
     <Compile Include="ResponseCode.cs" />
-    <Compile Include="VideoTerminal\TextVisual.cs" />
+    <Compile Include="Render\TextVisual.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

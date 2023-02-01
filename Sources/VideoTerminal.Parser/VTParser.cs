@@ -113,7 +113,7 @@ namespace XTerminalParser
         /// <summary>
         /// 表示终端键盘
         /// </summary>
-        private VTKeyboard Keyboard { get; set; }
+        public VTKeyboard Keyboard { get; private set; }
 
         #endregion
 

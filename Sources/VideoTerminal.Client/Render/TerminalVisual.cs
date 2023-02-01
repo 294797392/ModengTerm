@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace XTerminal.VideoTerminal
+namespace XTerminal.Render
 {
     /// <summary>
     /// 表示终端上的一个可视化对象（光标，文本块...）

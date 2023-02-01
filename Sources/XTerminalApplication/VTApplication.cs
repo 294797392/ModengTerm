@@ -21,7 +21,11 @@ namespace XTerminalController
         #region 实例变量
 
         private ChannelAuthorition authorition;
-        private VTChannel client;
+
+        /// <summary>
+        /// 与终端进行通信的信道
+        /// </summary>
+        private VTChannel vtChannel;
 
         /// <summary>
         /// 终端字符解析器
@@ -89,10 +93,10 @@ namespace XTerminalController
         private void RunSSHClient(SSHChannelAuthorition authorition)
         {
             this.authorition = authorition;
-            this.client = VTChannelFactory.CreateSSHClient(authorition.ServerAddress, authorition.ServerPort, authorition.UserName, authorition.Password);
-            this.client.StatusChanged += this.Client_StatusChanged;
-            this.client.DataReceived += this.Client_DataReceived;
-            this.client.Connect();
+            this.vtChannel = VTChannelFactory.CreateSSHClient(authorition.ServerAddress, authorition.ServerPort, authorition.UserName, authorition.Password);
+            this.vtChannel.StatusChanged += this.Client_StatusChanged;
+            this.vtChannel.DataReceived += this.Client_DataReceived;
+            this.vtChannel.Connect();
         }
 
         /// <summary>
@@ -104,9 +108,9 @@ namespace XTerminalController
 
             this.vtParser.ActionEvent -= this.VtParser_ActionEvent;
 
-            this.client.StatusChanged -= this.Client_StatusChanged;
-            this.client.DataReceived -= this.Client_DataReceived;
-            this.client.Disconnect();
+            this.vtChannel.StatusChanged -= this.Client_StatusChanged;
+            this.vtChannel.DataReceived -= this.Client_DataReceived;
+            this.vtChannel.Disconnect();
         }
 
         /// <summary>
@@ -145,6 +149,14 @@ namespace XTerminalController
         private void VideoTerminal_InputEvent(IVideoTerminal terminal, VTKeys key, VTModifierKeys mkey, string text)
         {
             // todo:translate and send to remote host
+            if (string.IsNullOrEmpty(text))
+            {
+
+            }
+            else
+            {
+
+            }
         }
 
         private void VtParser_ActionEvent(VTActions action, params object[] param)

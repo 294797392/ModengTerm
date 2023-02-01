@@ -14,7 +14,7 @@ using System.Windows.Media.TextFormatting;
 using XTerminalController;
 using XTerminalParser;
 
-namespace XTerminal.VideoTerminal
+namespace XTerminal.Render
 {
     public class TextCanvas : Canvas
     {

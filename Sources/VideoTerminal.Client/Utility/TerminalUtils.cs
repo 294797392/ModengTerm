@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using XTerminalController;
 using XTerminalParser;
@@ -15,7 +16,7 @@ namespace VideoTerminal.Utility
     {
         public static Brush VTForeground2Brush(VTForeground foreground)
         {
-            switch (foreground) 
+            switch (foreground)
             {
                 case VTForeground.BrightBlack: return Brushes.Black;
                 case VTForeground.BrightBlue: return Brushes.Blue;
@@ -32,7 +33,7 @@ namespace VideoTerminal.Utility
                 case VTForeground.DarkGreen: return Brushes.DarkGreen;
                 case VTForeground.DarkMagenta: return Brushes.DarkMagenta;
                 case VTForeground.DarkRed: return Brushes.DarkRed;
-                case VTForeground.DarkWhite:return Brushes.White;
+                case VTForeground.DarkWhite: return Brushes.White;
                 case VTForeground.DarkYellow: return Brushes.Yellow;
 
                 default:
@@ -54,6 +55,22 @@ namespace VideoTerminal.Utility
             textBlock.Metrics.Height = formattedText.Height;
         }
 
-        //public static void WPFKey2VTKey(Keymap)
+        public static VTKeys ConvertToVTKey(Key key)
+        {
+            switch (key)
+            {
+                case Key.A: return VTKeys.A;
+                case Key.B: return VTKeys.B;
+                case Key.C: return VTKeys.C;
+                case Key.D: return VTKeys.D;
+                case Key.E: return VTKeys.E;
+                case Key.F: return VTKeys.F;
+                case Key.G: return VTKeys.G;
+                case Key.Enter: return VTKeys.Enter;
+
+                default:
+                    return VTKeys.None;
+            }
+        }
     }
 }

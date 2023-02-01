@@ -14,7 +14,7 @@ using XTerminalController;
 using XTerminalParser;
 using VideoTerminal.Utility;
 
-namespace XTerminal.VideoTerminal
+namespace XTerminal.Render
 {
     /// <summary>
     /// 终端控件
@@ -82,8 +82,6 @@ namespace XTerminal.VideoTerminal
         {
             base.OnPreviewTextInput(e);
 
-            this.NotifyInputEvent(VTKeys.None, VTModifierKeys.None, e.Text);
-
             Console.WriteLine(e.Text);
         }
 
@@ -101,8 +99,7 @@ namespace XTerminal.VideoTerminal
             }
             else
             {
-                //this.NotifyInputEvent(VTKeys)
-                //e.Handled = true;
+                this.NotifyInputEvent(VTKeys.None, VTModifierKeys.None, string.Empty);
             }
         }
 
@@ -144,7 +141,7 @@ namespace XTerminal.VideoTerminal
             });
         }
 
-        public TextMetrics MeasureText(VTextBlock textBlock)
+        public VTextBlockMetrics MeasureText(VTextBlock textBlock)
         {
             FormattedText formattedText = TerminalUtils.CreateFormattedText(textBlock, this.typeface, this.pixelPerDip);
             TerminalUtils.UpdateTextMetrics(textBlock, formattedText);

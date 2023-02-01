@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace XTerminalController
 {
-    public class TextMetrics
+    /// <summary>
+    /// 存储文本块的测量信息
+    /// </summary>
+    public class VTextBlockMetrics
     {
         /// <summary>
         /// 渲染后该文本块的宽度

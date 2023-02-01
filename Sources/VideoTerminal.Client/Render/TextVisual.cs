@@ -9,7 +9,7 @@ using System.Windows.Media;
 using VideoTerminal.Utility;
 using XTerminalController;
 
-namespace XTerminal.VideoTerminal
+namespace XTerminal.Render
 {
     public class TextVisual : TerminalVisual
     {
@@ -27,7 +27,7 @@ namespace XTerminal.VideoTerminal
         /// <summary>
         /// 渲染的文本测量信息
         /// </summary>
-        public TextMetrics Metrics { get { return this.TextBlock.Metrics; } }
+        public VTextBlockMetrics Metrics { get { return this.TextBlock.Metrics; } }
 
         #endregion
 

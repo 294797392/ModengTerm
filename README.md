@@ -41,6 +41,7 @@ https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-seque
 https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 https://invisible-island.net/xterm/
 https://vt100.net/emu/dec_ansi_parser
+* 虚拟终端/控制台/Shell介绍：https://cloud.tencent.com/developer/news/304629
 
 后面会把实现原理的讲解补充到这上面
 

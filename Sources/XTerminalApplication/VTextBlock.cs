@@ -37,7 +37,7 @@ namespace XTerminalController
         /// <summary>
         /// 文本的测量信息
         /// </summary>
-        public TextMetrics Metrics { get; private set; }
+        public VTextBlockMetrics Metrics { get; private set; }
 
         /// <summary>
         /// 获取该文本块的宽度
@@ -51,7 +51,7 @@ namespace XTerminalController
 
         public VTextBlock()
         {
-            this.Metrics = new TextMetrics();
+            this.Metrics = new VTextBlockMetrics();
         }
 
         public void AppendText(char text)

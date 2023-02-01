@@ -136,7 +136,7 @@ namespace XTerminalParser
         /// <summary>
         /// 设置当前终端解析数据流的模式
         /// </summary>
-        /// <param name="isVt52Mode"></param>
+        /// <param name="isAnsiMode"></param>
         public void SetAnsiMode(bool isAnsiMode)
         {
             this.isVt52Mode = !isAnsiMode;

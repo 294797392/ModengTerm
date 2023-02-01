@@ -47,7 +47,7 @@ namespace XTerminalController
         /// </summary>
         /// <param name="textBlock"></param>
         /// <returns></returns>
-        TextMetrics MeasureText(VTextBlock textBlock);
+        VTextBlockMetrics MeasureText(VTextBlock textBlock);
 
         #endregion
 
