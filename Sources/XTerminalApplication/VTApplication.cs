@@ -57,6 +57,11 @@ namespace XTerminalController
 
         #region 属性
 
+        /// <summary>
+        /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流
+        /// </summary>
+        public VTKeyboard Keyboard { get { return this.vtParser.Keyboard; } }
+
         public VTextOptions TextOptions { get; private set; }
 
         #endregion
@@ -94,8 +99,8 @@ namespace XTerminalController
         {
             this.authorition = authorition;
             this.vtChannel = VTChannelFactory.CreateSSHClient(authorition.ServerAddress, authorition.ServerPort, authorition.UserName, authorition.Password);
-            this.vtChannel.StatusChanged += this.Client_StatusChanged;
-            this.vtChannel.DataReceived += this.Client_DataReceived;
+            this.vtChannel.StatusChanged += this.VTChannel_StatusChanged;
+            this.vtChannel.DataReceived += this.VTChannel_DataReceived;
             this.vtChannel.Connect();
         }
 
@@ -108,8 +113,8 @@ namespace XTerminalController
 
             this.vtParser.ActionEvent -= this.VtParser_ActionEvent;
 
-            this.vtChannel.StatusChanged -= this.Client_StatusChanged;
-            this.vtChannel.DataReceived -= this.Client_DataReceived;
+            this.vtChannel.StatusChanged -= this.VTChannel_StatusChanged;
+            this.vtChannel.DataReceived -= this.VTChannel_DataReceived;
             this.vtChannel.Disconnect();
         }
 
@@ -151,11 +156,18 @@ namespace XTerminalController
             // todo:translate and send to remote host
             if (string.IsNullOrEmpty(text))
             {
+                // 这里输入的都是键盘按键
+                byte[] bytes = this.Keyboard.TranslateKey(key, mkey);
+                if (bytes == null)
+                {
+                    return;
+                }
 
+                this.vtChannel.Write(bytes);
             }
             else
             {
-
+                // 这里输入的都是中文
             }
         }
 
@@ -220,13 +232,13 @@ namespace XTerminalController
             //this.videoTerminal.PerformAction(action, param);
         }
 
-        private void Client_DataReceived(VTChannel client, byte[] bytes)
+        private void VTChannel_DataReceived(VTChannel client, byte[] bytes)
         {
             logger.InfoFormat("Received");
             this.vtParser.ProcessCharacters(bytes);
         }
 
-        private void Client_StatusChanged(object client, VTChannelState state)
+        private void VTChannel_StatusChanged(object client, VTChannelState state)
         {
             logger.InfoFormat("客户端状态发生改变, {0}", state);
         }

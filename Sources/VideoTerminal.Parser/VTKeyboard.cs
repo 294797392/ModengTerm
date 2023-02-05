@@ -8,38 +8,38 @@ using XTerminalBase;
 
 namespace XTerminalParser
 {
-    public enum KeyboardMaps
-    {
-        /// <summary>
-        /// 普通模式下的光标键
-        /// </summary>
-        CursorKeyNormal = 0,
+    //public enum KeyboardMaps
+    //{
+    //    /// <summary>
+    //    /// 普通模式下的光标键
+    //    /// </summary>
+    //    CursorKeyNormal = 0,
 
-        /// <summary>
-        /// Application模式下的光标键
-        /// </summary>
-        CursorKeyApplication,
+    //    /// <summary>
+    //    /// Application模式下的光标键
+    //    /// </summary>
+    //    CursorKeyApplication,
 
-        /// <summary>
-        /// VT52模式下的光标键
-        /// </summary>
-        CursorKeyVT52,
+    //    /// <summary>
+    //    /// VT52模式下的光标键
+    //    /// </summary>
+    //    CursorKeyVT52,
 
-        /// <summary>
-        /// VT52模式下的按键
-        /// </summary>
-        KeypadVT52,
+    //    /// <summary>
+    //    /// VT52模式下的按键
+    //    /// </summary>
+    //    KeypadVT52,
 
-        /// <summary>
-        /// 普通模式下的按键
-        /// </summary>
-        KeypadNormal,
+    //    /// <summary>
+    //    /// 普通模式下的按键
+    //    /// </summary>
+    //    KeypadNormal,
 
-        /// <summary>
-        /// Application模式下的按键
-        /// </summary>
-        KeypadApplicaion,
-    }
+    //    /// <summary>
+    //    /// Application模式下的按键
+    //    /// </summary>
+    //    KeypadApplicaion,
+    //}
 
     /// <summary>
     /// 把不同模式下的键盘按键转换成要发送给终端的字节序列
@@ -151,54 +151,65 @@ namespace XTerminalParser
         /// <returns></returns>
         public byte[] TranslateKey(VTKeys key, VTModifierKeys mkey)
         {
+            switch (key)
+            {
+                case VTKeys.Enter:
+                    {
+                        return new byte[] { (byte)'\n' };
+                    }
+
+                default:
+                    return null;
+            }
+
             string keyText = string.Empty;
 
             //if (mkey == VTModifierKeys.None)
             //{
             // 没有按下修饰键
 
-            if (this.isVt52Mode)
-            {
-                // VT52模式下的按键转换，VT52模式下没有Application模式
-                if (this.IsCursorKey(key))
-                {
-                    keyText = this.keymap[KeyboardMaps.CursorKeyVT52][key];
-                }
-                else
-                {
-                    keyText = this.keymap[KeyboardMaps.KeypadVT52][key];
-                }
-            }
-            else
-            {
-                // ANSI模式下的按键转换
-                if (this.IsCursorKey(key))
-                {
-                    // 按下的是光标键
-                    if (this.isApplicationMode)
-                    {
-                        // 获取Application模式下的光标键的要发送的字节序列
-                        keyText = this.keymap[KeyboardMaps.CursorKeyApplication][key];
-                    }
-                    else
-                    {
-                        // 获取Normal模式下的光标键的要发送的字节序列
-                        keyText = this.keymap[KeyboardMaps.CursorKeyNormal][key];
-                    }
-                }
-                else
-                {
-                    // 按下的是其他按键
-                    if (this.isApplicationMode)
-                    {
-                        keyText = this.keymap[KeyboardMaps.KeypadApplicaion][key];
-                    }
-                    else
-                    {
-                        keyText = this.keymap[KeyboardMaps.KeypadNormal][key];
-                    }
-                }
-            }
+            //if (this.isVt52Mode)
+            //{
+            //    // VT52模式下的按键转换，VT52模式下没有Application模式
+            //    if (this.IsCursorKey(key))
+            //    {
+            //        keyText = this.keymap[KeyboardMaps.CursorKeyVT52][key];
+            //    }
+            //    else
+            //    {
+            //        keyText = this.keymap[KeyboardMaps.KeypadVT52][key];
+            //    }
+            //}
+            //else
+            //{
+            //    // ANSI模式下的按键转换
+            //    if (this.IsCursorKey(key))
+            //    {
+            //        // 按下的是光标键
+            //        if (this.isApplicationMode)
+            //        {
+            //            // 获取Application模式下的光标键的要发送的字节序列
+            //            keyText = this.keymap[KeyboardMaps.CursorKeyApplication][key];
+            //        }
+            //        else
+            //        {
+            //            // 获取Normal模式下的光标键的要发送的字节序列
+            //            keyText = this.keymap[KeyboardMaps.CursorKeyNormal][key];
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // 按下的是其他按键
+            //        if (this.isApplicationMode)
+            //        {
+            //            keyText = this.keymap[KeyboardMaps.KeypadApplicaion][key];
+            //        }
+            //        else
+            //        {
+            //            keyText = this.keymap[KeyboardMaps.KeypadNormal][key];
+            //        }
+            //    }
+            //}
             //}
             //else
             //{

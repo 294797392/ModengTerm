@@ -82,7 +82,7 @@ namespace XTerminal.Render
         {
             base.OnPreviewTextInput(e);
 
-            Console.WriteLine(e.Text);
+            //Console.WriteLine(e.Text);
         }
 
         /// <summary>
@@ -99,7 +99,8 @@ namespace XTerminal.Render
             }
             else
             {
-                this.NotifyInputEvent(VTKeys.None, VTModifierKeys.None, string.Empty);
+                VTKeys vtKey = TerminalUtils.ConvertToVTKey(e.Key);
+                this.NotifyInputEvent(vtKey, VTModifierKeys.None, string.Empty);
             }
         }
 
