@@ -26,9 +26,7 @@ namespace XTerminal.Render
 
         #region 实例方法
 
-        private List<TextVisual> textVisuals;
-
-        private Dictionary<TextBlock, TextVisual> textVisualMap;
+        private Dictionary<int, TextVisual> textVisuals;
 
         #endregion
 
@@ -50,7 +48,7 @@ namespace XTerminal.Render
 
         public TextCanvas()
         {
-            this.textVisuals = new List<TextVisual>();
+            this.textVisuals = new Dictionary<int, TextVisual>();
         }
 
         #endregion
@@ -63,13 +61,17 @@ namespace XTerminal.Render
 
         public void DrawText(VTextBlock textBlock)
         {
-            TextVisual textVisual = new TextVisual(textBlock);
-            textVisual.PixelsPerDip = this.PixelsPerDip;
-            textVisual.Typeface = this.Typeface;
+            TextVisual textVisual;
+            if (!this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
+            {
+                textVisual = new TextVisual(textBlock);
+                textVisual.PixelsPerDip = this.PixelsPerDip;
+                textVisual.Typeface = this.Typeface;
 
-            this.textVisuals.Add(textVisual);
+                this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
 
-            this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
+                this.textVisuals[textBlock.Index] = textVisual;
+            }
 
             textVisual.Draw();
         }

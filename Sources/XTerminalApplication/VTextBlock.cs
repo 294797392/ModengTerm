@@ -10,6 +10,11 @@ namespace XTerminalController
     public class VTextBlock
     {
         /// <summary>
+        /// TextBlock的索引号
+        /// </summary>
+        public int Index { get; set; }
+
+        /// <summary>
         /// 文本的颜色
         /// </summary>
         public VTForeground Foreground { get; set; }

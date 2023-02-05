@@ -128,23 +128,14 @@ namespace XTerminalController
         /// <param name="textBlock"></param>
         private void FlushText(VTextBlock textBlock)
         {
+            if (textBlock == null)
+            {
+                return;
+            }
+
             // 遇到空格就渲染当前的文本
             this.terminal.DrawText(textBlock);
-            this.textBlocks.Add(textBlock);
-            this.textOffsetX += textBlock.Width;
             this.textLineHeight = Math.Max(this.textLineHeight, textBlock.Height);
-        }
-
-        /// <summary>
-        /// 打印当前的TextBlock（如果存在未打印的TextBlock）
-        /// </summary>
-        private void FlushText()
-        {
-            if (this.textBlock != null)
-            {
-                this.FlushText(this.textBlock);
-                this.textBlock = null;
-            }
         }
 
         #endregion
@@ -187,7 +178,8 @@ namespace XTerminalController
                         {
                             case ' ':
                                 {
-                                    this.FlushText();
+                                    this.FlushText(this.textBlock);
+                                    this.textBlock = null;
                                     this.textOffsetX += this.whitespaceWidth;
                                     break;
                                 }
@@ -198,13 +190,23 @@ namespace XTerminalController
                                     {
                                         this.textBlock = new VTextBlock()
                                         {
+                                            Index = this.textBlocks.Count,
                                             Foreground = this.TextOptions.Foreground,
                                             Size = this.TextOptions.FontSize,
                                             X = this.textOffsetX,
                                             Y = this.textOffsetY
                                         };
+                                        this.textBlocks.Add(textBlock);
                                     }
                                     this.textBlock.AppendText(ch);
+
+                                    // 渲染之前字符的宽度
+                                    double width1 = this.textBlock.Metrics.Width;
+                                    this.FlushText(this.textBlock);
+                                    // 渲染之后的字符宽度
+                                    double width2 = this.textBlock.Metrics.Width;
+                                    // 下次新创建的TextBlock的X偏移量
+                                    this.textOffsetX += (width2 - width1);
                                     break;
                                 }
                         }
@@ -221,7 +223,8 @@ namespace XTerminalController
                 case VTActions.LineFeed:
                     {
                         // LF
-                        this.FlushText();
+                        this.FlushText(this.textBlock);
+                        this.textBlock = null;
                         this.textOffsetY += this.textLineHeight;
                         this.textOffsetX = 0;
                         break;
@@ -238,7 +241,7 @@ namespace XTerminalController
 
         private void VTChannel_DataReceived(VTChannel client, byte[] bytes)
         {
-            logger.InfoFormat("Received");
+            //logger.InfoFormat("Received");
             this.vtParser.ProcessCharacters(bytes);
         }
 

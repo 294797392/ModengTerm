@@ -15,6 +15,11 @@ namespace XTerminal.Render
     {
         #region 属性
 
+        /// <summary>
+        /// 文本块的索引
+        /// </summary>
+        public int Index { get { return this.TextBlock.Index; } }
+
         public double PixelsPerDip { get; set; }
 
         public Typeface Typeface { get; set; }
