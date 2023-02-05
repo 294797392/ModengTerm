@@ -142,6 +142,13 @@ namespace XTerminalParser
         /// <summary>
         /// 移动光标
         /// </summary>
-        CursorPosition
+        CursorPosition,
+
+        /// <summary>
+        /// 切换输入模式
+        /// </summary>
+        SetCursorKeyMode,
+
+        SetInputMode
     }
 }

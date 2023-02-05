@@ -455,14 +455,14 @@ namespace XTerminalParser
                             // true表示ApplicationMode
                             // false表示NormalMode
                             this.isApplicationMode = enable;
-                            this.Keyboard.SetKeypadMode(enable);
+                            this.NotifyActionEvent(VTActions.SetCursorKeyMode, enable ? VTCursorKeyMode.ApplicationMode : VTCursorKeyMode.NormalMode);
                             break;
                         }
 
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
                             this.isAnsiMode = enable;
-                            this.Keyboard.SetAnsiMode(enable);
+                            this.NotifyActionEvent(VTActions.SetInputMode, enable ? VTInputMode.AnsiMode : VTInputMode.VT52Mode);
                             break;
                         }
 

@@ -28,6 +28,8 @@ namespace XTerminal.Render
 
         private List<TextVisual> textVisuals;
 
+        private Dictionary<TextBlock, TextVisual> textVisualMap;
+
         #endregion
 
         #region 属性

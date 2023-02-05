@@ -110,11 +110,6 @@ namespace XTerminalParser
 
         #region 属性
 
-        /// <summary>
-        /// 表示终端键盘
-        /// </summary>
-        public VTKeyboard Keyboard { get; private set; }
-
         #endregion
 
         #region 公开接口
@@ -127,10 +122,6 @@ namespace XTerminalParser
         {
             this.isAnsiMode = true;
             this.isApplicationMode = false;
-
-            this.Keyboard = new VTKeyboard();
-            this.Keyboard.SetAnsiMode(true);
-            this.Keyboard.SetKeypadMode(false);
 
             this.unicodeText = new List<byte>();
 

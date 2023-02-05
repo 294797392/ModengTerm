@@ -60,13 +60,11 @@
   <ItemGroup>
     <Compile Include="ASCIIChars.cs" />
     <Compile Include="VTDefinitions.cs" />
-    <Compile Include="Keymap.cs" />
     <Compile Include="VTActions.cs" />
     <Compile Include="VTBackground.cs" />
     <Compile Include="VTForeground.cs" />
-    <Compile Include="VTKeyboard.cs" />
-    <Compile Include="VTKeys.cs" />
-    <Compile Include="VTModifierKeys.cs" />
+    <Compile Include="VTCursorKeyMode.cs" />
+    <Compile Include="VTInputMode.cs" />
     <Compile Include="VTParserDispatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VTParser.cs" />
@@ -79,11 +77,6 @@
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
       <Name>XTerminalBase</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="keymap.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -78,7 +78,10 @@ namespace XTerminalController
 
         public VTKeyboard()
         {
-            this.InitializeKeymap();
+            this.keymap = new DefaultKeymap();
+
+            this.SetAnsiMode(true);
+            this.SetKeypadMode(false);
         }
 
         #endregion
@@ -92,30 +95,6 @@ namespace XTerminalController
         public bool IsCursorKey(VTKeys key)
         {
             return key == VTKeys.UpArrow || key == VTKeys.DownArrow || key == VTKeys.LeftArrow || key == VTKeys.RightArrow;
-        }
-
-        private void InitializeKeymap()
-        {
-            //if (!File.Exists(DefaultValues.KeymapFile))
-            //{
-            //    this.UseHardcodeKeymap();
-            //    return;
-            //}
-
-            //try
-            //{
-            //    this.keymap = JSONHelper.ParseFile<Keymap>(DefaultValues.KeymapFile);
-            //}
-            //catch (Exception ex)
-            //{
-            //    logger.Error("加载keymap配置文件异常", ex);
-            //    this.UseHardcodeKeymap();
-            //}
-        }
-
-        private void UseHardcodeKeymap()
-        {
-            logger.Info("加载默认keymap配置");
         }
 
         #endregion
@@ -146,24 +125,15 @@ namespace XTerminalController
         /// 把系统按键转换成终端字节序列
         /// 代码参考terminal - terminalInput.cpp
         /// </summary>
-        /// <param name="key">要转换的系统按键</param>
-        /// <param name="mkey">当前按下的修饰键</param>
-        /// <param name="capsLock">capslock按键的状态</param>
         /// <returns></returns>
-        public byte[] TranslateKey()
+        public byte[] TranslateInput(VTInputEvent evt)
         {
-            switch (key)
+            if (evt.Key != VTKeys.None)
             {
-                case VTKeys.Enter:
-                    {
-                        return new byte[] { (byte)'\n' };
-                    }
-
-                default:
-                    return null;
+                return this.keymap.MapKey(evt);
             }
 
-            string keyText = string.Empty;
+            return null;
 
             //if (mkey == VTModifierKeys.None)
             //{
@@ -219,7 +189,7 @@ namespace XTerminalController
 
             // 如果keyText里包含转义字符，那么解析转义字符，转义字符使用十六进制表示，用\x或者\0开头
 
-            return Encoding.ASCII.GetBytes(keyText);
+            //return Encoding.ASCII.GetBytes(keyText);
         }
 
         #endregion

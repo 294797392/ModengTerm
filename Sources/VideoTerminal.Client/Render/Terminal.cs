@@ -29,7 +29,7 @@ namespace XTerminal.Render
 
         #region 公开事件
 
-        public event Action<IVideoTerminal, VTKeys, VTModifierKeys, string> InputEvent;
+        public event Action<IVideoTerminal, VTInputEvent> InputEvent;
 
         #endregion
 
@@ -38,6 +38,8 @@ namespace XTerminal.Render
         private TextCanvas textCanvas;
         private Typeface typeface;
         private double pixelPerDip;
+
+        private VTInputEvent inputEvent;
 
         #endregion
 
@@ -49,6 +51,8 @@ namespace XTerminal.Render
 
         public Terminal()
         {
+            this.inputEvent = new VTInputEvent();
+
             this.typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
@@ -62,11 +66,11 @@ namespace XTerminal.Render
 
         #region 实例方法
 
-        private void NotifyInputEvent(VTKeys key, VTModifierKeys mkey, string text)
+        private void NotifyInputEvent(VTInputEvent evt)
         {
             if (this.InputEvent != null)
             {
-                this.InputEvent(this, key, mkey, text);
+                this.InputEvent(this,evt);
             }
         }
 
@@ -100,7 +104,11 @@ namespace XTerminal.Render
             else
             {
                 VTKeys vtKey = TerminalUtils.ConvertToVTKey(e.Key);
-                this.NotifyInputEvent(vtKey, VTModifierKeys.None, string.Empty);
+                this.inputEvent.CapsLock = Console.CapsLock;
+                this.inputEvent.Key = vtKey;
+                this.inputEvent.Text = null;
+                this.inputEvent.Modifiers = VTModifierKeys.None;
+                this.NotifyInputEvent(this.inputEvent);
             }
         }
 

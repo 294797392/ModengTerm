@@ -60,7 +60,7 @@ namespace XTerminalController
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流
         /// </summary>
-        public VTKeyboard Keyboard { get { return this.vtParser.Keyboard; } }
+        public VTKeyboard Keyboard { get; private set; }
 
         public VTextOptions TextOptions { get; private set; }
 
@@ -72,6 +72,10 @@ namespace XTerminalController
         {
             this.textBlocks = new List<VTextBlock>();
             this.TextOptions = new VTextOptions();
+
+            this.Keyboard = new VTKeyboard();
+            this.Keyboard.SetAnsiMode(true);
+            this.Keyboard.SetKeypadMode(false);
 
             // 初始化视频终端
             this.terminal = terminal;
@@ -151,13 +155,13 @@ namespace XTerminalController
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        private void VideoTerminal_InputEvent(IVideoTerminal terminal, VTKeys key, VTModifierKeys mkey, string text)
+        private void VideoTerminal_InputEvent(IVideoTerminal terminal, VTInputEvent evt)
         {
             // todo:translate and send to remote host
-            if (string.IsNullOrEmpty(text))
+            if (string.IsNullOrEmpty(evt.Text))
             {
                 // 这里输入的都是键盘按键
-                byte[] bytes = this.Keyboard.TranslateKey(key, mkey);
+                byte[] bytes = this.Keyboard.TranslateInput(evt);
                 if (bytes == null)
                 {
                     return;

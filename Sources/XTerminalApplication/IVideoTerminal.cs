@@ -25,7 +25,7 @@ namespace XTerminalController
         /// VTModifierKeys：用户按下的控制按键（ctrl，alt...etc）
         /// string：用户输入的中文字符串，如果没有则写null
         /// </summary>
-        event Action<IVideoTerminal, VTKeys, VTModifierKeys, string> InputEvent;
+        event Action<IVideoTerminal, VTInputEvent> InputEvent;
 
         /// <summary>
         /// 执行一个虚拟终端的动作
