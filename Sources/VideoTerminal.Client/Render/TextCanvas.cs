@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
@@ -16,7 +17,7 @@ using XTerminalParser;
 
 namespace XTerminal.Render
 {
-    public class TextCanvas : Canvas
+    public class TextCanvas : Panel
     {
         #region 类变量
 
@@ -106,6 +107,12 @@ namespace XTerminal.Render
         protected override Visual GetVisualChild(int index)
         {
             return this.textVisuals[index];
+        }
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            Console.WriteLine("Measure");
+            return base.MeasureOverride(constraint);
         }
 
         #endregion
