@@ -147,7 +147,7 @@ namespace XTerminal.WPFDevice
         /// <param name="device"></param>
         public void ReleasePresentationDevice(IPresentationDevice device)
         {
-            
+
         }
 
         /// <summary>
@@ -156,8 +156,15 @@ namespace XTerminal.WPFDevice
         /// <param name="device"></param>
         public void SwitchPresentaionDevice(IPresentationDevice toRemove, IPresentationDevice toAdd)
         {
-            this.Children.Remove(toRemove as WPFPresentationDevice);
-            this.Children.Add(toAdd as WPFPresentationDevice);
+            if (toRemove != null)
+            {
+                this.Children.Remove(toRemove as WPFPresentationDevice);
+            }
+
+            if (toAdd != null)
+            {
+                this.Children.Add(toAdd as WPFPresentationDevice);
+            }
         }
 
         #endregion

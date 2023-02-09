@@ -73,12 +73,14 @@ namespace XTerminal.WPFDevice
 
         #region 实例方法
 
-        private void EnsureScrollViewer()
+        private bool EnsureScrollViewer()
         {
             if (this.scrollViewer == null)
             {
-                this.scrollViewer = this.FindVisual
+                this.scrollViewer = this.Parent as ScrollViewer;
             }
+
+            return this.scrollViewer != null;
         }
 
         #endregion
@@ -127,14 +129,42 @@ namespace XTerminal.WPFDevice
             this.InvalidateMeasure();
         }
 
-        public void ScrollToEnd()
+        public void ScrollToEnd(ScrollOrientation orientation)
         {
-            this.EnsureScrollViewer();
-        }
+            if (!this.EnsureScrollViewer())
+            {
+                return;
+            }
 
-        public void ScrollToTop()
-        {
-            this.EnsureScrollViewer();
+            switch (orientation)
+            {
+                case ScrollOrientation.Bottom:
+                    {
+                        this.scrollViewer.ScrollToEnd();
+                        break;
+                    }
+
+                case ScrollOrientation.Left:
+                    {
+                        this.scrollViewer.ScrollToLeftEnd();
+                        break;
+                    }
+
+                case ScrollOrientation.Right:
+                    {
+                        this.scrollViewer.ScrollToRightEnd();
+                        break;
+                    }
+
+                case ScrollOrientation.Top:
+                    {
+                        this.scrollViewer.ScrollToTop();
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         #endregion

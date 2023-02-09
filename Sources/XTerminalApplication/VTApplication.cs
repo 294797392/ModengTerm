@@ -123,7 +123,7 @@ namespace XTerminalDevice
             this.whitespaceWidth = this.PresentationDevice.MeasureText(spaceText).WidthIncludingWhitespace;
 
             this.PresentationDevice = this.VTDevice.CreatePresentationDevice();
-            this.VTDevice.SwitchPresentaionDevice(this.PresentationDevice);
+            this.VTDevice.SwitchPresentaionDevice(null, this.PresentationDevice);
             this.InputDevice = this.VTDevice.GetInputDevice();
         }
 
@@ -198,7 +198,7 @@ namespace XTerminalDevice
                 this.fullWidth = width;
                 this.fullHeight = height;
                 this.PresentationDevice.Resize(width, height);
-                this.PresentationDevice.ScrollToEnd();
+                this.PresentationDevice.ScrollToEnd(ScrollOrientation.Bottom);
             }
         }
 

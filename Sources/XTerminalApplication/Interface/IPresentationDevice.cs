@@ -5,6 +5,14 @@ using System.Text;
 
 namespace XTerminalDevice.Interface
 {
+    public enum ScrollOrientation
+    {
+        Top,
+        Bottom,
+        Left,
+        Right
+    }
+
     /// <summary>
     /// 表示一个用来渲染文本的设备
     /// </summary>
@@ -37,13 +45,8 @@ namespace XTerminalDevice.Interface
         void Resize(double width, double height);
 
         /// <summary>
-        /// 滚动到最底部
+        /// 滚动到某个方向的最底部
         /// </summary>
-        void ScrollToEnd();
-
-        /// <summary>
-        /// 滚动到最上面
-        /// </summary>
-        void ScrollToTop();
+        void ScrollToEnd(ScrollOrientation direction);
     }
 }
