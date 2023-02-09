@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     /// <summary>
     /// 存储不同模式下，键盘按键与终端字节流的映射关系

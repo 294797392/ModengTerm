@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using XTerminalController;
+using XTerminalDevice;
 using XTerminalParser;
 
-namespace VideoTerminal.Utility
+namespace XTerminal.WPFDevice
 {
     public static class TerminalUtils
     {

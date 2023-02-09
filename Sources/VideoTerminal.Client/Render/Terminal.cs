@@ -19,7 +19,7 @@ namespace XTerminal.Render
     /// <summary>
     /// 终端控件
     /// </summary>
-    public class Terminal : ContentControl, IVideoTerminal
+    public class Terminal : Panel
     {
         #region 类变量
 
@@ -35,15 +35,22 @@ namespace XTerminal.Render
 
         #region 实例变量
 
-        private TextCanvas textCanvas;
         private Typeface typeface;
         private double pixelPerDip;
 
         private VTInputEvent inputEvent;
 
+        private Dictionary<int, TextVisual> textVisuals;
+
         #endregion
 
         #region 属性
+
+        // Provide a required override for the VisualChildrenCount property.
+        protected override int VisualChildrenCount
+        {
+            get { return this.textVisuals.Count; }
+        }
 
         #endregion
 
@@ -51,15 +58,10 @@ namespace XTerminal.Render
 
         public Terminal()
         {
+            this.textVisuals = new Dictionary<int, TextVisual>();
             this.inputEvent = new VTInputEvent();
-
-            this.typeface = new Typeface(FontFamily, FontStyle, FontWeight, FontStretch);
+            this.typeface = new Typeface(new FontFamily("Ya Hei"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
-
-            this.textCanvas = new TextCanvas();
-            this.textCanvas.Typeface = this.typeface;
-            this.textCanvas.PixelsPerDip = this.pixelPerDip;
-            this.Content = this.textCanvas;
         }
 
         #endregion
@@ -130,87 +132,111 @@ namespace XTerminal.Render
             return new PointHitTestResult(this, hitTestParameters.HitPoint);
         }
 
+        // Provide a required override for the GetVisualChild method.
+        protected override Visual GetVisualChild(int index)
+        {
+            return this.textVisuals[index];
+        }
+
+        protected override Size MeasureOverride(Size constraint)
+        {
+            Console.WriteLine("Measure");
+            return base.MeasureOverride(constraint);
+        }
+
         #endregion
 
         #region IVideoTerminal
 
-        public void DrawText(List<VTextBlock> textBlocks)
-        {
-            foreach (VTextBlock textBlock in textBlocks)
-            {
-                this.DrawText(textBlock);
-            }
-        }
+        //public void DrawText(List<VTextBlock> textBlocks)
+        //{
+        //    foreach (VTextBlock textBlock in textBlocks)
+        //    {
+        //        this.DrawText(textBlock);
+        //    }
+        //}
 
-        public void DrawText(VTextBlock textBlock)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                this.textCanvas.DrawText(textBlock);
-            });
-        }
+        //public void DrawText(VTextBlock textBlock)
+        //{
+        //    Dispatcher.Invoke(() =>
+        //    {
+        //        TextVisual textVisual;
+        //        if (!this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
+        //        {
+        //            textVisual = new TextVisual(textBlock);
+        //            textVisual.PixelsPerDip = this.pixelPerDip;
+        //            textVisual.Typeface = this.typeface;
 
-        public VTextBlockMetrics MeasureText(VTextBlock textBlock)
-        {
-            FormattedText formattedText = TerminalUtils.CreateFormattedText(textBlock, this.typeface, this.pixelPerDip);
-            TerminalUtils.UpdateTextMetrics(textBlock, formattedText);
-            return textBlock.Metrics;
-        }
+        //            this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
 
-        public void PerformAction(VTActions vtAction, params object[] param)
-        {
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                switch (vtAction)
-                {
-                    case VTActions.PlayBell:
-                        {
-                            // 播放响铃
-                            break;
-                        }
+        //            this.textVisuals[textBlock.Index] = textVisual;
+        //        }
 
-                    default:
-                        {
-                            //this.textCanvas.PerformAction(vtAction, param);
-                            break;
-                        }
-                }
-            }));
-        }
+        //        textVisual.Draw();
+        //    });
+        //}
 
-        public ICursorState CursorSaveState()
-        {
-            logger.WarnFormat("CursorSaveState");
-            return null;
-        }
+        //public VTextBlockMetrics MeasureText(VTextBlock textBlock)
+        //{
+        //    FormattedText formattedText = TerminalUtils.CreateFormattedText(textBlock, this.typeface, this.pixelPerDip);
+        //    TerminalUtils.UpdateTextMetrics(textBlock, formattedText);
+        //    return textBlock.Metrics;
+        //}
 
-        public void CursorRestoreState(ICursorState state)
-        {
-            logger.WarnFormat("CursorRestoreState");
-        }
+        //public void PerformAction(VTActions vtAction, params object[] param)
+        //{
+        //    this.Dispatcher.Invoke(new Action(() =>
+        //    {
+        //        switch (vtAction)
+        //        {
+        //            case VTActions.PlayBell:
+        //                {
+        //                    // 播放响铃
+        //                    break;
+        //                }
 
-        public IPresentationDevice CreatePresentationDevice()
-        {
-            logger.WarnFormat("CreatePresentationDevice");
-            return null;
-        }
+        //            default:
+        //                {
+        //                    //this.textCanvas.PerformAction(vtAction, param);
+        //                    break;
+        //                }
+        //        }
+        //    }));
+        //}
 
-        public void DeletePresentationDevice(IPresentationDevice device)
-        {
-            logger.WarnFormat("DeletePresentationDevice");
-        }
+        //public ICursorState CursorSaveState()
+        //{
+        //    logger.WarnFormat("CursorSaveState");
+        //    return null;
+        //}
 
-        public bool SwitchPresentationDevice(IPresentationDevice activeDevice)
-        {
-            logger.WarnFormat("SwitchPresentationDevice");
-            return true;
-        }
+        //public void CursorRestoreState(ICursorState state)
+        //{
+        //    logger.WarnFormat("CursorRestoreState");
+        //}
 
-        public IPresentationDevice GetActivePresentationDevice()
-        {
-            logger.WarnFormat("GetActivePresentationDevice");
-            return null;
-        }
+        //public IPresentationDevice CreatePresentationDevice()
+        //{
+        //    logger.WarnFormat("CreatePresentationDevice");
+        //    return null;
+        //}
+
+        //public void DeletePresentationDevice(IPresentationDevice device)
+        //{
+        //    logger.WarnFormat("DeletePresentationDevice");
+        //}
+
+        //public bool SwitchPresentationDevice(IPresentationDevice activeDevice)
+        //{
+        //    logger.WarnFormat("SwitchPresentationDevice");
+        //    return true;
+        //}
+
+        //public IPresentationDevice GetActivePresentationDevice()
+        //{
+        //    logger.WarnFormat("GetActivePresentationDevice");
+        //    return null;
+        //}
 
         #endregion
     }

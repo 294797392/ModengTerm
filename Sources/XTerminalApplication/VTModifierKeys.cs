@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     /// <summary>
     /// 修饰键

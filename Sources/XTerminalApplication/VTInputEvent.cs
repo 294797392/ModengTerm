@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using XTerminalParser;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     /// <summary>
     /// 存储输入事件

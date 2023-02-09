@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminalParser;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     public class VTextBlock
     {
@@ -41,6 +41,7 @@ namespace XTerminalController
 
         /// <summary>
         /// 文本的测量信息
+        /// Draw完之后就有了测量信息
         /// </summary>
         public VTextBlockMetrics Metrics { get; private set; }
 
@@ -53,6 +54,11 @@ namespace XTerminalController
         /// 获取该文本块的高度
         /// </summary>
         public double Height { get { return this.Metrics.Height; } }
+
+        /// <summary>
+        /// 获取该文本的矩形框
+        /// </summary>
+        public VTRect Boundary { get { return new VTRect(this.X, this.Y, this.Width, this.Height); } }
 
         public VTextBlock()
         {

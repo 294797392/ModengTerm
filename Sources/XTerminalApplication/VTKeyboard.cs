@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using XTerminalBase;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     //public enum KeyboardMaps
     //{

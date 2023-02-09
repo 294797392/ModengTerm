@@ -5,7 +5,7 @@ using System.Text;
 using XTerminalBase;
 using XTerminalParser;
 
-namespace XTerminalController
+namespace XTerminalDevice.Interface
 {
     /// <summary>
     /// 视频终端渲染器
@@ -40,6 +40,10 @@ namespace XTerminalController
         /// <param name="textBlocks"></param>
         void DrawText(List<VTextBlock> textBlocks);
 
+        /// <summary>
+        /// 渲染文本块
+        /// </summary>
+        /// <param name="textBlock"></param>
         void DrawText(VTextBlock textBlock);
 
         /// <summary>
@@ -48,6 +52,13 @@ namespace XTerminalController
         /// <param name="textBlock"></param>
         /// <returns></returns>
         VTextBlockMetrics MeasureText(VTextBlock textBlock);
+
+        /// <summary>
+        /// 重新调整终端大小
+        /// </summary>
+        /// <param name="width">终端的宽度</param>
+        /// <param name="height">终端高度</param>
+        void Resize(double width, double height);
 
         #endregion
 

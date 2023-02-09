@@ -6,11 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
-using VideoTerminal.Utility;
 using XTerminalDevice;
 
-namespace XTerminal.Render
+namespace XTerminal.WPFDevice
 {
+    /// <summary>
+    /// 表示PresentationDevice上的一个文本块
+    /// </summary>
     public class TextVisual : TerminalVisual
     {
         #region 属性

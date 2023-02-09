@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:control="clr-namespace:XTerminal.Render"
+        xmlns:wpfdev="clr-namespace:XTerminal.WPFDevice;assembly=XTerminal.WPFDevice"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" WindowState="Maximized">
 
@@ -15,7 +15,7 @@
 
         <Button Grid.Row="0" Content="连接" Click="Button_Click"/>
 
-        <control:Terminal Grid.Row="1" x:Name="Terminal"/>
+        <wpfdev:WPFVTDevice Grid.Row="1" x:Name="Terminal"/>
     </Grid>
 
 </Window>

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminalParser;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     public class VTextOptions
     {

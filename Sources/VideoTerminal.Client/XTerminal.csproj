@@ -71,12 +71,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Utility\TerminalUtils.cs" />
-    <Compile Include="Render\Terminal.cs" />
-    <Compile Include="Render\TerminalVisual.cs" />
-    <Compile Include="Render\TextCanvas.cs" />
     <Compile Include="ResponseCode.cs" />
-    <Compile Include="Render\TextVisual.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -137,20 +132,6 @@
     <Resource Include="Fonts\UbuntuMono-RI.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VideoTerminal.Parser\XTerminalParser.csproj">
-      <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
-      <Name>XTerminalParser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\VTBase\XTerminalBase.csproj">
-      <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
-      <Name>XTerminalBase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XTerminalApplication\XTerminalController.csproj">
-      <Project>{c236bd15-c63c-45bd-b576-2caa49acaba2}</Project>
-      <Name>XTerminalController</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Fonts\CONTRIBUTING.txt" />
     <Resource Include="Fonts\copyright.txt" />
     <Resource Include="Fonts\FONTLOG.txt" />
@@ -161,6 +142,24 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Windows\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VideoTerminal.Parser\XTerminalParser.csproj">
+      <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
+      <Name>XTerminalParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VTBase\XTerminalBase.csproj">
+      <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
+      <Name>XTerminalBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminal.WPFDevice\XTerminal.WPFDevice.csproj">
+      <Project>{dcbd335a-2c3c-4fbf-a3d8-0859844519aa}</Project>
+      <Name>XTerminal.WPFDevice</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminalApplication\XTerminalDevice.csproj">
+      <Project>{c236bd15-c63c-45bd-b576-2caa49acaba2}</Project>
+      <Name>XTerminalDevice</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

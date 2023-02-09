@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using XTerminalBase.Channels;
+using XTerminalDevice.Interface;
 using XTerminalParser;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     /// <summary>
-    /// 第三方用户通过这个类来启动终端
+    /// 控制虚拟终端设备
     /// </summary>
     public class VTApplication
     {
@@ -32,16 +33,15 @@ namespace XTerminalController
         /// </summary>
         private VTParser vtParser;
 
-        // 终端控制器
-        private IVideoTerminal terminal;
-
-        // 当前正在渲染的文本块
+        /// <summary>
+        /// 当前正在渲染的文本块
+        /// </summary>
         private VTextBlock textBlock;
 
-        // 当前渲染的文本的X位置
+        // 当前渲染的文本的左上角X位置
         private double textOffsetX;
 
-        // 当前渲染的文本的Y位置
+        // 当前渲染的文本的左上角Y位置
         private double textOffsetY;
 
         // 所有的文本列表
@@ -53,9 +53,30 @@ namespace XTerminalController
         // 空白字符的宽度
         private double whitespaceWidth;
 
+        /// <summary>
+        /// Terminal区域的总长宽
+        /// </summary>
+        private double fullWidth;
+        private double fullHeight;
+
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 终端设备的一些接口
+        /// </summary>
+        public IVTDevice VTDevice { get; set; }
+
+        /// <summary>
+        /// 输入设备
+        /// </summary>
+        public IInputDevice InputDevice { get; private set; }
+
+        /// <summary>
+        /// 显示字符的设备
+        /// </summary>
+        public IPresentationDevice PresentationDevice { get; private set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流
@@ -68,7 +89,15 @@ namespace XTerminalController
 
         #region 构造方法
 
-        private VTApplication(IVideoTerminal terminal)
+        public VTApplication()
+        {
+        }
+
+        #endregion
+
+        #region 公开接口
+
+        public void Initialize() 
         {
             this.textBlocks = new List<VTextBlock>();
             this.TextOptions = new VTextOptions();
@@ -78,8 +107,7 @@ namespace XTerminalController
             this.Keyboard.SetKeypadMode(false);
 
             // 初始化视频终端
-            this.terminal = terminal;
-            this.terminal.InputEvent += this.VideoTerminal_InputEvent;
+            this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
 
             // 初始化终端解析器
             this.vtParser = new VTParser();
@@ -92,14 +120,14 @@ namespace XTerminalController
                 Foreground = VTForeground.DarkBlack,
                 Text = " ",
             };
-            this.whitespaceWidth = this.terminal.MeasureText(spaceText).WidthIncludingWhitespace;
+            this.whitespaceWidth = this.PresentationDevice.MeasureText(spaceText).WidthIncludingWhitespace;
+
+            this.PresentationDevice = this.VTDevice.CreatePresentationDevice();
+            this.VTDevice.SwitchPresentaionDevice(this.PresentationDevice);
+            this.InputDevice = this.VTDevice.GetInputDevice();
         }
 
-        #endregion
-
-        #region 实例方法
-
-        private void RunSSHClient(SSHChannelAuthorition authorition)
+        public void RunSSHClient(SSHChannelAuthorition authorition)
         {
             this.authorition = authorition;
             this.vtChannel = VTChannelFactory.CreateSSHClient(authorition.ServerAddress, authorition.ServerPort, authorition.UserName, authorition.Password);
@@ -113,14 +141,18 @@ namespace XTerminalController
         /// </summary>
         public void Exit()
         {
-            this.terminal.InputEvent -= this.VideoTerminal_InputEvent;
+            //this.terminal.InputEvent -= this.VideoTerminal_InputEvent;
 
-            this.vtParser.ActionEvent -= this.VtParser_ActionEvent;
+            //this.vtParser.ActionEvent -= this.VtParser_ActionEvent;
 
-            this.vtChannel.StatusChanged -= this.VTChannel_StatusChanged;
-            this.vtChannel.DataReceived -= this.VTChannel_DataReceived;
-            this.vtChannel.Disconnect();
+            //this.vtChannel.StatusChanged -= this.VTChannel_StatusChanged;
+            //this.vtChannel.DataReceived -= this.VTChannel_DataReceived;
+            //this.vtChannel.Disconnect();
         }
+
+        #endregion
+
+        #region 实例方法
 
         /// <summary>
         /// 打印TextBlock文本
@@ -134,8 +166,40 @@ namespace XTerminalController
             }
 
             // 遇到空格就渲染当前的文本
-            this.terminal.DrawText(textBlock);
+            this.PresentationDevice.DrawText(textBlock);
             this.textLineHeight = Math.Max(this.textLineHeight, textBlock.Height);
+        }
+
+        /// <summary>
+        /// 重新测量Terminal所需要的大小
+        /// 如果大小改变了，那么调整布局大小
+        /// </summary>
+        private void InvalidateMeasure()
+        {
+            if (this.textBlock == null) 
+            {
+                return;
+            }
+
+            double width = Math.Max(this.textBlock.Boundary.RightBottom.X, this.fullWidth);
+            double height = Math.Max(this.textBlock.Boundary.RightBottom.Y, this.fullHeight);
+
+            // 布局大小是否改变了
+            bool sizeChanged = false;
+
+            // 长宽和原来的完整长宽不一样就算改变了
+            if (width != this.fullWidth || height != this.fullHeight)
+            {
+                sizeChanged = true;
+            }
+
+            if (sizeChanged)
+            {
+                this.fullWidth = width;
+                this.fullHeight = height;
+                this.PresentationDevice.Resize(width, height);
+                this.PresentationDevice.ScrollToEnd();
+            }
         }
 
         #endregion
@@ -146,7 +210,7 @@ namespace XTerminalController
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        private void VideoTerminal_InputEvent(IVideoTerminal terminal, VTInputEvent evt)
+        private void VideoTerminal_InputEvent(IInputDevice terminal, VTInputEvent evt)
         {
             // todo:translate and send to remote host
             if (string.IsNullOrEmpty(evt.Text))
@@ -179,8 +243,9 @@ namespace XTerminalController
                             case ' ':
                                 {
                                     this.FlushText(this.textBlock);
-                                    this.textBlock = null;
+                                    this.InvalidateMeasure();
                                     this.textOffsetX += this.whitespaceWidth;
+                                    this.textBlock = null;
                                     break;
                                 }
 
@@ -200,13 +265,10 @@ namespace XTerminalController
                                     }
                                     this.textBlock.AppendText(ch);
 
-                                    // 渲染之前字符的宽度
-                                    double width1 = this.textBlock.Metrics.Width;
                                     this.FlushText(this.textBlock);
-                                    // 渲染之后的字符宽度
-                                    double width2 = this.textBlock.Metrics.Width;
+                                    this.InvalidateMeasure();
                                     // 下次新创建的TextBlock的X偏移量
-                                    this.textOffsetX += (width2 - width1);
+                                    this.textOffsetX += this.textBlock.Boundary.RightTop.X;
                                     break;
                                 }
                         }
@@ -224,9 +286,10 @@ namespace XTerminalController
                     {
                         // LF
                         this.FlushText(this.textBlock);
-                        this.textBlock = null;
+                        this.InvalidateMeasure();
                         this.textOffsetY += this.textLineHeight;
                         this.textOffsetX = 0;
+                        this.textBlock = null;
                         break;
                     }
 
@@ -235,8 +298,6 @@ namespace XTerminalController
                         break;
                     }
             }
-
-            //this.videoTerminal.PerformAction(action, param);
         }
 
         private void VTChannel_DataReceived(VTChannel client, byte[] bytes)
@@ -248,32 +309,6 @@ namespace XTerminalController
         private void VTChannel_StatusChanged(object client, VTChannelState state)
         {
             logger.InfoFormat("客户端状态发生改变, {0}", state);
-        }
-
-        #endregion
-
-        #region 公开接口
-
-        /// <summary>
-        /// 创建一个VTApplication的实例并开始运行
-        /// </summary>
-        /// <param name="authorition"></param>
-        /// <param name="terminal"></param>
-        /// <returns></returns>
-        public static VTApplication Run(SSHChannelAuthorition authorition, IVideoTerminal terminal)
-        {
-            VTApplication vtApp = new VTApplication(terminal);
-            vtApp.RunSSHClient(authorition);
-            return vtApp;
-        }
-
-        /// <summary>
-        /// 退出一个VTApplication并释放资源
-        /// </summary>
-        /// <param name="vtApp"></param>
-        public static void Exit(VTApplication vtApp)
-        {
-            vtApp.Exit();
         }
 
         #endregion

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminalController
+namespace XTerminalDevice
 {
     /// <summary>
     /// 存储文本块的测量信息
