@@ -126,45 +126,51 @@ namespace XTerminal.WPFDevice
         {
             this.fullWidth = width;
             this.fullHeight = height;
-            this.InvalidateMeasure();
+            Dispatcher.Invoke(() =>
+            {
+                this.InvalidateMeasure();
+            });
         }
 
         public void ScrollToEnd(ScrollOrientation orientation)
         {
-            if (!this.EnsureScrollViewer())
+            Dispatcher.Invoke(() => 
             {
-                return;
-            }
+                if (!this.EnsureScrollViewer())
+                {
+                    return;
+                }
 
-            switch (orientation)
-            {
-                case ScrollOrientation.Bottom:
-                    {
-                        this.scrollViewer.ScrollToEnd();
-                        break;
-                    }
+                switch (orientation)
+                {
+                    case ScrollOrientation.Bottom:
+                        {
+                            this.scrollViewer.ScrollToEnd();
+                            break;
+                        }
 
-                case ScrollOrientation.Left:
-                    {
-                        this.scrollViewer.ScrollToLeftEnd();
-                        break;
-                    }
+                    case ScrollOrientation.Left:
+                        {
+                            this.scrollViewer.ScrollToLeftEnd();
+                            break;
+                        }
 
-                case ScrollOrientation.Right:
-                    {
-                        this.scrollViewer.ScrollToRightEnd();
-                        break;
-                    }
+                    case ScrollOrientation.Right:
+                        {
+                            this.scrollViewer.ScrollToRightEnd();
+                            break;
+                        }
 
-                case ScrollOrientation.Top:
-                    {
-                        this.scrollViewer.ScrollToTop();
-                        break;
-                    }
+                    case ScrollOrientation.Top:
+                        {
+                            this.scrollViewer.ScrollToTop();
+                            break;
+                        }
 
-                default:
-                    throw new NotImplementedException();
-            }
+                    default:
+                        throw new NotImplementedException();
+                }
+            });
         }
 
         #endregion

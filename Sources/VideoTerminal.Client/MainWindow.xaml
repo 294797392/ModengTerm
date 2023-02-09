@@ -15,7 +15,8 @@
 
         <Button Grid.Row="0" Content="连接" Click="Button_Click"/>
 
-        <wpfdev:WPFVTDevice Grid.Row="1" x:Name="Terminal"/>
+        <wpfdev:WPFVTDevice Grid.Row="1" x:Name="Terminal">
+        </wpfdev:WPFVTDevice>
     </Grid>
 
 </Window>

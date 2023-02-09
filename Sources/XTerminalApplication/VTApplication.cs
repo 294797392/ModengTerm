@@ -107,6 +107,9 @@ namespace XTerminalDevice
             this.Keyboard.SetKeypadMode(false);
 
             // 初始化视频终端
+            this.PresentationDevice = this.VTDevice.CreatePresentationDevice();
+            this.VTDevice.SwitchPresentaionDevice(null, this.PresentationDevice);
+            this.InputDevice = this.VTDevice.GetInputDevice();
             this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
 
             // 初始化终端解析器
@@ -121,10 +124,6 @@ namespace XTerminalDevice
                 Text = " ",
             };
             this.whitespaceWidth = this.PresentationDevice.MeasureText(spaceText).WidthIncludingWhitespace;
-
-            this.PresentationDevice = this.VTDevice.CreatePresentationDevice();
-            this.VTDevice.SwitchPresentaionDevice(null, this.PresentationDevice);
-            this.InputDevice = this.VTDevice.GetInputDevice();
         }
 
         public void RunSSHClient(SSHChannelAuthorition authorition)
@@ -268,7 +267,7 @@ namespace XTerminalDevice
                                     this.FlushText(this.textBlock);
                                     this.InvalidateMeasure();
                                     // 下次新创建的TextBlock的X偏移量
-                                    this.textOffsetX += this.textBlock.Boundary.RightTop.X;
+                                    this.textOffsetX = this.textBlock.Boundary.RightTop.X;
                                     break;
                                 }
                         }

@@ -19,7 +19,7 @@ namespace XTerminal.WPFDevice
     /// <summary>
     /// 终端控件
     /// </summary>
-    public class WPFVTDevice : Panel, IInputDevice, IVTDevice
+    public class WPFVTDevice : Grid, IInputDevice, IVTDevice
     {
         #region 类变量
 
@@ -35,6 +35,7 @@ namespace XTerminal.WPFDevice
 
         #region 实例变量
 
+        private ScrollViewer scrollViewer;
         private VTInputEvent inputEvent;
 
         #endregion
@@ -48,6 +49,8 @@ namespace XTerminal.WPFDevice
         public WPFVTDevice()
         {
             this.inputEvent = new VTInputEvent();
+            this.Background = Brushes.Transparent;
+            this.Focusable = true;
         }
 
         #endregion
@@ -104,7 +107,7 @@ namespace XTerminal.WPFDevice
         {
             base.OnMouseDown(e);
 
-            base.Focus();
+            this.Focus();
         }
 
         /// <summary>
@@ -156,15 +159,17 @@ namespace XTerminal.WPFDevice
         /// <param name="device"></param>
         public void SwitchPresentaionDevice(IPresentationDevice toRemove, IPresentationDevice toAdd)
         {
-            if (toRemove != null)
+            if (this.scrollViewer == null)
             {
-                this.Children.Remove(toRemove as WPFPresentationDevice);
+                this.scrollViewer = new ScrollViewer()
+                {
+                    HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                };
+                this.Children.Add(this.scrollViewer);
             }
 
-            if (toAdd != null)
-            {
-                this.Children.Add(toAdd as WPFPresentationDevice);
-            }
+            this.scrollViewer.Content = toAdd;
         }
 
         #endregion
