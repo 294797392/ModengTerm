@@ -5,589 +5,819 @@ using System.Text;
 
 namespace XTerminalDevice
 {
+    //
+    // 摘要:
+    //     指定键盘上可能的键值。
     public enum VTKeys
     {
-        /// <summary>
-        /// 表示什么都没输入
-        /// </summary>
-        None,
-
         //
         // 摘要:
-        //     BACKSPACE 键。
-        Backspace = 8,
+        //     不按任何键。
+        None = 0,
         //
         // 摘要:
-        //     TAB 键。
-        Tab = 9,
+        //     Cancel 键。
+        Cancel = 1,
         //
         // 摘要:
-        //     CLEAR 键。
-        Clear = 12,
+        //     Backspace 键。
+        Back = 2,
         //
         // 摘要:
-        //     ENTER 键。
-        Enter = 13,
+        //     Tab 键。
+        Tab = 3,
         //
         // 摘要:
-        //     PAUSE 键。
-        Pause = 19,
+        //     Linefeed 键。
+        LineFeed = 4,
         //
         // 摘要:
-        //     ESC (ESCAPE) 键。
-        Escape = 27,
+        //     Clear 键。
+        Clear = 5,
         //
         // 摘要:
-        //     SPACEBAR 键。
-        Spacebar = 32,
+        //     Return 键。
+        Return = 6,
         //
         // 摘要:
-        //     PAGE UP 键。
-        PageUp = 33,
+        //     Enter 键。
+        Enter = 6,
         //
         // 摘要:
-        //     PAGE DOWN 键。
-        PageDown = 34,
+        //     Pause 键。
+        Pause = 7,
         //
         // 摘要:
-        //     END 键。
-        End = 35,
+        //     Caps Lock 键。
+        Capital = 8,
         //
         // 摘要:
-        //     HOME 键。
-        Home = 36,
+        //     Caps Lock 键。
+        CapsLock = 8,
         //
         // 摘要:
-        //     LEFT ARROW 键。
-        LeftArrow = 37,
+        //     IME Kana 模式键。
+        KanaMode = 9,
         //
         // 摘要:
-        //     UP ARROW 键。
-        UpArrow = 38,
+        //     IME Hangul 模式键。
+        HangulMode = 9,
         //
         // 摘要:
-        //     RIGHT ARROW 键。
-        RightArrow = 39,
+        //     IME Junja 模式键。
+        JunjaMode = 10,
         //
         // 摘要:
-        //     DOWN ARROW 键。
-        DownArrow = 40,
+        //     IME Final 模式键。
+        FinalMode = 11,
         //
         // 摘要:
-        //     SELECT 键。
-        Select = 41,
+        //     IME Hanja 模式键。
+        HanjaMode = 12,
         //
         // 摘要:
-        //     PRINT 键。
-        Print = 42,
+        //     IME Kanji 模式键。
+        KanjiMode = 12,
         //
         // 摘要:
-        //     EXECUTE 键。
-        Execute = 43,
+        //     ESC 键。
+        Escape = 13,
         //
         // 摘要:
-        //     PRINT SCREEN 键。
-        PrintScreen = 44,
+        //     IME Convert 键。
+        ImeConvert = 14,
         //
         // 摘要:
-        //     INS (INSERT) 键。
-        Insert = 45,
+        //     IME NonConvert 键。
+        ImeNonConvert = 15,
         //
         // 摘要:
-        //     DEL (DELETE) 键。
-        Delete = 46,
+        //     IME Accept 键。
+        ImeAccept = 16,
         //
         // 摘要:
-        //     HELP 键。
-        Help = 47,
+        //     IME 模式更改请求。
+        ImeModeChange = 17,
         //
         // 摘要:
-        //     0 键。
-        D0 = 48,
+        //     Spacebar 键。
+        Space = 18,
         //
         // 摘要:
-        //     1 键。
-        D1 = 49,
+        //     Page Up 键。
+        Prior = 19,
+        //
+        // 摘要:
+        //     Page Up 键。
+        PageUp = 19,
+        //
+        // 摘要:
+        //     Page Down 键。
+        Next = 20,
+        //
+        // 摘要:
+        //     Page Down 键。
+        PageDown = 20,
+        //
+        // 摘要:
+        //     End 键。
+        End = 21,
+        //
+        // 摘要:
+        //     Home 键。
+        Home = 22,
+        //
+        // 摘要:
+        //     Left Arrow 键。
+        Left = 23,
+        //
+        // 摘要:
+        //     Up Arrow 键。
+        Up = 24,
+        //
+        // 摘要:
+        //     Right Arrow 键。
+        Right = 25,
+        //
+        // 摘要:
+        //     Down Arrow 键。
+        Down = 26,
+        //
+        // 摘要:
+        //     Select 键。
+        Select = 27,
+        //
+        // 摘要:
+        //     Print 键。
+        Print = 28,
+        //
+        // 摘要:
+        //     Execute 键。
+        Execute = 29,
+        //
+        // 摘要:
+        //     Print Screen 键。
+        Snapshot = 30,
+        //
+        // 摘要:
+        //     Print Screen 键。
+        PrintScreen = 30,
+        //
+        // 摘要:
+        //     Insert 键。
+        Insert = 31,
+        //
+        // 摘要:
+        //     Delete 键。
+        Delete = 32,
+        //
+        // 摘要:
+        //     Help 键。
+        Help = 33,
+        //
+        // 摘要:
+        //     0 （零）键。
+        D0 = 34,
+        //
+        // 摘要:
+        //     1 （一）键。
+        D1 = 35,
         //
         // 摘要:
         //     2 键。
-        D2 = 50,
+        D2 = 36,
         //
         // 摘要:
         //     3 键。
-        D3 = 51,
+        D3 = 37,
         //
         // 摘要:
         //     4 键。
-        D4 = 52,
+        D4 = 38,
         //
         // 摘要:
         //     5 键。
-        D5 = 53,
+        D5 = 39,
         //
         // 摘要:
         //     6 键。
-        D6 = 54,
+        D6 = 40,
         //
         // 摘要:
         //     7 键。
-        D7 = 55,
+        D7 = 41,
         //
         // 摘要:
         //     8 键。
-        D8 = 56,
+        D8 = 42,
         //
         // 摘要:
         //     9 键。
-        D9 = 57,
+        D9 = 43,
         //
         // 摘要:
         //     A 键。
-        A = 65,
+        A = 44,
         //
         // 摘要:
         //     B 键。
-        B = 66,
+        B = 45,
         //
         // 摘要:
         //     C 键。
-        C = 67,
+        C = 46,
         //
         // 摘要:
         //     D 键。
-        D = 68,
+        D = 47,
         //
         // 摘要:
         //     E 键。
-        E = 69,
+        E = 48,
         //
         // 摘要:
         //     F 键。
-        F = 70,
+        F = 49,
         //
         // 摘要:
         //     G 键。
-        G = 71,
+        G = 50,
         //
         // 摘要:
         //     H 键。
-        H = 72,
+        H = 51,
         //
         // 摘要:
         //     I 键。
-        I = 73,
+        I = 52,
         //
         // 摘要:
         //     J 键。
-        J = 74,
+        J = 53,
         //
         // 摘要:
         //     K 键。
-        K = 75,
+        K = 54,
         //
         // 摘要:
         //     L 键。
-        L = 76,
+        L = 55,
         //
         // 摘要:
         //     M 键。
-        M = 77,
+        M = 56,
         //
         // 摘要:
         //     N 键。
-        N = 78,
+        N = 57,
         //
         // 摘要:
         //     O 键。
-        O = 79,
+        O = 58,
         //
         // 摘要:
         //     P 键。
-        P = 80,
+        P = 59,
         //
         // 摘要:
         //     Q 键。
-        Q = 81,
+        Q = 60,
         //
         // 摘要:
         //     R 键。
-        R = 82,
+        R = 61,
         //
         // 摘要:
         //     S 键。
-        S = 83,
+        S = 62,
         //
         // 摘要:
         //     T 键。
-        T = 84,
+        T = 63,
         //
         // 摘要:
         //     U 键。
-        U = 85,
+        U = 64,
         //
         // 摘要:
         //     V 键。
-        V = 86,
+        V = 65,
         //
         // 摘要:
         //     W 键。
-        W = 87,
+        W = 66,
         //
         // 摘要:
         //     X 键。
-        X = 88,
+        X = 67,
         //
         // 摘要:
         //     Y 键。
-        Y = 89,
+        Y = 68,
         //
         // 摘要:
         //     Z 键。
-        Z = 90,
+        Z = 69,
         //
         // 摘要:
         //     左 Windows 徽标键 (Microsoft Natural Keyboard)。
-        LeftWindows = 91,
+        LWin = 70,
         //
         // 摘要:
         //     右 Windows 徽标键 (Microsoft Natural Keyboard)。
-        RightWindows = 92,
+        RWin = 71,
         //
         // 摘要:
         //     应用程序键 (Microsoft Natural Keyboard)。
-        Applications = 93,
+        Apps = 72,
         //
         // 摘要:
         //     计算机休眠键。
-        Sleep = 95,
+        Sleep = 73,
         //
         // 摘要:
         //     数字键盘上的 0 键。
-        NumPad0 = 96,
+        NumPad0 = 74,
         //
         // 摘要:
         //     数字键盘上的 1 键。
-        NumPad1 = 97,
+        NumPad1 = 75,
         //
         // 摘要:
         //     数字键盘上的 2 键。
-        NumPad2 = 98,
+        NumPad2 = 76,
         //
         // 摘要:
         //     数字键盘上的 3 键。
-        NumPad3 = 99,
+        NumPad3 = 77,
         //
         // 摘要:
         //     数字键盘上的 4 键。
-        NumPad4 = 100,
+        NumPad4 = 78,
         //
         // 摘要:
         //     数字键盘上的 5 键。
-        NumPad5 = 101,
+        NumPad5 = 79,
         //
         // 摘要:
         //     数字键盘上的 6 键。
-        NumPad6 = 102,
+        NumPad6 = 80,
         //
         // 摘要:
         //     数字键盘上的 7 键。
-        NumPad7 = 103,
+        NumPad7 = 81,
         //
         // 摘要:
         //     数字键盘上的 8 键。
-        NumPad8 = 104,
+        NumPad8 = 82,
         //
         // 摘要:
         //     数字键盘上的 9 键。
-        NumPad9 = 105,
+        NumPad9 = 83,
         //
         // 摘要:
-        //     乘号键（数字键盘上的乘号键）。
-        Multiply = 106,
+        //     乘号键。
+        Multiply = 84,
         //
         // 摘要:
-        //     加号键（数字键盘上的加号键）。
-        Add = 107,
+        //     加号键。
+        Add = 85,
         //
         // 摘要:
         //     分隔符键。
-        Separator = 108,
+        Separator = 86,
         //
         // 摘要:
-        //     减号键（数字键盘上的减号键）。
-        Subtract = 109,
+        //     减号键。
+        Subtract = 87,
         //
         // 摘要:
-        //     小数点键（数字键盘上的小数点键）。
-        Decimal = 110,
+        //     句点键。
+        Decimal = 88,
         //
         // 摘要:
-        //     除号键（数字键盘上的除号键）。
-        Divide = 111,
+        //     除号键。
+        Divide = 89,
         //
         // 摘要:
         //     F1 键。
-        F1 = 112,
+        F1 = 90,
         //
         // 摘要:
         //     F2 键。
-        F2 = 113,
+        F2 = 91,
         //
         // 摘要:
         //     F3 键。
-        F3 = 114,
+        F3 = 92,
         //
         // 摘要:
         //     F4 键。
-        F4 = 115,
+        F4 = 93,
         //
         // 摘要:
         //     F5 键。
-        F5 = 116,
+        F5 = 94,
         //
         // 摘要:
         //     F6 键。
-        F6 = 117,
+        F6 = 95,
         //
         // 摘要:
         //     F7 键。
-        F7 = 118,
+        F7 = 96,
         //
         // 摘要:
         //     F8 键。
-        F8 = 119,
+        F8 = 97,
         //
         // 摘要:
         //     F9 键。
-        F9 = 120,
+        F9 = 98,
         //
         // 摘要:
         //     F10 键。
-        F10 = 121,
+        F10 = 99,
         //
         // 摘要:
         //     F11 键。
-        F11 = 122,
+        F11 = 100,
         //
         // 摘要:
         //     F12 键。
-        F12 = 123,
+        F12 = 101,
         //
         // 摘要:
         //     F13 键。
-        F13 = 124,
+        F13 = 102,
         //
         // 摘要:
         //     F14 键。
-        F14 = 125,
+        F14 = 103,
         //
         // 摘要:
         //     F15 键。
-        F15 = 126,
+        F15 = 104,
         //
         // 摘要:
         //     F16 键。
-        F16 = 127,
+        F16 = 105,
         //
         // 摘要:
         //     F17 键。
-        F17 = 128,
+        F17 = 106,
         //
         // 摘要:
         //     F18 键。
-        F18 = 129,
+        F18 = 107,
         //
         // 摘要:
         //     F19 键。
-        F19 = 130,
+        F19 = 108,
         //
         // 摘要:
         //     F20 键。
-        F20 = 131,
+        F20 = 109,
         //
         // 摘要:
         //     F21 键。
-        F21 = 132,
+        F21 = 110,
         //
         // 摘要:
         //     F22 键。
-        F22 = 133,
+        F22 = 111,
         //
         // 摘要:
         //     F23 键。
-        F23 = 134,
+        F23 = 112,
         //
         // 摘要:
         //     F24 键。
-        F24 = 135,
+        F24 = 113,
         //
         // 摘要:
-        //     浏览器后退键（Windows 2000 或更高版本）。
-        BrowserBack = 166,
+        //     Num Lock 键。
+        NumLock = 114,
         //
         // 摘要:
-        //     浏览器前进键（Windows 2000 或更高版本）。
-        BrowserForward = 167,
+        //     Scroll Lock 键。
+        Scroll = 115,
         //
         // 摘要:
-        //     浏览器刷新键（Windows 2000 或更高版本）。
-        BrowserRefresh = 168,
+        //     左 Shift 键。
+        LeftShift = 116,
         //
         // 摘要:
-        //     浏览器停止键（Windows 2000 或更高版本）。
-        BrowserStop = 169,
+        //     右 Shift 键。
+        RightShift = 117,
         //
         // 摘要:
-        //     浏览器搜索键（Windows 2000 或更高版本）。
-        BrowserSearch = 170,
+        //     左 CTRL 键。
+        LeftCtrl = 118,
         //
         // 摘要:
-        //     浏览器收藏键（Windows 2000 或更高版本）。
-        BrowserFavorites = 171,
+        //     右 CTRL 键。
+        RightCtrl = 119,
         //
         // 摘要:
-        //     浏览器主页键（Windows 2000 或更高版本）。
-        BrowserHome = 172,
+        //     左 ALT 键。
+        LeftAlt = 120,
         //
         // 摘要:
-        //     静音键（Microsoft Natural Keyboard，Windows 2000 或更高版本）。
-        VolumeMute = 173,
+        //     右 ALT 键。
+        RightAlt = 121,
         //
         // 摘要:
-        //     调低音量键（Microsoft Natural Keyboard，Windows 2000 或更高版本）。
-        VolumeDown = 174,
+        //     浏览器后退键。
+        BrowserBack = 122,
         //
         // 摘要:
-        //     调高音量键（Microsoft Natural Keyboard，Windows 2000 或更高版本）。
-        VolumeUp = 175,
+        //     浏览器前进键。
+        BrowserForward = 123,
         //
         // 摘要:
-        //     媒体下一曲目键（Windows 2000 或更高版本）。
-        MediaNext = 176,
+        //     浏览器刷新键。
+        BrowserRefresh = 124,
         //
         // 摘要:
-        //     媒体上一曲目键（Windows 2000 或更高版本）。
-        MediaPrevious = 177,
+        //     浏览器停止键。
+        BrowserStop = 125,
         //
         // 摘要:
-        //     媒体停止键（Windows 2000 或更高版本）。
-        MediaStop = 178,
+        //     浏览器搜索键。
+        BrowserSearch = 126,
         //
         // 摘要:
-        //     媒体播放/暂停键（Windows 2000 或更高版本）。
-        MediaPlay = 179,
+        //     浏览器收藏键。
+        BrowserFavorites = 127,
         //
         // 摘要:
-        //     启动邮件键（Microsoft Natural Keyboard，Windows 2000 或更高版本）。
-        LaunchMail = 180,
+        //     浏览器主页键。
+        BrowserHome = 128,
         //
         // 摘要:
-        //     选择媒体键（Microsoft Natural Keyboard，Windows 2000 或更高版本）。
-        LaunchMediaSelect = 181,
+        //     静音键。
+        VolumeMute = 129,
         //
         // 摘要:
-        //     启动应用程序 1 键（Microsoft Natural Keyboard，Windows 2000 或更高版本）。
-        LaunchApp1 = 182,
+        //     音量减小键。
+        VolumeDown = 130,
         //
         // 摘要:
-        //     启动应用程序 2 键（Microsoft Natural Keyboard，Windows 2000 或更高版本）。
-        LaunchApp2 = 183,
+        //     音量增大键。
+        VolumeUp = 131,
         //
         // 摘要:
-        //     OEM 1 键（特定于 OEM）。
-        Oem1 = 186,
+        //     媒体下一曲目键。
+        MediaNextTrack = 132,
         //
         // 摘要:
-        //     任何国家/地区键盘上的 OEM 加号键（Windows 2000 或更高版本）。
-        OemPlus = 187,
+        //     媒体上一曲目键。
+        MediaPreviousTrack = 133,
         //
         // 摘要:
-        //     任何国家/地区键盘上的 OEM 逗号键（Windows 2000 或更高版本）。
-        OemComma = 188,
+        //     媒体停止键。
+        MediaStop = 134,
         //
         // 摘要:
-        //     任何国家/地区键盘上的 OEM 减号键（Windows 2000 或更高版本）。
-        OemMinus = 189,
+        //     媒体暂停播放键。
+        MediaPlayPause = 135,
         //
         // 摘要:
-        //     任何国家/地区键盘上的 OEM 句号键（Windows 2000 或更高版本）。
-        OemPeriod = 190,
+        //     启动邮件键。
+        LaunchMail = 136,
         //
         // 摘要:
-        //     OEM 2 键（特定于 OEM）。
-        Oem2 = 191,
+        //     选择媒体键。
+        SelectMedia = 137,
         //
         // 摘要:
-        //     OEM 3 键（特定于 OEM）。
-        Oem3 = 192,
+        //     启动应用程序 1 键。
+        LaunchApplication1 = 138,
         //
         // 摘要:
-        //     OEM 4 键（特定于 OEM）。
-        Oem4 = 219,
+        //     启动应用程序 2 键。
+        LaunchApplication2 = 139,
         //
         // 摘要:
-        //     OEM 5 键（特定于 OEM）。
-        Oem5 = 220,
+        //     OEM 1 键。
+        Oem1 = 140,
         //
         // 摘要:
-        //     OEM 6 键（特定于 OEM）。
-        Oem6 = 221,
+        //     OEM 分号键。
+        OemSemicolon = 140,
         //
         // 摘要:
-        //     OEM 7 键（特定于 OEM）。
-        Oem7 = 222,
+        //     OEM 加号键。
+        OemPlus = 141,
         //
         // 摘要:
-        //     OEM 8 键（特定于 OEM）。
-        Oem8 = 223,
+        //     OEM 逗号键。
+        OemComma = 142,
         //
         // 摘要:
-        //     OEM 102 键（特定于 OEM）。
-        Oem102 = 226,
+        //     OEM 减号键。
+        OemMinus = 143,
         //
         // 摘要:
-        //     IME PROCESS 键。
-        Process = 229,
+        //     OEM 句号键。
+        OemPeriod = 144,
         //
         // 摘要:
-        //     PACKET 键（通过击键次数用于传递 Unicode 字符）。
-        Packet = 231,
+        //     OEM 2 键。
+        Oem2 = 145,
+        //
+        // 摘要:
+        //     OEM 问号键。
+        OemQuestion = 145,
+        //
+        // 摘要:
+        //     OEM 3 键。
+        Oem3 = 146,
+        //
+        // 摘要:
+        //     OEM 颚化符键。
+        OemTilde = 146,
+        //
+        // 摘要:
+        //     ABNT_C1（巴西）键。
+        AbntC1 = 147,
+        //
+        // 摘要:
+        //     ABNT_C2（巴西）键。
+        AbntC2 = 148,
+        //
+        // 摘要:
+        //     OEM 4 键。
+        Oem4 = 149,
+        //
+        // 摘要:
+        //     OEM 左大括号键。
+        OemOpenBrackets = 149,
+        //
+        // 摘要:
+        //     OEM 5 键。
+        Oem5 = 150,
+        //
+        // 摘要:
+        //     OEM 管道键。
+        OemPipe = 150,
+        //
+        // 摘要:
+        //     OEM 6 键。
+        Oem6 = 151,
+        //
+        // 摘要:
+        //     OEM 右大括号键。
+        OemCloseBrackets = 151,
+        //
+        // 摘要:
+        //     OEM 7 键。
+        Oem7 = 152,
+        //
+        // 摘要:
+        //     OEM 引号键。
+        OemQuotes = 152,
+        //
+        // 摘要:
+        //     OEM 8 键。
+        Oem8 = 153,
+        //
+        // 摘要:
+        //     OEM 102 键。
+        Oem102 = 154,
+        //
+        // 摘要:
+        //     OEM 反斜杠键。
+        OemBackslash = 154,
+        //
+        // 摘要:
+        //     用于屏蔽 IME 正在处理的真实键的特殊键。
+        ImeProcessed = 155,
+        //
+        // 摘要:
+        //     用于屏蔽作为系统键处理的真实键的特殊键。
+        System = 156,
+        //
+        // 摘要:
+        //     OEM ATTN 键。
+        OemAttn = 157,
+        //
+        // 摘要:
+        //     DBE_ALPHANUMERIC 键。
+        DbeAlphanumeric = 157,
+        //
+        // 摘要:
+        //     OEM FINISH 键。
+        OemFinish = 158,
+        //
+        // 摘要:
+        //     DBE_KATAKANA 键。
+        DbeKatakana = 158,
+        //
+        // 摘要:
+        //     OEM COPY 键。
+        OemCopy = 159,
+        //
+        // 摘要:
+        //     DBE_HIRAGANA 键。
+        DbeHiragana = 159,
+        //
+        // 摘要:
+        //     OEM AUTO 键。
+        OemAuto = 160,
+        //
+        // 摘要:
+        //     DBE_SBCSCHAR 键。
+        DbeSbcsChar = 160,
+        //
+        // 摘要:
+        //     OEM ENLW 键。
+        OemEnlw = 161,
+        //
+        // 摘要:
+        //     DBE_DBCSCHAR 键。
+        DbeDbcsChar = 161,
+        //
+        // 摘要:
+        //     OEM BACKTAB 键。
+        OemBackTab = 162,
+        //
+        // 摘要:
+        //     DBE_ROMAN 键。
+        DbeRoman = 162,
         //
         // 摘要:
         //     ATTN 键。
-        Attention = 246,
+        Attn = 163,
         //
         // 摘要:
-        //     CRSEL（光标选择）键。
-        CrSel = 247,
+        //     DBE_NOROMAN 键。
+        DbeNoRoman = 163,
         //
         // 摘要:
-        //     EXSEL（扩展选择）键。
-        ExSel = 248,
+        //     CRSEL 键。
+        CrSel = 164,
+        //
+        // 摘要:
+        //     DBE_ENTERWORDREGISTERMODE 键。
+        DbeEnterWordRegisterMode = 164,
+        //
+        // 摘要:
+        //     EXSEL 键。
+        ExSel = 165,
+        //
+        // 摘要:
+        //     DBE_ENTERIMECONFIGMODE 键。
+        DbeEnterImeConfigureMode = 165,
         //
         // 摘要:
         //     ERASE EOF 键。
-        EraseEndOfFile = 249,
+        EraseEof = 166,
+        //
+        // 摘要:
+        //     DBE_FLUSHSTRING 键。
+        DbeFlushString = 166,
         //
         // 摘要:
         //     播放键。
-        Play = 250,
+        Play = 167,
+        //
+        // 摘要:
+        //     DBE_CODEINPUT 键。
+        DbeCodeInput = 167,
         //
         // 摘要:
         //     缩放键。
-        Zoom = 251,
+        Zoom = 168,
+        //
+        // 摘要:
+        //     DBE_NOCODEINPUT 键。
+        DbeNoCodeInput = 168,
         //
         // 摘要:
         //     留待将来使用的常数。
-        NoName = 252,
+        NoName = 169,
+        //
+        // 摘要:
+        //     DBE_DETERMINESTRING 键。
+        DbeDetermineString = 169,
         //
         // 摘要:
         //     PA1 键。
-        Pa1 = 253,
+        Pa1 = 170,
         //
         // 摘要:
-        //     CLEAR 键（特定于 OEM）。
-        OemClear = 254
+        //     DBE_ENTERDLGCONVERSIONMODE 键。
+        DbeEnterDialogConversionMode = 170,
+        //
+        // 摘要:
+        //     OEM 清除键。
+        OemClear = 171,
+        //
+        // 摘要:
+        //     该键与另一个键配合使用，用于创建单一的组合字符。
+        DeadCharProcessed = 172
     }
 
     public static class VTKeyConverter

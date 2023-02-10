@@ -45,13 +45,39 @@ namespace XTerminalDevice
     /// 把不同模式下的键盘按键转换成要发送给终端的字节序列
     /// 参考：
     /// terminalInput.cpp
-    /// https://vt100.net/docs/vt220-rm/table3-5.html
+    /// VT100 User Guide/Chapter 3 - Programmer Information/The Keyboard
     /// </summary>
     public class VTKeyboard
     {
         #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTKeyboard");
+
+        private static readonly Dictionary<VTKeys, byte[]> Key2BytesTable = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.A, new byte[] { (byte)'a' } }, { VTKeys.B, new byte[] { (byte)'b' } }, { VTKeys.C, new byte[] { (byte)'c' } }, { VTKeys.D, new byte[] { (byte)'d' } },
+            { VTKeys.E, new byte[] { (byte)'e' } }, { VTKeys.F, new byte[] { (byte)'f' } }, { VTKeys.G, new byte[] { (byte)'g' } }, { VTKeys.H, new byte[] { (byte)'h' } },
+            { VTKeys.I, new byte[] { (byte)'i' } }, { VTKeys.J, new byte[] { (byte)'j' } }, { VTKeys.K, new byte[] { (byte)'k' } }, { VTKeys.L, new byte[] { (byte)'l' } },
+            { VTKeys.M, new byte[] { (byte)'m' } }, { VTKeys.N, new byte[] { (byte)'n' } }, { VTKeys.O, new byte[] { (byte)'o' } }, { VTKeys.P, new byte[] { (byte)'p' } },
+            { VTKeys.Q, new byte[] { (byte)'q' } }, { VTKeys.R, new byte[] { (byte)'r' } }, { VTKeys.S, new byte[] { (byte)'s' } }, { VTKeys.T, new byte[] { (byte)'t' } },
+            { VTKeys.U, new byte[] { (byte)'u' } }, { VTKeys.V, new byte[] { (byte)'v' } }, { VTKeys.W, new byte[] { (byte)'w' } }, { VTKeys.X, new byte[] { (byte)'x' } },
+            { VTKeys.Y, new byte[] { (byte)'y' } }, { VTKeys.Z, new byte[] { (byte)'z' } },
+
+            // FunctionKeys - VT100 User Guide/Chapter 3 - Programmer Information/The Keyboard
+            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Space, new byte[] { (byte)' ' } }, { VTKeys.Back, new byte[] { } },
+            { VTKeys.Back, new byte[] { 8 } }, { VTKeys.Tab, new byte[] { 9 } },
+
+
+            { VTKeys.OemOpenBrackets, new byte[] { (byte)'[' } }, { VTKeys.OemCloseBrackets, new byte[] { (byte)']' } },{ VTKeys.Oem5, new byte[] { (byte)'|' } },
+            { VTKeys.Oem1, new byte[] { (byte)';' } }, { VTKeys.OemQuotes, new byte[] { (byte)'\'' } },
+            { VTKeys.OemComma, new byte[] { (byte)',' } }, { VTKeys.OemPeriod, new byte[] { (byte)'.' } }, { VTKeys.OemQuestion, new byte[] { (byte)'/' } },
+
+            // 上面的数字键
+            { VTKeys.Oem3, new byte[] { (byte)'`' } }, { VTKeys.D1, new byte[] { (byte)'1' } }, { VTKeys.D2, new byte[] { (byte)'2' } },
+            { VTKeys.D3, new byte[] { (byte)'3' } }, { VTKeys.D4, new byte[] { (byte)'4' } },{ VTKeys.D5, new byte[] { (byte)'5' } }, { VTKeys.D6, new byte[] { (byte)'6' } },
+            { VTKeys.D7, new byte[] { (byte)'7' } }, { VTKeys.D8, new byte[] { (byte)'8' } },{ VTKeys.D9, new byte[] { (byte)'9' } }, { VTKeys.D0, new byte[] { (byte)'0' } },
+            { VTKeys.OemMinus, new byte[] { (byte)'-' } }, { VTKeys.OemPlus, new byte[] { (byte)'+' } },
+        };
 
         #endregion
 
@@ -67,10 +93,7 @@ namespace XTerminalDevice
         /// </summary>
         private bool isVt52Mode;
 
-        /// <summary>
-        /// 存储不同模式下按键和终端字节流的映射信息
-        /// </summary>
-        private Keymap keymap;
+        private byte[] capitalBytes;
 
         #endregion
 
@@ -78,8 +101,7 @@ namespace XTerminalDevice
 
         public VTKeyboard()
         {
-            this.keymap = new DefaultKeymap();
-
+            this.capitalBytes = new byte[1];
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
         }
@@ -92,9 +114,28 @@ namespace XTerminalDevice
         /// 判断该按键是否是光标键就
         /// </summary>
         /// <returns></returns>
-        public bool IsCursorKey(VTKeys key)
+        private bool IsCursorKey(VTKeys key)
         {
-            return key == VTKeys.UpArrow || key == VTKeys.DownArrow || key == VTKeys.LeftArrow || key == VTKeys.RightArrow;
+            return key == VTKeys.Up || key == VTKeys.Down || key == VTKeys.Left || key == VTKeys.Right;
+        }
+
+        private byte[] MapKey(VTInputEvent evt)
+        {
+            byte[] bytes;
+            if (!Key2BytesTable.TryGetValue(evt.Key, out bytes))
+            {
+                logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
+                return null;
+            }
+
+            // 这里表示输入的是大写字母
+            if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
+            {
+                capitalBytes[0] = (byte)(bytes[1] - 32);
+                return capitalBytes;
+            }
+
+            return bytes;
         }
 
         #endregion
@@ -130,7 +171,7 @@ namespace XTerminalDevice
         {
             if (evt.Key != VTKeys.None)
             {
-                return this.keymap.MapKey(evt);
+                return this.MapKey(evt);
             }
 
             return null;
@@ -195,5 +236,3 @@ namespace XTerminalDevice
         #endregion
     }
 }
-
-

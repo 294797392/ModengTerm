@@ -23,18 +23,9 @@ namespace XTerminalDevice
     /// </summary>
     public class DefaultKeymap : Keymap
     {
-        private static readonly Dictionary<VTKeys, byte[]> Key2BytesTableCapsLock = new Dictionary<VTKeys, byte[]>()
-        {
-            { VTKeys.A, new byte[] { (byte)'A' } }, { VTKeys.B, new byte[] { (byte)'B' } }, { VTKeys.C, new byte[] { (byte)'C' } }, { VTKeys.D, new byte[] { (byte)'D' } },
-            { VTKeys.E, new byte[] { (byte)'E' } }, { VTKeys.F, new byte[] { (byte)'F' } }, { VTKeys.G, new byte[] { (byte)'G' } }, { VTKeys.H, new byte[] { (byte)'H' } },
-            { VTKeys.I, new byte[] { (byte)'I' } }, { VTKeys.J, new byte[] { (byte)'J' } }, { VTKeys.K, new byte[] { (byte)'K' } }, { VTKeys.L, new byte[] { (byte)'L' } },
-            { VTKeys.M, new byte[] { (byte)'M' } }, { VTKeys.N, new byte[] { (byte)'N' } }, { VTKeys.O, new byte[] { (byte)'O' } }, { VTKeys.P, new byte[] { (byte)'P' } },
-            { VTKeys.Q, new byte[] { (byte)'Q' } }, { VTKeys.R, new byte[] { (byte)'R' } }, { VTKeys.S, new byte[] { (byte)'S' } }, { VTKeys.T, new byte[] { (byte)'T' } },
-            { VTKeys.U, new byte[] { (byte)'U' } }, { VTKeys.V, new byte[] { (byte)'V' } }, { VTKeys.W, new byte[] { (byte)'W' } }, { VTKeys.X, new byte[] { (byte)'X' } },
-            { VTKeys.Y, new byte[] { (byte)'Y' } }, { VTKeys.Z, new byte[] { (byte)'Z' } },
+        #region 类变量
 
-            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Spacebar, new byte[] { (byte)' ' } }
-        };
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DefaultKeymap");
 
         private static readonly Dictionary<VTKeys, byte[]> Key2BytesTable = new Dictionary<VTKeys, byte[]>()
         {
@@ -46,22 +37,48 @@ namespace XTerminalDevice
             { VTKeys.U, new byte[] { (byte)'u' } }, { VTKeys.V, new byte[] { (byte)'v' } }, { VTKeys.W, new byte[] { (byte)'w' } }, { VTKeys.X, new byte[] { (byte)'x' } },
             { VTKeys.Y, new byte[] { (byte)'y' } }, { VTKeys.Z, new byte[] { (byte)'z' } },
 
-            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Spacebar, new byte[] { (byte)' ' } }
+            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Space, new byte[] { (byte)' ' } }
         };
+
+        #endregion
+
+        #region 实例变量
+
+        private byte[] capitalBytes;
+
+        #endregion
+
+        #region 构造方法
+
+        public DefaultKeymap()
+        {
+            this.capitalBytes = new byte[1];
+        }
+
+        #endregion
+
+        #region Keymap
 
         public override byte[] MapKey(VTInputEvent evt)
         {
-            if (evt.CapsLock)
+            byte[] bytes;
+            if (!Key2BytesTable.TryGetValue(evt.Key, out bytes))
             {
-                // 大写锁定了
-                return Key2BytesTableCapsLock[evt.Key];
+                logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
+                return null;
             }
-            else
+
+            // 这里表示输入的是大写字母
+            if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
             {
-                // 大写没锁定
-                return Key2BytesTable[evt.Key];
+                capitalBytes[0] = (byte)(bytes[1] - 32);
+                return capitalBytes;
             }
+
+            return bytes;
         }
+
+        #endregion
     }
 }
 
