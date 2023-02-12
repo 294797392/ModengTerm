@@ -18,13 +18,13 @@ namespace XTerminalDevice
         public double Width { get; set; }
 
         /// <summary>
-        /// 带有空白的宽度
-        /// </summary>
-        public double WidthIncludingWhitespace { get; set; }
-
-        /// <summary>
         /// 渲染后该文本块的高度
         /// </summary>
         public double Height { get; set; }
+
+        /// <summary>
+        /// 带有空白的宽度
+        /// </summary>
+        public double WidthIncludingWhitespace { get; set; }
     }
 }

@@ -7,6 +7,19 @@ using XTerminalParser;
 
 namespace XTerminalDevice
 {
+    public enum DeleteCharacterFrom
+    {
+        /// <summary>
+        /// 从前往后删除字符
+        /// </summary>
+        FrontToBack,
+
+        /// <summary>
+        /// 从后往前删除字符
+        /// </summary>
+        BackToFront
+    }
+
     public class VTextBlock
     {
         /// <summary>
@@ -40,17 +53,9 @@ namespace XTerminalDevice
         public double Y { get; set; }
 
         /// <summary>
-        /// 该文本块所占据的行数
-        /// 文本块可能占据多行
+        /// 字符个数
         /// </summary>
-        public int Lines { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public int StartLine { get; set; }
-
-        public int EndLine { get; set; }
+        public int Characters { get { return this.Text.Length; } }
 
         /// <summary>
         /// 文本的测量信息
@@ -73,19 +78,80 @@ namespace XTerminalDevice
         /// </summary>
         public VTRect Boundary { get { return new VTRect(this.X, this.Y, this.Width, this.Height); } }
 
+        /// <summary>
+        /// 该文本块所在行数，从1开始
+        /// </summary>
+        public int Row { get; set; }
+
+        /// <summary>
+        /// 该文本块第一个字符所在列数，从1开始
+        /// </summary>
+        public int Column { get; set; }
+
+        /// <summary>
+        /// 获取该文本块所占据的列数
+        /// </summary>
+        public int Columns { get { return this.Text.Length; } }
+
         public VTextBlock()
         {
             this.Metrics = new VTextBlockMetrics();
         }
 
-        public void AppendText(char text)
+        /// <summary>
+        /// 向文本块里插入字符
+        /// </summary>
+        /// <param name="text"></param>
+        public void InsertCharacter(char text)
         {
             this.Text += text;
         }
 
-        public void AppendText(string text)
+        public void InsertText(string text)
         {
             this.Text += text;
+        }
+
+        /// <summary>
+        /// 删除字符
+        /// </summary>
+        /// <param name="startIndex">要删除的字符的起始位置</param>
+        /// <param name="count">要删除的字符的个数</param>
+        public void DeleteCharacter(int startIndex, int count)
+        {
+            if (this.Text.Length == 0)
+            {
+                return;
+            }
+
+            this.Text = this.Text.Remove(startIndex, count);
+        }
+
+        /// <summary>
+        /// 删除字符
+        /// </summary>
+        /// <param name="from">指定删除字符的位置</param>
+        /// <param name="count">指定要删除的字符个数</param>
+        public void DeleteCharacter(DeleteCharacterFrom from, int count)
+        {
+            switch (from)
+            {
+                case DeleteCharacterFrom.FrontToBack:
+                    {
+                        this.DeleteCharacter(0, count);
+                        break;
+                    }
+
+                case DeleteCharacterFrom.BackToFront:
+                    {
+                        int startIndex = this.Text.Length - count;
+                        this.DeleteCharacter(startIndex, count);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

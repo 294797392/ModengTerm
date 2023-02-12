@@ -64,7 +64,6 @@ namespace XTerminal.WPFDevice
 
         protected override Size MeasureOverride(Size constraint)
         {
-            Console.WriteLine("Measure");
             //return base.MeasureOverride(constraint);
             return new Size(this.fullWidth, this.fullHeight);
         }

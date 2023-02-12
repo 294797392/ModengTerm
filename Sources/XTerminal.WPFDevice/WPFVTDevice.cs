@@ -94,7 +94,6 @@ namespace XTerminal.WPFDevice
             }
             else
             {
-                Console.WriteLine(e.Key);
                 VTKeys vtKey = TerminalUtils.ConvertToVTKey(e.Key);
                 this.inputEvent.CapsLock = Console.CapsLock;
                 this.inputEvent.Key = vtKey;

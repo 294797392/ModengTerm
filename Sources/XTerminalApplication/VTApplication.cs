@@ -33,10 +33,14 @@ namespace XTerminalDevice
         /// </summary>
         private VTParser vtParser;
 
+        // 所有的文本列表
+        private List<VTextBlock> textBlocks;
+
         /// <summary>
         /// 当前正在渲染的文本块
+        /// 当前正在活动的文本块（Active Data）
         /// </summary>
-        private VTextBlock textBlock;
+        private VTextBlock activeTextBlock;
 
         // 当前渲染的文本的左上角X位置
         private double textOffsetX;
@@ -44,14 +48,16 @@ namespace XTerminalDevice
         // 当前渲染的文本的左上角Y位置
         private double textOffsetY;
 
-        // 所有的文本列表
-        private List<VTextBlock> textBlocks;
-
         // 当前行的高度
         private double textLineHeight;
 
         // 空白字符的宽度
         private double whitespaceWidth;
+
+        // 最后一个字符所在行
+        private int characterRow;
+        // 最后一个字符所在列
+        private int characterCol;
 
         /// <summary>
         /// Terminal区域的总长宽
@@ -59,9 +65,12 @@ namespace XTerminalDevice
         private double fullWidth;
         private double fullHeight;
 
-
-
-        private int selectImplicitMovementDirection;
+        /// <summary>
+        /// SIMD - SELECT IMPLICIT MOVEMENT DIRECTION
+        /// 0：数据的移动方向和字符方向一致（从左到右）
+        /// 1：数据的移动方向和字符方向相反（从右到左）
+        /// </summary>
+        private int movementDirection;
 
         #endregion
 
@@ -105,8 +114,7 @@ namespace XTerminalDevice
         {
             // 0:和字符方向相同（向右）
             // 1:和字符方向相反（向左）
-            this.selectImplicitMovementDirection = 0;
-
+            this.movementDirection = 0;
 
             this.textBlocks = new List<VTextBlock>();
             this.TextOptions = new VTextOptions();
@@ -166,7 +174,7 @@ namespace XTerminalDevice
         /// 打印TextBlock文本
         /// </summary>
         /// <param name="textBlock"></param>
-        private void FlushText(VTextBlock textBlock)
+        private void DrawTextBlock(VTextBlock textBlock)
         {
             if (textBlock == null)
             {
@@ -179,18 +187,40 @@ namespace XTerminalDevice
         }
 
         /// <summary>
+        /// 如果activeTextBlock为空，那么新建activeTextBlock
+        /// </summary>
+        private void EnsureActiveTextBlock()
+        {
+            if (this.activeTextBlock == null)
+            {
+                this.activeTextBlock = new VTextBlock()
+                {
+                    Index = this.textBlocks.Count,
+                    Foreground = this.TextOptions.Foreground,
+                    Size = this.TextOptions.FontSize,
+                    X = this.textOffsetX,
+                    Y = this.textOffsetY,
+                    Row = this.characterRow,
+                    Column = this.characterCol,
+                    Text = string.Empty
+                };
+                this.textBlocks.Add(activeTextBlock);
+            }
+        }
+
+        /// <summary>
         /// 重新测量Terminal所需要的大小
         /// 如果大小改变了，那么调整布局大小
         /// </summary>
         private void InvalidateMeasure()
         {
-            if (this.textBlock == null)
+            if (this.activeTextBlock == null)
             {
                 return;
             }
 
-            double width = Math.Max(this.textBlock.Boundary.RightBottom.X, this.fullWidth);
-            double height = Math.Max(this.textBlock.Boundary.RightBottom.Y, this.fullHeight);
+            double width = Math.Max(this.activeTextBlock.Boundary.RightBottom.X, this.fullWidth);
+            double height = Math.Max(this.activeTextBlock.Boundary.RightBottom.Y, this.fullHeight);
 
             // 布局大小是否改变了
             bool sizeChanged = false;
@@ -210,6 +240,23 @@ namespace XTerminalDevice
             }
         }
 
+        /// <summary>
+        /// 执行Backspace操作
+        /// </summary>
+        private void PerformBackspace(VTextBlock textBlock)
+        {
+            if (this.movementDirection == 0)
+            {
+                // implicit movement的方向是从左到右（和字符方向一致）
+                textBlock.DeleteCharacter(DeleteCharacterFrom.BackToFront, 1);
+            }
+            else if (this.movementDirection == 1)
+            {
+                // implicit movement的方向是从右到左（和字符方向相反）
+                throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -225,7 +272,7 @@ namespace XTerminalDevice
             {
                 if (evt.Key == VTKeys.Back)
                 {
-                    // 发送退格键给终端，终端没任何响应
+                    // 如果发送退格键给终端，终端没任何响应
                     // 所以在这里单独对退格键进行处理
 
                     // BS causes the active data position to be moved one character position in the data component in the 
@@ -233,6 +280,16 @@ namespace XTerminalDevice
                     // The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT
                     // MOVEMENT DIRECTION (SIMD).
 
+                    // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
+                    // implicit movement的移动方向使用SIMD标志来指定
+
+                    if (this.activeTextBlock == null) 
+                    {
+                        return;
+                    }
+
+                    this.PerformBackspace(this.activeTextBlock);
+                    this.DrawTextBlock(this.activeTextBlock);
                 }
                 else
                 {
@@ -264,33 +321,24 @@ namespace XTerminalDevice
                         {
                             case ' ':
                                 {
-                                    this.FlushText(this.textBlock);
+                                    Console.WriteLine("SSH -> PC, 空格");
+                                    this.DrawTextBlock(this.activeTextBlock);
                                     this.InvalidateMeasure();
                                     this.textOffsetX += this.whitespaceWidth;
-                                    this.textBlock = null;
+                                    this.characterCol++;
+                                    this.activeTextBlock = null;
                                     break;
                                 }
 
                             default:
                                 {
-                                    if (this.textBlock == null)
-                                    {
-                                        this.textBlock = new VTextBlock()
-                                        {
-                                            Index = this.textBlocks.Count,
-                                            Foreground = this.TextOptions.Foreground,
-                                            Size = this.TextOptions.FontSize,
-                                            X = this.textOffsetX,
-                                            Y = this.textOffsetY
-                                        };
-                                        this.textBlocks.Add(textBlock);
-                                    }
-                                    this.textBlock.AppendText(ch);
-
-                                    this.FlushText(this.textBlock);
+                                    this.EnsureActiveTextBlock();
+                                    this.activeTextBlock.InsertCharacter(ch);
+                                    this.DrawTextBlock(this.activeTextBlock);
                                     this.InvalidateMeasure();
                                     // 下次新创建的TextBlock的X偏移量
-                                    this.textOffsetX = this.textBlock.Boundary.RightTop.X;
+                                    this.textOffsetX = this.activeTextBlock.Boundary.RightTop.X;
+                                    this.characterCol++;
                                     break;
                                 }
                         }
@@ -301,17 +349,21 @@ namespace XTerminalDevice
                 case VTActions.CarriageReturn:
                     {
                         // CR
+                        Console.WriteLine("SSH -> PC, CR");
                         break;
                     }
 
                 case VTActions.LineFeed:
                     {
                         // LF
-                        this.FlushText(this.textBlock);
+                        Console.WriteLine("SSH -> PC, LF");
+                        this.DrawTextBlock(this.activeTextBlock);
                         this.InvalidateMeasure();
                         this.textOffsetY += this.textLineHeight;
                         this.textOffsetX = 0;
-                        this.textBlock = null;
+                        this.characterCol = 0;
+                        this.characterRow++;
+                        this.activeTextBlock = null;
                         break;
                     }
 
