@@ -281,7 +281,7 @@ namespace XTerminalDevice
                     // MOVEMENT DIRECTION (SIMD).
 
                     // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
-                    // implicit movement的移动方向使用SIMD标志来指定
+                    // implicit movement的方向使用SIMD标志来指定
 
                     if (this.activeTextBlock == null) 
                     {

@@ -71,6 +71,15 @@ namespace XTerminalParser
                 case ASCIIChars.BS:
                     {
                         // Backspace，退格，光标向前移动一位
+
+                        // BS causes the active data position to be moved one character position in the data component in the 
+                        // direction opposite to that of the implicit movement.
+                        // The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT
+                        // MOVEMENT DIRECTION (SIMD).
+
+                        // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
+                        // implicit movement的方向使用SIMD标志来指定
+
                         this.NotifyActionEvent(VTActions.CursorBackward, 1);
                         break;
                     }
@@ -107,8 +116,8 @@ namespace XTerminalParser
 
                 default:
                     {
-                        //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
-                        this.NotifyActionEvent(VTActions.Print, char.ToString((char)ch));
+                        throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
+                        //this.NotifyActionEvent(VTActions.Print, char.ToString((char)ch));
                         break;
                     }
             }

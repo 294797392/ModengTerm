@@ -250,6 +250,11 @@ namespace XTerminalParser
                                 this.EventVt52Param(ch);
                                 break;
                             }
+
+                        default:
+                            {
+                                break;
+                            }
                     }
                 }
             }
