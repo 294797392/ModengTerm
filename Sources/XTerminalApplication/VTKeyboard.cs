@@ -64,7 +64,7 @@ namespace XTerminalDevice
             { VTKeys.Y, new byte[] { (byte)'y' } }, { VTKeys.Z, new byte[] { (byte)'z' } },
 
             // FunctionKeys - VT100 User Guide/Chapter 3 - Programmer Information/The Keyboard
-            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Space, new byte[] { (byte)' ' } }, { VTKeys.Back, new byte[] { } },
+            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Space, new byte[] { (byte)' ' } }, 
             { VTKeys.Back, new byte[] { 8 } }, { VTKeys.Tab, new byte[] { 9 } },
 
 
@@ -131,7 +131,7 @@ namespace XTerminalDevice
             // 这里表示输入的是大写字母
             if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
             {
-                capitalBytes[0] = (byte)(bytes[1] - 32);
+                capitalBytes[0] = (byte)(bytes[0] - 32);
                 return capitalBytes;
             }
 

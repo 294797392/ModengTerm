@@ -20,7 +20,7 @@ namespace XTerminalDevice
         public VTForeground Foreground { get; set; }
 
         /// <summary>
-        /// 字号
+        /// 字体大小
         /// </summary>
         public double Size { get; set; }
 
@@ -38,6 +38,19 @@ namespace XTerminalDevice
         /// 该文本块左上角的Y坐标
         /// </summary>
         public double Y { get; set; }
+
+        /// <summary>
+        /// 该文本块所占据的行数
+        /// 文本块可能占据多行
+        /// </summary>
+        public int Lines { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int StartLine { get; set; }
+
+        public int EndLine { get; set; }
 
         /// <summary>
         /// 文本的测量信息

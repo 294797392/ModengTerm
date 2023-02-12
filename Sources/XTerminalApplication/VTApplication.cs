@@ -59,6 +59,10 @@ namespace XTerminalDevice
         private double fullWidth;
         private double fullHeight;
 
+
+
+        private int selectImplicitMovementDirection;
+
         #endregion
 
         #region 属性
@@ -97,8 +101,13 @@ namespace XTerminalDevice
 
         #region 公开接口
 
-        public void Initialize() 
+        public void Initialize()
         {
+            // 0:和字符方向相同（向右）
+            // 1:和字符方向相反（向左）
+            this.selectImplicitMovementDirection = 0;
+
+
             this.textBlocks = new List<VTextBlock>();
             this.TextOptions = new VTextOptions();
 
@@ -175,7 +184,7 @@ namespace XTerminalDevice
         /// </summary>
         private void InvalidateMeasure()
         {
-            if (this.textBlock == null) 
+            if (this.textBlock == null)
             {
                 return;
             }
@@ -214,14 +223,28 @@ namespace XTerminalDevice
             // todo:translate and send to remote host
             if (string.IsNullOrEmpty(evt.Text))
             {
-                // 这里输入的都是键盘按键
-                byte[] bytes = this.Keyboard.TranslateInput(evt);
-                if (bytes == null)
+                if (evt.Key == VTKeys.Back)
                 {
-                    return;
-                }
+                    // 发送退格键给终端，终端没任何响应
+                    // 所以在这里单独对退格键进行处理
 
-                this.vtChannel.Write(bytes);
+                    // BS causes the active data position to be moved one character position in the data component in the 
+                    // direction opposite to that of the implicit movement.
+                    // The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT
+                    // MOVEMENT DIRECTION (SIMD).
+
+                }
+                else
+                {
+                    // 这里输入的都是键盘按键
+                    byte[] bytes = this.Keyboard.TranslateInput(evt);
+                    if (bytes == null)
+                    {
+                        return;
+                    }
+
+                    this.vtChannel.Write(bytes);
+                }
             }
             else
             {
