@@ -321,7 +321,7 @@ namespace XTerminalDevice
                         {
                             case ' ':
                                 {
-                                    Console.WriteLine("SSH -> PC, 空格");
+                                    //Console.WriteLine("SSH -> PC, 空格");
                                     this.DrawTextBlock(this.activeTextBlock);
                                     this.InvalidateMeasure();
                                     this.textOffsetX += this.whitespaceWidth;
@@ -349,14 +349,14 @@ namespace XTerminalDevice
                 case VTActions.CarriageReturn:
                     {
                         // CR
-                        Console.WriteLine("SSH -> PC, CR");
+                        //Console.WriteLine("SSH -> PC, CR");
                         break;
                     }
 
                 case VTActions.LineFeed:
                     {
                         // LF
-                        Console.WriteLine("SSH -> PC, LF");
+                        //Console.WriteLine("SSH -> PC, LF");
                         this.DrawTextBlock(this.activeTextBlock);
                         this.InvalidateMeasure();
                         this.textOffsetY += this.textLineHeight;

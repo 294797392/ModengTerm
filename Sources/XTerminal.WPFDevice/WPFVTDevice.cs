@@ -94,6 +94,12 @@ namespace XTerminal.WPFDevice
             }
             else
             {
+                if (e.Key == Key.Tab)
+                {
+                    // 防止焦点移动到其他控件上了
+                    e.Handled = true;
+                }
+
                 VTKeys vtKey = TerminalUtils.ConvertToVTKey(e.Key);
                 this.inputEvent.CapsLock = Console.CapsLock;
                 this.inputEvent.Key = vtKey;

@@ -52,8 +52,8 @@ namespace XTerminal
 
         private void InitializeWindow()
         {
-            SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("linux-desktop", 22, "zyf", "18612538605");
-            //SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("ubuntu-dev", 22, "oheiheiheiheihei", "18612538605");
+            //SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("linux-desktop", 22, "zyf", "18612538605");
+            SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("192.168.215.128", 22, "oheiheiheiheihei", "18612538605");
             VTApplication vtApp = new VTApplication();
             vtApp.VTDevice = Terminal;
             vtApp.Initialize();
