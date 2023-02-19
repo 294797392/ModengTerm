@@ -126,7 +126,7 @@ namespace XTerminalParser
         /// <summary>
         /// CSI状态解析完毕，开始执行CSI对应的动作
         /// </summary>
-        /// <param name="ch">Final Byte</param>
+        /// <param name="finalByte">Final Byte</param>
         private void ActionCSIDispatch(int finalByte, List<int> parameters)
         {
             CSIActionCodes code = (CSIActionCodes)finalByte;
@@ -170,6 +170,7 @@ namespace XTerminalParser
 
                 case CSIActionCodes.DTTERM_WindowManipulation:
                     {
+                        logger.WarnFormat("DTTERM_WindowManipulation");
                         WindowManipulationType wmt = (WindowManipulationType)parameters[0];
                         this.PerformWindowManipulation(wmt, parameters[1], parameters[2]);
                         break;
@@ -177,6 +178,7 @@ namespace XTerminalParser
 
                 case CSIActionCodes.DECSTBM_SetScrollingRegion:
                     {
+                        logger.WarnFormat("DECSTBM_SetScrollingRegion");
                         int topMargin = parameters[0];
                         int bottomMargin = parameters[1];
                         break;

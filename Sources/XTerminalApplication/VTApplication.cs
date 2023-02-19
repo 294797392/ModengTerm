@@ -70,7 +70,24 @@ namespace XTerminalDevice
         /// 0：数据的移动方向和字符方向一致（从左到右）
         /// 1：数据的移动方向和字符方向相反（从右到左）
         /// </summary>
-        private int movementDirection;
+        private int implicitMovementDirection;
+
+        #region Modes - ECMA048 - Modes
+
+        /// <summary>
+        /// DCSM - DEVICE COMPONENT SELECT MODE
+        /// PRESENTATION:
+        /// 某些控制功能在Presentaion模式下执行，
+        /// DATA;
+        /// 某些控制功能在Data模式下执行，
+        /// 
+        /// 默认PRESENTATION状态
+        /// 
+        /// 受DCSM状态影响的控制功能有：CPR, CR, DCH, DL, EA, ECH, ED, EF, EL, ICH, IL, LF, NEL, RI, SLH, SLL, SPH, SPL
+        /// </summary>
+        private int deviceComponentSelectMode;
+
+        #endregion
 
         #endregion
 
@@ -114,7 +131,7 @@ namespace XTerminalDevice
         {
             // 0:和字符方向相同（向右）
             // 1:和字符方向相反（向左）
-            this.movementDirection = 0;
+            this.implicitMovementDirection = 0;
 
             this.textBlocks = new List<VTextBlock>();
             this.TextOptions = new VTextOptions();
@@ -245,12 +262,12 @@ namespace XTerminalDevice
         /// </summary>
         private void PerformBackspace(VTextBlock textBlock)
         {
-            if (this.movementDirection == 0)
+            if (this.implicitMovementDirection == 0)
             {
                 // implicit movement的方向是从左到右（和字符方向一致）
                 textBlock.DeleteCharacter(DeleteCharacterFrom.BackToFront, 1);
             }
-            else if (this.movementDirection == 1)
+            else if (this.implicitMovementDirection == 1)
             {
                 // implicit movement的方向是从右到左（和字符方向相反）
                 throw new NotImplementedException();
@@ -270,28 +287,28 @@ namespace XTerminalDevice
             // todo:translate and send to remote host
             if (string.IsNullOrEmpty(evt.Text))
             {
-                if (evt.Key == VTKeys.Back)
-                {
-                    // 如果发送退格键给终端，终端没任何响应
-                    // 所以在这里单独对退格键进行处理
+                //if (evt.Key == VTKeys.Back)
+                //{
+                //    // 如果发送退格键给终端，终端没任何响应
+                //    // 所以在这里单独对退格键进行处理
 
-                    // BS causes the active data position to be moved one character position in the data component in the 
-                    // direction opposite to that of the implicit movement.
-                    // The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT
-                    // MOVEMENT DIRECTION (SIMD).
+                //    // BS causes the active data position to be moved one character position in the data component in the 
+                //    // direction opposite to that of the implicit movement.
+                //    // The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT
+                //    // MOVEMENT DIRECTION (SIMD).
 
-                    // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
-                    // implicit movement的方向使用SIMD标志来指定
+                //    // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
+                //    // implicit movement的方向使用SIMD标志来指定
 
-                    if (this.activeTextBlock == null) 
-                    {
-                        return;
-                    }
+                //    if (this.activeTextBlock == null) 
+                //    {
+                //        return;
+                //    }
 
-                    this.PerformBackspace(this.activeTextBlock);
-                    this.DrawTextBlock(this.activeTextBlock);
-                }
-                else
+                //    this.PerformBackspace(this.activeTextBlock);
+                //    this.DrawTextBlock(this.activeTextBlock);
+                //}
+                //else
                 {
                     // 这里输入的都是键盘按键
                     byte[] bytes = this.Keyboard.TranslateInput(evt);
@@ -367,8 +384,18 @@ namespace XTerminalDevice
                         break;
                     }
 
+                case VTActions.PlayBell:
+                case VTActions.Bold:
+                case VTActions.Foreground:
+                case VTActions.Background:
+                case VTActions.DefaultAttributes:
+                case VTActions.DefaultBackground:
+                case VTActions.DefaultForeground:
+                    break;
+
                 default:
                     {
+                        logger.WarnFormat("未执行的VTAction, {0}", action);
                         break;
                     }
             }

@@ -60,7 +60,8 @@ namespace XTerminalBase.Channels
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.Connect();
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
-            this.stream = this.sshClient.CreateShellStream(this.authorition.TerminalName, DefaultValues.TerminalColumns, DefaultValues.TerminalRows, 0, 0, 4096);
+
+            this.stream = this.sshClient.CreateShellStream("xterm", 80, 24, 9999, 9999, 4096);
             this.stream.DataReceived += this.Stream_DataReceived;
 
             this.NotifyStatusChanged(VTChannelState.Connected);

@@ -11,8 +11,8 @@ namespace XTerminalBase
     public static class DefaultValues
     {
         public static Encoding DefaultEncoding = Encoding.UTF8;
-        public const int TerminalColumns = 0;
-        public const int TerminalRows = 0;
+        public const int TerminalColumns = 80;
+        public const int TerminalRows = 24;
         public const string TerminalName = "xterm-256color";
 
         /// <summary>

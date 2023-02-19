@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wpfdev="clr-namespace:XTerminal.WPFDevice;assembly=XTerminal.WPFDevice"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" WindowState="Maximized">
+        Title="MainWindow" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.RowDefinitions>
