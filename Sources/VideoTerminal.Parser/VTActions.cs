@@ -114,6 +114,10 @@ namespace XTerminalParser
         CarriageReturn,
         LineFeed,
 
+        /// <summary>
+        /// 删除行
+        /// </summary>
+        EraseLine,
 
         /// <summary>
         /// 光标向左移动N个字符的距离

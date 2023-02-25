@@ -60,6 +60,8 @@
     <Compile Include="Options\BackspaceOptions.cs" />
     <Compile Include="Options\ImplicitMovementDirections.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VTLine.cs" />
+    <Compile Include="VTScreen.cs" />
     <Compile Include="VTextBlockMetrics.cs" />
     <Compile Include="VTextOptions.cs" />
     <Compile Include="VTApplication.cs" />

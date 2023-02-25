@@ -64,6 +64,7 @@ namespace XTerminalParser
                 case ASCIIChars.BEL:
                     {
                         // 响铃
+                        logger.DebugFormat("Action - BEL");
                         this.NotifyActionEvent(VTActions.PlayBell);
                         break;
                     }
@@ -79,7 +80,7 @@ namespace XTerminalParser
 
                         // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
                         // implicit movement的方向使用SIMD标志来指定
-
+                        logger.DebugFormat("Action - Backspace");
                         this.NotifyActionEvent(VTActions.CursorBackward, 1);
                         break;
                     }
@@ -87,21 +88,36 @@ namespace XTerminalParser
                 case ASCIIChars.TAB:
                     {
                         // tab键
+                        logger.DebugFormat("Action - Tab");
                         this.NotifyActionEvent(VTActions.ForwardTab);
                         break;
                     }
 
                 case ASCIIChars.CR:
                     {
+                        logger.DebugFormat("Action - CR");
                         this.NotifyActionEvent(VTActions.CarriageReturn);
                         break;
                     }
 
                 case ASCIIChars.LF:
+                    {
+                        logger.DebugFormat("Action - LF");
+                        this.NotifyActionEvent(VTActions.LineFeed);
+                        break;
+                    }
+
                 case ASCIIChars.FF:
+                    {
+                        logger.DebugFormat("Action - LF");
+                        this.NotifyActionEvent(VTActions.LineFeed);
+                        break;
+                    }
+
                 case ASCIIChars.VT:
                     {
                         // 这三个都是LF
+                        logger.DebugFormat("Action - VT");
                         this.NotifyActionEvent(VTActions.LineFeed);
                         break;
                     }
@@ -143,19 +159,27 @@ namespace XTerminalParser
 
                 case CSIActionCodes.DECRST_PrivateModeReset:
                     {
+                        logger.DebugFormat("CSIDispatch - DECRST_PrivateModeReset");
                         this.PerformDECPrivateMode(parameters, false);
                         break;
                     }
 
                 case CSIActionCodes.DECSET_PrivateModeSet:
                     {
+                        logger.DebugFormat("CSIDispatch - DECSET_PrivateModeSet");
                         this.PerformDECPrivateMode(parameters, true);
                         break;
                     }
 
                 case CSIActionCodes.HVP_HorizontalVerticalPosition:
+                    {
+                        logger.DebugFormat("CSIDispatch - HVP_HorizontalVerticalPosition");
+                        break;
+                    }
+
                 case CSIActionCodes.CUP_CursorPosition:
                     {
+                        logger.DebugFormat("CSIDispatch - CUP_CursorPosition");
                         int row = parameters[0];
                         int col = parameters[1];
                         this.NotifyActionEvent(VTActions.CursorPosition, row, col);
@@ -164,13 +188,14 @@ namespace XTerminalParser
 
                 case CSIActionCodes.CUF_CursorForward:
                     {
+                        logger.DebugFormat("CSIDispatch - CUF_CursorForward");
                         this.NotifyActionEvent(VTActions.CursorForword, parameters[0]);
                         break;
                     }
 
                 case CSIActionCodes.DTTERM_WindowManipulation:
                     {
-                        logger.WarnFormat("DTTERM_WindowManipulation");
+                        logger.DebugFormat("CSIDispatch - DTTERM_WindowManipulation");
                         WindowManipulationType wmt = (WindowManipulationType)parameters[0];
                         this.PerformWindowManipulation(wmt, parameters[1], parameters[2]);
                         break;
@@ -178,14 +203,16 @@ namespace XTerminalParser
 
                 case CSIActionCodes.DECSTBM_SetScrollingRegion:
                     {
-                        logger.WarnFormat("DECSTBM_SetScrollingRegion");
+                        logger.DebugFormat("CSIDispatch - DECSTBM_SetScrollingRegion");
                         int topMargin = parameters[0];
                         int bottomMargin = parameters[1];
+                        throw new NotImplementedException();
                         break;
                     }
 
                 case CSIActionCodes.EL_EraseLine:
                     {
+                        logger.DebugFormat("CSIDispatch - EL_EraseLine");
                         this.PerformEraseLine(parameters);
                         break;
                     }
@@ -215,6 +242,8 @@ namespace XTerminalParser
                 case EscActionCodes.DECKPAM_KeypadApplicationMode:
                     {
                         // TODO：实现
+                        logger.DebugFormat("ESCDispatch - DECKPAM_KeypadApplicationMode");
+
                         break;
                     }
 
@@ -535,11 +564,8 @@ namespace XTerminalParser
         /// <param name="parameters"></param>
         private void PerformEraseLine(List<int> parameters)
         {
-            //logger.InfoFormat("PerformEraseLine, num paramters = {0}", parameters.Count);
-            foreach (int eraseType in parameters)
-            {
-
-            }
+            int parameter = parameters.Count > 0 ? parameters[0] : 0;
+            this.NotifyActionEvent(VTActions.EraseLine, parameter);
         }
 
         #endregion

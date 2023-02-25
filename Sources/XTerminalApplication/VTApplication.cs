@@ -54,10 +54,15 @@ namespace XTerminalDevice
         // 空白字符的宽度
         private double whitespaceWidth;
 
-        // 最后一个字符所在行
-        private int characterRow;
-        // 最后一个字符所在列
-        private int characterCol;
+        /// <summary>
+        /// 光标所在行
+        /// </summary>
+        private int cursorRow;
+
+        /// <summary>
+        /// 光标所在列
+        /// </summary>
+        private int cursorCol;
 
         /// <summary>
         /// Terminal区域的总长宽
@@ -188,6 +193,17 @@ namespace XTerminalDevice
         #region 实例方法
 
         /// <summary>
+        /// 给定一个位置，获取对应位置的文本块
+        /// 如果没有，则为null
+        /// </summary>
+        /// <returns></returns>
+        private VTextBlock GetTextBlockAt(int row, int col)
+        {
+            VTextBlock textBlock = this.textBlocks.FirstOrDefault(v => v.Column <= col && v.Column + v.Column >= col);
+            return textBlock;
+        }
+
+        /// <summary>
         /// 打印TextBlock文本
         /// </summary>
         /// <param name="textBlock"></param>
@@ -217,8 +233,8 @@ namespace XTerminalDevice
                     Size = this.TextOptions.FontSize,
                     X = this.textOffsetX,
                     Y = this.textOffsetY,
-                    Row = this.characterRow,
-                    Column = this.characterCol,
+                    Row = this.cursorRow,
+                    Column = this.cursorCol,
                     Text = string.Empty
                 };
                 this.textBlocks.Add(activeTextBlock);
@@ -274,6 +290,36 @@ namespace XTerminalDevice
             }
         }
 
+        private void PerformEraseLine(int parameter)
+        {
+            switch (parameter)
+            {
+                case 0:
+                    {
+                        // 当前光标处到结尾
+                        // 获取光标所在文本
+                        VTextBlock textBlock = this.GetTextBlockAt(this.cursorRow, this.cursorCol);
+                        int startIndex = this.cursorCol - textBlock.Column;
+                        break;
+                    }
+
+                case 1:
+                    {
+                        // 删除从行首到当前光标处的内容
+                        break;
+                    }
+
+                case 2:
+                    {
+                        // 删除整行
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -287,28 +333,6 @@ namespace XTerminalDevice
             // todo:translate and send to remote host
             if (string.IsNullOrEmpty(evt.Text))
             {
-                //if (evt.Key == VTKeys.Back)
-                //{
-                //    // 如果发送退格键给终端，终端没任何响应
-                //    // 所以在这里单独对退格键进行处理
-
-                //    // BS causes the active data position to be moved one character position in the data component in the 
-                //    // direction opposite to that of the implicit movement.
-                //    // The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT
-                //    // MOVEMENT DIRECTION (SIMD).
-
-                //    // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
-                //    // implicit movement的方向使用SIMD标志来指定
-
-                //    if (this.activeTextBlock == null) 
-                //    {
-                //        return;
-                //    }
-
-                //    this.PerformBackspace(this.activeTextBlock);
-                //    this.DrawTextBlock(this.activeTextBlock);
-                //}
-                //else
                 {
                     // 这里输入的都是键盘按键
                     byte[] bytes = this.Keyboard.TranslateInput(evt);
@@ -342,7 +366,7 @@ namespace XTerminalDevice
                                     this.DrawTextBlock(this.activeTextBlock);
                                     this.InvalidateMeasure();
                                     this.textOffsetX += this.whitespaceWidth;
-                                    this.characterCol++;
+                                    this.cursorCol++;
                                     this.activeTextBlock = null;
                                     break;
                                 }
@@ -355,7 +379,7 @@ namespace XTerminalDevice
                                     this.InvalidateMeasure();
                                     // 下次新创建的TextBlock的X偏移量
                                     this.textOffsetX = this.activeTextBlock.Boundary.RightTop.X;
-                                    this.characterCol++;
+                                    this.cursorCol++;
                                     break;
                                 }
                         }
@@ -366,21 +390,32 @@ namespace XTerminalDevice
                 case VTActions.CarriageReturn:
                     {
                         // CR
-                        //Console.WriteLine("SSH -> PC, CR");
                         break;
                     }
 
                 case VTActions.LineFeed:
                     {
                         // LF
-                        //Console.WriteLine("SSH -> PC, LF");
                         this.DrawTextBlock(this.activeTextBlock);
                         this.InvalidateMeasure();
                         this.textOffsetY += this.textLineHeight;
                         this.textOffsetX = 0;
-                        this.characterCol = 0;
-                        this.characterRow++;
+                        this.cursorCol = 0;
+                        this.cursorRow++;
                         this.activeTextBlock = null;
+                        break;
+                    }
+
+
+                case VTActions.EraseLine:
+                    {
+                        this.PerformEraseLine(Convert.ToInt32(param[0]));
+                        break;
+                    }
+
+                case VTActions.CursorBackward:
+                    {
+                        this.cursorCol--;
                         break;
                     }
 
