@@ -466,6 +466,8 @@ namespace XTerminalDevice
                 case VTActions.CarriageReturn:
                     {
                         // CR
+                        // 把光标移动到行开头
+                        this.cursorCol = 0;
                         break;
                     }
 
