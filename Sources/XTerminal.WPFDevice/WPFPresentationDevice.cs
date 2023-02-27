@@ -27,6 +27,7 @@ namespace XTerminal.WPFRenderer
         /// TextBlockIndex -> TextVisual
         /// </summary>
         private Dictionary<int, TextVisual> textVisuals;
+        private List<TextVisual> textVisuals2;
 
         private Typeface typeface;
         private double pixelPerDip;
@@ -41,7 +42,7 @@ namespace XTerminal.WPFRenderer
         // Provide a required override for the VisualChildrenCount property.
         protected override int VisualChildrenCount
         {
-            get { return this.textVisuals.Count; }
+            get { return this.textVisuals2.Count; }
         }
 
         #endregion
@@ -51,6 +52,7 @@ namespace XTerminal.WPFRenderer
         public WPFPresentationDevice()
         {
             this.textVisuals = new Dictionary<int, TextVisual>();
+            this.textVisuals2 = new List<TextVisual>();
             this.typeface = new Typeface(new FontFamily("Ya Hei"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         }
@@ -62,7 +64,7 @@ namespace XTerminal.WPFRenderer
         // Provide a required override for the GetVisualChild method.
         protected override Visual GetVisualChild(int index)
         {
-            return this.textVisuals[index];
+            return this.textVisuals2[index];
         }
 
         protected override Size MeasureOverride(Size constraint)
@@ -109,12 +111,13 @@ namespace XTerminal.WPFRenderer
                 this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
 
                 this.textVisuals[textBlock.Index] = textVisual;
+                this.textVisuals2.Add(textVisual);
             }
 
             textVisual.Draw();
         }
 
-        public void DeleteText(IEnumerable<VTextBlock> textBlocks)
+        public void DeleteText(List<VTextBlock> textBlocks)
         {
             foreach (VTextBlock textBlock in textBlocks)
             {
@@ -122,6 +125,7 @@ namespace XTerminal.WPFRenderer
                 if (this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
                 {
                     this.textVisuals.Remove(textBlock.Index);
+                    this.textVisuals2.Remove(textVisual);
                     this.RemoveVisualChild(textVisual);
                 }
             }

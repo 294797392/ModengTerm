@@ -66,7 +66,7 @@ namespace XTerminalDevice
         /// <summary>
         /// 获取该文本块的宽度
         /// </summary>
-        public double Width { get { return this.Metrics.Width; } }
+        public double Width { get { return this.Metrics.WidthIncludingWhitespace; } }
 
         /// <summary>
         /// 获取该文本块的高度

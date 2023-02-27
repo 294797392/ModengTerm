@@ -36,7 +36,7 @@ namespace XTerminalDevice
             this.TextBlocks.Add(textBlock);
         }
 
-        public void DeleteTextBlock(IEnumerable<VTextBlock> textBlocks)
+        public void DeleteTextBlock(List<VTextBlock> textBlocks)
         {
             foreach (VTextBlock textBlock in textBlocks)
             {
@@ -56,7 +56,7 @@ namespace XTerminalDevice
         /// <returns></returns>
         public IEnumerable<VTextBlock> GetTextBlockAfter(int column)
         {
-            return this.TextBlocks.Where(v => v.Column >= column);
+            return this.TextBlocks.Where(v => v.Column >= column || column >= v.Column && column <= v.Column + v.Columns);
         }
 
         /// <summary>
@@ -66,16 +66,16 @@ namespace XTerminalDevice
         /// <returns></returns>
         public IEnumerable<VTextBlock> GetTextBlockBefore(int column)
         {
-            return this.TextBlocks.Where(v => v.Column <= column);
+            return this.TextBlocks.Where(v => v.Column <= column || column >= v.Column && column <= v.Column + v.Columns);
         }
 
         /// <summary>
         /// 获取该行所包含的所有文本块
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<VTextBlock> GetAllTextBlocks()
+        public List<VTextBlock> GetAllTextBlocks()
         {
-            return this.TextBlocks;
+            return this.TextBlocks.ToList();
         }
     }
 }

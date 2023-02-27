@@ -223,6 +223,7 @@ namespace XTerminalDevice
                 Y = row * this.characterHeight,
                 Text = string.Empty
             };
+            this.textBlocks.Add(textBlock);
 
             // 找到文本块所属的行，并把文本块加到行里
             VTextLine ownerLine = this.textLines.FirstOrDefault(v => v.Row == row);
@@ -233,10 +234,10 @@ namespace XTerminalDevice
                     Row = row,
                     OffsetY = this.characterHeight * row,
                 };
-                ownerLine.AddTextBlock(textBlock);
                 this.textLines.Add(ownerLine);
             }
 
+            ownerLine.AddTextBlock(textBlock);
             textBlock.OwnerLine = ownerLine;
 
             return textBlock;
@@ -315,7 +316,7 @@ namespace XTerminalDevice
                             textBlockOverCursor.DeleteCharacter(startIndex, count);
 
                             // 删除剩余的文本块
-                            IEnumerable<VTextBlock> deleteList = textBlocks.Skip(1);
+                            List<VTextBlock> deleteList = textBlocks.Skip(1).ToList();
                             cursorLine.DeleteTextBlock(deleteList);
 
                             this.uiSyncContext.Send((v) =>
@@ -347,7 +348,7 @@ namespace XTerminalDevice
                             textBlockOverCursor.DeleteCharacter(startIndex, count);
 
                             // 删除剩余的文本块
-                            IEnumerable<VTextBlock> deleteList = textBlocks.Take(textBlocks.Count() - 1);
+                            List<VTextBlock> deleteList = textBlocks.Take(textBlocks.Count() - 1).ToList();
                             cursorLine.DeleteTextBlock(deleteList);
 
                             this.uiSyncContext.Send((v) =>
@@ -364,7 +365,7 @@ namespace XTerminalDevice
                     {
                         // 删除光标所在整行
                         VTextLine toDelete = this.GetCursorTextLine();
-                        IEnumerable<VTextBlock> textBlocks = toDelete.GetAllTextBlocks();
+                        List<VTextBlock> textBlocks = toDelete.GetAllTextBlocks();
                         toDelete.DeleteTextBlock(textBlocks);
 
                         this.uiSyncContext.Send((v) =>
@@ -420,9 +421,9 @@ namespace XTerminalDevice
                         switch (ch)
                         {
                             // 遇到下面的字符，渲染完后就重新创建TextBlock
-                            case ':':
-                            case '/':
-                            case '\\':
+                            //case ':':
+                            //case '/':
+                            //case '\\':
                             case ' ':
                                 {
                                     //Console.WriteLine("渲染断字符, {0}", ch);
