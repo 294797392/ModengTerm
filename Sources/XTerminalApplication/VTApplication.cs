@@ -33,6 +33,8 @@ namespace XTerminalDevice
         /// </summary>
         private VTParser vtParser;
 
+        private VTScreen vtScreen;
+
         // 所有的文本列表
         private List<VTextBlock> textBlocks;
 
