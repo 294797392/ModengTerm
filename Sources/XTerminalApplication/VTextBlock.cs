@@ -79,12 +79,12 @@ namespace XTerminalDevice
         public VTRect Boundary { get { return new VTRect(this.X, this.Y, this.Width, this.Height); } }
 
         /// <summary>
-        /// 该文本块所在行数，从1开始
+        /// 该文本块所在行数，从0开始
         /// </summary>
         public int Row { get; set; }
 
         /// <summary>
-        /// 该文本块第一个字符所在列数，从1开始
+        /// 该文本块第一个字符所在列数，从0开始
         /// </summary>
         public int Column { get; set; }
 
@@ -92,6 +92,11 @@ namespace XTerminalDevice
         /// 获取该文本块所占据的列数
         /// </summary>
         public int Columns { get { return this.Text.Length; } }
+
+        /// <summary>
+        /// 所属行
+        /// </summary>
+        public VTextLine OwnerLine { get; internal set; }
 
         public VTextBlock()
         {

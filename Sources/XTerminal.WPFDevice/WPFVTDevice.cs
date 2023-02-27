@@ -14,7 +14,7 @@ using XTerminalParser;
 using XTerminalDevice.Interface;
 using XTerminalDevice;
 
-namespace XTerminal.WPFDevice
+namespace XTerminal.WPFRenderer
 {
     /// <summary>
     /// 终端控件

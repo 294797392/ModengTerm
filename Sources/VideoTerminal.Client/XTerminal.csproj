@@ -152,9 +152,9 @@
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
       <Name>XTerminalBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\XTerminal.WPFDevice\XTerminal.WPFDevice.csproj">
+    <ProjectReference Include="..\XTerminal.WPFDevice\XTerminal.WPFRenderer.csproj">
       <Project>{dcbd335a-2c3c-4fbf-a3d8-0859844519aa}</Project>
-      <Name>XTerminal.WPFDevice</Name>
+      <Name>XTerminal.WPFRenderer</Name>
     </ProjectReference>
     <ProjectReference Include="..\XTerminalApplication\XTerminalDevice.csproj">
       <Project>{c236bd15-c63c-45bd-b576-2caa49acaba2}</Project>

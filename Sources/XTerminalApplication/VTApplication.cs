@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using XTerminalBase.Channels;
 using XTerminalDevice.Interface;
 using XTerminalParser;
@@ -33,7 +34,10 @@ namespace XTerminalDevice
         /// </summary>
         private VTParser vtParser;
 
-        private VTScreen vtScreen;
+        /// <summary>
+        /// 所有行
+        /// </summary>
+        private List<VTextLine> textLines;
 
         // 所有的文本列表
         private List<VTextBlock> textBlocks;
@@ -47,14 +51,13 @@ namespace XTerminalDevice
         // 当前渲染的文本的左上角X位置
         private double textOffsetX;
 
-        // 当前渲染的文本的左上角Y位置
-        private double textOffsetY;
-
-        // 当前行的高度
-        private double textLineHeight;
-
         // 空白字符的宽度
         private double whitespaceWidth;
+
+        /// <summary>
+        /// 一个字符的高度
+        /// </summary>
+        private double characterHeight;
 
         /// <summary>
         /// 光标所在行
@@ -96,6 +99,11 @@ namespace XTerminalDevice
 
         #endregion
 
+        /// <summary>
+        /// UI线程上下文
+        /// </summary>
+        private SynchronizationContext uiSyncContext;
+
         #endregion
 
         #region 属性
@@ -136,12 +144,18 @@ namespace XTerminalDevice
 
         public void Initialize()
         {
+            this.uiSyncContext = SynchronizationContext.Current;
+
             // 0:和字符方向相同（向右）
             // 1:和字符方向相反（向左）
             this.implicitMovementDirection = 0;
 
+            this.textLines = new List<VTextLine>();
             this.textBlocks = new List<VTextBlock>();
             this.TextOptions = new VTextOptions();
+
+            // 创建第一个TextBlock
+            this.activeTextBlock = this.CreateTextBlock(0, 0, 0);
 
             this.Keyboard = new VTKeyboard();
             this.Keyboard.SetAnsiMode(true);
@@ -164,7 +178,9 @@ namespace XTerminalDevice
                 Foreground = VTForeground.DarkBlack,
                 Text = " ",
             };
-            this.whitespaceWidth = this.PresentationDevice.MeasureText(spaceText).WidthIncludingWhitespace;
+            VTextBlockMetrics spaceTextMetrics = this.PresentationDevice.MeasureText(spaceText);
+            this.whitespaceWidth = spaceTextMetrics.WidthIncludingWhitespace;
+            this.characterHeight = spaceTextMetrics.Height;
         }
 
         public void RunSSHClient(SSHChannelAuthorition authorition)
@@ -194,53 +210,45 @@ namespace XTerminalDevice
 
         #region 实例方法
 
-        /// <summary>
-        /// 给定一个位置，获取对应位置的文本块
-        /// 如果没有，则为null
-        /// </summary>
-        /// <returns></returns>
-        private VTextBlock GetTextBlockAt(int row, int col)
+        private VTextBlock CreateTextBlock(int row, int column, double offsetX)
         {
-            VTextBlock textBlock = this.textBlocks.FirstOrDefault(v => v.Column <= col && v.Column + v.Column >= col);
+            VTextBlock textBlock = new VTextBlock()
+            {
+                Index = this.textBlocks.Count,
+                Foreground = this.TextOptions.Foreground,
+                Size = this.TextOptions.FontSize,
+                Column = column,
+                Row = row,
+                X = offsetX,
+                Y = row * this.characterHeight,
+                Text = string.Empty
+            };
+
+            // 找到文本块所属的行，并把文本块加到行里
+            VTextLine ownerLine = this.textLines.FirstOrDefault(v => v.Row == row);
+            if (ownerLine == null)
+            {
+                ownerLine = new VTextLine()
+                {
+                    Row = row,
+                    OffsetY = this.characterHeight * row,
+                };
+                ownerLine.AddTextBlock(textBlock);
+                this.textLines.Add(ownerLine);
+            }
+
+            textBlock.OwnerLine = ownerLine;
+
             return textBlock;
         }
 
         /// <summary>
-        /// 打印TextBlock文本
+        /// 获取光标所在文本行
         /// </summary>
-        /// <param name="textBlock"></param>
-        private void DrawTextBlock(VTextBlock textBlock)
+        /// <returns></returns>
+        private VTextLine GetCursorTextLine()
         {
-            if (textBlock == null)
-            {
-                return;
-            }
-
-            // 遇到空格就渲染当前的文本
-            this.PresentationDevice.DrawText(textBlock);
-            this.textLineHeight = Math.Max(this.textLineHeight, textBlock.Height);
-        }
-
-        /// <summary>
-        /// 如果activeTextBlock为空，那么新建activeTextBlock
-        /// </summary>
-        private void EnsureActiveTextBlock()
-        {
-            if (this.activeTextBlock == null)
-            {
-                this.activeTextBlock = new VTextBlock()
-                {
-                    Index = this.textBlocks.Count,
-                    Foreground = this.TextOptions.Foreground,
-                    Size = this.TextOptions.FontSize,
-                    X = this.textOffsetX,
-                    Y = this.textOffsetY,
-                    Row = this.cursorRow,
-                    Column = this.cursorCol,
-                    Text = string.Empty
-                };
-                this.textBlocks.Add(activeTextBlock);
-            }
+            return this.textLines.FirstOrDefault(v => v.Row == this.cursorRow);
         }
 
         /// <summary>
@@ -270,25 +278,12 @@ namespace XTerminalDevice
             {
                 this.fullWidth = width;
                 this.fullHeight = height;
-                this.PresentationDevice.Resize(width, height);
-                this.PresentationDevice.ScrollToEnd(ScrollOrientation.Bottom);
-            }
-        }
 
-        /// <summary>
-        /// 执行Backspace操作
-        /// </summary>
-        private void PerformBackspace(VTextBlock textBlock)
-        {
-            if (this.implicitMovementDirection == 0)
-            {
-                // implicit movement的方向是从左到右（和字符方向一致）
-                textBlock.DeleteCharacter(DeleteCharacterFrom.BackToFront, 1);
-            }
-            else if (this.implicitMovementDirection == 1)
-            {
-                // implicit movement的方向是从右到左（和字符方向相反）
-                throw new NotImplementedException();
+                this.uiSyncContext.Send((v) =>
+                {
+                    this.PresentationDevice.Resize(width, height);
+                    this.PresentationDevice.ScrollToEnd(ScrollOrientation.Bottom);
+                }, null);
             }
         }
 
@@ -300,20 +295,82 @@ namespace XTerminalDevice
                     {
                         // 当前光标处到结尾
                         // 获取光标所在文本
-                        VTextBlock textBlock = this.GetTextBlockAt(this.cursorRow, this.cursorCol);
-                        int startIndex = this.cursorCol - textBlock.Column;
+
+                        VTextLine cursorLine = this.GetCursorTextLine();
+                        if (cursorLine == null)
+                        {
+                            logger.ErrorFormat("获取光标所在VTextLine失败, cursorRow = {0}", this.cursorRow);
+                            return;
+                        }
+
+                        // 获取光标所在TextBlock和之后的所有textBlock
+                        IEnumerable<VTextBlock> textBlocks = cursorLine.GetTextBlockAfter(this.cursorCol);
+
+                        VTextBlock textBlockOverCursor = textBlocks.FirstOrDefault();
+                        if (textBlockOverCursor != null)
+                        {
+                            // 先删除文本
+                            int startIndex = this.cursorCol - textBlockOverCursor.Column;
+                            int count = textBlockOverCursor.Columns - startIndex;
+                            textBlockOverCursor.DeleteCharacter(startIndex, count);
+
+                            // 删除剩余的文本块
+                            IEnumerable<VTextBlock> deleteList = textBlocks.Skip(1);
+                            cursorLine.DeleteTextBlock(deleteList);
+
+                            this.uiSyncContext.Send((v) =>
+                            {
+                                this.PresentationDevice.DrawText(textBlockOverCursor);
+                                this.PresentationDevice.DeleteText(deleteList);
+                            }, null);
+                        }
                         break;
                     }
 
                 case 1:
                     {
                         // 删除从行首到当前光标处的内容
+                        VTextLine cursorLine = this.GetCursorTextLine();
+                        if (cursorLine == null)
+                        {
+                            logger.ErrorFormat("获取光标所在VTextLine失败, cursorRow = {0}", this.cursorRow);
+                            return;
+                        }
+
+                        IEnumerable<VTextBlock> textBlocks = cursorLine.GetTextBlockBefore(this.cursorCol);
+
+                        VTextBlock textBlockOverCursor = textBlocks.LastOrDefault();
+                        if (textBlockOverCursor != null)
+                        {
+                            int startIndex = 0;
+                            int count = this.cursorCol - textBlockOverCursor.Column;
+                            textBlockOverCursor.DeleteCharacter(startIndex, count);
+
+                            // 删除剩余的文本块
+                            IEnumerable<VTextBlock> deleteList = textBlocks.Take(textBlocks.Count() - 1);
+                            cursorLine.DeleteTextBlock(deleteList);
+
+                            this.uiSyncContext.Send((v) =>
+                            {
+                                this.PresentationDevice.DrawText(textBlockOverCursor);
+                                this.PresentationDevice.DeleteText(deleteList);
+                            }, null);
+                        }
+
                         break;
                     }
 
                 case 2:
                     {
-                        // 删除整行
+                        // 删除光标所在整行
+                        VTextLine toDelete = this.GetCursorTextLine();
+                        IEnumerable<VTextBlock> textBlocks = toDelete.GetAllTextBlocks();
+                        toDelete.DeleteTextBlock(textBlocks);
+
+                        this.uiSyncContext.Send((v) =>
+                        {
+                            this.PresentationDevice.DeleteText(textBlocks);
+                        }, null);
                         break;
                     }
 
@@ -362,12 +419,22 @@ namespace XTerminalDevice
 
                         switch (ch)
                         {
+                            // 遇到下面的字符，渲染完后就重新创建TextBlock
+                            case ':':
+                            case '/':
+                            case '\\':
                             case ' ':
                                 {
-                                    //Console.WriteLine("SSH -> PC, 空格");
-                                    this.DrawTextBlock(this.activeTextBlock);
+                                    //Console.WriteLine("渲染断字符, {0}", ch);
+                                    this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
+                                    this.activeTextBlock.InsertCharacter(ch);
+                                    this.uiSyncContext.Send((v) => 
+                                    {
+                                        this.PresentationDevice.DrawText(this.activeTextBlock);
+                                    }, null);
                                     this.InvalidateMeasure();
-                                    this.textOffsetX += this.whitespaceWidth;
+                                    // 下次新创建的TextBlock的X偏移量
+                                    this.textOffsetX = this.activeTextBlock.Boundary.RightTop.X;
                                     this.cursorCol++;
                                     this.activeTextBlock = null;
                                     break;
@@ -375,9 +442,15 @@ namespace XTerminalDevice
 
                             default:
                                 {
-                                    this.EnsureActiveTextBlock();
+                                    if (this.activeTextBlock == null)
+                                    {
+                                        this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
+                                    }
                                     this.activeTextBlock.InsertCharacter(ch);
-                                    this.DrawTextBlock(this.activeTextBlock);
+                                    this.uiSyncContext.Send((v) => 
+                                    {
+                                        this.PresentationDevice.DrawText(this.activeTextBlock);
+                                    }, null);
                                     this.InvalidateMeasure();
                                     // 下次新创建的TextBlock的X偏移量
                                     this.textOffsetX = this.activeTextBlock.Boundary.RightTop.X;
@@ -398,16 +471,12 @@ namespace XTerminalDevice
                 case VTActions.LineFeed:
                     {
                         // LF
-                        this.DrawTextBlock(this.activeTextBlock);
-                        this.InvalidateMeasure();
-                        this.textOffsetY += this.textLineHeight;
                         this.textOffsetX = 0;
                         this.cursorCol = 0;
                         this.cursorRow++;
-                        this.activeTextBlock = null;
+                        this.activeTextBlock = this.CreateTextBlock(this.cursorRow, 0, 0);
                         break;
                     }
-
 
                 case VTActions.EraseLine:
                     {

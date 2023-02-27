@@ -9,7 +9,7 @@ using System.Windows.Media;
 using XTerminalDevice;
 using XTerminalDevice.Interface;
 
-namespace XTerminal.WPFDevice
+namespace XTerminal.WPFRenderer
 {
     public class WPFPresentationDevice : Panel, IPresentationDevice
     {
@@ -23,6 +23,9 @@ namespace XTerminal.WPFDevice
 
         private ScrollViewer scrollViewer;
 
+        /// <summary>
+        /// TextBlockIndex -> TextVisual
+        /// </summary>
         private Dictionary<int, TextVisual> textVisuals;
 
         private Typeface typeface;
@@ -96,22 +99,32 @@ namespace XTerminal.WPFDevice
 
         public void DrawText(VTextBlock textBlock)
         {
-            Dispatcher.Invoke(() =>
+            TextVisual textVisual;
+            if (!this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
+            {
+                textVisual = new TextVisual(textBlock);
+                textVisual.PixelsPerDip = this.pixelPerDip;
+                textVisual.Typeface = this.typeface;
+
+                this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
+
+                this.textVisuals[textBlock.Index] = textVisual;
+            }
+
+            textVisual.Draw();
+        }
+
+        public void DeleteText(IEnumerable<VTextBlock> textBlocks)
+        {
+            foreach (VTextBlock textBlock in textBlocks)
             {
                 TextVisual textVisual;
-                if (!this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
+                if (this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
                 {
-                    textVisual = new TextVisual(textBlock);
-                    textVisual.PixelsPerDip = this.pixelPerDip;
-                    textVisual.Typeface = this.typeface;
-
-                    this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
-
-                    this.textVisuals[textBlock.Index] = textVisual;
+                    this.textVisuals.Remove(textBlock.Index);
+                    this.RemoveVisualChild(textVisual);
                 }
-
-                textVisual.Draw();
-            });
+            }
         }
 
         public VTextBlockMetrics MeasureText(VTextBlock textBlock)
@@ -125,51 +138,45 @@ namespace XTerminal.WPFDevice
         {
             this.fullWidth = width;
             this.fullHeight = height;
-            Dispatcher.Invoke(() =>
-            {
-                this.InvalidateMeasure();
-            });
+            this.InvalidateMeasure();
         }
 
         public void ScrollToEnd(ScrollOrientation orientation)
         {
-            Dispatcher.Invoke(() => 
+            if (!this.EnsureScrollViewer())
             {
-                if (!this.EnsureScrollViewer())
-                {
-                    return;
-                }
+                return;
+            }
 
-                switch (orientation)
-                {
-                    case ScrollOrientation.Bottom:
-                        {
-                            this.scrollViewer.ScrollToEnd();
-                            break;
-                        }
+            switch (orientation)
+            {
+                case ScrollOrientation.Bottom:
+                    {
+                        this.scrollViewer.ScrollToEnd();
+                        break;
+                    }
 
-                    case ScrollOrientation.Left:
-                        {
-                            this.scrollViewer.ScrollToLeftEnd();
-                            break;
-                        }
+                case ScrollOrientation.Left:
+                    {
+                        this.scrollViewer.ScrollToLeftEnd();
+                        break;
+                    }
 
-                    case ScrollOrientation.Right:
-                        {
-                            this.scrollViewer.ScrollToRightEnd();
-                            break;
-                        }
+                case ScrollOrientation.Right:
+                    {
+                        this.scrollViewer.ScrollToRightEnd();
+                        break;
+                    }
 
-                    case ScrollOrientation.Top:
-                        {
-                            this.scrollViewer.ScrollToTop();
-                            break;
-                        }
+                case ScrollOrientation.Top:
+                    {
+                        this.scrollViewer.ScrollToTop();
+                        break;
+                    }
 
-                    default:
-                        throw new NotImplementedException();
-                }
-            });
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         #endregion

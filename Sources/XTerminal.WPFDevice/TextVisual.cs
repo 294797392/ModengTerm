@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using XTerminalDevice;
 
-namespace XTerminal.WPFDevice
+namespace XTerminal.WPFRenderer
 {
     /// <summary>
     /// 表示PresentationDevice上的一个文本块

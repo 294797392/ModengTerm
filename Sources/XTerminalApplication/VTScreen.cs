@@ -16,7 +16,7 @@ namespace XTerminalDevice
         /// <summary>
         /// 屏幕的所有行
         /// </summary>
-        public List<VTLine> Lines { get; private set; }
+        public List<VTextLine> Lines { get; private set; }
 
         /// <summary>
         /// 光标所在行
@@ -34,7 +34,7 @@ namespace XTerminalDevice
 
         public VTScreen() 
         {
-            this.Lines = new List<VTLine>();
+            this.Lines = new List<VTextLine>();
         }
 
         #endregion

@@ -30,7 +30,11 @@ namespace XTerminalDevice.Interface
         /// <param name="textBlock"></param>
         void DrawText(VTextBlock textBlock);
 
-        //void DeleteText(int characters, int row, int col);
+        /// <summary>
+        /// 删除文本块
+        /// </summary>
+        /// <param name="textBlocks">要删除的文本块列表</param>
+        void DeleteText(IEnumerable<VTextBlock> textBlocks);
 
         /// <summary>
         /// 测量某个文本块的属性

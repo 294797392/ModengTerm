@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminal", "VideoTerminal.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminalDevice", "XTerminalApplication\XTerminalDevice.csproj", "{C236BD15-C63C-45BD-B576-2CAA49ACABA2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminal.WPFDevice", "XTerminal.WPFDevice\XTerminal.WPFDevice.csproj", "{DCBD335A-2C3C-4FBF-A3D8-0859844519AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XTerminal.WPFRenderer", "XTerminal.WPFDevice\XTerminal.WPFRenderer.csproj", "{DCBD335A-2C3C-4FBF-A3D8-0859844519AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

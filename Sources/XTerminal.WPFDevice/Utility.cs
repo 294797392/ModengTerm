@@ -10,7 +10,7 @@ using System.Windows.Media;
 using XTerminalDevice;
 using XTerminalParser;
 
-namespace XTerminal.WPFDevice
+namespace XTerminal.WPFRenderer
 {
     public static class TerminalUtils
     {
