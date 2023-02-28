@@ -201,11 +201,14 @@ namespace XTerminalParser
         /// ApplicationMode和NormalMode下，小键盘的每个按键的功能不一样，也就是要发送的字符序列不一样
         /// DECCKM:Cursor keys
         /// 光标键就是上下左右键
+        /// 
+        /// This is a private parameter applicable to set mode (SM) and reset mode (RM) control sequences. This mode is only effective when the terminal is in keypad application mode (see DECKPAM) and the ANSI/VT52 mode (DECANM) is set (see DECANM). Under these conditions, if the cursor key mode is reset, the four cursor function keys will send ANSI cursor control commands. If cursor key mode is set, the four cursor function keys will send application functions.
         /// </summary>
         DECCKM_CursorKeysMode = 1,
 
         /// <summary>
         /// 设置终端的数据流解析模式为ANSI或者VT52模式
+        /// This is a private parameter applicable to set mode (SM) and reset mode (RM) control sequences. The reset state causes only VT52 compatible escape sequences to be interpreted and executed. The set state causes only ANSI "compatible" escape and control sequences to be interpreted and executed
         /// </summary>
         DECANM_AnsiMode = 2,
 

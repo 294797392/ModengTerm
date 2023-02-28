@@ -55,13 +55,13 @@ namespace XTerminalParser
 
             switch (ch)
             {
-                case ASCIIChars.NUL:
+                case ASCIITable.NUL:
                     {
                         // do nothing
                         break;
                     }
 
-                case ASCIIChars.BEL:
+                case ASCIITable.BEL:
                     {
                         // 响铃
                         logger.DebugFormat("Action - BEL");
@@ -69,7 +69,7 @@ namespace XTerminalParser
                         break;
                     }
 
-                case ASCIIChars.BS:
+                case ASCIITable.BS:
                     {
                         // Backspace，退格，光标向前移动一位
 
@@ -85,7 +85,7 @@ namespace XTerminalParser
                         break;
                     }
 
-                case ASCIIChars.TAB:
+                case ASCIITable.TAB:
                     {
                         // tab键
                         logger.DebugFormat("Action - Tab");
@@ -93,28 +93,28 @@ namespace XTerminalParser
                         break;
                     }
 
-                case ASCIIChars.CR:
+                case ASCIITable.CR:
                     {
                         logger.DebugFormat("Action - CR");
                         this.NotifyActionEvent(VTActions.CarriageReturn);
                         break;
                     }
 
-                case ASCIIChars.LF:
+                case ASCIITable.LF:
                     {
                         logger.DebugFormat("Action - LF");
                         this.NotifyActionEvent(VTActions.LineFeed);
                         break;
                     }
 
-                case ASCIIChars.FF:
+                case ASCIITable.FF:
                     {
                         logger.DebugFormat("Action - LF");
                         this.NotifyActionEvent(VTActions.LineFeed);
                         break;
                     }
 
-                case ASCIIChars.VT:
+                case ASCIITable.VT:
                     {
                         // 这三个都是LF
                         logger.DebugFormat("Action - VT");
@@ -122,8 +122,8 @@ namespace XTerminalParser
                         break;
                     }
 
-                case ASCIIChars.SI:
-                case ASCIIChars.SO:
+                case ASCIITable.SI:
+                case ASCIITable.SO:
                     {
                         // 这两个不知道是什么意思
                         logger.WarnFormat("未处理的SI和SI");
@@ -241,14 +241,20 @@ namespace XTerminalParser
             {
                 case EscActionCodes.DECKPAM_KeypadApplicationMode:
                     {
-                        // TODO：实现
                         logger.DebugFormat("ESCDispatch - DECKPAM_KeypadApplicationMode");
+                        this.NotifyActionEvent(VTActions.SetKeypadMode, VTKeypadMode.ApplicationMode);
+                        break;
+                    }
 
+                case EscActionCodes.DECKPNM_KeypadNumericMode:
+                    {
+                        logger.DebugFormat("ESCDispatch - DECKPNM_KeypadNumericMode");
+                        this.NotifyActionEvent(VTActions.SetKeypadMode, VTKeypadMode.NumericMode);
                         break;
                     }
 
                 default:
-                    logger.WarnFormat("未实现EscAction, {0}", code);
+                    logger.ErrorFormat("未实现EscAction, {0}", code);
                     break;
             }
         }
@@ -502,7 +508,7 @@ namespace XTerminalParser
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
                             this.isAnsiMode = enable;
-                            this.NotifyActionEvent(VTActions.SetInputMode, enable ? VTInputMode.AnsiMode : VTInputMode.VT52Mode);
+                            this.NotifyActionEvent(VTActions.SetMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
                             break;
                         }
 

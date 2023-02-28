@@ -305,7 +305,7 @@ namespace XTerminalDevice
                         }
 
                         // 获取光标所在TextBlock和之后的所有textBlock
-                        IEnumerable<VTextBlock> textBlocks = cursorLine.GetTextBlockAfter(this.cursorCol);
+                        List<VTextBlock> textBlocks = cursorLine.GetTextBlockAfter(this.cursorCol);
 
                         VTextBlock textBlockOverCursor = textBlocks.FirstOrDefault();
                         if (textBlockOverCursor != null)
@@ -316,14 +316,25 @@ namespace XTerminalDevice
                             textBlockOverCursor.DeleteCharacter(startIndex, count);
 
                             // 删除剩余的文本块
-                            List<VTextBlock> deleteList = textBlocks.Skip(1).ToList();
-                            cursorLine.DeleteTextBlock(deleteList);
-
-                            this.uiSyncContext.Send((v) =>
+                            if (textBlockOverCursor.Columns == 0)
                             {
-                                this.PresentationDevice.DrawText(textBlockOverCursor);
-                                this.PresentationDevice.DeleteText(deleteList);
-                            }, null);
+                                // 文本块内容被删完了，直接删除文本块
+                                cursorLine.DeleteTextBlock(textBlocks);
+                                this.uiSyncContext.Send((v) =>
+                                {
+                                    this.PresentationDevice.DeleteText(textBlocks);
+                                }, null);
+                            }
+                            else
+                            {
+                                textBlocks.RemoveAt(0);
+                                cursorLine.DeleteTextBlock(textBlocks);
+                                this.uiSyncContext.Send((v) =>
+                                {
+                                    this.PresentationDevice.DrawText(textBlockOverCursor);
+                                    this.PresentationDevice.DeleteText(textBlocks);
+                                }, null);
+                            }
                         }
                         break;
                     }
@@ -338,7 +349,7 @@ namespace XTerminalDevice
                             return;
                         }
 
-                        IEnumerable<VTextBlock> textBlocks = cursorLine.GetTextBlockBefore(this.cursorCol);
+                        List<VTextBlock> textBlocks = cursorLine.GetTextBlockBefore(this.cursorCol);
 
                         VTextBlock textBlockOverCursor = textBlocks.LastOrDefault();
                         if (textBlockOverCursor != null)
@@ -347,15 +358,25 @@ namespace XTerminalDevice
                             int count = this.cursorCol - textBlockOverCursor.Column;
                             textBlockOverCursor.DeleteCharacter(startIndex, count);
 
-                            // 删除剩余的文本块
-                            List<VTextBlock> deleteList = textBlocks.Take(textBlocks.Count() - 1).ToList();
-                            cursorLine.DeleteTextBlock(deleteList);
-
-                            this.uiSyncContext.Send((v) =>
+                            if (textBlockOverCursor.Columns == 0)
                             {
-                                this.PresentationDevice.DrawText(textBlockOverCursor);
-                                this.PresentationDevice.DeleteText(deleteList);
-                            }, null);
+                                // 文本块内容被删完了，直接删除文本块
+                                cursorLine.DeleteTextBlock(textBlocks);
+                                this.uiSyncContext.Send((v) =>
+                                {
+                                    this.PresentationDevice.DeleteText(textBlocks);
+                                }, null);
+                            }
+                            else
+                            {
+                                textBlocks.RemoveAt(textBlocks.Count - 1);
+                                cursorLine.DeleteTextBlock(textBlocks);
+                                this.uiSyncContext.Send((v) =>
+                                {
+                                    this.PresentationDevice.DrawText(textBlockOverCursor);
+                                    this.PresentationDevice.DeleteText(textBlocks);
+                                }, null);
+                            }
                         }
 
                         break;
@@ -429,7 +450,7 @@ namespace XTerminalDevice
                                     //Console.WriteLine("渲染断字符, {0}", ch);
                                     this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
                                     this.activeTextBlock.InsertCharacter(ch);
-                                    this.uiSyncContext.Send((v) => 
+                                    this.uiSyncContext.Send((v) =>
                                     {
                                         this.PresentationDevice.DrawText(this.activeTextBlock);
                                     }, null);
@@ -448,7 +469,7 @@ namespace XTerminalDevice
                                         this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
                                     }
                                     this.activeTextBlock.InsertCharacter(ch);
-                                    this.uiSyncContext.Send((v) => 
+                                    this.uiSyncContext.Send((v) =>
                                     {
                                         this.PresentationDevice.DrawText(this.activeTextBlock);
                                     }, null);
@@ -501,6 +522,27 @@ namespace XTerminalDevice
                 case VTActions.DefaultBackground:
                 case VTActions.DefaultForeground:
                     break;
+
+                case VTActions.SetMode:
+                    {
+                        VTMode vtMode = (VTMode)param[0];
+                        this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
+                        break;
+                    }
+
+                case VTActions.SetCursorKeyMode:
+                    {
+                        VTCursorKeyMode cursorKeyMode = (VTCursorKeyMode)param[0];
+                        this.Keyboard.SetCursorKeyMode(cursorKeyMode == VTCursorKeyMode.ApplicationMode);
+                        break;
+                    }
+
+                case VTActions.SetKeypadMode:
+                    {
+                        VTKeypadMode keypadMode = (VTKeypadMode)param[0];
+                        this.Keyboard.SetKeypadMode(keypadMode == VTKeypadMode.ApplicationMode);
+                        break;
+                    }
 
                 default:
                     {

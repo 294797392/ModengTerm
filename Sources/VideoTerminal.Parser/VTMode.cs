@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XTerminalParser
 {
-    public enum VTInputMode
+    public enum VTMode
     {
         AnsiMode,
 

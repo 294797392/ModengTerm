@@ -147,7 +147,7 @@ namespace XTerminalParser
                 byte ch = bytes[i];
 
                 // 在OSCString的状态下，ESC转义字符可以用作OSC状态的结束符，所以在这里不进入ESC状态
-                if (ASCIIChars.IsEscape(ch) && this.state != VTStates.OSCString)
+                if (ASCIITable.IsEscape(ch) && this.state != VTStates.OSCString)
                 {
                     this.EnterEscape();
                 }
@@ -440,7 +440,7 @@ namespace XTerminalParser
                 this.parameters.Add(0);
             }
 
-            if (ASCIIChars.IsParameterDelimiter(ch))
+            if (ASCIITable.IsParameterDelimiter(ch))
             {
                 this.parameters.Add(0);
             }
@@ -494,12 +494,12 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventGround(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch) || ASCIIChars.IsDelete(ch))
+            if (ASCIITable.IsC0Code(ch) || ASCIITable.IsDelete(ch))
             {
                 // 如果是C0控制字符和Delete字符，说明要执行动作
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsPrintable(ch))
+            else if (ASCIITable.IsPrintable(ch))
             {
                 // 其他字符直接打印
                 this.ActionPrint(ch);
@@ -530,32 +530,32 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventEscape(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterEscapeIntermediate();
             }
             else if (this.isAnsiMode)
             {
-                if (ASCIIChars.IsCSIIndicator(ch))
+                if (ASCIITable.IsCSIIndicator(ch))
                 {
                     // 0x5B，进入到了csi entry状态
                     this.EnterCSIEntry();
                 }
-                else if (ASCIIChars.IsOSCIndicator(ch))
+                else if (ASCIITable.IsOSCIndicator(ch))
                 {
                     // 0x5D，进入到了osc状态
                     this.EnterOSCParam();
                 }
-                else if (ASCIIChars.IsDCSIndicator(ch))
+                else if (ASCIITable.IsDCSIndicator(ch))
                 {
                     // 0x50，进入到了dcs状态
                     this.EnterDCSEntry();
@@ -566,7 +566,7 @@ namespace XTerminalParser
                     this.EnterGround();
                 }
             }
-            else if (ASCIIChars.IsVt52CursorAddress(ch))
+            else if (ASCIITable.IsVt52CursorAddress(ch))
             {
                 // 判断是否是VT52模式下的移动光标指令, 当进入了VT52模式下才会触发
                 // 在VT52模式下只有移动光标的指令有参数，所以这里把移动光标的指令单独做处理
@@ -591,15 +591,15 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventEscapeIntermediate(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
@@ -608,7 +608,7 @@ namespace XTerminalParser
                 this.ActionEscDispatch(ch);
                 this.EnterGround();
             }
-            else if (ASCIIChars.IsVt52CursorAddress(ch))
+            else if (ASCIITable.IsVt52CursorAddress(ch))
             {
                 this.EnterVt52Param();
             }
@@ -625,18 +625,18 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventOSCParam(byte ch)
         {
-            if (ASCIIChars.IsOSCTerminator(ch))
+            if (ASCIITable.IsOSCTerminator(ch))
             {
                 // OSC状态下出现了BEL结束符
                 // 参考terminal的做法，进入Ground状态
                 this.EnterGround();
             }
-            else if (ASCIIChars.IsNumericParamValue(ch))
+            else if (ASCIITable.IsNumericParamValue(ch))
             {
                 // OSC状态下的数字，收集起来
                 this.ActionOSCParam(ch);
             }
-            else if (ASCIIChars.IsOSCDelimiter(ch))
+            else if (ASCIITable.IsOSCDelimiter(ch))
             {
                 // OSC状态下出现了分隔符，说明要开始收集字符串了
                 this.EnterOSCString();
@@ -660,13 +660,13 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventOSCString(byte ch)
         {
-            if (ASCIIChars.IsOSCTerminator(ch))
+            if (ASCIITable.IsOSCTerminator(ch))
             {
                 // 出现了OSC结束符，那么进入Ground状态
                 this.ActionOSCDispatch(ch);
                 this.EnterGround();
             }
-            else if (ASCIIChars.IsEscape(ch))
+            else if (ASCIITable.IsEscape(ch))
             {
                 // OSC状态下出现了ESC字符，那么有两种情况会出现：
                 // 1. ESC后面有ST字符，说明是OSC状态结束了
@@ -674,7 +674,7 @@ namespace XTerminalParser
                 // 所以这里定义一个OSCTermination状态来处理这两种状态
                 this.EnterOSCTermination();
             }
-            else if (ASCIIChars.IsOSCIndicator(ch))
+            else if (ASCIITable.IsOSCIndicator(ch))
             {
                 // OSC非法字符，忽略
                 this.ActionIgnore(ch);
@@ -695,7 +695,7 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventOSCTermination(byte ch)
         {
-            if (ASCIIChars.IsStringTermination(ch))
+            if (ASCIITable.IsStringTermination(ch))
             {
                 // OSC状态下出现了ESC后，后面紧跟着ST字符，说明是OSC状态结束了
                 this.ActionOSCDispatch(ch);
@@ -723,29 +723,29 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventCSIEntry(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterCSIIntermediate();
             }
-            else if (ASCIIChars.IsCSIInvalid(ch))
+            else if (ASCIITable.IsCSIInvalid(ch))
             {
                 this.EnterCSIIgnore();
             }
-            else if (ASCIIChars.IsNumericParamValue(ch) || ASCIIChars.IsParameterDelimiter(ch))
+            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
                 this.EnterCSIParam();
             }
-            else if (ASCIIChars.IsCSIPrivateMarker(ch))
+            else if (ASCIITable.IsCSIPrivateMarker(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterCSIParam();
@@ -769,19 +769,19 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventCSIIntermediate(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsIntermediateInvalid(ch))
+            else if (ASCIITable.IsIntermediateInvalid(ch))
             {
                 this.EnterCSIIgnore();
             }
@@ -804,19 +804,19 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventCSIIgnore(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsIntermediateInvalid(ch))
+            else if (ASCIITable.IsIntermediateInvalid(ch))
             {
                 this.ActionIgnore(ch);
             }
@@ -839,24 +839,24 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventCSIParam(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsNumericParamValue(ch) || ASCIIChars.IsParameterDelimiter(ch))
+            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterCSIIntermediate();
             }
-            else if (ASCIIChars.IsParameterInvalid(ch))
+            else if (ASCIITable.IsParameterInvalid(ch))
             {
                 this.EnterCSIIgnore();
             }
@@ -883,24 +883,24 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventDCSEntry(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsCSIInvalid(ch))
+            else if (ASCIITable.IsCSIInvalid(ch))
             {
                 this.EnterDCSIgnore();
             }
-            else if (ASCIIChars.IsNumericParamValue(ch) || ASCIIChars.IsParameterDelimiter(ch))
+            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
                 this.EnterDCSParam();
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterDCSIntermediate();
@@ -934,19 +934,19 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventDCSIntermediate(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
             }
-            else if (ASCIIChars.IsIntermediateInvalid(ch))
+            else if (ASCIITable.IsIntermediateInvalid(ch))
             {
                 this.EnterDCSIgnore();
             }
@@ -969,24 +969,24 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventDCSParam(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIIChars.IsNumericParamValue(ch) || ASCIIChars.IsParameterDelimiter(ch))
+            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
             }
-            else if (ASCIIChars.IsIntermediate(ch))
+            else if (ASCIITable.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterDCSIntermediate();
             }
-            else if (ASCIIChars.IsParameterInvalid(ch))
+            else if (ASCIITable.IsParameterInvalid(ch))
             {
                 this.EnterDCSIgnore();
             }
@@ -1006,7 +1006,7 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventDCSPassThrough(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch) || ASCIIChars.IsDCSPassThroughValid(ch))
+            if (ASCIITable.IsC0Code(ch) || ASCIITable.IsDCSPassThroughValid(ch))
             {
                 if (!this.dcsStringHandler(ch))
                 {
@@ -1030,11 +1030,11 @@ namespace XTerminalParser
         /// <param name="ch"></param>
         private void EventVt52Param(byte ch)
         {
-            if (ASCIIChars.IsC0Code(ch))
+            if (ASCIITable.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIIChars.IsDelete(ch))
+            else if (ASCIITable.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }

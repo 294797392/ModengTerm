@@ -5,44 +5,20 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using XTerminalBase;
+using XTerminalParser;
 
 namespace XTerminalDevice
 {
-    //public enum KeyboardMaps
-    //{
-    //    /// <summary>
-    //    /// 普通模式下的光标键
-    //    /// </summary>
-    //    CursorKeyNormal = 0,
-
-    //    /// <summary>
-    //    /// Application模式下的光标键
-    //    /// </summary>
-    //    CursorKeyApplication,
-
-    //    /// <summary>
-    //    /// VT52模式下的光标键
-    //    /// </summary>
-    //    CursorKeyVT52,
-
-    //    /// <summary>
-    //    /// VT52模式下的按键
-    //    /// </summary>
-    //    KeypadVT52,
-
-    //    /// <summary>
-    //    /// 普通模式下的按键
-    //    /// </summary>
-    //    KeypadNormal,
-
-    //    /// <summary>
-    //    /// Application模式下的按键
-    //    /// </summary>
-    //    KeypadApplicaion,
-    //}
-
     /// <summary>
     /// 把不同模式下的键盘按键转换成要发送给终端的字节序列
+    /// 
+    /// The VT100 is an upward and downward software compatible terminal; that is, previous DIGITAL video terminals have DIGITAL private standards for control sequences. The American National Standards Institute (ANSI) has since standardized escape and control sequences in terminals in documents X3.41-1974 and X3.64-1977.
+    /// NOTE: The ANSI standards allow the manufacturer flexibility in implementing each function.This manual describes how the VT100 will respond to the implemented ANSI control function.
+    /// The VT100 is compatible with both the previous DIGITAL standard and ANSI standards. Customers may use existing DIGITAL software designed around the VT52 or new VT100 software.The VT100 has a "VT52 compatible" mode in which the VT100 responds to control sequences like a VT52. In this mode, most of the new VT100 features cannot be used.
+    /// Throughout this section of the manual, references will be made to "VT52 mode" or "ANSI mode". These two terms are used to indicate the VT100's software compatibility. All new software should be designed around the VT100 "ANSI mode". Future DIGITAL video terminals will not necessarily be committed to VT52 compatibility.
+    /// 
+    /// VT100兼容旧的VT52模式下的控制序列和ANSI控制序列，所以VT100有两种模式，一种是VT52控制序列模式，一种是ANSI控制序列模式
+    /// 
     /// 参考：
     /// terminalInput.cpp
     /// VT100 User Guide/Chapter 3 - Programmer Information/The Keyboard
@@ -53,7 +29,7 @@ namespace XTerminalDevice
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTKeyboard");
 
-        private static readonly Dictionary<VTKeys, byte[]> Key2BytesTable = new Dictionary<VTKeys, byte[]>()
+        private static readonly Dictionary<VTKeys, byte[]> ANSIKeyTable = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.A, new byte[] { (byte)'a' } }, { VTKeys.B, new byte[] { (byte)'b' } }, { VTKeys.C, new byte[] { (byte)'c' } }, { VTKeys.D, new byte[] { (byte)'d' } },
             { VTKeys.E, new byte[] { (byte)'e' } }, { VTKeys.F, new byte[] { (byte)'f' } }, { VTKeys.G, new byte[] { (byte)'g' } }, { VTKeys.H, new byte[] { (byte)'h' } },
@@ -64,7 +40,7 @@ namespace XTerminalDevice
             { VTKeys.Y, new byte[] { (byte)'y' } }, { VTKeys.Z, new byte[] { (byte)'z' } },
 
             // FunctionKeys - VT100 User Guide/Chapter 3 - Programmer Information/The Keyboard
-            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Space, new byte[] { (byte)' ' } }, 
+            { VTKeys.Enter, new byte[] { (byte)'\n' } }, { VTKeys.Space, new byte[] { (byte)' ' } },
             { VTKeys.Back, new byte[] { 8 } }, { VTKeys.Tab, new byte[] { 9 } },
 
 
@@ -79,19 +55,121 @@ namespace XTerminalDevice
             { VTKeys.OemMinus, new byte[] { (byte)'-' } }, { VTKeys.OemPlus, new byte[] { (byte)'+' } },
         };
 
+        private static readonly Dictionary<VTKeys, byte[]> VT52KeyTable = new Dictionary<VTKeys, byte[]>()
+        {           
+        };
+
+        #region 方向键映射
+
+        private static readonly Dictionary<VTKeys, byte[]> VT52CursorKeyTable = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.Up, new byte[] { ASCIITable.ESC, (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC, (byte)'B' } },
+            { VTKeys.Right, new byte[] { ASCIITable.ESC, (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC, (byte)'D' } },
+        };
+
+        private static readonly Dictionary<VTKeys, byte[]> ANSICursorKeyNormalTable = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.Up, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'B' } },
+            { VTKeys.Right, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'D' } },
+        };
+
+        private static readonly Dictionary<VTKeys, byte[]> ANSICursorKeyApplicationTable = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.Up, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'B' } },
+            { VTKeys.Right, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'D' } },
+        };
+
+        #endregion
+
+        #region 辅助键盘映射
+
+        private static readonly Dictionary<VTKeys, byte[]> VT52AuxiliaryKeyApplicationModeTable = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'1' } }, 
+            { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'s' } }, 
+            { VTKeys.NumPad4, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'u' } }, 
+            { VTKeys.NumPad6, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'w' } }, 
+            { VTKeys.NumPad8, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'x' } }, { VTKeys.NumPad9, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'y' } },
+
+            // dash
+            { VTKeys.Subtract, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'m' } },
+            // period
+            { VTKeys.Decimal, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'n' } }
+        };
+
+        private static readonly Dictionary<VTKeys, byte[]> VT52AuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>() 
+        {
+            { VTKeys.NumPad0, new byte[] { (byte)'0' } }, { VTKeys.NumPad1, new byte[] { (byte)'1' } },
+            { VTKeys.NumPad2, new byte[] { (byte)'2' } }, { VTKeys.NumPad3, new byte[] { (byte)'3' } },
+            { VTKeys.NumPad4, new byte[] { (byte)'4' } }, { VTKeys.NumPad5, new byte[] { (byte)'5' } },
+            { VTKeys.NumPad6, new byte[] { (byte)'6' } }, { VTKeys.NumPad7, new byte[] { (byte)'7' } },
+            { VTKeys.NumPad8, new byte[] { (byte)'8' } }, { VTKeys.NumPad9, new byte[] { (byte)'9' } },
+
+            // dash
+            { VTKeys.Subtract, new byte[] { (byte)'-' } },
+            // period
+            { VTKeys.Decimal, new byte[] { (byte)'.' } }
+        };
+
+        private static readonly Dictionary<VTKeys, byte[]> ANSIAuxiliaryKeyApplicationModeTable = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'1' } },
+            { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'s' } },
+            { VTKeys.NumPad4, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'u' } },
+            { VTKeys.NumPad6, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'w' } },
+            { VTKeys.NumPad8, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'x' } }, { VTKeys.NumPad9, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'y' } },
+
+            // dash
+            { VTKeys.Subtract, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'m' } },
+            // period
+            { VTKeys.Decimal, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'n' } }
+        };
+
+        private static readonly Dictionary<VTKeys, byte[]> ANSIAuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>() 
+        {
+            { VTKeys.NumPad0, new byte[] { (byte)'0' } }, { VTKeys.NumPad1, new byte[] { (byte)'1' } },
+            { VTKeys.NumPad2, new byte[] { (byte)'2' } }, { VTKeys.NumPad3, new byte[] { (byte)'3' } },
+            { VTKeys.NumPad4, new byte[] { (byte)'4' } }, { VTKeys.NumPad5, new byte[] { (byte)'5' } },
+            { VTKeys.NumPad6, new byte[] { (byte)'6' } }, { VTKeys.NumPad7, new byte[] { (byte)'7' } },
+            { VTKeys.NumPad8, new byte[] { (byte)'8' } }, { VTKeys.NumPad9, new byte[] { (byte)'9' } },
+
+            // dash
+            { VTKeys.Subtract, new byte[] { (byte)'-' } },
+            // period
+            { VTKeys.Decimal, new byte[] { (byte)'.' } }
+        };
+
+        #endregion
+
         #endregion
 
         #region 实例变量
 
-        /// <summary>
-        /// 当前是否是ApplicationMode
-        /// </summary>
-        private bool isApplicationMode;
+        ///// <summary>
+        ///// 当前是否是ApplicationMode
+        ///// </summary>
+        //private bool isApplicationMode;
 
         /// <summary>
-        /// 当前是否是VT52模式
+        /// 当前是否按照VT52模式来解析终端序列
         /// </summary>
         private bool isVt52Mode;
+
+        /// <summary>
+        /// 键盘是否是Application模式
+        /// 1. NumbericMode
+        /// 2. ApplicationMode
+        /// VT52模式下的2种模式和ANSI模式下的2种模式发送的控制序列不一样
+        /// </summary>
+        private bool isKeypadApplicationMode;
+
+        /// <summary>
+        /// 光标键的模式（就是上下左右键）
+        /// 仅在终端是VT52模式下并且键盘是ApplicationMode下才生效
+        /// 如果是cursorKeyMode：发送ANSI光标控制命令
+        /// 如果不是cursorKeyMode：发送Application控制命令
+        /// </summary>
+        private bool isCursorKeyApplicationMode;
 
         private byte[] capitalBytes;
 
@@ -104,6 +182,7 @@ namespace XTerminalDevice
             this.capitalBytes = new byte[1];
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
+            this.SetCursorKeyMode(false);
         }
 
         #endregion
@@ -119,20 +198,116 @@ namespace XTerminalDevice
             return key == VTKeys.Up || key == VTKeys.Down || key == VTKeys.Left || key == VTKeys.Right;
         }
 
+        /// <summary>
+        /// 判断该按键是否是辅助按键（数字小键盘那一块的）
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private bool IsAuxiliaryKey(VTKeys key)
+        {
+            switch (key)
+            {
+                case VTKeys.NumPad0:
+                case VTKeys.NumPad1:
+                case VTKeys.NumPad2:
+                case VTKeys.NumPad3:
+                case VTKeys.NumPad4:
+                case VTKeys.NumPad5:
+                case VTKeys.NumPad6:
+                case VTKeys.NumPad7:
+                case VTKeys.NumPad8:
+                case VTKeys.NumPad9:
+                case VTKeys.Divide:
+                case VTKeys.Multiply:
+                case VTKeys.Subtract:
+                case VTKeys.Add:
+                case VTKeys.Decimal:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         private byte[] MapKey(VTInputEvent evt)
         {
-            byte[] bytes;
-            if (!Key2BytesTable.TryGetValue(evt.Key, out bytes))
+            #region 单独处理光标键
+
+            if (this.IsCursorKey(evt.Key))
             {
-                logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
-                return null;
+                if (this.isVt52Mode)
+                {
+                    return VT52CursorKeyTable[evt.Key];
+                }
+                else
+                {
+                    if (this.isCursorKeyApplicationMode)
+                    {
+                        return ANSICursorKeyApplicationTable[evt.Key];
+                    }
+                    else
+                    {
+                        return ANSICursorKeyNormalTable[evt.Key];
+                    }
+                }
             }
 
-            // 这里表示输入的是大写字母
-            if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
+            #endregion
+
+            #region 单独处理辅助键盘
+
+            if (this.IsAuxiliaryKey(evt.Key))
             {
-                capitalBytes[0] = (byte)(bytes[0] - 32);
-                return capitalBytes;
+                if (this.isVt52Mode)
+                {
+                    if (this.isKeypadApplicationMode)
+                    {
+                        // ApplicationMode
+                        return VT52AuxiliaryKeyApplicationModeTable[evt.Key];
+                    }
+                    else
+                    {
+                        // NumericMode
+                        return VT52AuxiliaryKeyNumericModeTable[evt.Key];
+                    }
+                }
+                else
+                {
+                    if (this.isKeypadApplicationMode)
+                    {
+                        return ANSIAuxiliaryKeyApplicationModeTable[evt.Key];
+                    }
+                    else
+                    {
+                        return ANSIAuxiliaryKeyNumericModeTable[evt.Key];
+                    }
+                }
+            }
+
+            #endregion
+
+            byte[] bytes = null;
+
+            if (this.isVt52Mode)
+            {
+                // VT52兼容模式
+
+            }
+            else
+            {
+                // ANSI兼容模式
+                if (!ANSIKeyTable.TryGetValue(evt.Key, out bytes))
+                {
+                    logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
+                    return null;
+                }
+
+                // 这里表示输入的是大写字母
+                if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
+                {
+                    capitalBytes[0] = (byte)(bytes[0] - 32);
+                    return capitalBytes;
+                }
             }
 
             return bytes;
@@ -150,7 +325,7 @@ namespace XTerminalDevice
         /// <param name="isApplicationMode"></param>
         public void SetKeypadMode(bool isApplicationMode)
         {
-            this.isApplicationMode = isApplicationMode;
+            this.isKeypadApplicationMode = isApplicationMode;
         }
 
         /// <summary>
@@ -160,6 +335,11 @@ namespace XTerminalDevice
         public void SetAnsiMode(bool isAnsiMode)
         {
             this.isVt52Mode = !isAnsiMode;
+        }
+
+        public void SetCursorKeyMode(bool isApplicationMode)
+        {
+            this.isCursorKeyApplicationMode = isApplicationMode;
         }
 
         /// <summary>
@@ -175,62 +355,6 @@ namespace XTerminalDevice
             }
 
             return null;
-
-            //if (mkey == VTModifierKeys.None)
-            //{
-            // 没有按下修饰键
-
-            //if (this.isVt52Mode)
-            //{
-            //    // VT52模式下的按键转换，VT52模式下没有Application模式
-            //    if (this.IsCursorKey(key))
-            //    {
-            //        keyText = this.keymap[KeyboardMaps.CursorKeyVT52][key];
-            //    }
-            //    else
-            //    {
-            //        keyText = this.keymap[KeyboardMaps.KeypadVT52][key];
-            //    }
-            //}
-            //else
-            //{
-            //    // ANSI模式下的按键转换
-            //    if (this.IsCursorKey(key))
-            //    {
-            //        // 按下的是光标键
-            //        if (this.isApplicationMode)
-            //        {
-            //            // 获取Application模式下的光标键的要发送的字节序列
-            //            keyText = this.keymap[KeyboardMaps.CursorKeyApplication][key];
-            //        }
-            //        else
-            //        {
-            //            // 获取Normal模式下的光标键的要发送的字节序列
-            //            keyText = this.keymap[KeyboardMaps.CursorKeyNormal][key];
-            //        }
-            //    }
-            //    else
-            //    {
-            //        // 按下的是其他按键
-            //        if (this.isApplicationMode)
-            //        {
-            //            keyText = this.keymap[KeyboardMaps.KeypadApplicaion][key];
-            //        }
-            //        else
-            //        {
-            //            keyText = this.keymap[KeyboardMaps.KeypadNormal][key];
-            //        }
-            //    }
-            //}
-            //}
-            //else
-            //{
-            //    // 按下了修饰键，有可能一次按了多个修饰键
-            //}
-
-            // 如果keyText里包含转义字符，那么解析转义字符，转义字符使用十六进制表示，用\x或者\0开头
-
-            //return Encoding.ASCII.GetBytes(keyText);
         }
 
         #endregion

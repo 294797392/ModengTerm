@@ -54,9 +54,9 @@ namespace XTerminalDevice
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        public IEnumerable<VTextBlock> GetTextBlockAfter(int column)
+        public List<VTextBlock> GetTextBlockAfter(int column)
         {
-            return this.TextBlocks.Where(v => v.Column >= column || column >= v.Column && column <= v.Column + v.Columns);
+            return this.TextBlocks.Where(v => v.Column >= column || column >= v.Column && column <= v.Column + v.Columns).ToList();
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace XTerminalDevice
         /// </summary>
         /// <param name="column"></param>
         /// <returns></returns>
-        public IEnumerable<VTextBlock> GetTextBlockBefore(int column)
+        public List<VTextBlock> GetTextBlockBefore(int column)
         {
-            return this.TextBlocks.Where(v => v.Column <= column || column >= v.Column && column <= v.Column + v.Columns);
+            return this.TextBlocks.Where(v => v.Column <= column || column >= v.Column && column <= v.Column + v.Columns).ToList();
         }
 
         /// <summary>

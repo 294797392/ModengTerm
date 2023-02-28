@@ -8,7 +8,7 @@ namespace XTerminalParser
     /// <summary>
     /// 和ASCII码相关的帮助函数
     /// </summary>
-    public static class ASCIIChars
+    public static class ASCIITable
     {
         // 从terminal项目拷贝的代码
         public const byte NUL = 0x0; // Null
@@ -63,7 +63,7 @@ namespace XTerminalParser
         /// <returns></returns>
         public static bool IsControlCharacter(byte ch)
         {
-            if (ch <= ASCIIChars.US)
+            if (ch <= ASCIITable.US)
             {
                 // 该字符是C0系列控制字符
                 return true;
@@ -73,7 +73,7 @@ namespace XTerminalParser
                 // 该字符是C1系列控制字符
                 return true;
             }
-            else if (ch == ASCIIChars.DEL)
+            else if (ch == ASCIITable.DEL)
             {
                 // 该字符是删除号，也是一个控制字符
                 return true;
@@ -91,9 +91,9 @@ namespace XTerminalParser
         /// <returns></returns>
         public static bool IsC0Code(byte ch)
         {
-            return (ch >= ASCIIChars.NUL && ch <= ASCIIChars.ETB) ||
-                ch == ASCIIChars.EM ||
-                (ch >= ASCIIChars.FS && ch <= ASCIIChars.US);
+            return (ch >= ASCIITable.NUL && ch <= ASCIITable.ETB) ||
+                ch == ASCIITable.EM ||
+                (ch >= ASCIITable.FS && ch <= ASCIITable.US);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace XTerminalParser
         /// <returns></returns>
         public static bool IsDelete(byte ch)
         {
-            return ch == ASCIIChars.DEL;
+            return ch == ASCIITable.DEL;
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace XTerminalParser
         /// <returns></returns>
         public static bool IsEscape(byte ch)
         {
-            return ch == ASCIIChars.ESC;
+            return ch == ASCIITable.ESC;
         }
 
         /// <summary>
@@ -261,7 +261,7 @@ namespace XTerminalParser
         /// <returns></returns>
         public static bool IsDCSPassThroughValid(byte ch)
         {
-            return ch >= ASCIIChars.SPC && ch < ASCIIChars.DEL;
+            return ch >= ASCIITable.SPC && ch < ASCIITable.DEL;
         }
 
         /// <summary>

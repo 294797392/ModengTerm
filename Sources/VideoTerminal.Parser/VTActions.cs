@@ -149,10 +149,15 @@ namespace XTerminalParser
         CursorPosition,
 
         /// <summary>
-        /// 切换输入模式
+        /// 设置光标键输入模式
         /// </summary>
         SetCursorKeyMode,
 
-        SetInputMode
+        /// <summary>
+        /// 设置Keypad输入模式
+        /// </summary>
+        SetKeypadMode,
+
+        SetMode
     }
 }
