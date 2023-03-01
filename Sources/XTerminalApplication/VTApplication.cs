@@ -473,6 +473,7 @@ namespace XTerminalDevice
 
             // 计算左对齐基准文本块
             VTextBlock baseText = null;
+            VTextBlock baseText2 = null;
 
             int startIndex = this.TranslateColumn(this.cursorCol, cursorText);
             if (cursorText.Columns - startIndex >= left)
@@ -487,28 +488,29 @@ namespace XTerminalDevice
             {
                 #region 一次性删不完
 
-                VTextBlock next = cursorText;
+                VTextBlock currentText = cursorText;
 
                 while (left > 0)
                 {
-                    if (next.Columns > left)
+                    if (currentText.Columns > left)
                     {
                         // 可以一次性删完
-                        next.DeleteText(0, left);
+                        currentText.DeleteText(0, left);
                         left = 0;
+                        baseText2 = currentText;
                     }
-                    else if (next.Columns == left)
+                    else if (currentText.Columns == left)
                     {
-                        next.DeleteText(0, left);
-                        left -= next.Columns;
+                        currentText.DeleteText(0, left);
+                        left -= currentText.Columns;
                     }
                     else
                     {
-                        next.DeleteText(0);
-                        left -= next.Columns;
+                        currentText.DeleteText(0);
+                        left -= currentText.Columns;
                     }
 
-                    next = next.Next;
+                    currentText = currentText.Next;
                 }
 
                 #endregion
