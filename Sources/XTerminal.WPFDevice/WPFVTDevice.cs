@@ -94,10 +94,19 @@ namespace XTerminal.WPFRenderer
             }
             else
             {
-                if (e.Key == Key.Tab)
+                switch (e.Key)
                 {
-                    // 防止焦点移动到其他控件上了
-                    e.Handled = true;
+                    case Key.Tab:
+                    case Key.Up:
+                    case Key.Down:
+                    case Key.Left:
+                    case Key.Right:
+                    case Key.Space:
+                        {
+                            // 防止焦点移动到其他控件上了
+                            e.Handled = true;
+                            break;
+                        }
                 }
 
                 VTKeys vtKey = TerminalUtils.ConvertToVTKey(e.Key);

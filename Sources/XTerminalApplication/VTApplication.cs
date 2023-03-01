@@ -488,6 +488,7 @@ namespace XTerminalDevice
                     {
                         // CR
                         // 把光标移动到行开头
+                        logger.DebugFormat("CR");
                         this.cursorCol = 0;
                         break;
                     }
@@ -495,6 +496,7 @@ namespace XTerminalDevice
                 case VTActions.LineFeed:
                     {
                         // LF
+                        logger.DebugFormat("LF");
                         this.textOffsetX = 0;
                         this.cursorCol = 0;
                         this.cursorRow++;
@@ -504,12 +506,14 @@ namespace XTerminalDevice
 
                 case VTActions.EraseLine:
                     {
+                        logger.DebugFormat("EraseLine");
                         this.PerformEraseLine(Convert.ToInt32(param[0]));
                         break;
                     }
 
                 case VTActions.CursorBackward:
                     {
+                        logger.DebugFormat("CursorBackward");
                         this.cursorCol--;
                         break;
                     }
@@ -525,6 +529,7 @@ namespace XTerminalDevice
 
                 case VTActions.SetMode:
                     {
+                        logger.DebugFormat("SetMode");
                         VTMode vtMode = (VTMode)param[0];
                         this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
                         break;
@@ -532,6 +537,7 @@ namespace XTerminalDevice
 
                 case VTActions.SetCursorKeyMode:
                     {
+                        logger.DebugFormat("SetCursorKeyMode");
                         VTCursorKeyMode cursorKeyMode = (VTCursorKeyMode)param[0];
                         this.Keyboard.SetCursorKeyMode(cursorKeyMode == VTCursorKeyMode.ApplicationMode);
                         break;
@@ -539,6 +545,7 @@ namespace XTerminalDevice
 
                 case VTActions.SetKeypadMode:
                     {
+                        logger.DebugFormat("SetKeypadMode");
                         VTKeypadMode keypadMode = (VTKeypadMode)param[0];
                         this.Keyboard.SetKeypadMode(keypadMode == VTKeypadMode.ApplicationMode);
                         break;
@@ -554,7 +561,8 @@ namespace XTerminalDevice
 
         private void VTChannel_DataReceived(VTChannel client, byte[] bytes)
         {
-            //logger.InfoFormat("Received");
+            //string str = string.Join(",", bytes.Select(v => v.ToString()).ToList());
+            //logger.InfoFormat("Received, {0}", str);
             this.vtParser.ProcessCharacters(bytes);
         }
 

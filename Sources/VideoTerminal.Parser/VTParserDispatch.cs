@@ -217,8 +217,14 @@ namespace XTerminalParser
                         break;
                     }
 
+                case CSIActionCodes.DCH_DeleteCharacter:
+                    {
+                        logger.DebugFormat("CSIDispatch - DCH_DeleteCharacter, {0}, {1}", parameters[0], parameters.Count);
+                        break;
+                    }
+
                 default:
-                    logger.WarnFormat("未实现CSIAction, {0}", finalByte);
+                    logger.WarnFormat("未实现CSIAction, {0}", (char)finalByte);
                     break;
             }
         }

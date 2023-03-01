@@ -154,7 +154,7 @@ namespace XTerminalParser
         SetCursorKeyMode,
 
         /// <summary>
-        /// 设置Keypad输入模式
+        /// 设置辅助键盘（右边的数字小键盘）输入模式
         /// </summary>
         SetKeypadMode,
 
