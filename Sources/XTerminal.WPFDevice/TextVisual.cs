@@ -20,7 +20,7 @@ namespace XTerminal.WPFRenderer
         /// <summary>
         /// 文本块的索引
         /// </summary>
-        public int Index { get { return this.TextBlock.Index; } }
+        public string ID { get { return this.TextBlock.ID; } }
 
         public double PixelsPerDip { get; set; }
 

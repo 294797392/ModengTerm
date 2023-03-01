@@ -37,6 +37,12 @@ namespace XTerminalDevice.Interface
         void DeleteText(List<VTextBlock> textBlocks);
 
         /// <summary>
+        /// 删除文本块
+        /// </summary>
+        /// <param name="textBlock"></param>
+        void DeleteText(VTextBlock textBlock);
+
+        /// <summary>
         /// 测量某个文本块的属性
         /// </summary>
         /// <param name="textBlock"></param>

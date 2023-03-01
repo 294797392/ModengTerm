@@ -26,7 +26,7 @@ namespace XTerminal.WPFRenderer
         /// <summary>
         /// TextBlockIndex -> TextVisual
         /// </summary>
-        private Dictionary<int, TextVisual> textVisuals;
+        private Dictionary<string, TextVisual> textVisuals;
         private List<TextVisual> textVisuals2;
 
         private Typeface typeface;
@@ -51,7 +51,7 @@ namespace XTerminal.WPFRenderer
 
         public WPFPresentationDevice()
         {
-            this.textVisuals = new Dictionary<int, TextVisual>();
+            this.textVisuals = new Dictionary<string, TextVisual>();
             this.textVisuals2 = new List<TextVisual>();
             this.typeface = new Typeface(new FontFamily("Ya Hei"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
@@ -102,7 +102,7 @@ namespace XTerminal.WPFRenderer
         public void DrawText(VTextBlock textBlock)
         {
             TextVisual textVisual;
-            if (!this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
+            if (!this.textVisuals.TryGetValue(textBlock.ID, out textVisual))
             {
                 textVisual = new TextVisual(textBlock);
                 textVisual.PixelsPerDip = this.pixelPerDip;
@@ -110,7 +110,7 @@ namespace XTerminal.WPFRenderer
 
                 this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
 
-                this.textVisuals[textBlock.Index] = textVisual;
+                this.textVisuals[textBlock.ID] = textVisual;
                 this.textVisuals2.Add(textVisual);
             }
 
@@ -122,9 +122,9 @@ namespace XTerminal.WPFRenderer
             foreach (VTextBlock textBlock in textBlocks)
             {
                 TextVisual textVisual;
-                if (this.textVisuals.TryGetValue(textBlock.Index, out textVisual))
+                if (this.textVisuals.TryGetValue(textBlock.ID, out textVisual))
                 {
-                    this.textVisuals.Remove(textBlock.Index);
+                    this.textVisuals.Remove(textBlock.ID);
                     this.textVisuals2.Remove(textVisual);
                     this.RemoveVisualChild(textVisual);
                 }

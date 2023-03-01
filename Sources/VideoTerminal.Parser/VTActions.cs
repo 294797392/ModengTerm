@@ -158,6 +158,15 @@ namespace XTerminalParser
         /// </summary>
         SetKeypadMode,
 
-        SetMode
+        /// <summary>
+        /// 设置终端模式
+        /// VT52和ANSI两种模式
+        /// </summary>
+        SetVTMode,
+
+        /// <summary>
+        /// 从当前光标处删除字符
+        /// </summary>
+        DeleteCharacters
     }
 }

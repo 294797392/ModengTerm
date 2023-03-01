@@ -219,7 +219,8 @@ namespace XTerminalParser
 
                 case CSIActionCodes.DCH_DeleteCharacter:
                     {
-                        logger.DebugFormat("CSIDispatch - DCH_DeleteCharacter, {0}, {1}", parameters[0], parameters.Count);
+                        logger.DebugFormat("CSIDispatch - DCH_DeleteCharacter, {0}", parameters[0]);
+                        this.NotifyActionEvent(VTActions.DeleteCharacters, parameters[0]);
                         break;
                     }
 
@@ -514,7 +515,7 @@ namespace XTerminalParser
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
                             this.isAnsiMode = enable;
-                            this.NotifyActionEvent(VTActions.SetMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
+                            this.NotifyActionEvent(VTActions.SetVTMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
                             break;
                         }
 
