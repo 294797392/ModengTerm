@@ -18,11 +18,11 @@ namespace XTerminalBase.IVideoTerminal
     /// </summary>
     public interface IPresentationDevice
     {
-        /// <summary>
-        /// 渲染一行
-        /// </summary>
-        /// <param name="textLine"></param>
-        void DrawLine(VTextLine textLine);
+        ///// <summary>
+        ///// 渲染一行
+        ///// </summary>
+        ///// <param name="textLine"></param>
+        //void DrawLine(VTextLine textLine);
 
         /// <summary>
         /// 渲染文本块

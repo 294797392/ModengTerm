@@ -51,27 +51,15 @@ namespace XTerminal.WPFRenderer
             }
         }
 
-        public static FormattedText CreateFormattedText(VTextBlock textBlock, Typeface typeface, double pixelsPerDip)
-        {
-            Brush foreground = TerminalUtils.VTForeground2Brush(textBlock.Foreground);
-            FormattedText formattedText = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, textBlock.Size, foreground, pixelsPerDip);
-            return formattedText;
-        }
-
-        public static void UpdateTextMetrics(VTextBlock textBlock, FormattedText formattedText)
-        {
-            textBlock.Metrics.Width = formattedText.Width;
-            textBlock.Metrics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
-            textBlock.Metrics.Height = formattedText.Height;
-        }
-
-        public static void UpdateTextMetrics(VTextBlock textBlock)
+        public static FormattedText UpdateTextMetrics(VTextBlock textBlock)
         {
             Typeface typeface = GetTypeface(textBlock);
-            FormattedText formattedText = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, textBlock.Size, Brushes.Black, PixelsPerDip);
+            FormattedText formattedText = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
+                textBlock.Style.FontSize, Brushes.Black, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
             textBlock.Metrics.Width = formattedText.Width;
             textBlock.Metrics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
             textBlock.Metrics.Height = formattedText.Height;
+            return formattedText;
         }
 
         public static VTKeys ConvertToVTKey(Key key)
@@ -82,14 +70,14 @@ namespace XTerminal.WPFRenderer
 
         public static Typeface GetTypeface(VTextBlock textBlock) 
         {
-            Typeface result;
-            VTypeface typeface = textBlock.Typeface;
-            if(!typefaceMap.TryGetValue(typeface.HashID, out result))
+            Typeface typeface;
+            VTextStyle style = textBlock.Style;
+            if(!typefaceMap.TryGetValue(style.HashID, out typeface))
             {
-                result = new Typeface(new FontFamily(typeface.FontFamily), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-                typefaceMap[typeface.HashID] = result;
+                typeface = new Typeface(new FontFamily(style.FontFamily), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+                typefaceMap[style.HashID] = typeface;
             }
-            return result;
+            return typeface;
         }
     }
 }

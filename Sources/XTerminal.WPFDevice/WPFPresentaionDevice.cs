@@ -23,14 +23,7 @@ namespace XTerminal.WPFRenderer
 
         private ScrollViewer scrollViewer;
 
-        /// <summary>
-        /// Row -> VisualLine
-        /// </summary>
-        private Dictionary<int, VisualLine> visualMap;
         private VisualCollection visuals;
-
-        private Typeface typeface;
-        private double pixelPerDip;
 
         private double fullWidth;
         private double fullHeight;
@@ -51,10 +44,7 @@ namespace XTerminal.WPFRenderer
 
         public WPFPresentaionDevice()
         {
-            this.visualMap = new Dictionary<int, VisualLine>();
             this.visuals = new VisualCollection(this);
-            this.typeface = new Typeface(new FontFamily("Ya Hei"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         }
 
         #endregion
@@ -91,70 +81,67 @@ namespace XTerminal.WPFRenderer
 
         #region IPresentationDevice
 
-        /// <summary>
-        /// 渲染一行
-        /// </summary>
-        /// <param name="textLine"></param>
-        public void DrawLine(VTextLine textLine)
-        {
-            VisualLine visualLine;
-            if (!this.visualMap.TryGetValue(textLine.Row, out visualLine))
-            {
-                visualLine = new VisualLine();
-                visualLine.TextLine = textLine;
-                this.visualMap[textLine.Row] = visualLine;
-                this.visuals.Add(visualLine);
-            }
+        ///// <summary>
+        ///// 渲染一行
+        ///// </summary>
+        ///// <param name="textLine"></param>
+        //public void DrawLine(VTextLine textLine)
+        //{
+        //    VisualLine visualLine;
+        //    if (!this.visualMap.TryGetValue(textLine.Row, out visualLine))
+        //    {
+        //        visualLine = new VisualLine();
+        //        visualLine.TextLine = textLine;
+        //        this.visualMap[textLine.Row] = visualLine;
+        //        this.visuals.Add(visualLine);
+        //    }
 
-            visualLine.Draw();
+        //    visualLine.Draw();
+        //}
+
+        public void DrawText(List<VTextBlock> textBlocks)
+        {
+            foreach (VTextBlock textBlock in textBlocks)
+            {
+                this.DrawText(textBlock);
+            }
         }
 
-        //public void DrawText(List<VTextBlock> textBlocks)
-        //{
-        //    foreach (VTextBlock textBlock in textBlocks)
-        //    {
-        //        this.DrawText(textBlock);
-        //    }
-        //}
+        public void DrawText(VTextBlock textBlock)
+        {
+            DrawingText textVisual = textBlock.DrawingObject as DrawingText;
+            if (textVisual == null)
+            {
+                textVisual = new DrawingText(textBlock);
+                this.visuals.Add(textVisual);
 
-        //public void DrawText(VTextBlock textBlock)
-        //{
-        //    VisualText textVisual;
-        //    if (!this.visualMap.TryGetValue(textBlock.ID, out textVisual))
-        //    {
-        //        textVisual = new VisualText(textBlock);
-        //        textVisual.PixelsPerDip = this.pixelPerDip;
-        //        textVisual.Typeface = this.typeface;
+                textBlock.DrawingObject = textVisual;
+            }
 
-        //        this.visualMap[textBlock.ID] = textVisual;
-        //        this.visuals.Add(textVisual);
-        //    }
+            textVisual.Draw();
+        }
 
-        //    textVisual.Draw();
-        //}
+        public void DeleteText(List<VTextBlock> textBlocks)
+        {
+            foreach (VTextBlock textBlock in textBlocks)
+            {
+                this.DeleteText(textBlock);
+            }
+        }
 
-        //public void DeleteText(List<VTextBlock> textBlocks)
-        //{
-        //    foreach (VTextBlock textBlock in textBlocks)
-        //    {
-        //        this.DeleteText(textBlock);
-        //    }
-        //}
-
-        //public void DeleteText(VTextBlock textBlock)
-        //{
-        //    VisualText textVisual;
-        //    if (this.visualMap.TryGetValue(textBlock.ID, out textVisual))
-        //    {
-        //        this.visualMap.Remove(textBlock.ID);
-        //        this.visuals.Remove(textVisual);
-        //    }
-        //}
+        public void DeleteText(VTextBlock textBlock)
+        {
+            DrawingText textVisual = textBlock.DrawingObject as DrawingText;
+            if(textVisual == null)
+            {
+                this.visuals.Remove(textVisual);
+                textBlock.DrawingObject = null;
+            }
+        }
 
         public VTextBlockMetrics MeasureText(VTextBlock textBlock)
         {
-            FormattedText formattedText = TerminalUtils.CreateFormattedText(textBlock, this.typeface, this.pixelPerDip);
-            TerminalUtils.UpdateTextMetrics(textBlock, formattedText);
+            TerminalUtils.UpdateTextMetrics(textBlock);
             return textBlock.Metrics;
         }
 

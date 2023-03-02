@@ -70,11 +70,11 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="VisualLine.cs" />
+    <Compile Include="DrawingLine.cs" />
     <Compile Include="WPFVideoTerminal.cs" />
     <Compile Include="TerminalUtils.cs" />
-    <Compile Include="TerminalVisual.cs" />
-    <Compile Include="VisualText.cs" />
+    <Compile Include="DrawingObject.cs" />
+    <Compile Include="DrawingText.cs" />
     <Compile Include="WPFPresentaionDevice.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

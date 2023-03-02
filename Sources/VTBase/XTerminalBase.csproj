@@ -83,7 +83,7 @@
     <Compile Include="VTPoint.cs" />
     <Compile Include="VTRect.cs" />
     <Compile Include="VTScreen.cs" />
-    <Compile Include="VTypeface.cs" />
+    <Compile Include="VTextStyle.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VideoTerminal.Parser\XTerminalParser.csproj">

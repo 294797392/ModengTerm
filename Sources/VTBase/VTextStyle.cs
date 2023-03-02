@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminalParser;
 
 namespace XTerminalBase
 {
-    public class VTypeface
+    public class VTextStyle
     {
+        /// <summary>
+        /// 默认Typeface
+        /// </summary>
+        public static readonly VTextStyle Default = new VTextStyle() { FontFamily = "宋体", FontSize = 14, Foreground = VTForeground.DarkBlack };
+
         private string hashId;
 
         public string HashID
@@ -32,5 +38,14 @@ namespace XTerminalBase
         /// </summary>
         public VFontWeight FontWeight { get; set; }
 
+        /// <summary>
+        /// 字体大小
+        /// </summary>
+        public double FontSize { get; set; }
+
+        /// <summary>
+        /// 文本的颜色
+        /// </summary>
+        public VTForeground Foreground { get; set; }
     }
 }

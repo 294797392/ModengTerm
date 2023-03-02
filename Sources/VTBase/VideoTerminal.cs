@@ -181,9 +181,8 @@ namespace XTerminalBase
 
             VTextBlock spaceText = new VTextBlock()
             {
-                Size = this.TextOptions.FontSize,
-                Foreground = VTForeground.DarkBlack,
                 Text = " ",
+                Style = VTextStyle.Default
             };
             VTextBlockMetrics spaceTextMetrics = this.PresentationDevice.MeasureText(spaceText);
             this.whitespaceWidth = spaceTextMetrics.WidthIncludingWhitespace;
@@ -228,13 +227,12 @@ namespace XTerminalBase
             VTextBlock textBlock = new VTextBlock()
             {
                 ID = Guid.NewGuid().ToString(),
-                Foreground = this.TextOptions.Foreground,
-                Size = this.TextOptions.FontSize,
                 Column = column,
                 Row = row,
                 X = offsetX,
                 Y = row * this.characterHeight,
-                Text = string.Empty
+                Text = string.Empty,
+                Style = VTextStyle.Default
             };
 
             // 找到文本块所属的行，并把文本块加到行里

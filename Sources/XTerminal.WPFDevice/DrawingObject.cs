@@ -10,9 +10,9 @@ namespace XTerminal.WPFRenderer
     /// <summary>
     /// 表示终端上的一个可视化对象（光标，文本块...）
     /// </summary>
-    public abstract class TerminalVisual : DrawingVisual
+    public abstract class DrawingObject : DrawingVisual
     {
-        public TerminalVisual()
+        public DrawingObject()
         {
         }
 

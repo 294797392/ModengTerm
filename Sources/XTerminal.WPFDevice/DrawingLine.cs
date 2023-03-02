@@ -8,7 +8,7 @@ using XTerminalBase;
 
 namespace XTerminal.WPFRenderer
 {
-    public class VisualLine : TerminalVisual
+    public class DrawingLine : DrawingObject
     {
         private static readonly StringBuilder LineBuilder = new StringBuilder();
 

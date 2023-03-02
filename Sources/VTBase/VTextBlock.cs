@@ -28,16 +28,6 @@ namespace XTerminalBase
         public string ID { get; set; }
 
         /// <summary>
-        /// 文本的颜色
-        /// </summary>
-        public VTForeground Foreground { get; set; }
-
-        /// <summary>
-        /// 字体大小
-        /// </summary>
-        public double Size { get; set; }
-
-        /// <summary>
         /// 要显示的文本
         /// </summary>
         public string Text { get; set; }
@@ -61,7 +51,7 @@ namespace XTerminalBase
         /// <summary>
         /// 字体格式
         /// </summary>
-        public VTypeface Typeface { get; private set; }
+        public VTextStyle Style { get; set; }
 
         /// <summary>
         /// 获取该文本块的宽度
@@ -107,6 +97,11 @@ namespace XTerminalBase
         /// 上一个文本块
         /// </summary>
         public VTextBlock Previous { get; internal set; }
+
+        /// <summary>
+        /// 与WPF关联的画图对象
+        /// </summary>
+        public object DrawingObject { get; set; }
 
         public VTextBlock()
         {

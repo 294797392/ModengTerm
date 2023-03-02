@@ -13,7 +13,7 @@ namespace XTerminal.WPFRenderer
     /// <summary>
     /// 表示PresentationDevice上的一个文本块
     /// </summary>
-    public class VisualText : TerminalVisual
+    public class DrawingText : DrawingObject
     {
         #region 属性
 
@@ -21,10 +21,6 @@ namespace XTerminal.WPFRenderer
         /// 文本块的索引
         /// </summary>
         public string ID { get { return this.TextBlock.ID; } }
-
-        public double PixelsPerDip { get; set; }
-
-        public Typeface Typeface { get; set; }
 
         /// <summary>
         /// 要渲染的文本
@@ -40,7 +36,7 @@ namespace XTerminal.WPFRenderer
 
         #region 构造方法
 
-        public VisualText(VTextBlock textBlock)
+        public DrawingText(VTextBlock textBlock)
         {
             this.TextBlock = textBlock;
         }
@@ -53,8 +49,8 @@ namespace XTerminal.WPFRenderer
         {
             this.Offset = new Vector(this.TextBlock.X, this.TextBlock.Y);
 
-            FormattedText formattedText = TerminalUtils.CreateFormattedText(this.TextBlock, this.Typeface, this.PixelsPerDip);
-            TerminalUtils.UpdateTextMetrics(this.TextBlock, formattedText);
+            Typeface typeface = TerminalUtils.GetTypeface(this.TextBlock);
+            FormattedText formattedText = TerminalUtils.UpdateTextMetrics(this.TextBlock);
             dc.DrawText(formattedText, new Point());
         }
 
