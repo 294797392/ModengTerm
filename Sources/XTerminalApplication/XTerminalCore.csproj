@@ -7,8 +7,8 @@
     <ProjectGuid>{C236BD15-C63C-45BD-B576-2CAA49ACABA2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>XTerminalDevice</RootNamespace>
-    <AssemblyName>XTerminalDevice</AssemblyName>
+    <RootNamespace>XTerminalCore</RootNamespace>
+    <AssemblyName>XTerminalCore</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -54,9 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="Interface\IInputDevice.cs" />
-    <Compile Include="Interface\IPresentationDevice.cs" />
-    <Compile Include="Interface\IVTDevice.cs" />
+    <Compile Include="Devices\IInputDevice.cs" />
+    <Compile Include="Devices\IPresentationDevice.cs" />
+    <Compile Include="Devices\IDeviceController.cs" />
     <Compile Include="Options\BackspaceOptions.cs" />
     <Compile Include="Options\ImplicitMovementDirections.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -64,7 +64,7 @@
     <Compile Include="VTScreen.cs" />
     <Compile Include="VTextBlockMetrics.cs" />
     <Compile Include="VTextOptions.cs" />
-    <Compile Include="VTApplication.cs" />
+    <Compile Include="VideoTerminal.cs" />
     <Compile Include="VTextBlock.cs" />
     <Compile Include="VTInputEvent.cs" />
     <Compile Include="VTKeyboard.cs" />

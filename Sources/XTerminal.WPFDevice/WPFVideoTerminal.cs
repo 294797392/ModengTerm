@@ -11,15 +11,14 @@ using System.Windows;
 using System.Windows.Media.TextFormatting;
 using XTerminalBase;
 using XTerminalParser;
-using XTerminalDevice.Interface;
-using XTerminalDevice;
+using XTerminalBase.IVideoTerminal;
 
 namespace XTerminal.WPFRenderer
 {
     /// <summary>
     /// 终端控件
     /// </summary>
-    public class WPFVTDevice : Grid, IInputDevice, IVTDevice
+    public class WPFVideoTerminal : Grid, IInputDevice, IVTController
     {
         #region 类变量
 
@@ -46,7 +45,7 @@ namespace XTerminal.WPFRenderer
 
         #region 构造方法
 
-        public WPFVTDevice()
+        public WPFVideoTerminal()
         {
             this.inputEvent = new VTInputEvent();
             this.Background = Brushes.Transparent;

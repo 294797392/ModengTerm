@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminalParser;
 
-namespace XTerminalDevice
+namespace XTerminalDevice.Options
 {
-    internal class DefaultValues
+    public enum ImplicitMovementDirections
     {
+        SameAs,
+
+
     }
 }

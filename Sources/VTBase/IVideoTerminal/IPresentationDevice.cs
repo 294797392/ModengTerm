@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminalDevice.Interface
+namespace XTerminalBase.IVideoTerminal
 {
     public enum ScrollOrientation
     {
@@ -14,10 +14,16 @@ namespace XTerminalDevice.Interface
     }
 
     /// <summary>
-    /// 表示一个用来渲染文本的设备
+    /// 定义终端显示器的接口
     /// </summary>
     public interface IPresentationDevice
     {
+        ///// <summary>
+        ///// 渲染一行
+        ///// </summary>
+        ///// <param name="textLine"></param>
+        //void DrawLine(VTextLine textLine);
+
         /// <summary>
         /// 渲染文本块
         /// </summary>

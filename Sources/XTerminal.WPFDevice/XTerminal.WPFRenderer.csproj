@@ -70,7 +70,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="WPFVTDevice.cs" />
+    <Compile Include="WPFVideoTerminal.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="TerminalVisual.cs" />
     <Compile Include="TextVisual.cs" />
@@ -92,10 +92,6 @@
     <ProjectReference Include="..\VTBase\XTerminalBase.csproj">
       <Project>{b5af0539-2902-4c1a-9386-7517c4e335bd}</Project>
       <Name>XTerminalBase</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XTerminalApplication\XTerminalDevice.csproj">
-      <Project>{c236bd15-c63c-45bd-b576-2caa49acaba2}</Project>
-      <Name>XTerminalDevice</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

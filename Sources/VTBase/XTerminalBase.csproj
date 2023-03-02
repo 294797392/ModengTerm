@@ -58,6 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
+    <Compile Include="IVideoTerminal\IVTController.cs" />
+    <Compile Include="IVideoTerminal\IInputDevice.cs" />
+    <Compile Include="IVideoTerminal\IPresentationDevice.cs" />
     <Compile Include="ICursorState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Channels\ChannelAuthorition.cs" />
@@ -67,6 +70,24 @@
     <Compile Include="Channels\VTChannelTypes.cs" />
     <Compile Include="Channels\SSHChannel.cs" />
     <Compile Include="Channels\SSHChannelAuthorition.cs" />
+    <Compile Include="VideoTerminal.cs" />
+    <Compile Include="VTextBlock.cs" />
+    <Compile Include="VTextBlockMetrics.cs" />
+    <Compile Include="VTextLine.cs" />
+    <Compile Include="VTextOptions.cs" />
+    <Compile Include="VTInputEvent.cs" />
+    <Compile Include="VTKeyboard.cs" />
+    <Compile Include="VTKeys.cs" />
+    <Compile Include="VTModifierKeys.cs" />
+    <Compile Include="VTPoint.cs" />
+    <Compile Include="VTRect.cs" />
+    <Compile Include="VTScreen.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VideoTerminal.Parser\XTerminalParser.csproj">
+      <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
+      <Name>XTerminalParser</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

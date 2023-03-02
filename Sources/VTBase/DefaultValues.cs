@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
+using XTerminalParser;
 
 namespace XTerminalBase
 {
@@ -35,6 +36,9 @@ namespace XTerminalBase
         public static FontWeight FontWeight = FontWeights.Normal;
         public static FontStyle FontStyle = FontStyles.Normal;
         public static FontStretch FontStretch = FontStretches.Normal;
-        public static double FontSize = 12;
+
+        public const double FontSize = 12;
+
+        public static readonly VTForeground Foreground = VTForeground.DarkBlack;
     }
 }

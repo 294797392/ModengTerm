@@ -15,8 +15,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Media.TextFormatting;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using XTerminalBase;
 using XTerminalBase.Channels;
-using XTerminalDevice;
 
 namespace XTerminal
 {
@@ -54,8 +54,8 @@ namespace XTerminal
         {
             //SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("linux-desktop", 22, "zyf", "18612538605");// 家
             SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("ubuntu-dev", 22, "oheiheiheiheihei", "18612538605");
-            VTApplication vtApp = new VTApplication();
-            vtApp.VTDevice = Terminal;
+            VideoTerminal vtApp = new VideoTerminal();
+            vtApp.Controller = Terminal;
             vtApp.Initialize();
             vtApp.RunSSHClient(authorition);
         }

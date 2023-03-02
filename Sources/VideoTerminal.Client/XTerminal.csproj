@@ -97,25 +97,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <AppDesigner Include="Properties\" />
     <Resource Include="Fonts\Ubuntu-B.ttf" />
     <Resource Include="Fonts\Ubuntu-BI.ttf" />
@@ -155,10 +137,6 @@
     <ProjectReference Include="..\XTerminal.WPFDevice\XTerminal.WPFRenderer.csproj">
       <Project>{dcbd335a-2c3c-4fbf-a3d8-0859844519aa}</Project>
       <Name>XTerminal.WPFRenderer</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XTerminalApplication\XTerminalDevice.csproj">
-      <Project>{c236bd15-c63c-45bd-b576-2caa49acaba2}</Project>
-      <Name>XTerminalDevice</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

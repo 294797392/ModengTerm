@@ -12,7 +12,7 @@ namespace XTerminalDevice
     /// <summary>
     /// 控制虚拟终端设备
     /// </summary>
-    public class VTApplication
+    public class VideoTerminal
     {
         #region 类变量
 
@@ -117,7 +117,7 @@ namespace XTerminalDevice
         /// <summary>
         /// 终端设备的一些接口
         /// </summary>
-        public IVTDevice VTDevice { get; set; }
+        public IDeviceController Controller { get; set; }
 
         /// <summary>
         /// 输入设备
@@ -125,7 +125,7 @@ namespace XTerminalDevice
         public IInputDevice InputDevice { get; private set; }
 
         /// <summary>
-        /// 显示字符的设备
+        /// 终端显示器接口
         /// </summary>
         public IPresentationDevice PresentationDevice { get; private set; }
 
@@ -140,7 +140,7 @@ namespace XTerminalDevice
 
         #region 构造方法
 
-        public VTApplication()
+        public VideoTerminal()
         {
         }
 
@@ -169,9 +169,9 @@ namespace XTerminalDevice
             this.Keyboard.SetKeypadMode(false);
 
             // 初始化视频终端
-            this.PresentationDevice = this.VTDevice.CreatePresentationDevice();
-            this.VTDevice.SwitchPresentaionDevice(null, this.PresentationDevice);
-            this.InputDevice = this.VTDevice.GetInputDevice();
+            this.PresentationDevice = this.Controller.CreatePresentationDevice();
+            this.Controller.SwitchPresentaionDevice(null, this.PresentationDevice);
+            this.InputDevice = this.Controller.GetInputDevice();
             this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
 
             // 初始化终端解析器
@@ -700,7 +700,7 @@ namespace XTerminalDevice
                 case VTActions.DeleteCharacters:
                     {
                         logger.DebugFormat("DeleteCharacters");
-                        this.PerformDeleteCharacters(Convert.ToInt32(param));
+                        this.PerformDeleteCharacters(Convert.ToInt32(param[0]));
                         break;
                     }
 

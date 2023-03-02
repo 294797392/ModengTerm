@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using XTerminalDevice;
-using XTerminalDevice.Interface;
+using XTerminalBase;
+using XTerminalBase.IVideoTerminal;
 
 namespace XTerminal.WPFRenderer
 {
@@ -121,13 +121,18 @@ namespace XTerminal.WPFRenderer
         {
             foreach (VTextBlock textBlock in textBlocks)
             {
-                TextVisual textVisual;
-                if (this.textVisuals.TryGetValue(textBlock.ID, out textVisual))
-                {
-                    this.textVisuals.Remove(textBlock.ID);
-                    this.textVisuals2.Remove(textVisual);
-                    this.RemoveVisualChild(textVisual);
-                }
+                this.DeleteText(textBlock);
+            }
+        }
+
+        public void DeleteText(VTextBlock textBlock)
+        {
+            TextVisual textVisual;
+            if (this.textVisuals.TryGetValue(textBlock.ID, out textVisual))
+            {
+                this.textVisuals.Remove(textBlock.ID);
+                this.textVisuals2.Remove(textVisual);
+                this.RemoveVisualChild(textVisual);
             }
         }
 

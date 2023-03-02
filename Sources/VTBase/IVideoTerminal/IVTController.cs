@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminalDevice.Interface
+namespace XTerminalBase.IVideoTerminal
 {
     /// <summary>
-    /// 定义终端的一些功能
+    /// 终端设备控制器
     /// </summary>
-    public interface IVTDevice
+    public interface IVTController
     {
         /// <summary>
         /// 获取输入设备
