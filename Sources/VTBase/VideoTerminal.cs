@@ -216,12 +216,6 @@ namespace XTerminalBase
 
         #region 实例方法
 
-        private void DrawTextAction(object state)
-        {
-            VTextBlock textBlock = state as VTextBlock;
-            this.PresentationDevice.DrawText(textBlock);
-        }
-
         private VTextBlock CreateTextBlock(int row, int column, double offsetX)
         {
             VTextBlock textBlock = new VTextBlock()

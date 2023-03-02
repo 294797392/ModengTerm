@@ -178,12 +178,19 @@ namespace XTerminal.WPFRenderer
                 this.scrollViewer = new ScrollViewer()
                 {
                     HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                    CanContentScroll = false
                 };
+                this.scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
                 this.Children.Add(this.scrollViewer);
             }
 
             this.scrollViewer.Content = toAdd;
+        }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            Console.WriteLine(e.ViewportHeightChange);
         }
 
         #endregion
