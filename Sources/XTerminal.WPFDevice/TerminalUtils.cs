@@ -14,6 +14,16 @@ namespace XTerminal.WPFRenderer
 {
     public static class TerminalUtils
     {
+        private static Dictionary<string, Typeface> typefaceMap = new Dictionary<string, Typeface>();
+
+
+        public static double PixelsPerDip = 0;
+
+        static TerminalUtils()
+        {
+            PixelsPerDip = VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip;
+        }
+
         public static Brush VTForeground2Brush(VTForeground foreground)
         {
             switch (foreground)
@@ -55,9 +65,31 @@ namespace XTerminal.WPFRenderer
             textBlock.Metrics.Height = formattedText.Height;
         }
 
+        public static void UpdateTextMetrics(VTextBlock textBlock)
+        {
+            Typeface typeface = GetTypeface(textBlock);
+            FormattedText formattedText = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, textBlock.Size, Brushes.Black, PixelsPerDip);
+            textBlock.Metrics.Width = formattedText.Width;
+            textBlock.Metrics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
+            textBlock.Metrics.Height = formattedText.Height;
+        }
+
         public static VTKeys ConvertToVTKey(Key key)
         {
             return (VTKeys)key;
+        }
+
+
+        public static Typeface GetTypeface(VTextBlock textBlock) 
+        {
+            Typeface result;
+            VTypeface typeface = textBlock.Typeface;
+            if(!typefaceMap.TryGetValue(typeface.HashID, out result))
+            {
+                result = new Typeface(new FontFamily(typeface.FontFamily), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+                typefaceMap[typeface.HashID] = result;
+            }
+            return result;
         }
     }
 }

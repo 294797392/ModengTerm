@@ -59,6 +59,11 @@ namespace XTerminalBase
         public VTextBlockMetrics Metrics { get; private set; }
 
         /// <summary>
+        /// 字体格式
+        /// </summary>
+        public VTypeface Typeface { get; private set; }
+
+        /// <summary>
         /// 获取该文本块的宽度
         /// </summary>
         public double Width { get { return this.Metrics.WidthIncludingWhitespace; } }

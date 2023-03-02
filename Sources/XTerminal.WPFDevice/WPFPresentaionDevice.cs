@@ -11,7 +11,7 @@ using XTerminalBase.IVideoTerminal;
 
 namespace XTerminal.WPFRenderer
 {
-    public class WPFPresentationDevice : Panel, IPresentationDevice
+    public class WPFPresentaionDevice : FrameworkElement, IPresentationDevice
     {
         #region 类变量
 
@@ -24,10 +24,10 @@ namespace XTerminal.WPFRenderer
         private ScrollViewer scrollViewer;
 
         /// <summary>
-        /// TextBlockIndex -> TextVisual
+        /// Row -> VisualLine
         /// </summary>
-        private Dictionary<string, TextVisual> textVisuals;
-        private List<TextVisual> textVisuals2;
+        private Dictionary<int, VisualLine> visualMap;
+        private VisualCollection visuals;
 
         private Typeface typeface;
         private double pixelPerDip;
@@ -42,17 +42,17 @@ namespace XTerminal.WPFRenderer
         // Provide a required override for the VisualChildrenCount property.
         protected override int VisualChildrenCount
         {
-            get { return this.textVisuals2.Count; }
+            get { return this.visuals.Count; }
         }
 
         #endregion
 
         #region 构造方法
 
-        public WPFPresentationDevice()
+        public WPFPresentaionDevice()
         {
-            this.textVisuals = new Dictionary<string, TextVisual>();
-            this.textVisuals2 = new List<TextVisual>();
+            this.visualMap = new Dictionary<int, VisualLine>();
+            this.visuals = new VisualCollection(this);
             this.typeface = new Typeface(new FontFamily("Ya Hei"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
             this.pixelPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         }
@@ -64,7 +64,7 @@ namespace XTerminal.WPFRenderer
         // Provide a required override for the GetVisualChild method.
         protected override Visual GetVisualChild(int index)
         {
-            return this.textVisuals2[index];
+            return this.visuals[index];
         }
 
         protected override Size MeasureOverride(Size constraint)
@@ -91,50 +91,65 @@ namespace XTerminal.WPFRenderer
 
         #region IPresentationDevice
 
-        public void DrawText(List<VTextBlock> textBlocks)
+        /// <summary>
+        /// 渲染一行
+        /// </summary>
+        /// <param name="textLine"></param>
+        public void DrawLine(VTextLine textLine)
         {
-            foreach (VTextBlock textBlock in textBlocks)
+            VisualLine visualLine;
+            if (!this.visualMap.TryGetValue(textLine.Row, out visualLine))
             {
-                this.DrawText(textBlock);
-            }
-        }
-
-        public void DrawText(VTextBlock textBlock)
-        {
-            TextVisual textVisual;
-            if (!this.textVisuals.TryGetValue(textBlock.ID, out textVisual))
-            {
-                textVisual = new TextVisual(textBlock);
-                textVisual.PixelsPerDip = this.pixelPerDip;
-                textVisual.Typeface = this.typeface;
-
-                this.AddVisualChild(textVisual); // 可视对象的父子关系会影响到命中测试的结果
-
-                this.textVisuals[textBlock.ID] = textVisual;
-                this.textVisuals2.Add(textVisual);
+                visualLine = new VisualLine();
+                visualLine.TextLine = textLine;
+                this.visualMap[textLine.Row] = visualLine;
+                this.visuals.Add(visualLine);
             }
 
-            textVisual.Draw();
+            visualLine.Draw();
         }
 
-        public void DeleteText(List<VTextBlock> textBlocks)
-        {
-            foreach (VTextBlock textBlock in textBlocks)
-            {
-                this.DeleteText(textBlock);
-            }
-        }
+        //public void DrawText(List<VTextBlock> textBlocks)
+        //{
+        //    foreach (VTextBlock textBlock in textBlocks)
+        //    {
+        //        this.DrawText(textBlock);
+        //    }
+        //}
 
-        public void DeleteText(VTextBlock textBlock)
-        {
-            TextVisual textVisual;
-            if (this.textVisuals.TryGetValue(textBlock.ID, out textVisual))
-            {
-                this.textVisuals.Remove(textBlock.ID);
-                this.textVisuals2.Remove(textVisual);
-                this.RemoveVisualChild(textVisual);
-            }
-        }
+        //public void DrawText(VTextBlock textBlock)
+        //{
+        //    VisualText textVisual;
+        //    if (!this.visualMap.TryGetValue(textBlock.ID, out textVisual))
+        //    {
+        //        textVisual = new VisualText(textBlock);
+        //        textVisual.PixelsPerDip = this.pixelPerDip;
+        //        textVisual.Typeface = this.typeface;
+
+        //        this.visualMap[textBlock.ID] = textVisual;
+        //        this.visuals.Add(textVisual);
+        //    }
+
+        //    textVisual.Draw();
+        //}
+
+        //public void DeleteText(List<VTextBlock> textBlocks)
+        //{
+        //    foreach (VTextBlock textBlock in textBlocks)
+        //    {
+        //        this.DeleteText(textBlock);
+        //    }
+        //}
+
+        //public void DeleteText(VTextBlock textBlock)
+        //{
+        //    VisualText textVisual;
+        //    if (this.visualMap.TryGetValue(textBlock.ID, out textVisual))
+        //    {
+        //        this.visualMap.Remove(textBlock.ID);
+        //        this.visuals.Remove(textVisual);
+        //    }
+        //}
 
         public VTextBlockMetrics MeasureText(VTextBlock textBlock)
         {

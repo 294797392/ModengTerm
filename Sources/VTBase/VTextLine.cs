@@ -19,7 +19,7 @@ namespace XTerminalBase
         /// <summary>
         /// 该行所有的文本块
         /// </summary>
-        private List<VTextBlock> TextBlocks { get; set; }
+        public List<VTextBlock> TextBlocks { get; set; }
 
         /// <summary>
         /// 第一个文本块
@@ -151,15 +151,15 @@ namespace XTerminalBase
         }
 
         /// <summary>
-        /// 使文本左对齐
+        /// 删除空的文本，然后使文本左对齐
         /// </summary>
         public void LeftAlignment()
         {
-            VTextBlock next = this.FirstTextBlock.Next;
+            VTextBlock current = this.FirstTextBlock;
 
-            while (next != null)
+            while (current != null)
             {
-                next.X = next.Previous.X + next.Width;
+                //current.X = current.Previous.X + current.Width;
             }
         }
     }

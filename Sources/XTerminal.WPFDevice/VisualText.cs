@@ -13,7 +13,7 @@ namespace XTerminal.WPFRenderer
     /// <summary>
     /// 表示PresentationDevice上的一个文本块
     /// </summary>
-    public class TextVisual : TerminalVisual
+    public class VisualText : TerminalVisual
     {
         #region 属性
 
@@ -40,7 +40,7 @@ namespace XTerminal.WPFRenderer
 
         #region 构造方法
 
-        public TextVisual(VTextBlock textBlock)
+        public VisualText(VTextBlock textBlock)
         {
             this.TextBlock = textBlock;
         }

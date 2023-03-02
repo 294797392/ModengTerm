@@ -70,6 +70,7 @@
     <Compile Include="Channels\VTChannelTypes.cs" />
     <Compile Include="Channels\SSHChannel.cs" />
     <Compile Include="Channels\SSHChannelAuthorition.cs" />
+    <Compile Include="VFontWeight.cs" />
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="VTextBlock.cs" />
     <Compile Include="VTextBlockMetrics.cs" />
@@ -82,6 +83,7 @@
     <Compile Include="VTPoint.cs" />
     <Compile Include="VTRect.cs" />
     <Compile Include="VTScreen.cs" />
+    <Compile Include="VTypeface.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VideoTerminal.Parser\XTerminalParser.csproj">

@@ -22,7 +22,7 @@ namespace XTerminal.WPFRenderer
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("Terminal");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("WPFVideoTerminal");
 
         #endregion
 
@@ -137,7 +137,7 @@ namespace XTerminal.WPFRenderer
 
         #endregion
 
-        #region IVTDevice
+        #region IVTController
 
         /// <summary>
         /// 获取输入设备
@@ -154,7 +154,7 @@ namespace XTerminal.WPFRenderer
         /// <returns></returns>
         public IPresentationDevice CreatePresentationDevice()
         {
-            WPFPresentationDevice device = new WPFPresentationDevice();
+            WPFPresentaionDevice device = new WPFPresentaionDevice();
             return device;
         }
 
