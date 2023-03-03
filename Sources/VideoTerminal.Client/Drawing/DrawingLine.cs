@@ -25,13 +25,16 @@ namespace XTerminal.Drawing
             this.Offset = new Vector(0, this.TextLine.OffsetY);
 
             Typeface typeface = TerminalUtils.GetTypeface(VTextStyle.Default);
-            FormattedText formattedText = new FormattedText(this.TextLine.Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 12, Brushes.Black, TerminalUtils.PixelsPerDip);
+            FormattedText formattedText = new FormattedText(this.TextLine.Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, DefaultValues.FontSize, DefaultValues.Foreground,
+                null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
 
             // 遍历链表，给每个TextBlock设置样式
             VTextBlock current = this.TextLine.First;
 
             while (current != null)
             {
+                // TODO：设置样式
+
                 current = current.Next;
             }
 

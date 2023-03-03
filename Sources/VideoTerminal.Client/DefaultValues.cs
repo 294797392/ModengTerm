@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace VideoTerminal
+namespace XTerminal
 {
     public static class DefaultValues
     {
@@ -19,9 +19,11 @@ namespace VideoTerminal
         public static double CaretHeight = 12;
         public static Brush CaretBrush = Brushes.Red;
 
-        public static FontFamily FontFamily = new FontFamily("宋体");
-        public static FontWeight FontWeight = FontWeights.Normal;
-        public static FontStyle FontStyle = FontStyles.Normal;
-        public static FontStretch FontStretch = FontStretches.Normal;
+        public static readonly FontFamily FontFamily = new FontFamily("宋体");
+        public static readonly FontWeight FontWeight = FontWeights.Normal;
+        public static readonly FontStyle FontStyle = FontStyles.Normal;
+        public static readonly FontStretch FontStretch = FontStretches.Normal;
+        public static readonly Brush Foreground = Brushes.Black;
+        public static readonly double FontSize = 14;
     }
 }
