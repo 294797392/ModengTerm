@@ -133,6 +133,12 @@ namespace XTerminal.Drawing
         /// <param name="textBlock">要删除的TextBlock</param>
         private void DeleteTextWithoutAlignment(VTextBlock textBlock)
         {
+            if (this.TextBlocks.Count == 1 && this.TextBlocks[0] == textBlock)
+            {
+                // 此时该行只有一个TextBlock了，不能删光，要留一个备用
+                return;
+            }
+
             VTextBlock previous = textBlock.Previous;
             if (previous != null)
             {
@@ -174,7 +180,7 @@ namespace XTerminal.Drawing
             if (textBlock == null)
             {
                 // 应该不会发生
-                logger.ErrorFormat("AddText失败, textBlock不存在, position = {0}", position);
+                logger.ErrorFormat("InsertText失败, textBlock不存在, position = {0}", position);
                 return;
             }
 
