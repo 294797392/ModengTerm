@@ -66,6 +66,7 @@ namespace XTerminal.Drawing
 
         public VTextLine()
         {
+            this.Text = string.Empty;
             this.TextBlocks = new List<VTextBlock>();
         }
 

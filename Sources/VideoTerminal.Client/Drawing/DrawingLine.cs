@@ -22,6 +22,8 @@ namespace XTerminal.Drawing
 
         protected override void Draw(DrawingContext dc)
         {
+            this.Offset = new Vector(0, this.TextLine.OffsetY);
+
             Typeface typeface = TerminalUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(this.TextLine.Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 12, Brushes.Black, TerminalUtils.PixelsPerDip);
 

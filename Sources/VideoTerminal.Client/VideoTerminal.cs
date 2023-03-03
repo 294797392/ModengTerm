@@ -151,9 +151,6 @@ namespace XTerminal
             this.textLines = new Dictionary<int, VTextLine>();
             this.TextOptions = new VTextOptions();
 
-            // 创建第一个TextBlock
-            this.activeTextBlock = this.CreateTextBlock(0, 0, 0);
-
             this.Keyboard = new VTKeyboard();
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
@@ -172,6 +169,9 @@ namespace XTerminal
             VTextMetrics spaceTextMetrics = this.DrawingCanvas.MeasureText(" ", VTextStyle.Default);
             this.whitespaceWidth = spaceTextMetrics.WidthIncludingWhitespace;
             this.characterHeight = spaceTextMetrics.Height;
+
+            // 创建第一个TextBlock
+            this.activeTextBlock = this.CreateTextBlock(0, 0, 0);
         }
 
         public void RunSSHClient(SSHChannelAuthorition authorition)
@@ -220,7 +220,8 @@ namespace XTerminal
                 ownerLine = new VTextLine()
                 {
                     Row = row,
-                    OffsetY = this.characterHeight * row
+                    OffsetY = this.characterHeight * row,
+                    OwnerCanvas = this.DrawingCanvas
                 };
                 this.textLines[row] = ownerLine;
             }
@@ -339,17 +340,6 @@ namespace XTerminal
                 default:
                     throw new NotImplementedException();
             }
-        }
-
-        /// <summary>
-        /// 把相对于一行的偏移转换成相对于TextBlock的偏移
-        /// </summary>
-        /// <param name="columnInLine"></param>
-        /// <param name="relativeTo"></param>
-        /// <returns></returns>
-        private int TranslateColumn(int columnInLine, VTextBlock relativeTo)
-        {
-            return columnInLine - relativeTo.Column;
         }
 
         /// <summary>
