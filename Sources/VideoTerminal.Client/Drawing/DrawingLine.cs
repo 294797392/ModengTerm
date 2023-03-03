@@ -6,14 +6,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
-using XTerminalBase;
 
-namespace XTerminal.WPFRenderer
+namespace XTerminal.Drawing
 {
     public class DrawingLine : DrawingObject
     {
-        private static readonly StringBuilder LineBuilder = new StringBuilder();
-
         #region 属性
 
         /// <summary>
@@ -25,28 +22,18 @@ namespace XTerminal.WPFRenderer
 
         protected override void Draw(DrawingContext dc)
         {
-            LineBuilder.Clear();
+            Typeface typeface = TerminalUtils.GetTypeface(VTextStyle.Default);
+            FormattedText formattedText = new FormattedText(this.TextLine.Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 12, Brushes.Black, TerminalUtils.PixelsPerDip);
 
-            //FormattedText formattedText = new FormattedText()
-            //formattedText.
-
+            // 遍历链表，给每个TextBlock设置样式
             VTextBlock current = this.TextLine.First;
 
             while (current != null)
             {
-                // 更新文本测量信息
-                TerminalUtils.UpdateTextMetrics(current);
-
                 current = current.Next;
             }
 
-            foreach (VTextBlock textBlock in this.TextLine.TextBlocks)
-            {
-
-
-                //TerminalUtils.UpdateTextMetrics()
-                //TerminalUtils.UpdateTextMetrics(textBlock
-            }
+            dc.DrawText(formattedText, new Point());
         }
     }
 }

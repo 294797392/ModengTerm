@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using XTerminalBase;
 using XTerminalParser;
 
-namespace XTerminal.WPFRenderer
+namespace XTerminal.Drawing
 {
     public static class TerminalUtils
     {
@@ -50,15 +49,15 @@ namespace XTerminal.WPFRenderer
             }
         }
 
-        public static FormattedText UpdateTextMetrics(VTextBlock textBlock)
+        public static VTextMetrics MeasureText(string text, VTextStyle textStyle)
         {
-            Typeface typeface = GetTypeface(textBlock);
-            FormattedText formattedText = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                textBlock.Style.FontSize, Brushes.Black, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
-            textBlock.Metrics.Width = formattedText.Width;
-            textBlock.Metrics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
-            textBlock.Metrics.Height = formattedText.Height;
-            return formattedText;
+            Typeface typeface = GetTypeface(textStyle);
+            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, textStyle.FontSize, Brushes.Black, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
+            VTextMetrics metrics = new VTextMetrics();
+            metrics.Width = formattedText.Width;
+            metrics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
+            metrics.Height = formattedText.Height;
+            return metrics;
         }
 
         public static VTKeys ConvertToVTKey(Key key)
@@ -66,11 +65,10 @@ namespace XTerminal.WPFRenderer
             return (VTKeys)key;
         }
 
-        public static Typeface GetTypeface(VTextBlock textBlock) 
+        public static Typeface GetTypeface(VTextStyle style)
         {
             Typeface typeface;
-            VTextStyle style = textBlock.Style;
-            if(!typefaceMap.TryGetValue(style.HashID, out typeface))
+            if (!typefaceMap.TryGetValue(style.HashID, out typeface))
             {
                 typeface = new Typeface(new FontFamily(style.FontFamily), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
                 typefaceMap[style.HashID] = typeface;
