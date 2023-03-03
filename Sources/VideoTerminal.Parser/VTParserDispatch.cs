@@ -37,12 +37,12 @@ namespace XTerminalParser
 
         private void ActionPrint(byte ch)
         {
-            this.NotifyActionEvent(VTActions.Print, char.ToString((char)ch));
+            this.NotifyActionEvent(VTActions.Print, (char)ch);
         }
 
-        private void ActionPrint(string text)
+        private void ActionPrint(char ch)
         {
-            this.NotifyActionEvent(VTActions.Print, text);
+            this.NotifyActionEvent(VTActions.Print, ch);
         }
 
         /// <summary>
@@ -58,6 +58,7 @@ namespace XTerminalParser
                 case ASCIITable.NUL:
                     {
                         // do nothing
+                        logger.ErrorFormat("Action - NUL");
                         break;
                     }
 
@@ -213,7 +214,8 @@ namespace XTerminalParser
                 case CSIActionCodes.EL_EraseLine:
                     {
                         logger.DebugFormat("CSIDispatch - EL_EraseLine");
-                        this.PerformEraseLine(parameters);
+                        int parameter = parameters.Count > 0 ? parameters[0] : 0;
+                        this.NotifyActionEvent(VTActions.EraseLine, parameter);
                         break;
                     }
 
@@ -569,16 +571,6 @@ namespace XTerminalParser
         /// <param name="parameter2"></param>
         private void PerformWindowManipulation(WindowManipulationType type, int parameter1, int parameter2)
         {
-        }
-
-        /// <summary>
-        /// 执行删除操作
-        /// </summary>
-        /// <param name="parameters"></param>
-        private void PerformEraseLine(List<int> parameters)
-        {
-            int parameter = parameters.Count > 0 ? parameters[0] : 0;
-            this.NotifyActionEvent(VTActions.EraseLine, parameter);
         }
 
         #endregion

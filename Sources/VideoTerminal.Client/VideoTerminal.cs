@@ -394,7 +394,7 @@ namespace XTerminal
             {
                 case VTActions.Print:
                     {
-                        char ch = param[0].ToString()[0];
+                        char ch = (char)param[0];
 
                         switch (ch)
                         {
@@ -406,7 +406,7 @@ namespace XTerminal
                                 {
                                     //Console.WriteLine("渲染断字符, {0}", ch);
                                     this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
-                                    this.activeTextBlock.OwnerLine.AddText(ch.ToString());
+                                    this.activeTextBlock.OwnerLine.InsertText(ch, this.cursorCol);
                                     this.uiSyncContext.Send((v) =>
                                     {
                                         this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);
@@ -425,7 +425,7 @@ namespace XTerminal
                                     {
                                         this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
                                     }
-                                    this.activeTextBlock.OwnerLine.AddText(ch.ToString());
+                                    this.activeTextBlock.OwnerLine.InsertText(ch, this.cursorCol);
                                     this.uiSyncContext.Send((v) =>
                                     {
                                         this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);
@@ -464,14 +464,14 @@ namespace XTerminal
 
                 case VTActions.EraseLine:
                     {
-                        logger.DebugFormat("EraseLine");
+                        logger.WarnFormat("EraseLine");
                         this.PerformEraseLine(Convert.ToInt32(param[0]));
                         break;
                     }
 
                 case VTActions.CursorBackward:
                     {
-                        logger.DebugFormat("CursorBackward");
+                        logger.WarnFormat("CursorBackward");
                         this.cursorCol--;
                         break;
                     }
@@ -487,7 +487,7 @@ namespace XTerminal
 
                 case VTActions.SetVTMode:
                     {
-                        logger.DebugFormat("SetMode");
+                        logger.WarnFormat("SetMode");
                         VTMode vtMode = (VTMode)param[0];
                         this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
                         break;
@@ -495,7 +495,7 @@ namespace XTerminal
 
                 case VTActions.SetCursorKeyMode:
                     {
-                        logger.DebugFormat("SetCursorKeyMode");
+                        logger.WarnFormat("SetCursorKeyMode");
                         VTCursorKeyMode cursorKeyMode = (VTCursorKeyMode)param[0];
                         this.Keyboard.SetCursorKeyMode(cursorKeyMode == VTCursorKeyMode.ApplicationMode);
                         break;
@@ -503,7 +503,7 @@ namespace XTerminal
 
                 case VTActions.SetKeypadMode:
                     {
-                        logger.DebugFormat("SetKeypadMode");
+                        logger.WarnFormat("SetKeypadMode");
                         VTKeypadMode keypadMode = (VTKeypadMode)param[0];
                         this.Keyboard.SetKeypadMode(keypadMode == VTKeypadMode.ApplicationMode);
                         break;
@@ -511,8 +511,9 @@ namespace XTerminal
 
                 case VTActions.DeleteCharacters:
                     {
-                        logger.DebugFormat("DeleteCharacters");
-                        this.PerformDeleteCharacters(Convert.ToInt32(param[0]));
+                        logger.WarnFormat("DeleteCharacters, {0}", param[0]);
+                        int count = Convert.ToInt32(param[0]);
+                        this.PerformDeleteCharacters(count);
                         break;
                     }
 

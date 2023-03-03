@@ -162,18 +162,13 @@ namespace XTerminal.Drawing
 
         #region 公开接口
 
-        public void AddText(string text)
-        {
-            this.AddText(text, this.Text.Length);
-        }
-
         /// <summary>
         /// 在指定位置插入字符串，然后进行排版
         /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
         /// </summary>
         /// <param name="text"></param>
         /// <param name="position">索引位置，在此处插入字符串</param>
-        public void AddText(string text, int position)
+        public void InsertText(char ch, int position)
         {
             VTextBlock textBlock = this.HitTestText(position);
             if (textBlock == null)
@@ -184,17 +179,17 @@ namespace XTerminal.Drawing
             }
 
             // 更新文本
-            this.Text = this.Text.Insert(position, text);
-
-            // 更新TextBlock的列数
-            textBlock.Columns += text.Length;
-
-            if (position == text.Length)
+            if (position > this.Text.Length - 1)
             {
                 // 说明是追加字符串操作
+                this.Text = this.Text.Insert(position, char.ToString(ch));
+
+                // 更新TextBlock的列数
+                textBlock.Columns += 1;
             }
             else
             {
+                this.Text = this.Text.Remove(position, 1).Insert(position, char.ToString(ch));
             }
 
             // 对齐
@@ -209,7 +204,7 @@ namespace XTerminal.Drawing
         /// <param name="count">要删除的字符个数</param>
         public void DeleteText(int position)
         {
-            this.DeleteText(position, this.Text.Length - position + 1);
+            this.DeleteText(position, this.Text.Length - position);
         }
 
         /// <summary>

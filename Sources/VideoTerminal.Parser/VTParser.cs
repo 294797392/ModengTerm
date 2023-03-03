@@ -518,7 +518,7 @@ namespace XTerminalParser
                 if (this.unicodeText.Count == this.unicodeText.Capacity)
                 {
                     string text = Encoding.UTF8.GetString(this.unicodeText.ToArray());
-                    this.ActionPrint(text);
+                    this.ActionPrint(text[0]);
                     this.unicodeText.Clear();
                 }
             }
