@@ -11,6 +11,12 @@ namespace XTerminalBase
     /// </summary>
     public class VTextLine
     {
+        #region 实例变量
+
+        #endregion
+
+        #region 属性
+
         /// <summary>
         /// 该行的索引
         /// </summary>
@@ -31,10 +37,16 @@ namespace XTerminalBase
         /// </summary>
         public double OffsetY { get; set; }
 
+        #endregion
+
+        #region 构造方法
+
         public VTextLine()
         {
             this.TextBlocks = new List<VTextBlock>();
         }
+
+        #endregion
 
         public void AddText(VTextBlock textBlock)
         {

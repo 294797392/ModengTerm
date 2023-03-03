@@ -23,6 +23,11 @@ namespace XTerminalBase
     public class VTextBlock
     {
         /// <summary>
+        /// 指示该TextBlock是否需要更新测量信息
+        /// </summary>
+        public bool Dirty { get; set; }
+
+        /// <summary>
         /// TextBlock的索引号
         /// </summary>
         public string ID { get; set; }

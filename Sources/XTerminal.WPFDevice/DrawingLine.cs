@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.TextFormatting;
 using XTerminalBase;
 
 namespace XTerminal.WPFRenderer
@@ -23,9 +25,12 @@ namespace XTerminal.WPFRenderer
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextBlock current = this.TextLine.FirstTextBlock;
-
             LineBuilder.Clear();
+
+            //FormattedText formattedText = new FormattedText()
+            //formattedText.
+
+            VTextBlock current = this.TextLine.FirstTextBlock;
 
             while (current != null)
             {

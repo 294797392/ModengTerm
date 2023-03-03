@@ -52,6 +52,7 @@ namespace XTerminal.WPFRenderer
             Typeface typeface = TerminalUtils.GetTypeface(this.TextBlock);
             FormattedText formattedText = TerminalUtils.UpdateTextMetrics(this.TextBlock);
             dc.DrawText(formattedText, new Point());
+            dc.DrawRectangle(null, new Pen(Brushes.Black, 1), new Rect(0, 0, this.TextBlock.Width, this.TextBlock.Height));
         }
 
         #endregion

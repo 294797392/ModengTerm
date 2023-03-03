@@ -190,7 +190,13 @@ namespace XTerminal.WPFRenderer
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            Console.WriteLine(e.ViewportHeightChange);
+        }
+
+        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseDown(e);
+
+            //Console.WriteLine((this.scrollViewer.Content as WPFPresentaionDevice).Count);
         }
 
         #endregion
