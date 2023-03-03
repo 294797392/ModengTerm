@@ -406,7 +406,7 @@ namespace XTerminal
                                 {
                                     //Console.WriteLine("渲染断字符, {0}", ch);
                                     this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
-                                    this.activeTextBlock.OwnerLine.InsertText(ch, this.cursorCol);
+                                    this.activeTextBlock.OwnerLine.InsertCharacter(ch, this.cursorCol);
                                     this.uiSyncContext.Send((v) =>
                                     {
                                         this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);
@@ -425,7 +425,7 @@ namespace XTerminal
                                     {
                                         this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
                                     }
-                                    this.activeTextBlock.OwnerLine.InsertText(ch, this.cursorCol);
+                                    this.activeTextBlock.OwnerLine.InsertCharacter(ch, this.cursorCol);
                                     this.uiSyncContext.Send((v) =>
                                     {
                                         this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);

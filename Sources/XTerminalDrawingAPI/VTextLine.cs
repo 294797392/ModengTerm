@@ -171,10 +171,12 @@ namespace XTerminal.Drawing
         /// <summary>
         /// 在指定位置插入字符串，然后进行排版
         /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
+        /// 
+        /// 如果该位置有字符了，那么把该位置的字符替换
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="ch">要插入的字符</param>
         /// <param name="position">索引位置，在此处插入字符串</param>
-        public void InsertText(char ch, int position)
+        public void InsertCharacter(char ch, int position)
         {
             VTextBlock textBlock = this.HitTestText(position);
             if (textBlock == null)
@@ -205,6 +207,8 @@ namespace XTerminal.Drawing
         /// <summary>
         /// 从指定位置开始删除字符串，然后进行排版
         /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
+        /// 
+        /// 删除后会对该行数据进行左对齐
         /// </summary>
         /// <param name="position">从此处开始删除字符</param>
         /// <param name="count">要删除的字符个数</param>
@@ -216,6 +220,8 @@ namespace XTerminal.Drawing
         /// <summary>
         /// 删除指定位置处的字符串，然后进行排版
         /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
+        /// 
+        /// 删除后会对该行数据进行左对齐
         /// </summary>
         /// <param name="position">从此处开始删除字符</param>
         /// <param name="count">要删除的字符个数</param>
@@ -281,10 +287,20 @@ namespace XTerminal.Drawing
         /// <param name="count">要删除的字符个数</param>
         public void DeleteAll()
         {
-            this.First = null;
-            this.Last = null;
+            // 删除整行要留一个TextBlock备用
+            this.First.Column = 0;
+            this.First.Columns = 0;
+            this.First.Metrics = new VTextMetrics();
+
+            // 如果链表的首尾相同，那么Next和Previous都设置成空指针
+            this.First.Next = null;
+            this.First.Previous = null;
+
+            this.Last = this.First;
+
             this.Text = string.Empty;
             this.TextBlocks.Clear();
+            this.TextBlocks.Add(this.First);
         }
 
 
