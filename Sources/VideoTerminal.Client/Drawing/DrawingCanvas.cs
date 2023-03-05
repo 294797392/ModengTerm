@@ -141,7 +141,7 @@ namespace XTerminal.Drawing
 
         public VTextMetrics MeasureText(string text, VTextStyle style)
         {
-            return TerminalUtils.MeasureText(text, style);
+            return TerminalUtils.UpdateTextMetrics(text, style);
         }
 
         public void Resize(double width, double height)

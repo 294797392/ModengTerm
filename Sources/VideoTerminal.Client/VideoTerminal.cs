@@ -43,10 +43,16 @@ namespace XTerminal
         /// 当前正在渲染的文本块
         /// 当前正在活动的文本块（Active Data）
         /// </summary>
-        private VTextBlock activeTextBlock;
+        private VTextBlock activeText;
+
+        /// <summary>
+        /// 活动的文本行
+        /// 也就是光标所在文本行
+        /// </summary>
+        private VTextLine activeLine;
 
         // 当前渲染的文本的左上角X位置
-        private double textOffsetX;
+        private double activeOffsetX;
 
         /// <summary>
         /// 空白字符的测量信息
@@ -98,6 +104,8 @@ namespace XTerminal
         /// </summary>
         private SynchronizationContext uiSyncContext;
 
+        private VTInitialOptions initialOptions;
+
         #endregion
 
         #region 属性
@@ -138,6 +146,7 @@ namespace XTerminal
 
         public void Initialize(VTInitialOptions options)
         {
+            this.initialOptions = options;
             this.uiSyncContext = SynchronizationContext.Current;
 
             // 0:和字符方向相同（向右）
@@ -167,7 +176,8 @@ namespace XTerminal
             this.blankCharacterMetrics = this.DrawingCanvas.MeasureText(" ", VTextStyle.Default);
 
             // 创建第一个TextBlock
-            this.activeTextBlock = this.CreateTextBlock(0, 0, 0);
+            this.activeLine = this.CreateTextLine(0, 0);
+            this.activeText = this.CreateTextBlock(this.activeLine, 0, 0);
 
             // 连接终端通道
             VTChannel vtChannel = VTChannelFactory.Create(options);
@@ -181,30 +191,47 @@ namespace XTerminal
 
         #region 实例方法
 
-        private VTextBlock CreateTextBlock(int row, int column, double offsetX)
+        private VTextLine CreateTextLine(int row)
+        {
+            VTextLine previousLine;
+            if (!this.textLines.TryGetValue(row - 1, out previousLine))
+            {
+                logger.ErrorFormat("CreateTextLine失败, 找不到上一行, previousRow = {0}", row - 1);
+                return null;
+            }
+
+            return this.CreateTextLine(row, previousLine.Boundary.LeftBottom.Y);
+        }
+
+        private VTextLine CreateTextLine(int row, double offsetY)
+        {
+            VTextLine textLine = new VTextLine()
+            {
+                Row = row,
+                OffsetX = 0,
+                OffsetY = offsetY,
+                CursorAtRightMargin = false,
+                TerminalColumns = this.initialOptions.TerminalOption.Columns,
+                DECPrivateAutoWrapMode = this.initialOptions.TerminalOption.DECPrivateAutoWrapMode,
+                OwnerCanvas = this.DrawingCanvas,
+                Text = string.Empty,
+            };
+
+            this.textLines[row] = textLine;
+
+            return textLine;
+        }
+
+        private VTextBlock CreateTextBlock(VTextLine ownerLine, int column, double offsetX)
         {
             VTextBlock textBlock = new VTextBlock()
             {
                 ID = Guid.NewGuid().ToString(),
                 Column = column,
-                Row = row,
+                Row = ownerLine.Row,
                 OffsetX = offsetX,
-                Style = VTextStyle.Default
+                Style = VTextStyle.Default,
             };
-
-            // 找到文本块所属的行，并把文本块加到行里
-            VTextLine ownerLine;
-            if (!this.textLines.TryGetValue(row, out ownerLine))
-            {
-                ownerLine = new VTextLine()
-                {
-                    Row = row,
-                    OffsetY = this.blankCharacterMetrics.Height * row,
-                    OwnerCanvas = this.DrawingCanvas,
-                    Columns = 80
-                };
-                this.textLines[row] = ownerLine;
-            }
 
             ownerLine.AddTextBlock(textBlock);
 
@@ -217,13 +244,13 @@ namespace XTerminal
         /// </summary>
         private void InvalidateMeasure()
         {
-            if (this.activeTextBlock == null)
+            if (this.activeText == null)
             {
                 return;
             }
 
-            double width = Math.Max(this.activeTextBlock.Boundary.RightBottom.X, this.fullWidth);
-            double height = Math.Max(this.activeTextBlock.Boundary.RightBottom.Y, this.fullHeight);
+            double width = Math.Max(this.activeText.Boundary.RightBottom.X, this.fullWidth);
+            double height = Math.Max(this.activeText.Boundary.RightBottom.Y, this.fullHeight);
 
             // 布局大小是否改变了
             bool sizeChanged = false;
@@ -290,7 +317,7 @@ namespace XTerminal
 
                         cursorLine.DeleteText(0, this.cursorCol);
 
-                        this.uiSyncContext.Send((v) => 
+                        this.uiSyncContext.Send((v) =>
                         {
                             this.DrawingCanvas.DrawLine(cursorLine);
                         }, null);
@@ -355,6 +382,14 @@ namespace XTerminal
             //textLine.InsertCharacter(ch, this.cursorCol, n);
         }
 
+        private void DrawLine(VTextLine textLine)
+        {
+            this.uiSyncContext.Send((v) =>
+            {
+                this.DrawingCanvas.DrawLine(textLine);
+            }, null);
+        }
+
         #endregion
 
         #region 事件处理器
@@ -402,38 +437,42 @@ namespace XTerminal
                             case ' ':
                                 {
                                     //Console.WriteLine("渲染断字符, {0}", ch);
-                                    this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
-                                    this.activeTextBlock.OwnerLine.SetCharacter(ch, this.cursorCol);
-                                    this.uiSyncContext.Send((v) =>
-                                    {
-                                        this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);
-                                    }, null);
+                                    this.activeText = this.CreateTextBlock(this.activeLine, this.cursorCol, this.activeOffsetX);
+                                    this.activeLine.PrintCharacter(ch, this.cursorCol);
+                                    this.DrawLine(this.activeLine);
                                     this.InvalidateMeasure();
-                                    // 下次新创建的TextBlock的X偏移量
-                                    this.textOffsetX = this.activeTextBlock.Boundary.RightTop.X;
                                     this.cursorCol++;
-                                    this.activeTextBlock = null;
+                                    // 下次新创建的TextBlock的X偏移量
+                                    this.activeOffsetX = this.activeText.Boundary.RightTop.X;
+                                    this.activeText = null;
                                     break;
                                 }
 
                             default:
                                 {
-                                    if (this.activeTextBlock == null)
+                                    if (this.activeText == null)
                                     {
-                                        this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
+                                        this.activeText = this.CreateTextBlock(this.activeLine, this.cursorCol, this.activeOffsetX);
                                     }
-                                    this.activeTextBlock.OwnerLine.SetCharacter(ch, this.cursorCol);
-                                    this.uiSyncContext.Send((v) =>
-                                    {
-                                        this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);
-                                    }, null);
+
+                                    this.activeLine.PrintCharacter(ch, this.cursorCol);
+                                    this.DrawLine(this.activeLine);
                                     this.InvalidateMeasure();
-                                    // 下次新创建的TextBlock的X偏移量
-                                    this.textOffsetX = this.activeTextBlock.Boundary.RightTop.X;
                                     this.cursorCol++;
+                                    // 下次新创建的TextBlock的X偏移量
+                                    this.activeOffsetX = this.activeText.Boundary.RightTop.X;
+
+                                    if (this.activeLine.Columns == this.activeLine.TerminalColumns)
+                                    {
+                                        // 光标在最右边了
+                                        // 在收到移动光标指令的时候，要清除这个标志
+                                        activeLine.CursorAtRightMargin = true;
+                                    }
+
                                     break;
                                 }
                         }
+
 
                         break;
                     }
@@ -444,7 +483,7 @@ namespace XTerminal
                         // 把光标移动到行开头
                         logger.DebugFormat("CR");
                         this.cursorCol = 0;
-                        this.textOffsetX = 0;
+                        this.activeOffsetX = 0;
                         break;
                     }
 
@@ -452,10 +491,9 @@ namespace XTerminal
                     {
                         // LF
                         logger.DebugFormat("LF");
-                        //this.textOffsetX = 0;
-                        //this.cursorCol = 0;
                         this.cursorRow++;
-                        this.activeTextBlock = this.CreateTextBlock(this.cursorRow, 0, 0);
+                        this.activeLine = this.CreateTextLine(this.cursorRow);
+                        this.activeText = this.CreateTextBlock(this.activeLine, 0, 0);
                         break;
                     }
 

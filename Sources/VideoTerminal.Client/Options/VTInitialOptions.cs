@@ -19,9 +19,13 @@ namespace VideoTerminal.Options
             ChannelType = VTChannelTypes.SSH,
             Authorition = new SSHChannelAuthorition()
             {
-                ServerAddress = "linux-desktop",
+                //ServerAddress = "linux-desktop",
+                //ServerPort = 22,
+                //UserName = "zyf",
+                //Password = "18612538605"
+                ServerAddress = "ubuntu-dev",
                 ServerPort = 22,
-                UserName = "zyf",
+                UserName = "oheiheiheiheihei",
                 Password = "18612538605"
             },
 
@@ -30,7 +34,7 @@ namespace VideoTerminal.Options
                 Type = TerminalTypes.XTerm,
                 Columns = 80,
                 Rows = 24,
-                DECAWM_AutoWrapMode = true
+                DECPrivateAutoWrapMode = true
             }
         };
 

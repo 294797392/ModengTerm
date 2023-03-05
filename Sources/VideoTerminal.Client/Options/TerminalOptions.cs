@@ -36,6 +36,6 @@ namespace VideoTerminal.Options
         /// <summary>
         /// DECAWM模式
         /// </summary>
-        public bool DECAWM_AutoWrapMode { get; set; }
+        public bool DECPrivateAutoWrapMode { get; set; }
     }
 }

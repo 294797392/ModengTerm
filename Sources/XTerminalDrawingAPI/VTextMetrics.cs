@@ -9,7 +9,7 @@ namespace XTerminal.Drawing
     /// <summary>
     /// 存储文本块的测量信息
     /// </summary>
-    public struct VTextMetrics
+    public class VTextMetrics
     {
         /// <summary>
         /// 渲染后该文本块的宽度
@@ -26,5 +26,8 @@ namespace XTerminal.Drawing
         /// 带有空白的宽度
         /// </summary>
         public double WidthIncludingWhitespace { get; set; }
+
+        public VTextMetrics()
+        { }
     }
 }

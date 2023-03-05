@@ -20,7 +20,7 @@ namespace XTerminal.Drawing
         BackToFront
     }
 
-    public class VTextBlock
+    public class VTextBlock : VTextElement
     {
         /// <summary>
         /// TextBlock的索引号
@@ -33,44 +33,9 @@ namespace XTerminal.Drawing
         //public string Text { get; set; }
 
         /// <summary>
-        /// 该文本块左上角的X坐标
-        /// </summary>
-        public double OffsetX { get; set; }
-
-        /// <summary>
-        /// 该文本块左上角的Y坐标
-        /// </summary>
-        internal double OffsetY { get; set; }
-
-        /// <summary>
-        /// 文本的测量信息
-        /// </summary>
-        public VTextMetrics Metrics { get; internal set; }
-
-        /// <summary>
         /// 字体格式
         /// </summary>
         public VTextStyle Style { get; set; }
-
-        /// <summary>
-        /// 获取该文本块的宽度
-        /// </summary>
-        public double Width { get { return this.Metrics.WidthIncludingWhitespace; } }
-
-        /// <summary>
-        /// 获取该文本块的高度
-        /// </summary>
-        public double Height { get { return this.Metrics.Height; } }
-
-        /// <summary>
-        /// 获取该文本的矩形框
-        /// </summary>
-        public VTRect Boundary { get { return new VTRect(this.OffsetX, this.OffsetY, this.Width, this.Height); } }
-
-        /// <summary>
-        /// 该文本块所在行数，从0开始
-        /// </summary>
-        public int Row { get; set; }
 
         /// <summary>
         /// 该文本块第一个字符所在列数，从0开始
@@ -104,7 +69,6 @@ namespace XTerminal.Drawing
 
         public VTextBlock()
         {
-            this.Metrics = new VTextMetrics();
         }
 
         ///// <summary>

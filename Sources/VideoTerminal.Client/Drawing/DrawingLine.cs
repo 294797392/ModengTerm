@@ -28,6 +28,8 @@ namespace XTerminal.Drawing
             FormattedText formattedText = new FormattedText(this.TextLine.Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, DefaultValues.FontSize, DefaultValues.Foreground,
                 null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
 
+            TerminalUtils.UpdateTextMetrics(this.TextLine.Metrics, formattedText);
+
             // 遍历链表，给每个TextBlock设置样式
             VTextBlock current = this.TextLine.First;
 

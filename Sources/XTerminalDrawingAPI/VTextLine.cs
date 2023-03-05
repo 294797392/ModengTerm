@@ -10,7 +10,7 @@ namespace XTerminal.Drawing
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine
+    public class VTextLine : VTextElement
     {
         #region 实例变量
 
@@ -21,9 +21,9 @@ namespace XTerminal.Drawing
         #region 属性
 
         /// <summary>
-        /// 该行的索引
+        /// 当前行包含字符的列数
         /// </summary>
-        public int Row { get; set; }
+        public int Columns { get { return this.Text.Length; } }
 
         /// <summary>
         /// 终端行的最大列数
@@ -31,20 +31,12 @@ namespace XTerminal.Drawing
         /// 超过列数要按照手册里定义的标准来执行动作
         /// 在linux里使用stty size获取
         /// </summary>
-        public int Columns { get; set; }
-
-        /// <summary>
-        /// 该行高度，有可能终端里的一行等于屏幕上的N行
-        /// 当一行的字符超过终端的列数的时候，DECAWM指令指定了超出的字符要如何处理
-        /// DECAWM SET：超出后要在新的一行上从头开始显示字符
-        /// DECAWM RESET：超出后在该行的第一个字符处开始显示字符
-        /// </summary>
-        public int Height { get; set; }
+        public int TerminalColumns { get; set; }
 
         /// <summary>
         /// 该行所有的文本块
         /// </summary>
-        public List<VTextBlock> TextBlocks { get; set; }
+        private List<VTextBlock> TextBlocks { get; set; }
 
         /// <summary>
         /// 第一个文本块
@@ -55,11 +47,6 @@ namespace XTerminal.Drawing
         /// 最后一个文本块
         /// </summary>
         public VTextBlock Last { get; private set; }
-
-        /// <summary>
-        /// 该行的Y偏移量
-        /// </summary>
-        public double OffsetY { get; set; }
 
         /// <summary>
         /// 该行文本
@@ -75,6 +62,13 @@ namespace XTerminal.Drawing
         /// 画图对象
         /// </summary>
         public object DrawingObject { get; set; }
+
+        public bool DECPrivateAutoWrapMode { get; set; }
+
+        /// <summary>
+        /// 当前光标是否在最右边
+        /// </summary>
+        public bool CursorAtRightMargin { get; set; }
 
         #endregion
 
@@ -192,9 +186,8 @@ namespace XTerminal.Drawing
         /// </summary>
         /// <param name="ch">要插入的字符</param>
         /// <param name="position">索引位置，在此处插入字符串</param>
-        public void SetCharacter(char ch, int position)
+        public void PrintCharacter(char ch, int position)
         {
-            logger.InfoFormat("SetCharacter, position = {0}", position);
             VTextBlock textBlock = this.HitTestText(position);
             if (textBlock == null)
             {
@@ -317,7 +310,9 @@ namespace XTerminal.Drawing
             // 删除整行要留一个TextBlock备用
             this.First.Column = 0;
             this.First.Columns = 0;
-            this.First.Metrics = new VTextMetrics();
+            this.First.Metrics.Height = 0;
+            this.First.Metrics.Width = 0;
+            this.First.Metrics.WidthIncludingWhitespace = 0;
 
             // 如果链表的首尾相同，那么Next和Previous都设置成空指针
             this.First.Next = null;

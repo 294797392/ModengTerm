@@ -49,15 +49,20 @@ namespace XTerminal.Drawing
             }
         }
 
-        public static VTextMetrics MeasureText(string text, VTextStyle textStyle)
+        public static VTextMetrics UpdateTextMetrics(string text, VTextStyle textStyle)
         {
             Typeface typeface = GetTypeface(textStyle);
             FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, textStyle.FontSize, Brushes.Black, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
-            VTextMetrics metrics = new VTextMetrics();
-            metrics.Width = formattedText.Width;
-            metrics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
-            metrics.Height = formattedText.Height;
-            return metrics;
+            VTextMetrics textMetrics = new VTextMetrics();
+            UpdateTextMetrics(textMetrics, formattedText);
+            return textMetrics;
+        }
+
+        public static void UpdateTextMetrics(VTextMetrics textMerics, FormattedText formattedText)
+        {
+            textMerics.Width = formattedText.Width;
+            textMerics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
+            textMerics.Height = formattedText.Height;
         }
 
         public static VTKeys ConvertToVTKey(Key key)
