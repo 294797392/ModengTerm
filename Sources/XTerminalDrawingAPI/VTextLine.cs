@@ -26,6 +26,22 @@ namespace XTerminal.Drawing
         public int Row { get; set; }
 
         /// <summary>
+        /// 终端行的最大列数
+        /// 规定终端一行里的字符数不能超过列数
+        /// 超过列数要按照手册里定义的标准来执行动作
+        /// 在linux里使用stty size获取
+        /// </summary>
+        public int Columns { get; set; }
+
+        /// <summary>
+        /// 该行高度，有可能终端里的一行等于屏幕上的N行
+        /// 当一行的字符超过终端的列数的时候，DECAWM指令指定了超出的字符要如何处理
+        /// DECAWM SET：超出后要在新的一行上从头开始显示字符
+        /// DECAWM RESET：超出后在该行的第一个字符处开始显示字符
+        /// </summary>
+        public int Height { get; set; }
+
+        /// <summary>
         /// 该行所有的文本块
         /// </summary>
         public List<VTextBlock> TextBlocks { get; set; }
@@ -169,15 +185,16 @@ namespace XTerminal.Drawing
         #region 公开接口
 
         /// <summary>
-        /// 在指定位置插入字符串，然后进行排版
+        /// 设置指定位置处的字符，然后进行排版
         /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
         /// 
         /// 如果该位置有字符了，那么把该位置的字符替换
         /// </summary>
         /// <param name="ch">要插入的字符</param>
         /// <param name="position">索引位置，在此处插入字符串</param>
-        public void InsertCharacter(char ch, int position)
+        public void SetCharacter(char ch, int position)
         {
+            logger.InfoFormat("SetCharacter, position = {0}", position);
             VTextBlock textBlock = this.HitTestText(position);
             if (textBlock == null)
             {
@@ -202,6 +219,16 @@ namespace XTerminal.Drawing
 
             // 对齐
             this.LeftAlignment();
+        }
+
+        /// <summary>
+        /// 在指定位置插入n个字符，要插入的字符由ch指定
+        /// </summary>
+        /// <param name="ch">要插入的字符</param>
+        /// <param name="position">插入位置</param>
+        /// <param name="n">要插入的字符数量</param>
+        public void InsertCharacter(char ch, int position, int n)
+        {
         }
 
         /// <summary>

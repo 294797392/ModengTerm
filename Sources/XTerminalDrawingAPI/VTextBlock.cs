@@ -40,7 +40,7 @@ namespace XTerminal.Drawing
         /// <summary>
         /// 该文本块左上角的Y坐标
         /// </summary>
-        public double OffsetY { get; set; }
+        internal double OffsetY { get; set; }
 
         /// <summary>
         /// 文本的测量信息

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using VideoTerminal.Options;
 
 namespace XTerminal.Channels
 {
@@ -31,25 +32,36 @@ namespace XTerminal.Channels
 
         #endregion
 
+        #region 实例变量
+
+        protected VTInitialOptions options;
+
+        #endregion
+
         #region 属性
+
+        /// <summary>
+        /// 终端可以显示的行数
+        /// </summary>
+        public int Rows { get { return this.options.TerminalOption.Rows; } }
+
+        /// <summary>
+        /// 终端可以显示的列数
+        /// </summary>
+        public int Columns { get { return this.options.TerminalOption.Columns; } }
 
         /// <summary>
         /// 通道类型
         /// </summary>
-        public abstract VTChannelTypes Type { get; }
-
-        /// <summary>
-        /// 连接Socket所需要的验证信息
-        /// </summary>
-        public ChannelAuthorition Authorition { get; private set; }
+        public VTChannelTypes Type { get { return this.options.ChannelType; } }
 
         #endregion
 
         #region 构造方法
 
-        public VTChannel(ChannelAuthorition authorition)
+        public VTChannel(VTInitialOptions options)
         {
-            this.Authorition = authorition;
+            this.options = options;
         }
 
         #endregion

@@ -46,7 +46,7 @@ namespace XTerminal.Drawing
 
         protected override void Draw(DrawingContext dc)
         {
-            this.Offset = new Vector(this.TextBlock.OffsetX, this.TextBlock.OffsetY);
+            //this.Offset = new Vector(this.TextBlock.OffsetX, this.TextBlock.OffsetY);
 
             //Typeface typeface = TerminalUtils.GetTypeface(this.TextBlock);
             //FormattedText formattedText = TerminalUtils.MeasureText(this.TextBlock);

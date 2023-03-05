@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using VideoTerminal.Options;
 using XTerminal.Channels;
 using XTerminal.Drawing;
 using XTerminalParser;
@@ -21,8 +22,6 @@ namespace XTerminal
         #endregion
 
         #region 实例变量
-
-        private ChannelAuthorition authorition;
 
         /// <summary>
         /// 与终端进行通信的信道
@@ -49,13 +48,10 @@ namespace XTerminal
         // 当前渲染的文本的左上角X位置
         private double textOffsetX;
 
-        // 空白字符的宽度
-        private double whitespaceWidth;
-
         /// <summary>
-        /// 一个字符的高度
+        /// 空白字符的测量信息
         /// </summary>
-        private double characterHeight;
+        private VTextMetrics blankCharacterMetrics;
 
         /// <summary>
         /// 光标所在行
@@ -140,7 +136,7 @@ namespace XTerminal
 
         #region 公开接口
 
-        public void Initialize()
+        public void Initialize(VTInitialOptions options)
         {
             this.uiSyncContext = SynchronizationContext.Current;
 
@@ -148,9 +144,11 @@ namespace XTerminal
             // 1:和字符方向相反（向左）
             this.implicitMovementDirection = 0;
 
+            // 初始化变量
             this.textLines = new Dictionary<int, VTextLine>();
             this.TextOptions = new VTextOptions();
 
+            // 初始化键盘
             this.Keyboard = new VTKeyboard();
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
@@ -166,35 +164,17 @@ namespace XTerminal
             this.vtParser.ActionEvent += VtParser_ActionEvent;
             this.vtParser.Initialize();
 
-            VTextMetrics spaceTextMetrics = this.DrawingCanvas.MeasureText(" ", VTextStyle.Default);
-            this.whitespaceWidth = spaceTextMetrics.WidthIncludingWhitespace;
-            this.characterHeight = spaceTextMetrics.Height;
+            this.blankCharacterMetrics = this.DrawingCanvas.MeasureText(" ", VTextStyle.Default);
 
             // 创建第一个TextBlock
             this.activeTextBlock = this.CreateTextBlock(0, 0, 0);
-        }
 
-        public void RunSSHClient(SSHChannelAuthorition authorition)
-        {
-            this.authorition = authorition;
-            this.vtChannel = VTChannelFactory.CreateSSHClient(authorition.ServerAddress, authorition.ServerPort, authorition.UserName, authorition.Password);
-            this.vtChannel.StatusChanged += this.VTChannel_StatusChanged;
-            this.vtChannel.DataReceived += this.VTChannel_DataReceived;
-            this.vtChannel.Connect();
-        }
-
-        /// <summary>
-        /// 关闭连接并释放资源
-        /// </summary>
-        public void Exit()
-        {
-            //this.terminal.InputEvent -= this.VideoTerminal_InputEvent;
-
-            //this.vtParser.ActionEvent -= this.VtParser_ActionEvent;
-
-            //this.vtChannel.StatusChanged -= this.VTChannel_StatusChanged;
-            //this.vtChannel.DataReceived -= this.VTChannel_DataReceived;
-            //this.vtChannel.Disconnect();
+            // 连接终端通道
+            VTChannel vtChannel = VTChannelFactory.Create(options);
+            vtChannel.StatusChanged += this.VTChannel_StatusChanged;
+            vtChannel.DataReceived += this.VTChannel_DataReceived;
+            vtChannel.Connect();
+            this.vtChannel = vtChannel;
         }
 
         #endregion
@@ -209,7 +189,6 @@ namespace XTerminal
                 Column = column,
                 Row = row,
                 OffsetX = offsetX,
-                OffsetY = row * this.characterHeight,
                 Style = VTextStyle.Default
             };
 
@@ -220,8 +199,9 @@ namespace XTerminal
                 ownerLine = new VTextLine()
                 {
                     Row = row,
-                    OffsetY = this.characterHeight * row,
-                    OwnerCanvas = this.DrawingCanvas
+                    OffsetY = this.blankCharacterMetrics.Height * row,
+                    OwnerCanvas = this.DrawingCanvas,
+                    Columns = 80
                 };
                 this.textLines[row] = ownerLine;
             }
@@ -358,6 +338,23 @@ namespace XTerminal
             textLine.DeleteText(this.cursorCol, n);
         }
 
+        /// <summary>
+        /// 在当前光标处插入n个字符，要插入的字符由ch指定
+        /// </summary>
+        /// <param name="n"></param>
+        /// <param name="ch"></param>
+        private void PerformInsertCharacters(int n, char ch)
+        {
+            VTextLine textLine;
+            if (!this.textLines.TryGetValue(this.cursorRow, out textLine))
+            {
+                logger.ErrorFormat("PerformInsertCharacters失败，没找到当前光标对应的VTextLine, cursorRow = {0}", cursorRow);
+                return;
+            }
+
+            //textLine.InsertCharacter(ch, this.cursorCol, n);
+        }
+
         #endregion
 
         #region 事件处理器
@@ -406,7 +403,7 @@ namespace XTerminal
                                 {
                                     //Console.WriteLine("渲染断字符, {0}", ch);
                                     this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
-                                    this.activeTextBlock.OwnerLine.InsertCharacter(ch, this.cursorCol);
+                                    this.activeTextBlock.OwnerLine.SetCharacter(ch, this.cursorCol);
                                     this.uiSyncContext.Send((v) =>
                                     {
                                         this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);
@@ -425,7 +422,7 @@ namespace XTerminal
                                     {
                                         this.activeTextBlock = this.CreateTextBlock(this.cursorRow, this.cursorCol, this.textOffsetX);
                                     }
-                                    this.activeTextBlock.OwnerLine.InsertCharacter(ch, this.cursorCol);
+                                    this.activeTextBlock.OwnerLine.SetCharacter(ch, this.cursorCol);
                                     this.uiSyncContext.Send((v) =>
                                     {
                                         this.DrawingCanvas.DrawLine(this.activeTextBlock.OwnerLine);
@@ -465,7 +462,16 @@ namespace XTerminal
                 case VTActions.EraseLine:
                     {
                         logger.WarnFormat("EraseLine");
-                        this.PerformEraseLine(Convert.ToInt32(param[0]));
+                        int parameter = Convert.ToInt32(param[0]);
+                        this.PerformEraseLine(parameter);
+                        break;
+                    }
+
+                case VTActions.CursorForword:
+                    {
+                        int n = Convert.ToInt32(param[0]);
+                        logger.WarnFormat("CursorForword, {0}", n);
+                        this.cursorCol += n;
                         break;
                     }
 
@@ -473,6 +479,22 @@ namespace XTerminal
                     {
                         logger.WarnFormat("CursorBackward");
                         this.cursorCol--;
+                        break;
+                    }
+
+                case VTActions.CursorUp:
+                    {
+                        int n = Convert.ToInt32(param[0]);
+                        logger.WarnFormat("CursorUp, {0}", n);
+                        this.cursorRow -= n;
+                        break;
+                    }
+
+                case VTActions.CursorDown:
+                    {
+                        int n = Convert.ToInt32(param[0]);
+                        logger.WarnFormat("CursorDown, {0}", n);
+                        this.cursorRow += n;
                         break;
                     }
 
@@ -487,33 +509,42 @@ namespace XTerminal
 
                 case VTActions.SetVTMode:
                     {
-                        logger.WarnFormat("SetMode");
                         VTMode vtMode = (VTMode)param[0];
+                        logger.WarnFormat("SetMode, {0}", vtMode);
                         this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
                         break;
                     }
 
                 case VTActions.SetCursorKeyMode:
                     {
-                        logger.WarnFormat("SetCursorKeyMode");
                         VTCursorKeyMode cursorKeyMode = (VTCursorKeyMode)param[0];
+                        logger.WarnFormat("SetCursorKeyMode, {0}", cursorKeyMode);
                         this.Keyboard.SetCursorKeyMode(cursorKeyMode == VTCursorKeyMode.ApplicationMode);
                         break;
                     }
 
                 case VTActions.SetKeypadMode:
                     {
-                        logger.WarnFormat("SetKeypadMode");
                         VTKeypadMode keypadMode = (VTKeypadMode)param[0];
+                        logger.WarnFormat("SetKeypadMode, {0}", keypadMode);
                         this.Keyboard.SetKeypadMode(keypadMode == VTKeypadMode.ApplicationMode);
                         break;
                     }
 
                 case VTActions.DeleteCharacters:
                     {
-                        logger.WarnFormat("DeleteCharacters, {0}", param[0]);
                         int count = Convert.ToInt32(param[0]);
+                        logger.WarnFormat("DeleteCharacters, {0}", count);
                         this.PerformDeleteCharacters(count);
+                        break;
+                    }
+
+                case VTActions.InsertCharacters:
+                    {
+                        // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
+                        int count = Convert.ToInt32(param[0]);
+                        logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.cursorCol);
+                        //this.PerformInsertCharacters(count, ' ');
                         break;
                     }
 

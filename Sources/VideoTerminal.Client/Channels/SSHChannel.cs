@@ -2,6 +2,7 @@
 using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
+using VideoTerminal.Options;
 
 namespace XTerminal.Channels
 {
@@ -23,14 +24,12 @@ namespace XTerminal.Channels
 
         #region 属性
 
-        public override VTChannelTypes Type { get { return VTChannelTypes.SSH; } }
-
         #endregion
 
         #region 构造方法
 
-        public SSHChannel(SSHChannelAuthorition authorition) : 
-            base(authorition)
+        public SSHChannel(VTInitialOptions options) :
+            base(options)
         {
         }
 
@@ -38,15 +37,27 @@ namespace XTerminal.Channels
 
         #region 实例方法
 
+        private string GetTerminalName(TerminalTypes types)
+        {
+            switch (types)
+            {
+                case TerminalTypes.VT100: return "vt100";
+                case TerminalTypes.VT220: return "vt220";
+                case TerminalTypes.XTerm: return "xterm";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
-        #region SocketBase
+        #region VTChannel
 
         public override bool Connect()
         {
             this.NotifyStatusChanged(VTChannelState.Connecting);
 
-            this.authorition = this.Authorition as SSHChannelAuthorition;
+            this.authorition = this.options.Authorition as SSHChannelAuthorition;
             var authentications = new List<AuthenticationMethod>();
             if (!string.IsNullOrEmpty(this.authorition.KeyFilePath))
             {
@@ -60,7 +71,11 @@ namespace XTerminal.Channels
             this.sshClient.Connect();
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
 
-            this.stream = this.sshClient.CreateShellStream("xterm", 80, 24, 9999, 9999, 4096);
+            Dictionary<TerminalModes, int> terminalModeValues = new Dictionary<TerminalModes, int>();
+            terminalModeValues[TerminalModes.ECHOCTL] = 1;
+
+            TerminalOptions terminalOptions = this.options.TerminalOption;
+            this.stream = this.sshClient.CreateShellStream(this.GetTerminalName(terminalOptions.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize);
             this.stream.DataReceived += this.Stream_DataReceived;
 
             this.NotifyStatusChanged(VTChannelState.Connected);

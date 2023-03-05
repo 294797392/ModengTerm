@@ -36,4 +36,18 @@ https://vt100.net/emu/dec_ansi_parser
 stateMachine -> OutputStateMachineEngine -> AdaptDispatch/TerminalDispatch -> outputStream
 
 
+# 虚拟终端功能
+1. 当窗口大小改变的时候，终端的行列可以动态改变
+
+
+# 虚拟终端支持启用或禁用以下模式
+DECAWM
+
+
+
+
+
+
+
+
 

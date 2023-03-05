@@ -120,13 +120,21 @@ namespace XTerminalParser
         EraseLine,
 
         /// <summary>
-        /// 光标向左移动N个字符的距离
+        /// 光标向左移动N个字符的位置
         /// </summary>
         CursorBackward,
         /// <summary>
-        /// 光标向右移动N个字符的距离
+        /// 光标向右移动N个字符的位置
         /// </summary>
         CursorForword,
+        /// <summary>
+        /// 光标向上移动N个字符的位置
+        /// </summary>
+        CursorUp,
+        /// <summary>
+        /// 光标向下移动N个字符的位置
+        /// </summary>
+        CursorDown,
 
         /// <summary>
         /// Tab键
@@ -167,6 +175,11 @@ namespace XTerminalParser
         /// <summary>
         /// 从当前光标处删除字符
         /// </summary>
-        DeleteCharacters
+        DeleteCharacters,
+
+        /// <summary>
+        /// 在当前光标处插入N个空白字符
+        /// </summary>
+        InsertCharacters
     }
 }

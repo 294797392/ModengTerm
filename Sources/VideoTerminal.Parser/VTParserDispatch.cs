@@ -189,8 +189,25 @@ namespace XTerminalParser
 
                 case CSIActionCodes.CUF_CursorForward:
                     {
-                        logger.DebugFormat("CSIDispatch - CUF_CursorForward");
-                        this.NotifyActionEvent(VTActions.CursorForword, parameters[0]);
+                        int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
+                        logger.DebugFormat("CSIDispatch - CUF_CursorForward, {0}", n);
+                        this.NotifyActionEvent(VTActions.CursorForword, n);
+                        break;
+                    }
+
+                case CSIActionCodes.CUU_CursorUp:
+                    {
+                        int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
+                        logger.DebugFormat("CSIDispatch - CUU_CursorUp, {0}", n);
+                        this.NotifyActionEvent(VTActions.CursorUp, n);
+                        break;
+                    }
+
+                case CSIActionCodes.CUD_CursorDown:
+                    {
+                        int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
+                        logger.DebugFormat("CSIDispatch - CUD_CursorDown, {0}", n);
+                        this.NotifyActionEvent(VTActions.CursorDown, n);
                         break;
                     }
 
@@ -226,9 +243,16 @@ namespace XTerminalParser
                         break;
                     }
 
+                case CSIActionCodes.ICH_InsertCharacter:
+                    {
+                        logger.DebugFormat("CSIDispatch - ICH_InsertCharacter, {0}", parameters[0]);
+                        this.NotifyActionEvent(VTActions.InsertCharacters, parameters[0]);
+                        break;
+                    }
+
                 default:
-                    logger.WarnFormat("未实现CSIAction, {0}", (char)finalByte);
-                    break;
+                    logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
+                    throw new NotImplementedException();
             }
         }
 
@@ -521,34 +545,30 @@ namespace XTerminalParser
                             break;
                         }
 
-                    case DECPrivateMode.ASB_AlternateScreenBuffer:
-                        {
-                            success = enable ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
-                            break;
-                        }
+                    //case DECPrivateMode.DECAWM_AutoWrapMode:
+                    //    {
+                    //        //throw new NotImplementedException();
+                    //        break;
+                    //    }
 
-                    case DECPrivateMode.DECTCEM_TextCursorEnableMode:
-                        {
-                            if (enable)
-                            {
-                                this.NotifyActionEvent(VTActions.CursorVisible);
-                            }
-                            else
-                            {
-                                this.NotifyActionEvent(VTActions.CursorHiden);
-                            }
-                            break;
-                        }
+                    //case DECPrivateMode.ASB_AlternateScreenBuffer:
+                    //    {
+                    //        success = enable ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
+                    //        break;
+                    //    }
 
-                    case DECPrivateMode.XTERM_BracketedPasteMode:
-                        {
-                            break;
-                        }
-
-                    case DECPrivateMode.ATT610_StartCursorBlink:
-                        {
-                            break;
-                        }
+                    //case DECPrivateMode.DECTCEM_TextCursorEnableMode:
+                    //    {
+                    //        if (enable)
+                    //        {
+                    //            this.NotifyActionEvent(VTActions.CursorVisible);
+                    //        }
+                    //        else
+                    //        {
+                    //            this.NotifyActionEvent(VTActions.CursorHiden);
+                    //        }
+                    //        break;
+                    //    }
 
                     default:
                         logger.WarnFormat("未实现DECSETPrivateMode, {0}", mode);
