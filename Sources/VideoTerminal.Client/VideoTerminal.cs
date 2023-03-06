@@ -214,7 +214,6 @@ namespace XTerminal
                 TerminalColumns = this.initialOptions.TerminalOption.Columns,
                 DECPrivateAutoWrapMode = this.initialOptions.TerminalOption.DECPrivateAutoWrapMode,
                 OwnerCanvas = this.DrawingCanvas,
-                Text = string.Empty,
             };
 
             this.textLines[row] = textLine;

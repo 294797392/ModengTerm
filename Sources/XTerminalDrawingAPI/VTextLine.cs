@@ -51,7 +51,7 @@ namespace XTerminal.Drawing
         /// <summary>
         /// 该行文本
         /// </summary>
-        public string Text { get; set; }
+        public string Text { get; internal set; }
 
         /// <summary>
         /// 所属的Canvas
@@ -63,6 +63,9 @@ namespace XTerminal.Drawing
         /// </summary>
         public object DrawingObject { get; set; }
 
+        /// <summary>
+        /// 是否开启了DECAWM模式
+        /// </summary>
         public bool DECPrivateAutoWrapMode { get; set; }
 
         /// <summary>
@@ -196,18 +199,31 @@ namespace XTerminal.Drawing
                 return;
             }
 
-            // 更新文本
-            if (position > this.Text.Length - 1)
+            if (this.CursorAtRightMargin && this.DECPrivateAutoWrapMode)
             {
-                // 说明是追加字符串操作
-                this.Text = this.Text.Insert(position, char.ToString(ch));
+                // 说明光标已经在最右边了
+                // 并且开启了自动换行(DECAWM)的功能，那么要自动换行
 
-                // 更新TextBlock的列数
-                textBlock.Columns += 1;
+
+
+                // 换行完了之后再重置状态
+                this.CursorAtRightMargin = false;
             }
             else
             {
-                this.Text = this.Text.Remove(position, 1).Insert(position, char.ToString(ch));
+                // 更新文本
+                if (position > this.Text.Length - 1)
+                {
+                    // 说明是追加字符串操作
+                    this.Text = this.Text.Insert(position, char.ToString(ch));
+
+                    // 更新TextBlock的列数
+                    textBlock.Columns += 1;
+                }
+                else
+                {
+                    this.Text = this.Text.Remove(position, 1).Insert(position, char.ToString(ch));
+                }
             }
 
             // 对齐
