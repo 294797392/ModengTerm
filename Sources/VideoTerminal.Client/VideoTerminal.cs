@@ -106,6 +106,11 @@ namespace XTerminal
 
         private VTInitialOptions initialOptions;
 
+        /// <summary>
+        /// DECAWM是否启用
+        /// </summary>
+        private bool autoWrapMode;
+
         #endregion
 
         #region 属性
@@ -148,6 +153,8 @@ namespace XTerminal
         {
             this.initialOptions = options;
             this.uiSyncContext = SynchronizationContext.Current;
+
+            this.autoWrapMode = this.initialOptions.TerminalOption.DECPrivateAutoWrapMode;
 
             // 0:和字符方向相同（向右）
             // 1:和字符方向相反（向左）
@@ -212,7 +219,7 @@ namespace XTerminal
                 OffsetY = offsetY,
                 CursorAtRightMargin = false,
                 TerminalColumns = this.initialOptions.TerminalOption.Columns,
-                DECPrivateAutoWrapMode = this.initialOptions.TerminalOption.DECPrivateAutoWrapMode,
+                DECPrivateAutoWrapMode = this.autoWrapMode,
                 OwnerCanvas = this.DrawingCanvas,
             };
 
@@ -297,10 +304,7 @@ namespace XTerminal
                         cursorLine.DeleteText(this.cursorCol);
 
                         // 刷新UI
-                        this.uiSyncContext.Send((v) =>
-                        {
-                            this.DrawingCanvas.DrawLine(cursorLine);
-                        }, null);
+                        this.DrawLine(cursorLine);
                         break;
                     }
 
@@ -316,11 +320,7 @@ namespace XTerminal
 
                         cursorLine.DeleteText(0, this.cursorCol);
 
-                        this.uiSyncContext.Send((v) =>
-                        {
-                            this.DrawingCanvas.DrawLine(cursorLine);
-                        }, null);
-
+                        this.DrawLine(cursorLine);
                         break;
                     }
 
@@ -336,10 +336,7 @@ namespace XTerminal
 
                         cursorLine.DeleteAll();
 
-                        this.uiSyncContext.Send((v) =>
-                        {
-                            this.DrawingCanvas.DrawLine(cursorLine);
-                        }, null);
+                        this.DrawLine(cursorLine);
                         break;
                     }
 
@@ -573,6 +570,12 @@ namespace XTerminal
                         int count = Convert.ToInt32(param[0]);
                         logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.cursorCol);
                         //this.PerformInsertCharacters(count, ' ');
+                        break;
+                    }
+
+                case VTActions.SetDECAWM:
+                    {
+                        this.autoWrapMode = (bool)param[0];
                         break;
                     }
 

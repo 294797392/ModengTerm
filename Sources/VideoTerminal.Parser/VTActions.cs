@@ -180,6 +180,8 @@ namespace XTerminalParser
         /// <summary>
         /// 在当前光标处插入N个空白字符
         /// </summary>
-        InsertCharacters
+        InsertCharacters,
+
+        SetDECAWM,
     }
 }

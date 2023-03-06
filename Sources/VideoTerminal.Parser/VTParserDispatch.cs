@@ -545,17 +545,17 @@ namespace XTerminalParser
                             break;
                         }
 
-                    //case DECPrivateMode.DECAWM_AutoWrapMode:
-                    //    {
-                    //        //throw new NotImplementedException();
-                    //        break;
-                    //    }
+                    case DECPrivateMode.DECAWM_AutoWrapMode:
+                        {
+                            this.NotifyActionEvent(VTActions.SetDECAWM, enable);
+                            break;
+                        }
 
-                    //case DECPrivateMode.ASB_AlternateScreenBuffer:
-                    //    {
-                    //        success = enable ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
-                    //        break;
-                    //    }
+                    case DECPrivateMode.ASB_AlternateScreenBuffer:
+                        {
+                            success = enable ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
+                            break;
+                        }
 
                     //case DECPrivateMode.DECTCEM_TextCursorEnableMode:
                     //    {
