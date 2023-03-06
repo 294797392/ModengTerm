@@ -460,18 +460,9 @@ namespace XTerminal
                                     this.cursorCol++;
                                     // 下次新创建的TextBlock的X偏移量
                                     this.activeOffsetX = this.activeText.Boundary.RightTop.X;
-
-                                    if (this.activeLine.Columns == this.activeLine.TerminalColumns)
-                                    {
-                                        // 光标在最右边了
-                                        // 在收到移动光标指令的时候，要清除这个标志
-                                        activeLine.CursorAtRightMargin = true;
-                                    }
-
                                     break;
                                 }
                         }
-
 
                         break;
                     }

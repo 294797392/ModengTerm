@@ -204,8 +204,6 @@ namespace XTerminal.Drawing
                 // 说明光标已经在最右边了
                 // 并且开启了自动换行(DECAWM)的功能，那么要自动换行
 
-
-
                 // 换行完了之后再重置状态
                 this.CursorAtRightMargin = false;
             }
@@ -224,6 +222,13 @@ namespace XTerminal.Drawing
                 {
                     this.Text = this.Text.Remove(position, 1).Insert(position, char.ToString(ch));
                 }
+            }
+
+            if (this.Columns == this.TerminalColumns)
+            {
+                // 光标在最右边了，下次在收到字符，要自动换行了
+                // 在收到移动光标指令的时候，要清除这个标志
+                this.CursorAtRightMargin = true;
             }
 
             // 对齐

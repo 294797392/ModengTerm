@@ -42,7 +42,7 @@ namespace XTerminal.Drawing
             { VTKeys.Back, new byte[] { 8 } }, { VTKeys.Tab, new byte[] { 9 } },
 
 
-            { VTKeys.OemOpenBrackets, new byte[] { (byte)'[' } }, { VTKeys.OemCloseBrackets, new byte[] { (byte)']' } },{ VTKeys.Oem5, new byte[] { (byte)'|' } },
+            { VTKeys.OemOpenBrackets, new byte[] { (byte)'[' } }, { VTKeys.OemCloseBrackets, new byte[] { (byte)']' } },{ VTKeys.Oem5, new byte[] { (byte)'\\' } },
             { VTKeys.Oem1, new byte[] { (byte)';' } }, { VTKeys.OemQuotes, new byte[] { (byte)'\'' } },
             { VTKeys.OemComma, new byte[] { (byte)',' } }, { VTKeys.OemPeriod, new byte[] { (byte)'.' } }, { VTKeys.OemQuestion, new byte[] { (byte)'/' } },
 
@@ -50,11 +50,31 @@ namespace XTerminal.Drawing
             { VTKeys.Oem3, new byte[] { (byte)'`' } }, { VTKeys.D1, new byte[] { (byte)'1' } }, { VTKeys.D2, new byte[] { (byte)'2' } },
             { VTKeys.D3, new byte[] { (byte)'3' } }, { VTKeys.D4, new byte[] { (byte)'4' } },{ VTKeys.D5, new byte[] { (byte)'5' } }, { VTKeys.D6, new byte[] { (byte)'6' } },
             { VTKeys.D7, new byte[] { (byte)'7' } }, { VTKeys.D8, new byte[] { (byte)'8' } },{ VTKeys.D9, new byte[] { (byte)'9' } }, { VTKeys.D0, new byte[] { (byte)'0' } },
-            { VTKeys.OemMinus, new byte[] { (byte)'-' } }, { VTKeys.OemPlus, new byte[] { (byte)'+' } },
+            { VTKeys.OemMinus, new byte[] { (byte)'-' } }, { VTKeys.OemPlus, new byte[] { (byte)'=' } },
+        };
+
+        private static readonly Dictionary<VTKeys, byte[]> ANSIShiftKeyTable = new Dictionary<VTKeys, byte[]>() 
+        {
+            { VTKeys.A, new byte[] { (byte)'a' } }, { VTKeys.B, new byte[] { (byte)'b' } }, { VTKeys.C, new byte[] { (byte)'c' } }, { VTKeys.D, new byte[] { (byte)'d' } },
+            { VTKeys.E, new byte[] { (byte)'e' } }, { VTKeys.F, new byte[] { (byte)'f' } }, { VTKeys.G, new byte[] { (byte)'g' } }, { VTKeys.H, new byte[] { (byte)'h' } },
+            { VTKeys.I, new byte[] { (byte)'i' } }, { VTKeys.J, new byte[] { (byte)'j' } }, { VTKeys.K, new byte[] { (byte)'k' } }, { VTKeys.L, new byte[] { (byte)'l' } },
+            { VTKeys.M, new byte[] { (byte)'m' } }, { VTKeys.N, new byte[] { (byte)'n' } }, { VTKeys.O, new byte[] { (byte)'o' } }, { VTKeys.P, new byte[] { (byte)'p' } },
+            { VTKeys.Q, new byte[] { (byte)'q' } }, { VTKeys.R, new byte[] { (byte)'r' } }, { VTKeys.S, new byte[] { (byte)'s' } }, { VTKeys.T, new byte[] { (byte)'t' } },
+            { VTKeys.U, new byte[] { (byte)'u' } }, { VTKeys.V, new byte[] { (byte)'v' } }, { VTKeys.W, new byte[] { (byte)'w' } }, { VTKeys.X, new byte[] { (byte)'x' } },
+            { VTKeys.Y, new byte[] { (byte)'y' } }, { VTKeys.Z, new byte[] { (byte)'z' } },
+
+            { VTKeys.OemOpenBrackets, new byte[] { (byte)'{' } }, { VTKeys.OemCloseBrackets, new byte[] { (byte)'}' } },{ VTKeys.Oem5, new byte[] { (byte)'|' } },
+            { VTKeys.Oem1, new byte[] { (byte)':' } }, { VTKeys.OemQuotes, new byte[] { (byte)'"' } },
+            { VTKeys.OemComma, new byte[] { (byte)'<' } }, { VTKeys.OemPeriod, new byte[] { (byte)'>' } }, { VTKeys.OemQuestion, new byte[] { (byte)'?' } },
+
+            { VTKeys.Oem3, new byte[] { (byte)'~' } },{ VTKeys.D1, new byte[] { (byte)'!' } }, { VTKeys.D2, new byte[] { (byte)'@' } },
+            { VTKeys.D3, new byte[] { (byte)'#' } }, { VTKeys.D4, new byte[] { (byte)'$' } }, { VTKeys.D5, new byte[] { (byte)'%' } }, { VTKeys.D6, new byte[] { (byte)'^' } },
+            { VTKeys.D7, new byte[] { (byte)'&' } }, { VTKeys.D8, new byte[] { (byte)'*' } }, { VTKeys.D9, new byte[] { (byte)'(' } }, { VTKeys.D0, new byte[] { (byte)')' } },
+            { VTKeys.OemMinus, new byte[] { (byte)'_' } }, { VTKeys.OemPlus, new byte[] { (byte)'+' } },
         };
 
         private static readonly Dictionary<VTKeys, byte[]> VT52KeyTable = new Dictionary<VTKeys, byte[]>()
-        {           
+        {
         };
 
         #region 方向键映射
@@ -83,10 +103,10 @@ namespace XTerminal.Drawing
 
         private static readonly Dictionary<VTKeys, byte[]> VT52AuxiliaryKeyApplicationModeTable = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'1' } }, 
-            { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'s' } }, 
-            { VTKeys.NumPad4, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'u' } }, 
-            { VTKeys.NumPad6, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'w' } }, 
+            { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'1' } },
+            { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'s' } },
+            { VTKeys.NumPad4, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'u' } },
+            { VTKeys.NumPad6, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'w' } },
             { VTKeys.NumPad8, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'x' } }, { VTKeys.NumPad9, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'y' } },
 
             // dash
@@ -95,7 +115,7 @@ namespace XTerminal.Drawing
             { VTKeys.Decimal, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'n' } }
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> VT52AuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>() 
+        private static readonly Dictionary<VTKeys, byte[]> VT52AuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.NumPad0, new byte[] { (byte)'0' } }, { VTKeys.NumPad1, new byte[] { (byte)'1' } },
             { VTKeys.NumPad2, new byte[] { (byte)'2' } }, { VTKeys.NumPad3, new byte[] { (byte)'3' } },
@@ -123,7 +143,7 @@ namespace XTerminal.Drawing
             { VTKeys.Decimal, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'n' } }
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> ANSIAuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>() 
+        private static readonly Dictionary<VTKeys, byte[]> ANSIAuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.NumPad0, new byte[] { (byte)'0' } }, { VTKeys.NumPad1, new byte[] { (byte)'1' } },
             { VTKeys.NumPad2, new byte[] { (byte)'2' } }, { VTKeys.NumPad3, new byte[] { (byte)'3' } },
@@ -169,7 +189,7 @@ namespace XTerminal.Drawing
         /// </summary>
         private bool isCursorKeyApplicationMode;
 
-        private byte[] capitalBytes;
+        private byte[] keyBytes;
 
         #endregion
 
@@ -177,7 +197,7 @@ namespace XTerminal.Drawing
 
         public VTKeyboard()
         {
-            this.capitalBytes = new byte[1];
+            this.keyBytes = new byte[1];
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
             this.SetCursorKeyMode(false);
@@ -194,6 +214,11 @@ namespace XTerminal.Drawing
         private bool IsCursorKey(VTKeys key)
         {
             return key == VTKeys.Up || key == VTKeys.Down || key == VTKeys.Left || key == VTKeys.Right;
+        }
+
+        private bool IsShiftKeyPressed(VTInputEvent evt)
+        {
+            return evt.Modifiers.HasFlag(VTModifierKeys.LeftShift) || evt.Modifiers.HasFlag(VTModifierKeys.RightShift);
         }
 
         /// <summary>
@@ -229,7 +254,7 @@ namespace XTerminal.Drawing
 
         private byte[] MapKey(VTInputEvent evt)
         {
-            #region 单独处理光标键
+            #region 单独翻译光标键
 
             if (this.IsCursorKey(evt.Key))
             {
@@ -252,7 +277,7 @@ namespace XTerminal.Drawing
 
             #endregion
 
-            #region 单独处理辅助键盘
+            #region 单独翻译辅助键盘
 
             if (this.IsAuxiliaryKey(evt.Key))
             {
@@ -284,15 +309,26 @@ namespace XTerminal.Drawing
 
             #endregion
 
+            #region 按照VT52或者ANSI标准翻译按键
+
             byte[] bytes = null;
 
             if (this.isVt52Mode)
             {
                 // VT52兼容模式
-
+                throw new NotImplementedException();
             }
             else
             {
+                // 处理按住Shift键的情况
+                if (this.IsShiftKeyPressed(evt))
+                {
+                    if (ANSIShiftKeyTable.TryGetValue(evt.Key, out bytes))
+                    {
+                        return bytes;
+                    }
+                }
+
                 // ANSI兼容模式
                 if (!ANSIKeyTable.TryGetValue(evt.Key, out bytes))
                 {
@@ -303,10 +339,12 @@ namespace XTerminal.Drawing
                 // 这里表示输入的是大写字母
                 if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
                 {
-                    capitalBytes[0] = (byte)(bytes[0] - 32);
-                    return capitalBytes;
+                    keyBytes[0] = (byte)(bytes[0] - 32);
+                    return keyBytes;
                 }
             }
+
+            #endregion
 
             return bytes;
         }
