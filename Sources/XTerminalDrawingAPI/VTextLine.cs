@@ -195,7 +195,7 @@ namespace XTerminal.Drawing
             if (textBlock == null)
             {
                 // 应该不会发生
-                logger.ErrorFormat("InsertText失败, textBlock不存在, position = {0}", position);
+                logger.ErrorFormat("PrintCharacter失败, textBlock不存在, row = {0}, column = {1}, ch = {2}", this.Row, position, ch);
                 return;
             }
 
@@ -271,14 +271,14 @@ namespace XTerminal.Drawing
             VTextBlock startTextBlock = this.HitTestText(position);
             if (startTextBlock == null)
             {
-                logger.ErrorFormat("DeleteText失败, startTextBlock不存在, position = {0}", position);
+                logger.ErrorFormat("DeleteText失败, startTextBlock不存在, row = {0}, position = {1}", this.Row, position);
                 return;
             }
 
             VTextBlock endTextBlock = this.HitTestText(position + count);
             if (endTextBlock == null)
             {
-                logger.ErrorFormat("DeleteText失败, endTextBlock不存在, position = {0}", position + count);
+                logger.ErrorFormat("DeleteText失败, endTextBlock不存在, row = {0}, position = {1}", this.Row, position + count);
                 return;
             }
 

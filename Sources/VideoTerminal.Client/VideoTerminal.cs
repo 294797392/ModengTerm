@@ -236,6 +236,7 @@ namespace XTerminal
                 Column = column,
                 Row = ownerLine.Row,
                 OffsetX = offsetX,
+                OffsetY = ownerLine.OffsetY,
                 Style = VTextStyle.Default,
             };
 
@@ -272,11 +273,8 @@ namespace XTerminal
                 this.fullWidth = width;
                 this.fullHeight = height;
 
-                this.uiSyncContext.Send((v) =>
-                {
-                    this.DrawingCanvas.Resize(width, height);
-                    this.DrawingCanvas.ScrollToEnd(ScrollOrientation.Bottom);
-                }, null);
+                this.DrawingCanvas.Resize(width, height);
+                this.DrawingCanvas.ScrollToEnd(ScrollOrientation.Bottom);
             }
         }
 
@@ -383,6 +381,7 @@ namespace XTerminal
             this.uiSyncContext.Send((v) =>
             {
                 this.DrawingCanvas.DrawLine(textLine);
+                this.InvalidateMeasure();
             }, null);
         }
 
@@ -436,7 +435,6 @@ namespace XTerminal
                                     this.activeText = this.CreateTextBlock(this.activeLine, this.cursorCol, this.activeOffsetX);
                                     this.activeLine.PrintCharacter(ch, this.cursorCol);
                                     this.DrawLine(this.activeLine);
-                                    this.InvalidateMeasure();
                                     this.cursorCol++;
                                     // 下次新创建的TextBlock的X偏移量
                                     this.activeOffsetX = this.activeText.Boundary.RightTop.X;
@@ -453,7 +451,6 @@ namespace XTerminal
 
                                     this.activeLine.PrintCharacter(ch, this.cursorCol);
                                     this.DrawLine(this.activeLine);
-                                    this.InvalidateMeasure();
                                     this.cursorCol++;
                                     // 下次新创建的TextBlock的X偏移量
                                     this.activeOffsetX = this.activeText.Boundary.RightTop.X;

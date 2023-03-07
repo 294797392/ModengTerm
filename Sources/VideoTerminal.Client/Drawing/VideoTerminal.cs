@@ -176,8 +176,7 @@ namespace XTerminal.Drawing
                 this.scrollViewer = new ScrollViewer()
                 {
                     HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                    CanContentScroll = false
+                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
                 };
                 this.scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
                 this.Children.Add(this.scrollViewer);
