@@ -172,6 +172,23 @@ namespace XTerminalParser
                         break;
                     }
 
+                case CSIActionCodes.ED_EraseDisplay:
+                    {
+                        /// <summary>
+                        /// This sequence erases some or all of the characters in the display according to the parameter. Any complete line erased by this sequence will return that line to single width mode. Editor Function
+                        /// 0	Erase from the active position to the end of the screen, inclusive (default)
+                        /// 1	Erase from start of the screen to the active position, inclusive
+                        /// 2	Erase all of the display -- all lines are erased, changed to single-width, and the cursor does not move.
+                        /// 
+                        /// 触发场景：VIM
+                        /// </summary>
+
+                        int parameter = Convert.ToInt32(parameters[0]);
+                        logger.ErrorFormat("未实现CSIDispatch - ED_EraseDisplay, parameter = {0}", parameter);
+                        this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameter);
+                        break;
+                    }
+
                 case CSIActionCodes.HVP_HorizontalVerticalPosition:
                     {
                         logger.DebugFormat("CSIDispatch - HVP_HorizontalVerticalPosition");
@@ -180,9 +197,13 @@ namespace XTerminalParser
 
                 case CSIActionCodes.CUP_CursorPosition:
                     {
-                        logger.DebugFormat("CSIDispatch - CUP_CursorPosition");
-                        int row = parameters[0];
-                        int col = parameters[1];
+                        int row = 0, col = 0;
+                        if (parameters.Count == 2)
+                        {
+                            row = parameters[0];
+                            col = parameters[1];
+                        }
+                        logger.DebugFormat("CSIDispatch - CUP_CursorPosition, row = {0}, col = {1}", row, col);
                         this.NotifyActionEvent(VTActions.CursorPosition, row, col);
                         break;
                     }
@@ -213,18 +234,32 @@ namespace XTerminalParser
 
                 case CSIActionCodes.DTTERM_WindowManipulation:
                     {
-                        logger.DebugFormat("CSIDispatch - DTTERM_WindowManipulation");
+                        /// <summary>
+                        /// Set Top and Bottom Margins
+                        /// This sequence sets the top and bottom margins to define the scrolling region.The first parameter is the line number of the first line in the scrolling region; the second parameter is the line number of the bottom line in the scrolling region.Default is the entire screen(no margins).The minimum size of the scrolling region allowed is two lines, i.e., the top margin must be less than the bottom margin. The cursor is placed in the home position(see Origin Mode DECOM).
+                        /// 
+                        /// 触发场景：VIM
+                        /// </summary>
+
+                        logger.ErrorFormat("未实现CSIDispatch - DTTERM_WindowManipulation");
                         WindowManipulationType wmt = (WindowManipulationType)parameters[0];
-                        this.PerformWindowManipulation(wmt, parameters[1], parameters[2]);
+                        this.PerformWindowManipulation(wmt, parameters[0], parameters[1]);
                         break;
                     }
 
                 case CSIActionCodes.DECSTBM_SetScrollingRegion:
                     {
-                        logger.DebugFormat("CSIDispatch - DECSTBM_SetScrollingRegion");
+                        /// <summary>
+                        /// Set Top and Bottom Margins
+                        /// This sequence sets the top and bottom margins to define the scrolling region.The first parameter is the line number of the first line in the scrolling region; the second parameter is the line number of the bottom line in the scrolling region.Default is the entire screen(no margins).The minimum size of the scrolling region allowed is two lines, i.e., the top margin must be less than the bottom margin. The cursor is placed in the home position(see Origin Mode DECOM).
+                        /// 
+                        /// 触发场景：VIM
+                        /// </summary>
+
                         int topMargin = parameters[0];
                         int bottomMargin = parameters[1];
-                        throw new NotImplementedException();
+                        logger.ErrorFormat("未实现CSIDispatch - DECSTBM_SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                        //throw new NotImplementedException();
                         break;
                     }
 
@@ -245,7 +280,7 @@ namespace XTerminalParser
 
                 case CSIActionCodes.ICH_InsertCharacter:
                     {
-                        logger.DebugFormat("CSIDispatch - ICH_InsertCharacter, {0}", parameters[0]);
+                        logger.ErrorFormat("未实现CSIDispatch - ICH_InsertCharacter, {0}", parameters[0]);
                         this.NotifyActionEvent(VTActions.InsertCharacters, parameters[0]);
                         break;
                     }
@@ -499,7 +534,7 @@ namespace XTerminalParser
         {
             //this.cursorState = this.terminal.CursorSaveState();
 
-            //// 首先保存主屏幕设备
+            // 首先保存主屏幕设备
             //this.presentationDevice = this.terminal.GetActivePresentationDevice();
 
             //// 再创建一个新的屏幕设备
@@ -529,6 +564,7 @@ namespace XTerminalParser
                 {
                     case DECPrivateMode.DECCKM_CursorKeysMode:
                         {
+                            logger.DebugFormat("DECPrivateMode.DECCKM_CursorKeysMode");
                             // set - Enable Application Mode, reset - Normal mode
 
                             // true表示ApplicationMode
@@ -540,6 +576,7 @@ namespace XTerminalParser
 
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
+                            logger.DebugFormat("DECPrivateMode.DECANM_AnsiMode");
                             this.isAnsiMode = enable;
                             this.NotifyActionEvent(VTActions.SetVTMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
                             break;
@@ -547,13 +584,16 @@ namespace XTerminalParser
 
                     case DECPrivateMode.DECAWM_AutoWrapMode:
                         {
+                            logger.DebugFormat("DECPrivateMode.DECAWM_AutoWrapMode");
                             this.NotifyActionEvent(VTActions.SetDECAWM, enable);
                             break;
                         }
 
                     case DECPrivateMode.ASB_AlternateScreenBuffer:
                         {
-                            success = enable ? this.UseAlternateScreenBuffer() : this.UseMainScreenBuffer();
+                            // 打开VIM等编辑器的时候会触发
+                            logger.DebugFormat("DECPrivateMode.ASB_AlternateScreenBuffer");
+                            this.NotifyActionEvent(enable ? VTActions.UseAlternateScreenBuffer : VTActions.UseMainScreenBuffer);
                             break;
                         }
 
@@ -571,7 +611,7 @@ namespace XTerminalParser
                     //    }
 
                     default:
-                        logger.WarnFormat("未实现DECSETPrivateMode, {0}", mode);
+                        logger.ErrorFormat("未实现DECSETPrivateMode, {0}", mode);
                         break;
                 }
             }

@@ -120,6 +120,14 @@ namespace XTerminalParser
         EraseLine,
 
         /// <summary>
+        /// This sequence erases some or all of the characters in the display according to the parameter. Any complete line erased by this sequence will return that line to single width mode. Editor Function
+        /// 0	Erase from the active position to the end of the screen, inclusive (default)
+        /// 1	Erase from start of the screen to the active position, inclusive
+        /// 2	Erase all of the display -- all lines are erased, changed to single-width, and the cursor does not move.
+        /// </summary>
+        ED_EraseDisplay,
+
+        /// <summary>
         /// 光标向左移动N个字符的位置
         /// </summary>
         CursorBackward,
@@ -183,5 +191,8 @@ namespace XTerminalParser
         InsertCharacters,
 
         SetDECAWM,
+
+        UseAlternateScreenBuffer,
+        UseMainScreenBuffer
     }
 }

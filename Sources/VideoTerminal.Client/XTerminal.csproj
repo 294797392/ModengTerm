@@ -85,6 +85,7 @@
     <Compile Include="Core\VTKeys.cs" />
     <Compile Include="Core\VTModifierKeys.cs" />
     <Compile Include="DefaultValues.cs" />
+    <Compile Include="Drawing\DrawingCursor.cs" />
     <Compile Include="Drawing\DrawingLine.cs" />
     <Compile Include="Drawing\DrawingObject.cs" />
     <Compile Include="Drawing\DrawingText.cs" />

@@ -53,7 +53,7 @@ namespace XTerminal.Drawing
             { VTKeys.OemMinus, new byte[] { (byte)'-' } }, { VTKeys.OemPlus, new byte[] { (byte)'=' } },
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> ANSIShiftKeyTable = new Dictionary<VTKeys, byte[]>() 
+        private static readonly Dictionary<VTKeys, byte[]> ANSIShiftKeyTable = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.A, new byte[] { (byte)'a' } }, { VTKeys.B, new byte[] { (byte)'b' } }, { VTKeys.C, new byte[] { (byte)'c' } }, { VTKeys.D, new byte[] { (byte)'d' } },
             { VTKeys.E, new byte[] { (byte)'e' } }, { VTKeys.F, new byte[] { (byte)'f' } }, { VTKeys.G, new byte[] { (byte)'g' } }, { VTKeys.H, new byte[] { (byte)'h' } },
@@ -218,7 +218,7 @@ namespace XTerminal.Drawing
 
         private bool IsShiftKeyPressed(VTInputEvent evt)
         {
-            return evt.Modifiers.HasFlag(VTModifierKeys.LeftShift) || evt.Modifiers.HasFlag(VTModifierKeys.RightShift);
+            return evt.Modifiers.HasFlag(VTModifierKeys.Shift);
         }
 
         /// <summary>

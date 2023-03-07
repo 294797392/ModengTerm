@@ -110,7 +110,7 @@ namespace XTerminal.Drawing
                 this.inputEvent.CapsLock = Console.CapsLock;
                 this.inputEvent.Key = vtKey;
                 this.inputEvent.Text = null;
-                this.inputEvent.Modifiers = VTModifierKeys.None;
+                this.inputEvent.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
                 this.NotifyInputEvent(this.inputEvent);
             }
         }

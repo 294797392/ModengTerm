@@ -111,6 +111,9 @@ namespace XTerminal
         /// </summary>
         private bool autoWrapMode;
 
+        private IDrawingCanvas alternateCanvas;
+        private IDrawingCanvas mainCanvas;
+
         #endregion
 
         #region 属性
@@ -172,6 +175,7 @@ namespace XTerminal
             // 初始化视频终端
             this.DrawingCanvas = this.Controller.CreatePresentationDevice();
             this.Controller.SwitchPresentaionDevice(null, this.DrawingCanvas);
+            this.mainCanvas = this.DrawingCanvas;
             this.InputDevice = this.Controller.GetInputDevice();
             this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
 
@@ -290,7 +294,7 @@ namespace XTerminal
                     {
                         // 删除从当前光标处到该行结尾的所有字符
 
-                        // 获取光标所在文本
+                        // 获取光标所在行
                         VTextLine cursorLine;
                         if (!this.textLines.TryGetValue(this.cursorRow, out cursorLine))
                         {
@@ -335,6 +339,64 @@ namespace XTerminal
                         cursorLine.DeleteAll();
 
                         this.DrawLine(cursorLine);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 执行删除显示操作
+        /// </summary>
+        /// <param name="parameter"></param>
+        private void PerformEraseDisplay(int parameter)
+        {
+            switch (parameter)
+            {
+                case 0:
+                    {
+                        // 从当前光标处直到屏幕最后一行全部都删除（包括当前光标处）
+
+                        // 获取光标所在行
+                        VTextLine cursorLine;
+                        if (!this.textLines.TryGetValue(this.cursorRow, out cursorLine))
+                        {
+                            logger.ErrorFormat("PerformEraseDisplay失败, 获取光标所在行失败, cursorRow = {0}", this.cursorRow);
+                            return;
+                        }
+
+                        // 先删第一行，从当前光标位置开始删除
+                        cursorLine.DeleteText(this.cursorCol);
+
+                        VTextLine current = cursorLine;
+
+                        while (current != null)
+                        {
+                            
+                        }
+
+                        // 删除
+                        cursorLine.DeleteText(this.cursorCol);
+
+                        // 刷新UI
+                        this.DrawLine(cursorLine);
+
+                        break;
+                    }
+
+                case 1:
+                    {
+                        // 从屏幕的开始处删除到当前光标处
+
+                        break;
+                    }
+
+                case 2:
+                    {
+                        // 删除显示的全部字符，所有行都被删除，changed to single-width，光标不移动
+
                         break;
                     }
 
@@ -573,6 +635,43 @@ namespace XTerminal
                 case VTActions.SetDECAWM:
                     {
                         this.autoWrapMode = (bool)param[0];
+                        break;
+                    }
+
+                case VTActions.UseAlternateScreenBuffer:
+                    {
+                        this.uiSyncContext.Send((state) =>
+                        {
+                            IDrawingCanvas alternateCanvas = this.Controller.CreatePresentationDevice();
+                            this.Controller.SwitchPresentaionDevice(this.DrawingCanvas, alternateCanvas);
+                            this.alternateCanvas = alternateCanvas;
+                            this.DrawingCanvas = alternateCanvas;
+                        }, null);
+                        break;
+                    }
+
+                case VTActions.UseMainScreenBuffer:
+                    {
+                        if (this.alternateCanvas == null)
+                        {
+                            logger.ErrorFormat("UseMainScreenBuffer, alternateCanvas不存在");
+                            return;
+                        }
+
+                        this.uiSyncContext.Send((state) =>
+                        {
+                            this.Controller.SwitchPresentaionDevice(this.alternateCanvas, this.mainCanvas);
+                            this.Controller.ReleasePresentationDevice(this.alternateCanvas);
+                            this.DrawingCanvas = this.mainCanvas;
+                            this.alternateCanvas = null;
+                        }, null);
+                        break;
+                    }
+
+                case VTActions.ED_EraseDisplay:
+                    {
+                        int parameter = Convert.ToInt32(param[0]);
+                        this.PerformEraseDisplay(parameter);
                         break;
                     }
 
