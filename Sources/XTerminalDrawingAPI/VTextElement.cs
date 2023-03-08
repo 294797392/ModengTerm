@@ -6,8 +6,18 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Drawing
 {
-    public abstract class VTextElement
+    public abstract class VTextElement<TTextElement>
     {
+        /// <summary>
+        /// 上一个文本元素
+        /// </summary>
+        public TTextElement Previous { get; set; }
+
+        /// <summary>
+        /// 下一个文本元素
+        /// </summary>
+        public TTextElement Next { get; set; }
+
         /// <summary>
         /// 该文本块左上角的X坐标
         /// </summary>

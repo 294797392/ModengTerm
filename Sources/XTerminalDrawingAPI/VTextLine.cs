@@ -10,7 +10,7 @@ namespace XTerminal.Drawing
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VTextElement
+    public class VTextLine : VTextElement<VTextLine>
     {
         #region 实例变量
 
@@ -191,14 +191,6 @@ namespace XTerminal.Drawing
         /// <param name="position">索引位置，在此处插入字符串</param>
         public void PrintCharacter(char ch, int position)
         {
-            VTextBlock textBlock = this.HitTestText(position);
-            if (textBlock == null)
-            {
-                // 应该不会发生
-                logger.ErrorFormat("PrintCharacter失败, textBlock不存在, row = {0}, column = {1}, ch = {2}", this.Row, position, ch);
-                return;
-            }
-
             if (this.CursorAtRightMargin && this.DECPrivateAutoWrapMode)
             {
                 // 说明光标已经在最右边了
@@ -214,9 +206,6 @@ namespace XTerminal.Drawing
                 {
                     // 说明是追加字符串操作
                     this.Text = this.Text.Insert(position, char.ToString(ch));
-
-                    // 更新TextBlock的列数
-                    textBlock.Columns += 1;
                 }
                 else
                 {
@@ -230,9 +219,6 @@ namespace XTerminal.Drawing
                 // 在收到移动光标指令的时候，要清除这个标志
                 this.CursorAtRightMargin = true;
             }
-
-            // 对齐
-            this.LeftAlignment();
         }
 
         /// <summary>
@@ -268,56 +254,7 @@ namespace XTerminal.Drawing
         /// <param name="count">要删除的字符个数</param>
         public void DeleteText(int position, int count)
         {
-            VTextBlock startTextBlock = this.HitTestText(position);
-            if (startTextBlock == null)
-            {
-                logger.ErrorFormat("DeleteText失败, startTextBlock不存在, row = {0}, position = {1}", this.Row, position);
-                return;
-            }
-
-            VTextBlock endTextBlock = this.HitTestText(position + count);
-            if (endTextBlock == null)
-            {
-                logger.ErrorFormat("DeleteText失败, endTextBlock不存在, row = {0}, position = {1}", this.Row, position + count);
-                return;
-            }
-
             this.Text = this.Text.Remove(position, count);
-
-            if (startTextBlock == endTextBlock)
-            {
-                // 此时说明一个TextBlock就可以删完整个字符了
-                startTextBlock.Columns -= count;
-                if (startTextBlock.IsEmpty())
-                {
-                    this.DeleteTextWithoutAlignment(startTextBlock);
-                }
-            }
-            else
-            {
-                // 先计算startTextBlock能删除多少字符
-                int startDelete = startTextBlock.Columns - (position - startTextBlock.Column + 1);
-
-                // 跨TextBlock删除, 把startTextBlock和endTextBlock中间的所有TextBlock删除, 并且计算一共删了多少个字符
-                int deletes = 0;
-                VTextBlock current = startTextBlock.Next;
-
-                while (current != null && current != endTextBlock)
-                {
-                    this.DeleteTextWithoutAlignment(current);
-
-                    deletes += current.Columns;
-
-                    current = current.Next;
-                }
-
-                // 最后计算endTextBlock能删除多少字符
-                int endDelete = count - startDelete - deletes;
-                endTextBlock.Columns -= endDelete;
-            }
-
-            // 左对齐排版
-            this.LeftAlignment();
         }
 
         /// <summary>
@@ -348,73 +285,73 @@ namespace XTerminal.Drawing
 
 
 
-        public void AddTextBlock(VTextBlock textBlock)
-        {
-            if (this.First == null)
-            {
-                this.First = textBlock;
-                this.Last = textBlock;
-            }
-            else
-            {
-                this.Last.Next = textBlock;
-                textBlock.Previous = this.Last;
-                this.Last = textBlock;
-            }
-            this.TextBlocks.Add(textBlock);
+        //public void AddTextBlock(VTextBlock textBlock)
+        //{
+        //    if (this.First == null)
+        //    {
+        //        this.First = textBlock;
+        //        this.Last = textBlock;
+        //    }
+        //    else
+        //    {
+        //        this.Last.Next = textBlock;
+        //        textBlock.Previous = this.Last;
+        //        this.Last = textBlock;
+        //    }
+        //    this.TextBlocks.Add(textBlock);
 
-            textBlock.OwnerLine = this;
-        }
+        //    textBlock.OwnerLine = this;
+        //}
 
-        /// <summary>
-        /// 删除文本
-        /// </summary>
-        /// <param name="textBlock"></param>
-        public void DeleteTextBlock(VTextBlock textBlock)
-        {
-            this.DeleteTextWithoutAlignment(textBlock);
-        }
+        ///// <summary>
+        ///// 删除文本
+        ///// </summary>
+        ///// <param name="textBlock"></param>
+        //public void DeleteTextBlock(VTextBlock textBlock)
+        //{
+        //    this.DeleteTextWithoutAlignment(textBlock);
+        //}
 
-        /// <summary>
-        /// 查询大于等于column列所有的文本块
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        public List<VTextBlock> GetTextBlockAfter(int column)
-        {
-            return this.TextBlocks.Where(v => v.Column >= column || column >= v.Column && column <= v.Column + v.Columns).ToList();
-        }
+        ///// <summary>
+        ///// 查询大于等于column列所有的文本块
+        ///// </summary>
+        ///// <param name="column"></param>
+        ///// <returns></returns>
+        //public List<VTextBlock> GetTextBlockAfter(int column)
+        //{
+        //    return this.TextBlocks.Where(v => v.Column >= column || column >= v.Column && column <= v.Column + v.Columns).ToList();
+        //}
 
-        /// <summary>
-        /// 查询小于等于column列所有的文本块
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        public List<VTextBlock> GetTextBlockBefore(int column)
-        {
-            return this.TextBlocks.Where(v => v.Column <= column || column >= v.Column && column <= v.Column + v.Columns).ToList();
-        }
+        ///// <summary>
+        ///// 查询小于等于column列所有的文本块
+        ///// </summary>
+        ///// <param name="column"></param>
+        ///// <returns></returns>
+        //public List<VTextBlock> GetTextBlockBefore(int column)
+        //{
+        //    return this.TextBlocks.Where(v => v.Column <= column || column >= v.Column && column <= v.Column + v.Columns).ToList();
+        //}
 
-        /// <summary>
-        /// 返回某个列所属的TextBlock
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        public VTextBlock HitTestText(int column)
-        {
-            foreach (VTextBlock textBlock in this.TextBlocks)
-            {
-                int startCol = textBlock.Column;
-                int endCol = textBlock.Column + textBlock.Columns;
+        ///// <summary>
+        ///// 返回某个列所属的TextBlock
+        ///// </summary>
+        ///// <param name="column"></param>
+        ///// <returns></returns>
+        //public VTextBlock HitTestText(int column)
+        //{
+        //    foreach (VTextBlock textBlock in this.TextBlocks)
+        //    {
+        //        int startCol = textBlock.Column;
+        //        int endCol = textBlock.Column + textBlock.Columns;
 
-                if (column >= startCol && column <= endCol)
-                {
-                    return textBlock;
-                }
-            }
+        //        if (column >= startCol && column <= endCol)
+        //        {
+        //            return textBlock;
+        //        }
+        //    }
 
-            return null;
-        }
+        //    return null;
+        //}
 
         #endregion
     }

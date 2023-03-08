@@ -20,7 +20,7 @@ namespace XTerminal.Drawing
         BackToFront
     }
 
-    public class VTextBlock : VTextElement
+    public class VTextBlock : VTextElement<VTextBlock>
     {
         /// <summary>
         /// TextBlock的索引号
@@ -51,16 +51,6 @@ namespace XTerminal.Drawing
         /// 所属行
         /// </summary>
         public VTextLine OwnerLine { get; internal set; }
-
-        /// <summary>
-        /// 下一个文本块
-        /// </summary>
-        public VTextBlock Next { get; internal set; }
-
-        /// <summary>
-        /// 上一个文本块
-        /// </summary>
-        public VTextBlock Previous { get; internal set; }
 
         /// <summary>
         /// 与WPF关联的画图对象
