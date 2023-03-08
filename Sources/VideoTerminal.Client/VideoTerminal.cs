@@ -20,6 +20,9 @@ namespace XTerminal
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VideoTerminal");
 
+        private static readonly byte[] OS_OperationStatusResult = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
+        private static readonly byte[] CPR_CursorPositionReportResult = new byte[6] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
+
         #endregion
 
         #region 实例变量
@@ -254,6 +257,33 @@ namespace XTerminal
             }, null);
         }
 
+        private void PerformDeviceStatusReport(StatusType statusType)
+        {
+            switch (statusType)
+            {
+                case StatusType.OS_OperatingStatus:
+                    {
+                        // Result ("OK") is CSI 0 n
+                        this.vtChannel.Write(OS_OperationStatusResult);
+                        break;
+                    }
+
+                case StatusType.CPR_CursorPositionReport:
+                    {
+                        // Result is CSI r ; c R
+                        int cursorRow = this.activeDocument.Cursor.Row;
+                        int cursorCol = this.activeDocument.Cursor.Column;
+                        CPR_CursorPositionReportResult[2] = (byte)cursorRow;
+                        CPR_CursorPositionReportResult[4] = (byte)cursorCol;
+                        this.vtChannel.Write(CPR_CursorPositionReportResult);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -435,6 +465,13 @@ namespace XTerminal
                     {
                         int parameter = Convert.ToInt32(param[0]);
                         this.activeDocument.EraseDisplay((EraseType)parameter);
+                        break;
+                    }
+
+                case VTActions.DSR_DeviceStatusReport:
+                    {
+                        StatusType statusType = (StatusType)Convert.ToInt32(param[0]);
+                        this.PerformDeviceStatusReport(statusType);
                         break;
                     }
 

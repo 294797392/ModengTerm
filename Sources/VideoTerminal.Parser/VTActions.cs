@@ -193,6 +193,8 @@ namespace XTerminalParser
         SetDECAWM,
 
         UseAlternateScreenBuffer,
-        UseMainScreenBuffer
+        UseMainScreenBuffer,
+
+        DSR_DeviceStatusReport
     }
 }

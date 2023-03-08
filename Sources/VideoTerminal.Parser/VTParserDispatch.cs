@@ -286,6 +286,14 @@ namespace XTerminalParser
                         break;
                     }
 
+                case CSIActionCodes.DSR_DeviceStatusReport:
+                    {
+                        StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
+                        logger.DebugFormat("CSIActionCodes - DSR_DeviceStatusReport, statusType = {0}", statusType);
+                        this.NotifyActionEvent(VTActions.DSR_DeviceStatusReport, statusType);
+                        break;
+                    }
+
                 default:
                     logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                     throw new NotImplementedException();

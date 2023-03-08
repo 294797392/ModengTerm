@@ -331,4 +331,13 @@ namespace XTerminalParser
         ExitAlternateKeypadMode = '>',
         ExitVt52Mode = '<'
     }
+
+    public enum StatusType
+    {
+        OS_OperatingStatus = 5,
+        CPR_CursorPositionReport = 6,
+        ExCPR_ExtendedCursorPositionReport = 16777222,
+        MSR_MacroSpaceReport = 16777278,
+        MEM_MemoryChecksum = 16777279,
+    }
 }
