@@ -20,8 +20,9 @@ namespace XTerminal
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VideoTerminal");
 
-        private static readonly byte[] OS_OperationStatusResult = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
-        private static readonly byte[] CPR_CursorPositionReportResult = new byte[6] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
+        private static readonly byte[] OS_OperationStatusResponse = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
+        private static readonly byte[] CPR_CursorPositionReportResponse = new byte[6] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
+        private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { (byte)'\x1b', (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
 
         #endregion
 
@@ -264,7 +265,7 @@ namespace XTerminal
                 case StatusType.OS_OperatingStatus:
                     {
                         // Result ("OK") is CSI 0 n
-                        this.vtChannel.Write(OS_OperationStatusResult);
+                        this.vtChannel.Write(OS_OperationStatusResponse);
                         break;
                     }
 
@@ -273,9 +274,9 @@ namespace XTerminal
                         // Result is CSI r ; c R
                         int cursorRow = this.activeDocument.Cursor.Row;
                         int cursorCol = this.activeDocument.Cursor.Column;
-                        CPR_CursorPositionReportResult[2] = (byte)cursorRow;
-                        CPR_CursorPositionReportResult[4] = (byte)cursorCol;
-                        this.vtChannel.Write(CPR_CursorPositionReportResult);
+                        CPR_CursorPositionReportResponse[2] = (byte)cursorRow;
+                        CPR_CursorPositionReportResponse[4] = (byte)cursorCol;
+                        this.vtChannel.Write(CPR_CursorPositionReportResponse);
                         break;
                     }
 
@@ -472,6 +473,12 @@ namespace XTerminal
                     {
                         StatusType statusType = (StatusType)Convert.ToInt32(param[0]);
                         this.PerformDeviceStatusReport(statusType);
+                        break;
+                    }
+
+                case VTActions.DA_DeviceAttributes:
+                    {
+                        this.vtChannel.Write(DA_DeviceAttributesResponse);
                         break;
                     }
 

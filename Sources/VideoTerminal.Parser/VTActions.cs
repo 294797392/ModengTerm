@@ -195,6 +195,7 @@ namespace XTerminalParser
         UseAlternateScreenBuffer,
         UseMainScreenBuffer,
 
-        DSR_DeviceStatusReport
+        DSR_DeviceStatusReport,
+        DA_DeviceAttributes
     }
 }

@@ -294,6 +294,52 @@ namespace XTerminalParser
                         break;
                     }
 
+                case CSIActionCodes.DA_DeviceAttributes:
+                    {
+                        /*****************************************************************
+                         *    CSI Ps c Send Device Attributes(Primary DA).
+                                Ps = 0  or omitted ⇒  request attributes from terminal.The response depends on the decTerminalID resource setting.
+                                ⇒  CSI ? 1 ; 2 c("VT100 with Advanced Video Option")
+                                ⇒  CSI ? 1 ; 0 c("VT101 with No Options")
+                                ⇒  CSI ? 4 ; 6 c("VT132 with Advanced Video and Graphics")
+                                ⇒  CSI ? 6 c("VT102")
+                                ⇒  CSI ? 7 c("VT131")
+                                ⇒  CSI ? 1 2; Ps c("VT125")
+                                ⇒  CSI ? 6 2; Ps c("VT220")
+                                ⇒  CSI ? 6 3; Ps c("VT320")
+                                ⇒  CSI ? 6 4; Ps c("VT420")
+
+                              The VT100-style response parameters do not mean anything by themselves.VT220(and higher) parameters do, telling the host what features the terminal supports:
+                                Ps = 1  ⇒  132 - columns.
+                                Ps = 2  ⇒  Printer.
+                                Ps = 3  ⇒  ReGIS graphics.
+                                Ps = 4  ⇒  Sixel graphics.
+                                Ps = 6  ⇒  Selective erase.
+                                Ps = 8  ⇒  User - defined keys.
+                                  Ps = 9  ⇒  National Replacement Character sets.
+                                Ps = 1 5  ⇒  Technical characters.
+                                Ps = 1 6  ⇒  Locator port.
+                                Ps = 1 7  ⇒  Terminal state interrogation.
+                                Ps = 1 8  ⇒  User windows.
+                                Ps = 2 1  ⇒  Horizontal scrolling.
+                                Ps = 2 2  ⇒  ANSI color, e.g., VT525.
+                                Ps = 2 8  ⇒  Rectangular editing.
+                                Ps = 2 9  ⇒  ANSI text locator(i.e., DEC Locator mode).
+
+                              XTerm supports part of the User windows feature, providing a
+                              single page(which corresponds to its visible window).Rather
+                              than resizing the font to change the number of lines/ columns
+                              in a fixed-size display, xterm uses the window extension
+                              controls(DECSNLS, DECSCPP, DECSLPP) to adjust its visible
+                              window's size.  The "cursor coupling" controls (DECHCCM,
+                              DECPCCM, DECVCCM) are ignored.
+                        ********************************************************************/
+
+                        logger.DebugFormat("CSIActionCodes - DA_DeviceAttributes");
+                        this.NotifyActionEvent(VTActions.DA_DeviceAttributes);
+                        break;
+                    }
+
                 default:
                     logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                     throw new NotImplementedException();

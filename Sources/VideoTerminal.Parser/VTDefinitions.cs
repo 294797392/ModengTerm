@@ -143,6 +143,7 @@ namespace XTerminalParser
         HPA_HorizontalPositionAbsolute = '`',
         HPR_HorizontalPositionRelative = 'a',
         REP_RepeatCharacter = 'b',
+
         DA_DeviceAttributes = 'c',
         //DA2_SecondaryDeviceAttributes = '>c',
         //DA3_TertiaryDeviceAttributes = '=c',
