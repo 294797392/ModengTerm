@@ -97,21 +97,21 @@ namespace XTerminalParser
 
                 case ASCIITable.CR:
                     {
-                        logger.DebugFormat("Action - CR");
+                        //logger.DebugFormat("Action - CR");
                         this.NotifyActionEvent(VTActions.CarriageReturn);
                         break;
                     }
 
                 case ASCIITable.LF:
                     {
-                        logger.DebugFormat("Action - LF");
+                        //logger.DebugFormat("Action - LF");
                         this.NotifyActionEvent(VTActions.LineFeed);
                         break;
                     }
 
                 case ASCIITable.FF:
                     {
-                        logger.DebugFormat("Action - LF");
+                        //logger.DebugFormat("Action - LF");
                         this.NotifyActionEvent(VTActions.LineFeed);
                         break;
                     }
@@ -119,7 +119,7 @@ namespace XTerminalParser
                 case ASCIITable.VT:
                     {
                         // 这三个都是LF
-                        logger.DebugFormat("Action - VT");
+                        //logger.DebugFormat("Action - VT");
                         this.NotifyActionEvent(VTActions.LineFeed);
                         break;
                     }
@@ -161,14 +161,12 @@ namespace XTerminalParser
 
                 case CSIActionCodes.DECRST_PrivateModeReset:
                     {
-                        logger.DebugFormat("CSIDispatch - DECRST_PrivateModeReset");
                         this.PerformDECPrivateMode(parameters, false);
                         break;
                     }
 
                 case CSIActionCodes.DECSET_PrivateModeSet:
                     {
-                        logger.DebugFormat("CSIDispatch - DECSET_PrivateModeSet");
                         this.PerformDECPrivateMode(parameters, true);
                         break;
                     }
@@ -185,14 +183,14 @@ namespace XTerminalParser
                         /// </summary>
 
                         int parameter = Convert.ToInt32(parameters[0]);
-                        logger.ErrorFormat("未实现CSIDispatch - ED_EraseDisplay, parameter = {0}", parameter);
+                        logger.DebugFormat("CSIDispatch - ED_EraseDisplay, parameter = {0}", parameter);
                         this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameter);
                         break;
                     }
 
                 case CSIActionCodes.HVP_HorizontalVerticalPosition:
                     {
-                        logger.DebugFormat("CSIDispatch - HVP_HorizontalVerticalPosition");
+                        logger.ErrorFormat("CSIDispatch - HVP_HorizontalVerticalPosition");
                         break;
                     }
 
@@ -242,8 +240,10 @@ namespace XTerminalParser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        logger.ErrorFormat("未实现CSIDispatch - DTTERM_WindowManipulation");
                         WindowManipulationType wmt = (WindowManipulationType)parameters[0];
+                        int parameter1 = parameters[1];
+                        int parameter2 = parameters[2];
+                        logger.ErrorFormat("未实现CSIDispatch - DTTERM_WindowManipulation, WindowManipulationType = {0}, parameter1 = {1}, parameter2 = {2}", wmt, parameter1, parameter2);
                         this.PerformWindowManipulation(wmt, parameters[0], parameters[1]);
                         break;
                     }
@@ -266,9 +266,9 @@ namespace XTerminalParser
 
                 case CSIActionCodes.EL_EraseLine:
                     {
-                        logger.DebugFormat("CSIDispatch - EL_EraseLine");
-                        int parameter = parameters.Count > 0 ? parameters[0] : 0;
-                        this.NotifyActionEvent(VTActions.EL_EraseLine, parameter);
+                        EraseType eraseType = parameters.Count > 0 ? (EraseType)Convert.ToInt32(parameters[0]) : EraseType.ToEnd;
+                        logger.DebugFormat("CSIDispatch - EL_EraseLine, eraseType = {0}", eraseType);
+                        this.NotifyActionEvent(VTActions.EL_EraseLine, eraseType);
                         break;
                     }
 
@@ -563,47 +563,6 @@ namespace XTerminalParser
             return optionsConsumed;
         }
 
-        private bool UseMainScreenBuffer()
-        {
-            //// 先获取子显示屏
-            //IPresentationDevice subDevice = this.terminal.GetActivePresentationDevice();
-
-            //// 切换主屏幕
-            //if (!this.terminal.SwitchPresentationDevice(this.presentationDevice))
-            //{
-            //    logger.Error("切换主显示屏失败");
-            //    return false;
-            //}
-
-            //// 还原鼠标状态
-            //this.terminal.CursorRestoreState(this.cursorState);
-
-            //// 删除子显示屏
-            //this.terminal.DeletePresentationDevice(subDevice);
-
-            //return true;
-            throw new NotImplementedException();
-        }
-
-        private bool UseAlternateScreenBuffer()
-        {
-            //this.cursorState = this.terminal.CursorSaveState();
-
-            // 首先保存主屏幕设备
-            //this.presentationDevice = this.terminal.GetActivePresentationDevice();
-
-            //// 再创建一个新的屏幕设备
-            //IPresentationDevice device = this.terminal.CreatePresentationDevice();
-            //if (device == null)
-            //{
-            //    logger.Error("创建显示屏失败");
-            //    return false;
-            //}
-
-            //return this.terminal.SwitchPresentationDevice(device);
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// 设置DECPrivateMode模式
         /// </summary>
@@ -619,7 +578,7 @@ namespace XTerminalParser
                 {
                     case DECPrivateMode.DECCKM_CursorKeysMode:
                         {
-                            logger.DebugFormat("DECPrivateMode.DECCKM_CursorKeysMode");
+                            logger.DebugFormat("DECPrivateMode - DECCKM_CursorKeysMode");
                             // set - Enable Application Mode, reset - Normal mode
 
                             // true表示ApplicationMode
@@ -631,7 +590,7 @@ namespace XTerminalParser
 
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
-                            logger.DebugFormat("DECPrivateMode.DECANM_AnsiMode");
+                            logger.DebugFormat("DECPrivateMode - DECANM_AnsiMode");
                             this.isAnsiMode = enable;
                             this.NotifyActionEvent(VTActions.SetVTMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
                             break;
@@ -639,16 +598,40 @@ namespace XTerminalParser
 
                     case DECPrivateMode.DECAWM_AutoWrapMode:
                         {
-                            logger.DebugFormat("DECPrivateMode.DECAWM_AutoWrapMode");
-                            this.NotifyActionEvent(VTActions.SetDECAWM, enable);
+                            logger.DebugFormat("DECPrivateMode - DECAWM_AutoWrapMode");
+                            this.NotifyActionEvent(VTActions.AutoWrapMode, enable);
                             break;
                         }
 
                     case DECPrivateMode.ASB_AlternateScreenBuffer:
                         {
                             // 打开VIM等编辑器的时候会触发
-                            logger.DebugFormat("DECPrivateMode.ASB_AlternateScreenBuffer");
+                            logger.DebugFormat("DECPrivateMode - ASB_AlternateScreenBuffer");
                             this.NotifyActionEvent(enable ? VTActions.UseAlternateScreenBuffer : VTActions.UseMainScreenBuffer);
+                            break;
+                        }
+
+                    case DECPrivateMode.XTERM_BracketedPasteMode:
+                        {
+                            // Sets the XTerm bracketed paste mode. This controls whether pasted content is bracketed with control sequences to differentiate it from typed text.
+                            logger.DebugFormat("DECPrivateMode - XTERM_BracketedPasteMode");
+                            this.NotifyActionEvent(VTActions.XTERM_BracketedPasteMode, enable);
+                            break;
+                        }
+
+                    case DECPrivateMode.ATT610_StartCursorBlink:
+                        {
+                            // 控制是否要闪烁光标
+                            logger.DebugFormat("DECPrivateMode - ATT610_StartCursorBlink");
+                            this.NotifyActionEvent(VTActions.ATT610_StartCursorBlink, enable);
+                            break;
+                        }
+
+                    case DECPrivateMode.DECTCEM_TextCursorEnableMode:
+                        {
+                            // 控制是否要显示光标
+                            logger.DebugFormat("DECPrivateMode - DECTCEM_TextCursorEnableMode");
+                            this.NotifyActionEvent(VTActions.DECTCEM_TextCursorEnableMode, enable);
                             break;
                         }
 

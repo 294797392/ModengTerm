@@ -25,6 +25,7 @@ namespace XTerminal.Terminal
 
         /// <summary>
         /// 清除当前所有画的东西并渲染一个文档
+        /// 该方法会自动处理滚动条和视图大小
         /// </summary>
         /// <param name="document"></param>
         void DrawDocument(VTDocument document);

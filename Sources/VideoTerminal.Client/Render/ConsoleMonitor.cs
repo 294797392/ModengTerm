@@ -1,43 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows;
+using System.Windows.Media.TextFormatting;
+using XTerminalParser;
 using XTerminal.Terminal;
 
 namespace XTerminal.Document
 {
-    public class ConsoleMonitor : FrameworkElement, IVTMonitor
+    /// <summary>
+    /// 用来显示字符的容器
+    /// </summary>
+    public class ConsoleMonitor : Grid, IInputDevice
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("WPFPresentationDevice");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ConsoleMonitor");
+
+        #endregion
+
+        #region 公开事件
+
+        public event Action<IInputDevice, VTInputEvent> InputEvent;
 
         #endregion
 
         #region 实例变量
 
         private ScrollViewer scrollViewer;
-
-        private VisualCollection visuals;
-
-        private double fullWidth;
-        private double fullHeight;
+        private VTInputEvent inputEvent;
 
         #endregion
 
         #region 属性
 
-        // Provide a required override for the VisualChildrenCount property.
-        protected override int VisualChildrenCount
-        {
-            get { return this.visuals.Count; }
-        }
+        /// <summary>
+        /// 终端显示器对象
+        /// </summary>
+        public IVTMonitor Monitor { get; private set; }
 
         #endregion
 
@@ -45,122 +51,116 @@ namespace XTerminal.Document
 
         public ConsoleMonitor()
         {
-            this.visuals = new VisualCollection(this);
-        }
+            this.inputEvent = new VTInputEvent();
+            this.Background = Brushes.Transparent;
+            this.Focusable = true;
 
-        #endregion
+            CharacterCanvas drawingCanvas = new CharacterCanvas();
+            ScrollViewer scrollViewer = new ScrollViewer()
+            {
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Content = drawingCanvas
+            };
+            scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
+            this.Children.Add(scrollViewer);
 
-        #region 重写方法
-
-        // Provide a required override for the GetVisualChild method.
-        protected override Visual GetVisualChild(int index)
-        {
-            return this.visuals[index];
-        }
-
-        protected override Size MeasureOverride(Size constraint)
-        {
-            //return base.MeasureOverride(constraint);
-            return new Size(this.fullWidth, this.fullHeight);
+            this.Monitor = drawingCanvas;
+            this.scrollViewer = scrollViewer;
         }
 
         #endregion
 
         #region 实例方法
 
-        private bool EnsureScrollViewer()
+        private void NotifyInputEvent(VTInputEvent evt)
         {
-            if (this.scrollViewer == null)
+            if (this.InputEvent != null)
             {
-                this.scrollViewer = this.Parent as ScrollViewer;
+                this.InputEvent(this, evt);
             }
-
-            return this.scrollViewer != null;
         }
 
         #endregion
 
-        #region IDrawingCanvas
+        #region 事件处理器
 
         /// <summary>
-        /// 渲染一行
+        /// 输入中文的时候会触发该事件
         /// </summary>
-        /// <param name="textLine"></param>
-        public void DrawLine(VTextLine textLine)
+        /// <param name="e"></param>
+        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
         {
-            DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
-            if (drawingLine == null)
-            {
-                drawingLine = new DrawingLine();
-                drawingLine.TextLine = textLine;
-                textLine.DrawingObject = drawingLine;
-                this.visuals.Add(drawingLine);
-            }
+            base.OnPreviewTextInput(e);
 
-            drawingLine.Draw();
+            //Console.WriteLine(e.Text);
         }
 
-        public void DrawDocument(VTDocument document)
+        /// <summary>
+        /// 从键盘上按下按键的时候会触发
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
-            this.visuals.Clear();
+            base.OnPreviewKeyDown(e);
 
-            VTextLine next = document.FirstLine;
-            while (next != null)
+            if (e.Key == Key.ImeProcessed)
             {
-                this.DrawLine(next);
+                // 这些字符交给输入法处理了
+            }
+            else
+            {
+                switch (e.Key)
+                {
+                    case Key.Tab:
+                    case Key.Up:
+                    case Key.Down:
+                    case Key.Left:
+                    case Key.Right:
+                    case Key.Space:
+                        {
+                            // 防止焦点移动到其他控件上了
+                            e.Handled = true;
+                            break;
+                        }
+                }
 
-                next = next.NextLine;
+                VTKeys vtKey = TerminalUtils.ConvertToVTKey(e.Key);
+                this.inputEvent.CapsLock = Console.CapsLock;
+                this.inputEvent.Key = vtKey;
+                this.inputEvent.Text = null;
+                this.inputEvent.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+                this.NotifyInputEvent(this.inputEvent);
             }
         }
 
-        public VTextMetrics MeasureText(string text, VTextStyle style)
+        protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            return TerminalUtils.UpdateTextMetrics(text, style);
+            base.OnMouseDown(e);
+
+            this.Focus();
         }
 
-        public void Resize(double width, double height)
+        /// <summary>
+        /// 参考AvalonEdit
+        /// 重写了这个事件后，就会触发鼠标相关的事件
+        /// </summary>
+        /// <param name="hitTestParameters"></param>
+        /// <returns></returns>
+        protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
-            this.fullWidth = width;
-            this.fullHeight = height;
-            this.InvalidateMeasure();
+            return new PointHitTestResult(this, hitTestParameters.HitPoint);
         }
 
-        public void ScrollToEnd(ScrollOrientation orientation)
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (!this.EnsureScrollViewer())
-            {
-                return;
-            }
+        }
 
-            switch (orientation)
-            {
-                case ScrollOrientation.Bottom:
-                    {
-                        this.scrollViewer.ScrollToEnd();
-                        break;
-                    }
+        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseDown(e);
 
-                case ScrollOrientation.Left:
-                    {
-                        this.scrollViewer.ScrollToLeftEnd();
-                        break;
-                    }
-
-                case ScrollOrientation.Right:
-                    {
-                        this.scrollViewer.ScrollToRightEnd();
-                        break;
-                    }
-
-                case ScrollOrientation.Top:
-                    {
-                        this.scrollViewer.ScrollToTop();
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
+            //Console.WriteLine((this.scrollViewer.Content as WPFPresentaionDevice).Count);
         }
 
         #endregion

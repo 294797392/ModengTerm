@@ -104,9 +104,11 @@ namespace XTerminalParser
         Scrollback = 3
     }
 
-    internal enum WindowManipulationType
+    public enum WindowManipulationType
     {
         Invalid = 0,
+        DeIconifyWindow = 1,
+        IconifyWindow = 2,
         RefreshWindow = 7,
         ResizeWindowInCharacters = 8,
     }

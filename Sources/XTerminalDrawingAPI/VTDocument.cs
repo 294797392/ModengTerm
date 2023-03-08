@@ -27,6 +27,11 @@ namespace XTerminal.Document
         #region 属性
 
         /// <summary>
+        /// 文档的名字，方便调试
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// 文档中的第一行
         /// </summary>
         public VTextLine FirstLine { get; private set; }
@@ -298,15 +303,17 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 清空所有字符
-        /// 但是保留行对象
+        /// 清除所有字符
+        /// 只留下第一行的文本行
         /// </summary>
-        public void ClearCharacter()
+        public void Reset()
         {
-            foreach (KeyValuePair<int, VTextLine> kv in this.lineMap)
-            {
-                kv.Value.DeleteAll();
-            }
+            this.FirstLine.DeleteAll();
+            this.FirstLine.NextLine = null;
+            this.LastLine = this.FirstLine;
+            this.activeLine = this.FirstLine;
+            this.lineMap.Clear();
+            this.lineMap[0] = this.FirstLine;
         }
 
         #endregion

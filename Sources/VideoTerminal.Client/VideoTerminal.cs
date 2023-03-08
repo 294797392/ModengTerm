@@ -116,6 +116,8 @@ namespace XTerminal
         /// </summary>
         private bool autoWrapMode;
 
+        private bool xtermBracketedPasteMode;
+
         #endregion
 
         #region 属性
@@ -186,13 +188,13 @@ namespace XTerminal
 
             #region 初始化文档模型
 
-            VTDocumentOptions documentOptions = new VTDocumentOptions() 
+            VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
                 Columns = initialOptions.TerminalOption.Columns,
                 DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode
             };
-            this.mainDocument = new VTDocument(documentOptions);
-            this.alternateDocument = new VTDocument(documentOptions);
+            this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
+            this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
 
             #endregion
@@ -355,17 +357,19 @@ namespace XTerminal
                         break;
                     }
 
-                case VTActions.CUF_CursorForward:
-                    {
-                        int n = Convert.ToInt32(param[0]);
-                        this.cursorCol += n;
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
-                        break;
-                    }
+                #region 光标移动
 
                 case VTActions.CursorBackward:
                     {
                         this.cursorCol--;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        break;
+                    }
+
+                case VTActions.CUF_CursorForward:
+                    {
+                        int n = Convert.ToInt32(param[0]);
+                        this.cursorCol += n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
@@ -386,6 +390,16 @@ namespace XTerminal
                         break;
                     }
 
+                case VTActions.CUP_CursorPosition:
+                    {
+                        int row = Convert.ToInt32(param[0]);
+                        int col = Convert.ToInt32(param[1]);
+                        this.activeDocument.SetCursor(row, col);
+                        break;
+                    }
+
+                #endregion
+
                 case VTActions.PlayBell:
                 case VTActions.Bold:
                 case VTActions.Foreground:
@@ -393,12 +407,22 @@ namespace XTerminal
                 case VTActions.DefaultAttributes:
                 case VTActions.DefaultBackground:
                 case VTActions.DefaultForeground:
+                case VTActions.Underline:
+                case VTActions.UnderlineUnset:
+                case VTActions.Faint:
+                case VTActions.ItalicsUnset:
+                case VTActions.CrossedOutUnset:
+                case VTActions.DoublyUnderlined:
+                case VTActions.DoublyUnderlinedUnset:
+                case VTActions.ReverseVideo:
+                case VTActions.ReverseVideoUnset:
                     break;
+
+                #region DECPrivateMode
 
                 case VTActions.SetVTMode:
                     {
                         VTMode vtMode = (VTMode)param[0];
-                        logger.WarnFormat("SetMode, {0}", vtMode);
                         this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
                         break;
                     }
@@ -406,7 +430,6 @@ namespace XTerminal
                 case VTActions.SetCursorKeyMode:
                     {
                         VTCursorKeyMode cursorKeyMode = (VTCursorKeyMode)param[0];
-                        logger.WarnFormat("SetCursorKeyMode, {0}", cursorKeyMode);
                         this.Keyboard.SetCursorKeyMode(cursorKeyMode == VTCursorKeyMode.ApplicationMode);
                         break;
                     }
@@ -414,10 +437,34 @@ namespace XTerminal
                 case VTActions.SetKeypadMode:
                     {
                         VTKeypadMode keypadMode = (VTKeypadMode)param[0];
-                        logger.WarnFormat("SetKeypadMode, {0}", keypadMode);
                         this.Keyboard.SetKeypadMode(keypadMode == VTKeypadMode.ApplicationMode);
                         break;
                     }
+
+                case VTActions.AutoWrapMode:
+                    {
+                        this.autoWrapMode = (bool)param[0];
+                        this.activeDocument.DECPrivateAutoWrapMode = this.autoWrapMode;
+                        break;
+                    }
+
+                case VTActions.XTERM_BracketedPasteMode:
+                    {
+                        this.xtermBracketedPasteMode = (bool)param[0];
+                        break;
+                    }
+
+                case VTActions.ATT610_StartCursorBlink:
+                    {
+                        break;
+                    }
+
+                case VTActions.DECTCEM_TextCursorEnableMode:
+                    {
+                        break;
+                    }
+
+                #endregion
 
                 case VTActions.DCH_DeleteCharacter:
                     {
@@ -432,21 +479,17 @@ namespace XTerminal
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
                         int count = Convert.ToInt32(param[0]);
                         logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.cursorCol);
-                        //this.PerformInsertCharacters(count, ' ');
-                        break;
-                    }
-
-                case VTActions.SetDECAWM:
-                    {
-                        this.autoWrapMode = (bool)param[0];
-                        this.activeDocument.DECPrivateAutoWrapMode = this.autoWrapMode;
                         break;
                     }
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
-                        this.alternateDocument.ClearCharacter();
-                        this.uiSyncContext.Send((state) => 
+                        this.cursorCol = 0;
+                        this.cursorRow = 0;
+                        this.alternateDocument.Reset();
+                        this.alternateDocument.SetCursor(0, 0);
+                        this.activeDocument = this.alternateDocument;
+                        this.uiSyncContext.Send((state) =>
                         {
                             this.Monitor.DrawDocument(this.alternateDocument);
                         }, null);
@@ -455,7 +498,10 @@ namespace XTerminal
 
                 case VTActions.UseMainScreenBuffer:
                     {
-                        this.uiSyncContext.Send((state) => 
+                        this.cursorCol = this.mainDocument.Cursor.Column;
+                        this.cursorRow = this.mainDocument.Cursor.Row;
+                        this.activeDocument = this.mainDocument;
+                        this.uiSyncContext.Send((state) =>
                         {
                             this.Monitor.DrawDocument(this.mainDocument);
                         }, null);

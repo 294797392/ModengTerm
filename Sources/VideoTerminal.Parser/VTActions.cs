@@ -164,6 +164,8 @@ namespace XTerminalParser
         /// </summary>
         CUP_CursorPosition,
 
+        #region DECPrivateMode
+
         /// <summary>
         /// 设置光标键输入模式
         /// </summary>
@@ -179,6 +181,12 @@ namespace XTerminalParser
         /// VT52和ANSI两种模式
         /// </summary>
         SetVTMode,
+        AutoWrapMode,
+        XTERM_BracketedPasteMode,
+        ATT610_StartCursorBlink,
+        DECTCEM_TextCursorEnableMode,
+
+        #endregion
 
         /// <summary>
         /// 从当前光标处删除字符
@@ -189,8 +197,6 @@ namespace XTerminalParser
         /// 在当前光标处插入N个空白字符
         /// </summary>
         ICH_InsertCharacter,
-
-        SetDECAWM,
 
         UseAlternateScreenBuffer,
         UseMainScreenBuffer,
