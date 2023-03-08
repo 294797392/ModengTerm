@@ -24,6 +24,12 @@ namespace XTerminal.Terminal
         void DrawLine(VTextLine textLine);
 
         /// <summary>
+        /// 清除当前所有画的东西并渲染一个文档
+        /// </summary>
+        /// <param name="document"></param>
+        void DrawDocument(VTDocument document);
+
+        /// <summary>
         /// 测量某个文本块的属性
         /// </summary>
         /// <param name="text">要测量的文本</param>

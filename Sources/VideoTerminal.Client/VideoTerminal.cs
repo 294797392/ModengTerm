@@ -414,33 +414,20 @@ namespace XTerminal
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
-                        //this.uiSyncContext.Send((state) =>
-                        //{
-                        //    IDrawingCanvas alternateCanvas = this.Controller.CreatePresentationDevice();
-                        //    this.Controller.SwitchPresentaionDevice(this.DrawingCanvas, alternateCanvas);
-                        //    this.alternateCanvas = alternateCanvas;
-                        //    this.DrawingCanvas = alternateCanvas;
-                        //}, null);
-                        throw new NotImplementedException();
+                        this.alternateDocument.ClearCharacter();
+                        this.uiSyncContext.Send((state) => 
+                        {
+                            this.Monitor.DrawDocument(this.alternateDocument);
+                        }, null);
                         break;
                     }
 
                 case VTActions.UseMainScreenBuffer:
                     {
-                        throw new NotImplementedException();
-                        //if (this.alternateCanvas == null)
-                        //{
-                        //    logger.ErrorFormat("UseMainScreenBuffer, alternateCanvas不存在");
-                        //    return;
-                        //}
-
-                        //this.uiSyncContext.Send((state) =>
-                        //{
-                        //    this.Controller.SwitchPresentaionDevice(this.alternateCanvas, this.mainCanvas);
-                        //    this.Controller.ReleasePresentationDevice(this.alternateCanvas);
-                        //    this.DrawingCanvas = this.mainCanvas;
-                        //    this.alternateCanvas = null;
-                        //}, null);
+                        this.uiSyncContext.Send((state) => 
+                        {
+                            this.Monitor.DrawDocument(this.mainDocument);
+                        }, null);
                         break;
                     }
 

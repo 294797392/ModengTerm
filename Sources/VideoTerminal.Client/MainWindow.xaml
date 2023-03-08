@@ -13,8 +13,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <xtermdrawing:ConsoleMonitor Grid.Row="1" x:Name="ConsoleMonitor">
-        </xtermdrawing:ConsoleMonitor>
+        <xtermdrawing:ConsolePanel Grid.Row="1" x:Name="ConsolePanel">
+        </xtermdrawing:ConsolePanel>
     </Grid>
 
 </Window>

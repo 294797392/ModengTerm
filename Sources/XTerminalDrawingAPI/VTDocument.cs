@@ -297,6 +297,18 @@ namespace XTerminal.Document
             this.activeLine.DeleteText(this.Cursor.Column, count);
         }
 
+        /// <summary>
+        /// 清空所有字符
+        /// 但是保留行对象
+        /// </summary>
+        public void ClearCharacter()
+        {
+            foreach (KeyValuePair<int, VTextLine> kv in this.lineMap)
+            {
+                kv.Value.DeleteAll();
+            }
+        }
+
         #endregion
     }
 }

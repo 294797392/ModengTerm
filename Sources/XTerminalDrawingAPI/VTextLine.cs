@@ -192,10 +192,7 @@ namespace XTerminal.Document
         #region 公开接口
 
         /// <summary>
-        /// 设置指定位置处的字符，然后进行排版
-        /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
-        /// 
-        /// 如果该位置有字符了，那么把该位置的字符替换
+        /// 设置指定位置处的字符
         /// </summary>
         /// <param name="ch">要插入的字符</param>
         /// <param name="column">索引位置，在此处插入字符串</param>
@@ -232,23 +229,16 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 从指定位置开始删除字符串，然后进行排版
-        /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
-        /// 
-        /// 删除后会对该行数据进行左对齐
+        /// 从指定位置开始删除字符串
         /// </summary>
         /// <param name="column">从此处开始删除字符</param>
-        /// <param name="count">要删除的字符个数</param>
         public void DeleteText(int column)
         {
             this.DeleteText(column, this.Characters.Count - column);
         }
 
         /// <summary>
-        /// 删除指定位置处的字符串，然后进行排版
-        /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
-        /// 
-        /// 删除后会对该行数据进行左对齐
+        /// 删除指定位置处的字符串
         /// </summary>
         /// <param name="column">从此处开始删除字符</param>
         /// <param name="count">要删除的字符个数</param>
@@ -258,11 +248,8 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 删除整行，然后进行排版
-        /// 该操作会更新VTextBlock的测量信息和其他的文本块信息
+        /// 删除整行
         /// </summary>
-        /// <param name="position">从此处开始删除字符</param>
-        /// <param name="count">要删除的字符个数</param>
         public void DeleteAll()
         {
             this.Characters.Clear();
