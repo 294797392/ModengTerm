@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using XTerminal.Terminal;
 using XTerminalParser;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Document
 {
     public static class TerminalUtils
     {

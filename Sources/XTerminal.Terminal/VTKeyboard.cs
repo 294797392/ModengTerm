@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using XTerminalParser;
+using XTerminal.Base;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Terminal
 {
     /// <summary>
     /// 把不同模式下的键盘按键转换成要发送给终端的字节序列

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using XTerminal.Document;
 
-namespace XTerminal.Document
+namespace XTerminal.Terminal
 {
     public enum ScrollOrientation
     {
@@ -13,10 +15,7 @@ namespace XTerminal.Document
         Right
     }
 
-    /// <summary>
-    /// 定义终端显示器的接口
-    /// </summary>
-    public interface IDrawingCanvas
+    public interface IVTMonitor
     {
         /// <summary>
         /// 渲染一行

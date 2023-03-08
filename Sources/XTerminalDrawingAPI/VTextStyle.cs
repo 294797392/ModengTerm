@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminalParser;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Document
 {
     public class VTextStyle
     {

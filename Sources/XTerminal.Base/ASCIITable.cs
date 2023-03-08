@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminalParser
+namespace XTerminal.Base
 {
     /// <summary>
     /// 和ASCII码相关的帮助函数

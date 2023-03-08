@@ -82,10 +82,24 @@ namespace XTerminalParser
     /// <returns></returns>
     internal delegate bool DCSStringHandlerDlg(byte ch);
 
-    internal enum EraseType
+    /// <summary>
+    /// EraseLine的类型
+    /// </summary>
+    public enum EraseType
     {
+        /// <summary>
+        /// 删除从当前光标处到该行结尾的所有字符
+        /// </summary>
         ToEnd = 0,
+
+        /// <summary>
+        /// 删除从行首到当前光标处的字符
+        /// </summary>
         FromBeginning = 1,
+
+        /// <summary>
+        /// 删除光标所在整行字符
+        /// </summary>
         All = 2,
         Scrollback = 3
     }

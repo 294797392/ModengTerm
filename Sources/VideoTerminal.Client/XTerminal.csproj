@@ -78,20 +78,14 @@
     <Compile Include="Channels\VTChannelFactory.cs" />
     <Compile Include="Channels\VTChannelState.cs" />
     <Compile Include="Channels\VTChannelTypes.cs" />
-    <Compile Include="Core\IInputDevice.cs" />
-    <Compile Include="Core\IVTController.cs" />
-    <Compile Include="Core\VTInputEvent.cs" />
-    <Compile Include="Core\VTKeyboard.cs" />
-    <Compile Include="Core\VTKeys.cs" />
-    <Compile Include="Core\VTModifierKeys.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="Drawing\DrawingCursor.cs" />
-    <Compile Include="Drawing\DrawingLine.cs" />
-    <Compile Include="Drawing\DrawingObject.cs" />
-    <Compile Include="Drawing\DrawingText.cs" />
-    <Compile Include="Drawing\TerminalUtils.cs" />
-    <Compile Include="Drawing\DrawingCanvas.cs" />
-    <Compile Include="Drawing\VideoTerminal.cs" />
+    <Compile Include="Render\DrawingCursor.cs" />
+    <Compile Include="Render\DrawingLine.cs" />
+    <Compile Include="Render\DrawingObject.cs" />
+    <Compile Include="Render\DrawingText.cs" />
+    <Compile Include="Render\TerminalUtils.cs" />
+    <Compile Include="Render\DrawingCanvas.cs" />
+    <Compile Include="Render\ConsoleMonitor.cs" />
     <Compile Include="Options\TerminalOptions.cs" />
     <Compile Include="ResponseCode.cs" />
     <Compile Include="VideoTerminal.cs" />
@@ -154,9 +148,17 @@
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>XTerminal.Parser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\XTerminalDrawingAPI\XTerminal.Drawing.csproj">
+    <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
+      <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
+      <Name>XTerminal.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminal.Terminal\XTerminal.Terminal.csproj">
+      <Project>{cbb55527-c3c1-4fb1-94a5-90387baa6416}</Project>
+      <Name>XTerminal.Terminal</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminalDrawingAPI\XTerminal.Document.csproj">
       <Project>{e9617b75-f328-4210-8df2-181562a691a3}</Project>
-      <Name>XTerminal.Drawing</Name>
+      <Name>XTerminal.Document</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

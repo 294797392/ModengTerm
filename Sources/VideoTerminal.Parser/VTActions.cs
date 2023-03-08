@@ -117,7 +117,7 @@ namespace XTerminalParser
         /// <summary>
         /// 删除行
         /// </summary>
-        EraseLine,
+        EL_EraseLine,
 
         /// <summary>
         /// This sequence erases some or all of the characters in the display according to the parameter. Any complete line erased by this sequence will return that line to single width mode. Editor Function
@@ -183,7 +183,7 @@ namespace XTerminalParser
         /// <summary>
         /// 从当前光标处删除字符
         /// </summary>
-        DeleteCharacters,
+        DCH_DeleteCharacter,
 
         /// <summary>
         /// 在当前光标处插入N个空白字符

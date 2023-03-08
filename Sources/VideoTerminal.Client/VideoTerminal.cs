@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading;
 using VideoTerminal.Options;
 using XTerminal.Channels;
-using XTerminal.Drawing;
+using XTerminal.Document;
+using XTerminal.Terminal;
 using XTerminalParser;
 
 namespace XTerminal
@@ -40,20 +41,19 @@ namespace XTerminal
         private Dictionary<int, VTextLine> textLines;
 
         /// <summary>
-        /// 活动的文本行
-        /// 也就是光标所在文本行
+        /// 主缓冲区文档模型
         /// </summary>
-        private VTextLine activeLine;
+        private VTDocument mainDocument;
 
         /// <summary>
-        /// 第一行
+        /// 备用缓冲区文档模型
         /// </summary>
-        private VTextLine firstLine;
+        private VTDocument alternateDocument;
 
         /// <summary>
-        /// 最后一行
+        /// 当前正在使用的文档模型
         /// </summary>
-        private VTextLine lastLine;
+        private VTDocument activeDocument;
 
         /// <summary>
         /// 空白字符的测量信息
@@ -112,27 +112,19 @@ namespace XTerminal
         /// </summary>
         private bool autoWrapMode;
 
-        private IDrawingCanvas alternateCanvas;
-        private IDrawingCanvas mainCanvas;
-
         #endregion
 
         #region 属性
 
         /// <summary>
-        /// 终端设备的一些接口
-        /// </summary>
-        public IVTController Controller { get; set; }
-
-        /// <summary>
         /// 输入设备
         /// </summary>
-        public IInputDevice InputDevice { get; private set; }
+        public IInputDevice InputDevice { get; set; }
 
         /// <summary>
         /// 终端显示器接口
         /// </summary>
-        public IDrawingCanvas DrawingCanvas { get; private set; }
+        public IVTMonitor Monitor { get; set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流
@@ -140,6 +132,11 @@ namespace XTerminal
         public VTKeyboard Keyboard { get; private set; }
 
         public VTextOptions TextOptions { get; private set; }
+
+        /// <summary>
+        /// 光标所在行
+        /// </summary>
+        public VTextLine ActiveLine { get { return this.activeDocument.ActiveLine; } }
 
         #endregion
 
@@ -174,10 +171,6 @@ namespace XTerminal
             this.Keyboard.SetKeypadMode(false);
 
             // 初始化视频终端
-            this.DrawingCanvas = this.Controller.CreatePresentationDevice();
-            this.Controller.SwitchPresentaionDevice(null, this.DrawingCanvas);
-            this.mainCanvas = this.DrawingCanvas;
-            this.InputDevice = this.Controller.GetInputDevice();
             this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
 
             // 初始化终端解析器
@@ -185,10 +178,20 @@ namespace XTerminal
             this.vtParser.ActionEvent += VtParser_ActionEvent;
             this.vtParser.Initialize();
 
-            this.blankCharacterMetrics = this.DrawingCanvas.MeasureText(" ", VTextStyle.Default);
+            this.blankCharacterMetrics = this.Monitor.MeasureText(" ", VTextStyle.Default);
 
-            // 创建第一个TextBlock
-            this.activeLine = this.CreateTextLine(0, 0);
+            #region 初始化文档模型
+
+            VTDocumentOptions documentOptions = new VTDocumentOptions() 
+            {
+                Columns = initialOptions.TerminalOption.Columns,
+                DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode
+            };
+            this.mainDocument = new VTDocument(documentOptions);
+            this.alternateDocument = new VTDocument(documentOptions);
+            this.activeDocument = this.mainDocument;
+
+            #endregion
 
             // 连接终端通道
             VTChannel vtChannel = VTChannelFactory.Create(options);
@@ -202,60 +205,20 @@ namespace XTerminal
 
         #region 实例方法
 
-        private VTextLine CreateFirstLine()
-        {
-            VTextLine firstLine = new VTextLine()
-            {
-                Row = 0,
-                OffsetX = 0,
-                OffsetY = 0,
-                CursorAtRightMargin = false,
-                TerminalColumns = this.initialOptions.TerminalOption.Columns,
-                DECPrivateAutoWrapMode = this.autoWrapMode,
-                OwnerCanvas = this.DrawingCanvas
-            };
-
-            VTextLine previousLine;
-            if (!this.textLines.TryGetValue(row - 1, out previousLine))
-            {
-                logger.ErrorFormat("CreateTextLine失败, 找不到上一行, previousRow = {0}", row - 1);
-                return null;
-            }
-
-            return this.CreateTextLine(row, previousLine.Boundary.LeftBottom.Y);
-        }
-
-        private VTextLine CreateTextLine(int row, double offsetY)
-        {
-            VTextLine textLine = new VTextLine()
-            {
-                Row = row,
-                OffsetX = 0,
-                OffsetY = offsetY,
-                CursorAtRightMargin = false,
-                TerminalColumns = this.initialOptions.TerminalOption.Columns,
-                DECPrivateAutoWrapMode = this.autoWrapMode,
-                OwnerCanvas = this.DrawingCanvas,
-            };
-
-            this.textLines[row] = textLine;
-
-            return textLine;
-        }
-
         /// <summary>
         /// 重新测量Terminal所需要的大小
         /// 如果大小改变了，那么调整布局大小
         /// </summary>
         private void InvalidateMeasure()
         {
-            if (this.activeLine == null)
+            if (this.ActiveLine == null)
             {
                 logger.ErrorFormat("InvalidateMeasure失败, activeLine不存在");
+                return;
             }
 
-            double width = Math.Max(this.activeLine.Boundary.RightBottom.X, this.fullWidth);
-            double height = Math.Max(this.activeLine.Boundary.RightBottom.Y, this.fullHeight);
+            double width = Math.Max(this.ActiveLine.Bounds.RightBottom.X, this.fullWidth);
+            double height = Math.Max(this.ActiveLine.Bounds.RightBottom.Y, this.fullHeight);
 
             // 布局大小是否改变了
             bool sizeChanged = false;
@@ -271,162 +234,22 @@ namespace XTerminal
                 this.fullWidth = width;
                 this.fullHeight = height;
 
-                this.DrawingCanvas.Resize(width, height);
-                this.DrawingCanvas.ScrollToEnd(ScrollOrientation.Bottom);
+                this.Monitor.Resize(width, height);
+                this.Monitor.ScrollToEnd(ScrollOrientation.Bottom);
             }
-        }
-
-        /// <summary>
-        /// 执行删除行操作
-        /// </summary>
-        /// <param name="parameter"></param>
-        private void PerformEraseLine(int parameter)
-        {
-            switch (parameter)
-            {
-                case 0:
-                    {
-                        // 删除从当前光标处到该行结尾的所有字符
-
-                        // 获取光标所在行
-                        VTextLine cursorLine;
-                        if (!this.textLines.TryGetValue(this.cursorRow, out cursorLine))
-                        {
-                            logger.ErrorFormat("获取光标所在VTextLine失败, cursorRow = {0}", this.cursorRow);
-                            return;
-                        }
-
-                        // 删除
-                        cursorLine.DeleteText(this.cursorCol);
-
-                        // 刷新UI
-                        this.DrawLine(cursorLine);
-                        break;
-                    }
-
-                case 1:
-                    {
-                        // 删除从行首到当前光标处的内容
-                        VTextLine cursorLine;
-                        if (!this.textLines.TryGetValue(this.cursorRow, out cursorLine))
-                        {
-                            logger.ErrorFormat("获取光标所在VTextLine失败, cursorRow = {0}", this.cursorRow);
-                            return;
-                        }
-
-                        cursorLine.DeleteText(0, this.cursorCol);
-
-                        this.DrawLine(cursorLine);
-                        break;
-                    }
-
-                case 2:
-                    {
-                        // 删除光标所在整行
-                        VTextLine cursorLine;
-                        if (!this.textLines.TryGetValue(this.cursorRow, out cursorLine))
-                        {
-                            logger.ErrorFormat("获取光标所在VTextLine失败, cursorRow = {0}", this.cursorRow);
-                            return;
-                        }
-
-                        cursorLine.DeleteAll();
-
-                        this.DrawLine(cursorLine);
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// 执行删除显示操作
-        /// </summary>
-        /// <param name="parameter"></param>
-        private void PerformEraseDisplay(int parameter)
-        {
-            switch (parameter)
-            {
-                case 0:
-                    {
-                        // 从当前光标处直到屏幕最后一行全部都删除（包括当前光标处）
-
-                        // 获取光标所在行
-                        VTextLine cursorLine;
-                        if (!this.textLines.TryGetValue(this.cursorRow, out cursorLine))
-                        {
-                            logger.ErrorFormat("PerformEraseDisplay失败, 获取光标所在行失败, cursorRow = {0}", this.cursorRow);
-                            return;
-                        }
-
-                        // 先删第一行，从当前光标位置开始删除
-                        cursorLine.DeleteText(this.cursorCol);
-
-                        // 刷新UI
-                        this.DrawLine(cursorLine);
-
-                        break;
-                    }
-
-                case 1:
-                    {
-                        // 从屏幕的开始处删除到当前光标处
-
-                        break;
-                    }
-
-                case 2:
-                    {
-                        // 删除显示的全部字符，所有行都被删除，changed to single-width，光标不移动
-
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// 从当前光标处开始删除字符
-        /// </summary>
-        /// <param name="n">要删除的字符数</param>
-        private void PerformDeleteCharacters(int n)
-        {
-            VTextLine textLine;
-            if (!this.textLines.TryGetValue(this.cursorRow, out textLine))
-            {
-                logger.ErrorFormat("PerformDeleteCharacters失败，没找到当前光标对应的VTextLine, cursorRow = {0}", cursorRow);
-                return;
-            }
-
-            textLine.DeleteText(this.cursorCol, n);
-        }
-
-        /// <summary>
-        /// 在当前光标处插入n个字符，要插入的字符由ch指定
-        /// </summary>
-        /// <param name="n"></param>
-        /// <param name="ch"></param>
-        private void PerformInsertCharacters(int n, char ch)
-        {
-            VTextLine textLine;
-            if (!this.textLines.TryGetValue(this.cursorRow, out textLine))
-            {
-                logger.ErrorFormat("PerformInsertCharacters失败，没找到当前光标对应的VTextLine, cursorRow = {0}", cursorRow);
-                return;
-            }
-
-            //textLine.InsertCharacter(ch, this.cursorCol, n);
         }
 
         private void DrawLine(VTextLine textLine)
         {
+            if (textLine == null)
+            {
+                logger.WarnFormat("DrawLine失败, Line不存在");
+                return;
+            }
+
             this.uiSyncContext.Send((v) =>
             {
-                this.DrawingCanvas.DrawLine(textLine);
+                this.Monitor.DrawLine(textLine);
                 this.InvalidateMeasure();
             }, null);
         }
@@ -468,31 +291,10 @@ namespace XTerminal
                 case VTActions.Print:
                     {
                         char ch = (char)param[0];
-
-                        switch (ch)
-                        {
-                            // 遇到下面的字符，渲染完后就重新创建TextBlock
-                            //case ':':
-                            //case '/':
-                            //case '\\':
-                            case ' ':
-                                {
-                                    //Console.WriteLine("渲染断字符, {0}", ch);
-                                    this.activeLine.PrintCharacter(ch, this.cursorCol);
-                                    this.DrawLine(this.activeLine);
-                                    this.cursorCol++;
-                                    break;
-                                }
-
-                            default:
-                                {
-                                    this.activeLine.PrintCharacter(ch, this.cursorCol);
-                                    this.DrawLine(this.activeLine);
-                                    this.cursorCol++;
-                                    break;
-                                }
-                        }
-
+                        this.activeDocument.PrintCharacter(ch, this.cursorCol);
+                        this.cursorCol++;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        this.DrawLine(this.ActiveLine);
                         break;
                     }
 
@@ -502,6 +304,7 @@ namespace XTerminal
                         // 把光标移动到行开头
                         logger.DebugFormat("CR");
                         this.cursorCol = 0;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -510,15 +313,17 @@ namespace XTerminal
                         // LF
                         logger.DebugFormat("LF");
                         this.cursorRow++;
-                        this.activeLine = this.CreateFirstLine(this.cursorRow);
+                        this.activeDocument.CreateNextLine();
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
-                case VTActions.EraseLine:
+                case VTActions.EL_EraseLine:
                     {
                         logger.WarnFormat("EraseLine");
                         int parameter = Convert.ToInt32(param[0]);
-                        this.PerformEraseLine(parameter);
+                        this.activeDocument.EraseLine((EraseType)parameter);
+                        this.DrawLine(this.activeDocument.ActiveLine);
                         break;
                     }
 
@@ -527,6 +332,7 @@ namespace XTerminal
                         int n = Convert.ToInt32(param[0]);
                         logger.WarnFormat("CursorForword, {0}", n);
                         this.cursorCol += n;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -534,6 +340,7 @@ namespace XTerminal
                     {
                         logger.WarnFormat("CursorBackward");
                         this.cursorCol--;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -542,6 +349,7 @@ namespace XTerminal
                         int n = Convert.ToInt32(param[0]);
                         logger.WarnFormat("CursorUp, {0}", n);
                         this.cursorRow -= n;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -550,6 +358,7 @@ namespace XTerminal
                         int n = Convert.ToInt32(param[0]);
                         logger.WarnFormat("CursorDown, {0}", n);
                         this.cursorRow += n;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -586,11 +395,12 @@ namespace XTerminal
                         break;
                     }
 
-                case VTActions.DeleteCharacters:
+                case VTActions.DCH_DeleteCharacter:
                     {
                         int count = Convert.ToInt32(param[0]);
                         logger.WarnFormat("DeleteCharacters, {0}", count);
-                        this.PerformDeleteCharacters(count);
+                        this.activeDocument.DeleteCharacter(count);
+                        this.DrawLine(this.ActiveLine);
                         break;
                     }
 
@@ -606,43 +416,46 @@ namespace XTerminal
                 case VTActions.SetDECAWM:
                     {
                         this.autoWrapMode = (bool)param[0];
+                        this.activeDocument.DECPrivateAutoWrapMode = this.autoWrapMode;
                         break;
                     }
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
-                        this.uiSyncContext.Send((state) =>
-                        {
-                            IDrawingCanvas alternateCanvas = this.Controller.CreatePresentationDevice();
-                            this.Controller.SwitchPresentaionDevice(this.DrawingCanvas, alternateCanvas);
-                            this.alternateCanvas = alternateCanvas;
-                            this.DrawingCanvas = alternateCanvas;
-                        }, null);
+                        //this.uiSyncContext.Send((state) =>
+                        //{
+                        //    IDrawingCanvas alternateCanvas = this.Controller.CreatePresentationDevice();
+                        //    this.Controller.SwitchPresentaionDevice(this.DrawingCanvas, alternateCanvas);
+                        //    this.alternateCanvas = alternateCanvas;
+                        //    this.DrawingCanvas = alternateCanvas;
+                        //}, null);
+                        throw new NotImplementedException();
                         break;
                     }
 
                 case VTActions.UseMainScreenBuffer:
                     {
-                        if (this.alternateCanvas == null)
-                        {
-                            logger.ErrorFormat("UseMainScreenBuffer, alternateCanvas不存在");
-                            return;
-                        }
+                        throw new NotImplementedException();
+                        //if (this.alternateCanvas == null)
+                        //{
+                        //    logger.ErrorFormat("UseMainScreenBuffer, alternateCanvas不存在");
+                        //    return;
+                        //}
 
-                        this.uiSyncContext.Send((state) =>
-                        {
-                            this.Controller.SwitchPresentaionDevice(this.alternateCanvas, this.mainCanvas);
-                            this.Controller.ReleasePresentationDevice(this.alternateCanvas);
-                            this.DrawingCanvas = this.mainCanvas;
-                            this.alternateCanvas = null;
-                        }, null);
+                        //this.uiSyncContext.Send((state) =>
+                        //{
+                        //    this.Controller.SwitchPresentaionDevice(this.alternateCanvas, this.mainCanvas);
+                        //    this.Controller.ReleasePresentationDevice(this.alternateCanvas);
+                        //    this.DrawingCanvas = this.mainCanvas;
+                        //    this.alternateCanvas = null;
+                        //}, null);
                         break;
                     }
 
                 case VTActions.ED_EraseDisplay:
                     {
                         int parameter = Convert.ToInt32(param[0]);
-                        this.PerformEraseDisplay(parameter);
+                        this.activeDocument.EraseDisplay((EraseType)parameter);
                         break;
                     }
 

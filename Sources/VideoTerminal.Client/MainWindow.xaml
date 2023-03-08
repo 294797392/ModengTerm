@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:xtermdrawing="clr-namespace:XTerminal.Drawing"
+        xmlns:xtermdrawing="clr-namespace:XTerminal.Document"
         mc:Ignorable="d"
         Title="MainWindow" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
 
@@ -13,10 +13,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" Content="连接" Click="Button_Click"/>
-
-        <xtermdrawing:VideoTerminal Grid.Row="1" x:Name="Terminal">
-        </xtermdrawing:VideoTerminal>
+        <xtermdrawing:ConsoleMonitor Grid.Row="1" x:Name="ConsoleMonitor">
+        </xtermdrawing:ConsoleMonitor>
     </Grid>
 
 </Window>

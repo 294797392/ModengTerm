@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using XTerminal.Base;
 
 namespace XTerminalParser
 {
@@ -267,14 +268,14 @@ namespace XTerminalParser
                     {
                         logger.DebugFormat("CSIDispatch - EL_EraseLine");
                         int parameter = parameters.Count > 0 ? parameters[0] : 0;
-                        this.NotifyActionEvent(VTActions.EraseLine, parameter);
+                        this.NotifyActionEvent(VTActions.EL_EraseLine, parameter);
                         break;
                     }
 
                 case CSIActionCodes.DCH_DeleteCharacter:
                     {
                         logger.DebugFormat("CSIDispatch - DCH_DeleteCharacter, {0}", parameters[0]);
-                        this.NotifyActionEvent(VTActions.DeleteCharacters, parameters[0]);
+                        this.NotifyActionEvent(VTActions.DCH_DeleteCharacter, parameters[0]);
                         break;
                     }
 

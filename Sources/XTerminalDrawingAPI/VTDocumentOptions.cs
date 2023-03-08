@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document
 {
-    public enum VFontWeight
+    public class VTDocumentOptions
     {
+        public int Columns { get; set; }
+
+        public bool DECPrivateAutoWrapMode { get; set; }
     }
 }

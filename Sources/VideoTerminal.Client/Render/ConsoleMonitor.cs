@@ -10,13 +10,14 @@ using System.Windows.Media;
 using System.Windows;
 using System.Windows.Media.TextFormatting;
 using XTerminalParser;
+using XTerminal.Terminal;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Document
 {
     /// <summary>
     /// 终端控件
     /// </summary>
-    public class VideoTerminal : Grid, IInputDevice, IVTController
+    public class ConsoleMonitor : Grid, IInputDevice
     {
         #region 类变量
 
@@ -39,15 +40,30 @@ namespace XTerminal.Drawing
 
         #region 属性
 
+        public IVTMonitor DrawingCanvas { get; private set; }
+
         #endregion
 
         #region 构造方法
 
-        public VideoTerminal()
+        public ConsoleMonitor()
         {
             this.inputEvent = new VTInputEvent();
             this.Background = Brushes.Transparent;
             this.Focusable = true;
+
+            DrawingCanvas drawingCanvas = new DrawingCanvas();
+            ScrollViewer scrollViewer = new ScrollViewer()
+            {
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                Content = drawingCanvas
+            };
+            scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
+            this.Children.Add(scrollViewer);
+
+            this.DrawingCanvas = drawingCanvas;
+            this.scrollViewer = scrollViewer;
         }
 
         #endregion
@@ -131,58 +147,6 @@ namespace XTerminal.Drawing
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
         {
             return new PointHitTestResult(this, hitTestParameters.HitPoint);
-        }
-
-        #endregion
-
-        #region IVTController
-
-        /// <summary>
-        /// 获取输入设备
-        /// </summary>
-        /// <returns></returns>
-        public IInputDevice GetInputDevice()
-        {
-            return this;
-        }
-
-        /// <summary>
-        /// 创建一个新的显示设备
-        /// </summary>
-        /// <returns></returns>
-        public IDrawingCanvas CreatePresentationDevice()
-        {
-            DrawingCanvas device = new DrawingCanvas();
-            return device;
-        }
-
-        /// <summary>
-        /// 释放显示设备占用的资源
-        /// </summary>
-        /// <param name="device"></param>
-        public void ReleasePresentationDevice(IDrawingCanvas device)
-        {
-
-        }
-
-        /// <summary>
-        /// 切换显示设备
-        /// </summary>
-        /// <param name="device"></param>
-        public void SwitchPresentaionDevice(IDrawingCanvas toRemove, IDrawingCanvas toAdd)
-        {
-            if (this.scrollViewer == null)
-            {
-                this.scrollViewer = new ScrollViewer()
-                {
-                    HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                    VerticalScrollBarVisibility = ScrollBarVisibility.Auto
-                };
-                this.scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
-                this.Children.Add(this.scrollViewer);
-            }
-
-            this.scrollViewer.Content = toAdd;
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)

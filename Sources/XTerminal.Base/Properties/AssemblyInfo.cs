@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("XTerminal.Document")]
+[assembly: AssemblyTitle("XTerminal.Base")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("XTerminal.Document")]
+[assembly: AssemblyProduct("XTerminal.Base")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("e9617b75-f328-4210-8df2-181562a691a3")]
+[assembly: Guid("f2c5bc95-5839-4c8f-9923-3512fe2ddea1")]
 
 // 程序集的版本信息由下列四个值组成: 
 //

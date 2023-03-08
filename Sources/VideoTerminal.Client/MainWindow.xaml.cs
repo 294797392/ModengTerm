@@ -53,24 +53,11 @@ namespace XTerminal
         private void InitializeWindow()
         {
             VideoTerminal videoTermianl = new VideoTerminal();
-            videoTermianl.Controller = Terminal;
+            videoTermianl.Monitor = ConsoleMonitor.DrawingCanvas;
+            videoTermianl.InputDevice = ConsoleMonitor;
             videoTermianl.Initialize(VTInitialOptions.Home);
-
-            //VTChannel channel = VTChannelFactory.Create(VTChannelTypes.SSH, VTInitialOptions.Home);
-            //SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("ubuntu-dev", 22, "oheiheiheiheihei", "18612538605");
-            //VideoTerminal vtApp = new VideoTerminal();
-            //vtApp.Controller = Terminal;
-            //vtApp.Initialize();
-            //vtApp.RunSSHClient(authorition);
         }
 
         #endregion
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            //SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("linux-desktop", 22, "zyf", "18612538605");
-            ////SSHChannelAuthorition authorition = VTChannelFactory.CreateSSHClientAuthorition("ubuntu-dev", 22, "oheiheiheiheihei", "18612538605");
-            //VTApplication vtApp = VTApplication.Run(authorition, Terminal);
-        }
     }
 }

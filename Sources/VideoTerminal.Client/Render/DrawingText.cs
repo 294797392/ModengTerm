@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Document
 {
     /// <summary>
     /// 表示PresentationDevice上的一个文本块

@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Document
 {
     public class DrawingLine : DrawingObject
     {
@@ -22,23 +22,25 @@ namespace XTerminal.Drawing
 
         protected override void Draw(DrawingContext dc)
         {
+            string text = this.TextLine.BuildText();
+
             this.Offset = new Vector(0, this.TextLine.OffsetY);
 
             Typeface typeface = TerminalUtils.GetTypeface(VTextStyle.Default);
-            FormattedText formattedText = new FormattedText(this.TextLine.Text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, DefaultValues.FontSize, DefaultValues.Foreground,
-                null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
+            FormattedText formattedText = new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
+                DefaultValues.FontSize, DefaultValues.Foreground, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
 
             TerminalUtils.UpdateTextMetrics(this.TextLine.Metrics, formattedText);
 
-            // 遍历链表，给每个TextBlock设置样式
-            VTextBlock current = this.TextLine.First;
+            //// 遍历链表，给每个TextBlock设置样式
+            //VTextBlock current = this.TextLine.First;
 
-            while (current != null)
-            {
-                // TODO：设置样式
+            //while (current != null)
+            //{
+            //    // TODO：设置样式
 
-                current = current.Next;
-            }
+            //    current = current.Next;
+            //}
 
             dc.DrawText(formattedText, new Point());
         }

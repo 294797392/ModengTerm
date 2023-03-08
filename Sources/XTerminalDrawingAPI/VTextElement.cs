@@ -4,20 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Document
 {
-    public abstract class VTextElement<TTextElement>
+    public abstract class VTextElement
     {
-        /// <summary>
-        /// 上一个文本元素
-        /// </summary>
-        public TTextElement Previous { get; set; }
-
-        /// <summary>
-        /// 下一个文本元素
-        /// </summary>
-        public TTextElement Next { get; set; }
-
         /// <summary>
         /// 该文本块左上角的X坐标
         /// </summary>
@@ -47,9 +37,10 @@ namespace XTerminal.Drawing
         public double Height { get { return this.Metrics.Height; } }
 
         /// <summary>
-        /// 获取该文本的矩形框
+        /// 获取该文本的边界框信息
+        /// 在画完之后会更新测量的矩形框信息
         /// </summary>
-        public VTRect Boundary { get { return new VTRect(this.OffsetX, this.OffsetY, this.Width, this.Height); } }
+        public VTRect Bounds { get { return new VTRect(this.OffsetX, this.OffsetY, this.Width, this.Height); } }
 
         /// <summary>
         /// 该文本块所在行数，从0开始

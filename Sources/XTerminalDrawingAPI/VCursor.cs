@@ -6,11 +6,16 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document
 {
-    public enum VTextLineState
+    public class VCursor
     {
         /// <summary>
-        /// 光标已经在最左边了
+        /// 光标所在列
         /// </summary>
-        CursorAtRightMargin
+        public int Column { get; set; }
+
+        /// <summary>
+        /// 光标所在行
+        /// </summary>
+        public int Row { get; set; }
     }
 }

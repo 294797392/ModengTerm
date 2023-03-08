@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows;
 using XTerminalParser;
 
-namespace XTerminal.Drawing
+namespace XTerminal.Document
 {
     internal static class DefaultValues
     {
