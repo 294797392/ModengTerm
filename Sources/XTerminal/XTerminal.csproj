@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>VideoTerminal</RootNamespace>
+    <AssemblyName>VideoTerminal</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\Dependence\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Renci.SshNet">
+      <HintPath>..\..\Dependence\Renci.SshNet.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Channels\ChannelAuthorition.cs" />
+    <Compile Include="Channels\SSHChannel.cs" />
+    <Compile Include="Channels\SSHChannelAuthorition.cs" />
+    <Compile Include="Channels\VTChannel.cs" />
+    <Compile Include="Channels\VTChannelFactory.cs" />
+    <Compile Include="Channels\VTChannelState.cs" />
+    <Compile Include="Channels\VTChannelTypes.cs" />
+    <Compile Include="DefaultValues.cs" />
+    <Compile Include="Render\DrawingCursor.cs" />
+    <Compile Include="Render\DrawingLine.cs" />
+    <Compile Include="Render\DrawingObject.cs" />
+    <Compile Include="Render\DrawingText.cs" />
+    <Compile Include="Render\TerminalUtils.cs" />
+    <Compile Include="Render\CharacterCanvas.cs" />
+    <Compile Include="Render\ConsoleMonitor.cs" />
+    <Compile Include="Options\TerminalOptions.cs" />
+    <Compile Include="ResponseCode.cs" />
+    <Compile Include="VideoTerminal.cs" />
+    <Compile Include="Options\VTInitialOptions.cs" />
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Themes.Ubuntu.Ambiance.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <None Include="app.config" />
+    <AppDesigner Include="Properties\" />
+    <Resource Include="Fonts\Ubuntu-B.ttf" />
+    <Resource Include="Fonts\Ubuntu-BI.ttf" />
+    <Resource Include="Fonts\Ubuntu-C.ttf" />
+    <Resource Include="Fonts\Ubuntu-L.ttf" />
+    <Resource Include="Fonts\Ubuntu-LI.ttf" />
+    <Resource Include="Fonts\Ubuntu-M.ttf" />
+    <Resource Include="Fonts\Ubuntu-MI.ttf" />
+    <Resource Include="Fonts\Ubuntu-R.ttf" />
+    <Resource Include="Fonts\Ubuntu-RI.ttf" />
+    <Resource Include="Fonts\UbuntuMono-B.ttf" />
+    <Resource Include="Fonts\UbuntuMono-BI.ttf" />
+    <Resource Include="Fonts\UbuntuMono-R.ttf" />
+    <Resource Include="Fonts\UbuntuMono-RI.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\CONTRIBUTING.txt" />
+    <Resource Include="Fonts\copyright.txt" />
+    <Resource Include="Fonts\FONTLOG.txt" />
+    <Resource Include="Fonts\LICENCE-FAQ.txt" />
+    <Resource Include="Fonts\LICENCE.txt" />
+    <Resource Include="Fonts\README.txt" />
+    <Resource Include="Fonts\TRADEMARKS.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Windows\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
+      <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
+      <Name>XTerminal.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminal.Document\XTerminal.Document.csproj">
+      <Project>{e9617b75-f328-4210-8df2-181562a691a3}</Project>
+      <Name>XTerminal.Document</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminal.Parser\XTerminal.Parser.csproj">
+      <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
+      <Name>XTerminal.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminal.Terminal\XTerminal.Terminal.csproj">
+      <Project>{cbb55527-c3c1-4fb1-94a5-90387baa6416}</Project>
+      <Name>XTerminal.Terminal</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
