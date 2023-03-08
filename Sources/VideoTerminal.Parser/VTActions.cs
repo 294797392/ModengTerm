@@ -134,15 +134,15 @@ namespace XTerminalParser
         /// <summary>
         /// 光标向右移动N个字符的位置
         /// </summary>
-        CursorForword,
+        CUF_CursorForward,
         /// <summary>
         /// 光标向上移动N个字符的位置
         /// </summary>
-        CursorUp,
+        CUU_CursorUp,
         /// <summary>
         /// 光标向下移动N个字符的位置
         /// </summary>
-        CursorDown,
+        CUD_CursorDown,
 
         /// <summary>
         /// Tab键
@@ -162,7 +162,7 @@ namespace XTerminalParser
         /// <summary>
         /// 移动光标
         /// </summary>
-        CursorPosition,
+        CUP_CursorPosition,
 
         /// <summary>
         /// 设置光标键输入模式
@@ -188,7 +188,7 @@ namespace XTerminalParser
         /// <summary>
         /// 在当前光标处插入N个空白字符
         /// </summary>
-        InsertCharacters,
+        ICH_InsertCharacter,
 
         SetDECAWM,
 

@@ -21,7 +21,7 @@ namespace XTerminal.Document
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("WPFVideoTerminal");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ConsoleMonitor");
 
         #endregion
 

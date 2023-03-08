@@ -205,7 +205,7 @@ namespace XTerminalParser
                             col = parameters[1];
                         }
                         logger.DebugFormat("CSIDispatch - CUP_CursorPosition, row = {0}, col = {1}", row, col);
-                        this.NotifyActionEvent(VTActions.CursorPosition, row, col);
+                        this.NotifyActionEvent(VTActions.CUP_CursorPosition, row, col);
                         break;
                     }
 
@@ -213,7 +213,7 @@ namespace XTerminalParser
                     {
                         int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
                         logger.DebugFormat("CSIDispatch - CUF_CursorForward, {0}", n);
-                        this.NotifyActionEvent(VTActions.CursorForword, n);
+                        this.NotifyActionEvent(VTActions.CUF_CursorForward, n);
                         break;
                     }
 
@@ -221,7 +221,7 @@ namespace XTerminalParser
                     {
                         int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
                         logger.DebugFormat("CSIDispatch - CUU_CursorUp, {0}", n);
-                        this.NotifyActionEvent(VTActions.CursorUp, n);
+                        this.NotifyActionEvent(VTActions.CUU_CursorUp, n);
                         break;
                     }
 
@@ -229,7 +229,7 @@ namespace XTerminalParser
                     {
                         int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
                         logger.DebugFormat("CSIDispatch - CUD_CursorDown, {0}", n);
-                        this.NotifyActionEvent(VTActions.CursorDown, n);
+                        this.NotifyActionEvent(VTActions.CUD_CursorDown, n);
                         break;
                     }
 
@@ -282,7 +282,7 @@ namespace XTerminalParser
                 case CSIActionCodes.ICH_InsertCharacter:
                     {
                         logger.ErrorFormat("未实现CSIDispatch - ICH_InsertCharacter, {0}", parameters[0]);
-                        this.NotifyActionEvent(VTActions.InsertCharacters, parameters[0]);
+                        this.NotifyActionEvent(VTActions.ICH_InsertCharacter, parameters[0]);
                         break;
                     }
 

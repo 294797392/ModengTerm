@@ -18,7 +18,7 @@ namespace XTerminal
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTApplication");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("VideoTerminal");
 
         #endregion
 
@@ -302,7 +302,6 @@ namespace XTerminal
                     {
                         // CR
                         // 把光标移动到行开头
-                        logger.DebugFormat("CR");
                         this.cursorCol = 0;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
@@ -311,7 +310,6 @@ namespace XTerminal
                 case VTActions.LineFeed:
                     {
                         // LF
-                        logger.DebugFormat("LF");
                         this.cursorRow++;
                         this.activeDocument.CreateNextLine();
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
@@ -320,17 +318,15 @@ namespace XTerminal
 
                 case VTActions.EL_EraseLine:
                     {
-                        logger.WarnFormat("EraseLine");
                         int parameter = Convert.ToInt32(param[0]);
                         this.activeDocument.EraseLine((EraseType)parameter);
                         this.DrawLine(this.activeDocument.ActiveLine);
                         break;
                     }
 
-                case VTActions.CursorForword:
+                case VTActions.CUF_CursorForward:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        logger.WarnFormat("CursorForword, {0}", n);
                         this.cursorCol += n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
@@ -338,25 +334,22 @@ namespace XTerminal
 
                 case VTActions.CursorBackward:
                     {
-                        logger.WarnFormat("CursorBackward");
                         this.cursorCol--;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
-                case VTActions.CursorUp:
+                case VTActions.CUU_CursorUp:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        logger.WarnFormat("CursorUp, {0}", n);
                         this.cursorRow -= n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
-                case VTActions.CursorDown:
+                case VTActions.CUD_CursorDown:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        logger.WarnFormat("CursorDown, {0}", n);
                         this.cursorRow += n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
@@ -398,13 +391,12 @@ namespace XTerminal
                 case VTActions.DCH_DeleteCharacter:
                     {
                         int count = Convert.ToInt32(param[0]);
-                        logger.WarnFormat("DeleteCharacters, {0}", count);
                         this.activeDocument.DeleteCharacter(count);
                         this.DrawLine(this.ActiveLine);
                         break;
                     }
 
-                case VTActions.InsertCharacters:
+                case VTActions.ICH_InsertCharacter:
                     {
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
                         int count = Convert.ToInt32(param[0]);

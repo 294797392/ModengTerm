@@ -75,6 +75,7 @@ namespace XTerminal.Document
             this.lineMap[0] = firstLine;
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
+            this.activeLine = firstLine;
 
             this.options = options;
         }
@@ -138,7 +139,7 @@ namespace XTerminal.Document
         {
             if (this.activeLine == null)
             {
-                logger.ErrorFormat("PrintCharacter失败，activeLine不存在");
+                logger.ErrorFormat("PrintCharacter失败，activeLine不存在, ch = {0}, col = {1}", ch, col);
                 return;
             }
 
