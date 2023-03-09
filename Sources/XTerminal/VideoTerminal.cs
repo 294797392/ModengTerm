@@ -549,6 +549,7 @@ namespace XTerminal
                         this.cursorCol = this.mainDocument.Cursor.Column;
                         this.cursorRow = this.mainDocument.Cursor.Row;
                         this.activeDocument = this.mainDocument;
+                        this.mainDocument.ViewableArea.DirtyAllTextLine();
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();

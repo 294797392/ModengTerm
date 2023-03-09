@@ -36,5 +36,26 @@ namespace XTerminal.Document
         /// 当前光标所在的行
         /// </summary>
         public int CorsorRow { get; internal set; }
+
+        /// <summary>
+        /// 把当前可视区域的所有TextLine标记为需要重新渲染的状态
+        /// </summary>
+        public void DirtyAllTextLine()
+        {
+            VTextLine current = this.FirstLine;
+            VTextLine last = this.LastLine;
+
+            while (current != null)
+            {
+                current.IsCharacterDirty = true;
+
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
+        }
     }
 }
