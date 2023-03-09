@@ -18,23 +18,29 @@ namespace XTerminal.Terminal
     public interface IDocumentRenderer
     {
         /// <summary>
-        /// 渲染一行
-        /// </summary>
-        /// <param name="textLine"></param>
-        void DrawLine(VTextLine textLine);
-
-        /// <summary>
-        /// 清除现实的内容并把状态还原
-        /// </summary>
-        void Reset();
-
-        /// <summary>
         /// 测量某个文本块的属性
         /// </summary>
         /// <param name="text">要测量的文本</param>
         /// <param name="style">文本的样式</param>
         /// <returns></returns>
         VTextMetrics MeasureText(string text, VTextStyle style);
+
+        /// <summary>
+        /// 重新绘制一行文本
+        /// </summary>
+        /// <param name="textLine"></param>
+        void RenderLine(VTextLine textLine);
+
+        /// <summary>
+        /// 根据VTextLine里的测量信息进行布局（移动文本行的位置）
+        /// </summary>
+        /// <param name="textLine"></param>
+        void ArrangeLine(VTextLine textLine);
+
+        /// <summary>
+        /// 清除现实的内容并把状态还原
+        /// </summary>
+        void Reset();
 
         /// <summary>
         /// 重新调整终端大小

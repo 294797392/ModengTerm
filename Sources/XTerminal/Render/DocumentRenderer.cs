@@ -89,7 +89,7 @@ namespace XTerminal.Document
         /// 渲染一行
         /// </summary>
         /// <param name="textLine"></param>
-        public void DrawLine(VTextLine textLine)
+        public void RenderLine(VTextLine textLine)
         {
             DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
             if (drawingLine == null)
@@ -101,6 +101,18 @@ namespace XTerminal.Document
             }
 
             drawingLine.Draw();
+        }
+
+        public void ArrangeLine(VTextLine textLine)
+        {
+            DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
+            if (drawingLine == null)
+            {
+                logger.ErrorFormat("ArrangeLine失败, DrawingLine不存在");
+                return;
+            }
+
+            drawingLine.Offset = new Vector(textLine.OffsetX, textLine.OffsetY);
         }
 
         public void Reset()

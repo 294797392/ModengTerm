@@ -283,7 +283,7 @@ namespace XTerminal
 
             this.uiSyncContext.Send((v) =>
             {
-                this.Renderer.DrawLine(textLine);
+                this.Renderer.RenderLine(textLine);
             }, null);
         }
 
@@ -305,30 +305,40 @@ namespace XTerminal
             double offsetY = 0;
 
             VTextLine next = document.FirstLine;
-            while (next != null)
+
+            this.uiSyncContext.Send((state) =>
             {
-                // 此时说明需要重新排版
-                next.OffsetY = offsetY;
-
-                VTextMetrics metrics = this.Renderer.MeasureText(next.BuildText(), VTextStyle.Default);
-
-                offsetY += metrics.Height;
-
-                if (next.IsCharacterDirty)
+                while (next != null)
                 {
-                    // 此时说明该行有字符变化，需要重绘
-                    this.Renderer.DrawLine(next);
-                    next.IsCharacterDirty = false;
-                }
+                    // 此时说明需要重新排版
+                    next.OffsetY = offsetY;
 
-                // 如果最后一行渲染完毕了，那么就退出
-                if (next == document.LastLine)
-                {
-                    break;
-                }
+                    VTextMetrics metrics = this.Renderer.MeasureText(next.BuildText(), VTextStyle.Default);
 
-                next = next.NextLine;
-            }
+                    offsetY += metrics.Height;
+
+                    if (next.IsCharacterDirty)
+                    {
+                        // 此时说明该行有字符变化，需要重绘
+                        // 重绘的时候会也会Arrange
+                        this.Renderer.RenderLine(next);
+                        next.IsCharacterDirty = false;
+                    }
+                    else
+                    {
+                        // 这里只需要执行Arrange就可以了，不需要重绘
+                        this.Renderer.ArrangeLine(next);
+                    }
+
+                    // 如果最后一行渲染完毕了，那么就退出
+                    if (next == document.LastLine)
+                    {
+                        break;
+                    }
+
+                    next = next.NextLine;
+                }
+            }, null);
 
             document.IsArrangeDirty = false;
         }
