@@ -100,7 +100,7 @@ namespace XTerminal.Document
                 CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
                 OwnerDocument = this,
-                DrawingObject = null
+                DrawingElement = null
             };
             this.lineMap[0] = firstLine;
             this.FirstLine = firstLine;
@@ -210,8 +210,10 @@ namespace XTerminal.Document
                 VTextLine newLastLine = this.ViewableArea.LastLine;
 
                 // 复用DrawingObject
-                newFirstLine.DrawingObject = oldFirstLine.DrawingObject;
-                newLastLine.DrawingObject = oldLastLine.DrawingObject;
+                newFirstLine.DrawingElement = oldFirstLine.DrawingElement;
+                newFirstLine.DrawingElement.Element = newFirstLine;
+                newLastLine.DrawingElement = oldLastLine.DrawingElement;
+                newLastLine.DrawingElement.Element = newLastLine;
                 newFirstLine.IsCharacterDirty = true; // 下次要重绘
                 oldFirstLine.IsCharacterDirty = true; // 下次要重绘
             }

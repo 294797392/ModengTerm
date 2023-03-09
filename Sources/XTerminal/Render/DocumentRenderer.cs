@@ -92,7 +92,7 @@ namespace XTerminal.Document
         /// <returns></returns>
         private DrawingLine RequestDrawingLine()
         {
-            return this.visuals.Cast<DrawingLine>().FirstOrDefault(v => v.TextLine == null);
+            return this.visuals.Cast<DrawingLine>().FirstOrDefault(v => v.Element == null);
         }
 
         #endregion
@@ -126,7 +126,7 @@ namespace XTerminal.Document
             while (next != null)
             {
                 // 首先获取当前行的DrawingObject
-                DrawingLine drawingLine = next.DrawingObject as DrawingLine;
+                DrawingLine drawingLine = next.DrawingElement as DrawingLine;
                 if (drawingLine == null)
                 {
                     drawingLine = this.RequestDrawingLine();
@@ -136,8 +136,8 @@ namespace XTerminal.Document
                         logger.FatalFormat("没有空闲的DrawingLine了");
                         return;
                     }
-                    drawingLine.TextLine = next;
-                    next.DrawingObject = drawingLine;
+                    drawingLine.Element = next;
+                    next.DrawingElement = drawingLine;
                 }
 
                 // 此时说明需要重新排版
@@ -147,6 +147,10 @@ namespace XTerminal.Document
                 {
                     // 此时说明该行有字符变化，需要重绘
                     // 重绘的时候会也会Arrange
+                    if (drawingLine.Element != next)
+                    {
+                        drawingLine.Element = next;
+                    }
                     drawingLine.Draw();
                     next.IsCharacterDirty = false;
                 }
@@ -171,7 +175,7 @@ namespace XTerminal.Document
             }
         }
 
-        public void RenderElement(IDrawingObject drawingObject)
+        public void RenderElement(IDrawingElement drawingObject)
         {
             DrawingObject drawingObject1 = drawingObject as DrawingObject;
             if (drawingObject1 == null)
@@ -192,7 +196,6 @@ namespace XTerminal.Document
 
             foreach (DrawingLine drawingLine in drawingLines)
             {
-                drawingLine.TextLine = null;
                 drawingLine.Reset();
             }
 

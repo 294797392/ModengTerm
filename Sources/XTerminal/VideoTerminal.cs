@@ -309,7 +309,7 @@ namespace XTerminal
                     if (next.IsCharacterDirty)
                     {
                         // 需要重绘
-                        this.Renderer.RenderElement(next.DrawingObject);
+                        this.Renderer.RenderElement(next.DrawingElement);
                         next.IsCharacterDirty = false;
                     }
 

@@ -41,7 +41,7 @@ namespace XTerminal.Terminal
         /// 重新绘制任意一个视图对象
         /// </summary>
         /// <param name="drawingObject">要重绘的对象</param>
-        void RenderElement(IDrawingObject drawingObject);
+        void RenderElement(IDrawingElement drawingObject);
 
         /// <summary>
         /// 清除现实的内容并把状态还原

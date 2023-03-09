@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document
 {
-    public abstract class VTextElement
+    public abstract class VDocumentElement
     {
         /// <summary>
         /// 该文本块左上角的X坐标
@@ -47,7 +47,7 @@ namespace XTerminal.Document
         /// </summary>
         public int Row { get; set; }
 
-        public VTextElement()
+        public VDocumentElement()
         {
             this.Metrics = new VTextMetrics();
         }

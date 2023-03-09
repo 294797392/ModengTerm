@@ -10,7 +10,7 @@ namespace XTerminal.Document
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VTextElement
+    public class VTextLine : VDocumentElement
     {
         #region 实例变量
 
@@ -62,7 +62,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 画图对象
         /// </summary>
-        public IDrawingObject DrawingObject { get; set; }
+        public IDrawingElement DrawingElement { get; set; }
 
         /// <summary>
         /// 是否开启了DECAWM模式

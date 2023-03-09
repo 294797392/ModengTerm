@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 
 namespace XTerminal.Document
 {
     /// <summary>
-    /// 表示终端上的一个可视化对象（光标，文本块...）
+    /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class DrawingObject : DrawingVisual
+    public abstract class DrawingObject : DrawingVisual, IDrawingElement
     {
+        /// <summary>
+        /// 保存要画的对象的数据
+        /// </summary>
+        public VDocumentElement Element { get; set; }
+
         public DrawingObject()
         {
         }
@@ -24,6 +30,17 @@ namespace XTerminal.Document
 
             this.Draw(dc);
 
+            dc.Close();
+        }
+
+        /// <summary>
+        /// 重置此绘图对象
+        /// </summary>
+        public void Reset()
+        {
+            this.Element = null;
+            this.Offset = new Vector();
+            DrawingContext dc = this.RenderOpen();
             dc.Close();
         }
     }
