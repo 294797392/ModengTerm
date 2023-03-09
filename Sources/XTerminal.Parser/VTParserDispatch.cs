@@ -198,8 +198,13 @@ namespace XTerminal.Parser
                         int row = 0, col = 0;
                         if (parameters.Count == 2)
                         {
-                            row = parameters[0];
-                            col = parameters[1];
+                            // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
+                            row = parameters[0] - 1;
+                            col = parameters[1] - 1;
+                        }
+                        else 
+                        {
+                            // 如果没有参数，那么说明就是定位到原点(0,0)
                         }
                         logger.DebugFormat("CSIDispatch - CUP_CursorPosition, row = {0}, col = {1}", row, col);
                         this.NotifyActionEvent(VTActions.CUP_CursorPosition, row, col);

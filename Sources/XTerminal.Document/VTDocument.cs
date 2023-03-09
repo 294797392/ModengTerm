@@ -183,8 +183,8 @@ namespace XTerminal.Document
                 // 可视区域的总行数大于等于最大行数
                 // 检查光标的新位置是否小于第一行或者是否大于最后一行
 
-                // 标记布局已失效，下次渲染的时候需要重新布局
-                this.SetArrangeDirty();
+                // 光标移动的行数
+                int numRows = Math.Abs(newCursorRow - oldCursorRow);
 
                 VTextLine oldFirstLine = this.ViewableArea.FirstLine;
                 VTextLine oldLastLine = this.ViewableArea.LastLine;
@@ -223,6 +223,9 @@ namespace XTerminal.Document
                     newLastLine.DrawingElement.Data = oldFirstLine;
                     newLastLine.IsCharacterDirty = true;
                 }
+
+                // 标记布局已失效，下次渲染的时候需要重新布局
+                this.SetArrangeDirty();
             }
 
             //this.Print();
@@ -284,6 +287,11 @@ namespace XTerminal.Document
             this.UpdateViewableArea(this.LastLine.Row, row);
 
             return textLine;
+        }
+
+        public bool ContainsLine(int row)
+        {
+            return this.lineMap.ContainsKey(row);
         }
 
         /// <summary>

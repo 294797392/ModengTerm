@@ -28,7 +28,8 @@ namespace XTerminal.Document
 
             string text = textLine.BuildText();
 
-            //text = string.Format("{0} - {1} ******* {2}", this.Row, textLine.Row, text);
+            text = string.Format("{0} - {1} ******* {2}", this.Row, textLine.Row, text);
+            //text = string.Format("{0} ********* {1}", textLine.Row, text);
 
             this.Offset = new Vector(0, textLine.OffsetY);
 

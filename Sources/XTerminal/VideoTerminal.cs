@@ -202,7 +202,7 @@ namespace XTerminal
 
             #region 初始化渲染器
 
-            DocumentRendererOptions rendererOptions = new DocumentRendererOptions() 
+            DocumentRendererOptions rendererOptions = new DocumentRendererOptions()
             {
                 Rows = initialOptions.TerminalOption.Rows
             };
@@ -384,7 +384,10 @@ namespace XTerminal
                     {
                         // LF
                         this.cursorRow++;
-                        this.activeDocument.CreateNextLine();
+                        if (!this.activeDocument.ContainsLine(this.cursorRow))
+                        {
+                            this.activeDocument.CreateNextLine();
+                        }
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
@@ -580,14 +583,27 @@ namespace XTerminal
 
                 case VTActions.RI_ReverseLineFeed:
                     {
-                        this.cursorRow--;
+                        // 和LineFeed相反，也就是把光标往上移一个位置
+                        // 这个指令可以把光标移动到Protected Area里
+                        // 目前我理解的Proteced Area就是用户不可见的区域（ViewableDocument之外的区域）
+                        // 在用man命令的时候会触发这个指令
+
+                        if (this.cursorRow == 0)
+                        {
+                            // 说明光标在可见区域的最上面，那么要把可视区域往上移动一行（也就是把打字机的纸往下挪动一行），光标的列坐标不变
+                        }
+                        else if (this.cursorRow > 0)
+                        {
+                            // 光标在可见区域里，那么就可以直接移动鼠标
+                            this.cursorRow--;
+                        }
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
                 case VTActions.DECSTBM_SetScrollingRegion:
                     {
-
+                        logger.ErrorFormat("未实现SetScrollingRegion");
                         break;
                     }
 
