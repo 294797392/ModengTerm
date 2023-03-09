@@ -24,10 +24,10 @@ namespace XTerminal.Document
 
         private VTDocumentOptions options;
 
-        /// <summary>
-        /// 光标所在行
-        /// </summary>
-        private VTextLine activeLine;
+        ///// <summary>
+        ///// 光标所在行
+        ///// </summary>
+        //private VTextLine activeLine;
 
         #endregion
 
@@ -65,10 +65,10 @@ namespace XTerminal.Document
         /// </summary>
         public int Rows { get { return this.options.Rows; } }
 
-        /// <summary>
-        /// 光标所在行
-        /// </summary>
-        public VTextLine ActiveLine { get { return this.activeLine; } }
+        ///// <summary>
+        ///// 光标所在行
+        ///// </summary>
+        //public VTextLine ActiveLine { get { return this.activeLine; } }
 
         /// <summary>
         /// 该文档要渲染的区域
@@ -105,11 +105,11 @@ namespace XTerminal.Document
             this.lineMap[0] = firstLine;
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
-            this.activeLine = firstLine;
+
+            // 更新可视区域
             this.ViewableArea.FirstLine = firstLine;
             this.ViewableArea.LastLine = firstLine;
-
-            this.IsArrangeDirty = true;
+            this.SetArrangeDirty();
         }
 
         #endregion
@@ -125,121 +125,9 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 根据当前光标位置更新可显示区域
-        /// 当行数量改变的时候调用此方法就可以
-        /// </summary>
-        /// <param name="oldCursorRow">光标移动之前的行</param>
-        /// <param name="newCursorRow">光标要移动到的行</param>
-        private void UpdateViewableArea(int oldCursorRow, int newCursorRow)
-        {
-            if (oldCursorRow == newCursorRow)
-            {
-                return;
-            }
-
-            // 可视区域的第一行
-            int firstRow = this.ViewableArea.FirstLine.Row;
-
-            // 可视区域的最后一行
-            int lastRow = this.ViewableArea.LastLine.Row;
-
-            // 可视区域的总行数
-            int viewableRows = lastRow - firstRow + 1)
-
-            if (viewableRows < this.Rows)
-            {
-                /*
-                 * ViewableArea:
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |            |
-                 * |            |
-                 * |____________|
-                 */
-
-                // 可视区域的总行数小于最大行数
-                // 只需要更新最后一行即可
-                if (this.ViewableArea.LastLine != this.LastLine)
-                {
-                    this.ViewableArea.LastLine = this.LastLine;
-                    this.SetArrangeDirty();
-                }
-            }
-            else
-            {
-                /*
-                 * ViewableArea:
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 */
-
-                // 可视区域的总行数大于等于最大行数
-                // 检查光标的新位置是否小于第一行或者是否大于最后一行
-
-                // 光标移动的行数
-                int movedRows = Math.Abs(newCursorRow - oldCursorRow);
-
-                VTextLine oldFirstLine = this.ViewableArea.FirstLine;
-                VTextLine oldLastLine = this.ViewableArea.LastLine;
-
-                // 重新计算第一行和最后一行的指针
-                if (newCursorRow < firstRow)
-                {
-                    // 光标要移动到的位置小于第一行，说明是要把可视区域往上移动
-                    // 那么就把最后一行的DrawingElement拿给第一行使用
-
-                    //for (int i = 0; i < movedRows; i++)
-                    //{
-
-                    //}
-
-                    // 此时activeLine就是光标移动后的行，可以直接使用activeLine
-                    this.ViewableArea.FirstLine = this.activeLine;
-
-                    // 同时更新LastLine指针
-                    this.ViewableArea.LastLine = this.ViewableArea.LastLine.PreviousLine;
-
-                    // 复用DrawingObject
-                    VTextLine newFirstLine = this.ViewableArea.FirstLine;
-                    newFirstLine.DrawingElement = oldLastLine.DrawingElement;
-                    newFirstLine.DrawingElement.Data = newFirstLine;
-                    newFirstLine.IsCharacterDirty = true;
-
-                }
-                else if (newCursorRow > lastRow)
-                {
-                    // 光标要移动到的位置大于最后一行，说明是要把可视区域往下移动
-                    // 那么就把第一行的DrawingElement拿给最后一行用
-
-                    // 和上面一样的思路更新首尾指针
-                    this.ViewableArea.LastLine = this.activeLine;
-                    this.ViewableArea.FirstLine = this.ViewableArea.FirstLine.NextLine;
-
-                    // 复用DrawingObject
-                    VTextLine newLastLine = this.ViewableArea.LastLine;
-                    newLastLine.DrawingElement = oldFirstLine.DrawingElement;
-                    newLastLine.DrawingElement.Data = oldFirstLine;
-                    newLastLine.IsCharacterDirty = true;
-                }
-
-                // 标记布局已失效，下次渲染的时候需要重新布局
-                this.SetArrangeDirty();
-            }
-
-            //this.Print();
-        }
-
-        /// <summary>
         /// 把当前Document的可显示区域打印到日志里，方便调试
         /// </summary>
-        private void Print()
+        public void Print()
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine();
@@ -286,10 +174,6 @@ namespace XTerminal.Document
             this.LastLine.NextLine = textLine;
             textLine.PreviousLine = this.LastLine;
             this.LastLine = textLine;
-            this.activeLine = textLine;
-
-            // 更新可视区域
-            this.UpdateViewableArea(this.LastLine.Row, row);
 
             return textLine;
         }
@@ -305,95 +189,63 @@ namespace XTerminal.Document
         /// <param name="ch"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
-        public void PrintCharacter(char ch, int row, int col)
+        public void PrintCharacter(VTextLine textLine, char ch, int col)
         {
-            VTextLine textLine;
-            if (!this.lineMap.TryGetValue(row, out textLine))
-            {
-                logger.ErrorFormat("PrintCharacter失败, 获取对应的行失败, ch = {0}, row = {1}, col = {2}", ch, row, col);
-                return;
-            }
-
             textLine.PrintCharacter(ch, col);
         }
 
-        /// <summary>
-        /// 在当前光标处打印字符
-        /// </summary>
-        /// <param name="ch"></param>
-        /// <param name="col"></param>
-        public void PrintCharacter(char ch, int col)
-        {
-            if (this.activeLine == null)
-            {
-                logger.ErrorFormat("PrintCharacter失败，activeLine不存在, ch = {0}, col = {1}", ch, col);
-                return;
-            }
+        ///// <summary>
+        ///// 设置文档中的光标位置
+        ///// 并更新ActiveLine
+        ///// </summary>
+        ///// <param name="row"></param>
+        ///// <param name="column"></param>
+        //public void SetCursor(int row, int column)
+        //{
+        //    if (this.Cursor.Row != row)
+        //    {
+        //        this.Cursor.Row = row;
 
-            this.activeLine.PrintCharacter(ch, col);
-        }
+        //        // 光标位置改变的时候，就改变activeLine
+        //        if (!this.lineMap.TryGetValue(row, out this.activeLine))
+        //        {
+        //            this.activeLine = null;
+        //            logger.ErrorFormat("切换activeLine失败, 没找到对应的行, row = {0}", row);
+        //            return;
+        //        }
+        //    }
 
-        /// <summary>
-        /// 设置文档中的光标位置
-        /// 并更新ActiveLine
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="column"></param>
-        public void SetCursor(int row, int column)
-        {
-            if (this.Cursor.Row != row)
-            {
-                int oldCursorRow = this.Cursor.Row;
-                this.Cursor.Row = row;
-
-                // 光标位置改变的时候，就改变activeLine
-                if (!this.lineMap.TryGetValue(row, out this.activeLine))
-                {
-                    this.activeLine = null;
-                    logger.ErrorFormat("切换activeLine失败, 没找到对应的行, row = {0}", row);
-                    return;
-                }
-
-                this.UpdateViewableArea(oldCursorRow, this.Cursor.Row);
-            }
-
-            if (this.Cursor.Column != column)
-            {
-                this.Cursor.Column = column;
-            }
-        }
+        //    if (this.Cursor.Column != column)
+        //    {
+        //        this.Cursor.Column = column;
+        //    }
+        //}
 
         /// <summary>
         /// 在当前光标所在行开始删除字符操作
         /// </summary>
-        public void EraseLine(EraseType eraseType)
+        public void EraseLine(VTextLine textLine, EraseType eraseType)
         {
-            if (this.activeLine == null)
-            {
-                logger.ErrorFormat("EraseLine失败, EraseType = {0}, 光标所在行不存在", eraseType);
-                return;
-            }
-
             switch (eraseType)
             {
                 case EraseType.ToEnd:
                     {
                         // 删除从当前光标处到该行结尾的所有字符
-                        this.activeLine.DeleteText(this.Cursor.Column);
+                        textLine.DeleteText(this.Cursor.Column);
                         break;
                     }
 
                 case EraseType.FromBeginning:
                     {
                         // 删除从行首到当前光标处的内容
-                        this.activeLine.DeleteText(0, this.Cursor.Column);
+                        textLine.DeleteText(0, this.Cursor.Column);
                         break;
                     }
 
                 case EraseType.All:
                     {
                         // 删除光标所在整行
-                        this.activeLine.DeleteAll();
+                        textLine.DeleteAll();
                         break;
                     }
 
@@ -403,23 +255,23 @@ namespace XTerminal.Document
 
         }
 
-        public void EraseDisplay(EraseType eraseType)
+        public void EraseDisplay(VTextLine textLine, EraseType eraseType)
         {
             switch (eraseType)
             {
                 case EraseType.ToEnd:
                     {
                         // 从当前光标处直到屏幕最后一行全部都删除（包括当前光标处）
-                        if (this.activeLine == null)
+                        if (textLine == null)
                         {
                             logger.ErrorFormat("EraseType.ToEnd失败, 光标所在行不存在");
                             return;
                         }
 
                         // 先删第一行
-                        this.activeLine.DeleteText(this.Cursor.Column);
+                        textLine.DeleteText(this.Cursor.Column);
 
-                        VTextLine next = this.activeLine.NextLine;
+                        VTextLine next = textLine.NextLine;
                         while (next != null)
                         {
                             next.DeleteAll();
@@ -433,16 +285,16 @@ namespace XTerminal.Document
                 case EraseType.FromBeginning:
                     {
                         // 从屏幕的开始处删除到当前光标处
-                        if (this.activeLine == null)
+                        if (textLine == null)
                         {
                             logger.ErrorFormat("EraseType.FromBeginning失败, 光标所在行不存在");
                             return;
                         }
 
-                        this.activeLine.DeleteText(0, this.Cursor.Column);
+                        textLine.DeleteText(0, this.Cursor.Column);
 
                         VTextLine next = this.FirstLine;
-                        while (next != null && next != this.activeLine)
+                        while (next != null && next != textLine)
                         {
                             next.DeleteAll();
 
@@ -476,15 +328,9 @@ namespace XTerminal.Document
         /// 从当前光标处开始删除字符，要删除的字符数由count指定
         /// </summary>
         /// <param name="count"></param>
-        public void DeleteCharacter(int count)
+        public void DeleteCharacter(VTextLine textLine, int count)
         {
-            if (this.activeLine == null)
-            {
-                logger.ErrorFormat("DeleteCharacter失败, 光标所在行不存在");
-                return;
-            }
-
-            this.activeLine.DeleteText(this.Cursor.Column, count);
+            textLine.DeleteText(this.Cursor.Column, count);
         }
 
         /// <summary>
@@ -516,12 +362,133 @@ namespace XTerminal.Document
             this.FirstLine.DeleteAll();
             this.FirstLine.NextLine = null;
             this.LastLine = this.FirstLine;
-            this.activeLine = this.FirstLine;
             this.lineMap.Clear();
             this.lineMap[0] = this.FirstLine;
             this.ViewableArea.FirstLine = this.FirstLine;
             this.ViewableArea.LastLine = this.FirstLine;
             this.IsArrangeDirty = true;
+        }
+
+        /// <summary>
+        /// 滚动可视区域
+        /// </summary>
+        /// <param name="orientation">滚动方向</param>
+        /// <param name="scrollRows">要滚动的行数</param>
+        public void ScrollViewableDocument(ScrollOrientation orientation, int scrollRows)
+        {
+            if (this.LastLine.Row + 1 <= this.Rows)
+            {
+                /*
+                 * ViewableArea:
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |            |
+                 * |            |
+                 * |____________|
+                 */
+
+                // 可视区域的总行数小于最大行数
+                // 只需要更新最后一行即可
+                if (this.ViewableArea.LastLine != this.LastLine)
+                {
+                    this.ViewableArea.LastLine = this.LastLine;
+                    this.SetArrangeDirty();
+                }
+            }
+            else
+            {
+                VTextLine oldFirstLine = this.ViewableArea.FirstLine;
+                VTextLine oldLastLine = this.ViewableArea.LastLine;
+                VTextLine newFirstLine = null;
+                VTextLine newLastLine = null;
+
+                #region 更新新的可视区域的第一行和最后一行的指针
+
+                switch (orientation)
+                {
+                    case ScrollOrientation.Down:
+                        {
+                            newFirstLine = this.lineMap[oldFirstLine.Row + scrollRows];
+                            newLastLine = this.lineMap[oldLastLine.Row + scrollRows];
+                            break;
+                        }
+
+                    case ScrollOrientation.Up:
+                        {
+                            newFirstLine = this.lineMap[oldFirstLine.Row - scrollRows];
+                            newLastLine = this.lineMap[oldLastLine.Row - scrollRows];
+                            break;
+                        }
+
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                this.ViewableArea.FirstLine = newFirstLine;
+                this.ViewableArea.LastLine = newLastLine;
+
+                #endregion
+
+                #region 计算从可视区域移出的行和移入的行
+
+                // 从可视区域内被删除的行
+                VTextLine removedFirst = null;
+                // 新增加到可视区域内的行
+                VTextLine addedFirst = null;
+
+                if (scrollRows >= this.Rows)
+                {
+                    // 此时说明已经移动了一整个屏幕了, 被复用的起始行和结束行就等于移动之前的起始行和结束行
+                    removedFirst = oldFirstLine;
+                    addedFirst = newFirstLine;
+                }
+                else
+                {
+                    if (orientation == ScrollOrientation.Up)
+                    {
+                        // 把可视区域往上移动
+                        removedFirst = newLastLine.NextLine;
+                        addedFirst = newFirstLine;
+                    }
+                    else if (orientation == ScrollOrientation.Down)
+                    {
+                        // 把可视区域往下移动
+                        removedFirst = oldFirstLine;
+                        addedFirst = oldLastLine.NextLine;
+                    }
+                }
+
+                #endregion
+
+                #region 复用移出的行的DrawingElement
+
+                VTextLine removedCurrent = removedFirst;
+                VTextLine addedCurrent = addedFirst;
+                for (int i = 0; i < scrollRows; i++)
+                {
+                    if (removedCurrent.DrawingElement != null)
+                    {
+                        addedCurrent.DrawingElement = removedCurrent.DrawingElement;
+                        addedCurrent.DrawingElement.Data = addedCurrent;
+                    }
+                    addedCurrent.IsCharacterDirty = true;
+
+                    removedCurrent = removedCurrent.NextLine;
+                    addedCurrent = addedCurrent.NextLine;
+                }
+
+                #endregion
+
+                // 下次渲染的时候排版
+                this.SetArrangeDirty();
+            }
+        }
+
+        public bool TryGetLine(int row, out VTextLine textLine)
+        {
+            return this.lineMap.TryGetValue(row, out textLine);
         }
 
         #endregion

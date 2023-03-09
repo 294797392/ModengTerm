@@ -7,13 +7,13 @@ using XTerminal.Document;
 
 namespace XTerminal.Terminal
 {
-    public enum ScrollOrientation
-    {
-        Top,
-        Bottom,
-        Left,
-        Right
-    }
+    //public enum ScrollOrientation
+    //{
+    //    Top,
+    //    Bottom,
+    //    Left,
+    //    Right
+    //}
 
     public interface IDocumentRenderer
     {
@@ -55,9 +55,9 @@ namespace XTerminal.Terminal
         /// <param name="height">终端高度</param>
         void Resize(double width, double height);
 
-        /// <summary>
-        /// 滚动到某个方向的最底部
-        /// </summary>
-        void ScrollToEnd(ScrollOrientation direction);
+        ///// <summary>
+        ///// 滚动到某个方向的最底部
+        ///// </summary>
+        //void ScrollToEnd(ScrollOrientation direction);
     }
 }

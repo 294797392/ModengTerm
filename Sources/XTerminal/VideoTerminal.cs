@@ -65,6 +65,11 @@ namespace XTerminal
         private VTextMetrics blankCharacterMetrics;
 
         /// <summary>
+        /// 鼠标所在行
+        /// </summary>
+        private VTextLine activeLine;
+
+        /// <summary>
         /// 光标所在行
         /// </summary>
         private int cursorRow;
@@ -139,11 +144,6 @@ namespace XTerminal
 
         public VTextOptions TextOptions { get; private set; }
 
-        /// <summary>
-        /// 光标所在行
-        /// </summary>
-        public VTextLine ActiveLine { get { return this.activeDocument.ActiveLine; } }
-
         #endregion
 
         #region 构造方法
@@ -197,6 +197,7 @@ namespace XTerminal
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
+            this.activeDocument.TryGetLine(0, out this.activeLine);
 
             #endregion
 
@@ -226,35 +227,35 @@ namespace XTerminal
         /// 重新测量Terminal所需要的大小
         /// 如果大小改变了，那么调整布局大小
         /// </summary>
-        private void InvalidateMeasure()
-        {
-            if (this.ActiveLine == null)
-            {
-                logger.ErrorFormat("InvalidateMeasure失败, activeLine不存在");
-                return;
-            }
+        //private void InvalidateMeasure()
+        //{
+        //    if (this.ActiveLine == null)
+        //    {
+        //        logger.ErrorFormat("InvalidateMeasure失败, activeLine不存在");
+        //        return;
+        //    }
 
-            double width = Math.Max(this.ActiveLine.Bounds.RightBottom.X, this.fullWidth);
-            double height = Math.Max(this.ActiveLine.Bounds.RightBottom.Y, this.fullHeight);
+        //    double width = Math.Max(this.ActiveLine.Bounds.RightBottom.X, this.fullWidth);
+        //    double height = Math.Max(this.ActiveLine.Bounds.RightBottom.Y, this.fullHeight);
 
-            // 布局大小是否改变了
-            bool sizeChanged = false;
+        //    // 布局大小是否改变了
+        //    bool sizeChanged = false;
 
-            // 长宽和原来的完整长宽不一样就算改变了
-            if (width != this.fullWidth || height != this.fullHeight)
-            {
-                sizeChanged = true;
-            }
+        //    // 长宽和原来的完整长宽不一样就算改变了
+        //    if (width != this.fullWidth || height != this.fullHeight)
+        //    {
+        //        sizeChanged = true;
+        //    }
 
-            if (sizeChanged)
-            {
-                this.fullWidth = width;
-                this.fullHeight = height;
+        //    if (sizeChanged)
+        //    {
+        //        this.fullWidth = width;
+        //        this.fullHeight = height;
 
-                this.Renderer.Resize(width, height);
-                this.Renderer.ScrollToEnd(ScrollOrientation.Bottom);
-            }
-        }
+        //        this.Renderer.Resize(width, height);
+        //        this.Renderer.ScrollToEnd(ScrollOrientation.Bottom);
+        //    }
+        //}
 
         private void PerformDeviceStatusReport(StatusType statusType)
         {
@@ -324,6 +325,17 @@ namespace XTerminal
             }
         }
 
+        private void UpdateActiveLine(int row)
+        {
+            if (this.activeLine.Row != row)
+            {
+                if (!this.activeDocument.TryGetLine(row, out this.activeLine))
+                {
+                    logger.ErrorFormat("SetCursor失败, 没找到对应的行, row = {0}", row);
+                }
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -362,9 +374,8 @@ namespace XTerminal
                     {
                         char ch = (char)param[0];
                         logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.cursorRow, this.cursorCol);
-                        this.activeDocument.PrintCharacter(ch, this.cursorCol);
+                        this.activeDocument.PrintCharacter(this.activeLine, ch, this.cursorCol);
                         this.cursorCol++;
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -373,7 +384,6 @@ namespace XTerminal
                         // CR
                         // 把光标移动到行开头
                         this.cursorCol = 0;
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         logger.DebugFormat("CarriageReturn, cursorRow = {0}, cursorCol = {1}", this.cursorRow, this.cursorCol);
                         break;
                     }
@@ -383,12 +393,13 @@ namespace XTerminal
                 case VTActions.LF:
                     {
                         // LF
-                        this.cursorRow++;
-                        if (!this.activeDocument.ContainsLine(this.cursorRow))
+                        if (!this.activeDocument.ContainsLine(this.cursorRow + 1))
                         {
                             this.activeDocument.CreateNextLine();
                         }
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        this.cursorRow++;
+                        this.UpdateActiveLine(this.cursorRow);
+                        this.activeDocument.ScrollViewableDocument(ScrollOrientation.Down, 1);
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
                     }
@@ -397,7 +408,7 @@ namespace XTerminal
                     {
                         EraseType eraseType = (EraseType)param[0];
                         logger.DebugFormat("EL_EraseLine, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.cursorRow, this.cursorCol);
-                        this.activeDocument.EraseLine(eraseType);
+                        this.activeDocument.EraseLine(this.activeLine, eraseType);
                         break;
                     }
 
@@ -407,7 +418,6 @@ namespace XTerminal
                     {
                         this.cursorCol--;
                         logger.DebugFormat("CursorBackward, cursorRow = {0}, cursorCol = {1}", this.cursorRow, this.cursorCol);
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -415,7 +425,6 @@ namespace XTerminal
                     {
                         int n = Convert.ToInt32(param[0]);
                         this.cursorCol += n;
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 
@@ -423,7 +432,7 @@ namespace XTerminal
                     {
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow -= n;
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        this.UpdateActiveLine(this.cursorRow);
                         break;
                     }
 
@@ -431,7 +440,7 @@ namespace XTerminal
                     {
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow += n;
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        this.UpdateActiveLine(this.cursorRow);
                         break;
                     }
 
@@ -441,7 +450,7 @@ namespace XTerminal
                         int col = Convert.ToInt32(param[1]);
                         this.cursorRow = row;
                         this.cursorCol = col;
-                        this.activeDocument.SetCursor(row, col);
+                        this.UpdateActiveLine(this.cursorRow);
                         break;
                     }
 
@@ -520,7 +529,7 @@ namespace XTerminal
                 case VTActions.DCH_DeleteCharacter:
                     {
                         int count = Convert.ToInt32(param[0]);
-                        this.activeDocument.DeleteCharacter(count);
+                        this.activeDocument.DeleteCharacter(this.activeLine, count);
                         break;
                     }
 
@@ -534,11 +543,15 @@ namespace XTerminal
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
+                        // 先记录当前的光标
+                        this.activeDocument.Cursor.Row = this.cursorRow;
+                        this.activeDocument.Cursor.Column = this.cursorCol;
+
                         this.cursorCol = 0;
                         this.cursorRow = 0;
                         this.alternateDocument.Reset();
-                        this.alternateDocument.SetCursor(0, 0);
                         this.activeDocument = this.alternateDocument;
+                        this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();
@@ -553,6 +566,7 @@ namespace XTerminal
                         this.cursorRow = this.mainDocument.Cursor.Row;
                         this.activeDocument = this.mainDocument;
                         this.mainDocument.ViewableArea.DirtyAll();
+                        this.activeDocument.TryGetLine(this.cursorRow, out this.activeLine);
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();
@@ -564,7 +578,7 @@ namespace XTerminal
                 case VTActions.ED_EraseDisplay:
                     {
                         int parameter = Convert.ToInt32(param[0]);
-                        this.activeDocument.EraseDisplay((EraseType)parameter);
+                        this.activeDocument.EraseDisplay(this.activeLine, (EraseType)parameter);
                         break;
                     }
 
@@ -591,13 +605,14 @@ namespace XTerminal
                         if (this.cursorRow == 0)
                         {
                             // 说明光标在可见区域的最上面，那么要把可视区域往上移动一行（也就是把打字机的纸往下挪动一行），光标的列坐标不变
+                            this.activeDocument.ScrollViewableDocument(ScrollOrientation.Up, 1);
                         }
                         else if (this.cursorRow > 0)
                         {
                             // 光标在可见区域里，那么就可以直接移动鼠标
                             this.cursorRow--;
                         }
-                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        this.UpdateActiveLine(this.cursorRow);
                         break;
                     }
 
@@ -624,6 +639,7 @@ namespace XTerminal
             // 全部字符都处理完了之后，只渲染一次
 
             this.RenderDocument(this.activeDocument);
+            //this.activeDocument.Print();
         }
 
         private void VTChannel_StatusChanged(object client, VTChannelState state)
