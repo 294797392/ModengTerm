@@ -144,9 +144,9 @@ namespace XTerminal.Document
             int lastRow = this.ViewableArea.LastLine.Row;
 
             // 可视区域的总行数
-            int rows = lastRow - firstRow + 1;
+            int viewableRows = lastRow - firstRow + 1)
 
-            if (rows < this.Rows)
+            if (viewableRows < this.Rows)
             {
                 /*
                  * ViewableArea:
@@ -184,7 +184,7 @@ namespace XTerminal.Document
                 // 检查光标的新位置是否小于第一行或者是否大于最后一行
 
                 // 光标移动的行数
-                int numRows = Math.Abs(newCursorRow - oldCursorRow);
+                int movedRows = Math.Abs(newCursorRow - oldCursorRow);
 
                 VTextLine oldFirstLine = this.ViewableArea.FirstLine;
                 VTextLine oldLastLine = this.ViewableArea.LastLine;
@@ -194,6 +194,11 @@ namespace XTerminal.Document
                 {
                     // 光标要移动到的位置小于第一行，说明是要把可视区域往上移动
                     // 那么就把最后一行的DrawingElement拿给第一行使用
+
+                    //for (int i = 0; i < movedRows; i++)
+                    //{
+
+                    //}
 
                     // 此时activeLine就是光标移动后的行，可以直接使用activeLine
                     this.ViewableArea.FirstLine = this.activeLine;
