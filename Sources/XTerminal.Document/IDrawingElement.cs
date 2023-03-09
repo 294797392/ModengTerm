@@ -14,6 +14,6 @@ namespace XTerminal.Document
         /// <summary>
         /// 保存要画的元素的信息
         /// </summary>
-        VDocumentElement Element { get; set; }
+        VDocumentElement Data { get; set; }
     }
 }

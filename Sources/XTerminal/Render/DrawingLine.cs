@@ -24,7 +24,7 @@ namespace XTerminal.Document
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextLine textLine = this.Element as VTextLine;
+            VTextLine textLine = this.Data as VTextLine;
 
             string text = textLine.BuildText();
 

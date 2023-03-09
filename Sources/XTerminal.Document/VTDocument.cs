@@ -204,7 +204,7 @@ namespace XTerminal.Document
                     // 复用DrawingObject
                     VTextLine newFirstLine = this.ViewableArea.FirstLine;
                     newFirstLine.DrawingElement = oldLastLine.DrawingElement;
-                    newFirstLine.DrawingElement.Element = newFirstLine;
+                    newFirstLine.DrawingElement.Data = newFirstLine;
                     newFirstLine.IsCharacterDirty = true;
 
                 }
@@ -220,7 +220,7 @@ namespace XTerminal.Document
                     // 复用DrawingObject
                     VTextLine newLastLine = this.ViewableArea.LastLine;
                     newLastLine.DrawingElement = oldFirstLine.DrawingElement;
-                    newLastLine.DrawingElement.Element = oldFirstLine;
+                    newLastLine.DrawingElement.Data = oldFirstLine;
                     newLastLine.IsCharacterDirty = true;
                 }
             }
@@ -337,7 +337,7 @@ namespace XTerminal.Document
                 if (!this.lineMap.TryGetValue(row, out this.activeLine))
                 {
                     this.activeLine = null;
-                    logger.ErrorFormat("切换activeLine失败, 没找到对应的行, {0}", row);
+                    logger.ErrorFormat("切换activeLine失败, 没找到对应的行, row = {0}", row);
                     return;
                 }
 
@@ -480,12 +480,35 @@ namespace XTerminal.Document
         /// </summary>
         public void Reset()
         {
+            // 先解除和DrawingElement的关联关系
+            VTextLine current = this.ViewableArea.FirstLine;
+            VTextLine last = this.ViewableArea.LastLine;
+
+            while (current != null)
+            {
+                if (current.DrawingElement != null)
+                {
+                    current.DrawingElement.Data = null;
+                    current.DrawingElement = null;
+                }
+
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
+
             this.FirstLine.DeleteAll();
             this.FirstLine.NextLine = null;
             this.LastLine = this.FirstLine;
             this.activeLine = this.FirstLine;
             this.lineMap.Clear();
             this.lineMap[0] = this.FirstLine;
+            this.ViewableArea.FirstLine = this.FirstLine;
+            this.ViewableArea.LastLine = this.FirstLine;
+            this.IsArrangeDirty = true;
         }
 
         #endregion

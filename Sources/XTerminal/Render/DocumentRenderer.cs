@@ -91,7 +91,7 @@ namespace XTerminal.Document
         /// <returns></returns>
         private DrawingLine RequestDrawingLine()
         {
-            return this.visuals.Cast<DrawingLine>().FirstOrDefault(v => v.Element == null);
+            return this.visuals.Cast<DrawingLine>().FirstOrDefault(v => v.Data == null);
         }
 
         #endregion
@@ -137,7 +137,7 @@ namespace XTerminal.Document
                         logger.FatalFormat("没有空闲的DrawingLine了");
                         return;
                     }
-                    drawingLine.Element = next;
+                    drawingLine.Data = next;
                     next.DrawingElement = drawingLine;
                 }
 
@@ -148,9 +148,9 @@ namespace XTerminal.Document
                 {
                     // 此时说明该行有字符变化，需要重绘
                     // 重绘的时候会也会Arrange
-                    if (drawingLine.Element != next)
+                    if (drawingLine.Data != next)
                     {
-                        drawingLine.Element = next;
+                        drawingLine.Data = next;
                     }
                     drawingLine.Draw();
                     next.IsCharacterDirty = false;

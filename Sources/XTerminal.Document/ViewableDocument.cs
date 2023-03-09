@@ -39,8 +39,9 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 把当前可视区域的所有TextLine标记为需要重新渲染的状态
+        /// 并且把ViewableDocument也标记为ArrangeDirty
         /// </summary>
-        public void DirtyAllTextLine()
+        public void DirtyAll()
         {
             VTextLine current = this.FirstLine;
             VTextLine last = this.LastLine;
@@ -56,6 +57,8 @@ namespace XTerminal.Document
 
                 current = current.NextLine;
             }
+
+            this.IsArrangeDirty = true;
         }
     }
 }

@@ -16,7 +16,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 保存要画的对象的数据
         /// </summary>
-        public VDocumentElement Element { get; set; }
+        public VDocumentElement Data { get; set; }
 
         public DrawingObject()
         {
@@ -38,7 +38,7 @@ namespace XTerminal.Document
         /// </summary>
         public void Reset()
         {
-            this.Element = null;
+            this.Data = null;
             this.Offset = new Vector();
             DrawingContext dc = this.RenderOpen();
             dc.Close();
