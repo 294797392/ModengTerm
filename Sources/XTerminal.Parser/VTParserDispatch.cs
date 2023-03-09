@@ -82,7 +82,6 @@ namespace XTerminal.Parser
 
                         // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
                         // implicit movement的方向使用SIMD标志来指定
-                        logger.DebugFormat("Action - Backspace");
                         this.NotifyActionEvent(VTActions.CursorBackward, 1);
                         break;
                     }
@@ -105,14 +104,14 @@ namespace XTerminal.Parser
                 case ASCIITable.LF:
                     {
                         //logger.DebugFormat("Action - LF");
-                        this.NotifyActionEvent(VTActions.LineFeed);
+                        this.NotifyActionEvent(VTActions.LF);
                         break;
                     }
 
                 case ASCIITable.FF:
                     {
                         //logger.DebugFormat("Action - LF");
-                        this.NotifyActionEvent(VTActions.LineFeed);
+                        this.NotifyActionEvent(VTActions.FF);
                         break;
                     }
 
@@ -120,7 +119,7 @@ namespace XTerminal.Parser
                     {
                         // 这三个都是LF
                         //logger.DebugFormat("Action - VT");
-                        this.NotifyActionEvent(VTActions.LineFeed);
+                        this.NotifyActionEvent(VTActions.VT);
                         break;
                     }
 
@@ -375,6 +374,15 @@ namespace XTerminal.Parser
                         break;
                     }
 
+                case EscActionCodes.RI_ReverseLineFeed:
+                    {
+                        // Performs a "Reverse line feed", essentially, the opposite of '\n'.
+                        //    Moves the cursor up one line, and tries to keep its position in the line
+                        logger.DebugFormat("ESCDispatch - RI_ReverseLineFeed");
+                        this.NotifyActionEvent(VTActions.RI_ReverseLineFeed);
+                        break;
+                    }
+
                 default:
                     logger.ErrorFormat("未实现EscAction, {0}", code);
                     break;
@@ -577,7 +585,7 @@ namespace XTerminal.Parser
                 {
                     case DECPrivateMode.DECCKM_CursorKeysMode:
                         {
-                            logger.DebugFormat("DECPrivateMode - DECCKM_CursorKeysMode");
+                            logger.DebugFormat("DECPrivateMode - DECCKM_CursorKeysMode, enable = {0}", enable);
                             // set - Enable Application Mode, reset - Normal mode
 
                             // true表示ApplicationMode
@@ -589,7 +597,7 @@ namespace XTerminal.Parser
 
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
-                            logger.DebugFormat("DECPrivateMode - DECANM_AnsiMode");
+                            logger.DebugFormat("DECPrivateMode - DECANM_AnsiMode, enable = {0}", enable);
                             this.isAnsiMode = enable;
                             this.NotifyActionEvent(VTActions.SetVTMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
                             break;
@@ -597,7 +605,7 @@ namespace XTerminal.Parser
 
                     case DECPrivateMode.DECAWM_AutoWrapMode:
                         {
-                            logger.DebugFormat("DECPrivateMode - DECAWM_AutoWrapMode");
+                            logger.DebugFormat("DECPrivateMode - DECAWM_AutoWrapMode, enable = {0}", enable);
                             this.NotifyActionEvent(VTActions.AutoWrapMode, enable);
                             break;
                         }

@@ -324,6 +324,7 @@ namespace XTerminal
                 case VTActions.Print:
                     {
                         char ch = (char)param[0];
+                        logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.cursorRow, this.cursorCol);
                         this.activeDocument.PrintCharacter(ch, this.cursorCol);
                         this.cursorCol++;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
@@ -337,25 +338,28 @@ namespace XTerminal
                         // 把光标移动到行开头
                         this.cursorCol = 0;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        logger.DebugFormat("CarriageReturn, cursorRow = {0}, cursorCol = {1}", this.cursorRow, this.cursorCol);
                         break;
                     }
 
-                case VTActions.LineFeed:
+                case VTActions.FF:
+                case VTActions.VT:
+                case VTActions.LF:
                     {
                         // LF
                         this.cursorRow++;
                         this.activeDocument.CreateNextLine();
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
-
                         // 空行要画一下，不然该行就没有位置信息，在创建下一行的时候下一行的位置信息就会出问题
                         this.DrawLine(this.ActiveLine);
+                        logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
                     }
 
                 case VTActions.EL_EraseLine:
                     {
                         EraseType eraseType = (EraseType)param[0];
-                        logger.DebugFormat("EL_EraseLine, eraseType = {0}, row = {1}", eraseType, this.ActiveLine.Row);
+                        logger.DebugFormat("EL_EraseLine, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.cursorRow, this.cursorCol);
                         this.activeDocument.EraseLine(eraseType);
                         this.DrawLine(this.activeDocument.ActiveLine);
                         break;
@@ -366,6 +370,7 @@ namespace XTerminal
                 case VTActions.CursorBackward:
                     {
                         this.cursorCol--;
+                        logger.DebugFormat("CursorBackward, cursorRow = {0}, cursorCol = {1}", this.cursorRow, this.cursorCol);
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
@@ -533,6 +538,13 @@ namespace XTerminal
                 case VTActions.DA_DeviceAttributes:
                     {
                         this.vtChannel.Write(DA_DeviceAttributesResponse);
+                        break;
+                    }
+
+                case VTActions.RI_ReverseLineFeed:
+                    {
+                        this.cursorRow--;
+                        this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         break;
                     }
 

@@ -112,7 +112,9 @@ namespace XTerminal.Parser
         /// Moves the cursor to the leftmost column
         /// </summary>
         CarriageReturn,
-        LineFeed,
+        LF,
+        FF,
+        VT,
 
         /// <summary>
         /// 删除行
@@ -202,6 +204,8 @@ namespace XTerminal.Parser
         UseMainScreenBuffer,
 
         DSR_DeviceStatusReport,
-        DA_DeviceAttributes
+        DA_DeviceAttributes,
+
+        RI_ReverseLineFeed
     }
 }
