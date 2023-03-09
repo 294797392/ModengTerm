@@ -175,8 +175,8 @@ namespace XTerminal.Document
             textLine.PreviousLine = this.LastLine;
             this.LastLine = textLine;
 
-            int viewableLines = (this.ViewableArea.LastLine.Row - this.ViewableArea.FirstLine.Row) + 1;
-            if (viewableLines >= this.Rows)
+            int viewableLines = this.ViewableArea.LastLine.Row - this.ViewableArea.FirstLine.Row + 2;
+            if (viewableLines > this.Rows)
             {
                 this.ScrollViewableDocument(ScrollOrientation.Down, 1);
             }
@@ -235,21 +235,24 @@ namespace XTerminal.Document
         /// <summary>
         /// 在当前光标所在行开始删除字符操作
         /// </summary>
-        public void EraseLine(VTextLine textLine, EraseType eraseType)
+        /// <param name="textLine">要执行删除操作的行</param>
+        /// <param name="column">光标所在列</param>
+        /// <param name="eraseType">删除类型</param>
+        public void EraseLine(VTextLine textLine, int column, EraseType eraseType)
         {
             switch (eraseType)
             {
                 case EraseType.ToEnd:
                     {
                         // 删除从当前光标处到该行结尾的所有字符
-                        textLine.DeleteText(this.Cursor.Column);
+                        textLine.DeleteText(column);
                         break;
                     }
 
                 case EraseType.FromBeginning:
                     {
                         // 删除从行首到当前光标处的内容
-                        textLine.DeleteText(0, this.Cursor.Column);
+                        textLine.DeleteText(0, column);
                         break;
                     }
 
@@ -266,7 +269,7 @@ namespace XTerminal.Document
 
         }
 
-        public void EraseDisplay(VTextLine textLine, EraseType eraseType)
+        public void EraseDisplay(VTextLine textLine, int column, EraseType eraseType)
         {
             switch (eraseType)
             {
@@ -280,7 +283,7 @@ namespace XTerminal.Document
                         }
 
                         // 先删第一行
-                        textLine.DeleteText(this.Cursor.Column);
+                        textLine.DeleteText(column);
 
                         VTextLine next = textLine.NextLine;
                         while (next != null)
@@ -302,7 +305,7 @@ namespace XTerminal.Document
                             return;
                         }
 
-                        textLine.DeleteText(0, this.Cursor.Column);
+                        textLine.DeleteText(0, column);
 
                         VTextLine next = this.FirstLine;
                         while (next != null && next != textLine)
@@ -339,9 +342,9 @@ namespace XTerminal.Document
         /// 从当前光标处开始删除字符，要删除的字符数由count指定
         /// </summary>
         /// <param name="count"></param>
-        public void DeleteCharacter(VTextLine textLine, int count)
+        public void DeleteCharacter(VTextLine textLine, int column, int count)
         {
-            textLine.DeleteText(this.Cursor.Column, count);
+            textLine.DeleteText(column, count);
         }
 
         /// <summary>

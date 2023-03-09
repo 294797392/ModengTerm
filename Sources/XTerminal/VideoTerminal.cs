@@ -271,8 +271,8 @@ namespace XTerminal
                 case StatusType.CPR_CursorPositionReport:
                     {
                         // Result is CSI r ; c R
-                        int cursorRow = this.activeDocument.Cursor.Row;
-                        int cursorCol = this.activeDocument.Cursor.Column;
+                        int cursorRow = this.cursorRow;
+                        int cursorCol = this.cursorCol;
                         CPR_CursorPositionReportResponse[2] = (byte)cursorRow;
                         CPR_CursorPositionReportResponse[4] = (byte)cursorCol;
                         this.vtChannel.Write(CPR_CursorPositionReportResponse);
@@ -407,7 +407,7 @@ namespace XTerminal
                     {
                         EraseType eraseType = (EraseType)param[0];
                         logger.DebugFormat("EL_EraseLine, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.cursorRow, this.cursorCol);
-                        this.activeDocument.EraseLine(this.activeLine, eraseType);
+                        this.activeDocument.EraseLine(this.activeLine, this.cursorCol, eraseType);
                         break;
                     }
 
@@ -528,7 +528,7 @@ namespace XTerminal
                 case VTActions.DCH_DeleteCharacter:
                     {
                         int count = Convert.ToInt32(param[0]);
-                        this.activeDocument.DeleteCharacter(this.activeLine, count);
+                        this.activeDocument.DeleteCharacter(this.activeLine, this.cursorCol, count);
                         break;
                     }
 
@@ -577,7 +577,7 @@ namespace XTerminal
                 case VTActions.ED_EraseDisplay:
                     {
                         int parameter = Convert.ToInt32(param[0]);
-                        this.activeDocument.EraseDisplay(this.activeLine, (EraseType)parameter);
+                        this.activeDocument.EraseDisplay(this.activeLine, this.cursorCol, (EraseType)parameter);
                         break;
                     }
 
