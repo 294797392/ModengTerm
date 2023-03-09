@@ -78,7 +78,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 该文档是否需要重新布局
         /// </summary>
-        public bool IsArrangeDirty { get { return this.ViewableArea.IsArrangeDirty; } }
+        public bool IsArrangeDirty { get { return this.ViewableArea.IsArrangeDirty; } internal set { this.ViewableArea.IsArrangeDirty = value; } }
 
         #endregion
 
@@ -108,11 +108,21 @@ namespace XTerminal.Document
             this.activeLine = firstLine;
             this.ViewableArea.FirstLine = firstLine;
             this.ViewableArea.LastLine = firstLine;
+
+            this.IsArrangeDirty = true;
         }
 
         #endregion
 
         #region 实例方法
+
+        private void SetArrangeDirty()
+        {
+            if (!this.IsArrangeDirty)
+            {
+                this.IsArrangeDirty = true;
+            }
+        }
 
         /// <summary>
         /// 根据当前光标位置更新可显示区域
@@ -154,6 +164,7 @@ namespace XTerminal.Document
                 if (this.ViewableArea.LastLine != this.LastLine)
                 {
                     this.ViewableArea.LastLine = this.LastLine;
+                    this.SetArrangeDirty();
                 }
             }
             else
@@ -173,7 +184,7 @@ namespace XTerminal.Document
                 // 检查光标的新位置是否小于第一行或者是否大于最后一行
 
                 // 标记布局已失效，下次渲染的时候需要重新布局
-                this.ViewableArea.IsArrangeDirty = true;
+                this.SetArrangeDirty();
 
                 VTextLine oldFirstLine = this.ViewableArea.FirstLine;
                 VTextLine oldLastLine = this.ViewableArea.LastLine;

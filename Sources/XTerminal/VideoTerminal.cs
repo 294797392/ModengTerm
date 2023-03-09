@@ -200,6 +200,16 @@ namespace XTerminal
 
             #endregion
 
+            #region 初始化渲染器
+
+            DocumentRendererOptions rendererOptions = new DocumentRendererOptions() 
+            {
+                Rows = initialOptions.TerminalOption.Rows
+            };
+            this.Renderer.Initialize(rendererOptions);
+
+            #endregion
+
             // 连接终端通道
             VTChannel vtChannel = VTChannelFactory.Create(options);
             vtChannel.StatusChanged += this.VTChannel_StatusChanged;
