@@ -128,9 +128,9 @@ namespace XTerminal
         public IInputDevice InputDevice { get; set; }
 
         /// <summary>
-        /// 终端显示器接口
+        /// 文档渲染器
         /// </summary>
-        public IVTMonitor Monitor { get; set; }
+        public IDocumentRenderer Renderer { get; set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流
@@ -184,13 +184,14 @@ namespace XTerminal
             this.vtParser.ActionEvent += VtParser_ActionEvent;
             this.vtParser.Initialize();
 
-            this.blankCharacterMetrics = this.Monitor.MeasureText(" ", VTextStyle.Default);
+            this.blankCharacterMetrics = this.Renderer.MeasureText(" ", VTextStyle.Default);
 
             #region 初始化文档模型
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
                 Columns = initialOptions.TerminalOption.Columns,
+                Rows = initialOptions.TerminalOption.Rows,
                 DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
@@ -240,24 +241,9 @@ namespace XTerminal
                 this.fullWidth = width;
                 this.fullHeight = height;
 
-                this.Monitor.Resize(width, height);
-                this.Monitor.ScrollToEnd(ScrollOrientation.Bottom);
+                this.Renderer.Resize(width, height);
+                this.Renderer.ScrollToEnd(ScrollOrientation.Bottom);
             }
-        }
-
-        private void DrawLine(VTextLine textLine)
-        {
-            if (textLine == null)
-            {
-                logger.WarnFormat("DrawLine失败, Line不存在");
-                return;
-            }
-
-            this.uiSyncContext.Send((v) =>
-            {
-                this.Monitor.DrawLine(textLine);
-                this.InvalidateMeasure();
-            }, null);
         }
 
         private void PerformDeviceStatusReport(StatusType statusType)
@@ -285,6 +271,66 @@ namespace XTerminal
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        private void DrawLine(VTextLine textLine)
+        {
+            if (textLine == null)
+            {
+                logger.FatalFormat("DrawLine失败, Line不存在");
+                return;
+            }
+
+            this.uiSyncContext.Send((v) =>
+            {
+                this.Renderer.DrawLine(textLine);
+            }, null);
+        }
+
+        /// <summary>
+        /// 重新计算文档的可视区域布局（如果需要的话）
+        /// 并且重新绘制DirtyTextLine
+        /// 只有在光标上下移动的时候再调用此方法，不然效率会降低
+        /// </summary>
+        /// <param name="vtDocument"></param>
+        private void ArrangeDocument(VTDocument vtDocument)
+        {
+            ViewableDocument document = vtDocument.ViewableArea;
+
+            if (!document.IsArrangeDirty)
+            {
+                return;
+            }
+
+            double offsetY = 0;
+
+            VTextLine next = document.FirstLine;
+            while (next != null)
+            {
+                // 此时说明需要重新排版
+                next.OffsetY = offsetY;
+
+                VTextMetrics metrics = this.Renderer.MeasureText(next.BuildText(), VTextStyle.Default);
+
+                offsetY += metrics.Height;
+
+                if (next.IsCharacterDirty)
+                {
+                    // 此时说明该行有字符变化，需要重绘
+                    this.Renderer.DrawLine(next);
+                    next.IsCharacterDirty = false;
+                }
+
+                // 如果最后一行渲染完毕了，那么就退出
+                if (next == document.LastLine)
+                {
+                    break;
+                }
+
+                next = next.NextLine;
+            }
+
+            document.IsArrangeDirty = false;
         }
 
         #endregion
@@ -350,8 +396,10 @@ namespace XTerminal
                         this.cursorRow++;
                         this.activeDocument.CreateNextLine();
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
-                        // 空行要画一下，不然该行就没有位置信息，在创建下一行的时候下一行的位置信息就会出问题
-                        this.DrawLine(this.ActiveLine);
+                        // 空行要测量一下，不然该行就没有位置信息，在创建下一行的时候下一行的Y偏移量就不会增加
+                        this.ActiveLine.Metrics = this.Renderer.MeasureText(" ", VTextStyle.Default);
+                        // 光标移动了，那么重新布局
+                        this.ArrangeDocument(this.activeDocument);
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
                     }
@@ -388,6 +436,7 @@ namespace XTerminal
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow -= n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        this.ArrangeDocument(this.activeDocument);
                         break;
                     }
 
@@ -396,6 +445,7 @@ namespace XTerminal
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow += n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        this.ArrangeDocument(this.activeDocument);
                         break;
                     }
 
@@ -403,7 +453,10 @@ namespace XTerminal
                     {
                         int row = Convert.ToInt32(param[0]);
                         int col = Convert.ToInt32(param[1]);
+                        this.cursorRow = row;
+                        this.cursorCol = col;
                         this.activeDocument.SetCursor(row, col);
+                        this.ArrangeDocument(this.activeDocument);
                         break;
                     }
 
@@ -504,7 +557,8 @@ namespace XTerminal
                         this.activeDocument = this.alternateDocument;
                         this.uiSyncContext.Send((state) =>
                         {
-                            this.Monitor.DrawDocument(this.alternateDocument);
+                            this.Renderer.Reset();
+                            this.ArrangeDocument(this.mainDocument);
                         }, null);
                         break;
                     }
@@ -516,7 +570,8 @@ namespace XTerminal
                         this.activeDocument = this.mainDocument;
                         this.uiSyncContext.Send((state) =>
                         {
-                            this.Monitor.DrawDocument(this.mainDocument);
+                            this.Renderer.Reset();
+                            this.ArrangeDocument(this.mainDocument);
                         }, null);
                         break;
                     }
@@ -545,6 +600,12 @@ namespace XTerminal
                     {
                         this.cursorRow--;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
+                        break;
+                    }
+
+                case VTActions.DECSTBM_SetScrollingRegion:
+                    {
+
                         break;
                     }
 

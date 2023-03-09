@@ -78,6 +78,11 @@ namespace XTerminal.Document
         /// </summary>
         private List<VTCharacter> Characters { get; set; }
 
+        /// <summary>
+        /// 表示该行是否有字符被修改了，需要重新渲染
+        /// </summary>
+        public bool IsCharacterDirty { get; set; }
+
         #endregion
 
         #region 构造方法

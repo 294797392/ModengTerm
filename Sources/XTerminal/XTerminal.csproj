@@ -84,7 +84,7 @@
     <Compile Include="Render\DrawingObject.cs" />
     <Compile Include="Render\DrawingText.cs" />
     <Compile Include="Render\TerminalUtils.cs" />
-    <Compile Include="Render\CharacterCanvas.cs" />
+    <Compile Include="Render\DocumentRenderer.cs" />
     <Compile Include="Render\ConsoleMonitor.cs" />
     <Compile Include="Options\TerminalOptions.cs" />
     <Compile Include="ResponseCode.cs" />

@@ -256,9 +256,14 @@ namespace XTerminal.Parser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        int topMargin = parameters[0];
-                        int bottomMargin = parameters[1];
-                        logger.ErrorFormat("未实现CSIDispatch - DECSTBM_SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                        // topMargin：is the line number for the top margin.
+                        // Default: Pt = 1
+                        // bottomMargin：is the line number for the bottom margin.
+                        // Default: Pb = current number of lines per screen
+                        int topMargin = this.GetParameter(parameters, 0, 1);
+                        int bottomMargin = this.GetParameter(parameters, 0, 0);
+                        logger.ErrorFormat("CSIDispatch - DECSTBM_SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                        this.NotifyActionEvent(VTActions.DECSTBM_SetScrollingRegion, topMargin, bottomMargin);
                         //throw new NotImplementedException();
                         break;
                     }
@@ -341,6 +346,18 @@ namespace XTerminal.Parser
                 default:
                     logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                     throw new NotImplementedException();
+            }
+        }
+
+        private int GetParameter(List<int> parameters, int index, int defaultParameter)
+        {
+            if (parameters.Count > index)
+            {
+                return parameters[index];
+            }
+            else
+            {
+                return defaultParameter;
             }
         }
 

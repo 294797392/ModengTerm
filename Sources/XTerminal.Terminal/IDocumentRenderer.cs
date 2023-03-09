@@ -15,7 +15,7 @@ namespace XTerminal.Terminal
         Right
     }
 
-    public interface IVTMonitor
+    public interface IDocumentRenderer
     {
         /// <summary>
         /// 渲染一行
@@ -24,11 +24,9 @@ namespace XTerminal.Terminal
         void DrawLine(VTextLine textLine);
 
         /// <summary>
-        /// 清除当前所有画的东西并渲染一个文档
-        /// 该方法会自动处理滚动条和视图大小
+        /// 清除现实的内容并把状态还原
         /// </summary>
-        /// <param name="document"></param>
-        void DrawDocument(VTDocument document);
+        void Reset();
 
         /// <summary>
         /// 测量某个文本块的属性

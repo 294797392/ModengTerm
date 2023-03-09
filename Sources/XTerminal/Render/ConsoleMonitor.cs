@@ -14,7 +14,7 @@ using XTerminal.Terminal;
 namespace XTerminal.Document
 {
     /// <summary>
-    /// 用来显示字符的容器
+    /// 显示器控件
     /// </summary>
     public class ConsoleMonitor : Grid, IInputDevice
     {
@@ -42,7 +42,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 终端显示器对象
         /// </summary>
-        public IVTMonitor Monitor { get; private set; }
+        public IDocumentRenderer Monitor { get; private set; }
 
         #endregion
 
@@ -54,7 +54,7 @@ namespace XTerminal.Document
             this.Background = Brushes.Transparent;
             this.Focusable = true;
 
-            CharacterCanvas drawingCanvas = new CharacterCanvas();
+            DocumentRenderer drawingCanvas = new DocumentRenderer();
             ScrollViewer scrollViewer = new ScrollViewer()
             {
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,

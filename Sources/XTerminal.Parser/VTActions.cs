@@ -206,6 +206,8 @@ namespace XTerminal.Parser
         DSR_DeviceStatusReport,
         DA_DeviceAttributes,
 
-        RI_ReverseLineFeed
+        RI_ReverseLineFeed,
+
+        DECSTBM_SetScrollingRegion
     }
 }

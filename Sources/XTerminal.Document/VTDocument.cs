@@ -7,9 +7,16 @@ using XTerminal.Parser;
 
 namespace XTerminal.Document
 {
+    /// <summary>
+    /// 终端显示的字符的文档模型
+    /// </summary>
     public class VTDocument
     {
+        #region 类变量
+
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDocument");
+
+        #endregion
 
         #region 实例变量
 
@@ -49,14 +56,24 @@ namespace XTerminal.Document
         public bool DECPrivateAutoWrapMode { get; set; }
 
         /// <summary>
-        /// 最大列数
+        /// 可视区域的最大列数
         /// </summary>
         public int Columns { get { return this.options.Columns; } }
+
+        /// <summary>
+        /// 可视区域的最大行数
+        /// </summary>
+        public int Rows { get { return this.options.Rows; } }
 
         /// <summary>
         /// 光标所在行
         /// </summary>
         public VTextLine ActiveLine { get { return this.activeLine; } }
+
+        /// <summary>
+        /// 该文档要渲染的区域
+        /// </summary>
+        public ViewableDocument ViewableArea { get; private set; }
 
         #endregion
 
@@ -68,6 +85,7 @@ namespace XTerminal.Document
 
             this.lineMap = new Dictionary<int, VTextLine>();
             this.Cursor = new VCursor();
+            this.ViewableArea = new ViewableDocument();
 
             VTextLine firstLine = new VTextLine(options.Columns)
             {
@@ -82,11 +100,93 @@ namespace XTerminal.Document
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
             this.activeLine = firstLine;
+            this.ViewableArea.FirstLine = firstLine;
+            this.ViewableArea.LastLine = firstLine;
         }
 
         #endregion
 
         #region 实例方法
+
+        /// <summary>
+        /// 根据当前光标位置更新可显示区域
+        /// 当行数量改变的时候调用此方法就可以
+        /// </summary>
+        /// <param name="oldCursorRow">光标移动之前的行</param>
+        /// <param name="newCursorRow">光标要移动到的行</param>
+        private void UpdateViewableArea(int oldCursorRow, int newCursorRow)
+        {
+            if (oldCursorRow == newCursorRow)
+            {
+                return;
+            }
+
+            // 可视区域的第一行
+            int firstRow = this.ViewableArea.FirstLine.Row;
+
+            // 可视区域的最后一行
+            int lastRow = this.ViewableArea.LastLine.Row;
+
+            // 可视区域的总行数
+            int rows = lastRow - firstRow + 1;
+
+            if (rows < this.Rows)
+            {
+                /*
+                 * ViewableArea:
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |            |
+                 * |            |
+                 * |____________|
+                 */
+
+                // 可视区域的总行数小于最大行数
+                // 只需要更新最后一行即可
+                if (this.ViewableArea.LastLine != this.LastLine)
+                {
+                    this.ViewableArea.LastLine = this.LastLine;
+                }
+            }
+            else
+            {
+                /*
+                 * ViewableArea:
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 * |------------|
+                 */
+
+                // 可视区域的总行数大于等于最大行数
+                // 检查光标的新位置是否小于第一行或者是否大于最后一行
+
+                if (newCursorRow < firstRow)
+                {
+                    this.ViewableArea.IsArrangeDirty = true;
+
+                    // 光标的新位置小于第一行，说明需要移动FirstLine指针
+                    // 此时activeLine就是光标所在的行，可以直接使用activeLine
+                    this.ViewableArea.FirstLine = this.activeLine;
+
+                    // 同时更新LastLine指针
+                    this.ViewableArea.LastLine = this.ViewableArea.LastLine.PreviousLine;
+                }
+                else if (newCursorRow > lastRow)
+                {
+                    this.ViewableArea.IsArrangeDirty = true;
+
+                    // 和上面一样的思路更新首尾指针
+                    this.ViewableArea.LastLine = this.activeLine;
+                    this.ViewableArea.FirstLine = this.ViewableArea.FirstLine.NextLine;
+                }
+            }
+        }
 
         #endregion
 
@@ -115,6 +215,9 @@ namespace XTerminal.Document
             textLine.PreviousLine = this.LastLine;
             this.LastLine = textLine;
             this.activeLine = textLine;
+
+            // 更新可视区域
+            this.UpdateViewableArea(this.LastLine.Row, row);
 
             return textLine;
         }
@@ -163,6 +266,7 @@ namespace XTerminal.Document
         {
             if (this.Cursor.Row != row)
             {
+                int oldCursorRow = this.Cursor.Row;
                 this.Cursor.Row = row;
 
                 // 光标位置改变的时候，就改变activeLine
@@ -172,6 +276,8 @@ namespace XTerminal.Document
                     logger.ErrorFormat("切换activeLine失败, 没找到对应的行, {0}", row);
                     return;
                 }
+
+                this.UpdateViewableArea(oldCursorRow, this.Cursor.Row);
             }
 
             if (this.Cursor.Column != column)

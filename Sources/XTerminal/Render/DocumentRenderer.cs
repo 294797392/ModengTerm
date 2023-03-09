@@ -15,7 +15,7 @@ namespace XTerminal.Document
     /// <summary>
     /// 用来显示字符的容器
     /// </summary>
-    public class CharacterCanvas : FrameworkElement, IVTMonitor
+    public class DocumentRenderer : FrameworkElement, IDocumentRenderer
     {
         #region 类变量
 
@@ -46,7 +46,7 @@ namespace XTerminal.Document
 
         #region 构造方法
 
-        public CharacterCanvas()
+        public DocumentRenderer()
         {
             this.visuals = new VisualCollection(this);
         }
@@ -83,7 +83,7 @@ namespace XTerminal.Document
 
         #endregion
 
-        #region IVTMonitor
+        #region IDocumentRenderer
 
         /// <summary>
         /// 渲染一行
@@ -103,30 +103,10 @@ namespace XTerminal.Document
             drawingLine.Draw();
         }
 
-        public void DrawDocument(VTDocument document)
+        public void Reset()
         {
             this.visuals.Clear();
-
-            double width = 0, height = 0;
-
-            VTextLine next = document.FirstLine;
-            while (next != null)
-            {
-                // 先把Visual加到界面上
-                DrawingLine drawingLine = next.DrawingObject as DrawingLine;
-                this.visuals.Add(drawingLine);
-
-                // 画文本
-                this.DrawLine(next);
-
-                width = Math.Max(width, next.Bounds.RightBottom.X);
-                height = Math.Max(height, next.Bounds.RightBottom.Y);
-
-                next = next.NextLine;
-            }
-
-            this.Resize(width, height);
-            this.ScrollToEnd(ScrollOrientation.Bottom);
+            this.Resize(0, 0);
         }
 
         public VTextMetrics MeasureText(string text, VTextStyle style)

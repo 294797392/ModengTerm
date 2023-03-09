@@ -57,6 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VCursor.cs" />
     <Compile Include="VFontWeight.cs" />
+    <Compile Include="ViewableDocument.cs" />
     <Compile Include="VTCharacter.cs" />
     <Compile Include="VTDocumentOptions.cs" />
     <Compile Include="VTDocument.cs" />
