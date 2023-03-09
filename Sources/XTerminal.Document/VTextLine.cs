@@ -188,6 +188,14 @@ namespace XTerminal.Document
             //this.TextBlocks.Remove(textBlock);
         }
 
+        private void SetDirty()
+        {
+            if (!this.IsCharacterDirty)
+            {
+                this.IsCharacterDirty = true;
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -218,7 +226,11 @@ namespace XTerminal.Document
             else
             {
                 this.Characters[column].Character = ch;
-            }            //}
+            }
+
+            this.SetDirty();
+
+            //}
 
             ////if (this.Columns == this)
             //{
@@ -245,6 +257,8 @@ namespace XTerminal.Document
         public void DeleteText(int column, int count)
         {
             this.Characters.RemoveRange(column, count);
+
+            this.SetDirty();
         }
 
         /// <summary>
@@ -253,6 +267,7 @@ namespace XTerminal.Document
         public void DeleteAll()
         {
             this.Characters.Clear();
+            this.SetDirty();
         }
 
         public string BuildText()

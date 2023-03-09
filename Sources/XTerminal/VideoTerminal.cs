@@ -298,6 +298,7 @@ namespace XTerminal
                     {
                         // 需要重绘
                         this.Renderer.RenderElement(next.DrawingObject);
+                        next.IsCharacterDirty = false;
                     }
 
                     if (next == document.LastLine)
