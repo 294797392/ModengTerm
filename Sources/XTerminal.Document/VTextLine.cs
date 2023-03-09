@@ -18,6 +18,12 @@ namespace XTerminal.Document
 
         #endregion
 
+        #region 实例变量
+
+        private bool isCharacterDirty;
+
+        #endregion
+
         #region 属性
 
         /// <summary>
@@ -81,7 +87,17 @@ namespace XTerminal.Document
         /// <summary>
         /// 表示该行是否有字符被修改了，需要重新渲染
         /// </summary>
-        public bool IsCharacterDirty { get; set; }
+        public bool IsCharacterDirty
+        {
+            get 
+            {
+                return this.isCharacterDirty;
+            }
+            set
+            {
+                this.isCharacterDirty = value;
+            }
+        }
 
         #endregion
 
@@ -274,12 +290,21 @@ namespace XTerminal.Document
         {
             string text = string.Empty;
 
-            foreach (VTCharacter character in this.Characters)
+            if (this.Characters.Count == 0)
             {
-                text += character.Character;
+                // 当该行一个字符都没有的时候，去测量的话，测量的数据都是0
+                // 这会导致一个空行的高度为0，从而影响到下一行的布局（Y偏移量）
+                return text.PadRight(this.Columns, ' ');
             }
+            else
+            {
+                foreach (VTCharacter character in this.Characters)
+                {
+                    text += character.Character;
+                }
 
-            return text;
+                return text;
+            }
         }
 
         #endregion

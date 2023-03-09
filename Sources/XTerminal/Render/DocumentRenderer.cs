@@ -34,6 +34,8 @@ namespace XTerminal.Document
 
         private DocumentRendererOptions options;
 
+        private VTextMetrics blankCharacterMetrics;
+
         #endregion
 
         #region 属性
@@ -51,6 +53,7 @@ namespace XTerminal.Document
         public DocumentRenderer()
         {
             this.visuals = new VisualCollection(this);
+            this.blankCharacterMetrics = TerminalUtils.UpdateTextMetrics(" ", VTextStyle.Default);
         }
 
         #endregion
@@ -114,10 +117,6 @@ namespace XTerminal.Document
         public void RenderDocument(VTDocument vtDocument)
         {
             ViewableDocument document = vtDocument.ViewableArea;
-            if (!document.IsArrangeDirty)
-            {
-                return;
-            }
 
             // 当前行的Y方向偏移量
             double offsetY = 0;
@@ -154,7 +153,8 @@ namespace XTerminal.Document
                 else
                 {
                     // 字符没有变化，那么只重新测量然后更新一下布局就好了
-                    next.Metrics = this.MeasureText(next.BuildText(), VTextStyle.Default);
+                    string text = next.BuildText();
+                    next.Metrics = this.MeasureText(text, VTextStyle.Default);
                     drawingLine.Offset = new Vector(next.OffsetX, next.OffsetY);
                 }
 
@@ -174,13 +174,16 @@ namespace XTerminal.Document
         public void RenderElement(IDrawingObject drawingObject)
         {
             DrawingObject drawingObject1 = drawingObject as DrawingObject;
-            if(drawingObject1 == null)
+            if (drawingObject1 == null)
             {
                 logger.ErrorFormat("RenderElement失败, 要重绘的对象不存在");
                 return;
             }
 
-            drawingObject1.Draw();
+            this.Dispatcher.Invoke(() => 
+            {
+                drawingObject1.Draw();
+            });
         }
 
         public void Reset()

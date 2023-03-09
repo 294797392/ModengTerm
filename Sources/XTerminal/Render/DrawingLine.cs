@@ -11,6 +11,8 @@ namespace XTerminal.Document
 {
     public class DrawingLine : DrawingObject, IDrawingObject
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingLine");
+
         #region 属性
 
         /// <summary>
@@ -33,6 +35,8 @@ namespace XTerminal.Document
                 DefaultValues.FontSize, DefaultValues.Foreground, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
 
             TerminalUtils.UpdateTextMetrics(this.TextLine.Metrics, formattedText);
+
+            logger.InfoFormat("Render:{0}", text);
 
             //// 遍历链表，给每个TextBlock设置样式
             //VTextBlock current = this.TextLine.First;

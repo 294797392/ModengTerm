@@ -78,7 +78,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 该文档是否需要重新布局
         /// </summary>
-        public bool IsArrangeDirty { get { return this.ViewableArea.IsArrangeDirty; } internal set { this.ViewableArea.IsArrangeDirty = value; } }
+        public bool IsArrangeDirty { get { return this.ViewableArea.IsArrangeDirty; } set { this.ViewableArea.IsArrangeDirty = value; } }
 
         #endregion
 

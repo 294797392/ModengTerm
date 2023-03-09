@@ -296,6 +296,8 @@ namespace XTerminal
                 {
                     this.Renderer.RenderDocument(vtDocument);
                 }, null);
+
+                vtDocument.IsArrangeDirty = false;
             }
             else
             {
@@ -384,8 +386,6 @@ namespace XTerminal
                         this.cursorRow++;
                         this.activeDocument.CreateNextLine();
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
-                        // 空行要测量一下，不然该行就没有位置信息，在创建下一行的时候下一行的Y偏移量就不会增加
-                        this.ActiveLine.Metrics = this.Renderer.MeasureText(" ", VTextStyle.Default);
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
                     }
