@@ -9,7 +9,7 @@ using System.Windows.Media.TextFormatting;
 
 namespace XTerminal.Document
 {
-    public class DrawingLine : DrawingObject
+    public class DrawingLine : DrawingObject, IDrawingObject
     {
         #region 属性
 
@@ -45,6 +45,14 @@ namespace XTerminal.Document
             //}
 
             dc.DrawText(formattedText, new Point());
+        }
+
+        public void Reset()
+        {
+            this.TextLine = null;
+            this.Offset = new Vector();
+            DrawingContext dc = this.RenderOpen();
+            dc.Close();
         }
     }
 }

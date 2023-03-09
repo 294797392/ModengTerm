@@ -18,6 +18,12 @@ namespace XTerminal.Terminal
     public interface IDocumentRenderer
     {
         /// <summary>
+        /// 初始化渲染器
+        /// </summary>
+        /// <param name="options"></param>
+        void Initialize(DocumentRendererOptions options);
+
+        /// <summary>
         /// 测量某个文本块的属性
         /// </summary>
         /// <param name="text">要测量的文本</param>
@@ -26,16 +32,16 @@ namespace XTerminal.Terminal
         VTextMetrics MeasureText(string text, VTextStyle style);
 
         /// <summary>
-        /// 重新绘制一行文本
+        /// 对每个VTextLine进行布局，并在IsCharacterDirty的时候重新渲染文本行
         /// </summary>
-        /// <param name="textLine"></param>
-        void RenderLine(VTextLine textLine);
+        /// <param name="vtDocument">要排版的文档</param>
+        void RenderDocument(VTDocument vtDocument);
 
         /// <summary>
-        /// 根据VTextLine里的测量信息进行布局（移动文本行的位置）
+        /// 重新绘制任意一个视图对象
         /// </summary>
-        /// <param name="textLine"></param>
-        void ArrangeLine(VTextLine textLine);
+        /// <param name="drawingObject">要重绘的对象</param>
+        void RenderElement(IDrawingObject drawingObject);
 
         /// <summary>
         /// 清除现实的内容并把状态还原

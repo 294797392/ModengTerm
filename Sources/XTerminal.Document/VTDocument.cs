@@ -75,6 +75,11 @@ namespace XTerminal.Document
         /// </summary>
         public ViewableDocument ViewableArea { get; private set; }
 
+        /// <summary>
+        /// 该文档是否需要重新布局
+        /// </summary>
+        public bool IsArrangeDirty { get { return this.ViewableArea.IsArrangeDirty; } }
+
         #endregion
 
         #region 构造方法
@@ -95,6 +100,7 @@ namespace XTerminal.Document
                 CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
                 OwnerDocument = this,
+                DrawingObject = null
             };
             this.lineMap[0] = firstLine;
             this.FirstLine = firstLine;
@@ -166,10 +172,15 @@ namespace XTerminal.Document
                 // 可视区域的总行数大于等于最大行数
                 // 检查光标的新位置是否小于第一行或者是否大于最后一行
 
+                // 标记布局已失效，下次渲染的时候需要重新布局
+                this.ViewableArea.IsArrangeDirty = true;
+
+                VTextLine oldFirstLine = this.ViewableArea.FirstLine;
+                VTextLine oldLastLine = this.ViewableArea.LastLine;
+
+                // 重新计算第一行和最后一行的指针
                 if (newCursorRow < firstRow)
                 {
-                    this.ViewableArea.IsArrangeDirty = true;
-
                     // 光标的新位置小于第一行，说明需要移动FirstLine指针
                     // 此时activeLine就是光标所在的行，可以直接使用activeLine
                     this.ViewableArea.FirstLine = this.activeLine;
@@ -179,12 +190,19 @@ namespace XTerminal.Document
                 }
                 else if (newCursorRow > lastRow)
                 {
-                    this.ViewableArea.IsArrangeDirty = true;
-
                     // 和上面一样的思路更新首尾指针
                     this.ViewableArea.LastLine = this.activeLine;
                     this.ViewableArea.FirstLine = this.ViewableArea.FirstLine.NextLine;
                 }
+
+                VTextLine newFirstLine = this.ViewableArea.FirstLine;
+                VTextLine newLastLine = this.ViewableArea.LastLine;
+
+                // 复用DrawingObject
+                newFirstLine.DrawingObject = oldFirstLine.DrawingObject;
+                newLastLine.DrawingObject = oldLastLine.DrawingObject;
+                newFirstLine.IsCharacterDirty = true; // 下次要重绘
+                oldFirstLine.IsCharacterDirty = true; // 下次要重绘
             }
         }
 

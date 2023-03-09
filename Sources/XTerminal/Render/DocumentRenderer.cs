@@ -32,6 +32,8 @@ namespace XTerminal.Document
         private double fullWidth;
         private double fullHeight;
 
+        private DocumentRendererOptions options;
+
         #endregion
 
         #region 属性
@@ -81,49 +83,117 @@ namespace XTerminal.Document
             return this.scrollViewer != null;
         }
 
+        /// <summary>
+        /// 获取没有被使用的DrawingVisual
+        /// </summary>
+        /// <returns></returns>
+        private DrawingLine RequestDrawingLine()
+        {
+            return this.visuals.Cast<DrawingLine>().FirstOrDefault(v => v.TextLine == null);
+        }
+
         #endregion
 
         #region IDocumentRenderer
 
-        /// <summary>
-        /// 渲染一行
-        /// </summary>
-        /// <param name="textLine"></param>
-        public void RenderLine(VTextLine textLine)
+        public void Initialize(DocumentRendererOptions options)
         {
-            DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
-            if (drawingLine == null)
+            this.options = options;
+            for (int i = 0; i < options.Rows; i++)
             {
-                drawingLine = new DrawingLine();
-                drawingLine.TextLine = textLine;
-                textLine.DrawingObject = drawingLine;
+                DrawingLine drawingLine = new DrawingLine();
                 this.visuals.Add(drawingLine);
             }
-
-            drawingLine.Draw();
-        }
-
-        public void ArrangeLine(VTextLine textLine)
-        {
-            DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
-            if (drawingLine == null)
-            {
-                logger.ErrorFormat("ArrangeLine失败, DrawingLine不存在");
-                return;
-            }
-
-            drawingLine.Offset = new Vector(textLine.OffsetX, textLine.OffsetY);
-        }
-
-        public void Reset()
-        {
-            this.visuals.Clear();
-            this.Resize(0, 0);
         }
 
         public VTextMetrics MeasureText(string text, VTextStyle style)
         {
             return TerminalUtils.UpdateTextMetrics(text, style);
+        }
+
+        public void RenderDocument(VTDocument vtDocument)
+        {
+            ViewableDocument document = vtDocument.ViewableArea;
+            if (!document.IsArrangeDirty)
+            {
+                return;
+            }
+
+            // 当前行的Y方向偏移量
+            double offsetY = 0;
+
+            VTextLine next = document.FirstLine;
+
+            while (next != null)
+            {
+                // 首先获取当前行的DrawingObject
+                DrawingLine drawingLine = next.DrawingObject as DrawingLine;
+                if (drawingLine == null)
+                {
+                    drawingLine = this.RequestDrawingLine();
+                    if (drawingLine == null)
+                    {
+                        // 不应该发生
+                        logger.FatalFormat("没有空闲的DrawingLine了");
+                        return;
+                    }
+                    drawingLine.TextLine = next;
+                    next.DrawingObject = drawingLine;
+                }
+
+                // 此时说明需要重新排版
+                next.OffsetY = offsetY;
+
+                if (next.IsCharacterDirty)
+                {
+                    // 此时说明该行有字符变化，需要重绘
+                    // 重绘的时候会也会Arrange
+                    drawingLine.Draw();
+                    next.IsCharacterDirty = false;
+                }
+                else
+                {
+                    // 字符没有变化，那么只重新测量然后更新一下布局就好了
+                    next.Metrics = this.MeasureText(next.BuildText(), VTextStyle.Default);
+                    drawingLine.Offset = new Vector(next.OffsetX, next.OffsetY);
+                }
+
+                // 更新下一个文本行的Y偏移量
+                offsetY += next.Metrics.Height;
+
+                // 如果最后一行渲染完毕了，那么就退出
+                if (next == document.LastLine)
+                {
+                    break;
+                }
+
+                next = next.NextLine;
+            }
+        }
+
+        public void RenderElement(IDrawingObject drawingObject)
+        {
+            DrawingObject drawingObject1 = drawingObject as DrawingObject;
+            if(drawingObject1 == null)
+            {
+                logger.ErrorFormat("RenderElement失败, 要重绘的对象不存在");
+                return;
+            }
+
+            drawingObject1.Draw();
+        }
+
+        public void Reset()
+        {
+            IEnumerable<DrawingLine> drawingLines = this.visuals.Cast<DrawingLine>();
+
+            foreach (DrawingLine drawingLine in drawingLines)
+            {
+                drawingLine.TextLine = null;
+                drawingLine.Reset();
+            }
+
+            this.Resize(0, 0);
         }
 
         public void Resize(double width, double height)

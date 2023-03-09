@@ -273,74 +273,42 @@ namespace XTerminal
             }
         }
 
-        private void DrawLine(VTextLine textLine)
-        {
-            if (textLine == null)
-            {
-                logger.FatalFormat("DrawLine失败, Line不存在");
-                return;
-            }
-
-            this.uiSyncContext.Send((v) =>
-            {
-                this.Renderer.RenderLine(textLine);
-            }, null);
-        }
-
         /// <summary>
-        /// 重新计算文档的可视区域布局（如果需要的话）
-        /// 并且重新绘制DirtyTextLine
-        /// 只有在光标上下移动的时候再调用此方法，不然效率会降低
+        /// 如果需要布局则进行布局
+        /// 如果不需要布局，那么就看是否需要重绘某些文本行
         /// </summary>
         /// <param name="vtDocument"></param>
-        private void ArrangeDocument(VTDocument vtDocument)
+        private void RenderDocument(VTDocument vtDocument)
         {
-            ViewableDocument document = vtDocument.ViewableArea;
-
-            if (!document.IsArrangeDirty)
+            if (vtDocument.IsArrangeDirty)
             {
-                return;
+                this.uiSyncContext.Send((state) =>
+                {
+                    this.Renderer.RenderDocument(vtDocument);
+                }, null);
             }
-
-            double offsetY = 0;
-
-            VTextLine next = document.FirstLine;
-
-            this.uiSyncContext.Send((state) =>
+            else
             {
+                ViewableDocument document = vtDocument.ViewableArea;
+
+                VTextLine next = document.FirstLine;
                 while (next != null)
                 {
-                    // 此时说明需要重新排版
-                    next.OffsetY = offsetY;
-
-                    VTextMetrics metrics = this.Renderer.MeasureText(next.BuildText(), VTextStyle.Default);
-
-                    offsetY += metrics.Height;
-
                     if (next.IsCharacterDirty)
                     {
-                        // 此时说明该行有字符变化，需要重绘
-                        // 重绘的时候会也会Arrange
-                        this.Renderer.RenderLine(next);
-                        next.IsCharacterDirty = false;
-                    }
-                    else
-                    {
-                        // 这里只需要执行Arrange就可以了，不需要重绘
-                        this.Renderer.ArrangeLine(next);
+                        // 需要重绘
+                        this.Renderer.RenderElement(next.DrawingObject);
                     }
 
-                    // 如果最后一行渲染完毕了，那么就退出
                     if (next == document.LastLine)
                     {
+                        // 最后一行渲染完了，退出
                         break;
                     }
 
                     next = next.NextLine;
                 }
-            }, null);
-
-            document.IsArrangeDirty = false;
+            }
         }
 
         #endregion
@@ -384,7 +352,6 @@ namespace XTerminal
                         this.activeDocument.PrintCharacter(ch, this.cursorCol);
                         this.cursorCol++;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
-                        this.DrawLine(this.ActiveLine);
                         break;
                     }
 
@@ -408,8 +375,6 @@ namespace XTerminal
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
                         // 空行要测量一下，不然该行就没有位置信息，在创建下一行的时候下一行的Y偏移量就不会增加
                         this.ActiveLine.Metrics = this.Renderer.MeasureText(" ", VTextStyle.Default);
-                        // 光标移动了，那么重新布局
-                        this.ArrangeDocument(this.activeDocument);
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
                     }
@@ -419,7 +384,6 @@ namespace XTerminal
                         EraseType eraseType = (EraseType)param[0];
                         logger.DebugFormat("EL_EraseLine, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.cursorRow, this.cursorCol);
                         this.activeDocument.EraseLine(eraseType);
-                        this.DrawLine(this.activeDocument.ActiveLine);
                         break;
                     }
 
@@ -446,7 +410,6 @@ namespace XTerminal
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow -= n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
-                        this.ArrangeDocument(this.activeDocument);
                         break;
                     }
 
@@ -455,7 +418,6 @@ namespace XTerminal
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow += n;
                         this.activeDocument.SetCursor(this.cursorRow, this.cursorCol);
-                        this.ArrangeDocument(this.activeDocument);
                         break;
                     }
 
@@ -466,7 +428,6 @@ namespace XTerminal
                         this.cursorRow = row;
                         this.cursorCol = col;
                         this.activeDocument.SetCursor(row, col);
-                        this.ArrangeDocument(this.activeDocument);
                         break;
                     }
 
@@ -546,7 +507,6 @@ namespace XTerminal
                     {
                         int count = Convert.ToInt32(param[0]);
                         this.activeDocument.DeleteCharacter(count);
-                        this.DrawLine(this.ActiveLine);
                         break;
                     }
 
@@ -568,7 +528,7 @@ namespace XTerminal
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();
-                            this.ArrangeDocument(this.mainDocument);
+                            this.RenderDocument(this.alternateDocument);
                         }, null);
                         break;
                     }
@@ -581,7 +541,7 @@ namespace XTerminal
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();
-                            this.ArrangeDocument(this.mainDocument);
+                            this.RenderDocument(this.mainDocument);
                         }, null);
                         break;
                     }
@@ -632,6 +592,10 @@ namespace XTerminal
             //string str = string.Join(",", bytes.Select(v => v.ToString()).ToList());
             //logger.InfoFormat("Received, {0}", str);
             this.vtParser.ProcessCharacters(bytes);
+
+            // 全部字符都处理完了之后，只渲染一次
+
+            this.RenderDocument(this.activeDocument);
         }
 
         private void VTChannel_StatusChanged(object client, VTChannelState state)

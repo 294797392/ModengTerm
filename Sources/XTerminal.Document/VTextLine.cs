@@ -56,7 +56,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 画图对象
         /// </summary>
-        public object DrawingObject { get; set; }
+        public IDrawingObject DrawingObject { get; set; }
 
         /// <summary>
         /// 是否开启了DECAWM模式
