@@ -217,6 +217,32 @@ namespace XTerminal.Document
                 newFirstLine.IsCharacterDirty = true; // 下次要重绘
                 oldFirstLine.IsCharacterDirty = true; // 下次要重绘
             }
+
+            //this.Print();
+        }
+
+        /// <summary>
+        /// 把当前Document的可显示区域打印到日志里，方便调试
+        /// </summary>
+        private void Print()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine();
+
+            VTextLine next = this.ViewableArea.FirstLine;
+            while (next != null)
+            {
+                builder.AppendLine(next.BuildText());
+
+                if (next == this.ViewableArea.LastLine)
+                {
+                    break;
+                }
+
+                next = next.NextLine;
+            }
+
+            logger.FatalFormat(builder.ToString());
         }
 
         #endregion

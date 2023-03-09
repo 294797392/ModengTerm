@@ -143,7 +143,8 @@ namespace XTerminal.Document
                 // 此时说明需要重新排版
                 next.OffsetY = offsetY;
 
-                if (next.IsCharacterDirty)
+                //if (next.IsCharacterDirty)
+                if(true)
                 {
                     // 此时说明该行有字符变化，需要重绘
                     // 重绘的时候会也会Arrange

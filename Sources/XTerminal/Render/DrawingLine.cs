@@ -33,7 +33,7 @@ namespace XTerminal.Document
 
             TerminalUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
 
-            logger.InfoFormat("Render:{0}", text);
+            //logger.InfoFormat("Render:{0}", text);
 
             //// 遍历链表，给每个TextBlock设置样式
             //VTextBlock current = this.TextLine.First;
