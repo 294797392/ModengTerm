@@ -192,30 +192,37 @@ namespace XTerminal.Document
                 // 重新计算第一行和最后一行的指针
                 if (newCursorRow < firstRow)
                 {
-                    // 光标的新位置小于第一行，说明需要移动FirstLine指针
-                    // 此时activeLine就是光标所在的行，可以直接使用activeLine
+                    // 光标要移动到的位置小于第一行，说明是要把可视区域往上移动
+                    // 那么就把最后一行的DrawingElement拿给第一行使用
+
+                    // 此时activeLine就是光标移动后的行，可以直接使用activeLine
                     this.ViewableArea.FirstLine = this.activeLine;
 
                     // 同时更新LastLine指针
                     this.ViewableArea.LastLine = this.ViewableArea.LastLine.PreviousLine;
+
+                    // 复用DrawingObject
+                    VTextLine newFirstLine = this.ViewableArea.FirstLine;
+                    newFirstLine.DrawingElement = oldLastLine.DrawingElement;
+                    newFirstLine.DrawingElement.Element = newFirstLine;
+                    newFirstLine.IsCharacterDirty = true;
+
                 }
                 else if (newCursorRow > lastRow)
                 {
+                    // 光标要移动到的位置大于最后一行，说明是要把可视区域往下移动
+                    // 那么就把第一行的DrawingElement拿给最后一行用
+
                     // 和上面一样的思路更新首尾指针
                     this.ViewableArea.LastLine = this.activeLine;
                     this.ViewableArea.FirstLine = this.ViewableArea.FirstLine.NextLine;
+
+                    // 复用DrawingObject
+                    VTextLine newLastLine = this.ViewableArea.LastLine;
+                    newLastLine.DrawingElement = oldFirstLine.DrawingElement;
+                    newLastLine.DrawingElement.Element = oldFirstLine;
+                    newLastLine.IsCharacterDirty = true;
                 }
-
-                VTextLine newFirstLine = this.ViewableArea.FirstLine;
-                VTextLine newLastLine = this.ViewableArea.LastLine;
-
-                // 复用DrawingObject
-                newFirstLine.DrawingElement = oldFirstLine.DrawingElement;
-                newFirstLine.DrawingElement.Element = newFirstLine;
-                newLastLine.DrawingElement = oldLastLine.DrawingElement;
-                newLastLine.DrawingElement.Element = newLastLine;
-                newFirstLine.IsCharacterDirty = true; // 下次要重绘
-                oldFirstLine.IsCharacterDirty = true; // 下次要重绘
             }
 
             //this.Print();

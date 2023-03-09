@@ -53,7 +53,6 @@ namespace XTerminal.Document
         public DocumentRenderer()
         {
             this.visuals = new VisualCollection(this);
-            this.blankCharacterMetrics = TerminalUtils.UpdateTextMetrics(" ", VTextStyle.Default);
         }
 
         #endregion
@@ -102,9 +101,11 @@ namespace XTerminal.Document
         public void Initialize(DocumentRendererOptions options)
         {
             this.options = options;
+
+            this.blankCharacterMetrics = TerminalUtils.UpdateTextMetrics(" ", VTextStyle.Default);
             for (int i = 0; i < options.Rows; i++)
             {
-                DrawingLine drawingLine = new DrawingLine();
+                DrawingLine drawingLine = new DrawingLine() { Row = i };
                 this.visuals.Add(drawingLine);
             }
         }
@@ -143,8 +144,7 @@ namespace XTerminal.Document
                 // 此时说明需要重新排版
                 next.OffsetY = offsetY;
 
-                //if (next.IsCharacterDirty)
-                if(true)
+                if (next.IsCharacterDirty)
                 {
                     // 此时说明该行有字符变化，需要重绘
                     // 重绘的时候会也会Arrange

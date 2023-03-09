@@ -15,6 +15,11 @@ namespace XTerminal.Document
 
         #region 属性
 
+        /// <summary>
+        /// 该行在ViewableDocument里的位置
+        /// </summary>
+        public int Row { get; set; }
+
         #endregion
 
         protected override void Draw(DrawingContext dc)
@@ -23,7 +28,7 @@ namespace XTerminal.Document
 
             string text = textLine.BuildText();
 
-            text = string.Format("{0} ******* {1}", textLine.Row, text);
+            //text = string.Format("{0} - {1} ******* {2}", this.Row, textLine.Row, text);
 
             this.Offset = new Vector(0, textLine.OffsetY);
 
