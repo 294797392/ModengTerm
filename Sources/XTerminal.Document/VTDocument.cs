@@ -175,6 +175,17 @@ namespace XTerminal.Document
             textLine.PreviousLine = this.LastLine;
             this.LastLine = textLine;
 
+            int viewableLines = (this.ViewableArea.LastLine.Row - this.ViewableArea.FirstLine.Row) + 1;
+            if (viewableLines >= this.Rows)
+            {
+                this.ScrollViewableDocument(ScrollOrientation.Down, 1);
+            }
+            else
+            {
+                this.ViewableArea.LastLine = textLine;
+                this.SetArrangeDirty();
+            }
+
             return textLine;
         }
 
@@ -376,114 +387,90 @@ namespace XTerminal.Document
         /// <param name="scrollRows">要滚动的行数</param>
         public void ScrollViewableDocument(ScrollOrientation orientation, int scrollRows)
         {
-            if (this.LastLine.Row + 1 <= this.Rows)
-            {
-                /*
-                 * ViewableArea:
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |------------|
-                 * |            |
-                 * |            |
-                 * |____________|
-                 */
+            VTextLine oldFirstLine = this.ViewableArea.FirstLine;
+            VTextLine oldLastLine = this.ViewableArea.LastLine;
+            VTextLine newFirstLine = null;
+            VTextLine newLastLine = null;
 
-                // 可视区域的总行数小于最大行数
-                // 只需要更新最后一行即可
-                if (this.ViewableArea.LastLine != this.LastLine)
-                {
-                    this.ViewableArea.LastLine = this.LastLine;
-                    this.SetArrangeDirty();
-                }
+            #region 更新新的可视区域的第一行和最后一行的指针
+
+            switch (orientation)
+            {
+                case ScrollOrientation.Down:
+                    {
+                        newFirstLine = this.lineMap[oldFirstLine.Row + scrollRows];
+                        newLastLine = this.lineMap[oldLastLine.Row + scrollRows];
+                        break;
+                    }
+
+                case ScrollOrientation.Up:
+                    {
+                        newFirstLine = this.lineMap[oldFirstLine.Row - scrollRows];
+                        newLastLine = this.lineMap[oldLastLine.Row - scrollRows];
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            this.ViewableArea.FirstLine = newFirstLine;
+            this.ViewableArea.LastLine = newLastLine;
+
+            #endregion
+
+            #region 计算从可视区域移出的行和移入的行
+
+            // 从可视区域内被删除的行
+            VTextLine removedFirst = null;
+            // 新增加到可视区域内的行
+            VTextLine addedFirst = null;
+
+            if (scrollRows >= this.Rows)
+            {
+                // 此时说明已经移动了一整个屏幕了, 被复用的起始行和结束行就等于移动之前的起始行和结束行
+                removedFirst = oldFirstLine;
+                addedFirst = newFirstLine;
             }
             else
             {
-                VTextLine oldFirstLine = this.ViewableArea.FirstLine;
-                VTextLine oldLastLine = this.ViewableArea.LastLine;
-                VTextLine newFirstLine = null;
-                VTextLine newLastLine = null;
-
-                #region 更新新的可视区域的第一行和最后一行的指针
-
-                switch (orientation)
+                if (orientation == ScrollOrientation.Up)
                 {
-                    case ScrollOrientation.Down:
-                        {
-                            newFirstLine = this.lineMap[oldFirstLine.Row + scrollRows];
-                            newLastLine = this.lineMap[oldLastLine.Row + scrollRows];
-                            break;
-                        }
-
-                    case ScrollOrientation.Up:
-                        {
-                            newFirstLine = this.lineMap[oldFirstLine.Row - scrollRows];
-                            newLastLine = this.lineMap[oldLastLine.Row - scrollRows];
-                            break;
-                        }
-
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                this.ViewableArea.FirstLine = newFirstLine;
-                this.ViewableArea.LastLine = newLastLine;
-
-                #endregion
-
-                #region 计算从可视区域移出的行和移入的行
-
-                // 从可视区域内被删除的行
-                VTextLine removedFirst = null;
-                // 新增加到可视区域内的行
-                VTextLine addedFirst = null;
-
-                if (scrollRows >= this.Rows)
-                {
-                    // 此时说明已经移动了一整个屏幕了, 被复用的起始行和结束行就等于移动之前的起始行和结束行
-                    removedFirst = oldFirstLine;
+                    // 把可视区域往上移动
+                    removedFirst = newLastLine.NextLine;
                     addedFirst = newFirstLine;
                 }
-                else
+                else if (orientation == ScrollOrientation.Down)
                 {
-                    if (orientation == ScrollOrientation.Up)
-                    {
-                        // 把可视区域往上移动
-                        removedFirst = newLastLine.NextLine;
-                        addedFirst = newFirstLine;
-                    }
-                    else if (orientation == ScrollOrientation.Down)
-                    {
-                        // 把可视区域往下移动
-                        removedFirst = oldFirstLine;
-                        addedFirst = oldLastLine.NextLine;
-                    }
+                    // 把可视区域往下移动
+                    removedFirst = oldFirstLine;
+                    addedFirst = oldLastLine.NextLine;
                 }
-
-                #endregion
-
-                #region 复用移出的行的DrawingElement
-
-                VTextLine removedCurrent = removedFirst;
-                VTextLine addedCurrent = addedFirst;
-                for (int i = 0; i < scrollRows; i++)
-                {
-                    if (removedCurrent.DrawingElement != null)
-                    {
-                        addedCurrent.DrawingElement = removedCurrent.DrawingElement;
-                        addedCurrent.DrawingElement.Data = addedCurrent;
-                    }
-                    addedCurrent.IsCharacterDirty = true;
-
-                    removedCurrent = removedCurrent.NextLine;
-                    addedCurrent = addedCurrent.NextLine;
-                }
-
-                #endregion
-
-                // 下次渲染的时候排版
-                this.SetArrangeDirty();
             }
+
+            #endregion
+
+            #region 复用移出的行的DrawingElement
+
+            VTextLine removedCurrent = removedFirst;
+            VTextLine addedCurrent = addedFirst;
+            for (int i = 0; i < scrollRows; i++)
+            {
+                if (removedCurrent.DrawingElement != null)
+                {
+                    addedCurrent.DrawingElement = removedCurrent.DrawingElement;
+                    addedCurrent.DrawingElement.Data = addedCurrent;
+                }
+                addedCurrent.IsCharacterDirty = true;
+
+                removedCurrent = removedCurrent.NextLine;
+                addedCurrent = addedCurrent.NextLine;
+            }
+
+            #endregion
+
+            // 下次渲染的时候排版
+            this.SetArrangeDirty();
         }
 
         public bool TryGetLine(int row, out VTextLine textLine)

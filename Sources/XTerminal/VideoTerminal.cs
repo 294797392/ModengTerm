@@ -399,7 +399,6 @@ namespace XTerminal
                         }
                         this.cursorRow++;
                         this.UpdateActiveLine(this.cursorRow);
-                        this.activeDocument.ScrollViewableDocument(ScrollOrientation.Down, 1);
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
                     }
