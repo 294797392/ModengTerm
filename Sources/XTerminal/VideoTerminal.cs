@@ -331,7 +331,7 @@ namespace XTerminal
             {
                 if (!this.activeDocument.TryGetLine(row, out this.activeLine))
                 {
-                    logger.ErrorFormat("SetCursor失败, 没找到对应的行, row = {0}", row);
+                    logger.ErrorFormat("UpdateActiveLine失败, 没找到对应的行, row = {0}", row);
                 }
             }
         }
@@ -413,9 +413,13 @@ namespace XTerminal
 
                 #region 光标移动
 
+                // 下面的光标移动指令不能进行VTDocument的滚动
+                // 光标的移动坐标是相对于可视区域内的坐标
+
                 case VTActions.CursorBackward:
                     {
-                        this.cursorCol--;
+                        int n = Convert.ToInt32(param[0]);
+                        this.cursorCol -= n;
                         logger.DebugFormat("CursorBackward, cursorRow = {0}, cursorCol = {1}", this.cursorRow, this.cursorCol);
                         break;
                     }
@@ -447,7 +451,11 @@ namespace XTerminal
                     {
                         int row = Convert.ToInt32(param[0]);
                         int col = Convert.ToInt32(param[1]);
-                        this.cursorRow = row;
+
+                        // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
+                        ViewableDocument document = this.activeDocument.ViewableArea;
+                        int firstVisibleRow = document.FirstLine.Row;
+                        this.cursorRow = firstVisibleRow + row;
                         this.cursorCol = col;
                         this.UpdateActiveLine(this.cursorRow);
                         break;
@@ -565,7 +573,7 @@ namespace XTerminal
                         this.cursorRow = this.mainDocument.Cursor.Row;
                         this.activeDocument = this.mainDocument;
                         this.mainDocument.ViewableArea.DirtyAll();
-                        this.activeDocument.TryGetLine(this.cursorRow, out this.activeLine);
+                        this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();
@@ -597,21 +605,38 @@ namespace XTerminal
                 case VTActions.RI_ReverseLineFeed:
                     {
                         // 和LineFeed相反，也就是把光标往上移一个位置
-                        // 这个指令可以把光标移动到Protected Area里
-                        // 目前我理解的Proteced Area就是用户不可见的区域（ViewableDocument之外的区域）
                         // 在用man命令的时候会触发这个指令
+                        // 反向索引 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
 
-                        if (this.cursorRow == 0)
+                        ViewableDocument document = this.activeDocument.ViewableArea;
+                        int firstVisibleRow = document.FirstLine.Row;
+                        int lastVisibleRow = document.LastLine.Row;
+
+                        if (this.cursorRow == firstVisibleRow)
                         {
-                            // 说明光标在可见区域的最上面，那么要把可视区域往上移动一行（也就是把打字机的纸往下挪动一行），光标的列坐标不变
+                            // 此时光标位置在可视区域的第一行
+                            logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
                             this.activeDocument.ScrollViewableDocument(ScrollOrientation.Up, 1);
-                        }
-                        else if (this.cursorRow > 0)
-                        {
-                            // 光标在可见区域里，那么就可以直接移动鼠标
                             this.cursorRow--;
+                            this.UpdateActiveLine(this.cursorRow);
                         }
-                        this.UpdateActiveLine(this.cursorRow);
+                        else if (this.cursorRow < firstVisibleRow)
+                        {
+                            // 光标位置在可视区域上面？？
+                            logger.ErrorFormat("RI_ReverseLineFeed状态不正确，光标在可视区域上面");
+                        }
+                        else if(this.cursorRow > lastVisibleRow)
+                        {
+                            // 光标位置在可视区域的下面？？
+                            logger.ErrorFormat("RI_ReverseLineFeed状态不正确，光标在可视区域下面");
+                        }
+                        else
+                        {
+                            // 光标位置在可视区域里面
+                            logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里面，直接向上移动一行光标");
+                            this.cursorRow--;
+                            this.UpdateActiveLine(this.cursorRow);
+                        }
                         break;
                     }
 
