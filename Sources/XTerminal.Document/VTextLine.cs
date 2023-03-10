@@ -262,7 +262,17 @@ namespace XTerminal.Document
         /// <param name="column">从此处开始删除字符</param>
         public void DeleteText(int column)
         {
-            this.DeleteText(column, this.Characters.Count - column);
+            if (column >= this.Characters.Count)
+            {
+                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
+                return;
+            }
+
+            int deletes = this.Characters.Count - column;
+
+            this.Characters.RemoveRange(column, deletes);
+
+            this.SetDirty();
         }
 
         /// <summary>
@@ -272,7 +282,18 @@ namespace XTerminal.Document
         /// <param name="count">要删除的字符个数</param>
         public void DeleteText(int column, int count)
         {
-            this.Characters.RemoveRange(column, count);
+            if(column >= this.Characters.Count)
+            {
+                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
+                return;
+            }
+
+            // 最多能删几个字符
+            int maxDeletes = this.Characters.Count - column;
+
+            int deletes = Math.Min(maxDeletes, count);
+
+            this.Characters.RemoveRange(column, deletes);
 
             this.SetDirty();
         }
