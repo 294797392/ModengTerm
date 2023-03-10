@@ -72,6 +72,7 @@ namespace XTerminal
 
         /// <summary>
         /// 光标所在行
+        /// 光标坐标是基于VTDocument的坐标
         /// </summary>
         private int cursorRow;
 
