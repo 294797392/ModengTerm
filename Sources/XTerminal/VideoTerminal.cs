@@ -393,11 +393,43 @@ namespace XTerminal
                 case VTActions.LF:
                     {
                         // LF
+
                         if (!this.activeDocument.ContainsLine(this.cursorRow + 1))
                         {
                             this.activeDocument.CreateNextLine();
                         }
-                        this.cursorRow++;
+                        else
+                        {
+                            // 下一行已经被创建过了，还是执行了一次LineFeed动作
+                            // 因为Reverse LineFeed导致可视区域向上滚动了
+                            ViewableDocument document = this.activeDocument.ViewableArea;
+                            int firstVisibleRow = document.FirstLine.Row;
+                            int lastVisibleRow = document.LastLine.Row;
+
+                            if (this.cursorRow == lastVisibleRow)
+                            {
+                                // 光标在可视区域的最后一行，那么要把可视区域向下移动
+                                logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
+                                this.activeDocument.ScrollViewableDocument(ScrollOrientation.Down, 1);
+                                this.cursorRow++;
+                            }
+                            else if (this.cursorRow < firstVisibleRow)
+                            {
+                                // 光标位置在可视区域上面？？
+                                logger.ErrorFormat("LineFeed状态不正确，光标在可视区域上面");
+                            }
+                            else if (this.cursorRow > lastVisibleRow)
+                            {
+                                // 光标位置在可视区域的下面？？
+                                logger.ErrorFormat("LineFeed状态不正确，光标在可视区域下面");
+                            }
+                            else
+                            {
+                                // 光标在可视区域里
+                                logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
+                                this.cursorRow++;
+                            }
+                        }
                         this.UpdateActiveLine(this.cursorRow);
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
@@ -625,7 +657,7 @@ namespace XTerminal
                             // 光标位置在可视区域上面？？
                             logger.ErrorFormat("RI_ReverseLineFeed状态不正确，光标在可视区域上面");
                         }
-                        else if(this.cursorRow > lastVisibleRow)
+                        else if (this.cursorRow > lastVisibleRow)
                         {
                             // 光标位置在可视区域的下面？？
                             logger.ErrorFormat("RI_ReverseLineFeed状态不正确，光标在可视区域下面");
