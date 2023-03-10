@@ -523,6 +523,25 @@ namespace XTerminal.Document
             return this.lineMap.TryGetValue(row, out textLine);
         }
 
+        /// <summary>
+        /// 删除多余的行
+        /// 只保存当前Rows数量的行
+        /// </summary>
+        public void Reset()
+        {
+            int deletes = this.LastLine.Row - (this.Rows - 1);
+            if (deletes > 0)
+            {
+                // 此时说明行数大于Rows，需要删除多余的行数
+                for (int i = this.LastLine.Row; i >= this.Rows; i--)
+                {
+                    this.lineMap.Remove(i);
+                }
+            }
+
+            this.LastLine = this.lineMap[this.Rows - 1];
+        }
+
         #endregion
     }
 }

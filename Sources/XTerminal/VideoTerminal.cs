@@ -599,9 +599,10 @@ namespace XTerminal
 
                         this.cursorCol = 0;
                         this.cursorRow = 0;
-                        this.alternateDocument.Clear();
                         this.activeDocument = this.alternateDocument;
                         this.activeDocument.ViewableArea.DirtyAll();
+                        this.alternateDocument.Reset();
+                        this.alternateDocument.Clear();
                         this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>
                         {
@@ -615,6 +616,7 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseMainScreenBuffer");
 
+                        // 恢复之前保存的光标
                         this.cursorCol = this.mainDocument.Cursor.Column;
                         this.cursorRow = this.mainDocument.Cursor.Row;
                         this.activeDocument = this.mainDocument;
