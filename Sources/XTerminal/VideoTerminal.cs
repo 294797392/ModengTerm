@@ -394,6 +394,9 @@ namespace XTerminal
                     {
                         // LF
 
+                        // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
+                        // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
+
                         if (!this.activeDocument.ContainsLine(this.cursorRow + 1))
                         {
                             this.activeDocument.CreateNextLine();
