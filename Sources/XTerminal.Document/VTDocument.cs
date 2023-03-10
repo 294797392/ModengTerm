@@ -106,9 +106,15 @@ namespace XTerminal.Document
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
 
+            // 默认创建80行，可见区域也是80行
+            for (int i = 1; i < options.Rows; i++)
+            {
+                this.CreateNextLine();
+            }
+
             // 更新可视区域
             this.ViewableArea.FirstLine = firstLine;
-            this.ViewableArea.LastLine = firstLine;
+            this.ViewableArea.LastLine = this.LastLine;
             this.SetArrangeDirty();
         }
 
@@ -153,10 +159,10 @@ namespace XTerminal.Document
         #region 公开接口
 
         /// <summary>
-        /// 执行LineFeed操作
+        /// 创建一个新行并更新Last指针
         /// </summary>
         /// <returns></returns>
-        public void LineFeed()
+        public void CreateNextLine()
         {
             int row = this.LastLine.Row + 1;
 
@@ -174,40 +180,6 @@ namespace XTerminal.Document
             this.LastLine.NextLine = textLine;
             textLine.PreviousLine = this.LastLine;
             this.LastLine = textLine;
-
-            int viewableLines = this.ViewableArea.LastLine.Row - this.ViewableArea.FirstLine.Row + 2;
-            if (viewableLines > this.Rows)
-            {
-                this.ScrollViewableDocument(ScrollOrientation.Down, 1);
-            }
-            else
-            {
-                this.ViewableArea.LastLine = textLine;
-                this.SetArrangeDirty();
-            }
-        }
-
-        public void CreateNewLines(int lines)
-        {
-            for (int i = 1; i <= lines; i++)
-            {
-                VTextLine textLine = new VTextLine(this.Columns)
-                {
-                    Row = this.LastLine.Row + i,
-                    OffsetX = 0,
-                    OffsetY = 0,
-                    CursorAtRightMargin = false,
-                    DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
-                    OwnerDocument = this,
-                };
-                this.lineMap[textLine.Row] = textLine;
-
-                this.LastLine.NextLine = textLine;
-                textLine.PreviousLine = this.LastLine;
-                this.LastLine = LastLine;
-            }
-
-            this.SetArrangeDirty();
         }
 
         public bool ContainsLine(int row)
@@ -225,33 +197,6 @@ namespace XTerminal.Document
         {
             textLine.PrintCharacter(ch, col);
         }
-
-        ///// <summary>
-        ///// 设置文档中的光标位置
-        ///// 并更新ActiveLine
-        ///// </summary>
-        ///// <param name="row"></param>
-        ///// <param name="column"></param>
-        //public void SetCursor(int row, int column)
-        //{
-        //    if (this.Cursor.Row != row)
-        //    {
-        //        this.Cursor.Row = row;
-
-        //        // 光标位置改变的时候，就改变activeLine
-        //        if (!this.lineMap.TryGetValue(row, out this.activeLine))
-        //        {
-        //            this.activeLine = null;
-        //            logger.ErrorFormat("切换activeLine失败, 没找到对应的行, row = {0}", row);
-        //            return;
-        //        }
-        //    }
-
-        //    if (this.Cursor.Column != column)
-        //    {
-        //        this.Cursor.Column = column;
-        //    }
-        //}
 
         /// <summary>
         /// 在当前光标所在行开始删除字符操作
