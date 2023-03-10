@@ -206,7 +206,6 @@ namespace XTerminal.Parser
                         {
                             // 如果没有参数，那么说明就是定位到原点(0,0)
                         }
-                        logger.DebugFormat("CSIDispatch - CUP_CursorPosition, row = {0}, col = {1}", row, col);
                         this.NotifyActionEvent(VTActions.CUP_CursorPosition, row, col);
                         break;
                     }
@@ -631,7 +630,6 @@ namespace XTerminal.Parser
                     case DECPrivateMode.ASB_AlternateScreenBuffer:
                         {
                             // 打开VIM等编辑器的时候会触发
-                            logger.DebugFormat("DECPrivateMode - ASB_AlternateScreenBuffer");
                             this.NotifyActionEvent(enable ? VTActions.UseAlternateScreenBuffer : VTActions.UseMainScreenBuffer);
                             break;
                         }

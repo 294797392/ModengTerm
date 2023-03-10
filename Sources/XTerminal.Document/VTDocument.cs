@@ -153,10 +153,10 @@ namespace XTerminal.Document
         #region 公开接口
 
         /// <summary>
-        /// 创建下一行，并把ActiveLine设置为新创建的行
+        /// 执行LineFeed操作
         /// </summary>
         /// <returns></returns>
-        public VTextLine CreateNextLine()
+        public void LineFeed()
         {
             int row = this.LastLine.Row + 1;
 
@@ -164,7 +164,7 @@ namespace XTerminal.Document
             {
                 Row = row,
                 OffsetX = 0,
-                OffsetY = this.LastLine.Bounds.LeftBottom.Y,
+                OffsetY = 0,
                 CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
                 OwnerDocument = this
@@ -185,8 +185,29 @@ namespace XTerminal.Document
                 this.ViewableArea.LastLine = textLine;
                 this.SetArrangeDirty();
             }
+        }
 
-            return textLine;
+        public void CreateNewLines(int lines)
+        {
+            for (int i = 1; i <= lines; i++)
+            {
+                VTextLine textLine = new VTextLine(this.Columns)
+                {
+                    Row = this.LastLine.Row + i,
+                    OffsetX = 0,
+                    OffsetY = 0,
+                    CursorAtRightMargin = false,
+                    DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
+                    OwnerDocument = this,
+                };
+                this.lineMap[textLine.Row] = textLine;
+
+                this.LastLine.NextLine = textLine;
+                textLine.PreviousLine = this.LastLine;
+                this.LastLine = LastLine;
+            }
+
+            this.SetArrangeDirty();
         }
 
         public bool ContainsLine(int row)

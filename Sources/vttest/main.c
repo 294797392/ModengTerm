@@ -22,7 +22,8 @@ int main()
 	}
 
 	printf(CUP00);
-	printf(ReverseLineFeed);
+	//printf(ReverseLineFeed);
+	//printf(ReverseLineFeed);
 	printf("ABC");
 
 	char read[1024];

@@ -326,15 +326,21 @@ namespace XTerminal
             }
         }
 
-        private void UpdateActiveLine(int row)
+        private bool UpdateActiveLine(int row)
         {
             if (this.activeLine.Row != row)
             {
-                if (!this.activeDocument.TryGetLine(row, out this.activeLine))
+                VTextLine newActiveLine;
+                if (!this.activeDocument.TryGetLine(row, out newActiveLine))
                 {
-                    logger.ErrorFormat("UpdateActiveLine失败, 没找到对应的行, row = {0}", row);
+                    logger.ErrorFormat("UpdateActiveLine失败, 没找到对应的行, row = {0}, lastRow = {1}, activeDocument = {2}", row, this.activeDocument.LastLine.Row, this.activeDocument.Name);
+                    return false;
                 }
+
+                this.activeLine = newActiveLine;
             }
+
+            return true;
         }
 
         #endregion
@@ -400,7 +406,7 @@ namespace XTerminal
 
                         if (!this.activeDocument.ContainsLine(this.cursorRow + 1))
                         {
-                            this.activeDocument.CreateNextLine();
+                            this.activeDocument.LineFeed();
                             this.cursorRow++;
                         }
                         else
@@ -489,12 +495,20 @@ namespace XTerminal
                         int row = Convert.ToInt32(param[0]);
                         int col = Convert.ToInt32(param[1]);
 
+                        logger.DebugFormat("CUP_CursorPosition, row = {0}, col = {1}", row, col);
+
                         // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
                         ViewableDocument document = this.activeDocument.ViewableArea;
                         int firstVisibleRow = document.FirstLine.Row;
                         this.cursorRow = firstVisibleRow + row;
                         this.cursorCol = col;
-                        this.UpdateActiveLine(this.cursorRow);
+
+                        if (!this.UpdateActiveLine(this.cursorRow))
+                        {
+                            int count = this.cursorRow - this.activeDocument.LastLine.Row;
+                            this.activeDocument.CreateNewLines(count);
+                            this.UpdateActiveLine(this.cursorRow);
+                        }
                         break;
                     }
 
@@ -587,6 +601,8 @@ namespace XTerminal
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
+                        logger.DebugFormat("UseAlternateScreenBuffer");
+
                         // 先记录当前的光标
                         this.activeDocument.Cursor.Row = this.cursorRow;
                         this.activeDocument.Cursor.Column = this.cursorCol;
@@ -606,6 +622,8 @@ namespace XTerminal
 
                 case VTActions.UseMainScreenBuffer:
                     {
+                        logger.DebugFormat("UseMainScreenBuffer");
+
                         this.cursorCol = this.mainDocument.Cursor.Column;
                         this.cursorRow = this.mainDocument.Cursor.Row;
                         this.activeDocument = this.mainDocument;
