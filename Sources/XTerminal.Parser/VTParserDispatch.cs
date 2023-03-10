@@ -244,11 +244,7 @@ namespace XTerminal.Parser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        WindowManipulationType wmt = (WindowManipulationType)parameters[0];
-                        int parameter1 = parameters[1];
-                        int parameter2 = parameters[2];
-                        logger.ErrorFormat("未实现CSIDispatch - DTTERM_WindowManipulation, WindowManipulationType = {0}, parameter1 = {1}, parameter2 = {2}", wmt, parameter1, parameter2);
-                        this.PerformWindowManipulation(wmt, parameters[0], parameters[1]);
+                        this.PerformWindowManipulation(parameters);
                         break;
                     }
 
@@ -696,8 +692,11 @@ namespace XTerminal.Parser
         /// <param name="type"></param>
         /// <param name="parameter1"></param>
         /// <param name="parameter2"></param>
-        private void PerformWindowManipulation(WindowManipulationType type, int parameter1, int parameter2)
+        private void PerformWindowManipulation(List<int> parameters)
         {
+            WindowManipulationType type = (WindowManipulationType)parameters[0];
+
+            logger.ErrorFormat("未处理的WindowManipulationType, {0}", type);
         }
 
         #endregion
