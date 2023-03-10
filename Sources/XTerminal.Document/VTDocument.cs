@@ -540,6 +540,10 @@ namespace XTerminal.Document
             }
 
             this.LastLine = this.lineMap[this.Rows - 1];
+
+            // 重置Viewable的状态
+            this.ViewableArea.FirstLine = this.FirstLine;
+            this.ViewableArea.LastLine = this.LastLine;
         }
 
         #endregion
