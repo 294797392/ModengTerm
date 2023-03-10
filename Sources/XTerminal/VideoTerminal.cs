@@ -397,6 +397,7 @@ namespace XTerminal
                         if (!this.activeDocument.ContainsLine(this.cursorRow + 1))
                         {
                             this.activeDocument.CreateNextLine();
+                            this.cursorRow++;
                         }
                         else
                         {
