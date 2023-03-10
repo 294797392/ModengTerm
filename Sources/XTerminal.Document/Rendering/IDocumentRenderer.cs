@@ -44,7 +44,7 @@ namespace XTerminal.Document.Rendering
         void RenderElement(IDrawingElement drawingObject);
 
         /// <summary>
-        /// 清除现实的内容并把状态还原
+        /// 清除显示的内容并把状态还原
         /// </summary>
         void Reset();
 

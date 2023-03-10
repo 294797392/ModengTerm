@@ -601,6 +601,7 @@ namespace XTerminal
                         this.cursorRow = 0;
                         this.alternateDocument.Clear();
                         this.activeDocument = this.alternateDocument;
+                        this.activeDocument.ViewableArea.DirtyAll();
                         this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>
                         {
@@ -617,7 +618,7 @@ namespace XTerminal
                         this.cursorCol = this.mainDocument.Cursor.Column;
                         this.cursorRow = this.mainDocument.Cursor.Row;
                         this.activeDocument = this.mainDocument;
-                        this.mainDocument.ViewableArea.DirtyAll();
+                        this.activeDocument.ViewableArea.DirtyAll();
                         this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>
                         {

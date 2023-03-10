@@ -20,7 +20,7 @@ namespace XTerminal.Rendering
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("WPFPresentationDevice");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DocumentRenderer");
 
         #endregion
 
