@@ -314,12 +314,13 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 清除所有字符
-        /// 只留下第一行的文本行
+        /// 重置文档的状态
+        /// 删除所有字符，只留下0-80行
         /// </summary>
         public void Reset()
         {
-            // 先解除和DrawingElement的关联关系
+            #region 先重置当前所有行的数据
+
             VTextLine current = this.ViewableArea.FirstLine;
             VTextLine last = this.ViewableArea.LastLine;
 
@@ -331,6 +332,9 @@ namespace XTerminal.Document
                     current.DrawingElement = null;
                 }
 
+                // 清空文本
+                current.DeleteAll();
+
                 if (current == last)
                 {
                     break;
@@ -339,13 +343,37 @@ namespace XTerminal.Document
                 current = current.NextLine;
             }
 
-            this.FirstLine.DeleteAll();
-            this.FirstLine.NextLine = null;
-            this.LastLine = this.FirstLine;
-            this.lineMap.Clear();
-            this.lineMap[0] = this.FirstLine;
+            #endregion
+
+            #region 如果终端大小动态修改了，可能行数会不足，要考虑到动态补齐行数
+
+            // 该操作会更新行尾指针
+
+            VTextLine lastLine;
+            if (!this.lineMap.TryGetValue(this.Rows - 1, out lastLine))
+            {
+                // 此时说明动态修改了行数，需要补齐
+                int count = (this.Rows - 1) - this.LastLine.Row;
+                for (int i = 0; i < count; i++)
+                {
+                    this.CreateNextLine();
+                }
+            }
+            else
+            {
+                // 有可能行数比最大行数多，需要删除
+                for (int i = this.LastLine.Row; i > lastLine.Row; i--)
+                {
+                    this.lineMap.Remove(i);
+                }
+
+                this.LastLine = lastLine;
+            }
+
+            #endregion
+
             this.ViewableArea.FirstLine = this.FirstLine;
-            this.ViewableArea.LastLine = this.FirstLine;
+            this.ViewableArea.LastLine = this.LastLine;
             this.IsArrangeDirty = true;
         }
 
