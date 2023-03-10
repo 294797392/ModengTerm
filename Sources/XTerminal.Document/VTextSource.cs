@@ -231,7 +231,20 @@ namespace XTerminal.Document
 
         public override void PrintCharacter(char ch, int column)
         {
-            this.characters[column].Character = ch;
+            if (column + 1 > this.characters.Count)
+            {
+                int count = (column + 1) - this.characters.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    VTCharacter character = new VTCharacter(' ');
+                    this.characters.Add(character);
+                }
+                this.characters[column].Character = ch;
+            }
+            else
+            {
+                this.characters[column].Character = ch;
+            }
         }
 
         protected override void ResetColumn(bool add, int changedColumns)
