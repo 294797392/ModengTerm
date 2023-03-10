@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
+using XTerminal.Document;
 
-namespace XTerminal.Document
+namespace XTerminal.Rendering
 {
     public class DrawingLine : DrawingObject
     {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Document;
 
-namespace XTerminal.Terminal
+namespace XTerminal.Document.Rendering
 {
     //public enum ScrollOrientation
     //{

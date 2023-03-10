@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using XTerminal.Base;
 
-namespace XTerminal.Terminal
+namespace XTerminal.VTDefinitions
 {
     /// <summary>
     /// 把不同模式下的键盘按键转换成要发送给终端的字节序列

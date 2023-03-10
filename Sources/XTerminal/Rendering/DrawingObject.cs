@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using XTerminal.Document;
 
-namespace XTerminal.Document
+namespace XTerminal.Rendering
 {
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）

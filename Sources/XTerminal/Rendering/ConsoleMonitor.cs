@@ -9,9 +9,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 using System.Windows.Media.TextFormatting;
-using XTerminal.Terminal;
+using XTerminal.VTDefinitions;
+using XTerminal.Document.Rendering;
 
-namespace XTerminal.Document
+namespace XTerminal.Rendering
 {
     /// <summary>
     /// 显示器控件
@@ -42,7 +43,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 终端显示器对象
         /// </summary>
-        public IDocumentRenderer Monitor { get; private set; }
+        public IDocumentRenderer DocumentRenderer { get; private set; }
 
         #endregion
 
@@ -54,17 +55,17 @@ namespace XTerminal.Document
             this.Background = Brushes.Transparent;
             this.Focusable = true;
 
-            DocumentRenderer drawingCanvas = new DocumentRenderer();
+            DocumentRenderer documentRenderer = new DocumentRenderer();
             ScrollViewer scrollViewer = new ScrollViewer()
             {
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                Content = drawingCanvas
+                Content = documentRenderer
             };
             scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
             this.Children.Add(scrollViewer);
 
-            this.Monitor = drawingCanvas;
+            this.DocumentRenderer = documentRenderer;
             this.scrollViewer = scrollViewer;
         }
 

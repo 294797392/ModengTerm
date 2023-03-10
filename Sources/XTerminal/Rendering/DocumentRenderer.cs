@@ -8,9 +8,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using XTerminal.Terminal;
+using XTerminal.Document;
+using XTerminal.Document.Rendering;
 
-namespace XTerminal.Document
+namespace XTerminal.Rendering
 {
     /// <summary>
     /// 用来显示字符的容器

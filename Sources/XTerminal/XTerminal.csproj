@@ -79,17 +79,22 @@
     <Compile Include="Channels\VTChannelState.cs" />
     <Compile Include="Channels\VTChannelTypes.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="Render\DrawingCursor.cs" />
-    <Compile Include="Render\DrawingLine.cs" />
-    <Compile Include="Render\DrawingObject.cs" />
-    <Compile Include="Render\DrawingText.cs" />
-    <Compile Include="Render\TerminalUtils.cs" />
-    <Compile Include="Render\DocumentRenderer.cs" />
-    <Compile Include="Render\ConsoleMonitor.cs" />
+    <Compile Include="Rendering\DrawingCursor.cs" />
+    <Compile Include="Rendering\DrawingLine.cs" />
+    <Compile Include="Rendering\DrawingObject.cs" />
+    <Compile Include="Rendering\DrawingText.cs" />
+    <Compile Include="Rendering\TerminalUtils.cs" />
+    <Compile Include="Rendering\DocumentRenderer.cs" />
+    <Compile Include="Rendering\ConsoleMonitor.cs" />
     <Compile Include="Options\TerminalOptions.cs" />
     <Compile Include="ResponseCode.cs" />
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="Options\VTInitialOptions.cs" />
+    <Compile Include="VTDefinitions\IInputDevice.cs" />
+    <Compile Include="VTDefinitions\VTInputEvent.cs" />
+    <Compile Include="VTDefinitions\VTKeyboard.cs" />
+    <Compile Include="VTDefinitions\VTKeys.cs" />
+    <Compile Include="VTDefinitions\VTModifierKeys.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -155,10 +160,6 @@
     <ProjectReference Include="..\XTerminal.Parser\XTerminal.Parser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>XTerminal.Parser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\XTerminal.Terminal\XTerminal.Terminal.csproj">
-      <Project>{cbb55527-c3c1-4fb1-94a5-90387baa6416}</Project>
-      <Name>XTerminal.Terminal</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

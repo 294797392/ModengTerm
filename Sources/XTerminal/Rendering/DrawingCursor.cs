@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using XTerminal.Document;
 
-namespace VideoTerminal.Drawing
+namespace XTerminal.Rendering
 {
     /// <summary>
     /// 用来显示光标

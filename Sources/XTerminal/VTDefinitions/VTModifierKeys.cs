@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Terminal
+namespace XTerminal.VTDefinitions
 {
     /// <summary>
     /// 修饰键

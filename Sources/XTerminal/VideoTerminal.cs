@@ -6,8 +6,9 @@ using System.Threading;
 using VideoTerminal.Options;
 using XTerminal.Channels;
 using XTerminal.Document;
+using XTerminal.Document.Rendering;
 using XTerminal.Parser;
-using XTerminal.Terminal;
+using XTerminal.VTDefinitions;
 
 namespace XTerminal
 {

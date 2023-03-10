@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:xtermdrawing="clr-namespace:XTerminal.Document"
+        xmlns:xtermrendering="clr-namespace:XTerminal.Rendering"
         mc:Ignorable="d"
         Title="MainWindow" Height="768" Width="1024" WindowStartupLocation="CenterScreen">
 
@@ -13,8 +13,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <xtermdrawing:ConsoleMonitor Grid.Row="1" x:Name="ConsolePanel">
-        </xtermdrawing:ConsoleMonitor>
+        <xtermrendering:ConsoleMonitor Grid.Row="1" x:Name="ConsolePanel">
+        </xtermrendering:ConsoleMonitor>
     </Grid>
 
 </Window>

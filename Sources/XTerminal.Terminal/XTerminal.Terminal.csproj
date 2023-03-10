@@ -50,14 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DocumentRendererOptions.cs" />
-    <Compile Include="IInputDevice.cs" />
-    <Compile Include="IDocumentRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VTInputEvent.cs" />
-    <Compile Include="VTKeyboard.cs" />
-    <Compile Include="VTKeys.cs" />
-    <Compile Include="VTModifierKeys.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">

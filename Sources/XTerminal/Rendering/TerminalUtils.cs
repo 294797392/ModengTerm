@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using XTerminal.Document;
 using XTerminal.Parser;
-using XTerminal.Terminal;
+using XTerminal.VTDefinitions;
 
-namespace XTerminal.Document
+namespace XTerminal.Rendering
 {
     public static class TerminalUtils
     {

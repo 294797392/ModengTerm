@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Terminal
+namespace XTerminal.VTDefinitions
 {
     public interface IInputDevice
     {
