@@ -78,18 +78,23 @@ namespace XTerminal.Document
         /// 所属的文档
         /// </summary>
         public VTDocument OwnerDocument { get; set; }
-
+        
         /// <summary>
-        /// 该行的所有字符
+        /// 文本数据源
         /// </summary>
-        private List<VTCharacter> Characters { get; set; }
+        public VTextSource TextSource { get; private set; }
+
+        ///// <summary>
+        ///// 该行的所有字符
+        ///// </summary>
+        //private List<VTCharacter> Characters { get; set; }
 
         /// <summary>
         /// 表示该行是否有字符被修改了，需要重新渲染
         /// </summary>
         public bool IsCharacterDirty
         {
-            get 
+            get
             {
                 return this.isCharacterDirty;
             }
@@ -103,11 +108,12 @@ namespace XTerminal.Document
 
         #region 构造方法
 
-        public VTextLine(int columns)
+        public VTextLine(int initialColumns)
         {
-            this.Columns = columns;
-            this.Characters = new List<VTCharacter>();
+            this.Columns = initialColumns;
+            //this.Characters = new List<VTCharacter>();
             this.TextBlocks = new List<VTextBlock>();
+            this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, initialColumns);
         }
 
         #endregion
@@ -115,95 +121,9 @@ namespace XTerminal.Document
         #region 实例方法
 
         /// <summary>
-        /// 删除空的文本，然后使文本左对齐
-        /// 并更新所有TextBlock的测量信息
+        /// 把该行设置为脏行
+        /// 表示下次会重绘
         /// </summary>
-        private void LeftAlignment()
-        {
-            //if (this.First == null)
-            //{
-            //    return;
-            //}
-
-            //string blockText = string.Empty;
-
-            //#region 先对第一个元素排版
-
-            //this.First.OffsetX = 0;
-            //this.First.Column = 0;
-            //blockText = this.Text.Substring(this.First.Column, this.First.Columns);
-            //this.First.Metrics = this.OwnerCanvas.MeasureText(blockText, this.First.Style);
-
-            //#endregion
-
-            //// 从第二个元素开始遍历
-            //VTextBlock current = this.First.Next;
-
-            //while (current != null)
-            //{
-            //    if (current.IsEmpty())
-            //    {
-            //        // 如果这个文本块是空的，那么删除掉，并且更新current指针
-            //        this.DeleteTextWithoutAlignment(current);
-
-            //        // 移动current指针指向下一个元素
-            //        current = current.Next;
-
-            //        // 这里要continue，因为下一个元素也可能是空的
-            //        continue;
-            //    }
-
-            //    VTextBlock previous = current.Previous;
-            //    if (previous != null)
-            //    {
-            //        current.OffsetX = previous.OffsetX + previous.Width;
-            //        current.Column = previous.Column + previous.Columns + 1;
-            //    }
-
-            //    // 更新测量信息
-            //    blockText = this.Text.Substring(current.Column, current.Columns);
-            //    current.Metrics = this.OwnerCanvas.MeasureText(blockText, current.Style);
-            //}
-        }
-
-        /// <summary>
-        /// 从缓存和链表里删除一个TextBlock
-        /// 并更新链表指针
-        /// </summary>
-        /// <param name="textBlock">要删除的TextBlock</param>
-        private void DeleteTextWithoutAlignment(VTextBlock textBlock)
-        {
-            //if (this.TextBlocks.Count == 1 && this.TextBlocks[0] == textBlock)
-            //{
-            //    // 此时该行只有一个TextBlock了，不能删光，要留一个备用
-            //    return;
-            //}
-
-            //VTextBlock previous = textBlock.Previous;
-            //if (previous != null)
-            //{
-            //    previous.Next = textBlock.Next;
-            //}
-
-            //VTextBlock next = textBlock.Next;
-            //if (next != null)
-            //{
-            //    next.Previous = previous;
-            //}
-
-            //if (textBlock == this.First)
-            //{
-            //    this.First = textBlock.Next;
-            //}
-
-            //if (textBlock == this.Last)
-            //{
-            //    this.Last = textBlock.Previous;
-            //}
-
-            //this.TextBlocks.Remove(textBlock);
-        }
-
         private void SetDirty()
         {
             if (!this.IsCharacterDirty)
@@ -234,15 +154,7 @@ namespace XTerminal.Document
             //else
             //{
             // 更新文本
-            if (column > this.Characters.Count - 1)
-            {
-                // 说明是追加字符串操作
-                this.Characters.Add(new VTCharacter(ch));
-            }
-            else
-            {
-                this.Characters[column].Character = ch;
-            }
+            this.TextSource.PrintCharacter(ch, column);
 
             this.SetDirty();
 
@@ -262,15 +174,7 @@ namespace XTerminal.Document
         /// <param name="column">从此处开始删除字符</param>
         public void DeleteText(int column)
         {
-            if (column >= this.Characters.Count)
-            {
-                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
-                return;
-            }
-
-            int deletes = this.Characters.Count - column;
-
-            this.Characters.RemoveRange(column, deletes);
+            this.TextSource.DeleteText(column);
 
             this.SetDirty();
         }
@@ -282,50 +186,39 @@ namespace XTerminal.Document
         /// <param name="count">要删除的字符个数</param>
         public void DeleteText(int column, int count)
         {
-            if(column >= this.Characters.Count)
-            {
-                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
-                return;
-            }
-
-            // 最多能删几个字符
-            int maxDeletes = this.Characters.Count - column;
-
-            int deletes = Math.Min(maxDeletes, count);
-
-            this.Characters.RemoveRange(column, deletes);
+            this.TextSource.DeleteText(column, count);
 
             this.SetDirty();
         }
 
         /// <summary>
-        /// 删除整行
+        /// 删除整行字符
         /// </summary>
         public void DeleteAll()
         {
-            this.Characters.Clear();
+            this.TextSource.DeleteAll();
+
             this.SetDirty();
         }
 
         public string BuildText()
         {
-            string text = string.Empty;
+            return this.TextSource.GetText();
+        }
 
-            if (this.Characters.Count == 0)
+        /// <summary>
+        /// 重置该行的状态为初始状态
+        /// </summary>
+        public void ResizeColumns(int columns)
+        {
+            if (this.Columns != columns)
             {
-                // 当该行一个字符都没有的时候，去测量的话，测量的数据都是0
-                // 这会导致一个空行的高度为0，从而影响到下一行的布局（Y偏移量）
-                return text.PadRight(this.Columns, ' ');
+                this.Columns = columns;
             }
-            else
-            {
-                foreach (VTCharacter character in this.Characters)
-                {
-                    text += character.Character;
-                }
 
-                return text;
-            }
+            this.TextSource.ResizeColumns(columns);
+
+            this.SetDirty();
         }
 
         #endregion

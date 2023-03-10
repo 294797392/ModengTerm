@@ -599,7 +599,7 @@ namespace XTerminal
 
                         this.cursorCol = 0;
                         this.cursorRow = 0;
-                        this.alternateDocument.Reset();
+                        this.alternateDocument.Clear();
                         this.activeDocument = this.alternateDocument;
                         this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>

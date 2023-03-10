@@ -314,40 +314,30 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 重置文档的状态
+        /// 清除文档里的所有数据
         /// 删除所有字符，只留下0-80行
         /// </summary>
-        public void Reset()
+        /// <param name="row">新行数</param>
+        /// <param name="column">新列数</param>
+        public void Resize(int row, int column)
         {
-            #region 先重置当前所有行的数据
+            this.ResizeRows(row);
+            this.ResizeColumns(column);
 
-            VTextLine current = this.ViewableArea.FirstLine;
-            VTextLine last = this.ViewableArea.LastLine;
+            this.ViewableArea.FirstLine = this.FirstLine;
+            this.ViewableArea.LastLine = this.LastLine;
 
-            while (current != null)
+            this.IsArrangeDirty = true;
+        }
+
+        public void ResizeRows(int rows)
+        {
+            if(this.Rows == rows)
             {
-                if (current.DrawingElement != null)
-                {
-                    current.DrawingElement.Data = null;
-                    current.DrawingElement = null;
-                }
-
-                // 清空文本
-                current.DeleteAll();
-
-                if (current == last)
-                {
-                    break;
-                }
-
-                current = current.NextLine;
+                return;
             }
 
-            #endregion
-
-            #region 如果终端大小动态修改了，可能行数会不足，要考虑到动态补齐行数
-
-            // 该操作会更新行尾指针
+            this.options.Rows = rows;
 
             VTextLine lastLine;
             if (!this.lineMap.TryGetValue(this.Rows - 1, out lastLine))
@@ -370,11 +360,69 @@ namespace XTerminal.Document
                 this.LastLine = lastLine;
             }
 
-            #endregion
+            this.SetArrangeDirty();
+        }
 
-            this.ViewableArea.FirstLine = this.FirstLine;
-            this.ViewableArea.LastLine = this.LastLine;
-            this.IsArrangeDirty = true;
+        public void ResizeColumns(int columns)
+        {
+            if (this.Columns == columns)
+            {
+                return;
+            }
+
+            this.options.Columns = columns;
+
+            VTextLine current = this.FirstLine;
+            VTextLine last = this.LastLine;
+
+            while (current != null)
+            {
+                if (current.DrawingElement != null)
+                {
+                    current.DrawingElement.Data = null;
+                    current.DrawingElement = null;
+                }
+
+                // 重置文本行
+                current.ResizeColumns(columns);
+
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
+
+            this.SetArrangeDirty();
+        }
+
+        /// <summary>
+        /// 清除当前文档里的所有内容
+        /// </summary>
+        public void Clear()
+        {
+            VTextLine current = this.FirstLine;
+            VTextLine last = this.LastLine;
+
+            while (current != null)
+            {
+                if (current.DrawingElement != null)
+                {
+                    current.DrawingElement.Data = null;
+                    current.DrawingElement = null;
+                }
+
+                // 重置文本行
+                current.DeleteAll();
+
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
         }
 
         /// <summary>
