@@ -114,6 +114,7 @@ namespace XTerminal.Document
             //this.Characters = new List<VTCharacter>();
             this.TextBlocks = new List<VTextBlock>();
             this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, initialColumns);
+            this.SetDirty();
         }
 
         #endregion
