@@ -192,7 +192,10 @@ namespace XTerminal.Document
 
             int deletes = this.characters.Count - column;
 
-            this.characters.RemoveRange(column, deletes);
+            for (int i = 0; i < deletes; i++)
+            {
+                this.characters[column + i].Character = ' ';
+            }
         }
 
         public override void DeleteText(int column, int count)
@@ -208,7 +211,10 @@ namespace XTerminal.Document
 
             int deletes = Math.Min(maxDeletes, count);
 
-            this.characters.RemoveRange(column, deletes);
+            for (int i = 0; i < deletes; i++)
+            {
+                this.characters[column + i].Character = ' ';
+            }
         }
 
         public override string GetText()

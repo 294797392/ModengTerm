@@ -40,7 +40,7 @@ namespace VideoTerminal.Options
                 Type = TerminalTypes.XTerm,
                 Columns = 80,
                 Rows = 24,
-                DECPrivateAutoWrapMode = true
+                DECPrivateAutoWrapMode = false
             }
         };
 
