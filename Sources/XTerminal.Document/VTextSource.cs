@@ -36,23 +36,23 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 设置该文本数据源最大的列数
+        /// 重新设置该文本数据源最大的列数
         /// </summary>
         /// <param name="column"></param>
-        public virtual void ResizeColumns(int column)
+        public void ResizeColumn(int column)
         {
-            if (this.columns == column)
+            if (column == this.columns)
             {
                 return;
             }
 
             if (column > this.columns)
             {
-                this.ResetColumn(true, column - this.columns);
+                this.ResizeColumn(true, column - this.columns);
             }
             else
             {
-                this.ResetColumn(false, this.columns - column);
+                this.ResizeColumn(false, this.columns - column);
             }
 
             this.columns = column;
@@ -63,7 +63,7 @@ namespace XTerminal.Document
         /// </summary>
         /// <param name="add">增加的列数</param>
         /// <param name="changedColumns">改变的列数</param>
-        protected abstract void ResetColumn(bool add, int changedColumns);
+        protected abstract void ResizeColumn(bool add, int changedColumns);
 
         /// <summary>
         /// 在指定的列打印字符
@@ -147,7 +147,7 @@ namespace XTerminal.Document
             this.text.Remove(column, 1).Insert(column, ch.ToString());
         }
 
-        protected override void ResetColumn(bool add, int changedColumns)
+        protected override void ResizeColumn(bool add, int changedColumns)
         {
             if (add)
             {
@@ -247,7 +247,7 @@ namespace XTerminal.Document
             }
         }
 
-        protected override void ResetColumn(bool add, int changedColumns)
+        protected override void ResizeColumn(bool add, int changedColumns)
         {
             if (add)
             {

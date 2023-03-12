@@ -12,6 +12,8 @@ namespace XTerminal.Document
     /// </summary>
     public class ViewableDocument
     {
+        private VTDocumentOptions options;
+
         /// <summary>
         /// 是否需要重新布局
         /// </summary>
@@ -33,9 +35,19 @@ namespace XTerminal.Document
         public VTDocument OwnerDocument { get; internal set; }
 
         /// <summary>
-        /// 当前光标所在的行
+        /// 总行数
         /// </summary>
-        public int CorsorRow { get; internal set; }
+        public int Rows { get { return this.options.Rows; } }
+
+        /// <summary>
+        /// 总列数
+        /// </summary>
+        public int Columns { get { return this.options.Columns; } }
+
+        public ViewableDocument(VTDocumentOptions options)
+        {
+            this.options = options;
+        }
 
         /// <summary>
         /// 把当前可视区域的所有TextLine标记为需要重新渲染的状态
@@ -59,6 +71,104 @@ namespace XTerminal.Document
             }
 
             this.IsArrangeDirty = true;
+        }
+
+        /// <summary>
+        /// 滚动可视区域
+        /// 该函数不保证滚动到的区域有VTextLine，当滚动到的区域没有VTextLine的时候，那么有可能会崩溃...
+        /// 所以在调用这个函数的时候，需要确保滚动到的区域有VTextLine
+        /// </summary>
+        /// <param name="orientation">滚动方向</param>
+        /// <param name="scrollRows">要滚动的行数</param>
+        public void ScrollDocument(ScrollOrientation orientation, int scrollRows)
+        {
+            VTextLine oldFirstLine = this.FirstLine;
+            VTextLine oldLastLine = this.LastLine;
+            VTextLine newFirstLine = null;
+            VTextLine newLastLine = null;
+
+            #region 更新新的可视区域的第一行和最后一行的指针
+
+            switch (orientation)
+            {
+                case ScrollOrientation.Down:
+                    {
+                        newFirstLine = this.OwnerDocument.lineMap[oldFirstLine.Row + scrollRows];
+                        newLastLine = this.OwnerDocument.lineMap[oldLastLine.Row + scrollRows];
+                        break;
+                    }
+
+                case ScrollOrientation.Up:
+                    {
+                        newFirstLine = this.OwnerDocument.lineMap[oldFirstLine.Row - scrollRows];
+                        newLastLine = this.OwnerDocument.lineMap[oldLastLine.Row - scrollRows];
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            this.FirstLine = newFirstLine;
+            this.LastLine = newLastLine;
+
+            #endregion
+
+            #region 计算从可视区域移出的行和移入的行
+
+            // 从可视区域内被删除的行
+            VTextLine removedFirst = null;
+            // 新增加到可视区域内的行
+            VTextLine addedFirst = null;
+
+            if (scrollRows >= this.OwnerDocument.Rows)
+            {
+                // 此时说明已经移动了一整个屏幕了, 被复用的起始行和结束行就等于移动之前的起始行和结束行
+                removedFirst = oldFirstLine;
+                addedFirst = newFirstLine;
+            }
+            else
+            {
+                if (orientation == ScrollOrientation.Up)
+                {
+                    // 把可视区域往上移动
+                    removedFirst = newLastLine.NextLine;
+                    addedFirst = newFirstLine;
+                }
+                else if (orientation == ScrollOrientation.Down)
+                {
+                    // 把可视区域往下移动
+                    removedFirst = oldFirstLine;
+                    addedFirst = oldLastLine.NextLine;
+                }
+            }
+
+            #endregion
+
+            #region 复用移出的行的DrawingElement
+
+            VTextLine removedCurrent = removedFirst;
+            VTextLine addedCurrent = addedFirst;
+            for (int i = 0; i < scrollRows; i++)
+            {
+                if (removedCurrent.DrawingElement != null)
+                {
+                    addedCurrent.DrawingElement = removedCurrent.DrawingElement;
+                    addedCurrent.DrawingElement.Data = addedCurrent;
+                }
+                addedCurrent.IsCharacterDirty = true;
+
+                removedCurrent = removedCurrent.NextLine;
+                addedCurrent = addedCurrent.NextLine;
+            }
+
+            #endregion
+
+            // 下次渲染的时候排版
+            if (!this.IsArrangeDirty)
+            {
+                this.IsArrangeDirty = true;
+            }
         }
     }
 }

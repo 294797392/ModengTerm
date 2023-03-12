@@ -12,14 +12,14 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class DrawingObject : DrawingVisual, IDrawingElement
+    public abstract class DrawingElement : DrawingVisual, IDrawingElement
     {
         /// <summary>
         /// 保存要画的对象的数据
         /// </summary>
         public VDocumentElement Data { get; set; }
 
-        public DrawingObject()
+        public DrawingElement()
         {
         }
 

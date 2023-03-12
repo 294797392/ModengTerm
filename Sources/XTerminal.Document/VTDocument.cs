@@ -20,7 +20,7 @@ namespace XTerminal.Document
 
         #region 实例变量
 
-        private Dictionary<int, VTextLine> lineMap;
+        internal Dictionary<int, VTextLine> lineMap;
 
         private VTDocumentOptions options;
 
@@ -51,7 +51,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 记录文档中光标的位置
         /// </summary>
-        public VCursor Cursor { get; private set; }
+        public VTCursor Cursor { get; private set; }
 
         public bool DECPrivateAutoWrapMode { get; set; }
 
@@ -64,11 +64,6 @@ namespace XTerminal.Document
         /// 可视区域的最大行数
         /// </summary>
         public int Rows { get { return this.options.Rows; } }
-
-        ///// <summary>
-        ///// 光标所在行
-        ///// </summary>
-        //public VTextLine ActiveLine { get { return this.activeLine; } }
 
         /// <summary>
         /// 该文档要渲染的区域
@@ -89,8 +84,11 @@ namespace XTerminal.Document
             this.options = options;
 
             this.lineMap = new Dictionary<int, VTextLine>();
-            this.Cursor = new VCursor();
-            this.ViewableArea = new ViewableDocument();
+            this.Cursor = new VTCursor();
+            this.ViewableArea = new ViewableDocument(options)
+            {
+                OwnerDocument = this
+            };
 
             VTextLine firstLine = new VTextLine(options.Columns)
             {
@@ -314,90 +312,6 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 清除文档里的所有数据
-        /// 删除所有字符，只留下0-80行
-        /// </summary>
-        /// <param name="row">新行数</param>
-        /// <param name="column">新列数</param>
-        public void Resize(int row, int column)
-        {
-            this.ResizeRows(row);
-            this.ResizeColumns(column);
-
-            this.ViewableArea.FirstLine = this.FirstLine;
-            this.ViewableArea.LastLine = this.LastLine;
-
-            this.IsArrangeDirty = true;
-        }
-
-        public void ResizeRows(int rows)
-        {
-            if(this.Rows == rows)
-            {
-                return;
-            }
-
-            this.options.Rows = rows;
-
-            VTextLine lastLine;
-            if (!this.lineMap.TryGetValue(this.Rows - 1, out lastLine))
-            {
-                // 此时说明动态修改了行数，需要补齐
-                int count = (this.Rows - 1) - this.LastLine.Row;
-                for (int i = 0; i < count; i++)
-                {
-                    this.CreateNextLine();
-                }
-            }
-            else
-            {
-                // 有可能行数比最大行数多，需要删除
-                for (int i = this.LastLine.Row; i > lastLine.Row; i--)
-                {
-                    this.lineMap.Remove(i);
-                }
-
-                this.LastLine = lastLine;
-            }
-
-            this.SetArrangeDirty();
-        }
-
-        public void ResizeColumns(int columns)
-        {
-            if (this.Columns == columns)
-            {
-                return;
-            }
-
-            this.options.Columns = columns;
-
-            VTextLine current = this.FirstLine;
-            VTextLine last = this.LastLine;
-
-            while (current != null)
-            {
-                if (current.DrawingElement != null)
-                {
-                    current.DrawingElement.Data = null;
-                    current.DrawingElement = null;
-                }
-
-                // 重置文本行
-                current.ResizeColumns(columns);
-
-                if (current == last)
-                {
-                    break;
-                }
-
-                current = current.NextLine;
-            }
-
-            this.SetArrangeDirty();
-        }
-
-        /// <summary>
         /// 清除当前文档里的所有内容
         /// </summary>
         public void Clear()
@@ -425,125 +339,105 @@ namespace XTerminal.Document
             }
         }
 
-        /// <summary>
-        /// 滚动可视区域
-        /// </summary>
-        /// <param name="orientation">滚动方向</param>
-        /// <param name="scrollRows">要滚动的行数</param>
-        public void ScrollViewableDocument(ScrollOrientation orientation, int scrollRows)
-        {
-            VTextLine oldFirstLine = this.ViewableArea.FirstLine;
-            VTextLine oldLastLine = this.ViewableArea.LastLine;
-            VTextLine newFirstLine = null;
-            VTextLine newLastLine = null;
-
-            #region 更新新的可视区域的第一行和最后一行的指针
-
-            switch (orientation)
-            {
-                case ScrollOrientation.Down:
-                    {
-                        newFirstLine = this.lineMap[oldFirstLine.Row + scrollRows];
-                        newLastLine = this.lineMap[oldLastLine.Row + scrollRows];
-                        break;
-                    }
-
-                case ScrollOrientation.Up:
-                    {
-                        newFirstLine = this.lineMap[oldFirstLine.Row - scrollRows];
-                        newLastLine = this.lineMap[oldLastLine.Row - scrollRows];
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            this.ViewableArea.FirstLine = newFirstLine;
-            this.ViewableArea.LastLine = newLastLine;
-
-            #endregion
-
-            #region 计算从可视区域移出的行和移入的行
-
-            // 从可视区域内被删除的行
-            VTextLine removedFirst = null;
-            // 新增加到可视区域内的行
-            VTextLine addedFirst = null;
-
-            if (scrollRows >= this.Rows)
-            {
-                // 此时说明已经移动了一整个屏幕了, 被复用的起始行和结束行就等于移动之前的起始行和结束行
-                removedFirst = oldFirstLine;
-                addedFirst = newFirstLine;
-            }
-            else
-            {
-                if (orientation == ScrollOrientation.Up)
-                {
-                    // 把可视区域往上移动
-                    removedFirst = newLastLine.NextLine;
-                    addedFirst = newFirstLine;
-                }
-                else if (orientation == ScrollOrientation.Down)
-                {
-                    // 把可视区域往下移动
-                    removedFirst = oldFirstLine;
-                    addedFirst = oldLastLine.NextLine;
-                }
-            }
-
-            #endregion
-
-            #region 复用移出的行的DrawingElement
-
-            VTextLine removedCurrent = removedFirst;
-            VTextLine addedCurrent = addedFirst;
-            for (int i = 0; i < scrollRows; i++)
-            {
-                if (removedCurrent.DrawingElement != null)
-                {
-                    addedCurrent.DrawingElement = removedCurrent.DrawingElement;
-                    addedCurrent.DrawingElement.Data = addedCurrent;
-                }
-                addedCurrent.IsCharacterDirty = true;
-
-                removedCurrent = removedCurrent.NextLine;
-                addedCurrent = addedCurrent.NextLine;
-            }
-
-            #endregion
-
-            // 下次渲染的时候排版
-            this.SetArrangeDirty();
-        }
-
         public bool TryGetLine(int row, out VTextLine textLine)
         {
             return this.lineMap.TryGetValue(row, out textLine);
         }
 
         /// <summary>
-        /// 删除多余的行
-        /// 只保存当前Rows数量的行
+        /// 使用当前Document里的Row重置终端的行数
+        /// 多余的行会删除
+        /// 不足的行会补齐
         /// </summary>
-        public void Reset()
+        /// <param name="rows"></param>
+        public void ResetRows()
         {
-            int deletes = this.LastLine.Row - (this.Rows - 1);
-            if (deletes > 0)
+            VTextLine lastLine;
+            if (!this.lineMap.TryGetValue(this.Rows - 1, out lastLine))
             {
-                // 此时说明行数大于Rows，需要删除多余的行数
-                for (int i = this.LastLine.Row; i >= this.Rows; i--)
+                // 此时说明动态修改了行数，需要补齐
+                int count = (this.Rows - 1) - this.LastLine.Row;
+                for (int i = 0; i < count; i++)
+                {
+                    this.CreateNextLine();
+                }
+            }
+            else
+            {
+                // 有可能行数比最大行数多，需要删除
+                for (int i = this.LastLine.Row; i > lastLine.Row; i--)
                 {
                     this.lineMap.Remove(i);
                 }
-            }
 
-            this.LastLine = this.lineMap[this.Rows - 1];
+                this.LastLine = lastLine;
+            }
 
             // 重置Viewable的状态
             this.ViewableArea.FirstLine = this.FirstLine;
             this.ViewableArea.LastLine = this.LastLine;
+
+            this.SetArrangeDirty();
+        }
+
+        /// <summary>
+        /// 使用新的行数和列数来调整终端的大小
+        /// 主要是需要调整ViewableDocument的大小
+        /// </summary>
+        /// <param name="rows">终端的新行数</param>
+        /// <param name="columns">终端的新列数</param>
+        public void Resize(int rows, int columns)
+        {
+            int oldColumns = this.options.Columns;
+            int newColumns = columns;
+            int oldRows = this.options.Rows;
+            int newRows = rows;
+
+            if (newColumns != oldColumns)
+            {
+                this.options.Columns = newColumns;
+
+                // 先不管列
+            }
+
+            if (newRows != oldRows)
+            {
+                this.options.Rows = newRows;
+
+                VTextLine firstLine = this.FirstLine;
+                VTextLine lastLine = this.LastLine;
+                VTextLine visibleFirstLine = this.ViewableArea.FirstLine;
+                VTextLine visibleLastLine = this.ViewableArea.LastLine;
+
+                if (newRows > oldRows)
+                {
+                    // 新的行数比旧的行数大
+                }
+                else
+                {
+                    // 新的行数比旧的行数小
+
+                    // 可显示区域的最后一行的索引不变
+                    // 改变可视区域的第一行的索引
+                    //visibleFirstLine.Row + (oldRows - newRows);
+                }
+
+                #region Resize可视区域
+
+
+
+                #endregion
+            }
+        }
+
+        /// <summary>
+        /// 在指定的行位置插入多行，并把指定位置和指定位置后面的所有行往后移动
+        /// </summary>
+        /// <param name="row">要插入的行的位置</param>
+        /// <param name="lines"></param>
+        public void InsertLines(int row, int lines)
+        {
+
         }
 
         #endregion

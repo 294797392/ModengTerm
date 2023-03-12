@@ -179,7 +179,7 @@ namespace XTerminal.Rendering
 
         public void RenderElement(IDrawingElement drawingObject)
         {
-            DrawingObject drawingObject1 = drawingObject as DrawingObject;
+            DrawingElement drawingObject1 = drawingObject as DrawingElement;
             if (drawingObject1 == null)
             {
                 logger.ErrorFormat("RenderElement失败, 要重绘的对象不存在");

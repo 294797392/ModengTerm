@@ -207,21 +207,6 @@ namespace XTerminal.Document
             return this.TextSource.GetText();
         }
 
-        /// <summary>
-        /// 重置该行的状态为初始状态
-        /// </summary>
-        public void ResizeColumns(int columns)
-        {
-            if (this.Columns != columns)
-            {
-                this.Columns = columns;
-            }
-
-            this.TextSource.ResizeColumns(columns);
-
-            this.SetDirty();
-        }
-
         #endregion
     }
 }

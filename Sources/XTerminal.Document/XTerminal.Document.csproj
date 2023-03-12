@@ -60,7 +60,7 @@
     <Compile Include="Rendering\DocumentRendererOptions.cs" />
     <Compile Include="Rendering\IDocumentRenderer.cs" />
     <Compile Include="ScrollOrientation.cs" />
-    <Compile Include="VCursor.cs" />
+    <Compile Include="VTCursor.cs" />
     <Compile Include="VFontWeight.cs" />
     <Compile Include="ViewableDocument.cs" />
     <Compile Include="VTCharacter.cs" />

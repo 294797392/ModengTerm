@@ -419,7 +419,7 @@ namespace XTerminal
                         {
                             // 光标在可视区域的最后一行，那么要把可视区域向下移动
                             logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
-                            this.activeDocument.ScrollViewableDocument(ScrollOrientation.Down, 1);
+                            document.ScrollDocument(ScrollOrientation.Down, 1);
                             this.cursorRow++;
                         }
                         else if (this.cursorRow < firstVisibleRow)
@@ -600,9 +600,11 @@ namespace XTerminal
 
                         this.cursorCol = 0;
                         this.cursorRow = 0;
+                        // 切换ActiveDocument
                         this.activeDocument = this.alternateDocument;
                         this.activeDocument.ViewableArea.DirtyAll();
-                        this.alternateDocument.Reset();
+                        // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
+                        this.alternateDocument.ResetRows();
                         this.alternateDocument.Clear();
                         this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>
@@ -665,7 +667,7 @@ namespace XTerminal
                         {
                             // 此时光标位置在可视区域的第一行
                             logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
-                            this.activeDocument.ScrollViewableDocument(ScrollOrientation.Up, 1);
+                            document.ScrollDocument(ScrollOrientation.Up, 1);
                             this.cursorRow--;
                             this.UpdateActiveLine(this.cursorRow);
                         }
@@ -692,6 +694,17 @@ namespace XTerminal
                 case VTActions.DECSTBM_SetScrollingRegion:
                     {
                         logger.ErrorFormat("未实现SetScrollingRegion");
+                        break;
+                    }
+
+                case VTActions.IL_InsertLine:
+                    {
+                        // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
+                        int lines = Convert.ToInt32(param[0]);
+                        logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
+
+                        ViewableDocument document = this.activeDocument.ViewableArea;
+
                         break;
                     }
 

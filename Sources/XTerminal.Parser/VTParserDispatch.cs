@@ -343,6 +343,13 @@ namespace XTerminal.Parser
                         break;
                     }
 
+                case CSIActionCodes.IL_InsertLine:
+                    {
+                        int rows = this.GetParameter(parameters, 0, 1);
+                        this.NotifyActionEvent(VTActions.IL_InsertLine, rows);
+                        break;
+                    }
+
                 default:
                     logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                     throw new NotImplementedException();

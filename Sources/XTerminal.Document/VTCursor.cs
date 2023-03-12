@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document
 {
-    public class VCursor
+    public class VTCursor
     {
         /// <summary>
         /// 光标所在列

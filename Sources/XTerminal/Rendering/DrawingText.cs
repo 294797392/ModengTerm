@@ -13,7 +13,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 表示PresentationDevice上的一个文本块
     /// </summary>
-    public class DrawingText : DrawingObject
+    public class DrawingText : DrawingElement
     {
         #region 属性
 

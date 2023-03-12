@@ -81,7 +81,7 @@
     <Compile Include="DefaultValues.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
     <Compile Include="Rendering\DrawingLine.cs" />
-    <Compile Include="Rendering\DrawingObject.cs" />
+    <Compile Include="Rendering\DrawingElement.cs" />
     <Compile Include="Rendering\DrawingText.cs" />
     <Compile Include="Rendering\TerminalUtils.cs" />
     <Compile Include="Rendering\DocumentRenderer.cs" />

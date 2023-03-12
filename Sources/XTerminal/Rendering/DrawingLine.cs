@@ -10,7 +10,7 @@ using XTerminal.Document;
 
 namespace XTerminal.Rendering
 {
-    public class DrawingLine : DrawingObject
+    public class DrawingLine : DrawingElement
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingLine");
 

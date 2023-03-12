@@ -208,6 +208,7 @@ namespace XTerminal.Parser
 
         RI_ReverseLineFeed,
 
-        DECSTBM_SetScrollingRegion
+        DECSTBM_SetScrollingRegion,
+        IL_InsertLine
     }
 }
