@@ -19,15 +19,15 @@ namespace VideoTerminal.Options
             ChannelType = VTChannelTypes.SSH,
             Authorition = new SSHChannelAuthorition()
             {
-                ServerAddress = "linux-desktop",
-                ServerPort = 22,
-                UserName = "zyf",
-                Password = "18612538605"
-
-                //ServerAddress = "ubuntu-dev",
+                //ServerAddress = "linux-desktop",
                 //ServerPort = 22,
-                //UserName = "oheiheiheiheihei",
-                //Password = "18612538605",
+                //UserName = "zyf",
+                //Password = "18612538605"
+
+                ServerAddress = "ubuntu-dev",
+                ServerPort = 22,
+                UserName = "oheiheiheiheihei",
+                Password = "18612538605",
 
                 //ServerAddress = "tty.sdf.org",
                 //ServerPort = 22,

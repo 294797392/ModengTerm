@@ -45,7 +45,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 该文本块所在行数，从0开始
         /// </summary>
-        public int Row { get; set; }
+        //public int Row { get; set; }
 
         public VDocumentElement()
         {

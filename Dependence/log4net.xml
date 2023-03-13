@@ -9,7 +9,7 @@
   <log4net>
     <root>
     	<!-- ALL/DEBUG/INFO/WARN/ERROR/FATAL/OFF -->
-      <level value="ERROR"/>
+      <level value="ALL"/>
 	  <appender-ref ref="RollingFileAppender"/>
       <appender-ref ref="ColoredConsoleAppender"/>
     </root>

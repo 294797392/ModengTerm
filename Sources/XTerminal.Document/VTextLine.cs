@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace XTerminal.Document
 {
@@ -205,6 +206,40 @@ namespace XTerminal.Document
         public string BuildText()
         {
             return this.TextSource.GetText();
+        }
+
+        /// <summary>
+        /// 往前找到下一个VTextLine
+        /// </summary>
+        /// <param name="rows">向前几行</param>
+        /// <returns></returns>
+        public VTextLine FindNext(int rows)
+        {
+            VTextLine current = this;
+
+            for (int i = 0; i < rows; i++)
+            {
+                current = current.NextLine;
+            }
+
+            return current;
+        }
+
+        /// <summary>
+        /// 往后找到上一个VTextLine
+        /// </summary>
+        /// <param name="rows">向后几行</param>
+        /// <returns></returns>
+        public VTextLine FindPrevious(int rows)
+        {
+            VTextLine current = this;
+
+            for (int i = 0; i < rows; i++)
+            {
+                current = current.PreviousLine;
+            }
+
+            return current;
         }
 
         #endregion

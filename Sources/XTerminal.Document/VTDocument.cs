@@ -20,7 +20,7 @@ namespace XTerminal.Document
 
         #region 实例变量
 
-        internal Dictionary<int, VTextLine> lineMap;
+        //internal Dictionary<int, VTextLine> lineMap;
 
         private VTDocumentOptions options;
 
@@ -66,6 +66,11 @@ namespace XTerminal.Document
         public int Rows { get { return this.options.Rows; } }
 
         /// <summary>
+        /// 总行数
+        /// </summary>
+        public int TotalRows { get; private set; }
+
+        /// <summary>
         /// 该文档要渲染的区域
         /// </summary>
         public ViewableDocument ViewableArea { get; private set; }
@@ -83,7 +88,6 @@ namespace XTerminal.Document
         {
             this.options = options;
 
-            this.lineMap = new Dictionary<int, VTextLine>();
             this.Cursor = new VTCursor();
             this.ViewableArea = new ViewableDocument(options)
             {
@@ -92,7 +96,6 @@ namespace XTerminal.Document
 
             VTextLine firstLine = new VTextLine(options.Columns)
             {
-                Row = 0,
                 OffsetX = 0,
                 OffsetY = 0,
                 CursorAtRightMargin = false,
@@ -100,7 +103,6 @@ namespace XTerminal.Document
                 OwnerDocument = this,
                 DrawingElement = null
             };
-            this.lineMap[0] = firstLine;
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
 
@@ -109,6 +111,8 @@ namespace XTerminal.Document
             {
                 this.CreateNextLine();
             }
+
+            this.TotalRows = options.Rows;
 
             // 更新可视区域
             this.ViewableArea.FirstLine = firstLine;
@@ -157,32 +161,30 @@ namespace XTerminal.Document
         #region 公开接口
 
         /// <summary>
-        /// 创建一个新行并更新Last指针
+        /// 创建一个新行并将新行挂到链表上
         /// </summary>
         /// <returns></returns>
         public void CreateNextLine()
         {
-            int row = this.LastLine.Row + 1;
-
             VTextLine textLine = new VTextLine(this.Columns)
             {
-                Row = row,
                 OffsetX = 0,
                 OffsetY = 0,
                 CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
                 OwnerDocument = this
             };
-            this.lineMap[row] = textLine;
 
             this.LastLine.NextLine = textLine;
             textLine.PreviousLine = this.LastLine;
             this.LastLine = textLine;
+
+            this.TotalRows++;
         }
 
-        public bool ContainsLine(int row)
+        public bool HasNextLine(VTextLine textLine)
         {
-            return this.lineMap.ContainsKey(row);
+            return textLine.NextLine != null;
         }
 
         /// <summary>
@@ -339,11 +341,6 @@ namespace XTerminal.Document
             }
         }
 
-        public bool TryGetLine(int row, out VTextLine textLine)
-        {
-            return this.lineMap.TryGetValue(row, out textLine);
-        }
-
         /// <summary>
         /// 使用当前Document里的Row重置终端的行数
         /// 多余的行会删除
@@ -352,27 +349,6 @@ namespace XTerminal.Document
         /// <param name="rows"></param>
         public void ResetRows()
         {
-            VTextLine lastLine;
-            if (!this.lineMap.TryGetValue(this.Rows - 1, out lastLine))
-            {
-                // 此时说明动态修改了行数，需要补齐
-                int count = (this.Rows - 1) - this.LastLine.Row;
-                for (int i = 0; i < count; i++)
-                {
-                    this.CreateNextLine();
-                }
-            }
-            else
-            {
-                // 有可能行数比最大行数多，需要删除
-                for (int i = this.LastLine.Row; i > lastLine.Row; i--)
-                {
-                    this.lineMap.Remove(i);
-                }
-
-                this.LastLine = lastLine;
-            }
-
             // 重置Viewable的状态
             this.ViewableArea.FirstLine = this.FirstLine;
             this.ViewableArea.LastLine = this.LastLine;

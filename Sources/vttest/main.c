@@ -10,21 +10,35 @@ static char CUP00[6] = { 0x1b, '[', '0',';','0', 'H' };// 光标移动到00
 
 static char ReverseLineFeed[2] = {0x1b, 'I'};
 
+static char DCH[4] = { 0x1b, '[','2','P' };
+
+static void TestDCH()
+{
+	printf("1234567");
+	printf(CUB);
+	printf(CUB);
+	printf(CUB);
+	printf(CUB);
+	//printf(DCH);
+}
+
 int main()
 {
 	system("mode con cols=80 lines=24");
 
-	for(size_t i = 0; i < 25; i++)
-	{
-		char line[1024] = { '\0' };
-		snprintf(line, sizeof(line), "%d\n", i);
-		printf(line);
-	}
+	TestDCH();
 
-	printf(CUP00);
-	//printf(ReverseLineFeed);
-	//printf(ReverseLineFeed);
-	printf("ABC");
+	//for(size_t i = 0; i < 25; i++)
+	//{
+	//	char line[1024] = { '\0' };
+	//	snprintf(line, sizeof(line), "%d\n", i);
+	//	printf(line);
+	//}
+
+	////printf(CUP00);
+	////printf(ReverseLineFeed);
+	////printf(ReverseLineFeed);
+	//printf("ABC");
 
 	char read[1024];
 	fgets(read, sizeof(read), stdin);

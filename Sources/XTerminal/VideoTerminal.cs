@@ -72,12 +72,13 @@ namespace XTerminal
 
         /// <summary>
         /// 光标所在行
-        /// 光标坐标是基于VTDocument的坐标
+        /// 该坐标是基于ViewableDocument的坐标
         /// </summary>
         private int cursorRow;
 
         /// <summary>
         /// 光标所在列
+        /// 该坐标是基于ViewableDocument的坐标
         /// </summary>
         private int cursorCol;
 
@@ -199,7 +200,7 @@ namespace XTerminal
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
-            this.activeDocument.TryGetLine(0, out this.activeLine);
+            this.activeLine = this.mainDocument.FirstLine;
 
             #endregion
 
@@ -327,23 +328,6 @@ namespace XTerminal
             }
         }
 
-        private bool UpdateActiveLine(int row)
-        {
-            if (this.activeLine.Row != row)
-            {
-                VTextLine newActiveLine;
-                if (!this.activeDocument.TryGetLine(row, out newActiveLine))
-                {
-                    logger.ErrorFormat("UpdateActiveLine失败, 没找到对应的行, row = {0}, lastRow = {1}, activeDocument = {2}", row, this.activeDocument.LastLine.Row, this.activeDocument.Name);
-                    return false;
-                }
-
-                this.activeLine = newActiveLine;
-            }
-
-            return true;
-        }
-
         #endregion
 
         #region 事件处理器
@@ -405,40 +389,33 @@ namespace XTerminal
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
 
-                        if (!this.activeDocument.ContainsLine(this.cursorRow + 1))
+                        if (!this.activeDocument.HasNextLine(this.activeLine))
                         {
                             this.activeDocument.CreateNextLine();
                         }
 
                         // 更新可视区域
                         ViewableDocument document = this.activeDocument.ViewableArea;
-                        int firstVisibleRow = document.FirstLine.Row;
-                        int lastVisibleRow = document.LastLine.Row;
+                        VTextLine firstVisibleRow = document.FirstLine;
+                        VTextLine lastVisibleRow = document.LastLine;
 
-                        if (this.cursorRow == lastVisibleRow)
+                        if (lastVisibleRow == this.activeLine)
                         {
                             // 光标在可视区域的最后一行，那么要把可视区域向下移动
                             logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
                             document.ScrollDocument(ScrollOrientation.Down, 1);
-                            this.cursorRow++;
-                        }
-                        else if (this.cursorRow < firstVisibleRow)
-                        {
-                            // 光标位置在可视区域上面？？
-                            logger.ErrorFormat("LineFeed状态不正确，光标在可视区域上面");
-                        }
-                        else if (this.cursorRow > lastVisibleRow)
-                        {
-                            // 光标位置在可视区域的下面？？
-                            logger.ErrorFormat("LineFeed状态不正确，光标在可视区域下面");
                         }
                         else
                         {
+                            // 这里假设光标在可视区域里
+                            // 实际上光标有可能在可视区域的上面或者下面，但是暂时还没找到方法去判定
+
                             // 光标在可视区域里
                             logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
                             this.cursorRow++;
                         }
-                        this.UpdateActiveLine(this.cursorRow);
+
+                        this.activeLine = this.activeLine.NextLine;
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.cursorRow, this.cursorCol, action);
                         break;
                     }
@@ -475,7 +452,7 @@ namespace XTerminal
                     {
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow -= n;
-                        this.UpdateActiveLine(this.cursorRow);
+                        this.activeLine = this.activeLine.FindPrevious(n);
                         break;
                     }
 
@@ -483,7 +460,7 @@ namespace XTerminal
                     {
                         int n = Convert.ToInt32(param[0]);
                         this.cursorRow += n;
-                        this.UpdateActiveLine(this.cursorRow);
+                        this.activeLine = this.activeLine.FindNext(n);
                         break;
                     }
 
@@ -496,10 +473,12 @@ namespace XTerminal
 
                         // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
                         ViewableDocument document = this.activeDocument.ViewableArea;
-                        int firstVisibleRow = document.FirstLine.Row;
-                        this.cursorRow = firstVisibleRow + row;
+
+                        // 更新当前行
+                        this.activeLine = document.FirstLine.FindNext(row);
+                        // 更新基于VTDocument的cursorRow和cursorCol
+                        this.cursorRow = row;
                         this.cursorCol = col;
-                        this.UpdateActiveLine(this.cursorRow);
                         break;
                     }
 
@@ -577,6 +556,7 @@ namespace XTerminal
 
                 case VTActions.DCH_DeleteCharacter:
                     {
+                        // 从指定位置删除n个字符，删除后的字符串要左对齐
                         int count = Convert.ToInt32(param[0]);
                         this.activeDocument.DeleteCharacter(this.activeLine, this.cursorCol, count);
                         break;
@@ -597,6 +577,7 @@ namespace XTerminal
                         // 先记录当前的光标
                         this.activeDocument.Cursor.Row = this.cursorRow;
                         this.activeDocument.Cursor.Column = this.cursorCol;
+                        this.activeDocument.Cursor.OwnerLine = this.activeLine;
 
                         this.cursorCol = 0;
                         this.cursorRow = 0;
@@ -606,11 +587,11 @@ namespace XTerminal
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.ResetRows();
                         this.alternateDocument.Clear();
-                        this.UpdateActiveLine(this.cursorRow);
+                        // 更新activeLine为AlternateDocument的第一行
+                        this.activeLine = this.alternateDocument.FirstLine;
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();
-                            this.RenderDocument(this.alternateDocument);
                         }, null);
                         break;
                     }
@@ -622,13 +603,12 @@ namespace XTerminal
                         // 恢复之前保存的光标
                         this.cursorCol = this.mainDocument.Cursor.Column;
                         this.cursorRow = this.mainDocument.Cursor.Row;
+                        this.activeLine = this.mainDocument.Cursor.OwnerLine;
                         this.activeDocument = this.mainDocument;
                         this.activeDocument.ViewableArea.DirtyAll();
-                        this.UpdateActiveLine(this.cursorRow);
                         this.uiSyncContext.Send((state) =>
                         {
                             this.Renderer.Reset();
-                            this.RenderDocument(this.mainDocument);
                         }, null);
                         break;
                     }
@@ -660,34 +640,26 @@ namespace XTerminal
                         // 反向索引 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
 
                         ViewableDocument document = this.activeDocument.ViewableArea;
-                        int firstVisibleRow = document.FirstLine.Row;
-                        int lastVisibleRow = document.LastLine.Row;
+                        VTextLine firstVisibleRow = document.FirstLine;
+                        VTextLine lastVisibleRow = document.LastLine;
 
-                        if (this.cursorRow == firstVisibleRow)
+                        if (firstVisibleRow == this.activeLine)
                         {
                             // 此时光标位置在可视区域的第一行
                             logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
                             document.ScrollDocument(ScrollOrientation.Up, 1);
                             this.cursorRow--;
-                            this.UpdateActiveLine(this.cursorRow);
-                        }
-                        else if (this.cursorRow < firstVisibleRow)
-                        {
-                            // 光标位置在可视区域上面？？
-                            logger.ErrorFormat("RI_ReverseLineFeed状态不正确，光标在可视区域上面");
-                        }
-                        else if (this.cursorRow > lastVisibleRow)
-                        {
-                            // 光标位置在可视区域的下面？？
-                            logger.ErrorFormat("RI_ReverseLineFeed状态不正确，光标在可视区域下面");
                         }
                         else
                         {
+                            // 这里假设光标在可视区域里面
+                            // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
+
                             // 光标位置在可视区域里面
-                            logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里面，直接向上移动一行光标");
                             this.cursorRow--;
-                            this.UpdateActiveLine(this.cursorRow);
                         }
+
+                        this.activeLine = this.activeLine.PreviousLine;
                         break;
                     }
 

@@ -17,5 +17,10 @@ namespace XTerminal.Document
         /// 光标所在行
         /// </summary>
         public int Row { get; set; }
+
+        /// <summary>
+        /// 光标所在的行
+        /// </summary>
+        public VTextLine OwnerLine { get; set; }
     }
 }

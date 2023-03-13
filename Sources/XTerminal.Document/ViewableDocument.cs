@@ -20,12 +20,12 @@ namespace XTerminal.Document
         public bool IsArrangeDirty { get; set; }
 
         /// <summary>
-        /// 要渲染的第一行
+        /// 可视区域的第一行
         /// </summary>
         public VTextLine FirstLine { get; internal set; }
 
         /// <summary>
-        /// 要渲染的最后一行
+        /// 可视区域的最后一行
         /// </summary>
         public VTextLine LastLine { get; internal set; }
 
@@ -93,15 +93,17 @@ namespace XTerminal.Document
             {
                 case ScrollOrientation.Down:
                     {
-                        newFirstLine = this.OwnerDocument.lineMap[oldFirstLine.Row + scrollRows];
-                        newLastLine = this.OwnerDocument.lineMap[oldLastLine.Row + scrollRows];
+                        // 往下滚动
+
+                        newFirstLine = oldFirstLine.FindNext(scrollRows);
+                        newLastLine = oldLastLine.FindNext(scrollRows);
                         break;
                     }
 
                 case ScrollOrientation.Up:
                     {
-                        newFirstLine = this.OwnerDocument.lineMap[oldFirstLine.Row - scrollRows];
-                        newLastLine = this.OwnerDocument.lineMap[oldLastLine.Row - scrollRows];
+                        newFirstLine = oldFirstLine.FindPrevious(scrollRows);
+                        newLastLine = oldLastLine.FindPrevious(scrollRows);
                         break;
                     }
 
