@@ -27,7 +27,7 @@ namespace XTerminal.Rendering
         {
             VTextLine textLine = this.OwnerElement as VTextLine;
 
-            string text = textLine.BuildText();
+            string text = textLine.GetText();
 
             text = string.Format("{0} ******* {1}", this.Row, text);
             //text = string.Format("{0} ********* {1}", textLine.Row, text);

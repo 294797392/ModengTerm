@@ -9,6 +9,8 @@ namespace XTerminal.Document
 {
     public abstract class VTDocumentElement
     {
+        private bool isDirty;
+
         /// <summary>
         /// 该文本块左上角的X坐标
         /// </summary>
@@ -53,6 +55,30 @@ namespace XTerminal.Document
         /// </summary>
         public IDocumentDrawable Drawable { get; private set; }
 
+        public bool IsDirty
+        {
+            get { return this.isDirty; }
+            protected set
+            {
+                if (this.isDirty != value)
+                {
+                    this.isDirty = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 把该元素设置为脏元素
+        /// 表示在下次渲染的时候需要重绘
+        /// </summary>
+        public void SetDirty(bool isDirty)
+        {
+            if (this.isDirty != isDirty)
+            {
+                this.isDirty = isDirty;
+            }
+        }
+
         public VTDocumentElement()
         {
             this.Metrics = new VTElementMetrics();
@@ -72,6 +98,7 @@ namespace XTerminal.Document
 
             this.Drawable = drawable;
             this.Drawable.OwnerElement = this;
+            this.SetDirty(true);
         }
 
         /// <summary>

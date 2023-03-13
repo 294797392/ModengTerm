@@ -14,6 +14,8 @@ namespace XTerminal.Document
     /// </summary>
     public class VTextLine : VTDocumentElement
     {
+        private static readonly string BlankText = " ";
+
         #region 实例变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTextLine");
@@ -21,8 +23,6 @@ namespace XTerminal.Document
         #endregion
 
         #region 实例变量
-
-        private bool isCharacterDirty;
 
         #endregion
 
@@ -91,21 +91,6 @@ namespace XTerminal.Document
         ///// </summary>
         //private List<VTCharacter> Characters { get; set; }
 
-        /// <summary>
-        /// 表示该行是否有字符被修改了，需要重新渲染
-        /// </summary>
-        public bool IsCharacterDirty
-        {
-            get
-            {
-                return this.isCharacterDirty;
-            }
-            set
-            {
-                this.isCharacterDirty = value;
-            }
-        }
-
         #endregion
 
         #region 构造方法
@@ -115,24 +100,11 @@ namespace XTerminal.Document
             //this.Characters = new List<VTCharacter>();
             this.TextBlocks = new List<VTextBlock>();
             this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, capacity);
-            this.SetDirty();
         }
 
         #endregion
 
         #region 实例方法
-
-        /// <summary>
-        /// 把该行设置为脏行
-        /// 表示下次会重绘
-        /// </summary>
-        private void SetDirty()
-        {
-            if (!this.IsCharacterDirty)
-            {
-                this.IsCharacterDirty = true;
-            }
-        }
 
         #endregion
 
@@ -163,7 +135,7 @@ namespace XTerminal.Document
 
             this.TextSource.SetCharacter(column, ch);
 
-            this.SetDirty();
+            this.SetDirty(true);
 
             //}
 
@@ -189,7 +161,7 @@ namespace XTerminal.Document
 
             this.TextSource.Remove(column);
 
-            this.SetDirty();
+            this.SetDirty(true);
         }
 
         /// <summary>
@@ -207,7 +179,7 @@ namespace XTerminal.Document
 
             this.TextSource.Remove(column, count);
 
-            this.SetDirty();
+            this.SetDirty(true);
         }
 
         /// <summary>
@@ -217,7 +189,7 @@ namespace XTerminal.Document
         {
             this.TextSource.DeleteAll();
 
-            this.SetDirty();
+            this.SetDirty(true);
         }
 
         /// <summary>
@@ -236,6 +208,8 @@ namespace XTerminal.Document
             {
                 this.TextSource.SetCharacter(i, ch);
             }
+
+            this.SetDirty(true);
         }
 
         public void Replace(int column, int count, char ch)
@@ -251,6 +225,8 @@ namespace XTerminal.Document
 
                 this.TextSource.SetCharacter(replaceColumn, ch);
             }
+
+            this.SetDirty(true);
         }
 
         public void ReplaceAll(char ch)
@@ -259,11 +235,18 @@ namespace XTerminal.Document
             {
                 this.TextSource.SetCharacter(i, ch);
             }
+
+            this.SetDirty(true);
         }
 
-        public string BuildText()
+        /// <summary>
+        /// 获取该行的文本，如果字符数量是0，那么返回空白字符
+        /// </summary>
+        /// <returns></returns>
+        public string GetText()
         {
-            return this.TextSource.GetText();
+            string text = this.TextSource.GetText();
+            return text.Length == 0 ? BlankText : text;
         }
 
         /// <summary>

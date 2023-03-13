@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
@@ -80,7 +81,7 @@ namespace XTerminal.Document
 
             while (current != null)
             {
-                current.IsCharacterDirty = true;
+                current.SetDirty(true);
 
                 if (current == last)
                 {
@@ -187,7 +188,37 @@ namespace XTerminal.Document
                 // 取消关联关系
                 current.DetachDrawable();
 
-                // 重置文本行
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
+        }
+
+        public void AttachAll(IEnumerable<IDocumentDrawable> drawables)
+        {
+            VTextLine current = this.FirstLine;
+
+            foreach (IDocumentDrawable drawable in drawables)
+            {
+                current.AttachDrawable(drawable);
+                current = current.NextLine;
+            }
+        }
+
+        /// <summary>
+        /// 删除所有行
+        /// </summary>
+        public void DeleteAll()
+        {
+            VTextLine current = this.FirstLine;
+            VTextLine last = this.LastLine;
+
+            while (current != null)
+            {
+                // 取消关联关系
                 current.DeleteAll();
 
                 if (current == last)

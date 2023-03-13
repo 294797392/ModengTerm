@@ -142,7 +142,7 @@ namespace XTerminal.Document
             VTextLine next = this.ViewableArea.FirstLine;
             while (next != null)
             {
-                builder.AppendLine(next.BuildText());
+                builder.AppendLine(next.GetText());
 
                 if (next == this.ViewableArea.LastLine)
                 {
@@ -316,15 +316,13 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 使用当前Document里的Row重置终端的行数
-        /// 多余的行会删除
-        /// 不足的行会补齐
         /// </summary>
         /// <param name="rows"></param>
         public void ResetRows()
         {
             // 重置Viewable的状态
-            this.ViewableArea.FirstLine = this.FirstLine;
-            this.ViewableArea.LastLine = this.LastLine;
+            this.FirstLine = this.ViewableArea.FirstLine;
+            this.LastLine = this.ViewableArea.LastLine;
 
             this.SetArrangeDirty();
         }

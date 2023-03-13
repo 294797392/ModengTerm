@@ -226,13 +226,8 @@ namespace XTerminal
 
             // 初始化文档行数据模型和渲染模型的关联关系
             ViewableDocument document = this.activeDocument.ViewableArea;
-            VTextLine current = document.FirstLine;
             List<IDocumentDrawable> drawableLines = this.Renderer.GetDrawableLines();
-            foreach (IDocumentDrawable drawableLine in drawableLines)
-            {
-                current.AttachDrawable(drawableLine);
-                current = current.NextLine;
-            }
+            document.AttachAll(drawableLines);
 
             #endregion
 
@@ -323,50 +318,51 @@ namespace XTerminal
 
             VTextLine next = document.FirstLine;
 
-            while (next != null)
+            this.uiSyncContext.Send((state) =>
             {
-                // 首先获取当前行的DrawingObject
-                DrawableLine drawingLine = next.Drawable as DrawableLine;
-                if (drawingLine == null)
+                int index = 0;
+                while (next != null)
                 {
-                    // 不应该发生
-                    logger.FatalFormat("没有空闲的DrawingLine了");
-                    return;
-                }
-
-                // 此时说明需要重新排版
-                next.OffsetY = offsetY;
-
-                if (next.IsCharacterDirty)
-                {
-                    // 此时说明该行有字符变化，需要重绘
-                    // 重绘的时候会也会Arrange
-                    if (drawingLine.OwnerElement != next)
+                    // 首先获取当前行的DrawingObject
+                    DrawableLine drawingLine = next.Drawable as DrawableLine;
+                    if (drawingLine == null)
                     {
-                        drawingLine.OwnerElement = next;
+                        // 不应该发生
+                        logger.FatalFormat("没有空闲的DrawingLine了");
+                        return;
                     }
-                    drawingLine.Draw();
-                    next.IsCharacterDirty = false;
-                }
-                else
-                {
-                    // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                    string text = next.BuildText();
-                    next.Metrics = this.Renderer.MeasureText(text, VTextStyle.Default);
-                    drawingLine.Offset = new Vector(next.OffsetX, next.OffsetY);
+
+                    // 此时说明需要重新排版
+                    next.OffsetY = offsetY;
+
+                    if (next.IsDirty)
+                    {
+                        // 此时说明该行有字符变化，需要重绘
+                        // 重绘的时候会也会Arrange
+                        drawingLine.Draw();
+                        next.SetDirty(false);
+                    }
+                    else
+                    {
+                        // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
+                        string text = next.GetText();
+                        next.Metrics = this.Renderer.MeasureText(text, VTextStyle.Default);
+                        drawingLine.Offset = new Vector(next.OffsetX, next.OffsetY);
+                    }
+
+                    // 更新下一个文本行的Y偏移量
+                    offsetY += next.Metrics.Height;
+
+                    // 如果最后一行渲染完毕了，那么就退出
+                    if (next == document.LastLine)
+                    {
+                        break;
+                    }
+
+                    next = next.NextLine;
                 }
 
-                // 更新下一个文本行的Y偏移量
-                offsetY += next.Metrics.Height;
-
-                // 如果最后一行渲染完毕了，那么就退出
-                if (next == document.LastLine)
-                {
-                    break;
-                }
-
-                next = next.NextLine;
-            }
+            }, null);
         }
 
         private void SetCursor(int row, int column)
@@ -483,7 +479,7 @@ namespace XTerminal
                     {
                         // 和LineFeed相反，也就是把光标往上移一个位置
                         // 在用man命令的时候会触发这个指令
-                        // 反向索引 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
+                        // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
 
                         ViewableDocument document = this.activeDocument.ViewableArea;
                         VTextLine oldFirstRow = document.FirstLine;
@@ -666,22 +662,24 @@ namespace XTerminal
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
-                        this.mainDocument.ViewableArea.DetachAll();
-
                         logger.DebugFormat("UseAlternateScreenBuffer");
 
                         // 先记录当前的光标
-                        this.activeDocument.Cursor.Row = this.CursorRow;
-                        this.activeDocument.Cursor.Column = this.CursorCol;
-                        this.activeDocument.Cursor.OwnerLine = this.activeLine;
+                        this.mainDocument.ViewableArea.DetachAll();
+                        this.mainDocument.Cursor.Row = this.CursorRow;
+                        this.mainDocument.Cursor.Column = this.CursorCol;
+                        this.mainDocument.Cursor.OwnerLine = this.activeLine;
 
                         this.SetCursor(0, 0);
+
                         // 切换ActiveDocument
-                        this.activeDocument = this.alternateDocument;
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
-                        this.activeDocument.ResetRows();
+                        this.alternateDocument.ResetRows();
+                        this.alternateDocument.ViewableArea.DeleteAll();
+                        this.alternateDocument.ViewableArea.AttachAll(this.Renderer.GetDrawableLines());
                         // 更新activeLine为AlternateDocument的第一行
-                        this.activeLine = this.activeDocument.FirstLine;
+                        this.activeLine = this.alternateDocument.FirstLine;
+                        this.activeDocument = this.alternateDocument;
                         break;
                     }
 
@@ -694,8 +692,9 @@ namespace XTerminal
                         // 恢复之前保存的光标
                         this.SetCursor(this.mainDocument.Cursor.Row, this.mainDocument.Cursor.Column);
                         this.activeLine = this.mainDocument.Cursor.OwnerLine;
+                        this.mainDocument.ViewableArea.AttachAll(this.Renderer.GetDrawableLines());
+                        this.mainDocument.ViewableArea.DirtyAll();
                         this.activeDocument = this.mainDocument;
-                        this.activeDocument.ViewableArea.DirtyAll();
                         break;
                     }
 
