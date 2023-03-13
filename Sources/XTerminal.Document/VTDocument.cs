@@ -249,12 +249,14 @@ namespace XTerminal.Document
                         }
 
                         // 先删第一行
-                        textLine.DeleteText(column);
+                        textLine.Replace(column, ' ');
+
+                        // 这里有可能会出现性能问题，因为删除的不是可视区域的行，而是整个VTDocument的行！
 
                         VTextLine next = textLine.NextLine;
                         while (next != null)
                         {
-                            next.DeleteAll();
+                            next.ReplaceAll(' ');
 
                             next = next.NextLine;
                         }
@@ -271,12 +273,12 @@ namespace XTerminal.Document
                             return;
                         }
 
-                        textLine.DeleteText(0, column);
+                        textLine.Replace(0, column, ' ');
 
                         VTextLine next = this.FirstLine;
                         while (next != null && next != textLine)
                         {
-                            next.DeleteAll();
+                            next.Replace(0, ' ');
 
                             next = next.NextLine;
                         }
@@ -291,7 +293,7 @@ namespace XTerminal.Document
                         VTextLine next = this.FirstLine;
                         while (next != null)
                         {
-                            next.DeleteAll();
+                            next.ReplaceAll(' ');
 
                             next = next.NextLine;
                         }

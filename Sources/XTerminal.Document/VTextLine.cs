@@ -33,7 +33,12 @@ namespace XTerminal.Document
         /// 超过列数要按照手册里定义的标准来执行动作
         /// 在linux里使用stty size获取
         /// </summary>
-        public int Columns { get; private set; }
+        public int Capacity { get { return this.TextSource.Capacity; } }
+
+        /// <summary>
+        /// 已经显示了的行数
+        /// </summary>
+        public int Columns { get { return this.TextSource.Columns; } }
 
         /// <summary>
         /// 该行所有的文本块
@@ -79,7 +84,7 @@ namespace XTerminal.Document
         /// 所属的文档
         /// </summary>
         public VTDocument OwnerDocument { get; set; }
-        
+
         /// <summary>
         /// 文本数据源
         /// </summary>
@@ -109,12 +114,11 @@ namespace XTerminal.Document
 
         #region 构造方法
 
-        public VTextLine(int initialColumns)
+        public VTextLine(int capacity)
         {
-            this.Columns = initialColumns;
             //this.Characters = new List<VTCharacter>();
             this.TextBlocks = new List<VTextBlock>();
-            this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, initialColumns);
+            this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, capacity);
             this.SetDirty();
         }
 
@@ -156,7 +160,12 @@ namespace XTerminal.Document
             //else
             //{
             // 更新文本
-            this.TextSource.PrintCharacter(ch, column);
+            if (column + 1 > this.Columns)
+            {
+                this.TextSource.PadRight(column + 1, ' ');
+            }
+
+            this.TextSource.SetCharacter(column, ch);
 
             this.SetDirty();
 
@@ -176,7 +185,13 @@ namespace XTerminal.Document
         /// <param name="column">从此处开始删除字符</param>
         public void DeleteText(int column)
         {
-            this.TextSource.DeleteText(column);
+            if (column >= this.Columns)
+            {
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                return;
+            }
+
+            this.TextSource.Remove(column);
 
             this.SetDirty();
         }
@@ -188,7 +203,13 @@ namespace XTerminal.Document
         /// <param name="count">要删除的字符个数</param>
         public void DeleteText(int column, int count)
         {
-            this.TextSource.DeleteText(column, count);
+            if (column >= this.Columns)
+            {
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                return;
+            }
+
+            this.TextSource.Remove(column, count);
 
             this.SetDirty();
         }
@@ -201,6 +222,47 @@ namespace XTerminal.Document
             this.TextSource.DeleteAll();
 
             this.SetDirty();
+        }
+
+        /// <summary>
+        /// 从指定的位置开始使用指定的字符串替换源TextSource里的字符
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="ch"></param>
+        public void Replace(int column, char ch)
+        {
+            if (column + 1 > this.Columns)
+            {
+                return;
+            }
+
+            for (int i = column; i < this.TextSource.Columns; i++)
+            {
+                this.TextSource.SetCharacter(i, ch);
+            }
+        }
+
+        public void Replace(int column, int count, char ch)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                int replaceColumn = column + i;
+
+                if (replaceColumn > this.Columns)
+                {
+                    return;
+                }
+
+                this.TextSource.SetCharacter(replaceColumn, ch);
+            }
+        }
+
+        public void ReplaceAll(char ch)
+        {
+            for (int i = 0; i < this.Columns; i++)
+            {
+                this.TextSource.SetCharacter(i, ch);
+            }
         }
 
         public string BuildText()

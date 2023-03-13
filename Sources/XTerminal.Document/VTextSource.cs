@@ -14,12 +14,12 @@ namespace XTerminal.Document
 
     public static class VTextSourceFactory
     {
-        public static VTextSource Create(VTextSources type, int initialColumns)
+        public static VTextSource Create(VTextSources type, int capacity)
         {
             switch (type)
             {
-                case VTextSources.CharactersTextSource: return new VTCharactersTextSource(initialColumns);
-                case VTextSources.StringTextSource: return new VTStringTextSource(initialColumns);
+                case VTextSources.CharactersTextSource: return new VTCharactersTextSource(capacity);
+                case VTextSources.StringTextSource: return new VTStringTextSource(capacity);
                 default:
                     throw new NotImplementedException();
             }
@@ -28,11 +28,31 @@ namespace XTerminal.Document
 
     public abstract class VTextSource
     {
-        protected int columns;
+        protected static log4net.ILog logger = log4net.LogManager.GetLogger(typeof(VTextSource));
 
-        public VTextSource(int column)
+        #region 实例变量
+
+        protected int capacity;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// 获取总列数
+        /// </summary>
+        public abstract int Columns { get; }
+
+        /// <summary>
+        /// 获取该文本数据源最大可以容纳多少列
+        /// </summary>
+        public int Capacity { get { return this.capacity; } }
+
+        #endregion
+
+        public VTextSource(int capacity)
         {
-            this.columns = column;
+            this.capacity = capacity;
         }
 
         /// <summary>
@@ -41,49 +61,56 @@ namespace XTerminal.Document
         /// <param name="column"></param>
         public void ResizeColumn(int column)
         {
-            if (column == this.columns)
+            if (column == this.capacity)
             {
                 return;
             }
 
-            if (column > this.columns)
+            if (column > this.capacity)
             {
-                this.ResizeColumn(true, column - this.columns);
+                this.ResizeColumn(true, column - this.capacity);
             }
             else
             {
-                this.ResizeColumn(false, this.columns - column);
+                this.ResizeColumn(false, this.capacity - column);
             }
 
-            this.columns = column;
+            this.capacity = column;
         }
+
+        #region 公开接口
+
+        /// <summary>
+        /// 通过在右侧填充指定的字符来达到指定的长度
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="padChar"></param>
+        public void PadRight(int column, char padChar)
+        {
+            if (this.Columns >= column)
+            {
+                return;
+            }
+
+            int count = column - this.Columns;
+
+            for (int i = 0; i < count; i++)
+            {
+                this.AddCharacter(padChar);
+            }
+        }
+
+        #endregion
+
+        #region 抽象方法
 
         /// <summary>
         /// 设置该文本数据源的列数
         /// </summary>
         /// <param name="add">增加的列数</param>
         /// <param name="changedColumns">改变的列数</param>
-        protected abstract void ResizeColumn(bool add, int changedColumns);
-
-        /// <summary>
-        /// 在指定的列打印字符
-        /// </summary>
-        /// <param name="ch"></param>
-        /// <param name="column"></param>
-        public abstract void PrintCharacter(char ch, int column);
-
-        /// <summary>
-        /// 从指定位置开始删除字符串
-        /// </summary>
-        /// <param name="column">从此处开始删除字符</param>
-        public abstract void DeleteText(int column);
-
-        /// <summary>
-        /// 删除指定位置处的字符串
-        /// </summary>
-        /// <param name="column">从此处开始删除字符</param>
-        /// <param name="count">要删除的字符个数</param>
-        public abstract void DeleteText(int column, int count);
+        protected virtual void ResizeColumn(bool add, int changedColumns)
+        { }
 
         /// <summary>
         /// 删除整行字符
@@ -95,46 +122,35 @@ namespace XTerminal.Document
         /// </summary>
         /// <returns></returns>
         public abstract string GetText();
+
+        public abstract void Insert(int column, char ch);
+        public abstract void Remove(int column);
+        public abstract void Remove(int column, int count);
+        public abstract void SetCharacter(int column, char setChar);
+
+        /// <summary>
+        /// 在末尾Append一个字符
+        /// </summary>
+        /// <param name="addChar"></param>
+        public abstract void AddCharacter(char addChar);
+
+        #endregion
     }
 
     public class VTStringTextSource : VTextSource
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTStringTextSource");
-
         private string text = string.Empty;
 
-        public VTStringTextSource(int column) :
-            base(column)
+        public VTStringTextSource(int capacity) :
+            base(capacity)
         {
-            this.text = string.Empty.PadRight(this.columns, ' ');
         }
+
+        public override int Columns => this.text.Length;
 
         public override void DeleteAll()
         {
-            this.text = string.Empty.PadRight(this.columns, ' ');
-        }
-
-        public override void DeleteText(int column)
-        {
-            if (column >= this.text.Length)
-            {
-                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
-                return;
-            }
-
-            this.text = this.text.Remove(column).PadRight(this.columns, ' ');
-        }
-
-        public override void DeleteText(int column, int count)
-        {
-            if (column >= this.text.Length)
-            {
-                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
-                return;
-            }
-
-            this.text = this.text.Remove(columns, count);
-            this.text = this.text.Insert(columns, string.Empty.PadRight(count, ' '));
+            this.text = string.Empty;
         }
 
         public override string GetText()
@@ -142,79 +158,58 @@ namespace XTerminal.Document
             return this.text;
         }
 
-        public override void PrintCharacter(char ch, int column)
+        public override void Insert(int column, char ch)
         {
-            this.text.Remove(column, 1).Insert(column, ch.ToString());
+            this.text = this.text.Insert(column, char.ToString(ch));
         }
 
-        protected override void ResizeColumn(bool add, int changedColumns)
+        public override void AddCharacter(char addChar)
         {
-            if (add)
-            {
-                this.text = this.text.PadRight(this.columns, ' ');
-            }
-            else
-            {
-                this.text = this.text.Substring(0, this.text.Length - changedColumns);
-            }
+            this.text = (this.text += char.ToString(addChar));
+        }
+
+        public override void Remove(int column)
+        {
+            this.text = this.text.Remove(column);
+        }
+
+        public override void Remove(int column, int count)
+        {
+            this.text = this.text.Remove(count, count);
+        }
+
+        public override void SetCharacter(int column, char setChar)
+        {
+            this.text = this.text.Remove(column, 1).Insert(column, char.ToString(setChar));
         }
     }
 
     public class VTCharactersTextSource : VTextSource
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTCharactersTextSource");
-
         private List<VTCharacter> characters;
 
-        public VTCharactersTextSource(int column) :
-            base(column)
+        public override int Columns => this.characters.Count;
+
+        public VTCharactersTextSource(int capacity) :
+            base(capacity)
         {
             this.characters = new List<VTCharacter>();
-            for (int i = 0; i < column; i++)
-            {
-                VTCharacter character = new VTCharacter(' ');
-                this.characters.Add(character);
-            }
         }
+
+        #region 实例方法
+
+        private VTCharacter CreateCharacter(char ch)
+        {
+            return new VTCharacter(ch);
+        }
+
+        #endregion
+
+        #region 重写方法
 
         public override void DeleteAll()
         {
-            this.characters.ForEach((character) => { character.Character = ' '; });
-        }
-
-        public override void DeleteText(int column)
-        {
-            if (column >= this.characters.Count)
-            {
-                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
-                return;
-            }
-
-            int deletes = this.characters.Count - column;
-
-            for (int i = 0; i < deletes; i++)
-            {
-                this.characters[column + i].Character = ' ';
-            }
-        }
-
-        public override void DeleteText(int column, int count)
-        {
-            if (column >= this.characters.Count)
-            {
-                logger.WarnFormat("DeleteText，删除的索引位置在字符之外");
-                return;
-            }
-
-            // 最多能删几个字符
-            int maxDeletes = this.characters.Count - column;
-
-            int deletes = Math.Min(maxDeletes, count);
-
-            for (int i = 0; i < deletes; i++)
-            {
-                this.characters[column + i].Character = ' ';
-            }
+            this.characters.Clear();
         }
 
         public override string GetText()
@@ -229,41 +224,31 @@ namespace XTerminal.Document
             return text;
         }
 
-        public override void PrintCharacter(char ch, int column)
+        public override void Insert(int column, char ch)
         {
-            if (column + 1 > this.characters.Count)
-            {
-                int count = (column + 1) - this.characters.Count;
-                for (int i = 0; i < count; i++)
-                {
-                    VTCharacter character = new VTCharacter(' ');
-                    this.characters.Add(character);
-                }
-                this.characters[column].Character = ch;
-            }
-            else
-            {
-                this.characters[column].Character = ch;
-            }
+            this.characters.Insert(column, this.CreateCharacter(ch));
         }
 
-        protected override void ResizeColumn(bool add, int changedColumns)
+        public override void Remove(int column)
         {
-            if (add)
-            {
-                for (int i = 0; i < changedColumns; i++)
-                {
-                    VTCharacter character = new VTCharacter(' ');
-                    this.characters.Add(character);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < changedColumns; i++)
-                {
-                    this.characters.RemoveAt(this.characters.Count - 1);
-                }
-            }
+            this.characters.RemoveAt(column);
         }
+
+        public override void Remove(int column, int count)
+        {
+            this.characters.RemoveRange(column, count);
+        }
+
+        public override void AddCharacter(char addChar)
+        {
+            this.characters.Add(this.CreateCharacter(addChar));
+        }
+
+        public override void SetCharacter(int column, char setChar)
+        {
+            this.characters[column].Character = setChar;
+        }
+
+        #endregion
     }
 }

@@ -420,6 +420,35 @@ namespace XTerminal
                         break;
                     }
 
+                case VTActions.RI_ReverseLineFeed:
+                    {
+                        // 和LineFeed相反，也就是把光标往上移一个位置
+                        // 在用man命令的时候会触发这个指令
+                        // 反向索引 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
+
+                        ViewableDocument document = this.activeDocument.ViewableArea;
+                        VTextLine firstVisibleRow = document.FirstLine;
+                        VTextLine lastVisibleRow = document.LastLine;
+
+                        if (firstVisibleRow == this.activeLine)
+                        {
+                            // 此时光标位置在可视区域的第一行
+                            logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
+                            document.ScrollDocument(ScrollOrientation.Up, 1);
+                        }
+                        else
+                        {
+                            // 这里假设光标在可视区域里面
+                            // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
+
+                            // 光标位置在可视区域里面
+                            this.cursorRow--;
+                        }
+
+                        this.activeLine = this.activeLine.PreviousLine;
+                        break;
+                    }
+
                 case VTActions.EL_EraseLine:
                     {
                         EraseType eraseType = (EraseType)param[0];
@@ -554,6 +583,8 @@ namespace XTerminal
 
                 #endregion
 
+                #region 文本操作
+
                 case VTActions.DCH_DeleteCharacter:
                     {
                         // 从指定位置删除n个字符，删除后的字符串要左对齐
@@ -569,6 +600,8 @@ namespace XTerminal
                         logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.cursorCol);
                         break;
                     }
+
+                #endregion
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
@@ -630,36 +663,6 @@ namespace XTerminal
                 case VTActions.DA_DeviceAttributes:
                     {
                         this.vtChannel.Write(DA_DeviceAttributesResponse);
-                        break;
-                    }
-
-                case VTActions.RI_ReverseLineFeed:
-                    {
-                        // 和LineFeed相反，也就是把光标往上移一个位置
-                        // 在用man命令的时候会触发这个指令
-                        // 反向索引 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
-
-                        ViewableDocument document = this.activeDocument.ViewableArea;
-                        VTextLine firstVisibleRow = document.FirstLine;
-                        VTextLine lastVisibleRow = document.LastLine;
-
-                        if (firstVisibleRow == this.activeLine)
-                        {
-                            // 此时光标位置在可视区域的第一行
-                            logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
-                            document.ScrollDocument(ScrollOrientation.Up, 1);
-                            this.cursorRow--;
-                        }
-                        else
-                        {
-                            // 这里假设光标在可视区域里面
-                            // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
-
-                            // 光标位置在可视区域里面
-                            this.cursorRow--;
-                        }
-
-                        this.activeLine = this.activeLine.PreviousLine;
                         break;
                     }
 
