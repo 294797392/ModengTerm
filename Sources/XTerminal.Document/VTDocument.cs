@@ -88,7 +88,16 @@ namespace XTerminal.Document
         {
             this.options = options;
 
-            this.Cursor = new VTCursor();
+            this.Cursor = new VTCursor()
+            {
+                Blinking = true,
+                Color = VTColors.DarkBlack,
+                OffsetX = 0,
+                OffsetY = 0,
+                Type = VTCursors.Line,
+                Interval = DefaultValues.CursorBlinkInterval
+            };
+
             this.ViewableArea = new ViewableDocument(options)
             {
                 OwnerDocument = this

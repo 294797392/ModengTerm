@@ -117,24 +117,29 @@ namespace XTerminal
         private bool xtermBracketedPasteMode;
 
         /// <summary>
-        /// 记录光标位置
-        /// 该坐标是基于ViewableDocument的坐标
+        /// 闪烁光标的线程
         /// </summary>
-        private VTCursor cursor;
+        private Thread cursorBlinkingThread;
 
         #endregion
 
         #region 属性
 
         /// <summary>
+        /// activeDocument的光标信息
+        /// 该坐标是基于ViewableDocument的坐标
+        /// </summary>
+        private VTCursor Cursor { get { return this.activeDocument.Cursor; } }
+
+        /// <summary>
         /// 获取当前光标所在行
         /// </summary>
-        public int CursorRow { get { return this.cursor.Row; } }
+        public int CursorRow { get { return this.Cursor.Row; } }
 
         /// <summary>
         /// 获取当前光标所在列
         /// </summary>
-        public int CursorCol { get { return this.cursor.Column; } }
+        public int CursorCol { get { return this.Cursor.Column; } }
 
         /// <summary>
         /// 输入设备
@@ -205,12 +210,6 @@ namespace XTerminal
 
             #endregion
 
-            #region 初始化光标
-
-            this.cursor = new VTCursor();
-
-            #endregion
-
             #region 初始化文档模型
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
@@ -228,6 +227,16 @@ namespace XTerminal
             ViewableDocument document = this.activeDocument.ViewableArea;
             List<IDocumentDrawable> drawableLines = this.Renderer.GetDrawableLines();
             document.AttachAll(drawableLines);
+
+            #endregion
+
+            #region 启动光标闪烁线程
+
+            IDocumentDrawable drawableCursor = this.Renderer.GetDrawableCursor();
+            this.Cursor.AttachDrawable(drawableCursor);
+            this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
+            this.cursorBlinkingThread.IsBackground = true;
+            this.cursorBlinkingThread.Start();
 
             #endregion
 
@@ -309,7 +318,7 @@ namespace XTerminal
         /// 如果不需要布局，那么就看是否需要重绘某些文本行
         /// </summary>
         /// <param name="vtDocument"></param>
-        private void DrawLines(VTDocument vtDocument)
+        private void DrawDocument(VTDocument vtDocument)
         {
             ViewableDocument document = vtDocument.ViewableArea;
 
@@ -320,26 +329,25 @@ namespace XTerminal
 
             this.uiSyncContext.Send((state) =>
             {
-                int index = 0;
                 while (next != null)
                 {
                     // 首先获取当前行的DrawingObject
-                    DrawableLine drawingLine = next.Drawable as DrawableLine;
-                    if (drawingLine == null)
+                    IDocumentDrawable drawableLine = next.Drawable;
+                    if (drawableLine == null)
                     {
                         // 不应该发生
-                        logger.FatalFormat("没有空闲的DrawingLine了");
+                        logger.FatalFormat("没有空闲的drawableLine了");
                         return;
                     }
 
-                    // 此时说明需要重新排版
+                    // 更新Y偏移量信息
                     next.OffsetY = offsetY;
 
                     if (next.IsDirty)
                     {
                         // 此时说明该行有字符变化，需要重绘
                         // 重绘的时候会也会Arrange
-                        drawingLine.Draw();
+                        this.Renderer.DrawDrawable(drawableLine);
                         next.SetDirty(false);
                     }
                     else
@@ -347,7 +355,7 @@ namespace XTerminal
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
                         string text = next.GetText();
                         next.Metrics = this.Renderer.MeasureText(text, VTextStyle.Default);
-                        drawingLine.Offset = new Vector(next.OffsetX, next.OffsetY);
+                        (drawableLine as DrawableLine).Offset = new Vector(next.OffsetX, next.OffsetY);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -367,14 +375,14 @@ namespace XTerminal
 
         private void SetCursor(int row, int column)
         {
-            if (this.cursor.Row != row)
+            if (this.Cursor.Row != row)
             {
-                this.cursor.Row = row;
+                this.Cursor.Row = row;
             }
 
-            if (this.cursor.Column != column)
+            if (this.Cursor.Column != column)
             {
-                this.cursor.Column = column;
+                this.Cursor.Column = column;
             }
         }
 
@@ -666,17 +674,15 @@ namespace XTerminal
 
                         // 先记录当前的光标
                         this.mainDocument.ViewableArea.DetachAll();
-                        this.mainDocument.Cursor.Row = this.CursorRow;
-                        this.mainDocument.Cursor.Column = this.CursorCol;
-                        this.mainDocument.Cursor.OwnerLine = this.activeLine;
-
-                        this.SetCursor(0, 0);
 
                         // 切换ActiveDocument
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.ResetRows();
+                        this.alternateDocument.Cursor.Column = 0;
+                        this.alternateDocument.Cursor.Row = 0;
                         this.alternateDocument.ViewableArea.DeleteAll();
                         this.alternateDocument.ViewableArea.AttachAll(this.Renderer.GetDrawableLines());
+                        this.alternateDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
                         // 更新activeLine为AlternateDocument的第一行
                         this.activeLine = this.alternateDocument.FirstLine;
                         this.activeDocument = this.alternateDocument;
@@ -690,10 +696,10 @@ namespace XTerminal
                         logger.DebugFormat("UseMainScreenBuffer");
 
                         // 恢复之前保存的光标
-                        this.SetCursor(this.mainDocument.Cursor.Row, this.mainDocument.Cursor.Column);
                         this.activeLine = this.mainDocument.Cursor.OwnerLine;
                         this.mainDocument.ViewableArea.AttachAll(this.Renderer.GetDrawableLines());
                         this.mainDocument.ViewableArea.DirtyAll();
+                        this.mainDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
                         this.activeDocument = this.mainDocument;
                         break;
                     }
@@ -751,13 +757,44 @@ namespace XTerminal
 
             // 全部字符都处理完了之后，只渲染一次
 
-            this.DrawLines(this.activeDocument);
+            this.DrawDocument(this.activeDocument);
             //this.activeDocument.Print();
         }
 
         private void VTChannel_StatusChanged(object client, VTChannelState state)
         {
             logger.InfoFormat("客户端状态发生改变, {0}", state);
+        }
+
+        private void CursorBlinkingThreadProc()
+        {
+            while (true)
+            {
+                VTCursor cursor = this.Cursor;
+
+                cursor.IsVisible = !cursor.IsVisible;
+
+                IDocumentDrawable drawableCursor = cursor.Drawable;
+                if (drawableCursor == null)
+                {
+                    // 此时可能正在切换AlternateScreenBuffer
+                    Thread.Sleep(cursor.Interval);
+                    continue;
+                }
+
+                try
+                {
+                    this.Renderer.DrawDrawable(drawableCursor);
+                }
+                catch (Exception e)
+                {
+                    logger.ErrorFormat(string.Format("渲染光标异常, {0}", e));
+                }
+                finally
+                {
+                    Thread.Sleep(cursor.Interval);
+                }
+            }
         }
 
         #endregion

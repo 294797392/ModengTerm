@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="Rendering\IDocumentDrawable.cs" />
+    <Compile Include="VTextElement.cs" />
     <Compile Include="VTextSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\DocumentRendererOptions.cs" />

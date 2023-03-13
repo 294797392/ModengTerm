@@ -39,6 +39,12 @@ namespace XTerminal.Document.Rendering
         VTElementMetrics MeasureText(string text, VTextStyle style);
 
         /// <summary>
+        /// 画
+        /// </summary>
+        /// <param name="drawable"></param>
+        void DrawDrawable(IDocumentDrawable drawable);
+
+        /// <summary>
         /// 重新调整终端大小
         /// </summary>
         /// <param name="width">终端的宽度</param>

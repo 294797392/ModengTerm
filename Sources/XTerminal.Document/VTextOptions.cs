@@ -17,7 +17,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 默认字体颜色
         /// </summary>
-        public VTForeground Foreground { get; set; }
+        public VTColors Foreground { get; set; }
 
         public VTextOptions()
         {

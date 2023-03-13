@@ -12,7 +12,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 默认Typeface
         /// </summary>
-        public static readonly VTextStyle Default = new VTextStyle() { FontFamily = "宋体", FontSize = 14, Foreground = VTForeground.DarkBlack };
+        public static readonly VTextStyle Default = new VTextStyle() { FontFamily = "宋体", FontSize = 14, Foreground = VTColors.DarkBlack };
 
         private string hashId;
 
@@ -46,6 +46,6 @@ namespace XTerminal.Document
         /// <summary>
         /// 文本的颜色
         /// </summary>
-        public VTForeground Foreground { get; set; }
+        public VTColors Foreground { get; set; }
     }
 }

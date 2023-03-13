@@ -125,7 +125,7 @@ namespace XTerminal.Rendering
                         }
                 }
 
-                VTKeys vtKey = TerminalUtils.ConvertToVTKey(e.Key);
+                VTKeys vtKey = WPFRenderUtils.ConvertToVTKey(e.Key);
                 this.inputEvent.CapsLock = Console.CapsLock;
                 this.inputEvent.Key = vtKey;
                 this.inputEvent.Text = null;

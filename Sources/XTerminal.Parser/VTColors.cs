@@ -8,7 +8,7 @@ namespace XTerminal.Parser
     /// <summary>
     /// 定义终端前景色
     /// </summary>
-    public enum VTForeground
+    public enum VTColors
     {
         DarkBlack,
         DarkRed,

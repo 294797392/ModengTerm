@@ -34,11 +34,11 @@ namespace XTerminal.Rendering
 
             this.Offset = new Vector(0, textLine.OffsetY);
 
-            Typeface typeface = TerminalUtils.GetTypeface(VTextStyle.Default);
+            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                DefaultValues.FontSize, DefaultValues.Foreground, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
+                DefaultValues.FontSize, DefaultValues.Foreground, null, TextFormattingMode.Display, WPFRenderUtils.PixelsPerDip);
 
-            TerminalUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
+            WPFRenderUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
 
             //logger.InfoFormat("Render:{0}", text);
 

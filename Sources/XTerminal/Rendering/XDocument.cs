@@ -107,7 +107,7 @@ namespace XTerminal.Rendering
             this.options = options;
 
             this.drawableLines = new List<IDocumentDrawable>();
-            this.blankCharacterMetrics = TerminalUtils.UpdateTextMetrics(" ", VTextStyle.Default);
+            this.blankCharacterMetrics = WPFRenderUtils.UpdateTextMetrics(" ", VTextStyle.Default);
             for (int i = 0; i < options.Rows; i++)
             {
                 DrawableLine drawableLine = new DrawableLine() { Row = i };
@@ -137,7 +137,13 @@ namespace XTerminal.Rendering
 
         public VTElementMetrics MeasureText(string text, VTextStyle style)
         {
-            return TerminalUtils.UpdateTextMetrics(text, style);
+            return WPFRenderUtils.UpdateTextMetrics(text, style);
+        }
+
+        public void DrawDrawable(IDocumentDrawable drawable)
+        {
+            XDocumentDrawable drawingVisual = drawable as XDocumentDrawable;
+            drawingVisual.Draw();
         }
 
         public void Resize(double width, double height)

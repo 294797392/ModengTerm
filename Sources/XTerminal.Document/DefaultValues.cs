@@ -25,6 +25,8 @@ namespace XTerminal.Document
 
         public const double FontSize = 12;
 
-        public static readonly VTForeground Foreground = VTForeground.DarkBlack;
+        public static readonly VTColors Foreground = VTColors.DarkBlack;
+
+        public const int CursorBlinkInterval = 1000;
     }
 }

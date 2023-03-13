@@ -60,8 +60,7 @@
   <ItemGroup>
     <Compile Include="VTDefinitions.cs" />
     <Compile Include="VTActions.cs" />
-    <Compile Include="VTBackground.cs" />
-    <Compile Include="VTForeground.cs" />
+    <Compile Include="VTColors.cs" />
     <Compile Include="VTCursorKeyMode.cs" />
     <Compile Include="VTKeypadMode.cs" />
     <Compile Include="VTMode.cs" />
