@@ -51,8 +51,8 @@ namespace XTerminal
         private void InitializeWindow()
         {
             VideoTerminal videoTermianl = new VideoTerminal();
-            videoTermianl.Renderer = ConsolePanel.DocumentRenderer;
-            videoTermianl.InputDevice = ConsolePanel;
+            videoTermianl.Renderer = DocumentPanel.DocumentRenderer;
+            videoTermianl.InputDevice = DocumentPanel;
             videoTermianl.Initialize(VTInitialOptions.Home);
         }
 

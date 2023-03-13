@@ -6,20 +6,21 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using XTerminal.Document;
+using XTerminal.Document.Rendering;
 
 namespace XTerminal.Rendering
 {
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class DrawingElement : DrawingVisual, IDrawingElement
+    public abstract class XDocumentDrawable : DrawingVisual, IDocumentDrawable
     {
         /// <summary>
         /// 保存要画的对象的数据
         /// </summary>
-        public VDocumentElement Data { get; set; }
+        public VTDocumentElement OwnerElement { get; set; }
 
-        public DrawingElement()
+        public XDocumentDrawable()
         {
         }
 
@@ -39,7 +40,7 @@ namespace XTerminal.Rendering
         /// </summary>
         public void Reset()
         {
-            this.Data = null;
+            this.OwnerElement = null;
             this.Offset = new Vector();
             DrawingContext dc = this.RenderOpen();
             dc.Close();

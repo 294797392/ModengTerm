@@ -19,7 +19,7 @@ namespace XTerminal.Document
         BackToFront
     }
 
-    public class VTextBlock : VDocumentElement
+    public class VTextBlock : VTDocumentElement
     {
         /// <summary>
         /// TextBlock的索引号

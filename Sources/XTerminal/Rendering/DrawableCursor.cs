@@ -11,7 +11,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 用来显示光标
     /// </summary>
-    public class DrawingCursor : DrawingElement
+    public class DrawableCursor : XDocumentDrawable
     {
         protected override void Draw(DrawingContext dc)
         {

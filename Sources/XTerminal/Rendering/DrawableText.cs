@@ -13,7 +13,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 表示PresentationDevice上的一个文本块
     /// </summary>
-    public class DrawingText : DrawingElement
+    public class DrawableText : XDocumentDrawable
     {
         #region 属性
 
@@ -30,13 +30,13 @@ namespace XTerminal.Rendering
         /// <summary>
         /// 渲染的文本测量信息
         /// </summary>
-        public VTextMetrics Metrics { get { return this.TextBlock.Metrics; } }
+        public VTElementMetrics Metrics { get { return this.TextBlock.Metrics; } }
 
         #endregion
 
         #region 构造方法
 
-        public DrawingText(VTextBlock textBlock)
+        public DrawableText(VTextBlock textBlock)
         {
             this.TextBlock = textBlock;
         }

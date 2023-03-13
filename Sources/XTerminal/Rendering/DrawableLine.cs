@@ -10,9 +10,9 @@ using XTerminal.Document;
 
 namespace XTerminal.Rendering
 {
-    public class DrawingLine : DrawingElement
+    public class DrawableLine : XDocumentDrawable
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingLine");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawableLine");
 
         #region 属性
 
@@ -25,7 +25,7 @@ namespace XTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextLine textLine = this.Data as VTextLine;
+            VTextLine textLine = this.OwnerElement as VTextLine;
 
             string text = textLine.BuildText();
 

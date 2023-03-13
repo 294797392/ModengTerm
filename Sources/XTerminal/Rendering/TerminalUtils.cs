@@ -51,16 +51,16 @@ namespace XTerminal.Rendering
             }
         }
 
-        public static VTextMetrics UpdateTextMetrics(string text, VTextStyle textStyle)
+        public static VTElementMetrics UpdateTextMetrics(string text, VTextStyle textStyle)
         {
             Typeface typeface = GetTypeface(textStyle);
             FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, textStyle.FontSize, Brushes.Black, null, TextFormattingMode.Display, TerminalUtils.PixelsPerDip);
-            VTextMetrics textMetrics = new VTextMetrics();
+            VTElementMetrics textMetrics = new VTElementMetrics();
             UpdateTextMetrics(textMetrics, formattedText);
             return textMetrics;
         }
 
-        public static void UpdateTextMetrics(VTextMetrics textMerics, FormattedText formattedText)
+        public static void UpdateTextMetrics(VTElementMetrics textMerics, FormattedText formattedText)
         {
             textMerics.Width = formattedText.Width;
             textMerics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;

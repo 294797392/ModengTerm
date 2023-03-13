@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
@@ -11,7 +12,7 @@ namespace XTerminal.Document
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VDocumentElement
+    public class VTextLine : VTDocumentElement
     {
         #region 实例变量
 
@@ -64,11 +65,6 @@ namespace XTerminal.Document
         ///// 最后一个文本块
         ///// </summary>
         //public VTextBlock LastBlock { get; private set; }
-
-        /// <summary>
-        /// 画图对象
-        /// </summary>
-        public IDrawingElement DrawingElement { get; set; }
 
         /// <summary>
         /// 是否开启了DECAWM模式

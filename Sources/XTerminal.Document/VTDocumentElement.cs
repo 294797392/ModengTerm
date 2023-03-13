@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
-    public abstract class VDocumentElement
+    public abstract class VTDocumentElement
     {
         /// <summary>
         /// 该文本块左上角的X坐标
@@ -21,7 +22,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 文本的测量信息
         /// </summary>
-        public VTextMetrics Metrics { get; set; }
+        public VTElementMetrics Metrics { get; set; }
 
         /// <summary>
         /// 获取该文本块的宽度
@@ -47,9 +48,42 @@ namespace XTerminal.Document
         /// </summary>
         //public int Row { get; set; }
 
-        public VDocumentElement()
+        /// <summary>
+        /// 该数据模型对应的渲染模型
+        /// </summary>
+        public IDocumentDrawable Drawable { get; private set; }
+
+        public VTDocumentElement()
         {
-            this.Metrics = new VTextMetrics();
+            this.Metrics = new VTElementMetrics();
+        }
+
+        /// <summary>
+        /// 关联一个Drawable对象
+        /// 该操作会把drawable之前关联的文档模型取消关联
+        /// </summary>
+        /// <param name="drawable"></param>
+        public void AttachDrawable(IDocumentDrawable drawable)
+        {
+            if (drawable.OwnerElement != null)
+            {
+                drawable.OwnerElement.DetachDrawable();
+            }
+
+            this.Drawable = drawable;
+            this.Drawable.OwnerElement = this;
+        }
+
+        /// <summary>
+        /// 取消关联的Drawable对象
+        /// </summary>
+        public void DetachDrawable()
+        {
+            if (this.Drawable != null)
+            {
+                this.Drawable.OwnerElement = null;
+                this.Drawable = null;
+            }
         }
     }
 }

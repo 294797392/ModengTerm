@@ -14,10 +14,24 @@ namespace XTerminal.Document
     {
         private VTDocumentOptions options;
 
+        private bool isArrangeDirty;
+
+        #region 属性
+
         /// <summary>
         /// 是否需要重新布局
         /// </summary>
-        public bool IsArrangeDirty { get; set; }
+        public bool IsArrangeDirty
+        {
+            get { return this.isArrangeDirty; }
+            set
+            {
+                if (this.isArrangeDirty != value)
+                {
+                    this.isArrangeDirty = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 可视区域的第一行
@@ -44,10 +58,16 @@ namespace XTerminal.Document
         /// </summary>
         public int Columns { get { return this.options.Columns; } }
 
+        #endregion
+
+        #region 构造方法
+
         public ViewableDocument(VTDocumentOptions options)
         {
             this.options = options;
         }
+
+        #endregion
 
         /// <summary>
         /// 把当前可视区域的所有TextLine标记为需要重新渲染的状态
@@ -80,7 +100,8 @@ namespace XTerminal.Document
         /// </summary>
         /// <param name="orientation">滚动方向</param>
         /// <param name="scrollRows">要滚动的行数</param>
-        public void ScrollDocument(ScrollOrientation orientation, int scrollRows)
+        /// <returns>可视区域第一行的指针</returns>
+        public VTextLine ScrollDocument(ScrollOrientation orientation, int scrollRows)
         {
             VTextLine oldFirstLine = this.FirstLine;
             VTextLine oldLastLine = this.LastLine;
@@ -147,29 +168,34 @@ namespace XTerminal.Document
 
             #endregion
 
-            #region 复用移出的行的DrawingElement
-
-            VTextLine removedCurrent = removedFirst;
-            VTextLine addedCurrent = addedFirst;
-            for (int i = 0; i < scrollRows; i++)
-            {
-                if (removedCurrent.DrawingElement != null)
-                {
-                    addedCurrent.DrawingElement = removedCurrent.DrawingElement;
-                    addedCurrent.DrawingElement.Data = addedCurrent;
-                }
-                addedCurrent.IsCharacterDirty = true;
-
-                removedCurrent = removedCurrent.NextLine;
-                addedCurrent = addedCurrent.NextLine;
-            }
-
-            #endregion
-
             // 下次渲染的时候排版
-            if (!this.IsArrangeDirty)
+            this.IsArrangeDirty = true;
+
+            return newFirstLine;
+        }
+
+        /// <summary>
+        /// 把所有的TextLine取消关联渲染模型
+        /// </summary>
+        public void DetachAll()
+        {
+            VTextLine current = this.FirstLine;
+            VTextLine last = this.LastLine;
+
+            while (current != null)
             {
-                this.IsArrangeDirty = true;
+                // 取消关联关系
+                current.DetachDrawable();
+
+                // 重置文本行
+                current.DeleteAll();
+
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
             }
         }
     }

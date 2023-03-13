@@ -17,7 +17,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 显示器控件
     /// </summary>
-    public class ConsoleMonitor : Grid, IInputDevice
+    public class XDocumentPanel : Grid, IInputDevice
     {
         #region 类变量
 
@@ -49,13 +49,13 @@ namespace XTerminal.Rendering
 
         #region 构造方法
 
-        public ConsoleMonitor()
+        public XDocumentPanel()
         {
             this.inputEvent = new VTInputEvent();
             this.Background = Brushes.Transparent;
             this.Focusable = true;
 
-            DocumentRenderer documentRenderer = new DocumentRenderer();
+            XDocument documentRenderer = new XDocument();
             ScrollViewer scrollViewer = new ScrollViewer()
             {
                 HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,

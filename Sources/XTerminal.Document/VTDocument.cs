@@ -101,7 +101,6 @@ namespace XTerminal.Document
                 CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
                 OwnerDocument = this,
-                DrawingElement = null
             };
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
@@ -313,34 +312,6 @@ namespace XTerminal.Document
         public void DeleteCharacter(VTextLine textLine, int column, int count)
         {
             textLine.DeleteText(column, count);
-        }
-
-        /// <summary>
-        /// 清除当前文档里的所有内容
-        /// </summary>
-        public void Clear()
-        {
-            VTextLine current = this.FirstLine;
-            VTextLine last = this.LastLine;
-
-            while (current != null)
-            {
-                if (current.DrawingElement != null)
-                {
-                    current.DrawingElement.Data = null;
-                    current.DrawingElement = null;
-                }
-
-                // 重置文本行
-                current.DeleteAll();
-
-                if (current == last)
-                {
-                    break;
-                }
-
-                current = current.NextLine;
-            }
         }
 
         /// <summary>

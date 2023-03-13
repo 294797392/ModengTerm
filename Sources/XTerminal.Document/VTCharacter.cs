@@ -10,7 +10,7 @@ namespace XTerminal.Document
     /// 存储终端里一个字符的信息
     /// VTCharacter保存要显示的字符信息和该字符的样式信息
     /// </summary>
-    public class VTCharacter : VDocumentElement
+    public class VTCharacter : VTDocumentElement
     {
         /// <summary>
         /// 字符

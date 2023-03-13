@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="IDrawingElement.cs" />
+    <Compile Include="Rendering\IDocumentDrawable.cs" />
     <Compile Include="VTextSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\DocumentRendererOptions.cs" />
@@ -67,9 +67,9 @@
     <Compile Include="VTDocumentOptions.cs" />
     <Compile Include="VTDocument.cs" />
     <Compile Include="VTextBlock.cs" />
-    <Compile Include="VDocumentElement.cs" />
+    <Compile Include="VTDocumentElement.cs" />
     <Compile Include="VTextLineState.cs" />
-    <Compile Include="VTextMetrics.cs" />
+    <Compile Include="VTElementMetrics.cs" />
     <Compile Include="VTextLine.cs" />
     <Compile Include="VTextOptions.cs" />
     <Compile Include="VTextStyle.cs" />

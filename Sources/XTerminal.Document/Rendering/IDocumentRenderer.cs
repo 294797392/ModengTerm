@@ -7,14 +7,9 @@ using XTerminal.Document;
 
 namespace XTerminal.Document.Rendering
 {
-    //public enum ScrollOrientation
-    //{
-    //    Top,
-    //    Bottom,
-    //    Left,
-    //    Right
-    //}
-
+    /// <summary>
+    /// 定义文档的渲染接口
+    /// </summary>
     public interface IDocumentRenderer
     {
         /// <summary>
@@ -24,29 +19,24 @@ namespace XTerminal.Document.Rendering
         void Initialize(DocumentRendererOptions options);
 
         /// <summary>
+        /// 获取行的渲染对象
+        /// </summary>
+        /// <returns></returns>
+        List<IDocumentDrawable> GetDrawableLines();
+
+        /// <summary>
+        /// 获取光标的渲染对象
+        /// </summary>
+        /// <returns></returns>
+        IDocumentDrawable GetDrawableCursor();
+
+        /// <summary>
         /// 测量某个文本块的属性
         /// </summary>
         /// <param name="text">要测量的文本</param>
         /// <param name="style">文本的样式</param>
         /// <returns></returns>
-        VTextMetrics MeasureText(string text, VTextStyle style);
-
-        /// <summary>
-        /// 对每个VTextLine进行布局，并在IsCharacterDirty的时候重新渲染文本行
-        /// </summary>
-        /// <param name="vtDocument">要排版的文档</param>
-        void RenderDocument(VTDocument vtDocument);
-
-        /// <summary>
-        /// 重新绘制任意一个视图对象
-        /// </summary>
-        /// <param name="drawingObject">要重绘的对象</param>
-        void RenderElement(IDrawingElement drawingObject);
-
-        /// <summary>
-        /// 清除显示的内容并把状态还原
-        /// </summary>
-        void Reset();
+        VTElementMetrics MeasureText(string text, VTextStyle style);
 
         /// <summary>
         /// 重新调整终端大小
@@ -54,10 +44,5 @@ namespace XTerminal.Document.Rendering
         /// <param name="width">终端的宽度</param>
         /// <param name="height">终端高度</param>
         void Resize(double width, double height);
-
-        ///// <summary>
-        ///// 滚动到某个方向的最底部
-        ///// </summary>
-        //void ScrollToEnd(ScrollOrientation direction);
     }
 }
