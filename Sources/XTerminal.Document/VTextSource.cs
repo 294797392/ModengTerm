@@ -231,7 +231,7 @@ namespace XTerminal.Document
 
         public override void Remove(int column)
         {
-            this.characters.RemoveAt(column);
+            this.characters.RemoveRange(column, this.characters.Count - column);
         }
 
         public override void Remove(int column, int count)
