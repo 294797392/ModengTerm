@@ -11,6 +11,8 @@ namespace XTerminal.Document.Rendering
     /// </summary>
     public interface IDocumentDrawable
     {
+        string ID { get; }
+
         /// <summary>
         /// 要渲染的文档模型里的信息
         /// </summary>

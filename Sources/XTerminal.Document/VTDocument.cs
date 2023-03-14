@@ -29,6 +29,8 @@ namespace XTerminal.Document
         ///// </summary>
         //private VTextLine activeLine;
 
+        private int row;
+
         #endregion
 
         #region 属性
@@ -176,6 +178,7 @@ namespace XTerminal.Document
         {
             VTextLine textLine = new VTextLine(this.Columns)
             {
+                ID = row++,
                 OffsetX = 0,
                 OffsetY = 0,
                 CursorAtRightMargin = false,

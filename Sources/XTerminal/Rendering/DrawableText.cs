@@ -18,11 +18,6 @@ namespace XTerminal.Rendering
         #region 属性
 
         /// <summary>
-        /// 文本块的索引
-        /// </summary>
-        public string ID { get { return this.TextBlock.ID; } }
-
-        /// <summary>
         /// 要渲染的文本
         /// </summary>
         public VTextBlock TextBlock { get; private set; }

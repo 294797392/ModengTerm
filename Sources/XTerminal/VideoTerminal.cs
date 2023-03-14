@@ -686,6 +686,7 @@ namespace XTerminal
                         logger.DebugFormat("UseAlternateScreenBuffer");
 
                         // 先记录当前的光标
+                        this.mainDocument.Cursor.OwnerLine = this.activeLine;
                         this.mainDocument.ViewableArea.DetachAll();
 
                         // 切换ActiveDocument

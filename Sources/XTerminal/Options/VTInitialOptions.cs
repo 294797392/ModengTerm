@@ -25,15 +25,15 @@ namespace VideoTerminal.Options
                 //UserName = "zyf",
                 //Password = "18612538605"
 
-                //ServerAddress = "ubuntu-dev",
-                //ServerPort = 22,
-                //UserName = "oheiheiheiheihei",
-                //Password = "18612538605",
-
-                ServerAddress = "tty.sdf.org",
+                ServerAddress = "ubuntu-dev",
                 ServerPort = 22,
                 UserName = "oheiheiheiheihei",
-                Password = "dycbfuS4TLvPw"
+                Password = "18612538605",
+
+                //ServerAddress = "tty.sdf.org",
+                //ServerPort = 22,
+                //UserName = "oheiheiheiheihei",
+                //Password = "dycbfuS4TLvPw"
             },
 
             TerminalOption = new TerminalOptions()

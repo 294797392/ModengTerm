@@ -19,9 +19,15 @@ namespace XTerminal.Rendering
         /// <summary>
         /// 该行在ViewableDocument里的位置
         /// </summary>
-        public int Row { get; set; }
+        public int Row { get; private set; }
 
         #endregion
+
+        public DrawableLine(int row)
+        {
+            this.Row = row;
+            this.ID = string.Format("Line - {0}", row);
+        }
 
         protected override void Draw(DrawingContext dc)
         {
@@ -29,8 +35,7 @@ namespace XTerminal.Rendering
 
             string text = textLine.GetText();
 
-            //text = string.Format("{0} ******* {1}", this.Row, text);
-            //text = string.Format("{0} ********* {1}", textLine.Row, text);
+            text = string.Format("{0} - {1}", this.ID, text);
 
             this.Offset = new Vector(0, textLine.OffsetY);
 

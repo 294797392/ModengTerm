@@ -28,7 +28,7 @@ namespace XTerminal.Document
 
         #region 属性
 
-        public string ID { get; set; }
+        public int ID { get; set; }
 
         /// <summary>
         /// 终端行的最大列数
@@ -99,8 +99,6 @@ namespace XTerminal.Document
 
         public VTextLine(int capacity)
         {
-            this.ID = Guid.NewGuid().ToString();
-
             //this.Characters = new List<VTCharacter>();
             this.TextBlocks = new List<VTextBlock>();
             this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, capacity);
@@ -159,7 +157,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.Drawable.ID);
                 return;
             }
 
@@ -177,7 +175,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.Drawable.ID);
                 return;
             }
 

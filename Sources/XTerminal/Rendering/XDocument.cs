@@ -99,7 +99,7 @@ namespace XTerminal.Rendering
             this.drawableLines = new List<IDocumentDrawable>();
             for (int i = 0; i < options.Rows; i++)
             {
-                DrawableLine drawableLine = new DrawableLine() { Row = i };
+                DrawableLine drawableLine = new DrawableLine(i);
                 this.visuals.Add(drawableLine);
                 this.drawableLines.Add(drawableLine);
             }

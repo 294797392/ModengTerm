@@ -15,6 +15,8 @@ namespace XTerminal.Rendering
     /// </summary>
     public abstract class XDocumentDrawable : DrawingVisual, IDocumentDrawable
     {
+        public string ID { get; protected set; }
+
         /// <summary>
         /// 保存要画的对象的数据
         /// </summary>
