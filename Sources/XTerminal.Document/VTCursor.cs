@@ -52,7 +52,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 光标所在的行
-        /// 该值不是实时更新的，不可以使用
+        /// 该值是实时更新的
         /// </summary>
         public VTextLine OwnerLine { get; set; }
 

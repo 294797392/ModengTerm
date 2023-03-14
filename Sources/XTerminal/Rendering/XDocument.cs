@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,8 +35,6 @@ namespace XTerminal.Rendering
         private double fullHeight;
 
         private DocumentRendererOptions options;
-
-        private VTElementMetrics blankCharacterMetrics;
 
         private List<IDocumentDrawable> drawableLines;
         private DrawableCursor drawableCursor;
@@ -98,7 +97,6 @@ namespace XTerminal.Rendering
             this.options = options;
 
             this.drawableLines = new List<IDocumentDrawable>();
-            this.blankCharacterMetrics = WPFRenderUtils.UpdateTextMetrics(" ", VTextStyle.Default);
             for (int i = 0; i < options.Rows; i++)
             {
                 DrawableLine drawableLine = new DrawableLine() { Row = i };
@@ -129,9 +127,25 @@ namespace XTerminal.Rendering
             return this.drawableCursor;
         }
 
-        public VTElementMetrics MeasureText(string text, VTextStyle style)
+        public VTElementMetrics MeasureLine(VTextLine textLine, int maxCharacters)
         {
-            return WPFRenderUtils.UpdateTextMetrics(text, style);
+            string text = textLine.GetText();
+            if (maxCharacters > 0)
+            {
+                text = text.Substring(0, maxCharacters);
+            }
+
+            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
+            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, WPFRenderUtils.PixelsPerDip);
+
+            VTElementMetrics metrics = new VTElementMetrics() 
+            {
+                Height = formattedText.Height,
+                Width = formattedText.Width,
+                WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace
+            };
+
+            return metrics;
         }
 
         public void DrawDrawable(IDocumentDrawable drawable)

@@ -51,15 +51,6 @@ namespace XTerminal.Rendering
             }
         }
 
-        public static VTElementMetrics UpdateTextMetrics(string text, VTextStyle textStyle)
-        {
-            Typeface typeface = GetTypeface(textStyle);
-            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, textStyle.FontSize, Brushes.Black, null, TextFormattingMode.Display, WPFRenderUtils.PixelsPerDip);
-            VTElementMetrics textMetrics = new VTElementMetrics();
-            UpdateTextMetrics(textMetrics, formattedText);
-            return textMetrics;
-        }
-
         public static void UpdateTextMetrics(VTElementMetrics textMerics, FormattedText formattedText)
         {
             textMerics.Width = formattedText.Width;

@@ -31,12 +31,13 @@ namespace XTerminal.Document.Rendering
         IDocumentDrawable GetDrawableCursor();
 
         /// <summary>
-        /// 测量某个文本块的属性
+        /// 测量某个渲染模型的大小
+        /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
         /// </summary>
-        /// <param name="text">要测量的文本</param>
-        /// <param name="style">文本的样式</param>
+        /// <param name="textLine">要测量的数据模型</param>
+        /// <param name="maxCharacters">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        VTElementMetrics MeasureText(string text, VTextStyle style);
+        VTElementMetrics MeasureLine(VTextLine textLine, int maxCharacters);
 
         /// <summary>
         /// 画
