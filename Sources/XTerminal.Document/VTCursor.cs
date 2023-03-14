@@ -10,7 +10,7 @@ namespace XTerminal.Document
     /// <summary>
     /// 定义光标类型
     /// </summary>
-    public enum VTCursors
+    public enum VTCursorStyles
     {
         None,
 
@@ -59,7 +59,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 光标类型
         /// </summary>
-        public VTCursors Type { get; set; }
+        public VTCursorStyles Style { get; set; }
 
         /// <summary>
         /// 是否闪烁

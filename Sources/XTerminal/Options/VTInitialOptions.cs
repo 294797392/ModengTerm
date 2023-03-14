@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Channels;
+using XTerminal.Document;
 
 namespace VideoTerminal.Options
 {
@@ -40,7 +41,13 @@ namespace VideoTerminal.Options
                 Type = TerminalTypes.XTerm,
                 Columns = 80,
                 Rows = 24,
-                DECPrivateAutoWrapMode = false
+                DECPrivateAutoWrapMode = false,
+            },
+
+            CursorOption = new CursorOptions() 
+            {
+                Style = VTCursorStyles.Line,
+                Interval = 500
             }
         };
 
@@ -63,6 +70,8 @@ namespace VideoTerminal.Options
         /// 连接Channel的验证信息
         /// </summary>
         public ChannelAuthorition Authorition { get; set; }
+
+        public CursorOptions CursorOption { get; set; }
 
         public VTInitialOptions()
         {

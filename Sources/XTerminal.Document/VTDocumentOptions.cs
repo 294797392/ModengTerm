@@ -22,5 +22,15 @@ namespace XTerminal.Document
         /// DECPrivateAutoWrapMode是否启用
         /// </summary>
         public bool DECPrivateAutoWrapMode { get; set; }
+
+        /// <summary>
+        /// 光标样式
+        /// </summary>
+        public VTCursorStyles CursorStyle { get; set; }
+
+        /// <summary>
+        /// 闪烁间隔时间
+        /// </summary>
+        public int Interval { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace XTerminal.Rendering
         private static readonly double LineWidth = 2;
         private static readonly double UnderscoreWidth = 3;
 
-        private VTCursors cursorType = VTCursors.None;
+        private VTCursorStyles cursorType = VTCursorStyles.None;
 
         protected override void Draw(DrawingContext dc)
         {
@@ -29,21 +29,21 @@ namespace XTerminal.Rendering
 
             Brush brush = WPFRenderUtils.VTForeground2Brush(cursor.Color);
 
-            switch (cursor.Type)
+            switch (cursor.Style)
             {
-                case VTCursors.Block:
+                case VTCursorStyles.Block:
                     {
                         dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, BlockWidth, cursor.LineHeight));
                         break;
                     }
 
-                case VTCursors.Line:
+                case VTCursorStyles.Line:
                     {
                         dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, LineWidth, cursor.LineHeight));
                         break;
                     }
 
-                case VTCursors.Underscore:
+                case VTCursorStyles.Underscore:
                     {
                         dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, cursor.LineHeight));
                         break;

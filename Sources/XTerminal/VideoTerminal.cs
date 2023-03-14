@@ -209,7 +209,9 @@ namespace XTerminal
             {
                 Columns = initialOptions.TerminalOption.Columns,
                 Rows = initialOptions.TerminalOption.Rows,
-                DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode
+                DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode,
+                CursorStyle = initialOptions.CursorOption.Style,
+                Interval = initialOptions.CursorOption.Interval
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };

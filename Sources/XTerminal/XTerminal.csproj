@@ -79,6 +79,7 @@
     <Compile Include="Channels\VTChannelState.cs" />
     <Compile Include="Channels\VTChannelTypes.cs" />
     <Compile Include="DefaultValues.cs" />
+    <Compile Include="Options\CursorOptions.cs" />
     <Compile Include="Rendering\DrawableCursor.cs" />
     <Compile Include="Rendering\DrawableLine.cs" />
     <Compile Include="Rendering\XDocumentDrawable.cs" />

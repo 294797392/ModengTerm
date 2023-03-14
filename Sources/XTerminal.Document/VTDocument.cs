@@ -94,8 +94,8 @@ namespace XTerminal.Document
                 Color = VTColors.DarkBlack,
                 OffsetX = 0,
                 OffsetY = 0,
-                Type = VTCursors.Line,
-                Interval = DefaultValues.CursorBlinkInterval
+                Style = options.CursorStyle,
+                Interval = options.Interval
             };
 
             this.ViewableArea = new ViewableDocument(options)
