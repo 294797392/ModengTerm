@@ -190,6 +190,20 @@ namespace XTerminal.Document
             this.TotalRows++;
         }
 
+        public VTextLine CreateLine()
+        {
+            VTextLine textLine = new VTextLine(this.Columns)
+            {
+                OffsetX = 0,
+                OffsetY = 0,
+                CursorAtRightMargin = false,
+                DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
+                OwnerDocument = this,
+            };
+
+            return textLine;
+        }
+
         public bool HasNextLine(VTextLine textLine)
         {
             return textLine.NextLine != null;
@@ -387,13 +401,39 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 在指定的行位置插入多行，并把指定位置和指定位置后面的所有行往后移动
+        /// 在指定的行位置插入光标位置，并把光标位置和指定位置后面的所有行往后移动
         /// </summary>
-        /// <param name="row">要插入的行的位置</param>
-        /// <param name="lines"></param>
-        public void InsertLines(int row, int lines)
+        /// <param name="activeLine">光标所在行</param>
+        /// <param name="lines">要插入的行数</param>
+        public void InsertLines(VTextLine activeLine, int lines)
         {
+            // 可视区域的最后一行
+            VTextLine lastVisibleLine = this.ViewableArea.LastLine;
 
+            // 从当前行的上一行开始插入
+            VTextLine startLine = activeLine.PreviousLine;
+
+            // 当前行作为插入的最后一行
+            VTextLine endLine = activeLine;
+
+            for (int i = 0; i < lines; i++)
+            {
+                VTextLine newLine = this.CreateLine();
+
+                // 新行关联渲染模型
+                newLine.AttachDrawable(lastVisibleLine.Drawable);
+                lastVisibleLine.DetachDrawable();
+
+                // 更新链表指针
+                startLine.NextLine = newLine;
+                newLine.PreviousLine = startLine;
+                newLine.NextLine = endLine;
+                endLine.PreviousLine = newLine;
+
+                lastVisibleLine = lastVisibleLine.PreviousLine;
+            }
+
+            this.SetArrangeDirty();
         }
 
         #endregion

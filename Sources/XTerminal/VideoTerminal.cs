@@ -736,9 +736,7 @@ namespace XTerminal
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
                         int lines = Convert.ToInt32(param[0]);
                         logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
-
-                        ViewableDocument document = this.activeDocument.ViewableArea;
-
+                        this.activeDocument.InsertLines(this.activeLine, lines);
                         break;
                     }
 
