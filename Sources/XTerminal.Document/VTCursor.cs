@@ -35,6 +35,8 @@ namespace XTerminal.Document
     /// </summary>
     public class VTCursor : VTDocumentElement
     {
+        public VTextLine OwnerLine { get; set; }
+
         /// <summary>
         /// 光标所在列
         /// </summary>
@@ -44,17 +46,6 @@ namespace XTerminal.Document
         /// 光标所在行
         /// </summary>
         public int Row { get; set; }
-
-        /// <summary>
-        /// 光标所在行的高度
-        /// </summary>
-        public double LineHeight { get; set; }
-
-        /// <summary>
-        /// 光标所在的行
-        /// 该值是实时更新的
-        /// </summary>
-        public VTextLine OwnerLine { get; set; }
 
         /// <summary>
         /// 光标类型

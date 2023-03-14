@@ -29,7 +29,7 @@ namespace XTerminal.Rendering
 
             string text = textLine.GetText();
 
-            text = string.Format("{0} ******* {1}", this.Row, text);
+            //text = string.Format("{0} ******* {1}", this.Row, text);
             //text = string.Format("{0} ********* {1}", textLine.Row, text);
 
             this.Offset = new Vector(0, textLine.OffsetY);

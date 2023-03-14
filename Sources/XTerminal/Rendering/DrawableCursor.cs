@@ -19,7 +19,10 @@ namespace XTerminal.Rendering
         private static readonly double LineWidth = 2;
         private static readonly double UnderscoreWidth = 3;
 
-        private VTCursorStyles cursorType = VTCursorStyles.None;
+        /// <summary>
+        /// TODO:先把光标高度写死，后面再优化..
+        /// </summary>
+        private static readonly double CursorHeight = 15;
 
         protected override void Draw(DrawingContext dc)
         {
@@ -33,19 +36,19 @@ namespace XTerminal.Rendering
             {
                 case VTCursorStyles.Block:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, BlockWidth, cursor.LineHeight));
+                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, BlockWidth, CursorHeight));
                         break;
                     }
 
                 case VTCursorStyles.Line:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, LineWidth, cursor.LineHeight));
+                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, LineWidth, CursorHeight));
                         break;
                     }
 
                 case VTCursorStyles.Underscore:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, cursor.LineHeight));
+                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, 5));
                         break;
                     }
 

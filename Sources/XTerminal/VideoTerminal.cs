@@ -229,6 +229,7 @@ namespace XTerminal
 
             IDocumentDrawable drawableCursor = this.Renderer.GetDrawableCursor();
             this.Cursor.AttachDrawable(drawableCursor);
+            this.Renderer.DrawDrawable(drawableCursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
@@ -324,6 +325,8 @@ namespace XTerminal
 
             this.uiSyncContext.Send((state) =>
             {
+                #region 更新文本行
+
                 while (next != null)
                 {
                     // 首先获取当前行的DrawingObject
@@ -364,6 +367,16 @@ namespace XTerminal
                     next = next.NextLine;
                 }
 
+                #endregion
+
+                #region 更新光标
+
+                this.Cursor.OffsetY = this.activeLine.OffsetY;
+                this.Cursor.OffsetX = this.Renderer.MeasureLine(this.activeLine, this.CursorCol).WidthIncludingWhitespace;
+                this.Renderer.UpdatePosition(this.Cursor.Drawable, this.Cursor.OffsetX, this.Cursor.OffsetY);
+
+                #endregion
+
             }, null);
         }
 
@@ -372,54 +385,17 @@ namespace XTerminal
         /// </summary>
         /// <param name="row">要设置的行</param>
         /// <param name="column">要设置的列</param>
-        /// <param name="cursorLine">设置之后光标所在行</param>
-        private void SetCursor(int row, int column, VTextLine cursorLine)
+        /// <param name="activeLine">设置之后光标所在行</param>
+        private void SetCursor(int row, int column)
         {
-            bool positionChanged = false;
-
             if (this.Cursor.Row != row)
             {
                 this.Cursor.Row = row;
-
-                this.Cursor.OwnerLine = cursorLine;
-
-                positionChanged = true;
             }
 
             if (this.Cursor.Column != column)
             {
                 this.Cursor.Column = column;
-
-                positionChanged = true;
-            }
-
-            if (positionChanged)
-            {
-                // 列变了，就更新OffsetX
-                VTElementMetrics metrics = this.Renderer.MeasureLine(cursorLine, column);
-
-                // 此时的metrics肯定是最新的值，因为字符打印完毕之后才会更新光标坐标
-                this.Cursor.OffsetX = metrics.Width;
-                this.Cursor.OffsetY = cursorLine.OffsetY;
-
-                // 有可能行高改变了，行高改变了要重新渲染光标
-                if (this.Cursor.LineHeight != metrics.Height)
-                {
-                    this.Cursor.LineHeight = metrics.Height;
-                    this.uiSyncContext.Send((state) =>
-                    {
-                        this.Renderer.DrawDrawable(this.Cursor.Drawable);
-                    }, null);
-                    logger.InfoFormat("行高改变, {0}", Guid.NewGuid().ToString());
-                }
-                else
-                {
-                    // 行高没改变，只改变了位置，更新位置即可
-                    this.uiSyncContext.Send((state) =>
-                    {
-                        this.Renderer.UpdatePosition(this.Cursor.Drawable, this.Cursor.OffsetX, this.Cursor.OffsetY);
-                    }, null);
-                }
             }
         }
 
@@ -462,7 +438,7 @@ namespace XTerminal
                         char ch = (char)param[0];
                         logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
                         this.activeDocument.PrintCharacter(this.activeLine, ch, this.CursorCol);
-                        this.SetCursor(this.CursorRow, this.CursorCol + 1, this.activeLine);
+                        this.SetCursor(this.CursorRow, this.CursorCol + 1);
                         break;
                     }
 
@@ -470,7 +446,7 @@ namespace XTerminal
                     {
                         // CR
                         // 把光标移动到行开头
-                        this.SetCursor(this.CursorRow, 0, this.activeLine);
+                        this.SetCursor(this.CursorRow, 0);
                         logger.DebugFormat("CarriageReturn, cursorRow = {0}, cursorCol = {1}", this.CursorRow, this.CursorCol);
                         break;
                     }
@@ -512,7 +488,7 @@ namespace XTerminal
 
                             // 光标在可视区域里
                             logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
-                            this.SetCursor(this.CursorRow + 1, this.CursorCol, this.activeLine.NextLine);
+                            this.SetCursor(this.CursorRow + 1, this.CursorCol);
                         }
 
                         this.activeLine = this.activeLine.NextLine;
@@ -545,7 +521,7 @@ namespace XTerminal
                             // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
 
                             // 光标位置在可视区域里面
-                            this.SetCursor(this.CursorRow - 1, this.CursorCol, this.activeLine.PreviousLine);
+                            this.SetCursor(this.CursorRow - 1, this.CursorCol);
                         }
 
                         this.activeLine = this.activeLine.PreviousLine;
@@ -568,7 +544,7 @@ namespace XTerminal
                 case VTActions.CursorBackward:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        this.SetCursor(this.CursorRow, this.CursorCol - n, this.activeLine);
+                        this.SetCursor(this.CursorRow, this.CursorCol - n);
                         logger.DebugFormat("CursorBackward, cursorRow = {0}, cursorCol = {1}", this.CursorRow, this.CursorCol);
                         break;
                     }
@@ -576,7 +552,7 @@ namespace XTerminal
                 case VTActions.CUF_CursorForward:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        this.SetCursor(this.CursorRow, this.CursorCol + n, this.activeLine);
+                        this.SetCursor(this.CursorRow, this.CursorCol + n);
                         break;
                     }
 
@@ -584,7 +560,7 @@ namespace XTerminal
                     {
                         int n = Convert.ToInt32(param[0]);
                         this.activeLine = this.activeLine.FindPrevious(n);
-                        this.SetCursor(this.CursorRow - n, this.CursorCol, this.activeLine);
+                        this.SetCursor(this.CursorRow - n, this.CursorCol);
                         break;
                     }
 
@@ -592,7 +568,7 @@ namespace XTerminal
                     {
                         int n = Convert.ToInt32(param[0]);
                         this.activeLine = this.activeLine.FindNext(n);
-                        this.SetCursor(this.CursorRow + n, this.CursorCol, this.activeLine);
+                        this.SetCursor(this.CursorRow + n, this.CursorCol);
                         break;
                     }
 
@@ -609,7 +585,7 @@ namespace XTerminal
                         // 更新当前行
                         this.activeLine = document.FirstLine.FindNext(row);
                         // 更新基于VTDocument的cursorRow和cursorCol
-                        this.SetCursor(row, col, this.activeLine);
+                        this.SetCursor(row, col);
                         break;
                     }
 

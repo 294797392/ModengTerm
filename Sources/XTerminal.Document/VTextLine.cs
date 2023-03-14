@@ -28,6 +28,8 @@ namespace XTerminal.Document
 
         #region 属性
 
+        public string ID { get; set; }
+
         /// <summary>
         /// 终端行的最大列数
         /// 规定终端一行里的字符数不能超过列数
@@ -97,6 +99,8 @@ namespace XTerminal.Document
 
         public VTextLine(int capacity)
         {
+            this.ID = Guid.NewGuid().ToString();
+
             //this.Characters = new List<VTCharacter>();
             this.TextBlocks = new List<VTextBlock>();
             this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, capacity);
