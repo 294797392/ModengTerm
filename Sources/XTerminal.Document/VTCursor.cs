@@ -12,6 +12,8 @@ namespace XTerminal.Document
     /// </summary>
     public enum VTCursors
     {
+        None,
+
         /// <summary>
         /// 光标是一条竖线
         /// </summary>

@@ -40,9 +40,29 @@ namespace XTerminal.Document.Rendering
 
         /// <summary>
         /// 画
+        /// 如果是文本元素，将对文本进行重新排版并渲染
+        /// 排版是比较耗时的操作
         /// </summary>
         /// <param name="drawable"></param>
         void DrawDrawable(IDocumentDrawable drawable);
+
+        /// <summary>
+        /// 更新元素的位置信息
+        /// 而不用重新画，速度要比DrawDrawable快
+        /// 画文本的速度还是比较慢的，因为需要对文本进行排版，耗时都花在排版上面了
+        /// 所以能不排版就最好不排版
+        /// </summary>
+        /// <param name="drawable"></param>
+        /// <param name="offsetX"></param>
+        /// <param name="offsetY"></param>
+        void UpdatePosition(IDocumentDrawable drawable, double offsetX, double offsetY);
+
+        /// <summary>
+        /// 设置元素的透明度
+        /// </summary>
+        /// <param name="drawable"></param>
+        /// <param name="opacity"></param>
+        void SetOpacity(IDocumentDrawable drawable, double opacity);
 
         /// <summary>
         /// 重新调整终端大小

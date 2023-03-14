@@ -26,7 +26,7 @@ namespace XTerminal.Rendering
 
         protected abstract void Draw(DrawingContext dc);
 
-        public void Draw()
+        public virtual void Draw()
         {
             DrawingContext dc = this.RenderOpen();
 

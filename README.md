@@ -44,6 +44,16 @@ stateMachine -> OutputStateMachineEngine -> AdaptDispatch/TerminalDispatch -> ou
 DECAWM
 
 
+# 渲染方式对比
+| 功能 | FlowDocument |
+| :--- | ---------------|
+| 显示光标        | &#10004; |
+| 修改光标样式    | &#10008; |
+| 文本选中    | &#10004; |
+| 自定义右键菜单    | &#10004; |
+
+
+
 
 
 

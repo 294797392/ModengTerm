@@ -38,7 +38,7 @@ namespace XTerminal.Rendering
         private VTElementMetrics blankCharacterMetrics;
 
         private List<IDocumentDrawable> drawableLines;
-        private IDocumentDrawable drawableCursor;
+        private DrawableCursor drawableCursor;
 
         #endregion
 
@@ -89,15 +89,6 @@ namespace XTerminal.Rendering
             return this.scrollViewer != null;
         }
 
-        /// <summary>
-        /// 获取没有被使用的DrawingVisual
-        /// </summary>
-        /// <returns></returns>
-        private DrawableLine RequestDrawingLine()
-        {
-            return this.visuals.Cast<DrawableLine>().FirstOrDefault(v => v.OwnerElement == null);
-        }
-
         #endregion
 
         #region IDocumentRenderer
@@ -114,6 +105,9 @@ namespace XTerminal.Rendering
                 this.visuals.Add(drawableLine);
                 this.drawableLines.Add(drawableLine);
             }
+
+            this.drawableCursor = new DrawableCursor();
+            this.visuals.Add(this.drawableCursor);
         }
 
         /// <summary>
@@ -144,6 +138,18 @@ namespace XTerminal.Rendering
         {
             XDocumentDrawable drawingVisual = drawable as XDocumentDrawable;
             drawingVisual.Draw();
+        }
+
+        public void UpdatePosition(IDocumentDrawable drawable, double offsetX, double offsetY)
+        {
+            XDocumentDrawable drawingVisual = drawable as XDocumentDrawable;
+            drawingVisual.Offset = new Vector(offsetX, offsetY);
+        }
+
+        public void SetOpacity(IDocumentDrawable drawable, double opacity)
+        {
+            XDocumentDrawable drawingVisual = drawable as XDocumentDrawable;
+            drawingVisual.Opacity = opacity;
         }
 
         public void Resize(double width, double height)

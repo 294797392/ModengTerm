@@ -19,6 +19,8 @@ namespace XTerminal.Rendering
         private static readonly double LineWidth = 2;
         private static readonly double UnderscoreWidth = 3;
 
+        private VTCursors cursorType = VTCursors.None;
+
         protected override void Draw(DrawingContext dc)
         {
             VTCursor cursor = this.OwnerElement as VTCursor;
@@ -29,19 +31,19 @@ namespace XTerminal.Rendering
             {
                 case VTCursors.Block:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(cursor.OffsetX, cursor.OffsetY, BlockWidth, cursor.LineHeight));
+                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, BlockWidth, cursor.LineHeight));
                         break;
                     }
 
                 case VTCursors.Line:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(cursor.OffsetX, cursor.OffsetY, LineWidth, cursor.LineHeight));
+                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, LineWidth, cursor.LineHeight));
                         break;
                     }
 
                 case VTCursors.Underscore:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(cursor.OffsetX, cursor.OffsetY, UnderscoreWidth, cursor.LineHeight));
+                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, cursor.LineHeight));
                         break;
                     }
 

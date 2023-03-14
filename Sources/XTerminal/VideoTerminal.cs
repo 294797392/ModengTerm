@@ -234,6 +234,7 @@ namespace XTerminal
 
             IDocumentDrawable drawableCursor = this.Renderer.GetDrawableCursor();
             this.Cursor.AttachDrawable(drawableCursor);
+            this.Renderer.DrawDrawable(drawableCursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
@@ -355,7 +356,7 @@ namespace XTerminal
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
                         string text = next.GetText();
                         next.Metrics = this.Renderer.MeasureText(text, VTextStyle.Default);
-                        (drawableLine as DrawableLine).Offset = new Vector(next.OffsetX, next.OffsetY);
+                        this.Renderer.UpdatePosition(drawableLine, next.OffsetX, next.OffsetY);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -784,7 +785,12 @@ namespace XTerminal
 
                 try
                 {
-                    this.Renderer.DrawDrawable(drawableCursor);
+                    double opacity = cursor.IsVisible ? 1 : 0;
+
+                    this.uiSyncContext.Send((state) =>
+                    {
+                        this.Renderer.SetOpacity(drawableCursor, opacity);
+                    }, null);
                 }
                 catch (Exception e)
                 {
