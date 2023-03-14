@@ -17,11 +17,8 @@ namespace XTerminal.Rendering
     {
         private static Dictionary<string, Typeface> typefaceMap = new Dictionary<string, Typeface>();
 
-        public static double PixelsPerDip = 0;
-
         static WPFRenderUtils()
         {
-            PixelsPerDip = VisualTreeHelper.GetDpi(Application.Current.MainWindow).PixelsPerDip;
         }
 
         public static Brush VTForeground2Brush(VTColors foreground)

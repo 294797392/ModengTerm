@@ -136,7 +136,7 @@ namespace XTerminal.Rendering
             }
 
             Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
-            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, WPFRenderUtils.PixelsPerDip);
+            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
 
             VTElementMetrics metrics = new VTElementMetrics() 
             {

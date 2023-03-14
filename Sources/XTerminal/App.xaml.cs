@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 
 namespace XTerminal
 {
@@ -15,6 +16,8 @@ namespace XTerminal
     public partial class App : Application
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("App");
+
+        public static double PixelsPerDip = 0;
 
         static App()
         {
@@ -33,6 +36,7 @@ namespace XTerminal
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+            PixelsPerDip = VisualTreeHelper.GetDpi(new DrawingVisual()).PixelsPerDip;
         }
     }
 }

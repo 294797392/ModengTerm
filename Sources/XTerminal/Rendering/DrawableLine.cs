@@ -36,7 +36,7 @@ namespace XTerminal.Rendering
 
             Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                DefaultValues.FontSize, DefaultValues.Foreground, null, TextFormattingMode.Display, WPFRenderUtils.PixelsPerDip);
+                DefaultValues.FontSize, DefaultValues.Foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
 
             WPFRenderUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
 

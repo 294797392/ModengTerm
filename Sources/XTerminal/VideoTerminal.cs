@@ -227,7 +227,6 @@ namespace XTerminal
 
             IDocumentDrawable drawableCursor = this.Renderer.GetDrawableCursor();
             this.Cursor.AttachDrawable(drawableCursor);
-            this.Renderer.DrawDrawable(drawableCursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
@@ -382,9 +381,6 @@ namespace XTerminal
 
                 this.Cursor.OwnerLine = cursorLine;
 
-                // 行变了，就更新OffsetY
-                this.Cursor.OffsetY = cursorLine.OffsetY;
-
                 positionChanged = true;
             }
 
@@ -392,19 +388,37 @@ namespace XTerminal
             {
                 this.Cursor.Column = column;
 
-                // 列变了，就更新OffsetX
-                VTElementMetrics metrics = this.Renderer.MeasureLine(cursorLine, column + 1);
-
-                // 此时的metrics肯定是最新的值，因为字符打印完毕之后才会更新光标坐标
-                this.Cursor.OffsetX = metrics.Width;
-
                 positionChanged = true;
             }
 
-            this.uiSyncContext.Send((state) =>
+            if (positionChanged)
             {
-                this.Renderer.UpdatePosition(this.Cursor.Drawable, this.Cursor.OffsetX, this.Cursor.OffsetY);
-            }, null);
+                // 列变了，就更新OffsetX
+                VTElementMetrics metrics = this.Renderer.MeasureLine(cursorLine, column);
+
+                // 此时的metrics肯定是最新的值，因为字符打印完毕之后才会更新光标坐标
+                this.Cursor.OffsetX = metrics.Width;
+                this.Cursor.OffsetY = cursorLine.OffsetY;
+
+                // 有可能行高改变了，行高改变了要重新渲染光标
+                if (this.Cursor.LineHeight != metrics.Height)
+                {
+                    this.Cursor.LineHeight = metrics.Height;
+                    this.uiSyncContext.Send((state) =>
+                    {
+                        this.Renderer.DrawDrawable(this.Cursor.Drawable);
+                    }, null);
+                    logger.InfoFormat("行高改变, {0}", Guid.NewGuid().ToString());
+                }
+                else
+                {
+                    // 行高没改变，只改变了位置，更新位置即可
+                    this.uiSyncContext.Send((state) =>
+                    {
+                        this.Renderer.UpdatePosition(this.Cursor.Drawable, this.Cursor.OffsetX, this.Cursor.OffsetY);
+                    }, null);
+                }
+            }
         }
 
         #endregion

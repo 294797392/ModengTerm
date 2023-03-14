@@ -25,6 +25,8 @@ namespace XTerminal.Rendering
         {
             VTCursor cursor = this.OwnerElement as VTCursor;
 
+            this.Offset = new Vector(cursor.OffsetX, cursor.OffsetY);
+
             Brush brush = WPFRenderUtils.VTForeground2Brush(cursor.Color);
 
             switch (cursor.Type)
