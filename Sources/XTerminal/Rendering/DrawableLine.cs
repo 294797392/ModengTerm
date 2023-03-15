@@ -26,7 +26,7 @@ namespace XTerminal.Rendering
         public DrawableLine(int row)
         {
             this.Row = row;
-            this.ID = string.Format("Line - {0}", row);
+            this.ID = "Drawable" + string.Format("{0}", row).PadLeft(2, '0');
         }
 
         protected override void Draw(DrawingContext dc)

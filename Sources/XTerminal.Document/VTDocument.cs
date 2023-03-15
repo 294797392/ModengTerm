@@ -82,6 +82,16 @@ namespace XTerminal.Document
         /// </summary>
         public bool IsArrangeDirty { get { return this.ViewableArea.IsArrangeDirty; } set { this.ViewableArea.IsArrangeDirty = value; } }
 
+        /// <summary>
+        /// 当光标在该范围内就得滚动
+        /// </summary>
+        public int ScrollMarginTop { get; private set; }
+
+        /// <summary>
+        /// 当光标在该范围内就得滚动
+        /// </summary>
+        public int ScrollMarginBottom { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -350,6 +360,9 @@ namespace XTerminal.Document
             this.FirstLine = this.ViewableArea.FirstLine;
             this.LastLine = this.ViewableArea.LastLine;
 
+            this.FirstLine.PreviousLine = null;
+            this.LastLine.NextLine = null;
+
             this.SetArrangeDirty();
         }
 
@@ -437,6 +450,12 @@ namespace XTerminal.Document
             }
 
             this.SetArrangeDirty();
+        }
+
+        public void SetScrollMargin(int marginTop, int marginBottom)
+        {
+            this.ScrollMarginTop = marginTop;
+            this.ScrollMarginBottom = marginBottom;
         }
 
         #endregion

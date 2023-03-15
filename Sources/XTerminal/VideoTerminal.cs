@@ -429,6 +429,8 @@ namespace XTerminal
             }
         }
 
+        private int index = 0;
+
         private void VtParser_ActionEvent(VTActions action, params object[] param)
         {
             switch (action)
@@ -470,7 +472,8 @@ namespace XTerminal
                         VTextLine oldFirstRow = document.FirstLine;
                         VTextLine oldLastRow = document.LastLine;
 
-                        if (oldLastRow == this.activeLine)
+                        VTextLine bottomVisibleRow = this.activeLine.FindNext(this.activeDocument.ScrollMarginBottom);
+                        if (oldLastRow == bottomVisibleRow)
                         {
                             // 光标在可视区域的最后一行，那么要把可视区域向下移动
                             logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
@@ -506,7 +509,8 @@ namespace XTerminal
                         VTextLine oldFirstRow = document.FirstLine;
                         VTextLine oldLastRow = document.LastLine;
 
-                        if (oldFirstRow == this.activeLine)
+                        VTextLine topVisibleRow = this.activeLine.FindPrevious(this.activeDocument.ScrollMarginTop);
+                        if (oldFirstRow == topVisibleRow)
                         {
                             // 此时光标位置在可视区域的第一行
                             logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
@@ -577,7 +581,7 @@ namespace XTerminal
                         int row = Convert.ToInt32(param[0]);
                         int col = Convert.ToInt32(param[1]);
 
-                        logger.DebugFormat("CUP_CursorPosition, row = {0}, col = {1}", row, col);
+                        logger.ErrorFormat("CUP_CursorPosition, row = {0}, col = {1}, {2}", row, col, this.index++);
 
                         // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
                         ViewableDocument document = this.activeDocument.ViewableArea;
@@ -740,7 +744,10 @@ namespace XTerminal
 
                 case VTActions.DECSTBM_SetScrollingRegion:
                     {
-                        logger.ErrorFormat("未实现SetScrollingRegion");
+                        int topMargin = Convert.ToInt32(param[0]);
+                        int bottomMargin = Convert.ToInt32(param[1]);
+                        logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                        this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
                         break;
                     }
 

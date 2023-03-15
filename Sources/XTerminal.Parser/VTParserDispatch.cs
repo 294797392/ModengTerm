@@ -262,7 +262,6 @@ namespace XTerminal.Parser
                         // Default: Pb = current number of lines per screen
                         int topMargin = this.GetParameter(parameters, 0, 1);
                         int bottomMargin = this.GetParameter(parameters, 0, 0);
-                        logger.ErrorFormat("CSIDispatch - DECSTBM_SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                         this.NotifyActionEvent(VTActions.DECSTBM_SetScrollingRegion, topMargin, bottomMargin);
                         //throw new NotImplementedException();
                         break;
