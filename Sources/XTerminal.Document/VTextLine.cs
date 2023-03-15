@@ -302,7 +302,7 @@ namespace XTerminal.Document
         /// 插到一个节点
         /// </summary>
         /// <param name="line">要插入的节点</param>
-        /// <param name="prepend">是否是</param>
+        /// <param name="options">是否是</param>
         public void InsertLine(VTextLine line, InsertOptions options)
         {
             switch (options)

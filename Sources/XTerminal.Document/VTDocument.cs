@@ -417,7 +417,7 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 在指定的行位置插入光标位置，并把光标位置和指定位置后面的所有行往后移动
+        /// 在可视区域的指定的行位置插入多个新行，并把指定的行和指定行后面的所有行往后移动
         /// </summary>
         /// <param name="activeLine">光标所在行</param>
         /// <param name="lines">要插入的行数</param>
@@ -447,6 +447,9 @@ namespace XTerminal.Document
                 endLine.PreviousLine = newLine;
 
                 lastVisibleLine = lastVisibleLine.PreviousLine;
+
+                // 更新可视区域最后一行的指针
+                this.ViewableArea.LastLine = lastVisibleLine;
             }
 
             this.SetArrangeDirty();
