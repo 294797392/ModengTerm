@@ -469,20 +469,35 @@ namespace XTerminal
 
                         // 更新可视区域
                         ViewableDocument document = this.activeDocument.ViewableArea;
-                        VTextLine oldFirstRow = document.FirstLine;
-                        VTextLine oldLastRow = document.LastLine;
+                        VTextLine oldFirstVisibleRow = document.FirstLine;
+                        VTextLine oldLastVisibleRow = document.LastLine;
 
                         VTextLine bottomVisibleRow = this.activeLine.FindNext(this.activeDocument.ScrollMarginBottom);
-                        if (oldLastRow == bottomVisibleRow)
-                        {
-                            // 光标在可视区域的最后一行，那么要把可视区域向下移动
-                            logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
-                            document.ScrollDocument(ScrollOrientation.Down, 1);
 
-                            // 更新文档模型和渲染模型的关联信息
-                            // 把oldFirstRow的渲染模型拿给newLastRow使用
-                            VTextLine newLastRow = document.LastLine;
-                            newLastRow.AttachDrawable(oldFirstRow.Drawable);
+                        // 是否需要滚动
+                        bool scroll = oldLastVisibleRow == bottomVisibleRow;
+                        if (scroll)
+                        {
+                            if (this.activeLine == oldLastVisibleRow)
+                            {
+                                // 当前行是可视区域的最后一行
+                                // 光标在可视区域的最后一行，那么要把可视区域向下移动
+                                logger.DebugFormat("LineFeed，光标在可视区域最后一行，没有Margin，向下移动一行并且可视区域往下移动一行");
+                                document.ScrollDocument(ScrollOrientation.Down, 1);
+
+                                // 更新文档模型和渲染模型的关联信息
+                                // 把oldFirstRow的渲染模型拿给newLastRow使用
+                                VTextLine newLastVisibleRow = document.LastLine;
+                                newLastVisibleRow.AttachDrawable(oldFirstVisibleRow.Drawable);
+                            }
+                            else
+                            {
+                                // 可视区域的最后一行不是当前行，那么滚动之后可以直接移动光标
+                                document.ScrollDocument(ScrollOrientation.Down, 1);
+                                this.SetCursor(this.CursorRow + 1, this.CursorCol);
+                                VTextLine newLastVisibleRow = document.LastLine;
+                                newLastVisibleRow.AttachDrawable(oldFirstVisibleRow.Drawable);
+                            }
                         }
                         else
                         {
@@ -490,7 +505,7 @@ namespace XTerminal
                             // 实际上光标有可能在可视区域的上面或者下面，但是暂时还没找到方法去判定
 
                             // 光标在可视区域里
-                            logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
+                            logger.DebugFormat("LineFeed，光标在可视区域里，不需要滚动，直接移动光标到下一行");
                             this.SetCursor(this.CursorRow + 1, this.CursorCol);
                         }
 

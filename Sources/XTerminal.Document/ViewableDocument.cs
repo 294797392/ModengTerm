@@ -8,6 +8,27 @@ using XTerminal.Document.Rendering;
 namespace XTerminal.Document
 {
     /// <summary>
+    /// 描述可视区域在整个文档里的位置
+    /// </summary>
+    public enum ViewablePlacement
+    {
+        /// <summary>
+        /// 可视区域再整个文档的中间
+        /// </summary>
+        Middle,
+
+        /// <summary>
+        /// 可视区域在整个文档的底部
+        /// </summary>
+        Bottom,
+
+        /// <summary>
+        /// 可视区域再整个文档的上面
+        /// </summary>
+        Top
+    }
+
+    /// <summary>
     /// 保存用户可以在界面上看到的文档区域
     /// 也就是要渲染到界面上的区域
     /// </summary>
@@ -58,6 +79,30 @@ namespace XTerminal.Document
         /// 总列数
         /// </summary>
         public int Columns { get { return this.options.Columns; } }
+
+        /// <summary>
+        /// 获取当前可视区域在整个VTDocument里的位置
+        /// </summary>
+        public ViewablePlacement Placement
+        {
+            get
+            {
+                VTDocument document = this.OwnerDocument;
+
+                if (document.FirstLine == this.FirstLine)
+                {
+                    return ViewablePlacement.Top;
+                }
+                else if (document.LastLine == this.LastLine)
+                {
+                    return ViewablePlacement.Bottom;
+                }
+                else
+                {
+                    return ViewablePlacement.Middle;
+                }
+            }
+        }
 
         #endregion
 
