@@ -254,6 +254,13 @@ namespace XTerminal.Document
             this.SetDirty(true);
         }
 
+        public void Insert(int column, char ch)
+        {
+            this.TextSource.Insert(column, ch);
+
+            this.SetDirty(true);
+        }
+
         /// <summary>
         /// 获取该行的文本，如果字符数量是0，那么返回空白字符
         /// </summary>

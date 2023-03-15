@@ -181,7 +181,7 @@ namespace XTerminal.Parser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        int parameter = Convert.ToInt32(parameters[0]);
+                        int parameter = this.GetParameter(parameters, 0, 0);
                         logger.DebugFormat("CSIDispatch - ED_EraseDisplay, parameter = {0}", parameter);
                         this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameter);
                         break;

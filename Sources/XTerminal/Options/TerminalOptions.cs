@@ -11,6 +11,7 @@ namespace VideoTerminal.Options
         VT100,
         VT220,
         XTerm,
+        XTerm256Color
     }
 
     /// <summary>

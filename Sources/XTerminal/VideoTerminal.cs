@@ -597,7 +597,7 @@ namespace XTerminal
                         int row = Convert.ToInt32(param[0]);
                         int col = Convert.ToInt32(param[1]);
 
-                        logger.ErrorFormat("CUP_CursorPosition, row = {0}, col = {1}, {2}", row, col, this.index++);
+                        logger.DebugFormat("CUP_CursorPosition, row = {0}, col = {1}, {2}", row, col, this.index++);
 
                         // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
                         ViewableDocument document = this.activeDocument.ViewableArea;
@@ -693,6 +693,7 @@ namespace XTerminal
 
                 case VTActions.ICH_InsertCharacter:
                     {
+                        // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
                         int count = Convert.ToInt32(param[0]);
                         logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
@@ -762,13 +763,13 @@ namespace XTerminal
                     {
                         int topMargin = Convert.ToInt32(param[0]);
                         int bottomMargin = Convert.ToInt32(param[1]);
+                        logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                         if (topMargin == bottomMargin || bottomMargin > this.initialOptions.TerminalOption.Rows)
                         {
                             // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
                             // 参考：https://github.com/microsoft/terminal/issues/1849
                             return;
                         }
-                        logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                         // 但是目前还不知道topMargin和bottomMargin如何实现
                         this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
                         break;

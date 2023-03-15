@@ -44,6 +44,7 @@ namespace XTerminal.Channels
                 case TerminalTypes.VT100: return "vt100";
                 case TerminalTypes.VT220: return "vt220";
                 case TerminalTypes.XTerm: return "xterm";
+                case TerminalTypes.XTerm256Color: return "xterm-256color";
                 default:
                     throw new NotImplementedException();
             }
@@ -71,11 +72,13 @@ namespace XTerminal.Channels
             this.sshClient.Connect();
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
 
-            Dictionary<TerminalModes, int> terminalModeValues = new Dictionary<TerminalModes, int>();
-            terminalModeValues[TerminalModes.ECHOCTL] = 1;
+            Dictionary<TerminalModes, uint> terminalModeValues = new Dictionary<TerminalModes, uint>();
+            //terminalModeValues[TerminalModes.ECHOCTL] = 1;
+            terminalModeValues[TerminalModes.IEXTEN] = 1;
 
             TerminalOptions terminalOptions = this.options.TerminalOption;
-            this.stream = this.sshClient.CreateShellStream(this.GetTerminalName(terminalOptions.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize);
+            //this.stream = this.sshClient.CreateShellStream(this.GetTerminalName(terminalOptions.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
+            this.stream = this.sshClient.CreateShellStream("xterm", (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
             this.stream.DataReceived += this.Stream_DataReceived;
 
             this.NotifyStatusChanged(VTChannelState.Connected);
