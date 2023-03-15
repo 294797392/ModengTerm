@@ -8,6 +8,19 @@ using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
+    public enum InsertOptions
+    {
+        /// <summary>
+        /// 插入到前面
+        /// </summary>
+        PrependInsert,
+
+        /// <summary>
+        /// 插入到后面
+        /// </summary>
+        AppendInsert
+    }
+
     /// <summary>
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
@@ -283,6 +296,62 @@ namespace XTerminal.Document
             }
 
             return current;
+        }
+
+        /// <summary>
+        /// 插到一个节点
+        /// </summary>
+        /// <param name="line">要插入的节点</param>
+        /// <param name="prepend">是否是</param>
+        public void InsertLine(VTextLine line, InsertOptions options)
+        {
+            switch (options)
+            {
+                case InsertOptions.AppendInsert:
+                    {
+                        // 插入到后面
+                        if (this == this.OwnerDocument.LastLine)
+                        {
+                            // 该行是最后一行了，直接插入
+                            this.NextLine = line;
+                            line.PreviousLine = this;
+                            this.OwnerDocument.LastLine = line;
+                        }
+                        else
+                        {
+                            // 该行不是最后一行
+                            line.NextLine = this.NextLine;
+                            line.PreviousLine = this;
+                            this.NextLine = line;
+                        }
+
+                        break;
+                    }
+
+                case InsertOptions.PrependInsert:
+                    {
+                        // 插入到前面
+                        if (this == this.OwnerDocument.FirstLine)
+                        {
+                            // 该行是第一行，直接插入
+                            this.PreviousLine = line;
+                            line.NextLine = this;
+                            this.OwnerDocument.FirstLine = line;
+                        }
+                        else
+                        {
+                            // 该行不是最后一行
+                            line.PreviousLine = this.PreviousLine;
+                            line.NextLine = this;
+                            this.PreviousLine = line;
+                        }
+
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         #endregion

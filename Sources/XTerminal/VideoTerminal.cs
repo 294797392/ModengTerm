@@ -458,57 +458,82 @@ namespace XTerminal
                 case VTActions.LF:
                     {
                         // LF
+                        // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
 
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
 
-                        if (!this.activeDocument.HasNextLine(this.activeLine))
-                        {
-                            this.activeDocument.CreateNextLine();
-                        }
+                        // 目前的实现方法是：
+                        // 举个例子，假设marginBottom等于1，那么把新行插入在可视区域倒数第1行之前，然后滚动
 
-                        // 更新可视区域
                         ViewableDocument document = this.activeDocument.ViewableArea;
                         VTextLine oldFirstVisibleRow = document.FirstLine;
                         VTextLine oldLastVisibleRow = document.LastLine;
 
-                        VTextLine bottomVisibleRow = this.activeLine.FindNext(this.activeDocument.ScrollMarginBottom);
-
-                        // 是否需要滚动
-                        bool scroll = oldLastVisibleRow == bottomVisibleRow;
-                        if (scroll)
+                        if (this.activeDocument.ScrollMarginBottom > 0)
                         {
-                            if (this.activeLine == oldLastVisibleRow)
+                            // 有滚动边距
+
+                            VTextLine marginedLastLine = document.LastLine.FindPrevious(this.activeDocument.ScrollMarginBottom);
+
+                            if (this.activeLine == marginedLastLine)
                             {
-                                // 当前行是可视区域的最后一行
-                                // 光标在可视区域的最后一行，那么要把可视区域向下移动
-                                logger.DebugFormat("LineFeed，光标在可视区域最后一行，没有Margin，向下移动一行并且可视区域往下移动一行");
+                                // 光标在可视区域最后一行了
+
+                                // 可视区域在整个文档的最底面，需要创建新行
+                                VTextLine newLine = this.activeDocument.CreateLine();
+
+                                // 把新创建的行插入到倒数marginBottom行之前
+                                marginedLastLine.InsertLine(newLine, InsertOptions.PrependInsert);
+
+                                // 插入完了滚动
                                 document.ScrollDocument(ScrollOrientation.Down, 1);
 
-                                // 更新文档模型和渲染模型的关联信息
-                                // 把oldFirstRow的渲染模型拿给newLastRow使用
-                                VTextLine newLastVisibleRow = document.LastLine;
-                                newLastVisibleRow.AttachDrawable(oldFirstVisibleRow.Drawable);
+                                // 滚动完了复用渲染模型
+                                // 新加到可视区域里的行复用更新之前的可视区域的第一行
+                                newLine.AttachDrawable(oldFirstVisibleRow.Drawable);
                             }
                             else
                             {
-                                // 可视区域的最后一行不是当前行，那么滚动之后可以直接移动光标
-                                document.ScrollDocument(ScrollOrientation.Down, 1);
+                                // 光标在可视区域里，还没到最后一行，那么直接移动光标
                                 this.SetCursor(this.CursorRow + 1, this.CursorCol);
-                                VTextLine newLastVisibleRow = document.LastLine;
-                                newLastVisibleRow.AttachDrawable(oldFirstVisibleRow.Drawable);
                             }
                         }
                         else
                         {
-                            // 这里假设光标在可视区域里
-                            // 实际上光标有可能在可视区域的上面或者下面，但是暂时还没找到方法去判定
+                            // 没有滚动边距
+                            if (this.activeLine == document.LastLine)
+                            {
+                                // 光标在可视区域最后一行了
 
-                            // 光标在可视区域里
-                            logger.DebugFormat("LineFeed，光标在可视区域里，不需要滚动，直接移动光标到下一行");
-                            this.SetCursor(this.CursorRow + 1, this.CursorCol);
+                                if (document.LastLine == this.activeDocument.LastLine)
+                                {
+                                    // 可视区域在整个文档的最底面，需要创建新行
+                                    logger.DebugFormat("LineFeed，可视区域在整个文档的最底面，创建新行然后往下滚动");
+                                    this.activeDocument.CreateNextLine();
+                                    document.ScrollDocument(ScrollOrientation.Down, 1);
+
+                                    // 更新文档模型和渲染模型的关联信息
+                                    // 更新后的可视区域的最后一行复用更新之前的可视区域的第一行
+                                    VTextLine newLastVisibleRow = this.activeLine.NextLine;
+                                    newLastVisibleRow.AttachDrawable(oldFirstVisibleRow.Drawable);
+                                }
+                                else
+                                {
+                                    // 可视区域不在整个文档的最底面，直接移动光标
+                                    this.SetCursor(this.CursorRow + 1, this.CursorCol);
+                                }
+                            }
+                            else
+                            {
+                                // 光标在可视区域里
+                                // 可视区域在整个文档的里面，移动光标即可
+                                logger.DebugFormat("LineFeed，可视区域在整个文档的里面，直接往下滚动");
+                                this.SetCursor(this.CursorRow + 1, this.CursorCol);
+                            }
                         }
 
+                        // 更新鼠标所在行
                         this.activeLine = this.activeLine.NextLine;
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.CursorRow, this.CursorCol, action);
                         break;

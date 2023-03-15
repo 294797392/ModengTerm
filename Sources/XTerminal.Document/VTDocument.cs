@@ -43,12 +43,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 文档中的第一行
         /// </summary>
-        public VTextLine FirstLine { get; private set; }
+        public VTextLine FirstLine { get; internal set; }
 
         /// <summary>
         /// 文档中的最后一行
         /// </summary>
-        public VTextLine LastLine { get; private set; }
+        public VTextLine LastLine { get; internal set; }
 
         /// <summary>
         /// 记录文档中光标的位置
