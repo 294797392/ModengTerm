@@ -477,15 +477,38 @@ namespace XTerminal
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
 
+                        // 可视区域的信息
+                        ViewableDocument document = this.activeDocument.ViewableArea;
+                        VTextLine oldFirstRow = document.FirstLine;
+                        VTextLine oldLastRow = document.LastLine;
+
+                        if (this.activeDocument.ScrollMarginBottom > 0)
+                        {
+                            // 有margin
+                            VTextLine marginBottomRow = document.LastLine.FindPrevious(this.activeDocument.ScrollMarginBottom);
+                            if (this.activeLine == marginBottomRow)
+                            {
+                                if (document.LastLine == this.activeDocument.LastLine)
+                                {
+                                    this.activeDocument.CreateNextLine();
+                                }
+
+                                document.ScrollDocument(ScrollOrientation.Down, 1);
+
+                                // 更新文档模型和渲染模型的关联信息
+                                // 把oldFirstRow的渲染模型拿给newLastRow使用
+                                VTextLine newLastRow = document.LastLine;
+                                newLastRow.AttachDrawable(oldFirstRow.Drawable);
+                                this.SetCursor(this.CursorRow + 1, this.CursorCol);
+                                this.activeLine = this.activeLine.NextLine;
+                                return;
+                            }
+                        }
+
                         if (!this.activeDocument.HasNextLine(this.activeLine))
                         {
                             this.activeDocument.CreateNextLine();
                         }
-
-                        // 更新可视区域
-                        ViewableDocument document = this.activeDocument.ViewableArea;
-                        VTextLine oldFirstRow = document.FirstLine;
-                        VTextLine oldLastRow = document.LastLine;
 
                         if (oldLastRow == this.activeLine)
                         {
@@ -767,14 +790,16 @@ namespace XTerminal
                         int topMargin = Convert.ToInt32(param[0]);
                         int bottomMargin = Convert.ToInt32(param[1]);
                         logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                        if (topMargin == bottomMargin || bottomMargin > this.initialOptions.TerminalOption.Rows)
+                        // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
+                        // 但是在测试的时候，打开VIM，topMargin和bottomMargin都被设置为了1，如果不设置的话貌似显示不正常，所以当topMargin和bottomMargin一致的时候也执行
+                        //if (topMargin == bottomMargin || bottomMargin > this.initialOptions.TerminalOption.Rows)
+                        if (bottomMargin < 0 || topMargin < 0 || bottomMargin > this.initialOptions.TerminalOption.Rows)
                         {
-                            // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
+                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置");
                             // 参考：https://github.com/microsoft/terminal/issues/1849
                             return;
                         }
-                        // 但是目前还不知道topMargin和bottomMargin如何实现
-                        // Margin实现方式：Margin永远都在第一行或者最后一行。
+                        // Margin目前的实现方式：当LF或者ReverseLF的时候，光标所在行到了Margin行，那么执行滚动操作
                         this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
                         break;
                     }
@@ -790,7 +815,7 @@ namespace XTerminal
                         }
                         catch (Exception ex)
                         {
-                            
+
                         }
                         break;
                     }
