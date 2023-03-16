@@ -25,7 +25,7 @@ namespace XTerminal
 
         private static readonly byte[] OS_OperationStatusResponse = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
         private static readonly byte[] CPR_CursorPositionReportResponse = new byte[6] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
-        private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { (byte)'\x1b', (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
+        private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
 
         #endregion
 
@@ -62,10 +62,24 @@ namespace XTerminal
         /// </summary>
         private VTDocument activeDocument;
 
+        private VTextLine line1;
+
         /// <summary>
         /// 鼠标所在行
         /// </summary>
-        private VTextLine activeLine;
+        private VTextLine activeLine
+        {
+            get { return this.line1; }
+            set
+            {
+                if (value == null)
+                {
+                    Console.WriteLine();
+                }
+
+                this.line1 = value;
+            }
+        }
 
         /// <summary>
         /// Terminal区域的总长宽
@@ -463,77 +477,37 @@ namespace XTerminal
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
 
-                        // 目前的实现方法是：
-                        // 举个例子，假设marginBottom等于1，那么把新行插入在可视区域倒数第1行之前，然后滚动
-
-                        ViewableDocument document = this.activeDocument.ViewableArea;
-                        VTextLine oldFirstVisibleRow = document.FirstLine;
-                        VTextLine oldLastVisibleRow = document.LastLine;
-
-                        if (this.activeDocument.ScrollMarginBottom > 0)
+                        if (!this.activeDocument.HasNextLine(this.activeLine))
                         {
-                            // 有滚动边距
+                            this.activeDocument.CreateNextLine();
+                        }
 
-                            VTextLine marginedLastLine = document.LastLine.FindPrevious(this.activeDocument.ScrollMarginBottom);
+                        // 更新可视区域
+                        ViewableDocument document = this.activeDocument.ViewableArea;
+                        VTextLine oldFirstRow = document.FirstLine;
+                        VTextLine oldLastRow = document.LastLine;
 
-                            if (this.activeLine == marginedLastLine)
-                            {
-                                // 光标在可视区域最后一行了
+                        if (oldLastRow == this.activeLine)
+                        {
+                            // 光标在可视区域的最后一行，那么要把可视区域向下移动
+                            logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
+                            document.ScrollDocument(ScrollOrientation.Down, 1);
 
-                                // 可视区域在整个文档的最底面，需要创建新行
-                                VTextLine newLine = this.activeDocument.CreateLine();
-
-                                // 把新创建的行插入到倒数marginBottom行之前
-                                marginedLastLine.InsertLine(newLine, InsertOptions.PrependInsert);
-
-                                // 插入完了滚动
-                                document.ScrollDocument(ScrollOrientation.Down, 1);
-
-                                // 滚动完了复用渲染模型
-                                // 新加到可视区域里的行复用更新之前的可视区域的第一行
-                                newLine.AttachDrawable(oldFirstVisibleRow.Drawable);
-                            }
-                            else
-                            {
-                                // 光标在可视区域里，还没到最后一行，那么直接移动光标
-                                this.SetCursor(this.CursorRow + 1, this.CursorCol);
-                            }
+                            // 更新文档模型和渲染模型的关联信息
+                            // 把oldFirstRow的渲染模型拿给newLastRow使用
+                            VTextLine newLastRow = document.LastLine;
+                            newLastRow.AttachDrawable(oldFirstRow.Drawable);
                         }
                         else
                         {
-                            // 没有滚动边距
-                            if (this.activeLine == document.LastLine)
-                            {
-                                // 光标在可视区域最后一行了
+                            // 这里假设光标在可视区域里
+                            // 实际上光标有可能在可视区域的上面或者下面，但是暂时还没找到方法去判定
 
-                                if (document.LastLine == this.activeDocument.LastLine)
-                                {
-                                    // 可视区域在整个文档的最底面，需要创建新行
-                                    logger.DebugFormat("LineFeed，可视区域在整个文档的最底面，创建新行然后往下滚动");
-                                    this.activeDocument.CreateNextLine();
-                                    document.ScrollDocument(ScrollOrientation.Down, 1);
-
-                                    // 更新文档模型和渲染模型的关联信息
-                                    // 更新后的可视区域的最后一行复用更新之前的可视区域的第一行
-                                    VTextLine newLastVisibleRow = this.activeLine.NextLine;
-                                    newLastVisibleRow.AttachDrawable(oldFirstVisibleRow.Drawable);
-                                }
-                                else
-                                {
-                                    // 可视区域不在整个文档的最底面，直接移动光标
-                                    this.SetCursor(this.CursorRow + 1, this.CursorCol);
-                                }
-                            }
-                            else
-                            {
-                                // 光标在可视区域里
-                                // 可视区域在整个文档的里面，移动光标即可
-                                logger.DebugFormat("LineFeed，可视区域在整个文档的里面，直接往下滚动");
-                                this.SetCursor(this.CursorRow + 1, this.CursorCol);
-                            }
+                            // 光标在可视区域里
+                            logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
+                            this.SetCursor(this.CursorRow + 1, this.CursorCol);
                         }
 
-                        // 更新鼠标所在行
                         this.activeLine = this.activeLine.NextLine;
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.CursorRow, this.CursorCol, action);
                         break;
@@ -541,6 +515,8 @@ namespace XTerminal
 
                 case VTActions.RI_ReverseLineFeed:
                     {
+                        logger.ErrorFormat("ReverseLineFeed");
+
                         // 和LineFeed相反，也就是把光标往上移一个位置
                         // 在用man命令的时候会触发这个指令
                         // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
@@ -621,7 +597,7 @@ namespace XTerminal
                         int row = Convert.ToInt32(param[0]);
                         int col = Convert.ToInt32(param[1]);
 
-                        logger.ErrorFormat("CUP_CursorPosition, row = {0}, col = {1}, {2}", row, col, this.index++);
+                        logger.DebugFormat("CUP_CursorPosition, row = {0}, col = {1}, {2}", row, col, this.index++);
 
                         // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
                         ViewableDocument document = this.activeDocument.ViewableArea;
@@ -659,9 +635,10 @@ namespace XTerminal
 
                 #region DECPrivateMode
 
-                case VTActions.SetVTMode:
+                case VTActions.DECANM_AnsiMode:
                     {
                         VTMode vtMode = (VTMode)param[0];
+                        logger.DebugFormat("DECANM_AnsiMode, mode = {0}", vtMode);
                         this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
                         break;
                     }
@@ -717,6 +694,7 @@ namespace XTerminal
 
                 case VTActions.ICH_InsertCharacter:
                     {
+                        // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
                         int count = Convert.ToInt32(param[0]);
                         logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
@@ -772,12 +750,14 @@ namespace XTerminal
                 case VTActions.DSR_DeviceStatusReport:
                     {
                         StatusType statusType = (StatusType)Convert.ToInt32(param[0]);
+                        logger.DebugFormat("DSR_DeviceStatusReport, statusType = {0}", statusType);
                         this.PerformDeviceStatusReport(statusType);
                         break;
                     }
 
                 case VTActions.DA_DeviceAttributes:
                     {
+                        logger.DebugFormat("DA_DeviceAttributes");
                         this.vtChannel.Write(DA_DeviceAttributesResponse);
                         break;
                     }
@@ -787,6 +767,14 @@ namespace XTerminal
                         int topMargin = Convert.ToInt32(param[0]);
                         int bottomMargin = Convert.ToInt32(param[1]);
                         logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                        if (topMargin == bottomMargin || bottomMargin > this.initialOptions.TerminalOption.Rows)
+                        {
+                            // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
+                            // 参考：https://github.com/microsoft/terminal/issues/1849
+                            return;
+                        }
+                        // 但是目前还不知道topMargin和bottomMargin如何实现
+                        // Margin实现方式：Margin永远都在第一行或者最后一行。
                         this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
                         break;
                     }
@@ -796,7 +784,14 @@ namespace XTerminal
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
                         int lines = Convert.ToInt32(param[0]);
                         logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
-                        this.activeDocument.InsertLines(this.activeLine, lines);
+                        try
+                        {
+                            this.activeDocument.InsertLines(this.activeLine, lines);
+                        }
+                        catch (Exception ex)
+                        {
+                            
+                        }
                         break;
                     }
 

@@ -38,7 +38,7 @@ namespace VideoTerminal.Options
 
             TerminalOption = new TerminalOptions()
             {
-                Type = TerminalTypes.XTerm,
+                Type = TerminalTypes.XTerm256Color,
                 Columns = 80,
                 Rows = 24,
                 DECPrivateAutoWrapMode = false,

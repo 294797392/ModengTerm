@@ -58,12 +58,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 可视区域的第一行
         /// </summary>
-        public VTextLine FirstLine { get; internal set; }
+        public VTextLine FirstLine { get; set; }
 
         /// <summary>
         /// 可视区域的最后一行
         /// </summary>
-        public VTextLine LastLine { get; internal set; }
+        public VTextLine LastLine { get; set; }
 
         /// <summary>
         /// 所属的文档
@@ -79,30 +79,6 @@ namespace XTerminal.Document
         /// 总列数
         /// </summary>
         public int Columns { get { return this.options.Columns; } }
-
-        /// <summary>
-        /// 获取当前可视区域在整个VTDocument里的位置
-        /// </summary>
-        public ViewablePlacement Placement
-        {
-            get
-            {
-                VTDocument document = this.OwnerDocument;
-
-                if (document.FirstLine == this.FirstLine)
-                {
-                    return ViewablePlacement.Top;
-                }
-                else if (document.LastLine == this.LastLine)
-                {
-                    return ViewablePlacement.Bottom;
-                }
-                else
-                {
-                    return ViewablePlacement.Middle;
-                }
-            }
-        }
 
         #endregion
 

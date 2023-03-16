@@ -181,7 +181,7 @@ namespace XTerminal.Parser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        int parameter = Convert.ToInt32(parameters[0]);
+                        int parameter = this.GetParameter(parameters, 0, 0);
                         logger.DebugFormat("CSIDispatch - ED_EraseDisplay, parameter = {0}", parameter);
                         this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameter);
                         break;
@@ -622,7 +622,7 @@ namespace XTerminal.Parser
                         {
                             logger.DebugFormat("DECPrivateMode - DECANM_AnsiMode, enable = {0}", enable);
                             this.isAnsiMode = enable;
-                            this.NotifyActionEvent(VTActions.SetVTMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
+                            this.NotifyActionEvent(VTActions.DECANM_AnsiMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
                             break;
                         }
 
