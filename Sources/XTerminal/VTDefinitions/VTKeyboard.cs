@@ -142,6 +142,8 @@ namespace XTerminal.VTDefinitions
 
         private static readonly Dictionary<VTKeys, byte[]> KeypadApplicationMode = new Dictionary<VTKeys, byte[]>()
         {
+            { VTKeys.Space, new byte[] { ASCIITable.ESC, (byte)'O', (byte)' ' } }, { VTKeys.Tab, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'I' } }, { VTKeys.Enter, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'M' } },
+
             { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'1' } },
             { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'s' } },
             { VTKeys.NumPad4, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'u' } },
@@ -204,130 +206,9 @@ namespace XTerminal.VTDefinitions
 
         #region 实例方法
 
-        /// <summary>
-        /// 判断该按键是否是光标键就
-        /// </summary>
-        /// <returns></returns>
-        private bool IsCursorKey(VTKeys key)
-        {
-            return key == VTKeys.Up || key == VTKeys.Down || key == VTKeys.Left || key == VTKeys.Right;
-        }
-
         private bool IsShiftKeyPressed(VTInputEvent evt)
         {
             return evt.Modifiers.HasFlag(VTModifierKeys.Shift);
-        }
-
-        /// <summary>
-        /// 判断该按键是否是辅助按键（数字小键盘那一块的）
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        private bool IsKeypadKey(VTKeys key)
-        {
-            switch (key)
-            {
-                case VTKeys.NumPad0:
-                case VTKeys.NumPad1:
-                case VTKeys.NumPad2:
-                case VTKeys.NumPad3:
-                case VTKeys.NumPad4:
-                case VTKeys.NumPad5:
-                case VTKeys.NumPad6:
-                case VTKeys.NumPad7:
-                case VTKeys.NumPad8:
-                case VTKeys.NumPad9:
-                case VTKeys.Divide:
-                case VTKeys.Multiply:
-                case VTKeys.Subtract:
-                case VTKeys.Add:
-                case VTKeys.Decimal:
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-
-        private byte[] MapKey(VTInputEvent evt)
-        {
-            if (this.isVt52Mode)
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                #region 单独翻译光标键
-
-                if (this.IsCursorKey(evt.Key))
-                {
-                    if (this.isCursorKeyApplicationMode)
-                    {
-                        return CursorKeyApplicationMode[evt.Key];
-                    }
-                    else
-                    {
-                        return CursorKeyNormalMode[evt.Key];
-                    }
-                }
-
-                #endregion
-
-                #region 单独翻译Keypad
-
-                if (this.IsKeypadKey(evt.Key))
-                {
-                    if (this.isKeypadApplicationMode)
-                    {
-                        return KeypadApplicationMode[evt.Key];
-                    }
-                    else
-                    {
-                        return KeypadNormalMode[evt.Key];
-                    }
-                }
-
-                #endregion
-            }
-            
-            #region 按照VT52或者ANSI标准翻译按键
-
-            byte[] bytes = null;
-
-            if (this.isVt52Mode)
-            {
-                // VT52兼容模式
-                throw new NotImplementedException();
-            }
-            else
-            {
-                // 处理按住Shift键的情况
-                if (this.IsShiftKeyPressed(evt))
-                {
-                    if (ANSIShiftKeyTable.TryGetValue(evt.Key, out bytes))
-                    {
-                        return bytes;
-                    }
-                }
-
-                // ANSI兼容模式
-                if (!ANSIKeyTable.TryGetValue(evt.Key, out bytes))
-                {
-                    logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
-                    return null;
-                }
-
-                // 这里表示输入的是大写字母
-                if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
-                {
-                    keyBytes[0] = (byte)(bytes[0] - 32);
-                    return keyBytes;
-                }
-            }
-
-            #endregion
-
-            return bytes;
         }
 
         #endregion
@@ -366,9 +247,83 @@ namespace XTerminal.VTDefinitions
         /// <returns></returns>
         public byte[] TranslateInput(VTInputEvent evt)
         {
-            if (evt.Key != VTKeys.None)
+            if (evt.Key == VTKeys.None)
             {
-                return this.MapKey(evt);
+                return null;
+            }
+
+            byte[] bytes = null;
+
+            if (this.isVt52Mode)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                #region 尝试映射光标键
+
+                if (this.isCursorKeyApplicationMode)
+                {
+                    if (CursorKeyApplicationMode.TryGetValue(evt.Key, out bytes))
+                    {
+                        return bytes;
+                    }
+                }
+                else
+                {
+                    if (CursorKeyNormalMode.TryGetValue(evt.Key, out bytes))
+                    {
+                        return bytes;
+                    }
+                }
+
+                #endregion
+
+                #region 尝试映射Keypad
+
+                if (this.isKeypadApplicationMode)
+                {
+                    if (KeypadApplicationMode.TryGetValue(evt.Key, out bytes))
+                    {
+                        return bytes;
+                    }
+                }
+                else
+                {
+                    if (KeypadNormalMode.TryGetValue(evt.Key, out bytes))
+                    {
+                        return bytes;
+                    }
+                }
+
+                #endregion
+
+                #region 都没映射成功，使用默认映射
+
+                // 处理按住Shift键的情况
+                if (this.IsShiftKeyPressed(evt))
+                {
+                    if (ANSIShiftKeyTable.TryGetValue(evt.Key, out bytes))
+                    {
+                        return bytes;
+                    }
+                }
+
+                // ANSI兼容模式
+                if (!ANSIKeyTable.TryGetValue(evt.Key, out bytes))
+                {
+                    logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
+                    return null;
+                }
+
+                // 这里表示输入的是大写字母
+                if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
+                {
+                    keyBytes[0] = (byte)(bytes[0] - 32);
+                    return keyBytes;
+                }
+
+                #endregion
             }
 
             return null;
