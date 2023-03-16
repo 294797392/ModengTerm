@@ -25,7 +25,7 @@ namespace XTerminal
 
         private static readonly byte[] OS_OperationStatusResponse = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
         private static readonly byte[] CPR_CursorPositionReportResponse = new byte[6] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
-        private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { (byte)'\x1b', (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
+        private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
 
         #endregion
 
@@ -635,9 +635,10 @@ namespace XTerminal
 
                 #region DECPrivateMode
 
-                case VTActions.SetVTMode:
+                case VTActions.DECANM_AnsiMode:
                     {
                         VTMode vtMode = (VTMode)param[0];
+                        logger.DebugFormat("DECANM_AnsiMode, mode = {0}", vtMode);
                         this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
                         break;
                     }
@@ -749,12 +750,14 @@ namespace XTerminal
                 case VTActions.DSR_DeviceStatusReport:
                     {
                         StatusType statusType = (StatusType)Convert.ToInt32(param[0]);
+                        logger.DebugFormat("DSR_DeviceStatusReport, statusType = {0}", statusType);
                         this.PerformDeviceStatusReport(statusType);
                         break;
                     }
 
                 case VTActions.DA_DeviceAttributes:
                     {
+                        logger.DebugFormat("DA_DeviceAttributes");
                         this.vtChannel.Write(DA_DeviceAttributesResponse);
                         break;
                     }
@@ -771,6 +774,7 @@ namespace XTerminal
                             return;
                         }
                         // 但是目前还不知道topMargin和bottomMargin如何实现
+                        // Margin实现方式：Margin永远都在第一行或者最后一行。
                         this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
                         break;
                     }
@@ -780,7 +784,14 @@ namespace XTerminal
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
                         int lines = Convert.ToInt32(param[0]);
                         logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
-                        this.activeDocument.InsertLines(this.activeLine, lines);
+                        try
+                        {
+                            this.activeDocument.InsertLines(this.activeLine, lines);
+                        }
+                        catch (Exception ex)
+                        {
+                            
+                        }
                         break;
                     }
 

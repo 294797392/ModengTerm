@@ -622,7 +622,7 @@ namespace XTerminal.Parser
                         {
                             logger.DebugFormat("DECPrivateMode - DECANM_AnsiMode, enable = {0}", enable);
                             this.isAnsiMode = enable;
-                            this.NotifyActionEvent(VTActions.SetVTMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
+                            this.NotifyActionEvent(VTActions.DECANM_AnsiMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
                             break;
                         }
 

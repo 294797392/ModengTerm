@@ -182,7 +182,7 @@ namespace XTerminal.Parser
         /// 设置终端模式
         /// VT52和ANSI两种模式
         /// </summary>
-        SetVTMode,
+        DECANM_AnsiMode,
         AutoWrapMode,
         XTERM_BracketedPasteMode,
         ATT610_StartCursorBlink,

@@ -74,7 +74,7 @@ namespace XTerminal.Channels
 
             Dictionary<TerminalModes, uint> terminalModeValues = new Dictionary<TerminalModes, uint>();
             //terminalModeValues[TerminalModes.ECHOCTL] = 1;
-            terminalModeValues[TerminalModes.IEXTEN] = 1;
+            //terminalModeValues[TerminalModes.IEXTEN] = 1;
 
             TerminalOptions terminalOptions = this.options.TerminalOption;
             //this.stream = this.sshClient.CreateShellStream(this.GetTerminalName(terminalOptions.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
