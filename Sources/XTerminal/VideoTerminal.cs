@@ -799,7 +799,8 @@ namespace XTerminal
                             // 参考：https://github.com/microsoft/terminal/issues/1849
                             return;
                         }
-                        // Margin目前的实现方式：当LF或者ReverseLF的时候，光标所在行到了Margin行，那么执行滚动操作
+                        // Margin目前的实现方式：
+                        // BottomMargin：相当于是把ViewableDocument缩小bottomMargin行，需要创建MarginLine用来填充剩余的区域
                         this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
                         break;
                     }
