@@ -73,25 +73,21 @@ namespace XTerminal.VTDefinitions
             { VTKeys.OemMinus, new byte[] { (byte)'_' } }, { VTKeys.OemPlus, new byte[] { (byte)'+' } },
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> VT52KeyTable = new Dictionary<VTKeys, byte[]>()
-        {
-        };
-
         #region 方向键映射
 
-        private static readonly Dictionary<VTKeys, byte[]> VT52CursorKeyTable = new Dictionary<VTKeys, byte[]>()
+        private static readonly Dictionary<VTKeys, byte[]> CursorKeyVT52 = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.Up, new byte[] { ASCIITable.ESC, (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC, (byte)'B' } },
             { VTKeys.Right, new byte[] { ASCIITable.ESC, (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC, (byte)'D' } },
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> ANSICursorKeyNormalTable = new Dictionary<VTKeys, byte[]>()
+        private static readonly Dictionary<VTKeys, byte[]> CursorKeyNormalMode = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.Up, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'B' } },
             { VTKeys.Right, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'D' } },
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> ANSICursorKeyApplicationTable = new Dictionary<VTKeys, byte[]>()
+        private static readonly Dictionary<VTKeys, byte[]> CursorKeyApplicationMode = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.Up, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'B' } },
             { VTKeys.Right, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'D' } },
@@ -129,7 +125,22 @@ namespace XTerminal.VTDefinitions
             { VTKeys.Decimal, new byte[] { (byte)'.' } }
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> ANSIAuxiliaryKeyApplicationModeTable = new Dictionary<VTKeys, byte[]>()
+        private static readonly Dictionary<VTKeys, byte[]> KeypadNormalMode = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.Space, new byte[] { (byte)' ' } }, { VTKeys.Tab, new byte[] { (byte)'\t' } }, { VTKeys.Enter, new byte[] { (byte)'\r' } },
+            { VTKeys.NumPad0, new byte[] { (byte)'0' } }, { VTKeys.NumPad1, new byte[] { (byte)'1' } },
+            { VTKeys.NumPad2, new byte[] { (byte)'2' } }, { VTKeys.NumPad3, new byte[] { (byte)'3' } },
+            { VTKeys.NumPad4, new byte[] { (byte)'4' } }, { VTKeys.NumPad5, new byte[] { (byte)'5' } },
+            { VTKeys.NumPad6, new byte[] { (byte)'6' } }, { VTKeys.NumPad7, new byte[] { (byte)'7' } },
+            { VTKeys.NumPad8, new byte[] { (byte)'8' } }, { VTKeys.NumPad9, new byte[] { (byte)'9' } },
+
+            // dash
+            { VTKeys.Subtract, new byte[] { (byte)'-' } },
+            // period
+            { VTKeys.Decimal, new byte[] { (byte)'.' } }
+        };
+
+        private static readonly Dictionary<VTKeys, byte[]> KeypadApplicationMode = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'1' } },
             { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'s' } },
@@ -141,20 +152,6 @@ namespace XTerminal.VTDefinitions
             { VTKeys.Subtract, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'m' } },
             // period
             { VTKeys.Decimal, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'n' } }
-        };
-
-        private static readonly Dictionary<VTKeys, byte[]> ANSIAuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>()
-        {
-            { VTKeys.NumPad0, new byte[] { (byte)'0' } }, { VTKeys.NumPad1, new byte[] { (byte)'1' } },
-            { VTKeys.NumPad2, new byte[] { (byte)'2' } }, { VTKeys.NumPad3, new byte[] { (byte)'3' } },
-            { VTKeys.NumPad4, new byte[] { (byte)'4' } }, { VTKeys.NumPad5, new byte[] { (byte)'5' } },
-            { VTKeys.NumPad6, new byte[] { (byte)'6' } }, { VTKeys.NumPad7, new byte[] { (byte)'7' } },
-            { VTKeys.NumPad8, new byte[] { (byte)'8' } }, { VTKeys.NumPad9, new byte[] { (byte)'9' } },
-
-            // dash
-            { VTKeys.Subtract, new byte[] { (byte)'-' } },
-            // period
-            { VTKeys.Decimal, new byte[] { (byte)'.' } }
         };
 
         #endregion
@@ -226,7 +223,7 @@ namespace XTerminal.VTDefinitions
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        private bool IsAuxiliaryKey(VTKeys key)
+        private bool IsKeypadKey(VTKeys key)
         {
             switch (key)
             {
@@ -254,61 +251,45 @@ namespace XTerminal.VTDefinitions
 
         private byte[] MapKey(VTInputEvent evt)
         {
-            #region 单独翻译光标键
-
-            if (this.IsCursorKey(evt.Key))
+            if (this.isVt52Mode)
             {
-                if (this.isVt52Mode)
-                {
-                    return VT52CursorKeyTable[evt.Key];
-                }
-                else
+                throw new NotImplementedException();
+            }
+            else
+            {
+                #region 单独翻译光标键
+
+                if (this.IsCursorKey(evt.Key))
                 {
                     if (this.isCursorKeyApplicationMode)
                     {
-                        return ANSICursorKeyApplicationTable[evt.Key];
+                        return CursorKeyApplicationMode[evt.Key];
                     }
                     else
                     {
-                        return ANSICursorKeyNormalTable[evt.Key];
+                        return CursorKeyNormalMode[evt.Key];
                     }
                 }
-            }
 
-            #endregion
+                #endregion
 
-            #region 单独翻译辅助键盘
+                #region 单独翻译Keypad
 
-            if (this.IsAuxiliaryKey(evt.Key))
-            {
-                if (this.isVt52Mode)
+                if (this.IsKeypadKey(evt.Key))
                 {
                     if (this.isKeypadApplicationMode)
                     {
-                        // ApplicationMode
-                        return VT52AuxiliaryKeyApplicationModeTable[evt.Key];
+                        return KeypadApplicationMode[evt.Key];
                     }
                     else
                     {
-                        // NumericMode
-                        return VT52AuxiliaryKeyNumericModeTable[evt.Key];
+                        return KeypadNormalMode[evt.Key];
                     }
                 }
-                else
-                {
-                    if (this.isKeypadApplicationMode)
-                    {
-                        return ANSIAuxiliaryKeyApplicationModeTable[evt.Key];
-                    }
-                    else
-                    {
-                        return ANSIAuxiliaryKeyNumericModeTable[evt.Key];
-                    }
-                }
+
+                #endregion
             }
-
-            #endregion
-
+            
             #region 按照VT52或者ANSI标准翻译按键
 
             byte[] bytes = null;
