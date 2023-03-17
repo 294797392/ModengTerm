@@ -14,12 +14,12 @@ namespace XTerminal.Document
 
     public static class VTextSourceFactory
     {
-        public static VTextSource Create(VTextSources type, int capacity)
+        public static VTextSource Create(VTextSources type)
         {
             switch (type)
             {
-                case VTextSources.CharactersTextSource: return new VTCharactersTextSource(capacity);
-                case VTextSources.StringTextSource: return new VTStringTextSource(capacity);
+                case VTextSources.CharactersTextSource: return new VTCharactersTextSource();
+                case VTextSources.StringTextSource: return new VTStringTextSource();
                 default:
                     throw new NotImplementedException();
             }
@@ -32,8 +32,6 @@ namespace XTerminal.Document
 
         #region 实例变量
 
-        protected int capacity;
-
         #endregion
 
         #region 属性
@@ -43,39 +41,10 @@ namespace XTerminal.Document
         /// </summary>
         public abstract int Columns { get; }
 
-        /// <summary>
-        /// 获取该文本数据源最大可以容纳多少列
-        /// </summary>
-        public int Capacity { get { return this.capacity; } }
-
         #endregion
 
-        public VTextSource(int capacity)
+        public VTextSource()
         {
-            this.capacity = capacity;
-        }
-
-        /// <summary>
-        /// 重新设置该文本数据源最大的列数
-        /// </summary>
-        /// <param name="column"></param>
-        public void ResizeColumn(int column)
-        {
-            if (column == this.capacity)
-            {
-                return;
-            }
-
-            if (column > this.capacity)
-            {
-                this.ResizeColumn(true, column - this.capacity);
-            }
-            else
-            {
-                this.ResizeColumn(false, this.capacity - column);
-            }
-
-            this.capacity = column;
         }
 
         #region 公开接口
@@ -141,8 +110,7 @@ namespace XTerminal.Document
     {
         private string text = string.Empty;
 
-        public VTStringTextSource(int capacity) :
-            base(capacity)
+        public VTStringTextSource() 
         {
         }
 
@@ -190,8 +158,7 @@ namespace XTerminal.Document
 
         public override int Columns => this.characters.Count;
 
-        public VTCharactersTextSource(int capacity) :
-            base(capacity)
+        public VTCharactersTextSource() 
         {
             this.characters = new List<VTCharacter>();
         }

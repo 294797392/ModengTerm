@@ -188,7 +188,7 @@ namespace XTerminal.VTDefinitions
         /// </summary>
         private bool isCursorKeyApplicationMode;
 
-        private byte[] keyBytes;
+        private byte[] upperCaseCharacter;
 
         #endregion
 
@@ -196,7 +196,7 @@ namespace XTerminal.VTDefinitions
 
         public VTKeyboard()
         {
-            this.keyBytes = new byte[1];
+            this.upperCaseCharacter = new byte[1];
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
             this.SetCursorKeyMode(false);
@@ -310,18 +310,19 @@ namespace XTerminal.VTDefinitions
                 }
 
                 // ANSI兼容模式
-                if (!ANSIKeyTable.TryGetValue(evt.Key, out bytes))
+                if (ANSIKeyTable.TryGetValue(evt.Key, out bytes))
                 {
-                    logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
-                    return null;
+                    // CapsLock打开了，说明输入的是大写字母，把小写字母转成大写字母
+                    if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
+                    {
+                        upperCaseCharacter[0] = (byte)(bytes[0] - 32);
+                        return upperCaseCharacter;
+                    }
+
+                    return bytes;
                 }
 
-                // 这里表示输入的是大写字母
-                if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
-                {
-                    keyBytes[0] = (byte)(bytes[0] - 32);
-                    return keyBytes;
-                }
+                logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
 
                 #endregion
             }

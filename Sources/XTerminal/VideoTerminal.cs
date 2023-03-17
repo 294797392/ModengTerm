@@ -62,25 +62,6 @@ namespace XTerminal
         /// </summary>
         private VTDocument activeDocument;
 
-        private VTextLine line1;
-
-        /// <summary>
-        /// 鼠标所在行
-        /// </summary>
-        private VTextLine activeLine
-        {
-            get { return this.line1; }
-            set
-            {
-                if (value == null)
-                {
-                    Console.WriteLine();
-                }
-
-                this.line1 = value;
-            }
-        }
-
         /// <summary>
         /// Terminal区域的总长宽
         /// </summary>
@@ -139,6 +120,11 @@ namespace XTerminal
         /// 该坐标是基于ViewableDocument的坐标
         /// </summary>
         private VTCursor Cursor { get { return this.activeDocument.Cursor; } }
+
+        /// <summary>
+        /// 获取当前光标所在行
+        /// </summary>
+        public VTextLine ActiveLine { get { return this.activeDocument.ActiveLine; } }
 
         /// <summary>
         /// 获取当前光标所在行
@@ -230,12 +216,11 @@ namespace XTerminal
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
-            this.activeLine = this.mainDocument.FirstLine;
 
             // 初始化文档行数据模型和渲染模型的关联关系
             ViewableDocument document = this.activeDocument.ViewableArea;
             List<IDocumentDrawable> drawableLines = this.Renderer.GetDrawableLines();
-            document.AttachAll(drawableLines);
+            this.activeDocument.AttachAll(drawableLines);
 
             #endregion
 
@@ -324,93 +309,96 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// 如果需要布局则进行布局
-        /// 如果不需要布局，那么就看是否需要重绘某些文本行
+        /// 渲染一个文档
         /// </summary>
-        /// <param name="vtDocument"></param>
-        private void DrawDocument(VTDocument vtDocument)
+        /// <param name="document">要渲染的文档</param>
+        /// <param name="startOffsetY">该文档的起始Y偏移量</param>
+        /// <returns>该文档渲染后的底部Y偏移量</returns>
+        private double DrawDocument(VTDocumentBase document, double startOffsetY)
         {
-            ViewableDocument document = vtDocument.ViewableArea;
-
-            // 当前行的Y方向偏移量
-            double offsetY = 0;
+            double offsetY = startOffsetY;
 
             VTextLine next = document.FirstLine;
 
-            this.uiSyncContext.Send((state) =>
+            while (next != null)
             {
-                #region 更新文本行
-
-                while (next != null)
+                // 首先获取当前行的DrawingObject
+                IDocumentDrawable drawableLine = next.Drawable;
+                if (drawableLine == null)
                 {
-                    // 首先获取当前行的DrawingObject
-                    IDocumentDrawable drawableLine = next.Drawable;
-                    if (drawableLine == null)
-                    {
-                        // 不应该发生
-                        logger.FatalFormat("没有空闲的drawableLine了");
-                        return;
-                    }
-
-                    // 更新Y偏移量信息
-                    next.OffsetY = offsetY;
-
-                    if (next.IsDirty)
-                    {
-                        // 此时说明该行有字符变化，需要重绘
-                        // 重绘的时候会也会Arrange
-                        this.Renderer.DrawDrawable(drawableLine);
-                        next.SetDirty(false);
-                    }
-                    else
-                    {
-                        // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                        next.Metrics = this.Renderer.MeasureLine(next, 0);
-                        this.Renderer.UpdatePosition(drawableLine, next.OffsetX, next.OffsetY);
-                    }
-
-                    // 更新下一个文本行的Y偏移量
-                    offsetY += next.Metrics.Height;
-
-                    // 如果最后一行渲染完毕了，那么就退出
-                    if (next == document.LastLine)
-                    {
-                        break;
-                    }
-
-                    next = next.NextLine;
+                    // 不应该发生
+                    logger.FatalFormat("没有空闲的drawableLine了");
+                    return -1;
                 }
 
-                #endregion
+                // 更新Y偏移量信息
+                next.OffsetY = offsetY;
+
+                if (next.IsDirty)
+                {
+                    // 此时说明该行有字符变化，需要重绘
+                    // 重绘的时候会也会Arrange
+                    this.Renderer.DrawDrawable(drawableLine);
+                    next.SetDirty(false);
+                }
+                else
+                {
+                    // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
+                    next.Metrics = this.Renderer.MeasureLine(next, 0);
+                    this.Renderer.UpdatePosition(drawableLine, next.OffsetX, next.OffsetY);
+                }
+
+                // 更新下一个文本行的Y偏移量
+                offsetY += next.Metrics.Height;
+
+                // 如果最后一行渲染完毕了，那么就退出
+                if (next == document.LastLine)
+                {
+                    break;
+                }
+
+                next = next.NextLine;
+            }
+
+            return offsetY;
+        }
+
+        /// <summary>
+        /// 如果需要布局则进行布局
+        /// 如果不需要布局，那么就看是否需要重绘某些文本行
+        /// </summary>
+        /// <param name="document">要渲染的文档</param>
+        private void DrawDocument(VTDocument document)
+        {
+            // 当前行的Y方向偏移量
+            double offsetY = 0;
+
+            this.uiSyncContext.Send((state) =>
+            {
+                // 先渲染顶部Margin区域
+                if (!document.TopMarginArea.IsEmpty)
+                {
+                    offsetY = this.DrawDocument(document.TopMarginArea, offsetY);
+                }
+
+                // 再渲染中间可视区域
+                offsetY = this.DrawDocument(document.ViewableArea, offsetY);
+
+                // 最后渲染底部Margin区域
+                if (!document.BottomMarginArea.IsEmpty)
+                {
+                    offsetY = this.DrawDocument(document.BottomMarginArea, offsetY);
+                }
 
                 #region 更新光标
 
-                this.Cursor.OffsetY = this.activeLine.OffsetY;
-                this.Cursor.OffsetX = this.Renderer.MeasureLine(this.activeLine, this.CursorCol).WidthIncludingWhitespace;
+                this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                this.Cursor.OffsetX = this.Renderer.MeasureLine(this.ActiveLine, this.CursorCol).WidthIncludingWhitespace;
                 this.Renderer.UpdatePosition(this.Cursor.Drawable, this.Cursor.OffsetX, this.Cursor.OffsetY);
 
                 #endregion
 
             }, null);
-        }
-
-        /// <summary>
-        /// 设置光标位置
-        /// </summary>
-        /// <param name="row">要设置的行</param>
-        /// <param name="column">要设置的列</param>
-        /// <param name="activeLine">设置之后光标所在行</param>
-        private void SetCursor(int row, int column)
-        {
-            if (this.Cursor.Row != row)
-            {
-                this.Cursor.Row = row;
-            }
-
-            if (this.Cursor.Column != column)
-            {
-                this.Cursor.Column = column;
-            }
         }
 
         #endregion
@@ -453,8 +441,8 @@ namespace XTerminal
                     {
                         char ch = (char)param[0];
                         logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
-                        this.activeDocument.PrintCharacter(this.activeLine, ch, this.CursorCol);
-                        this.SetCursor(this.CursorRow, this.CursorCol + 1);
+                        this.activeDocument.PrintCharacter(this.ActiveLine, ch, this.CursorCol);
+                        this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + 1);
                         break;
                     }
 
@@ -462,7 +450,7 @@ namespace XTerminal
                     {
                         // CR
                         // 把光标移动到行开头
-                        this.SetCursor(this.CursorRow, 0);
+                        this.activeDocument.SetCursor(this.CursorRow, 0);
                         logger.DebugFormat("CarriageReturn, cursorRow = {0}, cursorCol = {1}", this.CursorRow, this.CursorCol);
                         break;
                     }
@@ -476,98 +464,18 @@ namespace XTerminal
 
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
-
-                        // 可视区域的信息
-                        ViewableDocument document = this.activeDocument.ViewableArea;
-                        VTextLine oldFirstRow = document.FirstLine;
-                        VTextLine oldLastRow = document.LastLine;
-
-                        if (this.activeDocument.ScrollMarginBottom > 0)
-                        {
-                            // 有margin
-                            VTextLine marginBottomRow = document.LastLine.FindPrevious(this.activeDocument.ScrollMarginBottom);
-                            if (this.activeLine == marginBottomRow)
-                            {
-                                if (document.LastLine == this.activeDocument.LastLine)
-                                {
-                                    this.activeDocument.CreateNextLine();
-                                }
-
-                                document.ScrollDocument(ScrollOrientation.Down, 1);
-
-                                // 更新文档模型和渲染模型的关联信息
-                                // 把oldFirstRow的渲染模型拿给newLastRow使用
-                                VTextLine newLastRow = document.LastLine;
-                                newLastRow.AttachDrawable(oldFirstRow.Drawable);
-                                this.SetCursor(this.CursorRow + 1, this.CursorCol);
-                                this.activeLine = this.activeLine.NextLine;
-                                return;
-                            }
-                        }
-
-                        if (!this.activeDocument.HasNextLine(this.activeLine))
-                        {
-                            this.activeDocument.CreateNextLine();
-                        }
-
-                        if (oldLastRow == this.activeLine)
-                        {
-                            // 光标在可视区域的最后一行，那么要把可视区域向下移动
-                            logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
-                            document.ScrollDocument(ScrollOrientation.Down, 1);
-
-                            // 更新文档模型和渲染模型的关联信息
-                            // 把oldFirstRow的渲染模型拿给newLastRow使用
-                            VTextLine newLastRow = document.LastLine;
-                            newLastRow.AttachDrawable(oldFirstRow.Drawable);
-                        }
-                        else
-                        {
-                            // 这里假设光标在可视区域里
-                            // 实际上光标有可能在可视区域的上面或者下面，但是暂时还没找到方法去判定
-
-                            // 光标在可视区域里
-                            logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
-                            this.SetCursor(this.CursorRow + 1, this.CursorCol);
-                        }
-
-                        this.activeLine = this.activeLine.NextLine;
+                        this.activeDocument.LineFeed();
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.CursorRow, this.CursorCol, action);
                         break;
                     }
 
                 case VTActions.RI_ReverseLineFeed:
                     {
-                        logger.ErrorFormat("ReverseLineFeed");
-
                         // 和LineFeed相反，也就是把光标往上移一个位置
                         // 在用man命令的时候会触发这个指令
                         // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
-
-                        ViewableDocument document = this.activeDocument.ViewableArea;
-                        VTextLine oldFirstRow = document.FirstLine;
-                        VTextLine oldLastRow = document.LastLine;
-
-                        VTextLine topVisibleRow = this.activeLine.FindPrevious(this.activeDocument.ScrollMarginTop);
-                        if (oldFirstRow == topVisibleRow)
-                        {
-                            // 此时光标位置在可视区域的第一行
-                            logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
-                            VTextLine newFirstRow = document.ScrollDocument(ScrollOrientation.Up, 1);
-
-                            // 把oldLastRow的渲染模型拿给newFirstRow使用
-                            newFirstRow.AttachDrawable(oldLastRow.Drawable);
-                        }
-                        else
-                        {
-                            // 这里假设光标在可视区域里面
-                            // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
-
-                            // 光标位置在可视区域里面
-                            this.SetCursor(this.CursorRow - 1, this.CursorCol);
-                        }
-
-                        this.activeLine = this.activeLine.PreviousLine;
+                        this.activeDocument.ReverseLineFeed();
+                        logger.DebugFormat("ReverseLineFeed");
                         break;
                     }
 
@@ -575,7 +483,7 @@ namespace XTerminal
                     {
                         EraseType eraseType = (EraseType)param[0];
                         logger.DebugFormat("EL_EraseLine, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.CursorRow, this.CursorCol);
-                        this.activeDocument.EraseLine(this.activeLine, this.CursorCol, eraseType);
+                        this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
                         break;
                     }
 
@@ -587,7 +495,7 @@ namespace XTerminal
                 case VTActions.CursorBackward:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        this.SetCursor(this.CursorRow, this.CursorCol - n);
+                        this.activeDocument.SetCursor(this.CursorRow, this.CursorCol - n);
                         logger.DebugFormat("CursorBackward, cursorRow = {0}, cursorCol = {1}", this.CursorRow, this.CursorCol);
                         break;
                     }
@@ -595,23 +503,21 @@ namespace XTerminal
                 case VTActions.CUF_CursorForward:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        this.SetCursor(this.CursorRow, this.CursorCol + n);
+                        this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + n);
                         break;
                     }
 
                 case VTActions.CUU_CursorUp:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        this.activeLine = this.activeLine.FindPrevious(n);
-                        this.SetCursor(this.CursorRow - n, this.CursorCol);
+                        this.activeDocument.SetCursor(this.CursorRow - n, this.CursorCol);
                         break;
                     }
 
                 case VTActions.CUD_CursorDown:
                     {
                         int n = Convert.ToInt32(param[0]);
-                        this.activeLine = this.activeLine.FindNext(n);
-                        this.SetCursor(this.CursorRow + n, this.CursorCol);
+                        this.activeDocument.SetCursor(this.CursorRow + n, this.CursorCol);
                         break;
                     }
 
@@ -625,10 +531,7 @@ namespace XTerminal
                         // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
                         ViewableDocument document = this.activeDocument.ViewableArea;
 
-                        // 更新当前行
-                        this.activeLine = document.FirstLine.FindNext(row);
-                        // 更新基于VTDocument的cursorRow和cursorCol
-                        this.SetCursor(row, col);
+                        this.activeDocument.SetCursor(row, col);
                         break;
                     }
 
@@ -711,7 +614,7 @@ namespace XTerminal
                     {
                         // 从指定位置删除n个字符，删除后的字符串要左对齐
                         int count = Convert.ToInt32(param[0]);
-                        this.activeDocument.DeleteCharacter(this.activeLine, this.CursorCol, count);
+                        this.activeDocument.DeleteCharacter(this.ActiveLine, this.CursorCol, count);
                         break;
                     }
 
@@ -731,32 +634,28 @@ namespace XTerminal
                         logger.DebugFormat("UseAlternateScreenBuffer");
 
                         // 先记录当前的光标
-                        this.mainDocument.Cursor.OwnerLine = this.activeLine;
-                        this.mainDocument.ViewableArea.DetachAll();
+                        this.mainDocument.Cursor.OwnerLine = this.ActiveLine;
+                        this.mainDocument.DetachAll();
 
                         // 切换ActiveDocument
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.ResetRows();
-                        this.alternateDocument.Cursor.Column = 0;
-                        this.alternateDocument.Cursor.Row = 0;
                         this.alternateDocument.ViewableArea.DeleteAll();
-                        this.alternateDocument.ViewableArea.AttachAll(this.Renderer.GetDrawableLines());
+                        this.alternateDocument.AttachAll(this.Renderer.GetDrawableLines());
                         this.alternateDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
                         // 更新activeLine为AlternateDocument的第一行
-                        this.activeLine = this.alternateDocument.FirstLine;
                         this.activeDocument = this.alternateDocument;
                         break;
                     }
 
                 case VTActions.UseMainScreenBuffer:
                     {
-                        this.alternateDocument.ViewableArea.DetachAll();
+                        this.alternateDocument.DetachAll();
 
                         logger.DebugFormat("UseMainScreenBuffer");
 
                         // 恢复之前保存的光标
-                        this.activeLine = this.mainDocument.Cursor.OwnerLine;
-                        this.mainDocument.ViewableArea.AttachAll(this.Renderer.GetDrawableLines());
+                        this.mainDocument.AttachAll(this.Renderer.GetDrawableLines());
                         this.mainDocument.ViewableArea.DirtyAll();
                         this.mainDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
                         this.activeDocument = this.mainDocument;
@@ -766,7 +665,7 @@ namespace XTerminal
                 case VTActions.ED_EraseDisplay:
                     {
                         int parameter = Convert.ToInt32(param[0]);
-                        this.activeDocument.EraseDisplay(this.activeLine, this.CursorCol, (EraseType)parameter);
+                        this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, (EraseType)parameter);
                         break;
                     }
 
@@ -787,21 +686,41 @@ namespace XTerminal
 
                 case VTActions.DECSTBM_SetScrollingRegion:
                     {
+                        // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
+                        // 但是在测试的时候，打开VIM，topMargin和bottomMargin都被设置为了1，如果不设置的话貌似显示不正常，所以当topMargin和bottomMargin一致的时候也执行
+                        // 边距还会影响插入行 (IL) 和删除行 (DL)、向上滚动 (SU) 和向下滚动 (SD) 修改的行。
+
                         int topMargin = Convert.ToInt32(param[0]);
                         int bottomMargin = Convert.ToInt32(param[1]);
                         logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                        // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
-                        // 但是在测试的时候，打开VIM，topMargin和bottomMargin都被设置为了1，如果不设置的话貌似显示不正常，所以当topMargin和bottomMargin一致的时候也执行
-                        //if (topMargin == bottomMargin || bottomMargin > this.initialOptions.TerminalOption.Rows)
-                        if (bottomMargin < 0 || topMargin < 0 || bottomMargin > this.initialOptions.TerminalOption.Rows)
+
+                        if (bottomMargin < 0 || topMargin < 0)
                         {
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置");
                             // 参考：https://github.com/microsoft/terminal/issues/1849
+                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置");
                             return;
                         }
+                        if (topMargin > this.initialOptions.TerminalOption.Rows ||
+                            bottomMargin > this.initialOptions.TerminalOption.Rows ||
+                            bottomMargin + topMargin > this.initialOptions.TerminalOption.Rows)
+                        {
+                            // 上边距加下边距超出了整个可视区域的范围了
+                            return;
+                        }
+                        if (topMargin >= bottomMargin)
+                        {
+                            // 上边距必须小于下边距
+                            // 打开VIM的时候，上边距和下边距分别是1和1
+                            topMargin = bottomMargin - 1;
+                        }
+
                         // Margin目前的实现方式：
-                        // BottomMargin：相当于是把ViewableDocument缩小bottomMargin行，需要创建MarginLine用来填充剩余的区域
+                        // 相当于是把ViewableDocument缩小bottomMargin/topMargin行，然后创建MarginLine用来填充剩余的区域
+                        this.activeDocument.DetachAll();
                         this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
+                        // 设置完滚动区域后重新附加渲染模型
+                        List<IDocumentDrawable> drawableLines = this.Renderer.GetDrawableLines();
+                        this.activeDocument.AttachAll(drawableLines);
                         break;
                     }
 
@@ -810,14 +729,7 @@ namespace XTerminal
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
                         int lines = Convert.ToInt32(param[0]);
                         logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
-                        try
-                        {
-                            this.activeDocument.InsertLines(this.activeLine, lines);
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
+                        this.activeDocument.InsertLines(this.ActiveLine, lines);
                         break;
                     }
 

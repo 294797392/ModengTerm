@@ -32,64 +32,37 @@ namespace XTerminal.Document
     /// 保存用户可以在界面上看到的文档区域
     /// 也就是要渲染到界面上的区域
     /// </summary>
-    public class ViewableDocument
+    public class ViewableDocument : VTDocumentBase
     {
-        private VTDocumentOptions options;
-
-        private bool isArrangeDirty;
-
         #region 属性
-
-        /// <summary>
-        /// 是否需要重新布局
-        /// </summary>
-        public bool IsArrangeDirty
-        {
-            get { return this.isArrangeDirty; }
-            set
-            {
-                if (this.isArrangeDirty != value)
-                {
-                    this.isArrangeDirty = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 可视区域的第一行
-        /// </summary>
-        public VTextLine FirstLine { get; set; }
-
-        /// <summary>
-        /// 可视区域的最后一行
-        /// </summary>
-        public VTextLine LastLine { get; set; }
 
         /// <summary>
         /// 所属的文档
         /// </summary>
-        public VTDocument OwnerDocument { get; internal set; }
+        public VTDocument OwnerDocument { get; private set; }
 
-        /// <summary>
-        /// 总行数
-        /// </summary>
-        public int Rows { get { return this.options.Rows; } }
+        ///// <summary>
+        ///// 可视区域的总行数
+        ///// </summary>
+        //public int Rows { get; internal set; }
 
-        /// <summary>
-        /// 总列数
-        /// </summary>
-        public int Columns { get { return this.options.Columns; } }
+        ///// <summary>
+        ///// 可视区域的总列数
+        ///// </summary>
+        //public int Columns { get; internal set; }
 
         #endregion
 
         #region 构造方法
 
-        public ViewableDocument(VTDocumentOptions options)
+        public ViewableDocument(VTDocument ownerDocument)
         {
-            this.options = options;
+            this.OwnerDocument = ownerDocument;
         }
 
         #endregion
+
+        #region 公开接口
 
         /// <summary>
         /// 把当前可视区域的所有TextLine标记为需要重新渲染的状态
@@ -197,39 +170,6 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 把所有的TextLine取消关联渲染模型
-        /// </summary>
-        public void DetachAll()
-        {
-            VTextLine current = this.FirstLine;
-            VTextLine last = this.LastLine;
-
-            while (current != null)
-            {
-                // 取消关联关系
-                current.DetachDrawable();
-
-                if (current == last)
-                {
-                    break;
-                }
-
-                current = current.NextLine;
-            }
-        }
-
-        public void AttachAll(IEnumerable<IDocumentDrawable> drawables)
-        {
-            VTextLine current = this.FirstLine;
-
-            foreach (IDocumentDrawable drawable in drawables)
-            {
-                current.AttachDrawable(drawable);
-                current = current.NextLine;
-            }
-        }
-
-        /// <summary>
         /// 删除所有行
         /// </summary>
         public void DeleteAll()
@@ -249,6 +189,38 @@ namespace XTerminal.Document
 
                 current = current.NextLine;
             }
+
+            this.IsArrangeDirty = true;
         }
+
+        /// <summary>
+        /// 保持最后一行不变，通过改变第一行的指针缩小可视区域
+        /// </summary>
+        /// <param name="lines">要缩小的行</param>
+        public void Shrink(int lines)
+        {
+            for (int i = 0; i < lines; i++)
+            {
+                this.FirstLine = this.FirstLine.NextLine;
+            }
+
+            this.IsArrangeDirty = true;
+        }
+
+        /// <summary>
+        /// 保持最后一行不变，通过改变第一行的指针扩大可视区域
+        /// </summary>
+        /// <param name="lines">要扩大的行</param>
+        public void Expand(int lines)
+        {
+            for (int i = 0; i < lines; i++)
+            {
+                this.FirstLine = this.FirstLine.PreviousLine;
+            }
+
+            this.IsArrangeDirty = true;
+        }
+
+        #endregion
     }
 }

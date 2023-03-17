@@ -43,13 +43,13 @@ namespace XTerminal.Document
 
         public int ID { get; set; }
 
-        /// <summary>
-        /// 终端行的最大列数
-        /// 规定终端一行里的字符数不能超过列数
-        /// 超过列数要按照手册里定义的标准来执行动作
-        /// 在linux里使用stty size获取
-        /// </summary>
-        public int Capacity { get { return this.TextSource.Capacity; } }
+        ///// <summary>
+        ///// 终端行的最大列数
+        ///// 规定终端一行里的字符数不能超过列数
+        ///// 超过列数要按照手册里定义的标准来执行动作
+        ///// 在linux里使用stty size获取
+        ///// </summary>
+        //public int Capacity { get { return this.TextSource.Capacity; } }
 
         /// <summary>
         /// 已经显示了的行数
@@ -94,7 +94,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 所属的文档
         /// </summary>
-        public VTDocument OwnerDocument { get; set; }
+        public VTDocumentBase OwnerDocument { get; private set; }
 
         /// <summary>
         /// 文本数据源
@@ -110,11 +110,15 @@ namespace XTerminal.Document
 
         #region 构造方法
 
-        public VTextLine(int capacity)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="owner">该行所属的文档</param>
+        public VTextLine(VTDocumentBase owner)
         {
-            //this.Characters = new List<VTCharacter>();
             this.TextBlocks = new List<VTextBlock>();
-            this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource, capacity);
+            this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource);
+            this.OwnerDocument = owner;
         }
 
         #endregion
@@ -303,62 +307,6 @@ namespace XTerminal.Document
             }
 
             return current;
-        }
-
-        /// <summary>
-        /// 插到一个节点
-        /// </summary>
-        /// <param name="line">要插入的节点</param>
-        /// <param name="options">是否是</param>
-        public void InsertLine(VTextLine line, InsertOptions options)
-        {
-            switch (options)
-            {
-                case InsertOptions.AppendInsert:
-                    {
-                        // 插入到后面
-                        if (this == this.OwnerDocument.LastLine)
-                        {
-                            // 该行是最后一行了，直接插入
-                            this.NextLine = line;
-                            line.PreviousLine = this;
-                            this.OwnerDocument.LastLine = line;
-                        }
-                        else
-                        {
-                            // 该行不是最后一行
-                            line.NextLine = this.NextLine;
-                            line.PreviousLine = this;
-                            this.NextLine = line;
-                        }
-
-                        break;
-                    }
-
-                case InsertOptions.PrependInsert:
-                    {
-                        // 插入到前面
-                        if (this == this.OwnerDocument.FirstLine)
-                        {
-                            // 该行是第一行，直接插入
-                            this.PreviousLine = line;
-                            line.NextLine = this;
-                            this.OwnerDocument.FirstLine = line;
-                        }
-                        else
-                        {
-                            // 该行不是最后一行
-                            line.PreviousLine = this.PreviousLine;
-                            line.NextLine = this;
-                            this.PreviousLine = line;
-                        }
-
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         #endregion

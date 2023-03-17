@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 
 namespace XTerminal.Document
@@ -10,7 +11,7 @@ namespace XTerminal.Document
     /// <summary>
     /// 终端显示的字符的文档模型
     /// </summary>
-    public class VTDocument
+    public class VTDocument : VTDocumentBase
     {
         #region 类变量
 
@@ -36,19 +37,19 @@ namespace XTerminal.Document
         #region 属性
 
         /// <summary>
+        /// 上边距的文档
+        /// </summary>
+        public VTMarginedDocument TopMarginArea { get; private set; }
+
+        /// <summary>
+        /// 下边距的文档
+        /// </summary>
+        public VTMarginedDocument BottomMarginArea { get; private set; }
+
+        /// <summary>
         /// 文档的名字，方便调试
         /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// 文档中的第一行
-        /// </summary>
-        public VTextLine FirstLine { get; internal set; }
-
-        /// <summary>
-        /// 文档中的最后一行
-        /// </summary>
-        public VTextLine LastLine { get; internal set; }
 
         /// <summary>
         /// 记录文档中光标的位置
@@ -78,11 +79,6 @@ namespace XTerminal.Document
         public ViewableDocument ViewableArea { get; private set; }
 
         /// <summary>
-        /// 该文档是否需要重新布局
-        /// </summary>
-        public bool IsArrangeDirty { get { return this.ViewableArea.IsArrangeDirty; } set { this.ViewableArea.IsArrangeDirty = value; } }
-
-        /// <summary>
         /// 当光标在该范围内就得滚动
         /// </summary>
         public int ScrollMarginTop { get; private set; }
@@ -91,6 +87,12 @@ namespace XTerminal.Document
         /// 当光标在该范围内就得滚动
         /// </summary>
         public int ScrollMarginBottom { get; private set; }
+
+        /// <summary>
+        /// 当前光标所在行
+        /// 通过SetCursor函数设置
+        /// </summary>
+        public VTextLine ActiveLine { get; private set; }
 
         #endregion
 
@@ -106,25 +108,26 @@ namespace XTerminal.Document
                 Color = VTColors.DarkBlack,
                 OffsetX = 0,
                 OffsetY = 0,
+                Row = 0,
+                Column = 0,
                 Style = options.CursorStyle,
                 Interval = options.Interval
             };
 
-            this.ViewableArea = new ViewableDocument(options)
-            {
-                OwnerDocument = this
-            };
+            this.ViewableArea = new ViewableDocument(this);
+            this.TopMarginArea = new VTMarginedDocument(this);
+            this.BottomMarginArea = new VTMarginedDocument(this);
 
-            VTextLine firstLine = new VTextLine(options.Columns)
+            VTextLine firstLine = new VTextLine(this)
             {
                 OffsetX = 0,
                 OffsetY = 0,
                 CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
-                OwnerDocument = this,
             };
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
+            this.ActiveLine = firstLine;
 
             // 默认创建80行，可见区域也是80行
             for (int i = 1; i < options.Rows; i++)
@@ -176,24 +179,181 @@ namespace XTerminal.Document
             logger.FatalFormat(builder.ToString());
         }
 
+        private void ProcessMargin(VTMarginedDocument marginDocument, int newMargin, int oldMargin)
+        {
+            if (marginDocument.IsEmpty)
+            {
+                // 空文档，那么直接创建
+                marginDocument.InitializeLines(newMargin);
+
+                // 更新可视区域
+                this.ViewableArea.Shrink(newMargin);
+            }
+            else
+            {
+                int delta = Math.Abs(newMargin - oldMargin);
+
+                if (newMargin < oldMargin)
+                {
+                    // 更新上边距区域
+                    // 新的Margin比之前的Margin少，说明要移除行
+                    marginDocument.Remove(delta);
+
+                    // 更新可视区域
+                    this.ViewableArea.Expand(delta);
+                }
+                else
+                {
+                    // 更新上边距区域
+                    // 新的Margin比之前的Margin多，说明要增加行
+                    marginDocument.Add(delta);
+
+                    // 更新可视区域
+                    this.ViewableArea.Shrink(delta);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 解除文档里所有附加的Drawable
+        /// </summary>
+        /// <param name="document">要解除的文档</param>
+        private void DetachAllDrawable(VTDocumentBase document)
+        {
+            VTextLine current = document.FirstLine;
+            VTextLine last = document.LastLine;
+
+            while (current != null)
+            {
+                // 取消关联关系
+                current.DetachDrawable();
+
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
+        }
+
+        /// <summary>
+        /// 把drawables附加到某个文档里
+        /// </summary>
+        /// <param name="document">要附加的文档</param>
+        /// <param name="drawables">要附加到文档的drawable集合</param>
+        /// <param name="startIndex">drawables的偏移量</param>
+        /// <returns>附加之后的索引</returns>
+        private int AttachAllDrawable(VTDocumentBase document, List<IDocumentDrawable> drawables, int startIndex)
+        {
+            int index = startIndex;
+
+            VTextLine current = document.FirstLine;
+            VTextLine last = document.LastLine;
+
+            while (current != null)
+            {
+                IDocumentDrawable drawable = drawables[index++];
+
+                // 取消关联关系
+                current.AttachDrawable(drawable);
+
+                if (current == last)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
+
+            return index;
+        }
+
         #endregion
 
         #region 公开接口
 
         /// <summary>
-        /// 创建一个新行并将新行挂到链表上
+        /// 换行
+        /// </summary>
+        public void LineFeed()
+        {
+            ViewableDocument document = this.ViewableArea;
+            VTextLine oldFirstRow = document.FirstLine;
+            VTextLine oldLastRow = document.LastLine;
+
+            if (!this.HasNextLine(this.ActiveLine))
+            {
+                this.CreateNextLine();
+            }
+
+            if (oldLastRow == this.ActiveLine)
+            {
+                // 光标在可视区域的最后一行，那么要把可视区域向下移动
+                logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
+                document.ScrollDocument(ScrollOrientation.Down, 1);
+
+                // 更新文档模型和渲染模型的关联信息
+                // 把oldFirstRow的渲染模型拿给newLastRow使用
+                VTextLine newLastRow = document.LastLine;
+                newLastRow.AttachDrawable(oldFirstRow.Drawable);
+                this.ActiveLine = this.ActiveLine.NextLine;
+            }
+            else
+            {
+                // 这里假设光标在可视区域里
+                // 实际上光标有可能在可视区域的上面或者下面，但是暂时还没找到方法去判定
+
+                // 光标在可视区域里
+                logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
+                this.SetCursor(this.Cursor.Row + 1, this.Cursor.Column);
+            }
+        }
+
+        /// <summary>
+        /// 反向换行
+        /// </summary>
+        public void ReverseLineFeed()
+        {
+            ViewableDocument document = this.ViewableArea;
+            VTextLine oldFirstRow = document.FirstLine;
+            VTextLine oldLastRow = document.LastLine;
+
+            if (oldFirstRow == this.ActiveLine)
+            {
+                // 此时光标位置在可视区域的第一行
+                logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
+                VTextLine newFirstRow = document.ScrollDocument(ScrollOrientation.Up, 1);
+
+                // 把oldLastRow的渲染模型拿给newFirstRow使用
+                newFirstRow.AttachDrawable(oldLastRow.Drawable);
+                this.ActiveLine = this.ActiveLine.PreviousLine;
+            }
+            else
+            {
+                // 这里假设光标在可视区域里面
+                // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
+
+                // 光标位置在可视区域里面
+                logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
+                this.SetCursor(this.Cursor.Row - 1, this.Cursor.Column);
+            }
+        }
+
+        /// <summary>
+        /// 创建一个新行并将新行挂到链表的最后一个节点后面
         /// </summary>
         /// <returns></returns>
         public void CreateNextLine()
         {
-            VTextLine textLine = new VTextLine(this.Columns)
+            VTextLine textLine = new VTextLine(this)
             {
                 ID = row++,
                 OffsetX = 0,
                 OffsetY = 0,
                 CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
-                OwnerDocument = this
             };
 
             this.LastLine.NextLine = textLine;
@@ -201,20 +361,6 @@ namespace XTerminal.Document
             this.LastLine = textLine;
 
             this.TotalRows++;
-        }
-
-        public VTextLine CreateLine()
-        {
-            VTextLine textLine = new VTextLine(this.Columns)
-            {
-                OffsetX = 0,
-                OffsetY = 0,
-                CursorAtRightMargin = false,
-                DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
-                OwnerDocument = this,
-            };
-
-            return textLine;
         }
 
         public bool HasNextLine(VTextLine textLine)
@@ -434,7 +580,11 @@ namespace XTerminal.Document
 
             for (int i = 0; i < lines; i++)
             {
-                VTextLine newLine = this.CreateLine();
+                VTextLine newLine = new VTextLine(this)
+                {
+                    CursorAtRightMargin = false,
+                    DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode
+                };
 
                 // 新行关联渲染模型
                 newLine.AttachDrawable(lastVisibleLine.Drawable);
@@ -455,10 +605,130 @@ namespace XTerminal.Document
             this.SetArrangeDirty();
         }
 
+        /// <summary>
+        /// 设置可滚动区域的大小
+        /// </summary>
+        /// <param name="marginTop">可滚动区域的上边距</param>
+        /// <param name="marginBottom">可滚动区域的下边距</param>
         public void SetScrollMargin(int marginTop, int marginBottom)
         {
-            this.ScrollMarginTop = marginTop;
-            this.ScrollMarginBottom = marginBottom;
+            if (this.ScrollMarginTop != marginTop)
+            {
+                this.ProcessMargin(this.TopMarginArea, marginTop, this.ScrollMarginTop);
+                this.ScrollMarginTop = marginTop;
+            }
+
+            if (this.ScrollMarginBottom != marginBottom)
+            {
+                this.ProcessMargin(this.BottomMarginArea, marginBottom, this.ScrollMarginBottom);
+                this.ScrollMarginBottom = marginBottom;
+            }
+        }
+
+        /// <summary>
+        /// 把所有的TextLine取消关联渲染模型
+        /// </summary>
+        public void DetachAll()
+        {
+            // Detach TopMarginArea
+            if (!this.TopMarginArea.IsEmpty)
+            {
+                this.DetachAllDrawable(this.TopMarginArea);
+            }
+
+            // Detach ViewableArea
+            this.DetachAllDrawable(this.ViewableArea);
+
+            // Detach BottomMarginArea
+            if (!this.BottomMarginArea.IsEmpty)
+            {
+                this.DetachAllDrawable(this.BottomMarginArea);
+            }
+        }
+
+        /// <summary>
+        /// 按顺序为每个VTextLine附加渲染对象
+        /// </summary>
+        /// <param name="drawables"></param>
+        public void AttachAll(List<IDocumentDrawable> drawables)
+        {
+            int startIndex = 0;
+
+            // Attach TopMarginArea
+            if (!this.TopMarginArea.IsEmpty)
+            {
+                startIndex = this.AttachAllDrawable(this.TopMarginArea, drawables, startIndex);
+            }
+
+            // Attach ViewableArea
+            startIndex = this.AttachAllDrawable(this.ViewableArea, drawables, startIndex);
+
+            // Attach BottomMarginArea
+            if (!this.BottomMarginArea.IsEmpty)
+            {
+                startIndex = this.AttachAllDrawable(this.BottomMarginArea, drawables, startIndex);
+            }
+        }
+
+        /// <summary>
+        /// 设置光标位置和activeLine
+        /// </summary>
+        /// <param name="row">要设置的行</param>
+        /// <param name="column">要设置的列</param>
+        public void SetCursor(int row, int column)
+        {
+            if (this.Cursor.Row != row)
+            {
+                this.Cursor.Row = row;
+
+                /*****************
+                 *       1  0
+                 *       2  1       -> TopMarginArea
+                 *       3  2
+                 *       ----
+                 *       4  3
+                 *       5  4       -> ViewableArea
+                 *       6  5
+                 *       7  6
+                 *       ----
+                 *       8  7
+                 *       9  8       -> BottomMarginArea
+                 *      10  9
+                 *      11 10
+                 ******************/
+
+                int topMarginRows = this.ScrollMarginTop;
+                int topMarginStart = 0;
+                int topMarginEnd = topMarginStart + this.ScrollMarginTop - 1;
+
+                int bottomMarginRows = this.ScrollMarginBottom;
+                int bottomMarginStart = this.Rows - bottomMarginRows;
+                int bottomMarginEnd = this.Rows - 1;
+
+                int viewableStart = topMarginEnd + 1;
+                int viewableEnd = bottomMarginStart - 1;
+
+                if (topMarginRows > 0 && row >= topMarginStart && row <= topMarginEnd)
+                {
+                    // 光标在上边距文档内
+                    this.ActiveLine = this.TopMarginArea.FirstLine.FindNext(row);
+                }
+                else if (bottomMarginRows > 0 && row >= bottomMarginStart && row <= bottomMarginEnd)
+                {
+                    // 光标在下边距文档内
+                    this.ActiveLine = this.BottomMarginArea.LastLine.FindPrevious(bottomMarginEnd - row);
+                }
+                else
+                {
+                    // 光标在可视区域内
+                    this.ActiveLine = this.ViewableArea.FirstLine.FindNext((row - viewableStart));
+                }
+            }
+
+            if (this.Cursor.Column != column)
+            {
+                this.Cursor.Column = column;
+            }
         }
 
         #endregion

@@ -40,12 +40,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 光标所在列
         /// </summary>
-        public int Column { get; set; }
+        public int Column { get; internal set; }
 
         /// <summary>
         /// 光标所在行
         /// </summary>
-        public int Row { get; set; }
+        public int Row { get; internal set; }
 
         /// <summary>
         /// 光标类型
