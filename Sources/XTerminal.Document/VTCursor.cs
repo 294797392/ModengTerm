@@ -35,8 +35,6 @@ namespace XTerminal.Document
     /// </summary>
     public class VTCursor : VTDocumentElement
     {
-        public VTextLine OwnerLine { get; set; }
-
         /// <summary>
         /// 光标所在列
         /// </summary>

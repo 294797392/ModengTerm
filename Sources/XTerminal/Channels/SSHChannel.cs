@@ -77,8 +77,7 @@ namespace XTerminal.Channels
             //terminalModeValues[TerminalModes.IEXTEN] = 1;
 
             TerminalOptions terminalOptions = this.options.TerminalOption;
-            //this.stream = this.sshClient.CreateShellStream(this.GetTerminalName(terminalOptions.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
-            this.stream = this.sshClient.CreateShellStream("xterm", (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
+            this.stream = this.sshClient.CreateShellStream(this.GetTerminalName(terminalOptions.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
             this.stream.DataReceived += this.Stream_DataReceived;
 
             this.NotifyStatusChanged(VTChannelState.Connected);

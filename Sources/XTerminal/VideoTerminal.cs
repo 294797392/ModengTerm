@@ -479,6 +479,8 @@ namespace XTerminal
                         break;
                     }
 
+                #region Erase
+
                 case VTActions.EL_EraseLine:
                     {
                         EraseType eraseType = (EraseType)param[0];
@@ -486,6 +488,16 @@ namespace XTerminal
                         this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
                         break;
                     }
+
+                case VTActions.ED_EraseDisplay:
+                    {
+                        EraseType eraseType = (EraseType)param[0];
+                        logger.DebugFormat("ED_EraseDisplay, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.CursorRow, this.CursorCol);
+                        this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, eraseType);
+                        break;
+                    }
+
+                #endregion
 
                 #region 光标移动
 
@@ -633,8 +645,6 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseAlternateScreenBuffer");
 
-                        // 先记录当前的光标
-                        this.mainDocument.Cursor.OwnerLine = this.ActiveLine;
                         this.mainDocument.DetachAll();
 
                         // 切换ActiveDocument
@@ -643,29 +653,20 @@ namespace XTerminal
                         this.alternateDocument.ViewableArea.DeleteAll();
                         this.alternateDocument.AttachAll(this.Renderer.GetDrawableLines());
                         this.alternateDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
-                        // 更新activeLine为AlternateDocument的第一行
                         this.activeDocument = this.alternateDocument;
                         break;
                     }
 
                 case VTActions.UseMainScreenBuffer:
                     {
-                        this.alternateDocument.DetachAll();
-
                         logger.DebugFormat("UseMainScreenBuffer");
 
-                        // 恢复之前保存的光标
+                        this.alternateDocument.DetachAll();
+
                         this.mainDocument.AttachAll(this.Renderer.GetDrawableLines());
                         this.mainDocument.ViewableArea.DirtyAll();
                         this.mainDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
                         this.activeDocument = this.mainDocument;
-                        break;
-                    }
-
-                case VTActions.ED_EraseDisplay:
-                    {
-                        int parameter = Convert.ToInt32(param[0]);
-                        this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, (EraseType)parameter);
                         break;
                     }
 
@@ -760,6 +761,7 @@ namespace XTerminal
 
             this.DrawDocument(this.activeDocument);
             //this.activeDocument.Print();
+            //logger.ErrorFormat("TotalRows = {0}", this.activeDocument.TotalRows);
         }
 
         private void VTChannel_StatusChanged(object client, VTChannelState state)

@@ -329,6 +329,11 @@ namespace XTerminal.Document
                 // 把oldLastRow的渲染模型拿给newFirstRow使用
                 newFirstRow.AttachDrawable(oldLastRow.Drawable);
                 this.ActiveLine = this.ActiveLine.PreviousLine;
+
+                // 上移之后，删除整行数据，终端会重新打印该行数据的
+                // 如果不删除的话，在man程序下有可能会显示重叠的信息
+                // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
+                this.ActiveLine.DeleteAll();
             }
             else
             {
