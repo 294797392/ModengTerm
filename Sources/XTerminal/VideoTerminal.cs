@@ -713,6 +713,12 @@ namespace XTerminal
                             // 打开VIM的时候，上边距和下边距分别是1和1
                             topMargin = bottomMargin - 1;
                         }
+                        if (this.activeDocument.ScrollMarginTop == topMargin && 
+                            this.activeDocument.ScrollMarginBottom == bottomMargin)
+                        {
+                            // 滚动边距和当前文档是一致的，不用设置
+                            return;
+                        }
 
                         // Margin目前的实现方式：
                         // 相当于是把ViewableDocument缩小bottomMargin/topMargin行，然后创建MarginLine用来填充剩余的区域
@@ -729,7 +735,10 @@ namespace XTerminal
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
                         int lines = Convert.ToInt32(param[0]);
                         logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
-                        this.activeDocument.InsertLines(this.ActiveLine, lines);
+                        if (lines > 0)
+                        {
+                            this.activeDocument.InsertLines(this.ActiveLine, lines);
+                        }
                         break;
                     }
 

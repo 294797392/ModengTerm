@@ -35,7 +35,7 @@ namespace XTerminal.Rendering
 
             string text = textLine.GetText();
 
-            text = string.Format("{0} - {1}", this.ID, text);
+            //text = string.Format("{0} - {1}", this.ID, text);
 
             this.Offset = new Vector(0, textLine.OffsetY);
 

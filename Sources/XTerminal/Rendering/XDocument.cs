@@ -130,7 +130,7 @@ namespace XTerminal.Rendering
         public VTElementMetrics MeasureLine(VTextLine textLine, int maxCharacters)
         {
             string text = textLine.GetText();
-            if (maxCharacters > 0)
+            if (maxCharacters > 0 && text.Length >= maxCharacters)
             {
                 text = text.Substring(0, maxCharacters);
             }

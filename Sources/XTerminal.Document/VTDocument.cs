@@ -602,6 +602,15 @@ namespace XTerminal.Document
                 this.ViewableArea.LastLine = lastVisibleLine;
             }
 
+            // 如果插入的行是可视区域的第一行的话，那么要记得更新可视区域第一行的指针
+            if (activeLine == this.ViewableArea.FirstLine)
+            {
+                this.ViewableArea.FirstLine = startLine.NextLine;
+            }
+
+            // 更新ActiveLine
+            this.ActiveLine = this.ViewableArea.FirstLine.FindNext(this.Cursor.Row);
+
             this.SetArrangeDirty();
         }
 
