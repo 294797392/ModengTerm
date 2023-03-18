@@ -181,7 +181,7 @@ namespace XTerminal.Parser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        int parameter = this.GetParameter(parameters, 0, 0);
+                        int parameter = VTParameter.GetParameter(parameters, 0, 0);
                         logger.DebugFormat("CSIDispatch - ED_EraseDisplay, parameter = {0}", parameter);
                         this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameter);
                         break;
@@ -260,9 +260,7 @@ namespace XTerminal.Parser
                         // Default: Pt = 1
                         // bottomMargin：is the line number for the bottom margin.
                         // Default: Pb = current number of lines per screen
-                        int topMargin = this.GetParameter(parameters, 0, 1);
-                        int bottomMargin = this.GetParameter(parameters, 0, 0);
-                        this.NotifyActionEvent(VTActions.DECSTBM_SetScrollingRegion, topMargin, bottomMargin);
+                        this.NotifyActionEvent(VTActions.DECSTBM_SetScrollingRegion, parameters);
                         //throw new NotImplementedException();
                         break;
                     }
@@ -344,7 +342,7 @@ namespace XTerminal.Parser
 
                 case CSIActionCodes.IL_InsertLine:
                     {
-                        int rows = this.GetParameter(parameters, 0, 1);
+                        int rows = VTParameter.GetParameter(parameters, 0, 1);
                         this.NotifyActionEvent(VTActions.IL_InsertLine, rows);
                         break;
                     }
@@ -352,18 +350,6 @@ namespace XTerminal.Parser
                 default:
                     logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                     throw new NotImplementedException();
-            }
-        }
-
-        private int GetParameter(List<int> parameters, int index, int defaultParameter)
-        {
-            if (parameters.Count > index)
-            {
-                return parameters[index];
-            }
-            else
-            {
-                return defaultParameter;
             }
         }
 

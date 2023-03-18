@@ -158,6 +158,16 @@ namespace XTerminal.VTDefinitions
 
         #endregion
 
+        #region EditingKeypad
+
+        public static readonly Dictionary<VTKeys, byte[]> EditingKeypad = new Dictionary<VTKeys, byte[]>() 
+        {
+            { VTKeys.PageUp, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'5', (byte)'~' } },
+            { VTKeys.Next, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'6', (byte)'~' } },
+        };
+
+        #endregion
+
         #endregion
 
         #region 实例变量
@@ -294,6 +304,15 @@ namespace XTerminal.VTDefinitions
                     {
                         return bytes;
                     }
+                }
+
+                #endregion
+
+                #region 尝试映射EditingKeypad
+
+                if (EditingKeypad.TryGetValue(evt.Key, out bytes))
+                {
+                    return bytes;
                 }
 
                 #endregion

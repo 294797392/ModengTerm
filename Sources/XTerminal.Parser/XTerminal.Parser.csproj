@@ -7,8 +7,8 @@
     <ProjectGuid>{7909EA37-1524-415A-9CB8-DBE3274F4152}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>XTerminalParser</RootNamespace>
-    <AssemblyName>XTerminalParser</AssemblyName>
+    <RootNamespace>XTerminal.Parser</RootNamespace>
+    <AssemblyName>XTerminal.Parser</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -64,6 +64,7 @@
     <Compile Include="VTCursorKeyMode.cs" />
     <Compile Include="VTKeypadMode.cs" />
     <Compile Include="VTMode.cs" />
+    <Compile Include="VTParameter.cs" />
     <Compile Include="VTParserDispatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VTParser.cs" />

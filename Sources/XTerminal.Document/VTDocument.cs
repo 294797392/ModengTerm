@@ -37,16 +37,6 @@ namespace XTerminal.Document
         #region 属性
 
         /// <summary>
-        /// 上边距的文档
-        /// </summary>
-        public VTMarginedDocument TopMarginArea { get; private set; }
-
-        /// <summary>
-        /// 下边距的文档
-        /// </summary>
-        public VTMarginedDocument BottomMarginArea { get; private set; }
-
-        /// <summary>
         /// 文档的名字，方便调试
         /// </summary>
         public string Name { get; set; }
@@ -72,11 +62,6 @@ namespace XTerminal.Document
         /// 总行数
         /// </summary>
         public int TotalRows { get; private set; }
-
-        /// <summary>
-        /// 该文档要渲染的区域
-        /// </summary>
-        public ViewableDocument ViewableArea { get; private set; }
 
         /// <summary>
         /// 当光标在该范围内就得滚动
@@ -114,10 +99,6 @@ namespace XTerminal.Document
                 Interval = options.Interval
             };
 
-            this.ViewableArea = new ViewableDocument(this);
-            this.TopMarginArea = new VTMarginedDocument(this);
-            this.BottomMarginArea = new VTMarginedDocument(this);
-
             VTextLine firstLine = new VTextLine(this)
             {
                 OffsetX = 0,
@@ -138,14 +119,34 @@ namespace XTerminal.Document
             this.TotalRows = options.Rows;
 
             // 更新可视区域
-            this.ViewableArea.FirstLine = firstLine;
-            this.ViewableArea.LastLine = this.LastLine;
             this.SetArrangeDirty();
         }
 
         #endregion
 
         #region 实例方法
+
+        /// <summary>
+        /// 创建一个新行并将新行挂到链表的最后一个节点后面
+        /// </summary>
+        /// <returns></returns>
+        private void CreateNextLine()
+        {
+            VTextLine textLine = new VTextLine(this)
+            {
+                ID = row++,
+                OffsetX = 0,
+                OffsetY = 0,
+                CursorAtRightMargin = false,
+                DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
+            };
+
+            this.LastLine.NextLine = textLine;
+            textLine.PreviousLine = this.LastLine;
+            this.LastLine = textLine;
+
+            this.TotalRows++;
+        }
 
         private void SetArrangeDirty()
         {
@@ -163,12 +164,12 @@ namespace XTerminal.Document
             StringBuilder builder = new StringBuilder();
             builder.AppendLine();
 
-            VTextLine next = this.ViewableArea.FirstLine;
+            VTextLine next = this.FirstLine;
             while (next != null)
             {
                 builder.AppendLine(next.GetText());
 
-                if (next == this.ViewableArea.LastLine)
+                if (next == this.LastLine)
                 {
                     break;
                 }
@@ -177,97 +178,6 @@ namespace XTerminal.Document
             }
 
             logger.FatalFormat(builder.ToString());
-        }
-
-        private void ProcessMargin(VTMarginedDocument marginDocument, int newMargin, int oldMargin)
-        {
-            if (marginDocument.IsEmpty)
-            {
-                // 空文档，那么直接创建
-                marginDocument.InitializeLines(newMargin);
-
-                // 更新可视区域
-                this.ViewableArea.Shrink(newMargin);
-            }
-            else
-            {
-                int delta = Math.Abs(newMargin - oldMargin);
-
-                if (newMargin < oldMargin)
-                {
-                    // 更新上边距区域
-                    // 新的Margin比之前的Margin少，说明要移除行
-                    marginDocument.Remove(delta);
-
-                    // 更新可视区域
-                    this.ViewableArea.Expand(delta);
-                }
-                else
-                {
-                    // 更新上边距区域
-                    // 新的Margin比之前的Margin多，说明要增加行
-                    marginDocument.Add(delta);
-
-                    // 更新可视区域
-                    this.ViewableArea.Shrink(delta);
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// 解除文档里所有附加的Drawable
-        /// </summary>
-        /// <param name="document">要解除的文档</param>
-        private void DetachAllDrawable(VTDocumentBase document)
-        {
-            VTextLine current = document.FirstLine;
-            VTextLine last = document.LastLine;
-
-            while (current != null)
-            {
-                // 取消关联关系
-                current.DetachDrawable();
-
-                if (current == last)
-                {
-                    break;
-                }
-
-                current = current.NextLine;
-            }
-        }
-
-        /// <summary>
-        /// 把drawables附加到某个文档里
-        /// </summary>
-        /// <param name="document">要附加的文档</param>
-        /// <param name="drawables">要附加到文档的drawable集合</param>
-        /// <param name="startIndex">drawables的偏移量</param>
-        /// <returns>附加之后的索引</returns>
-        private int AttachAllDrawable(VTDocumentBase document, List<IDocumentDrawable> drawables, int startIndex)
-        {
-            int index = startIndex;
-
-            VTextLine current = document.FirstLine;
-            VTextLine last = document.LastLine;
-
-            while (current != null)
-            {
-                IDocumentDrawable drawable = drawables[index++];
-
-                // 取消关联关系
-                current.AttachDrawable(drawable);
-
-                if (current == last)
-                {
-                    break;
-                }
-
-                current = current.NextLine;
-            }
-
-            return index;
         }
 
         #endregion
@@ -279,26 +189,62 @@ namespace XTerminal.Document
         /// </summary>
         public void LineFeed()
         {
-            ViewableDocument document = this.ViewableArea;
-            VTextLine oldFirstRow = document.FirstLine;
-            VTextLine oldLastRow = document.LastLine;
+            //if (!this.HasNextLine(this.ActiveLine))
+            //{
+            //    this.CreateNextLine();
+            //}
 
-            if (!this.HasNextLine(this.ActiveLine))
-            {
-                this.CreateNextLine();
-            }
+            // 可滚动区域的第一行和最后一行
+            VTextLine head = this.FirstLine.FindNext(this.ScrollMarginTop);
+            VTextLine last = this.LastLine.FindPrevious(this.ScrollMarginBottom);
 
-            if (oldLastRow == this.ActiveLine)
+            if (last == this.ActiveLine)
             {
-                // 光标在可视区域的最后一行，那么要把可视区域向下移动
+                // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
                 logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
-                document.ScrollDocument(ScrollOrientation.Down, 1);
 
-                // 更新文档模型和渲染模型的关联信息
-                // 把oldFirstRow的渲染模型拿给newLastRow使用
-                VTextLine newLastRow = document.LastLine;
-                newLastRow.AttachDrawable(oldFirstRow.Drawable);
-                this.ActiveLine = this.ActiveLine.NextLine;
+                // 把第一行拿到最后一行后面
+                VTextLine node1 = head;
+                VTextLine node1Prev = node1.PreviousLine;
+                VTextLine node1Next = node1.NextLine;
+
+                VTextLine node2 = last;
+                VTextLine node2Prev = node2.PreviousLine;
+                VTextLine node2Next = node2.NextLine;
+
+                // node1Prev不为空说明有MarginTop
+                // node1Prev为空说明没有MarginTop
+                if (node1Prev != null)
+                {
+                    node1Prev.NextLine = node1Next;
+                }
+                node1Next.PreviousLine = node1Prev;
+
+                node1.PreviousLine = node2;
+                node1.NextLine = node2Next;
+                node2.NextLine = node1;
+                if (node2Next != null)
+                {
+                    node2Next.PreviousLine = node1;
+                }
+
+                if (this.ScrollMarginTop == 0)
+                {
+                    this.FirstLine = node1Next;
+                }
+
+                if (this.ScrollMarginBottom == 0)
+                {
+                    this.LastLine = node1;
+                }
+
+                this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
+
+                // 下移之后，删除整行数据，终端会重新打印该行数据的
+                // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
+                this.ActiveLine.DeleteAll();
+
+                this.SetArrangeDirty();
             }
             else
             {
@@ -316,24 +262,58 @@ namespace XTerminal.Document
         /// </summary>
         public void ReverseLineFeed()
         {
-            ViewableDocument document = this.ViewableArea;
-            VTextLine oldFirstRow = document.FirstLine;
-            VTextLine oldLastRow = document.LastLine;
+            // 可滚动区域的第一行和最后一行
+            VTextLine head = this.FirstLine.FindNext(this.ScrollMarginTop);
+            VTextLine last = this.LastLine.FindPrevious(this.ScrollMarginBottom);
 
-            if (oldFirstRow == this.ActiveLine)
+            if (head == this.ActiveLine)
             {
                 // 此时光标位置在可视区域的第一行
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
-                VTextLine newFirstRow = document.ScrollDocument(ScrollOrientation.Up, 1);
 
-                // 把oldLastRow的渲染模型拿给newFirstRow使用
-                newFirstRow.AttachDrawable(oldLastRow.Drawable);
-                this.ActiveLine = this.ActiveLine.PreviousLine;
+                // 把最后一行拿到第一行前面
+                VTextLine node1 = head;
+                VTextLine node1Prev = node1.PreviousLine;
+                VTextLine node1Next = node1.NextLine;
+
+                VTextLine node2 = last;
+                VTextLine node2Prev = node2.PreviousLine;
+                VTextLine node2Next = node2.NextLine;
+
+                // node2Next不为空说明有MarginBottom
+                // node2Next不为空说明没有MarginBottom
+                if (node2Next != null)
+                {
+                    node2Next.PreviousLine = node2Prev;
+                }
+                node2Prev.NextLine = node2Next;
+
+                node1.PreviousLine = node2;
+                node2.NextLine = node1;
+                node2.PreviousLine = node1Prev;
+                if (node1Prev != null)
+                {
+                    node1Prev.NextLine = node2;
+                }
+
+                if (this.ScrollMarginTop == 0)
+                {
+                    this.FirstLine = node2;
+                }
+
+                if (this.ScrollMarginBottom == 0)
+                {
+                    this.LastLine = node2Prev;
+                }
+
+                this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
 
                 // 上移之后，删除整行数据，终端会重新打印该行数据的
                 // 如果不删除的话，在man程序下有可能会显示重叠的信息
                 // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
                 this.ActiveLine.DeleteAll();
+
+                this.SetArrangeDirty();
             }
             else
             {
@@ -344,28 +324,6 @@ namespace XTerminal.Document
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
                 this.SetCursor(this.Cursor.Row - 1, this.Cursor.Column);
             }
-        }
-
-        /// <summary>
-        /// 创建一个新行并将新行挂到链表的最后一个节点后面
-        /// </summary>
-        /// <returns></returns>
-        public void CreateNextLine()
-        {
-            VTextLine textLine = new VTextLine(this)
-            {
-                ID = row++,
-                OffsetX = 0,
-                OffsetY = 0,
-                CursorAtRightMargin = false,
-                DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
-            };
-
-            this.LastLine.NextLine = textLine;
-            textLine.PreviousLine = this.LastLine;
-            this.LastLine = textLine;
-
-            this.TotalRows++;
         }
 
         public bool HasNextLine(VTextLine textLine)
@@ -502,119 +460,110 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 使用当前Document里的Row重置终端的行数
+        /// 删除所有行
         /// </summary>
-        /// <param name="rows"></param>
-        public void ResetRows()
+        public void DeleteAll()
         {
-            // 重置Viewable的状态
-            this.FirstLine = this.ViewableArea.FirstLine;
-            this.LastLine = this.ViewableArea.LastLine;
+            VTextLine current = this.FirstLine;
+            VTextLine last = this.LastLine;
 
-            this.FirstLine.PreviousLine = null;
-            this.LastLine.NextLine = null;
+            while (current != null)
+            {
+                // 取消关联关系
+                current.DeleteAll();
 
-            this.SetArrangeDirty();
+                current = current.NextLine;
+            }
+
+            this.IsArrangeDirty = true;
         }
 
         /// <summary>
-        /// 使用新的行数和列数来调整终端的大小
-        /// 主要是需要调整ViewableDocument的大小
+        /// 把当前可视区域的所有TextLine标记为需要重新渲染的状态
+        /// 并且把ViewableDocument也标记为ArrangeDirty
         /// </summary>
-        /// <param name="rows">终端的新行数</param>
-        /// <param name="columns">终端的新列数</param>
-        public void Resize(int rows, int columns)
+        public void DirtyAll()
         {
-            int oldColumns = this.options.Columns;
-            int newColumns = columns;
-            int oldRows = this.options.Rows;
-            int newRows = rows;
+            VTextLine current = this.FirstLine;
+            VTextLine last = this.LastLine;
 
-            if (newColumns != oldColumns)
+            while (current != null)
             {
-                this.options.Columns = newColumns;
+                current.SetDirty(true);
 
-                // 先不管列
+                current = current.NextLine;
             }
 
-            if (newRows != oldRows)
-            {
-                this.options.Rows = newRows;
-
-                VTextLine firstLine = this.FirstLine;
-                VTextLine lastLine = this.LastLine;
-                VTextLine visibleFirstLine = this.ViewableArea.FirstLine;
-                VTextLine visibleLastLine = this.ViewableArea.LastLine;
-
-                if (newRows > oldRows)
-                {
-                    // 新的行数比旧的行数大
-                }
-                else
-                {
-                    // 新的行数比旧的行数小
-
-                    // 可显示区域的最后一行的索引不变
-                    // 改变可视区域的第一行的索引
-                    //visibleFirstLine.Row + (oldRows - newRows);
-                }
-
-                #region Resize可视区域
-
-
-
-                #endregion
-            }
+            this.IsArrangeDirty = true;
         }
 
         /// <summary>
         /// 在可视区域的指定的行位置插入多个新行，并把指定的行和指定行后面的所有行往后移动
+        /// 要考虑到TopMargin和BottomMargin
         /// </summary>
         /// <param name="activeLine">光标所在行</param>
         /// <param name="lines">要插入的行数</param>
         public void InsertLines(VTextLine activeLine, int lines)
         {
-            // 可视区域的最后一行
-            VTextLine lastVisibleLine = this.ViewableArea.LastLine;
+            VTextLine head = this.FirstLine.FindNext(this.ScrollMarginTop);
+            VTextLine last = this.LastLine.FindPrevious(this.ScrollMarginBottom);
 
-            // 从当前行的上一行开始插入
-            VTextLine startLine = activeLine.PreviousLine;
+            VTextLine node1 = activeLine;
+            VTextLine node1Prev = node1.PreviousLine;
+            VTextLine node1Next = node1.NextLine;
 
-            // 当前行作为插入的最后一行
-            VTextLine endLine = activeLine;
+            VTextLine node2 = last;
+            VTextLine node2Prev = node2.PreviousLine;
+            VTextLine node2Next = node2.NextLine;
+
+            VTextLine newHead = null;
+            VTextLine newLast = null;
 
             for (int i = 0; i < lines; i++)
             {
-                VTextLine newLine = new VTextLine(this)
+                // 新行就是node2
+                // 每次都要把新行挂到node1上面
+
+                // 更新上半部分
+                node1.PreviousLine = node2;
+                if (node1Prev != null)
                 {
-                    CursorAtRightMargin = false,
-                    DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode
-                };
+                    node1Prev.NextLine = node2;
+                }
+                node2.NextLine = node1;
+                node2.PreviousLine = node1Prev;
+                node1Prev = node1.PreviousLine;
+                node1Next = node1.NextLine;
 
-                // 新行关联渲染模型
-                newLine.AttachDrawable(lastVisibleLine.Drawable);
-                lastVisibleLine.DetachDrawable();
+                // 更新下半部分
+                node2Prev.NextLine = node2Next;
+                if (node2Next != null)
+                {
+                    node2Next.PreviousLine = node2Prev;
+                }
+                node2 = node2Prev;
+                node2Prev = node2.PreviousLine;
+                node2Next = node2.NextLine;
 
-                // 更新链表指针
-                startLine.NextLine = newLine;
-                newLine.PreviousLine = startLine;
-                newLine.NextLine = endLine;
-                endLine.PreviousLine = newLine;
+                // 更新FirstLine
+                if (this.ScrollMarginTop == 0)
+                {
+                    if (newHead == null)
+                    {
+                        newHead = node1.PreviousLine;
+                        this.FirstLine = newHead;
+                    }
+                }
 
-                lastVisibleLine = lastVisibleLine.PreviousLine;
-
-                // 更新可视区域最后一行的指针
-                this.ViewableArea.LastLine = lastVisibleLine;
-            }
-
-            // 如果插入的行是可视区域的第一行的话，那么要记得更新可视区域第一行的指针
-            if (activeLine == this.ViewableArea.FirstLine)
-            {
-                this.ViewableArea.FirstLine = startLine.NextLine;
+                // 更新LastLine
+                if (this.ScrollMarginBottom == 0)
+                {
+                    this.LastLine = node2Prev;
+                }
             }
 
             // 更新ActiveLine
-            this.ActiveLine = this.ViewableArea.FirstLine.FindNext(this.Cursor.Row);
+            this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
 
             this.SetArrangeDirty();
         }
@@ -628,13 +577,11 @@ namespace XTerminal.Document
         {
             if (this.ScrollMarginTop != marginTop)
             {
-                this.ProcessMargin(this.TopMarginArea, marginTop, this.ScrollMarginTop);
                 this.ScrollMarginTop = marginTop;
             }
 
             if (this.ScrollMarginBottom != marginBottom)
             {
-                this.ProcessMargin(this.BottomMarginArea, marginBottom, this.ScrollMarginBottom);
                 this.ScrollMarginBottom = marginBottom;
             }
         }
@@ -644,19 +591,14 @@ namespace XTerminal.Document
         /// </summary>
         public void DetachAll()
         {
-            // Detach TopMarginArea
-            if (!this.TopMarginArea.IsEmpty)
-            {
-                this.DetachAllDrawable(this.TopMarginArea);
-            }
+            VTextLine current = this.FirstLine;
 
-            // Detach ViewableArea
-            this.DetachAllDrawable(this.ViewableArea);
-
-            // Detach BottomMarginArea
-            if (!this.BottomMarginArea.IsEmpty)
+            while (current != null)
             {
-                this.DetachAllDrawable(this.BottomMarginArea);
+                // 取消关联关系
+                current.DetachDrawable();
+
+                current = current.NextLine;
             }
         }
 
@@ -666,21 +608,13 @@ namespace XTerminal.Document
         /// <param name="drawables"></param>
         public void AttachAll(List<IDocumentDrawable> drawables)
         {
-            int startIndex = 0;
+            VTextLine current = this.FirstLine;
 
-            // Attach TopMarginArea
-            if (!this.TopMarginArea.IsEmpty)
+            foreach (IDocumentDrawable drawable in drawables)
             {
-                startIndex = this.AttachAllDrawable(this.TopMarginArea, drawables, startIndex);
-            }
+                current.AttachDrawable(drawable);
 
-            // Attach ViewableArea
-            startIndex = this.AttachAllDrawable(this.ViewableArea, drawables, startIndex);
-
-            // Attach BottomMarginArea
-            if (!this.BottomMarginArea.IsEmpty)
-            {
-                startIndex = this.AttachAllDrawable(this.BottomMarginArea, drawables, startIndex);
+                current = current.NextLine;
             }
         }
 
@@ -695,48 +629,7 @@ namespace XTerminal.Document
             {
                 this.Cursor.Row = row;
 
-                /*****************
-                 *       1  0
-                 *       2  1       -> TopMarginArea
-                 *       3  2
-                 *       ----
-                 *       4  3
-                 *       5  4       -> ViewableArea
-                 *       6  5
-                 *       7  6
-                 *       ----
-                 *       8  7
-                 *       9  8       -> BottomMarginArea
-                 *      10  9
-                 *      11 10
-                 ******************/
-
-                int topMarginRows = this.ScrollMarginTop;
-                int topMarginStart = 0;
-                int topMarginEnd = topMarginStart + this.ScrollMarginTop - 1;
-
-                int bottomMarginRows = this.ScrollMarginBottom;
-                int bottomMarginStart = this.Rows - bottomMarginRows;
-                int bottomMarginEnd = this.Rows - 1;
-
-                int viewableStart = topMarginEnd + 1;
-                int viewableEnd = bottomMarginStart - 1;
-
-                if (topMarginRows > 0 && row >= topMarginStart && row <= topMarginEnd)
-                {
-                    // 光标在上边距文档内
-                    this.ActiveLine = this.TopMarginArea.FirstLine.FindNext(row);
-                }
-                else if (bottomMarginRows > 0 && row >= bottomMarginStart && row <= bottomMarginEnd)
-                {
-                    // 光标在下边距文档内
-                    this.ActiveLine = this.BottomMarginArea.LastLine.FindPrevious(bottomMarginEnd - row);
-                }
-                else
-                {
-                    // 光标在可视区域内
-                    this.ActiveLine = this.ViewableArea.FirstLine.FindNext((row - viewableStart));
-                }
+                this.ActiveLine = this.FirstLine.FindNext(row);
             }
 
             if (this.Cursor.Column != column)

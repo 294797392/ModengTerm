@@ -218,7 +218,6 @@ namespace XTerminal
             this.activeDocument = this.mainDocument;
 
             // 初始化文档行数据模型和渲染模型的关联关系
-            ViewableDocument document = this.activeDocument.ViewableArea;
             List<IDocumentDrawable> drawableLines = this.Renderer.GetDrawableLines();
             this.activeDocument.AttachAll(drawableLines);
 
@@ -375,20 +374,7 @@ namespace XTerminal
 
             this.uiSyncContext.Send((state) =>
             {
-                // 先渲染顶部Margin区域
-                if (!document.TopMarginArea.IsEmpty)
-                {
-                    offsetY = this.DrawDocument(document.TopMarginArea, offsetY);
-                }
-
-                // 再渲染中间可视区域
-                offsetY = this.DrawDocument(document.ViewableArea, offsetY);
-
-                // 最后渲染底部Margin区域
-                if (!document.BottomMarginArea.IsEmpty)
-                {
-                    offsetY = this.DrawDocument(document.BottomMarginArea, offsetY);
-                }
+                this.DrawDocument(document, offsetY);
 
                 #region 更新光标
 
@@ -540,9 +526,6 @@ namespace XTerminal
 
                         logger.DebugFormat("CUP_CursorPosition, row = {0}, col = {1}, {2}", row, col, this.index++);
 
-                        // 把相对于ViewableDocument的光标坐标转换成相对于整个VTDocument的光标坐标
-                        ViewableDocument document = this.activeDocument.ViewableArea;
-
                         this.activeDocument.SetCursor(row, col);
                         break;
                     }
@@ -649,8 +632,8 @@ namespace XTerminal
 
                         // 切换ActiveDocument
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
-                        this.alternateDocument.ResetRows();
-                        this.alternateDocument.ViewableArea.DeleteAll();
+                        this.alternateDocument.SetScrollMargin(0, 0);
+                        this.alternateDocument.DeleteAll();
                         this.alternateDocument.AttachAll(this.Renderer.GetDrawableLines());
                         this.alternateDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
                         this.activeDocument = this.alternateDocument;
@@ -664,7 +647,7 @@ namespace XTerminal
                         this.alternateDocument.DetachAll();
 
                         this.mainDocument.AttachAll(this.Renderer.GetDrawableLines());
-                        this.mainDocument.ViewableArea.DirtyAll();
+                        this.mainDocument.DirtyAll();
                         this.mainDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
                         this.activeDocument = this.mainDocument;
                         break;
@@ -691,43 +674,49 @@ namespace XTerminal
                         // 但是在测试的时候，打开VIM，topMargin和bottomMargin都被设置为了1，如果不设置的话貌似显示不正常，所以当topMargin和bottomMargin一致的时候也执行
                         // 边距还会影响插入行 (IL) 和删除行 (DL)、向上滚动 (SU) 和向下滚动 (SD) 修改的行。
 
-                        int topMargin = Convert.ToInt32(param[0]);
-                        int bottomMargin = Convert.ToInt32(param[1]);
-                        logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                        // Notes on DECSTBM
+                        // * The value of the top margin (Pt) must be less than the bottom margin (Pb).
+                        // * The maximum size of the scrolling region is the page size
+                        // * DECSTBM moves the cursor to column 1, line 1 of the page
+                        // * https://github.com/microsoft/terminal/issues/1849
+
+                        // 当前终端屏幕可显示的行数量
+                        int lines = this.initialOptions.TerminalOption.Rows;
+
+                        List<int> parameters = param[0] as List<int>;
+                        int topMargin = VTParameter.GetParameter(parameters, 0, 1);
+                        int bottomMargin = VTParameter.GetParameter(parameters, 1, lines);
 
                         if (bottomMargin < 0 || topMargin < 0)
                         {
-                            // 参考：https://github.com/microsoft/terminal/issues/1849
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置");
-                            return;
-                        }
-                        if (topMargin > this.initialOptions.TerminalOption.Rows ||
-                            bottomMargin > this.initialOptions.TerminalOption.Rows ||
-                            bottomMargin + topMargin > this.initialOptions.TerminalOption.Rows)
-                        {
-                            // 上边距加下边距超出了整个可视区域的范围了
+                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                             return;
                         }
                         if (topMargin >= bottomMargin)
                         {
-                            // 上边距必须小于下边距
-                            // 打开VIM的时候，上边距和下边距分别是1和1
-                            topMargin = bottomMargin - 1;
+                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                            return;
                         }
-                        if (this.activeDocument.ScrollMarginTop == topMargin && 
-                            this.activeDocument.ScrollMarginBottom == bottomMargin)
+                        if (bottomMargin > lines)
                         {
-                            // 滚动边距和当前文档是一致的，不用设置
+                            logger.DebugFormat("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
                             return;
                         }
 
+                        int marginTop = topMargin == 1 ? 0 : topMargin;
+                        int marginBottom = lines - bottomMargin;
+                        if (this.activeDocument.ScrollMarginTop == marginTop && this.activeDocument.ScrollMarginBottom == marginBottom)
+                        {
+                            // 滚动边距和当前文档是一致的，不用设置
+                            logger.DebugFormat("DECSTBM_SetScrollingRegion参数和当前参数一致，不需要设置");
+                            return;
+                        }
+
+                        logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", marginTop, marginBottom);
+
                         // Margin目前的实现方式：
                         // 相当于是把ViewableDocument缩小bottomMargin/topMargin行，然后创建MarginLine用来填充剩余的区域
-                        this.activeDocument.DetachAll();
-                        this.activeDocument.SetScrollMargin(topMargin, bottomMargin);
-                        // 设置完滚动区域后重新附加渲染模型
-                        List<IDocumentDrawable> drawableLines = this.Renderer.GetDrawableLines();
-                        this.activeDocument.AttachAll(drawableLines);
+                        this.activeDocument.SetScrollMargin(marginTop, marginBottom);
                         break;
                     }
 

@@ -75,6 +75,12 @@ namespace XTerminal.Document
                 this.LastLine = this.LastLine.PreviousLine;
             }
 
+            // 如果最后一行没有了，说明文档是空的，那么要把FirstLine也置空
+            if (this.LastLine == null)
+            {
+                this.FirstLine = null;
+            }
+
             this.IsArrangeDirty = true;
         }
 

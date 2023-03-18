@@ -197,7 +197,7 @@ namespace XTerminal.Document
         /// 保持最后一行不变，通过改变第一行的指针缩小可视区域
         /// </summary>
         /// <param name="lines">要缩小的行</param>
-        public void Shrink(int lines)
+        public void ShrinkTop(int lines)
         {
             for (int i = 0; i < lines; i++)
             {
@@ -208,14 +208,42 @@ namespace XTerminal.Document
         }
 
         /// <summary>
+        /// 保持第一行不变，通过改变最后一行的指针缩小可视区域
+        /// </summary>
+        /// <param name="lines"></param>
+        public void ShrinkBottom(int lines)
+        {
+            for (int i = 0; i < lines; i++)
+            {
+                this.LastLine = this.LastLine.PreviousLine;
+            }
+
+            this.IsArrangeDirty = true;
+        }
+
+        /// <summary>
         /// 保持最后一行不变，通过改变第一行的指针扩大可视区域
         /// </summary>
         /// <param name="lines">要扩大的行</param>
-        public void Expand(int lines)
+        public void ExpandTop(int lines)
         {
             for (int i = 0; i < lines; i++)
             {
                 this.FirstLine = this.FirstLine.PreviousLine;
+            }
+
+            this.IsArrangeDirty = true;
+        }
+
+        /// <summary>
+        /// 保持第一行不变，通过改变最后一行的指针扩大可视区域
+        /// </summary>
+        /// <param name="lines"></param>
+        public void ExpandBottom(int lines)
+        {
+            for (int i = 0; i < lines; i++)
+            {
+                this.LastLine = this.LastLine.NextLine;
             }
 
             this.IsArrangeDirty = true;
