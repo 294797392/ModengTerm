@@ -570,7 +570,7 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 从activeLine开始删除lines行
+        /// 从activeLine开始删除lines行，并把后面的行往前移动
         /// </summary>
         /// <param name="activeLine"></param>
         /// <param name="lines"></param>
