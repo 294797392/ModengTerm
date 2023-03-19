@@ -534,6 +534,7 @@ namespace XTerminal.Document
                 node2.PreviousLine = node1Prev;
                 node1Prev = node1.PreviousLine;
                 node1Next = node1.NextLine;
+                node2.DeleteAll();  // 把新行清空
 
                 // 更新下半部分
                 node2Prev.NextLine = node2Next;
@@ -566,6 +567,23 @@ namespace XTerminal.Document
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
 
             this.SetArrangeDirty();
+        }
+
+        /// <summary>
+        /// 从activeLine开始删除lines行
+        /// </summary>
+        /// <param name="activeLine"></param>
+        /// <param name="lines"></param>
+        public void DeleteLines(VTextLine activeLine, int lines)
+        {
+            VTextLine current = activeLine;
+
+            for (int i = 0; i < lines; i++)
+            {
+                current.DeleteAll();
+
+                current = current.NextLine;
+            }
         }
 
         /// <summary>

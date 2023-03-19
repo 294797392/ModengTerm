@@ -246,40 +246,6 @@ namespace XTerminal
 
         #region 实例方法
 
-        /// <summary>
-        /// 重新测量Terminal所需要的大小
-        /// 如果大小改变了，那么调整布局大小
-        /// </summary>
-        //private void InvalidateMeasure()
-        //{
-        //    if (this.ActiveLine == null)
-        //    {
-        //        logger.ErrorFormat("InvalidateMeasure失败, activeLine不存在");
-        //        return;
-        //    }
-
-        //    double width = Math.Max(this.ActiveLine.Bounds.RightBottom.X, this.fullWidth);
-        //    double height = Math.Max(this.ActiveLine.Bounds.RightBottom.Y, this.fullHeight);
-
-        //    // 布局大小是否改变了
-        //    bool sizeChanged = false;
-
-        //    // 长宽和原来的完整长宽不一样就算改变了
-        //    if (width != this.fullWidth || height != this.fullHeight)
-        //    {
-        //        sizeChanged = true;
-        //    }
-
-        //    if (sizeChanged)
-        //    {
-        //        this.fullWidth = width;
-        //        this.fullHeight = height;
-
-        //        this.Renderer.Resize(width, height);
-        //        this.Renderer.ScrollToEnd(ScrollOrientation.Bottom);
-        //    }
-        //}
-
         private void PerformDeviceStatusReport(StatusType statusType)
         {
             switch (statusType)
@@ -425,6 +391,9 @@ namespace XTerminal
             {
                 case VTActions.Print:
                     {
+                        // 根据测试得出，一个UTF8中文字符使用2列来显示
+                        // 这仅仅只是测试得出的结论，但是并没有在哪个文档里找到遇到多字节字符的时候该如何处理的说明
+
                         char ch = (char)param[0];
                         logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
                         this.activeDocument.PrintCharacter(this.ActiveLine, ch, this.CursorCol);
@@ -469,7 +438,8 @@ namespace XTerminal
 
                 case VTActions.EL_EraseLine:
                     {
-                        EraseType eraseType = (EraseType)param[0];
+                        List<int> parameters = param[0] as List<int>;
+                        EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         logger.DebugFormat("EL_EraseLine, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.CursorRow, this.CursorCol);
                         this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
                         break;
@@ -477,7 +447,8 @@ namespace XTerminal
 
                 case VTActions.ED_EraseDisplay:
                     {
-                        EraseType eraseType = (EraseType)param[0];
+                        List<int> parameters = param[0] as List<int>;
+                        EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         logger.DebugFormat("ED_EraseDisplay, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.CursorRow, this.CursorCol);
                         this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, eraseType);
                         break;
@@ -705,17 +676,7 @@ namespace XTerminal
 
                         int marginTop = topMargin == 1 ? 0 : topMargin;
                         int marginBottom = lines - bottomMargin;
-                        if (this.activeDocument.ScrollMarginTop == marginTop && this.activeDocument.ScrollMarginBottom == marginBottom)
-                        {
-                            // 滚动边距和当前文档是一致的，不用设置
-                            logger.DebugFormat("DECSTBM_SetScrollingRegion参数和当前参数一致，不需要设置");
-                            return;
-                        }
-
                         logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", marginTop, marginBottom);
-
-                        // Margin目前的实现方式：
-                        // 相当于是把ViewableDocument缩小bottomMargin/topMargin行，然后创建MarginLine用来填充剩余的区域
                         this.activeDocument.SetScrollMargin(marginTop, marginBottom);
                         break;
                     }
@@ -723,11 +684,25 @@ namespace XTerminal
                 case VTActions.IL_InsertLine:
                     {
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
-                        int lines = Convert.ToInt32(param[0]);
+                        List<int> parameters = param[0] as List<int>;
+                        int lines = VTParameter.GetParameter(parameters, 0, 1);
                         logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
                         if (lines > 0)
                         {
                             this.activeDocument.InsertLines(this.ActiveLine, lines);
+                        }
+                        break;
+                    }
+
+                case VTActions.DL_DeleteLine:
+                    {
+                        // 从缓冲区中删除<n> 行，从光标所在的行开始。
+                        List<int> parameters = param[0] as List<int>;
+                        int lines = VTParameter.GetParameter(parameters, 0, 1);
+                        logger.DebugFormat("DL_DeleteLine, lines = {0}", lines);
+                        if (lines > 0)
+                        {
+                            this.activeDocument.DeleteLines(this.ActiveLine, lines);
                         }
                         break;
                     }

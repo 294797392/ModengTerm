@@ -29,6 +29,8 @@ namespace XTerminal.VTDefinitions
 
         private static readonly Dictionary<VTKeys, byte[]> ANSIKeyTable = new Dictionary<VTKeys, byte[]>()
         {
+            { VTKeys.Escape, new byte[] { 0x1B } },
+
             { VTKeys.A, new byte[] { (byte)'a' } }, { VTKeys.B, new byte[] { (byte)'b' } }, { VTKeys.C, new byte[] { (byte)'c' } }, { VTKeys.D, new byte[] { (byte)'d' } },
             { VTKeys.E, new byte[] { (byte)'e' } }, { VTKeys.F, new byte[] { (byte)'f' } }, { VTKeys.G, new byte[] { (byte)'g' } }, { VTKeys.H, new byte[] { (byte)'h' } },
             { VTKeys.I, new byte[] { (byte)'i' } }, { VTKeys.J, new byte[] { (byte)'j' } }, { VTKeys.K, new byte[] { (byte)'k' } }, { VTKeys.L, new byte[] { (byte)'l' } },
@@ -160,9 +162,9 @@ namespace XTerminal.VTDefinitions
 
         #region EditingKeypad
 
-        public static readonly Dictionary<VTKeys, byte[]> EditingKeypad = new Dictionary<VTKeys, byte[]>() 
+        public static readonly Dictionary<VTKeys, byte[]> EditingKeypad = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.PageUp, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'5', (byte)'~' } },
+            { VTKeys.Insert, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'2', (byte)'~' } }, { VTKeys.PageUp, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'5', (byte)'~' } },
             { VTKeys.Next, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'6', (byte)'~' } },
         };
 

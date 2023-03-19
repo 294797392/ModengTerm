@@ -104,6 +104,8 @@ namespace XTerminal.Rendering
         {
             base.OnPreviewKeyDown(e);
 
+            Console.WriteLine(e.Key);
+
             if (e.Key == Key.ImeProcessed)
             {
                 // 这些字符交给输入法处理了

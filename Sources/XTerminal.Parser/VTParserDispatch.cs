@@ -8,6 +8,7 @@ namespace XTerminal.Parser
 {
     /// <summary>
     /// 负责分发VTParser的事件
+    /// 把指令透传给外部模块，外部模块去解析每个指令的参数
     /// </summary>
     public partial class VTParser
     {
@@ -181,9 +182,7 @@ namespace XTerminal.Parser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        int parameter = VTParameter.GetParameter(parameters, 0, 0);
-                        logger.DebugFormat("CSIDispatch - ED_EraseDisplay, parameter = {0}", parameter);
-                        this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameter);
+                        this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameters);
                         break;
                     }
 
@@ -267,8 +266,7 @@ namespace XTerminal.Parser
 
                 case CSIActionCodes.EL_EraseLine:
                     {
-                        EraseType eraseType = parameters.Count > 0 ? (EraseType)Convert.ToInt32(parameters[0]) : EraseType.ToEnd;
-                        this.NotifyActionEvent(VTActions.EL_EraseLine, eraseType);
+                        this.NotifyActionEvent(VTActions.EL_EraseLine, parameters);
                         break;
                     }
 
@@ -342,8 +340,13 @@ namespace XTerminal.Parser
 
                 case CSIActionCodes.IL_InsertLine:
                     {
-                        int rows = VTParameter.GetParameter(parameters, 0, 1);
-                        this.NotifyActionEvent(VTActions.IL_InsertLine, rows);
+                        this.NotifyActionEvent(VTActions.IL_InsertLine, parameters);
+                        break;
+                    }
+
+                case CSIActionCodes.DL_DeleteLine:
+                    {
+                        this.NotifyActionEvent(VTActions.DL_DeleteLine, parameters);
                         break;
                     }
 
