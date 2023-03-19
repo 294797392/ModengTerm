@@ -1056,7 +1056,7 @@ namespace XTerminal.Parser
 
         #endregion
 
-        private void NotifyActionEvent(VTActions vtAction, params object[] param)
+        private void NotifyActionEvent(VTActions vtAction, object param = null)
         {
             if (this.ActionEvent != null)
             {

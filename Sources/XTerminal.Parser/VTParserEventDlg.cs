@@ -5,5 +5,5 @@ using System.Text;
 
 namespace XTerminal.Parser
 {
-    public delegate void VTParserEventDlg(VTActions action, params object[] param);
+    public delegate void VTParserEventDlg(VTActions action, object parameter);
 }

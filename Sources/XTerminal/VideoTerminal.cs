@@ -385,7 +385,7 @@ namespace XTerminal
 
         private int index = 0;
 
-        private void VtParser_ActionEvent(VTActions action, params object[] param)
+        private void VtParser_ActionEvent(VTActions action, object parameter)
         {
             switch (action)
             {
@@ -394,7 +394,7 @@ namespace XTerminal
                         // 根据测试得出，一个UTF8中文字符使用2列来显示
                         // 这仅仅只是测试得出的结论，但是并没有在哪个文档里找到遇到多字节字符的时候该如何处理的说明
 
-                        char ch = (char)param[0];
+                        char ch = Convert.ToChar(parameter);
                         logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
                         this.activeDocument.PrintCharacter(this.ActiveLine, ch, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + 1);
@@ -438,7 +438,7 @@ namespace XTerminal
 
                 case VTActions.EL_EraseLine:
                     {
-                        List<int> parameters = param[0] as List<int>;
+                        List<int> parameters = parameter as List<int>;
                         EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         logger.DebugFormat("EL_EraseLine, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.CursorRow, this.CursorCol);
                         this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
@@ -447,7 +447,7 @@ namespace XTerminal
 
                 case VTActions.ED_EraseDisplay:
                     {
-                        List<int> parameters = param[0] as List<int>;
+                        List<int> parameters = parameter as List<int>;
                         EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         logger.DebugFormat("ED_EraseDisplay, eraseType = {0}, cursorRow = {1}, cursorCol = {2}", eraseType, this.CursorRow, this.CursorCol);
                         this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, eraseType);
@@ -461,9 +461,17 @@ namespace XTerminal
                 // 下面的光标移动指令不能进行VTDocument的滚动
                 // 光标的移动坐标是相对于可视区域内的坐标
 
+                case VTActions.BS:
+                    {
+                        this.activeDocument.SetCursor(this.CursorRow, this.CursorCol - 1);
+                        logger.DebugFormat("CursorBackward, cursorRow = {0}, cursorCol = {1}", this.CursorRow, this.CursorCol);
+                        break;
+                    }
+
                 case VTActions.CursorBackward:
                     {
-                        int n = Convert.ToInt32(param[0]);
+                        List<int> parameters = parameter as List<int>;
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol - n);
                         logger.DebugFormat("CursorBackward, cursorRow = {0}, cursorCol = {1}", this.CursorRow, this.CursorCol);
                         break;
@@ -471,32 +479,45 @@ namespace XTerminal
 
                 case VTActions.CUF_CursorForward:
                     {
-                        int n = Convert.ToInt32(param[0]);
+                        List<int> parameters = parameter as List<int>;
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + n);
                         break;
                     }
 
                 case VTActions.CUU_CursorUp:
                     {
-                        int n = Convert.ToInt32(param[0]);
+                        List<int> parameters = parameter as List<int>;
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
                         this.activeDocument.SetCursor(this.CursorRow - n, this.CursorCol);
                         break;
                     }
 
                 case VTActions.CUD_CursorDown:
                     {
-                        int n = Convert.ToInt32(param[0]);
+                        List<int> parameters = parameter as List<int>;
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
                         this.activeDocument.SetCursor(this.CursorRow + n, this.CursorCol);
                         break;
                     }
 
                 case VTActions.CUP_CursorPosition:
                     {
-                        int row = Convert.ToInt32(param[0]);
-                        int col = Convert.ToInt32(param[1]);
+                        List<int> parameters = parameter as List<int>;
+
+                        int row = 0, col = 0;
+                        if (parameters.Count == 2)
+                        {
+                            // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
+                            row = parameters[0] - 1;
+                            col = parameters[1] - 1;
+                        }
+                        else
+                        {
+                            // 如果没有参数，那么说明就是定位到原点(0,0)
+                        }
 
                         logger.DebugFormat("CUP_CursorPosition, row = {0}, col = {1}, {2}", row, col, this.index++);
-
                         this.activeDocument.SetCursor(row, col);
                         break;
                     }
@@ -529,36 +550,47 @@ namespace XTerminal
 
                 case VTActions.DECANM_AnsiMode:
                     {
-                        VTMode vtMode = (VTMode)param[0];
-                        logger.DebugFormat("DECANM_AnsiMode, mode = {0}", vtMode);
-                        this.Keyboard.SetAnsiMode(vtMode == VTMode.AnsiMode);
+                        bool enable = Convert.ToBoolean(parameter);
+                        logger.DebugFormat("DECANM_AnsiMode, enable = {0}", enable);
+                        this.Keyboard.SetAnsiMode(enable);
                         break;
                     }
 
-                case VTActions.SetCursorKeyMode:
+                case VTActions.DECCKM_CursorKeysMode:
                     {
-                        VTCursorKeyMode cursorKeyMode = (VTCursorKeyMode)param[0];
-                        this.Keyboard.SetCursorKeyMode(cursorKeyMode == VTCursorKeyMode.ApplicationMode);
+                        bool enable = Convert.ToBoolean(parameter);
+                        logger.DebugFormat("DECCKM_CursorKeysMode, enable = {0}", enable);
+                        this.Keyboard.SetCursorKeyMode(enable);
                         break;
                     }
 
-                case VTActions.SetKeypadMode:
+                case VTActions.DECKPAM_KeypadApplicationMode:
                     {
-                        VTKeypadMode keypadMode = (VTKeypadMode)param[0];
-                        this.Keyboard.SetKeypadMode(keypadMode == VTKeypadMode.ApplicationMode);
+                        logger.DebugFormat("DECKPAM_KeypadApplicationMode");
+                        this.Keyboard.SetKeypadMode(true);
                         break;
                     }
 
-                case VTActions.AutoWrapMode:
+                case VTActions.DECKPNM_KeypadNumericMode:
                     {
-                        this.autoWrapMode = (bool)param[0];
-                        this.activeDocument.DECPrivateAutoWrapMode = this.autoWrapMode;
+                        logger.DebugFormat("DECKPNM_KeypadNumericMode");
+                        this.Keyboard.SetKeypadMode(false);
+                        break;
+                    }
+
+                case VTActions.DECAWM_AutoWrapMode:
+                    {
+                        bool enable = Convert.ToBoolean(parameter);
+                        this.autoWrapMode = enable;
+                        logger.DebugFormat("DECAWM_AutoWrapMode, enable = {0}", enable);
+                        this.activeDocument.DECPrivateAutoWrapMode = enable;
                         break;
                     }
 
                 case VTActions.XTERM_BracketedPasteMode:
                     {
-                        this.xtermBracketedPasteMode = (bool)param[0];
+                        this.xtermBracketedPasteMode = Convert.ToBoolean(parameter);
+                        logger.ErrorFormat("未实现XTERM_BracketedPasteMode");
                         break;
                     }
 
@@ -578,8 +610,10 @@ namespace XTerminal
 
                 case VTActions.DCH_DeleteCharacter:
                     {
-                        // 从指定位置删除n个字符，删除后的字符串要左对齐
-                        int count = Convert.ToInt32(param[0]);
+                        // 从指定位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
+                        List<int> parameters = parameter as List<int>;
+                        int count = VTParameter.GetParameter(parameters, 0, 1);
+                        logger.ErrorFormat("DCH_DeleteCharacter, {0}, cursorPos = {1}", count, this.CursorCol);
                         this.activeDocument.DeleteCharacter(this.ActiveLine, this.CursorCol, count);
                         break;
                     }
@@ -588,7 +622,8 @@ namespace XTerminal
                     {
                         // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
-                        int count = Convert.ToInt32(param[0]);
+                        List<int> parameters = parameter as List<int>;
+                        int count = VTParameter.GetParameter(parameters, 0, 1);
                         logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
                         break;
                     }
@@ -626,7 +661,8 @@ namespace XTerminal
 
                 case VTActions.DSR_DeviceStatusReport:
                     {
-                        StatusType statusType = (StatusType)Convert.ToInt32(param[0]);
+                        List<int> parameters = parameter as List<int>;
+                        StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
                         logger.DebugFormat("DSR_DeviceStatusReport, statusType = {0}", statusType);
                         this.PerformDeviceStatusReport(statusType);
                         break;
@@ -654,7 +690,7 @@ namespace XTerminal
                         // 当前终端屏幕可显示的行数量
                         int lines = this.initialOptions.TerminalOption.Rows;
 
-                        List<int> parameters = param[0] as List<int>;
+                        List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
                         int bottomMargin = VTParameter.GetParameter(parameters, 1, lines);
 
@@ -684,7 +720,7 @@ namespace XTerminal
                 case VTActions.IL_InsertLine:
                     {
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
-                        List<int> parameters = param[0] as List<int>;
+                        List<int> parameters = parameter as List<int>;
                         int lines = VTParameter.GetParameter(parameters, 0, 1);
                         logger.DebugFormat("IL_InsertLine, lines = {0}", lines);
                         if (lines > 0)
@@ -697,7 +733,7 @@ namespace XTerminal
                 case VTActions.DL_DeleteLine:
                     {
                         // 从缓冲区中删除<n> 行，从光标所在的行开始。
-                        List<int> parameters = param[0] as List<int>;
+                        List<int> parameters = parameter as List<int>;
                         int lines = VTParameter.GetParameter(parameters, 0, 1);
                         logger.DebugFormat("DL_DeleteLine, lines = {0}", lines);
                         if (lines > 0)

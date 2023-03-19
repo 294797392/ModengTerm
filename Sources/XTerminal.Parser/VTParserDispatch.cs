@@ -39,7 +39,7 @@ namespace XTerminal.Parser
 
         private void ActionPrint(byte ch)
         {
-            this.NotifyActionEvent(VTActions.Print, (char)ch);
+            this.NotifyActionEvent(VTActions.Print, ch);
         }
 
         private void ActionPrint(char ch)
@@ -75,15 +75,7 @@ namespace XTerminal.Parser
                 case ASCIITable.BS:
                     {
                         // Backspace，退格，光标向前移动一位
-
-                        // BS causes the active data position to be moved one character position in the data component in the 
-                        // direction opposite to that of the implicit movement.
-                        // The direction of the implicit movement depends on the parameter value of SELECT IMPLICIT
-                        // MOVEMENT DIRECTION (SIMD).
-
-                        // 在Active Position（光标的位置）的位置向implicit movement相反的方向移动一个字符
-                        // implicit movement的方向使用SIMD标志来指定
-                        this.NotifyActionEvent(VTActions.CursorBackward, 1);
+                        this.NotifyActionEvent(VTActions.BS);
                         break;
                     }
 
@@ -194,42 +186,25 @@ namespace XTerminal.Parser
 
                 case CSIActionCodes.CUP_CursorPosition:
                     {
-                        int row = 0, col = 0;
-                        if (parameters.Count == 2)
-                        {
-                            // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
-                            row = parameters[0] - 1;
-                            col = parameters[1] - 1;
-                        }
-                        else 
-                        {
-                            // 如果没有参数，那么说明就是定位到原点(0,0)
-                        }
-                        this.NotifyActionEvent(VTActions.CUP_CursorPosition, row, col);
+                        this.NotifyActionEvent(VTActions.CUP_CursorPosition, parameters);
                         break;
                     }
 
                 case CSIActionCodes.CUF_CursorForward:
                     {
-                        int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
-                        logger.DebugFormat("CSIDispatch - CUF_CursorForward, {0}", n);
-                        this.NotifyActionEvent(VTActions.CUF_CursorForward, n);
+                        this.NotifyActionEvent(VTActions.CUF_CursorForward, parameters);
                         break;
                     }
 
                 case CSIActionCodes.CUU_CursorUp:
                     {
-                        int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
-                        logger.DebugFormat("CSIDispatch - CUU_CursorUp, {0}", n);
-                        this.NotifyActionEvent(VTActions.CUU_CursorUp, n);
+                        this.NotifyActionEvent(VTActions.CUU_CursorUp, parameters);
                         break;
                     }
 
                 case CSIActionCodes.CUD_CursorDown:
                     {
-                        int n = parameters.Count > 0 ? Convert.ToInt32(parameters[0]) : 1;
-                        logger.DebugFormat("CSIDispatch - CUD_CursorDown, {0}", n);
-                        this.NotifyActionEvent(VTActions.CUD_CursorDown, n);
+                        this.NotifyActionEvent(VTActions.CUD_CursorDown, parameters);
                         break;
                     }
 
@@ -272,23 +247,19 @@ namespace XTerminal.Parser
 
                 case CSIActionCodes.DCH_DeleteCharacter:
                     {
-                        logger.DebugFormat("CSIDispatch - DCH_DeleteCharacter, {0}", parameters[0]);
-                        this.NotifyActionEvent(VTActions.DCH_DeleteCharacter, parameters[0]);
+                        this.NotifyActionEvent(VTActions.DCH_DeleteCharacter, parameters);
                         break;
                     }
 
                 case CSIActionCodes.ICH_InsertCharacter:
                     {
                         logger.ErrorFormat("未实现CSIDispatch - ICH_InsertCharacter, {0}", parameters[0]);
-                        this.NotifyActionEvent(VTActions.ICH_InsertCharacter, parameters[0]);
                         break;
                     }
 
                 case CSIActionCodes.DSR_DeviceStatusReport:
                     {
-                        StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
-                        logger.DebugFormat("CSIActionCodes - DSR_DeviceStatusReport, statusType = {0}", statusType);
-                        this.NotifyActionEvent(VTActions.DSR_DeviceStatusReport, statusType);
+                        this.NotifyActionEvent(VTActions.DSR_DeviceStatusReport, parameters);
                         break;
                     }
 
@@ -374,15 +345,13 @@ namespace XTerminal.Parser
             {
                 case EscActionCodes.DECKPAM_KeypadApplicationMode:
                     {
-                        logger.DebugFormat("ESCDispatch - DECKPAM_KeypadApplicationMode");
-                        this.NotifyActionEvent(VTActions.SetKeypadMode, VTKeypadMode.ApplicationMode);
+                        this.NotifyActionEvent(VTActions.DECKPAM_KeypadApplicationMode);
                         break;
                     }
 
                 case EscActionCodes.DECKPNM_KeypadNumericMode:
                     {
-                        logger.DebugFormat("ESCDispatch - DECKPNM_KeypadNumericMode");
-                        this.NotifyActionEvent(VTActions.SetKeypadMode, VTKeypadMode.NumericMode);
+                        this.NotifyActionEvent(VTActions.DECKPNM_KeypadNumericMode);
                         break;
                     }
 
@@ -523,7 +492,7 @@ namespace XTerminal.Parser
                         {
                             byte r, g, b;
                             i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), true, out r, out g, out b);
-                            this.NotifyActionEvent(VTActions.ForegroundRGB, r, g, b);
+                            //this.NotifyActionEvent(VTActions.ForegroundRGB, r, g, b);
                             break;
                         }
 
@@ -531,7 +500,7 @@ namespace XTerminal.Parser
                         {
                             byte r, g, b;
                             i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), false, out r, out g, out b);
-                            this.NotifyActionEvent(VTActions.BackgroundRGB, r, g, b);
+                            //this.NotifyActionEvent(VTActions.BackgroundRGB, r, g, b);
                             break;
                         }
 
@@ -603,22 +572,20 @@ namespace XTerminal.Parser
                             // true表示ApplicationMode
                             // false表示NormalMode
                             this.isApplicationMode = enable;
-                            this.NotifyActionEvent(VTActions.SetCursorKeyMode, enable ? VTCursorKeyMode.ApplicationMode : VTCursorKeyMode.NormalMode);
+                            this.NotifyActionEvent(VTActions.DECCKM_CursorKeysMode, enable);
                             break;
                         }
 
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
-                            logger.DebugFormat("DECPrivateMode - DECANM_AnsiMode, enable = {0}", enable);
                             this.isAnsiMode = enable;
-                            this.NotifyActionEvent(VTActions.DECANM_AnsiMode, enable ? VTMode.AnsiMode : VTMode.VT52Mode);
+                            this.NotifyActionEvent(VTActions.DECANM_AnsiMode, enable);
                             break;
                         }
 
                     case DECPrivateMode.DECAWM_AutoWrapMode:
                         {
-                            logger.DebugFormat("DECPrivateMode - DECAWM_AutoWrapMode, enable = {0}", enable);
-                            this.NotifyActionEvent(VTActions.AutoWrapMode, enable);
+                            this.NotifyActionEvent(VTActions.DECAWM_AutoWrapMode, enable);
                             break;
                         }
 
@@ -632,7 +599,6 @@ namespace XTerminal.Parser
                     case DECPrivateMode.XTERM_BracketedPasteMode:
                         {
                             // Sets the XTerm bracketed paste mode. This controls whether pasted content is bracketed with control sequences to differentiate it from typed text.
-                            logger.DebugFormat("DECPrivateMode - XTERM_BracketedPasteMode");
                             this.NotifyActionEvent(VTActions.XTERM_BracketedPasteMode, enable);
                             break;
                         }

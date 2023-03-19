@@ -145,6 +145,10 @@ namespace XTerminal.Parser
         /// 光标向下移动N个字符的位置
         /// </summary>
         CUD_CursorDown,
+        /// <summary>
+        /// 退格
+        /// </summary>
+        BS,
 
         /// <summary>
         /// Tab键
@@ -171,19 +175,17 @@ namespace XTerminal.Parser
         /// <summary>
         /// 设置光标键输入模式
         /// </summary>
-        SetCursorKeyMode,
+        DECCKM_CursorKeysMode,
 
-        /// <summary>
-        /// 设置辅助键盘（右边的数字小键盘）输入模式
-        /// </summary>
-        SetKeypadMode,
+        DECKPAM_KeypadApplicationMode,
+        DECKPNM_KeypadNumericMode,
 
         /// <summary>
         /// 设置终端模式
         /// VT52和ANSI两种模式
         /// </summary>
         DECANM_AnsiMode,
-        AutoWrapMode,
+        DECAWM_AutoWrapMode,
         XTERM_BracketedPasteMode,
         ATT610_StartCursorBlink,
         DECTCEM_TextCursorEnableMode,
