@@ -11,12 +11,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 文档所能显示的最大列数
         /// </summary>
-        public int Columns { get; set; }
+        public int ColumnSize { get; set; }
 
         /// <summary>
         /// 文档所能显示的最大行数
         /// </summary>
-        public int Rows { get; set; }
+        public int RowSize { get; set; }
 
         /// <summary>
         /// DECPrivateAutoWrapMode是否启用

@@ -66,7 +66,6 @@
     <Compile Include="ScrollOrientation.cs" />
     <Compile Include="VTCursor.cs" />
     <Compile Include="VFontWeight.cs" />
-    <Compile Include="ViewableDocument.cs" />
     <Compile Include="VTCharacter.cs" />
     <Compile Include="VTDocumentOptions.cs" />
     <Compile Include="VTDocument.cs" />
@@ -77,7 +76,6 @@
     <Compile Include="VTextLine.cs" />
     <Compile Include="VTextOptions.cs" />
     <Compile Include="VTextStyle.cs" />
-    <Compile Include="VTMarginedDocument.cs" />
     <Compile Include="VTPoint.cs" />
     <Compile Include="VTRect.cs" />
   </ItemGroup>

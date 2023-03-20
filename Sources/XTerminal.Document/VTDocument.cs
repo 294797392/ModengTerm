@@ -21,14 +21,10 @@ namespace XTerminal.Document
 
         #region 实例变量
 
-        //internal Dictionary<int, VTextLine> lineMap;
-
-        private VTDocumentOptions options;
-
-        ///// <summary>
-        ///// 光标所在行
-        ///// </summary>
-        //private VTextLine activeLine;
+        /// <summary>
+        /// 初始化文档的参数
+        /// </summary>
+        internal VTDocumentOptions options;
 
         private int row;
 
@@ -51,12 +47,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 可视区域的最大列数
         /// </summary>
-        public int Columns { get { return this.options.Columns; } }
+        public int ColumnSize { get { return this.options.ColumnSize; } }
 
         /// <summary>
         /// 可视区域的最大行数
         /// </summary>
-        public int Rows { get { return this.options.Rows; } }
+        public int RowSize { get { return this.options.RowSize; } }
 
         /// <summary>
         /// 总行数
@@ -103,7 +99,6 @@ namespace XTerminal.Document
             {
                 OffsetX = 0,
                 OffsetY = 0,
-                CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
             };
             this.FirstLine = firstLine;
@@ -111,12 +106,12 @@ namespace XTerminal.Document
             this.ActiveLine = firstLine;
 
             // 默认创建80行，可见区域也是80行
-            for (int i = 1; i < options.Rows; i++)
+            for (int i = 1; i < options.RowSize; i++)
             {
                 this.CreateNextLine();
             }
 
-            this.TotalRows = options.Rows;
+            this.TotalRows = options.RowSize;
 
             // 更新可视区域
             this.SetArrangeDirty();
@@ -137,7 +132,6 @@ namespace XTerminal.Document
                 ID = row++,
                 OffsetX = 0,
                 OffsetY = 0,
-                CursorAtRightMargin = false,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
             };
 

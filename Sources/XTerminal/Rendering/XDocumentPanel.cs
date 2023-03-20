@@ -104,7 +104,7 @@ namespace XTerminal.Rendering
         {
             base.OnPreviewKeyDown(e);
 
-            Console.WriteLine(e.Key);
+            //Console.WriteLine(e.Key);
 
             if (e.Key == Key.ImeProcessed)
             {

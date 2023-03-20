@@ -207,8 +207,8 @@ namespace XTerminal
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                Columns = initialOptions.TerminalOption.Columns,
-                Rows = initialOptions.TerminalOption.Rows,
+                ColumnSize = initialOptions.TerminalOption.Columns,
+                RowSize = initialOptions.TerminalOption.Rows,
                 DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode,
                 CursorStyle = initialOptions.CursorOption.Style,
                 Interval = initialOptions.CursorOption.Interval
@@ -395,7 +395,7 @@ namespace XTerminal
                         // 这仅仅只是测试得出的结论，但是并没有在哪个文档里找到遇到多字节字符的时候该如何处理的说明
 
                         char ch = Convert.ToChar(parameter);
-                        logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
+                        logger.ErrorFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
                         this.activeDocument.PrintCharacter(this.ActiveLine, ch, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + 1);
                         break;
