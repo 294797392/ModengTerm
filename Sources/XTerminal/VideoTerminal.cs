@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using VideoTerminal.Options;
+using XTerminal.Base;
 using XTerminal.Channels;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 using XTerminal.Rendering;
-using XTerminal.VTDefinitions;
 
 namespace XTerminal
 {

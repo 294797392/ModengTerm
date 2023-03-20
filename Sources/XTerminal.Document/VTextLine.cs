@@ -101,10 +101,10 @@ namespace XTerminal.Document
         /// </summary>
         public VTextSource TextSource { get; private set; }
 
-        ///// <summary>
-        ///// 该行的所有字符
-        ///// </summary>
-        //private List<VTCharacter> Characters { get; set; }
+        /// <summary>
+        /// 文本特性列表
+        /// </summary>
+        public List<VTextAttribute> Attributes { get; private set; }
 
         #endregion
 
@@ -119,6 +119,7 @@ namespace XTerminal.Document
             this.TextBlocks = new List<VTextBlock>();
             this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource);
             this.OwnerDocument = owner;
+            this.Attributes = new List<VTextAttribute>();
         }
 
         #endregion

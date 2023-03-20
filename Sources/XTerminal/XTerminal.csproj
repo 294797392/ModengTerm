@@ -91,11 +91,6 @@
     <Compile Include="ResponseCode.cs" />
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="Options\VTInitialOptions.cs" />
-    <Compile Include="VTDefinitions\IInputDevice.cs" />
-    <Compile Include="VTDefinitions\VTInputEvent.cs" />
-    <Compile Include="VTDefinitions\VTKeyboard.cs" />
-    <Compile Include="VTDefinitions\VTKeys.cs" />
-    <Compile Include="VTDefinitions\VTModifierKeys.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

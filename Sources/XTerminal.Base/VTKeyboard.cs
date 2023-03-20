@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using XTerminal.Base;
 
-namespace XTerminal.VTDefinitions
+namespace XTerminal.Base
 {
     /// <summary>
     /// 把不同模式下的键盘按键转换成要发送给终端的字节序列
@@ -164,8 +164,16 @@ namespace XTerminal.VTDefinitions
 
         public static readonly Dictionary<VTKeys, byte[]> EditingKeypad = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.Insert, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'2', (byte)'~' } }, { VTKeys.PageUp, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'5', (byte)'~' } },
+            // insert
+            { VTKeys.Insert, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'2', (byte)'~' } },
+            { VTKeys.Delete, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'3', (byte)'~' } }, 
+            // page up
+            { VTKeys.PageUp, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'5', (byte)'~' } },
+            // page down
             { VTKeys.Next, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'6', (byte)'~' } },
+
+            { VTKeys.Home, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'1', (byte)'~' } },
+            { VTKeys.End, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'4', (byte)'~' } },
         };
 
         #endregion

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.VTDefinitions
+namespace XTerminal.Base
 {
     //
     // 摘要:

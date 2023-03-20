@@ -9,8 +9,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
 using System.Windows.Media.TextFormatting;
-using XTerminal.VTDefinitions;
 using XTerminal.Document.Rendering;
+using XTerminal.Base;
 
 namespace XTerminal.Rendering
 {

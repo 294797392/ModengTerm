@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.VTDefinitions
+namespace XTerminal.Base
 {
     public interface IInputDevice
     {
@@ -16,5 +16,20 @@ namespace XTerminal.VTDefinitions
         /// string：用户输入的中文字符串，如果没有则写null
         /// </summary>
         event Action<IInputDevice, VTInputEvent> InputEvent;
+
+        ///// <summary>
+        ///// 鼠标移动的时候触发
+        ///// </summary>
+        //event Action<IInputDevice, double, double> MouseMoveEvent;
+
+        ///// <summary>
+        ///// 鼠标按下的时候触发
+        ///// </summary>
+        //event Action<IInputDevice, double, double> MouseDownEvent;
+
+        ///// <summary>
+        ///// 鼠标抬起的时候触发
+        ///// </summary>
+        //event Action<IInputDevice, double, double> MouseUpEvent;
     }
 }

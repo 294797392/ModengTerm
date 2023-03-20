@@ -41,7 +41,9 @@ stateMachine -> OutputStateMachineEngine -> AdaptDispatch/TerminalDispatch -> ou
 
 
 # 虚拟终端支持启用或禁用以下模式
-DECAWM
+| 模式 | 描述 | 启用/禁用方法 |
+| :--- | ---------------|---|
+| DECAWM | 是否自动换行 |tput smam/tput rmam|
 
 
 # 渲染方式对比

@@ -578,12 +578,64 @@ namespace XTerminal.Document
         {
             VTextLine current = activeLine;
 
+            VTextLine head = this.FirstLine.FindNext(this.ScrollMarginTop);
+            VTextLine last = this.LastLine.FindPrevious(this.ScrollMarginBottom);
+
+            VTextLine node1 = activeLine;
+            VTextLine node1Prev = node1.PreviousLine;
+            VTextLine node1Next = node1.NextLine;
+
+            VTextLine node2 = last;
+            VTextLine node2Prev = node2.PreviousLine;
+            VTextLine node2Next = node2.NextLine;
+
             for (int i = 0; i < lines; i++)
             {
-                current.DeleteAll();
+                // node1就是要删除的节点
+                // 把node1插到node2下面
 
-                current = current.NextLine;
+                // 更新上半部分
+                node1Next.PreviousLine = node1Prev;
+                if (node1Prev != null)
+                {
+                    node1Prev.NextLine = node1Next;
+                }
+
+                // 更新下半部分
+                node2.NextLine = node1;
+                node1.PreviousLine = node2;
+                node1.NextLine = node2Next;
+                if (node2Next != null)
+                {
+                    node2Next.PreviousLine = node1;
+                }
+                node1.DeleteAll();
+
+                // 更新FirstLine
+                if (this.ScrollMarginTop == 0)
+                {
+                    this.FirstLine = node1Next;
+                }
+
+                // 更新LastLine
+                if (this.ScrollMarginBottom == 0)
+                {
+                    this.LastLine = node1;
+                }
+
+                node2 = node1;
+                node1Prev = node2.PreviousLine;
+                node2Next = node2.NextLine;
+
+                node1 = node1Next;
+                node1Prev = node1.PreviousLine;
+                node1Next = node1.NextLine;
             }
+
+            // 更新ActiveLine
+            this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
+
+            this.SetArrangeDirty();
         }
 
         /// <summary>
