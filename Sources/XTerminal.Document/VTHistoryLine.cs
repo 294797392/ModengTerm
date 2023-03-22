@@ -57,7 +57,10 @@ namespace XTerminal.Document
                 PreviousLine = previousLine
             };
 
-            previousLine.NextLine = historyLine;
+            if (previousLine != null)
+            {
+                previousLine.NextLine = historyLine;
+            }
 
             return historyLine;
         }

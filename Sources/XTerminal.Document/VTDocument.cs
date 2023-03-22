@@ -682,8 +682,6 @@ namespace XTerminal.Document
         /// <param name="column">要设置的列</param>
         public void SetCursor(int row, int column)
         {
-            logger.ErrorFormat("SetCursor, Row = {0}, Column = {1}", row, column);
-
             if (this.Cursor.Row != row)
             {
                 this.Cursor.Row = row;

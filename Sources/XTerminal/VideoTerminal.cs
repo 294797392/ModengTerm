@@ -47,7 +47,7 @@ namespace XTerminal
         /// </summary>
         private Dictionary<int, VTHistoryLine> historyLines;
         private int historyLineIndex;
-        private VTHistoryLine previousHistoryLine;
+        private VTHistoryLine lastHistoryLine;
 
         /// <summary>
         /// 主缓冲区文档模型
@@ -231,7 +231,7 @@ namespace XTerminal
         /// </summary>
         public void Release()
         {
-            
+
         }
 
         #endregion
@@ -372,6 +372,16 @@ namespace XTerminal
         /// <param name="scrollLine">滚动到的行数</param>
         private void CanvasPanel_ScrollChanged(IDocumentCanvasPanel arg1, int scrollLine)
         {
+            // 终端可以显示的总行数
+            logger.ErrorFormat("ScrollChanged = {0}", scrollLine);
+            int terminalRows = this.initialOptions.TerminalOption.Rows;
+
+            // 当前滚动的行是最后一行，不动
+            if (scrollLine == this.lastHistoryLine.Row)
+            {
+                return;
+            }
+
             VTHistoryLine historyLine;
             if (!this.historyLines.TryGetValue(scrollLine, out historyLine))
             {
@@ -382,7 +392,7 @@ namespace XTerminal
             // 找到后面的行数显示
             VTHistoryLine currentHistory = historyLine;
             VTextLine currentTextLine = this.activeDocument.FirstLine;
-            for (int i = 0; i < this.initialOptions.TerminalOption.Rows; i++)
+            for (int i = 0; i < terminalRows; i++)
             {
                 currentTextLine.SetHistory(currentHistory);
                 currentHistory = currentHistory.NextLine;
@@ -440,13 +450,24 @@ namespace XTerminal
                             VTextLine previousLine = this.ActiveLine.PreviousLine;
                             previousLine.Metrics = this.Canvas.MeasureLine(previousLine, 0);
 
-                            VTHistoryLine historyLine = VTHistoryLine.Create(this.historyLineIndex, this.previousHistoryLine, previousLine);
+                            VTHistoryLine historyLine = VTHistoryLine.Create(this.historyLineIndex, this.lastHistoryLine, previousLine);
                             this.historyLines[this.historyLineIndex] = historyLine;
-                            this.previousHistoryLine = historyLine;
-                            this.historyLineIndex++;
+                            this.lastHistoryLine = historyLine;
 
-                            this.CanvasPanel.UpdateScrollInfo(this.historyLineIndex);
-                            this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);
+                            int terminalRows = this.initialOptions.TerminalOption.Rows;
+                            int scrollMax = this.historyLineIndex - terminalRows + 2;
+                            //logger.InfoFormat("scrollMax = {0}", scrollMax);
+                            if (scrollMax > 0)
+                            {
+                                logger.ErrorFormat("scrollMax = {0}", scrollMax);
+                                this.uiSyncContext.Send((state) =>
+                                {
+                                    this.CanvasPanel.UpdateScrollInfo(scrollMax);
+                                    this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);
+                                }, null);
+                            }
+
+                            this.historyLineIndex++;
                         }
 
                         break;

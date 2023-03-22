@@ -38,6 +38,8 @@ namespace XTerminal.Rendering
 
         private VTInputEvent inputEvent;
         private Slider scrollbar;
+        private int scrollbarCursorDownValue;
+        private bool cursorDown;
 
         #endregion
 
@@ -52,7 +54,9 @@ namespace XTerminal.Rendering
             set
             {
                 this.scrollbar = value;
-                this.scrollbar.ValueChanged += Scrollbar_ValueChanged;
+                this.scrollbar.PreviewMouseMove += Scrollbar_PreviewMouseMove;
+                this.scrollbar.PreviewMouseLeftButtonDown += Scrollbar_MouseLeftButtonDown;
+                this.scrollbar.PreviewMouseLeftButtonUp += Scrollbar_MouseLeftButtonUp;
             }
         }
 
@@ -77,6 +81,25 @@ namespace XTerminal.Rendering
             {
                 this.InputEvent(this, evt);
             }
+        }
+
+        private void HandleMouseScrollEvent()
+        {
+            if (!this.cursorDown)
+            {
+                return;
+            }
+
+            int newValue = Convert.ToInt32(this.scrollbar.Value);
+            if (newValue != this.scrollbarCursorDownValue)
+            {
+                if (this.ScrollChanged != null)
+                {
+                    this.ScrollChanged(this, newValue);
+                }
+            }
+
+            this.scrollbarCursorDownValue = newValue;
         }
 
         #endregion
@@ -182,6 +205,23 @@ namespace XTerminal.Rendering
             {
                 this.ScrollChanged(this, Convert.ToInt32(e.NewValue));
             }
+        }
+
+        private void Scrollbar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            this.cursorDown = true;
+            this.scrollbarCursorDownValue = Convert.ToInt32(this.scrollbar.Value);
+        }
+
+        private void Scrollbar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            this.HandleMouseScrollEvent();
+            this.cursorDown = false;
+        }
+
+        private void Scrollbar_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            this.HandleMouseScrollEvent();
         }
 
         #endregion

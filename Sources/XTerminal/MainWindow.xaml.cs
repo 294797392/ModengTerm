@@ -50,6 +50,8 @@ namespace XTerminal
 
         private void InitializeWindow()
         {
+            DocumentPanel.Scrollbar = SliderScrolbar;
+
             VideoTerminal videoTermianl = new VideoTerminal();
             videoTermianl.CanvasPanel = DocumentPanel;
             videoTermianl.Initialize(VTInitialOptions.Home);
