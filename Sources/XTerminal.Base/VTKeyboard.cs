@@ -286,7 +286,8 @@ namespace XTerminal.Base
         {
             if (evt.Key == VTKeys.None)
             {
-                return null;
+                // 这里说明是中文
+                return Encoding.UTF8.GetBytes(evt.Text);
             }
 
             byte[] bytes = null;

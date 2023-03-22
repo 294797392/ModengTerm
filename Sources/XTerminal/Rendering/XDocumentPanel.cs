@@ -93,6 +93,11 @@ namespace XTerminal.Rendering
         {
             base.OnPreviewTextInput(e);
 
+            this.inputEvent.CapsLock = Console.CapsLock;
+            this.inputEvent.Key = VTKeys.None;
+            this.inputEvent.Text = e.Text;
+            this.inputEvent.Modifiers = VTModifierKeys.None;
+
             //Console.WriteLine(e.Text);
         }
 

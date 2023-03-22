@@ -37,7 +37,8 @@ namespace XTerminal.Document
         #region 属性
 
         /// <summary>
-        /// 获取总列数
+        /// 获取该行字符所占用的总列数
+        /// 如果是宽字符的话（比如中文），那么一个字符占用两列
         /// </summary>
         public abstract int Columns { get; }
 
