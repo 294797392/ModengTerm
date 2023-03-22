@@ -376,12 +376,6 @@ namespace XTerminal
             logger.ErrorFormat("ScrollChanged = {0}", scrollLine);
             int terminalRows = this.initialOptions.TerminalOption.Rows;
 
-            // 当前滚动的行是最后一行，不动
-            if (scrollLine == this.lastHistoryLine.Row)
-            {
-                return;
-            }
-
             VTHistoryLine historyLine;
             if (!this.historyLines.TryGetValue(scrollLine, out historyLine))
             {
@@ -397,6 +391,13 @@ namespace XTerminal
                 currentTextLine.SetHistory(currentHistory);
                 currentHistory = currentHistory.NextLine;
                 currentTextLine = currentTextLine.NextLine;
+
+                if (currentHistory == null)
+                {
+                    // 当滚动到最底部的时候，因为没有保存用户正在编辑的行，所以会出现currentHistory == null的情况
+                    // 这种情况不用处理，因为最后一个VTextLine就是最新的数据
+                    break;
+                }
             }
 
             this.activeDocument.IsArrangeDirty = true;
@@ -442,7 +443,7 @@ namespace XTerminal
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.CursorRow, this.CursorCol, action);
 
                         // 换行之后记录历史行
-                        // 因为用户可以输入Backspace键或者上下左右光标键来修改该行的内容
+                        // 因为用户可以输入Backspace键或者上下左右光标键来修改最新行的内容
                         // 所以只记录换行之前的行，因为可以确保换行之前的行已经被用户输入完了，不会被更改了
                         // 只记录MainScrrenBuffer里的行，AlternateScrrenBuffer里的行不记录。AlternateScreenBuffer是用来给man，vim等程序使用的
                         if (this.activeDocument == this.mainDocument)
