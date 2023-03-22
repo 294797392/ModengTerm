@@ -97,6 +97,7 @@ namespace XTerminal.Rendering
             this.inputEvent.Key = VTKeys.None;
             this.inputEvent.Text = e.Text;
             this.inputEvent.Modifiers = VTModifierKeys.None;
+            this.NotifyInputEvent(this.inputEvent);
 
             //Console.WriteLine(e.Text);
         }

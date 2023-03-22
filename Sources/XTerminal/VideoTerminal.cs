@@ -363,24 +363,14 @@ namespace XTerminal
         /// <param name="terminal"></param>
         private void VideoTerminal_InputEvent(IInputDevice terminal, VTInputEvent evt)
         {
-            // todo:translate and send to remote host
-            if (string.IsNullOrEmpty(evt.Text))
+            // 这里输入的都是键盘按键
+            byte[] bytes = this.Keyboard.TranslateInput(evt);
+            if (bytes == null)
             {
-                {
-                    // 这里输入的都是键盘按键
-                    byte[] bytes = this.Keyboard.TranslateInput(evt);
-                    if (bytes == null)
-                    {
-                        return;
-                    }
+                return;
+            }
 
-                    this.vtChannel.Write(bytes);
-                }
-            }
-            else
-            {
-                // 这里输入的都是中文
-            }
+            this.vtChannel.Write(bytes);
         }
 
         private int index = 0;
@@ -395,7 +385,7 @@ namespace XTerminal
                         // 这仅仅只是测试得出的结论，但是并没有在哪个文档里找到遇到多字节字符的时候该如何处理的说明
 
                         char ch = Convert.ToChar(parameter);
-                        logger.ErrorFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
+                        logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
                         this.activeDocument.PrintCharacter(this.ActiveLine, ch, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + 1);
                         break;
