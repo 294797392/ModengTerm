@@ -55,7 +55,7 @@ namespace XTerminal.Base
             { VTKeys.OemMinus, new byte[] { (byte)'-' } }, { VTKeys.OemPlus, new byte[] { (byte)'=' } },
         };
 
-        private static readonly Dictionary<VTKeys, byte[]> ANSIShiftKeyTable = new Dictionary<VTKeys, byte[]>()
+        private static readonly Dictionary<VTKeys, byte[]> ANSIKeyShiftPressed = new Dictionary<VTKeys, byte[]>()
         {
             { VTKeys.A, new byte[] { (byte)'a' } }, { VTKeys.B, new byte[] { (byte)'b' } }, { VTKeys.C, new byte[] { (byte)'c' } }, { VTKeys.D, new byte[] { (byte)'d' } },
             { VTKeys.E, new byte[] { (byte)'e' } }, { VTKeys.F, new byte[] { (byte)'f' } }, { VTKeys.G, new byte[] { (byte)'g' } }, { VTKeys.H, new byte[] { (byte)'h' } },
@@ -75,6 +75,24 @@ namespace XTerminal.Base
             { VTKeys.OemMinus, new byte[] { (byte)'_' } }, { VTKeys.OemPlus, new byte[] { (byte)'+' } },
         };
 
+
+        #region Control键按下的时候字母键映射
+
+        private static readonly Dictionary<VTKeys, byte[]> ANSIKeyControlPressed = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.Space, new byte[] { 0 } },
+
+            { VTKeys.A, new byte[] { 1 } }, { VTKeys.B, new byte[] { 2 } }, { VTKeys.C, new byte[] { 3 } }, { VTKeys.D, new byte[] { 4 } },
+            { VTKeys.E, new byte[] { 5 } }, { VTKeys.F, new byte[] { 6 } }, { VTKeys.G, new byte[] { 7 } }, { VTKeys.H, new byte[] { 8 } },
+            { VTKeys.I, new byte[] { 9 } }, { VTKeys.J, new byte[] { 10 } }, { VTKeys.K, new byte[] { 11 } }, { VTKeys.L, new byte[] { 12 } },
+            { VTKeys.M, new byte[] { 13 } }, { VTKeys.N, new byte[] { 14 } }, { VTKeys.O, new byte[] { 15 } }, { VTKeys.P, new byte[] { 16 } },
+            { VTKeys.Q, new byte[] { 17 } }, { VTKeys.R, new byte[] { 18 } }, { VTKeys.S, new byte[] { 19 } }, { VTKeys.T, new byte[] { 20 } },
+            { VTKeys.U, new byte[] { 21 } }, { VTKeys.V, new byte[] { 22 } }, { VTKeys.W, new byte[] { 23 } }, { VTKeys.X, new byte[] { 24 } },
+            { VTKeys.Y, new byte[] { 25 } }, { VTKeys.Z, new byte[] { 26 } },
+        };
+
+        #endregion
+
         #region 方向键映射
 
         private static readonly Dictionary<VTKeys, byte[]> CursorKeyVT52 = new Dictionary<VTKeys, byte[]>()
@@ -93,6 +111,15 @@ namespace XTerminal.Base
         {
             { VTKeys.Up, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'B' } },
             { VTKeys.Right, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'D' } },
+        };
+
+        /// <summary>
+        /// 不管CursorKey当前是ApplicationMode还是NormalMode，只要Control键按下了，那么就使用这个映射关系
+        /// </summary>
+        private static readonly Dictionary<VTKeys, byte[]> CursorKeyControlPressed = new Dictionary<VTKeys, byte[]>()
+        {
+            { VTKeys.Up, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'B' } },
+            { VTKeys.Right, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'D' } },
         };
 
         #endregion
@@ -182,11 +209,6 @@ namespace XTerminal.Base
 
         #region 实例变量
 
-        ///// <summary>
-        ///// 当前是否是ApplicationMode
-        ///// </summary>
-        //private bool isApplicationMode;
-
         /// <summary>
         /// 当前是否按照VT52模式来解析终端序列
         /// </summary>
@@ -225,11 +247,6 @@ namespace XTerminal.Base
         #endregion
 
         #region 实例方法
-
-        private bool IsShiftKeyPressed(VTInputEvent evt)
-        {
-            return evt.Modifiers.HasFlag(VTModifierKeys.Shift);
-        }
 
         #endregion
 
@@ -282,18 +299,28 @@ namespace XTerminal.Base
             {
                 #region 尝试映射光标键
 
-                if (this.isCursorKeyApplicationMode)
+                if (evt.Modifiers.HasFlag(VTModifierKeys.Control))
                 {
-                    if (CursorKeyApplicationMode.TryGetValue(evt.Key, out bytes))
+                    if (CursorKeyControlPressed.TryGetValue(evt.Key, out bytes))
                     {
                         return bytes;
                     }
                 }
                 else
                 {
-                    if (CursorKeyNormalMode.TryGetValue(evt.Key, out bytes))
+                    if (this.isCursorKeyApplicationMode)
                     {
-                        return bytes;
+                        if (CursorKeyApplicationMode.TryGetValue(evt.Key, out bytes))
+                        {
+                            return bytes;
+                        }
+                    }
+                    else
+                    {
+                        if (CursorKeyNormalMode.TryGetValue(evt.Key, out bytes))
+                        {
+                            return bytes;
+                        }
                     }
                 }
 
@@ -330,9 +357,18 @@ namespace XTerminal.Base
                 #region 都没映射成功，使用默认映射
 
                 // 处理按住Shift键的情况
-                if (this.IsShiftKeyPressed(evt))
+                if (evt.Modifiers.HasFlag(VTModifierKeys.Shift))
                 {
-                    if (ANSIShiftKeyTable.TryGetValue(evt.Key, out bytes))
+                    if (ANSIKeyShiftPressed.TryGetValue(evt.Key, out bytes))
+                    {
+                        return bytes;
+                    }
+                }
+
+                // 处理按住Control键的情况
+                if (evt.Modifiers.HasFlag(VTModifierKeys.Control)) 
+                {
+                    if (ANSIKeyControlPressed.TryGetValue(evt.Key, out bytes))
                     {
                         return bytes;
                     }

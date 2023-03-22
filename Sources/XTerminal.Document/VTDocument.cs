@@ -702,6 +702,25 @@ namespace XTerminal.Document
             }
         }
 
+        /// <summary>
+        /// 从光标所在行向上滚动
+        /// </summary>
+        /// <param name="activeLine">光标所在行</param>
+        /// <param name="lines">要滚动的行数</param>
+        public void ScrollDown(VTextLine activeLine, int lines)
+        { 
+        }
+
+        /// <summary>
+        /// 从光标所在行向下滚动
+        /// </summary>
+        /// <param name="activeLine">光标所在行</param>
+        /// <param name="lines">要滚动的行数</param>
+        public void ScrollUp(VTextLine activeLine, int lines)
+        {
+            
+        }
+
         #endregion
     }
 }

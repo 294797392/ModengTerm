@@ -630,6 +630,10 @@ namespace XTerminal
 
                 #endregion
 
+                #region 上下滚动
+
+                #endregion
+
                 case VTActions.UseAlternateScreenBuffer:
                     {
                         logger.DebugFormat("UseAlternateScreenBuffer");
@@ -678,7 +682,6 @@ namespace XTerminal
                 case VTActions.DECSTBM_SetScrollingRegion:
                     {
                         // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
-                        // 但是在测试的时候，打开VIM，topMargin和bottomMargin都被设置为了1，如果不设置的话貌似显示不正常，所以当topMargin和bottomMargin一致的时候也执行
                         // 边距还会影响插入行 (IL) 和删除行 (DL)、向上滚动 (SU) 和向下滚动 (SD) 修改的行。
 
                         // Notes on DECSTBM
@@ -710,7 +713,9 @@ namespace XTerminal
                             return;
                         }
 
+                        // topMargin == 1表示默认值，也就是没有marginTop，所以当topMargin == 1的时候，marginTop改为0
                         int marginTop = topMargin == 1 ? 0 : topMargin;
+                        // bottomMargin == 控制台高度表示默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
                         int marginBottom = lines - bottomMargin;
                         logger.DebugFormat("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", marginTop, marginBottom);
                         this.activeDocument.SetScrollMargin(marginTop, marginBottom);
