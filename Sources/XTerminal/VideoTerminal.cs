@@ -45,7 +45,8 @@ namespace XTerminal
         /// 所有行
         /// Row -> VTextLine
         /// </summary>
-        private Dictionary<int, VTextLine> textLines;
+        private Dictionary<int, VTHistoryLine> historyLines;
+        private int historyLineIndex;
 
         /// <summary>
         /// 主缓冲区文档模型
@@ -67,30 +68,6 @@ namespace XTerminal
         /// </summary>
         private double fullWidth;
         private double fullHeight;
-
-        /// <summary>
-        /// SIMD - SELECT IMPLICIT MOVEMENT DIRECTION
-        /// 0：数据的移动方向和字符方向一致（从左到右）
-        /// 1：数据的移动方向和字符方向相反（从右到左）
-        /// </summary>
-        private int implicitMovementDirection;
-
-        #region Modes - ECMA048 - Modes
-
-        /// <summary>
-        /// DCSM - DEVICE COMPONENT SELECT MODE
-        /// PRESENTATION:
-        /// 某些控制功能在Presentaion模式下执行，
-        /// DATA;
-        /// 某些控制功能在Data模式下执行，
-        /// 
-        /// 默认PRESENTATION状态
-        /// 
-        /// 受DCSM状态影响的控制功能有：CPR, CR, DCH, DL, EA, ECH, ED, EF, EL, ICH, IL, LF, NEL, RI, SLH, SLL, SPH, SPL
-        /// </summary>
-        private int deviceComponentSelectMode;
-
-        #endregion
 
         /// <summary>
         /// UI线程上下文
@@ -170,28 +147,30 @@ namespace XTerminal
             this.initialOptions = options;
             this.uiSyncContext = SynchronizationContext.Current;
 
+            // DECAWM
             this.autoWrapMode = this.initialOptions.TerminalOption.DECPrivateAutoWrapMode;
 
-            // 0:和字符方向相同（向右）
-            // 1:和字符方向相反（向左）
-            this.implicitMovementDirection = 0;
-
             // 初始化变量
-            this.textLines = new Dictionary<int, VTextLine>();
+            this.historyLines = new Dictionary<int, VTHistoryLine>();
             this.TextOptions = new VTextOptions();
 
-            // 初始化键盘
+            #region 初始化键盘
+
             this.Keyboard = new VTKeyboard();
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
-
-            // 初始化视频终端
+            
             this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
 
-            // 初始化终端解析器
+            #endregion
+
+            #region 初始化终端解析器
+
             this.vtParser = new VTParser();
             this.vtParser.ActionEvent += VtParser_ActionEvent;
             this.vtParser.Initialize();
+
+            #endregion
 
             #region 初始化渲染器
 
@@ -234,12 +213,15 @@ namespace XTerminal
 
             #endregion
 
-            // 连接终端通道
+            #region 连接中断通道
+
             VTChannel vtChannel = VTChannelFactory.Create(options);
             vtChannel.StatusChanged += this.VTChannel_StatusChanged;
             vtChannel.DataReceived += this.VTChannel_DataReceived;
             vtChannel.Connect();
             this.vtChannel = vtChannel;
+
+            #endregion
         }
 
         #endregion
@@ -302,7 +284,7 @@ namespace XTerminal
                 if (next.IsDirty)
                 {
                     // 此时说明该行有字符变化，需要重绘
-                    // 重绘的时候会也会Arrange
+                    // 重绘的时候会也会UpdatePosition
                     this.Renderer.DrawDrawable(drawableLine);
                     next.SetDirty(false);
                 }
@@ -381,8 +363,7 @@ namespace XTerminal
             {
                 case VTActions.Print:
                     {
-                        // 根据测试得出，一个UTF8中文字符使用2列来显示
-                        // 这仅仅只是测试得出的结论，但是并没有在哪个文档里找到遇到多字节字符的时候该如何处理的说明
+                        // 根据测试得出结论：不论字符是单字节字符（英文字母）还是多字节字符（中文..），都只占用一列来显示
 
                         char ch = Convert.ToChar(parameter);
                         logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
@@ -411,6 +392,20 @@ namespace XTerminal
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
                         this.activeDocument.LineFeed();
                         logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.CursorRow, this.CursorCol, action);
+
+                        // 换行之后记录历史行
+                        // 因为用户可以输入Backspace键或者上下左右光标键来修改该行的内容
+                        // 所以只记录换行之前的行，因为可以确保换行之前的行已经被用户输入完了，不会被更改了
+                        // 只记录MainScrrenBuffer里的行，AlternateScrrenBuffer里的行不记录。AlternateScreenBuffer是用来给man，vim等程序使用的
+                        if (this.activeDocument == this.mainDocument)
+                        {
+                            VTextLine previousLine = this.ActiveLine.PreviousLine;
+                            previousLine.Metrics = this.Renderer.MeasureLine(previousLine, 0);
+
+                            this.historyLines[this.historyLineIndex] = VTHistoryLine.Create(this.historyLineIndex, previousLine);
+                            this.historyLineIndex++;
+                        }
+
                         break;
                     }
 

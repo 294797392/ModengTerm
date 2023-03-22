@@ -8,6 +8,7 @@ namespace XTerminal.Document
 {
     /// <summary>
     /// 文本元素的基类
+    /// 定义了文本元素的一些基础属性，测量信息
     /// </summary>
     public class VTextElement : VTDocumentElement
     {

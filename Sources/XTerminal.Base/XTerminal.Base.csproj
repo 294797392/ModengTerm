@@ -53,6 +53,8 @@
     <Compile Include="ASCIITable.cs" />
     <Compile Include="IInputDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UICanvas.cs" />
+    <Compile Include="UICanvasPanel.cs" />
     <Compile Include="VTInputEvent.cs" />
     <Compile Include="VTKeyboard.cs" />
     <Compile Include="VTKeys.cs" />

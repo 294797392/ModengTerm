@@ -76,6 +76,7 @@
     <Compile Include="VTextLine.cs" />
     <Compile Include="VTextOptions.cs" />
     <Compile Include="VTextStyle.cs" />
+    <Compile Include="VTHistoryLine.cs" />
     <Compile Include="VTPoint.cs" />
     <Compile Include="VTRect.cs" />
   </ItemGroup>

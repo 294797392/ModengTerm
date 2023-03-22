@@ -183,19 +183,15 @@ namespace XTerminal.Document
         /// </summary>
         public void LineFeed()
         {
-            //if (!this.HasNextLine(this.ActiveLine))
-            //{
-            //    this.CreateNextLine();
-            //}
-
             // 可滚动区域的第一行和最后一行
             VTextLine head = this.FirstLine.FindNext(this.ScrollMarginTop);
             VTextLine last = this.LastLine.FindPrevious(this.ScrollMarginBottom);
 
+            // 光标所在行是可滚动区域的最后一行
             if (last == this.ActiveLine)
             {
                 // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
-                logger.DebugFormat("LineFeed，光标在可视区域最后一行，向下移动一行并且可视区域往下移动一行");
+                logger.DebugFormat("LineFeed，光标在可滚动区域最后一行，向下滚动一行");
 
                 // 把第一行拿到最后一行后面
                 VTextLine node1 = head;
@@ -242,11 +238,8 @@ namespace XTerminal.Document
             }
             else
             {
-                // 这里假设光标在可视区域里
-                // 实际上光标有可能在可视区域的上面或者下面，但是暂时还没找到方法去判定
-
-                // 光标在可视区域里
-                logger.DebugFormat("LineFeed，光标在可视区域里，直接移动光标到下一行");
+                // 光标不在可滚动区域的最后一行，说明可以直接移动光标
+                logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 this.SetCursor(this.Cursor.Row + 1, this.Cursor.Column);
             }
         }
