@@ -80,6 +80,8 @@ namespace XTerminal.Rendering
             this.inputEvent.Modifiers = VTModifierKeys.None;
             this.NotifyInputEvent(this.inputEvent);
 
+            e.Handled = true;
+
             //Console.WriteLine(e.Text);
         }
 
@@ -114,6 +116,11 @@ namespace XTerminal.Rendering
                         }
                 }
 
+                if (e.Key != Key.ImeProcessed)
+                {
+                    e.Handled = true;
+                }
+
                 VTKeys vtKey = WPFRenderUtils.ConvertToVTKey(e.Key);
                 this.inputEvent.CapsLock = Console.CapsLock;
                 this.inputEvent.Key = vtKey;
@@ -131,9 +138,9 @@ namespace XTerminal.Rendering
         }
 
         /// <summary>
-        /// 参考AvalonEdit
         /// 重写了这个事件后，就会触发鼠标相关的事件
         /// </summary>
+        /// 参考AvalonEdit
         /// <param name="hitTestParameters"></param>
         /// <returns></returns>
         protected override HitTestResult HitTestCore(PointHitTestParameters hitTestParameters)
