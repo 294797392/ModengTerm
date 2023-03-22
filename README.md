@@ -26,20 +26,6 @@ https://vt100.net/emu/dec_ansi_parser
 * 虚拟终端/控制台/Shell介绍：https://cloud.tencent.com/developer/news/304629
 
 
-
-
-
-## 编译方法
-使用VS2019打开VideoTerminal.sln直接编译解决方案
-
-### 数据流解析流程
-stateMachine -> OutputStateMachineEngine -> AdaptDispatch/TerminalDispatch -> outputStream
-
-
-# 虚拟终端功能
-1. 当窗口大小改变的时候，终端的行列可以动态改变
-
-
 # 虚拟终端支持启用或禁用以下模式
 | 模式 | 描述 | 启用/禁用方法 |
 | :--- | ---------------|---|
@@ -54,14 +40,13 @@ stateMachine -> OutputStateMachineEngine -> AdaptDispatch/TerminalDispatch -> ou
 | 文本选中    | &#10004; |
 | 自定义右键菜单    | &#10004; |
 
-
-
-
-# 测试流程
-1. ls
-2. man cc
-3. vim
-4. 方向键切换历史记录
+# 不同程序终端的输出对比
+| 程序 | 动作 | 输出 |
+| :--- | ----|------|
+| vim  | 打开|      |
+| vim  | PageUp/PageDown ||
+| man | 打开| |
+| man | PageUp/PageDown ||
 
 
 
