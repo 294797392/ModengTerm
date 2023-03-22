@@ -41,6 +41,12 @@ namespace XTerminal.Document
         /// </summary>
         public VTHistoryLine NextLine { get; internal set; }
 
+        public void Update(VTextLine line)
+        {
+            this.Metrics = line.Metrics;
+            this.Text = line.GetText();
+        }
+
         /// <summary>
         /// 从VTextLine创建一个VTHistoryLine
         /// </summary>

@@ -46,8 +46,7 @@ namespace XTerminal
         /// Row -> VTextLine
         /// </summary>
         private Dictionary<int, VTHistoryLine> historyLines;
-        private int historyLineIndex;
-        private VTHistoryLine lastHistoryLine;
+        private VTHistoryLine activeHistoryLine;
 
         /// <summary>
         /// 主缓冲区文档模型
@@ -197,6 +196,8 @@ namespace XTerminal
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
+            this.activeHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
+            this.historyLines[0] = this.activeHistoryLine;
 
             // 初始化文档行数据模型和渲染模型的关联关系
             List<IDocumentDrawable> drawableLines = this.Canvas.GetDrawableLines();
@@ -373,7 +374,6 @@ namespace XTerminal
         private void CanvasPanel_ScrollChanged(IDocumentCanvasPanel arg1, int scrollLine)
         {
             // 终端可以显示的总行数
-            logger.ErrorFormat("ScrollChanged = {0}", scrollLine);
             int terminalRows = this.initialOptions.TerminalOption.Rows;
 
             VTHistoryLine historyLine;
@@ -391,13 +391,6 @@ namespace XTerminal
                 currentTextLine.SetHistory(currentHistory);
                 currentHistory = currentHistory.NextLine;
                 currentTextLine = currentTextLine.NextLine;
-
-                if (currentHistory == null)
-                {
-                    // 当滚动到最底部的时候，因为没有保存用户正在编辑的行，所以会出现currentHistory == null的情况
-                    // 这种情况不用处理，因为最后一个VTextLine就是最新的数据
-                    break;
-                }
             }
 
             this.activeDocument.IsArrangeDirty = true;
@@ -418,6 +411,8 @@ namespace XTerminal
                         logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);
                         this.activeDocument.PrintCharacter(this.ActiveLine, ch, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + 1);
+                        this.ActiveLine.Metrics = this.Canvas.MeasureLine(this.ActiveLine, 0);
+                        this.activeHistoryLine.Update(this.ActiveLine);
                         break;
                     }
 
@@ -448,27 +443,24 @@ namespace XTerminal
                         // 只记录MainScrrenBuffer里的行，AlternateScrrenBuffer里的行不记录。AlternateScreenBuffer是用来给man，vim等程序使用的
                         if (this.activeDocument == this.mainDocument)
                         {
-                            VTextLine previousLine = this.ActiveLine.PreviousLine;
-                            previousLine.Metrics = this.Canvas.MeasureLine(previousLine, 0);
+                            int historyIndex = this.activeHistoryLine.Row + 1;
+                            this.ActiveLine.Metrics = this.Canvas.MeasureLine(this.ActiveLine, 0);
 
-                            VTHistoryLine historyLine = VTHistoryLine.Create(this.historyLineIndex, this.lastHistoryLine, previousLine);
-                            this.historyLines[this.historyLineIndex] = historyLine;
-                            this.lastHistoryLine = historyLine;
+                            VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.activeHistoryLine, this.ActiveLine);
+                            this.historyLines[historyIndex] = historyLine;
+                            this.activeHistoryLine = historyLine;
 
                             int terminalRows = this.initialOptions.TerminalOption.Rows;
-                            int scrollMax = this.historyLineIndex - terminalRows + 2;
-                            //logger.InfoFormat("scrollMax = {0}", scrollMax);
+                            int scrollMax = historyIndex - terminalRows + 1;
                             if (scrollMax > 0)
                             {
-                                logger.ErrorFormat("scrollMax = {0}", scrollMax);
+                                logger.DebugFormat("scrollMax = {0}", scrollMax);
                                 this.uiSyncContext.Send((state) =>
                                 {
                                     this.CanvasPanel.UpdateScrollInfo(scrollMax);
                                     this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);
                                 }, null);
                             }
-
-                            this.historyLineIndex++;
                         }
 
                         break;
