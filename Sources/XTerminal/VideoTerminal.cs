@@ -47,6 +47,7 @@ namespace XTerminal
         /// </summary>
         private Dictionary<int, VTHistoryLine> historyLines;
         private int historyLineIndex;
+        private VTHistoryLine previousHistoryLine;
 
         /// <summary>
         /// 主缓冲区文档模型
@@ -62,12 +63,6 @@ namespace XTerminal
         /// 当前正在使用的文档模型
         /// </summary>
         private VTDocument activeDocument;
-
-        /// <summary>
-        /// Terminal区域的总长宽
-        /// </summary>
-        private double fullWidth;
-        private double fullHeight;
 
         /// <summary>
         /// UI线程上下文
@@ -114,11 +109,6 @@ namespace XTerminal
         public int CursorCol { get { return this.Cursor.Column; } }
 
         /// <summary>
-        /// 输入设备
-        /// </summary>
-        public IInputDevice InputDevice { get; set; }
-
-        /// <summary>
         /// 文档渲染器
         /// </summary>
         public IDocumentCanvas Canvas { get; private set; }
@@ -147,6 +137,10 @@ namespace XTerminal
 
         #region 公开接口
 
+        /// <summary>
+        /// 初始化终端模拟器
+        /// </summary>
+        /// <param name="options"></param>
         public void Initialize(VTInitialOptions options)
         {
             this.initialOptions = options;
@@ -165,8 +159,6 @@ namespace XTerminal
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
 
-            this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
-
             #endregion
 
             #region 初始化终端解析器
@@ -179,6 +171,8 @@ namespace XTerminal
 
             #region 初始化渲染器
 
+            this.CanvasPanel.InputEvent += this.VideoTerminal_InputEvent;
+            this.CanvasPanel.ScrollChanged += this.CanvasPanel_ScrollChanged;
             DocumentCanvasOptions canvasOptions = new DocumentCanvasOptions()
             {
                 Rows = initialOptions.TerminalOption.Rows
@@ -230,6 +224,14 @@ namespace XTerminal
             this.vtChannel = vtChannel;
 
             #endregion
+        }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Release()
+        {
+            
         }
 
         #endregion
@@ -351,7 +353,7 @@ namespace XTerminal
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        private void VideoTerminal_InputEvent(IInputDevice terminal, VTInputEvent evt)
+        private void VideoTerminal_InputEvent(IDocumentCanvasPanel canvasPanel, VTInputEvent evt)
         {
             // 这里输入的都是键盘按键
             byte[] bytes = this.Keyboard.TranslateInput(evt);
@@ -361,6 +363,34 @@ namespace XTerminal
             }
 
             this.vtChannel.Write(bytes);
+        }
+
+        /// <summary>
+        /// 当滚动条滚动的时候触发
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="scrollLine">滚动到的行数</param>
+        private void CanvasPanel_ScrollChanged(IDocumentCanvasPanel arg1, int scrollLine)
+        {
+            VTHistoryLine historyLine;
+            if (!this.historyLines.TryGetValue(scrollLine, out historyLine))
+            {
+                logger.ErrorFormat("CanvasPanel_ScrollChanged失败, 找不到对应的VTHistoryLine, scrollLine = {0}", scrollLine);
+                return;
+            }
+
+            // 找到后面的行数显示
+            VTHistoryLine currentHistory = historyLine;
+            VTextLine currentTextLine = this.activeDocument.FirstLine;
+            for (int i = 0; i < this.initialOptions.TerminalOption.Rows; i++)
+            {
+                currentTextLine.SetHistory(currentHistory);
+                currentHistory = currentHistory.NextLine;
+                currentTextLine = currentTextLine.NextLine;
+            }
+
+            this.activeDocument.IsArrangeDirty = true;
+            this.DrawDocument(this.activeDocument);
         }
 
         private int index = 0;
@@ -410,8 +440,13 @@ namespace XTerminal
                             VTextLine previousLine = this.ActiveLine.PreviousLine;
                             previousLine.Metrics = this.Canvas.MeasureLine(previousLine, 0);
 
-                            this.historyLines[this.historyLineIndex] = VTHistoryLine.Create(this.historyLineIndex, previousLine);
+                            VTHistoryLine historyLine = VTHistoryLine.Create(this.historyLineIndex, this.previousHistoryLine, previousLine);
+                            this.historyLines[this.historyLineIndex] = historyLine;
+                            this.previousHistoryLine = historyLine;
                             this.historyLineIndex++;
+
+                            this.CanvasPanel.UpdateScrollInfo(this.historyLineIndex);
+                            this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);
                         }
 
                         break;

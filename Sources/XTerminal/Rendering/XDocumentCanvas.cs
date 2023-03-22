@@ -166,51 +166,6 @@ namespace XTerminal.Rendering
             drawingVisual.Opacity = opacity;
         }
 
-        public void Resize(double width, double height)
-        {
-            this.fullWidth = width;
-            this.fullHeight = height;
-            this.InvalidateMeasure();
-        }
-
-        //public void ScrollToEnd(ScrollOrientation orientation)
-        //{
-        //    if (!this.EnsureScrollViewer())
-        //    {
-        //        return;
-        //    }
-
-        //    switch (orientation)
-        //    {
-        //        case ScrollOrientation.Bottom:
-        //            {
-        //                this.scrollViewer.ScrollToEnd();
-        //                break;
-        //            }
-
-        //        case ScrollOrientation.Left:
-        //            {
-        //                this.scrollViewer.ScrollToLeftEnd();
-        //                break;
-        //            }
-
-        //        case ScrollOrientation.Right:
-        //            {
-        //                this.scrollViewer.ScrollToRightEnd();
-        //                break;
-        //            }
-
-        //        case ScrollOrientation.Top:
-        //            {
-        //                this.scrollViewer.ScrollToTop();
-        //                break;
-        //            }
-
-        //        default:
-        //            throw new NotImplementedException();
-        //    }
-        //}
-
         #endregion
     }
 }

@@ -99,6 +99,13 @@ namespace XTerminal.Document
         public abstract void SetCharacter(int column, char setChar);
 
         /// <summary>
+        /// 把文本设置到该文本数据源里
+        /// 从第一列开始
+        /// </summary>
+        /// <param name="text">要设置的文本</param>
+        public abstract void SetText(string text);
+
+        /// <summary>
         /// 在末尾Append一个字符
         /// </summary>
         /// <param name="addChar"></param>
@@ -150,6 +157,11 @@ namespace XTerminal.Document
         public override void SetCharacter(int column, char setChar)
         {
             this.text = this.text.Remove(column, 1).Insert(column, char.ToString(setChar));
+        }
+
+        public override void SetText(string text)
+        {
+            this.text = text;
         }
     }
 
@@ -215,6 +227,16 @@ namespace XTerminal.Document
         public override void SetCharacter(int column, char setChar)
         {
             this.characters[column].Character = setChar;
+        }
+
+        public override void SetText(string text)
+        {
+            this.characters.Clear();
+
+            foreach (char ch in text)
+            {
+                this.characters.Add(new VTCharacter(ch));
+            }
         }
 
         #endregion

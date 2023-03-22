@@ -52,7 +52,6 @@ namespace XTerminal
         {
             VideoTerminal videoTermianl = new VideoTerminal();
             videoTermianl.CanvasPanel = DocumentPanel;
-            videoTermianl.InputDevice = DocumentPanel;
             videoTermianl.Initialize(VTInitialOptions.Home);
         }
 

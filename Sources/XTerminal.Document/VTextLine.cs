@@ -301,6 +301,20 @@ namespace XTerminal.Document
             return current;
         }
 
+        /// <summary>
+        /// 把一个历史行的数据应用到VTextLine上
+        /// </summary>
+        /// <param name="historyLine">要应用的历史行数据</param>
+        public void SetHistory(VTHistoryLine historyLine)
+        {
+            this.Attributes.Clear();
+            this.Attributes.AddRange(historyLine.TextAttributes);
+
+            this.TextSource.SetText(historyLine.Text);
+
+            this.SetDirty(true);
+        }
+
         #endregion
     }
 }

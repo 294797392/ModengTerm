@@ -32,19 +32,34 @@ namespace XTerminal.Document
         public List<VTextAttribute> TextAttributes { get; private set; }
 
         /// <summary>
+        /// 上一行
+        /// </summary>
+        public VTHistoryLine PreviousLine { get; internal set; }
+
+        /// <summary>
+        /// 下一行
+        /// </summary>
+        public VTHistoryLine NextLine { get; internal set; }
+
+        /// <summary>
         /// 从VTextLine创建一个VTHistoryLine
         /// </summary>
         /// <param name="fromLine"></param>
         /// <returns></returns>
-        public static VTHistoryLine Create(int row, VTextLine fromLine)
+        public static VTHistoryLine Create(int row, VTHistoryLine previousLine, VTextLine fromLine)
         {
-            return new VTHistoryLine()
+            VTHistoryLine historyLine = new VTHistoryLine()
             {
                 Metrics =  fromLine.Metrics,
                 Text = fromLine.GetText(),
                 TextAttributes = fromLine.Attributes.ToList(),
                 Row = row,
+                PreviousLine = previousLine
             };
+
+            previousLine.NextLine = historyLine;
+
+            return historyLine;
         }
     }
 }

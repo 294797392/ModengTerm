@@ -57,6 +57,7 @@
     <Compile Include="Rendering\IDocumentDrawable.cs" />
     <Compile Include="Rendering\IDocumentCanvas.cs" />
     <Compile Include="Rendering\IDocumentCanvasPanel.cs" />
+    <Compile Include="Rendering\ScrollOrientations.cs" />
     <Compile Include="VTDocumentBase.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />
@@ -82,6 +83,10 @@
     <Compile Include="VTRect.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
+      <Project>{F2C5BC95-5839-4C8F-9923-3512FE2DDEA1}</Project>
+      <Name>XTerminal.Base</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XTerminal.Parser\XTerminal.Parser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>XTerminal.Parser</Name>

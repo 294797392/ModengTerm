@@ -12,9 +12,16 @@
             <RowDefinition Height="0"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="30"/>
+        </Grid.ColumnDefinitions>
 
-        <xtermrendering:XDocumentPanel Grid.Row="1" x:Name="DocumentPanel">
+        <xtermrendering:XDocumentPanel Grid.Row="1" Grid.Column="0" x:Name="DocumentPanel" Scrollbar="{Binding ElementName=SliderScrolbar}">
         </xtermrendering:XDocumentPanel>
+
+        <!-- Slider模拟滚动条 -->
+        <Slider Grid.Row="1" Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" Minimum="0" Delay="500"/>
     </Grid>
 
 </Window>
