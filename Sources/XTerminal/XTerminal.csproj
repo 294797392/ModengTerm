@@ -85,7 +85,7 @@
     <Compile Include="Rendering\XDocumentDrawable.cs" />
     <Compile Include="Rendering\DrawableText.cs" />
     <Compile Include="Rendering\WPFRenderUtils.cs" />
-    <Compile Include="Rendering\XDocument.cs" />
+    <Compile Include="Rendering\XDocumentCanvas.cs" />
     <Compile Include="Rendering\XDocumentPanel.cs" />
     <Compile Include="Options\TerminalOptions.cs" />
     <Compile Include="ResponseCode.cs" />

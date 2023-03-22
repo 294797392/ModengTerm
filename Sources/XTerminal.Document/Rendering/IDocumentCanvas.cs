@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Document;
 
 namespace XTerminal.Document.Rendering
 {
     /// <summary>
-    /// 定义文档的渲染接口
+    /// 表示一个用来显示文档的画板
     /// </summary>
-    public interface IDocumentRenderer
+    public interface IDocumentCanvas
     {
         /// <summary>
         /// 初始化渲染器
@@ -64,12 +63,5 @@ namespace XTerminal.Document.Rendering
         /// <param name="drawable"></param>
         /// <param name="opacity"></param>
         void SetOpacity(IDocumentDrawable drawable, double opacity);
-
-        /// <summary>
-        /// 重新调整终端大小
-        /// </summary>
-        /// <param name="width">终端的宽度</param>
-        /// <param name="height">终端高度</param>
-        void Resize(double width, double height);
     }
 }

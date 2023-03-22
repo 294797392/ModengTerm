@@ -17,7 +17,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 用来显示字符的容器
     /// </summary>
-    public class XDocument : FrameworkElement, IDocumentRenderer
+    public class XDocumentCanvas : FrameworkElement, IDocumentCanvas
     {
         #region 类变量
 
@@ -34,7 +34,7 @@ namespace XTerminal.Rendering
         private double fullWidth;
         private double fullHeight;
 
-        private DocumentRendererOptions options;
+        private DocumentCanvasOptions options;
 
         private List<IDocumentDrawable> drawableLines;
         private DrawableCursor drawableCursor;
@@ -53,7 +53,7 @@ namespace XTerminal.Rendering
 
         #region 构造方法
 
-        public XDocument()
+        public XDocumentCanvas()
         {
             this.visuals = new VisualCollection(this);
         }
@@ -90,9 +90,9 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        #region IDocumentRenderer
+        #region IDocumentCanvas
 
-        public void Initialize(DocumentRendererOptions options)
+        public void Initialize(DocumentCanvasOptions options)
         {
             this.options = options;
 

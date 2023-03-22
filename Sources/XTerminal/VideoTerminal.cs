@@ -121,7 +121,12 @@ namespace XTerminal
         /// <summary>
         /// 文档渲染器
         /// </summary>
-        public IDocumentRenderer Renderer { get; set; }
+        public IDocumentCanvas Canvas { get; private set; }
+
+        /// <summary>
+        /// 文档画布容器
+        /// </summary>
+        public IDocumentCanvasPanel CanvasPanel { get; set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流
@@ -159,7 +164,7 @@ namespace XTerminal
             this.Keyboard = new VTKeyboard();
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
-            
+
             this.InputDevice.InputEvent += this.VideoTerminal_InputEvent;
 
             #endregion
@@ -174,11 +179,14 @@ namespace XTerminal
 
             #region 初始化渲染器
 
-            DocumentRendererOptions rendererOptions = new DocumentRendererOptions()
+            DocumentCanvasOptions canvasOptions = new DocumentCanvasOptions()
             {
                 Rows = initialOptions.TerminalOption.Rows
             };
-            this.Renderer.Initialize(rendererOptions);
+            IDocumentCanvas characterCanvas = this.CanvasPanel.CreateCanvas();
+            characterCanvas.Initialize(canvasOptions);
+            this.CanvasPanel.AddCanvas(characterCanvas);
+            this.Canvas = characterCanvas;
 
             #endregion
 
@@ -197,16 +205,16 @@ namespace XTerminal
             this.activeDocument = this.mainDocument;
 
             // 初始化文档行数据模型和渲染模型的关联关系
-            List<IDocumentDrawable> drawableLines = this.Renderer.GetDrawableLines();
+            List<IDocumentDrawable> drawableLines = this.Canvas.GetDrawableLines();
             this.activeDocument.AttachAll(drawableLines);
 
             #endregion
 
             #region 初始化光标
 
-            IDocumentDrawable drawableCursor = this.Renderer.GetDrawableCursor();
+            IDocumentDrawable drawableCursor = this.Canvas.GetDrawableCursor();
             this.Cursor.AttachDrawable(drawableCursor);
-            this.Renderer.DrawDrawable(drawableCursor);
+            this.Canvas.DrawDrawable(drawableCursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
@@ -285,14 +293,14 @@ namespace XTerminal
                 {
                     // 此时说明该行有字符变化，需要重绘
                     // 重绘的时候会也会UpdatePosition
-                    this.Renderer.DrawDrawable(drawableLine);
+                    this.Canvas.DrawDrawable(drawableLine);
                     next.SetDirty(false);
                 }
                 else
                 {
                     // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                    next.Metrics = this.Renderer.MeasureLine(next, 0);
-                    this.Renderer.UpdatePosition(drawableLine, next.OffsetX, next.OffsetY);
+                    next.Metrics = this.Canvas.MeasureLine(next, 0);
+                    this.Canvas.UpdatePosition(drawableLine, next.OffsetX, next.OffsetY);
                 }
 
                 // 更新下一个文本行的Y偏移量
@@ -327,8 +335,8 @@ namespace XTerminal
                 #region 更新光标
 
                 this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                this.Cursor.OffsetX = this.Renderer.MeasureLine(this.ActiveLine, this.CursorCol).WidthIncludingWhitespace;
-                this.Renderer.UpdatePosition(this.Cursor.Drawable, this.Cursor.OffsetX, this.Cursor.OffsetY);
+                this.Cursor.OffsetX = this.Canvas.MeasureLine(this.ActiveLine, this.CursorCol).WidthIncludingWhitespace;
+                this.Canvas.UpdatePosition(this.Cursor.Drawable, this.Cursor.OffsetX, this.Cursor.OffsetY);
 
                 #endregion
 
@@ -400,7 +408,7 @@ namespace XTerminal
                         if (this.activeDocument == this.mainDocument)
                         {
                             VTextLine previousLine = this.ActiveLine.PreviousLine;
-                            previousLine.Metrics = this.Renderer.MeasureLine(previousLine, 0);
+                            previousLine.Metrics = this.Canvas.MeasureLine(previousLine, 0);
 
                             this.historyLines[this.historyLineIndex] = VTHistoryLine.Create(this.historyLineIndex, previousLine);
                             this.historyLineIndex++;
@@ -629,8 +637,8 @@ namespace XTerminal
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
                         this.alternateDocument.DeleteAll();
-                        this.alternateDocument.AttachAll(this.Renderer.GetDrawableLines());
-                        this.alternateDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
+                        this.alternateDocument.AttachAll(this.Canvas.GetDrawableLines());
+                        this.alternateDocument.Cursor.AttachDrawable(this.Canvas.GetDrawableCursor());
                         this.activeDocument = this.alternateDocument;
                         break;
                     }
@@ -641,9 +649,9 @@ namespace XTerminal
 
                         this.alternateDocument.DetachAll();
 
-                        this.mainDocument.AttachAll(this.Renderer.GetDrawableLines());
+                        this.mainDocument.AttachAll(this.Canvas.GetDrawableLines());
                         this.mainDocument.DirtyAll();
-                        this.mainDocument.Cursor.AttachDrawable(this.Renderer.GetDrawableCursor());
+                        this.mainDocument.Cursor.AttachDrawable(this.Canvas.GetDrawableCursor());
                         this.activeDocument = this.mainDocument;
                         break;
                     }
@@ -781,7 +789,7 @@ namespace XTerminal
 
                     this.uiSyncContext.Send((state) =>
                     {
-                        this.Renderer.SetOpacity(drawableCursor, opacity);
+                        this.Canvas.SetOpacity(drawableCursor, opacity);
                     }, null);
                 }
                 catch (Exception e)

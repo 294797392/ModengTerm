@@ -17,7 +17,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 显示器控件
     /// </summary>
-    public class XDocumentPanel : Grid, IInputDevice
+    public class XDocumentPanel : Grid, IInputDevice, IDocumentCanvasPanel
     {
         #region 类变量
 
@@ -33,17 +33,11 @@ namespace XTerminal.Rendering
 
         #region 实例变量
 
-        private ScrollViewer scrollViewer;
         private VTInputEvent inputEvent;
 
         #endregion
 
         #region 属性
-
-        /// <summary>
-        /// 终端显示器对象
-        /// </summary>
-        public IDocumentRenderer DocumentRenderer { get; private set; }
 
         #endregion
 
@@ -54,19 +48,6 @@ namespace XTerminal.Rendering
             this.inputEvent = new VTInputEvent();
             this.Background = Brushes.Transparent;
             this.Focusable = true;
-
-            XDocument documentRenderer = new XDocument();
-            ScrollViewer scrollViewer = new ScrollViewer()
-            {
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                Content = documentRenderer
-            };
-            scrollViewer.ScrollChanged += ScrollViewer_ScrollChanged;
-            this.Children.Add(scrollViewer);
-
-            this.DocumentRenderer = documentRenderer;
-            this.scrollViewer = scrollViewer;
         }
 
         #endregion
@@ -169,6 +150,21 @@ namespace XTerminal.Rendering
             base.OnPreviewMouseDown(e);
 
             //Console.WriteLine((this.scrollViewer.Content as WPFPresentaionDevice).Count);
+        }
+
+        #endregion
+
+        #region IDocumentCanvasPanel
+
+        public IDocumentCanvas CreateCanvas()
+        {
+            XDocumentCanvas canvas = new XDocumentCanvas();
+            return canvas;
+        }
+
+        public void AddCanvas(IDocumentCanvas canvas)
+        {
+            this.Children.Add(canvas as XDocumentCanvas);
         }
 
         #endregion
