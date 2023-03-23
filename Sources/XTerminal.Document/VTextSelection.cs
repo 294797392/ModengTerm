@@ -15,9 +15,9 @@ namespace XTerminal.Document
         public override Drawables Type => Drawables.SelectionRange;
 
         /// <summary>
-        /// 每一行就是一个矩形
+        /// 选中的文本范围
         /// </summary>
-        public List<VTRect> LineBounds { get; private set; }
+        public List<VTRect> Ranges { get; private set; }
 
         /// <summary>
         /// 所选内容的开始位置
@@ -31,7 +31,7 @@ namespace XTerminal.Document
 
         public VTextSelection()
         {
-            this.LineBounds = new List<VTRect>();
+            this.Ranges = new List<VTRect>();
             this.Start = new VTextPointer();
             this.End = new VTextPointer();
         }
@@ -41,7 +41,7 @@ namespace XTerminal.Document
         /// </summary>
         public void Reset()
         {
-            this.LineBounds.Clear();
+            this.Ranges.Clear();
             this.Start.IsEmpty = true;
             this.End.IsEmpty = true;
         }

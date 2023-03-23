@@ -96,7 +96,11 @@ namespace XTerminal
 
         #region SelectionRange
 
+        /// <summary>
+        /// 鼠标是否按下
+        /// </summary>
         private bool isCursorDown;
+        private VTPoint cursorDownPos;
 
         /// <summary>
         /// 存储选中的文本信息
@@ -1104,14 +1108,14 @@ namespace XTerminal
                         double height = rect1.Height;
 
                         VTRect bounds = new VTRect(x, y, width, height);
-                        this.textSelection.LineBounds.Clear();
-                        this.textSelection.LineBounds.Add(bounds);
+                        this.textSelection.Ranges.Clear();
+                        this.textSelection.Ranges.Add(bounds);
                         break;
                     }
 
                 default:
                     {
-                        this.textSelection.LineBounds.Clear();
+                        this.textSelection.Ranges.Clear();
 
                         // 其他的鼠标都是在多行之间进行移动
                         double xmin = Math.Min(rect1.X, rect2.X);
@@ -1124,12 +1128,12 @@ namespace XTerminal
                         VTextPointer bottomPointer = this.textSelection.Start.Row < this.textSelection.End.Row ? this.textSelection.End : this.textSelection.Start;
                         VTRect topBounds = topPointer.CharacterBounds;
                         VTRect bottomBounds = bottomPointer.CharacterBounds;
-                        this.textSelection.LineBounds.Add(new VTRect(topBounds.X, topBounds.Y, topPointer.Line.Metrics.WidthIncludingWhitespace - topBounds.X, topBounds.Height));
-                        this.textSelection.LineBounds.Add(new VTRect(0, bottomBounds.Y, bottomBounds.X + bottomBounds.Width, bottomBounds.Height));
+                        this.textSelection.Ranges.Add(new VTRect(topBounds.X, topBounds.Y, topPointer.Line.Metrics.WidthIncludingWhitespace - topBounds.X, topBounds.Height));
+                        this.textSelection.Ranges.Add(new VTRect(0, bottomBounds.Y, bottomBounds.X + bottomBounds.Width, bottomBounds.Height));
 
                         // 构建中间的几何图形
                         VTRect middleBounds = new VTRect(0, topBounds.Y + topBounds.Height, 9999, bottomBounds.Y - topBounds.Bottom);
-                        this.textSelection.LineBounds.Add(middleBounds);
+                        this.textSelection.Ranges.Add(middleBounds);
 
                         break;
                     }
@@ -1144,6 +1148,7 @@ namespace XTerminal
         private void CanvasPanel_VTMouseDown(IDocumentCanvasPanel arg1, VTPoint cursorPos)
         {
             this.isCursorDown = true;
+            this.cursorDownPos = cursorPos;
 
             // 得到startPos对应的VTextLine
             this.GetTextPointer(cursorPos, this.textSelection.Start);
