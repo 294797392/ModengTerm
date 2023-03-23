@@ -179,6 +179,7 @@ namespace XTerminal
             this.TextOptions = new VTextOptions();
             this.startTextPointer = new VTextPointer();
             this.currentTextPointer = new VTextPointer();
+            this.selectionRange = new VTSelectionRange();
 
             #region 初始化键盘
 
@@ -1061,7 +1062,6 @@ namespace XTerminal
         private void CanvasPanel_VTMouseUp(IDocumentCanvasPanel arg1, VTPoint cursorPos)
         {
             this.isCursorDown = false;
-            this.startTextPointer = null;
             this.selectionRange.LineBounds.Clear();
         }
 

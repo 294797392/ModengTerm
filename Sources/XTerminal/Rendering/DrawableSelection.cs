@@ -17,11 +17,12 @@ namespace VideoTerminal.Rendering
     {
         private StreamGeometry selectionGeometry;
         private Pen pen;
+        private Brush brush = new SolidColorBrush(Color.FromArgb(0x80, 0, 0, 0));
 
         public DrawableSelection()
         {
             this.selectionGeometry = new StreamGeometry();
-            this.pen = new Pen(Brushes.Black, 1);
+            this.pen = new Pen(Brushes.Transparent, 1);
         }
 
         protected override void Draw(DrawingContext dc)
@@ -40,7 +41,7 @@ namespace VideoTerminal.Rendering
 
             sgc.Close();
 
-            dc.DrawGeometry(Brushes.Transparent, this.pen, this.selectionGeometry);
+            dc.DrawGeometry(this.brush, this.pen, this.selectionGeometry);
         }
     }
 }
