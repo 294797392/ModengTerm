@@ -161,7 +161,7 @@ namespace XTerminal.Document
             VTextLine next = this.FirstLine;
             while (next != null)
             {
-                builder.AppendLine(next.GetText());
+                builder.AppendLine(next.Text);
 
                 if (next == this.LastLine)
                 {
@@ -646,17 +646,24 @@ namespace XTerminal.Document
         /// <summary>
         /// 把所有的TextLine取消关联渲染模型
         /// </summary>
-        public void DetachAll()
+        /// <returns>返回被取消关联的渲染对象</returns>
+        public List<IDocumentDrawable> DetachAll()
         {
+            List<IDocumentDrawable> drawables = new List<IDocumentDrawable>();
+
             VTextLine current = this.FirstLine;
 
             while (current != null)
             {
+                drawables.Add(current.Drawable);
+
                 // 取消关联关系
                 current.DetachDrawable();
 
                 current = current.NextLine;
             }
+
+            return drawables;
         }
 
         /// <summary>

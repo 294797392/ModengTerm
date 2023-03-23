@@ -82,8 +82,8 @@
     <Compile Include="Options\CursorOptions.cs" />
     <Compile Include="Rendering\DrawableCursor.cs" />
     <Compile Include="Rendering\DrawableLine.cs" />
+    <Compile Include="Rendering\DrawableSelection.cs" />
     <Compile Include="Rendering\XDocumentDrawable.cs" />
-    <Compile Include="Rendering\DrawableText.cs" />
     <Compile Include="Rendering\WPFRenderUtils.cs" />
     <Compile Include="Rendering\XDocumentCanvas.cs" />
     <Compile Include="Rendering\XDocumentPanel.cs" />

@@ -8,24 +8,11 @@ using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
-    public enum InsertOptions
-    {
-        /// <summary>
-        /// 插入到前面
-        /// </summary>
-        PrependInsert,
-
-        /// <summary>
-        /// 插入到后面
-        /// </summary>
-        AppendInsert
-    }
-
     /// <summary>
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VTextElement
+    public class VTextLine : VTextElement, VTextLineBase
     {
         private static readonly string BlankText = " ";
 
@@ -42,6 +29,8 @@ namespace XTerminal.Document
         #region 属性
 
         public int ID { get; set; }
+
+        public override Drawables Type => Drawables.TextLine;
 
         /// <summary>
         /// 列大小
@@ -90,6 +79,18 @@ namespace XTerminal.Document
         /// 文本特性列表
         /// </summary>
         public List<VTextAttribute> Attributes { get; private set; }
+
+        /// <summary>
+        /// 获取该行的文本，如果字符数量是0，那么返回一个空白字符，目的是可以测量出来文本的测量信息
+        /// </summary>
+        public string Text
+        {
+            get 
+            {
+                string text = this.TextSource.GetText();
+                return text.Length == 0 ? BlankText : text;
+            }
+        }
 
         #endregion
 
@@ -258,16 +259,6 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 获取该行的文本，如果字符数量是0，那么返回空白字符
-        /// </summary>
-        /// <returns></returns>
-        public string GetText()
-        {
-            string text = this.TextSource.GetText();
-            return text.Length == 0 ? BlankText : text;
-        }
-
-        /// <summary>
         /// 往前找到下一个VTextLine
         /// </summary>
         /// <param name="rows">向前几行</param>
@@ -308,7 +299,7 @@ namespace XTerminal.Document
         public void SetHistory(VTHistoryLine historyLine)
         {
             this.Attributes.Clear();
-            this.Attributes.AddRange(historyLine.TextAttributes);
+            this.Attributes.AddRange(historyLine.Attributes);
 
             this.TextSource.SetText(historyLine.Text);
 

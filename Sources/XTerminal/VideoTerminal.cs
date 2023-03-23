@@ -42,21 +42,6 @@ namespace XTerminal
         private VTParser vtParser;
 
         /// <summary>
-        /// 所有行
-        /// Row -> VTextLine
-        /// </summary>
-        private Dictionary<int, VTHistoryLine> historyLines;
-        private VTHistoryLine activeHistoryLine;
-        /// <summary>
-        /// 记录滚动条滚动到底的时候，滚动条的值
-        /// </summary>
-        private int scrollMax;
-        /// <summary>
-        /// 记录当前滚动条滚动的值
-        /// </summary>
-        private int currentScroll;
-
-        /// <summary>
         /// 主缓冲区文档模型
         /// </summary>
         private VTDocument mainDocument;
@@ -89,6 +74,39 @@ namespace XTerminal
         /// 闪烁光标的线程
         /// </summary>
         private Thread cursorBlinkingThread;
+
+        #region History & Scroll
+
+        /// <summary>
+        /// 所有行
+        /// Row(scrollValue) -> VTextLine
+        /// </summary>
+        private Dictionary<int, VTHistoryLine> historyLines;
+        private VTHistoryLine activeHistoryLine;
+        /// <summary>
+        /// 记录滚动条滚动到底的时候，滚动条的值
+        /// </summary>
+        private int scrollMax;
+        /// <summary>
+        /// 记录当前滚动条滚动的值
+        /// </summary>
+        private int currentScroll;
+
+        #endregion
+
+        #region SelectionRange
+
+        private VTextPointer startTextPointer;
+
+        /// <summary>
+        /// 缓存用的当前鼠标的命中信息
+        /// </summary>
+        private VTextPointer currentTextPointer;
+        private bool isCursorDown;
+
+        private VTSelectionRange selectionRange;
+
+        #endregion
 
         #endregion
 
@@ -159,6 +177,8 @@ namespace XTerminal
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
             this.TextOptions = new VTextOptions();
+            this.startTextPointer = new VTextPointer();
+            this.currentTextPointer = new VTextPointer();
 
             #region 初始化键盘
 
@@ -180,6 +200,9 @@ namespace XTerminal
 
             this.CanvasPanel.InputEvent += this.VideoTerminal_InputEvent;
             this.CanvasPanel.ScrollChanged += this.CanvasPanel_ScrollChanged;
+            this.CanvasPanel.VTMouseDown += this.CanvasPanel_VTMouseDown;
+            this.CanvasPanel.VTMouseMove += this.CanvasPanel_VTMouseMove;
+            this.CanvasPanel.VTMouseUp += this.CanvasPanel_VTMouseUp;
             DocumentCanvasOptions canvasOptions = new DocumentCanvasOptions()
             {
                 Rows = initialOptions.TerminalOption.Rows
@@ -208,14 +231,18 @@ namespace XTerminal
             this.historyLines[0] = this.activeHistoryLine;
 
             // 初始化文档行数据模型和渲染模型的关联关系
-            List<IDocumentDrawable> drawableLines = this.Canvas.GetDrawableLines();
+            List<IDocumentDrawable> drawableLines = this.Canvas.RequestDrawable(Drawables.TextLine, this.initialOptions.TerminalOption.Rows);
             this.activeDocument.AttachAll(drawableLines);
+
+            // 初始化SelectionRange
+            IDocumentDrawable drawableSelection = this.Canvas.RequestDrawable(Drawables.SelectionRange, 1)[0];
+            this.selectionRange.AttachDrawable(drawableSelection);
 
             #endregion
 
             #region 初始化光标
 
-            IDocumentDrawable drawableCursor = this.Canvas.GetDrawableCursor();
+            IDocumentDrawable drawableCursor = this.Canvas.RequestDrawable(Drawables.Cursor, 1)[0];
             this.Cursor.AttachDrawable(drawableCursor);
             this.Canvas.DrawDrawable(drawableCursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
@@ -386,6 +413,153 @@ namespace XTerminal
             this.DrawDocument(this.activeDocument);
         }
 
+        /// <summary>
+        /// 使用像素坐标对VTextLine做命中测试
+        /// </summary>
+        /// <param name="cursorPos">鼠标坐标</param>
+        /// <param name="pointer">获取到的TextPointer信息保存到该变量里</param>
+        /// <returns>
+        /// 是否获取成功
+        /// 当光标不在某一行或者不在某个字符上的时候，就获取失败
+        /// </returns>
+        private bool GetTextPointer(VTPoint cursorPos, VTextPointer pointer)
+        {
+            double x = cursorPos.X;
+            double y = cursorPos.Y;
+
+            pointer.IsEmpty = true;
+            pointer.CharacterIndex = -1;
+
+            #region 先找到鼠标悬浮的历史行
+
+            // 有可能当前有滚动，所以要从历史行里开始找
+            // 先获取到当前屏幕上显示的历史行的首行
+
+            VTHistoryLine topHistoryLine;
+            if (!this.historyLines.TryGetValue(this.currentScroll, out topHistoryLine))
+            {
+                logger.ErrorFormat("GetTextPointer失败, 不存在历史行记录, currentScroll = {0}", this.currentScroll);
+                return false;
+            }
+
+            // 当前行的Y偏移量
+            double offsetY = 0;
+            int termLines = this.initialOptions.TerminalOption.Rows;
+            VTHistoryLine lineHit = topHistoryLine;
+            for (int i = 0; i < termLines; i++)
+            {
+                VTRect bounds = new VTRect(0, offsetY, lineHit.Metrics.WidthIncludingWhitespace, lineHit.Metrics.Height);
+
+                if (bounds.Top <= y && bounds.Bottom >= y)
+                {
+                    break;
+                }
+
+                offsetY += bounds.Height;
+
+                lineHit = lineHit.NextLine;
+
+                if (lineHit == null)
+                {
+                    break;
+                }
+            }
+
+            // 这里说明鼠标没有在任何一个行上
+            if (lineHit == null)
+            {
+                logger.ErrorFormat("没有找到鼠标位置对应的行, cursorY = {0}", y);
+                return false;
+            }
+
+            #endregion
+
+            #region 再计算鼠标悬浮于哪个字符上
+
+            bool findMatches = false;
+            VTRect characterBounds = new VTRect();
+            int characterIndex = -1;
+            string text = lineHit.Text;
+            for (int i = 0; i < text.Length; i++)
+            {
+                characterBounds = this.Canvas.MeasureCharacter(lineHit, i);
+
+                if (characterBounds.Left <= x && characterBounds.Right >= x)
+                {
+                    characterIndex = i;
+                    characterBounds.Y = offsetY;
+                    findMatches = true;
+                    break;
+                }
+            }
+
+            if (!findMatches)
+            {
+                logger.ErrorFormat("没有找到鼠标位置对应的字符, cursorX = {0}", x);
+                return false;
+            }
+
+            #endregion
+
+            pointer.IsEmpty = false;
+            pointer.Line = lineHit;
+            pointer.CharacterBounds = characterBounds;
+            pointer.CharacterIndex = characterIndex;
+
+            return true;
+        }
+
+        /// <summary>
+        /// 获取pointer2相对于pointer1的方向
+        /// </summary>
+        /// <param name="pointer1">第一个pointer</param>
+        /// <param name="pointer2">第二个pointer</param>
+        /// <returns></returns>
+        private TextPointerPositions GetTextPointerPosition(VTextPointer pointer1, VTextPointer pointer2)
+        {
+            VTRect rect1 = pointer1.CharacterBounds;
+            VTRect rect2 = pointer2.CharacterBounds;
+            int row1 = pointer1.Row;
+            int row2 = pointer2.Row;
+
+            if (rect2.X == rect1.X && row2 < row1)
+            {
+                return TextPointerPositions.Top;
+            }
+            else if (rect2.X > rect1.X && row2 < row1)
+            {
+                return TextPointerPositions.RightTop;
+            }
+            else if (rect2.X > rect1.X && row2 == row1)
+            {
+                return TextPointerPositions.Right;
+            }
+            else if (rect2.X > rect1.X && row2 > row1)
+            {
+                return TextPointerPositions.RightBottom;
+            }
+            else if (rect2.X == rect1.X && row2 > row1)
+            {
+                return TextPointerPositions.Bottom;
+            }
+            else if (rect2.X < rect1.X && row2 > row1)
+            {
+                return TextPointerPositions.LeftBottom;
+            }
+            else if (rect2.X < rect1.X && row2 == row1)
+            {
+                return TextPointerPositions.Left;
+            }
+            else if (rect2.X < rect1.X && row2 < row1)
+            {
+                return TextPointerPositions.LeftTop;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -404,16 +578,6 @@ namespace XTerminal
             }
 
             this.vtChannel.Write(bytes);
-        }
-
-        /// <summary>
-        /// 当滚动条滚动的时候触发
-        /// </summary>
-        /// <param name="arg1"></param>
-        /// <param name="scrollValue">滚动到的行数</param>
-        private void CanvasPanel_ScrollChanged(IDocumentCanvasPanel arg1, int scrollValue)
-        {
-            this.ScrollTo(scrollValue);
         }
 
         private int index = 0;
@@ -709,14 +873,14 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseAlternateScreenBuffer");
 
-                        this.mainDocument.DetachAll();
+                        List<IDocumentDrawable> drawables = this.mainDocument.DetachAll();
 
                         // 切换ActiveDocument
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
                         this.alternateDocument.DeleteAll();
-                        this.alternateDocument.AttachAll(this.Canvas.GetDrawableLines());
-                        this.alternateDocument.Cursor.AttachDrawable(this.Canvas.GetDrawableCursor());
+                        this.alternateDocument.AttachAll(drawables);
+                        this.alternateDocument.Cursor.AttachDrawable(this.mainDocument.Cursor.Drawable);
                         this.activeDocument = this.alternateDocument;
                         break;
                     }
@@ -725,11 +889,11 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseMainScreenBuffer");
 
-                        this.alternateDocument.DetachAll();
+                        List<IDocumentDrawable> drawables = this.alternateDocument.DetachAll();
 
-                        this.mainDocument.AttachAll(this.Canvas.GetDrawableLines());
+                        this.mainDocument.AttachAll(drawables);
                         this.mainDocument.DirtyAll();
-                        this.mainDocument.Cursor.AttachDrawable(this.Canvas.GetDrawableCursor());
+                        this.mainDocument.Cursor.AttachDrawable(this.alternateDocument.Cursor.Drawable);
                         this.activeDocument = this.mainDocument;
                         break;
                     }
@@ -879,6 +1043,80 @@ namespace XTerminal
                     Thread.Sleep(cursor.Interval);
                 }
             }
+        }
+
+
+
+
+        /// <summary>
+        /// 当滚动条滚动的时候触发
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="scrollValue">滚动到的行数</param>
+        private void CanvasPanel_ScrollChanged(IDocumentCanvasPanel arg1, int scrollValue)
+        {
+            this.ScrollTo(scrollValue);
+        }
+
+        private void CanvasPanel_VTMouseUp(IDocumentCanvasPanel arg1, VTPoint cursorPos)
+        {
+            this.isCursorDown = false;
+            this.startTextPointer = null;
+            this.selectionRange.LineBounds.Clear();
+        }
+
+        private void CanvasPanel_VTMouseMove(IDocumentCanvasPanel arg1, VTPoint cursorPos)
+        {
+            if (!this.isCursorDown || this.startTextPointer.IsEmpty)
+            {
+                return;
+            }
+
+            // 得到当前鼠标的行数
+            this.GetTextPointer(cursorPos, this.currentTextPointer);
+
+            // 算出来startTextPointer和currentTextPointer之间的几何图形
+
+            // 鼠标移动后悬浮在相同的字符上没变化，不用操作
+            if (this.startTextPointer.CharacterIndex == this.currentTextPointer.CharacterIndex)
+            {
+                return;
+            }
+
+            if (this.currentTextPointer.IsEmpty)
+            {
+                // 鼠标不在字符上，这里需要做特殊处理，鼠标不在任意一个字符上，已经超过字符了，说明该行是全部选中
+            }
+            else
+            {
+                // 先算鼠标的移动方向
+                TextPointerPositions pointerPosition = this.GetTextPointerPosition(this.startTextPointer, this.currentTextPointer);
+
+                VTRect startRect = this.startTextPointer.CharacterBounds;
+                VTRect currentRect = this.currentTextPointer.CharacterBounds;
+
+                switch (pointerPosition)
+                {
+                    case TextPointerPositions.Left:
+                        {
+                            VTRect bounds = new VTRect(currentRect.Left, currentRect.Top, startRect.Right - currentRect.Left, startRect.Height);
+                            this.selectionRange.LineBounds.Add(bounds);
+                            this.uiSyncContext.Send((state) => 
+                            {
+                                this.Canvas.DrawDrawable(this.selectionRange.Drawable);
+                            }, null);
+                            break;
+                        }
+                }
+            }
+        }
+
+        private void CanvasPanel_VTMouseDown(IDocumentCanvasPanel arg1, VTPoint cursorPos)
+        {
+            this.isCursorDown = true;
+
+            // 得到startPos对应的VTextLine
+            this.GetTextPointer(cursorPos, this.startTextPointer);
         }
 
         #endregion

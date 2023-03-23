@@ -12,13 +12,28 @@ namespace XTerminal.Document
     public class VTextPointer
     {
         /// <summary>
-        /// 相对于行的Y偏移量
+        /// 指针命中的行数
         /// </summary>
-        public double OffsetYLine { get; set; }
+        public int Row { get { return this.Line.Row; } }
 
         /// <summary>
-        /// 所属的行
+        /// 命中的字符的测量信息
         /// </summary>
-        public VTextLine OwnerLine { get; set; }
+        public VTRect CharacterBounds { get; set; }
+
+        /// <summary>
+        /// 命中的字符的索引
+        /// </summary>
+        public int CharacterIndex { get; set; }
+
+        /// <summary>
+        /// 光标所命中的行
+        /// </summary>
+        public VTHistoryLine Line { get; set; }
+
+        /// <summary>
+        /// 是否是空的位置
+        /// </summary>
+        public bool IsEmpty { get; set; }
     }
 }

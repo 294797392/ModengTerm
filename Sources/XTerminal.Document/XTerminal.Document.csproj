@@ -54,13 +54,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
+    <Compile Include="Rendering\TextPointerPositions.cs" />
     <Compile Include="Rendering\IDocumentDrawable.cs" />
     <Compile Include="Rendering\IDocumentCanvas.cs" />
     <Compile Include="Rendering\IDocumentCanvasPanel.cs" />
+    <Compile Include="Rendering\DrawableElement.cs" />
     <Compile Include="Rendering\ScrollOrientations.cs" />
     <Compile Include="VTDocumentBase.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />
+    <Compile Include="VTextLineBase.cs" />
     <Compile Include="VTextPointer.cs" />
     <Compile Include="VTextSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -71,7 +74,6 @@
     <Compile Include="VTCharacter.cs" />
     <Compile Include="VTDocumentOptions.cs" />
     <Compile Include="VTDocument.cs" />
-    <Compile Include="VTextBlock.cs" />
     <Compile Include="VTDocumentElement.cs" />
     <Compile Include="VTextLineState.cs" />
     <Compile Include="VTElementMetrics.cs" />
@@ -80,7 +82,9 @@
     <Compile Include="VTextStyle.cs" />
     <Compile Include="VTHistoryLine.cs" />
     <Compile Include="VTPoint.cs" />
+    <Compile Include="VTPointCollection.cs" />
     <Compile Include="VTRect.cs" />
+    <Compile Include="VTSelectionRange.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">

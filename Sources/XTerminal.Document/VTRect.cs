@@ -36,6 +36,26 @@ namespace XTerminal.Document
 
         public VTPoint RightBottom { get { return new VTPoint(this.X + this.Width, this.Y + this.Height); } }
 
+        /// <summary>
+        /// 获取该矩形上边的Y坐标
+        /// </summary>
+        public double Top { get { return this.Y; } }
+
+        /// <summary>
+        /// 获取该矩形下边的Y坐标
+        /// </summary>
+        public double Bottom { get { return this.Top + this.Height; } }
+
+        /// <summary>
+        /// 获取该矩形左边的X坐标
+        /// </summary>
+        public double Left { get { return this.LeftBottom.X; } }
+
+        /// <summary>
+        /// 获取该矩形右边的X坐标
+        /// </summary>
+        public double Right { get { return this.Left + this.Width; } }
+
         public VTRect(double x, double y, double width, double height)
         {
             this.X = x;

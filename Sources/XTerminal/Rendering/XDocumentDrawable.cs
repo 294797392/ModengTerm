@@ -18,9 +18,9 @@ namespace XTerminal.Rendering
         public string ID { get; protected set; }
 
         /// <summary>
-        /// 保存要画的对象的数据
+        /// 和该渲染对象关联的要绘制的元素信息
         /// </summary>
-        public VTDocumentElement OwnerElement { get; set; }
+        public DrawableElement OwnerElement { get; set; }
 
         public XDocumentDrawable()
         {

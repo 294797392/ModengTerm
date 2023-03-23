@@ -16,6 +16,6 @@ namespace XTerminal.Document.Rendering
         /// <summary>
         /// 要渲染的文档模型里的信息
         /// </summary>
-        VTDocumentElement OwnerElement { get; set; }
+        DrawableElement OwnerElement { get; set; }
     }
 }

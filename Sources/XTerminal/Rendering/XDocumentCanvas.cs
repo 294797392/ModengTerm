@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using VideoTerminal.Rendering;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 
@@ -27,14 +28,9 @@ namespace XTerminal.Rendering
 
         #region 实例变量
 
-        private ScrollViewer scrollViewer;
-
         private VisualCollection visuals;
 
         private DocumentCanvasOptions options;
-
-        private List<IDocumentDrawable> drawableLines;
-        private DrawableCursor drawableCursor;
 
         #endregion
 
@@ -69,14 +65,16 @@ namespace XTerminal.Rendering
 
         #region 实例方法
 
-        private bool EnsureScrollViewer()
+        private XDocumentDrawable CreateDrawable(Drawables type)
         {
-            if (this.scrollViewer == null)
+            switch (type)
             {
-                this.scrollViewer = this.Parent as ScrollViewer;
+                case Drawables.Cursor: return new DrawableCursor();
+                case Drawables.SelectionRange: return new DrawableSelection();
+                case Drawables.TextLine: return new DrawableLine();
+                default:
+                    throw new NotImplementedException();
             }
-
-            return this.scrollViewer != null;
         }
 
         #endregion
@@ -86,41 +84,27 @@ namespace XTerminal.Rendering
         public void Initialize(DocumentCanvasOptions options)
         {
             this.options = options;
+        }
 
-            this.drawableLines = new List<IDocumentDrawable>();
-            for (int i = 0; i < options.Rows; i++)
+        public List<IDocumentDrawable> RequestDrawable(Drawables type, int count)
+        {
+            List<IDocumentDrawable> drawables = new List<IDocumentDrawable>();
+
+            for (int i = 0; i < count; i++)
             {
-                DrawableLine drawableLine = new DrawableLine(i);
-                this.visuals.Add(drawableLine);
-                this.drawableLines.Add(drawableLine);
+                XDocumentDrawable drawable = this.CreateDrawable(type);
+
+                drawables.Add(drawable);
+
+                this.visuals.Add(drawable);
             }
 
-            this.drawableCursor = new DrawableCursor();
-            this.visuals.Add(this.drawableCursor);
+            return drawables;
         }
 
-        /// <summary>
-        /// 获取行的渲染对象
-        /// 行数量等于可视区域的行数量
-        /// </summary>
-        /// <returns></returns>
-        public List<IDocumentDrawable> GetDrawableLines()
+        public VTElementMetrics MeasureLine(VTextLineBase textLine, int maxCharacters)
         {
-            return this.drawableLines;
-        }
-
-        /// <summary>
-        /// 获取光标的渲染对象
-        /// </summary>
-        /// <returns></returns>
-        public IDocumentDrawable GetDrawableCursor()
-        {
-            return this.drawableCursor;
-        }
-
-        public VTElementMetrics MeasureLine(VTextLine textLine, int maxCharacters)
-        {
-            string text = textLine.GetText();
+            string text = textLine.Text;
             if (maxCharacters > 0 && text.Length >= maxCharacters)
             {
                 text = text.Substring(0, maxCharacters);
@@ -129,7 +113,7 @@ namespace XTerminal.Rendering
             Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
 
-            VTElementMetrics metrics = new VTElementMetrics() 
+            VTElementMetrics metrics = new VTElementMetrics()
             {
                 Height = formattedText.Height,
                 Width = formattedText.Width,
@@ -137,6 +121,26 @@ namespace XTerminal.Rendering
             };
 
             return metrics;
+        }
+
+        public VTRect MeasureCharacter(VTextLineBase textLine, int characterIndex)
+        {
+            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
+
+            string text = textLine.Text;
+            if (characterIndex == 0)
+            {
+                // 第一个字符，返回第一个字符的左边
+                FormattedText formattedText = new FormattedText(text.Substring(0, 1), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+                return new VTRect(0, 0, formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
+            }
+            else
+            {
+                // 其他字符，返回前一个字符的右边
+                FormattedText formattedText1 = new FormattedText(text.Substring(0, characterIndex), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+                FormattedText formattedText2 = new FormattedText(text.Substring(characterIndex, 1), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+                return new VTRect(formattedText1.WidthIncludingTrailingWhitespace, 0, formattedText2.WidthIncludingTrailingWhitespace, formattedText2.Height);
+            }
         }
 
         public void DrawDrawable(IDocumentDrawable drawable)

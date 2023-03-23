@@ -18,16 +18,12 @@ namespace XTerminal.Document.Rendering
         void Initialize(DocumentCanvasOptions options);
 
         /// <summary>
-        /// 获取行的渲染对象
+        /// 请求创建一个新的渲染对象
         /// </summary>
+        /// <param name="type">渲染对象的类型</param>
+        /// <param name="num">请求的数量</param>
         /// <returns></returns>
-        List<IDocumentDrawable> GetDrawableLines();
-
-        /// <summary>
-        /// 获取光标的渲染对象
-        /// </summary>
-        /// <returns></returns>
-        IDocumentDrawable GetDrawableCursor();
+        List<IDocumentDrawable> RequestDrawable(Drawables type, int num);
 
         /// <summary>
         /// 测量某个渲染模型的大小
@@ -36,7 +32,16 @@ namespace XTerminal.Document.Rendering
         /// <param name="textLine">要测量的数据模型</param>
         /// <param name="maxCharacters">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        VTElementMetrics MeasureLine(VTextLine textLine, int maxCharacters);
+        VTElementMetrics MeasureLine(VTextLineBase textLine, int maxCharacters);
+
+        /// <summary>
+        /// 测量一行里某个字符的测量信息
+        /// 注意该接口只能测量出来X偏移量，Y偏移量需要外部根据高度自己计算
+        /// </summary>
+        /// <param name="textLine">要测量的文本行</param>
+        /// <param name="characterIndex">要测量的字符</param>
+        /// <returns>文本坐标，X=文本左边的X偏移量，Y=文本高度</returns>
+        VTRect MeasureCharacter(VTextLineBase textLine, int characterIndex);
 
         /// <summary>
         /// 画

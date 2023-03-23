@@ -9,12 +9,12 @@ namespace XTerminal.Document
     /// <summary>
     /// 用来存储历史的行记录
     /// </summary>
-    public class VTHistoryLine
+    public class VTHistoryLine : VTextLineBase
     {
         /// <summary>
         /// 文本的测量信息
         /// </summary>
-        public VTElementMetrics Metrics { get; set; }
+        public VTElementMetrics Metrics { get; private set; }
 
         /// <summary>
         /// 行索引，从0开始
@@ -29,7 +29,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 该行文本的样式
         /// </summary>
-        public List<VTextAttribute> TextAttributes { get; private set; }
+        public List<VTextAttribute> Attributes { get; private set; }
 
         /// <summary>
         /// 上一行
@@ -44,7 +44,7 @@ namespace XTerminal.Document
         public void Update(VTextLine line)
         {
             this.Metrics = line.Metrics;
-            this.Text = line.GetText();
+            this.Text = line.Text;
         }
 
         /// <summary>
@@ -56,11 +56,11 @@ namespace XTerminal.Document
         {
             VTHistoryLine historyLine = new VTHistoryLine()
             {
-                Metrics =  fromLine.Metrics,
-                Text = fromLine.GetText(),
-                TextAttributes = fromLine.Attributes.ToList(),
+                Metrics = fromLine.Metrics,
+                Text = fromLine.Text,
+                Attributes = fromLine.Attributes.ToList(),
                 Row = row,
-                PreviousLine = previousLine
+                PreviousLine = previousLine,
             };
 
             if (previousLine != null)

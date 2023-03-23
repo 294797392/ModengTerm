@@ -23,17 +23,16 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        public DrawableLine(int row)
+        public DrawableLine()
         {
-            this.Row = row;
-            this.ID = "Drawable" + string.Format("{0}", row).PadLeft(2, '0');
+            this.ID = "Drawable" + string.Format("{0}", -1).PadLeft(2, '0');
         }
 
         protected override void Draw(DrawingContext dc)
         {
             VTextLine textLine = this.OwnerElement as VTextLine;
 
-            string text = textLine.GetText();
+            string text = textLine.Text;
 
             //text = string.Format("{0} - {1}", this.ID, text);
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 
 namespace XTerminal.Document
@@ -35,6 +36,8 @@ namespace XTerminal.Document
     /// </summary>
     public class VTCursor : VTDocumentElement
     {
+        public override Drawables Type => Drawables.Cursor;
+
         /// <summary>
         /// 光标所在列
         /// </summary>

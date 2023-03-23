@@ -29,6 +29,21 @@ namespace XTerminal.Document.Rendering
         event Action<IDocumentCanvasPanel, int> ScrollChanged;
 
         /// <summary>
+        /// 鼠标移动的时候触发
+        /// </summary>
+        event Action<IDocumentCanvasPanel, VTPoint> VTMouseMove;
+
+        /// <summary>
+        /// 鼠标按下的时候触发
+        /// </summary>
+        event Action<IDocumentCanvasPanel, VTPoint> VTMouseDown;
+
+        /// <summary>
+        /// 鼠标抬起的时候触发
+        /// </summary>
+        event Action<IDocumentCanvasPanel, VTPoint> VTMouseUp;
+
+        /// <summary>
         /// 创建一个画板
         /// </summary>
         /// <returns></returns>

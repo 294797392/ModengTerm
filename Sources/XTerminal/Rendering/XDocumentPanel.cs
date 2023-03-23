@@ -32,6 +32,21 @@ namespace XTerminal.Rendering
 
         public event Action<IDocumentCanvasPanel, int> ScrollChanged;
 
+        /// <summary>
+        /// 鼠标移动的时候触发
+        /// </summary>
+        public event Action<IDocumentCanvasPanel, VTPoint> VTMouseMove;
+
+        /// <summary>
+        /// 鼠标按下的时候触发
+        /// </summary>
+        public event Action<IDocumentCanvasPanel, VTPoint> VTMouseDown;
+
+        /// <summary>
+        /// 鼠标抬起的时候触发
+        /// </summary>
+        public event Action<IDocumentCanvasPanel, VTPoint> VTMouseUp;
+
         #endregion
 
         #region 实例变量
@@ -188,24 +203,32 @@ namespace XTerminal.Rendering
             return new PointHitTestResult(this, hitTestParameters.HitPoint);
         }
 
-        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-        }
+
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseDown(e);
 
-            //Console.WriteLine((this.scrollViewer.Content as WPFPresentaionDevice).Count);
+            Point p = e.GetPosition(this);
+            this.VTMouseDown(this, new VTPoint(p.X, p.Y));
         }
 
-        private void Scrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        protected override void OnPreviewMouseMove(MouseEventArgs e)
         {
-            if (this.ScrollChanged != null)
-            {
-                this.ScrollChanged(this, Convert.ToInt32(e.NewValue));
-            }
+            base.OnPreviewMouseMove(e);
+
+            Point p = e.GetPosition(this);
+            this.VTMouseMove(this, new VTPoint(p.X, p.Y));
         }
+
+        protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseUp(e);
+
+            Point p = e.GetPosition(this);
+            this.VTMouseUp(this, new VTPoint(p.X, p.Y));
+        }
+
 
         private void Scrollbar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
