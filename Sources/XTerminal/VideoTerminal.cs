@@ -47,6 +47,14 @@ namespace XTerminal
         /// </summary>
         private Dictionary<int, VTHistoryLine> historyLines;
         private VTHistoryLine activeHistoryLine;
+        /// <summary>
+        /// 记录滚动条滚动到底的时候，滚动条的值
+        /// </summary>
+        private int scrollMax;
+        /// <summary>
+        /// 记录当前滚动条滚动的值
+        /// </summary>
+        private int currentScroll;
 
         /// <summary>
         /// 主缓冲区文档模型
@@ -346,6 +354,38 @@ namespace XTerminal
             }, null);
         }
 
+        /// <summary>
+        /// 滚动到滚动条上的某个值
+        /// </summary>
+        /// <param name="scrollValue"></param>
+        private void ScrollTo(int scrollValue)
+        {
+            this.currentScroll = scrollValue;
+
+            // 终端可以显示的总行数
+            int terminalRows = this.initialOptions.TerminalOption.Rows;
+
+            VTHistoryLine historyLine;
+            if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
+            {
+                logger.ErrorFormat("ScrollTo失败, 找不到对应的VTHistoryLine, scrollValue = {0}", scrollValue);
+                return;
+            }
+
+            // 找到后面的行数显示
+            VTHistoryLine currentHistory = historyLine;
+            VTextLine currentTextLine = this.activeDocument.FirstLine;
+            for (int i = 0; i < terminalRows; i++)
+            {
+                currentTextLine.SetHistory(currentHistory);
+                currentHistory = currentHistory.NextLine;
+                currentTextLine = currentTextLine.NextLine;
+            }
+
+            this.activeDocument.IsArrangeDirty = true;
+            this.DrawDocument(this.activeDocument);
+        }
+
         #endregion
 
         #region 事件处理器
@@ -370,31 +410,10 @@ namespace XTerminal
         /// 当滚动条滚动的时候触发
         /// </summary>
         /// <param name="arg1"></param>
-        /// <param name="scrollLine">滚动到的行数</param>
-        private void CanvasPanel_ScrollChanged(IDocumentCanvasPanel arg1, int scrollLine)
+        /// <param name="scrollValue">滚动到的行数</param>
+        private void CanvasPanel_ScrollChanged(IDocumentCanvasPanel arg1, int scrollValue)
         {
-            // 终端可以显示的总行数
-            int terminalRows = this.initialOptions.TerminalOption.Rows;
-
-            VTHistoryLine historyLine;
-            if (!this.historyLines.TryGetValue(scrollLine, out historyLine))
-            {
-                logger.ErrorFormat("CanvasPanel_ScrollChanged失败, 找不到对应的VTHistoryLine, scrollLine = {0}", scrollLine);
-                return;
-            }
-
-            // 找到后面的行数显示
-            VTHistoryLine currentHistory = historyLine;
-            VTextLine currentTextLine = this.activeDocument.FirstLine;
-            for (int i = 0; i < terminalRows; i++)
-            {
-                currentTextLine.SetHistory(currentHistory);
-                currentHistory = currentHistory.NextLine;
-                currentTextLine = currentTextLine.NextLine;
-            }
-
-            this.activeDocument.IsArrangeDirty = true;
-            this.DrawDocument(this.activeDocument);
+            this.ScrollTo(scrollValue);
         }
 
         private int index = 0;
@@ -432,6 +451,15 @@ namespace XTerminal
                         // LF
                         // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
 
+                        if (this.activeDocument == this.mainDocument)
+                        {
+                            // 如果滚动条不在最底部，那么先把滚动条滚动到底
+                            if (this.currentScroll != this.scrollMax)
+                            {
+                                this.ScrollTo(this.scrollMax);
+                            }
+                        }
+
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
                         this.activeDocument.LineFeed();
@@ -454,6 +482,7 @@ namespace XTerminal
                             int scrollMax = historyIndex - terminalRows + 1;
                             if (scrollMax > 0)
                             {
+                                this.scrollMax = scrollMax;
                                 logger.DebugFormat("scrollMax = {0}", scrollMax);
                                 this.uiSyncContext.Send((state) =>
                                 {

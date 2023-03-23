@@ -31,9 +31,6 @@ namespace XTerminal.Rendering
 
         private VisualCollection visuals;
 
-        private double fullWidth;
-        private double fullHeight;
-
         private DocumentCanvasOptions options;
 
         private List<IDocumentDrawable> drawableLines;
@@ -66,12 +63,6 @@ namespace XTerminal.Rendering
         protected override Visual GetVisualChild(int index)
         {
             return this.visuals[index];
-        }
-
-        protected override Size MeasureOverride(Size constraint)
-        {
-            //return base.MeasureOverride(constraint);
-            return new Size(this.fullWidth, this.fullHeight);
         }
 
         #endregion
