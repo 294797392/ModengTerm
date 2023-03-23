@@ -84,7 +84,7 @@
     <Compile Include="VTPoint.cs" />
     <Compile Include="VTPointCollection.cs" />
     <Compile Include="VTRect.cs" />
-    <Compile Include="VTSelectionRange.cs" />
+    <Compile Include="VTextSelection.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">

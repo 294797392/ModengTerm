@@ -96,15 +96,12 @@ namespace XTerminal
 
         #region SelectionRange
 
-        private VTextPointer startTextPointer;
-
-        /// <summary>
-        /// 缓存用的当前鼠标的命中信息
-        /// </summary>
-        private VTextPointer currentTextPointer;
         private bool isCursorDown;
 
-        private VTSelectionRange selectionRange;
+        /// <summary>
+        /// 存储选中的文本信息
+        /// </summary>
+        private VTextSelection textSelection;
 
         #endregion
 
@@ -177,9 +174,7 @@ namespace XTerminal
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
             this.TextOptions = new VTextOptions();
-            this.startTextPointer = new VTextPointer();
-            this.currentTextPointer = new VTextPointer();
-            this.selectionRange = new VTSelectionRange();
+            this.textSelection = new VTextSelection();
 
             #region 初始化键盘
 
@@ -237,7 +232,7 @@ namespace XTerminal
 
             // 初始化SelectionRange
             IDocumentDrawable drawableSelection = this.Canvas.RequestDrawable(Drawables.SelectionRange, 1)[0];
-            this.selectionRange.AttachDrawable(drawableSelection);
+            this.textSelection.AttachDrawable(drawableSelection);
 
             #endregion
 
@@ -1062,53 +1057,88 @@ namespace XTerminal
         private void CanvasPanel_VTMouseUp(IDocumentCanvasPanel arg1, VTPoint cursorPos)
         {
             this.isCursorDown = false;
-            this.selectionRange.LineBounds.Clear();
         }
 
         private void CanvasPanel_VTMouseMove(IDocumentCanvasPanel arg1, VTPoint cursorPos)
         {
-            if (!this.isCursorDown || this.startTextPointer.IsEmpty)
+            if (!this.isCursorDown || this.textSelection.Start.IsEmpty)
             {
                 return;
             }
 
             // 得到当前鼠标的行数
-            this.GetTextPointer(cursorPos, this.currentTextPointer);
+            this.GetTextPointer(cursorPos, this.textSelection.End);
 
             // 算出来startTextPointer和currentTextPointer之间的几何图形
 
             // 鼠标移动后悬浮在相同的字符上没变化，不用操作
-            if (this.startTextPointer.CharacterIndex == this.currentTextPointer.CharacterIndex)
+            if (this.textSelection.Start.CharacterIndex == this.textSelection.End.CharacterIndex)
             {
                 return;
             }
 
-            if (this.currentTextPointer.IsEmpty)
+            // 没有选中任何一个字符，暂时不处理
+            if (this.textSelection.End.IsEmpty)
             {
-                // 鼠标不在字符上，这里需要做特殊处理，鼠标不在任意一个字符上，已经超过字符了，说明该行是全部选中
+                return;
             }
-            else
+
+            // 先算鼠标的移动方向
+            TextPointerPositions pointerPosition = this.GetTextPointerPosition(this.textSelection.Start, this.textSelection.End);
+
+            VTRect rect1 = this.textSelection.Start.CharacterBounds;
+            VTRect rect2 = this.textSelection.End.CharacterBounds;
+
+            switch (pointerPosition)
             {
-                // 先算鼠标的移动方向
-                TextPointerPositions pointerPosition = this.GetTextPointerPosition(this.startTextPointer, this.currentTextPointer);
+                case TextPointerPositions.Right:
+                case TextPointerPositions.Left:
+                    {
+                        // 这两个是鼠标在同一行上移动
 
-                VTRect startRect = this.startTextPointer.CharacterBounds;
-                VTRect currentRect = this.currentTextPointer.CharacterBounds;
+                        double xmin = Math.Min(rect1.X, rect2.X);
+                        double xmax = Math.Max(rect1.X, rect2.X);
+                        double x = xmin;
+                        double y = rect1.Y;
+                        double width = xmax - xmin;
+                        double height = rect1.Height;
 
-                switch (pointerPosition)
-                {
-                    case TextPointerPositions.Left:
-                        {
-                            VTRect bounds = new VTRect(currentRect.Left, currentRect.Top, startRect.Right - currentRect.Left, startRect.Height);
-                            this.selectionRange.LineBounds.Add(bounds);
-                            this.uiSyncContext.Send((state) => 
-                            {
-                                this.Canvas.DrawDrawable(this.selectionRange.Drawable);
-                            }, null);
-                            break;
-                        }
-                }
+                        VTRect bounds = new VTRect(x, y, width, height);
+                        this.textSelection.LineBounds.Clear();
+                        this.textSelection.LineBounds.Add(bounds);
+                        break;
+                    }
+
+                default:
+                    {
+                        this.textSelection.LineBounds.Clear();
+
+                        // 其他的鼠标都是在多行之间进行移动
+                        double xmin = Math.Min(rect1.X, rect2.X);
+                        double xmax = Math.Max(rect1.X, rect2.X);
+                        double ymin = Math.Min(rect1.Y, rect2.Y);
+                        double ymax = Math.Max(rect1.Y, rect2.Y);
+
+                        // 构建上边和下边的矩形
+                        VTextPointer topPointer = this.textSelection.Start.Row < this.textSelection.End.Row ? this.textSelection.Start : this.textSelection.End;
+                        VTextPointer bottomPointer = this.textSelection.Start.Row < this.textSelection.End.Row ? this.textSelection.End : this.textSelection.Start;
+                        VTRect topBounds = topPointer.CharacterBounds;
+                        VTRect bottomBounds = bottomPointer.CharacterBounds;
+                        this.textSelection.LineBounds.Add(new VTRect(topBounds.X, topBounds.Y, topPointer.Line.Metrics.WidthIncludingWhitespace - topBounds.X, topBounds.Height));
+                        this.textSelection.LineBounds.Add(new VTRect(0, bottomBounds.Y, bottomBounds.X + bottomBounds.Width, bottomBounds.Height));
+
+                        // 构建中间的几何图形
+                        VTRect middleBounds = new VTRect(0, topBounds.Y + topBounds.Height, 9999, bottomBounds.Y - topBounds.Bottom);
+                        this.textSelection.LineBounds.Add(middleBounds);
+
+                        break;
+                    }
             }
+
+            this.uiSyncContext.Send((state) =>
+            {
+                this.Canvas.DrawDrawable(this.textSelection.Drawable);
+            }, null);
         }
 
         private void CanvasPanel_VTMouseDown(IDocumentCanvasPanel arg1, VTPoint cursorPos)
@@ -1116,7 +1146,7 @@ namespace XTerminal
             this.isCursorDown = true;
 
             // 得到startPos对应的VTextLine
-            this.GetTextPointer(cursorPos, this.startTextPointer);
+            this.GetTextPointer(cursorPos, this.textSelection.Start);
         }
 
         #endregion

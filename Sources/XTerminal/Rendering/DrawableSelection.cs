@@ -27,7 +27,7 @@ namespace VideoTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            VTSelectionRange selectionRange = this.OwnerElement as VTSelectionRange;
+            VTextSelection selectionRange = this.OwnerElement as VTextSelection;
 
             StreamGeometryContext sgc = this.selectionGeometry.Open();
 
