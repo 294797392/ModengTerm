@@ -49,10 +49,10 @@ namespace XTerminal.Document.Rendering
         /// 排版是比较耗时的操作
         /// </summary>
         /// <param name="drawable"></param>
-        void DrawDrawable(VTDocumentDrawable drawable);
+        void DrawDrawable(VTDocumentElement drawable);
 
         /// <summary>
-        /// 更新元素的位置信息
+        /// 对元素进行布局
         /// 而不用重新画，速度要比DrawDrawable快
         /// 画文本的速度还是比较慢的，因为需要对文本进行排版，耗时都花在排版上面了
         /// 所以能不排版就最好不排版
@@ -60,13 +60,13 @@ namespace XTerminal.Document.Rendering
         /// <param name="drawable"></param>
         /// <param name="offsetX"></param>
         /// <param name="offsetY"></param>
-        void UpdatePosition(VTDocumentDrawable drawable, double offsetX, double offsetY);
+        void Arrange(VTDocumentElement drawable, double offsetX, double offsetY);
 
         /// <summary>
         /// 设置元素的透明度
         /// </summary>
         /// <param name="drawable"></param>
         /// <param name="opacity"></param>
-        void SetOpacity(VTDocumentDrawable drawable, double opacity);
+        void SetOpacity(VTDocumentElement drawable, double opacity);
     }
 }

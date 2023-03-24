@@ -30,7 +30,7 @@ namespace XTerminal.Document.Rendering
     /// <summary>
     /// 表示文档里的一个可以画的元素
     /// </summary>
-    public interface VTDocumentDrawable
+    public interface IDocumentDrawable
     {
         /// <summary>
         /// 该对象的类型

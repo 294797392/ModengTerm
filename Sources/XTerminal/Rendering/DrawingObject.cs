@@ -20,7 +20,7 @@ namespace XTerminal.Rendering
         /// <summary>
         /// 和该渲染对象关联的要绘制的元素信息
         /// </summary>
-        public VTDocumentDrawable Drawable { get; set; }
+        public VTDocumentElement Drawable { get; set; }
 
         public DrawingObject()
         {

@@ -28,8 +28,6 @@ namespace XTerminal.Document
 
         private int row;
 
-        private bool isArrangeDirty;
-
         #endregion
 
         #region 属性
@@ -137,7 +135,7 @@ namespace XTerminal.Document
             this.TotalRows = options.RowSize;
 
             // 更新可视区域
-            this.SetArrangeDirty();
+            this.SetArrangeDirty(true);
         }
 
         #endregion
@@ -165,11 +163,11 @@ namespace XTerminal.Document
             this.TotalRows++;
         }
 
-        private void SetArrangeDirty()
+        public void SetArrangeDirty(bool isDirty)
         {
-            if (!this.IsArrangeDirty)
+            if (this.IsArrangeDirty != isDirty)
             {
-                this.IsArrangeDirty = true;
+                this.IsArrangeDirty = isDirty;
             }
         }
 
@@ -257,7 +255,7 @@ namespace XTerminal.Document
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
                 this.ActiveLine.DeleteAll();
 
-                this.SetArrangeDirty();
+                this.SetArrangeDirty(true);
             }
             else
             {
@@ -323,7 +321,7 @@ namespace XTerminal.Document
                 // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
                 this.ActiveLine.DeleteAll();
 
-                this.SetArrangeDirty();
+                this.SetArrangeDirty(true);
             }
             else
             {
@@ -499,7 +497,7 @@ namespace XTerminal.Document
 
             while (current != null)
             {
-                current.SetDirty(true);
+                current.SetRenderDirty(true);
 
                 current = current.NextLine;
             }
@@ -576,7 +574,7 @@ namespace XTerminal.Document
             // 更新ActiveLine
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
 
-            this.SetArrangeDirty();
+            this.SetArrangeDirty(true);
         }
 
         /// <summary>
@@ -645,7 +643,7 @@ namespace XTerminal.Document
             // 更新ActiveLine
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
 
-            this.SetArrangeDirty();
+            this.SetArrangeDirty(true);
         }
 
         /// <summary>
@@ -708,17 +706,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 是否需要重新布局
         /// </summary>
-        public bool IsArrangeDirty
-        {
-            get { return this.isArrangeDirty; }
-            set
-            {
-                if (this.isArrangeDirty != value)
-                {
-                    this.isArrangeDirty = value;
-                }
-            }
-        }
+        public bool IsArrangeDirty { get; private set; }
 
         #endregion
     }

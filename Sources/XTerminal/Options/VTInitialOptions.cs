@@ -15,7 +15,7 @@ namespace VideoTerminal.Options
     {
         public static readonly VTInitialOptions Home = new VTInitialOptions()
         {
-            ReadBufferSize = 4096,
+            ReadBufferSize = 16384,
 
             ChannelType = VTChannelTypes.SSH,
             Authorition = new SSHChannelAuthorition()

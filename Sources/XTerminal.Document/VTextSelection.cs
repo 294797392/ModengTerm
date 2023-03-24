@@ -10,11 +10,9 @@ namespace XTerminal.Document
     /// <summary>
     /// 存储鼠标选中的文本信息
     /// </summary>
-    public class VTextSelection : VTDocumentElement, VTDocumentDrawable
+    public class VTextSelection : VTDocumentElement
     {
-        public object DrawingContext { get; set; }
-
-        public Drawables Type => Drawables.SelectionRange;
+        public override VTDocumentElements Type => VTDocumentElements.SelectionRange;
 
         /// <summary>
         /// 选中的文本范围
@@ -44,11 +42,14 @@ namespace XTerminal.Document
         public void Reset()
         {
             this.Ranges.Clear();
+
             this.Start.IsCharacterHit = false;
             this.Start.CharacterIndex = -1;
+            this.Start.Line = null;
 
             this.End.IsCharacterHit = false;
             this.End.CharacterIndex = -1;
+            this.End.Line = null;
         }
     }
 }

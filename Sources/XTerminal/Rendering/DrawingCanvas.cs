@@ -65,19 +65,19 @@ namespace XTerminal.Rendering
 
         #region 实例方法
 
-        private DrawingObject CreateDrawingObject(Drawables type)
+        private DrawingObject CreateDrawingObject(VTDocumentElements type)
         {
             switch (type)
             {
-                case Drawables.Cursor: return new DrawingCursor();
-                case Drawables.SelectionRange: return new DrawingSelection();
-                case Drawables.TextLine: return new DrawingLine();
+                case VTDocumentElements.Cursor: return new DrawingCursor();
+                case VTDocumentElements.SelectionRange: return new DrawingSelection();
+                case VTDocumentElements.TextLine: return new DrawingLine();
                 default:
                     throw new NotImplementedException();
             }
         }
 
-        private DrawingObject EnsureDrawingObject(VTDocumentDrawable drawable)
+        private DrawingObject EnsureDrawingObject(VTDocumentElement drawable)
         {
             DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
             if (drawingObject == null)
@@ -114,6 +114,8 @@ namespace XTerminal.Rendering
 
             textLine.Metrics.Height = formattedText.Height;
             textLine.Metrics.Width = formattedText.WidthIncludingTrailingWhitespace;
+
+            textLine.SetMeasureDirty(false);
         }
 
         /// <summary>
@@ -158,19 +160,20 @@ namespace XTerminal.Rendering
             }
         }
 
-        public void DrawDrawable(VTDocumentDrawable drawable)
+        public void DrawDrawable(VTDocumentElement drawable)
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Draw();
+            drawable.SetRenderDirty(false);
         }
 
-        public void UpdatePosition(VTDocumentDrawable drawable, double offsetX, double offsetY)
+        public void Arrange(VTDocumentElement drawable, double offsetX, double offsetY)
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Offset = new Vector(offsetX, offsetY);
         }
 
-        public void SetOpacity(VTDocumentDrawable drawable, double opacity)
+        public void SetOpacity(VTDocumentElement drawable, double opacity)
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Opacity = opacity;

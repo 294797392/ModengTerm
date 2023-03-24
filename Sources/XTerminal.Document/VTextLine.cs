@@ -12,7 +12,7 @@ namespace XTerminal.Document
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VTextElement, VTDocumentDrawable
+    public class VTextLine : VTextElement
     {
         private static readonly string BlankText = " ";
 
@@ -30,9 +30,7 @@ namespace XTerminal.Document
 
         public int ID { get; set; }
 
-        public Drawables Type => Drawables.TextLine;
-
-        public object DrawingContext { get; set; }
+        public override VTDocumentElements Type => VTDocumentElements.TextLine;
 
         /// <summary>
         /// 列大小
@@ -119,33 +117,33 @@ namespace XTerminal.Document
         /// <param name="column">索引位置，在此处插入字符串</param>
         public void PrintCharacter(char ch, int column)
         {
-            if (this.CursorAtRightMargin && this.DECPrivateAutoWrapMode)
+            //if (this.CursorAtRightMargin && this.DECPrivateAutoWrapMode)
+            //{
+            //    // 说明光标已经在最右边了
+            //    // 并且开启了自动换行(DECAWM)的功能，那么要自动换行
+
+            //    // 换行完了之后再重置状态
+            //    this.CursorAtRightMargin = false;
+            //}
+            //else
+            //{
+            // 更新文本
+            if (column + 1 > this.Columns)
             {
-                // 说明光标已经在最右边了
-                // 并且开启了自动换行(DECAWM)的功能，那么要自动换行
-
-                // 换行完了之后再重置状态
-                this.CursorAtRightMargin = false;
+                this.TextSource.PadRight(column + 1, ' ');
             }
-            else
+
+            this.TextSource.SetCharacter(column, ch);
+
+            if (column == this.ColumnSize - 1)
             {
-                // 更新文本
-                if (column + 1 > this.Columns)
-                {
-                    this.TextSource.PadRight(column + 1, ' ');
-                }
-
-                this.TextSource.SetCharacter(column, ch);
-
-                if (column == this.ColumnSize - 1)
-                {
-                    logger.ErrorFormat("光标在最右边");
-                    // 此时说明光标在最右边
-                    this.CursorAtRightMargin = true;
-                }
-
-                this.SetDirty(true);
+                //logger.ErrorFormat("光标在最右边");
+                // 此时说明光标在最右边
+                this.CursorAtRightMargin = true;
             }
+
+            this.SetRenderDirty(true);
+            //}
 
             //if (this.Columns == this)
             //{
@@ -169,7 +167,7 @@ namespace XTerminal.Document
 
             this.TextSource.Remove(column);
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         /// <summary>
@@ -187,7 +185,7 @@ namespace XTerminal.Document
 
             this.TextSource.Remove(column, count);
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         /// <summary>
@@ -197,7 +195,7 @@ namespace XTerminal.Document
         {
             this.TextSource.DeleteAll();
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         /// <summary>
@@ -217,7 +215,7 @@ namespace XTerminal.Document
                 this.TextSource.SetCharacter(i, ch);
             }
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         public void Replace(int column, int count, char ch)
@@ -234,7 +232,7 @@ namespace XTerminal.Document
                 this.TextSource.SetCharacter(replaceColumn, ch);
             }
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         public void ReplaceAll(char ch)
@@ -244,14 +242,14 @@ namespace XTerminal.Document
                 this.TextSource.SetCharacter(i, ch);
             }
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         public void Insert(int column, char ch)
         {
             this.TextSource.Insert(column, ch);
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         /// <summary>
@@ -299,7 +297,7 @@ namespace XTerminal.Document
 
             this.TextSource.SetText(historyLine.Text);
 
-            this.SetDirty(true);
+            this.SetRenderDirty(true);
         }
 
         #endregion
