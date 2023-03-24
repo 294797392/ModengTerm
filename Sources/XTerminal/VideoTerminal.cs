@@ -222,6 +222,7 @@ namespace XTerminal
             this.activeDocument = this.mainDocument;
             this.activeHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.activeHistoryLine;
+            this.CanvasPanel.AddCanvas(this.activeDocument.Canvas);
 
             #endregion
 
@@ -856,7 +857,6 @@ namespace XTerminal
                         this.CanvasPanel.SwitchCanvas(remove, add);
 
                         this.mainDocument.DirtyAll();
-                        this.CanvasPanel.AddCanvas(this.mainDocument.Canvas);
                         this.activeDocument = this.mainDocument;
                         break;
                     }

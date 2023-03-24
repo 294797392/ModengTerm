@@ -77,6 +77,19 @@ namespace XTerminal.Rendering
             }
         }
 
+        private DrawingObject EnsureDrawingObject(VTDocumentDrawable drawable)
+        {
+            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            if (drawingObject == null)
+            {
+                drawingObject = this.CreateDrawingObject(drawable.Type);
+                drawingObject.Drawable = drawable;
+                drawable.DrawingContext = drawingObject;
+                this.visuals.Add(drawingObject);
+            }
+            return drawingObject;
+        }
+
         #endregion
 
         #region IDrawingCanvas
@@ -128,25 +141,19 @@ namespace XTerminal.Rendering
 
         public void DrawDrawable(VTDocumentDrawable drawable)
         {
-            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
-            if (drawingObject == null)
-            {
-                drawingObject = this.CreateDrawingObject(drawable.Type);
-                drawable.DrawingContext = drawingObject;
-                this.visuals.Add(drawingObject);
-            }
+            DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Draw();
         }
 
         public void UpdatePosition(VTDocumentDrawable drawable, double offsetX, double offsetY)
         {
-            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Offset = new Vector(offsetX, offsetY);
         }
 
         public void SetOpacity(VTDocumentDrawable drawable, double opacity)
         {
-            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Opacity = opacity;
         }
 
