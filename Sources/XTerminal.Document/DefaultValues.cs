@@ -22,7 +22,6 @@ namespace XTerminal.Document
 
         public static readonly string KeymapFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "keymap.json");
 
-
         public const double FontSize = 12;
 
         public static readonly VTColors Foreground = VTColors.DarkBlack;

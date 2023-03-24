@@ -96,6 +96,8 @@ using System;using System.Collections.Generic;using System.Linq;using System.
             #endregion
             #region 初始化光标
             this.Canvas.Draw(this.Cursor);            this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);            this.cursorBlinkingThread.IsBackground = true;            this.cursorBlinkingThread.Start();
+            // 先初始化备用缓冲区的光标渲染上下文
+            this.alternateDocument.Canvas.Draw(this.alternateDocument.Cursor);
 
             #endregion
             #region 连接中断通道
@@ -146,7 +148,8 @@ using System;using System.Collections.Generic;using System.Linq;using System.
             {
                 if (!this.ScrollChanged)
                 {
-                    this.activeHistoryLine.Update(this.activeDocument.LastLine);
+                    // 滚动到底的话，ActiveLine就是最后一行
+                    this.activeHistoryLine.Update(this.ActiveLine);
                 }
             }
         }
@@ -219,8 +222,17 @@ using System;using System.Collections.Generic;using System.Linq;using System.
                         // 只记录MainScrrenBuffer里的行，AlternateScrrenBuffer里的行不记录。AlternateScreenBuffer是用来给man，vim等程序使用的
                         if (this.activeDocument == this.mainDocument)                        {
                             // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里更新一下换行之前的历史行的数据
-                            this.activeHistoryLine.Update(this.ActiveLine.PreviousLine);                            int historyIndex = this.activeHistoryLine.Row + 1;                            this.Canvas.MeasureLine(this.ActiveLine);
-                            // 再创建最新行的历史行                            VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.activeHistoryLine, this.ActiveLine);                            this.historyLines[historyIndex] = historyLine;                            this.activeHistoryLine = historyLine;                            int terminalRows = this.initialOptions.TerminalOption.Rows;                            int scrollMax = historyIndex - terminalRows + 1;                            if (scrollMax > 0)                            {                                this.scrollMax = scrollMax;                                this.currentScroll = scrollMax;                                logger.DebugFormat("scrollMax = {0}", scrollMax);                                this.uiSyncContext.Send((state) =>                                {                                    this.CanvasPanel.UpdateScrollInfo(scrollMax);                                    this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);                                }, null);                            }                        }                        break;                    }                case VTActions.RI_ReverseLineFeed:                    {
+
+                            // 有几种特殊情况：
+                            // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
+                            if (this.ActiveLine.PreviousLine.IsMeasureDirety)
+                            {
+                                this.Canvas.MeasureLine(this.ActiveLine.PreviousLine);
+                            }
+                            this.activeHistoryLine.Update(this.ActiveLine.PreviousLine);
+
+                            // 再创建最新行的历史行
+                            int historyIndex = this.activeHistoryLine.Row + 1;                            VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.activeHistoryLine, this.ActiveLine);                            this.historyLines[historyIndex] = historyLine;                            this.activeHistoryLine = historyLine;                            int terminalRows = this.initialOptions.TerminalOption.Rows;                            int scrollMax = historyIndex - terminalRows + 1;                            if (scrollMax > 0)                            {                                this.scrollMax = scrollMax;                                this.currentScroll = scrollMax;                                logger.DebugFormat("scrollMax = {0}", scrollMax);                                this.uiSyncContext.Send((state) =>                                {                                    this.CanvasPanel.UpdateScrollInfo(scrollMax);                                    this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);                                }, null);                            }                        }                        break;                    }                case VTActions.RI_ReverseLineFeed:                    {
                         // 和LineFeed相反，也就是把光标往上移一个位置
                         // 在用man命令的时候会触发这个指令
                         // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
