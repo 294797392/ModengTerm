@@ -12,6 +12,11 @@ namespace XTerminal.Document.Rendering
     public enum TextPointerPositions
     {
         /// <summary>
+        /// 在原点位置没动
+        /// </summary>
+        Original,
+
+        /// <summary>
         /// 正上方
         /// </summary>
         Top,

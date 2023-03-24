@@ -12,7 +12,7 @@ namespace XTerminal.Document
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VTextElement, ITextLine, VTDocumentDrawable
+    public class VTextLine : VTextElement, VTDocumentDrawable
     {
         private static readonly string BlankText = " ";
 

@@ -90,6 +90,13 @@ namespace XTerminal.Rendering
             return drawingObject;
         }
 
+        private FormattedText CreateFormattedText(string text, List<VTextAttribute> attributes)
+        {
+            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
+            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+            return formattedText;
+        }
+
         #endregion
 
         #region IDrawingCanvas
@@ -99,7 +106,24 @@ namespace XTerminal.Rendering
             this.options = options;
         }
 
-        public VTElementMetrics MeasureLine(ITextLine textLine, int maxCharacters)
+        public void MeasureLine(VTextLine textLine)
+        {
+            string text = textLine.Text;
+
+            FormattedText formattedText = this.CreateFormattedText(text, textLine.Attributes);
+
+            textLine.Metrics.Height = formattedText.Height;
+            textLine.Metrics.Width = formattedText.WidthIncludingTrailingWhitespace;
+        }
+
+        /// <summary>
+        /// 测量某个渲染模型的大小
+        /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
+        /// </summary>
+        /// <param name="textLine">要测量的数据模型</param>
+        /// <param name="maxCharacters">要测量的最大字符数，0为全部测量</param>
+        /// <returns></returns>
+        public VTSize MeasureBlock(VTextLine textLine, int maxCharacters)
         {
             string text = textLine.Text;
             if (maxCharacters > 0 && text.Length >= maxCharacters)
@@ -107,34 +131,29 @@ namespace XTerminal.Rendering
                 text = text.Substring(0, maxCharacters);
             }
 
-            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
-            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+            FormattedText formattedText = this.CreateFormattedText(text, textLine.Attributes);
 
-            VTElementMetrics metrics = new VTElementMetrics()
-            {
-                Height = formattedText.Height,
-                Width = formattedText.WidthIncludingTrailingWhitespace,
-            };
-
-            return metrics;
+            return new VTSize(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
         }
 
-        public VTRect MeasureCharacter(ITextLine textLine, int characterIndex)
+        public VTRect MeasureCharacter(VTHistoryLine textLine, int characterIndex)
         {
-            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
-
             string text = textLine.Text;
+
             if (characterIndex == 0)
             {
                 // 第一个字符，返回第一个字符的左边
-                FormattedText formattedText = new FormattedText(text.Substring(0, 1), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+                string textToMeasure = text.Substring(0, 1);
+                FormattedText formattedText = this.CreateFormattedText(textToMeasure, textLine.Attributes);
                 return new VTRect(0, 0, formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
             }
             else
             {
                 // 其他字符，返回前一个字符的右边
-                FormattedText formattedText1 = new FormattedText(text.Substring(0, characterIndex), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
-                FormattedText formattedText2 = new FormattedText(text.Substring(characterIndex, 1), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+                string textToMeasure1 = text.Substring(0, characterIndex);
+                string textToMeasure2 = text.Substring(characterIndex, 1);
+                FormattedText formattedText1 = this.CreateFormattedText(textToMeasure1, textLine.Attributes);
+                FormattedText formattedText2 = this.CreateFormattedText(textToMeasure2, textLine.Attributes);
                 return new VTRect(formattedText1.WidthIncludingTrailingWhitespace, 0, formattedText2.WidthIncludingTrailingWhitespace, formattedText2.Height);
             }
         }

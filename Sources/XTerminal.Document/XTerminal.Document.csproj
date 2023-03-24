@@ -61,7 +61,6 @@
     <Compile Include="Rendering\ScrollOrientations.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />
-    <Compile Include="ITextLine.cs" />
     <Compile Include="VTextPointer.cs" />
     <Compile Include="VTextSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

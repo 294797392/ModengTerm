@@ -22,9 +22,17 @@ namespace XTerminal.Document.Rendering
         /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
         /// </summary>
         /// <param name="textLine">要测量的数据模型</param>
+        /// <returns></returns>
+        void MeasureLine(VTextLine textLine);
+
+        /// <summary>
+        /// 测量文本块的大小
+        /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
+        /// </summary>
+        /// <param name="textLine">要测量的数据模型</param>
         /// <param name="maxCharacters">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        VTElementMetrics MeasureLine(ITextLine textLine, int maxCharacters);
+        VTSize MeasureBlock(VTextLine textLine, int maxCharacters);
 
         /// <summary>
         /// 测量一行里某个字符的测量信息
@@ -33,7 +41,7 @@ namespace XTerminal.Document.Rendering
         /// <param name="textLine">要测量的文本行</param>
         /// <param name="characterIndex">要测量的字符</param>
         /// <returns>文本坐标，X=文本左边的X偏移量，Y=文本高度</returns>
-        VTRect MeasureCharacter(ITextLine textLine, int characterIndex);
+        VTRect MeasureCharacter(VTHistoryLine textLine, int characterIndex);
 
         /// <summary>
         /// 画

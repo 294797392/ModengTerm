@@ -6,6 +6,19 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document
 {
+    public struct VTSize
+    {
+        public double Width { get; set; }
+
+        public double Height { get; set; }
+
+        public VTSize(double w, double h)
+        {
+            this.Width = w;
+            this.Height = h;
+        }
+    }
+
     public struct VTRect
     {
         /// <summary>
