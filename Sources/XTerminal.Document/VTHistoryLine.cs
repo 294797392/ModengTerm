@@ -9,8 +9,18 @@ namespace XTerminal.Document
     /// <summary>
     /// 用来存储历史的行记录
     /// </summary>
-    public class VTHistoryLine : VTextLineBase
+    public class VTHistoryLine : ITextLine
     {
+        /// <summary>
+        /// 获取该文本行的宽度
+        /// </summary>
+        public double Width { get { return this.Metrics.Width; } }
+
+        /// <summary>
+        /// 获取该文本行的高度
+        /// </summary>
+        public double Height { get { return this.Metrics.Height; } }
+
         /// <summary>
         /// 文本的测量信息
         /// </summary>

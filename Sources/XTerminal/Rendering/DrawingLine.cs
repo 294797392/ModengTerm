@@ -10,7 +10,7 @@ using XTerminal.Document;
 
 namespace XTerminal.Rendering
 {
-    public class DrawableLine : XDocumentDrawable
+    public class DrawingLine : DrawingObject
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawableLine");
 
@@ -23,14 +23,14 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        public DrawableLine()
+        public DrawingLine()
         {
             this.ID = "Drawable" + string.Format("{0}", -1).PadLeft(2, '0');
         }
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextLine textLine = this.OwnerElement as VTextLine;
+            VTextLine textLine = this.Drawable as VTextLine;
 
             string text = textLine.Text;
 

@@ -12,7 +12,7 @@ namespace XTerminal.Document
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VTextElement, VTextLineBase
+    public class VTextLine : VTextElement, ITextLine
     {
         private static readonly string BlankText = " ";
 
@@ -66,11 +66,6 @@ namespace XTerminal.Document
         public bool CursorAtRightMargin { get; private set; }
 
         /// <summary>
-        /// 所属的文档
-        /// </summary>
-        public VTDocumentBase OwnerDocument { get; private set; }
-
-        /// <summary>
         /// 文本数据源
         /// </summary>
         public VTextSource TextSource { get; private set; }
@@ -85,7 +80,7 @@ namespace XTerminal.Document
         /// </summary>
         public string Text
         {
-            get 
+            get
             {
                 string text = this.TextSource.GetText();
                 return text.Length == 0 ? BlankText : text;
@@ -100,11 +95,10 @@ namespace XTerminal.Document
         /// 
         /// </summary>
         /// <param name="owner">该行所属的文档</param>
-        public VTextLine(VTDocument owner)
+        public VTextLine(VTDocument owner) : base(owner)
         {
             this.ColumnSize = owner.ColumnSize;
             this.TextSource = VTextSourceFactory.Create(VTextSources.CharactersTextSource);
-            this.OwnerDocument = owner;
             this.Attributes = new List<VTextAttribute>();
         }
 
@@ -167,7 +161,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.Drawable.ID);
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.DrawingObject.ID);
                 return;
             }
 
@@ -185,7 +179,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.Drawable.ID);
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.DrawingObject.ID);
                 return;
             }
 

@@ -18,7 +18,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 显示器控件
     /// </summary>
-    public class XDocumentPanel : Grid, IDocumentCanvasPanel
+    public class DrawingCanvasPanel : Grid, IDrawingCanvasPanel
     {
         #region 类变量
 
@@ -28,24 +28,24 @@ namespace XTerminal.Rendering
 
         #region 公开事件
 
-        public event Action<IDocumentCanvasPanel, VTInputEvent> InputEvent;
+        public event Action<IDrawingCanvasPanel, VTInputEvent> InputEvent;
 
-        public event Action<IDocumentCanvasPanel, int> ScrollChanged;
+        public event Action<IDrawingCanvasPanel, int> ScrollChanged;
 
         /// <summary>
         /// 鼠标移动的时候触发
         /// </summary>
-        public event Action<IDocumentCanvasPanel, VTPoint> VTMouseMove;
+        public event Action<IDrawingCanvasPanel, VTPoint> VTMouseMove;
 
         /// <summary>
         /// 鼠标按下的时候触发
         /// </summary>
-        public event Action<IDocumentCanvasPanel, VTPoint> VTMouseDown;
+        public event Action<IDrawingCanvasPanel, VTPoint> VTMouseDown;
 
         /// <summary>
         /// 鼠标抬起的时候触发
         /// </summary>
-        public event Action<IDocumentCanvasPanel, VTPoint> VTMouseUp;
+        public event Action<IDrawingCanvasPanel, VTPoint> VTMouseUp;
 
         #endregion
 
@@ -79,7 +79,7 @@ namespace XTerminal.Rendering
 
         #region 构造方法
 
-        public XDocumentPanel()
+        public DrawingCanvasPanel()
         {
             this.inputEvent = new VTInputEvent();
             this.Background = Brushes.Transparent;
@@ -251,15 +251,15 @@ namespace XTerminal.Rendering
 
         #region IDocumentCanvasPanel
 
-        public IDocumentCanvas CreateCanvas()
+        public IDrawingCanvas CreateCanvas()
         {
-            XDocumentCanvas canvas = new XDocumentCanvas();
+            DrawingCanvas canvas = new DrawingCanvas();
             return canvas;
         }
 
-        public void AddCanvas(IDocumentCanvas canvas)
+        public void AddCanvas(IDrawingCanvas canvas)
         {
-            this.Children.Add(canvas as XDocumentCanvas);
+            this.Children.Add(canvas as DrawingCanvas);
         }
 
         /// <summary>

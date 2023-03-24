@@ -13,16 +13,16 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class XDocumentDrawable : DrawingVisual, IDocumentDrawable
+    public abstract class DrawingObject : DrawingVisual, IDrawingObject
     {
         public string ID { get; protected set; }
 
         /// <summary>
         /// 和该渲染对象关联的要绘制的元素信息
         /// </summary>
-        public DrawableElement OwnerElement { get; set; }
+        public VTDrawable Drawable { get; set; }
 
-        public XDocumentDrawable()
+        public DrawingObject()
         {
         }
 
@@ -42,7 +42,7 @@ namespace XTerminal.Rendering
         /// </summary>
         public void Reset()
         {
-            this.OwnerElement = null;
+            this.Drawable = null;
             this.Offset = new Vector();
             DrawingContext dc = this.RenderOpen();
             dc.Close();

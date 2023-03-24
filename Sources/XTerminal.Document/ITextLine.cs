@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document
 {
-    public interface VTextLineBase
+    public interface ITextLine
     {
         /// <summary>
         /// 文本行的属性

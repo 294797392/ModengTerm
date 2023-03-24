@@ -12,7 +12,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 光标的渲染模型
     /// </summary>
-    public class DrawableCursor : XDocumentDrawable
+    public class DrawingCursor : DrawingObject
     {
         private static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
         private static readonly double BlockWidth = 5;
@@ -26,7 +26,7 @@ namespace XTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            VTCursor cursor = this.OwnerElement as VTCursor;
+            VTCursor cursor = this.Drawable as VTCursor;
 
             this.Offset = new Vector(cursor.OffsetX, cursor.OffsetY);
 

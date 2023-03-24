@@ -17,8 +17,8 @@
             <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
 
-        <xtermrendering:XDocumentPanel Grid.Row="1" Grid.Column="0" x:Name="DocumentPanel">
-        </xtermrendering:XDocumentPanel>
+        <xtermrendering:DrawingCanvasPanel Grid.Row="1" Grid.Column="0" x:Name="DocumentPanel">
+        </xtermrendering:DrawingCanvasPanel>
 
         <!-- Slider模拟滚动条 -->
         <Slider Grid.Row="1" Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" Minimum="0" Maximum="0" Delay="500">

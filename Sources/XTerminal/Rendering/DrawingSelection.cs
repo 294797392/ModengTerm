@@ -13,13 +13,13 @@ namespace VideoTerminal.Rendering
     /// <summary>
     /// 用来画光标选中的文本的Drawable
     /// </summary>
-    public class DrawableSelection : XDocumentDrawable
+    public class DrawingSelection : DrawingObject
     {
         private StreamGeometry selectionGeometry;
         private Pen pen;
         private Brush brush = new SolidColorBrush(Color.FromArgb(0x80, 0, 0, 0));
 
-        public DrawableSelection()
+        public DrawingSelection()
         {
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
@@ -27,7 +27,7 @@ namespace VideoTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextSelection selectionRange = this.OwnerElement as VTextSelection;
+            VTextSelection selectionRange = this.Drawable as VTextSelection;
 
             StreamGeometryContext sgc = this.selectionGeometry.Open();
 

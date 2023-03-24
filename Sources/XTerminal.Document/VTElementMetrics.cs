@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace XTerminal.Document
 {
     /// <summary>
-    /// 存储显示元素的测量信息
+    /// 存储文档里某个元素的测量信息
     /// </summary>
     public class VTElementMetrics
     {
@@ -21,11 +21,6 @@ namespace XTerminal.Document
         /// 渲染后该文本块的高度
         /// </summary>
         public double Height { get; set; }
-
-        /// <summary>
-        /// 带有空白的宽度
-        /// </summary>
-        public double WidthIncludingWhitespace { get; set; }
 
         public VTElementMetrics()
         { }

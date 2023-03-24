@@ -11,7 +11,7 @@ namespace XTerminal.Document
     /// <summary>
     /// 终端显示的字符的文档模型
     /// </summary>
-    public class VTDocument : VTDocumentBase
+    public class VTDocument
     {
         #region 类变量
 
@@ -27,6 +27,8 @@ namespace XTerminal.Document
         internal VTDocumentOptions options;
 
         private int row;
+
+        private bool isArrangeDirty;
 
         #endregion
 
@@ -74,6 +76,21 @@ namespace XTerminal.Document
         /// 通过SetCursor函数设置
         /// </summary>
         public VTextLine ActiveLine { get; private set; }
+
+        /// <summary>
+        /// 文档里的第一行
+        /// </summary>
+        public VTextLine FirstLine { get; internal set; }
+
+        /// <summary>
+        /// 文档里的最后一行
+        /// </summary>
+        public VTextLine LastLine { get; internal set; }
+
+        /// <summary>
+        /// 该文档是否是空文档
+        /// </summary>
+        public bool IsEmpty { get { return this.FirstLine == null && this.LastLine == null; } }
 
         #endregion
 
@@ -647,18 +664,18 @@ namespace XTerminal.Document
         /// 把所有的TextLine取消关联渲染模型
         /// </summary>
         /// <returns>返回被取消关联的渲染对象</returns>
-        public List<IDocumentDrawable> DetachAll()
+        public List<IDrawingObject> DetachAll()
         {
-            List<IDocumentDrawable> drawables = new List<IDocumentDrawable>();
+            List<IDrawingObject> drawables = new List<IDrawingObject>();
 
             VTextLine current = this.FirstLine;
 
             while (current != null)
             {
-                drawables.Add(current.Drawable);
+                drawables.Add(current.DrawingObject);
 
                 // 取消关联关系
-                current.DetachDrawable();
+                current.DetachDrawing();
 
                 current = current.NextLine;
             }
@@ -670,13 +687,13 @@ namespace XTerminal.Document
         /// 按顺序为每个VTextLine附加渲染对象
         /// </summary>
         /// <param name="drawables"></param>
-        public void AttachAll(List<IDocumentDrawable> drawables)
+        public void AttachAll(List<IDrawingObject> drawables)
         {
             VTextLine current = this.FirstLine;
 
-            foreach (IDocumentDrawable drawable in drawables)
+            foreach (IDrawingObject drawable in drawables)
             {
-                current.AttachDrawable(drawable);
+                current.AttachDrawing(drawable);
 
                 current = current.NextLine;
             }
@@ -719,6 +736,21 @@ namespace XTerminal.Document
         public void ScrollUp(VTextLine activeLine, int lines)
         {
             
+        }
+
+        /// <summary>
+        /// 是否需要重新布局
+        /// </summary>
+        public bool IsArrangeDirty
+        {
+            get { return this.isArrangeDirty; }
+            set
+            {
+                if (this.isArrangeDirty != value)
+                {
+                    this.isArrangeDirty = value;
+                }
+            }
         }
 
         #endregion

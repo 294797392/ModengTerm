@@ -50,8 +50,7 @@ namespace XTerminal.Rendering
 
         public static void UpdateTextMetrics(VTElementMetrics textMerics, FormattedText formattedText)
         {
-            textMerics.Width = formattedText.Width;
-            textMerics.WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace;
+            textMerics.Width = formattedText.WidthIncludingTrailingWhitespace;
             textMerics.Height = formattedText.Height;
         }
 

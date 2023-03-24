@@ -20,7 +20,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 获取该文本块的宽度
         /// </summary>
-        public double Width { get { return this.Metrics.WidthIncludingWhitespace; } }
+        public double Width { get { return this.Metrics.Width; } }
 
         /// <summary>
         /// 该行高度，当DECAWM被设置的时候，终端里的一行如果超出了列数，那么会自动换行
@@ -36,8 +36,14 @@ namespace XTerminal.Document
         /// </summary>
         public VTRect Bounds { get { return new VTRect(this.OffsetX, this.OffsetY, this.Width, this.Height); } }
 
-        public VTextElement()
+        /// <summary>
+        /// 所属的文档
+        /// </summary>
+        public VTDocument OwnerDocument { get; private set; }
+
+        public VTextElement(VTDocument owner)
         {
+            this.OwnerDocument = owner;
             this.Metrics = new VTElementMetrics();
         }
     }

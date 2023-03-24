@@ -30,7 +30,7 @@ namespace XTerminal.Document.Rendering
     /// <summary>
     /// 表示文档里的一个可以画的元素
     /// </summary>
-    public abstract class DrawableElement
+    public abstract class VTDrawable
     {
         private bool isDirty;
 
@@ -66,34 +66,34 @@ namespace XTerminal.Document.Rendering
         /// <summary>
         /// 该数据模型对应的渲染模型
         /// </summary>
-        public IDocumentDrawable Drawable { get; private set; }
+        public IDrawingObject DrawingObject { get; private set; }
 
         /// <summary>
         /// 关联一个Drawable对象
         /// 该操作会把drawable之前关联的文档模型取消关联
         /// </summary>
-        /// <param name="drawable"></param>
-        public void AttachDrawable(IDocumentDrawable drawable)
+        /// <param name="drawingObject"></param>
+        public void AttachDrawing(IDrawingObject drawingObject)
         {
-            if (drawable.OwnerElement != null)
+            if (drawingObject.Drawable != null)
             {
-                drawable.OwnerElement.DetachDrawable();
+                drawingObject.Drawable.DetachDrawing();
             }
 
-            this.Drawable = drawable;
-            this.Drawable.OwnerElement = this;
+            this.DrawingObject = drawingObject;
+            this.DrawingObject.Drawable = this;
             this.SetDirty(true);
         }
 
         /// <summary>
         /// 取消关联的Drawable对象
         /// </summary>
-        public void DetachDrawable()
+        public void DetachDrawing()
         {
-            if (this.Drawable != null)
+            if (this.DrawingObject != null)
             {
-                this.Drawable.OwnerElement = null;
-                this.Drawable = null;
+                this.DrawingObject.Drawable = null;
+                this.DrawingObject = null;
             }
         }
     }

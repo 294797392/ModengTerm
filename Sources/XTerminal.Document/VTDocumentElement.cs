@@ -10,7 +10,7 @@ namespace XTerminal.Document
     /// <summary>
     /// 表示文档上的一个元素
     /// </summary>
-    public abstract class VTDocumentElement : DrawableElement
+    public abstract class VTDocumentElement : VTDrawable
     {
         /// <summary>
         /// 该元素左上角的X坐标

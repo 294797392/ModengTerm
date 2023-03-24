@@ -18,7 +18,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 用来显示字符的容器
     /// </summary>
-    public class XDocumentCanvas : FrameworkElement, IDocumentCanvas
+    public class DrawingCanvas : FrameworkElement, IDrawingCanvas
     {
         #region 类变量
 
@@ -30,7 +30,7 @@ namespace XTerminal.Rendering
 
         private VisualCollection visuals;
 
-        private DocumentCanvasOptions options;
+        private DrawingCanvasOptions options;
 
         #endregion
 
@@ -46,7 +46,7 @@ namespace XTerminal.Rendering
 
         #region 构造方法
 
-        public XDocumentCanvas()
+        public DrawingCanvas()
         {
             this.visuals = new VisualCollection(this);
         }
@@ -65,13 +65,13 @@ namespace XTerminal.Rendering
 
         #region 实例方法
 
-        private XDocumentDrawable CreateDrawable(Drawables type)
+        private DrawingObject CreateDrawable(Drawables type)
         {
             switch (type)
             {
-                case Drawables.Cursor: return new DrawableCursor();
-                case Drawables.SelectionRange: return new DrawableSelection();
-                case Drawables.TextLine: return new DrawableLine();
+                case Drawables.Cursor: return new DrawingCursor();
+                case Drawables.SelectionRange: return new DrawingSelection();
+                case Drawables.TextLine: return new DrawingLine();
                 default:
                     throw new NotImplementedException();
             }
@@ -81,18 +81,18 @@ namespace XTerminal.Rendering
 
         #region IDocumentCanvas
 
-        public void Initialize(DocumentCanvasOptions options)
+        public void Initialize(DrawingCanvasOptions options)
         {
             this.options = options;
         }
 
-        public List<IDocumentDrawable> RequestDrawable(Drawables type, int count)
+        public List<IDrawingObject> RequestDrawable(Drawables type, int count)
         {
-            List<IDocumentDrawable> drawables = new List<IDocumentDrawable>();
+            List<IDrawingObject> drawables = new List<IDrawingObject>();
 
             for (int i = 0; i < count; i++)
             {
-                XDocumentDrawable drawable = this.CreateDrawable(type);
+                DrawingObject drawable = this.CreateDrawable(type);
 
                 drawables.Add(drawable);
 
@@ -102,7 +102,7 @@ namespace XTerminal.Rendering
             return drawables;
         }
 
-        public VTElementMetrics MeasureLine(VTextLineBase textLine, int maxCharacters)
+        public VTElementMetrics MeasureLine(ITextLine textLine, int maxCharacters)
         {
             string text = textLine.Text;
             if (maxCharacters > 0 && text.Length >= maxCharacters)
@@ -116,14 +116,13 @@ namespace XTerminal.Rendering
             VTElementMetrics metrics = new VTElementMetrics()
             {
                 Height = formattedText.Height,
-                Width = formattedText.Width,
-                WidthIncludingWhitespace = formattedText.WidthIncludingTrailingWhitespace
+                Width = formattedText.WidthIncludingTrailingWhitespace,
             };
 
             return metrics;
         }
 
-        public VTRect MeasureCharacter(VTextLineBase textLine, int characterIndex)
+        public VTRect MeasureCharacter(ITextLine textLine, int characterIndex)
         {
             Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
 
@@ -143,21 +142,21 @@ namespace XTerminal.Rendering
             }
         }
 
-        public void DrawDrawable(IDocumentDrawable drawable)
+        public void DrawDrawable(IDrawingObject drawable)
         {
-            XDocumentDrawable drawingVisual = drawable as XDocumentDrawable;
+            DrawingObject drawingVisual = drawable as DrawingObject;
             drawingVisual.Draw();
         }
 
-        public void UpdatePosition(IDocumentDrawable drawable, double offsetX, double offsetY)
+        public void UpdatePosition(IDrawingObject drawable, double offsetX, double offsetY)
         {
-            XDocumentDrawable drawingVisual = drawable as XDocumentDrawable;
+            DrawingObject drawingVisual = drawable as DrawingObject;
             drawingVisual.Offset = new Vector(offsetX, offsetY);
         }
 
-        public void SetOpacity(IDocumentDrawable drawable, double opacity)
+        public void SetOpacity(IDrawingObject drawable, double opacity)
         {
-            XDocumentDrawable drawingVisual = drawable as XDocumentDrawable;
+            DrawingObject drawingVisual = drawable as DrawingObject;
             drawingVisual.Opacity = opacity;
         }
 

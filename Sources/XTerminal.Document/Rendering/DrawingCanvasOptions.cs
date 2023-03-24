@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document.Rendering
 {
-    public class DocumentCanvasOptions
+    public class DrawingCanvasOptions
     {
         /// <summary>
         /// 总行数
