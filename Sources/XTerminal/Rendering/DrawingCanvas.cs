@@ -160,7 +160,7 @@ namespace XTerminal.Rendering
             }
         }
 
-        public void DrawDrawable(VTDocumentElement drawable)
+        public void Draw(VTDocumentElement drawable)
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Draw();

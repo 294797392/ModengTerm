@@ -262,6 +262,7 @@ namespace XTerminal.Document
                 // 光标不在可滚动区域的最后一行，说明可以直接移动光标
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 this.SetCursor(this.Cursor.Row + 1, this.Cursor.Column);
+                this.ActiveLine.SetRenderDirty(true);
             }
         }
 
@@ -331,6 +332,7 @@ namespace XTerminal.Document
                 // 光标位置在可视区域里面
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
                 this.SetCursor(this.Cursor.Row - 1, this.Cursor.Column);
+                this.ActiveLine.SetRenderDirty(true);
             }
         }
 

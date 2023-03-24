@@ -53,6 +53,17 @@ using System;using System.Collections.Generic;using System.Linq;using System.
 
         /// <summary>        /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流        /// </summary>        public VTKeyboard Keyboard { get; private set; }        public VTextOptions TextOptions { get; private set; }
 
+        /// <summary>
+        /// 获取当前滚动条是否在最底部
+        /// </summary>
+        public bool ScrollChanged
+        {
+            get
+            {
+                return this.currentScroll != this.scrollMax;
+            }
+        }
+
         #endregion
         #region 构造方法
         public VideoTerminal()        {        }
@@ -67,52 +78,28 @@ using System;using System.Collections.Generic;using System.Linq;using System.
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();            this.TextOptions = new VTextOptions();            this.textSelection = new VTextSelection();
 
-
-
             #region 初始化键盘
             this.Keyboard = new VTKeyboard();            this.Keyboard.SetAnsiMode(true);            this.Keyboard.SetKeypadMode(false);
-
-
-
-
 
             #endregion
             #region 初始化终端解析器
             this.vtParser = new VTParser();            this.vtParser.ActionEvent += VtParser_ActionEvent;            this.vtParser.Initialize();
 
-
-
-
-
             #endregion
             #region 初始化鼠标事件
             this.CanvasPanel.InputEvent += this.VideoTerminal_InputEvent;            this.CanvasPanel.ScrollChanged += this.CanvasPanel_ScrollChanged;            this.CanvasPanel.VTMouseDown += this.CanvasPanel_VTMouseDown;            this.CanvasPanel.VTMouseMove += this.CanvasPanel_VTMouseMove;            this.CanvasPanel.VTMouseUp += this.CanvasPanel_VTMouseUp;
-
-
-
-
 
             #endregion
             #region 初始化文档模型
             VTDocumentOptions documentOptions = new VTDocumentOptions()            {                ColumnSize = initialOptions.TerminalOption.Columns,                RowSize = initialOptions.TerminalOption.Rows,                DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode,                CursorStyle = initialOptions.CursorOption.Style,                Interval = initialOptions.CursorOption.Interval,                CanvasCreator = this.CanvasPanel            };            this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };            this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };            this.activeDocument = this.mainDocument;            this.activeHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);            this.historyLines[0] = this.activeHistoryLine;            this.CanvasPanel.AddCanvas(this.activeDocument.Canvas);
 
-
-
-
-
             #endregion
             #region 初始化光标
-            this.Canvas.DrawDrawable(this.Cursor);            this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);            this.cursorBlinkingThread.IsBackground = true;            this.cursorBlinkingThread.Start();
-
-
-
-
+            this.Canvas.Draw(this.Cursor);            this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);            this.cursorBlinkingThread.IsBackground = true;            this.cursorBlinkingThread.Start();
 
             #endregion
             #region 连接中断通道
             VTChannel vtChannel = VTChannelFactory.Create(options);            vtChannel.StatusChanged += this.VTChannel_StatusChanged;            vtChannel.DataReceived += this.VTChannel_DataReceived;            vtChannel.Connect();            this.vtChannel = vtChannel;
-
-
 
             #endregion        }
 
@@ -134,18 +121,14 @@ using System;using System.Collections.Generic;using System.Linq;using System.
                     // 更新Y偏移量信息
                     next.OffsetY = offsetY;                    if (next.IsRenderDirty)                    {
                         // 此时说明该行有字符变化，需要重绘
-                        // 重绘的时候会也会UpdatePosition
-                        this.Canvas.DrawDrawable(next);                        logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);                    }                    else if (next.IsMeasureDirety)                    {
+                        this.Canvas.Draw(next);                        //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);                    }                    else if (next.IsMeasureDirety)                    {
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                        this.Canvas.MeasureLine(next);                        if (arrangeDirty)
-                        {
-                            this.Canvas.Arrange(next, next.OffsetX, next.OffsetY);
-                        }                    }
-                    else if (arrangeDirty)
+                        this.Canvas.MeasureLine(next);                    }
+
+                    if (arrangeDirty)
                     {
                         this.Canvas.Arrange(next, next.OffsetX, next.OffsetY);
-                    }
-                    // 更新下一个文本行的Y偏移量
+                    }                    // 更新下一个文本行的Y偏移量
                     offsetY += next.Height;
 
                     // 如果最后一行渲染完毕了，那么就退出
@@ -156,7 +139,17 @@ using System;using System.Collections.Generic;using System.Linq;using System.
                 this.Cursor.OffsetY = this.ActiveLine.OffsetY;                this.Cursor.OffsetX = this.Canvas.MeasureBlock(this.ActiveLine, this.CursorCol).Width;                this.Canvas.Arrange(this.Cursor, this.Cursor.OffsetX, this.Cursor.OffsetY);
 
                 #endregion
-            }, null);            document.SetArrangeDirty(false);        }
+            }, null);            document.SetArrangeDirty(false);
+
+            // 如果当前滚动条滚动到底了，那么可以更新最新历史行的数据
+            if (this.activeDocument == this.mainDocument)
+            {
+                if (!this.ScrollChanged)
+                {
+                    this.activeHistoryLine.Update(this.activeDocument.LastLine);
+                }
+            }
+        }
 
         /// <summary>        /// 滚动到滚动条上的某个值        /// </summary>        /// <param name="scrollValue"></param>        private void ScrollTo(int scrollValue)        {            this.currentScroll = scrollValue;
 
@@ -167,8 +160,6 @@ using System;using System.Collections.Generic;using System.Linq;using System.
             VTHistoryLine currentHistory = historyLine;            VTextLine currentTextLine = this.activeDocument.FirstLine;            for (int i = 0; i < terminalRows; i++)            {                currentTextLine.SetHistory(currentHistory);                currentHistory = currentHistory.NextLine;                currentTextLine = currentTextLine.NextLine;            }            this.activeDocument.SetArrangeDirty(true);            this.DrawDocument(this.activeDocument);        }
 
         /// <summary>        /// 使用像素坐标对VTextLine做命中测试        /// </summary>        /// <param name="cursorPos">鼠标坐标</param>        /// <param name="pointer">获取到的TextPointer信息保存到该变量里</param>        /// <returns>        /// 是否获取成功        /// 当光标不在某一行或者不在某个字符上的时候，就获取失败        /// </returns>        private bool GetTextPointer(VTPoint cursorPos, VTextPointer pointer)        {            double x = cursorPos.X;            double y = cursorPos.Y;            pointer.IsCharacterHit = false;            pointer.CharacterIndex = -1;
-
-
 
             #region 先找到鼠标悬浮的历史行
             // 有可能当前有滚动，所以要从历史行里开始找
@@ -185,10 +176,6 @@ using System;using System.Collections.Generic;using System.Linq;using System.
             // 这里说明鼠标没有在任何一个行上
             if (lineHit == null)            {                logger.ErrorFormat("没有找到鼠标位置对应的行, cursorY = {0}", y);                return false;            }            pointer.Line = lineHit;
 
-
-
-
-
             #endregion
             #region 再计算鼠标悬浮于哪个字符上
             string text = lineHit.Text;            for (int i = 0; i < text.Length; i++)            {                VTRect characterBounds = this.Canvas.MeasureCharacter(lineHit, i);                if (characterBounds.Left <= x && characterBounds.Right >= x)                {
@@ -198,8 +185,6 @@ using System;using System.Collections.Generic;using System.Linq;using System.
                     pointer.CharacterBounds = characterBounds;                    pointer.CharacterIndex = i;                    pointer.IsCharacterHit = true;                    break;                }            }            if (!pointer.IsCharacterHit)            {
                 // 如果没命中字符，那么以鼠标当前位置为中心生成一个空白字符的CharacterBounds
                 pointer.CharacterBounds = new VTRect(cursorPos.X - 5, offsetY, 10, lineHit.Height);            }
-
-
 
             #endregion
             return true;        }
@@ -214,9 +199,7 @@ using System;using System.Collections.Generic;using System.Linq;using System.
                         // 根据测试得出结论：不论字符是单字节字符（英文字母）还是多字节字符（中文..），都只占用一列来显示
 
                         char ch = Convert.ToChar(parameter);                        logger.DebugFormat("Print:{0}, cursorRow = {1}, cursorCol = {2}", ch, this.CursorRow, this.CursorCol);                        this.activeDocument.PrintCharacter(this.ActiveLine, ch, this.CursorCol);                        this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + 1);
-
-                        // 这里需要实时更新historyLine的测量信息，不然先往上滚动再滚回来的时候会出现问题
-                        //this.Canvas.MeasureLine(this.ActiveLine);                        //this.activeHistoryLine.Update(this.ActiveLine);                        break;                    }                case VTActions.CarriageReturn:                    {
+                        break;                    }                case VTActions.CarriageReturn:                    {
                         // CR
                         // 把光标移动到行开头
                         this.activeDocument.SetCursor(this.CursorRow, 0);                        logger.DebugFormat("CarriageReturn, cursorRow = {0}, cursorCol = {1}", this.CursorRow, this.CursorCol);                        break;                    }                case VTActions.FF:                case VTActions.VT:                case VTActions.LF:                    {
@@ -225,17 +208,19 @@ using System;using System.Collections.Generic;using System.Linq;using System.
 
                         if (this.activeDocument == this.mainDocument)                        {
                             // 如果滚动条不在最底部，那么先把滚动条滚动到底
-                            if (this.currentScroll != this.scrollMax)                            {                                this.ScrollTo(this.scrollMax);                            }                        }
+                            if (this.ScrollChanged)                            {                                this.ScrollTo(this.scrollMax);                            }                        }
 
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
                         this.activeDocument.LineFeed();                        logger.DebugFormat("LineFeed, cursorRow = {0}, cursorCol = {1}, {2}", this.CursorRow, this.CursorCol, action);
 
                         // 换行之后记录历史行
-                        // 因为用户可以输入Backspace键或者上下左右光标键来修改最新行的内容
-                        // 所以只记录换行之前的行，因为可以确保换行之前的行已经被用户输入完了，不会被更改了
+                        // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
                         // 只记录MainScrrenBuffer里的行，AlternateScrrenBuffer里的行不记录。AlternateScreenBuffer是用来给man，vim等程序使用的
-                        if (this.activeDocument == this.mainDocument)                        {                            int historyIndex = this.activeHistoryLine.Row + 1;                            this.Canvas.MeasureLine(this.ActiveLine);                            VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.activeHistoryLine, this.ActiveLine);                            this.historyLines[historyIndex] = historyLine;                            this.activeHistoryLine = historyLine;                            int terminalRows = this.initialOptions.TerminalOption.Rows;                            int scrollMax = historyIndex - terminalRows + 1;                            if (scrollMax > 0)                            {                                this.scrollMax = scrollMax;                                this.currentScroll = scrollMax;                                logger.DebugFormat("scrollMax = {0}", scrollMax);                                this.uiSyncContext.Send((state) =>                                {                                    this.CanvasPanel.UpdateScrollInfo(scrollMax);                                    this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);                                }, null);                            }                        }                        break;                    }                case VTActions.RI_ReverseLineFeed:                    {
+                        if (this.activeDocument == this.mainDocument)                        {
+                            // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里更新一下换行之前的历史行的数据
+                            this.activeHistoryLine.Update(this.ActiveLine.PreviousLine);                            int historyIndex = this.activeHistoryLine.Row + 1;                            this.Canvas.MeasureLine(this.ActiveLine);
+                            // 再创建最新行的历史行                            VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.activeHistoryLine, this.ActiveLine);                            this.historyLines[historyIndex] = historyLine;                            this.activeHistoryLine = historyLine;                            int terminalRows = this.initialOptions.TerminalOption.Rows;                            int scrollMax = historyIndex - terminalRows + 1;                            if (scrollMax > 0)                            {                                this.scrollMax = scrollMax;                                this.currentScroll = scrollMax;                                logger.DebugFormat("scrollMax = {0}", scrollMax);                                this.uiSyncContext.Send((state) =>                                {                                    this.CanvasPanel.UpdateScrollInfo(scrollMax);                                    this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);                                }, null);                            }                        }                        break;                    }                case VTActions.RI_ReverseLineFeed:                    {
                         // 和LineFeed相反，也就是把光标往上移一个位置
                         // 在用man命令的时候会触发这个指令
                         // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
@@ -305,7 +290,7 @@ using System;using System.Collections.Generic;using System.Linq;using System.
             // 全部字符都处理完了之后，只渲染一次
 
             this.DrawDocument(this.activeDocument);
-            logger.ErrorFormat("receivedCounter = {0}", this.dataReceivedCounter++);
+            //logger.ErrorFormat("receivedCounter = {0}", this.dataReceivedCounter++);
             //this.activeDocument.Print();
             //logger.ErrorFormat("TotalRows = {0}", this.activeDocument.TotalRows);
         }        private void VTChannel_StatusChanged(object client, VTChannelState state)        {            logger.InfoFormat("客户端状态发生改变, {0}", state);        }        private void CursorBlinkingThreadProc()        {            while (true)            {                VTCursor cursor = this.Cursor;                cursor.IsVisible = !cursor.IsVisible;                try                {                    double opacity = cursor.IsVisible ? 1 : 0;                    this.uiSyncContext.Send((state) =>                    {                        this.Canvas.SetOpacity(cursor, opacity);                    }, null);                }                catch (Exception e)                {                    logger.ErrorFormat(string.Format("渲染光标异常, {0}", e));                }                finally                {                    Thread.Sleep(cursor.Interval);                }            }        }
@@ -342,7 +327,7 @@ using System;using System.Collections.Generic;using System.Linq;using System.
                         VTextPointer topPointer = startPointer.Row < endPointer.Row ? startPointer : endPointer;                        VTextPointer bottomPointer = startPointer.Row < endPointer.Row ? endPointer : startPointer;                        VTRect topBounds = topPointer.CharacterBounds;                        VTRect bottomBounds = bottomPointer.CharacterBounds;                        this.textSelection.Ranges.Add(new VTRect(topBounds.X, topBounds.Y, 9999, topBounds.Height));                        this.textSelection.Ranges.Add(new VTRect(0, bottomBounds.Y, bottomBounds.X + bottomBounds.Width, bottomBounds.Height));
 
                         // 构建中间的几何图形
-                        VTRect middleBounds = new VTRect(0, topBounds.Y + topBounds.Height, 9999, bottomBounds.Y - topBounds.Bottom);                        this.textSelection.Ranges.Add(middleBounds);                        break;                    }            }            this.uiSyncContext.Send((state) =>            {                this.Canvas.DrawDrawable(this.textSelection);            }, null);        }        private void CanvasPanel_VTMouseDown(IDrawingCanvasPanel arg1, VTPoint cursorPos)        {            this.isCursorDown = true;            this.cursorDownPos = cursorPos;
+                        VTRect middleBounds = new VTRect(0, topBounds.Y + topBounds.Height, 9999, bottomBounds.Y - topBounds.Bottom);                        this.textSelection.Ranges.Add(middleBounds);                        break;                    }            }            this.uiSyncContext.Send((state) =>            {                this.Canvas.Draw(this.textSelection);            }, null);        }        private void CanvasPanel_VTMouseDown(IDrawingCanvasPanel arg1, VTPoint cursorPos)        {            this.isCursorDown = true;            this.cursorDownPos = cursorPos;
 
             // 得到startPos对应的VTextLine
             this.GetTextPointer(cursorPos, this.textSelection.Start);        }

@@ -49,7 +49,7 @@ namespace XTerminal.Document.Rendering
         /// 排版是比较耗时的操作
         /// </summary>
         /// <param name="drawable"></param>
-        void DrawDrawable(VTDocumentElement drawable);
+        void Draw(VTDocumentElement drawable);
 
         /// <summary>
         /// 对元素进行布局
