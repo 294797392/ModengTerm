@@ -92,6 +92,11 @@ namespace XTerminal.Document
         /// </summary>
         public bool IsEmpty { get { return this.FirstLine == null && this.LastLine == null; } }
 
+        /// <summary>
+        /// 渲染该文档的Canvas
+        /// </summary>
+        public IDrawingCanvas Canvas { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -99,6 +104,7 @@ namespace XTerminal.Document
         public VTDocument(VTDocumentOptions options)
         {
             this.options = options;
+            this.Canvas = options.CanvasCreator.CreateCanvas();
 
             this.Cursor = new VTCursor()
             {
@@ -657,45 +663,6 @@ namespace XTerminal.Document
             if (this.ScrollMarginBottom != marginBottom)
             {
                 this.ScrollMarginBottom = marginBottom;
-            }
-        }
-
-        /// <summary>
-        /// 把所有的TextLine取消关联渲染模型
-        /// </summary>
-        /// <returns>返回被取消关联的渲染对象</returns>
-        public List<IDrawingObject> DetachAll()
-        {
-            List<IDrawingObject> drawables = new List<IDrawingObject>();
-
-            VTextLine current = this.FirstLine;
-
-            while (current != null)
-            {
-                drawables.Add(current.DrawingObject);
-
-                // 取消关联关系
-                current.DetachDrawing();
-
-                current = current.NextLine;
-            }
-
-            return drawables;
-        }
-
-        /// <summary>
-        /// 按顺序为每个VTextLine附加渲染对象
-        /// </summary>
-        /// <param name="drawables"></param>
-        public void AttachAll(List<IDrawingObject> drawables)
-        {
-            VTextLine current = this.FirstLine;
-
-            foreach (IDrawingObject drawable in drawables)
-            {
-                current.AttachDrawing(drawable);
-
-                current = current.NextLine;
             }
         }
 

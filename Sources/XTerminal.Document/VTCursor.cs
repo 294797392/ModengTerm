@@ -34,9 +34,11 @@ namespace XTerminal.Document
     /// <summary>
     /// 光标的数据模型
     /// </summary>
-    public class VTCursor : VTDocumentElement
+    public class VTCursor : VTDocumentElement, VTDocumentDrawable
     {
-        public override Drawables Type => Drawables.Cursor;
+        public Drawables Type => Drawables.Cursor;
+
+        public object DrawingContext { get; set; }
 
         /// <summary>
         /// 光标所在列

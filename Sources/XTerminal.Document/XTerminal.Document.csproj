@@ -55,10 +55,9 @@
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="Rendering\TextPointerPositions.cs" />
-    <Compile Include="Rendering\IDrawingObject.cs" />
     <Compile Include="Rendering\IDrawingCanvas.cs" />
     <Compile Include="Rendering\IDrawingCanvasPanel.cs" />
-    <Compile Include="VTDrawable.cs" />
+    <Compile Include="VTDocumentDrawable.cs" />
     <Compile Include="Rendering\ScrollOrientations.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />

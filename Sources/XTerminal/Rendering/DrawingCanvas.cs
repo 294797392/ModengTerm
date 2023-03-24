@@ -65,7 +65,7 @@ namespace XTerminal.Rendering
 
         #region 实例方法
 
-        private DrawingObject CreateDrawable(Drawables type)
+        private DrawingObject CreateDrawingObject(Drawables type)
         {
             switch (type)
             {
@@ -79,27 +79,11 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        #region IDocumentCanvas
+        #region IDrawingCanvas
 
         public void Initialize(DrawingCanvasOptions options)
         {
             this.options = options;
-        }
-
-        public List<IDrawingObject> RequestDrawable(Drawables type, int count)
-        {
-            List<IDrawingObject> drawables = new List<IDrawingObject>();
-
-            for (int i = 0; i < count; i++)
-            {
-                DrawingObject drawable = this.CreateDrawable(type);
-
-                drawables.Add(drawable);
-
-                this.visuals.Add(drawable);
-            }
-
-            return drawables;
         }
 
         public VTElementMetrics MeasureLine(ITextLine textLine, int maxCharacters)
@@ -142,22 +126,28 @@ namespace XTerminal.Rendering
             }
         }
 
-        public void DrawDrawable(IDrawingObject drawable)
+        public void DrawDrawable(VTDocumentDrawable drawable)
         {
-            DrawingObject drawingVisual = drawable as DrawingObject;
-            drawingVisual.Draw();
+            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            if (drawingObject == null)
+            {
+                drawingObject = this.CreateDrawingObject(drawable.Type);
+                drawable.DrawingContext = drawingObject;
+                this.visuals.Add(drawingObject);
+            }
+            drawingObject.Draw();
         }
 
-        public void UpdatePosition(IDrawingObject drawable, double offsetX, double offsetY)
+        public void UpdatePosition(VTDocumentDrawable drawable, double offsetX, double offsetY)
         {
-            DrawingObject drawingVisual = drawable as DrawingObject;
-            drawingVisual.Offset = new Vector(offsetX, offsetY);
+            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            drawingObject.Offset = new Vector(offsetX, offsetY);
         }
 
-        public void SetOpacity(IDrawingObject drawable, double opacity)
+        public void SetOpacity(VTDocumentDrawable drawable, double opacity)
         {
-            DrawingObject drawingVisual = drawable as DrawingObject;
-            drawingVisual.Opacity = opacity;
+            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            drawingObject.Opacity = opacity;
         }
 
         #endregion

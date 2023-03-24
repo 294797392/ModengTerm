@@ -249,7 +249,7 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        #region IDocumentCanvasPanel
+        #region IDrawingCanvasPanel
 
         public IDrawingCanvas CreateCanvas()
         {
@@ -260,6 +260,16 @@ namespace XTerminal.Rendering
         public void AddCanvas(IDrawingCanvas canvas)
         {
             this.Children.Add(canvas as DrawingCanvas);
+        }
+
+        public void SwitchCanvas(IDrawingCanvas remove, IDrawingCanvas add)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                int index = this.Children.IndexOf(remove as DrawingCanvas);
+                this.Children.RemoveAt(index);
+                this.Children.Insert(index, add as DrawingCanvas);
+            });
         }
 
         /// <summary>

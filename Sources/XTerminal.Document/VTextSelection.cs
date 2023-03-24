@@ -10,9 +10,11 @@ namespace XTerminal.Document
     /// <summary>
     /// 存储鼠标选中的文本信息
     /// </summary>
-    public class VTextSelection : VTDocumentElement
+    public class VTextSelection : VTDocumentElement, VTDocumentDrawable
     {
-        public override Drawables Type => Drawables.SelectionRange;
+        public object DrawingContext { get; set; }
+
+        public Drawables Type => Drawables.SelectionRange;
 
         /// <summary>
         /// 选中的文本范围

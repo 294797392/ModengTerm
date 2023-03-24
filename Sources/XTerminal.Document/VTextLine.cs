@@ -12,7 +12,7 @@ namespace XTerminal.Document
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
     /// </summary>
-    public class VTextLine : VTextElement, ITextLine
+    public class VTextLine : VTextElement, ITextLine, VTDocumentDrawable
     {
         private static readonly string BlankText = " ";
 
@@ -30,7 +30,9 @@ namespace XTerminal.Document
 
         public int ID { get; set; }
 
-        public override Drawables Type => Drawables.TextLine;
+        public Drawables Type => Drawables.TextLine;
+
+        public object DrawingContext { get; set; }
 
         /// <summary>
         /// 列大小
@@ -161,7 +163,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.DrawingObject.ID);
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
                 return;
             }
 
@@ -179,7 +181,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外, {0}", this.DrawingObject.ID);
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
                 return;
             }
 

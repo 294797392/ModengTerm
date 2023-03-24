@@ -137,7 +137,7 @@ namespace XTerminal
         /// <summary>
         /// 文档渲染器
         /// </summary>
-        public IDrawingCanvas Canvas { get; private set; }
+        public IDrawingCanvas Canvas { get { return this.activeDocument.Canvas; } }
 
         /// <summary>
         /// 文档画布容器
@@ -196,21 +196,13 @@ namespace XTerminal
 
             #endregion
 
-            #region 初始化渲染器
+            #region 初始化鼠标事件
 
             this.CanvasPanel.InputEvent += this.VideoTerminal_InputEvent;
             this.CanvasPanel.ScrollChanged += this.CanvasPanel_ScrollChanged;
             this.CanvasPanel.VTMouseDown += this.CanvasPanel_VTMouseDown;
             this.CanvasPanel.VTMouseMove += this.CanvasPanel_VTMouseMove;
             this.CanvasPanel.VTMouseUp += this.CanvasPanel_VTMouseUp;
-            DrawingCanvasOptions canvasOptions = new DrawingCanvasOptions()
-            {
-                Rows = initialOptions.TerminalOption.Rows
-            };
-            IDrawingCanvas characterCanvas = this.CanvasPanel.CreateCanvas();
-            characterCanvas.Initialize(canvasOptions);
-            this.CanvasPanel.AddCanvas(characterCanvas);
-            this.Canvas = characterCanvas;
 
             #endregion
 
@@ -222,7 +214,8 @@ namespace XTerminal
                 RowSize = initialOptions.TerminalOption.Rows,
                 DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode,
                 CursorStyle = initialOptions.CursorOption.Style,
-                Interval = initialOptions.CursorOption.Interval
+                Interval = initialOptions.CursorOption.Interval,
+                CanvasCreator = this.CanvasPanel
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
@@ -230,21 +223,11 @@ namespace XTerminal
             this.activeHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.activeHistoryLine;
 
-            // 初始化文档行数据模型和渲染模型的关联关系
-            List<IDrawingObject> drawableLines = this.Canvas.RequestDrawable(Drawables.TextLine, this.initialOptions.TerminalOption.Rows);
-            this.activeDocument.AttachAll(drawableLines);
-
-            // 初始化SelectionRange
-            IDrawingObject drawableSelection = this.Canvas.RequestDrawable(Drawables.SelectionRange, 1)[0];
-            this.textSelection.AttachDrawing(drawableSelection);
-
             #endregion
 
             #region 初始化光标
 
-            IDrawingObject drawableCursor = this.Canvas.RequestDrawable(Drawables.Cursor, 1)[0];
-            this.Cursor.AttachDrawing(drawableCursor);
-            this.Canvas.DrawDrawable(drawableCursor);
+            this.Canvas.DrawDrawable(this.Cursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
@@ -319,15 +302,6 @@ namespace XTerminal
 
                 while (next != null)
                 {
-                    // 首先获取当前行的DrawingObject
-                    IDrawingObject drawableLine = next.DrawingObject;
-                    if (drawableLine == null)
-                    {
-                        // 不应该发生
-                        logger.FatalFormat("没有空闲的drawableLine了");
-                        return;
-                    }
-
                     // 更新Y偏移量信息
                     next.OffsetY = offsetY;
 
@@ -335,14 +309,14 @@ namespace XTerminal
                     {
                         // 此时说明该行有字符变化，需要重绘
                         // 重绘的时候会也会UpdatePosition
-                        this.Canvas.DrawDrawable(drawableLine);
+                        this.Canvas.DrawDrawable(next);
                         next.SetDirty(false);
                     }
                     else
                     {
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
                         next.Metrics = this.Canvas.MeasureLine(next, 0);
-                        this.Canvas.UpdatePosition(drawableLine, next.OffsetX, next.OffsetY);
+                        this.Canvas.UpdatePosition(next, next.OffsetX, next.OffsetY);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -363,7 +337,7 @@ namespace XTerminal
 
                 this.Cursor.OffsetY = this.ActiveLine.OffsetY;
                 this.Cursor.OffsetX = this.Canvas.MeasureLine(this.ActiveLine, this.CursorCol).Width;
-                this.Canvas.UpdatePosition(this.Cursor.DrawingObject, this.Cursor.OffsetX, this.Cursor.OffsetY);
+                this.Canvas.UpdatePosition(this.Cursor, this.Cursor.OffsetX, this.Cursor.OffsetY);
 
                 #endregion
 
@@ -862,14 +836,13 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseAlternateScreenBuffer");
 
-                        List<IDrawingObject> drawables = this.mainDocument.DetachAll();
+                        IDrawingCanvas remove = this.mainDocument.Canvas;
+                        IDrawingCanvas add = this.alternateDocument.Canvas;
+                        this.CanvasPanel.SwitchCanvas(remove, add);
 
-                        // 切换ActiveDocument
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
                         this.alternateDocument.DeleteAll();
-                        this.alternateDocument.AttachAll(drawables);
-                        this.alternateDocument.Cursor.AttachDrawing(this.mainDocument.Cursor.DrawingObject);
                         this.activeDocument = this.alternateDocument;
                         break;
                     }
@@ -878,11 +851,12 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseMainScreenBuffer");
 
-                        List<IDrawingObject> drawables = this.alternateDocument.DetachAll();
+                        IDrawingCanvas remove = this.alternateDocument.Canvas;
+                        IDrawingCanvas add = this.mainDocument.Canvas;
+                        this.CanvasPanel.SwitchCanvas(remove, add);
 
-                        this.mainDocument.AttachAll(drawables);
                         this.mainDocument.DirtyAll();
-                        this.mainDocument.Cursor.AttachDrawing(this.alternateDocument.Cursor.DrawingObject);
+                        this.CanvasPanel.AddCanvas(this.mainDocument.Canvas);
                         this.activeDocument = this.mainDocument;
                         break;
                     }
@@ -1006,21 +980,13 @@ namespace XTerminal
 
                 cursor.IsVisible = !cursor.IsVisible;
 
-                IDrawingObject drawableCursor = cursor.DrawingObject;
-                if (drawableCursor == null)
-                {
-                    // 此时可能正在切换AlternateScreenBuffer
-                    Thread.Sleep(cursor.Interval);
-                    continue;
-                }
-
                 try
                 {
                     double opacity = cursor.IsVisible ? 1 : 0;
 
                     this.uiSyncContext.Send((state) =>
                     {
-                        this.Canvas.SetOpacity(drawableCursor, opacity);
+                        this.Canvas.SetOpacity(cursor, opacity);
                     }, null);
                 }
                 catch (Exception e)
@@ -1130,7 +1096,7 @@ namespace XTerminal
 
             this.uiSyncContext.Send((state) =>
             {
-                this.Canvas.DrawDrawable(this.textSelection.DrawingObject);
+                this.Canvas.DrawDrawable(this.textSelection);
             }, null);
         }
 

@@ -50,6 +50,13 @@ namespace XTerminal.Document.Rendering
         IDrawingCanvas CreateCanvas();
 
         /// <summary>
+        /// 切换Canvas
+        /// </summary>
+        /// <param name="remove">要移除的canvas</param>
+        /// <param name="add">要显示的canvas</param>
+        void SwitchCanvas(IDrawingCanvas remove, IDrawingCanvas add);
+
+        /// <summary>
         /// 把画布加到容器里
         /// </summary>
         /// <param name="canvas"></param>

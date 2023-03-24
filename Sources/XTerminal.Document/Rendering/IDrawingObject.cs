@@ -14,9 +14,9 @@ namespace XTerminal.Document.Rendering
     {
         string ID { get; }
 
-        /// <summary>
-        /// 存储要渲染的对象
-        /// </summary>
-        VTDrawable Drawable { get; set; }
+        ///// <summary>
+        ///// 存储要渲染的对象
+        ///// </summary>
+        //VTDrawable Drawable { get; set; }
     }
 }

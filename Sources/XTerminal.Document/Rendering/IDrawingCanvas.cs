@@ -18,14 +18,6 @@ namespace XTerminal.Document.Rendering
         void Initialize(DrawingCanvasOptions options);
 
         /// <summary>
-        /// 请求创建一个新的渲染对象
-        /// </summary>
-        /// <param name="type">渲染对象的类型</param>
-        /// <param name="num">请求的数量</param>
-        /// <returns></returns>
-        List<IDrawingObject> RequestDrawable(Drawables type, int num);
-
-        /// <summary>
         /// 测量某个渲染模型的大小
         /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
         /// </summary>
@@ -49,7 +41,7 @@ namespace XTerminal.Document.Rendering
         /// 排版是比较耗时的操作
         /// </summary>
         /// <param name="drawable"></param>
-        void DrawDrawable(IDrawingObject drawable);
+        void DrawDrawable(VTDocumentDrawable drawable);
 
         /// <summary>
         /// 更新元素的位置信息
@@ -60,13 +52,13 @@ namespace XTerminal.Document.Rendering
         /// <param name="drawable"></param>
         /// <param name="offsetX"></param>
         /// <param name="offsetY"></param>
-        void UpdatePosition(IDrawingObject drawable, double offsetX, double offsetY);
+        void UpdatePosition(VTDocumentDrawable drawable, double offsetX, double offsetY);
 
         /// <summary>
         /// 设置元素的透明度
         /// </summary>
         /// <param name="drawable"></param>
         /// <param name="opacity"></param>
-        void SetOpacity(IDrawingObject drawable, double opacity);
+        void SetOpacity(VTDocumentDrawable drawable, double opacity);
     }
 }

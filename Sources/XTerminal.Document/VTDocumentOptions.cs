@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
@@ -29,8 +30,13 @@ namespace XTerminal.Document
         public VTCursorStyles CursorStyle { get; set; }
 
         /// <summary>
-        /// 闪烁间隔时间
+        /// 光标闪烁间隔时间
         /// </summary>
         public int Interval { get; set; }
+
+        /// <summary>
+        /// 画布创建器
+        /// </summary>
+        public IDrawingCanvasPanel CanvasCreator { get; set; }
     }
 }
