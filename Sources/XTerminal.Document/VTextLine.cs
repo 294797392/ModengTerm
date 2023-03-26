@@ -9,7 +9,6 @@ using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
-
     /// <summary>
     /// 1. 对文本行进行排版，分块
     /// 2. 维护行的测量信息
@@ -408,20 +407,8 @@ namespace XTerminal.Document
         /// <param name="historyLine">要应用的历史行数据</param>
         public void SetHistory(VTHistoryLine historyLine)
         {
-            if (this.OwnerDocument.ActiveLine == this)
-            {
-                // 要把光标所在行显示历史行了，那么不能Clear，因为光标所在行和光标所在行对应的历史行里保存的VTCharacters对象引用是同一个
-                // Clear之后会导致光标所在行的数据被清空了的问题，因为此时activeHistoryLine还没有被冻结
-                // 重新创建一个集合，使ActiveLine和activeHistoryLine都指向它
-                List<VTCharacter> characters = new List<VTCharacter>(historyLine.Characters);
-                this.characters = characters;
-                historyLine.Characters = characters;
-            }
-            else
-            {
-                this.characters.Clear();
-                this.characters.AddRange(historyLine.Characters);
-            }
+            this.characters.Clear();
+            this.characters.AddRange(historyLine.Characters);
 
             this.SetRenderDirty(true);
         }

@@ -30,6 +30,7 @@ namespace XTerminal.Document.Rendering
 
         /// <summary>
         /// 鼠标移动的时候触发
+        /// 在鼠标移动出Panel外的时候，也会触发
         /// </summary>
         event Action<IDrawingCanvasPanel, VTPoint> VTMouseMove;
 
@@ -42,6 +43,12 @@ namespace XTerminal.Document.Rendering
         /// 鼠标抬起的时候触发
         /// </summary>
         event Action<IDrawingCanvasPanel, VTPoint> VTMouseUp;
+
+        /// <summary>
+        /// 获取Panel的相对于整个显示器屏幕的边界框
+        /// </summary>
+        /// <returns></returns>
+        VTRect GetBoundary();
 
         /// <summary>
         /// 创建一个画板
@@ -80,5 +87,11 @@ namespace XTerminal.Document.Rendering
         /// </summary>
         /// <param name="orientation">滚动的方向</param>
         void ScrollToEnd(ScrollOrientation orientation);
+
+        /// <summary>
+        /// 滚动到某个值
+        /// </summary>
+        /// <param name="scrollValue"></param>
+        void ScrollTo(int scrollValue);
     }
 }

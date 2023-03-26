@@ -211,6 +211,8 @@ namespace XTerminal.Rendering
 
             Point p = e.GetPosition(this);
             this.VTMouseDown(this, new VTPoint(p.X, p.Y));
+
+            this.CaptureMouse();
         }
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
@@ -227,6 +229,8 @@ namespace XTerminal.Rendering
 
             Point p = e.GetPosition(this);
             this.VTMouseUp(this, new VTPoint(p.X, p.Y));
+
+            this.ReleaseMouseCapture();
         }
 
 
@@ -250,6 +254,12 @@ namespace XTerminal.Rendering
         #endregion
 
         #region IDrawingCanvasPanel
+
+        public VTRect GetBoundary()
+        {
+            Point leftTop = this.PointToScreen(new Point(0, 0));
+            return new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
+        }
 
         public IDrawingCanvas CreateCanvas()
         {
@@ -310,6 +320,11 @@ namespace XTerminal.Rendering
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public void ScrollTo(int scrollValue)
+        {
+            this.Scrollbar.Value = scrollValue;
         }
 
         #endregion

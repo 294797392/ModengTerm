@@ -76,5 +76,10 @@ namespace XTerminal.Document
             this.Width = width;
             this.Height = height;
         }
+
+        public override string ToString()
+        {
+            return string.Format("x = {0}, y = {1}, width = {2}, height = {3}", this.LeftTop.X, this.LeftTop.Y, this.Width, this.Height);
+        }
     }
 }

@@ -94,6 +94,11 @@ namespace XTerminal
         /// </summary>
         private int currentScroll;
 
+        /// <summary>
+        /// 当鼠标按下的时候，记录Panel相对于屏幕的坐标
+        /// </summary>
+        private VTRect panelBounds;
+
         #endregion
 
         #region SelectionRange
@@ -157,13 +162,24 @@ namespace XTerminal
         public VTextOptions TextOptions { get; private set; }
 
         /// <summary>
-        /// 获取当前滚动条是否在最底部
+        /// 获取当前滚动条是否滚动到底了
         /// </summary>
-        public bool ScrollChanged
+        public bool ScrollAtBottom
         {
             get
             {
-                return this.currentScroll != this.scrollMax;
+                return this.currentScroll == this.scrollMax;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前滚动条是否滚动到顶了
+        /// </summary>
+        public bool ScrollAtTop
+        {
+            get
+            {
+                return this.currentScroll == 0;
             }
         }
 
@@ -368,14 +384,24 @@ namespace XTerminal
 
             }, null);
 
+            if (this.activeDocument == this.mainDocument)
+            {
+                if (this.ScrollAtBottom)
+                {
+                    // 滚动到底了，说明是ActiveLine就是当前正在输入的行
+                    // 更新下历史行的大小和文字，不然在执行光标选中的时候文本为空，会影响到测量
+                    this.activeHistoryLine.Freeze(this.ActiveLine);
+                }
+            }
+
             document.SetArrangeDirty(false);
         }
 
         /// <summary>
-        /// 滚动到滚动条上的某个值
+        /// 滚动到指定的历史记录
         /// </summary>
-        /// <param name="scrollValue"></param>
-        private void ScrollTo(int scrollValue)
+        /// <param name="scrollValue">要显示的第一行历史记录</param>
+        private void ScrollToHistory(int scrollValue)
         {
             this.currentScroll = scrollValue;
 
@@ -394,13 +420,9 @@ namespace XTerminal
             VTextLine currentTextLine = this.activeDocument.FirstLine;
             for (int i = 0; i < terminalRows; i++)
             {
-                // 直接使用VTHistoryLine的List<VTCharacter>的引用，因为冻结状态下的VTextLine不会再有修改了
-                if (this.ActiveLine == currentTextLine)
-                {
-                    // 如果要显示的历史行和光标所在行一致，那么不能Clear，因为光标所在行和光标所在行对应的历史行里保存的对象引用是同一个
-                    // Clear之后会导致ActiveLine的数据被清空了的问题
-                    // 重新创建一个集合，使ActiveLine和activeHistoryLine都指向它
-                }
+                // 直接使用VTHistoryLine的List<VTCharacter>的引用
+                // 冻结状态下的VTextLine不会再有修改了
+                // 非冻结状态(ActiveLine)需要重新创建一个集合
                 currentTextLine.SetHistory(currentHistory);
                 currentHistory = currentHistory.NextLine;
                 currentTextLine = currentTextLine.NextLine;
@@ -408,6 +430,41 @@ namespace XTerminal
 
             this.activeDocument.SetArrangeDirty(true);
             this.DrawDocument(this.activeDocument);
+        }
+
+        /// <summary>
+        /// 当光标在容器外面的时候，进行滚动
+        /// </summary>
+        private void ScrollIfCursorOutsidePanel(VTPoint cursorPos, VTRect panelBounds)
+        {
+            int scrollTarget = -1;
+
+            if (cursorPos.Y < 0)
+            {
+                // 光标在容器上面
+                if (!this.ScrollAtTop)
+                {
+                    // 不在最上面，往上滚动一行
+                    scrollTarget = this.currentScroll - 1;
+                }
+            }
+            else if (cursorPos.Y > panelBounds.Height)
+            {
+                // 光标在容器下面
+                if (!this.ScrollAtBottom)
+                {
+                    scrollTarget = this.currentScroll + 1;
+                }
+            }
+
+            if (scrollTarget != -1)
+            {
+                this.ScrollToHistory(scrollTarget);
+                this.uiSyncContext.Send((state) =>
+                {
+                    this.CanvasPanel.ScrollTo(scrollTarget);
+                }, null);
+            }
         }
 
         /// <summary>
@@ -629,9 +686,9 @@ namespace XTerminal
                         if (this.activeDocument == this.mainDocument)
                         {
                             // 如果滚动条不在最底部，那么先把滚动条滚动到底
-                            if (this.ScrollChanged)
+                            if (!this.ScrollAtBottom)
                             {
-                                this.ScrollTo(this.scrollMax);
+                                this.ScrollToHistory(this.scrollMax);
                             }
                         }
 
@@ -655,6 +712,8 @@ namespace XTerminal
                             this.activeHistoryLine.Freeze(this.ActiveLine.PreviousLine);
 
                             // 再创建最新行的历史行
+                            // 先测量下最新的行，确保有高度
+                            this.Canvas.MeasureLine(this.ActiveLine);
                             int historyIndex = this.activeHistoryLine.Row + 1;
                             VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.activeHistoryLine, this.ActiveLine);
                             this.historyLines[historyIndex] = historyLine;
@@ -1065,7 +1124,7 @@ namespace XTerminal
         /// <param name="scrollValue">滚动到的行数</param>
         private void CanvasPanel_ScrollChanged(IDrawingCanvasPanel arg1, int scrollValue)
         {
-            this.ScrollTo(scrollValue);
+            this.ScrollToHistory(scrollValue);
         }
 
         private void CanvasPanel_VTMouseUp(IDrawingCanvasPanel arg1, VTPoint cursorPos)
@@ -1081,6 +1140,9 @@ namespace XTerminal
             {
                 return;
             }
+
+            // 首先检测鼠标是否在容器边界框的外面
+            this.ScrollIfCursorOutsidePanel(cursorPos, this.panelBounds);
 
             // 整理思路是算出来StartTextPointer和EndTextPointer之间的几何图形
             // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
@@ -1104,8 +1166,6 @@ namespace XTerminal
                 return;
             }
 
-
-
             #region 鼠标移动后悬浮在相同的字符上没变化，不用操作
 
             if (startPointer.IsCharacterHit && endPointer.IsCharacterHit)
@@ -1115,8 +1175,6 @@ namespace XTerminal
                     return;
                 }
             }
-
-
 
             #endregion
 
@@ -1177,10 +1235,11 @@ namespace XTerminal
             }, null);
         }
 
-        private void CanvasPanel_VTMouseDown(IDrawingCanvasPanel arg1, VTPoint cursorPos)
+        private void CanvasPanel_VTMouseDown(IDrawingCanvasPanel canvasPanel, VTPoint cursorPos)
         {
             this.isCursorDown = true;
             this.cursorDownPos = cursorPos;
+            this.panelBounds = canvasPanel.GetBoundary();
 
             // 得到startPos对应的VTextLine
             this.GetTextPointer(cursorPos, this.textSelection.Start);

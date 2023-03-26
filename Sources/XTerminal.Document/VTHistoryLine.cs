@@ -86,9 +86,7 @@ namespace XTerminal.Document
             VTHistoryLine historyLine = new VTHistoryLine()
             {
                 Row = row,
-                PreviousLine = previousLine,
-                // 使用sourceLine的字符列表引用，这样就不用实时更新VTHistoryLine的字符列表了
-                Characters = sourceLine.Characters
+                PreviousLine = previousLine
             };
 
             if (previousLine != null)
