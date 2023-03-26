@@ -90,7 +90,7 @@ namespace XTerminal.Rendering
             return drawingObject;
         }
 
-        private FormattedText CreateFormattedText(string text, List<VTextAttribute> attributes)
+        private FormattedText CreateFormattedText(string text, IEnumerable<VTCharacter> characters)
         {
             Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
@@ -110,7 +110,7 @@ namespace XTerminal.Rendering
         {
             string text = textLine.Text;
 
-            FormattedText formattedText = this.CreateFormattedText(text, textLine.Attributes);
+            FormattedText formattedText = this.CreateFormattedText(text, textLine.Characters);
 
             textLine.Metrics.Height = formattedText.Height;
             textLine.Metrics.Width = formattedText.WidthIncludingTrailingWhitespace;
@@ -133,7 +133,7 @@ namespace XTerminal.Rendering
                 text = text.Substring(0, maxCharacters);
             }
 
-            FormattedText formattedText = this.CreateFormattedText(text, textLine.Attributes);
+            FormattedText formattedText = this.CreateFormattedText(text, textLine.Characters);
 
             return new VTSize(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
         }
@@ -146,7 +146,7 @@ namespace XTerminal.Rendering
             {
                 // 第一个字符，返回第一个字符的左边
                 string textToMeasure = text.Substring(0, 1);
-                FormattedText formattedText = this.CreateFormattedText(textToMeasure, textLine.Attributes);
+                FormattedText formattedText = this.CreateFormattedText(textToMeasure, textLine.Characters);
                 return new VTRect(0, 0, formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
             }
             else
@@ -154,8 +154,8 @@ namespace XTerminal.Rendering
                 // 其他字符，返回前一个字符的右边
                 string textToMeasure1 = text.Substring(0, characterIndex);
                 string textToMeasure2 = text.Substring(characterIndex, 1);
-                FormattedText formattedText1 = this.CreateFormattedText(textToMeasure1, textLine.Attributes);
-                FormattedText formattedText2 = this.CreateFormattedText(textToMeasure2, textLine.Attributes);
+                FormattedText formattedText1 = this.CreateFormattedText(textToMeasure1, textLine.Characters);
+                FormattedText formattedText2 = this.CreateFormattedText(textToMeasure2, textLine.Characters);
                 return new VTRect(formattedText1.WidthIncludingTrailingWhitespace, 0, formattedText2.WidthIncludingTrailingWhitespace, formattedText2.Height);
             }
         }

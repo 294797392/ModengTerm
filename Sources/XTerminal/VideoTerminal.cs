@@ -314,6 +314,7 @@ namespace XTerminal
             double offsetY = 0;
 
             bool arrangeDirty = document.IsArrangeDirty;
+            bool activeLineDirty = this.ActiveLine.IsRenderDirty;
 
             this.uiSyncContext.Send((state) =>
             {
@@ -368,16 +369,6 @@ namespace XTerminal
             }, null);
 
             document.SetArrangeDirty(false);
-
-            // 如果当前滚动条滚动到底了，那么可以更新最新历史行的数据
-            if (this.activeDocument == this.mainDocument)
-            {
-                if (!this.ScrollChanged)
-                {
-                    // 滚动到底的话，ActiveLine就是最后一行
-                    this.activeHistoryLine.Update(this.ActiveLine);
-                }
-            }
         }
 
         /// <summary>
@@ -403,6 +394,13 @@ namespace XTerminal
             VTextLine currentTextLine = this.activeDocument.FirstLine;
             for (int i = 0; i < terminalRows; i++)
             {
+                // 直接使用VTHistoryLine的List<VTCharacter>的引用，因为冻结状态下的VTextLine不会再有修改了
+                if (this.ActiveLine == currentTextLine)
+                {
+                    // 如果要显示的历史行和光标所在行一致，那么不能Clear，因为光标所在行和光标所在行对应的历史行里保存的对象引用是同一个
+                    // Clear之后会导致ActiveLine的数据被清空了的问题
+                    // 重新创建一个集合，使ActiveLine和activeHistoryLine都指向它
+                }
                 currentTextLine.SetHistory(currentHistory);
                 currentHistory = currentHistory.NextLine;
                 currentTextLine = currentTextLine.NextLine;
@@ -647,15 +645,14 @@ namespace XTerminal
                         // 只记录MainScrrenBuffer里的行，AlternateScrrenBuffer里的行不记录。AlternateScreenBuffer是用来给man，vim等程序使用的
                         if (this.activeDocument == this.mainDocument)
                         {
-                            // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里更新一下换行之前的历史行的数据
-
+                            // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里冻结一下换行之前的历史行的数据，冻结之后，该历史行的数据就不会再更改了
                             // 有几种特殊情况：
                             // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
                             if (this.ActiveLine.PreviousLine.IsMeasureDirety)
                             {
                                 this.Canvas.MeasureLine(this.ActiveLine.PreviousLine);
                             }
-                            this.activeHistoryLine.Update(this.ActiveLine.PreviousLine);
+                            this.activeHistoryLine.Freeze(this.ActiveLine.PreviousLine);
 
                             // 再创建最新行的历史行
                             int historyIndex = this.activeHistoryLine.Row + 1;
@@ -663,6 +660,7 @@ namespace XTerminal
                             this.historyLines[historyIndex] = historyLine;
                             this.activeHistoryLine = historyLine;
 
+                            // 滚动条滚动到底
                             int terminalRows = this.initialOptions.TerminalOption.Rows;
                             int scrollMax = historyIndex - terminalRows + 1;
                             if (scrollMax > 0)

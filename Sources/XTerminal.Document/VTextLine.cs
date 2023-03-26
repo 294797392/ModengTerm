@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +16,6 @@ namespace XTerminal.Document
     /// </summary>
     public class VTextLine : VTextElement
     {
-        private static readonly string BlankText = " ";
-
         #region 实例变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTextLine");
@@ -72,11 +71,6 @@ namespace XTerminal.Document
         public bool CursorAtRightMargin { get; private set; }
 
         /// <summary>
-        /// 文本特性列表
-        /// </summary>
-        public List<VTextAttribute> Attributes { get; private set; }
-
-        /// <summary>
         /// 获取该行的文本，如果字符数量是0，那么返回一个空白字符，目的是可以测量出来文本的测量信息
         /// </summary>
         public string Text
@@ -84,9 +78,14 @@ namespace XTerminal.Document
             get
             {
                 string text = this.GetText();
-                return text.Length == 0 ? BlankText : text;
+                return text.Length == 0 ? " " : text;
             }
         }
+
+        /// <summary>
+        /// 获取该行字符的只读集合
+        /// </summary>
+        public IEnumerable<VTCharacter> Characters { get { return this.characters; } }
 
         #endregion
 
@@ -99,7 +98,6 @@ namespace XTerminal.Document
         public VTextLine(VTDocument owner) : base(owner)
         {
             this.ColumnSize = owner.ColumnSize;
-            this.Attributes = new List<VTextAttribute>();
             this.characters = new List<VTCharacter>();
         }
 
@@ -410,10 +408,20 @@ namespace XTerminal.Document
         /// <param name="historyLine">要应用的历史行数据</param>
         public void SetHistory(VTHistoryLine historyLine)
         {
-            this.Attributes.Clear();
-            this.Attributes.AddRange(historyLine.Attributes);
-
-            //this.TextSource.SetText(historyLine.Text);
+            if (this.OwnerDocument.ActiveLine == this)
+            {
+                // 要把光标所在行显示历史行了，那么不能Clear，因为光标所在行和光标所在行对应的历史行里保存的VTCharacters对象引用是同一个
+                // Clear之后会导致光标所在行的数据被清空了的问题，因为此时activeHistoryLine还没有被冻结
+                // 重新创建一个集合，使ActiveLine和activeHistoryLine都指向它
+                List<VTCharacter> characters = new List<VTCharacter>(historyLine.Characters);
+                this.characters = characters;
+                historyLine.Characters = characters;
+            }
+            else
+            {
+                this.characters.Clear();
+                this.characters.AddRange(historyLine.Characters);
+            }
 
             this.SetRenderDirty(true);
         }
