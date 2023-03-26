@@ -179,6 +179,12 @@ namespace XTerminal.Rendering
             drawingObject.Opacity = opacity;
         }
 
+        public VTRect GetRectRelativeToDesktop()
+        {
+            Point leftTop = this.PointToScreen(new Point(0, 0));
+            return new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
+        }
+
         #endregion
     }
 }

@@ -68,5 +68,11 @@ namespace XTerminal.Document.Rendering
         /// <param name="drawable"></param>
         /// <param name="opacity"></param>
         void SetOpacity(VTDocumentElement drawable, double opacity);
+
+        /// <summary>
+        /// 获取相对于整个显示器屏幕的Canvas边界框
+        /// </summary>
+        /// <returns></returns>
+        VTRect GetRectRelativeToDesktop();
     }
 }

@@ -45,12 +45,6 @@ namespace XTerminal.Document.Rendering
         event Action<IDrawingCanvasPanel, VTPoint> VTMouseUp;
 
         /// <summary>
-        /// 获取Panel的相对于整个显示器屏幕的边界框
-        /// </summary>
-        /// <returns></returns>
-        VTRect GetBoundary();
-
-        /// <summary>
         /// 创建一个画板
         /// </summary>
         /// <returns></returns>
