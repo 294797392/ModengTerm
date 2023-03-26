@@ -45,8 +45,32 @@ https://vt100.net/emu/dec_ansi_parser
 | :--- | ----|------|
 | vim  | 打开|      |
 | vim  | PageUp/PageDown ||
+| vim  | 输入3个中文字符 |Print:你, cursorRow = 0, cursorCol = 4<br/>Print:你, cursorRow = 0, cursorCol = 6<br/>Print:你, cursorRow = 0, cursorCol = 8|
+| vim  | 按二次Backspace删除中文字符 |CUP_CursorPosition, row = 0, col = 8<br/>EL_EraseLine, eraseType = ToEnd, cursorRow = 0, cursorCol = 8<br/>CUP_CursorPosition, row = 0, col = 6,EL_EraseLine, eraseType = ToEnd, cursorRow = 0, cursorCol = 6|
+| shell  | 输入3个中文字符 |Print:你, cursorRow = 23, cursorCol = 31<br/>Print:你, cursorRow = 23, cursorCol = 32<br/>Print:你, cursorRow = 23, cursorCol = 33|
+| shell  | 按一次Backspace删除中文字符 |CursorBackward, cursorRow = 23, cursorCol = 33<br/>CursorBackward, cursorRow = 23, cursorCol = 32<br/>EL_EraseLine, eraseType = ToEnd, cursorRow = 23, cursorCol = 32|
 | man | 打开| |
 | man | PageUp/PageDown ||
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

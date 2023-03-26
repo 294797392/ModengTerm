@@ -171,7 +171,7 @@ namespace XTerminal.Base
 
         private static readonly Dictionary<VTKeys, byte[]> KeypadApplicationMode = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.Space, new byte[] { ASCIITable.ESC, (byte)'O', (byte)' ' } }, { VTKeys.Tab, new byte[] { (byte)'\t' } }, { VTKeys.Enter, new byte[] { (byte)'\r' } },
+            { VTKeys.Space, new byte[] { (byte)' ' } }, { VTKeys.Tab, new byte[] { (byte)'\t' } }, { VTKeys.Enter, new byte[] { (byte)'\r' } },
 
             { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'1' } },
             { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'s' } },

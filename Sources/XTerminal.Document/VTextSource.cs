@@ -6,6 +6,19 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document
 {
+    public enum VTCharOptions
+    {
+        /// <summary>
+        /// 单字节字符
+        /// </summary>
+        SingleBytesChar,
+
+        /// <summary>
+        /// 多字节字符
+        /// </summary>
+        MulitBytesChar
+    }
+
     public enum VTextSources
     {
         StringTextSource,
@@ -19,7 +32,7 @@ namespace XTerminal.Document
             switch (type)
             {
                 case VTextSources.CharactersTextSource: return new VTCharactersTextSource();
-                case VTextSources.StringTextSource: return new VTStringTextSource();
+                //case VTextSources.StringTextSource: return new VTStringTextSource();
                 default:
                     throw new NotImplementedException();
             }
@@ -40,7 +53,7 @@ namespace XTerminal.Document
         /// 获取该行字符所占用的总列数
         /// 如果是宽字符的话（比如中文），那么一个字符占用两列
         /// </summary>
-        public abstract int Columns { get; }
+        public abstract int Columns { get; protected set; }
 
         #endregion
 
@@ -114,73 +127,93 @@ namespace XTerminal.Document
         #endregion
     }
 
-    public class VTStringTextSource : VTextSource
-    {
-        private string text = string.Empty;
+    //public class VTStringTextSource : VTextSource
+    //{
+    //    private string text = string.Empty;
 
-        public VTStringTextSource() 
-        {
-        }
+    //    public VTStringTextSource() 
+    //    {
+    //    }
 
-        public override int Columns => this.text.Length;
+    //    public override int Columns => this.text.Length;
 
-        public override void DeleteAll()
-        {
-            this.text = string.Empty;
-        }
+    //    public override void DeleteAll()
+    //    {
+    //        this.text = string.Empty;
+    //    }
 
-        public override string GetText()
-        {
-            return this.text;
-        }
+    //    public override string GetText()
+    //    {
+    //        return this.text;
+    //    }
 
-        public override void Insert(int column, char ch)
-        {
-            this.text = this.text.Insert(column, char.ToString(ch));
-        }
+    //    public override void Insert(int column, char ch)
+    //    {
+    //        this.text = this.text.Insert(column, char.ToString(ch));
+    //    }
 
-        public override void AddCharacter(char addChar)
-        {
-            this.text = (this.text += char.ToString(addChar));
-        }
+    //    public override void AddCharacter(char addChar)
+    //    {
+    //        this.text = (this.text += char.ToString(addChar));
+    //    }
 
-        public override void Remove(int column)
-        {
-            this.text = this.text.Remove(column);
-        }
+    //    public override void Remove(int column)
+    //    {
+    //        this.text = this.text.Remove(column);
+    //    }
 
-        public override void Remove(int column, int count)
-        {
-            this.text = this.text.Remove(count, count);
-        }
+    //    public override void Remove(int column, int count)
+    //    {
+    //        this.text = this.text.Remove(count, count);
+    //    }
 
-        public override void SetCharacter(int column, char setChar)
-        {
-            this.text = this.text.Remove(column, 1).Insert(column, char.ToString(setChar));
-        }
+    //    public override void SetCharacter(int column, char setChar)
+    //    {
+    //        this.text = this.text.Remove(column, 1).Insert(column, char.ToString(setChar));
+    //    }
 
-        public override void SetText(string text)
-        {
-            this.text = text;
-        }
-    }
+    //    public override void SetText(string text)
+    //    {
+    //        this.text = text;
+    //    }
+    //}
 
     public class VTCharactersTextSource : VTextSource
     {
+        #region 实例变量
+
         private List<VTCharacter> characters;
 
-        public override int Columns => this.characters.Count;
+        #endregion
+
+        #region 属性
+
+        public override int Columns { get; protected set; }
+
+        #endregion
+
+        #region 构造方法
 
         public VTCharactersTextSource() 
         {
             this.characters = new List<VTCharacter>();
         }
 
+        #endregion
+
         #region 实例方法
 
         private VTCharacter CreateCharacter(char ch)
         {
             return new VTCharacter(ch);
+        }
+
+        /// <summary>
+        /// 更新文本源所占用的列数
+        /// </summary>
+        private void UpdateColumns()
+        {
+            this.Columns = this.characters.Sum(v => v.Columns);
         }
 
         #endregion
@@ -190,6 +223,7 @@ namespace XTerminal.Document
         public override void DeleteAll()
         {
             this.characters.Clear();
+            this.Columns = 0;
         }
 
         public override string GetText()

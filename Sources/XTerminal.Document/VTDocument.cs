@@ -347,16 +347,16 @@ namespace XTerminal.Document
         /// <param name="ch"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
-        public void PrintCharacter(VTextLine textLine, char ch, int col)
+        public void PrintCharacter(VTextLine textLine, VTCharacter character, int column)
         {
-            textLine.PrintCharacter(ch, col);
+            textLine.PrintCharacter(character, column);
         }
 
         /// <summary>
         /// 在当前光标所在行开始删除字符操作
         /// </summary>
         /// <param name="textLine">要执行删除操作的行</param>
-        /// <param name="column">光标所在列</param>
+        /// <param name="column">要删除的起始列，该列也需要删除</param>
         /// <param name="eraseType">删除类型</param>
         public void EraseLine(VTextLine textLine, int column, EraseType eraseType)
         {
@@ -403,14 +403,13 @@ namespace XTerminal.Document
                         }
 
                         // 先删第一行
-                        textLine.Replace(column, ' ');
+                        textLine.Erase(column);
 
-                        // 这里有可能会出现性能问题，因为删除的不是可视区域的行，而是整个VTDocument的行！
-
+                        // 再删剩下的行
                         VTextLine next = textLine.NextLine;
                         while (next != null)
                         {
-                            next.ReplaceAll(' ');
+                            next.Erase(0);
 
                             next = next.NextLine;
                         }
@@ -427,12 +426,12 @@ namespace XTerminal.Document
                             return;
                         }
 
-                        textLine.Replace(0, column, ' ');
+                        textLine.Erase(0);
 
                         VTextLine next = this.FirstLine;
                         while (next != null && next != textLine)
                         {
-                            next.Replace(0, ' ');
+                            next.EraseAll();
 
                             next = next.NextLine;
                         }
@@ -447,7 +446,7 @@ namespace XTerminal.Document
                         VTextLine next = this.FirstLine;
                         while (next != null)
                         {
-                            next.ReplaceAll(' ');
+                            next.EraseAll();
 
                             next = next.NextLine;
                         }
