@@ -324,7 +324,11 @@ namespace XTerminal
         /// 如果不需要布局，那么就看是否需要重绘某些文本行
         /// </summary>
         /// <param name="document">要渲染的文档</param>
-        private void DrawDocument(VTDocument document)
+        /// <param name="scrollValue">
+        /// 是否要移动滚动条，设置为-1表示不移动滚动条
+        /// 注意这里只是更新UI上的滚动条位置，并不会实际的去滚动
+        /// </param>
+        private void DrawDocument(VTDocument document, int scrollValue = -1)
         {
             // 当前行的Y方向偏移量
             double offsetY = 0;
@@ -382,6 +386,15 @@ namespace XTerminal
 
                 #endregion
 
+                #region 移动滚动条
+
+                if (scrollValue != -1)
+                {
+                    this.CanvasPanel.ScrollTo(scrollValue);
+                }
+
+                #endregion
+
             }, null);
 
             if (this.activeDocument == this.mainDocument)
@@ -399,6 +412,7 @@ namespace XTerminal
 
         /// <summary>
         /// 滚动到指定的历史记录
+        /// 并更新UI上的滚动条位置
         /// </summary>
         /// <param name="scrollValue">要显示的第一行历史记录</param>
         private void ScrollToHistory(int scrollValue)
@@ -429,7 +443,7 @@ namespace XTerminal
             }
 
             this.activeDocument.SetArrangeDirty(true);
-            this.DrawDocument(this.activeDocument);
+            this.DrawDocument(this.activeDocument, scrollValue);
         }
 
         /// <summary>
@@ -460,10 +474,6 @@ namespace XTerminal
             if (scrollTarget != -1)
             {
                 this.ScrollToHistory(scrollTarget);
-                this.uiSyncContext.Send((state) =>
-                {
-                    this.CanvasPanel.ScrollTo(scrollTarget);
-                }, null);
             }
         }
 
