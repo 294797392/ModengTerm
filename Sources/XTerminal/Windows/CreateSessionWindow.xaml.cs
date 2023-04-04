@@ -11,6 +11,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WPFToolkit.MVVM;
+using XTerminal.Base;
+using XTerminal.Base.Definitions;
 
 namespace VideoTerminal.Windows
 {
@@ -19,9 +22,38 @@ namespace VideoTerminal.Windows
     /// </summary>
     public partial class CreateSessionWindow : Window
     {
+        private enum PageTypeEnum
+        {
+            SessionList,
+            UpdateProperties
+        }
+
+        #region 实例变量
+
+        private BindableCollection<SessionDefinition> sessionList;
+
+        #endregion
+
+        #region 构造方法
+
         public CreateSessionWindow()
         {
             InitializeComponent();
+
+            this.InitializeWindow();
         }
+
+        #endregion
+
+        #region 实例方法
+
+        private void InitializeWindow()
+        {
+            this.sessionList = new BindableCollection<SessionDefinition>();
+            this.sessionList.AddRange(XTermApp.Context.ServiceAgent.GetSessionDefinitions());
+            ListBoxSessionList.DataContext = this.sessionList;
+        }
+
+        #endregion
     }
 }

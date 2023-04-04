@@ -9,14 +9,14 @@ using XTerminal.Base.Definitions;
 
 namespace VideoTerminal.ViewModels
 {
-    public class StartupWindowVM : ViewModelBase
+    public class CreateSessionVM : ViewModelBase
     {
         /// <summary>
         /// 所有可创建的会话列表
         /// </summary>
         public BindableCollection<SessionDefinition> SessionList { get; private set; }
 
-        public StartupWindowVM()
+        public CreateSessionVM()
         {
             this.Initialize();
         }

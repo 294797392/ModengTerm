@@ -4,9 +4,44 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VideoTerminal.Windows"
+        xmlns:usercontrols="clr-namespace:VideoTerminal.UserControls"
+        xmlns:viewmodels="clr-namespace:VideoTerminal.ViewModels"
         mc:Ignorable="d"
         Title="CreateSessionWindow" Height="450" Width="800">
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1">
+            <Grid x:Name="GridSessionList">
+                <ListBox x:Name="ListBoxSessionList" ItemsSource="{Binding}" 
+                         SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <Grid x:Name="GridUpdateProperties" Visibility="Collapsed">
+                <usercontrols:UpdatePropertiesUserControl/>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="上一页"/>
+            <Button Grid.Column="1" Content="下一页"/>
+        </Grid>
 
     </Grid>
 </Window>
