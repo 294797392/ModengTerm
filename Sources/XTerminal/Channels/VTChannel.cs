@@ -68,36 +68,30 @@ namespace XTerminal.Channels
 
         #region 公开接口
 
-        public abstract bool Connect();
+        public int Initialize()
+        {
+            return this.OnInitialize();
+        }
 
-        public abstract bool Disconnect();
+        public void Release()
+        {
+            this.OnRelease();
+        }
 
-        /// <summary>
-        /// 从Socket中读取一段数据
-        /// </summary>
-        /// <param name="bytes">保存读取的数据的缓冲区</param>
-        /// <returns>读取的数据长度</returns>
-        public abstract int Read(byte[] bytes);
+        public abstract int Connect();
 
-        /// <summary>
-        /// 从Socket中读取一个字节的数据
-        /// </summary>
-        /// <returns></returns>
-        public abstract byte Read();
-
-        /// <summary>
-        /// 向Socket写入一个字节的数据
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public abstract bool Write(byte data);
+        public abstract void Disconnect();
 
         /// <summary>
         /// 向Socket里写入一段数据
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public abstract bool Write(byte[] data);
+        public abstract int Write(byte[] data);
+
+        protected abstract int OnInitialize();
+
+        protected abstract void OnRelease();
 
         #endregion
 

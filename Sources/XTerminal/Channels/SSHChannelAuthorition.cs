@@ -19,12 +19,6 @@ namespace XTerminal.Channels
 
         public int ServerPort { get; set; }
 
-        public string TerminalName { get; set; }
-
-        public uint TerminalColumns { get; set; }
-
-        public uint TerminalRows { get; set; }
-
         public SSHChannelAuthorition()
         {
             //this.TerminalColumns = DefaultValues.TerminalColumns;

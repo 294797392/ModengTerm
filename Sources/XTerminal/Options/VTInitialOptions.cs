@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Base.Enumerations;
 using XTerminal.Channels;
 using XTerminal.Document;
 
@@ -38,7 +39,7 @@ namespace VideoTerminal.Options
 
             TerminalOption = new TerminalOptions()
             {
-                Type = TerminalTypes.XTerm,
+                Type = TerminalTypeEnum.XTerm,
                 Columns = 80,
                 Rows = 24,
                 DECPrivateAutoWrapMode = false,

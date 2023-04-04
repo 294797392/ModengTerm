@@ -3,17 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Base.Enumerations;
 
 namespace VideoTerminal.Options
 {
-    public enum TerminalTypes
-    {
-        VT100,
-        VT220,
-        XTerm,
-        XTerm256Color
-    }
-
     /// <summary>
     /// 保存终端的配置信息
     /// </summary>
@@ -22,7 +15,7 @@ namespace VideoTerminal.Options
         /// <summary>
         /// 终端类型
         /// </summary>
-        public TerminalTypes Type { get; set; }
+        public TerminalTypeEnum Type { get; set; }
 
         /// <summary>
         /// 终端的列数

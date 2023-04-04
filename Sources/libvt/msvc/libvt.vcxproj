@@ -94,6 +94,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)../.../../Dependence/libssh2/lib/x86;$(SolutionDir)../.../../Dependence/libY/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libssh2.lib;libY.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,10 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\source\vtbase.h" />
+    <ClInclude Include="..\source\vt.h" />
+    <ClInclude Include="..\source\vtglobal.h" />
     <ClInclude Include="..\source\vtssh.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\main.c" />
+    <ClCompile Include="..\source\vtglobal.c" />
     <ClCompile Include="..\source\vtssh.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

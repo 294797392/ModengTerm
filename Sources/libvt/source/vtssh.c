@@ -1,12 +1,3 @@
-/***********************************************************************************
- * @ file    : vtssh.h
- * @ author  : oheiheiheiheihei
- * @ version : 0.9
- * @ date    : 2023.04.03 19:10
- * @ brief   : 封装不同平台通用的ssh客户端
- * 代码参考自：https://www.libssh2.org/examples/direct_tcpip.html
- ************************************************************************************/
-
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -44,119 +35,60 @@ struct vtssh
 	vtssh_options *options;
 	VTSOCK sock;
 	vtssh_status_enum status;
+	int notify;
 	LIBSSH2_SESSION *session;
+	LIBSSH2_CHANNEL *channel;
+	Ythread *ssh_thread;
 };
 
 static void ssh_thread_proc(void *userdata)
 {
 	vtssh *ssh = (vtssh *)userdata;
 	vtssh_options *options = ssh->options;
-	VTSOCK sock = ssh->sock;
-	LIBSSH2_SESSION *session = ssh->session;
-	fd_set fds;
-	struct timeval tv;
-	ssize_t len, wr;
-	char buf[16384];
-	const char *shost;
-	unsigned int sport;
-	int rc = 0;
+	LIBSSH2_CHANNEL *channel = ssh->channel;
+	char buffer[8192] = { '\0' };
 
 	while(ssh->status == VTSSH_STATUS_CONNECTED)
 	{
-		FD_ZERO(&fds);
-		FD_SET(sock, &fds);
-		tv.tv_sec = 0;
-		tv.tv_usec = 100000;
-		rc = select(sock + 1, &fds, NULL, NULL, &tv);
-		if(-1 == rc) {
-			YLOGE("select failed, %s", strerror(errno));
+		int rc = libssh2_channel_read(channel, buffer, sizeof(buffer));
+		if(rc < 0)
+		{
+			// 读取失败，断开连接
 			ssh->status = VTSSH_STATUS_DISCONNECTED;
+			YLOGE("libssh2_channel_read failed, %d", rc);
+			if(ssh->notify)
+			{
+				options->on_status_changed(ssh, ssh->status);
+			}
 			break;
 		}
-		if(rc && FD_ISSET(sock, &fds)) {
-			len = recv(sock, buf, sizeof(buf), 0);
-			if(len < 0) {
-				YLOGE("read failed, %s", strerror(errno));
-				ssh->status = VTSSH_STATUS_DISCONNECTED;
-				break;
-			}
-			else if(0 == len) {
-				ssh->status = VTSSH_STATUS_DISCONNECTED;
-				YLOGE("The client at %s:%d disconnected!", shost, sport);
-				break;
-			}
-			wr = 0;
-			while(wr < len) {
-				i = libssh2_channel_write(channel, buf + wr, len - wr);
-
-				if(LIBSSH2_ERROR_EAGAIN == i) {
-					continue;
-				}
-				if(i < 0) {
-					fprintf(stderr, "libssh2_channel_write: %d\n", i);
-					goto shutdown;
-				}
-				wr += i;
-			}
+		else if(rc == 0)
+		{
+			// 继续读
+			continue;
 		}
-		while(1) {
-			len = libssh2_channel_read(channel, buf, sizeof(buf));
-
-			if(LIBSSH2_ERROR_EAGAIN == len)
-				break;
-			else if(len < 0) {
-				fprintf(stderr, "libssh2_channel_read: %d", (int)len);
-				goto shutdown;
-			}
-			wr = 0;
-			while(wr < len) {
-				i = send(forwardsock, buf + wr, len - wr, 0);
-				if(i <= 0) {
-					perror("write");
-					goto shutdown;
-				}
-				wr += i;
-			}
-			if(libssh2_channel_eof(channel)) {
-
-				fprintf(stderr, "The server at %s:%d disconnected!\n",
-					remote_desthost, remote_destport);
-				goto shutdown;
-			}
+		else
+		{
+			// 读到了一些数据
+			options->on_data_received(ssh, buffer, rc);
 		}
 	}
 }
 
-
-int vtssh_create(vtssh **_ssh, vtssh_options *ssh_options)
-{
-	vtssh *ssh = (vtssh *)calloc(1, sizeof(vtssh));
-	if(ssh == NULL)
-	{
-		return VTSSH_ERR_NO_MEM;
-	}
-
-	ssh->options = ssh_options;
-
-	*_ssh = ssh;
-
-	return VTSSH_ERR_OK;
-}
-
-int vtssh_start(vtssh *ssh)
+/// <summary>
+/// 连接ssh服务器
+/// 连接成功后填充ssh->sock字段
+/// </summary>
+/// <param name="ssh"></param>
+/// <returns></returns>
+static int connect_ssh_server(vtssh *ssh)
 {
 	struct sockaddr_in sin;
-	socklen_t sinlen;
+	//socklen_t sinlen;
 	vtssh_options *options = ssh->options;
-	const char *fingerprint;
-	char *userauthlist;
-	vtssh_auth_enum supported_auth = 0;
-	vtssh_auth_enum auth = options->auth;
-	LIBSSH2_SESSION *session = NULL;
-	int rc = 0;
 
 #ifdef VTWIN32
-	char sockopt;
+	//char sockopt;
 	SOCKET sock = INVALID_SOCKET;
 	SOCKET listensock = INVALID_SOCKET, forwardsock = INVALID_SOCKET;
 	WSADATA wsadata;
@@ -190,8 +122,32 @@ int vtssh_start(vtssh *ssh)
 
 	if(connect(sock, (struct sockaddr *)(&sin), sizeof(struct sockaddr_in)) != 0) {
 		YLOGE("failed to connect, %s", strerror(errno));
-		return;
+		return VTSSH_ERR_SYSERR;
 	}
+
+	ssh->sock = sock;
+	
+	YLOGI("connect ssh server success");
+
+	return VTSSH_ERR_OK;
+}
+
+/// <summary>
+/// 初始化sshChannel
+/// 成功后填充ssh->channel字段
+/// </summary>
+/// <param name="ssh"></param>
+/// <returns></returns>
+static int initialize_ssh_channel(vtssh *ssh)
+{
+	vtssh_options *options = ssh->options;
+	VTSOCK sock = ssh->sock;
+	const char *fingerprint;
+	char *userauthlist;
+	vtssh_auth_enum supported_auth = 0;
+	vtssh_auth_enum auth = options->auth;
+	LIBSSH2_SESSION *session = NULL;
+	int rc = 0;
 
 	/* Create a session instance */
 	session = libssh2_session_init();
@@ -206,7 +162,7 @@ int vtssh_start(vtssh *ssh)
 	rc = libssh2_session_handshake(session, sock);
 	if(rc) {
 		YLOGE("Error when starting up SSH session: %d", rc);
-		return;
+		return VTSSH_ERR_SYSERR;
 	}
 
 	/* At this point we havn't yet authenticated.  The first thing to do
@@ -246,7 +202,7 @@ int vtssh_start(vtssh *ssh)
 		// 使用密码登录
 		if(libssh2_userauth_password(session, options->username, options->password)) {
 			YLOGE("Authentication by password failed");
-			return;
+			return VTSSH_ERR_AUTH_FAILED;
 		}
 		else {
 			YLOGI("Authentication by password succeeded");
@@ -258,7 +214,7 @@ int vtssh_start(vtssh *ssh)
 	{
 		if(libssh2_userauth_publickey_fromfile(session, options->username, options->keyfile1, options->keyfile2, options->password)) {
 			YLOGE("Authentication by public key failed!");
-			return;
+			return VTSSH_ERR_AUTH_FAILED;
 		}
 		else {
 			YLOGI("Authentication by public key succeeded.");
@@ -273,27 +229,127 @@ int vtssh_start(vtssh *ssh)
 #pragma endregion
 
 #pragma region 创建SSH Shell通道
-	//libssh2_channel_open_ex(session, )
+	/* Request a shell */
 	LIBSSH2_CHANNEL *channel = libssh2_channel_open_session(session);
+	if(channel == NULL)
+	{
+		YLOGE("libssh2_channel_open_session failed");
+		return VTSSH_ERR_SYSERR;
+	}
 
+	/* Request a terminal with 'vanilla' terminal emulation
+	 * See /etc/termcap for more options
+	 */
+	rc = libssh2_channel_request_pty_ex(channel, options->term, strlen(options->term), NULL, 0, options->term_columns, options->term_rows, 0, 0);
+	if(rc != 0)
+	{
+		YLOGE("libssh2_channel_request_pty_ex failed, %d", rc);
+		return VTSSH_ERR_SYSERR;
+	}
+
+	/* Open a SHELL on that pty */
+	if(libssh2_channel_shell(channel)) {
+		YLOGE("Unable to request shell on allocated pty");
+		return VTSSH_ERR_SYSERR;
+	}
 #pragma endregion
 
+	/* At this point the shell can be interacted with using
+	 * libssh2_channel_read()
+	 * libssh2_channel_read_stderr()
+	 * libssh2_channel_write()
+	 * libssh2_channel_write_stderr()
+	 *
+	 * Blocking mode may be (en|dis)abled with: libssh2_channel_set_blocking()
+	 * If the server send EOF, libssh2_channel_eof() will return non-0
+	 * To send EOF to the server use: libssh2_channel_send_eof()
+	 * A channel can be closed with: libssh2_channel_close()
+	 * A channel can be freed with: libssh2_channel_free()
+	 */
 
-
-	ssh->sock = sock;
-	ssh->options = options;
 	ssh->session = session;
+	ssh->channel = channel;
 
-	/* Must use non-blocking IO hereafter due to the current libssh2 API */
-	libssh2_session_set_blocking(session, 0);
-
-	Ythread *thread = Y_create_thread(ssh_thread_proc, ssh);
 	return VTSSH_ERR_OK;
 }
 
-void vtssh_stop(vtssh *ssh)
-{
 
+
+
+int vtssh_create(vtssh **_ssh, vtssh_options *ssh_options)
+{
+	vtssh *ssh = (vtssh *)calloc(1, sizeof(vtssh));
+	if(ssh == NULL)
+	{
+		return VTSSH_ERR_NO_MEM;
+	}
+
+	ssh->options = ssh_options;
+
+	*_ssh = ssh;
+
+	return VTSSH_ERR_OK;
+}
+
+int vtssh_connect(vtssh *ssh)
+{
+	vtssh_options *options = ssh->options;
+	int rc = 0;
+
+	// 1. 连接ssh服务器
+	if((rc = connect_ssh_server(ssh)) != VTSSH_ERR_OK)
+	{
+		return rc;
+	}
+
+	// 2. 初始化ssh通道
+	if((rc = initialize_ssh_channel(ssh)) != VTSSH_ERR_OK)
+	{
+		return rc;
+	}
+
+	ssh->notify = 1;
+
+	Ythread *thread = Y_create_thread(ssh_thread_proc, ssh);
+	ssh->ssh_thread = thread;
+	return VTSSH_ERR_OK;
+}
+
+int vtssh_send(vtssh *ssh, char *bytes, uint32_t bytesize)
+{
+	if(ssh->channel == NULL)
+	{
+		return VTSSH_ERR_OK;
+	}
+	libssh2_channel_write(ssh->channel, bytes, bytesize);
+	return VTSSH_ERR_OK;
+}
+
+void vtssh_disconnect(vtssh *ssh)
+{
+	ssh->status = VTSSH_STATUS_DISCONNECTED;
+	ssh->notify = 0;
+
+	if(ssh->channel)
+	{
+		libssh2_channel_close(ssh->channel);
+		libssh2_channel_free(ssh->channel);
+		ssh->channel = NULL;
+	}
+
+	if(ssh->session)
+	{
+		libssh2_session_disconnect(ssh->session, "Normal Shutdown, Thank you for playing");
+		libssh2_session_free(ssh->session);
+		ssh->session = NULL;
+	}
+
+#ifdef WIN32
+	closesocket(ssh->sock);
+#else
+	close(ssh->sock);
+#endif
+	Y_delete_thread(ssh->ssh_thread);
 }
 
 void vtssh_delete(vtssh *ssh)

@@ -18,6 +18,11 @@ namespace XTerminal.Channels
         /// <summary>
         /// 所有准备工作已就绪，可以开始解析终端数据流了
         /// </summary>
-        Connected
+        Connected,
+
+        /// <summary>
+        /// 断开连接
+        /// </summary>
+        Disconnected
     }
 }

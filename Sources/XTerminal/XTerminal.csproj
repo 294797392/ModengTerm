@@ -72,6 +72,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Channels\ChannelAuthorition.cs" />
+    <Compile Include="Channels\libvtsshChannel.cs" />
     <Compile Include="Channels\SSHChannel.cs" />
     <Compile Include="Channels\SSHChannelAuthorition.cs" />
     <Compile Include="Channels\VTChannel.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Channels\VTChannelState.cs" />
     <Compile Include="Channels\VTChannelTypes.cs" />
     <Compile Include="DefaultValues.cs" />
+    <Compile Include="libvt.cs" />
     <Compile Include="Options\CursorOptions.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
     <Compile Include="Rendering\DrawingLine.cs" />
@@ -88,7 +90,6 @@
     <Compile Include="Rendering\DrawingCanvas.cs" />
     <Compile Include="Rendering\DrawingCanvasPanel.cs" />
     <Compile Include="Options\TerminalOptions.cs" />
-    <Compile Include="ResponseCode.cs" />
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="Options\VTInitialOptions.cs" />
     <Page Include="MainWindow.xaml">

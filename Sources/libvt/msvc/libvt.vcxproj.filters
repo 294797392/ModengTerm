@@ -1,10 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="..\source\vtbase.h" />
+    <ClInclude Include="..\source\vt.h" />
     <ClInclude Include="..\source\vtssh.h" />
+    <ClInclude Include="..\source\vtglobal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\vtssh.c" />
+    <ClCompile Include="..\source\vtglobal.c" />
+    <ClCompile Include="..\source\main.c" />
   </ItemGroup>
 </Project>

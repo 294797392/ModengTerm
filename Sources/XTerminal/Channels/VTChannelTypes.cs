@@ -16,6 +16,11 @@ namespace XTerminal.Channels
         SSH,
 
         /// <summary>
+        /// 使用libvt库实现的ssh客户端
+        /// </summary>
+        libvtssh,
+
+        /// <summary>
         /// 是一个串口设备
         /// </summary>
         SerialPort

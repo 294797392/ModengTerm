@@ -3,6 +3,7 @@ using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
 using VideoTerminal.Options;
+using XTerminal.Base;
 
 namespace XTerminal.Channels
 {
@@ -37,27 +38,12 @@ namespace XTerminal.Channels
 
         #region 实例方法
 
-        private string GetTerminalName(TerminalTypes types)
-        {
-            switch (types)
-            {
-                case TerminalTypes.VT100: return "vt100";
-                case TerminalTypes.VT220: return "vt220";
-                case TerminalTypes.XTerm: return "xterm";
-                case TerminalTypes.XTerm256Color: return "xterm-256color";
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         #endregion
 
         #region VTChannel
 
-        public override bool Connect()
+        protected override int OnInitialize()
         {
-            this.NotifyStatusChanged(VTChannelState.Connecting);
-
             this.authorition = this.options.Authorition as SSHChannelAuthorition;
             var authentications = new List<AuthenticationMethod>();
             if (!string.IsNullOrEmpty(this.authorition.KeyFilePath))
@@ -67,67 +53,52 @@ namespace XTerminal.Channels
             }
             authentications.Add(new PasswordAuthenticationMethod(this.authorition.UserName, this.authorition.Password));
             ConnectionInfo connectionInfo = new ConnectionInfo(this.authorition.ServerAddress, this.authorition.ServerPort, this.authorition.UserName, authentications.ToArray());
-
             this.sshClient = new SshClient(connectionInfo);
-            this.sshClient.Connect();
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
+
+            return ResponseCode.SUCCESS;
+        }
+
+        protected override void OnRelease()
+        {
+            this.stream.Dispose();
+            this.sshClient.Disconnect();
+        }
+
+        public override int Connect()
+        {
+            this.sshClient.Connect();
 
             Dictionary<TerminalModes, uint> terminalModeValues = new Dictionary<TerminalModes, uint>();
             //terminalModeValues[TerminalModes.ECHOCTL] = 1;
             //terminalModeValues[TerminalModes.IEXTEN] = 1;
 
             TerminalOptions terminalOptions = this.options.TerminalOption;
-            //this.stream = this.sshClient.CreateShellStream(this.GetTerminalName(terminalOptions.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
-            this.stream = this.sshClient.CreateShellStream("xterm", (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
+            this.stream = this.sshClient.CreateShellStream(XTermUtils.GetTermName(this.options.TerminalOption.Type), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
             this.stream.DataReceived += this.Stream_DataReceived;
 
-            this.NotifyStatusChanged(VTChannelState.Connected);
-
-            return true;
+            return ResponseCode.SUCCESS;
         }
 
-        public override bool Disconnect()
+        public override void Disconnect()
         {
-            throw new NotImplementedException();
+            this.stream.DataReceived -= this.Stream_DataReceived;
+            this.sshClient.Disconnect();
         }
 
-        public override int Read(byte[] bytes)
+        public override int Write(byte[] data)
         {
-            long left = bytes.Length;
-            int readed = 0;
-
-            while (left > 0)
+            try
             {
-                int readLen = left > DefaultReadBufferSize ? DefaultReadBufferSize : (int)left;
-                int size = this.stream.Read(bytes, readed, readLen);
-                if (size == 0)
-                {
-                    return readed;
-                }
-                readed += size;
-                left -= readed;
+                this.stream.Write(data, 0, data.Length);
+                this.stream.Flush();
+                return ResponseCode.SUCCESS;
             }
-
-            return readed;
-        }
-
-        public override byte Read()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool Write(byte data)
-        {
-            this.stream.WriteByte(data);
-            this.stream.Flush();
-            return true;
-        }
-
-        public override bool Write(byte[] data)
-        {
-            this.stream.Write(data, 0, data.Length);
-            this.stream.Flush();
-            return true;
+            catch (Exception ex)
+            {
+                logger.Error("ShellStream.Write异常", ex);
+                return ResponseCode.FAILED;
+            }
         }
 
         #endregion
