@@ -1,0 +1,20 @@
+﻿{
+    "modules": [
+        {
+            "ID": "1",
+            "Name": "服务代理",
+            "ClassName": "XTerminal.Base.ServiceAgents.FileServiceAgent, XTerminal.Base",
+            "Inputs": {
+            }
+        }
+    ],
+
+    "sessions": [
+        {
+            "id": "",
+            "name": "ssh",
+            "description": "",
+            "icon": ""
+        }
+    ]
+}

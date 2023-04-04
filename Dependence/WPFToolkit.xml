@@ -1,0 +1,2942 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WPFToolkit</name>
+    </assembly>
+    <members>
+        <member name="T:WPFToolkit.Attributes.DataGridColumnAttribute">
+            <summary>
+            描述DataGrid的一个列的信息
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.Index">
+            <summary>
+            该列的索引
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.Title">
+            <summary>
+            列标题
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.DataType">
+            <summary>
+            列数据类型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.DataTemplateURI">
+            <summary>
+            该列使用的数据模板URI
+            如果没指定，那么会根据DataType类型去自动生成（这个功能暂时没实现）
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.Width">
+            <summary>
+            列宽度
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.WidthUnitType">
+            <summary>
+            列宽度类型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.HorizontalContentAlignment">
+            <summary>
+            该列里的水平对齐方式
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Attributes.ItemsSourceType.JSONFile">
+            <summary>
+            文件数据源
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.ItemsSourceAttribute.SourceType">
+            <summary>
+            数据源类型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.ItemsSourceAttribute.URI">
+            <summary>
+            数据源的地址
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:WPFToolkit.ColorConverter" -->
+        <member name="M:WPFToolkit.ColorConverter.RGB2HSB(System.Byte,System.Byte,System.Byte,System.Double@,System.Double@,System.Double@)">
+            <summary>
+            RGB颜色模式转HSV颜色模式
+            </summary>
+            <param name="r"></param>
+            <param name="g"></param>
+            <param name="b"></param>
+            <param name="h"></param>
+            <param name="s"></param>
+            <param name="v"></param>
+        </member>
+        <member name="M:WPFToolkit.ColorConverter.RGB2HSB(System.Windows.Media.Color,System.Double@,System.Double@,System.Double@)">
+            <summary>
+            RGB颜色模式转HSV颜色模式
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.ColorConverter.HSB2RGB(System.Double,System.Double,System.Double,System.Byte@,System.Byte@,System.Byte@)">
+            <summary>
+            HSV颜色模式转RGB颜色模式
+            </summary>
+            <param name="h"></param>
+            <param name="s"></param>
+            <param name="v1"></param>
+            <param name="r"></param>
+            <param name="g"></param>
+            <param name="b"></param>
+        </member>
+        <member name="M:WPFToolkit.ColorConverter.HSB2RGB(System.Double,System.Double,System.Double,System.Windows.Media.Color@)">
+            <summary>
+            HSV颜色模式转RGB颜色模式
+            </summary>
+            <param name="hue"></param>
+            <param name="saturation"></param>
+            <param name="brightness"></param>
+            <param name="c"></param>
+        </member>
+        <member name="P:WPFToolkit.Controls.TreeListViewItem.Level">
+            <summary>
+            Item's hierarchy in the tree
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Controls.LevelToIndentConverter">
+            <summary>
+            Convert Level to left margin
+            Pass a prarameter if you want a unit length other than 19.0.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Controls.KColorPicker">
+            <summary>
+            颜色选择器
+            
+            色相是分段线性变化的，因此，我们可以利用LinearGradientBrush来绘制颜色条
+            
+            H(Hue) 为色相, 取值范围：0-360°，就是颜色名称，例如“红色”、“蓝色”。
+            S(Saturation) 为饱和度， 取值范围：0 - 1(0% - 100%), 即颜色的纯度。
+            B(Brightness)为明度, 取值范围：0 - 1(0% - 100%)，颜色的明亮程度。
+            
+            HSB 的 B（明度）控制纯色中混入黑色的量，越往上，值越大，黑色越少，颜色明度越高。
+            HSB 的 S（饱和度）控制纯色中混入白色的量，越往右，值越大，白色越少，颜色纯度越高。
+            
+            HSV和HSB是一样的
+            
+            https://www.cnblogs.com/nabian/p/9267646.html
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.KColorPicker.SelectionChangingEvent">
+            <summary>
+                An event fired when the selection changes.
+            </summary>
+        </member>
+        <member name="E:WPFToolkit.Controls.KColorPicker.SelectionChanging">
+            <summary>
+                An event fired when the selection changes.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Controls.KColorPicker.GetRelativeColor(System.Windows.Media.GradientStopCollection,System.Double)">
+            <summary>
+            https://stackoverflow.com/questions/9650049/get-color-in-specific-location-on-gradient
+            </summary>
+            <param name="gsc"></param>
+            <param name="offset"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Controls.KColorPicker.OnMouseDown(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            When we have capture, all clicks off the popup will have the combobox as the OriginalSource
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:WPFToolkit.Controls.PanAndZoomViewer.CreatePanAnimation(System.Double)">
+            <summary>Helper to create the panning animation for x,y coordinates.</summary>
+            <param name="toValue">New value of the coordinate.</param>
+            <returns>Double animation</returns>
+        </member>
+        <member name="M:WPFToolkit.Controls.PanAndZoomViewer.CreateZoomAnimation(System.Double)">
+            <summary>Helper to create the zoom double animation for scaling.</summary>
+            <param name="toValue">Value to animate to.</param>
+            <returns>Double animation.</returns>
+        </member>
+        <member name="M:WPFToolkit.Controls.PanAndZoomViewer.DoZoom(System.Double,System.Windows.Point,System.Windows.Point)">
+            <summary>Zoom into or out of the content.</summary>
+            <param name="deltaZoom">Factor to mutliply the zoom level by. </param>
+            <param name="mousePosition">Logical mouse position relative to the original content.</param>
+            <param name="physicalPosition">Actual mouse position on the screen (relative to the parent window)</param>
+        </member>
+        <member name="M:WPFToolkit.Controls.PanAndZoomViewer.DoZoomPercent(System.Double,System.Windows.Point,System.Windows.Point)">
+            <summary>Zoom into or out of the content by percent.</summary>
+            <param name="deltaZoom">Percent to set zoom too.</param>
+            <param name="mousePosition">Logical mouse position relative to the original content.</param>
+            <param name="physicalPosition">Actual mouse position on the screen (relative to the parent window)</param>
+        </member>
+        <member name="M:WPFToolkit.Controls.PanAndZoomViewer.Reset">
+            <summary>Reset to default zoom level and centered content.</summary>
+        </member>
+        <member name="T:WPFToolkit.Controls.HotKeyStrategy">
+            <summary>
+            快捷键的策略
+            注意，快捷键都使用字符键结尾，如果按了字符键后，继续按控制键，那么会进行重置操作
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.HotKeyStrategy.WeChat">
+            <summary>
+            微信的快捷键方式..
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.HotKeyStrategy.StartWithControlKey">
+            <summary>
+            以控制键开头的快捷键，控制键后可以有多个字符按键组合
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Controls.Hotkey">
+            <summary>
+            快捷键控件
+            快捷键设置规则：快捷键要使用控制按键开头，或者是一个单独的英文字母。英文字母后面不能出现控制按键
+            快捷键设置完毕判断策略：当输入英文字母的时候，就算设置完毕
+            
+            注意，这个控件继承自TextBox，因为之前发现过如果把该控件用于ListBox里，那么不会触发KeyDown事件。然而TextBox就可以触发KeyDown事件，所以就改成继承自TextBox
+            猜测是因为ListBoxItem给KeyDown事件做了特殊处理，设置了Handled=True
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Controls.Hotkey.KeyTypes">
+            <summary>
+            按键类型
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.KeyTypes.None">
+            <summary>
+            什么按键都没按
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.KeyTypes.ControlKey">
+            <summary>
+            控制按键
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.KeyTypes.CharacterKey">
+            <summary>
+            26个英文字母
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.MAXIMUM_COMBINATION_KEYS">
+            <summary>
+            最多有两个组合键
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.DefaultStrategy">
+            <summary>
+            默认的快捷键策略
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.previouseKey">
+            <summary>
+            上一次按下的按键
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.previouseKeyState">
+            <summary>
+            上一次按键的状态
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.previouseKeyType">
+            <summary>
+            最后一次记录的按键类型
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Controls.Hotkey.reset">
+            <summary>
+            标识下一次按键的时候是否需要重置
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Controls.Hotkey.MaximumCombinations">
+            <summary>
+            快捷键的组合键个数
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.OnHotkeysPropertyChangedCallback(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            依赖属性回调
+            </summary>
+            <param name="d">触发回调的对象</param>
+            <param name="e">回调参数</param>        
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.StartWithControlKeyProcess(System.Windows.Input.Key)">
+            <summary>
+            处理当策略是StartWithControlKey的时候的按键逻辑
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.WeChatProcess(System.Windows.Input.Key)">
+            <summary>
+            处理当策略是Free的时候的按键逻辑
+            </summary>
+            <param name="pressedKey"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.UpdateHotkeyText">
+            <summary>
+            更新快捷键文本
+            </summary>
+            <param name="hotKeys"></param>
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.IsControlKey(System.Windows.Input.Key)">
+            <summary>
+            判断按键是否为控制键（ctrl, shift, alt）
+            </summary>
+            <param name="k"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.IsCharacterKey(System.Windows.Input.Key)">
+            <summary>
+            判断是否是字符
+            </summary>
+            <param name="k"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.IsKeySupported(System.Windows.Input.Key)">
+            <summary>
+            判断按键是否可以作为快捷键使用
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Controls.Hotkey.GetPressedKey(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            获取当前按下的按键
+            </summary>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WPFToolkit.Drawing.CommandBase">
+            <summary>
+            Base class for commands used for Undo - Redo
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.CommandAdd">
+            <summary>
+            Add new object command
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandAdd.Undo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Delete added object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandAdd.Redo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Add object again
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.CommandChangeOrder">
+            <summary>
+            Changing objects order: move to front/back.
+            
+            Command keeps list of object IDs before and after operation.
+            Using these lists, it is possible to undo/redo Move to ... operation.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandChangeOrder.Undo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Restore order to its state before change.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandChangeOrder.Redo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Restore order to its state after change.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandChangeOrder.Dump(System.Collections.Generic.List{System.Int32},System.String)">
+            <summary>
+            Dump (for debugging)
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.CommandChangeState">
+            <summary>
+            Changing state of existing objects:
+            move, resize, change properties.
+            
+            This command is always applied to the list selection.
+            It keeps selection clone before and after operation.
+            Undo/Redo operations replace objects in the list
+            using selection clone.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandChangeState.Undo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Restore selection to its state before change.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandChangeState.Redo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Restore selection to its state after change.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.CommandDelete">
+            <summary>
+            Delete command.
+            Applied to list selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandDelete.Undo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Restore deleted objects
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandDelete.Redo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Delete objects again.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.CommandDeleteAll">
+            <summary>
+            Delete command.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandDeleteAll.Undo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Add all deleted objects to GraphicsList
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.CommandDeleteAll.Redo(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Detete All again
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolType">
+            <summary>
+            Defines drawing tool
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Drawing.GestureData.startDistInTwoFingers">
+            <summary>
+            判断具体手势的一些基本信息
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ContextMenuCommand">
+            <summary>
+            Context menu command types
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.DrawingCanvas">
+            <summary>
+            Canvas used as host for DrawingVisual objects.
+            Allows to draw graphics objects using mouse.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.Tool">
+            <summary>
+            Currently active drawing tool
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.ActualScale">
+            <summary>
+            Dependency property ActualScale.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.ActualScaleChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when ActualScale dependency property is changed.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.IsDirty">
+            <summary>
+            Returns true if document is changed
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanUndo">
+            <summary>
+            Return True if Undo operation is possible
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanRedo">
+            <summary>
+            Return True if Redo operation is possible
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanSelectAll">
+            <summary>
+            Return true if Select All function is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanUnselectAll">
+            <summary>
+            Return true if Unselect All function is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanDelete">
+            <summary>
+            Return true if Delete function is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanDeleteAll">
+            <summary>
+            Return true if Delete All function is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanMoveToFront">
+            <summary>
+            Return true if Move to Front function is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanMoveToBack">
+            <summary>
+            Return true if Move to Back function is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.CanSetProperties">
+            <summary>
+            Return true if currently active properties (line width, color etc.)
+            can be applied to selected objects.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.LineWidth">
+            <summary>
+            Line width of new graphics object.
+            Setting this property is also applied to current selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.LineWidthChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when LineWidth dependency property is changed
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.ObjectColor">
+            <summary>
+            Color of new graphics object.
+            Setting this property is also applied to current selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.ObjectColorChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when ObjectColor dependency property is changed
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.TextFontFamilyName">
+            <summary>
+            Font Family name of new graphics object.
+            Setting this property is also applied to current selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.TextFontFamilyNameChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when TextFontFamilyName dependency property is changed
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.TextFontStyle">
+            <summary>
+            Font style of new graphics object.
+            Setting this property is also applied to current selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.TextFontStyleChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when TextFontStyle dependency property is changed
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.TextFontWeight">
+            <summary>
+            Font weight of new graphics object.
+            Setting this property is also applied to current selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.TextFontWeightChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when TextFontWeight dependency property is changed
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.TextFontStretch">
+            <summary>
+            Font stretch of new graphics object.
+            Setting this property is also applied to current selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.TextFontStretchChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when TextFontStretch dependency property is changed
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.TextFontSize">
+            <summary>
+            Font size of new graphics object.
+            Setting this property is also applied to current selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.TextFontSizeChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Callback function called when TextFontSize dependency property is changed
+            </summary>
+        </member>
+        <member name="E:WPFToolkit.Drawing.DrawingCanvas.IsDirtyChanged">
+            <summary>
+            IsDirtyChanged event.
+            
+            If client binds to IsDirty property, this event is not required.
+            But if client knows when IsDirty changed without binding, 
+            IsDirtyChanged is needed.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.GetListOfGraphicObjects">
+            <summary>
+            Return list of graphic objects.
+            Used if client program needs to make its own usage of
+            graphics objects, like save them in some persistent storage.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw all graphics objects to DrawingContext supplied by client.
+            Can be used for printing or saving image together with graphics
+            as single bitmap.
+            
+            Selection tracker is not drawn.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Draw(System.Windows.Media.DrawingContext,System.Boolean)">
+            <summary>
+            Draw all graphics objects to DrawingContext supplied by client.
+            Can be used for printing or saving image together with graphics
+            as single bitmap.
+            
+            withSelection = true - draw selected objects with tracker.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Clear">
+            <summary>
+            Clear graphics list
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Save(System.String)">
+            <summary>
+            Save graphics to XML file.
+            Throws: DrawingCanvasException.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Load(System.String)">
+            <summary>
+            Load graphics from XML file.
+            Throws: DrawingCanvasException.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.SelectAll">
+            <summary>
+            Select all
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.UnselectAll">
+            <summary>
+            Unselect all
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Delete">
+            <summary>
+            Delete selection
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.DeleteAll">
+            <summary>
+            Delete all
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.MoveToFront">
+            <summary>
+            Move selection to the front of Z-order
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.MoveToBack">
+            <summary>
+            Move selection to the end of Z-order
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.SetProperties">
+            <summary>
+            Apply currently active properties to selected objects
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.RefreshClip">
+            <summary>
+            Set clip for all graphics objects.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.RemoveClip">
+            <summary>
+            Remove clip for all graphics objects.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Undo">
+            <summary>
+            Undo
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.Redo">
+            <summary>
+            Redo
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.Item(System.Int32)">
+            <summary>
+            Get graphic object by index
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.Count">
+            <summary>
+            Get number of graphic objects
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.SelectionCount">
+            <summary>
+            Get number of selected graphic objects
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.GraphicsList">
+            <summary>
+            Return list of graphics
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.Selection">
+            <summary>
+            Returns INumerable which may be used for enumeration
+            of selected objects.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.DrawingCanvas.VisualChildrenCount">
+            <summary>
+            Get number of children: VisualCollection count.
+            If in-place editing textbox is active, add 1.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.GetVisualChild(System.Int32)">
+            <summary>
+            Get visual child - one of GraphicsBase objects
+            or in-place editing textbox, if it is active.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.DrawingCanvas_MouseDown(System.Object,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Mouse down.
+            Left button down event is passed to active tool.
+            Right button down event is handled in this class.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.DrawingCanvas_MouseMove(System.Object,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Mouse move.
+            Moving without button pressed or with left button pressed
+            is passed to active tool.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.DrawingCanvas_MouseUp(System.Object,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Mouse up event.
+            Left button up event is passed to active tool.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.DrawingCanvas_Loaded(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Initialization after control is loaded
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.contextMenuItem_Click(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Context menu item is clicked
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.DrawingCanvas_LostMouseCapture(System.Object,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Mouse capture is lost
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.DrawingCanvas_KeyDown(System.Object,System.Windows.Input.KeyEventArgs)">
+            <summary>
+            Handle keyboard input
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.undoManager_StateChanged(System.Object,System.EventArgs)">
+            <summary>
+            UndoManager state is changed.
+            Refresh CanUndo, CanRedo and IsDirty properties.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.CreateContextMenu">
+            <summary>
+            Create context menu
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.ShowContextMenu(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Show context menu.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.CancelCurrentOperation">
+            <summary>
+            Cancel currently executed operation:
+            add new object or group selection.
+            
+            Called when mouse capture is lost or Esc is pressed.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.HideTextbox(WPFToolkit.Drawing.GraphicsText)">
+            <summary>
+            Hide in-place editing textbox.
+            Called from TextTool, when user pressed Enter or Esc,
+            or from this class, when user clicks on the canvas.
+            
+            graphicsText passed to this function can be new text added by
+            ToolText, or existing text opened for editing.
+            If ToolText.OldText is empty, this is new object.
+            If not, this is existing object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.HandleDoubleClick(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Open in-place edit box if GraphicsText is clicked
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.AddCommandToHistory(WPFToolkit.Drawing.CommandBase)">
+            <summary>
+            Add command to history.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.ClearHistory">
+            <summary>
+            Clear Undo history.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.DrawingCanvas.UpdateState">
+            <summary>
+            Update state of Can* dependency properties
+            used for Edit commands.
+            This function calls after any change in drawing canvas state,
+            caused by user commands.
+            Helps to keep client controls state up-to-date, in the case
+            if Can* properties are used for binding.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.DrawingCanvasException">
+            <summary>
+            Exception thrown by DrawingCanvas Load and Save methods
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.FontConversions">
+            <summary>
+            Functions used to convert FontStyle, FontWeight and FontStretch
+            structures to strings and from strings.
+            These structures are not serialized by default. 
+            I keep this information as strings in serialized classes. 
+            
+            These functions are used inside of DrawTolsLib, and can be used
+            by client for font serialization.
+            
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.FontConversions.FontStyleToString(System.Windows.FontStyle)">
+            <summary>
+            Convert FontStyle to string for serialization
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.FontConversions.FontStyleFromString(System.String)">
+            <summary>
+            Convert string to FontStyle for serialization
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.FontConversions.FontWeightToString(System.Windows.FontWeight)">
+            <summary>
+            Convert FontWeight to string for serialization
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.FontConversions.FontWeightFromString(System.String)">
+            <summary>
+            Convert string to FontWeight for serialization
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.FontConversions.FontStretchToString(System.Windows.FontStretch)">
+            <summary>
+            Convert FontStretch to string for serialization
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.FontConversions.FontStretchFromString(System.String)">
+            <summary>
+            Convert string to FontStretch for serialization
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsBase">
+            <summary>
+            Base class for all graphics objects.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.GraphicsBase.Id">
+            <summary>
+            Object ID
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.GraphicsBase.HandleCount">
+            <summary>
+            Returns number of handles
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Contains(System.Windows.Point)">
+            <summary>
+            Hit test, should be overwritten in derived classes.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.CreateSerializedObject">
+            <summary>
+            Create object for serialization
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.GetHandle(System.Int32)">
+            <summary>
+            Get handle point by 1-based number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.MakeHitTest(System.Windows.Point)">
+            <summary>
+            Hit test.
+            Return value: -1 - no hit
+                           0 - hit anywhere
+                           > 1 - handle number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.IntersectsWith(System.Windows.Rect)">
+            <summary>
+            Test whether object intersects with rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Move(System.Double,System.Double)">
+            <summary>
+            Move object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Zoom(System.Double,System.Windows.Point)">
+            <summary>
+            放大缩小对象
+            </summary>
+            <param name="scale"></param>
+            <param name="center"></param>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.CopyPoints">
+            <summary>
+             拷贝对象的初始点，以便用于还原初始状态
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Reset(System.Double,System.Windows.Point)">
+            <summary>
+            根据比例和中心点还原到相应
+            </summary>
+            <param name="scale"></param>
+            <param name="center"></param>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Rotate(System.Double,System.Windows.Point)">
+            <summary>
+            旋转对象
+            </summary>
+            <param name="scale"></param>
+            <param name="center"></param>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.MoveHandleTo(System.Windows.Point,System.Int32)">
+            <summary>
+            Move handle to the point
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.GetHandleCursor(System.Int32)">
+            <summary>
+            Get cursor for the handle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Normalize">
+            <summary>
+            Normalize object.
+            Call this function in the end of object resizing,
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Implements actual drawing code.
+            
+            Call GraphicsBase.Draw in the end of every derived class Draw 
+            function to draw tracker if necessary.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.DrawTracker(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw tracker for selected object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.Dump">
+            <summary>
+            Dump (for debugging)
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.DrawTrackerRectangle(System.Windows.Media.DrawingContext,System.Windows.Rect)">
+            <summary>
+            Draw tracker rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.RefreshDrawing">
+            <summary>
+            Refresh drawing.
+            Called after change if any object property.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.GetHandleRectangle(System.Int32)">
+            <summary>
+            Get handle rectangle by 1-based number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.DoubleForDisplay(System.Double)">
+            <summary>
+            Helper function used for Dump
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsBase.ColorToDisplay(System.Windows.Media.Color)">
+            <summary>
+            Helper function used for Dump
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsEllipse">
+            <summary>
+             Rectangle graphics object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEllipse.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEllipse.Contains(System.Windows.Point)">
+            <summary>
+            Test whether object contains point
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEllipse.IntersectsWith(System.Windows.Rect)">
+            <summary>
+            Test whether object intersects with rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEllipse.CreateSerializedObject">
+            <summary>
+            Serialization support
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEraser.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEraser.Contains(System.Windows.Point)">
+            <summary>
+            Test whether object contains point
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEraser.IntersectsWith(System.Windows.Rect)">
+            <summary>
+            Test whether object intersects with rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsEraser.CreateSerializedObject">
+            <summary>
+            Serialization support
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsLine">
+            <summary>
+             Line graphics object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.Contains(System.Windows.Point)">
+            <summary>
+            Test whether object contains point
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.CreateSerializedObject">
+            <summary>
+            XML serialization support
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:WPFToolkit.Drawing.GraphicsLine.HandleCount">
+            <summary>
+            Get number of handles
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.GetHandle(System.Int32)">
+            <summary>
+            Get handle point by 1-based number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.MakeHitTest(System.Windows.Point)">
+            <summary>
+            Hit test.
+            Return value: -1 - no hit
+                           0 - hit anywhere
+                           > 1 - handle number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.IntersectsWith(System.Windows.Rect)">
+            <summary>
+            Test whether object intersects with rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.GetHandleCursor(System.Int32)">
+            <summary>
+            Get cursor for the handle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.MoveHandleTo(System.Windows.Point,System.Int32)">
+            <summary>
+            Move handle to new point (resizing)
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.Move(System.Double,System.Double)">
+            <summary>
+            Move object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsLine.CopyPoints">
+            <summary>
+            将初始点拷贝一份，在moveUp或者touchUp执行的时候进行调用
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsPolyLine">
+            <summary>
+             PolyLine graphics object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.MakePoints">
+            <summary>
+            Convert geometry to array of points.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.GetPoints">
+            <summary>
+            Return array of points.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.getPointsOfCopy">
+            <summary>
+            Return array of copy points
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.MakeGeometryFromPoints(System.Windows.Point[]@)">
+            <summary>
+            Convert array of points to geometry.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.AddPoint(System.Windows.Point)">
+            <summary>
+            Add new point (line segment)
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.Contains(System.Windows.Point)">
+            <summary>
+            Test whether object contains point
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.CreateSerializedObject">
+            <summary>
+            XML serialization support
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.GraphicsPolyLine.HandleCount">
+            <summary>
+            Get number of handles
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.GetHandle(System.Int32)">
+            <summary>
+            Get handle point by 1-based number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.GetHandleCursor(System.Int32)">
+            <summary>
+            Get cursor for the handle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.MoveHandleTo(System.Windows.Point,System.Int32)">
+            <summary>
+            Move handle to new point (resizing).
+            handleNumber is 1-based.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.Move(System.Double,System.Double)">
+            <summary>
+            Move object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.MakeHitTest(System.Windows.Point)">
+            <summary>
+            Hit test.
+            Return value: -1 - no hit
+                           0 - hit anywhere
+                           > 1 - handle number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.IntersectsWith(System.Windows.Rect)">
+            <summary>
+            Test whether object intersects with rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsPolyLine.CopyPoints">
+            <summary>
+            将初始点拷贝一份，在moveUp或者touchUp执行的时候进行调用
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.GraphicsPolyLine.DeviceID">
+            <summary>
+            触摸设备Id，用来区分不同的手指
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsRectangle">
+            <summary>
+             Rectangle graphics object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangle.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangle.Contains(System.Windows.Point)">
+            <summary>
+            Test whether object contains point
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangle.CreateSerializedObject">
+            <summary>
+            Serialization support
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsRectangleBase">
+            <summary>
+            Base class for rectangle-based graphics:
+            rectangle and ellipse.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.GraphicsRectangleBase.Rectangle">
+            <summary>
+            Read-only property, returns Rect calculated on the fly from four points.
+            Points can make inverted rectangle, fix this.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.GraphicsRectangleBase.HandleCount">
+            <summary>
+            Get number of handles
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.GetHandle(System.Int32)">
+            <summary>
+            Get handle point by 1-based number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.MakeHitTest(System.Windows.Point)">
+            <summary>
+            Hit test.
+            Return value: -1 - no hit
+                           0 - hit anywhere
+                           > 1 - handle number
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.GetHandleCursor(System.Int32)">
+            <summary>
+            Get cursor for the handle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.MoveHandleTo(System.Windows.Point,System.Int32)">
+            <summary>
+            Move handle to new point (resizing)
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.IntersectsWith(System.Windows.Rect)">
+            <summary>
+            Test whether object intersects with rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.Move(System.Double,System.Double)">
+            <summary>
+            Move object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.Normalize">
+            <summary>
+            Normalize rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.Zoom(System.Double,System.Windows.Point)">
+            <summary>
+            放缩代码
+            </summary>
+            <param name="scale"></param>
+            <param name="center"></param>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.CopyPoints">
+            <summary>
+             拷贝对象的初始点，以便用于还原初始状态
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsRectangleBase.Reset(System.Double,System.Windows.Point)">
+            <summary>
+            根据比例和中心点还原到相应
+            </summary>
+            <param name="scale"></param>
+            <param name="center"></param>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsSelectionRectangle">
+            <summary>
+            Selection Rectangle graphics object, used for group selection.
+            
+            Instance of this class should be created only for group selection
+            and removed immediately after group selection finished.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsSelectionRectangle.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw graphics object
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.GraphicsText">
+            <summary>
+             Text graphics object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsText.Draw(System.Windows.Media.DrawingContext)">
+            <summary>
+            Draw text
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsText.UpdateRectangle">
+            <summary>
+            Update rectangle to fit actual text size.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsText.CreateFormattedText">
+            <summary>
+            Create formatted text.
+            It is required for drawing and updating bounding rectangle.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsText.Contains(System.Windows.Point)">
+            <summary>
+            Test whether object contains point
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.GraphicsText.CreateSerializedObject">
+            <summary>
+            Serialization support
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.HelperFunctions">
+            <summary>
+            Helper class which contains general helper functions and properties.
+            
+            Most functions in this class replace VisualCollection-derived class
+            methods, because I cannot derive from VisualCollection.
+            They make different operations with GraphicsBase list.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.getRakeRatio(System.Windows.Point,System.Windows.Point)">
+            <summary>
+            计算两个点之间的斜率
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.getCenterPoint(System.Windows.Point,System.Windows.Point)">
+            <summary>
+            获取两个点之间的中心点
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.CalcDistanceSquare(System.Windows.Point,System.Windows.Point)">
+            <summary>
+            计算两点之间距离的平方
+            </summary>
+            <param name="p1"></param>
+            <param name="p2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.IsGesture(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.TouchEventArgs)">
+            <summary>
+            判断是否是手势
+            需要的参数，手指数根据设备Id拿到，第一个手指的起始点
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.getGestureId(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.TouchEventArgs)">
+            <summary>
+            记录下变化时刻两指之间的动态距离，变化足够大（负，表示缩小，正，表示放大）
+            以及中心点的位置变化不大则说明是缩放操作。
+            而平移的特点刚刚相反：如何中心变化足够大，以及两指之间的动态距离变化不大(区分效果不是很好，
+            因此在天添加一个特点判断，即两指之间斜率)。
+            旋转的特点：中心变化不大，而且两指之间的动态距离也变化不大。
+            </summary>
+            <param name="drawingCanvas"></param>
+            <param name="e"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.clear(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            手指up之后，还原GestureData中的数据。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.HelperFunctions.DefaultCursor">
+            <summary>
+            Default cursor
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.SelectAll(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Select all graphic objects
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.UnselectAll(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Unselect all graphic objects
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.DeleteSelection(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Delete selected graphic objects
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.DeleteAll(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Delete all graphic objects
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.MoveSelectionToFront(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Move selection to front
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.MoveSelectionToBack(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Move selection to back
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyLineWidth(WPFToolkit.Drawing.DrawingCanvas,System.Double,System.Boolean)">
+            <summary>
+            Apply new line width
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyColor(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Media.Color,System.Boolean)">
+            <summary>
+            Apply new color
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyFontFamily(WPFToolkit.Drawing.DrawingCanvas,System.String,System.Boolean)">
+            <summary>
+            Apply new font family
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyFontStyle(WPFToolkit.Drawing.DrawingCanvas,System.Windows.FontStyle,System.Boolean)">
+            <summary>
+            Apply new font style
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyFontWeight(WPFToolkit.Drawing.DrawingCanvas,System.Windows.FontWeight,System.Boolean)">
+            <summary>
+            Apply new font weight
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyFontStretch(WPFToolkit.Drawing.DrawingCanvas,System.Windows.FontStretch,System.Boolean)">
+            <summary>
+            Apply new font stretch
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyFontSize(WPFToolkit.Drawing.DrawingCanvas,System.Double,System.Boolean)">
+            <summary>
+            Apply new font size
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.Dump(System.Windows.Media.VisualCollection,System.String)">
+            <summary>
+            Dump graphics list (for debugging)
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.Dump(System.Windows.Media.VisualCollection)">
+            <summary>
+            Dump graphics list overload
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.CanApplyProperties(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Return true if currently active properties (line width, color etc.)
+            can be applied to selected items.
+            
+            If at least one selected object has property different from currently
+            active property value, properties can be applied.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.HelperFunctions.ApplyProperties(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Apply currently active properties to selected objects
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.PropertiesGraphicsBase">
+            <summary>
+            Base class for all serialization helper classes.
+            PropertiesGraphics* class hierarchy contains base class
+            and class for every non-abstract Graphics* class.
+            Since Graphics* classes are derived from DrawingVisual, I
+            cannot serialize them directly.
+            
+            Every PropertiesGraphics* class knows to create instance
+            of Graphics* class - see CreateGraphics function.
+            This function is called during deserialization, when 
+            PropertiesGraphics* class is loaded from XML file.
+            
+            On the other hand, every non-abstract Graphics* class
+            can create PropertiesGraphics* class: see 
+            GraphicsBase.CreateSerializedObject function.
+            It is called during serialization, when every Graphics*
+            object must create PropertiesGraphics*.
+            
+            
+            PropertiesGraphics* classes are also used in UndoManager
+            as light-weight clones of Graphics* classes.
+            These classes are also used in DrawingCanvas.GetListOfGraphicObjects
+            function for client which needs to get all data from DrawingCanvas
+            directly.
+            
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.PropertiesGraphicsEllipse">
+            <summary>
+            Ellipse object properties.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEllipse.Left">
+            <summary>
+            Left bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEllipse.Top">
+            <summary>
+            Top bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEllipse.Right">
+            <summary>
+            Right bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEllipse.Bottom">
+            <summary>
+            Bottom bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEllipse.LineWidth">
+            <summary>
+            Line Width
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEllipse.ObjectColor">
+            <summary>
+            Color
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEraser.Left">
+            <summary>
+            Left bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEraser.Top">
+            <summary>
+            Top bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEraser.Right">
+            <summary>
+            Right bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEraser.Bottom">
+            <summary>
+            Bottom bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEraser.LineWidth">
+            <summary>
+            Line Width
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsEraser.ObjectColor">
+            <summary>
+            Color
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.PropertiesGraphicsLine">
+            <summary>
+            Line object properties
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsLine.Start">
+            <summary>
+            Start Point
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsLine.End">
+            <summary>
+            End Point
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsLine.LineWidth">
+            <summary>
+            Line Width
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsLine.ObjectColor">
+            <summary>
+            Color
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.PropertiesGraphicsPolyLine">
+            <summary>
+            Polyline object properties
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsPolyLine.Points">
+            <summary>
+            Points
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsPolyLine.LineWidth">
+            <summary>
+            Line Width
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsPolyLine.ObjectColor">
+            <summary>
+            Color
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.PropertiesGraphicsRectangle">
+            <summary>
+            Rectangle object properties.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsRectangle.Left">
+            <summary>
+            Left bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsRectangle.Top">
+            <summary>
+            Top bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsRectangle.Right">
+            <summary>
+            Right bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsRectangle.Bottom">
+            <summary>
+            Bottom bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsRectangle.LineWidth">
+            <summary>
+            Line Width
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsRectangle.ObjectColor">
+            <summary>
+            Color
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.PropertiesGraphicsText">
+            <summary>
+            Text object properties
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.Text">
+            <summary>
+            Left bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.Left">
+            <summary>
+            Top bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.Top">
+            <summary>
+            Right bounding rectangle side, X
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.Right">
+            <summary>
+            Bottom bounding rectangle side, Y
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.ObjectColor">
+            <summary>
+            Color
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.TextFontSize">
+            <summary>
+            Font Size
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.TextFontFamilyName">
+            <summary>
+            Font Family Name
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.TextFontStyle">
+            <summary>
+            Font Style
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.TextFontWeight">
+            <summary>
+            Font Weight
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.PropertiesGraphicsText.TextFontStretch">
+            <summary>
+            Font Stretch
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.SerializationHelper">
+            <summary>
+            Helper class used for XML serialization.
+            Contains array of SerializedGraphicsBase instances.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.SerializationHelper.#ctor">
+            <summary>
+            Default constructor is XML serialization requirement.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.SerializationHelper.#ctor(System.Windows.Media.VisualCollection)">
+            <summary>
+            This constructor is used for serialization.
+            VisualCollection contains Graphics* instances.
+            Every Graphics instance creates SerializedGraphics*
+            instance which is added to graphics array.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.SerializationHelper.Graphics">
+            <summary>
+            When class is serialized, graphics array is filled in the constructor
+            and saved to XML file.
+            When class is deserialized, graphics array is loaded from XML file
+            and then used by called to create VisualCollection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.Stroke.Freeze">
+            <summary>
+            Seal the object.
+            </summary>
+            <remarks>
+            To improve performance, Seal replaces the list with fixed array.
+            </remarks>
+        </member>
+        <member name="P:WPFToolkit.Drawing.Stroke.IsFrozen">
+            <summary>
+            Indicate if we can add nore points to the stroke
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.Stroke.AddToCanvas(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+             Add the complete stroke
+            </summary>
+            <param name="canvas">the canvas that hold all figures</param>
+        </member>
+        <member name="P:WPFToolkit.Drawing.Stroke.Color">
+            <summary>
+            Access to the property stroke color
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.Stroke.Id">
+            <summary>
+            Access to the property stroke ID 
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.Stroke.Add(System.Windows.Point)">
+            <summary>
+            Adds a point to the stroke.
+            </summary>
+            <param name="pt">point to be added to the stroke</param>
+        </member>
+        <member name="T:WPFToolkit.Drawing.Tool">
+            <summary>
+            Base class for all drawing tools
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolEllipse">
+            <summary>
+            Ellipse tool
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolEllipse.OnMouseDown(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Create new rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolEraser.OnMouseDown(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Create new rectangle
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolEraser.OnMouseMove(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Set cursor and resize new object.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolLine">
+            <summary>
+            Line tool
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolLine.OnMouseDown(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Create new object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolLine.OnMouseMove(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Set cursor and resize new object.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolObject">
+            <summary>
+            Base class for all tools which create new graphic object
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.ToolObject.ToolCursor">
+            <summary>
+            Tool cursor.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolObject.OnMouseUp(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Left mouse is released.
+            New object is created and resized.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolObject.AddNewObject(WPFToolkit.Drawing.DrawingCanvas,WPFToolkit.Drawing.GraphicsBase)">
+            <summary>
+            Add new object to drawing canvas.
+            Function is called when user left-clicks drawing canvas,
+            and one of ToolObject-derived tools is active.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolObject.SetCursor(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Set cursor
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolPointer">
+            <summary>
+            Pointer tool
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPointer.OnMouseDown(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Handle mouse down.
+            Start moving, resizing or group selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPointer.OnMouseMove(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Handle mouse move.
+            Se cursor, move/resize, make group selection.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPointer.OnMouseUp(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Handle mouse up.
+            Return to normal state.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPointer.SetCursor(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Set cursor
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPointer.AddChangeToHistory(WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Add change to history.
+            Called after finishing moving/resizing.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolPolyLine">
+            <summary>
+            Polyline tool
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPolyLine.OnMouseDown(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Create new object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPolyLine.OnMouseMove(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Set cursor and resize new polyline
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPolyLine.TouchDownHandler(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.TouchEventArgs)">
+            <summary>
+            输入一个点，判定是否为手势，是则不需要在继续判断，手指离开时，将手势标识设置为false
+            如果不是则继续判断是否为手势.
+            </summary>
+            <param name="drawingCanvas"></param>
+            <param name="e"></param>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolPolyLine.TouchMoveHandler(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.TouchEventArgs)">
+            <summary>
+            在move过程判断具体的手势（zoom，pan,rotate）
+            </summary>
+            <param name="drawingCanvas"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolRectangle">
+            <summary>
+            Rectangle tool
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolRectangle.OnMouseDown(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Create new rectangle
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolRectangleBase">
+            <summary>
+            Base class for rectangle-based tools
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolRectangleBase.OnMouseMove(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Set cursor and resize new object.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolRectangleBase.OnMouseUp(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseEventArgs)">
+            <summary>
+            Set cursor and resize new object.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolText">
+            <summary>
+            Text tool
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.ToolText.TextBox">
+            <summary>
+            Textbox is exposed for DrawingCanvas Visual Children Overrides.
+            If it is not null, overrides should include this textbox.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolText.OnMouseDown(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Create new text object
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolText.OnMouseUp(WPFToolkit.Drawing.DrawingCanvas,System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            Left mouse is released.
+            New object is created and resized.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolText.CreateTextBox(WPFToolkit.Drawing.GraphicsText,WPFToolkit.Drawing.DrawingCanvas)">
+            <summary>
+            Create textbox for in-place editing
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolText.textBox_Loaded(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Correct textbox position.
+            Without this correction text shown in a textbox appears with some
+            horizontal and vertical offset relatively to textbox bounding rectangle.
+            We need to apply this correction, moving textbox in left-up direction.
+            
+            Visually, text should not "jump" on the screen, when in-place editing
+            textbox is open and closed.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolText.ComputeTextOffset(System.Windows.Controls.TextBox,System.Double@,System.Double@)">
+            <summary>
+            Compute distance between textbox top-left point and actual
+            text top-left point inside of textbox.
+            
+            Thanks to Nick Holmes for showing this code in MSDN WPF Forum.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolText.textBox_LostFocus(System.Object,System.Windows.RoutedEventArgs)">
+            <summary>
+            Hide textbox when it looses focus.  
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.ToolText.textBox_LostKeyboardFocus(System.Object,System.Windows.Input.KeyboardFocusChangedEventArgs)">
+            <summary>
+            Hide textbox when it looses keyboard focus.  
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.ToolText.OldText">
+            <summary>
+            Textbox text value before in-place editing.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.ToolTypeConverter">
+            <summary>
+            Convert ToolType to bool.
+            Can be used to check active tool button/menu item
+            in client application.
+            ConverterParameter should be string representation 
+            of the button tool type ("Pointer", "Rectangle" etc.)
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Drawing.UndoManager">
+            <summary>
+            Class is responsible for executing Undo - Redo operations
+            </summary>
+        </member>
+        <member name="E:WPFToolkit.Drawing.UndoManager.StateChanged">
+            <summary>
+            This event is raised after any operation which can change
+            UndoManager state. Client can subscribe to this event and
+            check CanUndo, CanRedo and IsDirty values.
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.UndoManager.CanUndo">
+            <summary>
+            Return true if Undo operation is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.UndoManager.CanRedo">
+            <summary>
+            Return true if Redo operation is available
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Drawing.UndoManager.IsDirty">
+            <summary>
+            Returns dirty flag for client document.
+            Document is dirty if it is possible to make Undo operation -
+            I hope this is correct.
+            
+            This can be changed if history has restricted length.
+            Once history is trimmed from the beginning, IsDirty should
+            be always true.
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.UndoManager.ClearHistory">
+            <summary>
+            Clear History
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.UndoManager.AddCommandToHistory(WPFToolkit.Drawing.CommandBase)">
+            <summary>
+            Add new command to history.
+            Called by client after executing some action.
+            </summary>
+            <param name="command"></param>
+        </member>
+        <member name="M:WPFToolkit.Drawing.UndoManager.Undo">
+            <summary>
+            Undo
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.UndoManager.Redo">
+            <summary>
+            Redo
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Drawing.UndoManager.RaiseStateChangedEvent">
+            <summary>
+            Raise UndoManagerOperation event.
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Panels.AVGPanel">
+            <summary>
+            一个可以根据内容平分高度的面板
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Panels.CircularPanel.MeasureOverride(System.Windows.Size)">
+            <summary>
+            
+            </summary>
+            <param name="availableSize">FrameworkElement所测量到的可供Panel使用的空间大小</param>
+            <returns></returns>
+        </member>
+        <member name="T:WPFToolkit.Utils.SelectionArea">
+            <summary>
+            专门用来绘制选框的控件
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utils.ItemsControlUtils">
+            <summary>
+            对ItemsControl进行扩展
+            在实现SelectionArea属性的时候，意外的解决了一个困扰我多年的问题。。。如何实现在框选的时候滚动条自动往下滚动？
+            原来这个功能根本不用我们自己去实现，WPF已经帮我们实现好了，只要在鼠标按下的时候，调用控件的CaptureMouse即可。。。。
+            
+            注意，如果ItemsControl开启了虚拟化支持，那么请设置：VirtualizingPanel.ScrollUnit="Pixel"，不然获取不到ScrollViewer所滚动的距离
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Utils.ItemsControlUtils.AutoBringIntoViewProperty">
+            <summary>
+            当列表项被选中的时候，是否自动让滚动条滚动到列表项可见区域
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utils.VisualTreeUtils">
+            <summary>
+            提供对VisualTree的扩展函数
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Utils.VisualTreeUtils.FindAllVisualChild``1(System.Windows.DependencyObject)">
+            <summary>
+            找到一个节点下的指定类型的所有子元素
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Utils.VisualTreeUtils.FindAllChildVisualChild``1(System.Windows.DependencyObject,System.Collections.Generic.List{``0})">
+            <summary>
+            找到一个节点下的指定类型的所有子元素
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Utils.VisualTreeUtils.CopyFrom(System.Windows.FrameworkElement,System.Windows.FrameworkElement,System.Collections.Generic.Dictionary{System.Type,System.Windows.DependencyProperty})">
+            <summary>
+            把一个控件里的所有子控件的值拷贝到另外一个相同的控件里
+            </summary>
+            <param name="srcElement"></param>
+            <param name="targetElement"></param>
+            <param name="copyWhat"></param>
+        </member>
+        <member name="T:WPFToolkit.Utility.DataGridUtils">
+            <summary>
+            为DataGrid附加功能
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utility.FontUtility">
+            <summary>
+            对字体的帮助类
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utility.ImageUtility">
+            <summary>
+            提供对ImageSource的帮助函数
+            
+            位图和调色板：https://blog.csdn.net/kingbyang1/article/details/5564704
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Utility.ImageUtility.FromURI(System.String)">
+            <summary>
+            使用imageURI创建一个ImageSource
+            </summary>
+            <param name="imageURI"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Utility.ImageUtility.FromBitmap(System.Drawing.Bitmap)">
+            <summary>
+            使用Winform的Bitmap创建一个ImageSource
+            注意，该函数不会释放Bitmap
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WPFToolkit.YControls.YDivider">
+            <summary>
+            分割线控件
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YDivider.Color">
+            <summary>
+            分割线的颜色
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YDivider.Orientation">
+            <summary>
+            分割线的方向
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YDivider.Thickness">
+            <summary>
+            分割线的粗细
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.YControls.YPressedEffects">
+            <summary>
+            定义当按钮被按下的时候的效果
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.YControls.YPressedEffects.BackgroundEffect">
+            <summary>
+            当鼠标移动到按钮上的时候显示一个浅颜色的背景
+            当鼠标按下的时候显示一个深颜色的背景
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundHover">
+            <summary>
+            指定当鼠标移动到按钮上显示的背景颜色
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundPressed">
+            <summary>
+            指定当鼠标按下的时候显示的背景颜色
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.ColorTextConverter">
+            <summary>
+            颜色结构体转文本
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.NullableVisiblityConverter">
+            <summary>
+            布尔值到空值的转换
+            如果传进来的值为空，那么返回Collapsed，否则返回Visible
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter">
+            <summary>
+            True转成Visible
+            False转成Collapsed
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter2">
+            <summary>
+            True转成Collapsed
+            False转成Visible
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.DragDrop.IDragSource.StartDrag(WPFToolkit.DragDrop.DragInfo)">
+            <summary>
+            开始处理拖拽：
+            1. 判断元素是否可以拖拽
+            2. 如果可以，则根据DragInfo的信息解析数据，填充DragInfo.Data，设置DragDropEffects
+            
+            </summary>
+            <param name="dragInfo"></param>
+        </member>
+        <member name="T:WPFToolkit.DragDrop.IDropHandler">
+            <summary>
+            处理Drop事件
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.DragDrop.IDropHandler.OnDragOver(WPFToolkit.DragDrop.DropInfo)">
+            <summary>
+            处理Drop Over消息。判断当前是否能够接受拖拽的数据源，同时根据需求修改鼠标拖拽效果
+            </summary>
+            <param name="dropInfo"></param>
+        </member>
+        <member name="M:WPFToolkit.DragDrop.IDropHandler.OnDrop(WPFToolkit.DragDrop.DropInfo)">
+            <summary>
+            处理Drop事件
+            </summary>
+            <param name="dropInfo"></param>
+        </member>
+        <member name="T:WPFToolkit.MVVM.BindableCollection`1">
+            <summary>
+            ObservableCollection的增强版
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:WPFToolkit.MVVM.BindableCollection`1.SelectedItem">
+            <summary>
+            当前选中的项
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.BindableCollection`1.SelectedItems">
+            <summary>
+            当前选中的项集合
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.NotifiableAttribute">
+            <summary>
+            表示一个可通知的属性
+            动态创建ViewModel的时候，如果检测到属性上有这个特性，那么自动为属性附加PropertyChanged通知
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.DataProviders.HierarchicalDataProvider">
+            <summary>
+            有父子关系的数据结构数据提供器
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.DataProviders.IDataProvider">
+            <summary>
+            数据提供器
+            ViewModel通过DataProvider加载数据
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.IExpandableViewModel">
+            <summary>
+            表示一个可展开的项
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.IExpandableViewModel.IsExpanded">
+            <summary>
+            是否展开了项
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Interactivity.BehaviorCollection.AttachedObject">
+            <summary>
+            记录被Behavior附加的UI对象
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Behavior">
+            <summary>
+            可以附加到Xaml界面上的状态
+            继承DependencyObject的目的是为了让Behavior可以定义依赖项属性，从而可以在界面上进行绑定操作
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Interactivity.Behavior.AttachedObject">
+            <summary>
+            被Behavior附加的界面对象
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.Interactivity.Behavior.Initialize">
+            <summary>
+            属性附加完成了（AttachedObject不为空），可以做初始化操作了
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.Interactivity.Behavior.Release">
+            <summary>
+            释放Behavior占用的资源
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Behaviors.EventActionBehavior">
+            <summary>
+            事件转Action
+            使用反射注册事件：https://www.cnblogs.com/walterlv/p/10236420.html
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Interactivity.Behaviors.EventActionBehavior.EventName">
+            <summary>
+            要执行Action的Event
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Interactivity.Behaviors.EventActionBehavior.Action">
+            <summary>
+            要执行的Action
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Interactivity.Behaviors.EventActionBehavior.EventArgsConverter">
+            <summary>
+            事件参数转换器
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.Interactivity.Behaviors.EventActionBehavior.RegisterEvent(System.String,System.Object)">
+            <summary>
+            给一个对象注册事件处理器
+            </summary>
+            <param name="eventName"></param>
+            <param name="registeredObject"></param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.Interactivity.Behaviors.EventActionBehavior.AttachedObjectEventHandler(System.Object,System.Object)">
+            <summary>
+            被附加对象的事件处理器
+            </summary>
+            <param name="sender"></param>
+            <param name="eventArgs"></param>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Interaction">
+            <summary>
+            Interaction类
+            
+            BehaviorsProperty这个附加属性是连接XAML和ViewMode的桥梁，它也是完美实现ViewModel和Xaml分离的最重要的属性。它是直接和XAML打交道的，是要直接定义在XAML里的
+            如果我们直接在XAML里定义Behaviors，那么WPF在解析XAML的时候，发现Behaviors这个属性是空的，导致的结果就是会直接抛出一个（XamlObjectWriterException: “集合属性“System.Windows.Controls.Grid”.“Behaviors”为 null）的异常
+            后来经过查看其它MVVM框架的源码，发现在注册附加属性的时候，如果在附加属性的名字后面加一个Internal（参照BehaviorsProperty的注册方式），那么WPF就会先去调用Get访问器。。我们可以在Get访问器里初始化Behaviors这个集合，这样就不会抛异常了
+            
+            WPF执行顺序：
+            1. 调用GetBehaviors函数（在这个函数里我们会初始化Behaviors属性）
+            2. 对XAML里定义的每个Behavior进行实例化
+            3. Behavior里如果定义了依赖属性并且设置了依赖属性回调，那么回调用Behavior -> 依赖项属性回调函数
+            4. 把Behavior加入到Behaviors里
+            5. Behaviors集合发生改变，发出CollectionChanged通知
+            
+            根据这个顺序，我们现在要做的事情就是要在Behaviors的CollectionChanged的时候初始化每个Behavior
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.Interactivity.Interaction.Behaviors_CollectionChanged(System.Object,System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            XAML里的Behavior被加入到集合里了
+            </summary>
+            <param name="sender"></param>
+            <param name="e"></param>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Service">
+            <summary>
+            表示ViewModel里的一个服务
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Services.IBackgroundTaskService">
+            <summary>
+            为执行后台任务提供服务
+            该服务会在会把函数放到异步线程去运行，同时界面上会弹出一个ProrgessWindow以提示用户任务运行进度
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Interactivity.Services.IBackgroundTaskService.Dispatcher">
+            <summary>
+            UI工作线程调度队列
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Services.IDialogService">
+            <summary>
+            为Dialog窗口提供基本服务
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Services.IDispatcherService">
+            <summary>
+            提供可以访问UI线程的能力
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Interactivity.Services.IDispatcherService.Dispatcher">
+            <summary>
+            UI工作线程调度队列
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Services.IMessageBoxService">
+            <summary>
+            提供弹窗服务
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Services.ClassicMessageBoxService">
+            <summary>
+            Windows经典弹窗
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Interactivity.Services.Windows10MessageBoxService">
+            <summary>
+            模拟Win10弹窗
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Internals.InternalTreeNode.ID">
+            <summary>
+            节点ID
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Internals.InternalTreeNode.Name">
+            <summary>
+            节点名字
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Internals.InternalTreeNode.Icon">
+            <summary>
+            TreeItem图标
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Internals.InternalTreeNode.Children">
+            <summary>
+            子节点列表
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Internals.InternalTreeNode.Data">
+            <summary>
+            用户自定义数据
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.Internals.InternalTreeView">
+            <summary>
+            存储数据模型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.Internals.InternalTreeView.NodeList">
+            <summary>
+            节点列表
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.ItemViewModel">
+            <summary>
+            列表项通用ViewModel
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ItemViewModel.IconURI">
+            <summary>
+            当前项要显示的图标URI
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ItemViewModel.IsSelected">
+            <summary>
+            当前项是否被选中
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ItemViewModel.IsExpanded">
+            <summary>
+            当前节点是否被展开
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ItemViewModel.IsChecked">
+            <summary>
+            节点是否被勾选（当节点带有CheckBox的时候）
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ItemViewModel.IsVisible">
+            <summary>
+            是否显示该节点
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.ISelectableViewModel">
+            <summary>
+            表示一个可选中的项
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ISelectableViewModel.IsSelected">
+            <summary>
+            当前是否被选中
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.ClassName">
+            <summary>
+            界面入口点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.VMClassName">
+            <summary>
+            ViewModel的完整类名
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.IsInitialized">
+            <summary>
+            该菜单是否初始化完了
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.Content">
+            <summary>
+            该菜单所要显示的内容
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.ContentVM">
+            <summary>
+            该菜单所显示的内容的ViewModel
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.MenuItems">
+            <summary>
+            子菜单
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.MenuDefinition">
+            <summary>
+            定义配置文件里的菜单模型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuDefinition.ID">
+            <summary>
+            菜单ID
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuDefinition.Name">
+            <summary>
+            菜单名字
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuDefinition.ClassName">
+            <summary>
+            界面类名
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuDefinition.VMClassName">
+            <summary>
+            ViewModel类名
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuDefinition.Icon">
+            <summary>
+            图标
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuDefinition.Children">
+            <summary>
+            子菜单
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.IContentHook">
+            <summary>
+            表示内容控件生命周期钩子对象
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.IContentHook.Initialize">
+            <summary>
+            第一次初始化会调用
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.IContentHook.Release">
+            <summary>
+            释放ContentHost的资源
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.IContentHook.OnLoaded">
+            <summary>
+            每次显示在界面上之后都会触发
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.IContentHook.OnUnload">
+            <summary>
+            每次从界面上移除之前都会触发
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.MenuVM">
+            <summary>
+            菜单ViewModel
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.MenuVM.currentContent">
+            <summary>
+            当前选中的页面
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.MenuVM.previouseSelectedMenu">
+            <summary>
+            上次选中的菜单
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.MenuVM.isContentLoading">
+            <summary>
+            当前的内容是否正在初始化
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuVM.SelectedMenu">
+            <summary>
+            当前选中的菜单
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuVM.MenuItems">
+            <summary>
+            所有的菜单列表
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuVM.IsContentLoading">
+            <summary>
+            当前的内容是否正在初始化
+            界面上可以通过这个值给用户显示一个“加载中”的界面
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuVM.CurrentContent">
+            <summary>
+            当前显示的界面
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.MenuVM.LoadSubMenus(WPFToolkit.MVVM.MenuItemVM,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
+            <summary>
+            递归加载子菜单
+            </summary>
+            <param name="parentMenu"></param>
+            <param name="childMenus"></param>
+        </member>
+        <member name="T:WPFToolkit.MVVM.TreeViewModelContext">
+            <summary>
+            存储树形列表ViewModel共享的数据
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.NodeMap">
+            <summary>
+            存储所有节点列表
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.NodeList">
+            <summary>
+            获取树形列表里的所有的节点列表
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.SelectedItem">
+            <summary>
+            当前选中的节点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.SelectedItems">
+            <summary>
+            当前选中的节点集合
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.CheckedItems">
+            <summary>
+            当前选中的节点集合
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.AddNode(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            缓存TreeNode，方便以后查询
+            </summary>
+            <param name="node"></param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.RemoveNode(System.String)">
+            <summary>
+            删除一个缓存的树形节点
+            </summary>
+            <param name="nodeID"></param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.QueryNode``1(System.Func{``0,System.Boolean})">
+            <summary>
+            根据条件查询节点，如果没查询到则返回null
+            </summary>
+            <param name="predicate"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WPFToolkit.MVVM.TreeNodeViewModel">
+            <summary>
+            通用属性列表每个列表项的ViewModel
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.Parent">
+            <summary>
+            父节点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.Children">
+            <summary>
+            该节点下的子节点列表
+            不要使用Children.Add和Children.Remove去增加和删除子节点
+            请调用AddChildNode和RemoveChildNode方法去增加和删除子节点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.Data">
+            <summary>
+            存储该节点的用户自定义数据模型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.Context">
+            <summary>
+            树形列表上下文信息
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.IsExpanded">
+            <summary>
+            设置是否展开该节点
+            如果是展开，那么该操作会对上级节点进行递归展开
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.IsSelected">
+            <summary>
+            设置是否选中当前节点
+            如果是选中，那么该操作会对上级节点进行递归展开
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.IsChecked">
+            <summary>
+            设置是否选中当前节点
+            如果是选中，那么该操作会对上级节点进行递归选中
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.AddChildNode(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            增加一个子节点
+            </summary>
+            <param name="node">要增加的子节点</param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.RemoveChildNode(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            删除一个子节点
+            </summary>
+            <param name="node">要删除的子节点</param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.OnInitialized">
+            <summary>
+            当子节点加载完毕的时候触发
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.TreeViewModel`1">
+            <summary>
+            通用树形列表ViewModel
+            项目在开发的时候可以继承这个ViewModel，也可以直接使用该ViewModel
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.TreeViewModel`1.ActionOptions">
+            <summary>
+            指定某个动作的选项
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.TreeViewModel`1.ActionOptions.None">
+            <summary>
+            没有选项
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.TreeViewModel`1.ActionOptions.Recursion">
+            <summary>
+            递归对子节点执行同样的动作
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModel`1.Roots">
+            <summary>
+            树形列表的根节点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModel`1.Context">
+            <summary>
+            存储树形列表上下文信息
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.#ctor">
+            <summary>
+            构造方法
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.AddRootNode(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            增加一个根节点
+            </summary>
+            <param name="root">要增加的根节点</param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.TryGetNode(System.String,WPFToolkit.MVVM.TreeNodeViewModel@)">
+            <summary>
+            获取一个节点VM
+            </summary>
+            <param name="nodeID">要获取的节点的ID</param>
+            <param name="node">获取到的节点</param>
+            <returns>是否存在节点</returns>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.ExpandNode(System.String)">
+            <summary>
+            展开某个节点
+            </summary>
+            <param name="nodeID">要展开的节点ID</param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.SelectNode(System.String)">
+            <summary>
+            选中某个节点
+            </summary>
+            <param name="nodeID">要选中的节点ID</param>
+        </member>
+        <member name="T:WPFToolkit.MVVM.ViewModelBase">
+            <summary>
+            ViewModelBase类
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.ViewModelBase.name">
+            <summary>
+            冗余Name属性
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.ViewModelBase.id">
+            <summary>
+            冗余属性，字符串格式的ID
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.MVVM.ViewModelBase.description">
+            <summary>
+            冗余Description属性
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MarkupExtensions.EnumItemsSource">
+            <summary>
+            把一个枚举类型转换成可以直接绑定到ItemsControl上的类型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MarkupExtensions.EnumItemsSource.EnumType">
+            <summary>
+            枚举的类型
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MarkupExtensions.EnumItemsSource.EnumTypeName">
+            <summary>
+            枚举类型的名字
+            优先使用EnumTypeName进行反射
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MarkupExtensions.EnumItemsSource.EnumMemberConverter">
+            <summary>
+            对值进行转换的转换器
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MarkupExtensions.EnumMemberVM.Value">
+            <summary>
+            枚举的值
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MarkupExtensions.EnumMemberVM.ToString">
+            <summary>
+            绑定的时候，ItemsControl会自动调用每个模型的ToString函数并显示到界面上
+            这里我们需要显示Name属性
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:WPFToolkit.MarkupExtensions.Images">
+            <summary>
+            提供把图片文件转换成ImageSource的功能
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MarkupExtensions.Images.Name">
+            <summary>
+            要显示的图像名字
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Properties.Resources">
+            <summary>
+              一个强类型的资源类，用于查找本地化的字符串等。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.ResourceManager">
+            <summary>
+              返回此类使用的缓存的 ResourceManager 实例。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.Culture">
+            <summary>
+              重写当前线程的 CurrentUICulture 属性，对
+              使用此强类型资源类的所有资源查找执行重写。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.Ellipse">
+            <summary>
+              查找 System.Byte[] 类型的本地化资源。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.Eraser">
+            <summary>
+              查找 System.Byte[] 类型的本地化资源。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.Line">
+            <summary>
+              查找 System.Byte[] 类型的本地化资源。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.Pencil">
+            <summary>
+              查找 System.Byte[] 类型的本地化资源。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.PolyHandle">
+            <summary>
+              查找 System.Byte[] 类型的本地化资源。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.Rectangle">
+            <summary>
+              查找 System.Byte[] 类型的本地化资源。
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Properties.Resources.Text">
+            <summary>
+              查找 System.Byte[] 类型的本地化资源。
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.ThemeManager">
+            <summary>
+            动态换肤工具
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Windows.SplashScreenWindow">
+            <summary>
+            SplashScreenWindow.xaml 的交互逻辑
+            </summary>
+            <summary>
+            SplashScreenWindow
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Windows.SplashScreenWindow.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+    </members>
+</doc>

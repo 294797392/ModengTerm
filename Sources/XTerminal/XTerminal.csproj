@@ -65,6 +65,9 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WPFToolkit">
+      <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -90,8 +93,21 @@
     <Compile Include="Rendering\DrawingCanvas.cs" />
     <Compile Include="Rendering\DrawingCanvasPanel.cs" />
     <Compile Include="Options\TerminalOptions.cs" />
+    <Compile Include="UserControls\UpdatePropertiesUserControl.xaml.cs">
+      <DependentUpon>UpdatePropertiesUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="Options\VTInitialOptions.cs" />
+    <Compile Include="ViewModels\GroupVM.cs" />
+    <Compile Include="ViewModels\SessionVM.cs" />
+    <Compile Include="ViewModels\StartupWindowVM.cs" />
+    <Compile Include="ViewModels\UpdatePropertiesVM.cs" />
+    <Compile Include="Windows\CreateSessionWindow.xaml.cs">
+      <DependentUpon>CreateSessionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\StartupWindow.xaml.cs">
+      <DependentUpon>StartupWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -112,6 +128,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UserControls\UpdatePropertiesUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\CreateSessionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\StartupWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -119,6 +147,9 @@
     </Compile>
     <None Include="app.config" />
     <AppDesigner Include="Properties\" />
+    <None Include="app.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Resource Include="Fonts\Ubuntu-B.ttf" />
     <Resource Include="Fonts\Ubuntu-BI.ttf" />
     <Resource Include="Fonts\Ubuntu-C.ttf" />
@@ -142,9 +173,7 @@
     <Resource Include="Fonts\README.txt" />
     <Resource Include="Fonts\TRADEMARKS.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Windows\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
       <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
@@ -160,6 +189,11 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties app_1json__JsonSchema="https://beaujs.com/schema.json" />
+    </VisualStudio>
+  </ProjectExtensions>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

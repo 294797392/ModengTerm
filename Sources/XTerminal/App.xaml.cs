@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
+using VideoTerminal;
+using XTerminal.Base;
 
 namespace XTerminal
 {
@@ -38,6 +40,8 @@ namespace XTerminal
         {
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
             PixelsPerDip = VisualTreeHelper.GetDpi(new DrawingVisual()).PixelsPerDip;
+
+            XTermApp.Context.Initialize("app.json");
         }
     }
 }
