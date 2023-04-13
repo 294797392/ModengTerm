@@ -22,7 +22,10 @@ namespace VideoTerminal.Windows
     /// </summary>
     public partial class CreateSessionWindow : Window
     {
-        private enum PageTypeEnum
+        /// <summary>
+        /// 当前新建Session的步骤
+        /// </summary>
+        private enum StepEnum
         {
             SessionList,
             UpdateProperties
