@@ -144,11 +144,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\source\vt.h" />
+    <ClInclude Include="..\source\vterminal.h" />
     <ClInclude Include="..\source\vtglobal.h" />
     <ClInclude Include="..\source\vtssh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\main.c" />
+    <ClCompile Include="..\source\vterminal.c" />
     <ClCompile Include="..\source\vtglobal.c" />
     <ClCompile Include="..\source\vtssh.c" />
   </ItemGroup>

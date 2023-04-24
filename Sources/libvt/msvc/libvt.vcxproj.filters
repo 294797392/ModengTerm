@@ -4,10 +4,12 @@
     <ClInclude Include="..\source\vt.h" />
     <ClInclude Include="..\source\vtssh.h" />
     <ClInclude Include="..\source\vtglobal.h" />
+    <ClInclude Include="..\source\vterminal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\vtssh.c" />
     <ClCompile Include="..\source\vtglobal.c" />
     <ClCompile Include="..\source\main.c" />
+    <ClCompile Include="..\source\vterminal.c" />
   </ItemGroup>
 </Project>

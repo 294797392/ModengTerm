@@ -3,34 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Base;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 
 namespace XTerminal.Document
 {
-    /// <summary>
-    /// 定义光标类型
-    /// </summary>
-    public enum VTCursorStyles
-    {
-        None,
-
-        /// <summary>
-        /// 光标是一条竖线
-        /// </summary>
-        Line,
-
-        /// <summary>
-        /// 光标是一个矩形块
-        /// </summary>
-        Block,
-
-        /// <summary>
-        /// 光标是半个下划线
-        /// </summary>
-        Underscore
-    }
-
     /// <summary>
     /// 光标的数据模型
     /// </summary>

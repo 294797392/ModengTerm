@@ -1,14 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using DotNEToolkit.DataModels;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Base
+namespace XTerminal.Base.DataModels
 {
-    public static class XTermUtils
+    public class GroupDM : ModelBase
     {
     }
 }

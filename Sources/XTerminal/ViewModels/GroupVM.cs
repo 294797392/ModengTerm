@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace VideoTerminal.ViewModels
+namespace XTerminal.ViewModels
 {
     public class GroupVM : ViewModelBase
     {

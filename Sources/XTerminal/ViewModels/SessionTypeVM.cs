@@ -4,14 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
-using XTerminal.Channels;
 using XTerminal.Sessions;
 
 namespace XTerminal.ViewModels
 {
-    public class SessionVM : ItemViewModel
+    public class SessionTypeVM : ItemViewModel
     {
         private SessionTypeEnum type;
+
+        /// <summary>
+        /// 参数配置界面的入口点类名
+        /// </summary>
+        public string ProviderEntry { get; set; }
 
         /// <summary>
         /// 会话类型
@@ -24,15 +28,6 @@ namespace XTerminal.ViewModels
                 this.type = value;
                 this.NotifyPropertyChanged("Type");
             }
-        }
-
-        /// <summary>
-        /// 该会话的属性
-        /// </summary>
-        public SessionPropertiesVM PropertiesVM { get; set; }
-
-        public SessionVM()
-        {
         }
     }
 }

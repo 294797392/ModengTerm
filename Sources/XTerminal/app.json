@@ -3,7 +3,7 @@
         {
             "ID": "1",
             "Name": "服务代理",
-            "ClassName": "XTerminal.Base.ServiceAgents.FileServiceAgent, XTerminal.Base",
+            "ClassName": "XTerminal.ServiceAgents.FileServiceAgent, XTerminal",
             "Inputs": {
             }
         }
@@ -11,10 +11,12 @@
 
     "sessions": [
         {
-            "id": "",
+            "id": "1",
             "name": "ssh",
             "description": "",
-            "icon": ""
+            "icon": "",
+            "providerEntry": "XTerminal.UserControls.SSHPropertiesUserControl, XTerminal",
+            "type": 0
         }
     ]
 }

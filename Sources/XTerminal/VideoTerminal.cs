@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using VideoTerminal.Options;
 using XTerminal.Base;
 using XTerminal.Channels;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 using XTerminal.Rendering;
+using XTerminal.Session;
 
 namespace XTerminal
 {
@@ -52,7 +52,7 @@ namespace XTerminal
         /// <summary>
         /// 与终端进行通信的信道
         /// </summary>
-        private VTChannel vtChannel;
+        private VTSession vtChannel;
 
         /// <summary>
         /// 终端字符解析器
@@ -224,7 +224,7 @@ namespace XTerminal
             this.uiSyncContext = SynchronizationContext.Current;
 
             // DECAWM
-            this.autoWrapMode = this.initialOptions.TerminalOption.DECPrivateAutoWrapMode;
+            this.autoWrapMode = this.initialOptions.TerminalProperties.DECPrivateAutoWrapMode;
 
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
@@ -261,9 +261,9 @@ namespace XTerminal
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                ColumnSize = initialOptions.TerminalOption.Columns,
-                RowSize = initialOptions.TerminalOption.Rows,
-                DECPrivateAutoWrapMode = initialOptions.TerminalOption.DECPrivateAutoWrapMode,
+                ColumnSize = initialOptions.TerminalProperties.Columns,
+                RowSize = initialOptions.TerminalProperties.Rows,
+                DECPrivateAutoWrapMode = initialOptions.TerminalProperties.DECPrivateAutoWrapMode,
                 CursorStyle = initialOptions.CursorOption.Style,
                 Interval = initialOptions.CursorOption.Interval,
                 CanvasCreator = this.CanvasPanel
@@ -290,7 +290,7 @@ namespace XTerminal
 
             #region 连接中断通道
 
-            VTChannel vtChannel = VTChannelFactory.Create(options);
+            VTSession vtChannel = VTSessionFactory.Create(options);
             vtChannel.StatusChanged += this.VTChannel_StatusChanged;
             vtChannel.DataReceived += this.VTChannel_DataReceived;
             vtChannel.Connect();
@@ -439,7 +439,7 @@ namespace XTerminal
             this.currentScroll = scrollValue;
 
             // 终端可以显示的总行数
-            int terminalRows = this.initialOptions.TerminalOption.Rows;
+            int terminalRows = this.initialOptions.TerminalProperties.Rows;
 
             VTHistoryLine historyLine;
             if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
@@ -556,7 +556,7 @@ namespace XTerminal
 
             // 当前行的Y偏移量
             double offsetY = 0;
-            int termLines = this.initialOptions.TerminalOption.Rows;
+            int termLines = this.initialOptions.TerminalProperties.Rows;
             VTHistoryLine lineHit = topHistoryLine;
             for (int i = 0; i < termLines; i++)
             {
@@ -636,7 +636,7 @@ namespace XTerminal
 
             // 当前行的Y偏移量
             double offsetY = 0;
-            int termLines = this.initialOptions.TerminalOption.Rows;
+            int termLines = this.initialOptions.TerminalProperties.Rows;
             VTHistoryLine currentLine = topHistoryLine;
             for (int i = 0; i < termLines; i++)
             {
@@ -829,7 +829,7 @@ namespace XTerminal
                             this.activeHistoryLine = historyLine;
 
                             // 滚动条滚动到底
-                            int terminalRows = this.initialOptions.TerminalOption.Rows;
+                            int terminalRows = this.initialOptions.TerminalProperties.Rows;
                             int scrollMax = historyIndex - terminalRows + 1;
                             if (scrollMax > 0)
                             {
@@ -1113,7 +1113,7 @@ namespace XTerminal
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = this.initialOptions.TerminalOption.Rows;
+                        int lines = this.initialOptions.TerminalProperties.Rows;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
@@ -1178,7 +1178,7 @@ namespace XTerminal
             }
         }
 
-        private void VTChannel_DataReceived(VTChannel client, byte[] bytes)
+        private void VTChannel_DataReceived(VTSession client, byte[] bytes)
         {
             //string str = string.Join(",", bytes.Select(v => v.ToString()).ToList());
             //logger.InfoFormat("Received, {0}", str);
@@ -1192,7 +1192,7 @@ namespace XTerminal
             //logger.ErrorFormat("TotalRows = {0}", this.activeDocument.TotalRows);
         }
 
-        private void VTChannel_StatusChanged(object client, VTChannelState state)
+        private void VTChannel_StatusChanged(object client, VTSessionStateEnum state)
         {
             logger.InfoFormat("客户端状态发生改变, {0}", state);
         }

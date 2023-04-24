@@ -7,8 +7,8 @@
     <ProjectGuid>{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VideoTerminal</RootNamespace>
-    <AssemblyName>VideoTerminal</AssemblyName>
+    <RootNamespace>XTerminal</RootNamespace>
+    <AssemblyName>XTerminal</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -74,17 +74,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Channels\ChannelAuthorition.cs" />
-    <Compile Include="Channels\libvtsshChannel.cs" />
-    <Compile Include="Channels\SSHChannel.cs" />
-    <Compile Include="Channels\SSHChannelAuthorition.cs" />
-    <Compile Include="Channels\VTChannel.cs" />
-    <Compile Include="Channels\VTChannelFactory.cs" />
-    <Compile Include="Channels\VTChannelState.cs" />
-    <Compile Include="Channels\VTChannelTypes.cs" />
+    <Compile Include="Converters.cs" />
     <Compile Include="DefaultValues.cs" />
-    <Compile Include="libvt.cs" />
-    <Compile Include="Options\CursorOptions.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
     <Compile Include="Rendering\DrawingLine.cs" />
     <Compile Include="Rendering\DrawingSelection.cs" />
@@ -92,17 +83,23 @@
     <Compile Include="Rendering\WPFRenderUtils.cs" />
     <Compile Include="Rendering\DrawingCanvas.cs" />
     <Compile Include="Rendering\DrawingCanvasPanel.cs" />
-    <Compile Include="Options\TerminalOptions.cs" />
-    <Compile Include="UserControls\UpdatePropertiesUserControl.xaml.cs">
-      <DependentUpon>UpdatePropertiesUserControl.xaml</DependentUpon>
+    <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
+    <Compile Include="ServiceAgents\FileServiceAgent.cs" />
+    <Compile Include="ServiceAgents\ServiceAgent.cs" />
+    <Compile Include="UserControls\SSHPropertiesUserControl.xaml.cs">
+      <DependentUpon>SSHPropertiesUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="VideoTerminal.cs" />
-    <Compile Include="Options\VTInitialOptions.cs" />
     <Compile Include="ViewModels\GroupVM.cs" />
+    <Compile Include="ViewModels\MainWindowVM.cs" />
+    <Compile Include="ViewModels\SessionPropertiesVM.cs" />
+    <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\SessionVM.cs" />
-    <Compile Include="Windows\CreateSessionWindow.xaml.cs">
-      <DependentUpon>CreateSessionWindow.xaml</DependentUpon>
+    <Compile Include="ViewModels\SSHSessionPropertiesVM.cs" />
+    <Compile Include="Windows\TestWindow.xaml.cs">
+      <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="XTermApp.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -123,11 +120,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UserControls\UpdatePropertiesUserControl.xaml">
+    <Page Include="UserControls\SessionPropertiesDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\CreateSessionWindow.xaml">
+    <Page Include="UserControls\SSHPropertiesUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TestWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -177,6 +178,10 @@
     <ProjectReference Include="..\XTerminal.Parser\XTerminal.Parser.csproj">
       <Project>{7909ea37-1524-415a-9cb8-dbe3274f4152}</Project>
       <Name>XTerminal.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XTerminal.Session\XTerminal.Session.csproj">
+      <Project>{fbe890d8-f5ba-4bd4-a298-e85ecfb6754a}</Project>
+      <Name>XTerminal.Session</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

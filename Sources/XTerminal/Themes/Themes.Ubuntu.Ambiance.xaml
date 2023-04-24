@@ -5,5 +5,4 @@
     <SolidColorBrush x:Key="BrushCaret" Color="White"/>
     <SolidColorBrush x:Key="BrushDefaultForeground" Color="White"/>
 
-
 </ResourceDictionary>
