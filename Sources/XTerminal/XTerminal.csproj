@@ -96,6 +96,9 @@
     <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\SessionVM.cs" />
     <Compile Include="ViewModels\SSHSessionPropertiesVM.cs" />
+    <Compile Include="Windows\CreateSessionWindow.xaml.cs">
+      <DependentUpon>CreateSessionWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
@@ -127,6 +130,10 @@
     <Page Include="UserControls\SSHPropertiesUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\CreateSessionWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\TestWindow.xaml">
       <SubType>Designer</SubType>

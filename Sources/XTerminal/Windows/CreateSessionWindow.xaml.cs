@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DotNEToolkit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,27 +14,21 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 using XTerminal.Base;
-using XTerminal.Base.Definitions;
+using XTerminal.Session.Property;
+using XTerminal.ViewModels;
 
-namespace VideoTerminal.Windows
+namespace XTerminal.Windows
 {
     /// <summary>
     /// CreateSessionWindow.xaml 的交互逻辑
     /// </summary>
     public partial class CreateSessionWindow : Window
     {
-        /// <summary>
-        /// 当前新建Session的步骤
-        /// </summary>
-        private enum StepEnum
-        {
-            SessionList,
-            UpdateProperties
-        }
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionWindow");
 
         #region 实例变量
 
-        private BindableCollection<SessionDefinition> sessionList;
+        private Dictionary<SessionTypeVM, FrameworkElement> stepElementMap;
 
         #endregion
 
@@ -52,11 +47,46 @@ namespace VideoTerminal.Windows
 
         private void InitializeWindow()
         {
-            this.sessionList = new BindableCollection<SessionDefinition>();
-            this.sessionList.AddRange(XTermApp.Context.ServiceAgent.GetSessionDefinitions());
-            ListBoxSessionList.DataContext = this.sessionList;
+            this.stepElementMap = new Dictionary<SessionTypeVM, FrameworkElement>();
         }
 
         #endregion
+
+        private void ListBoxSessionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SessionTypeVM sessionVM = ListBoxSessionList.SelectedItem as SessionTypeVM;
+            if (sessionVM == null)
+            {
+                return;
+            }
+
+            FrameworkElement element;
+            if (!this.stepElementMap.TryGetValue(sessionVM, out element))
+            {
+                try
+                {
+                    element = ConfigFactory<FrameworkElement>.CreateInstance(sessionVM.ProviderEntry);
+                    element.DataContext = SessionPropertiesVM.Create(sessionVM.Type);
+                    this.stepElementMap[sessionVM] = element;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("创建Session对应的属性配置页面异常", ex);
+                    return;
+                }
+            }
+
+            GridStep1.Visibility = Visibility.Collapsed;
+            GridStep2.Visibility = Visibility.Visible;
+            ContentControlSessionProperties.Content = element;
+            TabItemSessionProperties.IsSelected = true;
+            TabItemSessionProperties.DataContext = element.DataContext;
+        }
+
+        private void ButtonCompleted_Click(object sender, RoutedEventArgs e)
+        {
+            SessionPropertiesVM sessionPropertiesVM = TabItemSessionProperties.DataContext as SessionPropertiesVM;
+            SessionProperties sessionProperties = sessionPropertiesVM.GetProperties();
+        }
     }
 }

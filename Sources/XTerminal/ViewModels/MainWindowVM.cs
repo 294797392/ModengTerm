@@ -52,9 +52,14 @@ namespace XTerminal.ViewModels
             List<SessionDM> sessionList = XTermApp.Context.ServiceAgent.GetSessions();
             foreach (SessionDM session in sessionList)
             {
-                SessionVM sessionVM = new SessionVM() 
+                SessionVM sessionVM = new SessionVM()
                 {
+                    ID = session.ID,
+                    Name = session.Name,
+                    Description = session.Description,
                 };
+
+                this.SessionList.Add(sessionVM);
             }
 
             #endregion

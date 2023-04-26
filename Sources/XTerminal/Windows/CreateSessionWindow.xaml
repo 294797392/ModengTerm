@@ -1,47 +1,91 @@
-﻿<Window x:Class="VideoTerminal.Windows.CreateSessionWindow"
+﻿<Window x:Class="XTerminal.Windows.CreateSessionWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:VideoTerminal.Windows"
-        xmlns:usercontrols="clr-namespace:VideoTerminal.UserControls"
-        xmlns:viewmodels="clr-namespace:VideoTerminal.ViewModels"
         mc:Ignorable="d"
         Title="CreateSessionWindow" Height="450" Width="800">
 
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../UserControls/SessionPropertiesDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="StyleListBoxItemSession" TargetType="{x:Type ListBoxItem}">
+                <Setter Property="Width" Value="80"/>
+                <Setter Property="Height" Value="80"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StyleListBoxSessionList" TargetType="{x:Type ListBox}">
+                <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemSession}"/>
+            </Style>
+
+        </ResourceDictionary>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1">
-            <Grid x:Name="GridSessionList">
-                <ListBox x:Name="ListBoxSessionList" ItemsSource="{Binding}" 
-                         SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path=Name}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Grid>
-
-            <Grid x:Name="GridUpdateProperties" Visibility="Collapsed">
-                <usercontrols:UpdatePropertiesUserControl/>
-            </Grid>
+        <!-- 会话类型列表 -->
+        <Grid Grid.Row="0" x:Name="GridStep1">
+            <ListBox x:Name="ListBoxSessionList" DataContext="{Binding Path=SessionTypes}" ItemsSource="{Binding}" 
+                     SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     SelectionChanged="ListBoxSessionList_SelectionChanged"
+                     Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Name}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="0" x:Name="GridStep2" Visibility="Collapsed">
+            <TabControl>
+                <TabItem x:Name="TabItemSessionProperties" Header="基础设置">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="会话名称：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+                        <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="ContentControlSessionProperties"/>
+
+                    </Grid>
+                </TabItem>
+                <TabItem Header="日志设置"></TabItem>
+                <TabItem Header="高级设置"></TabItem>
+            </TabControl>
+        </Grid>
+
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Content="上一页"/>
-            <Button Grid.Column="1" Content="下一页"/>
+            <Button Grid.Column="0" x:Name="ButtonPreviousStep" Content="上一页"/>
+            <Button Grid.Column="1" x:Name="ButtonCompleted" Content="完成" Click="ButtonCompleted_Click"/>
         </Grid>
 
     </Grid>
+
 </Window>

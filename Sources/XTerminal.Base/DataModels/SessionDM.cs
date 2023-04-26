@@ -29,9 +29,7 @@ namespace XTerminal.Base.DataModels
         /// <summary>
         /// 被JSON序列化后的Session数据
         /// </summary>
-        [JsonProperty("data")]
-        public string Data { get; set; }
-
-
+        [JsonProperty("properties")]
+        public string Properties { get; set; }
     }
 }

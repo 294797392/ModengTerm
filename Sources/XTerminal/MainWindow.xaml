@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:XTerminal.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="768" Width="1024" 
+        Title="MainWindow" Height="600" Width="900" 
         WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
@@ -33,13 +33,23 @@
     </Window.DataContext>
 
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="350"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <!-- 用户登录 -->
-        <Grid Grid.Column="0">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0" Content="新建" Click="ButtonCreateSession_Click"/>
+
+        </Grid>
+        
+        <Grid Grid.Row="1">
             <GroupBox Header="会话列表">
                 <DataGrid IsReadOnly="True" AutoGenerateColumns="False">
                     <DataGrid.Columns>
@@ -60,69 +70,6 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </GroupBox>
-        </Grid>
-
-        <!-- 新建会话 -->
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="40"/>
-            </Grid.RowDefinitions>
-
-            <!-- 会话类型列表 -->
-            <Grid Grid.Row="0" x:Name="GridStep1">
-                <ListBox x:Name="ListBoxSessionList" DataContext="{Binding Path=SessionTypes}" ItemsSource="{Binding}" 
-                         SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         SelectionChanged="ListBoxSessionList_SelectionChanged"
-                         Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Path=Name}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel IsItemsHost="True"/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                </ListBox>
-            </Grid>
-
-            <Grid Grid.Row="0" x:Name="GridStep2" Visibility="Collapsed">
-                <TabControl>
-                    <TabItem x:Name="TabItemSessionProperties" Header="基础设置">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="35"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="会话名称：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
-
-                            <ContentControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="ContentControlSessionProperties"/>
-
-                        </Grid>
-                    </TabItem>
-                    <TabItem Header="日志设置"></TabItem>
-                    <TabItem Header="高级设置"></TabItem>
-                </TabControl>
-            </Grid>
-
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-
-                <Button Grid.Column="0" x:Name="ButtonPreviousStep" Content="上一页"/>
-                <Button Grid.Column="1" x:Name="ButtonCompleted" Content="完成" Click="ButtonCompleted_Click"/>
-            </Grid>
-
         </Grid>
 
     </Grid>
