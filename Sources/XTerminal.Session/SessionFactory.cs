@@ -6,11 +6,11 @@ using XTerminal.Sessions;
 
 namespace XTerminal.Session
 {
-    public static class VTSessionFactory
+    public static class SessionFactory
     {
-        public static VTSession Create(VTInitialOptions options)
+        public static SessionBase Create(VTInitialOptions options)
         {
-            switch (options.ChannelType)
+            switch (options.SessionType)
             {
                 case SessionTypeEnum.SSH: return new SSHSession(options);
                 default:

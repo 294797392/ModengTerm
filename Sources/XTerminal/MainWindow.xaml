@@ -6,7 +6,7 @@
         xmlns:viewmodels="clr-namespace:XTerminal.ViewModels"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="900" 
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -48,7 +48,7 @@
             <Button Grid.Column="0" Content="新建" Click="ButtonCreateSession_Click"/>
 
         </Grid>
-        
+
         <Grid Grid.Row="1">
             <GroupBox Header="会话列表">
                 <DataGrid IsReadOnly="True" AutoGenerateColumns="False">

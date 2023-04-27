@@ -11,7 +11,7 @@ using XTerminal.Session.Property;
 
 namespace XTerminal.Session
 {
-    public class libvtsshSession : VTSession
+    public class libvtsshSession : SessionBase
     {
         #region 类变量
 
@@ -111,13 +111,13 @@ namespace XTerminal.Session
 
         #region 实例方法
 
-        private VTSessionStateEnum GetVTChannelState(libvt.vtssh_status_enum status)
+        private SessionStatusEnum GetVTChannelState(libvt.vtssh_status_enum status)
         {
             switch (status)
             {
-                case libvt.vtssh_status_enum.VTSSH_STATUS_CONNECTED: return VTSessionStateEnum.Connected;
-                case libvt.vtssh_status_enum.VTSSH_STATUS_CONNECTING: return VTSessionStateEnum.Connecting;
-                case libvt.vtssh_status_enum.VTSSH_STATUS_DISCONNECTED: return VTSessionStateEnum.Disconnected;
+                case libvt.vtssh_status_enum.VTSSH_STATUS_CONNECTED: return SessionStatusEnum.Connected;
+                case libvt.vtssh_status_enum.VTSSH_STATUS_CONNECTING: return SessionStatusEnum.Connecting;
+                case libvt.vtssh_status_enum.VTSSH_STATUS_DISCONNECTED: return SessionStatusEnum.Disconnected;
                 default:
                     throw new NotImplementedException();
             }

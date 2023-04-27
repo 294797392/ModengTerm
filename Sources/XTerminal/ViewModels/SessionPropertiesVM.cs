@@ -15,7 +15,7 @@ namespace XTerminal.ViewModels
         /// 获取该会话的属性
         /// </summary>
         /// <returns></returns>
-        public abstract SessionProperties GetProperties();
+        public abstract string GetProperties();
 
         public static SessionPropertiesVM Create(SessionTypeEnum type)
         {

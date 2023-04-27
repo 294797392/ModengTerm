@@ -26,6 +26,8 @@
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
+            <RowDefinition Height="35" x:Name="RowDefinitionUserName"/>
+            <RowDefinition Height="35" x:Name="RowDefinitionPassword"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
@@ -39,8 +41,9 @@
         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=Port, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="认证方式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="2" Grid.Column="1" DataContext="{Binding Path=AuthList}" ItemsSource="{Binding}"
+        <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxAuthList" DataContext="{Binding Path=AuthList}" ItemsSource="{Binding}"
                   SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectionChanged="ComboBoxAuthList_SelectionChanged"
                   Style="{StaticResource ResourceKey=StyleComboBoxValue}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
@@ -48,6 +51,12 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxUserName" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <PasswordBox Grid.Row="4" Grid.Column="1" x:Name="PasswordBoxPassword" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>
 
     </Grid>
 </UserControl>

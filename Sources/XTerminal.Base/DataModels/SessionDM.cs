@@ -27,6 +27,18 @@ namespace XTerminal.Base.DataModels
         public int Type { get; set; }
 
         /// <summary>
+        /// 终端行数
+        /// </summary>
+        [JsonProperty("row")]
+        public int Row { get; set; }
+
+        /// <summary>
+        /// 终端列数
+        /// </summary>
+        [JsonProperty("column")]
+        public int Column { get; set; }
+
+        /// <summary>
         /// 被JSON序列化后的Session数据
         /// </summary>
         [JsonProperty("properties")]

@@ -2727,6 +2727,11 @@
             如果是选中，那么该操作会对上级节点进行递归选中
             </summary>
         </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.IsVisible">
+            <summary>
+            控制该节点是否显示
+            </summary>
+        </member>
         <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.AddChildNode(WPFToolkit.MVVM.TreeNodeViewModel)">
             <summary>
             增加一个子节点
@@ -2785,6 +2790,12 @@
             增加一个根节点
             </summary>
             <param name="root">要增加的根节点</param>
+        </member>
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.RemoveRootNode(WPFToolkit.MVVM.TreeNodeViewModel)">
+            <summary>
+            删除一个根节点
+            </summary>
+            <param name="root"></param>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModel`1.TryGetNode(System.String,WPFToolkit.MVVM.TreeNodeViewModel@)">
             <summary>

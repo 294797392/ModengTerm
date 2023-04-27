@@ -47,12 +47,18 @@ namespace XTerminal
 
         #endregion
 
+        #region 公开事件
+
+        public event Action<VideoTerminal, SessionStatusEnum> SessionStatusChanged;
+
+        #endregion
+
         #region 实例变量
 
         /// <summary>
         /// 与终端进行通信的信道
         /// </summary>
-        private VTSession vtChannel;
+        private SessionBase vtChannel;
 
         /// <summary>
         /// 终端字符解析器
@@ -290,7 +296,7 @@ namespace XTerminal
 
             #region 连接中断通道
 
-            VTSession vtChannel = VTSessionFactory.Create(options);
+            SessionBase vtChannel = SessionFactory.Create(options);
             vtChannel.StatusChanged += this.VTChannel_StatusChanged;
             vtChannel.DataReceived += this.VTChannel_DataReceived;
             vtChannel.Connect();
@@ -1178,7 +1184,7 @@ namespace XTerminal
             }
         }
 
-        private void VTChannel_DataReceived(VTSession client, byte[] bytes)
+        private void VTChannel_DataReceived(SessionBase client, byte[] bytes)
         {
             //string str = string.Join(",", bytes.Select(v => v.ToString()).ToList());
             //logger.InfoFormat("Received, {0}", str);
@@ -1192,9 +1198,13 @@ namespace XTerminal
             //logger.ErrorFormat("TotalRows = {0}", this.activeDocument.TotalRows);
         }
 
-        private void VTChannel_StatusChanged(object client, VTSessionStateEnum state)
+        private void VTChannel_StatusChanged(object client, SessionStatusEnum status)
         {
-            logger.InfoFormat("客户端状态发生改变, {0}", state);
+            logger.InfoFormat("会话状态发生改变, {0}", status);
+            if (this.SessionStatusChanged != null)
+            {
+                this.SessionStatusChanged(this, status);
+            }
         }
 
         private void CursorBlinkingThreadProc()

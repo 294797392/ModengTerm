@@ -7,7 +7,7 @@ using XTerminal.Session.Property;
 
 namespace XTerminal.Session
 {
-    public class SSHSession : VTSession
+    public class SSHSession : SessionBase
     {
         #region 类变量
 

@@ -19,7 +19,7 @@ namespace XTerminal.Session
         {
             ReadBufferSize = 16384,
 
-            ChannelType = SessionTypeEnum.SSH,
+            SessionType = SessionTypeEnum.SSH,
             SessionProperties = new SSHSessionProperties()
             {
                 //ServerAddress = "linux-desktop",
@@ -64,15 +64,18 @@ namespace XTerminal.Session
         public TerminalProperties TerminalProperties { get; set; }
 
         /// <summary>
-        /// 要连接的通道类型
+        /// 要连接的会话类型
         /// </summary>
-        public SessionTypeEnum ChannelType { get; set; }
+        public SessionTypeEnum SessionType { get; set; }
 
         /// <summary>
-        /// 连接Channel的验证信息
+        /// 会话详细信息
         /// </summary>
         public SessionProperties SessionProperties { get; set; }
 
+        /// <summary>
+        /// 光标信息
+        /// </summary>
         public CursorOptions CursorOption { get; set; }
 
         public VTInitialOptions()

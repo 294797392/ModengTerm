@@ -17,5 +17,11 @@
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
-    
+
+    <Style x:Key="StylePasswordBoxValue" TargetType="{x:Type PasswordBox}">
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+
 </ResourceDictionary>

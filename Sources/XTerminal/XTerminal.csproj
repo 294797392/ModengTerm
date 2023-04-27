@@ -89,15 +89,24 @@
     <Compile Include="UserControls\SSHPropertiesUserControl.xaml.cs">
       <DependentUpon>SSHPropertiesUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\TerminalUserControl.xaml.cs">
+      <DependentUpon>TerminalUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="VideoTerminal.cs" />
+    <Compile Include="ViewModels\CreateSessionVM.cs" />
     <Compile Include="ViewModels\GroupVM.cs" />
     <Compile Include="ViewModels\MainWindowVM.cs" />
+    <Compile Include="ViewModels\OpenedSessionVM.cs" />
     <Compile Include="ViewModels\SessionPropertiesVM.cs" />
     <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\SessionVM.cs" />
     <Compile Include="ViewModels\SSHSessionPropertiesVM.cs" />
+    <Compile Include="ViewModels\WorkbenchVM.cs" />
     <Compile Include="Windows\CreateSessionWindow.xaml.cs">
       <DependentUpon>CreateSessionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\WorkbenchWindow.xaml.cs">
+      <DependentUpon>WorkbenchWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
@@ -131,9 +140,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\TerminalUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\CreateSessionWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\WorkbenchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\TestWindow.xaml">
       <SubType>Designer</SubType>

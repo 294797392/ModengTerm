@@ -66,9 +66,9 @@
     <Compile Include="SessionTypeEnum.cs" />
     <Compile Include="SSHSession.cs" />
     <Compile Include="VTInitialOptions.cs" />
-    <Compile Include="VTSession.cs" />
-    <Compile Include="VTSessionFactory.cs" />
-    <Compile Include="VTSessionStateEnum.cs" />
+    <Compile Include="SessionBase.cs" />
+    <Compile Include="SessionFactory.cs" />
+    <Compile Include="SessionStatusEnum.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">

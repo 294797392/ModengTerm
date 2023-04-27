@@ -84,7 +84,7 @@ namespace XTerminal.ViewModels
 
         #region SessionPropertiesVM
 
-        public override SessionProperties GetProperties()
+        public override string GetProperties()
         {
             throw new NotImplementedException();
         }

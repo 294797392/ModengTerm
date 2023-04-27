@@ -14,7 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 using XTerminal.Base;
+using XTerminal.Base.DataModels;
 using XTerminal.Session.Property;
+using XTerminal.Sessions;
 using XTerminal.ViewModels;
 
 namespace XTerminal.Windows
@@ -28,9 +30,14 @@ namespace XTerminal.Windows
 
         #region 实例变量
 
-        private Dictionary<SessionTypeVM, FrameworkElement> stepElementMap;
+        private Dictionary<SessionTypeVM, FrameworkElement> propertyContents;
 
         #endregion
+
+        /// <summary>
+        /// 获取当前窗口所编辑的会话
+        /// </summary>
+        public SessionDM Session { get; private set; }
 
         #region 构造方法
 
@@ -47,27 +54,30 @@ namespace XTerminal.Windows
 
         private void InitializeWindow()
         {
-            this.stepElementMap = new Dictionary<SessionTypeVM, FrameworkElement>();
+            this.propertyContents = new Dictionary<SessionTypeVM, FrameworkElement>();
+            ComboBoxSessionList.SelectedIndex = 0;
         }
 
         #endregion
 
-        private void ListBoxSessionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        #region 事件处理器
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SessionTypeVM sessionVM = ListBoxSessionList.SelectedItem as SessionTypeVM;
+            SessionTypeVM sessionVM = ComboBoxSessionList.SelectedItem as SessionTypeVM;
             if (sessionVM == null)
             {
                 return;
             }
 
             FrameworkElement element;
-            if (!this.stepElementMap.TryGetValue(sessionVM, out element))
+            if (!this.propertyContents.TryGetValue(sessionVM, out element))
             {
                 try
                 {
                     element = ConfigFactory<FrameworkElement>.CreateInstance(sessionVM.ProviderEntry);
                     element.DataContext = SessionPropertiesVM.Create(sessionVM.Type);
-                    this.stepElementMap[sessionVM] = element;
+                    this.propertyContents[sessionVM] = element;
                 }
                 catch (Exception ex)
                 {
@@ -76,17 +86,47 @@ namespace XTerminal.Windows
                 }
             }
 
-            GridStep1.Visibility = Visibility.Collapsed;
-            GridStep2.Visibility = Visibility.Visible;
             ContentControlSessionProperties.Content = element;
             TabItemSessionProperties.IsSelected = true;
-            TabItemSessionProperties.DataContext = element.DataContext;
         }
 
-        private void ButtonCompleted_Click(object sender, RoutedEventArgs e)
+        private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
-            SessionPropertiesVM sessionPropertiesVM = TabItemSessionProperties.DataContext as SessionPropertiesVM;
-            SessionProperties sessionProperties = sessionPropertiesVM.GetProperties();
+            int row, column;
+            if (!int.TryParse(TextBoxTerminalRows.Text, out row))
+            {
+                return;
+            }
+
+            if (!int.TryParse(TextBoxTerminalColumns.Text, out column))
+            {
+                return;
+            }
+
+            SessionTypeVM sessionType = ComboBoxSessionList.SelectedItem as SessionTypeVM;
+            if (sessionType == null)
+            {
+                return;
+            }
+
+            SessionPropertiesVM propertiesVM = (ContentControlSessionProperties.Content as FrameworkElement).DataContext as SessionPropertiesVM;
+
+            SessionDM session = new SessionDM()
+            {
+                ID = propertiesVM.ID.ToString(),
+                Name = propertiesVM.Name,
+                Description = propertiesVM.Description,
+                Row = row,
+                Column = column,
+                Type = (int)sessionType.Type,
+                Properties = propertiesVM.GetProperties()
+            };
+
+            this.Session = session;
+
+            base.DialogResult = true;
         }
+
+        #endregion
     }
 }

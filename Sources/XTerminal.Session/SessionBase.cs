@@ -10,7 +10,7 @@ namespace XTerminal.Session
     /// <summary>
     /// 管理与远程主机的连接
     /// </summary>
-    public abstract class VTSession
+    public abstract class SessionBase
     {
         #region 常量
 
@@ -23,12 +23,12 @@ namespace XTerminal.Session
 
         #region 公开事件
 
-        public event Action<object, VTSessionStateEnum> StatusChanged;
+        public event Action<object, SessionStatusEnum> StatusChanged;
 
         /// <summary>
         /// 当收到数据流的时候触发
         /// </summary>
-        public event Action<VTSession, byte[]> DataReceived;
+        public event Action<SessionBase, byte[]> DataReceived;
 
         #endregion
 
@@ -53,13 +53,13 @@ namespace XTerminal.Session
         /// <summary>
         /// 通道类型
         /// </summary>
-        public SessionTypeEnum Type { get { return this.options.ChannelType; } }
+        public SessionTypeEnum Type { get { return this.options.SessionType; } }
 
         #endregion
 
         #region 构造方法
 
-        public VTSession(VTInitialOptions options)
+        public SessionBase(VTInitialOptions options)
         {
             this.options = options;
         }
@@ -97,7 +97,7 @@ namespace XTerminal.Session
 
         #region 实例方法
 
-        protected void NotifyStatusChanged(VTSessionStateEnum state)
+        protected void NotifyStatusChanged(SessionStatusEnum state)
         {
             if (this.StatusChanged != null)
             {

@@ -8,7 +8,7 @@ namespace XTerminal.Session
     /// <summary>
     /// 表示会话的连接状态
     /// </summary>
-    public enum VTSessionStateEnum
+    public enum SessionStatusEnum
     {
         /// <summary>
         /// 数据流处于初始化状态

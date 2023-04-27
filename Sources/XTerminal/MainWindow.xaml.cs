@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using WPFToolkit.Utility;
+using XTerminal.Base;
+using XTerminal.Base.DataModels;
 using XTerminal.Session.Property;
 using XTerminal.ViewModels;
 using XTerminal.Windows;
@@ -41,6 +44,14 @@ namespace XTerminal
         {
         }
 
+        private void OpenTerminalWindow(SessionDM session)
+        {
+            WorkbenchWindow window = new WorkbenchWindow();
+            window.Show();
+            window.OpenSession(session);
+            this.Close();
+        }
+
         #endregion
 
         #region 事件处理器
@@ -50,10 +61,23 @@ namespace XTerminal
             CreateSessionWindow window = new CreateSessionWindow();
             window.Owner = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            if ((bool)window.ShowDialog())
+            if (!(bool)window.ShowDialog())
             {
-                
+                return;
             }
+
+            SessionDM session = window.Session;
+
+            // 在数据库里新建会话
+            int code = XTermApp.Context.ServiceAgent.AddSession(session);
+            if (code != ResponseCode.SUCCESS)
+            {
+                MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
+                return;
+            }
+
+            // 新建成功后，打开会话窗口
+            this.OpenTerminalWindow(session);
         }
 
         #endregion
