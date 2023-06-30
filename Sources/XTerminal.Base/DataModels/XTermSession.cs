@@ -12,7 +12,7 @@ namespace XTerminal.Base.DataModels
     /// <summary>
     /// 存储一个会话的详细信息
     /// </summary>
-    public class SessionDM : ModelBase
+    public class XTermSession : ModelBase
     {
         /// <summary>
         /// 会话所属分组
@@ -39,9 +39,27 @@ namespace XTerminal.Base.DataModels
         public int Column { get; set; }
 
         /// <summary>
-        /// 被JSON序列化后的Session数据
+        /// 要连接的主机名
         /// </summary>
-        [JsonProperty("properties")]
-        public string Properties { get; set; }
+        [JsonProperty("host")]
+        public string Host { get; set; }
+
+        /// <summary>
+        /// 要连接的主机端口号
+        /// </summary>
+        [JsonProperty("port")]
+        public int Port { get; set; }
+
+        /// <summary>
+        /// 用户名
+        /// </summary>
+        [JsonProperty("userName")]
+        public string UserName { get; set; }
+
+        /// <summary>
+        /// 密码
+        /// </summary>
+        [JsonProperty("password")]
+        public string Password { get; set; }
     }
 }

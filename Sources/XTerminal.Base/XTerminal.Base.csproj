@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="ASCIITable.cs" />
     <Compile Include="DataModels\GroupDM.cs" />
-    <Compile Include="DataModels\SessionDM.cs" />
+    <Compile Include="DataModels\XTermSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseCode.cs" />
     <Compile Include="VTCursorStyles.cs" />

@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:XTerminal.ViewModels"
         mc:Ignorable="d"
-        Title="CreateSessionWindow" Height="450" Width="800"
-        ResizeMode="NoResize">
+        Title="新建会话" Height="450" Width="800"
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -14,8 +14,9 @@
                 <ResourceDictionary Source="../UserControls/SessionPropertiesDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="StyleButtonOK" TargetType="{x:Type Button}">
-                <Setter Property="Margin" Value="10,5,10,5"/>
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="5,3,0,3"/>
+                <Setter Property="Width" Value="70"/>
             </Style>
             
         </ResourceDictionary>
@@ -29,7 +30,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -87,7 +88,10 @@
             </TabControl>
         </Grid>
 
-        <Button Grid.Row="2" Content="确定" Click="ButtonOK_Click" Style="{StaticResource ResourceKey=StyleButtonOK}"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="保存" Click="ButtonSave_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Content="取消" Click="ButtonCancel_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        </StackPanel>
 
     </Grid>
 

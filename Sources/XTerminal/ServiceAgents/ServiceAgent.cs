@@ -26,14 +26,14 @@ namespace XTerminal.ServiceAgents
         /// 获取所有的会话列表
         /// </summary>
         /// <returns></returns>
-        public abstract List<SessionDM> GetSessions();
+        public abstract List<Base.DataModels.XTermSession> GetSessions();
 
         /// <summary>
         /// 增加一个会话
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public abstract int AddSession(SessionDM session);
+        public abstract int AddSession(Base.DataModels.XTermSession session);
 
         /// <summary>
         /// 删除Session
@@ -47,6 +47,6 @@ namespace XTerminal.ServiceAgents
         /// </summary>
         /// <param name="session"></param>
         /// <returns></returns>
-        public abstract int UpdateSession(SessionDM session);
+        public abstract int UpdateSession(Base.DataModels.XTermSession session);
     }
 }

@@ -37,7 +37,7 @@ namespace XTerminal.Windows
         /// <summary>
         /// 获取当前窗口所编辑的会话
         /// </summary>
-        public SessionDM Session { get; private set; }
+        public XTermSession Session { get; private set; }
 
         #region 构造方法
 
@@ -76,7 +76,7 @@ namespace XTerminal.Windows
                 try
                 {
                     element = ConfigFactory<FrameworkElement>.CreateInstance(sessionVM.ProviderEntry);
-                    element.DataContext = SessionPropertiesVM.Create(sessionVM.Type);
+                    element.DataContext = new XTermSessionVM();
                     this.propertyContents[sessionVM] = element;
                 }
                 catch (Exception ex)
@@ -90,7 +90,7 @@ namespace XTerminal.Windows
             TabItemSessionProperties.IsSelected = true;
         }
 
-        private void ButtonOK_Click(object sender, RoutedEventArgs e)
+        private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             int row, column;
             if (!int.TryParse(TextBoxTerminalRows.Text, out row))
@@ -109,22 +109,30 @@ namespace XTerminal.Windows
                 return;
             }
 
-            SessionPropertiesVM propertiesVM = (ContentControlSessionProperties.Content as FrameworkElement).DataContext as SessionPropertiesVM;
+            XTermSessionVM sessionVM = (ContentControlSessionProperties.Content as FrameworkElement).DataContext as XTermSessionVM;
 
-            SessionDM session = new SessionDM()
+            XTermSession session = new XTermSession()
             {
-                ID = propertiesVM.ID.ToString(),
-                Name = propertiesVM.Name,
-                Description = propertiesVM.Description,
+                ID = sessionVM.ID.ToString(),
+                Name = sessionVM.Name,
+                Description = sessionVM.Description,
                 Row = row,
                 Column = column,
                 Type = (int)sessionType.Type,
-                Properties = propertiesVM.GetProperties()
+                Host = sessionVM.Host,
+                Port = sessionVM.Port,
+                Password = sessionVM.Password,
+                UserName = sessionVM.UserName,
             };
 
             this.Session = session;
 
             base.DialogResult = true;
+        }
+
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e)
+        {
+            base.DialogResult = false;
         }
 
         #endregion

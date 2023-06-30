@@ -9,11 +9,11 @@ namespace XTerminal.ViewModels
 {
     public class GroupVM : ViewModelBase
     {
-        public BindableCollection<SessionVM> SessionList { get; private set; }
+        public BindableCollection<XTermSessionVM> SessionList { get; private set; }
 
         public GroupVM()
         {
-            this.SessionList = new BindableCollection<SessionVM>();
+            this.SessionList = new BindableCollection<XTermSessionVM>();
         }
     }
 }

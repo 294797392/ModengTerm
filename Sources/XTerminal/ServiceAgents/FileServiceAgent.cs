@@ -27,11 +27,11 @@ namespace XTerminal.ServiceAgents
 
         #region Session管理
 
-        public override int AddSession(SessionDM session)
+        public override int AddSession(Base.DataModels.XTermSession session)
         {
             try
             {
-                JSONDatabase.Insert<SessionDM>(session);
+                JSONDatabase.Insert<Base.DataModels.XTermSession>(session);
 
                 return ResponseCode.SUCCESS;
             }
@@ -46,7 +46,7 @@ namespace XTerminal.ServiceAgents
         {
             try
             {
-                JSONDatabase.Delete<SessionDM>(v => v.ID == sessionID);
+                JSONDatabase.Delete<Base.DataModels.XTermSession>(v => v.ID == sessionID);
 
                 return ResponseCode.SUCCESS;
             }
@@ -57,24 +57,24 @@ namespace XTerminal.ServiceAgents
             }
         }
 
-        public override List<SessionDM> GetSessions()
+        public override List<Base.DataModels.XTermSession> GetSessions()
         {
             try
             {
-                return JSONDatabase.SelectAll<SessionDM>();
+                return JSONDatabase.SelectAll<Base.DataModels.XTermSession>();
             }
             catch (Exception ex)
             {
                 logger.Error("GetSessions异常", ex);
-                return new List<SessionDM>();
+                return new List<Base.DataModels.XTermSession>();
             }
         }
 
-        public override int UpdateSession(SessionDM session)
+        public override int UpdateSession(Base.DataModels.XTermSession session)
         {
             try
             {
-                return JSONDatabase.Update<SessionDM>(v => v.ID == session.ID, session);
+                return JSONDatabase.Update<Base.DataModels.XTermSession>(v => v.ID == session.ID, session);
             }
             catch (Exception ex)
             {

@@ -39,7 +39,7 @@ namespace XTerminal.Windows
         /// 打开一个会话
         /// </summary>
         /// <param name="session"></param>
-        public void OpenSession(SessionDM session)
+        public void OpenSession(Base.DataModels.XTermSession session)
         {
             OpenedSessionVM openedSessionVM = new OpenedSessionVM(session)
             {

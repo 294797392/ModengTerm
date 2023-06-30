@@ -3,75 +3,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewmodels="clr-namespace:XTerminal.ViewModels"
+        xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
+        xmlns:local="clr-namespace:XTerminal"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="900" 
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="UserControls/SessionPropertiesDictionary.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
-
-            <Style x:Key="StyleListBoxItemSession" TargetType="{x:Type ListBoxItem}">
-                <Setter Property="Width" Value="80"/>
-                <Setter Property="Height" Value="80"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            </Style>
-
-            <Style x:Key="StyleListBoxSessionList" TargetType="{x:Type ListBox}">
-                <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemSession}"/>
-            </Style>
-
-        </ResourceDictionary>
-    </Window.Resources>
-
-    <Window.DataContext>
-        <viewmodels:MainWindowVM/>
-    </Window.DataContext>
+        Title="MainWindow" Height="450" Width="800"
+        WindowState="Maximized" Loaded="Window_Loaded">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0" Content="新建" Click="ButtonCreateSession_Click"/>
-
-        </Grid>
-
-        <Grid Grid.Row="1">
-            <GroupBox Header="会话列表">
-                <DataGrid IsReadOnly="True" AutoGenerateColumns="False">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="名称" Width="1*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=Name}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTemplateColumn Header="创建时间" Width="1*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=Name}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
-        </Grid>
-
+        <xtermuc:ContentLayoutUserControl x:Name="ContentLayoutUserControl"/>
     </Grid>
 
 </Window>

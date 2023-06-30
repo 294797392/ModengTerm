@@ -1,14 +1,17 @@
-﻿using DotNEToolkit;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using WPFToolkit.Utility;
-using XTerminal.Base;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using XTerminal.Base.DataModels;
-using XTerminal.Session.Property;
-using XTerminal.ViewModels;
-using XTerminal.Windows;
 
 namespace XTerminal
 {
@@ -17,18 +20,6 @@ namespace XTerminal
     /// </summary>
     public partial class MainWindow : Window
     {
-        #region 类变量
-
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("MainWindow");
-
-        #endregion
-
-        #region 实例变量
-
-        #endregion
-
-        #region 构造方法
-
         public MainWindow()
         {
             InitializeComponent();
@@ -36,50 +27,20 @@ namespace XTerminal
             this.InitializeWindow();
         }
 
-        #endregion
-
-        #region 实例方法
-
         private void InitializeWindow()
         {
         }
 
-        private void OpenTerminalWindow(SessionDM session)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            WorkbenchWindow window = new WorkbenchWindow();
-            window.Show();
-            window.OpenSession(session);
-            this.Close();
-        }
-
-        #endregion
-
-        #region 事件处理器
-
-        private void ButtonCreateSession_Click(object sender, RoutedEventArgs e)
-        {
-            CreateSessionWindow window = new CreateSessionWindow();
-            window.Owner = this;
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            if (!(bool)window.ShowDialog())
+            SessionListWindow sessionListWindow = new SessionListWindow();
+            sessionListWindow.Owner = this;
+            if ((bool)sessionListWindow.ShowDialog())
             {
-                return;
+                XTermSession session = sessionListWindow.SelectedSession;
+
+                ContentLayoutUserControl.Get
             }
-
-            SessionDM session = window.Session;
-
-            // 在数据库里新建会话
-            int code = XTermApp.Context.ServiceAgent.AddSession(session);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
-                return;
-            }
-
-            // 新建成功后，打开会话窗口
-            this.OpenTerminalWindow(session);
         }
-
-        #endregion
     }
 }

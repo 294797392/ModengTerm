@@ -22,7 +22,7 @@ namespace XTerminal.ViewModels
 
         private SessionStatusEnum status;
         private VideoTerminal videoTerminal;
-        private SessionDM session;
+        private Base.DataModels.XTermSession session;
 
         #endregion
 
@@ -57,7 +57,7 @@ namespace XTerminal.ViewModels
         /// 构造方法
         /// </summary>
         /// <param name="session">要打开的会话对象</param>
-        public OpenedSessionVM(SessionDM session)
+        public OpenedSessionVM(Base.DataModels.XTermSession session)
         {
             this.session = session;
 
@@ -74,15 +74,15 @@ namespace XTerminal.ViewModels
         {
             VTInitialOptions initialOptions = new VTInitialOptions()
             {
-                SessionType = (SessionTypeEnum)this.session.Type,
-                SessionProperties = this.DeserializeSessionProperty((SessionTypeEnum)this.session.Type, this.session.Properties),
-                TerminalProperties = new TerminalProperties()
-                {
-                    Columns = this.session.Column,
-                    Rows = this.session.Row,
-                    Type = TerminalTypeEnum.XTerm
-                },
-                ReadBufferSize = 8192,
+                //SessionType = (SessionTypeEnum)this.session.Type,
+                //SessionProperties = this.DeserializeSessionProperty((SessionTypeEnum)this.session.Type, this.session.Properties),
+                //TerminalProperties = new TerminalProperties()
+                //{
+                //    Columns = this.session.Column,
+                //    Rows = this.session.Row,
+                //    Type = TerminalTypeEnum.XTerm
+                //},
+                //ReadBufferSize = 8192,
             };
 
             this.videoTerminal.Initialize(initialOptions);

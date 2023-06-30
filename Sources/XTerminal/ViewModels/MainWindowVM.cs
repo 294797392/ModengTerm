@@ -16,18 +16,18 @@ namespace XTerminal.ViewModels
         /// <summary>
         /// 用户已经创建了的会话列表
         /// </summary>
-        public BindableCollection<SessionVM> SessionList { get; private set; }
+        public BindableCollection<XTermSessionVM> SessionList { get; private set; }
 
         public MainWindowVM()
         {
-            this.SessionList = new BindableCollection<SessionVM>();
+            this.SessionList = new BindableCollection<XTermSessionVM>();
 
             #region 加载已存在的会话列表
 
-            List<SessionDM> sessionList = XTermApp.Context.ServiceAgent.GetSessions();
-            foreach (SessionDM session in sessionList)
+            List<Base.DataModels.XTermSession> sessionList = XTermApp.Context.ServiceAgent.GetSessions();
+            foreach (Base.DataModels.XTermSession session in sessionList)
             {
-                SessionVM sessionVM = new SessionVM()
+                XTermSessionVM sessionVM = new XTermSessionVM()
                 {
                     ID = session.ID,
                     Name = session.Name,
