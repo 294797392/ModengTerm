@@ -11,6 +11,11 @@ namespace XTerminal.Sessions
     public enum SessionTypeEnum
     {
         /// <summary>
+        /// Windows命令行
+        /// </summary>
+        Win32CommandLine,
+
+        /// <summary>
         /// 是一个SSH远程主机
         /// </summary>
         SSH,

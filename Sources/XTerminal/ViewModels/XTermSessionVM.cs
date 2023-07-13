@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
+using XTerminal.Base.DataModels;
 using XTerminal.Channels;
+using XTerminal.Session.Enumerations;
 using XTerminal.Sessions;
 
 namespace XTerminal.ViewModels
@@ -16,6 +18,7 @@ namespace XTerminal.ViewModels
         private int port;
         private string userName;
         private string password;
+        private DateTime creationTime;
 
         /// <summary>
         /// 会话类型
@@ -59,7 +62,7 @@ namespace XTerminal.ViewModels
         /// <summary>
         /// 用户名
         /// </summary>
-        public string UserName 
+        public string UserName
         {
             get { return this.userName; }
             set
@@ -82,8 +85,42 @@ namespace XTerminal.ViewModels
             }
         }
 
-        public XTermSessionVM()
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreationTime
         {
+            get { return this.creationTime; }
+            set
+            {
+                if (this.creationTime != value)
+                {
+                    this.creationTime = value;
+                    this.NotifyPropertyChanged("CreationTime");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 身份验证类型
+        /// </summary>
+        public int AuthType { get; set; }
+
+        public XTermSession Session { get; private set; }
+
+        public XTermSessionVM(XTermSession session)
+        {
+            this.Session = session;
+            this.ID = session.ID;
+            this.Name = session.Name;
+            this.Description = session.Description;
+            this.CreationTime = session.CreationTime;
+            this.Type = (SessionTypeEnum)session.Type;
+            this.AuthType = session.AuthType;
+            this.Host = session.Host;
+            this.Port = session.Port;
+            this.UserName = session.UserName;
+            this.Password = session.Password;
         }
     }
 }

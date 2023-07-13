@@ -36,15 +36,15 @@ namespace XTerminal.Session
             this.statusChangedDlg = new libvt.vtssh_status_changed_callback(this.StatusChangedCallback);
             this.dataReceivedDlg = new libvt.vtssh_data_received_callback(this.DataReceivedCallback);
 
-            SSHSessionProperties channelAuthorition = this.options.SessionProperties as SSHSessionProperties;
+            SessionProperties sessionProperty = this.options.SessionProperties;
             TerminalProperties terminalProperties = this.options.TerminalProperties;
 
             libvt.vtssh_options vtssh_Options = new libvt.vtssh_options()
             {
-                serverip = Encoding.ASCII.GetBytes(channelAuthorition.ServerAddress),
-                serverport = channelAuthorition.ServerPort,
-                username = Encoding.ASCII.GetBytes(channelAuthorition.UserName),
-                password = Encoding.ASCII.GetBytes(channelAuthorition.Password),
+                serverip = Encoding.ASCII.GetBytes(sessionProperty.ServerAddress),
+                serverport = sessionProperty.ServerPort,
+                username = Encoding.ASCII.GetBytes(sessionProperty.UserName),
+                password = Encoding.ASCII.GetBytes(sessionProperty.Password),
                 term = Encoding.ASCII.GetBytes(terminalProperties.GetTerminalName()),
                 term_columns = terminalProperties.Columns,
                 term_rows = terminalProperties.Rows,

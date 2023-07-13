@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using XTerminal.Session.Enumerations;
 using XTerminal.Session.Property;
 
 namespace XTerminal
@@ -18,11 +19,11 @@ namespace XTerminal
                 return "未知";
             }
 
-            switch ((SSHAuthEnum)value)
+            switch ((SSHAuthTypeEnum)value)
             {
-                case SSHAuthEnum.None: return "不需要身份验证";
-                case SSHAuthEnum.Password: return "用户名和密码";
-                case SSHAuthEnum.PulicKey: return "公钥";
+                case SSHAuthTypeEnum.None: return "不需要身份验证";
+                case SSHAuthTypeEnum.Password: return "用户名和密码";
+                case SSHAuthTypeEnum.PulicKey: return "公钥";
                 default:
                     throw new NotImplementedException();
             }

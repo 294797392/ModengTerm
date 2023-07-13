@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodel="clr-namespace:XTerminal.ViewModels"
+        xmlns:xtermconverter="clr-namespace:XTerminal"
         mc:Ignorable="d"
         Title="新建会话" Height="450" Width="800"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
@@ -11,8 +12,32 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="../UserControls/SessionPropertiesDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <xtermconverter:SSHAuthTextConverter x:Key="SSHAuthTextConverter"/>
+
+            <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StyleComboBoxValue" TargetType="{x:Type ComboBox}">
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StyleTextBoxValue" TargetType="{x:Type TextBox}">
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StylePasswordBoxValue" TargetType="{x:Type PasswordBox}">
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
 
             <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
                 <Setter Property="Margin" Value="5,3,0,3"/>
@@ -21,10 +46,6 @@
             
         </ResourceDictionary>
     </Window.Resources>
-
-    <Window.DataContext>
-        <viewmodel:CreateSessionVM/>
-    </Window.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -44,11 +65,10 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Text="会话名称：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <TextBox Grid.Row="0" Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxSessionName" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="会话类型：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxSessionList" Margin="0,0,10,0" 
-                      ItemsSource="{Binding Path=SessionList}"
+            <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxSessionTypes" Margin="0,0,10,0" 
                       SelectionChanged="ComboBox_SelectionChanged" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -62,7 +82,41 @@
             <TabControl>
                 <TabItem x:Name="TabItemSessionProperties" Header="基础设置">
                     <Grid>
-                        <ContentControl x:Name="ContentControlSessionProperties"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35"/>
+                                <RowDefinition Height="35" x:Name="RowDefinitionUserName"/>
+                                <RowDefinition Height="35" x:Name="RowDefinitionPassword"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="主机名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxSSHHostName" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="端口号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" x:Name="TextBoxSSHPort" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="认证方式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxAuthList" SelectionChanged="ComboBoxAuthList_SelectionChanged" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource ResourceKey=SSHAuthTextConverter}}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxSSHUserName" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <PasswordBox Grid.Row="4" Grid.Column="1" x:Name="PasswordBoxSSHPassword" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>
+
+                        </Grid>
                     </Grid>
                 </TabItem>
                 <TabItem Header="终端设置">

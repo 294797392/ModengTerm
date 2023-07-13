@@ -53,24 +53,24 @@ namespace XTerminal
 
         private void InitializeWindow()
         {
-            List<Base.DataModels.XTermSession> sessions = XTermApp.Context.ServiceAgent.GetSessions();
+            List<XTermSession> sessions = XTermApp.Context.ServiceAgent.GetSessions();
 
             BindableCollection<XTermSessionVM> sessionVMs = new BindableCollection<XTermSessionVM>();
 
-            foreach (Base.DataModels.XTermSession session in sessions)
+            foreach (XTermSession session in sessions)
             {
-                XTermSessionVM sessionVM = new XTermSessionVM()
-                {
-                    ID = session.ID,
-                    Name = session.Name,
-                    Description = session.Description,
-                    Type = (SessionTypeEnum)session.Type,
-                };
-
+                XTermSessionVM sessionVM = new XTermSessionVM(session);
                 sessionVMs.Add(sessionVM);
             }
 
             DataGridSessionList.DataContext = sessionVMs;
+        }
+
+        private void OpenSession(XTermSessionVM sessionVM)
+        {
+            this.SelectedSession = sessionVM.Session;
+
+            base.DialogResult = true;
         }
 
         #endregion
@@ -100,6 +100,23 @@ namespace XTerminal
             this.SelectedSession = session;
 
             base.DialogResult = true;
+        }
+
+        private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)
+        {
+            DataGridSessionList_MouseDoubleClick(null, null);
+        }
+
+        private void DataGridSessionList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            XTermSessionVM sessionVM = DataGridSessionList.SelectedItem as XTermSessionVM;
+            if (sessionVM == null)
+            {
+                MessageBoxUtils.Info("请选择要打开的会话");
+                return;
+            }
+
+            this.OpenSession(sessionVM);
         }
 
         #endregion

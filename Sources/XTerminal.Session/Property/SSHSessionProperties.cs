@@ -5,27 +5,6 @@ using System.Text;
 
 namespace XTerminal.Session.Property
 {
-    /// <summary>
-    /// 连接SSH服务器的身份验证方式
-    /// </summary>
-    public enum SSHAuthEnum
-    {
-        /// <summary>
-        /// 不需要验证，直接输入IP地址和端口号就可以
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// 密码验证
-        /// </summary>
-        Password,
-
-        /// <summary>
-        /// 公钥验证
-        /// </summary>
-        PulicKey
-    }
-
     public class SSHSessionProperties : SessionProperties
     {
         public string KeyFilePath { get; set; }

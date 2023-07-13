@@ -20,7 +20,7 @@ namespace XTerminal.Session
             ReadBufferSize = 16384,
 
             SessionType = SessionTypeEnum.SSH,
-            SessionProperties = new SSHSessionProperties()
+            SessionProperties = new SessionProperties()
             {
                 //ServerAddress = "linux-desktop",
                 //ServerPort = 22,

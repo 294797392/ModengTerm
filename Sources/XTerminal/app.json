@@ -12,10 +12,17 @@
     "sessions": [
         {
             "id": "1",
-            "name": "ssh",
+            "name": "SSH",
             "description": "",
             "icon": "",
-            "providerEntry": "XTerminal.UserControls.SSHPropertiesUserControl, XTerminal",
+            "type": 1
+        },
+
+        {
+            "id": "2",
+            "name": "Windows命令行",
+            "description": "",
+            "icon": "",
             "type": 0
         }
     ]

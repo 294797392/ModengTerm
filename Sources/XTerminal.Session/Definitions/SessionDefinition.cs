@@ -23,12 +23,6 @@ namespace XTerminal.Session.Definitions
         [JsonProperty("icon")]
         public string Icon { get; set; }
 
-        /// <summary>
-        /// 属性提供器的入口类
-        /// </summary>
-        [JsonProperty("providerEntry")]
-        public string ProviderEntry { get; set; }
-
         [EnumDataType(typeof(SessionTypeEnum))]
         [JsonProperty("type")]
         public int Type { get; set; }

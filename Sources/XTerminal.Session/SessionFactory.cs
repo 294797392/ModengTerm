@@ -13,27 +13,10 @@ namespace XTerminal.Session
             switch (options.SessionType)
             {
                 case SessionTypeEnum.SSH: return new SSHSession(options);
+                case SessionTypeEnum.Win32CommandLine: return new Win32CMDLineSession(options);
                 default:
                     throw new NotImplementedException();
             }
         }
-
-        //public static SSHChannelAuthorition CreateSSHClientAuthorition(string ip, int port, string userName, string password)
-        //{
-        //    return new SSHChannelAuthorition()
-        //    {
-        //        ServerAddress = ip,
-        //        ServerPort = port,
-        //        UserName = userName,
-        //        Password = password,
-        //        TerminalName = "xterm-256color"
-        //    };
-        //}
-
-        //public static VTChannel CreateSSHClient(string ip, int port, string userName, string password)
-        //{
-        //    ChannelAuthorition authorition = CreateSSHClientAuthorition(ip, port, userName, password);
-        //    return VTChannelFactory.Create(VTChannelTypes.SSH, authorition);
-        //}
     }
 }

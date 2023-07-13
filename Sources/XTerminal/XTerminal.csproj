@@ -89,30 +89,14 @@
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
     <Compile Include="ServiceAgents\FileServiceAgent.cs" />
     <Compile Include="ServiceAgents\ServiceAgent.cs" />
-    <Compile Include="UserControls\ContentLayoutUserControl.xaml.cs">
-      <DependentUpon>ContentLayoutUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\IWorkbenchContent.cs" />
-    <Compile Include="UserControls\SSHPropertiesUserControl.xaml.cs">
-      <DependentUpon>SSHPropertiesUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UserControls\TabManagerUserControl.xaml.cs">
-      <DependentUpon>TabManagerUserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UserControls\TerminalUserControl.xaml.cs">
       <DependentUpon>TerminalUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\WorkbenchUserControl.xaml.cs">
-      <DependentUpon>WorkbenchUserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="VideoTerminal.cs" />
-    <Compile Include="ViewModels\CreateSessionVM.cs" />
     <Compile Include="ViewModels\GroupVM.cs" />
-    <Compile Include="ViewModels\MainWindowVM.cs" />
     <Compile Include="ViewModels\OpenedSessionVM.cs" />
     <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\XTermSessionVM.cs" />
-    <Compile Include="ViewModels\WorkbenchVM.cs" />
     <Compile Include="Windows\CreateSessionWindow.xaml.cs">
       <DependentUpon>CreateSessionWindow.xaml</DependentUpon>
     </Compile>
@@ -120,19 +104,11 @@
       <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="XTermApp.cs" />
+    <Page Include="Languages\Chinese.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\ContentLayoutUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\TabManagerUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\WorkbenchUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -155,14 +131,6 @@
     <Page Include="Themes\Themes.Ubuntu.Ambiance.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UserControls\SessionPropertiesDictionary.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\SSHPropertiesUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\TerminalUserControl.xaml">
       <SubType>Designer</SubType>
@@ -209,7 +177,9 @@
     <Resource Include="Fonts\README.txt" />
     <Resource Include="Fonts\TRADEMARKS.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\close.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
       <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>

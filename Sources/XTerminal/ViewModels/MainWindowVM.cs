@@ -24,8 +24,8 @@ namespace XTerminal.ViewModels
 
             #region 加载已存在的会话列表
 
-            List<Base.DataModels.XTermSession> sessionList = XTermApp.Context.ServiceAgent.GetSessions();
-            foreach (Base.DataModels.XTermSession session in sessionList)
+            List<XTermSession> sessionList = XTermApp.Context.ServiceAgent.GetSessions();
+            foreach (XTermSession session in sessionList)
             {
                 XTermSessionVM sessionVM = new XTermSessionVM()
                 {

@@ -61,5 +61,11 @@ namespace XTerminal.Base.DataModels
         /// </summary>
         [JsonProperty("password")]
         public string Password { get; set; }
+
+        /// <summary>
+        /// 身份验证方式
+        /// </summary>
+        [JsonProperty("authType")]
+        public int AuthType { get; set; }
     }
 }

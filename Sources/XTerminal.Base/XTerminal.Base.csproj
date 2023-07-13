@@ -64,6 +64,7 @@
     <Compile Include="VTKeyboard.cs" />
     <Compile Include="VTKeys.cs" />
     <Compile Include="VTModifierKeys.cs" />
+    <Compile Include="XTermConsts.cs" />
     <Compile Include="XTermUtils.cs" />
   </ItemGroup>
   <ItemGroup>

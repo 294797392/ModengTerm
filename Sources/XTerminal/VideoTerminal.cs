@@ -294,7 +294,7 @@ namespace XTerminal
 
             #endregion
 
-            #region 连接中断通道
+            #region 连接终端通道
 
             SessionBase vtChannel = SessionFactory.Create(options);
             vtChannel.StatusChanged += this.VTChannel_StatusChanged;

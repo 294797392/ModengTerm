@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
+using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Document.Rendering;
 using XTerminal.Session;
@@ -23,6 +24,15 @@ namespace XTerminal.ViewModels
         private SessionStatusEnum status;
         private VideoTerminal videoTerminal;
         private Base.DataModels.XTermSession session;
+
+        #endregion
+
+        #region 公开事件
+
+        /// <summary>
+        /// 会话状态改变的时候触发
+        /// </summary>
+        public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
 
         #endregion
 
@@ -45,7 +55,12 @@ namespace XTerminal.ViewModels
         }
 
         /// <summary>
-        /// 画板容器
+        /// 会话类型
+        /// </summary>
+        public SessionTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 用来渲染终端的画布容器
         /// </summary>
         public IDrawingCanvasPanel CanvasPanel { get; set; }
 
@@ -57,13 +72,13 @@ namespace XTerminal.ViewModels
         /// 构造方法
         /// </summary>
         /// <param name="session">要打开的会话对象</param>
-        public OpenedSessionVM(Base.DataModels.XTermSession session)
+        public OpenedSessionVM(XTermSession session)
         {
             this.session = session;
-
-            this.videoTerminal = new VideoTerminal();
-            this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
-            this.videoTerminal.CanvasPanel = this.CanvasPanel;
+            this.ID = session.ID;
+            this.Name = session.Name;
+            this.Description = session.Description;
+            this.Type = (SessionTypeEnum)session.Type;
         }
 
         #endregion
@@ -74,39 +89,46 @@ namespace XTerminal.ViewModels
         {
             VTInitialOptions initialOptions = new VTInitialOptions()
             {
-                //SessionType = (SessionTypeEnum)this.session.Type,
-                //SessionProperties = this.DeserializeSessionProperty((SessionTypeEnum)this.session.Type, this.session.Properties),
-                //TerminalProperties = new TerminalProperties()
-                //{
-                //    Columns = this.session.Column,
-                //    Rows = this.session.Row,
-                //    Type = TerminalTypeEnum.XTerm
-                //},
-                //ReadBufferSize = 8192,
+                SessionType = (SessionTypeEnum)this.session.Type,
+                SessionProperties = new SessionProperties()
+                {
+                    ServerAddress = this.session.Host,
+                    ServerPort = this.session.Port,
+                    UserName = this.session.UserName,
+                    Password = this.session.Password
+                },
+                TerminalProperties = new TerminalProperties()
+                {
+                    Columns = this.session.Column,
+                    Rows = this.session.Row,
+                    Type = TerminalTypeEnum.XTerm
+                },
+                ReadBufferSize = 8192,
+                CursorOption = new CursorOptions()
+                {
+                    Style = Base.VTCursorStyles.Line,
+                    Interval = XTermConsts.CURSOR_BLINK_INTERVAL
+                }
             };
-
+            this.videoTerminal = new VideoTerminal();
+            this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
+            this.videoTerminal.CanvasPanel = this.CanvasPanel;
             this.videoTerminal.Initialize(initialOptions);
         }
 
         public void Close()
-        { }
+        {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+            this.videoTerminal.SessionStatusChanged -= this.VideoTerminal_SessionStatusChanged;
+            this.videoTerminal.Release();
+        }
 
         #endregion
 
         #region 实例方法
-
-        private SessionProperties DeserializeSessionProperty(SessionTypeEnum sessionType, string propertyString)
-        {
-            switch (sessionType)
-            {
-                case SessionTypeEnum.libvtssh:
-                case SessionTypeEnum.SSH:
-                    return JSONHelper.Parse<SSHSessionProperties>(propertyString);
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
 
         #endregion
 

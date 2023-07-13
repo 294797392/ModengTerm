@@ -19,7 +19,7 @@ namespace XTerminal.Session
 
         private SshClient sshClient;
         private ShellStream stream;
-        private SSHSessionProperties authorition;
+        private SessionProperties sessionProperties;
 
         #endregion
 
@@ -44,15 +44,15 @@ namespace XTerminal.Session
 
         protected override int OnInitialize()
         {
-            this.authorition = this.options.SessionProperties as SSHSessionProperties;
+            this.sessionProperties = this.options.SessionProperties;
             var authentications = new List<AuthenticationMethod>();
-            if (!string.IsNullOrEmpty(this.authorition.KeyFilePath))
+            if (!string.IsNullOrEmpty(this.sessionProperties.KeyFilePath))
             {
-                var privateKeyFile = new PrivateKeyFile(this.authorition.KeyFilePath, this.authorition.KeyFilePassphrase);
-                authentications.Add(new PrivateKeyAuthenticationMethod(this.authorition.UserName, privateKeyFile));
+                var privateKeyFile = new PrivateKeyFile(this.sessionProperties.KeyFilePath, this.sessionProperties.KeyFilePassphrase);
+                authentications.Add(new PrivateKeyAuthenticationMethod(this.sessionProperties.UserName, privateKeyFile));
             }
-            authentications.Add(new PasswordAuthenticationMethod(this.authorition.UserName, this.authorition.Password));
-            ConnectionInfo connectionInfo = new ConnectionInfo(this.authorition.ServerAddress, this.authorition.ServerPort, this.authorition.UserName, authentications.ToArray());
+            authentications.Add(new PasswordAuthenticationMethod(this.sessionProperties.UserName, this.sessionProperties.Password));
+            ConnectionInfo connectionInfo = new ConnectionInfo(this.sessionProperties.ServerAddress, this.sessionProperties.ServerPort, this.sessionProperties.UserName, authentications.ToArray());
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
 

@@ -55,13 +55,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Definitions\SessionDefinition.cs" />
+    <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChannelAuthorition.cs" />
     <Compile Include="libvt.cs" />
     <Compile Include="libvtsshSession.cs" />
     <Compile Include="Property\CursorProperties.cs" />
     <Compile Include="Property\SessionProperties.cs" />
-    <Compile Include="Property\SSHSessionProperties.cs" />
     <Compile Include="Property\TerminalProperties.cs" />
     <Compile Include="SessionTypeEnum.cs" />
     <Compile Include="SSHSession.cs" />
@@ -69,6 +69,7 @@
     <Compile Include="SessionBase.cs" />
     <Compile Include="SessionFactory.cs" />
     <Compile Include="SessionStatusEnum.cs" />
+    <Compile Include="Win32CMDLineSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
