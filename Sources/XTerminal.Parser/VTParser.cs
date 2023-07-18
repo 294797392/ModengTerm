@@ -135,6 +135,11 @@ namespace XTerminal.Parser
             this.state = VTStates.Ground;   // 状态机默认设置为基态
         }
 
+        public void Release()
+        {
+
+        }
+
         /// <summary>
         /// 解析终端字节流
         /// </summary>

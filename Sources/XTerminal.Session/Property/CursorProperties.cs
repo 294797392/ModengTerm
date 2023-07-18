@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Channels;
 
 namespace XTerminal.Session.Property
 {

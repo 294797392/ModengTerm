@@ -21,6 +21,7 @@ namespace XTerminal.Session
         private Process process;
         private Task outputThread;
         private byte[] outputBuffer;
+        private bool processExited;
 
         #endregion
 
@@ -30,12 +31,13 @@ namespace XTerminal.Session
 
         public override int Connect()
         {
+            this.processExited = false;
             this.outputBuffer = new byte[base.options.ReadBufferSize];
 
             this.process = Process.Start(new ProcessStartInfo()
             {
                 FileName = "cmd.exe",
-                Arguments = "/a",
+                Arguments = "",
                 UseShellExecute = false,
                 RedirectStandardInput = true,
                 RedirectStandardError = true,
@@ -49,6 +51,7 @@ namespace XTerminal.Session
 
         public override void Disconnect()
         {
+            this.processExited = true;
             this.process.Kill();
             this.process.Dispose();
             this.outputThread.Wait();
@@ -73,7 +76,7 @@ namespace XTerminal.Session
 
         private void OutputThreadProc()
         {
-            while (!this.process.HasExited)
+            while (!this.processExited)
             {
                 try
                 {
@@ -87,6 +90,8 @@ namespace XTerminal.Session
                     logger.Error("OutputThreadProc异常", ex);
                 }
             }
+
+            logger.ErrorFormat("OutputThread退出");
         }
 
         #endregion

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace XTerminal.Document.Rendering
 {
     /// <summary>
-    /// 表示一个用来显示文档的画板
+    /// 表示一个用来渲染终端输出的表面
     /// </summary>
     public interface ITerminalSurface
     {

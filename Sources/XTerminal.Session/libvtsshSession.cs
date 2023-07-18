@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Channels;
 using XTerminal.Session.Property;
 
 namespace XTerminal.Session

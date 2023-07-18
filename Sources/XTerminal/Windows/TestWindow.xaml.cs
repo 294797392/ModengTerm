@@ -24,10 +24,10 @@ namespace XTerminal.Windows
         {
             InitializeComponent();
 
-            DocumentPanel.Scrollbar = SliderScrolbar;
+            //DocumentPanel.Scrollbar = SliderScrolbar;
 
             VideoTerminal videoTermianl = new VideoTerminal();
-            videoTermianl.SurfacePanel = DocumentPanel;
+            //videoTermianl.SurfacePanel = DocumentPanel;
             videoTermianl.Initialize(VTInitialOptions.Home);
         }
     }

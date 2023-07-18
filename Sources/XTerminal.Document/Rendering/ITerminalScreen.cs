@@ -11,7 +11,7 @@ namespace XTerminal.Document.Rendering
     /// 表示画板容器
     /// 容器里可以包含多个画图，并对画面进行管理
     /// </summary>
-    public interface ITerminalSurfacePanel
+    public interface ITerminalScreen
     {
         /// <summary>
         /// 当用户按下按键的时候要触发这个事件
@@ -20,29 +20,29 @@ namespace XTerminal.Document.Rendering
         /// VTModifierKeys：用户按下的控制按键（ctrl，alt...etc）
         /// string：用户输入的中文字符串，如果没有则写null
         /// </summary>
-        event Action<ITerminalSurfacePanel, VTInputEvent> InputEvent;
+        event Action<ITerminalScreen, VTInputEvent> InputEvent;
 
         /// <summary>
         /// 当用户拖动滚动条的时候触发
         /// int:滚动条移动到的行数
         /// </summary>
-        event Action<ITerminalSurfacePanel, int> ScrollChanged;
+        event Action<ITerminalScreen, int> ScrollChanged;
 
         /// <summary>
         /// 鼠标移动的时候触发
         /// 在鼠标移动出Panel外的时候，也会触发
         /// </summary>
-        event Action<ITerminalSurfacePanel, VTPoint> VTMouseMove;
+        event Action<ITerminalScreen, VTPoint> VTMouseMove;
 
         /// <summary>
         /// 鼠标按下的时候触发
         /// </summary>
-        event Action<ITerminalSurfacePanel, VTPoint> VTMouseDown;
+        event Action<ITerminalScreen, VTPoint> VTMouseDown;
 
         /// <summary>
         /// 鼠标抬起的时候触发
         /// </summary>
-        event Action<ITerminalSurfacePanel, VTPoint> VTMouseUp;
+        event Action<ITerminalScreen, VTPoint> VTMouseUp;
 
         /// <summary>
         /// 创建一个画板

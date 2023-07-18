@@ -15,6 +15,37 @@
                 <ResourceDictionary Source="pack://application:,,,/XTerminal;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <local:CloseSessionButtonColorConverter x:Key="CloseSessionButtonColorConverter"/>
+
+            <DataTemplate x:Key="DataTemplateOpenedSession">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MinWidth="80"/>
+                        <ColumnDefinition Width="20"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+                    <Path Grid.Column="1" x:Name="PathClose" Data="M30,15 L15,30 M15,15 30,30" Stretch="Fill" Stroke="{Binding Path=IsSelected, Converter={StaticResource ResourceKey=CloseSessionButtonColorConverter}}" 
+                          StrokeThickness="2" Cursor="Hand" Width="8" Height="8" Fill="Transparent" Tag="{Binding}"
+                          MouseLeftButtonDown="PathClose_MouseLeftButtonDown"/>
+
+                </Grid>
+
+                <DataTemplate.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Stroke" Value="Red" TargetName="PathClose"/>
+                    </Trigger>
+                </DataTemplate.Triggers>
+
+            </DataTemplate>
+
+            <DataTemplate x:Key="DataTemplateOpenSession">
+                <Grid Width="20">
+                    <TextBlock Text="+" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16"/>
+                </Grid>
+            </DataTemplate>
+            
             <Style x:Key="StyleMenuItemLocal" TargetType="{x:Type MenuItem}">
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="Width" Value="60"/>
@@ -51,31 +82,10 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <ListBox Grid.Row="0" DataContext="{Binding Source={x:Static local:XTermApp.Context}}" ItemsSource="{Binding Path=OpenedSessionList}"
-                     SelectedItem="{Binding Path=SelectedOpenedSession}" Style="{StaticResource ResourceKey=StyleListBoxTerminalWindowList}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" MinWidth="80"/>
-                                <ColumnDefinition Width="20"/>
-                            </Grid.ColumnDefinitions>
-
-                            <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-
-                            <Path Grid.Column="1" x:Name="PathClose" Data="M30,15 L15,30 M15,15 30,30" Stretch="Fill" Stroke="White" 
-                                  StrokeThickness="2" Cursor="Hand" Width="10" Height="10" Fill="Transparent"/>
-
-                        </Grid>
-
-                        <DataTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Stroke" Value="Red" TargetName="PathClose"/>
-                            </Trigger>
-                        </DataTemplate.Triggers>
-                        
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
+            <!-- 打开的终端列表Tab页 -->
+            <ListBox Grid.Row="0" x:Name="ListBoxOpenedSessionTab" DataContext="{Binding Source={x:Static local:XTermApp.Context}}" ItemsSource="{Binding Path=OpenedSessionList}"
+                     SelectedItem="{Binding Path=SelectedOpenedSession}" SelectionChanged="ListBoxOpenedSessionTab_SelectionChanged"
+                     Style="{StaticResource ResourceKey=StyleListBoxTerminalWindowList}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
@@ -83,6 +93,7 @@
                 </ListBox.ItemsPanel>
             </ListBox>
 
+            <!-- 终端展示页面 -->
             <ContentControl Grid.Row="1" x:Name="ContentControlTerminal"/>
 
         </Grid>

@@ -38,6 +38,6 @@ namespace XTerminal.Document
         /// <summary>
         /// 画布创建器
         /// </summary>
-        public ITerminalSurfacePanel CanvasCreator { get; set; }
+        public ITerminalScreen CanvasCreator { get; set; }
     }
 }

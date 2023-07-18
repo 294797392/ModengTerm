@@ -1,28 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows;
-using System.Windows.Media.TextFormatting;
-using XTerminal.Document.Rendering;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 using XTerminal.Base;
 using XTerminal.Document;
+using XTerminal.Document.Rendering;
+using XTerminal.Rendering;
+using XTerminal.Session;
 
-namespace XTerminal.Rendering
+namespace XTerminal.UserControls
 {
     /// <summary>
-    /// 显示器控件
+    /// TerminalUserControl.xaml 的交互逻辑
     /// </summary>
-    public class DrawingCanvasPanel : Grid, ITerminalScreen
+    public partial class TerminalScreenUserControl : UserControl, ITerminalScreen
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("XDocumentPanel");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("TerminalUserControl");
 
         #endregion
 
@@ -58,37 +63,25 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        #region 属性
-
-        /// <summary>
-        /// 滚动条
-        /// </summary>
-        public Slider Scrollbar
-        {
-            get { return this.scrollbar; }
-            set
-            {
-                this.scrollbar = value;
-                this.scrollbar.PreviewMouseMove += Scrollbar_PreviewMouseMove;
-                this.scrollbar.PreviewMouseLeftButtonDown += Scrollbar_MouseLeftButtonDown;
-                this.scrollbar.PreviewMouseLeftButtonUp += Scrollbar_MouseLeftButtonUp;
-            }
-        }
-
-        #endregion
-
         #region 构造方法
 
-        public DrawingCanvasPanel()
+        public TerminalScreenUserControl()
         {
-            this.inputEvent = new VTInputEvent();
-            this.Background = Brushes.Transparent;
-            this.Focusable = true;
+            InitializeComponent();
+
+            this.InitializeUserControl();
         }
 
         #endregion
 
         #region 实例方法
+
+        private void InitializeUserControl()
+        {
+            this.inputEvent = new VTInputEvent();
+            this.Background = Brushes.Transparent;
+            this.Focusable = true;
+        }
 
         private void NotifyInputEvent(VTInputEvent evt)
         {
@@ -98,7 +91,7 @@ namespace XTerminal.Rendering
             }
         }
 
-        private void HandleMouseScrollEvent()
+        private void HandleScrollEvent()
         {
             if (!this.cursorDown)
             {
@@ -234,51 +227,51 @@ namespace XTerminal.Rendering
         }
 
 
-        private void Scrollbar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void SliderScrolbar_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            this.HandleScrollEvent();
+        }
+
+        private void SliderScrolbar_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            this.HandleScrollEvent();
+            this.cursorDown = false;
+        }
+
+        private void SliderScrolbar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             this.cursorDown = true;
             this.scrollbarCursorDownValue = Convert.ToInt32(this.scrollbar.Value);
         }
 
-        private void Scrollbar_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            this.HandleMouseScrollEvent();
-            this.cursorDown = false;
-        }
-
-        private void Scrollbar_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            this.HandleMouseScrollEvent();
-        }
-
         #endregion
 
-        #region IDrawingCanvasPanel
+        #region ITerminalScreen
 
         public VTRect GetBoundary()
         {
-            Point leftTop = this.PointToScreen(new Point(0, 0));
+            Point leftTop = ContentControlSurface.PointToScreen(new Point(0, 0));
             return new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
         }
 
         public ITerminalSurface CreateSurface()
         {
-            DrawingCanvas canvas = new DrawingCanvas();
+            DrawingSurface canvas = new DrawingSurface();
             return canvas;
         }
 
-        public void AddSurface(ITerminalSurface canvas)
+        public void AddSurface(ITerminalSurface surface)
         {
-            this.Children.Add(canvas as DrawingCanvas);
+            ContentControlSurface.Content = surface;
         }
 
         public void SwitchSurface(ITerminalSurface remove, ITerminalSurface add)
         {
             this.Dispatcher.Invoke(() =>
             {
-                int index = this.Children.IndexOf(remove as DrawingCanvas);
-                this.Children.RemoveAt(index);
-                this.Children.Insert(index, add as DrawingCanvas);
+                //int index = this.Children.IndexOf(remove as DrawingCanvas);
+                //this.Children.RemoveAt(index);
+                //this.Children.Insert(index, add as DrawingCanvas);
             });
         }
 
@@ -288,7 +281,7 @@ namespace XTerminal.Rendering
         /// <param name="maximum">滚动条的最大值</param>
         public void UpdateScrollInfo(int maximum)
         {
-            this.Scrollbar.Maximum = maximum;
+            this.SliderScrolbar.Maximum = maximum;
         }
 
         /// <summary>
@@ -298,7 +291,7 @@ namespace XTerminal.Rendering
         /// <param name="historyLine">要滚动到的历史行</param>
         public void ScrollToHistoryLine(VTHistoryLine historyLine)
         {
-            this.Scrollbar.Value = historyLine.Row;
+            this.SliderScrolbar.Value = historyLine.Row;
         }
 
         public void ScrollToEnd(ScrollOrientation orientation)
@@ -307,13 +300,13 @@ namespace XTerminal.Rendering
             {
                 case ScrollOrientation.Down:
                     {
-                        this.Scrollbar.Value = this.Scrollbar.Maximum;
+                        this.SliderScrolbar.Value = this.SliderScrolbar.Maximum;
                         break;
                     }
 
                 case ScrollOrientation.Up:
                     {
-                        this.Scrollbar.Value = this.Scrollbar.Minimum;
+                        this.SliderScrolbar.Value = this.SliderScrolbar.Minimum;
                         break;
                     }
 
@@ -324,7 +317,7 @@ namespace XTerminal.Rendering
 
         public void ScrollTo(int scrollValue)
         {
-            this.Scrollbar.Value = scrollValue;
+            this.SliderScrolbar.Value = scrollValue;
         }
 
         #endregion

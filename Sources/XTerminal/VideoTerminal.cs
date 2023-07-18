@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using XTerminal.Base;
-using XTerminal.Channels;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
@@ -144,6 +143,11 @@ namespace XTerminal
         private int renderCounter;
         private int dataReceivedCounter;
 
+        /// <summary>
+        /// 是否正在运行
+        /// </summary>
+        private bool isRunning;
+
         #endregion
 
         #region 属性
@@ -177,7 +181,7 @@ namespace XTerminal
         /// <summary>
         /// 文档画布容器
         /// </summary>
-        public ITerminalSurfacePanel SurfacePanel { get; set; }
+        public ITerminalScreen SurfacePanel { get; set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -236,6 +240,8 @@ namespace XTerminal
             this.historyLines = new Dictionary<int, VTHistoryLine>();
             this.TextOptions = new VTextOptions();
             this.textSelection = new VTextSelection();
+
+            this.isRunning = true;
 
             #region 初始化键盘
 
@@ -296,11 +302,11 @@ namespace XTerminal
 
             #region 连接终端通道
 
-            SessionBase vtChannel = SessionFactory.Create(options);
-            vtChannel.StatusChanged += this.VTSession_StatusChanged;
-            vtChannel.DataReceived += this.VTSession_DataReceived;
-            vtChannel.Connect();
-            this.session = vtChannel;
+            SessionBase session = SessionFactory.Create(options);
+            session.StatusChanged += this.VTSession_StatusChanged;
+            session.DataReceived += this.VTSession_DataReceived;
+            session.Connect();
+            this.session = session;
 
             #endregion
         }
@@ -310,7 +316,24 @@ namespace XTerminal
         /// </summary>
         public void Release()
         {
+            this.isRunning = false;
 
+            this.vtParser.ActionEvent -= VtParser_ActionEvent;
+            this.vtParser.Release();
+
+            this.SurfacePanel.InputEvent -= this.VideoTerminal_InputEvent;
+            this.SurfacePanel.ScrollChanged -= this.CanvasPanel_ScrollChanged;
+            this.SurfacePanel.VTMouseDown -= this.CanvasPanel_VTMouseDown;
+            this.SurfacePanel.VTMouseMove -= this.CanvasPanel_VTMouseMove;
+            this.SurfacePanel.VTMouseUp -= this.CanvasPanel_VTMouseUp;
+
+            this.cursorBlinkingThread.Join();
+
+            this.session.StatusChanged -= this.VTSession_StatusChanged;
+            this.session.DataReceived -= this.VTSession_DataReceived;
+            this.session.Disconnect();
+
+            this.historyLines.Clear();
         }
 
         #endregion
@@ -748,7 +771,7 @@ namespace XTerminal
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        private void VideoTerminal_InputEvent(ITerminalSurfacePanel canvasPanel, VTInputEvent evt)
+        private void VideoTerminal_InputEvent(ITerminalScreen canvasPanel, VTInputEvent evt)
         {
             byte[] bytes = this.Keyboard.TranslateInput(evt);
 
@@ -1209,7 +1232,7 @@ namespace XTerminal
 
         private void CursorBlinkingThreadProc()
         {
-            while (true)
+            while (this.isRunning)
             {
                 VTCursor cursor = this.Cursor;
 
@@ -1241,19 +1264,19 @@ namespace XTerminal
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="scrollValue">滚动到的行数</param>
-        private void CanvasPanel_ScrollChanged(ITerminalSurfacePanel arg1, int scrollValue)
+        private void CanvasPanel_ScrollChanged(ITerminalScreen arg1, int scrollValue)
         {
             this.ScrollToHistory(scrollValue);
         }
 
-        private void CanvasPanel_VTMouseUp(ITerminalSurfacePanel arg1, VTPoint cursorPos)
+        private void CanvasPanel_VTMouseUp(ITerminalScreen arg1, VTPoint cursorPos)
         {
             this.isMouseDown = false;
 
             this.textSelection.Reset();
         }
 
-        private void CanvasPanel_VTMouseMove(ITerminalSurfacePanel arg1, VTPoint mousePosition)
+        private void CanvasPanel_VTMouseMove(ITerminalScreen arg1, VTPoint mousePosition)
         {
             if (!this.isMouseDown)
             {
@@ -1403,7 +1426,7 @@ namespace XTerminal
             }, null);
         }
 
-        private void CanvasPanel_VTMouseDown(ITerminalSurfacePanel canvasPanel, VTPoint mousePosition)
+        private void CanvasPanel_VTMouseDown(ITerminalScreen canvasPanel, VTPoint mousePosition)
         {
             this.isMouseDown = true;
             this.mouseDownPos = mousePosition;

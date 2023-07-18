@@ -17,7 +17,7 @@ namespace XTerminal.ViewModels
     /// <summary>
     /// 运行时的会话信息
     /// </summary>
-    public class OpenedSessionVM : ViewModelBase
+    public class OpenedSessionVM : SessionTabItemVM
     {
         #region 实例变量
 
@@ -60,9 +60,9 @@ namespace XTerminal.ViewModels
         public SessionTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 用来渲染终端的画布容器
+        /// 用来显示输出的终端屏幕
         /// </summary>
-        public ITerminalSurfacePanel CanvasPanel { get; set; }
+        public ITerminalScreen TerminalScreen { get; set; }
 
         #endregion
 
@@ -75,7 +75,7 @@ namespace XTerminal.ViewModels
         public OpenedSessionVM(XTermSession session)
         {
             this.session = session;
-            this.ID = session.ID;
+            this.ID = Guid.NewGuid().ToString();
             this.Name = session.Name;
             this.Description = session.Description;
             this.Type = (SessionTypeEnum)session.Type;
@@ -112,7 +112,7 @@ namespace XTerminal.ViewModels
             };
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
-            this.videoTerminal.SurfacePanel = this.CanvasPanel;
+            this.videoTerminal.SurfacePanel = this.TerminalScreen;
             this.videoTerminal.Initialize(initialOptions);
         }
 

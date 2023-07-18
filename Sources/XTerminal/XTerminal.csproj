@@ -84,17 +84,18 @@
     <Compile Include="Rendering\DrawingSelection.cs" />
     <Compile Include="Rendering\DrawingObject.cs" />
     <Compile Include="Rendering\WPFRenderUtils.cs" />
-    <Compile Include="Rendering\DrawingCanvas.cs" />
-    <Compile Include="Rendering\DrawingCanvasPanel.cs" />
+    <Compile Include="Rendering\DrawingSurface.cs" />
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
     <Compile Include="ServiceAgents\FileServiceAgent.cs" />
     <Compile Include="ServiceAgents\ServiceAgent.cs" />
-    <Compile Include="UserControls\TerminalUserControl.xaml.cs">
-      <DependentUpon>TerminalUserControl.xaml</DependentUpon>
+    <Compile Include="UserControls\TerminalScreenUserControl.xaml.cs">
+      <DependentUpon>TerminalScreenUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="ViewModels\GroupVM.cs" />
     <Compile Include="ViewModels\OpenedSessionVM.cs" />
+    <Compile Include="ViewModels\OpenSessionVM.cs" />
+    <Compile Include="ViewModels\SessionTabItemVM.cs" />
     <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\XTermSessionVM.cs" />
     <Compile Include="VTDebug.cs" />
@@ -137,7 +138,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UserControls\TerminalUserControl.xaml">
+    <Page Include="UserControls\TerminalScreenUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -16,9 +16,9 @@ using XTerminal.Document.Rendering;
 namespace XTerminal.Rendering
 {
     /// <summary>
-    /// 用来显示字符的容器
+    /// 用来渲染终端输出的表面
     /// </summary>
-    public class DrawingCanvas : FrameworkElement, ITerminalSurface
+    public class DrawingSurface : FrameworkElement, ITerminalSurface
     {
         #region 类变量
 
@@ -46,7 +46,7 @@ namespace XTerminal.Rendering
 
         #region 构造方法
 
-        public DrawingCanvas()
+        public DrawingSurface()
         {
             this.visuals = new VisualCollection(this);
         }
@@ -99,7 +99,7 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        #region IDrawingCanvas
+        #region ITerminalSurface
 
         public void Initialize(TerminalSurfaceOptions options)
         {
