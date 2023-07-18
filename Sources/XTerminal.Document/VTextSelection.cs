@@ -43,13 +43,11 @@ namespace XTerminal.Document
         {
             this.Ranges.Clear();
 
-            this.Start.IsCharacterHit = false;
             this.Start.CharacterIndex = -1;
-            this.Start.Line = null;
+            this.Start.LineHit = null;
 
-            this.End.IsCharacterHit = false;
             this.End.CharacterIndex = -1;
-            this.End.Line = null;
+            this.End.LineHit = null;
         }
     }
 }

@@ -112,7 +112,7 @@ namespace XTerminal.ViewModels
             };
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
-            this.videoTerminal.SurfacePanel = this.TerminalScreen;
+            this.videoTerminal.TerminalScreen = this.TerminalScreen;
             this.videoTerminal.Initialize(initialOptions);
         }
 

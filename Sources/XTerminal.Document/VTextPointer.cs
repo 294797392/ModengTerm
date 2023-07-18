@@ -14,27 +14,22 @@ namespace XTerminal.Document
         /// <summary>
         /// 指针命中的行数
         /// </summary>
-        public int Row { get { return this.Line.Row; } }
+        public int Row { get { return this.LineHit.Row; } }
 
         /// <summary>
-        /// 命中的字符的测量信息
+        /// 光标所在行
+        /// </summary>
+        public VTHistoryLine LineHit { get; set; }
+
+        /// <summary>
+        /// 光标所命中的字符的边界框信息
         /// </summary>
         public VTRect CharacterBounds { get; set; }
 
         /// <summary>
-        /// 是否命中了字符
-        /// 如果没命中字符，那么以鼠标当前位置为中心生成一个空白字符的CharacterBounds
-        /// </summary>
-        public bool IsCharacterHit { get; set; }
-
-        /// <summary>
         /// 命中的字符的索引
+        /// 如果没命中，那么就是-1
         /// </summary>
         public int CharacterIndex { get; set; }
-
-        /// <summary>
-        /// 光标所命中的行
-        /// </summary>
-        public VTHistoryLine Line { get; set; }
     }
 }

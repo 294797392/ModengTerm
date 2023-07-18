@@ -116,12 +116,12 @@ namespace XTerminal
         /// 记录当前滚动条滚动的值
         /// 也就是文档里的第一条历史记录的Row的值
         /// </summary>
-        private int currentScroll;
+        private int scrollValue;
 
         /// <summary>
         /// 当鼠标按下的时候，记录Canvas相对于屏幕的坐标
         /// </summary>
-        private VTRect canvasRect;
+        private VTRect surfaceRect;
 
         #endregion
 
@@ -181,7 +181,7 @@ namespace XTerminal
         /// <summary>
         /// 文档画布容器
         /// </summary>
-        public ITerminalScreen SurfacePanel { get; set; }
+        public ITerminalScreen TerminalScreen { get; set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -197,7 +197,7 @@ namespace XTerminal
         {
             get
             {
-                return this.currentScroll == this.scrollMax;
+                return this.scrollValue == this.scrollMax;
             }
         }
 
@@ -208,7 +208,7 @@ namespace XTerminal
         {
             get
             {
-                return this.currentScroll == 0;
+                return this.scrollValue == 0;
             }
         }
 
@@ -261,11 +261,11 @@ namespace XTerminal
 
             #region 初始化鼠标事件
 
-            this.SurfacePanel.InputEvent += this.VideoTerminal_InputEvent;
-            this.SurfacePanel.ScrollChanged += this.CanvasPanel_ScrollChanged;
-            this.SurfacePanel.VTMouseDown += this.CanvasPanel_VTMouseDown;
-            this.SurfacePanel.VTMouseMove += this.CanvasPanel_VTMouseMove;
-            this.SurfacePanel.VTMouseUp += this.CanvasPanel_VTMouseUp;
+            this.TerminalScreen.InputEvent += this.VideoTerminal_InputEvent;
+            this.TerminalScreen.ScrollChanged += this.TerminalScreen_ScrollChanged;
+            this.TerminalScreen.VTMouseDown += this.TerminalScreen_VTMouseDown;
+            this.TerminalScreen.VTMouseMove += this.TerminalScreen_VTMouseMove;
+            this.TerminalScreen.VTMouseUp += this.TerminalScreen_VTMouseUp;
 
             #endregion
 
@@ -278,14 +278,14 @@ namespace XTerminal
                 DECPrivateAutoWrapMode = initialOptions.TerminalProperties.DECPrivateAutoWrapMode,
                 CursorStyle = initialOptions.CursorOption.Style,
                 Interval = initialOptions.CursorOption.Interval,
-                CanvasCreator = this.SurfacePanel
+                CanvasCreator = this.TerminalScreen
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
             this.activeHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.activeHistoryLine;
-            this.SurfacePanel.AddSurface(this.activeDocument.Surface);
+            this.TerminalScreen.AddSurface(this.activeDocument.Surface);
 
             #endregion
 
@@ -321,11 +321,11 @@ namespace XTerminal
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
 
-            this.SurfacePanel.InputEvent -= this.VideoTerminal_InputEvent;
-            this.SurfacePanel.ScrollChanged -= this.CanvasPanel_ScrollChanged;
-            this.SurfacePanel.VTMouseDown -= this.CanvasPanel_VTMouseDown;
-            this.SurfacePanel.VTMouseMove -= this.CanvasPanel_VTMouseMove;
-            this.SurfacePanel.VTMouseUp -= this.CanvasPanel_VTMouseUp;
+            this.TerminalScreen.InputEvent -= this.VideoTerminal_InputEvent;
+            this.TerminalScreen.ScrollChanged -= this.TerminalScreen_ScrollChanged;
+            this.TerminalScreen.VTMouseDown -= this.TerminalScreen_VTMouseDown;
+            this.TerminalScreen.VTMouseMove -= this.TerminalScreen_VTMouseMove;
+            this.TerminalScreen.VTMouseUp -= this.TerminalScreen_VTMouseUp;
 
             this.cursorBlinkingThread.Join();
 
@@ -438,7 +438,7 @@ namespace XTerminal
 
                 if (scrollValue != -1)
                 {
-                    this.SurfacePanel.ScrollTo(scrollValue);
+                    this.TerminalScreen.ScrollTo(scrollValue);
                 }
 
                 #endregion
@@ -465,7 +465,7 @@ namespace XTerminal
         /// <param name="scrollValue">要显示的第一行历史记录</param>
         private void ScrollToHistory(int scrollValue)
         {
-            this.currentScroll = scrollValue;
+            this.scrollValue = scrollValue;
 
             // 终端可以显示的总行数
             int terminalRows = this.initialOptions.TerminalProperties.Rows;
@@ -495,15 +495,16 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// 当光标在容器外面的时候，进行滚动
+        /// 当光标在容器外面移动的时候，进行滚动
         /// </summary>
         /// <param name="mousePosition">当前鼠标的坐标</param>
-        /// <param name="canvasBoundary">相对于电脑显示器的画布的边界框</param>
+        /// <param name="surfaceBoundary">相对于电脑显示器的画布的边界框</param>
         /// <returns>是否执行了滚动动作</returns>
-        private OutsideScrollResult ScrollIfCursorOutsidePanel(VTPoint mousePosition, VTRect canvasBoundary)
+        private OutsideScrollResult ScrollIfCursorOutsideSurface(VTPoint mousePosition, VTRect surfaceBoundary)
         {
             OutsideScrollResult scrollResult = OutsideScrollResult.None;
 
+            // 要滚动到的目标行
             int scrollTarget = -1;
 
             if (mousePosition.Y < 0)
@@ -512,16 +513,16 @@ namespace XTerminal
                 if (!this.ScrollAtTop)
                 {
                     // 不在最上面，往上滚动一行
-                    scrollTarget = this.currentScroll - 1;
+                    scrollTarget = this.scrollValue - 1;
                     scrollResult = OutsideScrollResult.ScrollTop;
                 }
             }
-            else if (mousePosition.Y > canvasBoundary.Height)
+            else if (mousePosition.Y > surfaceBoundary.Height)
             {
                 // 光标在容器下面
                 if (!this.ScrollAtBottom)
                 {
-                    scrollTarget = this.currentScroll + 1;
+                    scrollTarget = this.scrollValue + 1;
                     scrollResult = OutsideScrollResult.ScrollDown;
                 }
             }
@@ -538,14 +539,14 @@ namespace XTerminal
         /// 使用像素坐标对VTextLine做命中测试
         /// </summary>
         /// <param name="mousePosition">鼠标坐标</param>
-        /// <param name="canvasBoundary">相对于电脑显示器的画布的边界框，也是鼠标的限定范围</param>
+        /// <param name="surfaceBoundary">相对于电脑显示器的画布的边界框，也是鼠标的限定范围</param>
         /// <param name="pointer">存储命中测试结果的变量</param>
-        /// <remarks>如果传递进来的鼠标位置在窗口外，那么会把鼠标限定在距离鼠标最近的Canvas边缘处</remarks>
+        /// <remarks>如果传递进来的鼠标位置在窗口外，那么会把鼠标限定在距离鼠标最近的Surface边缘处</remarks>
         /// <returns>
         /// 是否获取成功
         /// 当光标不在某一行或者不在某个字符上的时候，就获取失败
         /// </returns>
-        private bool GetTextPointer(VTPoint mousePosition, VTRect canvasBoundary, VTextPointer pointer)
+        private bool GetTextPointer(VTPoint mousePosition, VTRect surfaceBoundary, VTextPointer pointer)
         {
             double mouseX = mousePosition.X;
             double mouseY = mousePosition.Y;
@@ -554,95 +555,59 @@ namespace XTerminal
             {
                 mouseX = 0;
             }
-            if (mouseX > canvasBoundary.Width)
+            if (mouseX > surfaceBoundary.Width)
             {
-                mouseX = canvasBoundary.Width;
+                mouseX = surfaceBoundary.Width;
             }
 
             if (mouseY < 0)
             {
                 mouseY = 0;
             }
-            if (mouseY > canvasBoundary.Height)
+            if (mouseY > surfaceBoundary.Height)
             {
-                mouseY = canvasBoundary.Height;
+                mouseY = surfaceBoundary.Height;
             }
 
-            pointer.IsCharacterHit = false;
             pointer.CharacterIndex = -1;
 
-            #region 先找到鼠标悬浮的历史行
+            #region 先找到鼠标所在行
 
             // 有可能当前有滚动，所以要从历史行里开始找
             // 先获取到当前屏幕上显示的历史行的首行
 
             VTHistoryLine topHistoryLine;
-            if (!this.historyLines.TryGetValue(this.currentScroll, out topHistoryLine))
+            if (!this.historyLines.TryGetValue(this.scrollValue, out topHistoryLine))
             {
-                logger.ErrorFormat("GetTextPointer失败, 不存在历史行记录, currentScroll = {0}", this.currentScroll);
+                logger.ErrorFormat("GetTextPointer失败, 不存在历史行记录, currentScroll = {0}", this.scrollValue);
                 return false;
             }
 
-            // 当前行的Y偏移量
-            double offsetY = 0;
-            int termLines = this.initialOptions.TerminalProperties.Rows;
-            VTHistoryLine lineHit = topHistoryLine;
-            for (int i = 0; i < termLines; i++)
-            {
-                VTRect bounds = new VTRect(0, offsetY, lineHit.Width, lineHit.Height);
-
-                if (bounds.Top <= mouseY && bounds.Bottom >= mouseY)
-                {
-                    break;
-                }
-
-                offsetY += bounds.Height;
-
-                lineHit = lineHit.NextLine;
-
-                if (lineHit == null)
-                {
-                    // 当行数少于可显示的总行数的时候，会发生这种情况
-                    // 比如在终端刚打开的时候
-                    break;
-                }
-            }
-
-            // 这里说明鼠标没有在任何一个行上
+            double lineOffsetY;
+            VTHistoryLine lineHit = VTextSelectionHelper.HitTestVTextLine(topHistoryLine, mouseY, out lineOffsetY);
             if (lineHit == null)
             {
+                // 这里说明鼠标没有在任何一行上
                 logger.ErrorFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
                 return false;
             }
 
-            pointer.Line = lineHit;
+            pointer.LineHit = lineHit;
 
             #endregion
 
             #region 再计算鼠标悬浮于哪个字符上
 
-            string text = lineHit.Text;
-            for (int i = 0; i < text.Length; i++)
+            int characterIndex;
+            VTRect characterBounds;
+            if (!VTextSelectionHelper.HitTestVTCharacter(this.Surface, lineHit, mouseX, out characterIndex, out characterBounds))
             {
-                VTRect characterBounds = this.Surface.MeasureCharacter(lineHit, i);
-
-                if (characterBounds.Left <= mouseX && characterBounds.Right >= mouseX)
-                {
-                    // 测量出来的边界框没有Y边距，要手动设置
-                    characterBounds.Y = offsetY;
-                    // 鼠标命中了字符，使用命中的字符的边界框
-                    pointer.CharacterBounds = characterBounds;
-                    pointer.CharacterIndex = i;
-                    pointer.IsCharacterHit = true;
-                    break;
-                }
+                return false;
             }
 
-            if (!pointer.IsCharacterHit)
-            {
-                // 如果没命中字符，那么以鼠标当前位置为中心生成一个空白字符的CharacterBounds
-                pointer.CharacterBounds = new VTRect(mouseX - 5, offsetY, 10, lineHit.Height);
-            }
+            characterBounds.Y = lineOffsetY;
+            pointer.CharacterIndex = characterIndex;
+            pointer.CharacterBounds = characterBounds;
 
             #endregion
 
@@ -657,9 +622,9 @@ namespace XTerminal
         private bool UpdateTextPointerBounds(VTextPointer pointer)
         {
             VTHistoryLine topHistoryLine;
-            if (!this.historyLines.TryGetValue(this.currentScroll, out topHistoryLine))
+            if (!this.historyLines.TryGetValue(this.scrollValue, out topHistoryLine))
             {
-                logger.ErrorFormat("GetTextPointerRect失败, 不存在历史行记录, currentScroll = {0}", this.currentScroll);
+                logger.ErrorFormat("GetTextPointerRect失败, 不存在历史行记录, currentScroll = {0}", this.scrollValue);
                 return false;
             }
 
@@ -863,12 +828,12 @@ namespace XTerminal
                             if (scrollMax > 0)
                             {
                                 this.scrollMax = scrollMax;
-                                this.currentScroll = scrollMax;
+                                this.scrollValue = scrollMax;
                                 logger.DebugFormat("scrollMax = {0}", scrollMax);
                                 this.uiSyncContext.Send((state) =>
                                 {
-                                    this.SurfacePanel.UpdateScrollInfo(scrollMax);
-                                    this.SurfacePanel.ScrollToEnd(ScrollOrientation.Down);
+                                    this.TerminalScreen.UpdateScrollInfo(scrollMax);
+                                    this.TerminalScreen.ScrollToEnd(ScrollOrientation.Down);
                                 }, null);
                             }
                         }
@@ -1092,7 +1057,7 @@ namespace XTerminal
 
                         ITerminalSurface remove = this.mainDocument.Surface;
                         ITerminalSurface add = this.alternateDocument.Surface;
-                        this.SurfacePanel.SwitchSurface(remove, add);
+                        this.TerminalScreen.SwitchSurface(remove, add);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1107,7 +1072,7 @@ namespace XTerminal
 
                         ITerminalSurface remove = this.alternateDocument.Surface;
                         ITerminalSurface add = this.mainDocument.Surface;
-                        this.SurfacePanel.SwitchSurface(remove, add);
+                        this.TerminalScreen.SwitchSurface(remove, add);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
@@ -1264,27 +1229,37 @@ namespace XTerminal
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="scrollValue">滚动到的行数</param>
-        private void CanvasPanel_ScrollChanged(ITerminalScreen arg1, int scrollValue)
+        private void TerminalScreen_ScrollChanged(ITerminalScreen arg1, int scrollValue)
         {
             this.ScrollToHistory(scrollValue);
         }
 
-        private void CanvasPanel_VTMouseUp(ITerminalScreen arg1, VTPoint cursorPos)
+        private void TerminalScreen_VTMouseDown(ITerminalScreen canvasPanel, VTPoint mousePosition)
         {
-            this.isMouseDown = false;
-
-            this.textSelection.Reset();
+            this.isMouseDown = true;
+            this.mouseDownPos = mousePosition;
+            this.surfaceRect = this.Surface.GetRectRelativeToDesktop();
         }
 
-        private void CanvasPanel_VTMouseMove(ITerminalScreen arg1, VTPoint mousePosition)
+        private void TerminalScreen_VTMouseMove(ITerminalScreen arg1, VTPoint mousePosition)
         {
             if (!this.isMouseDown)
             {
                 return;
             }
 
+            // 如果还没有测量起始字符，那么测量起始字符
+            if (this.textSelection.Start.CharacterIndex == -1)
+            {
+                if (!this.GetTextPointer(mousePosition, this.surfaceRect, this.textSelection.Start))
+                {
+                    // 没有命中起始字符，那么直接返回啥都不做
+                    return;
+                }
+            }
+
             // 首先检测鼠标是否在容器边界框的外面
-            OutsideScrollResult scrollResult = this.ScrollIfCursorOutsidePanel(mousePosition, this.canvasRect);
+            OutsideScrollResult scrollResult = this.ScrollIfCursorOutsideSurface(mousePosition, this.surfaceRect);
 
             // 整理思路是算出来StartTextPointer和EndTextPointer之间的几何图形
             // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
@@ -1293,16 +1268,16 @@ namespace XTerminal
 
             // 鼠标按下的时候不在行上，然后鼠标移动到了行上
             // 需要刷新起始的鼠标命中信息
-            if (startPointer.Line == null)
+            if (startPointer.LineHit == null)
             {
-                if (!this.GetTextPointer(mousePosition, this.canvasRect, startPointer))
+                if (!this.GetTextPointer(mousePosition, this.surfaceRect, startPointer))
                 {
                     return;
                 }
             }
 
             // 得到当前鼠标的命中信息
-            if (!this.GetTextPointer(mousePosition, this.canvasRect, endPointer))
+            if (!this.GetTextPointer(mousePosition, this.surfaceRect, endPointer))
             {
                 // 只有在没有Outside滚动的时候，才返回
                 // Outside滚动会导致GetTextPointer失败，虽然失败，还是要更新SelectionRange
@@ -1312,9 +1287,9 @@ namespace XTerminal
                 }
             }
 
-            #region 鼠标移动后悬浮在相同的字符上没变化，不用操作
+            #region Selection的起始字符和结束字符是同一个字符，啥都不做
 
-            if (startPointer.IsCharacterHit && endPointer.IsCharacterHit)
+            if (startPointer.CharacterIndex > -1 && endPointer.CharacterIndex > -1)
             {
                 if (startPointer.CharacterIndex == endPointer.CharacterIndex)
                 {
@@ -1341,8 +1316,8 @@ namespace XTerminal
                         VTRect rect1 = startPointer.CharacterBounds;
                         VTRect rect2 = endPointer.CharacterBounds;
 
-                        double xmin = Math.Min(rect1.X, rect2.X);
-                        double xmax = Math.Max(rect1.X, rect2.X);
+                        double xmin = Math.Min(rect1.Left, rect2.Left);
+                        double xmax = Math.Max(rect1.Right, rect2.Right);
                         double x = xmin;
                         double y = rect1.Y;
                         double width = xmax - xmin;
@@ -1382,8 +1357,8 @@ namespace XTerminal
                             if (!this.UpdateTextPointerBounds(bottomPointer))
                             {
                                 // Pointer更新失败，说明Pointer所指向的行已经滚动到文档外了，那么把bottom的字符位置改成右下角
-                                bottomBounds.X = this.canvasRect.Width;
-                                bottomBounds.Y = this.canvasRect.Height;
+                                bottomBounds.X = this.surfaceRect.Width;
+                                bottomBounds.Y = this.surfaceRect.Height;
                                 //logger.FatalFormat("更新失败");
                             }
                             else
@@ -1397,7 +1372,7 @@ namespace XTerminal
                             // 鼠标往下滚动
 
                             // 鼠标已经移动到窗口下面了，要修改bottomBounds位置为最后一行
-                            bottomBounds.Y = this.canvasRect.Height;
+                            bottomBounds.Y = this.surfaceRect.Height;
 
                             if (!this.UpdateTextPointerBounds(topPointer))
                             {
@@ -1426,17 +1401,11 @@ namespace XTerminal
             }, null);
         }
 
-        private void CanvasPanel_VTMouseDown(ITerminalScreen canvasPanel, VTPoint mousePosition)
+        private void TerminalScreen_VTMouseUp(ITerminalScreen arg1, VTPoint cursorPos)
         {
-            this.isMouseDown = true;
-            this.mouseDownPos = mousePosition;
-            this.canvasRect = this.Surface.GetRectRelativeToDesktop();
+            this.isMouseDown = false;
 
-            // 得到startPos对应的VTextLine
-            if (this.GetTextPointer(mousePosition, this.canvasRect, this.textSelection.Start))
-            {
-                logger.DebugFormat("命中:{0}", this.textSelection.Start.Row);
-            }
+            this.textSelection.Reset();
         }
 
         #endregion

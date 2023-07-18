@@ -15,14 +15,17 @@ namespace VideoTerminal.Rendering
     /// </summary>
     public class DrawingSelection : DrawingObject
     {
+        private static readonly Brush DefaultSelectionBrush = Application.Current.FindResource("BrushSelectionBackground") as Brush;
+
         private StreamGeometry selectionGeometry;
         private Pen pen;
-        private Brush brush = new SolidColorBrush(Color.FromArgb(0x80, 0, 0, 0));
+        private Brush brush;
 
         public DrawingSelection()
         {
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
+            this.brush = DefaultSelectionBrush;
         }
 
         protected override void Draw(DrawingContext dc)
