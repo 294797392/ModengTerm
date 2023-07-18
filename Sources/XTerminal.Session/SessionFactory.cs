@@ -12,7 +12,7 @@ namespace XTerminal.Session
         {
             switch (options.SessionType)
             {
-                case SessionTypeEnum.SSH: return new SSHSession(options);
+                case SessionTypeEnum.SSH: return new SshNetSession(options);
                 case SessionTypeEnum.Win32CommandLine: return new Win32CMDLineSession(options);
                 default:
                     throw new NotImplementedException();

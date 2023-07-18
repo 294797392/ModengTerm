@@ -12,21 +12,8 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/WPFToolkit;component/ClearDefaultStyles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/XTerminal;component/Themes/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
-            <Style x:Key="StyleListBoxItemTerminalList" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItem}">
-                <Style.Triggers>
-                    <Trigger Property="IsSelected" Value="True">
-                        <Setter Property="BorderBrush" Value="Black"/>
-                    </Trigger>
-                </Style.Triggers>
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="MinWidth" Value="80"/>
-                <Setter Property="Margin" Value="0,0,3,0"/>
-                <Setter Property="BorderBrush" Value="Silver"/>
-                <Setter Property="BorderThickness" Value="1"/>
-            </Style>
 
             <Style x:Key="StyleMenuItemLocal" TargetType="{x:Type MenuItem}">
                 <Setter Property="Height" Value="30"/>
@@ -45,10 +32,10 @@
 
         <!-- 菜单 -->
         <Menu Grid.Row="0">
-            
-            <MenuItem Header="会话" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                <MenuItem Header="打开新会话"/>
+
+            <MenuItem Header="文件" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                 <MenuItem Header="新建会话"/>
+                <MenuItem Header="打开会话"/>
             </MenuItem>
 
             <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
@@ -60,30 +47,38 @@
         <!-- 终端显示区域 -->
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <ListBox Grid.Row="0" DataContext="{Binding Source={x:Static local:XTermApp.Context}}" ItemsSource="{Binding Path=OpenedSessionList}"
-                    SelectedItem="{Binding Path=SelectedOpenedSession}" ItemContainerStyle="{StaticResource ResourceKey=StyleListBoxItemTerminalList}">
+                     SelectedItem="{Binding Path=SelectedOpenedSession}" Style="{StaticResource ResourceKey=StyleListBoxTerminalWindowList}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" MinWidth="50"/>
+                                <ColumnDefinition Width="*" MinWidth="80"/>
                                 <ColumnDefinition Width="20"/>
                             </Grid.ColumnDefinitions>
 
                             <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
-                            <Image Grid.Column="1" Source="Images/close.png"/>
+                            <Path Grid.Column="1" x:Name="PathClose" Data="M30,15 L15,30 M15,15 30,30" Stretch="Fill" Stroke="White" 
+                                  StrokeThickness="2" Cursor="Hand" Width="10" Height="10" Fill="Transparent"/>
 
                         </Grid>
+
+                        <DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Stroke" Value="Red" TargetName="PathClose"/>
+                            </Trigger>
+                        </DataTemplate.Triggers>
+                        
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>
@@ -96,7 +91,7 @@
         <Grid Grid.Row="2" x:Name="GridStatusbar">
             
         </Grid>
-        
+
     </Grid>
 
 </Window>

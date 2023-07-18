@@ -59,7 +59,7 @@ namespace XTerminal.Session
 
         #region VTChannel
 
-        protected override int OnInitialize()
+        public override int Connect()
         {
             int code = libvt.vtssh_create(out this.ssh, this.vtssh_options_ptr);
             if (code != libvt.VTSSH_ERR.VTSSH_ERR_OK)
@@ -68,18 +68,7 @@ namespace XTerminal.Session
                 return ResponseCode.FAILED;
             }
 
-            return ResponseCode.SUCCESS;
-        }
-
-        protected override void OnRelease()
-        {
-            libvt.vtssh_delete(this.ssh);
-            this.ssh = IntPtr.Zero;
-        }
-
-        public override int Connect()
-        {
-            int code = libvt.vtssh_connect(this.ssh);
+            code = libvt.vtssh_connect(this.ssh);
             if (code != libvt.VTSSH_ERR.VTSSH_ERR_OK)
             {
                 logger.ErrorFormat("vtssh_connect失败, code = {0}", code);
@@ -92,6 +81,13 @@ namespace XTerminal.Session
         public override void Disconnect()
         {
             libvt.vtssh_disconnect(this.ssh);
+            libvt.vtssh_delete(this.ssh);
+            this.ssh = IntPtr.Zero;
+        }
+
+        public override int Input(VTInputEvent ievt)
+        {
+            return ResponseCode.SUCCESS;
         }
 
         public override int Write(byte[] data)

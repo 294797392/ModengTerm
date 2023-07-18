@@ -13,7 +13,7 @@ namespace XTerminal.Base
     {
         /// <summary>
         /// 经过输入法处理后的字符串（用户输入的中文字符），如果没有则填null
-        /// 在WPF里这个值使用TextInput事件的e.Text属性获取到
+        /// 在WPF里这个值使用TextInput事件参数的Text属性获取到
         /// </summary>
         public string Text { get; set; }
 

@@ -7,7 +7,10 @@ using XTerminal.Session.Property;
 
 namespace XTerminal.Session
 {
-    public class SSHSession : SessionBase
+    /// <summary>
+    /// 使用Rench.SshNet库实现的ssh会话
+    /// </summary>
+    public class SshNetSession : SessionBase
     {
         #region 类变量
 
@@ -29,7 +32,7 @@ namespace XTerminal.Session
 
         #region 构造方法
 
-        public SSHSession(VTInitialOptions options) :
+        public SshNetSession(VTInitialOptions options) :
             base(options)
         {
         }
@@ -40,9 +43,9 @@ namespace XTerminal.Session
 
         #endregion
 
-        #region VTChannel
+        #region SessionBase
 
-        protected override int OnInitialize()
+        public override int Connect()
         {
             this.sessionProperties = this.options.SessionProperties;
             var authentications = new List<AuthenticationMethod>();
@@ -55,18 +58,6 @@ namespace XTerminal.Session
             ConnectionInfo connectionInfo = new ConnectionInfo(this.sessionProperties.ServerAddress, this.sessionProperties.ServerPort, this.sessionProperties.UserName, authentications.ToArray());
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
-
-            return ResponseCode.SUCCESS;
-        }
-
-        protected override void OnRelease()
-        {
-            this.stream.Dispose();
-            this.sshClient.Disconnect();
-        }
-
-        public override int Connect()
-        {
             this.sshClient.Connect();
 
             Dictionary<TerminalModes, uint> terminalModeValues = new Dictionary<TerminalModes, uint>();
@@ -84,13 +75,23 @@ namespace XTerminal.Session
         {
             this.stream.DataReceived -= this.Stream_DataReceived;
             this.sshClient.Disconnect();
+
+            this.stream.Dispose();
+            this.sshClient.Disconnect();
         }
 
-        public override int Write(byte[] data)
+        public override int Input(VTInputEvent ievt)
+        {
+            //byte[] bytes = this.keyboard.TranslateInput(ievt);
+            //return this.Write(bytes);
+            throw new NotImplementedException();
+        }
+
+        public override int Write(byte[] bytes)
         {
             try
             {
-                this.stream.Write(data, 0, data.Length);
+                this.stream.Write(bytes, 0, bytes.Length);
                 this.stream.Flush();
                 return ResponseCode.SUCCESS;
             }

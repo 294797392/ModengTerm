@@ -58,7 +58,7 @@ namespace XTerminal
         /// <summary>
         /// 与终端进行通信的信道
         /// </summary>
-        private SessionBase vtChannel;
+        private SessionBase session;
 
         /// <summary>
         /// 终端字符解析器
@@ -180,7 +180,7 @@ namespace XTerminal
         public IDrawingCanvasPanel CanvasPanel { get; set; }
 
         /// <summary>
-        /// 根据当前电脑键盘的按键状态，转换成对应的终端数据流
+        /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
         /// </summary>
         public VTKeyboard Keyboard { get; private set; }
 
@@ -297,10 +297,10 @@ namespace XTerminal
             #region 连接终端通道
 
             SessionBase vtChannel = SessionFactory.Create(options);
-            vtChannel.StatusChanged += this.VTChannel_StatusChanged;
-            vtChannel.DataReceived += this.VTChannel_DataReceived;
+            vtChannel.StatusChanged += this.VTSession_StatusChanged;
+            vtChannel.DataReceived += this.VTSession_DataReceived;
             vtChannel.Connect();
-            this.vtChannel = vtChannel;
+            this.session = vtChannel;
 
             #endregion
         }
@@ -324,7 +324,7 @@ namespace XTerminal
                 case StatusType.OS_OperatingStatus:
                     {
                         // Result ("OK") is CSI 0 n
-                        this.vtChannel.Write(OS_OperationStatusResponse);
+                        this.session.Write(OS_OperationStatusResponse);
                         break;
                     }
 
@@ -335,7 +335,7 @@ namespace XTerminal
                         int cursorCol = this.CursorCol;
                         CPR_CursorPositionReportResponse[2] = (byte)cursorRow;
                         CPR_CursorPositionReportResponse[4] = (byte)cursorCol;
-                        this.vtChannel.Write(CPR_CursorPositionReportResponse);
+                        this.session.Write(CPR_CursorPositionReportResponse);
                         break;
                     }
 
@@ -750,14 +750,14 @@ namespace XTerminal
         /// <param name="terminal"></param>
         private void VideoTerminal_InputEvent(IDrawingCanvasPanel canvasPanel, VTInputEvent evt)
         {
-            // 这里输入的都是键盘按键
             byte[] bytes = this.Keyboard.TranslateInput(evt);
-            if (bytes == null)
-            {
-                return;
-            }
 
-            this.vtChannel.Write(bytes);
+            // 这里输入的都是键盘按键
+            int code = this.session.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
+            }
         }
 
         private void VtParser_ActionEvent(VTActions action, object parameter)
@@ -1103,7 +1103,7 @@ namespace XTerminal
                 case VTActions.DA_DeviceAttributes:
                     {
                         logger.DebugFormat("DA_DeviceAttributes");
-                        this.vtChannel.Write(DA_DeviceAttributesResponse);
+                        this.session.Write(DA_DeviceAttributesResponse);
                         break;
                     }
 
@@ -1184,7 +1184,7 @@ namespace XTerminal
             }
         }
 
-        private void VTChannel_DataReceived(SessionBase client, byte[] bytes)
+        private void VTSession_DataReceived(SessionBase client, byte[] bytes)
         {
             //string str = string.Join(",", bytes.Select(v => v.ToString()).ToList());
             //logger.InfoFormat("Received, {0}", str);
@@ -1198,7 +1198,7 @@ namespace XTerminal
             //logger.ErrorFormat("TotalRows = {0}", this.activeDocument.TotalRows);
         }
 
-        private void VTChannel_StatusChanged(object client, SessionStatusEnum status)
+        private void VTSession_StatusChanged(object client, SessionStatusEnum status)
         {
             logger.InfoFormat("会话状态发生改变, {0}", status);
             if (this.SessionStatusChanged != null)

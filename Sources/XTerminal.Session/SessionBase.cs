@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using XTerminal.Base;
 using XTerminal.Sessions;
 
 namespace XTerminal.Session
@@ -68,30 +69,23 @@ namespace XTerminal.Session
 
         #region 公开接口
 
-        public int Initialize()
-        {
-            return this.OnInitialize();
-        }
-
-        public void Release()
-        {
-            this.OnRelease();
-        }
-
         public abstract int Connect();
 
         public abstract void Disconnect();
 
         /// <summary>
-        /// 向Socket里写入一段数据
+        /// 处理输入数据
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="ievt"></param>
         /// <returns></returns>
-        public abstract int Write(byte[] data);
+        public abstract int Input(VTInputEvent ievt);
 
-        protected abstract int OnInitialize();
-
-        protected abstract void OnRelease();
+        /// <summary>
+        /// 往会话里写入数据
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        public abstract int Write(byte[] bytes);
 
         #endregion
 
