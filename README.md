@@ -3,6 +3,7 @@
 
 一个多功能的终端模拟器，可以连接SSH服务器，串口...etc  
 类似于XShell，putty和微软开源的terminal，代码参考了xterm和terminal的源码  
+整体的设计文档请参考__Documents/设计文档.pptx__  
 
 ## 支持连接的客户端类型
 1. SSH服务器
