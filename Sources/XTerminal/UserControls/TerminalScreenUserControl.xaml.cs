@@ -107,7 +107,7 @@ namespace XTerminal.UserControls
                 return;
             }
 
-            int newValue = Convert.ToInt32(this.scrollbar.Value);
+            int newValue = Convert.ToInt32(SliderScrolbar.Value);
             if (newValue != this.scrollbarCursorDownValue)
             {
                 if (this.ScrollChanged != null)
