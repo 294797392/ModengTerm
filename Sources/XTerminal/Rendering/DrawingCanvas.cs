@@ -18,7 +18,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 用来显示字符的容器
     /// </summary>
-    public class DrawingCanvas : FrameworkElement, IDrawingCanvas
+    public class DrawingCanvas : FrameworkElement, ITerminalSurface
     {
         #region 类变量
 
@@ -30,7 +30,7 @@ namespace XTerminal.Rendering
 
         private VisualCollection visuals;
 
-        private DrawingCanvasOptions options;
+        private TerminalSurfaceOptions options;
 
         #endregion
 
@@ -101,7 +101,7 @@ namespace XTerminal.Rendering
 
         #region IDrawingCanvas
 
-        public void Initialize(DrawingCanvasOptions options)
+        public void Initialize(TerminalSurfaceOptions options)
         {
             this.options = options;
         }

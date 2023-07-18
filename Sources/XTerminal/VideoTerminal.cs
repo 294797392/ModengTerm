@@ -172,12 +172,12 @@ namespace XTerminal
         /// <summary>
         /// 文档渲染器
         /// </summary>
-        public IDrawingCanvas Canvas { get { return this.activeDocument.Canvas; } }
+        public ITerminalSurface Surface { get { return this.activeDocument.Surface; } }
 
         /// <summary>
         /// 文档画布容器
         /// </summary>
-        public IDrawingCanvasPanel CanvasPanel { get; set; }
+        public ITerminalSurfacePanel SurfacePanel { get; set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -255,11 +255,11 @@ namespace XTerminal
 
             #region 初始化鼠标事件
 
-            this.CanvasPanel.InputEvent += this.VideoTerminal_InputEvent;
-            this.CanvasPanel.ScrollChanged += this.CanvasPanel_ScrollChanged;
-            this.CanvasPanel.VTMouseDown += this.CanvasPanel_VTMouseDown;
-            this.CanvasPanel.VTMouseMove += this.CanvasPanel_VTMouseMove;
-            this.CanvasPanel.VTMouseUp += this.CanvasPanel_VTMouseUp;
+            this.SurfacePanel.InputEvent += this.VideoTerminal_InputEvent;
+            this.SurfacePanel.ScrollChanged += this.CanvasPanel_ScrollChanged;
+            this.SurfacePanel.VTMouseDown += this.CanvasPanel_VTMouseDown;
+            this.SurfacePanel.VTMouseMove += this.CanvasPanel_VTMouseMove;
+            this.SurfacePanel.VTMouseUp += this.CanvasPanel_VTMouseUp;
 
             #endregion
 
@@ -272,25 +272,25 @@ namespace XTerminal
                 DECPrivateAutoWrapMode = initialOptions.TerminalProperties.DECPrivateAutoWrapMode,
                 CursorStyle = initialOptions.CursorOption.Style,
                 Interval = initialOptions.CursorOption.Interval,
-                CanvasCreator = this.CanvasPanel
+                CanvasCreator = this.SurfacePanel
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
             this.activeHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.activeHistoryLine;
-            this.CanvasPanel.AddCanvas(this.activeDocument.Canvas);
+            this.SurfacePanel.AddSurface(this.activeDocument.Surface);
 
             #endregion
 
             #region 初始化光标
 
-            this.Canvas.Draw(this.Cursor);
+            this.Surface.Draw(this.Cursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
             // 先初始化备用缓冲区的光标渲染上下文
-            this.alternateDocument.Canvas.Draw(this.alternateDocument.Cursor);
+            this.alternateDocument.Surface.Draw(this.alternateDocument.Cursor);
 
             #endregion
 
@@ -375,18 +375,18 @@ namespace XTerminal
                     if (next.IsRenderDirty)
                     {
                         // 此时说明该行有字符变化，需要重绘
-                        this.Canvas.Draw(next);
+                        this.Surface.Draw(next);
                         //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);
                     }
                     else if (next.IsMeasureDirety)
                     {
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                        this.Canvas.MeasureLine(next);
+                        this.Surface.MeasureLine(next);
                     }
 
                     if (arrangeDirty)
                     {
-                        this.Canvas.Arrange(next, next.OffsetX, next.OffsetY);
+                        this.Surface.Arrange(next, next.OffsetX, next.OffsetY);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -406,8 +406,8 @@ namespace XTerminal
                 #region 渲染光标
 
                 this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                this.Cursor.OffsetX = this.Canvas.MeasureBlock(this.ActiveLine, this.ActiveLine.FindCharacterIndex(this.CursorCol)).Width;
-                this.Canvas.Arrange(this.Cursor, this.Cursor.OffsetX, this.Cursor.OffsetY);
+                this.Cursor.OffsetX = this.Surface.MeasureBlock(this.ActiveLine, this.ActiveLine.FindCharacterIndex(this.CursorCol)).Width;
+                this.Surface.Arrange(this.Cursor, this.Cursor.OffsetX, this.Cursor.OffsetY);
 
                 #endregion
 
@@ -415,7 +415,7 @@ namespace XTerminal
 
                 if (scrollValue != -1)
                 {
-                    this.CanvasPanel.ScrollTo(scrollValue);
+                    this.SurfacePanel.ScrollTo(scrollValue);
                 }
 
                 #endregion
@@ -601,7 +601,7 @@ namespace XTerminal
             string text = lineHit.Text;
             for (int i = 0; i < text.Length; i++)
             {
-                VTRect characterBounds = this.Canvas.MeasureCharacter(lineHit, i);
+                VTRect characterBounds = this.Surface.MeasureCharacter(lineHit, i);
 
                 if (characterBounds.Left <= mouseX && characterBounds.Right >= mouseX)
                 {
@@ -748,7 +748,7 @@ namespace XTerminal
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        private void VideoTerminal_InputEvent(IDrawingCanvasPanel canvasPanel, VTInputEvent evt)
+        private void VideoTerminal_InputEvent(ITerminalSurfacePanel canvasPanel, VTInputEvent evt)
         {
             byte[] bytes = this.Keyboard.TranslateInput(evt);
 
@@ -822,13 +822,13 @@ namespace XTerminal
                             // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
                             if (this.ActiveLine.PreviousLine.IsMeasureDirety)
                             {
-                                this.Canvas.MeasureLine(this.ActiveLine.PreviousLine);
+                                this.Surface.MeasureLine(this.ActiveLine.PreviousLine);
                             }
                             this.activeHistoryLine.Freeze(this.ActiveLine.PreviousLine);
 
                             // 再创建最新行的历史行
                             // 先测量下最新的行，确保有高度
-                            this.Canvas.MeasureLine(this.ActiveLine);
+                            this.Surface.MeasureLine(this.ActiveLine);
                             int historyIndex = this.activeHistoryLine.Row + 1;
                             VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.activeHistoryLine, this.ActiveLine);
                             this.historyLines[historyIndex] = historyLine;
@@ -844,8 +844,8 @@ namespace XTerminal
                                 logger.DebugFormat("scrollMax = {0}", scrollMax);
                                 this.uiSyncContext.Send((state) =>
                                 {
-                                    this.CanvasPanel.UpdateScrollInfo(scrollMax);
-                                    this.CanvasPanel.ScrollToEnd(ScrollOrientation.Down);
+                                    this.SurfacePanel.UpdateScrollInfo(scrollMax);
+                                    this.SurfacePanel.ScrollToEnd(ScrollOrientation.Down);
                                 }, null);
                             }
                         }
@@ -1067,9 +1067,9 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseAlternateScreenBuffer");
 
-                        IDrawingCanvas remove = this.mainDocument.Canvas;
-                        IDrawingCanvas add = this.alternateDocument.Canvas;
-                        this.CanvasPanel.SwitchCanvas(remove, add);
+                        ITerminalSurface remove = this.mainDocument.Surface;
+                        ITerminalSurface add = this.alternateDocument.Surface;
+                        this.SurfacePanel.SwitchSurface(remove, add);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1082,9 +1082,9 @@ namespace XTerminal
                     {
                         logger.DebugFormat("UseMainScreenBuffer");
 
-                        IDrawingCanvas remove = this.alternateDocument.Canvas;
-                        IDrawingCanvas add = this.mainDocument.Canvas;
-                        this.CanvasPanel.SwitchCanvas(remove, add);
+                        ITerminalSurface remove = this.alternateDocument.Surface;
+                        ITerminalSurface add = this.mainDocument.Surface;
+                        this.SurfacePanel.SwitchSurface(remove, add);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
@@ -1221,7 +1221,7 @@ namespace XTerminal
 
                     this.uiSyncContext.Send((state) =>
                     {
-                        this.Canvas.SetOpacity(cursor, opacity);
+                        this.Surface.SetOpacity(cursor, opacity);
                     }, null);
                 }
                 catch (Exception e)
@@ -1241,19 +1241,19 @@ namespace XTerminal
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="scrollValue">滚动到的行数</param>
-        private void CanvasPanel_ScrollChanged(IDrawingCanvasPanel arg1, int scrollValue)
+        private void CanvasPanel_ScrollChanged(ITerminalSurfacePanel arg1, int scrollValue)
         {
             this.ScrollToHistory(scrollValue);
         }
 
-        private void CanvasPanel_VTMouseUp(IDrawingCanvasPanel arg1, VTPoint cursorPos)
+        private void CanvasPanel_VTMouseUp(ITerminalSurfacePanel arg1, VTPoint cursorPos)
         {
             this.isMouseDown = false;
 
             this.textSelection.Reset();
         }
 
-        private void CanvasPanel_VTMouseMove(IDrawingCanvasPanel arg1, VTPoint mousePosition)
+        private void CanvasPanel_VTMouseMove(ITerminalSurfacePanel arg1, VTPoint mousePosition)
         {
             if (!this.isMouseDown)
             {
@@ -1399,15 +1399,15 @@ namespace XTerminal
 
             this.uiSyncContext.Send((state) =>
             {
-                this.Canvas.Draw(this.textSelection);
+                this.Surface.Draw(this.textSelection);
             }, null);
         }
 
-        private void CanvasPanel_VTMouseDown(IDrawingCanvasPanel canvasPanel, VTPoint mousePosition)
+        private void CanvasPanel_VTMouseDown(ITerminalSurfacePanel canvasPanel, VTPoint mousePosition)
         {
             this.isMouseDown = true;
             this.mouseDownPos = mousePosition;
-            this.canvasRect = this.Canvas.GetRectRelativeToDesktop();
+            this.canvasRect = this.Surface.GetRectRelativeToDesktop();
 
             // 得到startPos对应的VTextLine
             if (this.GetTextPointer(mousePosition, this.canvasRect, this.textSelection.Start))

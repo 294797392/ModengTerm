@@ -55,15 +55,15 @@
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="Rendering\TextPointerPositions.cs" />
-    <Compile Include="Rendering\IDrawingCanvas.cs" />
-    <Compile Include="Rendering\IDrawingCanvasPanel.cs" />
+    <Compile Include="Rendering\ITerminalSurface.cs" />
+    <Compile Include="Rendering\ITerminalSurfacePanel.cs" />
     <Compile Include="Rendering\ScrollOrientations.cs" />
     <Compile Include="VTCharacterFlags.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />
     <Compile Include="VTextPointer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\DrawingCanvasOptions.cs" />
+    <Compile Include="Rendering\TerminalSurfaceOptions.cs" />
     <Compile Include="ScrollOrientation.cs" />
     <Compile Include="VTCursor.cs" />
     <Compile Include="VFontWeight.cs" />

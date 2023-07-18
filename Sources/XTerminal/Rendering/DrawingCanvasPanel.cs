@@ -18,7 +18,7 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 显示器控件
     /// </summary>
-    public class DrawingCanvasPanel : Grid, IDrawingCanvasPanel
+    public class DrawingCanvasPanel : Grid, ITerminalSurfacePanel
     {
         #region 类变量
 
@@ -28,24 +28,24 @@ namespace XTerminal.Rendering
 
         #region 公开事件
 
-        public event Action<IDrawingCanvasPanel, VTInputEvent> InputEvent;
+        public event Action<ITerminalSurfacePanel, VTInputEvent> InputEvent;
 
-        public event Action<IDrawingCanvasPanel, int> ScrollChanged;
+        public event Action<ITerminalSurfacePanel, int> ScrollChanged;
 
         /// <summary>
         /// 鼠标移动的时候触发
         /// </summary>
-        public event Action<IDrawingCanvasPanel, VTPoint> VTMouseMove;
+        public event Action<ITerminalSurfacePanel, VTPoint> VTMouseMove;
 
         /// <summary>
         /// 鼠标按下的时候触发
         /// </summary>
-        public event Action<IDrawingCanvasPanel, VTPoint> VTMouseDown;
+        public event Action<ITerminalSurfacePanel, VTPoint> VTMouseDown;
 
         /// <summary>
         /// 鼠标抬起的时候触发
         /// </summary>
-        public event Action<IDrawingCanvasPanel, VTPoint> VTMouseUp;
+        public event Action<ITerminalSurfacePanel, VTPoint> VTMouseUp;
 
         #endregion
 
@@ -261,18 +261,18 @@ namespace XTerminal.Rendering
             return new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
         }
 
-        public IDrawingCanvas CreateCanvas()
+        public ITerminalSurface CreateSurface()
         {
             DrawingCanvas canvas = new DrawingCanvas();
             return canvas;
         }
 
-        public void AddCanvas(IDrawingCanvas canvas)
+        public void AddSurface(ITerminalSurface canvas)
         {
             this.Children.Add(canvas as DrawingCanvas);
         }
 
-        public void SwitchCanvas(IDrawingCanvas remove, IDrawingCanvas add)
+        public void SwitchSurface(ITerminalSurface remove, ITerminalSurface add)
         {
             this.Dispatcher.Invoke(() =>
             {

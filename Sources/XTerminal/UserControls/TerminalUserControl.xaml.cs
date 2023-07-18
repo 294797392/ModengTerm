@@ -22,7 +22,7 @@ namespace XTerminal.UserControls
     /// </summary>
     public partial class TerminalUserControl : UserControl
     {
-        public IDrawingCanvasPanel CanvasPanel { get { return DrawingCanvasPanel; } }
+        public ITerminalSurfacePanel CanvasPanel { get { return DrawingCanvasPanel; } }
 
         public TerminalUserControl()
         {

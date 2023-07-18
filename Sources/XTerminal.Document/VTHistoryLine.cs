@@ -58,9 +58,10 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 冻结该历史行的数据
-        /// 冻结后，就说明该历史行数据不会再变化了
+        /// 当某一行已经显示完成的时候需要冻结
+        /// 冻结操作会把要冻结的行里的数据复制到VTHistoryLine里
         /// </summary>
-        /// <param name="sourceLine">该历史行对应的实时行</param>
+        /// <param name="sourceLine">要冻结的行</param>
         public void Freeze(VTextLine sourceLine)
         {
             this.Width = sourceLine.Width;

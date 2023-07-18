@@ -89,7 +89,7 @@ namespace XTerminal
 
         #region 公开接口
 
-        public int OpenSession(XTermSession session, IDrawingCanvasPanel canvasPanel)
+        public int OpenSession(XTermSession session, ITerminalSurfacePanel canvasPanel)
         {
             // 新建会话ViewModel
             OpenedSessionVM sessionVM = new OpenedSessionVM(session);

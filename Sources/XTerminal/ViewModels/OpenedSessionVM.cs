@@ -62,7 +62,7 @@ namespace XTerminal.ViewModels
         /// <summary>
         /// 用来渲染终端的画布容器
         /// </summary>
-        public IDrawingCanvasPanel CanvasPanel { get; set; }
+        public ITerminalSurfacePanel CanvasPanel { get; set; }
 
         #endregion
 
@@ -112,7 +112,7 @@ namespace XTerminal.ViewModels
             };
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
-            this.videoTerminal.CanvasPanel = this.CanvasPanel;
+            this.videoTerminal.SurfacePanel = this.CanvasPanel;
             this.videoTerminal.Initialize(initialOptions);
         }
 

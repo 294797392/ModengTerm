@@ -91,9 +91,9 @@ namespace XTerminal.Document
         public bool IsEmpty { get { return this.FirstLine == null && this.LastLine == null; } }
 
         /// <summary>
-        /// 渲染该文档的Canvas
+        /// 渲染该文档的Surface
         /// </summary>
-        public IDrawingCanvas Canvas { get; private set; }
+        public ITerminalSurface Surface { get; private set; }
 
         #endregion
 
@@ -102,7 +102,7 @@ namespace XTerminal.Document
         public VTDocument(VTDocumentOptions options)
         {
             this.options = options;
-            this.Canvas = options.CanvasCreator.CreateCanvas();
+            this.Surface = options.CanvasCreator.CreateSurface();
 
             this.Cursor = new VTCursor()
             {

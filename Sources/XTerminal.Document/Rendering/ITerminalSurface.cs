@@ -9,17 +9,17 @@ namespace XTerminal.Document.Rendering
     /// <summary>
     /// 表示一个用来显示文档的画板
     /// </summary>
-    public interface IDrawingCanvas
+    public interface ITerminalSurface
     {
         /// <summary>
         /// 初始化渲染器
         /// </summary>
         /// <param name="options"></param>
-        void Initialize(DrawingCanvasOptions options);
+        void Initialize(TerminalSurfaceOptions options);
 
         /// <summary>
-        /// 测量某个渲染模型的大小
-        /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
+        /// 测量某个文本行的大小
+        /// 测量后的结果存储在VTextLine.Metrics属性里
         /// </summary>
         /// <param name="textLine">要测量的数据模型</param>
         /// <returns></returns>
@@ -27,7 +27,6 @@ namespace XTerminal.Document.Rendering
 
         /// <summary>
         /// 测量文本块的大小
-        /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
         /// </summary>
         /// <param name="textLine">要测量的数据模型</param>
         /// <param name="maxCharacters">要测量的最大字符数，0为全部测量</param>
