@@ -57,9 +57,17 @@ namespace XTerminal.UserControls
         #region 实例变量
 
         private VTInputEvent inputEvent;
-        private Slider scrollbar;
         private int scrollbarCursorDownValue;
         private bool cursorDown;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// 该屏幕所显示的终端
+        /// </summary>
+        public VideoTerminal VideoTerminal { get; set; }
 
         #endregion
 
@@ -81,6 +89,7 @@ namespace XTerminal.UserControls
             this.inputEvent = new VTInputEvent();
             this.Background = Brushes.Transparent;
             this.Focusable = true;
+            base.Cursor = Cursors.IBeam;
         }
 
         private void NotifyInputEvent(VTInputEvent evt)
@@ -108,6 +117,24 @@ namespace XTerminal.UserControls
             }
 
             this.scrollbarCursorDownValue = newValue;
+        }
+
+        /// <summary>
+        /// 复制当前选中的行
+        /// </summary>
+        private void Copy()
+        {
+            TerminalScreenUserControl terminalScreen = this.ContentControlSurface.Content as TerminalScreenUserControl;
+
+            // 先获取当前选中的所有行
+        }
+
+        /// <summary>
+        /// 粘贴
+        /// </summary>
+        private void Paste()
+        {
+            
         }
 
         #endregion
@@ -197,14 +224,12 @@ namespace XTerminal.UserControls
         }
 
 
-
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseDown(e);
 
             Point p = e.GetPosition(this);
             this.VTMouseDown(this, new VTPoint(p.X, p.Y));
-
             this.CaptureMouse();
         }
 
@@ -241,7 +266,18 @@ namespace XTerminal.UserControls
         private void SliderScrolbar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             this.cursorDown = true;
-            this.scrollbarCursorDownValue = Convert.ToInt32(this.scrollbar.Value);
+            this.scrollbarCursorDownValue = Convert.ToInt32(SliderScrolbar.Value);
+        }
+
+
+        private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
+        {
+            this.Copy();
+        }
+
+        private void MenuItemPaste_Click(object sender, RoutedEventArgs e)
+        {
+            this.Paste();
         }
 
         #endregion

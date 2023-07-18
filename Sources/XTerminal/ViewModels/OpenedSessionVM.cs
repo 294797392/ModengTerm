@@ -64,6 +64,11 @@ namespace XTerminal.ViewModels
         /// </summary>
         public ITerminalScreen TerminalScreen { get; set; }
 
+        /// <summary>
+        /// 该会话所维护的终端
+        /// </summary>
+        public VideoTerminal VideoTerminal { get { return this.videoTerminal; } }
+
         #endregion
 
         #region 构造方法
