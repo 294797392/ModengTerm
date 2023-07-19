@@ -56,11 +56,8 @@ namespace XTerminal
                 ContentControlTerminal.Content = terminalControl;
 
                 // 打开Session
-                int code = XTermApp.Context.OpenSession(session, terminalControl);
-                if (code != ResponseCode.SUCCESS)
-                {
-                    MessageBoxUtils.Error("打开会话失败, {0}", ResponseCode.GetMessage(code));
-                }
+                OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session, terminalControl);
+                terminalControl.VideoTerminal = openedSession.VideoTerminal;
             }
         }
 

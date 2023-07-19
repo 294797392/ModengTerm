@@ -92,7 +92,7 @@ namespace XTerminal
 
         #region 公开接口
 
-        public int OpenSession(XTermSession session, ITerminalScreen screen)
+        public OpenedSessionVM OpenSession(XTermSession session, ITerminalScreen screen)
         {
             // 新建会话ViewModel
             OpenedSessionVM sessionVM = new OpenedSessionVM(session);
@@ -106,7 +106,7 @@ namespace XTerminal
             this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);
             this.SelectedOpenedSession = sessionVM;
 
-            return ResponseCode.SUCCESS;
+            return sessionVM;
         }
 
         public void CloseSession(OpenedSessionVM session)

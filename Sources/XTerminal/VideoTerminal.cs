@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -134,6 +135,11 @@ namespace XTerminal
         private VTPoint mouseDownPos;
 
         /// <summary>
+        /// 当前鼠标是否处于Selection状态
+        /// </summary>
+        private bool selectionState;
+
+        /// <summary>
         /// 存储选中的文本信息
         /// </summary>
         private VTextSelection textSelection;
@@ -164,6 +170,11 @@ namespace XTerminal
         public VTextLine ActiveLine { get { return this.activeDocument.ActiveLine; } }
 
         /// <summary>
+        /// 获取当前选中的行
+        /// </summary>
+        public VTextSelection Selection { get { return this.textSelection; } }
+
+        /// <summary>
         /// 获取当前光标所在行
         /// </summary>
         public int CursorRow { get { return this.Cursor.Row; } }
@@ -174,7 +185,7 @@ namespace XTerminal
         public int CursorCol { get { return this.Cursor.Column; } }
 
         /// <summary>
-        /// 文档渲染器
+        /// 渲染终端输出的画布
         /// </summary>
         public ITerminalSurface Surface { get { return this.activeDocument.Surface; } }
 
@@ -334,6 +345,42 @@ namespace XTerminal
             this.session.Disconnect();
 
             this.historyLines.Clear();
+        }
+
+        /// <summary>
+        /// 复制当前选中的行
+        /// </summary>
+        public void CopySelection()
+        {
+            if (this.textSelection.IsEmpty)
+            {
+                return;
+            }
+
+            string text = this.textSelection.GetText();
+
+            // 调用剪贴板API复制到剪贴板
+            Clipboard.SetText(text);
+        }
+
+        /// <summary>
+        /// 保存成HTML文档
+        /// 带有颜色的
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void SaveAsHtml(string filePath)
+        {
+            
+        }
+
+        /// <summary>
+        /// 保存成普通文本文档
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void SaveAsText(string filePath)
+        {
+            string text = this.textSelection.GetText();
+            File.WriteAllText(filePath, text);
         }
 
         #endregion
@@ -1248,6 +1295,12 @@ namespace XTerminal
                 return;
             }
 
+            if (!this.selectionState)
+            {
+                this.selectionState = true;
+                this.textSelection.Reset();
+            }
+
             // 如果还没有测量起始字符，那么测量起始字符
             if (this.textSelection.Start.CharacterIndex == -1)
             {
@@ -1404,8 +1457,7 @@ namespace XTerminal
         private void TerminalScreen_VTMouseUp(ITerminalScreen arg1, VTPoint cursorPos)
         {
             this.isMouseDown = false;
-
-            this.textSelection.Reset();
+            this.selectionState = false;
         }
 
         #endregion

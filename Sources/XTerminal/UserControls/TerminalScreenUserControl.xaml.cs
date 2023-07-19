@@ -120,13 +120,11 @@ namespace XTerminal.UserControls
         }
 
         /// <summary>
-        /// 复制当前选中的行
+        /// 复制
         /// </summary>
-        private void Copy()
+        public void Copy()
         {
-            TerminalScreenUserControl terminalScreen = this.ContentControlSurface.Content as TerminalScreenUserControl;
-
-            // 先获取当前选中的所有行
+            this.VideoTerminal.CopySelection();
         }
 
         /// <summary>
@@ -136,6 +134,10 @@ namespace XTerminal.UserControls
         {
             
         }
+
+        #endregion
+
+        #region 公开接口
 
         #endregion
 
@@ -228,9 +230,12 @@ namespace XTerminal.UserControls
         {
             base.OnPreviewMouseDown(e);
 
-            Point p = e.GetPosition(this);
-            this.VTMouseDown(this, new VTPoint(p.X, p.Y));
-            this.CaptureMouse();
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                Point p = e.GetPosition(this);
+                this.VTMouseDown(this, new VTPoint(p.X, p.Y));
+                this.CaptureMouse();
+            }
         }
 
         protected override void OnPreviewMouseMove(MouseEventArgs e)
@@ -245,10 +250,12 @@ namespace XTerminal.UserControls
         {
             base.OnPreviewMouseUp(e);
 
-            Point p = e.GetPosition(this);
-            this.VTMouseUp(this, new VTPoint(p.X, p.Y));
-
-            this.ReleaseMouseCapture();
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                Point p = e.GetPosition(this);
+                this.VTMouseUp(this, new VTPoint(p.X, p.Y));
+                this.ReleaseMouseCapture();
+            }
         }
 
 

@@ -14,6 +14,8 @@ namespace XTerminal.Document
     {
         private static readonly VTRect EmptyRect = new VTRect();
 
+        private const int CharacterHitTolerance = 3;
+
         /// <summary>
         /// 根据Y坐标找到包含该Y坐标的历史行
         /// </summary>
@@ -72,7 +74,7 @@ namespace XTerminal.Document
             {
                 VTRect characterBounds = surface.MeasureCharacter(historyLine, i);
 
-                if (characterBounds.Left <= xPos && characterBounds.Right >= xPos)
+                if (characterBounds.Left <= xPos && characterBounds.Right - CharacterHitTolerance >= xPos)
                 {
                     // 鼠标命中了字符，使用命中的字符的边界框
                     index = i;
