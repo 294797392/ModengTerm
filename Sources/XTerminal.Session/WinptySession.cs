@@ -274,7 +274,13 @@ namespace XTerminal.Session
             }
 
             string cmdexePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
-            this.spawn_config = winpty.winpty_spawn_config_new(winpty.WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN, cmdexePath, string.Empty, string.Empty, string.Empty, out winpty_error);
+            string envPath = Environment.GetEnvironmentVariable("PATH");
+            string env = string.Empty;
+            if (string.IsNullOrEmpty(envPath))
+            {
+                env = string.Format("PATH={0}", envPath);
+            }
+            this.spawn_config = winpty.winpty_spawn_config_new(winpty.WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN, cmdexePath, string.Empty, string.Empty, env, out winpty_error);
             if (winpty_error != IntPtr.Zero)
             {
                 this.HandleWinptyError("winpty_spawn_config_new", winpty_error);
