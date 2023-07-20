@@ -189,16 +189,18 @@ namespace XTerminal.Document
             //{
             // 更新文本
 
+            // 算出来要打印的列与当前行的最后一列之间相差多少列
             int value = column + 1 - this.Columns;
 
+            // 只相差一列，说明是在该行最后一个字符的后面打印字符，可以直接添加字符
             if (value == 1)
             {
-                // 说明是在该行最后一个字符的后面打印字符
                 this.characters.Add(character);
                 this.Columns += character.ColumnSize;
             }
             else if (value > 1)
             {
+                // 相差了多列，那么创建空字符填充相差的列，然后在指定位置打印要打印的字符
                 int count = column - this.Columns;
 
                 for (int i = 0; i < count - 1; i++)
@@ -212,6 +214,7 @@ namespace XTerminal.Document
             }
             else
             {
+                // 不相差列，说明要在已有列中替换字符
                 // 替换指定列的文本
                 VTCharacter oldCharacte = this.FindCharacter(column);
                 if (oldCharacte == null)

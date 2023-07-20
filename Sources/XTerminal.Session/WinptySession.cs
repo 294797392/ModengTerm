@@ -276,7 +276,7 @@ namespace XTerminal.Session
             string cmdexePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             string envPath = Environment.GetEnvironmentVariable("PATH");
             string env = string.Empty;
-            if (string.IsNullOrEmpty(envPath))
+            if (!string.IsNullOrEmpty(envPath))
             {
                 env = string.Format("PATH={0}", envPath);
             }

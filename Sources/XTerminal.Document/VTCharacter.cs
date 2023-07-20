@@ -71,6 +71,10 @@ namespace XTerminal.Document
             return character;
         }
 
+        /// <summary>
+        /// 从缓冲池里创建一个空的字符
+        /// </summary>
+        /// <returns></returns>
         public static VTCharacter CreateNull()
         {
             return Create(' ', 1, VTCharacterFlags.SingleByteChar);

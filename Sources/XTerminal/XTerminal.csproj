@@ -98,7 +98,6 @@
     <Compile Include="ViewModels\SessionTabItemVM.cs" />
     <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\XTermSessionVM.cs" />
-    <Compile Include="VTDebug.cs" />
     <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
