@@ -100,7 +100,8 @@ namespace XTerminal.ViewModels
                     ServerAddress = this.session.Host,
                     ServerPort = this.session.Port,
                     UserName = this.session.UserName,
-                    Password = this.session.Password
+                    Password = this.session.Password,
+                    BaudRate = this.session.BaudRate
                 },
                 TerminalProperties = new TerminalProperties()
                 {
@@ -114,7 +115,7 @@ namespace XTerminal.ViewModels
                     Style = Base.VTCursorStyles.Line,
                     Interval = XTermConsts.CURSOR_BLINK_INTERVAL
                 },
-                InputEncoding = XTermConsts.DefaultInputEncoding
+                InputEncoding = XTermConsts.DefaultInputEncoding,
             };
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;

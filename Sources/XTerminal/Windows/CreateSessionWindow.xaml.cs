@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,11 +66,13 @@ namespace XTerminal.Windows
 
         private void InitializeWindow()
         {
+            this.CollapsedAllGrid();
+
             // 初始化SSH验证方式列表
             ComboBoxAuthList.ItemsSource = Enum.GetValues(typeof(SSHAuthTypeEnum));
             ComboBoxAuthList.SelectedIndex = 0;
 
-            // 初始化会话列表
+            // 初始化会话类型列表
             this.sessionTypeList = new BindableCollection<SessionTypeVM>();
             List<SessionDefinition> sessions = XTermApp.Context.ServiceAgent.GetSessionDefinitions();
             foreach (SessionDefinition session in sessions)
@@ -78,6 +81,15 @@ namespace XTerminal.Windows
             }
             ComboBoxSessionTypes.ItemsSource = this.sessionTypeList;
             ComboBoxSessionTypes.SelectedIndex = 0;
+
+            // 串口波特率列表
+            ComboBoxSerialPortBaudRate.ItemsSource = XTermConsts.DefaultSerialPortBaudRates;
+        }
+
+        private void CollapsedAllGrid()
+        {
+            GridSessionSSH.Visibility = Visibility.Collapsed;
+            GridSessionSerialPort.Visibility = Visibility.Collapsed;
         }
 
         #endregion
@@ -86,6 +98,40 @@ namespace XTerminal.Windows
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            SessionTypeVM sessionType = ComboBoxSessionTypes.SelectedItem as SessionTypeVM;
+            if (sessionType == null)
+            {
+                return;
+            }
+
+            this.CollapsedAllGrid();
+
+            switch (sessionType.Type)
+            {
+                case SessionTypeEnum.libvtssh:
+                case SessionTypeEnum.SSH:
+                    {
+                        GridSessionSSH.Visibility = Visibility.Visible;
+                        break;
+                    }
+
+                case SessionTypeEnum.SerialPort:
+                    {
+                        ComboBoxSerialPortNames.ItemsSource = SerialPort.GetPortNames();
+                        GridSessionSerialPort.Visibility = Visibility.Visible;
+                        break;
+                    }
+
+                case SessionTypeEnum.Win32CommandLine:
+                    {
+                        break;
+                    }
+
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
+            }
         }
 
         private void ComboBoxAuthList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -146,6 +192,17 @@ namespace XTerminal.Windows
                 return;
             }
 
+            // 保存新创建的Session信息
+            XTermSession session = new XTermSession()
+            {
+                ID = Guid.NewGuid().ToString(),
+                Name = TextBoxSessionName.Text,
+                CreationTime = DateTime.Now,
+                Row = row,
+                Column = column,
+                Type = (int)sessionType.Type,
+            };
+
             switch (sessionType.Type)
             {
                 case SessionTypeEnum.SSH:
@@ -205,27 +262,46 @@ namespace XTerminal.Windows
                                 throw new NotImplementedException();
                         }
 
-                        XTermSession session = new XTermSession()
+                        session.AuthType = (int)authType;
+                        session.Host = hostName;
+                        session.Password = password;
+                        session.Port = port;
+                        session.UserName = userName;
+                        break;
+                    }
+
+                case SessionTypeEnum.SerialPort:
+                    {
+                        string portName = ComboBoxSerialPortNames.Text;
+                        if (string.IsNullOrEmpty(portName))
                         {
-                            ID = Guid.NewGuid().ToString(),
-                            Name = TextBoxSessionName.Text,
-                            CreationTime = DateTime.Now,
-                            Row = row,
-                            Column = column,
-                            Type = (int)sessionType.Type,
-                            AuthType = (int)authType,
-                            Host = hostName,
-                            Password = password,
-                            Port = port,
-                            UserName = userName,
-                        };
-                        this.Session = session;
+                            MessageBoxUtils.Info("请输入端口号");
+                            return;
+                        }
+
+                        int baudRate;
+                        if (string.IsNullOrEmpty(ComboBoxSerialPortBaudRate.Text) ||
+                            !int.TryParse(ComboBoxSerialPortBaudRate.Text, out baudRate))
+                        {
+                            MessageBoxUtils.Info("请输入波特率");
+                            return;
+                        }
+
+                        session.Host = portName;
+                        session.BaudRate = baudRate;
+                        break;
+                    }
+
+                case SessionTypeEnum.Win32CommandLine:
+                    {
                         break;
                     }
 
                 default:
                     throw new NotImplementedException();
             }
+
+            this.Session = session;
 
             base.DialogResult = true;
         }

@@ -24,6 +24,14 @@
             "description": "",
             "icon": "",
             "type": 0
+        },
+
+        {
+            "id": "3",
+            "name": "串口",
+            "description": "",
+            "icon": "",
+            "type": 3
         }
     ]
 }

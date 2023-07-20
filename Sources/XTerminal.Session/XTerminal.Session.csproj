@@ -62,6 +62,7 @@
     <Compile Include="Property\CursorProperties.cs" />
     <Compile Include="Property\SessionProperties.cs" />
     <Compile Include="Property\TerminalProperties.cs" />
+    <Compile Include="SerialPortSession.cs" />
     <Compile Include="SessionTypeEnum.cs" />
     <Compile Include="SshNetSession.cs" />
     <Compile Include="VTInitialOptions.cs" />

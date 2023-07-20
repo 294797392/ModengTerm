@@ -41,5 +41,20 @@ namespace XTerminal.Base
         /// 默认的输入编码方式
         /// </summary>
         public static readonly Encoding DefaultInputEncoding = Encoding.UTF8;
+
+        /// <summary>
+        /// 默认的串口波特率列表
+        /// </summary>
+        public static readonly List<string> DefaultSerialPortBaudRates = new List<string>()
+        {
+            "4800",
+            "9600",
+            "14410",
+            "19200",
+            "38400",
+            "57600",
+            "115200",
+            "921600"
+        };
     }
 }

@@ -14,6 +14,7 @@ namespace XTerminal.Session
             {
                 case SessionTypeEnum.SSH: return new SshNetSession(options);
                 case SessionTypeEnum.Win32CommandLine: return new Win32CMDLineSession(options);
+                case SessionTypeEnum.SerialPort: return new SerialPortSession(options);
                 default:
                     throw new NotImplementedException();
             }

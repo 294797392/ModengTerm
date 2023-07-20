@@ -13,21 +13,21 @@ namespace XTerminal.Sessions
         /// <summary>
         /// Windows命令行
         /// </summary>
-        Win32CommandLine,
+        Win32CommandLine = 0,
 
         /// <summary>
         /// 是一个SSH远程主机
         /// </summary>
-        SSH,
+        SSH = 1,
 
         /// <summary>
         /// 使用libvt库实现的ssh客户端
         /// </summary>
-        libvtssh,
+        libvtssh = 2,
 
         /// <summary>
         /// 是一个串口设备
         /// </summary>
-        SerialPort
+        SerialPort = 3
     }
 }

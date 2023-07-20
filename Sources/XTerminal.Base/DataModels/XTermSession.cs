@@ -67,5 +67,11 @@ namespace XTerminal.Base.DataModels
         /// </summary>
         [JsonProperty("authType")]
         public int AuthType { get; set; }
+
+        /// <summary>
+        /// 串口的波特率
+        /// </summary>
+        [JsonProperty("baudRate")]
+        public int BaudRate { get; set; }
     }
 }
