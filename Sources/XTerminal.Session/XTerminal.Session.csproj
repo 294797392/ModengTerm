@@ -63,13 +63,14 @@
     <Compile Include="Property\SessionProperties.cs" />
     <Compile Include="Property\TerminalProperties.cs" />
     <Compile Include="SerialPortSession.cs" />
+    <Compile Include="SessionTransport.cs" />
     <Compile Include="SessionTypeEnum.cs" />
     <Compile Include="SshNetSession.cs" />
     <Compile Include="VTInitialOptions.cs" />
     <Compile Include="SessionBase.cs" />
     <Compile Include="SessionFactory.cs" />
     <Compile Include="SessionStatusEnum.cs" />
-    <Compile Include="Win32CMDLineSession.cs" />
+    <Compile Include="WinptySession.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">

@@ -26,16 +26,16 @@ namespace XTerminal.Session
 
         public event Action<object, SessionStatusEnum> StatusChanged;
 
-        /// <summary>
-        /// 当收到数据流的时候触发
-        /// </summary>
-        public event Action<SessionBase, byte[]> DataReceived;
-
         #endregion
 
         #region 实例变量
 
         protected VTInitialOptions options;
+
+        /// <summary>
+        /// 当前会话状态
+        /// </summary>
+        private SessionStatusEnum status;
 
         #endregion
 
@@ -69,16 +69,16 @@ namespace XTerminal.Session
 
         #region 公开接口
 
-        public abstract int Connect();
-
-        public abstract void Disconnect();
+        /// <summary>
+        /// 打开会话
+        /// </summary>
+        /// <returns></returns>
+        public abstract int Open();
 
         /// <summary>
-        /// 处理输入数据
+        /// 关闭会话
         /// </summary>
-        /// <param name="ievt"></param>
-        /// <returns></returns>
-        public abstract int Input(VTInputEvent ievt);
+        public abstract void Close();
 
         /// <summary>
         /// 往会话里写入数据
@@ -87,23 +87,31 @@ namespace XTerminal.Session
         /// <returns></returns>
         public abstract int Write(byte[] bytes);
 
+        /// <summary>
+        /// 从会话里同步读取数据
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <returns>
+        /// 返回读取到的字节数，如果读取失败则返回-1
+        /// </returns>
+        internal abstract int Read(byte[] buffer);
+
         #endregion
 
         #region 实例方法
 
-        protected void NotifyStatusChanged(SessionStatusEnum state)
+        protected void NotifyStatusChanged(SessionStatusEnum status)
         {
+            if (this.status == status)
+            {
+                return;
+            }
+
+            this.status = status;
+
             if (this.StatusChanged != null)
             {
-                this.StatusChanged(this, state);
-            }
-        }
-
-        protected void NotifyDataReceived(byte[] bytes)
-        {
-            if (this.DataReceived != null)
-            {
-                this.DataReceived(this, bytes);
+                this.StatusChanged(this, status);
             }
         }
 

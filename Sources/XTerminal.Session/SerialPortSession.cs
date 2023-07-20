@@ -34,7 +34,7 @@ namespace XTerminal.Session
 
         #region SessionBase
 
-        public override int Connect()
+        public override int Open()
         {
             SessionProperties sessionProperties = this.options.SessionProperties;
 
@@ -44,7 +44,6 @@ namespace XTerminal.Session
             {
                 this.serialPort = new SerialPort(portName);
                 this.serialPort.BaudRate = sessionProperties.BaudRate;
-                this.serialPort.DataReceived += SerialPort_DataReceived;
                 this.serialPort.Open();
             }
             catch (Exception ex)
@@ -58,16 +57,10 @@ namespace XTerminal.Session
             return ResponseCode.SUCCESS;
         }
 
-        public override void Disconnect()
+        public override void Close()
         {
-            this.serialPort.DataReceived -= this.SerialPort_DataReceived;
             this.serialPort.Close();
             this.serialPort.Dispose();
-        }
-
-        public override int Input(VTInputEvent ievt)
-        {
-            throw new NotImplementedException();
         }
 
         public override int Write(byte[] bytes)
@@ -86,17 +79,14 @@ namespace XTerminal.Session
             return ResponseCode.SUCCESS;
         }
 
+        internal override int Read(byte[] buffer)
+        {
+            return this.serialPort.Read(buffer, 0, buffer.Length);
+        }
+
         #endregion
 
         #region 事件处理器
-
-        private void SerialPort_DataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            int bytesToRead = this.serialPort.BytesToRead;
-            byte[] buffer = new byte[bytesToRead];
-            this.serialPort.Read(buffer, 0, buffer.Length);
-            this.NotifyDataReceived(buffer);
-        }
 
         #endregion
     }

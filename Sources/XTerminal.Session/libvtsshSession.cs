@@ -58,7 +58,7 @@ namespace XTerminal.Session
 
         #region VTChannel
 
-        public override int Connect()
+        public override int Open()
         {
             int code = libvt.vtssh_create(out this.ssh, this.vtssh_options_ptr);
             if (code != libvt.VTSSH_ERR.VTSSH_ERR_OK)
@@ -77,16 +77,11 @@ namespace XTerminal.Session
             return ResponseCode.SUCCESS;
         }
 
-        public override void Disconnect()
+        public override void Close()
         {
             libvt.vtssh_disconnect(this.ssh);
             libvt.vtssh_delete(this.ssh);
             this.ssh = IntPtr.Zero;
-        }
-
-        public override int Input(VTInputEvent ievt)
-        {
-            return ResponseCode.SUCCESS;
         }
 
         public override int Write(byte[] data)
@@ -100,6 +95,11 @@ namespace XTerminal.Session
             }
 
             return ResponseCode.SUCCESS;
+        }
+
+        internal override int Read(byte[] buffer)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -131,7 +131,6 @@ namespace XTerminal.Session
         {
             byte[] bytes = new byte[datasize];
             Marshal.Copy(data, bytes, 0, bytes.Length);
-            this.NotifyDataReceived(bytes);
         }
 
         #endregion

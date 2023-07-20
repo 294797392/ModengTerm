@@ -58,7 +58,7 @@ namespace XTerminal
         /// <summary>
         /// 与终端进行通信的信道
         /// </summary>
-        private SessionBase session;
+        private SessionTransport session;
 
         /// <summary>
         /// 终端字符解析器
@@ -331,11 +331,12 @@ namespace XTerminal
 
             #region 连接终端通道
 
-            SessionBase session = SessionFactory.Create(options);
-            session.StatusChanged += this.VTSession_StatusChanged;
-            session.DataReceived += this.VTSession_DataReceived;
-            session.Connect();
-            this.session = session;
+            SessionTransport transport = new SessionTransport();
+            transport.StatusChanged += this.VTSession_StatusChanged;
+            transport.DataReceived += this.VTSession_DataReceived;
+            transport.Initialize(options);
+            transport.Open();
+            this.session = transport;
 
             #endregion
         }
@@ -360,7 +361,8 @@ namespace XTerminal
 
             this.session.StatusChanged -= this.VTSession_StatusChanged;
             this.session.DataReceived -= this.VTSession_DataReceived;
-            this.session.Disconnect();
+            this.session.Close();
+            this.session.Release();
 
             this.mainDocument.Dispose();
             this.alternateDocument.Dispose();
@@ -1198,11 +1200,11 @@ namespace XTerminal
             }
         }
 
-        private void VTSession_DataReceived(SessionBase client, byte[] bytes)
+        private void VTSession_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
             //string str = string.Join(",", bytes.Select(v => v.ToString()).ToList());
             //logger.InfoFormat("Received, {0}", str);
-            this.vtParser.ProcessCharacters(bytes);
+            this.vtParser.ProcessCharacters(bytes, size);
 
             // 全部字符都处理完了之后，只渲染一次
 

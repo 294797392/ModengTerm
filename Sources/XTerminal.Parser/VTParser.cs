@@ -144,9 +144,10 @@ namespace XTerminal.Parser
         /// 解析终端字节流
         /// </summary>
         /// <param name="bytes">要解析的字节流</param>
-        public void ProcessCharacters(byte[] bytes)
+        /// <param name="size">字节流长度</param>
+        public void ProcessCharacters(byte[] bytes, int size)
         {
-            int length = bytes.Length;
+            int length = size;
 
             for (int i = 0; i < length; i++)
             {

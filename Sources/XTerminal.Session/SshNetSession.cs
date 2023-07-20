@@ -45,7 +45,7 @@ namespace XTerminal.Session
 
         #region SessionBase
 
-        public override int Connect()
+        public override int Open()
         {
             this.sessionProperties = this.options.SessionProperties;
             var authentications = new List<AuthenticationMethod>();
@@ -66,25 +66,16 @@ namespace XTerminal.Session
 
             TerminalProperties terminalOptions = this.options.TerminalProperties;
             this.stream = this.sshClient.CreateShellStream(this.options.TerminalProperties.GetTerminalName(), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
-            this.stream.DataReceived += this.Stream_DataReceived;
 
             return ResponseCode.SUCCESS;
         }
 
-        public override void Disconnect()
+        public override void Close()
         {
-            this.stream.DataReceived -= this.Stream_DataReceived;
             this.sshClient.Disconnect();
 
             this.stream.Dispose();
             this.sshClient.Disconnect();
-        }
-
-        public override int Input(VTInputEvent ievt)
-        {
-            //byte[] bytes = this.keyboard.TranslateInput(ievt);
-            //return this.Write(bytes);
-            throw new NotImplementedException();
         }
 
         public override int Write(byte[] bytes)
@@ -102,14 +93,14 @@ namespace XTerminal.Session
             }
         }
 
+        internal override int Read(byte[] buffer)
+        {
+            return this.stream.Read(buffer, 0, buffer.Length);
+        }
+
         #endregion
 
         #region 实例方法
-
-        private void Stream_DataReceived(object sender, ShellDataEventArgs e)
-        {
-            base.NotifyDataReceived(e.Data);
-        }
 
         #endregion
     }
