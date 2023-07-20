@@ -71,6 +71,7 @@ namespace XTerminal.Windows
             // 初始化SSH验证方式列表
             ComboBoxAuthList.ItemsSource = Enum.GetValues(typeof(SSHAuthTypeEnum));
             ComboBoxAuthList.SelectedIndex = 0;
+            TextBoxSSHPort.Text = XTermConsts.DefaultSSHPort.ToString();
 
             // 初始化会话类型列表
             this.sessionTypeList = new BindableCollection<SessionTypeVM>();

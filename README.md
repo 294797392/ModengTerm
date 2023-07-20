@@ -24,15 +24,14 @@ XTerminal的目标是为开发者提供一个方便的，舒适的，用着爽�
 使用VS2019打开Sources/VideoTerminal.sln，直接进行编译。项目基于.net framework 4.8版本。
 
 # 参考资料
-* https://github.com/microsoft/terminal.git
-* https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/
-* Control Functions for Coded Character Sets Ecma-048.pdf
-* 终端字符解析：
-https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
-https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-https://invisible-island.net/xterm/
-https://vt100.net/emu/dec_ansi_parser
-* 虚拟终端/控制台/Shell介绍：https://cloud.tencent.com/developer/news/304629
+* https://github.com/microsoft/terminal.git  
+* https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/  
+* Control Functions for Coded Character Sets Ecma-048.pdf  
+* https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences  
+* https://invisible-island.net/xterm/ctlseqs/ctlseqs.html  
+* https://invisible-island.net/xterm/  
+* https://vt100.net/emu/dec_ansi_parser  
+* 虚拟终端/控制台/Shell介绍：https://cloud.tencent.com/developer/news/304629  
 
 
 

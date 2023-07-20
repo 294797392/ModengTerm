@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Pipes;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -12,7 +14,7 @@ namespace XTerminal.Session
     /// <summary>
     /// Native API wrapper for WinPty.
     /// </summary>
-    internal static class WinPty
+    internal static class winpty
     {
         /// <summary>
         /// Marshals a LPWStr (const wchar_t *) to a string without destroying the LPWStr.
@@ -64,6 +66,7 @@ namespace XTerminal.Session
 
         [DllImport("winpty.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr winpty_config_new(ulong agentFlags, out IntPtr err);
+
 
         [DllImport("winpty.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void winpty_config_free(IntPtr cfg);
@@ -228,6 +231,12 @@ namespace XTerminal.Session
 
         #region 实例变量
 
+        private IntPtr winpty_config;
+        private IntPtr winpty_handle;
+        private IntPtr spawn_config;
+        private NamedPipeClientStream inputStream;
+        private NamedPipeClientStream outputStream;
+
         #endregion
 
         #region 构造方法
@@ -242,21 +251,152 @@ namespace XTerminal.Session
 
         public override int Open()
         {
+            IntPtr winpty_error;
+
+            // 看了winpty的源码，winpty_error这个参数没使用
+            this.winpty_config = winpty.winpty_config_new(winpty.WINPTY_FLAG_COLOR_ESCAPES, out winpty_error);
+            if (winpty_error != IntPtr.Zero)
+            {
+                this.HandleWinptyError("winpty_config_new", winpty_error);
+                return ResponseCode.FAILED;
+            }
+
+            winpty.winpty_config_set_initial_size(this.winpty_config, this.options.TerminalProperties.Columns, this.options.TerminalProperties.Rows);
+
+            // winpty_error也没用
+            this.winpty_handle = winpty.winpty_open(this.winpty_config, out winpty_error);
+            if (winpty_error != IntPtr.Zero)
+            {
+                // 打开失败
+                this.HandleWinptyError("winpty_open", winpty_error);
+                this.Release();
+                return ResponseCode.FAILED;
+            }
+
+            string cmdexePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            this.spawn_config = winpty.winpty_spawn_config_new(winpty.WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN, cmdexePath, string.Empty, string.Empty, string.Empty, out winpty_error);
+            if (winpty_error != IntPtr.Zero)
+            {
+                this.HandleWinptyError("winpty_spawn_config_new", winpty_error);
+                this.Release();
+                return ResponseCode.FAILED;
+            }
+
+            // 与winpty建立NamedPipe信道
+            this.inputStream = this.CreatePipe(winpty.winpty_conin_name(winpty_handle), PipeDirection.Out);
+            this.outputStream = this.CreatePipe(winpty.winpty_conout_name(winpty_handle), PipeDirection.In);
+
+            if (!winpty.winpty_spawn(winpty_handle, this.spawn_config, out IntPtr process, out IntPtr thread, out int procError, out winpty_error))
+            {
+                this.HandleWinptyError("winpty_spawn", winpty_error);
+                this.Release();
+                return ResponseCode.FAILED;
+            }
+
             return ResponseCode.SUCCESS;
         }
 
         public override void Close()
         {
+            this.Release();
+
+            if (this.inputStream != null)
+            {
+                try
+                {
+                    this.inputStream.Dispose();
+                    this.inputStream = null;
+                }
+                catch
+                { }
+            }
+
+            if (this.outputStream != null)
+            {
+                try
+                {
+                    this.outputStream.Dispose();
+                    this.outputStream = null;
+                }
+                catch
+                { }
+            }
         }
 
         public override int Write(byte[] bytes)
         {
+            this.inputStream.Write(bytes, 0, bytes.Length);
             return ResponseCode.SUCCESS;
         }
 
         internal override int Read(byte[] buffer)
         {
-            throw new NotImplementedException();
+            return this.outputStream.Read(buffer, 0, buffer.Length);
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void HandleWinptyError(string api, IntPtr winpty_error)
+        {
+            string msg = winpty.winpty_error_msg(winpty_error);
+            logger.ErrorFormat("{0}失败, msg = {1}", api, msg);
+            winpty.winpty_error_free(winpty_error);
+        }
+
+        private void Release()
+        {
+            if (this.winpty_handle != IntPtr.Zero)
+            {
+                // Kill the agent connection.  This will kill the agent, closing the CONIN
+                // and CONOUT pipes on the agent pipe, prompting our I/O handler to shut
+                // down.
+                winpty.winpty_free(this.winpty_handle);
+                this.winpty_handle = IntPtr.Zero;
+            }
+
+            if (this.winpty_config != IntPtr.Zero)
+            {
+                winpty.winpty_config_free(this.winpty_config);
+                this.winpty_config = IntPtr.Zero;
+            }
+
+            if (this.spawn_config != IntPtr.Zero)
+            {
+                winpty.winpty_spawn_config_free(this.spawn_config);
+                this.spawn_config = IntPtr.Zero;
+            }
+        }
+
+        private NamedPipeClientStream CreatePipe(string pipeName, PipeDirection direction)
+        {
+            string serverName = ".";
+            if (pipeName.StartsWith("\\"))
+            {
+                int slash3 = pipeName.IndexOf('\\', 2);
+                if (slash3 != -1)
+                {
+                    serverName = pipeName.Substring(2, slash3 - 2);
+                }
+                int slash4 = pipeName.IndexOf('\\', slash3 + 1);
+                if (slash4 != -1)
+                {
+                    pipeName = pipeName.Substring(slash4 + 1);
+                }
+            }
+
+            try
+            {
+                NamedPipeClientStream pipe = new NamedPipeClientStream(serverName, pipeName, direction);
+                pipe.Connect();
+                return pipe;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("winpty NamedPipe连接失败", ex);
+                return null;
+            }
         }
 
         #endregion

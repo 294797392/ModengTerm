@@ -757,6 +757,10 @@ namespace XTerminal
         private void VideoTerminal_InputEvent(ITerminalScreen canvasPanel, VTInputEvent evt)
         {
             byte[] bytes = this.Keyboard.TranslateInput(evt);
+            if (bytes == null)
+            {
+                return;
+            }
 
             // 这里输入的都是键盘按键
             int code = this.session.Write(bytes);

@@ -56,5 +56,10 @@ namespace XTerminal.Base
             "115200",
             "921600"
         };
+
+        /// <summary>
+        /// 默认的SSH服务端口号
+        /// </summary>
+        public const int DefaultSSHPort = 22;
     }
 }
