@@ -7,5 +7,6 @@
     <sys:String x:Key="UIText3">新建</sys:String>
     <sys:String x:Key="UIText4">删除</sys:String>
     <sys:String x:Key="UIText5">编辑</sys:String>
+    <sys:String x:Key="UIText6">关于</sys:String>
 
 </ResourceDictionary>

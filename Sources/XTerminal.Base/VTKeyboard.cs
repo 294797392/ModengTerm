@@ -234,6 +234,16 @@ namespace XTerminal.Base
 
         #endregion
 
+        #region 属性
+
+        /// <summary>
+        /// 翻译使用的编码方式
+        /// 默认值是XTermConsts.DefaultInputEncoding
+        /// </summary>
+        public Encoding Encoding { get; set; }
+
+        #endregion
+
         #region 构造方法
 
         public VTKeyboard()
@@ -242,6 +252,7 @@ namespace XTerminal.Base
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
             this.SetCursorKeyMode(false);
+            this.Encoding = XTermConsts.DefaultInputEncoding;
         }
 
         #endregion
@@ -287,7 +298,7 @@ namespace XTerminal.Base
             if (evt.Key == VTKeys.None)
             {
                 // 这里说明是中文
-                return Encoding.UTF8.GetBytes(evt.Text);
+                return this.Encoding.GetBytes(evt.Text);
             }
 
             byte[] bytes = null;

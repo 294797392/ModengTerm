@@ -1,21 +1,22 @@
 
-# terminal
+# XTerminal
 
-一个多功能的终端模拟器，可以连接SSH服务器，串口...etc  
-类似于XShell，putty和微软开源的terminal，代码参考了xterm和terminal的源码  
-整体的设计文档请参考__Documents/设计文档.pptx__  
+XTerminal一个使用C#/WPF开发的多功能的终端模拟器，和市面上的其他远程连接工具差不多，用来连接SSH服务器，串口，telnet等等。和其他的终端工具不同的是，XTerminal希望可以开发出一些在特定的调试场景中可以方便开发者进行调试的小功能，目前这些小功能还在持续开发中，敬请期待。因为我自己也经常使用XShell之类的远程工具。我想按照我自己的想法去把这些小功能实现出来。  
+XTerminal的目标是为开发者提供一个方便的，舒适的，用着爽的远程开发环境，为软件开发者提供极致的使用体验。  
+目前版本的XTerminal界面模仿了XShell的界面，并且里面的终端字节流解析器模块的代码参考了微软开源的terminal项目。  
 
-## 支持连接的客户端类型
-1. SSH服务器
-2. 串口 - 正在实现
+设计文档请参考 __Documents__ 目录下的 __设计文档.pptx__
 
-## 开发环境
-使用VS2019，WPF开发
+# 功能列表
+* 支持与SSH服务器连接
+* 支持串口连接
+* 支持与Windows命令行进行交互
 
-## 项目结构
 
-## 实现原理
-参考：  
+# 编译项目
+使用VS2019打开Sources/VideoTerminal.sln，直接进行编译。项目基于.net framework 4.8版本。
+
+# 参考资料
 * https://github.com/microsoft/terminal.git
 * https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/
 * Control Functions for Coded Character Sets Ecma-048.pdf
@@ -25,36 +26,6 @@ https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 https://invisible-island.net/xterm/
 https://vt100.net/emu/dec_ansi_parser
 * 虚拟终端/控制台/Shell介绍：https://cloud.tencent.com/developer/news/304629
-
-
-# 虚拟终端支持启用或禁用以下模式
-| 模式 | 描述 | 启用/禁用方法 |
-| :--- | ---------------|---|
-| DECAWM | 是否自动换行 |tput smam/tput rmam|
-
-
-# 渲染方式对比
-| 功能 | FlowDocument |
-| :--- | ---------------|
-| 显示光标        | &#10004; |
-| 修改光标样式    | &#10008; |
-| 文本选中    | &#10004; |
-| 自定义右键菜单    | &#10004; |
-
-# 不同程序终端的输出对比
-| 程序 | 动作 | 输出 |
-| :--- | ----|------|
-| vim  | 打开|      |
-| vim  | PageUp/PageDown ||
-| vim  | 输入3个中文字符 |Print:你, cursorRow = 0, cursorCol = 4<br/>Print:你, cursorRow = 0, cursorCol = 6<br/>Print:你, cursorRow = 0, cursorCol = 8|
-| vim  | 按二次Backspace删除中文字符 |CUP_CursorPosition, row = 0, col = 8<br/>EL_EraseLine, eraseType = ToEnd, cursorRow = 0, cursorCol = 8<br/>CUP_CursorPosition, row = 0, col = 6,EL_EraseLine, eraseType = ToEnd, cursorRow = 0, cursorCol = 6|
-| shell  | 输入3个中文字符 |Print:你, cursorRow = 23, cursorCol = 31<br/>Print:你, cursorRow = 23, cursorCol = 32<br/>Print:你, cursorRow = 23, cursorCol = 33|
-| shell  | 按一次Backspace删除中文字符 |CursorBackward, cursorRow = 23, cursorCol = 33<br/>CursorBackward, cursorRow = 23, cursorCol = 32<br/>EL_EraseLine, eraseType = ToEnd, cursorRow = 23, cursorCol = 32|
-| man | 打开| |
-| man | PageUp/PageDown ||
-
-
-
 
 
 

@@ -36,5 +36,10 @@ namespace XTerminal.Base
             Column = TerminalColumns,
             Row = TerminalRows,
         };
+
+        /// <summary>
+        /// 默认的输入编码方式
+        /// </summary>
+        public static readonly Encoding DefaultInputEncoding = Encoding.UTF8;
     }
 }

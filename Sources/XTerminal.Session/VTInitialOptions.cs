@@ -77,6 +77,11 @@ namespace XTerminal.Session
         /// </summary>
         public CursorOptions CursorOption { get; set; }
 
+        /// <summary>
+        /// 输入字符的编码方式
+        /// </summary>
+        public Encoding InputEncoding { get; set; }
+
         public VTInitialOptions()
         {
         }

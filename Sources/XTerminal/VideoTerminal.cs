@@ -164,6 +164,11 @@ namespace XTerminal
         /// </summary>
         private bool isRunning;
 
+        /// <summary>
+        /// 输入编码方式
+        /// </summary>
+        private Encoding inputEncoding;
+
         #endregion
 
         #region 属性
@@ -252,10 +257,11 @@ namespace XTerminal
         public void Initialize(VTInitialOptions options)
         {
             this.initialOptions = options;
+            this.inputEncoding = options.InputEncoding;
             this.uiSyncContext = SynchronizationContext.Current;
 
             // DECAWM
-            this.autoWrapMode = this.initialOptions.TerminalProperties.DECPrivateAutoWrapMode;
+            this.autoWrapMode = options.TerminalProperties.DECPrivateAutoWrapMode;
 
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
@@ -267,6 +273,7 @@ namespace XTerminal
             #region 初始化键盘
 
             this.Keyboard = new VTKeyboard();
+            this.Keyboard.Encoding = options.InputEncoding;
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
 
@@ -377,6 +384,29 @@ namespace XTerminal
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
+        }
+
+        /// <summary>
+        /// 将剪贴板的数据发送给会话
+        /// </summary>
+        /// <returns>发送成功返回SUCCESS，失败返回错误码</returns>
+        public int Paste()
+        {
+            string text = Clipboard.GetText();
+            if (string.IsNullOrEmpty(text))
+            {
+                return ResponseCode.SUCCESS;
+            }
+
+            byte[] bytes = this.inputEncoding.GetBytes(text);
+
+            int code = this.session.Write(bytes);
+            if (code != ResponseCode.SUCCESS) 
+            {
+                logger.ErrorFormat("粘贴数据失败, {0}", code);
+            }
+
+            return code;
         }
 
         /// <summary>

@@ -65,12 +65,12 @@
         <Menu Grid.Row="0">
 
             <MenuItem Header="文件" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                <MenuItem Header="新建会话"/>
-                <MenuItem Header="打开会话"/>
+                <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
+                <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
             </MenuItem>
 
             <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                <MenuItem Header="关于XTerminal"/>
+                <MenuItem Header="关于XTerminal" Click="MenuItemAbout_Click"/>
             </MenuItem>
 
         </Menu>

@@ -132,7 +132,7 @@ namespace XTerminal.UserControls
         /// </summary>
         private void Paste()
         {
-            
+            this.VideoTerminal.Paste();
         }
 
         #endregion

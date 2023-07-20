@@ -16,6 +16,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.UserControls;
 using XTerminal.ViewModels;
+using XTerminal.Windows;
 
 namespace XTerminal
 {
@@ -51,14 +52,19 @@ namespace XTerminal
             {
                 XTermSession session = sessionListWindow.SelectedSession;
 
-                // 创建TerminalControl
-                TerminalScreenUserControl terminalControl = new TerminalScreenUserControl();
-                ContentControlTerminal.Content = terminalControl;
-
-                // 打开Session
-                OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session, terminalControl);
-                terminalControl.VideoTerminal = openedSession.VideoTerminal;
+                this.OpenSession(session);
             }
+        }
+
+        private void OpenSession(XTermSession session)
+        {
+            // 创建TerminalControl
+            TerminalScreenUserControl terminalControl = new TerminalScreenUserControl();
+            ContentControlTerminal.Content = terminalControl;
+
+            // 打开Session
+            OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session, terminalControl);
+            terminalControl.VideoTerminal = openedSession.VideoTerminal;
         }
 
         /// <summary>
@@ -124,6 +130,42 @@ namespace XTerminal
             }
 
             XTermApp.Context.CloseSession(openedSession);
+        }
+
+        private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)
+        {
+            this.OpenSession();
+        }
+
+        private void MenuItemCreateSession_Click(object sender, RoutedEventArgs e)
+        {
+            CreateSessionWindow window = new CreateSessionWindow();
+            window.Owner = this;
+            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            if (!(bool)window.ShowDialog())
+            {
+                return;
+            }
+
+            XTermSession session = window.Session;
+
+            // 在数据库里新建会话
+            int code = XTermApp.Context.ServiceAgent.AddSession(session);
+            if (code != ResponseCode.SUCCESS)
+            {
+                MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
+                return;
+            }
+
+            // 打开会话
+            this.OpenSession(session);
+        }
+
+        private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
+        {
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.Owner = this;
+            aboutWindow.ShowDialog();
         }
 
         #endregion
