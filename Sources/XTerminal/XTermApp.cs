@@ -34,7 +34,11 @@ namespace XTerminal
 
     public class XTermApp : ModularApp<XTermApp, XTermManifest>, INotifyPropertyChanged
     {
+        #region 实例变量
+
         private OpenedSessionVM selectedOpenedSession;
+
+        #endregion
 
         #region 属性
 

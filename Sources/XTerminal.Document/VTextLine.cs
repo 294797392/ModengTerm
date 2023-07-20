@@ -32,7 +32,11 @@ namespace XTerminal.Document
 
         #region 属性
 
-        public int ID { get; set; }
+        /// <summary>
+        /// 行的逻辑索引
+        /// 比如界面上一共能显示80行，那么逻辑索引就表示是哪一行
+        /// </summary>
+        public int LogicalID { get; set; }
 
         public override VTDocumentElements Type => VTDocumentElements.TextLine;
 

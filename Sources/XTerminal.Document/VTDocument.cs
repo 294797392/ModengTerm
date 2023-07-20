@@ -26,8 +26,6 @@ namespace XTerminal.Document
         /// </summary>
         internal VTDocumentOptions options;
 
-        private int row;
-
         #endregion
 
         #region 属性
@@ -53,11 +51,6 @@ namespace XTerminal.Document
         /// 可视区域的最大行数
         /// </summary>
         public int RowSize { get { return this.options.RowSize; } }
-
-        /// <summary>
-        /// 总行数
-        /// </summary>
-        public int TotalRows { get; private set; }
 
         /// <summary>
         /// 当光标在该范围内就得滚动
@@ -116,8 +109,11 @@ namespace XTerminal.Document
                 Interval = options.Interval
             };
 
+            #region 初始化第一行，并设置链表首尾指针
+
             VTextLine firstLine = new VTextLine(this)
             {
+                LogicalID = 0,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
@@ -126,13 +122,13 @@ namespace XTerminal.Document
             this.LastLine = firstLine;
             this.ActiveLine = firstLine;
 
+            #endregion
+
             // 默认创建80行，可见区域也是80行
             for (int i = 1; i < options.RowSize; i++)
             {
-                this.CreateNextLine();
+                this.CreateNextLine(i);
             }
-
-            this.TotalRows = options.RowSize;
 
             // 更新可视区域
             this.SetArrangeDirty(true);
@@ -146,11 +142,11 @@ namespace XTerminal.Document
         /// 创建一个新行并将新行挂到链表的最后一个节点后面
         /// </summary>
         /// <returns></returns>
-        private void CreateNextLine()
+        private void CreateNextLine(int row)
         {
             VTextLine textLine = new VTextLine(this)
             {
-                ID = row++,
+                LogicalID = row,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
@@ -159,10 +155,12 @@ namespace XTerminal.Document
             this.LastLine.NextLine = textLine;
             textLine.PreviousLine = this.LastLine;
             this.LastLine = textLine;
-
-            this.TotalRows++;
         }
 
+        /// <summary>
+        /// 设置是否需要重新布局
+        /// </summary>
+        /// <param name="isDirty"></param>
         public void SetArrangeDirty(bool isDirty)
         {
             if (this.IsArrangeDirty != isDirty)
@@ -685,28 +683,19 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 从光标所在行向上滚动
-        /// </summary>
-        /// <param name="activeLine">光标所在行</param>
-        /// <param name="lines">要滚动的行数</param>
-        public void ScrollDown(VTextLine activeLine, int lines)
-        { 
-        }
-
-        /// <summary>
-        /// 从光标所在行向下滚动
-        /// </summary>
-        /// <param name="activeLine">光标所在行</param>
-        /// <param name="lines">要滚动的行数</param>
-        public void ScrollUp(VTextLine activeLine, int lines)
-        {
-            
-        }
-
-        /// <summary>
         /// 是否需要重新布局
         /// </summary>
         public bool IsArrangeDirty { get; private set; }
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Dispose()
+        {
+            this.FirstLine = null;
+            this.LastLine = null;
+            this.ActiveLine = null;
+        }
 
         #endregion
     }

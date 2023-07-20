@@ -22,11 +22,6 @@ namespace XTerminal.Document
         public VTHistoryLine LineHit { get; set; }
 
         /// <summary>
-        /// 光标所命中的字符的边界框信息
-        /// </summary>
-        public VTRect CharacterBounds { get; set; }
-
-        /// <summary>
         /// 命中的字符的索引
         /// 如果没命中，那么就是-1
         /// </summary>
