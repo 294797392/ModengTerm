@@ -104,6 +104,7 @@ namespace XTerminal
         /// <summary>
         /// 存储所有的历史行
         /// Row(scrollValue) -> VTextLine
+        /// 注意该字典里保存的是mainDocument的历史行，alternateDocument没有保存，需要单独考虑alternateDocument
         /// </summary>
         private Dictionary<int, VTHistoryLine> historyLines;
 
@@ -372,7 +373,7 @@ namespace XTerminal
                 return;
             }
 
-            string text = this.textSelection.GetText();
+            string text = this.textSelection.GetText(this.historyLines);
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
@@ -391,11 +392,11 @@ namespace XTerminal
                 return;
             }
 
-            this.textSelection.Start.LineHit = this.firstHistoryLine;
-            this.textSelection.Start.CharacterIndex = 0;
+            //this.textSelection.Start.LineHit = this.firstHistoryLine;
+            //this.textSelection.Start.CharacterIndex = 0;
 
-            this.textSelection.End.LineHit = this.lastHistoryLine;
-            this.textSelection.End.CharacterIndex = this.lastHistoryLine.Text.Length - 1;
+            //this.textSelection.End.LineHit = this.lastHistoryLine;
+            //this.textSelection.End.CharacterIndex = this.lastHistoryLine.Text.Length - 1;
         }
 
         /// <summary>
@@ -414,7 +415,7 @@ namespace XTerminal
         /// <param name="filePath"></param>
         public void SaveAsText(string filePath)
         {
-            string text = this.textSelection.GetText();
+            string text = this.textSelection.GetText(this.historyLines);
             File.WriteAllText(filePath, text);
         }
 
@@ -541,119 +542,6 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// 渲染用户选中的内容
-        /// </summary>
-        /// <param name="selection"></param>
-        private void DrawTextSelection(VTextSelection selection)
-        {
-            //VTextPointer startPointer = selection.Start;
-            //VTextPointer endPointer = selection.End;
-
-            //// 判断起始位置或者结束位置是否在Surface外
-
-            //// 先算鼠标的移动方向
-            //TextPointerPositions pointerPosition = this.GetTextPointerPosition(startPointer, endPointer);
-
-            //switch (pointerPosition)
-            //{
-            //    case TextPointerPositions.Original:
-            //        {
-            //            break;
-            //        }
-
-            //    // 这两个是鼠标在同一行上移动
-            //    case TextPointerPositions.Right:
-            //    case TextPointerPositions.Left:
-            //        {
-            //            VTRect rect1 = startPointer.CharacterBounds;
-            //            VTRect rect2 = endPointer.CharacterBounds;
-
-            //            double xmin = Math.Min(rect1.Left, rect2.Left);
-            //            double xmax = Math.Max(rect1.Right, rect2.Right);
-            //            double x = xmin;
-            //            double y = rect1.Y;
-            //            double width = xmax - xmin;
-            //            double height = rect1.Height;
-
-            //            VTRect bounds = new VTRect(x, y, width, height);
-            //            this.textSelection.Ranges.Clear();
-            //            this.textSelection.Ranges.Add(bounds);
-            //            break;
-            //        }
-
-            //    // 其他的是鼠标上下移动
-            //    default:
-            //        {
-            //            this.textSelection.Ranges.Clear();
-
-            //            // 构建上边和下边的矩形
-            //            VTextPointer topPointer = startPointer.Row < endPointer.Row ? startPointer : endPointer;
-            //            VTextPointer bottomPointer = startPointer.Row < endPointer.Row ? endPointer : startPointer;
-
-            //            //logger.FatalFormat("top = {0}, bottom = {1}", topPointer.Row, bottomPointer.Row);
-
-            //            // 相对于Panel的起始选中边界框和结束选中的边界框
-            //            VTRect topBounds = topPointer.CharacterBounds;
-            //            VTRect bottomBounds = bottomPointer.CharacterBounds;
-
-            //            // 当光标在Panel外的时候（也就是一边在滚动，一边在选中），需要做特殊处理
-            //            if (scrollResult == OutsideScrollResult.ScrollTop)
-            //            {
-            //                // 鼠标往上滚动
-
-            //                // 鼠标已经移动到窗口上面了，要修改topBounds位置为第一行
-            //                topBounds.Y = 0;
-
-            //                //logger.FatalFormat("bottom:{0}, top:{1}", bottomPointer.Row, topPointer.Row);
-
-            //                if (!this.UpdateTextPointerBounds(bottomPointer))
-            //                {
-            //                    // Pointer更新失败，说明Pointer所指向的行已经滚动到文档外了，那么把bottom的字符位置改成右下角
-            //                    bottomBounds.X = this.surfaceRect.Width;
-            //                    bottomBounds.Y = this.surfaceRect.Height;
-            //                    //logger.FatalFormat("更新失败");
-            //                }
-            //                else
-            //                {
-            //                    // 更新成功，刷新bottomBounds
-            //                    bottomBounds = bottomPointer.CharacterBounds;
-            //                }
-            //            }
-            //            else if (scrollResult == OutsideScrollResult.ScrollDown)
-            //            {
-            //                // 鼠标往下滚动
-
-            //                // 鼠标已经移动到窗口下面了，要修改bottomBounds位置为最后一行
-            //                bottomBounds.Y = this.surfaceRect.Height;
-
-            //                if (!this.UpdateTextPointerBounds(topPointer))
-            //                {
-            //                    topBounds.X = 0;
-            //                    topBounds.Y = 0;
-            //                }
-            //                else
-            //                {
-            //                    topBounds = topPointer.CharacterBounds;
-            //                }
-            //            }
-
-            //            this.textSelection.Ranges.Add(new VTRect(topBounds.X, topBounds.Y, 9999, topBounds.Height));
-            //            this.textSelection.Ranges.Add(new VTRect(0, bottomBounds.Y, bottomBounds.X + bottomBounds.Width, bottomBounds.Height));
-
-            //            // 构建中间的几何图形
-            //            VTRect middleBounds = new VTRect(0, topBounds.Y + topBounds.Height, 9999, bottomBounds.Y - topBounds.Bottom);
-            //            this.textSelection.Ranges.Add(middleBounds);
-            //            break;
-            //        }
-            //}
-
-            //this.uiSyncContext.Send((state) =>
-            //{
-            //    this.Surface.Draw(this.textSelection);
-            //}, null);
-        }
-
-        /// <summary>
         /// 滚动到指定的历史记录
         /// 并更新UI上的滚动条位置
         /// </summary>
@@ -774,7 +662,7 @@ namespace XTerminal
             VTHistoryLine topHistoryLine;
             if (!this.historyLines.TryGetValue(this.scrollValue, out topHistoryLine))
             {
-                logger.ErrorFormat("GetTextPointer失败, 不存在历史行记录, currentScroll = {0}", this.scrollValue);
+                logger.DebugFormat("GetTextPointer失败, 不存在历史行记录, currentScroll = {0}", this.scrollValue);
                 return false;
             }
 
@@ -783,11 +671,11 @@ namespace XTerminal
             if (lineHit == null)
             {
                 // 这里说明鼠标没有在任何一行上
-                logger.ErrorFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
+                logger.DebugFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
                 return false;
             }
 
-            pointer.LineHit = lineHit;
+            pointer.PhysicsRow = lineHit.Row;
 
             #endregion
 
@@ -801,61 +689,12 @@ namespace XTerminal
             }
 
             pointer.CharacterIndex = characterIndex;
+            pointer.CharacterBounds = characterBounds;
+            pointer.OffsetY = lineOffsetY;
 
             #endregion
 
             return true;
-        }
-
-        /// <summary>
-        /// 获取pointer2相对于pointer1的方向
-        /// </summary>
-        /// <param name="pointer1">第一个pointer</param>
-        /// <param name="pointer2">第二个pointer</param>
-        /// <returns></returns>
-        private TextPointerPositions GetTextPointerPosition(VTextPointer pointer1, VTextPointer pointer2)
-        {
-            double p1x = pointer1.CharacterIndex;
-            double p2x = pointer2.CharacterIndex;
-            int row1 = pointer1.Row;
-            int row2 = pointer2.Row;
-
-            if (p2x == p1x && row2 < row1)
-            {
-                return TextPointerPositions.Top;
-            }
-            else if (p2x > p1x && row2 < row1)
-            {
-                return TextPointerPositions.RightTop;
-            }
-            else if (p2x > p1x && row2 == row1)
-            {
-                return TextPointerPositions.Right;
-            }
-            else if (p2x > p1x && row2 > row1)
-            {
-                return TextPointerPositions.RightBottom;
-            }
-            else if (p2x == p1x && row2 > row1)
-            {
-                return TextPointerPositions.Bottom;
-            }
-            else if (p2x < p1x && row2 > row1)
-            {
-                return TextPointerPositions.LeftBottom;
-            }
-            else if (p2x < p1x && row2 == row1)
-            {
-                return TextPointerPositions.Left;
-            }
-            else if (p2x < p1x && row2 < row1)
-            {
-                return TextPointerPositions.LeftTop;
-            }
-            else
-            {
-                return TextPointerPositions.Original;
-            }
         }
 
         /// <summary>
@@ -1421,23 +1260,14 @@ namespace XTerminal
                 }
             }
 
-            // 首先检测鼠标是否在容器边界框的外面
+            // 首先检测鼠标是否在Surface边界框的外面
+            // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
             OutsideScrollResult scrollResult = this.ScrollIfCursorOutsideSurface(mousePosition, this.surfaceRect);
 
             // 整理思路是算出来StartTextPointer和EndTextPointer之间的几何图形
             // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
             VTextPointer startPointer = this.textSelection.Start;
             VTextPointer endPointer = this.textSelection.End;
-
-            // 鼠标按下的时候不在行上，然后鼠标移动到了行上
-            // 需要刷新起始的鼠标命中信息
-            if (startPointer.LineHit == null)
-            {
-                if (!this.GetTextPointer(mousePosition, this.surfaceRect, startPointer))
-                {
-                    return;
-                }
-            }
 
             // 得到当前鼠标的命中信息
             if (!this.GetTextPointer(mousePosition, this.surfaceRect, endPointer))
@@ -1462,7 +1292,12 @@ namespace XTerminal
 
             #endregion
 
-            this.DrawTextSelection(this.textSelection);
+            // 计算选中内容的几何图形，并渲染
+            this.textSelection.BuildGeometry();
+            this.uiSyncContext.Send((state) =>
+            {
+                this.Surface.Draw(this.textSelection);
+            }, null);
         }
 
         private void TerminalScreen_VTMouseUp(ITerminalScreen arg1, VTPoint cursorPos)

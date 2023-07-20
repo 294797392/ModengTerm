@@ -34,7 +34,7 @@ namespace VideoTerminal.Rendering
 
             StreamGeometryContext sgc = this.selectionGeometry.Open();
 
-            foreach (VTRect bounds in selectionRange.Ranges)
+            foreach (VTRect bounds in selectionRange.Geometry)
             {
                 sgc.BeginFigure(new Point(bounds.LeftTop.X, bounds.LeftTop.Y), true, true);
                 sgc.LineTo(new Point(bounds.RightTop.X, bounds.RightTop.Y), true, true);

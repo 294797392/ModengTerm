@@ -39,7 +39,7 @@ namespace XTerminal.Document.Rendering
         /// </summary>
         /// <param name="textLine">要测量的文本行</param>
         /// <param name="characterIndex">要测量的字符</param>
-        /// <returns>文本坐标，X=文本左边的X偏移量，Y=文本高度</returns>
+        /// <returns>文本坐标，X=文本左边的X偏移量，Y永远是0，因为边界框是相对于该行的</returns>
         VTRect MeasureCharacter(VTHistoryLine textLine, int characterIndex);
 
         /// <summary>

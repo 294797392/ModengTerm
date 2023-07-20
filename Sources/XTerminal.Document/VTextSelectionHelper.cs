@@ -12,6 +12,8 @@ namespace XTerminal.Document
     /// </summary>
     public static class VTextSelectionHelper
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTextSelectionHelper");
+
         private static readonly VTRect EmptyRect = new VTRect();
 
         private const int CharacterHitTolerance = 3;
@@ -84,6 +86,57 @@ namespace XTerminal.Document
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 获取pointer2相对于pointer1的方向
+        /// </summary>
+        /// <param name="pointer1">第一个pointer</param>
+        /// <param name="pointer2">第二个pointer</param>
+        /// <returns></returns>
+        public static TextPointerPositions GetTextPointerPosition(VTextPointer pointer1, VTextPointer pointer2)
+        {
+            double p1x = pointer1.CharacterIndex;
+            double p2x = pointer2.CharacterIndex;
+            int row1 = pointer1.PhysicsRow;
+            int row2 = pointer2.PhysicsRow;
+
+            if (p2x == p1x && row2 < row1)
+            {
+                return TextPointerPositions.Top;
+            }
+            else if (p2x > p1x && row2 < row1)
+            {
+                return TextPointerPositions.RightTop;
+            }
+            else if (p2x > p1x && row2 == row1)
+            {
+                return TextPointerPositions.Right;
+            }
+            else if (p2x > p1x && row2 > row1)
+            {
+                return TextPointerPositions.RightBottom;
+            }
+            else if (p2x == p1x && row2 > row1)
+            {
+                return TextPointerPositions.Bottom;
+            }
+            else if (p2x < p1x && row2 > row1)
+            {
+                return TextPointerPositions.LeftBottom;
+            }
+            else if (p2x < p1x && row2 == row1)
+            {
+                return TextPointerPositions.Left;
+            }
+            else if (p2x < p1x && row2 < row1)
+            {
+                return TextPointerPositions.LeftTop;
+            }
+            else
+            {
+                return TextPointerPositions.Original;
+            }
         }
     }
 }
