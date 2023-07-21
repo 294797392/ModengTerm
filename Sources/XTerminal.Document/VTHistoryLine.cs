@@ -28,7 +28,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 行索引，从0开始
         /// </summary>
-        public int Row { get; private set; }
+        public int PhysicsRow { get; private set; }
 
         /// <summary>
         /// 上一行
@@ -49,7 +49,7 @@ namespace XTerminal.Document
         /// 该行的所有字符
         /// 显示历史行的时候用到
         /// </summary>
-        public IEnumerable<VTCharacter> Characters { get; set; }
+        public IEnumerable<VTCharacter> Characters { get; private set; }
 
         private VTHistoryLine()
         {
@@ -86,7 +86,7 @@ namespace XTerminal.Document
         {
             VTHistoryLine historyLine = new VTHistoryLine()
             {
-                Row = row,
+                PhysicsRow = row,
                 PreviousLine = previousLine
             };
 

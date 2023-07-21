@@ -125,7 +125,8 @@ namespace XTerminal
 
         /// <summary>
         /// 记录当前滚动条滚动的值
-        /// 也就是文档里的第一条历史记录的Row的值
+        /// 也就是当前Surface上渲染的第一行的PhysicsRow
+        /// 默认值是0
         /// </summary>
         private int scrollValue;
 
@@ -403,7 +404,7 @@ namespace XTerminal
             byte[] bytes = this.inputEncoding.GetBytes(text);
 
             int code = this.session.Write(bytes);
-            if (code != ResponseCode.SUCCESS) 
+            if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("粘贴数据失败, {0}", code);
             }
@@ -489,9 +490,9 @@ namespace XTerminal
         /// <param name="document">要渲染的文档</param>
         /// <param name="scrollValue">
         /// 是否要移动滚动条，设置为-1表示不移动滚动条
-        /// 注意这里只是更新UI上的滚动条位置，并不会实际的去滚动
+        /// 注意这里只是更新UI上的滚动条位置，并不会实际的去滚动内容
         /// </param>
-        private void DrawDocument(VTDocument document, int scrollValue = -1)
+        private void DrawDocument(VTDocument document, int scrollValue = -1, bool arrangeSelectionArea = false)
         {
             // 当前行的Y方向偏移量
             double offsetY = 0;
@@ -522,6 +523,7 @@ namespace XTerminal
                         this.Surface.MeasureLine(next);
                     }
 
+                    // 更新行偏移量
                     if (arrangeDirty)
                     {
                         this.Surface.Arrange(next, next.OffsetX, next.OffsetY);
@@ -558,6 +560,15 @@ namespace XTerminal
 
                 #endregion
 
+                #region 更新选中区域的位置
+
+                if (arrangeSelectionArea)
+                {
+                    this.Surface.Arrange(this.textSelection, this.textSelection.OffsetX, this.textSelection.OffsetY);
+                }
+
+                #endregion
+
             }, null);
 
             if (this.activeDocument == this.mainDocument)
@@ -580,33 +591,109 @@ namespace XTerminal
         /// <param name="scrollValue">要显示的第一行历史记录</param>
         private void ScrollToHistory(int scrollValue)
         {
+            // 要滚动到的值
+            int newScroll = scrollValue;
+            // 滚动之前的值
+            int oldScroll = this.scrollValue;
+
+            // 更新当前滚动条的值，一定要先更新，因为DrawDocument函数会用到该值
             this.scrollValue = scrollValue;
 
             // 终端可以显示的总行数
             int terminalRows = this.initialOptions.TerminalProperties.Rows;
 
-            VTHistoryLine historyLine;
-            if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
-            {
-                logger.ErrorFormat("ScrollTo失败, 找不到对应的VTHistoryLine, scrollValue = {0}", scrollValue);
-                return;
-            }
+            // 被滚动的行数
+            int scrolledRows = Math.Abs(newScroll - oldScroll);
 
-            // 找到后面的行数显示
-            VTHistoryLine currentHistory = historyLine;
-            VTextLine currentTextLine = this.activeDocument.FirstLine;
-            for (int i = 0; i < terminalRows; i++)
+            // 是否需要移动选中区域
+            bool arrangeSelectionArea = false;
+
+            if (scrolledRows >= terminalRows)
             {
-                // 直接使用VTHistoryLine的List<VTCharacter>的引用
-                // 冻结状态下的VTextLine不会再有修改了
-                // 非冻结状态(ActiveLine)需要重新创建一个集合
-                currentTextLine.SetHistory(currentHistory);
-                currentHistory = currentHistory.NextLine;
-                currentTextLine = currentTextLine.NextLine;
+                // 先找到Surface上要显示的第一行数据
+                VTHistoryLine historyLine;
+                if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
+                {
+                    logger.ErrorFormat("ScrollTo失败, 找不到对应的VTHistoryLine, scrollValue = {0}", scrollValue);
+                    return;
+                }
+
+                // 此时说明把所有行都滚动到Surface外了，需要重新显示所有行
+                // 找到后面的行数显示
+                VTHistoryLine currentHistory = historyLine;
+                VTextLine currentTextLine = this.activeDocument.FirstLine;
+                for (int i = 0; i < terminalRows; i++)
+                {
+                    // 直接使用VTHistoryLine的List<VTCharacter>的引用
+                    // 冻结状态下的VTextLine不会再有修改了
+                    // 非冻结状态(ActiveLine)需要重新创建一个集合
+                    currentTextLine.SetHistory(currentHistory);
+                    currentHistory = currentHistory.NextLine;
+                    currentTextLine = currentTextLine.NextLine;
+                }
+
+                // 如果当前有选中内容，那么更新选中内容的图形为位置
+                if (!this.textSelection.IsEmpty)
+                {
+                    this.textSelection.OffsetY = -9999;
+                }
+            }
+            else
+            {
+                // 算出来移动前的第一行/最后一行与移动后的第一行/最后一行的差值
+                // 这个差值就是TextSelection.Geometry的OffsetY
+                VTextLine line1 = null;
+                VTextLine line2 = null;
+
+                // 此时说明只需要更新移动出去的行就可以了
+                if (newScroll > oldScroll)
+                {
+                    line1 = this.activeDocument.FirstLine;
+
+                    // 往下滚动，把上面的拿到下面，从第一行开始
+                    for (int i = 0; i < scrolledRows; i++)
+                    {
+                        VTHistoryLine historyLine = this.historyLines[oldScroll + terminalRows + i];
+
+                        // 该值永远是第一行，因为下面被Move到最后一行了
+                        VTextLine firstLine = this.activeDocument.FirstLine;
+
+                        firstLine.Move(VTextLine.MoveOptions.MoveToLast);
+
+                        firstLine.SetHistory(historyLine);
+                    }
+
+                    line2 = this.activeDocument.FirstLine;
+                }
+                else
+                {
+                    line1 = this.activeDocument.LastLine;
+
+                    // 往上滚动，把下面的拿到上面，从最后一行开始
+                    for (int i = 1; i <= scrolledRows; i++)
+                    {
+                        VTHistoryLine historyLine = this.historyLines[oldScroll - i];
+
+                        VTextLine lastLine = this.activeDocument.LastLine;
+
+                        lastLine.Move(VTextLine.MoveOptions.MoveToFirst);
+
+                        lastLine.SetHistory(historyLine);
+                    }
+
+                    line2 = this.activeDocument.LastLine;
+                }
+
+                // 如果当前有选中内容，那么更新选中内容的图形为位置
+                if (!this.textSelection.IsEmpty)
+                {
+                    this.textSelection.OffsetY += line1.OffsetY - line2.OffsetY;
+                    arrangeSelectionArea = true;
+                }
             }
 
             this.activeDocument.SetArrangeDirty(true);
-            this.DrawDocument(this.activeDocument, scrollValue);
+            this.DrawDocument(this.activeDocument, scrollValue, arrangeSelectionArea);
         }
 
         /// <summary>
@@ -644,7 +731,6 @@ namespace XTerminal
 
             if (scrollTarget != -1)
             {
-                logger.ErrorFormat("ScrollToHistory");
                 this.ScrollToHistory(scrollTarget);
             }
 
@@ -708,7 +794,7 @@ namespace XTerminal
                 return false;
             }
 
-            pointer.PhysicsRow = lineHit.Row;
+            pointer.PhysicsRow = lineHit.PhysicsRow;
 
             #endregion
 
@@ -843,23 +929,35 @@ namespace XTerminal
                             // 再创建最新行的历史行
                             // 先测量下最新的行，确保有高度
                             this.Surface.MeasureLine(this.ActiveLine);
-                            int historyIndex = this.lastHistoryLine.Row + 1;
+                            int historyIndex = this.lastHistoryLine.PhysicsRow + 1;
                             VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.lastHistoryLine, this.ActiveLine);
                             this.historyLines[historyIndex] = historyLine;
                             this.lastHistoryLine = historyLine;
 
                             // 滚动条滚动到底
                             int terminalRows = this.initialOptions.TerminalProperties.Rows;
+                            // 计算滚动条可以滚动的最大值
                             int scrollMax = historyIndex - terminalRows + 1;
                             if (scrollMax > 0)
                             {
+                                // 更新滚动条的值
                                 this.scrollMax = scrollMax;
                                 this.scrollValue = scrollMax;
+
                                 logger.DebugFormat("scrollMax = {0}", scrollMax);
                                 this.uiSyncContext.Send((state) =>
                                 {
                                     this.TerminalScreen.UpdateScrollInfo(scrollMax);
                                     this.TerminalScreen.ScrollToEnd(ScrollOrientation.Down);
+
+                                    // 如果当前有选中的内容，那么更新选中的内容
+                                    // 选中的区域往上移动
+                                    if (!this.textSelection.IsEmpty)
+                                    {
+                                        this.textSelection.OffsetY -= this.lastHistoryLine.PreviousLine.Height;
+                                        this.Surface.Arrange(this.textSelection, this.textSelection.OffsetX, this.textSelection.OffsetY);
+                                    }
+
                                 }, null);
                             }
                         }
@@ -1301,6 +1399,8 @@ namespace XTerminal
 
             if (!this.selectionState)
             {
+                // 此时说明开始选中操作
+                logger.ErrorFormat("开始选中操作");
                 this.selectionState = true;
                 this.textSelection.Reset();
             }

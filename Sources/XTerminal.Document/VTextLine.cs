@@ -10,11 +10,26 @@ using XTerminal.Document.Rendering;
 namespace XTerminal.Document
 {
     /// <summary>
-    /// 1. 对文本行进行排版，分块
-    /// 2. 维护行的测量信息
+    /// 存储当前Surface里显示的一行信息
     /// </summary>
     public class VTextLine : VTextElement
     {
+        /// <summary>
+        /// 指定要把行移动到的位置
+        /// </summary>
+        public enum MoveOptions
+        {
+            /// <summary>
+            /// 移动到最后一行
+            /// </summary>
+            MoveToLast,
+
+            /// <summary>
+            /// 移动到第一行
+            /// </summary>
+            MoveToFirst
+        }
+
         #region 实例变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTextLine");
@@ -36,7 +51,7 @@ namespace XTerminal.Document
         /// 行的逻辑索引
         /// 比如界面上一共能显示80行，那么逻辑索引就表示是哪一行
         /// </summary>
-        public int LogicalID { get; set; }
+        public int LogicalRow { get; set; }
 
         public override VTDocumentElements Type => VTDocumentElements.TextLine;
 
@@ -135,6 +150,37 @@ namespace XTerminal.Document
             }
 
             return this.characters[characterIndex];
+        }
+
+        /// <summary>
+        /// 将该节点从VTDocument里移除
+        /// </summary>
+        private void Remove()
+        {
+            VTextLine previous = this.PreviousLine;
+            VTextLine next = this.NextLine;
+
+            if (previous == null)
+            {
+                // 说明是第一行
+                next.PreviousLine = null;
+                this.OwnerDocument.FirstLine = next;
+            }
+            else if (next == null)
+            {
+                // 说明是最后一行
+                previous.NextLine = null;
+                this.OwnerDocument.LastLine = previous;
+            }
+            else
+            {
+                // 说明是中间的行
+                previous.NextLine = next;
+                next.PreviousLine = previous;
+            }
+
+            this.PreviousLine = null;
+            this.NextLine = null;
         }
 
         #endregion
@@ -434,6 +480,39 @@ namespace XTerminal.Document
 
             // 要补齐的字符数
             this.PrintCharacter(VTCharacter.CreateNull(), columns);
+        }
+
+        /// <summary>
+        /// 把该行移动到指定位置
+        /// </summary>
+        /// <param name="options"></param>
+        public void Move(MoveOptions options)
+        {
+            switch (options) 
+            {
+                case MoveOptions.MoveToFirst:
+                    {
+                        this.Remove();
+                        VTextLine firstLine = this.OwnerDocument.FirstLine;
+                        this.OwnerDocument.FirstLine.PreviousLine = this;
+                        this.OwnerDocument.FirstLine = this;
+                        this.NextLine = firstLine;
+                        break;
+                    }
+
+                case MoveOptions.MoveToLast:
+                    {
+                        this.Remove();
+                        VTextLine lastLine = this.OwnerDocument.LastLine;
+                        this.OwnerDocument.LastLine.NextLine = this;
+                        this.OwnerDocument.LastLine = this;
+                        this.PreviousLine = lastLine;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         #endregion

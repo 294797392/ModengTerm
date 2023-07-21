@@ -51,13 +51,18 @@ namespace XTerminal.Document
         /// </summary>
         public void Reset()
         {
+            this.OffsetY = 0;
+            this.OffsetX = 0;
+
             this.Geometry.Clear();
 
             this.Start.CharacterIndex = -1;
             this.Start.PhysicsRow = -1;
+            this.Start.CharacterBounds = VTRect.Empty;
 
             this.End.CharacterIndex = -1;
             this.End.PhysicsRow = -1;
+            this.Start.CharacterBounds = VTRect.Empty;
         }
 
         /// <summary>

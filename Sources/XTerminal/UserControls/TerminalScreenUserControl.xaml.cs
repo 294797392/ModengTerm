@@ -325,7 +325,7 @@ namespace XTerminal.UserControls
         /// <param name="historyLine">要滚动到的历史行</param>
         public void ScrollToHistoryLine(VTHistoryLine historyLine)
         {
-            this.SliderScrolbar.Value = historyLine.Row;
+            this.SliderScrolbar.Value = historyLine.PhysicsRow;
         }
 
         public void ScrollToEnd(ScrollOrientation orientation)

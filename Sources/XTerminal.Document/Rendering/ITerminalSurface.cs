@@ -51,7 +51,7 @@ namespace XTerminal.Document.Rendering
         void Draw(VTDocumentElement drawable);
 
         /// <summary>
-        /// 对元素进行布局
+        /// 对元素进行布局，也就是改变元素在Surface中的位置
         /// 而不用重新画，速度要比DrawDrawable快
         /// 画文本的速度还是比较慢的，因为需要对文本进行排版，耗时都花在排版上面了
         /// 所以能不排版就最好不排版

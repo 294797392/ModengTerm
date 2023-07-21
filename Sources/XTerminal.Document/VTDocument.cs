@@ -88,6 +88,11 @@ namespace XTerminal.Document
         /// </summary>
         public ITerminalSurface Surface { get; private set; }
 
+        /// <summary>
+        /// 是否需要重新布局
+        /// </summary>
+        public bool IsArrangeDirty { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -113,7 +118,7 @@ namespace XTerminal.Document
 
             VTextLine firstLine = new VTextLine(this)
             {
-                LogicalID = 0,
+                LogicalRow = 0,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
@@ -146,7 +151,7 @@ namespace XTerminal.Document
         {
             VTextLine textLine = new VTextLine(this)
             {
-                LogicalID = row,
+                LogicalRow = row,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
@@ -681,11 +686,6 @@ namespace XTerminal.Document
                 this.Cursor.Column = column;
             }
         }
-
-        /// <summary>
-        /// 是否需要重新布局
-        /// </summary>
-        public bool IsArrangeDirty { get; private set; }
 
         /// <summary>
         /// 释放资源

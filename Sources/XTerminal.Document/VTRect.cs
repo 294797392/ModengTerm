@@ -21,6 +21,8 @@ namespace XTerminal.Document
 
     public struct VTRect
     {
+        public static readonly VTRect Empty = new VTRect();
+
         /// <summary>
         /// 左上角X坐标
         /// </summary>
