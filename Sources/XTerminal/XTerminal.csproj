@@ -76,6 +76,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters.cs" />
     <Compile Include="DefaultValues.cs" />
+    <Compile Include="Enumerations\SessionModeEnum.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
@@ -92,9 +93,12 @@
       <DependentUpon>TerminalScreenUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="VideoTerminal.cs" />
+    <Compile Include="ViewModels\CollectionItem\CollectionItemVM.cs" />
+    <Compile Include="ViewModels\CollectionItem\TextItemVM.cs" />
     <Compile Include="ViewModels\GroupVM.cs" />
     <Compile Include="ViewModels\OpenedSessionVM.cs" />
     <Compile Include="ViewModels\OpenSessionVM.cs" />
+    <Compile Include="ViewModels\CollectionVM.cs" />
     <Compile Include="ViewModels\SessionTabItemVM.cs" />
     <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\XTermSessionVM.cs" />

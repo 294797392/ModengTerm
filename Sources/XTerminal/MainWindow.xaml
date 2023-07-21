@@ -6,7 +6,9 @@
         xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
         xmlns:local="clr-namespace:XTerminal"
         mc:Ignorable="d"
-        Title="{DynamicResource ResourceKey=UIText1}" Height="450" Width="800"
+        Title="{DynamicResource ResourceKey=UIText1}"
+        Width="800" Height="600"
+        MinWidth="800" MinHeight="600"
         WindowState="Maximized" Loaded="Window_Loaded">
 
     <Window.Resources>
@@ -45,12 +47,12 @@
                     <TextBlock Text="+" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16"/>
                 </Grid>
             </DataTemplate>
-            
+
             <Style x:Key="StyleMenuItemLocal" TargetType="{x:Type MenuItem}">
-                <Setter Property="Height" Value="30"/>
-                <Setter Property="Width" Value="60"/>
+                <Setter Property="Height" Value="25"/>
+                <Setter Property="Width" Value="50"/>
             </Style>
-            
+
         </ResourceDictionary>
     </Window.Resources>
 
@@ -62,18 +64,22 @@
         </Grid.RowDefinitions>
 
         <!-- 菜单 -->
-        <Menu Grid.Row="0">
+        <Border Grid.Row="0" Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
+                BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}" BorderThickness="0,0,0,1">
+            <Menu Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0"
+                  VerticalContentAlignment="Center" VerticalAlignment="Center">
 
-            <MenuItem Header="文件" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
-                <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
-            </MenuItem>
+                <MenuItem Header="文件" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
+                    <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
+                </MenuItem>
 
-            <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                <MenuItem Header="关于XTerminal" Click="MenuItemAbout_Click"/>
-            </MenuItem>
+                <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem Header="关于XTerminal" Click="MenuItemAbout_Click"/>
+                </MenuItem>
 
-        </Menu>
+            </Menu>
+        </Border>
 
         <!-- 终端显示区域 -->
         <Grid Grid.Row="1">
@@ -100,7 +106,9 @@
 
         <!-- 状态栏 -->
         <Grid Grid.Row="2" x:Name="GridStatusbar">
-            
+            <Border Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
+                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
+                    BorderThickness="0,1,0,0"/>
         </Grid>
 
     </Grid>

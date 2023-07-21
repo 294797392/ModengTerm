@@ -11,4 +11,7 @@
     <SolidColorBrush x:Key="BrushTermTabFocusedForeground" Color="White"/>
     <SolidColorBrush x:Key="BrushTermTabBorder" Color="Black"/>
 
+    <SolidColorBrush x:Key="BrushStatusBarBackground" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="BrushStatsuBarBorder" Color="Silver"/>
+
 </ResourceDictionary>
