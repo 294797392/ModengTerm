@@ -172,6 +172,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 设置指定位置处的字符
+        /// 该方法不会移动光标，单纯的设置某个列的字符
         /// </summary>
         /// <param name="character">要插入的字符</param>
         /// <param name="column">索引位置，在此处插入字符串</param>
@@ -418,6 +419,21 @@ namespace XTerminal.Document
             this.characters.AddRange(historyLine.Characters);
 
             this.SetRenderDirty(true);
+        }
+
+        /// <summary>
+        /// 如果该行的列不足n个，那么补齐空字符直到有n列
+        /// </summary>
+        /// <param name="columns">要补齐到的列数</param>
+        public void PadColumns(int columns)
+        {
+            if (this.Columns >= columns)
+            {
+                return;
+            }
+
+            // 要补齐的字符数
+            this.PrintCharacter(VTCharacter.CreateNull(), columns);
         }
 
         #endregion

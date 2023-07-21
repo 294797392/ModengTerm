@@ -902,6 +902,7 @@ namespace XTerminal
 
                 // 下面的光标移动指令不能进行VTDocument的滚动
                 // 光标的移动坐标是相对于可视区域内的坐标
+                // 服务器发送过来的光标原点是从(1,1)开始的，我们程序里的是(0,0)开始的，所以要减1
 
                 case VTActions.BS:
                     {
@@ -961,6 +962,23 @@ namespace XTerminal
 
                         logger.DebugFormat("CUP_CursorPosition, row = {0}, col = {1}", row, col);
                         this.activeDocument.SetCursor(row, col);
+                        break;
+                    }
+
+                case VTActions.CHA_CursorHorizontalAbsolute:
+                    {
+                        List<int> parameters = parameter as List<int>;
+
+                        // 将光标移动到当前行中的第n列
+                        int n = VTParameter.GetParameter(parameters, 0, -1);
+                        if (n == -1)
+                        {
+                            logger.ErrorFormat("CHA_CursorHorizontalAbsolute失败");
+                            return;
+                        }
+
+                        this.ActiveLine.PadColumns(n - 1);
+                        this.activeDocument.SetCursor(this.CursorRow, n);
                         break;
                     }
 

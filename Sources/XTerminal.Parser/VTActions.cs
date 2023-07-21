@@ -146,6 +146,11 @@ namespace XTerminal.Parser
         /// </summary>
         CUD_CursorDown,
         /// <summary>
+        /// 把光标移动到水平方向的一个绝对位置上（注意不是相对位置，而是绝对位置）
+        /// </summary>
+        CHA_CursorHorizontalAbsolute,
+
+        /// <summary>
         /// 退格
         /// </summary>
         BS,

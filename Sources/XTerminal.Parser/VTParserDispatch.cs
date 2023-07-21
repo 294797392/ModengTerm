@@ -321,6 +321,12 @@ namespace XTerminal.Parser
                         break;
                     }
 
+                case CSIActionCodes.CHA_CursorHorizontalAbsolute:
+                    {
+                        this.NotifyActionEvent(VTActions.CHA_CursorHorizontalAbsolute, parameters);
+                        break;
+                    }
+
                 default:
                     logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                     throw new NotImplementedException();
