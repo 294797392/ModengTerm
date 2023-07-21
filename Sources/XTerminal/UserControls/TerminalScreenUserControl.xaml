@@ -13,7 +13,10 @@
             <ColumnDefinition Width="30"/>
         </Grid.ColumnDefinitions>
 
-        <ContentControl Grid.Row="0" x:Name="ContentControlSurface">
+        <ContentControl Grid.Row="0" x:Name="ContentControlSurface"
+                        PreviewMouseLeftButtonDown="ContentControlSurface_PreviewMouseLeftButtonDown"
+                        PreviewMouseMove="ContentControlSurface_PreviewMouseMove"
+                        PreviewMouseLeftButtonUp="ContentControlSurface_PreviewMouseLeftButtonUp">
             <ContentControl.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="复制" Click="MenuItemCopy_Click"/>

@@ -226,38 +226,11 @@ namespace XTerminal.UserControls
         }
 
 
-        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+        private void SliderScrolbar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            base.OnPreviewMouseDown(e);
-
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                Point p = e.GetPosition(this);
-                this.VTMouseDown(this, new VTPoint(p.X, p.Y));
-                this.CaptureMouse();
-            }
+            this.cursorDown = true;
+            this.scrollbarCursorDownValue = Convert.ToInt32(SliderScrolbar.Value);
         }
-
-        protected override void OnPreviewMouseMove(MouseEventArgs e)
-        {
-            base.OnPreviewMouseMove(e);
-
-            Point p = e.GetPosition(this);
-            this.VTMouseMove(this, new VTPoint(p.X, p.Y));
-        }
-
-        protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
-        {
-            base.OnPreviewMouseUp(e);
-
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                Point p = e.GetPosition(this);
-                this.VTMouseUp(this, new VTPoint(p.X, p.Y));
-                this.ReleaseMouseCapture();
-            }
-        }
-
 
         private void SliderScrolbar_PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -270,10 +243,28 @@ namespace XTerminal.UserControls
             this.cursorDown = false;
         }
 
-        private void SliderScrolbar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+
+        private void ContentControlSurface_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            this.cursorDown = true;
-            this.scrollbarCursorDownValue = Convert.ToInt32(SliderScrolbar.Value);
+            ContentControlSurface.CaptureMouse();
+            Point p = e.GetPosition(this);
+            this.VTMouseDown(this, new VTPoint(p.X, p.Y));
+        }
+
+        private void ContentControlSurface_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (ContentControlSurface.IsMouseCaptured)
+            {
+                Point p = e.GetPosition(this);
+                this.VTMouseMove(this, new VTPoint(p.X, p.Y));
+            }
+        }
+
+        private void ContentControlSurface_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Point p = e.GetPosition(this);
+            this.VTMouseUp(this, new VTPoint(p.X, p.Y));
+            ContentControlSurface.ReleaseMouseCapture();
         }
 
 

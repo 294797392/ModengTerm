@@ -644,6 +644,7 @@ namespace XTerminal
 
             if (scrollTarget != -1)
             {
+                logger.ErrorFormat("ScrollToHistory");
                 this.ScrollToHistory(scrollTarget);
             }
 
