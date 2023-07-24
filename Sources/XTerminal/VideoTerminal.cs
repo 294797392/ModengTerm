@@ -7,6 +7,7 @@ using System.Threading;
 using System.Windows;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.DataModels.Session;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
@@ -59,7 +60,7 @@ namespace XTerminal
         /// <summary>
         /// 与终端进行通信的信道
         /// </summary>
-        private SessionTransport session;
+        private SessionTransport sessionTransport;
 
         /// <summary>
         /// 终端字符解析器
@@ -86,7 +87,8 @@ namespace XTerminal
         /// </summary>
         private SynchronizationContext uiSyncContext;
 
-        private XTermSession initialOptions;
+        private XTermSession sessionInfo;
+        private MouseOptions mouseOptions;
 
         /// <summary>
         /// DECAWM是否启用
@@ -255,15 +257,16 @@ namespace XTerminal
         /// <summary>
         /// 初始化终端模拟器
         /// </summary>
-        /// <param name="options"></param>
-        public void Initialize(XTermSession options)
+        /// <param name="sessionInfo"></param>
+        public void Initialize(XTermSession sessionInfo)
         {
-            this.initialOptions = options;
-            this.inputEncoding = Encoding.GetEncoding(options.InputEncoding);
+            this.sessionInfo = sessionInfo;
+            this.mouseOptions = sessionInfo.MouseOptions;
+            this.inputEncoding = Encoding.GetEncoding(sessionInfo.InputEncoding);
             this.uiSyncContext = SynchronizationContext.Current;
 
             // DECAWM
-            this.autoWrapMode = options.TerminalProperties.DECPrivateAutoWrapMode;
+            this.autoWrapMode = sessionInfo.TerminalOptions.DECPrivateAutoWrapMode;
 
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
@@ -275,7 +278,7 @@ namespace XTerminal
             #region 初始化键盘
 
             this.Keyboard = new VTKeyboard();
-            this.Keyboard.Encoding = Encoding.GetEncoding(options.InputEncoding);
+            this.Keyboard.Encoding = Encoding.GetEncoding(sessionInfo.InputEncoding);
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
 
@@ -296,6 +299,7 @@ namespace XTerminal
             this.TerminalScreen.VTMouseDown += this.TerminalScreen_VTMouseDown;
             this.TerminalScreen.VTMouseMove += this.TerminalScreen_VTMouseMove;
             this.TerminalScreen.VTMouseUp += this.TerminalScreen_VTMouseUp;
+            this.TerminalScreen.VTMouseWheel += this.TerminalScreen_VTMouseWheel;
 
             #endregion
 
@@ -303,11 +307,11 @@ namespace XTerminal
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                ColumnSize = initialOptions.TerminalProperties.Columns,
-                RowSize = initialOptions.TerminalProperties.Rows,
-                DECPrivateAutoWrapMode = initialOptions.TerminalProperties.DECPrivateAutoWrapMode,
-                CursorStyle = initialOptions.CursorOption.Style,
-                Interval = initialOptions.CursorOption.Interval,
+                ColumnSize = this.sessionInfo.TerminalOptions.Columns,
+                RowSize = this.sessionInfo.TerminalOptions.Rows,
+                DECPrivateAutoWrapMode = this.sessionInfo.TerminalOptions.DECPrivateAutoWrapMode,
+                CursorStyle = this.sessionInfo.MouseOptions.CursorStyle,
+                Interval = this.sessionInfo.MouseOptions.CursorInterval,
                 CanvasCreator = this.TerminalScreen
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
@@ -336,9 +340,9 @@ namespace XTerminal
             SessionTransport transport = new SessionTransport();
             transport.StatusChanged += this.VTSession_StatusChanged;
             transport.DataReceived += this.VTSession_DataReceived;
-            transport.Initialize(options);
+            transport.Initialize(sessionInfo);
             transport.Open();
-            this.session = transport;
+            this.sessionTransport = transport;
 
             #endregion
         }
@@ -358,13 +362,14 @@ namespace XTerminal
             this.TerminalScreen.VTMouseDown -= this.TerminalScreen_VTMouseDown;
             this.TerminalScreen.VTMouseMove -= this.TerminalScreen_VTMouseMove;
             this.TerminalScreen.VTMouseUp -= this.TerminalScreen_VTMouseUp;
+            this.TerminalScreen.VTMouseWheel -= this.TerminalScreen_VTMouseWheel;
 
             this.cursorBlinkingThread.Join();
 
-            this.session.StatusChanged -= this.VTSession_StatusChanged;
-            this.session.DataReceived -= this.VTSession_DataReceived;
-            this.session.Close();
-            this.session.Release();
+            this.sessionTransport.StatusChanged -= this.VTSession_StatusChanged;
+            this.sessionTransport.DataReceived -= this.VTSession_DataReceived;
+            this.sessionTransport.Close();
+            this.sessionTransport.Release();
 
             this.mainDocument.Dispose();
             this.alternateDocument.Dispose();
@@ -404,7 +409,7 @@ namespace XTerminal
 
             byte[] bytes = this.inputEncoding.GetBytes(text);
 
-            int code = this.session.Write(bytes);
+            int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("粘贴数据失败, {0}", code);
@@ -464,7 +469,7 @@ namespace XTerminal
                 case StatusType.OS_OperatingStatus:
                     {
                         // Result ("OK") is CSI 0 n
-                        this.session.Write(OS_OperationStatusResponse);
+                        this.sessionTransport.Write(OS_OperationStatusResponse);
                         break;
                     }
 
@@ -475,7 +480,7 @@ namespace XTerminal
                         int cursorCol = this.CursorCol;
                         CPR_CursorPositionReportResponse[2] = (byte)cursorRow;
                         CPR_CursorPositionReportResponse[4] = (byte)cursorCol;
-                        this.session.Write(CPR_CursorPositionReportResponse);
+                        this.sessionTransport.Write(CPR_CursorPositionReportResponse);
                         break;
                     }
 
@@ -527,7 +532,7 @@ namespace XTerminal
                     // 更新行偏移量
                     if (arrangeDirty)
                     {
-                        this.Surface.Arrange(next, next.OffsetX, next.OffsetY);
+                        this.Surface.Arrange(next);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -548,7 +553,7 @@ namespace XTerminal
 
                 this.Cursor.OffsetY = this.ActiveLine.OffsetY;
                 this.Cursor.OffsetX = this.Surface.MeasureBlock(this.ActiveLine, this.ActiveLine.FindCharacterIndex(this.CursorCol)).Width;
-                this.Surface.Arrange(this.Cursor, this.Cursor.OffsetX, this.Cursor.OffsetY);
+                this.Surface.Arrange(this.Cursor);
 
                 #endregion
 
@@ -565,7 +570,7 @@ namespace XTerminal
 
                 if (arrangeSelectionArea)
                 {
-                    this.Surface.Arrange(this.textSelection, this.textSelection.OffsetX, this.textSelection.OffsetY);
+                    this.Surface.Arrange(this.textSelection);
                 }
 
                 #endregion
@@ -601,7 +606,7 @@ namespace XTerminal
             this.scrollValue = scrollValue;
 
             // 终端可以显示的总行数
-            int terminalRows = this.initialOptions.TerminalProperties.Rows;
+            int terminalRows = this.sessionInfo.TerminalOptions.Rows;
 
             // 被滚动的行数
             int scrolledRows = Math.Abs(newScroll - oldScroll);
@@ -851,7 +856,7 @@ namespace XTerminal
             }
 
             // 这里输入的都是键盘按键
-            int code = this.session.Write(bytes);
+            int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
@@ -936,7 +941,7 @@ namespace XTerminal
                             this.lastHistoryLine = historyLine;
 
                             // 滚动条滚动到底
-                            int terminalRows = this.initialOptions.TerminalProperties.Rows;
+                            int terminalRows = this.sessionInfo.TerminalOptions.Rows;
                             // 计算滚动条可以滚动的最大值
                             int scrollMax = historyIndex - terminalRows + 1;
                             if (scrollMax > 0)
@@ -956,7 +961,7 @@ namespace XTerminal
                                     if (!this.textSelection.IsEmpty)
                                     {
                                         this.textSelection.OffsetY -= this.lastHistoryLine.PreviousLine.Height;
-                                        this.Surface.Arrange(this.textSelection, this.textSelection.OffsetX, this.textSelection.OffsetY);
+                                        this.Surface.Arrange(this.textSelection);
                                     }
 
                                 }, null);
@@ -1234,7 +1239,7 @@ namespace XTerminal
                 case VTActions.DA_DeviceAttributes:
                     {
                         logger.DebugFormat("DA_DeviceAttributes");
-                        this.session.Write(DA_DeviceAttributesResponse);
+                        this.sessionTransport.Write(DA_DeviceAttributesResponse);
                         break;
                     }
 
@@ -1257,7 +1262,7 @@ namespace XTerminal
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = this.initialOptions.TerminalProperties.Rows;
+                        int lines = this.sessionInfo.TerminalOptions.Rows;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
@@ -1401,9 +1406,9 @@ namespace XTerminal
             if (!this.selectionState)
             {
                 // 此时说明开始选中操作
-                logger.ErrorFormat("开始选中操作");
                 this.selectionState = true;
                 this.textSelection.Reset();
+                this.Surface.Arrange(this.textSelection);
             }
 
             // 如果还没有测量起始字符，那么测量起始字符
@@ -1460,6 +1465,54 @@ namespace XTerminal
         {
             this.isMouseDown = false;
             this.selectionState = false;
+        }
+
+        private void TerminalScreen_VTMouseWheel(ITerminalScreen screen, bool upper)
+        {
+            if (upper)
+            {
+                // 向上滚动
+
+                // 先判断是不是已经滚动到顶了
+                if (this.ScrollAtTop)
+                {
+                    // 滚动到顶直接返回
+                    return;
+                }
+
+                if (this.scrollValue < this.mouseOptions.ScrollDelta)
+                {
+                    // 一次可以全部滚完并且还有剩余
+                    this.ScrollToHistory(0);
+                }
+                else
+                {
+                    this.ScrollToHistory(this.scrollValue - this.mouseOptions.ScrollDelta);
+                }
+            }
+            else
+            {
+                // 向下滚动
+
+                if (this.ScrollAtBottom)
+                {
+                    // 滚动到底直接返回
+                    return;
+                }
+
+                // 剩余可以往下滚动的行数
+                int remainScroll = this.scrollMax - this.scrollValue;
+
+                if (remainScroll >= this.mouseOptions.ScrollDelta)
+                {
+                    this.ScrollToHistory(this.scrollValue + this.mouseOptions.ScrollDelta);
+                }
+                else
+                {
+                    // 直接滚动到底
+                    this.ScrollToHistory(this.scrollMax);
+                }
+            }
         }
 
         #endregion

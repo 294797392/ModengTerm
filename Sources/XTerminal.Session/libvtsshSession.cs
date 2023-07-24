@@ -36,8 +36,8 @@ namespace XTerminal.Session
             this.statusChangedDlg = new libvt.vtssh_status_changed_callback(this.StatusChangedCallback);
             this.dataReceivedDlg = new libvt.vtssh_data_received_callback(this.DataReceivedCallback);
 
-            SessionProperties sessionProperty = this.options.SessionProperties;
-            TerminalProperties terminalProperties = this.options.TerminalProperties;
+            ConnectionOptions sessionProperty = this.options.ConnectionOptions;
+            TerminalOptions terminalProperties = this.options.TerminalOptions;
 
             libvt.vtssh_options vtssh_Options = new libvt.vtssh_options()
             {

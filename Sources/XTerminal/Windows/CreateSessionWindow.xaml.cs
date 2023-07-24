@@ -70,7 +70,7 @@ namespace XTerminal.Windows
             // 初始化SSH验证方式列表
             ComboBoxAuthList.ItemsSource = Enum.GetValues(typeof(SSHAuthTypeEnum));
             ComboBoxAuthList.SelectedIndex = 0;
-            TextBoxSSHPort.Text = XTermConsts.DefaultSSHPort.ToString();
+            TextBoxSSHPort.Text = XTermDefaultValues.DefaultSSHPort.ToString();
 
             // 初始化会话类型列表
             this.sessionTypeList = new BindableCollection<SessionTypeVM>();
@@ -83,7 +83,7 @@ namespace XTerminal.Windows
             ComboBoxSessionTypes.SelectedIndex = 0;
 
             // 串口波特率列表
-            ComboBoxSerialPortBaudRate.ItemsSource = XTermConsts.DefaultSerialPortBaudRates;
+            ComboBoxSerialPortBaudRate.ItemsSource = XTermDefaultValues.DefaultSerialPortBaudRates;
         }
 
         private void CollapsedAllGrid()
@@ -198,19 +198,20 @@ namespace XTerminal.Windows
                 ID = Guid.NewGuid().ToString(),
                 Name = TextBoxSessionName.Text,
                 CreationTime = DateTime.Now,
-                TerminalProperties = new TerminalProperties()
+                TerminalOptions = new TerminalOptions()
                 {
                     Rows = row,
                     Columns = column,
                     Type = (int)TerminalTypeEnum.VT100
                 },
                 SessionType = (int)sessionType.Type,
-                InputEncoding = XTermConsts.DefaultInputEncoding,
-                OutputBufferSize = XTermConsts.DefaultOutptBufferSize,
-                CursorOption = new CursorOptions() 
+                InputEncoding = XTermDefaultValues.DefaultInputEncoding,
+                OutputBufferSize = XTermDefaultValues.DefaultOutptBufferSize,
+                MouseOptions = new MouseOptions() 
                 {
-                    Style = VTCursorStyles.Line,
-                    Interval = XTermConsts.DefaultCursorBlinkInterval
+                    CursorStyle = VTCursorStyles.Line,
+                    CursorInterval = XTermDefaultValues.DefaultCursorBlinkInterval,
+                    ScrollDelta = XTermDefaultValues.DefaultScrollSensitivity
                 }
             };
 
@@ -227,7 +228,7 @@ namespace XTerminal.Windows
 
                         int port;
                         if (!int.TryParse(TextBoxSSHPort.Text, out port) ||
-                            port < XTermConsts.MIN_PORT || port > XTermConsts.MAX_PORT)
+                            port < XTermDefaultValues.MIN_PORT || port > XTermDefaultValues.MAX_PORT)
                         {
                             MessageBoxUtils.Info("请输入正确的端口号");
                             return;
@@ -273,7 +274,7 @@ namespace XTerminal.Windows
                                 throw new NotImplementedException();
                         }
 
-                        session.SessionProperties = new SessionProperties()
+                        session.ConnectionOptions = new ConnectionOptions()
                         {
                             SSHAuthType = (int)authType,
                             ServerAddress = hostName,
@@ -301,7 +302,7 @@ namespace XTerminal.Windows
                             return;
                         }
 
-                        session.SessionProperties = new SessionProperties()
+                        session.ConnectionOptions = new ConnectionOptions()
                         {
                             ServerAddress = portName,
                             BaudRate = baudRate

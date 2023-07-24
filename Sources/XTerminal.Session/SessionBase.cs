@@ -45,12 +45,12 @@ namespace XTerminal.Session
         /// <summary>
         /// 终端可以显示的行数
         /// </summary>
-        public int Rows { get { return this.options.TerminalProperties.Rows; } }
+        public int Rows { get { return this.options.TerminalOptions.Rows; } }
 
         /// <summary>
         /// 终端可以显示的列数
         /// </summary>
-        public int Columns { get { return this.options.TerminalProperties.Columns; } }
+        public int Columns { get { return this.options.TerminalOptions.Columns; } }
 
         /// <summary>
         /// 通道类型

@@ -23,7 +23,7 @@ namespace XTerminal.Session
 
         private SshClient sshClient;
         private ShellStream stream;
-        private SessionProperties sessionProperties;
+        private ConnectionOptions sessionProperties;
 
         #endregion
 
@@ -48,7 +48,7 @@ namespace XTerminal.Session
 
         public override int Open()
         {
-            this.sessionProperties = this.options.SessionProperties;
+            this.sessionProperties = this.options.ConnectionOptions;
             var authentications = new List<AuthenticationMethod>();
             if (!string.IsNullOrEmpty(this.sessionProperties.KeyFilePath))
             {
@@ -65,8 +65,8 @@ namespace XTerminal.Session
             //terminalModeValues[TerminalModes.ECHOCTL] = 1;
             //terminalModeValues[TerminalModes.IEXTEN] = 1;
 
-            TerminalProperties terminalOptions = this.options.TerminalProperties;
-            this.stream = this.sshClient.CreateShellStream(this.options.TerminalProperties.GetTerminalName(), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.OutputBufferSize, terminalModeValues);
+            TerminalOptions terminalOptions = this.options.TerminalOptions;
+            this.stream = this.sshClient.CreateShellStream(this.options.TerminalOptions.GetTerminalName(), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.OutputBufferSize, terminalModeValues);
 
             return ResponseCode.SUCCESS;
         }

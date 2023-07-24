@@ -19,7 +19,7 @@ namespace XTerminal.Base.DataModels.Session
     /// <summary>
     /// 保存终端的配置信息
     /// </summary>
-    public class TerminalProperties
+    public class TerminalOptions
     {
         /// <summary>
         /// 终端类型

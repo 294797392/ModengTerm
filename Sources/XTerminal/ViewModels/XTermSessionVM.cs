@@ -114,11 +114,11 @@ namespace XTerminal.ViewModels
             this.Description = session.Description;
             this.CreationTime = session.CreationTime;
             this.Type = (SessionTypeEnum)session.SessionType;
-            this.AuthType = session.SessionProperties.SSHAuthType;
-            this.Host = session.SessionProperties.ServerAddress;
-            this.Port = session.SessionProperties.ServerPort;
-            this.UserName = session.SessionProperties.UserName;
-            this.Password = session.SessionProperties.Password;
+            this.AuthType = session.ConnectionOptions.SSHAuthType;
+            this.Host = session.ConnectionOptions.ServerAddress;
+            this.Port = session.ConnectionOptions.ServerPort;
+            this.UserName = session.ConnectionOptions.UserName;
+            this.Password = session.ConnectionOptions.Password;
         }
     }
 }

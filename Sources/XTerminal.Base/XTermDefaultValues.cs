@@ -9,7 +9,10 @@ using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base
 {
-    public static class XTermConsts
+    /// <summary>
+    /// XTerminal使用的默认值
+    /// </summary>
+    public static class XTermDefaultValues
     {
         public const int MIN_PORT = 1;
         public const int MAX_PORT = 65535;
@@ -35,21 +38,21 @@ namespace XTerminal.Base
             ID = Guid.Empty.ToString(),
             Name = "命令行",
             SessionType = (int)SessionTypeEnum.Win32CommandLine,
-            CursorOption = new CursorOptions()
+            MouseOptions = new MouseOptions()
             {
-                Style = VTCursorStyles.Line,
-                Interval = XTermConsts.DefaultCursorBlinkInterval
+                CursorStyle = VTCursorStyles.Line,
+                CursorInterval = XTermDefaultValues.DefaultCursorBlinkInterval
             },
-            OutputBufferSize = XTermConsts.DefaultOutptBufferSize,
-            InputEncoding = XTermConsts.DefaultInputEncoding,
-            TerminalProperties = new TerminalProperties()
+            OutputBufferSize = XTermDefaultValues.DefaultOutptBufferSize,
+            InputEncoding = XTermDefaultValues.DefaultInputEncoding,
+            TerminalOptions = new TerminalOptions()
             {
                 DECPrivateAutoWrapMode = false,
-                Columns = XTermConsts.DefaultTerminalColumns,
-                Rows = XTermConsts.DefaultTerminalRows,
+                Columns = XTermDefaultValues.DefaultTerminalColumns,
+                Rows = XTermDefaultValues.DefaultTerminalRows,
                 Type = (int)TerminalTypeEnum.VT100
             },
-            SessionProperties = new SessionProperties()
+            ConnectionOptions = new ConnectionOptions()
         };
 
         /// <summary>
@@ -86,5 +89,10 @@ namespace XTerminal.Base
         /// 默认的光标闪烁间隔时间是500毫秒
         /// </summary>
         public const int DefaultCursorBlinkInterval = 500;
+
+        /// <summary>
+        /// 滚轮滚动一下翻两行
+        /// </summary>
+        public const int DefaultScrollSensitivity = 2;
     }
 }

@@ -52,6 +52,8 @@ namespace XTerminal.UserControls
         /// </summary>
         public event Action<ITerminalScreen, VTPoint> VTMouseUp;
 
+        public event Action<ITerminalScreen, bool> VTMouseWheel;
+
         #endregion
 
         #region 实例变量
@@ -214,6 +216,13 @@ namespace XTerminal.UserControls
             this.Focus();
         }
 
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            base.OnMouseWheel(e);
+
+            this.VTMouseWheel(this, e.Delta > 0);
+        }
+
         /// <summary>
         /// 重写了这个事件后，就会触发鼠标相关的事件
         /// </summary>
@@ -316,16 +325,6 @@ namespace XTerminal.UserControls
         public void UpdateScrollInfo(int maximum)
         {
             this.SliderScrolbar.Maximum = maximum;
-        }
-
-        /// <summary>
-        /// 滚动到某一个历史行
-        /// 默认把历史行设置为滚动之后的窗口中的第一行
-        /// </summary>
-        /// <param name="historyLine">要滚动到的历史行</param>
-        public void ScrollToHistoryLine(VTHistoryLine historyLine)
-        {
-            this.SliderScrolbar.Value = historyLine.PhysicsRow;
         }
 
         public void ScrollToEnd(ScrollOrientation orientation)

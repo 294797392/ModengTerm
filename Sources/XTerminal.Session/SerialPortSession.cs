@@ -37,7 +37,7 @@ namespace XTerminal.Session
 
         public override int Open()
         {
-            SessionProperties sessionProperties = this.options.SessionProperties;
+            ConnectionOptions sessionProperties = this.options.ConnectionOptions;
 
             string portName = sessionProperties.ServerAddress;
 

@@ -8,8 +8,8 @@ using XTerminal.Base;
 namespace XTerminal.Document.Rendering
 {
     /// <summary>
-    /// 表示画板容器
-    /// 容器里可以包含多个画图，并对画面进行管理
+    /// 终端显示屏
+    /// 显示屏里包含多个Surface，Surface用来真正渲染终端输出
     /// </summary>
     public interface ITerminalScreen
     {
@@ -45,6 +45,12 @@ namespace XTerminal.Document.Rendering
         event Action<ITerminalScreen, VTPoint> VTMouseUp;
 
         /// <summary>
+        /// 鼠标滚轮滚动的时候触发
+        /// 如果向上滚动则为true，否则为false
+        /// </summary>
+        event Action<ITerminalScreen, bool> VTMouseWheel;
+
+        /// <summary>
         /// 创建一个画板
         /// </summary>
         /// <returns></returns>
@@ -64,17 +70,10 @@ namespace XTerminal.Document.Rendering
         void AddSurface(ITerminalSurface canvas);
 
         /// <summary>
-        /// 更新滚动信息
+        /// 更新滚动条的信息
         /// </summary>
         /// <param name="maximum">滚动条的最大值</param>
         void UpdateScrollInfo(int maximum);
-
-        /// <summary>
-        /// 滚动到某一个历史行
-        /// 默认把历史行设置为滚动之后的窗口中的第一行
-        /// </summary>
-        /// <param name="historyLine">要滚动到的历史行</param>
-        void ScrollToHistoryLine(VTHistoryLine historyLine);
 
         /// <summary>
         /// 把滚动条滚动到底

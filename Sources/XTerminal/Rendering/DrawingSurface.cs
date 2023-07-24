@@ -167,10 +167,10 @@ namespace XTerminal.Rendering
             drawable.SetRenderDirty(false);
         }
 
-        public void Arrange(VTDocumentElement drawable, double offsetX, double offsetY)
+        public void Arrange(VTDocumentElement drawable)
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
-            drawingObject.Offset = new Vector(offsetX, offsetY);
+            drawingObject.Offset = new Vector(drawable.OffsetX, drawable.OffsetY);
         }
 
         public void SetOpacity(VTDocumentElement drawable, double opacity)

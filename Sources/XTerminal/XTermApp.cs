@@ -122,7 +122,7 @@ namespace XTerminal
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
             if (firstOpenedSession == null)
             {
-                this.OpenSession(XTermConsts.DefaultSession, new TerminalScreenUserControl());
+                this.OpenSession(XTermDefaultValues.DefaultSession, new TerminalScreenUserControl());
             }
             else
             {

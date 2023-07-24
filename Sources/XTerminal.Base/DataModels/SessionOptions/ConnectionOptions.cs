@@ -10,7 +10,10 @@ using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base.DataModels.Session
 {
-    public class SessionProperties
+    /// <summary>
+    /// 连接会话的信息
+    /// </summary>
+    public class ConnectionOptions
     {
         [JsonProperty("keyFilePath")]
         public string KeyFilePath { get; set; }

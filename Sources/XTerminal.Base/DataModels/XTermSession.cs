@@ -33,7 +33,7 @@ namespace XTerminal.Base.DataModels
         /// 终端设置
         /// </summary>
         [JsonProperty("terminalOptions")]
-        public TerminalProperties TerminalProperties { get; set; }
+        public TerminalOptions TerminalOptions { get; set; }
 
         /// <summary>
         /// 要连接的会话类型
@@ -46,19 +46,19 @@ namespace XTerminal.Base.DataModels
         /// 会话详细信息
         /// </summary>
         [JsonProperty("authOptions")]
-        public SessionProperties SessionProperties { get; set; }
+        public ConnectionOptions ConnectionOptions { get; set; }
 
         /// <summary>
         /// 光标信息
         /// </summary>
         [JsonProperty("cursorOptions")]
-        public CursorOptions CursorOption { get; set; }
+        public MouseOptions MouseOptions { get; set; }
 
         public XTermSession()
         {
-            this.SessionProperties = new SessionProperties();
-            this.CursorOption = new CursorOptions();
-            this.TerminalProperties = new TerminalProperties();
+            this.ConnectionOptions = new ConnectionOptions();
+            this.MouseOptions = new MouseOptions();
+            this.TerminalOptions = new TerminalOptions();
         }
     }
 }

@@ -91,13 +91,37 @@ namespace XTerminal
             int code = XTermApp.Context.ServiceAgent.AddSession(session);
             if (code != ResponseCode.SUCCESS)
             {
-                MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
+                MessageBoxUtils.Error("新建会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
                 return;
             }
 
             this.SelectedSession = session;
 
             base.DialogResult = true;
+        }
+
+        private void ButtonDeleteSession_Click(object sender, RoutedEventArgs e)
+        {
+            XTermSessionVM selectedSession = DataGridSessionList.SelectedItem as XTermSessionVM;
+            if (selectedSession == null)
+            {
+                return;
+            }
+
+            if (!MessageBoxUtils.Confirm("确定要删除{0}吗", selectedSession.Name))
+            {
+                return;
+            }
+
+            int code = XTermApp.Context.ServiceAgent.DeleteSession(selectedSession.ID.ToString());
+            if (code != ResponseCode.SUCCESS)
+            {
+                MessageBoxUtils.Error("删除会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
+                return;
+            }
+
+            BindableCollection<XTermSessionVM> sessionVMs = DataGridSessionList.DataContext as BindableCollection<XTermSessionVM>;
+            sessionVMs.Remove(selectedSession);
         }
 
         private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)

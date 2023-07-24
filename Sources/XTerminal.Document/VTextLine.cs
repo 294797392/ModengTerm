@@ -484,6 +484,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 把该行移动到指定位置
+        /// 不考虑ScrollMargin
         /// </summary>
         /// <param name="options"></param>
         public void Move(MoveOptions options)

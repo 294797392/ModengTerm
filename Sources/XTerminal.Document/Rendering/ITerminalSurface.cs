@@ -51,15 +51,13 @@ namespace XTerminal.Document.Rendering
         void Draw(VTDocumentElement drawable);
 
         /// <summary>
-        /// 对元素进行布局，也就是改变元素在Surface中的位置
-        /// 而不用重新画，速度要比DrawDrawable快
+        /// 根据元素的OffsetX和OffsetY属性，设置元素在Surface中的位置
+        /// 而不用重新画，速度要比Draw快
         /// 画文本的速度还是比较慢的，因为需要对文本进行排版，耗时都花在排版上面了
         /// 所以能不排版就最好不排版
         /// </summary>
         /// <param name="drawable"></param>
-        /// <param name="offsetX"></param>
-        /// <param name="offsetY"></param>
-        void Arrange(VTDocumentElement drawable, double offsetX, double offsetY);
+        void Arrange(VTDocumentElement drawable);
 
         /// <summary>
         /// 设置元素的透明度

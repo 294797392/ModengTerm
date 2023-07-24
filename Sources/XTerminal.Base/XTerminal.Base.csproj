@@ -57,10 +57,10 @@
     <Compile Include="ASCIITable.cs" />
     <Compile Include="DataModels\FixedText.cs" />
     <Compile Include="DataModels\GroupDM.cs" />
-    <Compile Include="DataModels\Session\CursorProperties.cs" />
-    <Compile Include="DataModels\Session\SessionProperties.cs" />
+    <Compile Include="DataModels\SessionOptions\MouseOptions.cs" />
+    <Compile Include="DataModels\SessionOptions\ConnectionOptions.cs" />
     <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
-    <Compile Include="DataModels\Session\TerminalProperties.cs" />
+    <Compile Include="DataModels\SessionOptions\TerminalOptions.cs" />
     <Compile Include="DataModels\XTermSession.cs" />
     <Compile Include="Definitions\SessionDefinition.cs" />
     <Compile Include="Enumerations\SessionTypeEnum.cs" />
@@ -72,7 +72,7 @@
     <Compile Include="VTKeyboard.cs" />
     <Compile Include="VTKeys.cs" />
     <Compile Include="VTModifierKeys.cs" />
-    <Compile Include="XTermConsts.cs" />
+    <Compile Include="XTermDefaultValues.cs" />
     <Compile Include="XTermUtils.cs" />
   </ItemGroup>
   <ItemGroup />

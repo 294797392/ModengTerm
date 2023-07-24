@@ -43,12 +43,13 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="90"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0" Content="{DynamicResource ResourceKey=UIText3}" Click="ButtonCreateSession_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Grid.Column="1" Content="{DynamicResource ResourceKey=UIText4}" Click="ButtonDeleteSession_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
         </Grid>
 

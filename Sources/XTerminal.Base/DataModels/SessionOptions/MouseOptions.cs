@@ -12,18 +12,24 @@ namespace XTerminal.Base.DataModels.Session
     /// <summary>
     /// 光标选项
     /// </summary>
-    public class CursorOptions
+    public class MouseOptions
     {
         /// <summary>
         /// 光标样式
         /// </summary>
         [JsonProperty("style")]
-        public VTCursorStyles Style { get; set; }
+        public VTCursorStyles CursorStyle { get; set; }
 
         /// <summary>
         /// 闪烁间隔时间
         /// </summary>
         [JsonProperty("interval")]
-        public int Interval { get; set; }
+        public int CursorInterval { get; set; }
+
+        /// <summary>
+        /// 滚轮滚动一下，滚动几行
+        /// </summary>
+        [JsonProperty("scrollDelta")]
+        public int ScrollDelta { get; set; }
     }
 }
