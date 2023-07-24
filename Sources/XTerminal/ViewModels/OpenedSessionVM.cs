@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.Enumerations;
 using XTerminal.Document.Rendering;
 using XTerminal.Session;
-using XTerminal.Session.Property;
-using XTerminal.Sessions;
 
 namespace XTerminal.ViewModels
 {
@@ -83,7 +83,7 @@ namespace XTerminal.ViewModels
             this.ID = Guid.NewGuid().ToString();
             this.Name = session.Name;
             this.Description = session.Description;
-            this.Type = (SessionTypeEnum)session.Type;
+            this.Type = (SessionTypeEnum)session.SessionType;
         }
 
         #endregion
@@ -92,35 +92,10 @@ namespace XTerminal.ViewModels
 
         public void Open()
         {
-            VTInitialOptions initialOptions = new VTInitialOptions()
-            {
-                SessionType = (SessionTypeEnum)this.session.Type,
-                SessionProperties = new SessionProperties()
-                {
-                    ServerAddress = this.session.Host,
-                    ServerPort = this.session.Port,
-                    UserName = this.session.UserName,
-                    Password = this.session.Password,
-                    BaudRate = this.session.BaudRate
-                },
-                TerminalProperties = new TerminalProperties()
-                {
-                    Columns = this.session.Column,
-                    Rows = this.session.Row,
-                    Type = TerminalTypeEnum.XTerm
-                },
-                ReadBufferSize = 8192,
-                CursorOption = new CursorOptions()
-                {
-                    Style = Base.VTCursorStyles.Line,
-                    Interval = XTermConsts.CURSOR_BLINK_INTERVAL
-                },
-                InputEncoding = XTermConsts.DefaultInputEncoding,
-            };
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
             this.videoTerminal.TerminalScreen = this.TerminalScreen;
-            this.videoTerminal.Initialize(initialOptions);
+            this.videoTerminal.Initialize(this.session);
         }
 
         public void Close()

@@ -7,8 +7,6 @@ using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Session.Property;
-using XTerminal.Sessions;
 using XTerminal.ViewModels;
 using XTerminal.Windows;
 

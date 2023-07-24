@@ -55,11 +55,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASCIITable.cs" />
+    <Compile Include="DataModels\FixedText.cs" />
     <Compile Include="DataModels\GroupDM.cs" />
+    <Compile Include="DataModels\Session\CursorProperties.cs" />
+    <Compile Include="DataModels\Session\SessionProperties.cs" />
+    <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
+    <Compile Include="DataModels\Session\TerminalProperties.cs" />
     <Compile Include="DataModels\XTermSession.cs" />
+    <Compile Include="Definitions\SessionDefinition.cs" />
+    <Compile Include="Enumerations\SessionTypeEnum.cs" />
+    <Compile Include="Enumerations\VTCursorStyles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseCode.cs" />
-    <Compile Include="VTCursorStyles.cs" />
     <Compile Include="VTDebug.cs" />
     <Compile Include="VTInputEvent.cs" />
     <Compile Include="VTKeyboard.cs" />
@@ -68,8 +75,6 @@
     <Compile Include="XTermConsts.cs" />
     <Compile Include="XTermUtils.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Enumerations\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

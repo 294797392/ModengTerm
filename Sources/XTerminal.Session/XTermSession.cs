@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
+using XTerminal.Models.Enumerations;
 using XTerminal.Session.Property;
 using XTerminal.Sessions;
 
@@ -12,9 +13,9 @@ namespace XTerminal.Session
     /// <summary>
     /// 保存一个通道的配置信息
     /// </summary>
-    public class VTInitialOptions
+    public class XTermSession
     {
-        public static readonly VTInitialOptions Home = new VTInitialOptions()
+        public static readonly XTermSession Home = new XTermSession()
         {
             ReadBufferSize = 16384,
 
@@ -82,7 +83,7 @@ namespace XTerminal.Session
         /// </summary>
         public Encoding InputEncoding { get; set; }
 
-        public VTInitialOptions()
+        public XTermSession()
         {
         }
     }

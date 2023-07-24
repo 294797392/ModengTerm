@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Base
+namespace XTerminal.Base.Enumerations
 {
     /// <summary>
     /// 定义光标类型

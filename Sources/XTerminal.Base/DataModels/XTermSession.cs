@@ -6,72 +6,59 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Base;
+using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base.DataModels
 {
     /// <summary>
-    /// 存储一个会话的详细信息
+    /// 保存一个通道的配置信息
     /// </summary>
     public class XTermSession : ModelBase
     {
         /// <summary>
-        /// 会话所属分组
+        /// 从通道里读取数据的缓冲区大小
         /// </summary>
-        [JsonProperty("groupId")]
-        public string GroupID { get; set; }
+        [JsonProperty("outputBufferSize")]
+        public int OutputBufferSize { get; set; }
 
         /// <summary>
-        /// 会话类型
+        /// 输入字符的编码方式
         /// </summary>
+        [JsonProperty("inputEncoding")]
+        public string InputEncoding { get; set; }
+
+        /// <summary>
+        /// 终端设置
+        /// </summary>
+        [JsonProperty("terminalOptions")]
+        public TerminalProperties TerminalProperties { get; set; }
+
+        /// <summary>
+        /// 要连接的会话类型
+        /// </summary>
+        [EnumDataType(typeof(SessionTypeEnum))]
         [JsonProperty("type")]
-        public int Type { get; set; }
+        public int SessionType { get; set; }
 
         /// <summary>
-        /// 终端行数
+        /// 会话详细信息
         /// </summary>
-        [JsonProperty("row")]
-        public int Row { get; set; }
+        [JsonProperty("authOptions")]
+        public SessionProperties SessionProperties { get; set; }
 
         /// <summary>
-        /// 终端列数
+        /// 光标信息
         /// </summary>
-        [JsonProperty("column")]
-        public int Column { get; set; }
+        [JsonProperty("cursorOptions")]
+        public CursorOptions CursorOption { get; set; }
 
-        /// <summary>
-        /// 要连接的主机名
-        /// </summary>
-        [JsonProperty("host")]
-        public string Host { get; set; }
-
-        /// <summary>
-        /// 要连接的主机端口号
-        /// </summary>
-        [JsonProperty("port")]
-        public int Port { get; set; }
-
-        /// <summary>
-        /// 用户名
-        /// </summary>
-        [JsonProperty("userName")]
-        public string UserName { get; set; }
-
-        /// <summary>
-        /// 密码
-        /// </summary>
-        [JsonProperty("password")]
-        public string Password { get; set; }
-
-        /// <summary>
-        /// 身份验证方式
-        /// </summary>
-        [JsonProperty("authType")]
-        public int AuthType { get; set; }
-
-        /// <summary>
-        /// 串口的波特率
-        /// </summary>
-        [JsonProperty("baudRate")]
-        public int BaudRate { get; set; }
+        public XTermSession()
+        {
+            this.SessionProperties = new SessionProperties();
+            this.CursorOption = new CursorOptions();
+            this.TerminalProperties = new TerminalProperties();
+        }
     }
 }

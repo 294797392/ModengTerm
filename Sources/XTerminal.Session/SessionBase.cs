@@ -4,7 +4,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using XTerminal.Base;
-using XTerminal.Sessions;
+using XTerminal.Base.DataModels;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
 {
@@ -30,7 +31,7 @@ namespace XTerminal.Session
 
         #region 实例变量
 
-        protected VTInitialOptions options;
+        protected XTermSession options;
 
         /// <summary>
         /// 当前会话状态
@@ -54,13 +55,13 @@ namespace XTerminal.Session
         /// <summary>
         /// 通道类型
         /// </summary>
-        public SessionTypeEnum Type { get { return this.options.SessionType; } }
+        public SessionTypeEnum Type { get { return (SessionTypeEnum)this.options.SessionType; } }
 
         #endregion
 
         #region 构造方法
 
-        public SessionBase(VTInitialOptions options)
+        public SessionBase(XTermSession options)
         {
             this.options = options;
         }

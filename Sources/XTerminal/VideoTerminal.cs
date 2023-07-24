@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using XTerminal.Base;
+using XTerminal.Base.DataModels;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
@@ -85,7 +86,7 @@ namespace XTerminal
         /// </summary>
         private SynchronizationContext uiSyncContext;
 
-        private VTInitialOptions initialOptions;
+        private XTermSession initialOptions;
 
         /// <summary>
         /// DECAWM是否启用
@@ -255,10 +256,10 @@ namespace XTerminal
         /// 初始化终端模拟器
         /// </summary>
         /// <param name="options"></param>
-        public void Initialize(VTInitialOptions options)
+        public void Initialize(XTermSession options)
         {
             this.initialOptions = options;
-            this.inputEncoding = options.InputEncoding;
+            this.inputEncoding = Encoding.GetEncoding(options.InputEncoding);
             this.uiSyncContext = SynchronizationContext.Current;
 
             // DECAWM
@@ -274,7 +275,7 @@ namespace XTerminal
             #region 初始化键盘
 
             this.Keyboard = new VTKeyboard();
-            this.Keyboard.Encoding = options.InputEncoding;
+            this.Keyboard.Encoding = Encoding.GetEncoding(options.InputEncoding);
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
 

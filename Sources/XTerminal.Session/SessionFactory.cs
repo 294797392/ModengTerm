@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using XTerminal.Sessions;
+using XTerminal.Base.DataModels;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
 {
     public static class SessionFactory
     {
-        public static SessionBase Create(VTInitialOptions options)
+        public static SessionBase Create(XTermSession options)
         {
-            switch (options.SessionType)
+            switch ((SessionTypeEnum)options.SessionType)
             {
                 case SessionTypeEnum.SSH: return new SshNetSession(options);
                 case SessionTypeEnum.Win32CommandLine: return new WinptySession(options);

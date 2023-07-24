@@ -5,8 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 using XTerminal.Base.DataModels;
-using XTerminal.Session.Enumerations;
-using XTerminal.Sessions;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.ViewModels
 {
@@ -114,12 +113,12 @@ namespace XTerminal.ViewModels
             this.Name = session.Name;
             this.Description = session.Description;
             this.CreationTime = session.CreationTime;
-            this.Type = (SessionTypeEnum)session.Type;
-            this.AuthType = session.AuthType;
-            this.Host = session.Host;
-            this.Port = session.Port;
-            this.UserName = session.UserName;
-            this.Password = session.Password;
+            this.Type = (SessionTypeEnum)session.SessionType;
+            this.AuthType = session.SessionProperties.SSHAuthType;
+            this.Host = session.SessionProperties.ServerAddress;
+            this.Port = session.SessionProperties.ServerPort;
+            this.UserName = session.SessionProperties.UserName;
+            this.Password = session.SessionProperties.Password;
         }
     }
 }

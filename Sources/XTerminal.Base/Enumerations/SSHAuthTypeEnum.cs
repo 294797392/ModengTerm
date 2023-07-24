@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Session.Enumerations
+namespace XTerminal.Base.Enumerations
 {
     /// <summary>
     /// 连接SSH服务器的身份验证方式

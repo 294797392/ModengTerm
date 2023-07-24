@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using XTerminal.Base;
+using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 
 namespace XTerminal.Rendering

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base
 {
@@ -32,15 +34,33 @@ namespace XTerminal.Base
         {
             ID = Guid.Empty.ToString(),
             Name = "命令行",
-            Type = 0, // 0表示Windows命令行
-            Column = TerminalColumns,
-            Row = TerminalRows,
+            SessionType = (int)SessionTypeEnum.Win32CommandLine,
+            CursorOption = new CursorOptions()
+            {
+                Style = VTCursorStyles.Line,
+                Interval = XTermConsts.DefaultCursorBlinkInterval
+            },
+            OutputBufferSize = XTermConsts.DefaultOutptBufferSize,
+            InputEncoding = XTermConsts.DefaultInputEncoding,
+            TerminalProperties = new TerminalProperties()
+            {
+                DECPrivateAutoWrapMode = false,
+                Columns = XTermConsts.DefaultTerminalColumns,
+                Rows = XTermConsts.DefaultTerminalRows,
+                Type = (int)TerminalTypeEnum.VT100
+            },
+            SessionProperties = new SessionProperties()
         };
 
         /// <summary>
         /// 默认的输入编码方式
         /// </summary>
-        public static readonly Encoding DefaultInputEncoding = Encoding.UTF8;
+        public const string DefaultInputEncoding = "UTF-8";
+
+        public const int DefaultOutptBufferSize = 8192;
+
+        public const int DefaultTerminalColumns = 80;
+        public const int DefaultTerminalRows = 24;
 
         /// <summary>
         /// 默认的串口波特率列表
@@ -61,5 +81,10 @@ namespace XTerminal.Base
         /// 默认的SSH服务端口号
         /// </summary>
         public const int DefaultSSHPort = 22;
+
+        /// <summary>
+        /// 默认的光标闪烁间隔时间是500毫秒
+        /// </summary>
+        public const int DefaultCursorBlinkInterval = 500;
     }
 }

@@ -6,8 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
-using XTerminal.Session.Enumerations;
-using XTerminal.Session.Property;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal
 {

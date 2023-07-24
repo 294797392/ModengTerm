@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using XTerminal.Base;
+using XTerminal.Base.DataModels;
 
 namespace XTerminal.Session
 {
@@ -43,9 +44,9 @@ namespace XTerminal.Session
 
         #region 公开接口
 
-        public int Initialize(VTInitialOptions initialOptions)
+        public int Initialize(XTermSession initialOptions)
         {
-            this.outputBuffer = new byte[initialOptions.ReadBufferSize];
+            this.outputBuffer = new byte[initialOptions.OutputBufferSize];
 
             this.session = SessionFactory.Create(initialOptions);
             this.session.StatusChanged += Session_StatusChanged;

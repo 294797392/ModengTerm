@@ -17,10 +17,9 @@ using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Session.Definitions;
-using XTerminal.Session.Enumerations;
-using XTerminal.Session.Property;
-using XTerminal.Sessions;
+using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.Definitions;
+using XTerminal.Base.Enumerations;
 using XTerminal.ViewModels;
 
 namespace XTerminal.Windows
@@ -199,9 +198,20 @@ namespace XTerminal.Windows
                 ID = Guid.NewGuid().ToString(),
                 Name = TextBoxSessionName.Text,
                 CreationTime = DateTime.Now,
-                Row = row,
-                Column = column,
-                Type = (int)sessionType.Type,
+                TerminalProperties = new TerminalProperties()
+                {
+                    Rows = row,
+                    Columns = column,
+                    Type = (int)TerminalTypeEnum.VT100
+                },
+                SessionType = (int)sessionType.Type,
+                InputEncoding = XTermConsts.DefaultInputEncoding,
+                OutputBufferSize = XTermConsts.DefaultOutptBufferSize,
+                CursorOption = new CursorOptions() 
+                {
+                    Style = VTCursorStyles.Line,
+                    Interval = XTermConsts.DefaultCursorBlinkInterval
+                }
             };
 
             switch (sessionType.Type)
@@ -263,11 +273,14 @@ namespace XTerminal.Windows
                                 throw new NotImplementedException();
                         }
 
-                        session.AuthType = (int)authType;
-                        session.Host = hostName;
-                        session.Password = password;
-                        session.Port = port;
-                        session.UserName = userName;
+                        session.SessionProperties = new SessionProperties()
+                        {
+                            SSHAuthType = (int)authType,
+                            ServerAddress = hostName,
+                            ServerPort = port,
+                            UserName = userName,
+                            Password = password
+                        };
                         break;
                     }
 
@@ -288,8 +301,11 @@ namespace XTerminal.Windows
                             return;
                         }
 
-                        session.Host = portName;
-                        session.BaudRate = baudRate;
+                        session.SessionProperties = new SessionProperties()
+                        {
+                            ServerAddress = portName,
+                            BaudRate = baudRate
+                        };
                         break;
                     }
 

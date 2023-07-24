@@ -12,10 +12,10 @@ using WPFToolkit.MVVM;
 using WPFToolkit.Utils;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Definitions;
 using XTerminal.Document.Rendering;
 using XTerminal.ServiceAgents;
 using XTerminal.Session;
-using XTerminal.Session.Definitions;
 using XTerminal.UserControls;
 using XTerminal.ViewModels;
 

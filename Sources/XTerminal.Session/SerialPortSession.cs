@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Session.Property;
+using XTerminal.Base.DataModels;
+using XTerminal.Base.DataModels.Session;
 
 namespace XTerminal.Session
 {
@@ -25,7 +26,7 @@ namespace XTerminal.Session
 
         #region 构造方法
 
-        public SerialPortSession(VTInitialOptions options) :
+        public SerialPortSession(XTermSession options) :
             base(options)
         {
         }

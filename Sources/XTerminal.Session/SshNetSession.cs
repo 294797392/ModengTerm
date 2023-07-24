@@ -3,7 +3,8 @@ using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
 using XTerminal.Base;
-using XTerminal.Session.Property;
+using XTerminal.Base.DataModels;
+using XTerminal.Base.DataModels.Session;
 
 namespace XTerminal.Session
 {
@@ -32,7 +33,7 @@ namespace XTerminal.Session
 
         #region 构造方法
 
-        public SshNetSession(VTInitialOptions options) :
+        public SshNetSession(XTermSession options) :
             base(options)
         {
         }
@@ -65,7 +66,7 @@ namespace XTerminal.Session
             //terminalModeValues[TerminalModes.IEXTEN] = 1;
 
             TerminalProperties terminalOptions = this.options.TerminalProperties;
-            this.stream = this.sshClient.CreateShellStream(this.options.TerminalProperties.GetTerminalName(), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.ReadBufferSize, terminalModeValues);
+            this.stream = this.sshClient.CreateShellStream(this.options.TerminalProperties.GetTerminalName(), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.OutputBufferSize, terminalModeValues);
 
             return ResponseCode.SUCCESS;
         }

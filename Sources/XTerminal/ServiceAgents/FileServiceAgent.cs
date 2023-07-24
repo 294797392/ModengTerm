@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Session;
 
 namespace XTerminal.ServiceAgents
 {
@@ -27,11 +28,11 @@ namespace XTerminal.ServiceAgents
 
         #region Session管理
 
-        public override int AddSession(Base.DataModels.XTermSession session)
+        public override int AddSession(XTermSession session)
         {
             try
             {
-                JSONDatabase.Insert<Base.DataModels.XTermSession>(session);
+                JSONDatabase.Insert<XTermSession>(session);
 
                 return ResponseCode.SUCCESS;
             }
@@ -46,7 +47,7 @@ namespace XTerminal.ServiceAgents
         {
             try
             {
-                JSONDatabase.Delete<Base.DataModels.XTermSession>(v => v.ID == sessionID);
+                JSONDatabase.Delete<XTermSession>(v => v.ID == sessionID);
 
                 return ResponseCode.SUCCESS;
             }
@@ -57,24 +58,24 @@ namespace XTerminal.ServiceAgents
             }
         }
 
-        public override List<Base.DataModels.XTermSession> GetSessions()
+        public override List<XTermSession> GetSessions()
         {
             try
             {
-                return JSONDatabase.SelectAll<Base.DataModels.XTermSession>();
+                return JSONDatabase.SelectAll<XTermSession>();
             }
             catch (Exception ex)
             {
                 logger.Error("GetSessions异常", ex);
-                return new List<Base.DataModels.XTermSession>();
+                return new List<XTermSession>();
             }
         }
 
-        public override int UpdateSession(Base.DataModels.XTermSession session)
+        public override int UpdateSession(XTermSession session)
         {
             try
             {
-                return JSONDatabase.Update<Base.DataModels.XTermSession>(v => v.ID == session.ID, session);
+                return JSONDatabase.Update<XTermSession>(v => v.ID == session.ID, session);
             }
             catch (Exception ex)
             {

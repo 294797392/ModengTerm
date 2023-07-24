@@ -6,7 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Session.Property;
+using XTerminal.Base.DataModels;
+using XTerminal.Base.DataModels.Session;
 
 namespace XTerminal.Session
 {
@@ -29,7 +30,7 @@ namespace XTerminal.Session
 
         #region 构造方法
 
-        public libvtsshSession(VTInitialOptions options) :
+        public libvtsshSession(XTermSession options) :
             base(options)
         {
             this.statusChangedDlg = new libvt.vtssh_status_changed_callback(this.StatusChangedCallback);

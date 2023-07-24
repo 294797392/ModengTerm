@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
-using XTerminal.Session.Definitions;
-using XTerminal.Sessions;
+using XTerminal.Base.Definitions;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.ViewModels
 {

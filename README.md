@@ -17,7 +17,7 @@ XTerminal的目标是为开发者提供一个方便的，舒适的，用着爽�
 * 支持与Windows命令行进行交互
 
 # 跨平台支持
-很遗憾，目前XTerminal只能运行在Windwos环境下，XTerminal没有计划兼容Linux和Mac系统。但是XTerminal希望未来可以运行在安卓和IOS手机操作系统上，这样可以让开发者坐在公交车或者地铁上就可以随时随地的进行远程。
+很遗憾，目前XTerminal只能运行在Windows环境下，XTerminal没有计划兼容Linux和Mac系统。但是XTerminal希望未来可以运行在安卓和IOS手机操作系统上，这样可以让开发者坐在公交车或者地铁上就可以随时随地的进行远程。
 
 
 # 编译项目

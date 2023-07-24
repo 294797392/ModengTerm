@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
+using XTerminal.Base.DataModels;
 
 namespace XTerminal.Session
 {
@@ -241,7 +242,7 @@ namespace XTerminal.Session
 
         #region 构造方法
 
-        public WinptySession(VTInitialOptions options) :
+        public WinptySession(XTermSession options) :
             base(options)
         { }
 

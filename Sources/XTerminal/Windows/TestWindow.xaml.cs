@@ -26,9 +26,9 @@ namespace XTerminal.Windows
 
             //DocumentPanel.Scrollbar = SliderScrolbar;
 
-            VideoTerminal videoTermianl = new VideoTerminal();
-            //videoTermianl.SurfacePanel = DocumentPanel;
-            videoTermianl.Initialize(VTInitialOptions.Home);
+            //VideoTerminal videoTermianl = new VideoTerminal();
+            ////videoTermianl.SurfacePanel = DocumentPanel;
+            //videoTermianl.Initialize(XTermSession.Home);
         }
     }
 }

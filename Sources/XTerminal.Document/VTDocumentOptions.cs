@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
+using XTerminal.Base.Enumerations;
 using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document

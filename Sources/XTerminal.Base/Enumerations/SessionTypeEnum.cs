@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Sessions
+namespace XTerminal.Base.Enumerations
 {
     /// <summary>
     /// 标识会话类型

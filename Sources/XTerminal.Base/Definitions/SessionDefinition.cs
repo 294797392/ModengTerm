@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Sessions;
+using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Session.Definitions
+namespace XTerminal.Base.Definitions
 {
     public class SessionDefinition
     {
