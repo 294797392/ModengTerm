@@ -67,6 +67,8 @@ namespace XTerminal.Windows
         {
             this.CollapsedAllGrid();
 
+            TextBoxSessionName.Text = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+
             // 初始化SSH验证方式列表
             ComboBoxAuthList.ItemsSource = Enum.GetValues(typeof(SSHAuthTypeEnum));
             ComboBoxAuthList.SelectedIndex = 0;
