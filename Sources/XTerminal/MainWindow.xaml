@@ -109,6 +109,10 @@
             <Border Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
                     BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
                     BorderThickness="0,1,0,0"/>
+
+            <CheckBox x:Name="CheckBoxEnableDebugMode" Content="调试模式" VerticalAlignment="Center" Checked="CheckBoxEnableDebugMode_CheckedChanged"
+                      Unchecked="CheckBoxEnableDebugMode_CheckedChanged"/>
+
         </Grid>
 
     </Grid>

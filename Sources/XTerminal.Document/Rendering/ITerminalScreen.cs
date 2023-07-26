@@ -57,17 +57,11 @@ namespace XTerminal.Document.Rendering
         ITerminalSurface CreateSurface();
 
         /// <summary>
-        /// 切换Canvas
+        /// 切换要显示的Canvas
         /// </summary>
         /// <param name="remove">要移除的canvas</param>
         /// <param name="add">要显示的canvas</param>
         void SwitchSurface(ITerminalSurface remove, ITerminalSurface add);
-
-        /// <summary>
-        /// 把画布加到容器里
-        /// </summary>
-        /// <param name="canvas"></param>
-        void AddSurface(ITerminalSurface canvas);
 
         /// <summary>
         /// 更新滚动条的信息

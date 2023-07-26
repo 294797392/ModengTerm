@@ -133,8 +133,6 @@ namespace XTerminal.Document
             VTextPointer startPointer = this.Start;
             VTextPointer endPointer = this.End;
 
-            logger.ErrorFormat("startY = {0}, endY = {1}", startPointer.OffsetY, endPointer.OffsetY);
-
             // 判断起始位置或者结束位置是否在Surface外
 
             // 先算鼠标的移动方向

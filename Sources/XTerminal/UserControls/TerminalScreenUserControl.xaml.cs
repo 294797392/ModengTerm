@@ -303,18 +303,11 @@ namespace XTerminal.UserControls
             return canvas;
         }
 
-        public void AddSurface(ITerminalSurface surface)
-        {
-            ContentControlSurface.Content = surface;
-        }
-
         public void SwitchSurface(ITerminalSurface remove, ITerminalSurface add)
         {
             this.Dispatcher.Invoke(() =>
             {
-                //int index = this.Children.IndexOf(remove as DrawingCanvas);
-                //this.Children.RemoveAt(index);
-                //this.Children.Insert(index, add as DrawingCanvas);
+                ContentControlSurface.Content = add;
             });
         }
 

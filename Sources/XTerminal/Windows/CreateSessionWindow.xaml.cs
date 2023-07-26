@@ -204,7 +204,7 @@ namespace XTerminal.Windows
                 {
                     Rows = row,
                     Columns = column,
-                    Type = (int)TerminalTypeEnum.VT100
+                    Type = (int)XTermDefaultValues.DefaultTerminalType
                 },
                 SessionType = (int)sessionType.Type,
                 InputEncoding = XTermDefaultValues.DefaultInputEncoding,

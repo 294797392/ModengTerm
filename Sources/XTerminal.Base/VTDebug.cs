@@ -11,6 +11,8 @@ namespace XTerminal.Base
     /// </summary>
     public static class VTDebug
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDebug");
+
         /// <summary>
         /// 是否启用调试模式
         /// </summary>
@@ -40,9 +42,14 @@ namespace XTerminal.Base
             }
         }
 
-        public static void WriteAction()
+        public static void WriteAction(string format, params object[] param)
         {
+            if (!Enabled)
+            {
+                return;
+            }
 
+            logger.InfoFormat("Action:{0}", string.Format(format, param));
         }
     }
 }
