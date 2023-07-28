@@ -8,32 +8,54 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="30"/>
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" x:Name="ContentControlSurface"
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+
+            <ContentControl Grid.Row="0" x:Name="ContentControlSurface"
                         PreviewMouseLeftButtonDown="ContentControlSurface_PreviewMouseLeftButtonDown"
                         PreviewMouseMove="ContentControlSurface_PreviewMouseMove"
                         PreviewMouseLeftButtonUp="ContentControlSurface_PreviewMouseLeftButtonUp">
-            <ContentControl.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
-                    <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
-                </ContextMenu>
-            </ContentControl.ContextMenu>
-        </ContentControl>
+                <ContentControl.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
+                        <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
+                    </ContextMenu>
+                </ContentControl.ContextMenu>
+            </ContentControl>
 
-        <!-- Slider模拟滚动条 -->
-        <Slider Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" 
+            <!-- Slider模拟滚动条 -->
+            <Slider Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" 
                 Minimum="0" Maximum="0" Delay="500" Cursor="Arrow"
                 PreviewMouseMove="SliderScrolbar_PreviewMouseMove"
                 PreviewMouseUp="SliderScrolbar_PreviewMouseUp"
                 PreviewMouseDown="SliderScrolbar_PreviewMouseDown">
-            <Slider.LayoutTransform>
-                <RotateTransform Angle="90"/>
-            </Slider.LayoutTransform>
-        </Slider>
+                <Slider.LayoutTransform>
+                    <RotateTransform Angle="90"/>
+                </Slider.LayoutTransform>
+            </Slider>
+        </Grid>
+
+        <!-- 状态栏 -->
+        <Grid Grid.Row="1" x:Name="GridStatusbar">
+            <Border Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
+                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
+                    BorderThickness="0,1,0,0"/>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            </StackPanel>
+
+            <CheckBox x:Name="CheckBoxEnableDebugMode" Content="调试模式" VerticalAlignment="Center" Checked="CheckBoxEnableDebugMode_CheckedChanged"
+                      Unchecked="CheckBoxEnableDebugMode_CheckedChanged" Visibility="Collapsed"/>
+
+        </Grid>
+
     </Grid>
 </UserControl>

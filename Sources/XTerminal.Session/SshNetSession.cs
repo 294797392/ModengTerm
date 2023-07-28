@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
 {
@@ -15,7 +16,7 @@ namespace XTerminal.Session
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("SSHSocket");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("SshNetSession");
 
         #endregion
 
@@ -49,17 +50,47 @@ namespace XTerminal.Session
         public override int Open()
         {
             this.sessionProperties = this.options.ConnectionOptions;
-            var authentications = new List<AuthenticationMethod>();
-            if (!string.IsNullOrEmpty(this.sessionProperties.KeyFilePath))
+
+            #region 初始化身份验证方式
+
+            AuthenticationMethod authentication = null;
+            switch ((SSHAuthTypeEnum)this.sessionProperties.SSHAuthType)
             {
-                var privateKeyFile = new PrivateKeyFile(this.sessionProperties.KeyFilePath, this.sessionProperties.KeyFilePassphrase);
-                authentications.Add(new PrivateKeyAuthenticationMethod(this.sessionProperties.UserName, privateKeyFile));
+                case SSHAuthTypeEnum.None:
+                    {
+                        authentication = new NoneAuthenticationMethod(this.sessionProperties.UserName);
+                        break;
+                    }
+
+                case SSHAuthTypeEnum.Password:
+                    {
+                        authentication = new PasswordAuthenticationMethod(this.sessionProperties.UserName, this.sessionProperties.Password);
+                        break;
+                    }
+
+                case SSHAuthTypeEnum.PulicKey:
+                    {
+                        var privateKeyFile = new PrivateKeyFile(this.sessionProperties.KeyFilePath, this.sessionProperties.KeyFilePassphrase);
+                        authentication = new PrivateKeyAuthenticationMethod(this.sessionProperties.UserName, privateKeyFile);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
             }
-            authentications.Add(new PasswordAuthenticationMethod(this.sessionProperties.UserName, this.sessionProperties.Password));
-            ConnectionInfo connectionInfo = new ConnectionInfo(this.sessionProperties.ServerAddress, this.sessionProperties.ServerPort, this.sessionProperties.UserName, authentications.ToArray());
+
+            #endregion
+
+            #region 连接服务器
+
+            ConnectionInfo connectionInfo = new ConnectionInfo(this.sessionProperties.ServerAddress, this.sessionProperties.ServerPort, this.sessionProperties.UserName, authentication);
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
             this.sshClient.Connect();
+
+            #endregion
+
+            #region 创建终端
 
             Dictionary<TerminalModes, uint> terminalModeValues = new Dictionary<TerminalModes, uint>();
             //terminalModeValues[TerminalModes.ECHOCTL] = 1;
@@ -67,6 +98,8 @@ namespace XTerminal.Session
 
             TerminalOptions terminalOptions = this.options.TerminalOptions;
             this.stream = this.sshClient.CreateShellStream(this.options.TerminalOptions.GetTerminalName(), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.OutputBufferSize, terminalModeValues);
+
+            #endregion
 
             return ResponseCode.SUCCESS;
         }

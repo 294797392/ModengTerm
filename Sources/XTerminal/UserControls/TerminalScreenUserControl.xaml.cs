@@ -287,6 +287,12 @@ namespace XTerminal.UserControls
             this.Paste();
         }
 
+
+        private void CheckBoxEnableDebugMode_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         #endregion
 
         #region ITerminalScreen

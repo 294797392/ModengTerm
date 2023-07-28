@@ -170,7 +170,7 @@ namespace XTerminal
 
         private void CheckBoxEnableDebugMode_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            VTDebug.Enabled = CheckBoxEnableDebugMode.IsChecked.Value;
+            //VTDebug.Enabled = CheckBoxEnableDebugMode.IsChecked.Value;
         }
 
         #endregion

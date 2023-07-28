@@ -60,7 +60,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <!-- 菜单 -->
@@ -101,17 +100,6 @@
 
             <!-- 终端展示页面 -->
             <ContentControl Grid.Row="1" x:Name="ContentControlTerminal"/>
-
-        </Grid>
-
-        <!-- 状态栏 -->
-        <Grid Grid.Row="2" x:Name="GridStatusbar">
-            <Border Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
-                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
-                    BorderThickness="0,1,0,0"/>
-
-            <CheckBox x:Name="CheckBoxEnableDebugMode" Content="调试模式" VerticalAlignment="Center" Checked="CheckBoxEnableDebugMode_CheckedChanged"
-                      Unchecked="CheckBoxEnableDebugMode_CheckedChanged"/>
 
         </Grid>
 

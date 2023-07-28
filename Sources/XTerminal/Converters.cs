@@ -48,4 +48,33 @@ namespace XTerminal
             throw new NotImplementedException();
         }
     }
+
+    public class SessionTypeStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return "未知类型";
+            }
+
+            SessionTypeEnum type = (SessionTypeEnum)value;
+
+            switch (type)
+            {
+                case SessionTypeEnum.SerialPort: return "串口";
+                case SessionTypeEnum.libvtssh:
+                case SessionTypeEnum.SSH: return "SSH";
+                case SessionTypeEnum.Win32CommandLine: return "命令行";
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

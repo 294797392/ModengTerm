@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewmodels="clr-namespace:XTerminal.ViewModels"
+        xmlns:local="clr-namespace:XTerminal"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText2}" Height="450" Width="800" 
         WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
@@ -13,6 +14,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <!--<ResourceDictionary Source="UserControls/SessionPropertiesDictionary.xaml"/>-->
             </ResourceDictionary.MergedDictionaries>
+
+            <local:SessionTypeStringConverter x:Key="SessionTypeStringConverter"/>
 
             <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
                 <Setter Property="Width" Value="80"/>
@@ -66,6 +69,23 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="类型" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Type, Converter={StaticResource ResourceKey=SessionTypeStringConverter}}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTemplateColumn Header="主机名" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Host}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
                         <DataGridTemplateColumn Header="创建时间" Width="1*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
