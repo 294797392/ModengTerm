@@ -53,12 +53,19 @@
                 <Setter Property="Width" Value="50"/>
             </Style>
 
+            <Style x:Key="StyleCanvasUnfixed" TargetType="{x:Type Canvas}">
+                <Setter Property="VerticalAlignment" Value="Top"/>
+            </Style>
+
+            <Style x:Key="StyleCanvasFixed" TargetType="{x:Type Canvas}"></Style>
+
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -73,6 +80,8 @@
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
                 </MenuItem>
 
+                <ToggleButton x:Name="ToggleButtonInsert" Content="插入"/>
+
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于XTerminal" Click="MenuItemAbout_Click"/>
                 </MenuItem>
@@ -81,7 +90,7 @@
         </Border>
 
         <!-- 终端显示区域 -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
@@ -102,6 +111,10 @@
             <ContentControl Grid.Row="1" x:Name="ContentControlTerminal"/>
 
         </Grid>
+
+        <Canvas Visibility="Collapsed" Background="Red" Grid.Row="1" Grid.RowSpan="99" Height="100" Style="{StaticResource ResourceKey=StyleCanvasUnfixed}">
+            <Grid></Grid>
+        </Canvas>
 
     </Grid>
 
