@@ -48,6 +48,7 @@ namespace XTerminal
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
             sessionListWindow.Owner = this;
+            sessionListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if ((bool)sessionListWindow.ShowDialog())
             {
                 XTermSession session = sessionListWindow.SelectedSession;
