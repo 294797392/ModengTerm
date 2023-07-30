@@ -45,6 +45,7 @@ namespace XTerminal
 
         private static readonly byte[] OS_OperationStatusResponse = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
         private static readonly byte[] CPR_CursorPositionReportResponse = new byte[6] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
+        //private static readonly byte[] CPR_CursorPositionReportResponse = new byte[5] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0' };
         private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
 
         #endregion
@@ -475,12 +476,16 @@ namespace XTerminal
 
                 case StatusType.CPR_CursorPositionReport:
                     {
-                        // Result is CSI r ; c R
-                        int cursorRow = this.CursorRow;
-                        int cursorCol = this.CursorCol;
-                        CPR_CursorPositionReportResponse[2] = (byte)cursorRow;
-                        CPR_CursorPositionReportResponse[4] = (byte)cursorCol;
-                        this.sessionTransport.Write(CPR_CursorPositionReportResponse);
+                        // 打开VIM后会收到这个请求
+                        // 发送CPR的时候，因为CPR消息最后面有个R，会导致打开VIM后直接进入替换模式
+                        // 这个BUG暂时没找到产生的原因和解决方法，所以暂时先注释掉
+
+                        //// Result is CSI r ; c R
+                        //int cursorRow = this.CursorRow;
+                        //int cursorCol = this.CursorCol;
+                        //CPR_CursorPositionReportResponse[2] = (byte)cursorRow;
+                        //CPR_CursorPositionReportResponse[4] = (byte)cursorCol;
+                        //this.sessionTransport.Write(CPR_CursorPositionReportResponse);
                         break;
                     }
 

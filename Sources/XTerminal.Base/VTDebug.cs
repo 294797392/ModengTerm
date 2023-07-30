@@ -20,7 +20,7 @@ namespace XTerminal.Base
 
         static VTDebug()
         {
-            Enabled = true;
+            Enabled = false;
         }
 
         /// <summary>
