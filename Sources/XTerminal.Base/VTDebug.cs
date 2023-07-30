@@ -18,6 +18,11 @@ namespace XTerminal.Base
         /// </summary>
         public static bool Enabled { get; set; }
 
+        static VTDebug()
+        {
+            Enabled = true;
+        }
+
         /// <summary>
         /// 记录输入日志
         /// </summary>

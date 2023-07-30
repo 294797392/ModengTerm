@@ -339,11 +339,6 @@ namespace XTerminal.Document
             }
         }
 
-        public bool HasNextLine(VTextLine textLine)
-        {
-            return textLine.NextLine != null;
-        }
-
         /// <summary>
         /// 在指定的光标位置打印一个字符
         /// </summary>
@@ -684,6 +679,11 @@ namespace XTerminal.Document
             if (this.Cursor.Column != column)
             {
                 this.Cursor.Column = column;
+
+                // 在VIM模式下，如果在一行的最后输入空格，那么收到CUP指令，CUP的位置是把光标位置向后移动一列
+                // 此时如果后面没有字符，那么在渲染的时候，光标的位置并不会变，所以这里先判断要移动到的光标处是否有字符
+                // 如果有则直接移动，如果没有则添加一个空的字符
+                this.ActiveLine.PadColumns(column + 1);
             }
         }
 

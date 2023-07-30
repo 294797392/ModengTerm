@@ -470,7 +470,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 如果该行的列不足n个，那么补齐空字符直到有n列
         /// </summary>
-        /// <param name="columns">要补齐到的列数</param>
+        /// <param name="columns">要补齐到的列数。是从1开始的列数，而不是从0开始</param>
         public void PadColumns(int columns)
         {
             if (this.Columns >= columns)
@@ -479,7 +479,7 @@ namespace XTerminal.Document
             }
 
             // 要补齐的字符数
-            this.PrintCharacter(VTCharacter.CreateNull(), columns);
+            this.PrintCharacter(VTCharacter.CreateNull(), columns - 1);
         }
 
         /// <summary>

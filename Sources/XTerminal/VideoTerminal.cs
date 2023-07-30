@@ -1085,7 +1085,7 @@ namespace XTerminal
                             return;
                         }
 
-                        this.ActiveLine.PadColumns(n - 1);
+                        this.ActiveLine.PadColumns(n);
                         this.activeDocument.SetCursor(this.CursorRow, n);
                         VTDebug.WriteAction("CHA_CursorHorizontalAbsolute, targetColumn = {0}", n);
                         break;
