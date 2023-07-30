@@ -1,6 +1,8 @@
 ﻿using DotNEToolkit;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
@@ -71,7 +73,7 @@ namespace XTerminal.Windows
 
             // 初始化SSH验证方式列表
             ComboBoxAuthList.ItemsSource = Enum.GetValues(typeof(SSHAuthTypeEnum));
-            ComboBoxAuthList.SelectedIndex = 0;
+            ComboBoxAuthList.SelectedItem = SSHAuthTypeEnum.Password;
             TextBoxSSHPort.Text = XTermDefaultValues.DefaultSSHPort.ToString();
 
             // 初始化会话类型列表
@@ -144,22 +146,28 @@ namespace XTerminal.Windows
             {
                 case SSHAuthTypeEnum.None:
                     {
-                        RowDefinitionPassword.Height = new GridLength(0);
                         RowDefinitionUserName.Height = new GridLength(0);
+                        RowDefinitionPassword.Height = new GridLength(0);
+                        RowDefinitionPublicKey.Height = new GridLength(0);
+                        RowDefinitionPassphrase.Height = new GridLength(0);
                         break;
                     }
 
                 case SSHAuthTypeEnum.Password:
                     {
-                        RowDefinitionPassword.Height = new GridLength(35);
                         RowDefinitionUserName.Height = new GridLength(35);
+                        RowDefinitionPassword.Height = new GridLength(35);
+                        RowDefinitionPublicKey.Height = new GridLength(0);
+                        RowDefinitionPassphrase.Height = new GridLength(0);
                         break;
                     }
 
-                case SSHAuthTypeEnum.PulicKey:
+                case SSHAuthTypeEnum.PrivateKey:
                     {
+                        RowDefinitionUserName.Height = new GridLength(35);
                         RowDefinitionPassword.Height = new GridLength(0);
-                        RowDefinitionUserName.Height = new GridLength(0);
+                        RowDefinitionPublicKey.Height = new GridLength(35);
+                        RowDefinitionPassphrase.Height = new GridLength(35);
                         break;
                     }
 
@@ -242,8 +250,16 @@ namespace XTerminal.Windows
                             return;
                         }
 
+                        string userName = TextBoxSSHUserName.Text;
+                        if (string.IsNullOrEmpty(userName))
+                        {
+                            MessageBoxUtils.Info("请输入用户名");
+                            return;
+                        }
+
                         string password = string.Empty;
-                        string userName = string.Empty;
+                        string privateKey = string.Empty;
+                        string passphrase = string.Empty;
 
                         SSHAuthTypeEnum authType = (SSHAuthTypeEnum)ComboBoxAuthList.SelectedItem;
                         switch (authType)
@@ -255,12 +271,6 @@ namespace XTerminal.Windows
 
                             case SSHAuthTypeEnum.Password:
                                 {
-                                    userName = TextBoxSSHUserName.Text;
-                                    if (string.IsNullOrEmpty(userName))
-                                    {
-                                        MessageBoxUtils.Info("请输入用户名");
-                                        return;
-                                    }
 
                                     password = PasswordBoxSSHPassword.Password;
                                     if (string.IsNullOrEmpty(password))
@@ -268,6 +278,28 @@ namespace XTerminal.Windows
                                         MessageBoxUtils.Info("请输入密码");
                                         return;
                                     }
+
+                                    break;
+                                }
+
+                            case SSHAuthTypeEnum.PrivateKey:
+                                {
+                                    string privateKeyFile = TextBoxSSHPrivateKey.Text;
+                                    if (string.IsNullOrEmpty(privateKeyFile))
+                                    {
+                                        MessageBoxUtils.Info("请选择密钥文件");
+                                        return;
+                                    }
+
+                                    if (!File.Exists(privateKeyFile))
+                                    {
+                                        MessageBoxUtils.Info("密钥文件不存在");
+                                        return;
+                                    }
+
+                                    // 密钥密码可以为空
+                                    passphrase = PasswordBoxSSHPassphrase.Password;
+                                    privateKey = File.ReadAllText(privateKeyFile);
 
                                     break;
                                 }
@@ -282,7 +314,9 @@ namespace XTerminal.Windows
                             ServerAddress = hostName,
                             ServerPort = port,
                             UserName = userName,
-                            Password = password
+                            Password = password,
+                            PrivateKey = privateKey,
+                            Passphrase = passphrase
                         };
                         break;
                     }
@@ -329,6 +363,15 @@ namespace XTerminal.Windows
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
             base.DialogResult = false;
+        }
+
+        private void ButtonBrowsePrivateKeyFile_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if ((bool)openFileDialog.ShowDialog())
+            {
+                TextBoxSSHPrivateKey.Text = openFileDialog.FileName;
+            }
         }
 
         #endregion

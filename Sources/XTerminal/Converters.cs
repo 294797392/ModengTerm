@@ -23,7 +23,7 @@ namespace XTerminal
             {
                 case SSHAuthTypeEnum.None: return "不需要身份验证";
                 case SSHAuthTypeEnum.Password: return "用户名和密码";
-                case SSHAuthTypeEnum.PulicKey: return "公钥";
+                case SSHAuthTypeEnum.PrivateKey: return "密钥验证";
                 default:
                     throw new NotImplementedException();
             }

@@ -22,9 +22,9 @@ namespace XTerminal.Base.Enumerations
         Password,
 
         /// <summary>
-        /// 公钥验证
+        /// 私钥验证
         /// </summary>
-        PulicKey
+        PrivateKey
     }
 
 }

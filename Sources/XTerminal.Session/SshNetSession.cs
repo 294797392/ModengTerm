@@ -2,6 +2,8 @@
 using Renci.SshNet.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.DataModels.Session;
@@ -68,10 +70,13 @@ namespace XTerminal.Session
                         break;
                     }
 
-                case SSHAuthTypeEnum.PulicKey:
+                case SSHAuthTypeEnum.PrivateKey:
                     {
-                        var privateKeyFile = new PrivateKeyFile(this.sessionProperties.KeyFilePath, this.sessionProperties.KeyFilePassphrase);
-                        authentication = new PrivateKeyAuthenticationMethod(this.sessionProperties.UserName, privateKeyFile);
+                        using (MemoryStream ms = new MemoryStream(Encoding.ASCII.GetBytes(this.sessionProperties.PrivateKey)))
+                        {
+                            var privateKeyFile = new PrivateKeyFile(ms, this.sessionProperties.Passphrase);
+                            authentication = new PrivateKeyAuthenticationMethod(this.sessionProperties.UserName, privateKeyFile);
+                        }
                         break;
                     }
 

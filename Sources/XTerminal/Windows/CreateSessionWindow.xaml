@@ -91,6 +91,8 @@
                                 <RowDefinition Height="35"/>
                                 <RowDefinition Height="35" x:Name="RowDefinitionUserName"/>
                                 <RowDefinition Height="35" x:Name="RowDefinitionPassword"/>
+                                <RowDefinition Height="35" x:Name="RowDefinitionPublicKey"/>
+                                <RowDefinition Height="35" x:Name="RowDefinitionPassphrase"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="80"/>
@@ -112,11 +114,18 @@
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" x:Name="TextBlockSSHUserName" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                             <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxSSHUserName" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <TextBlock Grid.Row="4" Grid.Column="0" x:Name="TextBlockSSHPassword" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                             <PasswordBox Grid.Row="4" Grid.Column="1" x:Name="PasswordBoxSSHPassword" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" x:Name="TextBlockSSHPrivateKey" Text="PrivateKey：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <TextBox Grid.Row="5" Grid.Column="1" x:Name="TextBoxSSHPrivateKey" IsEnabled="False" Margin="0,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+                            <Button Grid.Row="5" Grid.Column="1" Width="80" Content="浏览" HorizontalAlignment="Right" Margin="3" Click="ButtonBrowsePrivateKeyFile_Click"/>
+
+                            <TextBlock Grid.Row="6" Grid.Column="0" x:Name="TextBlockSSHPassphrase" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                            <PasswordBox Grid.Row="6" Grid.Column="1" x:Name="PasswordBoxSSHPassphrase" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>
 
                         </Grid>
 

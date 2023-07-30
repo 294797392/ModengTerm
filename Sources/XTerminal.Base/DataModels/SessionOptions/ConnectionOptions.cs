@@ -15,11 +15,11 @@ namespace XTerminal.Base.DataModels.Session
     /// </summary>
     public class ConnectionOptions
     {
-        [JsonProperty("keyFilePath")]
-        public string KeyFilePath { get; set; }
+        [JsonProperty("publickKey")]
+        public string PrivateKey { get; set; }
 
-        [JsonProperty("keyFilePassphrase")]
-        public string KeyFilePassphrase { get; set; }
+        [JsonProperty("passphrase")]
+        public string Passphrase { get; set; }
 
         [JsonProperty("userName")]
         public string UserName { get; set; }
