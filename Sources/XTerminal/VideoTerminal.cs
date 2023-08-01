@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,74 +17,74 @@ using XTerminal.Session;
 namespace XTerminal
 {
     /// <summary>
-    /// ´¦ÀíĞéÄâÖÕ¶ËµÄËùÓĞÂß¼­
+    /// å¤„ç†è™šæ‹Ÿç»ˆç«¯çš„æ‰€æœ‰é€»è¾‘
     /// </summary>
     public class VideoTerminal
     {
         private enum OutsideScrollResult
         {
             /// <summary>
-            /// Ã»¹ö¶¯
+            /// æ²¡æ»šåŠ¨
             /// </summary>
             None,
 
             /// <summary>
-            /// Êó±êÍùÉÏ¹ö¶¯
+            /// é¼ æ ‡å¾€ä¸Šæ»šåŠ¨
             /// </summary>
             ScrollTop,
 
             /// <summary>
-            /// Êó±êÍùÏÂ¹ö¶¯
+            /// é¼ æ ‡å¾€ä¸‹æ»šåŠ¨
             /// </summary>
             ScrollDown
         }
 
-        #region Àà±äÁ¿
+        #region ç±»å˜é‡
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VideoTerminal");
 
         private static readonly byte[] OS_OperationStatusResponse = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
-        private static readonly byte[] CPR_CursorPositionReportResponse = new byte[6] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
+        private static readonly byte[] CPR_CursorPositionReportResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
         //private static readonly byte[] CPR_CursorPositionReportResponse = new byte[5] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0' };
         private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
 
         #endregion
 
-        #region ¹«¿ªÊÂ¼ş
+        #region å…¬å¼€äº‹ä»¶
 
         public event Action<VideoTerminal, SessionStatusEnum> SessionStatusChanged;
 
         #endregion
 
-        #region ÊµÀı±äÁ¿
+        #region å®ä¾‹å˜é‡
 
         /// <summary>
-        /// ÓëÖÕ¶Ë½øĞĞÍ¨ĞÅµÄĞÅµÀ
+        /// ä¸ç»ˆç«¯è¿›è¡Œé€šä¿¡çš„ä¿¡é“
         /// </summary>
         private SessionTransport sessionTransport;
 
         /// <summary>
-        /// ÖÕ¶Ë×Ö·û½âÎöÆ÷
+        /// ç»ˆç«¯å­—ç¬¦è§£æå™¨
         /// </summary>
         private VTParser vtParser;
 
         /// <summary>
-        /// Ö÷»º³åÇøÎÄµµÄ£ĞÍ
+        /// ä¸»ç¼“å†²åŒºæ–‡æ¡£æ¨¡å‹
         /// </summary>
         private VTDocument mainDocument;
 
         /// <summary>
-        /// ±¸ÓÃ»º³åÇøÎÄµµÄ£ĞÍ
+        /// å¤‡ç”¨ç¼“å†²åŒºæ–‡æ¡£æ¨¡å‹
         /// </summary>
         private VTDocument alternateDocument;
 
         /// <summary>
-        /// µ±Ç°ÕıÔÚÊ¹ÓÃµÄÎÄµµÄ£ĞÍ
+        /// å½“å‰æ­£åœ¨ä½¿ç”¨çš„æ–‡æ¡£æ¨¡å‹
         /// </summary>
         private VTDocument activeDocument;
 
         /// <summary>
-        /// UIÏß³ÌÉÏÏÂÎÄ
+        /// UIçº¿ç¨‹ä¸Šä¸‹æ–‡
         /// </summary>
         private SynchronizationContext uiSyncContext;
 
@@ -92,50 +92,50 @@ namespace XTerminal
         private MouseOptions mouseOptions;
 
         /// <summary>
-        /// DECAWMÊÇ·ñÆôÓÃ
+        /// DECAWMæ˜¯å¦å¯ç”¨
         /// </summary>
         private bool autoWrapMode;
 
         private bool xtermBracketedPasteMode;
 
         /// <summary>
-        /// ÉÁË¸¹â±êµÄÏß³Ì
+        /// é—ªçƒå…‰æ ‡çš„çº¿ç¨‹
         /// </summary>
         private Thread cursorBlinkingThread;
 
         #region History & Scroll
 
         /// <summary>
-        /// ´æ´¢ËùÓĞµÄÀúÊ·ĞĞ
+        /// å­˜å‚¨æ‰€æœ‰çš„å†å²è¡Œ
         /// Row(scrollValue) -> VTextLine
-        /// ×¢Òâ¸Ã×ÖµäÀï±£´æµÄÊÇmainDocumentµÄÀúÊ·ĞĞ£¬alternateDocumentÃ»ÓĞ±£´æ£¬ĞèÒªµ¥¶À¿¼ÂÇalternateDocument
+        /// æ³¨æ„è¯¥å­—å…¸é‡Œä¿å­˜çš„æ˜¯mainDocumentçš„å†å²è¡Œï¼ŒalternateDocumentæ²¡æœ‰ä¿å­˜ï¼Œéœ€è¦å•ç‹¬è€ƒè™‘alternateDocument
         /// </summary>
         private Dictionary<int, VTHistoryLine> historyLines;
 
         /// <summary>
-        /// ÀúÊ·ĞĞµÄµÚÒ»ĞĞ
+        /// å†å²è¡Œçš„ç¬¬ä¸€è¡Œ
         /// </summary>
         private VTHistoryLine firstHistoryLine;
 
         /// <summary>
-        /// ÀúÊ·ĞĞµÄ×îºóÒ»ĞĞ
+        /// å†å²è¡Œçš„æœ€åä¸€è¡Œ
         /// </summary>
         private VTHistoryLine lastHistoryLine;
 
         /// <summary>
-        /// ¼ÇÂ¼¹ö¶¯Ìõ¹ö¶¯µ½µ×µÄÊ±ºò£¬¹ö¶¯ÌõµÄÖµ
+        /// è®°å½•æ»šåŠ¨æ¡æ»šåŠ¨åˆ°åº•çš„æ—¶å€™ï¼Œæ»šåŠ¨æ¡çš„å€¼
         /// </summary>
         private int scrollMax;
 
         /// <summary>
-        /// ¼ÇÂ¼µ±Ç°¹ö¶¯Ìõ¹ö¶¯µÄÖµ
-        /// Ò²¾ÍÊÇµ±Ç°SurfaceÉÏäÖÈ¾µÄµÚÒ»ĞĞµÄPhysicsRow
-        /// Ä¬ÈÏÖµÊÇ0
+        /// è®°å½•å½“å‰æ»šåŠ¨æ¡æ»šåŠ¨çš„å€¼
+        /// ä¹Ÿå°±æ˜¯å½“å‰Surfaceä¸Šæ¸²æŸ“çš„ç¬¬ä¸€è¡Œçš„PhysicsRow
+        /// é»˜è®¤å€¼æ˜¯0
         /// </summary>
         private int scrollValue;
 
         /// <summary>
-        /// µ±Êó±ê°´ÏÂµÄÊ±ºò£¬¼ÇÂ¼CanvasÏà¶ÔÓÚÆÁÄ»µÄ×ø±ê
+        /// å½“é¼ æ ‡æŒ‰ä¸‹çš„æ—¶å€™ï¼Œè®°å½•Canvasç›¸å¯¹äºå±å¹•çš„åæ ‡
         /// </summary>
         private VTRect surfaceRect;
 
@@ -144,18 +144,18 @@ namespace XTerminal
         #region SelectionRange
 
         /// <summary>
-        /// Êó±êÊÇ·ñ°´ÏÂ
+        /// é¼ æ ‡æ˜¯å¦æŒ‰ä¸‹
         /// </summary>
         private bool isMouseDown;
         private VTPoint mouseDownPos;
 
         /// <summary>
-        /// µ±Ç°Êó±êÊÇ·ñ´¦ÓÚSelection×´Ì¬
+        /// å½“å‰é¼ æ ‡æ˜¯å¦å¤„äºSelectionçŠ¶æ€
         /// </summary>
         private bool selectionState;
 
         /// <summary>
-        /// ´æ´¢Ñ¡ÖĞµÄÎÄ±¾ĞÅÏ¢
+        /// å­˜å‚¨é€‰ä¸­çš„æ–‡æœ¬ä¿¡æ¯
         /// </summary>
         private VTextSelection textSelection;
 
@@ -165,64 +165,64 @@ namespace XTerminal
         private int dataReceivedCounter;
 
         /// <summary>
-        /// ÊÇ·ñÕıÔÚÔËĞĞ
+        /// æ˜¯å¦æ­£åœ¨è¿è¡Œ
         /// </summary>
         private bool isRunning;
 
         /// <summary>
-        /// ÊäÈë±àÂë·½Ê½
+        /// è¾“å…¥ç¼–ç æ–¹å¼
         /// </summary>
         private Encoding inputEncoding;
 
         #endregion
 
-        #region ÊôĞÔ
+        #region å±æ€§
 
         /// <summary>
-        /// activeDocumentµÄ¹â±êĞÅÏ¢
-        /// ¸Ã×ø±êÊÇ»ùÓÚViewableDocumentµÄ×ø±ê
+        /// activeDocumentçš„å…‰æ ‡ä¿¡æ¯
+        /// è¯¥åæ ‡æ˜¯åŸºäºViewableDocumentçš„åæ ‡
         /// </summary>
         private VTCursor Cursor { get { return this.activeDocument.Cursor; } }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°¹â±êËùÔÚĞĞ
+        /// è·å–å½“å‰å…‰æ ‡æ‰€åœ¨è¡Œ
         /// </summary>
         public VTextLine ActiveLine { get { return this.activeDocument.ActiveLine; } }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°Ñ¡ÖĞµÄĞĞ
+        /// è·å–å½“å‰é€‰ä¸­çš„è¡Œ
         /// </summary>
         public VTextSelection Selection { get { return this.textSelection; } }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°¹â±êËùÔÚĞĞ
+        /// è·å–å½“å‰å…‰æ ‡æ‰€åœ¨è¡Œ
         /// </summary>
         public int CursorRow { get { return this.Cursor.Row; } }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°¹â±êËùÔÚÁĞ
+        /// è·å–å½“å‰å…‰æ ‡æ‰€åœ¨åˆ—
         /// </summary>
         public int CursorCol { get { return this.Cursor.Column; } }
 
         /// <summary>
-        /// äÖÈ¾ÖÕ¶ËÊä³öµÄ»­²¼
+        /// æ¸²æŸ“ç»ˆç«¯è¾“å‡ºçš„ç”»å¸ƒ
         /// </summary>
         public ITerminalSurface Surface { get { return this.activeDocument.Surface; } }
 
         /// <summary>
-        /// ÎÄµµ»­²¼ÈİÆ÷
+        /// æ–‡æ¡£ç”»å¸ƒå®¹å™¨
         /// </summary>
         public ITerminalScreen TerminalScreen { get; set; }
 
         /// <summary>
-        /// ¸ù¾İµ±Ç°µçÄÔ¼üÅÌµÄ°´¼ü×´Ì¬£¬×ª»»³É±ê×¼µÄANSI¿ØÖÆĞòÁĞ
+        /// æ ¹æ®å½“å‰ç”µè„‘é”®ç›˜çš„æŒ‰é”®çŠ¶æ€ï¼Œè½¬æ¢æˆæ ‡å‡†çš„ANSIæ§åˆ¶åºåˆ—
         /// </summary>
         public VTKeyboard Keyboard { get; private set; }
 
         public VTextOptions TextOptions { get; private set; }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°¹ö¶¯ÌõÊÇ·ñ¹ö¶¯µ½µ×ÁË
+        /// è·å–å½“å‰æ»šåŠ¨æ¡æ˜¯å¦æ»šåŠ¨åˆ°åº•äº†
         /// </summary>
         public bool ScrollAtBottom
         {
@@ -233,7 +233,7 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// »ñÈ¡µ±Ç°¹ö¶¯ÌõÊÇ·ñ¹ö¶¯µ½¶¥ÁË
+        /// è·å–å½“å‰æ»šåŠ¨æ¡æ˜¯å¦æ»šåŠ¨åˆ°é¡¶äº†
         /// </summary>
         public bool ScrollAtTop
         {
@@ -245,7 +245,7 @@ namespace XTerminal
 
         #endregion
 
-        #region ¹¹Ôì·½·¨
+        #region æ„é€ æ–¹æ³•
 
         public VideoTerminal()
         {
@@ -253,10 +253,10 @@ namespace XTerminal
 
         #endregion
 
-        #region ¹«¿ª½Ó¿Ú
+        #region å…¬å¼€æ¥å£
 
         /// <summary>
-        /// ³õÊ¼»¯ÖÕ¶ËÄ£ÄâÆ÷
+        /// åˆå§‹åŒ–ç»ˆç«¯æ¨¡æ‹Ÿå™¨
         /// </summary>
         /// <param name="sessionInfo"></param>
         public void Initialize(XTermSession sessionInfo)
@@ -269,14 +269,14 @@ namespace XTerminal
             // DECAWM
             this.autoWrapMode = sessionInfo.TerminalOptions.DECPrivateAutoWrapMode;
 
-            // ³õÊ¼»¯±äÁ¿
+            // åˆå§‹åŒ–å˜é‡
             this.historyLines = new Dictionary<int, VTHistoryLine>();
             this.TextOptions = new VTextOptions();
             this.textSelection = new VTextSelection();
 
             this.isRunning = true;
 
-            #region ³õÊ¼»¯¼üÅÌ
+            #region åˆå§‹åŒ–é”®ç›˜
 
             this.Keyboard = new VTKeyboard();
             this.Keyboard.Encoding = Encoding.GetEncoding(sessionInfo.InputEncoding);
@@ -285,7 +285,7 @@ namespace XTerminal
 
             #endregion
 
-            #region ³õÊ¼»¯ÖÕ¶Ë½âÎöÆ÷
+            #region åˆå§‹åŒ–ç»ˆç«¯è§£æå™¨
 
             this.vtParser = new VTParser();
             this.vtParser.ActionEvent += VtParser_ActionEvent;
@@ -293,7 +293,7 @@ namespace XTerminal
 
             #endregion
 
-            #region ³õÊ¼»¯Êó±êÊÂ¼ş
+            #region åˆå§‹åŒ–é¼ æ ‡äº‹ä»¶
 
             this.TerminalScreen.InputEvent += this.VideoTerminal_InputEvent;
             this.TerminalScreen.ScrollChanged += this.TerminalScreen_ScrollChanged;
@@ -304,7 +304,7 @@ namespace XTerminal
 
             #endregion
 
-            #region ³õÊ¼»¯ÎÄµµÄ£ĞÍ
+            #region åˆå§‹åŒ–æ–‡æ¡£æ¨¡å‹
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
@@ -325,18 +325,18 @@ namespace XTerminal
 
             #endregion
 
-            #region ³õÊ¼»¯¹â±ê
+            #region åˆå§‹åŒ–å…‰æ ‡
 
             this.Surface.Draw(this.Cursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
-            // ÏÈ³õÊ¼»¯±¸ÓÃ»º³åÇøµÄ¹â±êäÖÈ¾ÉÏÏÂÎÄ
+            // å…ˆåˆå§‹åŒ–å¤‡ç”¨ç¼“å†²åŒºçš„å…‰æ ‡æ¸²æŸ“ä¸Šä¸‹æ–‡
             this.alternateDocument.Surface.Draw(this.alternateDocument.Cursor);
 
             #endregion
 
-            #region Á¬½ÓÖÕ¶ËÍ¨µÀ
+            #region è¿æ¥ç»ˆç«¯é€šé“
 
             SessionTransport transport = new SessionTransport();
             transport.StatusChanged += this.VTSession_StatusChanged;
@@ -349,7 +349,7 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// ÊÍ·Å×ÊÔ´
+        /// é‡Šæ”¾èµ„æº
         /// </summary>
         public void Release()
         {
@@ -381,7 +381,7 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// ¸´ÖÆµ±Ç°Ñ¡ÖĞµÄĞĞ
+        /// å¤åˆ¶å½“å‰é€‰ä¸­çš„è¡Œ
         /// </summary>
         public void CopySelection()
         {
@@ -392,14 +392,14 @@ namespace XTerminal
 
             string text = this.textSelection.GetText(this.historyLines);
 
-            // µ÷ÓÃ¼ôÌù°åAPI¸´ÖÆµ½¼ôÌù°å
+            // è°ƒç”¨å‰ªè´´æ¿APIå¤åˆ¶åˆ°å‰ªè´´æ¿
             Clipboard.SetText(text);
         }
 
         /// <summary>
-        /// ½«¼ôÌù°åµÄÊı¾İ·¢ËÍ¸ø»á»°
+        /// å°†å‰ªè´´æ¿çš„æ•°æ®å‘é€ç»™ä¼šè¯
         /// </summary>
-        /// <returns>·¢ËÍ³É¹¦·µ»ØSUCCESS£¬Ê§°Ü·µ»Ø´íÎóÂë</returns>
+        /// <returns>å‘é€æˆåŠŸè¿”å›SUCCESSï¼Œå¤±è´¥è¿”å›é”™è¯¯ç </returns>
         public int Paste()
         {
             string text = Clipboard.GetText();
@@ -413,14 +413,14 @@ namespace XTerminal
             int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
-                logger.ErrorFormat("Õ³ÌùÊı¾İÊ§°Ü, {0}", code);
+                logger.ErrorFormat("ç²˜è´´æ•°æ®å¤±è´¥, {0}", code);
             }
 
             return code;
         }
 
         /// <summary>
-        /// Ñ¡ÖĞÈ«²¿µÄÎÄ±¾
+        /// é€‰ä¸­å…¨éƒ¨çš„æ–‡æœ¬
         /// </summary>
         public void SelectAll()
         {
@@ -428,7 +428,7 @@ namespace XTerminal
 
             if (this.firstHistoryLine == null || this.lastHistoryLine == null)
             {
-                logger.WarnFormat("SelectAllÊ§°Ü, ÀúÊ·¼ÇÂ¼ÀïµÄµÚÒ»ĞĞ»òÕß×îºóÒ»ĞĞÎª¿Õ");
+                logger.WarnFormat("SelectAllå¤±è´¥, å†å²è®°å½•é‡Œçš„ç¬¬ä¸€è¡Œæˆ–è€…æœ€åä¸€è¡Œä¸ºç©º");
                 return;
             }
 
@@ -440,8 +440,8 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// ±£´æ³ÉHTMLÎÄµµ
-        /// ´øÓĞÑÕÉ«µÄ
+        /// ä¿å­˜æˆHTMLæ–‡æ¡£
+        /// å¸¦æœ‰é¢œè‰²çš„
         /// </summary>
         /// <param name="filePath"></param>
         public void SaveAsHtml(string filePath)
@@ -450,7 +450,7 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// ±£´æ³ÉÆÕÍ¨ÎÄ±¾ÎÄµµ
+        /// ä¿å­˜æˆæ™®é€šæ–‡æœ¬æ–‡æ¡£
         /// </summary>
         /// <param name="filePath"></param>
         public void SaveAsText(string filePath)
@@ -461,7 +461,7 @@ namespace XTerminal
 
         #endregion
 
-        #region ÊµÀı·½·¨
+        #region å®ä¾‹æ–¹æ³•
 
         private void PerformDeviceStatusReport(StatusType statusType)
         {
@@ -476,16 +476,14 @@ namespace XTerminal
 
                 case StatusType.CPR_CursorPositionReport:
                     {
-                        // ´ò¿ªVIMºó»áÊÕµ½Õâ¸öÇëÇó
-                        // ·¢ËÍCPRµÄÊ±ºò£¬ÒòÎªCPRÏûÏ¢×îºóÃæÓĞ¸öR£¬»áµ¼ÖÂ´ò¿ªVIMºóÖ±½Ó½øÈëÌæ»»Ä£Ê½
-                        // Õâ¸öBUGÔİÊ±Ã»ÕÒµ½²úÉúµÄÔ­ÒòºÍ½â¾ö·½·¨£¬ËùÒÔÔİÊ±ÏÈ×¢ÊÍµô
+                        // æ‰“å¼€VIMåä¼šæ”¶åˆ°è¿™ä¸ªè¯·æ±‚
 
-                        //// Result is CSI r ; c R
-                        //int cursorRow = this.CursorRow;
-                        //int cursorCol = this.CursorCol;
-                        //CPR_CursorPositionReportResponse[2] = (byte)cursorRow;
-                        //CPR_CursorPositionReportResponse[4] = (byte)cursorCol;
-                        //this.sessionTransport.Write(CPR_CursorPositionReportResponse);
+                        // Result is CSI ? r ; c R
+                        int cursorRow = this.CursorRow;
+                        int cursorCol = this.CursorCol;
+                        CPR_CursorPositionReportResponse[3] = (byte)cursorRow;
+                        CPR_CursorPositionReportResponse[5] = (byte)cursorCol;
+                        this.sessionTransport.Write(CPR_CursorPositionReportResponse);
                         break;
                     }
 
@@ -495,17 +493,17 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// Èç¹ûĞèÒª²¼¾ÖÔò½øĞĞ²¼¾Ö
-        /// Èç¹û²»ĞèÒª²¼¾Ö£¬ÄÇÃ´¾Í¿´ÊÇ·ñĞèÒªÖØ»æÄ³Ğ©ÎÄ±¾ĞĞ
+        /// å¦‚æœéœ€è¦å¸ƒå±€åˆ™è¿›è¡Œå¸ƒå±€
+        /// å¦‚æœä¸éœ€è¦å¸ƒå±€ï¼Œé‚£ä¹ˆå°±çœ‹æ˜¯å¦éœ€è¦é‡ç»˜æŸäº›æ–‡æœ¬è¡Œ
         /// </summary>
-        /// <param name="document">ÒªäÖÈ¾µÄÎÄµµ</param>
+        /// <param name="document">è¦æ¸²æŸ“çš„æ–‡æ¡£</param>
         /// <param name="scrollValue">
-        /// ÊÇ·ñÒªÒÆ¶¯¹ö¶¯Ìõ£¬ÉèÖÃÎª-1±íÊ¾²»ÒÆ¶¯¹ö¶¯Ìõ
-        /// ×¢ÒâÕâÀïÖ»ÊÇ¸üĞÂUIÉÏµÄ¹ö¶¯ÌõÎ»ÖÃ£¬²¢²»»áÊµ¼ÊµÄÈ¥¹ö¶¯ÄÚÈİ
+        /// æ˜¯å¦è¦ç§»åŠ¨æ»šåŠ¨æ¡ï¼Œè®¾ç½®ä¸º-1è¡¨ç¤ºä¸ç§»åŠ¨æ»šåŠ¨æ¡
+        /// æ³¨æ„è¿™é‡Œåªæ˜¯æ›´æ–°UIä¸Šçš„æ»šåŠ¨æ¡ä½ç½®ï¼Œå¹¶ä¸ä¼šå®é™…çš„å»æ»šåŠ¨å†…å®¹
         /// </param>
         private void DrawDocument(VTDocument document, int scrollValue = -1, bool arrangeSelectionArea = false)
         {
-            // µ±Ç°ĞĞµÄY·½ÏòÆ«ÒÆÁ¿
+            // å½“å‰è¡Œçš„Yæ–¹å‘åç§»é‡
             double offsetY = 0;
 
             bool arrangeDirty = document.IsArrangeDirty;
@@ -513,37 +511,37 @@ namespace XTerminal
 
             this.uiSyncContext.Send((state) =>
             {
-                #region äÖÈ¾ÎÄµµ
+                #region æ¸²æŸ“æ–‡æ¡£
 
                 VTextLine next = document.FirstLine;
 
                 while (next != null)
                 {
-                    // ¸üĞÂYÆ«ÒÆÁ¿ĞÅÏ¢
+                    // æ›´æ–°Yåç§»é‡ä¿¡æ¯
                     next.OffsetY = offsetY;
 
                     if (next.IsRenderDirty)
                     {
-                        // ´ËÊ±ËµÃ÷¸ÃĞĞÓĞ×Ö·û±ä»¯£¬ĞèÒªÖØ»æ
+                        // æ­¤æ—¶è¯´æ˜è¯¥è¡Œæœ‰å­—ç¬¦å˜åŒ–ï¼Œéœ€è¦é‡ç»˜
                         this.Surface.Draw(next);
                         //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);
                     }
                     else if (next.IsMeasureDirety)
                     {
-                        // ×Ö·ûÃ»ÓĞ±ä»¯£¬ÄÇÃ´Ö»ÖØĞÂ²âÁ¿È»ºó¸üĞÂÒ»ÏÂÎÄ±¾µÄÆ«ÒÆÁ¿¾ÍºÃÁË
+                        // å­—ç¬¦æ²¡æœ‰å˜åŒ–ï¼Œé‚£ä¹ˆåªé‡æ–°æµ‹é‡ç„¶åæ›´æ–°ä¸€ä¸‹æ–‡æœ¬çš„åç§»é‡å°±å¥½äº†
                         this.Surface.MeasureLine(next);
                     }
 
-                    // ¸üĞÂĞĞÆ«ÒÆÁ¿
+                    // æ›´æ–°è¡Œåç§»é‡
                     if (arrangeDirty)
                     {
                         this.Surface.Arrange(next);
                     }
 
-                    // ¸üĞÂÏÂÒ»¸öÎÄ±¾ĞĞµÄYÆ«ÒÆÁ¿
+                    // æ›´æ–°ä¸‹ä¸€ä¸ªæ–‡æœ¬è¡Œçš„Yåç§»é‡
                     offsetY += next.Height;
 
-                    // Èç¹û×îºóÒ»ĞĞäÖÈ¾Íê±ÏÁË£¬ÄÇÃ´¾ÍÍË³ö
+                    // å¦‚æœæœ€åä¸€è¡Œæ¸²æŸ“å®Œæ¯•äº†ï¼Œé‚£ä¹ˆå°±é€€å‡º
                     if (next == document.LastLine)
                     {
                         break;
@@ -554,7 +552,7 @@ namespace XTerminal
 
                 #endregion
 
-                #region äÖÈ¾¹â±ê
+                #region æ¸²æŸ“å…‰æ ‡
 
                 this.Cursor.OffsetY = this.ActiveLine.OffsetY;
                 this.Cursor.OffsetX = this.Surface.MeasureBlock(this.ActiveLine, this.ActiveLine.FindCharacterIndex(this.CursorCol)).Width;
@@ -562,7 +560,7 @@ namespace XTerminal
 
                 #endregion
 
-                #region ÒÆ¶¯¹ö¶¯Ìõ
+                #region ç§»åŠ¨æ»šåŠ¨æ¡
 
                 if (scrollValue != -1)
                 {
@@ -571,7 +569,7 @@ namespace XTerminal
 
                 #endregion
 
-                #region ¸üĞÂÑ¡ÖĞÇøÓòµÄÎ»ÖÃ
+                #region æ›´æ–°é€‰ä¸­åŒºåŸŸçš„ä½ç½®
 
                 if (arrangeSelectionArea)
                 {
@@ -586,8 +584,8 @@ namespace XTerminal
             {
                 if (this.ScrollAtBottom)
                 {
-                    // ¹ö¶¯µ½µ×ÁË£¬ËµÃ÷ÊÇActiveLine¾ÍÊÇµ±Ç°ÕıÔÚÊäÈëµÄĞĞ
-                    // ¸üĞÂÏÂÀúÊ·ĞĞµÄ´óĞ¡ºÍÎÄ×Ö£¬²»È»ÔÚÖ´ĞĞ¹â±êÑ¡ÖĞµÄÊ±ºòÎÄ±¾Îª¿Õ£¬»áÓ°Ïìµ½²âÁ¿
+                    // æ»šåŠ¨åˆ°åº•äº†ï¼Œè¯´æ˜æ˜¯ActiveLineå°±æ˜¯å½“å‰æ­£åœ¨è¾“å…¥çš„è¡Œ
+                    // æ›´æ–°ä¸‹å†å²è¡Œçš„å¤§å°å’Œæ–‡å­—ï¼Œä¸ç„¶åœ¨æ‰§è¡Œå…‰æ ‡é€‰ä¸­çš„æ—¶å€™æ–‡æœ¬ä¸ºç©ºï¼Œä¼šå½±å“åˆ°æµ‹é‡
                     this.lastHistoryLine.Freeze(this.ActiveLine);
                 }
             }
@@ -596,54 +594,54 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// ¹ö¶¯µ½Ö¸¶¨µÄÀúÊ·¼ÇÂ¼
-        /// ²¢¸üĞÂUIÉÏµÄ¹ö¶¯ÌõÎ»ÖÃ
+        /// æ»šåŠ¨åˆ°æŒ‡å®šçš„å†å²è®°å½•
+        /// å¹¶æ›´æ–°UIä¸Šçš„æ»šåŠ¨æ¡ä½ç½®
         /// </summary>
-        /// <param name="scrollValue">ÒªÏÔÊ¾µÄµÚÒ»ĞĞÀúÊ·¼ÇÂ¼</param>
+        /// <param name="scrollValue">è¦æ˜¾ç¤ºçš„ç¬¬ä¸€è¡Œå†å²è®°å½•</param>
         private void ScrollToHistory(int scrollValue)
         {
-            // Òª¹ö¶¯µ½µÄÖµ
+            // è¦æ»šåŠ¨åˆ°çš„å€¼
             int newScroll = scrollValue;
-            // ¹ö¶¯Ö®Ç°µÄÖµ
+            // æ»šåŠ¨ä¹‹å‰çš„å€¼
             int oldScroll = this.scrollValue;
 
-            // ¸üĞÂµ±Ç°¹ö¶¯ÌõµÄÖµ£¬Ò»¶¨ÒªÏÈ¸üĞÂ£¬ÒòÎªDrawDocumentº¯Êı»áÓÃµ½¸ÃÖµ
+            // æ›´æ–°å½“å‰æ»šåŠ¨æ¡çš„å€¼ï¼Œä¸€å®šè¦å…ˆæ›´æ–°ï¼Œå› ä¸ºDrawDocumentå‡½æ•°ä¼šç”¨åˆ°è¯¥å€¼
             this.scrollValue = scrollValue;
 
-            // ÖÕ¶Ë¿ÉÒÔÏÔÊ¾µÄ×ÜĞĞÊı
+            // ç»ˆç«¯å¯ä»¥æ˜¾ç¤ºçš„æ€»è¡Œæ•°
             int terminalRows = this.sessionInfo.TerminalOptions.Rows;
 
-            // ±»¹ö¶¯µÄĞĞÊı
+            // è¢«æ»šåŠ¨çš„è¡Œæ•°
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
-            // ÊÇ·ñĞèÒªÒÆ¶¯Ñ¡ÖĞÇøÓò
+            // æ˜¯å¦éœ€è¦ç§»åŠ¨é€‰ä¸­åŒºåŸŸ
             bool arrangeSelectionArea = false;
 
             if (scrolledRows >= terminalRows)
             {
-                // ÏÈÕÒµ½SurfaceÉÏÒªÏÔÊ¾µÄµÚÒ»ĞĞÊı¾İ
+                // å…ˆæ‰¾åˆ°Surfaceä¸Šè¦æ˜¾ç¤ºçš„ç¬¬ä¸€è¡Œæ•°æ®
                 VTHistoryLine historyLine;
                 if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
                 {
-                    logger.ErrorFormat("ScrollToÊ§°Ü, ÕÒ²»µ½¶ÔÓ¦µÄVTHistoryLine, scrollValue = {0}", scrollValue);
+                    logger.ErrorFormat("ScrollToå¤±è´¥, æ‰¾ä¸åˆ°å¯¹åº”çš„VTHistoryLine, scrollValue = {0}", scrollValue);
                     return;
                 }
 
-                // ´ËÊ±ËµÃ÷°ÑËùÓĞĞĞ¶¼¹ö¶¯µ½SurfaceÍâÁË£¬ĞèÒªÖØĞÂÏÔÊ¾ËùÓĞĞĞ
-                // ÕÒµ½ºóÃæµÄĞĞÊıÏÔÊ¾
+                // æ­¤æ—¶è¯´æ˜æŠŠæ‰€æœ‰è¡Œéƒ½æ»šåŠ¨åˆ°Surfaceå¤–äº†ï¼Œéœ€è¦é‡æ–°æ˜¾ç¤ºæ‰€æœ‰è¡Œ
+                // æ‰¾åˆ°åé¢çš„è¡Œæ•°æ˜¾ç¤º
                 VTHistoryLine currentHistory = historyLine;
                 VTextLine currentTextLine = this.activeDocument.FirstLine;
                 for (int i = 0; i < terminalRows; i++)
                 {
-                    // Ö±½ÓÊ¹ÓÃVTHistoryLineµÄList<VTCharacter>µÄÒıÓÃ
-                    // ¶³½á×´Ì¬ÏÂµÄVTextLine²»»áÔÙÓĞĞŞ¸ÄÁË
-                    // ·Ç¶³½á×´Ì¬(ActiveLine)ĞèÒªÖØĞÂ´´½¨Ò»¸ö¼¯ºÏ
+                    // ç›´æ¥ä½¿ç”¨VTHistoryLineçš„List<VTCharacter>çš„å¼•ç”¨
+                    // å†»ç»“çŠ¶æ€ä¸‹çš„VTextLineä¸ä¼šå†æœ‰ä¿®æ”¹äº†
+                    // éå†»ç»“çŠ¶æ€(ActiveLine)éœ€è¦é‡æ–°åˆ›å»ºä¸€ä¸ªé›†åˆ
                     currentTextLine.SetHistory(currentHistory);
                     currentHistory = currentHistory.NextLine;
                     currentTextLine = currentTextLine.NextLine;
                 }
 
-                // Èç¹ûµ±Ç°ÓĞÑ¡ÖĞÄÚÈİ£¬ÄÇÃ´¸üĞÂÑ¡ÖĞÄÚÈİµÄÍ¼ĞÎÎªÎ»ÖÃ
+                // å¦‚æœå½“å‰æœ‰é€‰ä¸­å†…å®¹ï¼Œé‚£ä¹ˆæ›´æ–°é€‰ä¸­å†…å®¹çš„å›¾å½¢ä¸ºä½ç½®
                 if (!this.textSelection.IsEmpty)
                 {
                     this.textSelection.OffsetY = -9999;
@@ -651,22 +649,22 @@ namespace XTerminal
             }
             else
             {
-                // Ëã³öÀ´ÒÆ¶¯Ç°µÄµÚÒ»ĞĞ/×îºóÒ»ĞĞÓëÒÆ¶¯ºóµÄµÚÒ»ĞĞ/×îºóÒ»ĞĞµÄ²îÖµ
-                // Õâ¸ö²îÖµ¾ÍÊÇTextSelection.GeometryµÄOffsetY
+                // ç®—å‡ºæ¥ç§»åŠ¨å‰çš„ç¬¬ä¸€è¡Œ/æœ€åä¸€è¡Œä¸ç§»åŠ¨åçš„ç¬¬ä¸€è¡Œ/æœ€åä¸€è¡Œçš„å·®å€¼
+                // è¿™ä¸ªå·®å€¼å°±æ˜¯TextSelection.Geometryçš„OffsetY
                 VTextLine line1 = null;
                 VTextLine line2 = null;
 
-                // ´ËÊ±ËµÃ÷Ö»ĞèÒª¸üĞÂÒÆ¶¯³öÈ¥µÄĞĞ¾Í¿ÉÒÔÁË
+                // æ­¤æ—¶è¯´æ˜åªéœ€è¦æ›´æ–°ç§»åŠ¨å‡ºå»çš„è¡Œå°±å¯ä»¥äº†
                 if (newScroll > oldScroll)
                 {
                     line1 = this.activeDocument.FirstLine;
 
-                    // ÍùÏÂ¹ö¶¯£¬°ÑÉÏÃæµÄÄÃµ½ÏÂÃæ£¬´ÓµÚÒ»ĞĞ¿ªÊ¼
+                    // å¾€ä¸‹æ»šåŠ¨ï¼ŒæŠŠä¸Šé¢çš„æ‹¿åˆ°ä¸‹é¢ï¼Œä»ç¬¬ä¸€è¡Œå¼€å§‹
                     for (int i = 0; i < scrolledRows; i++)
                     {
                         VTHistoryLine historyLine = this.historyLines[oldScroll + terminalRows + i];
 
-                        // ¸ÃÖµÓÀÔ¶ÊÇµÚÒ»ĞĞ£¬ÒòÎªÏÂÃæ±»Moveµ½×îºóÒ»ĞĞÁË
+                        // è¯¥å€¼æ°¸è¿œæ˜¯ç¬¬ä¸€è¡Œï¼Œå› ä¸ºä¸‹é¢è¢«Moveåˆ°æœ€åä¸€è¡Œäº†
                         VTextLine firstLine = this.activeDocument.FirstLine;
 
                         firstLine.Move(VTextLine.MoveOptions.MoveToLast);
@@ -680,7 +678,7 @@ namespace XTerminal
                 {
                     line1 = this.activeDocument.LastLine;
 
-                    // ÍùÉÏ¹ö¶¯£¬°ÑÏÂÃæµÄÄÃµ½ÉÏÃæ£¬´Ó×îºóÒ»ĞĞ¿ªÊ¼
+                    // å¾€ä¸Šæ»šåŠ¨ï¼ŒæŠŠä¸‹é¢çš„æ‹¿åˆ°ä¸Šé¢ï¼Œä»æœ€åä¸€è¡Œå¼€å§‹
                     for (int i = 1; i <= scrolledRows; i++)
                     {
                         VTHistoryLine historyLine = this.historyLines[oldScroll - i];
@@ -695,7 +693,7 @@ namespace XTerminal
                     line2 = this.activeDocument.LastLine;
                 }
 
-                // Èç¹ûµ±Ç°ÓĞÑ¡ÖĞÄÚÈİ£¬ÄÇÃ´¸üĞÂÑ¡ÖĞÄÚÈİµÄÍ¼ĞÎÎªÎ»ÖÃ
+                // å¦‚æœå½“å‰æœ‰é€‰ä¸­å†…å®¹ï¼Œé‚£ä¹ˆæ›´æ–°é€‰ä¸­å†…å®¹çš„å›¾å½¢ä¸ºä½ç½®
                 if (!this.textSelection.IsEmpty)
                 {
                     this.textSelection.OffsetY += line1.OffsetY - line2.OffsetY;
@@ -708,31 +706,31 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// µ±¹â±êÔÚÈİÆ÷ÍâÃæÒÆ¶¯µÄÊ±ºò£¬½øĞĞ¹ö¶¯
+        /// å½“å…‰æ ‡åœ¨å®¹å™¨å¤–é¢ç§»åŠ¨çš„æ—¶å€™ï¼Œè¿›è¡Œæ»šåŠ¨
         /// </summary>
-        /// <param name="mousePosition">µ±Ç°Êó±êµÄ×ø±ê</param>
-        /// <param name="surfaceBoundary">Ïà¶ÔÓÚµçÄÔÏÔÊ¾Æ÷µÄ»­²¼µÄ±ß½ç¿ò</param>
-        /// <returns>ÊÇ·ñÖ´ĞĞÁË¹ö¶¯¶¯×÷</returns>
+        /// <param name="mousePosition">å½“å‰é¼ æ ‡çš„åæ ‡</param>
+        /// <param name="surfaceBoundary">ç›¸å¯¹äºç”µè„‘æ˜¾ç¤ºå™¨çš„ç”»å¸ƒçš„è¾¹ç•Œæ¡†</param>
+        /// <returns>æ˜¯å¦æ‰§è¡Œäº†æ»šåŠ¨åŠ¨ä½œ</returns>
         private OutsideScrollResult ScrollIfCursorOutsideSurface(VTPoint mousePosition, VTRect surfaceBoundary)
         {
             OutsideScrollResult scrollResult = OutsideScrollResult.None;
 
-            // Òª¹ö¶¯µ½µÄÄ¿±êĞĞ
+            // è¦æ»šåŠ¨åˆ°çš„ç›®æ ‡è¡Œ
             int scrollTarget = -1;
 
             if (mousePosition.Y < 0)
             {
-                // ¹â±êÔÚÈİÆ÷ÉÏÃæ
+                // å…‰æ ‡åœ¨å®¹å™¨ä¸Šé¢
                 if (!this.ScrollAtTop)
                 {
-                    // ²»ÔÚ×îÉÏÃæ£¬ÍùÉÏ¹ö¶¯Ò»ĞĞ
+                    // ä¸åœ¨æœ€ä¸Šé¢ï¼Œå¾€ä¸Šæ»šåŠ¨ä¸€è¡Œ
                     scrollTarget = this.scrollValue - 1;
                     scrollResult = OutsideScrollResult.ScrollTop;
                 }
             }
             else if (mousePosition.Y > surfaceBoundary.Height)
             {
-                // ¹â±êÔÚÈİÆ÷ÏÂÃæ
+                // å…‰æ ‡åœ¨å®¹å™¨ä¸‹é¢
                 if (!this.ScrollAtBottom)
                 {
                     scrollTarget = this.scrollValue + 1;
@@ -749,15 +747,15 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// Ê¹ÓÃÏñËØ×ø±ê¶ÔVTextLine×öÃüÖĞ²âÊÔ
+        /// ä½¿ç”¨åƒç´ åæ ‡å¯¹VTextLineåšå‘½ä¸­æµ‹è¯•
         /// </summary>
-        /// <param name="mousePosition">Êó±ê×ø±ê</param>
-        /// <param name="surfaceBoundary">Ïà¶ÔÓÚµçÄÔÏÔÊ¾Æ÷µÄ»­²¼µÄ±ß½ç¿ò£¬Ò²ÊÇÊó±êµÄÏŞ¶¨·¶Î§</param>
-        /// <param name="pointer">´æ´¢ÃüÖĞ²âÊÔ½á¹ûµÄ±äÁ¿</param>
-        /// <remarks>Èç¹û´«µİ½øÀ´µÄÊó±êÎ»ÖÃÔÚ´°¿ÚÍâ£¬ÄÇÃ´»á°ÑÊó±êÏŞ¶¨ÔÚ¾àÀëÊó±ê×î½üµÄSurface±ßÔµ´¦</remarks>
+        /// <param name="mousePosition">é¼ æ ‡åæ ‡</param>
+        /// <param name="surfaceBoundary">ç›¸å¯¹äºç”µè„‘æ˜¾ç¤ºå™¨çš„ç”»å¸ƒçš„è¾¹ç•Œæ¡†ï¼Œä¹Ÿæ˜¯é¼ æ ‡çš„é™å®šèŒƒå›´</param>
+        /// <param name="pointer">å­˜å‚¨å‘½ä¸­æµ‹è¯•ç»“æœçš„å˜é‡</param>
+        /// <remarks>å¦‚æœä¼ é€’è¿›æ¥çš„é¼ æ ‡ä½ç½®åœ¨çª—å£å¤–ï¼Œé‚£ä¹ˆä¼šæŠŠé¼ æ ‡é™å®šåœ¨è·ç¦»é¼ æ ‡æœ€è¿‘çš„Surfaceè¾¹ç¼˜å¤„</remarks>
         /// <returns>
-        /// ÊÇ·ñ»ñÈ¡³É¹¦
-        /// µ±¹â±ê²»ÔÚÄ³Ò»ĞĞ»òÕß²»ÔÚÄ³¸ö×Ö·ûÉÏµÄÊ±ºò£¬¾Í»ñÈ¡Ê§°Ü
+        /// æ˜¯å¦è·å–æˆåŠŸ
+        /// å½“å…‰æ ‡ä¸åœ¨æŸä¸€è¡Œæˆ–è€…ä¸åœ¨æŸä¸ªå­—ç¬¦ä¸Šçš„æ—¶å€™ï¼Œå°±è·å–å¤±è´¥
         /// </returns>
         private bool GetTextPointer(VTPoint mousePosition, VTRect surfaceBoundary, VTextPointer pointer)
         {
@@ -784,15 +782,15 @@ namespace XTerminal
 
             pointer.CharacterIndex = -1;
 
-            #region ÏÈÕÒµ½Êó±êËùÔÚĞĞ
+            #region å…ˆæ‰¾åˆ°é¼ æ ‡æ‰€åœ¨è¡Œ
 
-            // ÓĞ¿ÉÄÜµ±Ç°ÓĞ¹ö¶¯£¬ËùÒÔÒª´ÓÀúÊ·ĞĞÀï¿ªÊ¼ÕÒ
-            // ÏÈ»ñÈ¡µ½µ±Ç°ÆÁÄ»ÉÏÏÔÊ¾µÄÀúÊ·ĞĞµÄÊ×ĞĞ
+            // æœ‰å¯èƒ½å½“å‰æœ‰æ»šåŠ¨ï¼Œæ‰€ä»¥è¦ä»å†å²è¡Œé‡Œå¼€å§‹æ‰¾
+            // å…ˆè·å–åˆ°å½“å‰å±å¹•ä¸Šæ˜¾ç¤ºçš„å†å²è¡Œçš„é¦–è¡Œ
 
             VTHistoryLine topHistoryLine;
             if (!this.historyLines.TryGetValue(this.scrollValue, out topHistoryLine))
             {
-                logger.DebugFormat("GetTextPointerÊ§°Ü, ²»´æÔÚÀúÊ·ĞĞ¼ÇÂ¼, currentScroll = {0}", this.scrollValue);
+                logger.DebugFormat("GetTextPointerå¤±è´¥, ä¸å­˜åœ¨å†å²è¡Œè®°å½•, currentScroll = {0}", this.scrollValue);
                 return false;
             }
 
@@ -800,8 +798,8 @@ namespace XTerminal
             VTHistoryLine lineHit = VTextSelectionHelper.HitTestVTextLine(topHistoryLine, mouseY, out lineOffsetY);
             if (lineHit == null)
             {
-                // ÕâÀïËµÃ÷Êó±êÃ»ÓĞÔÚÈÎºÎÒ»ĞĞÉÏ
-                logger.DebugFormat("Ã»ÓĞÕÒµ½Êó±êÎ»ÖÃ¶ÔÓ¦µÄĞĞ, cursorY = {0}", mouseY);
+                // è¿™é‡Œè¯´æ˜é¼ æ ‡æ²¡æœ‰åœ¨ä»»ä½•ä¸€è¡Œä¸Š
+                logger.DebugFormat("æ²¡æœ‰æ‰¾åˆ°é¼ æ ‡ä½ç½®å¯¹åº”çš„è¡Œ, cursorY = {0}", mouseY);
                 return false;
             }
 
@@ -809,7 +807,7 @@ namespace XTerminal
 
             #endregion
 
-            #region ÔÙ¼ÆËãÊó±êĞü¸¡ÓÚÄÄ¸ö×Ö·ûÉÏ
+            #region å†è®¡ç®—é¼ æ ‡æ‚¬æµ®äºå“ªä¸ªå­—ç¬¦ä¸Š
 
             int characterIndex;
             VTRect characterBounds;
@@ -828,9 +826,9 @@ namespace XTerminal
         }
 
         /// <summary>
-        /// ×Ô¶¯ÅĞ¶ÏchÊÇ¶à×Ö½Ú×Ö·û»¹ÊÇµ¥×Ö½Ú×Ö·û£¬´´½¨Ò»¸öVTCharacter
+        /// è‡ªåŠ¨åˆ¤æ–­chæ˜¯å¤šå­—èŠ‚å­—ç¬¦è¿˜æ˜¯å•å­—èŠ‚å­—ç¬¦ï¼Œåˆ›å»ºä¸€ä¸ªVTCharacter
         /// </summary>
-        /// <param name="ch">¶à×Ö½Ú»òÕßµ¥×Ö½ÚµÄ×Ö·û</param>
+        /// <param name="ch">å¤šå­—èŠ‚æˆ–è€…å•å­—èŠ‚çš„å­—ç¬¦</param>
         /// <returns></returns>
         private VTCharacter CreateCharacter(object ch)
         {
@@ -846,10 +844,10 @@ namespace XTerminal
 
         #endregion
 
-        #region ÊÂ¼ş´¦ÀíÆ÷
+        #region äº‹ä»¶å¤„ç†å™¨
 
         /// <summary>
-        /// µ±ÓÃ»§°´ÏÂ°´¼üµÄÊ±ºò´¥·¢
+        /// å½“ç”¨æˆ·æŒ‰ä¸‹æŒ‰é”®çš„æ—¶å€™è§¦å‘
         /// </summary>
         /// <param name="terminal"></param>
         private void VideoTerminal_InputEvent(ITerminalScreen canvasPanel, VTInputEvent evt)
@@ -860,11 +858,11 @@ namespace XTerminal
                 return;
             }
 
-            // ÕâÀïÊäÈëµÄ¶¼ÊÇ¼üÅÌ°´¼ü
+            // è¿™é‡Œè¾“å…¥çš„éƒ½æ˜¯é”®ç›˜æŒ‰é”®
             int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
-                logger.ErrorFormat("´¦ÀíÊäÈëÒì³£, {0}", ResponseCode.GetMessage(code));
+                logger.ErrorFormat("å¤„ç†è¾“å…¥å¼‚å¸¸, {0}", ResponseCode.GetMessage(code));
             }
         }
 
@@ -874,13 +872,13 @@ namespace XTerminal
             {
                 case VTActions.Print:
                     {
-                        // ¸ù¾İ²âÊÔµÃ³ö½áÂÛ£º
-                        // ÔÚVIMÄ£Ê½ÏÂÊäÈëÖĞÎÄ×Ö·û£¬VIM»á×Ô¶¯°Ñ¹â±êÍùºóÒÆ¶¯2ÁĞ£¬ËùÒÔÅĞ¶ÏVIMÀïÒ»¸öÖĞÎÄ×Ö·ûÕ¼ÓÃ2ÁĞµÄ¿í¶È
-                        // ÔÚÕı³£Ä£Ê½ÏÂ£¬Èç¹ûÓöµ½ÖĞÎÄ×Ö·û£¬Ò²Ê¹ÓÃ2ÁĞÀ´ÏÔÊ¾
-                        // Ò²¾ÍÊÇËµ£¬Èç¹ûÖÕ¶ËÁĞÊıÒ»¹²ÊÇ80£¬ÄÇÃ´¿ÉÒÔÏÔÊ¾40¸öÖĞÎÄ×Ö·û£¬ÏÔÊ¾Íê40¸öÖĞÎÄ×Ö·ûºó¾ÍÒª»»ĞĞ
+                        // æ ¹æ®æµ‹è¯•å¾—å‡ºç»“è®ºï¼š
+                        // åœ¨VIMæ¨¡å¼ä¸‹è¾“å…¥ä¸­æ–‡å­—ç¬¦ï¼ŒVIMä¼šè‡ªåŠ¨æŠŠå…‰æ ‡å¾€åç§»åŠ¨2åˆ—ï¼Œæ‰€ä»¥åˆ¤æ–­VIMé‡Œä¸€ä¸ªä¸­æ–‡å­—ç¬¦å ç”¨2åˆ—çš„å®½åº¦
+                        // åœ¨æ­£å¸¸æ¨¡å¼ä¸‹ï¼Œå¦‚æœé‡åˆ°ä¸­æ–‡å­—ç¬¦ï¼Œä¹Ÿä½¿ç”¨2åˆ—æ¥æ˜¾ç¤º
+                        // ä¹Ÿå°±æ˜¯è¯´ï¼Œå¦‚æœç»ˆç«¯åˆ—æ•°ä¸€å…±æ˜¯80ï¼Œé‚£ä¹ˆå¯ä»¥æ˜¾ç¤º40ä¸ªä¸­æ–‡å­—ç¬¦ï¼Œæ˜¾ç¤ºå®Œ40ä¸ªä¸­æ–‡å­—ç¬¦åå°±è¦æ¢è¡Œ
 
-                        // Èç¹ûÔÚshellÀïÉ¾³ıÒ»¸öÖĞÎÄ×Ö·û£¬ÄÇÃ´»áÖ´ĞĞÁ½´Î¹â±êÏòºóÒÆ¶¯µÄ¶¯×÷£¬È»ºóEraseLine - ToEnd
-                        // ÓÉ´Ë¿ÉµÃ³ö½áÂÛ£¬²»ÂÛÊÇVIM»¹ÊÇshell£¬Ò»¸öÖĞÎÄ×Ö·û¶¼ÊÇ°´ÕÕÕ¼ÓÃÁ½ÁĞµÄ¿Õ¼äÀ´¼ÆËãµÄ
+                        // å¦‚æœåœ¨shellé‡Œåˆ é™¤ä¸€ä¸ªä¸­æ–‡å­—ç¬¦ï¼Œé‚£ä¹ˆä¼šæ‰§è¡Œä¸¤æ¬¡å…‰æ ‡å‘åç§»åŠ¨çš„åŠ¨ä½œï¼Œç„¶åEraseLine - ToEnd
+                        // ç”±æ­¤å¯å¾—å‡ºç»“è®ºï¼Œä¸è®ºæ˜¯VIMè¿˜æ˜¯shellï¼Œä¸€ä¸ªä¸­æ–‡å­—ç¬¦éƒ½æ˜¯æŒ‰ç…§å ç”¨ä¸¤åˆ—çš„ç©ºé—´æ¥è®¡ç®—çš„
 
                         char ch = Convert.ToChar(parameter);
                         VTDebug.WriteAction("Print:{0}, Cursor={1},{2}", ch, this.CursorRow, this.CursorCol);
@@ -893,7 +891,7 @@ namespace XTerminal
                 case VTActions.CarriageReturn:
                     {
                         // CR
-                        // °Ñ¹â±êÒÆ¶¯µ½ĞĞ¿ªÍ·
+                        // æŠŠå…‰æ ‡ç§»åŠ¨åˆ°è¡Œå¼€å¤´
                         this.activeDocument.SetCursor(this.CursorRow, 0);
                         VTDebug.WriteAction("CarriageReturn, Cursor={0},{1}", this.CursorRow, this.CursorCol);
                         break;
@@ -904,31 +902,31 @@ namespace XTerminal
                 case VTActions.LF:
                     {
                         // LF
-                        // ¹ö¶¯±ß¾à»áÓ°Ïìµ½LF£¨DECSTBM_SetScrollingRegion£©£¬ÔÚÊµÏÖµÄÊ±ºòÒª¿¼ÂÇµ½¹ö¶¯±ß¾à
+                        // æ»šåŠ¨è¾¹è·ä¼šå½±å“åˆ°LFï¼ˆDECSTBM_SetScrollingRegionï¼‰ï¼Œåœ¨å®ç°çš„æ—¶å€™è¦è€ƒè™‘åˆ°æ»šåŠ¨è¾¹è·
 
                         if (this.activeDocument == this.mainDocument)
                         {
-                            // Èç¹û¹ö¶¯Ìõ²»ÔÚ×îµ×²¿£¬ÄÇÃ´ÏÈ°Ñ¹ö¶¯Ìõ¹ö¶¯µ½µ×
+                            // å¦‚æœæ»šåŠ¨æ¡ä¸åœ¨æœ€åº•éƒ¨ï¼Œé‚£ä¹ˆå…ˆæŠŠæ»šåŠ¨æ¡æ»šåŠ¨åˆ°åº•
                             if (!this.ScrollAtBottom)
                             {
                                 this.ScrollToHistory(this.scrollMax);
                             }
                         }
 
-                        // ÏëÏñÒ»ÏÂÓĞÒ»¸ö´òÓ¡»úÍùÒ»ÕÅÖ½ÉÏ´ò×Ö£¬µ±´òÓ¡»úÏëÒÆ¶¯µ½ÏÂÒ»ĞĞ´ò×ÖµÄÊ±ºò£¬Ëü»á·¢³öÒ»¸öLineFeedÖ¸Áî£¬ÈÃÖ½ÍùÉÏÒÆ¶¯Ò»ĞĞ
-                        // LineFeed£¬×ÖÃæÒâË¼¾ÍÊÇ°ÑÖ½ÉÏµÄÏÂÒ»ĞĞÎ¹¸ø´òÓ¡»úÊ¹ÓÃ
+                        // æƒ³åƒä¸€ä¸‹æœ‰ä¸€ä¸ªæ‰“å°æœºå¾€ä¸€å¼ çº¸ä¸Šæ‰“å­—ï¼Œå½“æ‰“å°æœºæƒ³ç§»åŠ¨åˆ°ä¸‹ä¸€è¡Œæ‰“å­—çš„æ—¶å€™ï¼Œå®ƒä¼šå‘å‡ºä¸€ä¸ªLineFeedæŒ‡ä»¤ï¼Œè®©çº¸å¾€ä¸Šç§»åŠ¨ä¸€è¡Œ
+                        // LineFeedï¼Œå­—é¢æ„æ€å°±æ˜¯æŠŠçº¸ä¸Šçš„ä¸‹ä¸€è¡Œå–‚ç»™æ‰“å°æœºä½¿ç”¨
                         this.activeDocument.LineFeed();
 
-                        // »»ĞĞÖ®ºó¼ÇÂ¼ÀúÊ·ĞĞ
-                        // ×¢ÒâÓÃ»§¿ÉÒÔÊäÈëBackspace¼ü»òÕßÉÏÏÂ×óÓÒ¹â±ê¼üÀ´ĞŞ¸Ä×îĞÂĞĞµÄÄÚÈİ£¬ËùÒÔ×îĞÂÒ»ĞĞµÄÄÚÈİÊÇÊµÊ±±ä»¯µÄ£¬Ä¿Ç°µÄ½â¾ö·½°¸ÊÇÔÚäÖÈ¾Õû¸öÎÄµµµÄÊ±ºòÈ¥¸üĞÂ×îºóÒ»¸öÀúÊ·ĞĞµÄÊı¾İ
-                        // MainScrrenBufferºÍAlternateScrrenBufferÀïµÄĞĞ·Ö±ğ¼ÇÂ¼
-                        // AlternateScreenBufferÊÇÓÃÀ´¸øman£¬vimµÈ³ÌĞòÊ¹ÓÃµÄ
-                        // ÔİÊ±Ö»¼ÇÂ¼Ö÷»º³åÇøÀïµÄÊı¾İ£¬±¸ÓÃ»º³åÇøĞèÒª¿¼ÂÇÏÂÔõÃ´¼ÇÂ¼£¬ÒòÎªVIM£¬ManµÈ³ÌĞòÓÃµÄÊÇ±¸ÓÃ»º³åÇø£¬ÓÃ»§ÊÇ¿ÉÒÔÊµÊ±±à¼­»º³åÇøÀïµÄÊı¾İµÄ
+                        // æ¢è¡Œä¹‹åè®°å½•å†å²è¡Œ
+                        // æ³¨æ„ç”¨æˆ·å¯ä»¥è¾“å…¥Backspaceé”®æˆ–è€…ä¸Šä¸‹å·¦å³å…‰æ ‡é”®æ¥ä¿®æ”¹æœ€æ–°è¡Œçš„å†…å®¹ï¼Œæ‰€ä»¥æœ€æ–°ä¸€è¡Œçš„å†…å®¹æ˜¯å®æ—¶å˜åŒ–çš„ï¼Œç›®å‰çš„è§£å†³æ–¹æ¡ˆæ˜¯åœ¨æ¸²æŸ“æ•´ä¸ªæ–‡æ¡£çš„æ—¶å€™å»æ›´æ–°æœ€åä¸€ä¸ªå†å²è¡Œçš„æ•°æ®
+                        // MainScrrenBufferå’ŒAlternateScrrenBufferé‡Œçš„è¡Œåˆ†åˆ«è®°å½•
+                        // AlternateScreenBufferæ˜¯ç”¨æ¥ç»™manï¼Œvimç­‰ç¨‹åºä½¿ç”¨çš„
+                        // æš‚æ—¶åªè®°å½•ä¸»ç¼“å†²åŒºé‡Œçš„æ•°æ®ï¼Œå¤‡ç”¨ç¼“å†²åŒºéœ€è¦è€ƒè™‘ä¸‹æ€ä¹ˆè®°å½•ï¼Œå› ä¸ºVIMï¼ŒManç­‰ç¨‹åºç”¨çš„æ˜¯å¤‡ç”¨ç¼“å†²åŒºï¼Œç”¨æˆ·æ˜¯å¯ä»¥å®æ—¶ç¼–è¾‘ç¼“å†²åŒºé‡Œçš„æ•°æ®çš„
                         if (this.activeDocument == this.mainDocument)
                         {
-                            // ¿ÉÒÔÈ·±£»»ĞĞÖ®Ç°µÄĞĞÒÑ¾­±»ÓÃ»§ÊäÈëÍêÁË£¬²»»á±»¸ü¸ÄÁË£¬ËùÒÔÕâÀï¶³½áÒ»ÏÂ»»ĞĞÖ®Ç°µÄÀúÊ·ĞĞµÄÊı¾İ£¬¶³½áÖ®ºó£¬¸ÃÀúÊ·ĞĞµÄÊı¾İ¾Í²»»áÔÙ¸ü¸ÄÁË
-                            // ÓĞ¼¸ÖÖÌØÊâÇé¿ö£º
-                            // 1. Èç¹ûÖ÷»úÒ»´ÎĞÔ·µ»ØÁË¶àĞĞÊı¾İ£¬ÄÇÃ´ÓĞ¿ÉÄÜÇ°ÃæµÄ¼¸ĞĞ¶¼Ã»ÓĞ²âÁ¿£¬ËùÒÔÕâÀïÒªÏÈÅĞ¶ÏÉÏÒ»ĞĞÊÇ·ñÓĞ²âÁ¿¹ı
+                            // å¯ä»¥ç¡®ä¿æ¢è¡Œä¹‹å‰çš„è¡Œå·²ç»è¢«ç”¨æˆ·è¾“å…¥å®Œäº†ï¼Œä¸ä¼šè¢«æ›´æ”¹äº†ï¼Œæ‰€ä»¥è¿™é‡Œå†»ç»“ä¸€ä¸‹æ¢è¡Œä¹‹å‰çš„å†å²è¡Œçš„æ•°æ®ï¼Œå†»ç»“ä¹‹åï¼Œè¯¥å†å²è¡Œçš„æ•°æ®å°±ä¸ä¼šå†æ›´æ”¹äº†
+                            // æœ‰å‡ ç§ç‰¹æ®Šæƒ…å†µï¼š
+                            // 1. å¦‚æœä¸»æœºä¸€æ¬¡æ€§è¿”å›äº†å¤šè¡Œæ•°æ®ï¼Œé‚£ä¹ˆæœ‰å¯èƒ½å‰é¢çš„å‡ è¡Œéƒ½æ²¡æœ‰æµ‹é‡ï¼Œæ‰€ä»¥è¿™é‡Œè¦å…ˆåˆ¤æ–­ä¸Šä¸€è¡Œæ˜¯å¦æœ‰æµ‹é‡è¿‡
 
                             if (this.ActiveLine.PreviousLine.IsMeasureDirety)
                             {
@@ -936,21 +934,21 @@ namespace XTerminal
                             }
                             this.lastHistoryLine.Freeze(this.ActiveLine.PreviousLine);
 
-                            // ÔÙ´´½¨×îĞÂĞĞµÄÀúÊ·ĞĞ
-                            // ÏÈ²âÁ¿ÏÂ×îĞÂµÄĞĞ£¬È·±£ÓĞ¸ß¶È
+                            // å†åˆ›å»ºæœ€æ–°è¡Œçš„å†å²è¡Œ
+                            // å…ˆæµ‹é‡ä¸‹æœ€æ–°çš„è¡Œï¼Œç¡®ä¿æœ‰é«˜åº¦
                             this.Surface.MeasureLine(this.ActiveLine);
                             int historyIndex = this.lastHistoryLine.PhysicsRow + 1;
                             VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.lastHistoryLine, this.ActiveLine);
                             this.historyLines[historyIndex] = historyLine;
                             this.lastHistoryLine = historyLine;
 
-                            // ¹ö¶¯Ìõ¹ö¶¯µ½µ×
+                            // æ»šåŠ¨æ¡æ»šåŠ¨åˆ°åº•
                             int terminalRows = this.sessionInfo.TerminalOptions.Rows;
-                            // ¼ÆËã¹ö¶¯Ìõ¿ÉÒÔ¹ö¶¯µÄ×î´óÖµ
+                            // è®¡ç®—æ»šåŠ¨æ¡å¯ä»¥æ»šåŠ¨çš„æœ€å¤§å€¼
                             int scrollMax = historyIndex - terminalRows + 1;
                             if (scrollMax > 0)
                             {
-                                // ¸üĞÂ¹ö¶¯ÌõµÄÖµ
+                                // æ›´æ–°æ»šåŠ¨æ¡çš„å€¼
                                 this.scrollMax = scrollMax;
                                 this.scrollValue = scrollMax;
 
@@ -960,8 +958,8 @@ namespace XTerminal
                                     this.TerminalScreen.UpdateScrollInfo(scrollMax);
                                     this.TerminalScreen.ScrollToEnd(ScrollOrientation.Down);
 
-                                    // Èç¹ûµ±Ç°ÓĞÑ¡ÖĞµÄÄÚÈİ£¬ÄÇÃ´¸üĞÂÑ¡ÖĞµÄÄÚÈİ
-                                    // Ñ¡ÖĞµÄÇøÓòÍùÉÏÒÆ¶¯
+                                    // å¦‚æœå½“å‰æœ‰é€‰ä¸­çš„å†…å®¹ï¼Œé‚£ä¹ˆæ›´æ–°é€‰ä¸­çš„å†…å®¹
+                                    // é€‰ä¸­çš„åŒºåŸŸå¾€ä¸Šç§»åŠ¨
                                     if (!this.textSelection.IsEmpty)
                                     {
                                         this.textSelection.OffsetY -= this.lastHistoryLine.PreviousLine.Height;
@@ -978,11 +976,17 @@ namespace XTerminal
 
                 case VTActions.RI_ReverseLineFeed:
                     {
-                        // ºÍLineFeedÏà·´£¬Ò²¾ÍÊÇ°Ñ¹â±êÍùÉÏÒÆÒ»¸öÎ»ÖÃ
-                        // ÔÚÓÃmanÃüÁîµÄÊ±ºò»á´¥·¢Õâ¸öÖ¸Áî
-                        // ·´Ïò»»ĞĞ ¨C Ö´ĞĞ\nµÄ·´Ïò²Ù×÷£¬½«¹â±êÏòÉÏÒÆ¶¯Ò»ĞĞ£¬Î¬»¤Ë®Æ½Î»ÖÃ£¬ÈçÓĞ±ØÒª£¬¹ö¶¯»º³åÇø *
+                        // å’ŒLineFeedç›¸åï¼Œä¹Ÿå°±æ˜¯æŠŠå…‰æ ‡å¾€ä¸Šç§»ä¸€ä¸ªä½ç½®
+                        // åœ¨ç”¨manå‘½ä»¤çš„æ—¶å€™ä¼šè§¦å‘è¿™ä¸ªæŒ‡ä»¤
+                        // åå‘æ¢è¡Œ â€“ æ‰§è¡Œ\nçš„åå‘æ“ä½œï¼Œå°†å…‰æ ‡å‘ä¸Šç§»åŠ¨ä¸€è¡Œï¼Œç»´æŠ¤æ°´å¹³ä½ç½®ï¼Œå¦‚æœ‰å¿…è¦ï¼Œæ»šåŠ¨ç¼“å†²åŒº *
                         this.activeDocument.ReverseLineFeed();
                         VTDebug.WriteAction("ReverseLineFeed");
+                        break;
+                    }
+
+                case VTActions.PlayBell:
+                    {
+                        // å“é“ƒ
                         break;
                     }
 
@@ -992,7 +996,7 @@ namespace XTerminal
                     {
                         List<int> parameters = parameter as List<int>;
                         EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        VTDebug.WriteAction("EL_EraseLine, eraseType = {0}, ´Ó¹â±êÎ»ÖÃ{1},{2}¿ªÊ¼erase", eraseType, this.CursorRow, this.CursorCol);
+                        VTDebug.WriteAction("EL_EraseLine, eraseType = {0}, ä»å…‰æ ‡ä½ç½®{1},{2}å¼€å§‹erase", eraseType, this.CursorRow, this.CursorCol);
                         this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
                         break;
                     }
@@ -1008,11 +1012,11 @@ namespace XTerminal
 
                 #endregion
 
-                #region ¹â±êÒÆ¶¯
+                #region å…‰æ ‡ç§»åŠ¨
 
-                // ÏÂÃæµÄ¹â±êÒÆ¶¯Ö¸Áî²»ÄÜ½øĞĞVTDocumentµÄ¹ö¶¯
-                // ¹â±êµÄÒÆ¶¯×ø±êÊÇÏà¶ÔÓÚ¿ÉÊÓÇøÓòÄÚµÄ×ø±ê
-                // ·şÎñÆ÷·¢ËÍ¹ıÀ´µÄ¹â±êÔ­µãÊÇ´Ó(1,1)¿ªÊ¼µÄ£¬ÎÒÃÇ³ÌĞòÀïµÄÊÇ(0,0)¿ªÊ¼µÄ£¬ËùÒÔÒª¼õ1
+                // ä¸‹é¢çš„å…‰æ ‡ç§»åŠ¨æŒ‡ä»¤ä¸èƒ½è¿›è¡ŒVTDocumentçš„æ»šåŠ¨
+                // å…‰æ ‡çš„ç§»åŠ¨åæ ‡æ˜¯ç›¸å¯¹äºå¯è§†åŒºåŸŸå†…çš„åæ ‡
+                // æœåŠ¡å™¨å‘é€è¿‡æ¥çš„å…‰æ ‡åŸç‚¹æ˜¯ä»(1,1)å¼€å§‹çš„ï¼Œæˆ‘ä»¬ç¨‹åºé‡Œçš„æ˜¯(0,0)å¼€å§‹çš„ï¼Œæ‰€ä»¥è¦å‡1
 
                 case VTActions.BS:
                     {
@@ -1064,13 +1068,13 @@ namespace XTerminal
                         int row = 0, col = 0;
                         if (parameters.Count == 2)
                         {
-                            // VTµÄ¹â±êÔ­µãÊÇ(1,1)£¬ÎÒÃÇ³ÌĞòÀïµÄÊÇ(0,0)£¬ËùÒÔÒª¼õ1
+                            // VTçš„å…‰æ ‡åŸç‚¹æ˜¯(1,1)ï¼Œæˆ‘ä»¬ç¨‹åºé‡Œçš„æ˜¯(0,0)ï¼Œæ‰€ä»¥è¦å‡1
                             row = parameters[0] - 1;
                             col = parameters[1] - 1;
                         }
                         else
                         {
-                            // Èç¹ûÃ»ÓĞ²ÎÊı£¬ÄÇÃ´ËµÃ÷¾ÍÊÇ¶¨Î»µ½Ô­µã(0,0)
+                            // å¦‚æœæ²¡æœ‰å‚æ•°ï¼Œé‚£ä¹ˆè¯´æ˜å°±æ˜¯å®šä½åˆ°åŸç‚¹(0,0)
                         }
 
                         VTDebug.WriteAction("CUP_CursorPosition, row = {0}, col = {1}", row, col);
@@ -1082,11 +1086,11 @@ namespace XTerminal
                     {
                         List<int> parameters = parameter as List<int>;
 
-                        // ½«¹â±êÒÆ¶¯µ½µ±Ç°ĞĞÖĞµÄµÚnÁĞ
+                        // å°†å…‰æ ‡ç§»åŠ¨åˆ°å½“å‰è¡Œä¸­çš„ç¬¬nåˆ—
                         int n = VTParameter.GetParameter(parameters, 0, -1);
                         if (n == -1)
                         {
-                            VTDebug.WriteAction("CHA_CursorHorizontalAbsoluteÊ§°Ü");
+                            VTDebug.WriteAction("CHA_CursorHorizontalAbsoluteå¤±è´¥");
                             return;
                         }
 
@@ -1098,22 +1102,44 @@ namespace XTerminal
 
                 #endregion
 
-                #region ÎÄ±¾ÌØĞ§
+                #region æ–‡æœ¬ç‰¹æ•ˆ
 
-                case VTActions.PlayBell:
                 case VTActions.Bold:
-                case VTActions.Foreground:
-                case VTActions.Background:
-                case VTActions.DefaultAttributes:
-                case VTActions.DefaultBackground:
-                case VTActions.DefaultForeground:
+                case VTActions.BoldUnset:
                 case VTActions.Underline:
                 case VTActions.UnderlineUnset:
-                case VTActions.Faint:
+                case VTActions.Italics:
                 case VTActions.ItalicsUnset:
-                case VTActions.CrossedOutUnset:
                 case VTActions.DoublyUnderlined:
                 case VTActions.DoublyUnderlinedUnset:
+                case VTActions.Foreground:
+                case VTActions.DefaultForeground:
+                case VTActions.Background:
+                case VTActions.DefaultBackground:
+                    {
+                        bool unset;
+                        VTextDecorations decoration = XDocumentUtils.VTAction2TextDecoration(action, out unset);
+                        VTextAttribute textAttribute = this.ActiveLine.Attributes.FirstOrDefault(v => v.Decoration == decoration);
+                        if (textAttribute == null)
+                        {
+                            textAttribute = new VTextAttribute() 
+                            {
+                                StartCharacter = this.CursorCol,
+                                Decoration = decoration,
+                            };
+                        }
+
+                        if (unset)
+                        {
+                            textAttribute.EndCharacter = this.CursorCol;
+                            textAttribute.Completed = true;
+                        }
+                        break;
+                    }
+
+                case VTActions.DefaultAttributes:
+                case VTActions.Faint:
+                case VTActions.CrossedOutUnset:
                 case VTActions.ReverseVideo:
                 case VTActions.ReverseVideoUnset:
                     break;
@@ -1164,7 +1190,7 @@ namespace XTerminal
                 case VTActions.XTERM_BracketedPasteMode:
                     {
                         this.xtermBracketedPasteMode = Convert.ToBoolean(parameter);
-                        VTDebug.WriteAction("Î´ÊµÏÖXTERM_BracketedPasteMode");
+                        VTDebug.WriteAction("æœªå®ç°XTERM_BracketedPasteMode");
                         break;
                     }
 
@@ -1180,11 +1206,11 @@ namespace XTerminal
 
                 #endregion
 
-                #region ÎÄ±¾²Ù×÷
+                #region æ–‡æœ¬æ“ä½œ
 
                 case VTActions.DCH_DeleteCharacter:
                     {
-                        // ´ÓÖ¸¶¨Î»ÖÃÉ¾³ın¸ö×Ö·û£¬É¾³ıºóµÄ×Ö·û´®Òª×ó¶ÔÆë£¬Ä¬ÈÏÉ¾³ı1¸ö×Ö·û
+                        // ä»æŒ‡å®šä½ç½®åˆ é™¤nä¸ªå­—ç¬¦ï¼Œåˆ é™¤åçš„å­—ç¬¦ä¸²è¦å·¦å¯¹é½ï¼Œé»˜è®¤åˆ é™¤1ä¸ªå­—ç¬¦
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
                         VTDebug.WriteAction("DCH_DeleteCharacter, {0}, cursorPos = {1}", count, this.CursorCol);
@@ -1194,17 +1220,17 @@ namespace XTerminal
 
                 case VTActions.ICH_InsertCharacter:
                     {
-                        // ÔÚµ±Ç°¹â±ê´¦²åÈëN¸ö¿Õ°××Ö·û,Õâ»á½«ËùÓĞÏÖÓĞÎÄ±¾ÒÆµ½ÓÒ²à¡£ ÏòÓÒÒç³öÆÁÄ»µÄÎÄ±¾»á±»É¾³ı
-                        // Ä¿Ç°Ã»·¢ÏÖÕâ¸ö²Ù×÷¶ÔÖÕ¶ËÏÔÊ¾ÓĞÊ²Ã´Ó°Ïì£¬ËùÒÔÔİÊ±²»ÊµÏÖ
+                        // åœ¨å½“å‰å…‰æ ‡å¤„æ’å…¥Nä¸ªç©ºç™½å­—ç¬¦,è¿™ä¼šå°†æ‰€æœ‰ç°æœ‰æ–‡æœ¬ç§»åˆ°å³ä¾§ã€‚ å‘å³æº¢å‡ºå±å¹•çš„æ–‡æœ¬ä¼šè¢«åˆ é™¤
+                        // ç›®å‰æ²¡å‘ç°è¿™ä¸ªæ“ä½œå¯¹ç»ˆç«¯æ˜¾ç¤ºæœ‰ä»€ä¹ˆå½±å“ï¼Œæ‰€ä»¥æš‚æ—¶ä¸å®ç°
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.WriteAction("Î´ÊµÏÖInsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
+                        VTDebug.WriteAction("æœªå®ç°InsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
                         break;
                     }
 
                 #endregion
 
-                #region ÉÏÏÂ¹ö¶¯
+                #region ä¸Šä¸‹æ»šåŠ¨
 
                 #endregion
 
@@ -1216,7 +1242,7 @@ namespace XTerminal
                         ITerminalSurface add = this.alternateDocument.Surface;
                         this.TerminalScreen.SwitchSurface(remove, add);
 
-                        // ÕâÀïÖ»ÖØÖÃĞĞÊı£¬ÔÚÓÃ»§µ÷Õû´°¿Ú´óĞ¡µÄÊ±ºòĞèÒªÖ´ĞĞÖÕ¶ËµÄResize²Ù×÷
+                        // è¿™é‡Œåªé‡ç½®è¡Œæ•°ï¼Œåœ¨ç”¨æˆ·è°ƒæ•´çª—å£å¤§å°çš„æ—¶å€™éœ€è¦æ‰§è¡Œç»ˆç«¯çš„Resizeæ“ä½œ
                         this.alternateDocument.SetScrollMargin(0, 0);
                         this.alternateDocument.DeleteAll();
                         this.activeDocument = this.alternateDocument;
@@ -1238,6 +1264,8 @@ namespace XTerminal
 
                 case VTActions.DSR_DeviceStatusReport:
                     {
+                        // DSRï¼Œå‚è€ƒhttps://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+
                         List<int> parameters = parameter as List<int>;
                         StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
                         VTDebug.WriteAction("DSR_DeviceStatusReport, statusType = {0}", statusType);
@@ -1254,15 +1282,15 @@ namespace XTerminal
 
                 case VTActions.DECSTBM_SetScrollingRegion:
                     {
-                        // ÉèÖÃ¿É¹ö¶¯ÇøÓò
-                        // ²»¿ÉÒÔ²Ù×÷¹ö¶¯ÇøÓòÒÔÍâµÄĞĞ£¬Ö»ÄÜ¶Ô¹ö¶¯ÇøÓòÄÚµÄĞĞ½øĞĞ²Ù×÷
-                        // ¶ÔÓÚ¹ö¶¯ÇøÓòµÄ×÷ÓÃµÄ½âÊÍ£¬¾Ù¸öÀı×ÓËµÃ÷
-                        // ±È·½ËµmarginTopÊÇ1£¬marginBottomÒ²ÊÇ1
-                        // ÄÇÃ´ÔÚÖ´ĞĞLineFeed¶¯×÷µÄÊ±ºò£¬Ä¬ÈÏÇé¿öÏÂ£¬ÊÇ°ÑµÚÒ»ĞĞ¹Òµ½×îºóÒ»ĞĞµÄºóÃæ£¬ÓĞÁËmarginÖ®ºó£¬¾ÍÒª°ÑµÚ¶şĞĞ¹Òµ½µ¹ÊıµÚ¶şĞĞµÄºóÃæ
-                        // ScrollMargin»á¶ÔºÜ¶à¶¯×÷²úÉúÓ°Ïì£ºLF£¬RI_ReverseLineFeed£¬DeleteLine£¬InsertLine
+                        // è®¾ç½®å¯æ»šåŠ¨åŒºåŸŸ
+                        // ä¸å¯ä»¥æ“ä½œæ»šåŠ¨åŒºåŸŸä»¥å¤–çš„è¡Œï¼Œåªèƒ½å¯¹æ»šåŠ¨åŒºåŸŸå†…çš„è¡Œè¿›è¡Œæ“ä½œ
+                        // å¯¹äºæ»šåŠ¨åŒºåŸŸçš„ä½œç”¨çš„è§£é‡Šï¼Œä¸¾ä¸ªä¾‹å­è¯´æ˜
+                        // æ¯”æ–¹è¯´marginTopæ˜¯1ï¼ŒmarginBottomä¹Ÿæ˜¯1
+                        // é‚£ä¹ˆåœ¨æ‰§è¡ŒLineFeedåŠ¨ä½œçš„æ—¶å€™ï¼Œé»˜è®¤æƒ…å†µä¸‹ï¼Œæ˜¯æŠŠç¬¬ä¸€è¡ŒæŒ‚åˆ°æœ€åä¸€è¡Œçš„åé¢ï¼Œæœ‰äº†marginä¹‹åï¼Œå°±è¦æŠŠç¬¬äºŒè¡ŒæŒ‚åˆ°å€’æ•°ç¬¬äºŒè¡Œçš„åé¢
+                        // ScrollMarginä¼šå¯¹å¾ˆå¤šåŠ¨ä½œäº§ç”Ÿå½±å“ï¼šLFï¼ŒRI_ReverseLineFeedï¼ŒDeleteLineï¼ŒInsertLine
 
-                        // ÊÓÆµÖÕ¶ËµÄ¹æ·¶ÀïËµ£¬Èç¹ûtopMarginµÈÓÚbottomMargin£¬»òÕßbottomMargin´óÓÚÆÁÄ»¸ß¶È£¬ÄÇÃ´ºöÂÔÕâ¸öÖ¸Áî
-                        // ±ß¾à»¹»áÓ°Ïì²åÈëĞĞ (IL) ºÍÉ¾³ıĞĞ (DL)¡¢ÏòÉÏ¹ö¶¯ (SU) ºÍÏòÏÂ¹ö¶¯ (SD) ĞŞ¸ÄµÄĞĞ¡£
+                        // è§†é¢‘ç»ˆç«¯çš„è§„èŒƒé‡Œè¯´ï¼Œå¦‚æœtopMarginç­‰äºbottomMarginï¼Œæˆ–è€…bottomMarginå¤§äºå±å¹•é«˜åº¦ï¼Œé‚£ä¹ˆå¿½ç•¥è¿™ä¸ªæŒ‡ä»¤
+                        // è¾¹è·è¿˜ä¼šå½±å“æ’å…¥è¡Œ (IL) å’Œåˆ é™¤è¡Œ (DL)ã€å‘ä¸Šæ»šåŠ¨ (SU) å’Œå‘ä¸‹æ»šåŠ¨ (SD) ä¿®æ”¹çš„è¡Œã€‚
 
                         // Notes on DECSTBM
                         // * The value of the top margin (Pt) must be less than the bottom margin (Pb).
@@ -1270,7 +1298,7 @@ namespace XTerminal
                         // * DECSTBM moves the cursor to column 1, line 1 of the page
                         // * https://github.com/microsoft/terminal/issues/1849
 
-                        // µ±Ç°ÖÕ¶ËÆÁÄ»¿ÉÏÔÊ¾µÄĞĞÊıÁ¿
+                        // å½“å‰ç»ˆç«¯å±å¹•å¯æ˜¾ç¤ºçš„è¡Œæ•°é‡
                         int lines = this.sessionInfo.TerminalOptions.Rows;
 
                         List<int> parameters = parameter as List<int>;
@@ -1279,23 +1307,23 @@ namespace XTerminal
 
                         if (bottomMargin < 0 || topMargin < 0)
                         {
-                            VTDebug.WriteAction("DECSTBM_SetScrollingRegion²ÎÊı²»ÕıÈ·£¬ºöÂÔ±¾´ÎÉèÖÃ, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                            VTDebug.WriteAction("DECSTBM_SetScrollingRegionå‚æ•°ä¸æ­£ç¡®ï¼Œå¿½ç•¥æœ¬æ¬¡è®¾ç½®, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                             return;
                         }
                         if (topMargin >= bottomMargin)
                         {
-                            VTDebug.WriteAction("DECSTBM_SetScrollingRegion²ÎÊı²»ÕıÈ·£¬topMargin´óÓÚµÈbottomMargin£¬ºöÂÔ±¾´ÎÉèÖÃ, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                            VTDebug.WriteAction("DECSTBM_SetScrollingRegionå‚æ•°ä¸æ­£ç¡®ï¼ŒtopMarginå¤§äºç­‰bottomMarginï¼Œå¿½ç•¥æœ¬æ¬¡è®¾ç½®, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                             return;
                         }
                         if (bottomMargin > lines)
                         {
-                            VTDebug.WriteAction("DECSTBM_SetScrollingRegion²ÎÊı²»ÕıÈ·£¬bottomMargin´óÓÚµ±Ç°ÆÁÄ»×ÜĞĞÊı, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
+                            VTDebug.WriteAction("DECSTBM_SetScrollingRegionå‚æ•°ä¸æ­£ç¡®ï¼ŒbottomMarginå¤§äºå½“å‰å±å¹•æ€»è¡Œæ•°, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
                             return;
                         }
 
-                        // Èç¹ûtopMarginµÈÓÚ1£¬ÄÇÃ´¾Í±íÊ¾Ê¹ÓÃÄ¬ÈÏÖµ£¬Ò²¾ÍÊÇÃ»ÓĞmarginTop£¬ËùÒÔµ±topMargin == 1µÄÊ±ºò£¬marginTop¸ÄÎª0
+                        // å¦‚æœtopMarginç­‰äº1ï¼Œé‚£ä¹ˆå°±è¡¨ç¤ºä½¿ç”¨é»˜è®¤å€¼ï¼Œä¹Ÿå°±æ˜¯æ²¡æœ‰marginTopï¼Œæ‰€ä»¥å½“topMargin == 1çš„æ—¶å€™ï¼ŒmarginTopæ”¹ä¸º0
                         int marginTop = topMargin == 1 ? 0 : topMargin;
-                        // Èç¹ûbottomMarginµÈÓÚ¿ØÖÆÌ¨¸ß¶È£¬ÄÇÃ´¾Í±íÊ¾Ê¹ÓÃÄ¬ÈÏÖµ£¬Ò²¾ÍÊÇÃ»ÓĞmarginBottom£¬ËùÒÔµ±bottomMargin == ¿ØÖÆÌ¨¸ß¶ÈµÄÊ±ºò£¬marginBottom¸ÄÎª0
+                        // å¦‚æœbottomMarginç­‰äºæ§åˆ¶å°é«˜åº¦ï¼Œé‚£ä¹ˆå°±è¡¨ç¤ºä½¿ç”¨é»˜è®¤å€¼ï¼Œä¹Ÿå°±æ˜¯æ²¡æœ‰marginBottomï¼Œæ‰€ä»¥å½“bottomMargin == æ§åˆ¶å°é«˜åº¦çš„æ—¶å€™ï¼ŒmarginBottomæ”¹ä¸º0
                         int marginBottom = lines - bottomMargin;
                         VTDebug.WriteAction("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", marginTop, marginBottom);
                         this.activeDocument.SetScrollMargin(marginTop, marginBottom);
@@ -1304,7 +1332,7 @@ namespace XTerminal
 
                 case VTActions.IL_InsertLine:
                     {
-                        // ½« <n> ĞĞ²åÈë¹â±êÎ»ÖÃµÄ»º³åÇø¡£ ¹â±êËùÔÚµÄĞĞ¼°ÆäÏÂ·½µÄĞĞ½«ÏòÏÂÒÆ¶¯¡£
+                        // å°† <n> è¡Œæ’å…¥å…‰æ ‡ä½ç½®çš„ç¼“å†²åŒºã€‚ å…‰æ ‡æ‰€åœ¨çš„è¡ŒåŠå…¶ä¸‹æ–¹çš„è¡Œå°†å‘ä¸‹ç§»åŠ¨ã€‚
                         List<int> parameters = parameter as List<int>;
                         int lines = VTParameter.GetParameter(parameters, 0, 1);
                         VTDebug.WriteAction("IL_InsertLine, lines = {0}", lines);
@@ -1317,7 +1345,7 @@ namespace XTerminal
 
                 case VTActions.DL_DeleteLine:
                     {
-                        // ´Ó»º³åÇøÖĞÉ¾³ı<n> ĞĞ£¬´Ó¹â±êËùÔÚµÄĞĞ¿ªÊ¼¡£
+                        // ä»ç¼“å†²åŒºä¸­åˆ é™¤<n> è¡Œï¼Œä»å…‰æ ‡æ‰€åœ¨çš„è¡Œå¼€å§‹ã€‚
                         List<int> parameters = parameter as List<int>;
                         int lines = VTParameter.GetParameter(parameters, 0, 1);
                         VTDebug.WriteAction("DL_DeleteLine, lines = {0}", lines);
@@ -1330,7 +1358,7 @@ namespace XTerminal
 
                 default:
                     {
-                        VTDebug.WriteAction("Î´Ö´ĞĞµÄVTAction, {0}", action);
+                        VTDebug.WriteAction("æœªæ‰§è¡Œçš„VTAction, {0}", action);
                         break;
                     }
             }
@@ -1342,7 +1370,7 @@ namespace XTerminal
             //logger.InfoFormat("Received, {0}", str);
             this.vtParser.ProcessCharacters(bytes, size);
 
-            // È«²¿×Ö·û¶¼´¦ÀíÍêÁËÖ®ºó£¬Ö»äÖÈ¾Ò»´Î
+            // å…¨éƒ¨å­—ç¬¦éƒ½å¤„ç†å®Œäº†ä¹‹åï¼Œåªæ¸²æŸ“ä¸€æ¬¡
 
             this.DrawDocument(this.activeDocument);
             //logger.ErrorFormat("receivedCounter = {0}", this.dataReceivedCounter++);
@@ -1352,7 +1380,7 @@ namespace XTerminal
 
         private void VTSession_StatusChanged(object client, SessionStatusEnum status)
         {
-            logger.InfoFormat("»á»°×´Ì¬·¢Éú¸Ä±ä, {0}", status);
+            logger.InfoFormat("ä¼šè¯çŠ¶æ€å‘ç”Ÿæ”¹å˜, {0}", status);
             if (this.SessionStatusChanged != null)
             {
                 this.SessionStatusChanged(this, status);
@@ -1378,7 +1406,7 @@ namespace XTerminal
                 }
                 catch (Exception e)
                 {
-                    logger.ErrorFormat(string.Format("äÖÈ¾¹â±êÒì³£, {0}", e));
+                    logger.ErrorFormat(string.Format("æ¸²æŸ“å…‰æ ‡å¼‚å¸¸, {0}", e));
                 }
                 finally
                 {
@@ -1389,10 +1417,10 @@ namespace XTerminal
 
 
         /// <summary>
-        /// µ±¹ö¶¯Ìõ¹ö¶¯µÄÊ±ºò´¥·¢
+        /// å½“æ»šåŠ¨æ¡æ»šåŠ¨çš„æ—¶å€™è§¦å‘
         /// </summary>
         /// <param name="arg1"></param>
-        /// <param name="scrollValue">¹ö¶¯µ½µÄĞĞÊı</param>
+        /// <param name="scrollValue">æ»šåŠ¨åˆ°çš„è¡Œæ•°</param>
         private void TerminalScreen_ScrollChanged(ITerminalScreen arg1, int scrollValue)
         {
             this.ScrollToHistory(scrollValue);
@@ -1414,44 +1442,44 @@ namespace XTerminal
 
             if (!this.selectionState)
             {
-                // ´ËÊ±ËµÃ÷¿ªÊ¼Ñ¡ÖĞ²Ù×÷
+                // æ­¤æ—¶è¯´æ˜å¼€å§‹é€‰ä¸­æ“ä½œ
                 this.selectionState = true;
                 this.textSelection.Reset();
                 this.Surface.Draw(this.textSelection);
                 this.Surface.Arrange(this.textSelection);
             }
 
-            // Èç¹û»¹Ã»ÓĞ²âÁ¿ÆğÊ¼×Ö·û£¬ÄÇÃ´²âÁ¿ÆğÊ¼×Ö·û
+            // å¦‚æœè¿˜æ²¡æœ‰æµ‹é‡èµ·å§‹å­—ç¬¦ï¼Œé‚£ä¹ˆæµ‹é‡èµ·å§‹å­—ç¬¦
             if (this.textSelection.Start.CharacterIndex == -1)
             {
                 if (!this.GetTextPointer(mousePosition, this.surfaceRect, this.textSelection.Start))
                 {
-                    // Ã»ÓĞÃüÖĞÆğÊ¼×Ö·û£¬ÄÇÃ´Ö±½Ó·µ»ØÉ¶¶¼²»×ö
+                    // æ²¡æœ‰å‘½ä¸­èµ·å§‹å­—ç¬¦ï¼Œé‚£ä¹ˆç›´æ¥è¿”å›å•¥éƒ½ä¸åš
                     return;
                 }
             }
 
-            // Ê×ÏÈ¼ì²âÊó±êÊÇ·ñÔÚSurface±ß½ç¿òµÄÍâÃæ
-            // Èç¹ûÔÚSurfaceµÄÍâÃæ²¢ÇÒĞĞÊı³¬³öÁËSurface¿ÉÒÔÏÔÊ¾µÄ×î¶àĞĞÊı£¬ÄÇÃ´¸ù¾İÊó±ê·½Ïò½øĞĞ¹ö¶¯£¬Ã¿´Î¹ö¶¯Ò»ĞĞ
+            // é¦–å…ˆæ£€æµ‹é¼ æ ‡æ˜¯å¦åœ¨Surfaceè¾¹ç•Œæ¡†çš„å¤–é¢
+            // å¦‚æœåœ¨Surfaceçš„å¤–é¢å¹¶ä¸”è¡Œæ•°è¶…å‡ºäº†Surfaceå¯ä»¥æ˜¾ç¤ºçš„æœ€å¤šè¡Œæ•°ï¼Œé‚£ä¹ˆæ ¹æ®é¼ æ ‡æ–¹å‘è¿›è¡Œæ»šåŠ¨ï¼Œæ¯æ¬¡æ»šåŠ¨ä¸€è¡Œ
             OutsideScrollResult scrollResult = this.ScrollIfCursorOutsideSurface(mousePosition, this.surfaceRect);
 
-            // ÕûÀíË¼Â·ÊÇËã³öÀ´StartTextPointerºÍEndTextPointerÖ®¼äµÄ¼¸ºÎÍ¼ĞÎ
-            // È»ºóäÖÈ¾¼¸ºÎÍ¼ĞÎ£¬SelectionRange±¾ÖÊÉÏ¾ÍÊÇÒ»¶Ñ¾ØĞÎ
+            // æ•´ç†æ€è·¯æ˜¯ç®—å‡ºæ¥StartTextPointerå’ŒEndTextPointerä¹‹é—´çš„å‡ ä½•å›¾å½¢
+            // ç„¶åæ¸²æŸ“å‡ ä½•å›¾å½¢ï¼ŒSelectionRangeæœ¬è´¨ä¸Šå°±æ˜¯ä¸€å †çŸ©å½¢
             VTextPointer startPointer = this.textSelection.Start;
             VTextPointer endPointer = this.textSelection.End;
 
-            // µÃµ½µ±Ç°Êó±êµÄÃüÖĞĞÅÏ¢
+            // å¾—åˆ°å½“å‰é¼ æ ‡çš„å‘½ä¸­ä¿¡æ¯
             if (!this.GetTextPointer(mousePosition, this.surfaceRect, endPointer))
             {
-                // Ö»ÓĞÔÚÃ»ÓĞOutside¹ö¶¯µÄÊ±ºò£¬²Å·µ»Ø
-                // Outside¹ö¶¯»áµ¼ÖÂGetTextPointerÊ§°Ü£¬ËäÈ»Ê§°Ü£¬»¹ÊÇÒª¸üĞÂSelectionRange
+                // åªæœ‰åœ¨æ²¡æœ‰Outsideæ»šåŠ¨çš„æ—¶å€™ï¼Œæ‰è¿”å›
+                // Outsideæ»šåŠ¨ä¼šå¯¼è‡´GetTextPointerå¤±è´¥ï¼Œè™½ç„¶å¤±è´¥ï¼Œè¿˜æ˜¯è¦æ›´æ–°SelectionRange
                 if (scrollResult == OutsideScrollResult.None)
                 {
                     return;
                 }
             }
 
-            #region SelectionµÄÆğÊ¼×Ö·ûºÍ½áÊø×Ö·ûÊÇÍ¬Ò»¸ö×Ö·û£¬É¶¶¼²»×ö
+            #region Selectionçš„èµ·å§‹å­—ç¬¦å’Œç»“æŸå­—ç¬¦æ˜¯åŒä¸€ä¸ªå­—ç¬¦ï¼Œå•¥éƒ½ä¸åš
 
             if (startPointer.CharacterIndex > -1 && endPointer.CharacterIndex > -1)
             {
@@ -1463,7 +1491,7 @@ namespace XTerminal
 
             #endregion
 
-            // ¼ÆËãÑ¡ÖĞÄÚÈİµÄ¼¸ºÎÍ¼ĞÎ£¬²¢äÖÈ¾
+            // è®¡ç®—é€‰ä¸­å†…å®¹çš„å‡ ä½•å›¾å½¢ï¼Œå¹¶æ¸²æŸ“
             this.textSelection.BuildGeometry();
             this.uiSyncContext.Send((state) =>
             {
@@ -1481,18 +1509,18 @@ namespace XTerminal
         {
             if (upper)
             {
-                // ÏòÉÏ¹ö¶¯
+                // å‘ä¸Šæ»šåŠ¨
 
-                // ÏÈÅĞ¶ÏÊÇ²»ÊÇÒÑ¾­¹ö¶¯µ½¶¥ÁË
+                // å…ˆåˆ¤æ–­æ˜¯ä¸æ˜¯å·²ç»æ»šåŠ¨åˆ°é¡¶äº†
                 if (this.ScrollAtTop)
                 {
-                    // ¹ö¶¯µ½¶¥Ö±½Ó·µ»Ø
+                    // æ»šåŠ¨åˆ°é¡¶ç›´æ¥è¿”å›
                     return;
                 }
 
                 if (this.scrollValue < this.mouseOptions.ScrollDelta)
                 {
-                    // Ò»´Î¿ÉÒÔÈ«²¿¹öÍê²¢ÇÒ»¹ÓĞÊ£Óà
+                    // ä¸€æ¬¡å¯ä»¥å…¨éƒ¨æ»šå®Œå¹¶ä¸”è¿˜æœ‰å‰©ä½™
                     this.ScrollToHistory(0);
                 }
                 else
@@ -1502,15 +1530,15 @@ namespace XTerminal
             }
             else
             {
-                // ÏòÏÂ¹ö¶¯
+                // å‘ä¸‹æ»šåŠ¨
 
                 if (this.ScrollAtBottom)
                 {
-                    // ¹ö¶¯µ½µ×Ö±½Ó·µ»Ø
+                    // æ»šåŠ¨åˆ°åº•ç›´æ¥è¿”å›
                     return;
                 }
 
-                // Ê£Óà¿ÉÒÔÍùÏÂ¹ö¶¯µÄĞĞÊı
+                // å‰©ä½™å¯ä»¥å¾€ä¸‹æ»šåŠ¨çš„è¡Œæ•°
                 int remainScroll = this.scrollMax - this.scrollValue;
 
                 if (remainScroll >= this.mouseOptions.ScrollDelta)
@@ -1519,7 +1547,7 @@ namespace XTerminal
                 }
                 else
                 {
-                    // Ö±½Ó¹ö¶¯µ½µ×
+                    // ç›´æ¥æ»šåŠ¨åˆ°åº•
                     this.ScrollToHistory(this.scrollMax);
                 }
             }

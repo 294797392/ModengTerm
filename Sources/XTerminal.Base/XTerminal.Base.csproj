@@ -40,6 +40,7 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="Renci.SshNet">
       <HintPath>..\..\Dependence\Renci.SshNet.dll</HintPath>
     </Reference>

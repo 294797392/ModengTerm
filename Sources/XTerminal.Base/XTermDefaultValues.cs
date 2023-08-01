@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.DataModels.Session;
 using XTerminal.Base.Enumerations;
@@ -94,5 +95,12 @@ namespace XTerminal.Base
         /// 滚轮滚动一下翻两行
         /// </summary>
         public const int DefaultScrollSensitivity = 2;
+
+        #region 终端字体
+
+        public static readonly Brush Foreground = Brushes.Black;
+        public static readonly double FontSize = 14;
+
+        #endregion
     }
 }

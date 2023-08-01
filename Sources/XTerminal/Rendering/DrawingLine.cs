@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
+using XTerminal.Base;
 using XTerminal.Document;
 
 namespace XTerminal.Rendering
@@ -40,7 +41,7 @@ namespace XTerminal.Rendering
 
             Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                DefaultValues.FontSize, DefaultValues.Foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
+                XTermDefaultValues.FontSize, XTermDefaultValues.Foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
 
             WPFRenderUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
 

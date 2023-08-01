@@ -105,6 +105,11 @@ namespace XTerminal.Document
         /// </summary>
         public IEnumerable<VTCharacter> Characters { get { return this.characters; } }
 
+        /// <summary>
+        /// 该行文本的装饰信息
+        /// </summary>
+        public List<VTextAttribute> Attributes { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -117,6 +122,7 @@ namespace XTerminal.Document
         {
             this.ColumnSize = owner.ColumnSize;
             this.characters = new List<VTCharacter>();
+            this.Attributes = new List<VTextAttribute>();
         }
 
         #endregion

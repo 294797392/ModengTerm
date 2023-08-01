@@ -23,7 +23,5 @@ namespace XTerminal
         public static readonly FontWeight FontWeight = FontWeights.Normal;
         public static readonly FontStyle FontStyle = FontStyles.Normal;
         public static readonly FontStretch FontStretch = FontStretches.Normal;
-        public static readonly Brush Foreground = Brushes.Black;
-        public static readonly double FontSize = 14;
     }
 }
