@@ -200,7 +200,7 @@ namespace XTerminal.UserControls
                     e.Handled = true;
                 }
 
-                VTKeys vtKey = WPFRenderUtils.ConvertToVTKey(e.Key);
+                VTKeys vtKey = DrawingUtils.ConvertToVTKey(e.Key);
                 this.inputEvent.CapsLock = Console.CapsLock;
                 this.inputEvent.Key = vtKey;
                 this.inputEvent.Text = null;

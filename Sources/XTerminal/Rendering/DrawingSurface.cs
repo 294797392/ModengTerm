@@ -92,7 +92,7 @@ namespace XTerminal.Rendering
 
         private FormattedText CreateFormattedText(string text, IEnumerable<VTCharacter> characters)
         {
-            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
+            Typeface typeface = DrawingUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
             return formattedText;
         }

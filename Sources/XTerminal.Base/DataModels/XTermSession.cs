@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base.DataModels
@@ -34,6 +35,12 @@ namespace XTerminal.Base.DataModels
         /// </summary>
         [JsonProperty("terminalOptions")]
         public TerminalOptions TerminalOptions { get; set; }
+
+        /// <summary>
+        /// 外观设置
+        /// </summary>
+        [JsonProperty("visualOptions")]
+        public VisualOptions VisualOptions { get; set; }
 
         /// <summary>
         /// 要连接的会话类型

@@ -32,7 +32,7 @@ namespace XTerminal.Rendering
 
             this.Offset = new Vector(cursor.OffsetX, cursor.OffsetY);
 
-            Brush brush = WPFRenderUtils.VTForeground2Brush(cursor.Color);
+            Brush brush = DrawingUtils.VTForeground2Brush(cursor.Color);
 
             switch (cursor.Style)
             {

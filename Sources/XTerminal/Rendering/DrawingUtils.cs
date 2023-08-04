@@ -13,11 +13,11 @@ using XTerminal.Parser;
 
 namespace XTerminal.Rendering
 {
-    public static class WPFRenderUtils
+    public static class DrawingUtils
     {
         private static Dictionary<string, Typeface> typefaceMap = new Dictionary<string, Typeface>();
 
-        static WPFRenderUtils()
+        static DrawingUtils()
         {
         }
 

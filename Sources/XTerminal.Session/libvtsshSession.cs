@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.DataModels.SessionOptions;
 
 namespace XTerminal.Session
 {

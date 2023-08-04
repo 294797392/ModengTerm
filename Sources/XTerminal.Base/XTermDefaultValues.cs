@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base

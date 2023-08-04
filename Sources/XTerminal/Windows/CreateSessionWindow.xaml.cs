@@ -20,6 +20,7 @@ using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 using XTerminal.ViewModels;

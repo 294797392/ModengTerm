@@ -13,7 +13,7 @@ namespace XTerminal.Rendering
 {
     public class DrawingLine : DrawingObject
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawableLine");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingLine");
 
         #region 属性
 
@@ -39,11 +39,11 @@ namespace XTerminal.Rendering
 
             this.Offset = new Vector(0, textLine.OffsetY);
 
-            Typeface typeface = WPFRenderUtils.GetTypeface(VTextStyle.Default);
+            Typeface typeface = DrawingUtils.GetTypeface(VTextStyle.Default);
             FormattedText formattedText = new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
                 XTermDefaultValues.FontSize, XTermDefaultValues.Foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
 
-            WPFRenderUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
+            DrawingUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
 
             //logger.InfoFormat("Render:{0}", text);
 

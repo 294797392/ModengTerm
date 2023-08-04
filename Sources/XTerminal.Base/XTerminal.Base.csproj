@@ -60,6 +60,7 @@
     <Compile Include="DataModels\GroupDM.cs" />
     <Compile Include="DataModels\SessionOptions\MouseOptions.cs" />
     <Compile Include="DataModels\SessionOptions\ConnectionOptions.cs" />
+    <Compile Include="DataModels\SessionOptions\VisualOptions.cs" />
     <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
     <Compile Include="DataModels\SessionOptions\TerminalOptions.cs" />
     <Compile Include="DataModels\XTermSession.cs" />

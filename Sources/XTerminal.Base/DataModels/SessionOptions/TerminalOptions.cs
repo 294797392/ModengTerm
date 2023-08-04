@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Base.DataModels.Session
+namespace XTerminal.Base.DataModels.SessionOptions
 {
     public enum TerminalTypeEnum
     {

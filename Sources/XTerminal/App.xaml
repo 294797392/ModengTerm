@@ -8,7 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Languages/Chinese.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/XTerminal;component/Themes/Themes.XShell.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/XTerminal;component/Themes/Themes.Default.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
         

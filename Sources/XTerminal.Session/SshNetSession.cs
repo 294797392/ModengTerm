@@ -7,6 +7,7 @@ using System.Text;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
