@@ -47,13 +47,12 @@ namespace XTerminal.Document
 
         #region 属性
 
-        /// <summary>
-        /// 行的逻辑索引
-        /// 比如界面上一共能显示80行，那么逻辑索引就表示是哪一行
-        /// </summary>
-        public int LogicalRow { get; set; }
-
         public override VTDocumentElements Type => VTDocumentElements.TextLine;
+
+        /// <summary>
+        /// 行索引，从0开始
+        /// </summary>
+        public int PhysicsRow { get; set; }
 
         /// <summary>
         /// 列大小
@@ -469,6 +468,7 @@ namespace XTerminal.Document
         {
             this.characters.Clear();
             this.characters.AddRange(historyLine.Characters);
+            this.PhysicsRow = historyLine.PhysicsRow;
 
             this.SetRenderDirty(true);
         }

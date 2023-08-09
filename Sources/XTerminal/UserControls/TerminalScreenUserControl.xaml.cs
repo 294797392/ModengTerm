@@ -253,27 +253,27 @@ namespace XTerminal.UserControls
         }
 
 
-        private void ContentControlSurface_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void GridContent_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            ContentControlSurface.CaptureMouse();
+            GridContent.CaptureMouse();
             Point p = e.GetPosition(this);
             this.VTMouseDown(this, new VTPoint(p.X, p.Y));
         }
 
-        private void ContentControlSurface_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void GridContent_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (ContentControlSurface.IsMouseCaptured)
+            if (GridContent.IsMouseCaptured)
             {
                 Point p = e.GetPosition(this);
                 this.VTMouseMove(this, new VTPoint(p.X, p.Y));
             }
         }
 
-        private void ContentControlSurface_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void GridContent_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Point p = e.GetPosition(this);
             this.VTMouseUp(this, new VTPoint(p.X, p.Y));
-            ContentControlSurface.ReleaseMouseCapture();
+            GridContent.ReleaseMouseCapture();
         }
 
 

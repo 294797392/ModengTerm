@@ -19,17 +19,20 @@
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
 
-            <ContentControl Grid.Row="0" x:Name="ContentControlSurface"
-                        PreviewMouseLeftButtonDown="ContentControlSurface_PreviewMouseLeftButtonDown"
-                        PreviewMouseMove="ContentControlSurface_PreviewMouseMove"
-                        PreviewMouseLeftButtonUp="ContentControlSurface_PreviewMouseLeftButtonUp">
-                <ContentControl.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
-                        <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
-                    </ContextMenu>
-                </ContentControl.ContextMenu>
-            </ContentControl>
+            <Grid Grid.Row="0" x:Name="GridContent" 
+                  PreviewMouseLeftButtonDown="GridContent_PreviewMouseLeftButtonDown"
+                  PreviewMouseMove="GridContent_PreviewMouseMove"
+                  PreviewMouseLeftButtonUp="GridContent_PreviewMouseLeftButtonUp"
+                  Background="Transparent">
+                <ContentControl x:Name="ContentControlSurface">
+                    <ContentControl.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
+                            <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
+                        </ContextMenu>
+                    </ContentControl.ContextMenu>
+                </ContentControl>
+            </Grid>
 
             <!-- Slider模拟滚动条 -->
             <Slider Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" 

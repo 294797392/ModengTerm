@@ -36,7 +36,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 指示当前选中的内容是否为空
         /// </summary>
-        public bool IsEmpty { get { return this.Geometry.Count == 0; } }
+        public bool IsEmpty { get { return this.Start.CharacterIndex < 0 || this.End.CharacterIndex < 0; } }
 
         public VTextSelection()
         {
@@ -44,6 +44,9 @@ namespace XTerminal.Document
             this.Start = new VTextPointer();
             this.End = new VTextPointer();
             this.textBuilder = new StringBuilder();
+
+            this.Start.CharacterIndex = -1;
+            this.End.CharacterIndex = -1;
         }
 
         /// <summary>
@@ -58,11 +61,9 @@ namespace XTerminal.Document
 
             this.Start.CharacterIndex = -1;
             this.Start.PhysicsRow = -1;
-            this.Start.CharacterBounds = VTRect.Empty;
 
             this.End.CharacterIndex = -1;
             this.End.PhysicsRow = -1;
-            this.Start.CharacterBounds = VTRect.Empty;
         }
 
         /// <summary>
@@ -73,12 +74,7 @@ namespace XTerminal.Document
         /// <returns></returns>
         public string GetText(Dictionary<int, VTHistoryLine> historyLines)
         {
-            if (this.IsEmpty)
-            {
-                return string.Empty;
-            }
-
-            // 找到选中的第一行和最后一行的信息
+            // 找到选中的起始行和结束行的信息
             VTHistoryLine firstLine, lastLine;
             if (!historyLines.TryGetValue(this.Start.PhysicsRow, out firstLine) ||
                 !historyLines.TryGetValue(this.End.PhysicsRow, out lastLine))
@@ -90,26 +86,50 @@ namespace XTerminal.Document
             // 当前只选中了一行
             if (firstLine == lastLine)
             {
-                return firstLine.Text.Substring(this.Start.CharacterIndex, this.End.CharacterIndex - this.Start.CharacterIndex);
+                // 注意要处理鼠标从右向左选中的情况
+                // 如果鼠标是从右向左进行选中，那么Start就是Selection的右边，End就是Selection的左边
+                int startCharacterIndex = Math.Min(this.Start.CharacterIndex, this.End.CharacterIndex);
+                int endCharacterIndex = Math.Max(this.Start.CharacterIndex, this.End.CharacterIndex);
+                return firstLine.Text.Substring(startCharacterIndex, endCharacterIndex - startCharacterIndex + 1);
             }
 
-            // 当前选中了多行，那么每行的数据都要复制
-
+            // 清空之前选中的数据
             this.textBuilder.Clear();
 
-            VTHistoryLine currentLine = firstLine;
+            // 鼠标从下往上选中，需要单独处理
+            bool reverse = this.Start.PhysicsRow > this.End.PhysicsRow;
+
+            // 当前选中了多行，那么每行的数据都要复制
+            VTHistoryLine currentLine = reverse ? lastLine : firstLine;
             while (currentLine != null)
             {
                 if (currentLine == firstLine)
                 {
-                    // 第一行
-                    this.textBuilder.AppendLine(currentLine.Text.Substring(this.Start.CharacterIndex));
+                    if (reverse)
+                    {
+                        // 如果是鼠标从下往上选中，那么就是最后一行
+                        this.textBuilder.AppendLine(currentLine.Text.Substring(0, this.Start.CharacterIndex + 1));
+                        break;
+                    }
+                    else
+                    {
+                        // 第一行
+                        this.textBuilder.AppendLine(currentLine.Text.Substring(this.Start.CharacterIndex));
+                    }
                 }
                 else if (currentLine == lastLine)
                 {
-                    // 最后一行
-                    this.textBuilder.AppendLine(currentLine.Text.Substring(0, this.End.CharacterIndex + 1));
-                    break;
+                    if (reverse)
+                    {
+                        // 如果是鼠标从下往上选中，那么就是第一行
+                        this.textBuilder.AppendLine(currentLine.Text.Substring(this.End.CharacterIndex));
+                    }
+                    else
+                    {
+                        // 最后一行
+                        this.textBuilder.AppendLine(currentLine.Text.Substring(0, this.End.CharacterIndex + 1));
+                        break;
+                    }
                 }
                 else
                 {
@@ -123,73 +143,8 @@ namespace XTerminal.Document
             return this.textBuilder.ToString();
         }
 
-        /// <summary>
-        /// 构建选中内容的几何图形
-        /// </summary>
-        public void BuildGeometry()
-        {
-            this.Geometry.Clear();
+        #region 实例方法
 
-            VTextPointer startPointer = this.Start;
-            VTextPointer endPointer = this.End;
-
-            // 判断起始位置或者结束位置是否在Surface外
-
-            // 先算鼠标的移动方向
-            TextPointerPositions pointerPosition = VTextSelectionHelper.GetTextPointerPosition(startPointer, endPointer);
-
-            switch (pointerPosition)
-            {
-                case TextPointerPositions.Original:
-                    {
-                        break;
-                    }
-
-                // 这两个是鼠标在同一行上移动
-                case TextPointerPositions.Right:
-                case TextPointerPositions.Left:
-                    {
-                        VTRect rect1 = startPointer.CharacterBounds;
-                        VTRect rect2 = endPointer.CharacterBounds;
-
-                        double xmin = Math.Min(rect1.Left, rect2.Left);
-                        double xmax = Math.Max(rect1.Right, rect2.Right);
-                        double x = xmin;
-                        double y = startPointer.OffsetY;
-                        double width = xmax - xmin;
-                        double height = rect1.Height;
-
-                        VTRect bounds = new VTRect(x, y, width, height);
-                        this.Geometry.Add(bounds);
-                        break;
-                    }
-
-                // 其他的是鼠标上下移动
-                default:
-                    {
-                        // 构建上边和下边的矩形
-                        VTextPointer topPointer = startPointer.PhysicsRow < endPointer.PhysicsRow ? startPointer : endPointer;
-                        VTextPointer bottomPointer = startPointer.PhysicsRow < endPointer.PhysicsRow ? endPointer : startPointer;
-
-                        //logger.FatalFormat("top = {0}, bottom = {1}", topPointer.Row, bottomPointer.Row);
-
-                        // 相对于Panel的起始选中边界框和结束选中的边界框
-                        VTRect topBounds = topPointer.CharacterBounds;
-                        VTRect bottomBounds = bottomPointer.CharacterBounds;
-
-                        // 第一行的矩形
-                        this.Geometry.Add(new VTRect(topBounds.X, topPointer.OffsetY, 9999, topBounds.Height));
-
-                        // 中间的矩形
-                        double y = topPointer.OffsetY + topBounds.Height;
-                        double height = bottomPointer.OffsetY - (topPointer.OffsetY + topBounds.Height);
-                        this.Geometry.Add(new VTRect(0, y, 9999, height));
-
-                        // 最后一行的矩形
-                        this.Geometry.Add(new VTRect(0, bottomPointer.OffsetY, bottomBounds.Right, bottomBounds.Height));
-                        break;
-                    }
-            }
-        }
+        #endregion
     }
 }

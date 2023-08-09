@@ -16,37 +16,30 @@ namespace XTerminal.Document
 
         private static readonly VTRect EmptyRect = new VTRect();
 
-        private const int CharacterHitTolerance = 3;
-
         /// <summary>
         /// 根据Y坐标找到包含该Y坐标的历史行
         /// </summary>
         /// <param name="firstLine">要从第几行开始往下找</param>
-        /// <param name="yPos">Y坐标偏移量</param>
-        /// <param name="offsetY">该行相对于Surface的Y偏移量</param>
+        /// <param name="cursorY">Y坐标偏移量</param>
         /// <returns>找到了就返回找到的历史行，没找到返回null</returns>
-        public static VTHistoryLine HitTestVTextLine(VTHistoryLine firstLine, double yPos, out double offsetY)
+        public static VTextLine HitTestVTextLine(VTextLine firstLine, double cursorY)
         {
             // 当前行的Y偏移量
-            offsetY = 0;
-            VTHistoryLine historyLine = firstLine;
+            VTextLine current = firstLine;
 
-            while (historyLine != null)
+            while (current != null)
             {
                 // 当前行的边界框信息
-                VTRect lineBounds = new VTRect(0, offsetY, historyLine.Width, historyLine.Height);
+                VTRect lineBounds = current.Bounds;
 
                 // 判断鼠标的Y坐标是否在边界框内
-                if (lineBounds.Top <= yPos && lineBounds.Bottom >= yPos)
+                if (lineBounds.Top <= cursorY && lineBounds.Bottom >= cursorY)
                 {
                     // 此时说明找到了鼠标所在行
-                    return historyLine;
+                    return current;
                 }
 
-                // 下一行的Y坐标
-                offsetY += lineBounds.Height;
-
-                historyLine = historyLine.NextLine;
+                current = current.NextLine;
             }
 
             return null;
@@ -54,14 +47,15 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 根据X坐标找到该坐标下的字符的边界框信息
+        /// 因为字符与字符之间有间隙，如果在测量的时候cursorX刚好在两个字符的间隙里，那么此时返回false
         /// </summary>
         /// <param name="surface">渲染该字符的Surface，用来测量字符</param>
-        /// <param name="historyLine">要做字符命中测试的行</param>
-        /// <param name="xPos">要做命中测试的X偏移量</param>
+        /// <param name="lineToHit">要做字符命中测试的行</param>
+        /// <param name="cursorX">要做命中测试的X偏移量</param>
         /// <param name="index">被命中的字符的索引</param>
         /// <param name="bounds">被命中的字符的边界框信息</param>
         /// <returns>命中成功返回true，失败返回false</returns>
-        public static bool HitTestVTCharacter(ITerminalSurface surface, VTHistoryLine historyLine, double xPos, out int index, out VTRect bounds)
+        public static bool HitTestVTCharacter(ITerminalSurface surface, VTextLine lineToHit, double cursorX, out int index, out VTRect bounds)
         {
             // 命中测试流程是一个一个字符做边界框的判断
             // 先测量第一个字符的边界框，然后判断xPos是否在该边界框里
@@ -71,12 +65,12 @@ namespace XTerminal.Document
             index = -1;
             bounds = EmptyRect;
 
-            string text = historyLine.Text;
+            string text = lineToHit.Text;
             for (int i = 0; i < text.Length; i++)
             {
-                VTRect characterBounds = surface.MeasureCharacter(historyLine, i);
+                VTRect characterBounds = surface.MeasureCharacter(lineToHit, i);
 
-                if (characterBounds.Left <= xPos && characterBounds.Right - CharacterHitTolerance >= xPos)
+                if (characterBounds.Left <= cursorX && characterBounds.Right >= cursorX)
                 {
                     // 鼠标命中了字符，使用命中的字符的边界框
                     index = i;
@@ -86,57 +80,6 @@ namespace XTerminal.Document
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// 获取pointer2相对于pointer1的方向
-        /// </summary>
-        /// <param name="pointer1">第一个pointer</param>
-        /// <param name="pointer2">第二个pointer</param>
-        /// <returns></returns>
-        public static TextPointerPositions GetTextPointerPosition(VTextPointer pointer1, VTextPointer pointer2)
-        {
-            double p1x = pointer1.CharacterIndex;
-            double p2x = pointer2.CharacterIndex;
-            int row1 = pointer1.PhysicsRow;
-            int row2 = pointer2.PhysicsRow;
-
-            if (p2x == p1x && row2 < row1)
-            {
-                return TextPointerPositions.Top;
-            }
-            else if (p2x > p1x && row2 < row1)
-            {
-                return TextPointerPositions.RightTop;
-            }
-            else if (p2x > p1x && row2 == row1)
-            {
-                return TextPointerPositions.Right;
-            }
-            else if (p2x > p1x && row2 > row1)
-            {
-                return TextPointerPositions.RightBottom;
-            }
-            else if (p2x == p1x && row2 > row1)
-            {
-                return TextPointerPositions.Bottom;
-            }
-            else if (p2x < p1x && row2 > row1)
-            {
-                return TextPointerPositions.LeftBottom;
-            }
-            else if (p2x < p1x && row2 == row1)
-            {
-                return TextPointerPositions.Left;
-            }
-            else if (p2x < p1x && row2 < row1)
-            {
-                return TextPointerPositions.LeftTop;
-            }
-            else
-            {
-                return TextPointerPositions.Original;
-            }
         }
     }
 }

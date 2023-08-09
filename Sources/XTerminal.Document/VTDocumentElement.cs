@@ -37,7 +37,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 元素是否需要重新测量
         /// </summary>
-        public bool IsMeasureDirety { get; private set; }
+        public bool IsMeasureDirty { get; private set; }
 
         /// <summary>
         /// 元素是否需要重新渲染
@@ -71,9 +71,9 @@ namespace XTerminal.Document
 
         public void SetMeasureDirty(bool isDirty)
         {
-            if (this.IsMeasureDirety != isDirty)
+            if (this.IsMeasureDirty != isDirty)
             {
-                this.IsMeasureDirety = isDirty;
+                this.IsMeasureDirty = isDirty;
             }
         }
 
@@ -84,7 +84,7 @@ namespace XTerminal.Document
                 this.IsRenderDirty = isDirty;
 
                 // 需要render的时候也说明需要measure
-                this.IsMeasureDirety = isDirty;
+                this.IsMeasureDirty = isDirty;
             }
         }
     }

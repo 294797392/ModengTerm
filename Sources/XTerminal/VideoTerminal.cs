@@ -103,6 +103,20 @@ namespace XTerminal
         /// </summary>
         private Thread cursorBlinkingThread;
 
+        #region Terminal Info
+
+        /// <summary>
+        /// 当前终端可以显示的总行数
+        /// </summary>
+        private int terminalRows;
+
+        /// <summary>
+        /// 当前终端可以显示的总列数
+        /// </summary>
+        private int terminalColumns;
+
+        #endregion
+
         #region History & Scroll
 
         /// <summary>
@@ -135,7 +149,7 @@ namespace XTerminal
         private int scrollValue;
 
         /// <summary>
-        /// 当鼠标按下的时候，记录Canvas相对于屏幕的坐标
+        /// surface相对于屏幕的坐标
         /// </summary>
         private VTRect surfaceRect;
 
@@ -276,6 +290,9 @@ namespace XTerminal
 
             this.isRunning = true;
 
+            this.terminalRows = sessionInfo.TerminalOptions.Rows;
+            this.terminalColumns = sessionInfo.TerminalOptions.Columns;
+
             #region 初始化键盘
 
             this.Keyboard = new VTKeyboard();
@@ -387,6 +404,7 @@ namespace XTerminal
         {
             if (this.textSelection.IsEmpty)
             {
+                logger.WarnFormat("CopySelection失败, 起始字符索引或者结束字符索引小于0");
                 return;
             }
 
@@ -501,13 +519,12 @@ namespace XTerminal
         /// 是否要移动滚动条，设置为-1表示不移动滚动条
         /// 注意这里只是更新UI上的滚动条位置，并不会实际的去滚动内容
         /// </param>
-        private void DrawDocument(VTDocument document, int scrollValue = -1, bool arrangeSelectionArea = false)
+        private void DrawDocument(VTDocument document, int scrollValue = -1)
         {
             // 当前行的Y方向偏移量
             double offsetY = 0;
 
             bool arrangeDirty = document.IsArrangeDirty;
-            bool activeLineDirty = this.ActiveLine.IsRenderDirty;
 
             this.uiSyncContext.Send((state) =>
             {
@@ -526,7 +543,7 @@ namespace XTerminal
                         this.Surface.Draw(next);
                         //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);
                     }
-                    else if (next.IsMeasureDirety)
+                    else if (next.IsMeasureDirty)
                     {
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
                         this.Surface.MeasureLine(next);
@@ -569,11 +586,14 @@ namespace XTerminal
 
                 #endregion
 
-                #region 更新选中区域的位置
+                #region 更新选中高亮几何图形
 
-                if (arrangeSelectionArea)
+                if (this.textSelection.IsRenderDirty)
                 {
-                    this.Surface.Arrange(this.textSelection);
+                    // 此时的VTextLine测量数据都是最新的
+                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection, this.scrollValue);
+                    this.Surface.Draw(this.textSelection);
+                    this.textSelection.SetRenderDirty(false);
                 }
 
                 #endregion
@@ -586,7 +606,7 @@ namespace XTerminal
                 {
                     // 滚动到底了，说明是ActiveLine就是当前正在输入的行
                     // 更新下历史行的大小和文字，不然在执行光标选中的时候文本为空，会影响到测量
-                    this.lastHistoryLine.Freeze(this.ActiveLine);
+                    this.lastHistoryLine.SetVTextLine(this.ActiveLine);
                 }
             }
 
@@ -608,14 +628,10 @@ namespace XTerminal
             // 更新当前滚动条的值，一定要先更新，因为DrawDocument函数会用到该值
             this.scrollValue = scrollValue;
 
-            // 终端可以显示的总行数
-            int terminalRows = this.sessionInfo.TerminalOptions.Rows;
-
-            // 被滚动的行数
+            // 需要进行滚动的行数
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
-            // 是否需要移动选中区域
-            bool arrangeSelectionArea = false;
+            #region 更新要显示的行
 
             if (scrolledRows >= terminalRows)
             {
@@ -639,12 +655,6 @@ namespace XTerminal
                     currentTextLine.SetHistory(currentHistory);
                     currentHistory = currentHistory.NextLine;
                     currentTextLine = currentTextLine.NextLine;
-                }
-
-                // 如果当前有选中内容，那么更新选中内容的图形为位置
-                if (!this.textSelection.IsEmpty)
-                {
-                    this.textSelection.OffsetY = -9999;
                 }
             }
             else
@@ -692,17 +702,33 @@ namespace XTerminal
 
                     line2 = this.activeDocument.LastLine;
                 }
-
-                // 如果当前有选中内容，那么更新选中内容的图形为位置
-                if (!this.textSelection.IsEmpty)
-                {
-                    this.textSelection.OffsetY += line1.OffsetY - line2.OffsetY;
-                    arrangeSelectionArea = true;
-                }
             }
 
             this.activeDocument.SetArrangeDirty(true);
-            this.DrawDocument(this.activeDocument, scrollValue, arrangeSelectionArea);
+
+            #endregion
+
+            #region 如果有TextSelection，那么更新TextSelection
+
+            // 只有当前是主缓冲区才支持用鼠标滚轮滚动
+            // 备用缓冲区不支持，也就是说VIM，man这种程序不支持用鼠标滚轮
+            if (this.activeDocument == this.mainDocument)
+            {
+                if (!this.textSelection.IsEmpty)
+                {
+                    // 此时的VTextLine测量数据都是最新的
+                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection, this.scrollValue);
+                    this.textSelection.SetRenderDirty(true);
+                }
+            }
+
+            #endregion
+
+            #region 重新渲染
+
+            this.DrawDocument(this.activeDocument, scrollValue);
+
+            #endregion
         }
 
         /// <summary>
@@ -780,30 +806,15 @@ namespace XTerminal
                 mouseY = surfaceBoundary.Height;
             }
 
-            pointer.CharacterIndex = -1;
-
             #region 先找到鼠标所在行
 
-            // 有可能当前有滚动，所以要从历史行里开始找
-            // 先获取到当前屏幕上显示的历史行的首行
-
-            VTHistoryLine topHistoryLine;
-            if (!this.historyLines.TryGetValue(this.scrollValue, out topHistoryLine))
-            {
-                logger.DebugFormat("GetTextPointer失败, 不存在历史行记录, currentScroll = {0}", this.scrollValue);
-                return false;
-            }
-
-            double lineOffsetY;
-            VTHistoryLine lineHit = VTextSelectionHelper.HitTestVTextLine(topHistoryLine, mouseY, out lineOffsetY);
-            if (lineHit == null)
+            VTextLine cursorLine = VTextSelectionHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseY);
+            if (cursorLine == null)
             {
                 // 这里说明鼠标没有在任何一行上
                 logger.DebugFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
                 return false;
             }
-
-            pointer.PhysicsRow = lineHit.PhysicsRow;
 
             #endregion
 
@@ -811,16 +822,16 @@ namespace XTerminal
 
             int characterIndex;
             VTRect characterBounds;
-            if (!VTextSelectionHelper.HitTestVTCharacter(this.Surface, lineHit, mouseX, out characterIndex, out characterBounds))
+            if (!VTextSelectionHelper.HitTestVTCharacter(this.Surface, cursorLine, mouseX, out characterIndex, out characterBounds))
             {
                 return false;
             }
 
-            pointer.CharacterIndex = characterIndex;
-            pointer.CharacterBounds = characterBounds;
-            pointer.OffsetY = lineOffsetY;
-
             #endregion
+
+            // 命中成功再更新TextPointer，保证pointer不为空
+            pointer.PhysicsRow = cursorLine.PhysicsRow;
+            pointer.CharacterIndex = characterIndex;
 
             return true;
         }
@@ -839,6 +850,98 @@ namespace XTerminal
             else
             {
                 return VTCharacter.Create(Convert.ToChar(ch), 1, VTCharacterFlags.SingleByteChar);
+            }
+        }
+
+        /// <summary>
+        /// 根据当前滚动条的状态和选中状态重新构建高亮几何图形
+        /// </summary>
+        /// <param name="document">当前显示的文档</param>
+        /// <param name="selection">鼠标命中信息</param>
+        /// <param name="scrollValue">滚动条的值</param>
+        private void UpdateSelectionGeometry(VTDocument document, VTextSelection selection, int scrollValue)
+        {
+            selection.Geometry.Clear();
+
+            // 单独处理选中的是同一行的情况
+            if (selection.Start.PhysicsRow == selection.End.PhysicsRow)
+            {
+                // 找到对应的文本行
+                VTextLine textLine = document.FindLine(selection.Start.PhysicsRow);
+                if (textLine == null)
+                {
+                    // 当选中了一行之后，然后该行被移动到屏幕外了，会出现这种情况
+                    return;
+                }
+
+                VTextPointer leftPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.Start : selection.End;
+                VTextPointer rightPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.End : selection.Start;
+
+                VTRect leftBounds = this.Surface.MeasureCharacter(textLine, leftPointer.CharacterIndex);
+                VTRect rightBounds = this.Surface.MeasureCharacter(textLine, rightPointer.CharacterIndex);
+
+                double x = leftBounds.Left;
+                double y = textLine.OffsetY;
+                double width = rightBounds.Right - leftBounds.Left;
+                double height = textLine.Height;
+
+                VTRect bounds = new VTRect(x, y, width, height);
+                selection.Geometry.Add(bounds);
+                return;
+            }
+
+            // 下面处理选中了多行的状态
+            VTextPointer topPointer = selection.Start.PhysicsRow > selection.End.PhysicsRow ? selection.End : selection.Start;
+            VTextPointer bottomPointer = selection.Start.PhysicsRow > selection.End.PhysicsRow ? selection.Start : selection.End;
+
+            VTextLine topLine = document.FindLine(topPointer.PhysicsRow);
+            VTextLine bottomLine = document.FindLine(bottomPointer.PhysicsRow);
+
+            if (topLine != null && bottomLine != null)
+            {
+                // 此时说明选中的内容都在屏幕里
+                // 构建上边和下边的矩形
+                VTRect topBounds = this.Surface.MeasureCharacter(topLine, topPointer.CharacterIndex);
+                VTRect bottomBounds = this.Surface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
+
+                // 第一行的矩形
+                selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, this.surfaceRect.Width - topBounds.X, topLine.Height));
+
+                // 中间的矩形
+                double y = topLine.OffsetY + topBounds.Height;
+                double height = bottomLine.OffsetY - (topLine.OffsetY + topBounds.Height);
+                selection.Geometry.Add(new VTRect(0, y, this.surfaceRect.Width, height));
+
+                // 最后一行的矩形
+                selection.Geometry.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
+                return;
+            }
+
+            if (topLine != null && bottomLine == null)
+            {
+                // 选中的内容有一部分被移到屏幕外了，滚动条往上移动
+                VTRect topBounds = this.Surface.MeasureCharacter(topLine, topPointer.CharacterIndex);
+
+                // 第一行的矩形
+                selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, this.surfaceRect.Width - topBounds.X, topLine.Height));
+
+                // 剩下的矩形
+                double height = document.LastLine.Bounds.Bottom - topLine.Bounds.Bottom;
+                selection.Geometry.Add(new VTRect(0, topLine.Bounds.Bottom, this.surfaceRect.Width, height));
+                return;
+            }
+
+            if (topLine == null && bottomLine != null)
+            {
+                // 选中的内容有一部分被移到屏幕外了，滚动条往下移动
+                VTRect bottomBounds = this.Surface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
+
+                // 最后一行的矩形
+                selection.Geometry.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
+
+                // 剩下的矩形
+                selection.Geometry.Add(new VTRect(0, 0, this.surfaceRect.Width, bottomLine.OffsetY));
+                return;
             }
         }
 
@@ -917,6 +1020,10 @@ namespace XTerminal
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
                         this.activeDocument.LineFeed();
 
+                        VTextLine oldLastLine = this.ActiveLine.PreviousLine;
+                        VTextLine newLastLine = this.ActiveLine;
+                        newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
+
                         // 换行之后记录历史行
                         // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
                         // MainScrrenBuffer和AlternateScrrenBuffer里的行分别记录
@@ -928,46 +1035,55 @@ namespace XTerminal
                             // 有几种特殊情况：
                             // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
 
-                            if (this.ActiveLine.PreviousLine.IsMeasureDirety)
+                            #region 更新当前的最后一个历史行
+
+                            if (oldLastLine.IsMeasureDirty)
                             {
-                                this.Surface.MeasureLine(this.ActiveLine.PreviousLine);
+                                this.Surface.MeasureLine(oldLastLine);
                             }
-                            this.lastHistoryLine.Freeze(this.ActiveLine.PreviousLine);
+                            this.lastHistoryLine.SetVTextLine(oldLastLine);
+
+                            #endregion
+
+                            #region 再创建新行对应的历史行
 
                             // 再创建最新行的历史行
                             // 先测量下最新的行，确保有高度
                             this.Surface.MeasureLine(this.ActiveLine);
-                            int historyIndex = this.lastHistoryLine.PhysicsRow + 1;
-                            VTHistoryLine historyLine = VTHistoryLine.Create(historyIndex, this.lastHistoryLine, this.ActiveLine);
-                            this.historyLines[historyIndex] = historyLine;
-                            this.lastHistoryLine = historyLine;
+                            int newHistoryRow = newLastLine.PhysicsRow;
+                            VTHistoryLine newHistory = VTHistoryLine.Create(newLastLine.PhysicsRow, this.lastHistoryLine, this.ActiveLine);
+                            this.historyLines[newHistoryRow] = newHistory;
+                            this.lastHistoryLine = newHistory;
+
+                            #endregion
+
+                            #region 滚动滚动条
 
                             // 滚动条滚动到底
-                            int terminalRows = this.sessionInfo.TerminalOptions.Rows;
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = historyIndex - terminalRows + 1;
+                            int scrollMax = newHistoryRow - this.terminalRows + 1;
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
                                 this.scrollMax = scrollMax;
                                 this.scrollValue = scrollMax;
 
+                                // 如果当前有选中的内容，那么把选中内容设置为脏状态，下次在渲染的时候会更新
+                                // 选中的区域往上移动
+                                if (!this.textSelection.IsEmpty)
+                                {
+                                    this.textSelection.SetRenderDirty(true);
+                                }
+
                                 logger.DebugFormat("scrollMax = {0}", scrollMax);
                                 this.uiSyncContext.Send((state) =>
                                 {
                                     this.TerminalScreen.UpdateScrollInfo(scrollMax);
                                     this.TerminalScreen.ScrollToEnd(ScrollOrientation.Down);
-
-                                    // 如果当前有选中的内容，那么更新选中的内容
-                                    // 选中的区域往上移动
-                                    if (!this.textSelection.IsEmpty)
-                                    {
-                                        this.textSelection.OffsetY -= this.lastHistoryLine.PreviousLine.Height;
-                                        this.Surface.Arrange(this.textSelection);
-                                    }
-
                                 }, null);
                             }
+
+                            #endregion
                         }
 
                         VTDebug.WriteAction("LF/FF/VT, Cursor={0},{1}, {2}", this.CursorRow, this.CursorCol, action);
@@ -1122,7 +1238,7 @@ namespace XTerminal
                         VTextAttribute textAttribute = this.ActiveLine.Attributes.FirstOrDefault(v => v.Decoration == decoration);
                         if (textAttribute == null)
                         {
-                            textAttribute = new VTextAttribute() 
+                            textAttribute = new VTextAttribute()
                             {
                                 StartCharacter = this.CursorCol,
                                 Decoration = decoration,
@@ -1299,7 +1415,7 @@ namespace XTerminal
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = this.sessionInfo.TerminalOptions.Rows;
+                        int lines = this.terminalRows;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
@@ -1426,7 +1542,7 @@ namespace XTerminal
             this.ScrollToHistory(scrollValue);
         }
 
-        private void TerminalScreen_VTMouseDown(ITerminalScreen canvasPanel, VTPoint mousePosition)
+        private void TerminalScreen_VTMouseDown(ITerminalScreen screen, VTPoint mousePosition)
         {
             this.isMouseDown = true;
             this.mouseDownPos = mousePosition;
@@ -1455,6 +1571,7 @@ namespace XTerminal
                 if (!this.GetTextPointer(mousePosition, this.surfaceRect, this.textSelection.Start))
                 {
                     // 没有命中起始字符，那么直接返回啥都不做
+                    //logger.DebugFormat("没命中起始字符");
                     return;
                 }
             }
@@ -1479,24 +1596,34 @@ namespace XTerminal
                 }
             }
 
-            #region Selection的起始字符和结束字符是同一个字符，啥都不做
+            #region 起始字符和结束字符测量出来的索引位置都是-1，啥都不做
 
-            if (startPointer.CharacterIndex > -1 && endPointer.CharacterIndex > -1)
+            if (startPointer.CharacterIndex < 0 || endPointer.CharacterIndex < 0)
             {
-                if (startPointer.CharacterIndex == endPointer.CharacterIndex)
-                {
-                    return;
-                }
+                logger.WarnFormat("鼠标命中的起始字符和结束字符位置都小于0");
+                return;
             }
 
             #endregion
 
-            // 计算选中内容的几何图形，并渲染
-            this.textSelection.BuildGeometry();
-            this.uiSyncContext.Send((state) =>
+            #region 起始字符和结束字符是同一个字符，啥都不做
+
+            if (startPointer.CharacterIndex == endPointer.CharacterIndex)
             {
-                this.Surface.Draw(this.textSelection);
-            }, null);
+                //logger.WarnFormat("鼠标命中的起始字符和结束字符是相同字符");
+                return;
+            }
+
+            #endregion
+
+            #region 计算并重新渲染选中内容的几何图形，要考虑到滚动条滚动的情况
+
+            // 此时的VTextLine测量数据都是最新的
+            // 主缓冲区和备用缓冲区都支持选中
+            this.UpdateSelectionGeometry(this.activeDocument, this.textSelection, this.scrollValue);
+            this.Surface.Draw(this.textSelection);
+
+            #endregion
         }
 
         private void TerminalScreen_VTMouseUp(ITerminalScreen arg1, VTPoint cursorPos)

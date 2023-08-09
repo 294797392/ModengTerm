@@ -57,16 +57,17 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 冻结该历史行的数据
+        /// 设置该历史行的数据
         /// 当某一行已经显示完成的时候需要冻结
         /// 冻结操作会把要冻结的行里的数据复制到VTHistoryLine里
         /// </summary>
         /// <param name="sourceLine">要冻结的行</param>
-        public void Freeze(VTextLine sourceLine)
+        public void SetVTextLine(VTextLine sourceLine)
         {
             this.Width = sourceLine.Width;
             this.Height = sourceLine.Height;
             this.Text = sourceLine.Text;
+            this.PhysicsRow = sourceLine.PhysicsRow;
             // 复制一份字符列表
             this.Characters = CloneCharacters(sourceLine.Characters);
         }

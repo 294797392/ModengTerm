@@ -138,7 +138,7 @@ namespace XTerminal.Rendering
             return new VTSize(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
         }
 
-        public VTRect MeasureCharacter(VTHistoryLine textLine, int characterIndex)
+        public VTRect MeasureCharacter(VTextLine textLine, int characterIndex)
         {
             string text = textLine.Text;
 

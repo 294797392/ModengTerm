@@ -71,12 +71,35 @@ namespace XTerminal.Document
         /// </summary>
         public double Right { get { return this.Left + this.Width; } }
 
+        /// <summary>
+        /// 获取中心点X坐标
+        /// </summary>
+        public double CenterX { get { return this.Left + this.Width / 2; } }
+
         public VTRect(double x, double y, double width, double height)
         {
             this.X = x;
             this.Y = y;
             this.Width = width;
             this.Height = height;
+        }
+
+        /// <summary>
+        /// 测试是否在水平位置包含X
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="tolerance"></param>
+        /// <returns></returns>
+        public bool ContainsX(double x, int tolerance = 0)
+        {
+            if (tolerance > 0)
+            {
+                return x >= this.Left - tolerance && x <= this.Right + tolerance;
+            }
+            else
+            {
+                return x >= this.Left && x <= this.Right;
+            }
         }
 
         public override string ToString()

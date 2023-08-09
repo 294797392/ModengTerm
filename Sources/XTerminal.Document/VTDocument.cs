@@ -118,7 +118,6 @@ namespace XTerminal.Document
 
             VTextLine firstLine = new VTextLine(this)
             {
-                LogicalRow = 0,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
@@ -151,7 +150,6 @@ namespace XTerminal.Document
         {
             VTextLine textLine = new VTextLine(this)
             {
-                LogicalRow = row,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
@@ -204,6 +202,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 换行
+        /// 换行逻辑是把第一行拿到最后一行，要考虑到scrollMargin
         /// </summary>
         public void LineFeed()
         {
@@ -696,6 +695,28 @@ namespace XTerminal.Document
             this.FirstLine = null;
             this.LastLine = null;
             this.ActiveLine = null;
+        }
+
+        /// <summary>
+        /// 根据physicsRow找到对应的行
+        /// </summary>
+        /// <param name="row">指定要找到的行的索引</param>
+        /// <returns></returns>
+        public VTextLine FindLine(int physicsRow)
+        {
+            VTextLine current = this.FirstLine;
+
+            while (current != null)
+            {
+                if (current.PhysicsRow == physicsRow)
+                {
+                    return current;
+                }
+
+                current = current.NextLine;
+            }
+
+            return null;
         }
 
         #endregion

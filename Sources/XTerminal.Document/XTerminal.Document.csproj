@@ -40,9 +40,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Renci.SshNet">
-      <HintPath>..\..\Dependence\Renci.SshNet.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -85,6 +82,10 @@
     <Compile Include="XDocumentUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
+      <Project>{fad04a41-2dbb-49ec-a8ed-fbd0dc62d26c}</Project>
+      <Name>Renci.SshNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XTerminal.Base\XTerminal.Base.csproj">
       <Project>{F2C5BC95-5839-4C8F-9923-3512FE2DDEA1}</Project>
       <Name>XTerminal.Base</Name>
