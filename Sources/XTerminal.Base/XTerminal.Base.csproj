@@ -61,6 +61,7 @@
     <Compile Include="Definitions\ColorDefinition.cs" />
     <Compile Include="Definitions\FontFamilyDefinition.cs" />
     <Compile Include="Definitions\FontSizeDefinition.cs" />
+    <Compile Include="Definitions\ThemeDefinition.cs" />
     <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
     <Compile Include="DataModels\SessionOptions\TerminalOptions.cs" />
     <Compile Include="DataModels\XTermSession.cs" />

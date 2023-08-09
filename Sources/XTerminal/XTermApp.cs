@@ -47,12 +47,19 @@ namespace XTerminal
         [JsonProperty("fontFamily")]
         public List<FontFamilyDefinition> FontFamilyList { get; private set; }
 
+        /// <summary>
+        /// 主题列表
+        /// </summary>
+        [JsonProperty("themes")]
+        public List<ThemeDefinition> ThemeList { get; private set; }
+
         public XTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
             this.ForegroundList = new List<ColorDefinition>();
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
+            this.ThemeList = new List<ThemeDefinition>();
         }
     }
 

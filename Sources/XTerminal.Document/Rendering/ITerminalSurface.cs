@@ -12,6 +12,11 @@ namespace XTerminal.Document.Rendering
     public interface ITerminalSurface
     {
         /// <summary>
+        /// 获取相对于整个显示器屏幕的Canvas边界框
+        /// </summary>
+        VTRect BoundaryRelativeToDesktop { get; }
+
+        /// <summary>
         /// 测量某个文本行的大小
         /// 测量后的结果存储在VTextLine.Metrics属性里
         /// </summary>
@@ -60,11 +65,5 @@ namespace XTerminal.Document.Rendering
         /// <param name="drawable"></param>
         /// <param name="opacity"></param>
         void SetOpacity(VTDocumentElement drawable, double opacity);
-
-        /// <summary>
-        /// 获取相对于整个显示器屏幕的Canvas边界框
-        /// </summary>
-        /// <returns></returns>
-        VTRect GetRectRelativeToDesktop();
     }
 }

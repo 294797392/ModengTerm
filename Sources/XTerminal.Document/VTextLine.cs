@@ -50,6 +50,11 @@ namespace XTerminal.Document
         public override VTDocumentElements Type => VTDocumentElements.TextLine;
 
         /// <summary>
+        /// 该行唯一标识符
+        /// </summary>
+        public string ID { get; internal set; }
+
+        /// <summary>
         /// 行索引，从0开始
         /// </summary>
         public int PhysicsRow { get; set; }

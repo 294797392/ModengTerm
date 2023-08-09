@@ -7,6 +7,7 @@
              xmlns:xtermrendering="clr-namespace:XTerminal.Rendering"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -24,14 +25,16 @@
                   PreviewMouseMove="GridContent_PreviewMouseMove"
                   PreviewMouseLeftButtonUp="GridContent_PreviewMouseLeftButtonUp"
                   Background="Transparent">
-                <ContentControl x:Name="ContentControlSurface" SizeChanged="ContentControlSurface_SizeChanged">
-                    <ContentControl.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
-                            <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
-                        </ContextMenu>
-                    </ContentControl.ContextMenu>
-                </ContentControl>
+
+                <Grid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
+                        <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
+                        <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>
+                    </ContextMenu>
+                </Grid.ContextMenu>
+
+                <ContentControl x:Name="ContentControlSurface" SizeChanged="ContentControlSurface_SizeChanged"/>
             </Grid>
 
             <!-- Slider模拟滚动条 -->

@@ -134,7 +134,6 @@ namespace XTerminal
             XTermSessionVM sessionVM = DataGridSessionList.SelectedItem as XTermSessionVM;
             if (sessionVM == null)
             {
-                MessageBoxUtils.Info("请选择要打开的会话");
                 return;
             }
 

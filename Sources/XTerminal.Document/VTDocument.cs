@@ -117,6 +117,7 @@ namespace XTerminal.Document
 
             VTextLine firstLine = new VTextLine(this)
             {
+                ID = "0",
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
@@ -155,6 +156,7 @@ namespace XTerminal.Document
         {
             VTextLine textLine = new VTextLine(this)
             {
+                ID = row.ToString(),
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
@@ -689,12 +691,6 @@ namespace XTerminal.Document
             if (this.Cursor.Column != column)
             {
                 this.Cursor.Column = column;
-
-                // 在VIM模式下，如果在一行的最后输入空格，那么会收到CUP指令，CUP的意思是把光标位置向后移动一列
-                // 此时如果后面没有字符，那么在渲染的时候，光标的位置就不会变化，所以这里先判断要移动到的光标处是否有字符
-                // 如果有则直接移动，如果没有则添加一个空的字符
-                // 在VIM模式下如果当前光标在0,1处，那么输入空格后，会收到指令CUP 0,2
-                //this.ActiveLine.PadColumns(column + 1);
             }
         }
 

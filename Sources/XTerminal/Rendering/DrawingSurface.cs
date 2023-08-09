@@ -44,6 +44,11 @@ namespace XTerminal.Rendering
             get { return this.visuals.Count; }
         }
 
+        /// <summary>
+        /// 获取相对于整个显示器屏幕的Canvas边界框
+        /// </summary>
+        public VTRect BoundaryRelativeToDesktop { get; internal set; }
+
         #endregion
 
         #region 构造方法
@@ -144,12 +149,6 @@ namespace XTerminal.Rendering
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Opacity = opacity;
-        }
-
-        public VTRect GetRectRelativeToDesktop()
-        {
-            Point leftTop = this.PointToScreen(new Point(0, 0));
-            return new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
         }
 
         protected override void OnRender(DrawingContext drawingContext)

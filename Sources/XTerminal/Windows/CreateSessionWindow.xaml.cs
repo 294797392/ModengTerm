@@ -94,6 +94,8 @@ namespace XTerminal.Windows
             ComboBoxForeground.SelectedIndex = 0;
             ComboBoxFontSize.ItemsSource = XTermApp.Context.Manifest.FontSizeList;
             ComboBoxFontSize.SelectedIndex = 0;
+            ComboBoxThemes.ItemsSource = XTermApp.Context.Manifest.ThemeList;
+            ComboBoxThemes.SelectedIndex = 0;
 
             // 串口波特率列表
             ComboBoxSerialPortBaudRate.ItemsSource = XTermDefaultValues.DefaultSerialPortBaudRates;

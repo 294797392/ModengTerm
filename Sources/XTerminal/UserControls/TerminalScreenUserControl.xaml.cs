@@ -124,6 +124,11 @@ namespace XTerminal.UserControls
             this.VideoTerminal.Paste();
         }
 
+        private void SelectAll()
+        {
+            this.VideoTerminal.SelectAll();
+        }
+
         #endregion
 
         #region 公开接口
@@ -241,11 +246,34 @@ namespace XTerminal.UserControls
         }
 
 
+
         private void GridContent_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            GridContent.CaptureMouse();
-            Point p = e.GetPosition(this);
-            this.VTMouseDown(this, new VTPoint(p.X, p.Y));
+            switch (e.ClickCount)
+            {
+                case 1:
+                    {
+                        GridContent.CaptureMouse();
+                        Point p = e.GetPosition(this);
+                        this.VTMouseDown(this, new VTPoint(p.X, p.Y));
+                        break;
+                    }
+
+                case 2:
+                    {
+                        break;
+                    }
+
+                case 3:
+                    {
+                        break;
+                    }
+
+                default:
+                    {
+                        break;
+                    }
+            }
         }
 
         private void GridContent_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -265,11 +293,19 @@ namespace XTerminal.UserControls
         }
 
 
+
         private void ContentControlSurface_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            // 每次大小改变的时候重新计算下渲染区域的边界框
+            DrawingSurface drawingSurface = this.ContentControlSurface.Content as DrawingSurface;
+            Point leftTop = drawingSurface.PointToScreen(new Point(0, 0));
+            drawingSurface.BoundaryRelativeToDesktop = new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
+
             //VTRect newRect = this.GetBoundary();
             //this.VTSizeChanged(this, newRect);
         }
+
+
 
         private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
         {
@@ -281,6 +317,11 @@ namespace XTerminal.UserControls
             this.Paste();
         }
 
+        private void MenuItemSelectAll_Click(object sender, RoutedEventArgs e)
+        {
+            this.SelectAll();
+        }
+
 
         private void CheckBoxEnableDebugMode_CheckedChanged(object sender, RoutedEventArgs e)
         {
@@ -290,12 +331,6 @@ namespace XTerminal.UserControls
         #endregion
 
         #region ITerminalScreen
-
-        public VTRect GetBoundary()
-        {
-            Point leftTop = ContentControlSurface.PointToScreen(new Point(0, 0));
-            return new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
-        }
 
         public ITerminalSurface CreateSurface()
         {
