@@ -70,21 +70,17 @@ namespace XTerminal.Document.Rendering
         void SwitchSurface(ITerminalSurface remove, ITerminalSurface add);
 
         /// <summary>
+        /// 获取滚动条信息
+        /// </summary>
+        /// <param name="maximum">滚动条最大值</param>
+        /// <param name="scrollValue">当前滚动条的值</param>
+        /// <returns></returns>
+        void GetScrollInfo(out int maximum, out int scrollValue);
+
+        /// <summary>
         /// 更新滚动条的信息
         /// </summary>
         /// <param name="maximum">滚动条的最大值</param>
-        void UpdateScrollInfo(int maximum);
-
-        /// <summary>
-        /// 把滚动条滚动到底
-        /// </summary>
-        /// <param name="orientation">滚动的方向</param>
-        void ScrollToEnd(ScrollOrientation orientation);
-
-        /// <summary>
-        /// 滚动到某个值
-        /// </summary>
-        /// <param name="scrollValue"></param>
-        void ScrollTo(int scrollValue);
+        void SetScrollInfo(int maximum, int scrollValue);
     }
 }

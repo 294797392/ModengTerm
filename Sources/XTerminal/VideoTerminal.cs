@@ -507,6 +507,7 @@ namespace XTerminal
         }
 
         /// <summary>
+        /// update anything about ui
         /// 如果需要布局则进行布局
         /// 如果不需要布局，那么就看是否需要重绘某些文本行
         /// </summary>
@@ -515,7 +516,7 @@ namespace XTerminal
         /// 是否要移动滚动条，设置为-1表示不移动滚动条
         /// 注意这里只是更新UI上的滚动条位置，并不会实际的去滚动内容
         /// </param>
-        private void DrawDocument(VTDocument document, int scrollValue = -1)
+        private void PerformDrawing(VTDocument document)
         {
             // 当前行的Y方向偏移量
             double offsetY = 0;
@@ -590,16 +591,18 @@ namespace XTerminal
 
                 #region 移动滚动条
 
-                if (scrollValue != -1)
+                int scrollMax, scrollValue;
+                this.TerminalScreen.GetScrollInfo(out scrollMax, out scrollValue);
+                if (this.scrollMax != scrollMax || this.scrollValue != scrollValue)
                 {
-                    this.TerminalScreen.ScrollTo(scrollValue);
+                    this.TerminalScreen.SetScrollInfo(this.scrollMax, this.scrollValue);
                 }
 
                 #endregion
 
                 #region 更新选中高亮几何图形
 
-                if (this.textSelection.IsRenderDirty)
+                if (!this.textSelection.IsEmpty && this.textSelection.IsRenderDirty)
                 {
                     // 此时的VTextLine测量数据都是最新的
                     this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
@@ -727,8 +730,7 @@ namespace XTerminal
             {
                 if (!this.textSelection.IsEmpty)
                 {
-                    // 此时的VTextLine测量数据都是最新的
-                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
+                    // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
                     this.textSelection.SetRenderDirty(true);
                 }
             }
@@ -737,7 +739,7 @@ namespace XTerminal
 
             #region 重新渲染
 
-            this.DrawDocument(this.activeDocument, scrollValue);
+            this.PerformDrawing(this.activeDocument);
 
             #endregion
         }
@@ -1078,7 +1080,7 @@ namespace XTerminal
 
                             #endregion
 
-                            #region 滚动滚动条
+                            #region 更新滚动条的值
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
@@ -1090,18 +1092,10 @@ namespace XTerminal
                                 this.scrollValue = scrollMax;
 
                                 // 如果当前有选中的内容，那么把选中内容设置为脏状态，下次在渲染的时候会更新
-                                // 选中的区域往上移动
                                 if (!this.textSelection.IsEmpty)
                                 {
                                     this.textSelection.SetRenderDirty(true);
                                 }
-
-                                logger.DebugFormat("scrollMax = {0}", scrollMax);
-                                this.uiSyncContext.Send((state) =>
-                                {
-                                    this.TerminalScreen.UpdateScrollInfo(scrollMax);
-                                    this.TerminalScreen.ScrollToEnd(ScrollOrientation.Down);
-                                }, null);
                             }
 
                             #endregion
@@ -1509,7 +1503,7 @@ namespace XTerminal
 
             // 全部字符都处理完了之后，只渲染一次
 
-            this.DrawDocument(this.activeDocument);
+            this.PerformDrawing(this.activeDocument);
             //logger.ErrorFormat("receivedCounter = {0}", this.dataReceivedCounter++);
             //this.activeDocument.Print();
             //logger.ErrorFormat("TotalRows = {0}", this.activeDocument.TotalRows);

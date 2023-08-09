@@ -63,7 +63,6 @@
     <Compile Include="VTextPointer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rendering\RenderingOptions.cs" />
-    <Compile Include="ScrollOrientation.cs" />
     <Compile Include="VTCursor.cs" />
     <Compile Include="VFontWeight.cs" />
     <Compile Include="VTCharacter.cs" />

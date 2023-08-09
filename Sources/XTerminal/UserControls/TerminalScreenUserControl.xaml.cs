@@ -346,39 +346,27 @@ namespace XTerminal.UserControls
             });
         }
 
+        public void GetScrollInfo(out int maximum, out int scrollValue)
+        {
+            maximum = (int)SliderScrolbar.Maximum;
+            scrollValue = (int)SliderScrolbar.Value;
+        }
+
         /// <summary>
         /// 更新滚动信息
         /// </summary>
         /// <param name="maximum">滚动条的最大值</param>
-        public void UpdateScrollInfo(int maximum)
+        public void SetScrollInfo(int maximum, int scrollValue)
         {
-            this.SliderScrolbar.Maximum = maximum;
-        }
-
-        public void ScrollToEnd(ScrollOrientation orientation)
-        {
-            switch (orientation)
+            if (this.SliderScrolbar.Maximum != maximum)
             {
-                case ScrollOrientation.Down:
-                    {
-                        this.SliderScrolbar.Value = this.SliderScrolbar.Maximum;
-                        break;
-                    }
-
-                case ScrollOrientation.Up:
-                    {
-                        this.SliderScrolbar.Value = this.SliderScrolbar.Minimum;
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
+                this.SliderScrolbar.Maximum = maximum;
             }
-        }
 
-        public void ScrollTo(int scrollValue)
-        {
-            this.SliderScrolbar.Value = scrollValue;
+            if (this.SliderScrolbar.Value != scrollValue)
+            {
+                this.SliderScrolbar.Value = scrollValue;
+            }
         }
 
         #endregion
