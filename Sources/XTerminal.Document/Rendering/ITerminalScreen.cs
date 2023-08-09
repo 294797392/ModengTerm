@@ -45,6 +45,11 @@ namespace XTerminal.Document.Rendering
         event Action<ITerminalScreen, VTPoint> VTMouseUp;
 
         /// <summary>
+        /// 当鼠标双击的时候触发
+        /// </summary>
+        event Action<ITerminalScreen, double, double, int> VTMouseDoubleClick;
+
+        /// <summary>
         /// 鼠标滚轮滚动的时候触发
         /// 如果向上滚动则为true，否则为false
         /// </summary>

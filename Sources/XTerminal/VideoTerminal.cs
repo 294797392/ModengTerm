@@ -217,7 +217,7 @@ namespace XTerminal
         /// <summary>
         /// 渲染终端输出的画布
         /// </summary>
-        public ITerminalSurface CurrentSurface { get { return this.activeDocument.Surface; } }
+        public ITerminalSurface ActiveSurface { get { return this.activeDocument.Surface; } }
 
         /// <summary>
         /// 文档画布容器
@@ -259,6 +259,7 @@ namespace XTerminal
 
         public VideoTerminal()
         {
+
         }
 
         #endregion
@@ -306,6 +307,7 @@ namespace XTerminal
             this.TerminalScreen.VTMouseMove += this.OnMouseMove;
             this.TerminalScreen.VTMouseUp += this.OnMouseUp;
             this.TerminalScreen.VTMouseWheel += this.OnMouseWheel;
+            this.TerminalScreen.VTMouseDoubleClick += this.OnMouseDoubleClick;
 
             #endregion
 
@@ -342,7 +344,7 @@ namespace XTerminal
 
             #region 初始化光标
 
-            this.CurrentSurface.Draw(this.Cursor);
+            this.ActiveSurface.Draw(this.Cursor);
             this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
             this.cursorBlinkingThread.IsBackground = true;
             this.cursorBlinkingThread.Start();
@@ -376,6 +378,7 @@ namespace XTerminal
             this.TerminalScreen.VTMouseMove -= this.OnMouseMove;
             this.TerminalScreen.VTMouseUp -= this.OnMouseUp;
             this.TerminalScreen.VTMouseWheel -= this.OnMouseWheel;
+            this.TerminalScreen.VTMouseDoubleClick -= this.OnMouseDoubleClick;
 
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
@@ -450,7 +453,7 @@ namespace XTerminal
 
             this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
 
-            this.CurrentSurface.Draw(this.textSelection);
+            this.ActiveSurface.Draw(this.textSelection);
         }
 
         /// <summary>
@@ -537,19 +540,19 @@ namespace XTerminal
                     if (next.IsRenderDirty)
                     {
                         // 此时说明该行有字符变化，需要重绘
-                        this.CurrentSurface.Draw(next);
+                        this.ActiveSurface.Draw(next);
                         //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);
                     }
                     else if (next.IsMeasureDirty)
                     {
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                        this.CurrentSurface.MeasureLine(next);
+                        this.ActiveSurface.MeasureLine(next);
                     }
 
                     // 更新行偏移量
                     if (arrangeDirty)
                     {
-                        this.CurrentSurface.Arrange(next);
+                        this.ActiveSurface.Arrange(next);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -573,7 +576,7 @@ namespace XTerminal
                     // 当前光标在第一列，那么光标偏移量直接变成0
                     this.Cursor.OffsetX = 0;
                     this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                    this.CurrentSurface.Arrange(this.Cursor);
+                    this.ActiveSurface.Arrange(this.Cursor);
                 }
                 else
                 {
@@ -581,9 +584,9 @@ namespace XTerminal
                     if (characterIndex >= 0)
                     {
                         this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                        VTRect rect = this.CurrentSurface.MeasureLine(this.ActiveLine, characterIndex, 1);
+                        VTRect rect = this.ActiveSurface.MeasureLine(this.ActiveLine, characterIndex, 1);
                         this.Cursor.OffsetX = rect.Right;
-                        this.CurrentSurface.Arrange(this.Cursor);
+                        this.ActiveSurface.Arrange(this.Cursor);
                     }
                 }
 
@@ -606,7 +609,7 @@ namespace XTerminal
                 {
                     // 此时的VTextLine测量数据都是最新的
                     this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-                    this.CurrentSurface.Draw(this.textSelection);
+                    this.ActiveSurface.Draw(this.textSelection);
                     this.textSelection.SetRenderDirty(false);
                 }
 
@@ -821,7 +824,7 @@ namespace XTerminal
 
             #region 先找到鼠标所在行
 
-            VTextLine cursorLine = VTextSelectionHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseY);
+            VTextLine cursorLine = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseY);
             if (cursorLine == null)
             {
                 // 这里说明鼠标没有在任何一行上
@@ -835,7 +838,7 @@ namespace XTerminal
 
             int characterIndex;
             VTRect characterBounds;
-            if (!VTextSelectionHelper.HitTestVTCharacter(this.CurrentSurface, cursorLine, mouseX, out characterIndex, out characterBounds))
+            if (!HitTestHelper.HitTestVTCharacter(this.ActiveSurface, cursorLine, mouseX, out characterIndex, out characterBounds))
             {
                 return false;
             }
@@ -890,8 +893,8 @@ namespace XTerminal
                 VTextPointer leftPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.Start : selection.End;
                 VTextPointer rightPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.End : selection.Start;
 
-                VTRect leftBounds = this.CurrentSurface.MeasureCharacter(textLine, leftPointer.CharacterIndex);
-                VTRect rightBounds = this.CurrentSurface.MeasureCharacter(textLine, rightPointer.CharacterIndex);
+                VTRect leftBounds = this.ActiveSurface.MeasureCharacter(textLine, leftPointer.CharacterIndex);
+                VTRect rightBounds = this.ActiveSurface.MeasureCharacter(textLine, rightPointer.CharacterIndex);
 
                 double x = leftBounds.Left;
                 double y = textLine.OffsetY;
@@ -916,8 +919,8 @@ namespace XTerminal
             {
                 // 此时说明选中的内容都在屏幕里
                 // 构建上边和下边的矩形
-                VTRect topBounds = this.CurrentSurface.MeasureCharacter(topLine, topPointer.CharacterIndex);
-                VTRect bottomBounds = this.CurrentSurface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
+                VTRect topBounds = this.ActiveSurface.MeasureCharacter(topLine, topPointer.CharacterIndex);
+                VTRect bottomBounds = this.ActiveSurface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
 
                 // 第一行的矩形
                 selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
@@ -935,7 +938,7 @@ namespace XTerminal
             if (topLine != null && bottomLine == null)
             {
                 // 选中的内容有一部分被移到屏幕外了，滚动条往上移动
-                VTRect topBounds = this.CurrentSurface.MeasureCharacter(topLine, topPointer.CharacterIndex);
+                VTRect topBounds = this.ActiveSurface.MeasureCharacter(topLine, topPointer.CharacterIndex);
 
                 // 第一行的矩形
                 selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
@@ -949,7 +952,7 @@ namespace XTerminal
             if (topLine == null && bottomLine != null)
             {
                 // 选中的内容有一部分被移到屏幕外了，滚动条往下移动
-                VTRect bottomBounds = this.CurrentSurface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
+                VTRect bottomBounds = this.ActiveSurface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
 
                 // 最后一行的矩形
                 selection.Geometry.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
@@ -1062,7 +1065,7 @@ namespace XTerminal
 
                             if (oldLastLine.IsMeasureDirty)
                             {
-                                this.CurrentSurface.MeasureLine(oldLastLine);
+                                this.ActiveSurface.MeasureLine(oldLastLine);
                             }
                             this.lastHistoryLine.SetVTextLine(oldLastLine);
 
@@ -1072,7 +1075,7 @@ namespace XTerminal
 
                             // 再创建最新行的历史行
                             // 先测量下最新的行，确保有高度
-                            this.CurrentSurface.MeasureLine(this.ActiveLine);
+                            this.ActiveSurface.MeasureLine(this.ActiveLine);
                             int newHistoryRow = newLastLine.PhysicsRow;
                             VTHistoryLine newHistory = VTHistoryLine.Create(newLastLine.PhysicsRow, this.lastHistoryLine, this.ActiveLine);
                             this.historyLines[newHistoryRow] = newHistory;
@@ -1532,7 +1535,7 @@ namespace XTerminal
 
                     this.uiSyncContext.Send((state) =>
                     {
-                        this.CurrentSurface.SetOpacity(cursor, opacity);
+                        this.ActiveSurface.SetOpacity(cursor, opacity);
                     }, null);
                 }
                 catch (Exception e)
@@ -1575,11 +1578,11 @@ namespace XTerminal
                 // 此时说明开始选中操作
                 this.selectionState = true;
                 this.textSelection.Reset();
-                this.CurrentSurface.Draw(this.textSelection);
-                this.CurrentSurface.Arrange(this.textSelection);
+                this.ActiveSurface.Draw(this.textSelection);
+                this.ActiveSurface.Arrange(this.textSelection);
             }
 
-            VTRect surfaceRect = this.CurrentSurface.BoundaryRelativeToDesktop;
+            VTRect surfaceRect = this.ActiveSurface.BoundaryRelativeToDesktop;
 
             // 如果还没有测量起始字符，那么测量起始字符
             if (this.textSelection.Start.CharacterIndex == -1)
@@ -1637,7 +1640,7 @@ namespace XTerminal
             // 此时的VTextLine测量数据都是最新的
             // 主缓冲区和备用缓冲区都支持选中
             this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-            this.CurrentSurface.Draw(this.textSelection);
+            this.ActiveSurface.Draw(this.textSelection);
 
             #endregion
         }
@@ -1700,6 +1703,57 @@ namespace XTerminal
                     this.ScrollToHistory(this.scrollMax);
                 }
             }
+        }
+
+        private void OnMouseDoubleClick(ITerminalScreen screen, double mouseX, double mouseY, int clickCount)
+        {
+            int startIndex = 0, endIndex = 0;
+
+            VTextLine lineHit = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseY);
+            if (lineHit == null)
+            {
+                return;
+            }
+
+            switch (clickCount)
+            {
+                case 2:
+                    {
+                        // 选中单词
+                        int characterIndex;
+                        VTRect characterBounds;
+                        if (!HitTestHelper.HitTestVTCharacter(this.ActiveSurface, lineHit, mouseX, out characterIndex, out characterBounds))
+                        {
+                            return;
+                        }
+                        XDocumentUtils.GetSegement(lineHit.Text, characterIndex, out startIndex, out endIndex);
+                        break;
+                    }
+
+                case 3:
+                    {
+                        // 选中一整行
+                        startIndex = 0;
+                        endIndex = lineHit.Text.Length - 1;
+                        break;
+                    }
+
+                default:
+                    {
+                        return;
+                    }
+            }
+
+            this.textSelection.Reset();
+            this.textSelection.Start.CharacterIndex = startIndex;
+            this.textSelection.Start.PhysicsRow = lineHit.PhysicsRow;
+
+            this.textSelection.End.CharacterIndex = endIndex;
+            this.textSelection.End.PhysicsRow = lineHit.PhysicsRow;
+
+            this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
+
+            this.ActiveSurface.Draw(this.textSelection);
         }
 
         #endregion

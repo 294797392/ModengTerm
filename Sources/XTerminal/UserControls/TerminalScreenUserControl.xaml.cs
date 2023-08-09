@@ -40,6 +40,7 @@ namespace XTerminal.UserControls
         public event Action<ITerminalScreen, VTPoint> VTMouseUp;
         public event Action<ITerminalScreen, bool> VTMouseWheel;
         public event Action<ITerminalScreen, VTRect> VTSizeChanged;
+        public event Action<ITerminalScreen, double, double, int> VTMouseDoubleClick;
 
         #endregion
 
@@ -249,30 +250,14 @@ namespace XTerminal.UserControls
 
         private void GridContent_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            switch (e.ClickCount)
+            Point p = e.GetPosition(this);
+
+            GridContent.CaptureMouse();
+            this.VTMouseDown(this, new VTPoint(p.X, p.Y));
+
+            if (e.ClickCount > 1)
             {
-                case 1:
-                    {
-                        GridContent.CaptureMouse();
-                        Point p = e.GetPosition(this);
-                        this.VTMouseDown(this, new VTPoint(p.X, p.Y));
-                        break;
-                    }
-
-                case 2:
-                    {
-                        break;
-                    }
-
-                case 3:
-                    {
-                        break;
-                    }
-
-                default:
-                    {
-                        break;
-                    }
+                this.VTMouseDoubleClick(this, p.X, p.Y, e.ClickCount);
             }
         }
 

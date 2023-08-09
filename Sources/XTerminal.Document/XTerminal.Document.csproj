@@ -56,7 +56,7 @@
     <Compile Include="Rendering\ITerminalSurface.cs" />
     <Compile Include="Rendering\ITerminalScreen.cs" />
     <Compile Include="Rendering\ScrollOrientations.cs" />
-    <Compile Include="VTextSelectionHelper.cs" />
+    <Compile Include="HitTestHelper.cs" />
     <Compile Include="VTCharacterFlags.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />

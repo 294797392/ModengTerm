@@ -8,11 +8,11 @@ using XTerminal.Document.Rendering;
 namespace XTerminal.Document
 {
     /// <summary>
-    /// 提供一些文本选择操作的帮助函数
+    /// 提供做命中测试的帮助函数
     /// </summary>
-    public static class VTextSelectionHelper
+    public static class HitTestHelper
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTextSelectionHelper");
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("HitTestHelper");
 
         private static readonly VTRect EmptyRect = new VTRect();
 
