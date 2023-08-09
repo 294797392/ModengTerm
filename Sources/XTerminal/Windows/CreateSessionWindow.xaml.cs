@@ -87,6 +87,14 @@ namespace XTerminal.Windows
             ComboBoxSessionTypes.ItemsSource = this.sessionTypeList;
             ComboBoxSessionTypes.SelectedIndex = 0;
 
+            // 初始化外观设置
+            ComboBoxFontFamily.ItemsSource = XTermApp.Context.Manifest.FontFamilyList;
+            ComboBoxFontFamily.SelectedIndex = 0;
+            ComboBoxForeground.ItemsSource = XTermApp.Context.Manifest.ForegroundList;
+            ComboBoxForeground.SelectedIndex = 0;
+            ComboBoxFontSize.ItemsSource = XTermApp.Context.Manifest.FontSizeList;
+            ComboBoxFontSize.SelectedIndex = 0;
+
             // 串口波特率列表
             ComboBoxSerialPortBaudRate.ItemsSource = XTermDefaultValues.DefaultSerialPortBaudRates;
         }
@@ -95,6 +103,39 @@ namespace XTerminal.Windows
         {
             GridSessionSSH.Visibility = Visibility.Collapsed;
             GridSessionSerialPort.Visibility = Visibility.Collapsed;
+        }
+
+        private AppearanceOptions GetAppearanceOptions()
+        {
+            FontFamilyDefinition fontFamily = ComboBoxFontFamily.SelectedItem as FontFamilyDefinition;
+            if (fontFamily == null)
+            {
+                MessageBoxUtils.Info("请选择字体");
+                return null;
+            }
+
+            ColorDefinition foreground = ComboBoxForeground.SelectedItem as ColorDefinition;
+            if (foreground == null)
+            {
+                MessageBoxUtils.Info("请选择字体颜色");
+                return null;
+            }
+
+            FontSizeDefinition fontSize = ComboBoxFontSize.SelectedItem as FontSizeDefinition;
+            if (fontSize == null)
+            {
+                MessageBoxUtils.Info("请选择字体大小");
+                return null;
+            }
+
+            return new AppearanceOptions()
+            {
+                ID = Guid.NewGuid().ToString(),
+                Name = Guid.NewGuid().ToString(),
+                FontSize = fontSize.Value,
+                FontFamily = fontFamily.Value,
+                Foreground = foreground.Value
+            };
         }
 
         #endregion
@@ -203,6 +244,12 @@ namespace XTerminal.Windows
                 return;
             }
 
+            AppearanceOptions appearanceOptions = this.GetAppearanceOptions();
+            if (appearanceOptions == null) 
+            {
+                return;
+            }
+
             // 保存新创建的Session信息
             XTermSession session = new XTermSession()
             {
@@ -218,12 +265,13 @@ namespace XTerminal.Windows
                 SessionType = (int)sessionType.Type,
                 InputEncoding = XTermDefaultValues.DefaultInputEncoding,
                 OutputBufferSize = XTermDefaultValues.DefaultOutptBufferSize,
-                MouseOptions = new MouseOptions() 
+                MouseOptions = new MouseOptions()
                 {
                     CursorStyle = VTCursorStyles.Line,
                     CursorInterval = XTermDefaultValues.DefaultCursorBlinkInterval,
                     ScrollDelta = XTermDefaultValues.DefaultScrollSensitivity
-                }
+                },
+                AppearanceOptions = appearanceOptions
             };
 
             switch (sessionType.Type)

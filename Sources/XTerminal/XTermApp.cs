@@ -23,12 +23,36 @@ namespace XTerminal
 {
     public class XTermManifest : AppManifest
     {
+        /// <summary>
+        /// 支持的会话列表
+        /// </summary>
         [JsonProperty("sessions")]
         public List<SessionDefinition> SessionList { get; private set; }
+
+        /// <summary>
+        /// 定义XTerminal支持的文本颜色
+        /// </summary>
+        [JsonProperty("foreground")]
+        public List<ColorDefinition> ForegroundList { get; private set; }
+
+        /// <summary>
+        /// XTerminal支持的文字大小列表
+        /// </summary>
+        [JsonProperty("fontSize")]
+        public List<FontSizeDefinition> FontSizeList { get; private set; }
+
+        /// <summary>
+        /// 支持的文字样式列表
+        /// </summary>
+        [JsonProperty("fontFamily")]
+        public List<FontFamilyDefinition> FontFamilyList { get; private set; }
 
         public XTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
+            this.ForegroundList = new List<ColorDefinition>();
+            this.FontSizeList = new List<FontSizeDefinition>();
+            this.FontFamilyList = new List<FontFamilyDefinition>();
         }
     }
 

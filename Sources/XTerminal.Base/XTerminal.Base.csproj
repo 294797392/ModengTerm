@@ -57,7 +57,10 @@
     <Compile Include="DataModels\GroupDM.cs" />
     <Compile Include="DataModels\SessionOptions\MouseOptions.cs" />
     <Compile Include="DataModels\SessionOptions\ConnectionOptions.cs" />
-    <Compile Include="DataModels\SessionOptions\VisualOptions.cs" />
+    <Compile Include="DataModels\SessionOptions\AppearanceOptions.cs" />
+    <Compile Include="Definitions\ColorDefinition.cs" />
+    <Compile Include="Definitions\FontFamilyDefinition.cs" />
+    <Compile Include="Definitions\FontSizeDefinition.cs" />
     <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
     <Compile Include="DataModels\SessionOptions\TerminalOptions.cs" />
     <Compile Include="DataModels\XTermSession.cs" />

@@ -12,12 +12,6 @@ namespace XTerminal.Document.Rendering
     public interface ITerminalSurface
     {
         /// <summary>
-        /// 初始化渲染器
-        /// </summary>
-        /// <param name="options"></param>
-        void Initialize(TerminalSurfaceOptions options);
-
-        /// <summary>
         /// 测量某个文本行的大小
         /// 测量后的结果存储在VTextLine.Metrics属性里
         /// </summary>
@@ -29,9 +23,10 @@ namespace XTerminal.Document.Rendering
         /// 测量文本块的大小
         /// </summary>
         /// <param name="textLine">要测量的数据模型</param>
-        /// <param name="maxCharacters">要测量的最大字符数，0为全部测量</param>
+        /// <param name="startIndex">要测量的起始字符索引</param>
+        /// <param name="count">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        VTSize MeasureBlock(VTextLine textLine, int maxCharacters);
+        VTRect MeasureLine(VTextLine textLine, int startIndex, int count);
 
         /// <summary>
         /// 测量一行里某个字符的测量信息

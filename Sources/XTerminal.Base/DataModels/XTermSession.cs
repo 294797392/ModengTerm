@@ -19,6 +19,13 @@ namespace XTerminal.Base.DataModels
     public class XTermSession : ModelBase
     {
         /// <summary>
+        /// 要连接的会话类型
+        /// </summary>
+        [EnumDataType(typeof(SessionTypeEnum))]
+        [JsonProperty("type")]
+        public int SessionType { get; set; }
+
+        /// <summary>
         /// 从通道里读取数据的缓冲区大小
         /// </summary>
         [JsonProperty("outputBufferSize")]
@@ -39,15 +46,8 @@ namespace XTerminal.Base.DataModels
         /// <summary>
         /// 外观设置
         /// </summary>
-        [JsonProperty("visualOptions")]
-        public VisualOptions VisualOptions { get; set; }
-
-        /// <summary>
-        /// 要连接的会话类型
-        /// </summary>
-        [EnumDataType(typeof(SessionTypeEnum))]
-        [JsonProperty("type")]
-        public int SessionType { get; set; }
+        [JsonProperty("appearanceOptions")]
+        public AppearanceOptions AppearanceOptions { get; set; }
 
         /// <summary>
         /// 会话详细信息
@@ -66,6 +66,7 @@ namespace XTerminal.Base.DataModels
             this.ConnectionOptions = new ConnectionOptions();
             this.MouseOptions = new MouseOptions();
             this.TerminalOptions = new TerminalOptions();
+            this.AppearanceOptions = new AppearanceOptions();
         }
     }
 }

@@ -33,5 +33,29 @@
             "icon": "",
             "type": 3
         }
+    ],
+
+    "foreground": [
+        {
+            "id": "1",
+            "name": "黑色",
+            "value": "black"
+        }
+    ],
+
+    "fontSize": [
+        {
+            "id": "1",
+            "name": "14号",
+            "value": 14
+        }
+    ],
+
+    "fontFamily": [
+        {
+            "id": "1",
+            "name": "宋体",
+            "value": "宋体"
+        }
     ]
 }

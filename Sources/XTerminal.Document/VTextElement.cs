@@ -41,6 +41,11 @@ namespace XTerminal.Document
         /// </summary>
         public VTDocument OwnerDocument { get; private set; }
 
+        /// <summary>
+        /// 文本样式
+        /// </summary>
+        public VTextStyle Style { get; set; }
+
         public VTextElement(VTDocument owner)
         {
             this.OwnerDocument = owner;

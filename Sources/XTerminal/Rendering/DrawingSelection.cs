@@ -23,6 +23,10 @@ namespace VideoTerminal.Rendering
 
         public DrawingSelection()
         {
+        }
+
+        protected override void OnInitialize(VTDocumentElement element)
+        {
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
             this.brush = DefaultSelectionBrush;
@@ -30,7 +34,7 @@ namespace VideoTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextSelection selectionRange = this.Drawable as VTextSelection;
+            VTextSelection selectionRange = this.DocumentElement as VTextSelection;
 
             StreamGeometryContext sgc = this.selectionGeometry.Open();
 

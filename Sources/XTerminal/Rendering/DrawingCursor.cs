@@ -26,9 +26,13 @@ namespace XTerminal.Rendering
         /// </summary>
         private static readonly double CursorHeight = 15;
 
+        protected override void OnInitialize(VTDocumentElement element)
+        {
+        }
+
         protected override void Draw(DrawingContext dc)
         {
-            VTCursor cursor = this.Drawable as VTCursor;
+            VTCursor cursor = this.DocumentElement as VTCursor;
 
             this.Offset = new Vector(cursor.OffsetX, cursor.OffsetY);
 

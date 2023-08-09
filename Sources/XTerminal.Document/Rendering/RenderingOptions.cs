@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace XTerminal.Document.Rendering
 {
-    public class TerminalSurfaceOptions
+    /// <summary>
+    /// Surface渲染参数
+    /// </summary>
+    public class RenderingOptions
     {
-        /// <summary>
-        /// 总行数
-        /// </summary>
-        public int Rows { get; set; }
     }
 }

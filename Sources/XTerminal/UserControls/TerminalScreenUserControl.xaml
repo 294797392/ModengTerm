@@ -24,7 +24,7 @@
                   PreviewMouseMove="GridContent_PreviewMouseMove"
                   PreviewMouseLeftButtonUp="GridContent_PreviewMouseLeftButtonUp"
                   Background="Transparent">
-                <ContentControl x:Name="ContentControlSurface">
+                <ContentControl x:Name="ContentControlSurface" SizeChanged="ContentControlSurface_SizeChanged">
                     <ContentControl.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="复制" Click="MenuItemCopy_Click"/>

@@ -10,33 +10,14 @@ namespace XTerminal.Document
     public class VTextStyle
     {
         /// <summary>
-        /// 默认Typeface
-        /// </summary>
-        public static readonly VTextStyle Default = new VTextStyle() { FontFamily = "宋体", FontSize = 14, Foreground = VTColors.DarkBlack };
-
-        private string hashId;
-
-        public string HashID
-        {
-            get
-            {
-                if(string.IsNullOrEmpty(this.hashId))
-                {
-                    this.hashId = string.Format("{0}_{1}", this.FontFamily, this.FontWeight);
-                }
-                return this.hashId;
-            }
-        }
-
-        /// <summary>
         /// 字体
         /// </summary>
         public string FontFamily { get; set; }
 
-        /// <summary>
-        /// 字体粗细
-        /// </summary>
-        public VFontWeight FontWeight { get; set; }
+        ///// <summary>
+        ///// 字体粗细
+        ///// </summary>
+        //public VFontWeight FontWeight { get; set; }
 
         /// <summary>
         /// 字体大小
@@ -46,6 +27,6 @@ namespace XTerminal.Document
         /// <summary>
         /// 文本的颜色
         /// </summary>
-        public VTColors Foreground { get; set; }
+        public string Foreground { get; set; }
     }
 }

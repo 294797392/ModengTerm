@@ -13,7 +13,18 @@ namespace XTerminal.Rendering
 {
     public class DrawingLine : DrawingObject
     {
+        #region 类变量
+
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingLine");
+
+        #endregion
+
+        #region 实例变量
+
+        internal Typeface typeface;
+        internal Brush foreground;
+
+        #endregion
 
         #region 属性
 
@@ -24,26 +35,38 @@ namespace XTerminal.Rendering
 
         #endregion
 
+        #region 构造方法
+
         public DrawingLine()
         {
             this.ID = "Drawable" + string.Format("{0}", -1).PadLeft(2, '0');
         }
 
+        #endregion
+
+        #region DrawingObject
+
+        protected override void OnInitialize(VTDocumentElement element)
+        {
+            VTextLine textLine = element as VTextLine;
+
+            FontFamily fontFamily = new FontFamily(textLine.Style.FontFamily);
+            this.typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+
+            this.foreground = DrawingUtils.ConvertBrush(textLine.Style.Foreground);
+        }
+
         protected override void Draw(DrawingContext dc)
         {
-            VTextLine textLine = this.Drawable as VTextLine;
-
-            string text = textLine.Text;
+            VTextLine textLine = this.DocumentElement as VTextLine;
 
             //text = string.Format("{0} - {1}", this.ID, text);
 
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
+
             this.Offset = new Vector(0, textLine.OffsetY);
 
-            Typeface typeface = DrawingUtils.GetTypeface(VTextStyle.Default);
-            FormattedText formattedText = new FormattedText(text, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                XTermDefaultValues.FontSize, XTermDefaultValues.Foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
-
-            DrawingUtils.UpdateTextMetrics(textLine.Metrics, formattedText);
+            DrawingUtils.UpdateTextMetrics(textLine, formattedText);
 
             //logger.InfoFormat("Render:{0}", text);
 
@@ -59,5 +82,7 @@ namespace XTerminal.Rendering
 
             dc.DrawText(formattedText, new Point());
         }
+
+        #endregion
     }
 }

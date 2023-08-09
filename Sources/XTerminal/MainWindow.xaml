@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:XTerminal"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
-        Width="800" Height="600"
+        Width="800" Height="600" WindowStartupLocation="CenterScreen"
         MinWidth="800" MinHeight="600" Loaded="Window_Loaded">
 
     <Window.Resources>

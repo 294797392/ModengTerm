@@ -15,7 +15,7 @@ namespace XTerminal.Rendering
 {
     public static class DrawingUtils
     {
-        private static Dictionary<string, Typeface> typefaceMap = new Dictionary<string, Typeface>();
+        private static readonly BrushConverter BrushConverter = new BrushConverter();
 
         static DrawingUtils()
         {
@@ -48,10 +48,10 @@ namespace XTerminal.Rendering
             }
         }
 
-        public static void UpdateTextMetrics(VTElementMetrics textMerics, FormattedText formattedText)
+        public static void UpdateTextMetrics(VTextLine textLine, FormattedText formattedText)
         {
-            textMerics.Width = formattedText.WidthIncludingTrailingWhitespace;
-            textMerics.Height = formattedText.Height;
+            textLine.Metrics.Width = formattedText.WidthIncludingTrailingWhitespace;
+            textLine.Metrics.Height = formattedText.Height;
         }
 
         public static VTKeys ConvertToVTKey(Key key)
@@ -59,15 +59,22 @@ namespace XTerminal.Rendering
             return (VTKeys)key;
         }
 
-        public static Typeface GetTypeface(VTextStyle style)
+        public static Brush ConvertBrush(string colorName)
         {
-            Typeface typeface;
-            if (!typefaceMap.TryGetValue(style.HashID, out typeface))
-            {
-                typeface = new Typeface(new FontFamily(style.FontFamily), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-                typefaceMap[style.HashID] = typeface;
-            }
-            return typeface;
+            return (Brush)BrushConverter.ConvertFrom(colorName);
+        }
+
+        /// <summary>
+        /// 根据VTextLine生成一个FormattedText
+        /// </summary>
+        /// <param name="textLine"></param>
+        /// <returns></returns>
+        public static FormattedText CreateFormattedText(VTextLine textLine)
+        {
+            DrawingLine drawingLine = textLine.DrawingContext as DrawingLine;
+            FormattedText formattedText = new FormattedText(textLine.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
+                textLine.Style.FontSize, drawingLine.foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
+            return formattedText;
         }
     }
 }

@@ -15,18 +15,41 @@ namespace XTerminal.Rendering
     /// </summary>
     public abstract class DrawingObject : DrawingVisual
     {
+        #region 属性
+
         public string ID { get; protected set; }
 
         /// <summary>
-        /// 和该渲染对象关联的要绘制的元素信息
+        /// 和该渲染对象关联的渲染模型的信息
         /// </summary>
-        public VTDocumentElement Drawable { get; internal set; }
+        public VTDocumentElement DocumentElement { get; private set; }
+
+        #endregion
+        
+        #region 构造方法
 
         public DrawingObject()
         {
         }
 
+        #endregion
+
+        #region 受保护方法
+
         protected abstract void Draw(DrawingContext dc);
+
+        protected abstract void OnInitialize(VTDocumentElement element);
+
+        #endregion
+
+        #region 公开接口
+
+        public void Initialize(VTDocumentElement element)
+        {
+            this.DocumentElement = element;
+
+            this.OnInitialize(element);
+        }
 
         public virtual void Draw()
         {
@@ -37,15 +60,6 @@ namespace XTerminal.Rendering
             dc.Close();
         }
 
-        /// <summary>
-        /// 重置此绘图对象
-        /// </summary>
-        public void Reset()
-        {
-            this.Drawable = null;
-            this.Offset = new Vector();
-            DrawingContext dc = this.RenderOpen();
-            dc.Close();
-        }
+        #endregion
     }
 }

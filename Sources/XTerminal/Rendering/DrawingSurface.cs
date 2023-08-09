@@ -24,13 +24,15 @@ namespace XTerminal.Rendering
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DocumentRenderer");
 
+        private static readonly Point ZeroPoint = new Point();
+
         #endregion
 
         #region 实例变量
 
         private VisualCollection visuals;
 
-        private TerminalSurfaceOptions options;
+        private RenderingOptions options;
 
         #endregion
 
@@ -77,44 +79,34 @@ namespace XTerminal.Rendering
             }
         }
 
-        private DrawingObject EnsureDrawingObject(VTDocumentElement drawable)
+        private DrawingObject EnsureDrawingObject(VTDocumentElement documentElement)
         {
-            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            DrawingObject drawingObject = documentElement.DrawingContext as DrawingObject;
             if (drawingObject == null)
             {
-                drawingObject = this.CreateDrawingObject(drawable.Type);
-                drawingObject.Drawable = drawable;
-                drawable.DrawingContext = drawingObject;
+                drawingObject = this.CreateDrawingObject(documentElement.Type);
+                drawingObject.Initialize(documentElement);
+                documentElement.DrawingContext = drawingObject;
                 this.visuals.Add(drawingObject);
             }
             return drawingObject;
         }
 
-        private FormattedText CreateFormattedText(string text, IEnumerable<VTCharacter> characters)
+        private VTRect CommonMeasureLine(VTextLine textLine, int startIndex, int count)
         {
-            Typeface typeface = DrawingUtils.GetTypeface(VTextStyle.Default);
-            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, VTextStyle.Default.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
-            return formattedText;
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
+            Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, count);
+            return new VTRect(geometry.Bounds.Left, geometry.Bounds.Top, geometry.Bounds.Width, geometry.Bounds.Height);
         }
 
         #endregion
 
         #region ITerminalSurface
 
-        public void Initialize(TerminalSurfaceOptions options)
-        {
-            this.options = options;
-        }
-
         public void MeasureLine(VTextLine textLine)
         {
-            string text = textLine.Text;
-
-            FormattedText formattedText = this.CreateFormattedText(text, textLine.Characters);
-
-            textLine.Metrics.Height = formattedText.Height;
-            textLine.Metrics.Width = formattedText.WidthIncludingTrailingWhitespace;
-
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
+            DrawingUtils.UpdateTextMetrics(textLine, formattedText);
             textLine.SetMeasureDirty(false);
         }
 
@@ -123,41 +115,16 @@ namespace XTerminal.Rendering
         /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
         /// </summary>
         /// <param name="textLine">要测量的数据模型</param>
-        /// <param name="maxCharacters">要测量的最大字符数，0为全部测量</param>
+        /// <param name="maxCharacters">要测量的最大字符数</param>
         /// <returns></returns>
-        public VTSize MeasureBlock(VTextLine textLine, int maxCharacters)
+        public VTRect MeasureLine(VTextLine textLine, int startIndex, int count)
         {
-            string text = textLine.Text;
-            if (maxCharacters > 0 && text.Length >= maxCharacters)
-            {
-                text = text.Substring(0, maxCharacters);
-            }
-
-            FormattedText formattedText = this.CreateFormattedText(text, textLine.Characters);
-
-            return new VTSize(formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
+            return this.CommonMeasureLine(textLine, startIndex, count);
         }
 
         public VTRect MeasureCharacter(VTextLine textLine, int characterIndex)
         {
-            string text = textLine.Text;
-
-            if (characterIndex == 0)
-            {
-                // 第一个字符，返回第一个字符的左边
-                string textToMeasure = text.Substring(0, 1);
-                FormattedText formattedText = this.CreateFormattedText(textToMeasure, textLine.Characters);
-                return new VTRect(0, 0, formattedText.WidthIncludingTrailingWhitespace, formattedText.Height);
-            }
-            else
-            {
-                // 其他字符，返回前一个字符的右边
-                string textToMeasure1 = text.Substring(0, characterIndex);
-                string textToMeasure2 = text.Substring(characterIndex, 1);
-                FormattedText formattedText1 = this.CreateFormattedText(textToMeasure1, textLine.Characters);
-                FormattedText formattedText2 = this.CreateFormattedText(textToMeasure2, textLine.Characters);
-                return new VTRect(formattedText1.WidthIncludingTrailingWhitespace, 0, formattedText2.WidthIncludingTrailingWhitespace, formattedText2.Height);
-            }
+            return this.CommonMeasureLine(textLine, characterIndex, 1);
         }
 
         public void Draw(VTDocumentElement drawable)
@@ -183,6 +150,14 @@ namespace XTerminal.Rendering
         {
             Point leftTop = this.PointToScreen(new Point(0, 0));
             return new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
+        }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
+
+            // 调试用，看这个Surface有多大
+            //drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
         #endregion

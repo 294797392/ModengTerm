@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
+    <Compile Include="HighlightGeometry\HighlightGeometryBuilder.cs" />
     <Compile Include="Rendering\TextPointerPositions.cs" />
     <Compile Include="Rendering\ITerminalSurface.cs" />
     <Compile Include="Rendering\ITerminalScreen.cs" />
@@ -61,7 +62,7 @@
     <Compile Include="VTextElement.cs" />
     <Compile Include="VTextPointer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rendering\TerminalSurfaceOptions.cs" />
+    <Compile Include="Rendering\RenderingOptions.cs" />
     <Compile Include="ScrollOrientation.cs" />
     <Compile Include="VTCursor.cs" />
     <Compile Include="VFontWeight.cs" />

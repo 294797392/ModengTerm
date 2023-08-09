@@ -215,6 +215,7 @@ namespace XTerminal
 
         /// <summary>
         /// 获取当前光标所在列
+        /// 下一个字符要显示的位置
         /// </summary>
         public int CursorCol { get { return this.Cursor.Column; } }
 
@@ -302,22 +303,22 @@ namespace XTerminal
 
             #endregion
 
+            #region 注册事件
+
+            this.TerminalScreen.InputEvent += this.OnInputEvent;
+            this.TerminalScreen.ScrollChanged += this.OnScrollChanged;
+            this.TerminalScreen.VTMouseDown += this.OnMouseDown;
+            this.TerminalScreen.VTMouseMove += this.OnMouseMove;
+            this.TerminalScreen.VTMouseUp += this.OnMouseUp;
+            this.TerminalScreen.VTMouseWheel += this.OnMouseWheel;
+
+            #endregion
+
             #region 初始化终端解析器
 
             this.vtParser = new VTParser();
             this.vtParser.ActionEvent += VtParser_ActionEvent;
             this.vtParser.Initialize();
-
-            #endregion
-
-            #region 初始化鼠标事件
-
-            this.TerminalScreen.InputEvent += this.VideoTerminal_InputEvent;
-            this.TerminalScreen.ScrollChanged += this.TerminalScreen_ScrollChanged;
-            this.TerminalScreen.VTMouseDown += this.TerminalScreen_VTMouseDown;
-            this.TerminalScreen.VTMouseMove += this.TerminalScreen_VTMouseMove;
-            this.TerminalScreen.VTMouseUp += this.TerminalScreen_VTMouseUp;
-            this.TerminalScreen.VTMouseWheel += this.TerminalScreen_VTMouseWheel;
 
             #endregion
 
@@ -330,10 +331,12 @@ namespace XTerminal
                 DECPrivateAutoWrapMode = this.sessionInfo.TerminalOptions.DECPrivateAutoWrapMode,
                 CursorStyle = this.sessionInfo.MouseOptions.CursorStyle,
                 Interval = this.sessionInfo.MouseOptions.CursorInterval,
-                CanvasCreator = this.TerminalScreen
+                FontFamily = sessionInfo.AppearanceOptions.FontFamily,
+                FontSize = sessionInfo.AppearanceOptions.FontSize,
+                Foreground = sessionInfo.AppearanceOptions.Foreground
             };
-            this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument" };
-            this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument" };
+            this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument", Surface = this.TerminalScreen.CreateSurface() };
+            this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument", Surface = this.TerminalScreen.CreateSurface() };
             this.activeDocument = this.mainDocument;
             this.firstHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.firstHistoryLine;
@@ -372,15 +375,15 @@ namespace XTerminal
         {
             this.isRunning = false;
 
+            this.TerminalScreen.InputEvent -= this.OnInputEvent;
+            this.TerminalScreen.ScrollChanged -= this.OnScrollChanged;
+            this.TerminalScreen.VTMouseDown -= this.OnMouseDown;
+            this.TerminalScreen.VTMouseMove -= this.OnMouseMove;
+            this.TerminalScreen.VTMouseUp -= this.OnMouseUp;
+            this.TerminalScreen.VTMouseWheel -= this.OnMouseWheel;
+
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
-
-            this.TerminalScreen.InputEvent -= this.VideoTerminal_InputEvent;
-            this.TerminalScreen.ScrollChanged -= this.TerminalScreen_ScrollChanged;
-            this.TerminalScreen.VTMouseDown -= this.TerminalScreen_VTMouseDown;
-            this.TerminalScreen.VTMouseMove -= this.TerminalScreen_VTMouseMove;
-            this.TerminalScreen.VTMouseUp -= this.TerminalScreen_VTMouseUp;
-            this.TerminalScreen.VTMouseWheel -= this.TerminalScreen_VTMouseWheel;
 
             this.cursorBlinkingThread.Join();
 
@@ -571,9 +574,14 @@ namespace XTerminal
 
                 #region 渲染光标
 
-                this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                this.Cursor.OffsetX = this.Surface.MeasureBlock(this.ActiveLine, this.ActiveLine.FindCharacterIndex(this.CursorCol)).Width;
-                this.Surface.Arrange(this.Cursor);
+                int characterIndex = this.ActiveLine.FindCharacterIndex(this.CursorCol - 1);
+                if (characterIndex >= 0)
+                {
+                    VTRect rect = this.Surface.MeasureLine(this.ActiveLine, characterIndex, 1);
+                    this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                    this.Cursor.OffsetX = rect.Right;
+                    this.Surface.Arrange(this.Cursor);
+                }
 
                 #endregion
 
@@ -591,7 +599,7 @@ namespace XTerminal
                 if (this.textSelection.IsRenderDirty)
                 {
                     // 此时的VTextLine测量数据都是最新的
-                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection, this.scrollValue);
+                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
                     this.Surface.Draw(this.textSelection);
                     this.textSelection.SetRenderDirty(false);
                 }
@@ -717,7 +725,7 @@ namespace XTerminal
                 if (!this.textSelection.IsEmpty)
                 {
                     // 此时的VTextLine测量数据都是最新的
-                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection, this.scrollValue);
+                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
                     this.textSelection.SetRenderDirty(true);
                 }
             }
@@ -858,8 +866,7 @@ namespace XTerminal
         /// </summary>
         /// <param name="document">当前显示的文档</param>
         /// <param name="selection">鼠标命中信息</param>
-        /// <param name="scrollValue">滚动条的值</param>
-        private void UpdateSelectionGeometry(VTDocument document, VTextSelection selection, int scrollValue)
+        private void UpdateSelectionGeometry(VTDocument document, VTextSelection selection)
         {
             selection.Geometry.Clear();
 
@@ -953,7 +960,7 @@ namespace XTerminal
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        private void VideoTerminal_InputEvent(ITerminalScreen canvasPanel, VTInputEvent evt)
+        private void OnInputEvent(ITerminalScreen canvasPanel, VTInputEvent evt)
         {
             byte[] bytes = this.Keyboard.TranslateInput(evt);
             if (bytes == null)
@@ -1211,7 +1218,7 @@ namespace XTerminal
                         }
 
                         this.ActiveLine.PadColumns(n);
-                        this.activeDocument.SetCursor(this.CursorRow, n);
+                        this.activeDocument.SetCursor(this.CursorRow, n - 1);
                         VTDebug.WriteAction("CHA_CursorHorizontalAbsolute, targetColumn = {0}", n);
                         break;
                     }
@@ -1537,19 +1544,19 @@ namespace XTerminal
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="scrollValue">滚动到的行数</param>
-        private void TerminalScreen_ScrollChanged(ITerminalScreen arg1, int scrollValue)
+        private void OnScrollChanged(ITerminalScreen arg1, int scrollValue)
         {
             this.ScrollToHistory(scrollValue);
         }
 
-        private void TerminalScreen_VTMouseDown(ITerminalScreen screen, VTPoint mousePosition)
+        private void OnMouseDown(ITerminalScreen screen, VTPoint mousePosition)
         {
             this.isMouseDown = true;
             this.mouseDownPos = mousePosition;
             this.surfaceRect = this.Surface.GetRectRelativeToDesktop();
         }
 
-        private void TerminalScreen_VTMouseMove(ITerminalScreen arg1, VTPoint mousePosition)
+        private void OnMouseMove(ITerminalScreen arg1, VTPoint mousePosition)
         {
             if (!this.isMouseDown)
             {
@@ -1620,20 +1627,26 @@ namespace XTerminal
 
             // 此时的VTextLine测量数据都是最新的
             // 主缓冲区和备用缓冲区都支持选中
-            this.UpdateSelectionGeometry(this.activeDocument, this.textSelection, this.scrollValue);
+            this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
             this.Surface.Draw(this.textSelection);
 
             #endregion
         }
 
-        private void TerminalScreen_VTMouseUp(ITerminalScreen arg1, VTPoint cursorPos)
+        private void OnMouseUp(ITerminalScreen arg1, VTPoint cursorPos)
         {
             this.isMouseDown = false;
             this.selectionState = false;
         }
 
-        private void TerminalScreen_VTMouseWheel(ITerminalScreen screen, bool upper)
+        private void OnMouseWheel(ITerminalScreen screen, bool upper)
         {
+            // 只有主缓冲区才可以用鼠标滚轮进行滚动
+            if (this.activeDocument != this.mainDocument)
+            {
+                return;
+            }
+
             if (upper)
             {
                 // 向上滚动

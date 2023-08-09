@@ -34,25 +34,12 @@ namespace XTerminal.UserControls
         #region 公开事件
 
         public event Action<ITerminalScreen, VTInputEvent> InputEvent;
-
         public event Action<ITerminalScreen, int> ScrollChanged;
-
-        /// <summary>
-        /// 鼠标移动的时候触发
-        /// </summary>
         public event Action<ITerminalScreen, VTPoint> VTMouseMove;
-
-        /// <summary>
-        /// 鼠标按下的时候触发
-        /// </summary>
         public event Action<ITerminalScreen, VTPoint> VTMouseDown;
-
-        /// <summary>
-        /// 鼠标抬起的时候触发
-        /// </summary>
         public event Action<ITerminalScreen, VTPoint> VTMouseUp;
-
         public event Action<ITerminalScreen, bool> VTMouseWheel;
+        public event Action<ITerminalScreen, VTRect> VTSizeChanged;
 
         #endregion
 
@@ -235,6 +222,7 @@ namespace XTerminal.UserControls
         }
 
 
+
         private void SliderScrolbar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             this.cursorDown = true;
@@ -276,6 +264,12 @@ namespace XTerminal.UserControls
             GridContent.ReleaseMouseCapture();
         }
 
+
+        private void ContentControlSurface_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            //VTRect newRect = this.GetBoundary();
+            //this.VTSizeChanged(this, newRect);
+        }
 
         private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
         {

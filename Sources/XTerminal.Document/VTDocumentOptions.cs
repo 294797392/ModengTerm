@@ -37,8 +37,18 @@ namespace XTerminal.Document
         public int Interval { get; set; }
 
         /// <summary>
-        /// 画布创建器
+        /// 文本前景色
         /// </summary>
-        public ITerminalScreen CanvasCreator { get; set; }
+        public string Foreground { get; set; }
+
+        /// <summary>
+        /// 字体样式
+        /// </summary>
+        public string FontFamily { get; set; }
+
+        /// <summary>
+        /// 字体大小
+        /// </summary>
+        public int FontSize { get; set; }
     }
 }
