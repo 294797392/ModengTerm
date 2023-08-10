@@ -1070,10 +1070,6 @@ namespace XTerminal
 
                             #region 更新当前的最后一个历史行
 
-                            if (oldLastLine.IsMeasureDirty)
-                            {
-                                this.ActiveSurface.MeasureLine(oldLastLine);
-                            }
                             this.lastHistoryLine.SetVTextLine(oldLastLine);
 
                             #endregion
@@ -1081,8 +1077,6 @@ namespace XTerminal
                             #region 再创建新行对应的历史行
 
                             // 再创建最新行的历史行
-                            // 先测量下最新的行，确保有高度
-                            this.ActiveSurface.MeasureLine(this.ActiveLine);
                             int newHistoryRow = newLastLine.PhysicsRow;
                             VTHistoryLine newHistory = VTHistoryLine.Create(newLastLine.PhysicsRow, this.lastHistoryLine, this.ActiveLine);
                             this.historyLines[newHistoryRow] = newHistory;

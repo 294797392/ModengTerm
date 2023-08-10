@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Enumerations;
 using XTerminal.UserControls;
 using XTerminal.ViewModels;
 using XTerminal.Windows;
@@ -59,28 +60,20 @@ namespace XTerminal
 
         private void OpenSession(XTermSession session)
         {
-            // 创建TerminalControl
-            TerminalScreenUserControl terminalControl = new TerminalScreenUserControl();
-            ContentControlTerminal.Content = terminalControl;
-
-            // 打开Session
-            TerminalSessionVM openedSession = XTermApp.Context.OpenSession(session, terminalControl);
-            terminalControl.VideoTerminal = openedSession.VideoTerminal;
+            OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session);
+            ContentControlTerminal.Content = openedSession.Content;
         }
 
         /// <summary>
         /// 切换要显示的Session
         /// </summary>
         /// <param name="openedSessionVM"></param>
-        private void SwitchSession(TerminalSessionVM openedSessionVM)
+        private void SwitchSession(OpenedSessionVM openedSessionVM)
         {
-            TerminalScreenUserControl terminalUserControl = openedSessionVM.TerminalScreen as TerminalScreenUserControl;
-            if (ContentControlTerminal.Content == terminalUserControl)
+            if (ContentControlTerminal.Content != openedSessionVM.Content)
             {
-                return;
+                ContentControlTerminal.Content = openedSessionVM.Content;
             }
-
-            ContentControlTerminal.Content = terminalUserControl;
         }
 
         #endregion
@@ -110,13 +103,9 @@ namespace XTerminal
 
                 this.OpenSession();
             }
-            else if (selectedTabItem is TerminalSessionVM)
-            {
-                this.SwitchSession(selectedTabItem as TerminalSessionVM);
-            }
             else
             {
-                throw new NotImplementedException();
+                this.SwitchSession(selectedTabItem);
             }
         }
 

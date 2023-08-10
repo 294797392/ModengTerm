@@ -14,7 +14,7 @@ using XTerminal.Session;
 namespace XTerminal.ViewModels
 {
     /// <summary>
-    /// 运行时的会话信息
+    /// 管理终端类型的Session运行时状态
     /// </summary>
     public class TerminalSessionVM : OpenedSessionVM
     {
@@ -23,15 +23,6 @@ namespace XTerminal.ViewModels
         private SessionStatusEnum status;
         private VideoTerminal videoTerminal;
         private Base.DataModels.XTermSession session;
-
-        #endregion
-
-        #region 公开事件
-
-        /// <summary>
-        /// 会话状态改变的时候触发
-        /// </summary>
-        public event Action<TerminalSessionVM, SessionStatusEnum> StatusChanged;
 
         #endregion
 
@@ -59,11 +50,6 @@ namespace XTerminal.ViewModels
         public SessionTypeEnum Type { get; set; }
 
         /// <summary>
-        /// 用来显示输出的终端屏幕
-        /// </summary>
-        public ITerminalScreen TerminalScreen { get; set; }
-
-        /// <summary>
         /// 该会话所维护的终端
         /// </summary>
         public VideoTerminal VideoTerminal { get { return this.videoTerminal; } }
@@ -75,29 +61,31 @@ namespace XTerminal.ViewModels
         /// <summary>
         /// 构造方法
         /// </summary>
-        /// <param name="session">要打开的会话对象</param>
-        public TerminalSessionVM(XTermSession session)
+        public TerminalSessionVM()
         {
-            this.session = session;
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = session.Name;
-            this.Description = session.Description;
-            this.Type = (SessionTypeEnum)session.SessionType;
         }
 
         #endregion
 
         #region 公开接口
 
-        public void Open()
+        public override int Open(XTermSession session)
         {
+            this.session = session;
+            this.ID = Guid.NewGuid().ToString();
+            this.Name = session.Name;
+            this.Description = session.Description;
+            this.Type = (SessionTypeEnum)session.SessionType;
+
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
-            this.videoTerminal.TerminalScreen = this.TerminalScreen;
+            this.videoTerminal.TerminalScreen = this.Content as ITerminalScreen;
             this.videoTerminal.Initialize(this.session);
+
+            return ResponseCode.SUCCESS;
         }
 
-        public void Close()
+        public override void Close()
         {
             if (this.videoTerminal == null)
             {

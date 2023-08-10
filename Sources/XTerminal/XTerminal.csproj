@@ -95,7 +95,7 @@
     <Compile Include="UserControls\FileExplorerUserControl.xaml.cs">
       <DependentUpon>FileExplorerUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\IViewportFiller.cs" />
+    <Compile Include="UserControls\SessionContent.cs" />
     <Compile Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml.cs">
       <DependentUpon>SerialPortOptionsUserControl.xaml</DependentUpon>
     </Compile>
@@ -108,11 +108,12 @@
     <Compile Include="UserControls\OptionsUserControl\ThemeOptionsUserControl.xaml.cs">
       <DependentUpon>ThemeOptionsUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\TerminalScreenUserControl.xaml.cs">
-      <DependentUpon>TerminalScreenUserControl.xaml</DependentUpon>
+    <Compile Include="UserControls\SessionContentFactory.cs" />
+    <Compile Include="UserControls\TerminalContentUserControl.xaml.cs">
+      <DependentUpon>TerminalContentUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\ViewportUserControl.xaml.cs">
-      <DependentUpon>ViewportUserControl.xaml</DependentUpon>
+    <Compile Include="UserControls\SFTPContentUserControl.xaml.cs">
+      <DependentUpon>SFTPContentUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="ViewModels\CollectionItem\CollectionItemVM.cs" />
@@ -183,7 +184,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControls\ViewportUserControl.xaml">
+    <Page Include="UserControls\SFTPContentUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -215,7 +216,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UserControls\TerminalScreenUserControl.xaml">
+    <Page Include="UserControls\TerminalContentUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -284,9 +285,7 @@
   <ItemGroup>
     <Resource Include="icon.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UserControls\ViewporFiller\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

@@ -15,15 +15,15 @@ namespace XTerminal.Document
     /// </summary>
     public class VTHistoryLine
     {
-        /// <summary>
-        /// 获取该文本行的宽度
-        /// </summary>
-        public double Width { get; private set; }
+        ///// <summary>
+        ///// 获取该文本行的宽度
+        ///// </summary>
+        //public double Width { get; private set; }
 
-        /// <summary>
-        /// 获取该文本行的高度
-        /// </summary>
-        public double Height { get; private set; }
+        ///// <summary>
+        ///// 获取该文本行的高度
+        ///// </summary>
+        //public double Height { get; private set; }
 
         /// <summary>
         /// 行索引，从0开始
@@ -64,8 +64,8 @@ namespace XTerminal.Document
         /// <param name="sourceLine">要冻结的行</param>
         public void SetVTextLine(VTextLine sourceLine)
         {
-            this.Width = sourceLine.Width;
-            this.Height = sourceLine.Height;
+            //this.Width = sourceLine.Width;
+            //this.Height = sourceLine.Height;
             this.Text = sourceLine.Text;
             this.PhysicsRow = sourceLine.PhysicsRow;
             // 复制一份字符列表

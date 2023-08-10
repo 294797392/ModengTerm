@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Base.DataModels;
 using XTerminal.ViewModels.SFTP;
 
 namespace XTerminal.ViewModels
@@ -32,6 +33,16 @@ namespace XTerminal.ViewModels
         {
             this.RemoteTreeVM = new SftpTreeVM();
             this.LocalTreeVM = new SftpTreeVM();
+        }
+
+        public override int Open(XTermSession session)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Close()
+        {
+            throw new NotImplementedException();
         }
     }
 }

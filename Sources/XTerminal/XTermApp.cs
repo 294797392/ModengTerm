@@ -13,6 +13,7 @@ using WPFToolkit.Utils;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
+using XTerminal.Base.Enumerations;
 using XTerminal.Document.Rendering;
 using XTerminal.ServiceAgents;
 using XTerminal.Session;
@@ -75,7 +76,7 @@ namespace XTerminal
     {
         #region 实例变量
 
-        private TerminalSessionVM selectedOpenedSession;
+        private OpenedSessionVM selectedOpenedSession;
 
         #endregion
 
@@ -99,7 +100,7 @@ namespace XTerminal
         /// <summary>
         /// 界面上当前选中的会话
         /// </summary>
-        public TerminalSessionVM SelectedOpenedSession
+        public OpenedSessionVM SelectedOpenedSession
         {
             get { return this.selectedOpenedSession; }
             set
@@ -201,15 +202,13 @@ namespace XTerminal
 
         #region 公开接口
 
-        public TerminalSessionVM OpenSession(XTermSession session, ITerminalScreen screen)
+        public OpenedSessionVM OpenSession(XTermSession session)
         {
             // 新建会话ViewModel
-            TerminalSessionVM sessionVM = new TerminalSessionVM(session);
-            sessionVM.TerminalScreen = screen;
+            OpenedSessionVM sessionVM = this.CreateOpenedSessionVM(session);
+            sessionVM.Content = SessionContentFactory.Create(session);
             sessionVM.StatusChanged += this.SessionVM_StatusChanged;
-
-            // 打开会话
-            sessionVM.Open();
+            sessionVM.Open(session);
 
             // 添加到界面上，因为最后一个元素是打开Session的TabItem，所以要添加到倒数第二个元素的位置
             this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);
@@ -218,16 +217,16 @@ namespace XTerminal
             return sessionVM;
         }
 
-        public void CloseSession(TerminalSessionVM session)
+        public void CloseSession(OpenedSessionVM session)
         {
             session.StatusChanged -= this.SessionVM_StatusChanged;
             session.Close();
 
             this.OpenedSessionList.Remove(session);
-            TerminalSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
+            OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
             if (firstOpenedSession == null)
             {
-                this.OpenSession(XTermDefaultValues.DefaultSession, new TerminalScreenUserControl());
+                this.OpenSession(XTermDefaultValues.DefaultSession);
             }
             else
             {
@@ -239,16 +238,42 @@ namespace XTerminal
         /// 获取所有已经打开了的会话列表
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<TerminalSessionVM> GetOpenedSessions()
+        public IEnumerable<OpenedSessionVM> GetOpenedSessions()
         {
-            return this.OpenedSessionList.OfType<TerminalSessionVM>();
+            return this.OpenedSessionList.OfType<OpenedSessionVM>();
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private OpenedSessionVM CreateOpenedSessionVM(XTermSession session)
+        {
+            switch ((SessionTypeEnum)session.SessionType)
+            {
+                case SessionTypeEnum.libvtssh:
+                case SessionTypeEnum.SerialPort:
+                case SessionTypeEnum.SSH:
+                case SessionTypeEnum.Win32CommandLine:
+                    {
+                        return new TerminalSessionVM();
+                    }
+
+                case SessionTypeEnum.SFTP:
+                    {
+                        return new SFTPSessionVM();
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         #endregion
 
         #region 事件处理器
 
-        private void SessionVM_StatusChanged(TerminalSessionVM sessionVM, SessionStatusEnum status)
+        private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
         {
         }
 

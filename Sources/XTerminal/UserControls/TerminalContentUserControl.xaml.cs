@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using XTerminal.Base;
+using XTerminal.Base.DataModels;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Rendering;
@@ -21,9 +22,9 @@ using XTerminal.Session;
 namespace XTerminal.UserControls
 {
     /// <summary>
-    /// TerminalUserControl.xaml 的交互逻辑
+    /// TerminalContentUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalScreenUserControl : UserControl, ITerminalScreen
+    public partial class TerminalContentUserControl : SessionContent, ITerminalScreen
     {
         #region 类变量
 
@@ -63,7 +64,7 @@ namespace XTerminal.UserControls
 
         #region 构造方法
 
-        public TerminalScreenUserControl()
+        public TerminalContentUserControl()
         {
             InitializeComponent();
 
@@ -352,6 +353,20 @@ namespace XTerminal.UserControls
             {
                 this.SliderScrolbar.Value = scrollValue;
             }
+        }
+
+        #endregion
+
+        #region SessionContent
+
+        public override int Open(XTermSession session)
+        {
+            return ResponseCode.SUCCESS;
+        }
+
+        public override void Close()
+        {
+            
         }
 
         #endregion
