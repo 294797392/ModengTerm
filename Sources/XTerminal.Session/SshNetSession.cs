@@ -6,8 +6,6 @@ using System.IO;
 using System.Text;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Base.DataModels.Session;
-using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
@@ -27,7 +25,6 @@ namespace XTerminal.Session
 
         private SshClient sshClient;
         private ShellStream stream;
-        private ConnectionOptions sessionProperties;
 
         #endregion
 
@@ -52,31 +49,36 @@ namespace XTerminal.Session
 
         public override int Open()
         {
-            this.sessionProperties = this.options.ConnectionOptions;
-
             #region 初始化身份验证方式
 
+            SSHAuthTypeEnum authType = this.options.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_AUTH_TYPE);
+            string userName = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME);
+            string password = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_PASSWORD);
+            string privateKeyFile = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_PRIVATE_KEY_FILE);
+            string passphrase = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_Passphrase);
+
             AuthenticationMethod authentication = null;
-            switch ((SSHAuthTypeEnum)this.sessionProperties.SSHAuthType)
+            switch (authType)
             {
                 case SSHAuthTypeEnum.None:
                     {
-                        authentication = new NoneAuthenticationMethod(this.sessionProperties.UserName);
+                        authentication = new NoneAuthenticationMethod(userName);
                         break;
                     }
 
                 case SSHAuthTypeEnum.Password:
                     {
-                        authentication = new PasswordAuthenticationMethod(this.sessionProperties.UserName, this.sessionProperties.Password);
+                        authentication = new PasswordAuthenticationMethod(userName, password);
                         break;
                     }
 
                 case SSHAuthTypeEnum.PrivateKey:
                     {
-                        using (MemoryStream ms = new MemoryStream(Encoding.ASCII.GetBytes(this.sessionProperties.PrivateKey)))
+                        byte[] privateKey = File.ReadAllBytes(privateKeyFile);
+                        using (MemoryStream ms = new MemoryStream(privateKey))
                         {
-                            var privateKeyFile = new PrivateKeyFile(ms, this.sessionProperties.Passphrase);
-                            authentication = new PrivateKeyAuthenticationMethod(this.sessionProperties.UserName, privateKeyFile);
+                            var keyFile = new PrivateKeyFile(ms, passphrase);
+                            authentication = new PrivateKeyAuthenticationMethod(userName, keyFile);
                         }
                         break;
                     }
@@ -89,7 +91,9 @@ namespace XTerminal.Session
 
             #region 连接服务器
 
-            ConnectionInfo connectionInfo = new ConnectionInfo(this.sessionProperties.ServerAddress, this.sessionProperties.ServerPort, this.sessionProperties.UserName, authentication);
+            string serverAddress = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
+            int serverPort = this.options.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
+            ConnectionInfo connectionInfo = new ConnectionInfo(serverAddress, serverPort, userName, authentication);
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
             this.sshClient.Connect();
@@ -98,12 +102,11 @@ namespace XTerminal.Session
 
             #region 创建终端
 
-            Dictionary<TerminalModes, uint> terminalModeValues = new Dictionary<TerminalModes, uint>();
-            //terminalModeValues[TerminalModes.ECHOCTL] = 1;
-            //terminalModeValues[TerminalModes.IEXTEN] = 1;
-
-            TerminalOptions terminalOptions = this.options.TerminalOptions;
-            this.stream = this.sshClient.CreateShellStream(this.options.TerminalOptions.GetTerminalName(), (uint)terminalOptions.Columns, (uint)terminalOptions.Rows, 0, 0, this.options.OutputBufferSize, terminalModeValues);
+            string terminalType = this.options.GetOption<string>(OptionKeyEnum.SSH_TERM_TYPE);
+            int columns = this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+            int rows = this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            int outputBufferSize = this.options.GetOption<int>(OptionKeyEnum.WRITE_BUFFER_SIZE);
+            this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, outputBufferSize, null);
 
             #endregion
 

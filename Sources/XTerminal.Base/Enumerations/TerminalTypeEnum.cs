@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.ViewModels
+namespace XTerminal.Base.Enumerations
 {
-    public class OpenSessionVM : OpenedSessionVM
+    public enum TerminalTypeEnum
     {
+        VT100,
+        VT220,
+        XTerm,
+        XTerm256Color
     }
 }

@@ -19,8 +19,6 @@ using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Base.DataModels.Session;
-using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 using XTerminal.ViewModels;
@@ -105,39 +103,6 @@ namespace XTerminal.Windows
         {
             GridSessionSSH.Visibility = Visibility.Collapsed;
             GridSessionSerialPort.Visibility = Visibility.Collapsed;
-        }
-
-        private AppearanceOptions GetAppearanceOptions()
-        {
-            FontFamilyDefinition fontFamily = ComboBoxFontFamily.SelectedItem as FontFamilyDefinition;
-            if (fontFamily == null)
-            {
-                MessageBoxUtils.Info("请选择字体");
-                return null;
-            }
-
-            ColorDefinition foreground = ComboBoxForeground.SelectedItem as ColorDefinition;
-            if (foreground == null)
-            {
-                MessageBoxUtils.Info("请选择字体颜色");
-                return null;
-            }
-
-            FontSizeDefinition fontSize = ComboBoxFontSize.SelectedItem as FontSizeDefinition;
-            if (fontSize == null)
-            {
-                MessageBoxUtils.Info("请选择字体大小");
-                return null;
-            }
-
-            return new AppearanceOptions()
-            {
-                ID = Guid.NewGuid().ToString(),
-                Name = Guid.NewGuid().ToString(),
-                FontSize = fontSize.Value,
-                FontFamily = fontFamily.Value,
-                Foreground = foreground.Value
-            };
         }
 
         #endregion

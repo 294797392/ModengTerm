@@ -262,7 +262,7 @@ namespace XTerminal.Session
                 return ResponseCode.FAILED;
             }
 
-            winpty.winpty_config_set_initial_size(this.winpty_config, this.options.TerminalOptions.Columns, this.options.TerminalOptions.Rows);
+            winpty.winpty_config_set_initial_size(this.winpty_config, this.Columns, this.Rows);
 
             // winpty_error也没用
             this.winpty_handle = winpty.winpty_open(this.winpty_config, out winpty_error);

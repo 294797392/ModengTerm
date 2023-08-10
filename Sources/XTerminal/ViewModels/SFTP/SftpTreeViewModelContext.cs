@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace XTerminal.ViewModels
+namespace XTerminal.ViewModels.SFTP
 {
-    public abstract class SessionTabItemVM : ItemViewModel
+    public class SftpTreeViewModelContext : TreeViewModelContext
     {
-
     }
 }

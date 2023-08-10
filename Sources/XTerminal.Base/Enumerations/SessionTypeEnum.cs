@@ -28,6 +28,11 @@ namespace XTerminal.Base.Enumerations
         /// <summary>
         /// 是一个串口设备
         /// </summary>
-        SerialPort = 3
+        SerialPort = 3,
+
+        /// <summary>
+        /// SFTP会话
+        /// </summary>
+        SFTP
     }
 }

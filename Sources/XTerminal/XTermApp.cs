@@ -53,6 +53,12 @@ namespace XTerminal
         [JsonProperty("themes")]
         public List<ThemeDefinition> ThemeList { get; private set; }
 
+        [JsonProperty("ftpOptions")]
+        public List<OptionDefinition> FTPOptionList { get; private set; }
+
+        [JsonProperty("terminalOptions")]
+        public List<OptionDefinition> TerminalOptionList { get; private set; }
+
         public XTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
@@ -60,6 +66,8 @@ namespace XTerminal
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
             this.ThemeList = new List<ThemeDefinition>();
+            this.FTPOptionList = new List<OptionDefinition>();
+            this.TerminalOptionList = new List<OptionDefinition>();
         }
     }
 
@@ -67,7 +75,7 @@ namespace XTerminal
     {
         #region 实例变量
 
-        private OpenedSessionVM selectedOpenedSession;
+        private TerminalSessionVM selectedOpenedSession;
 
         #endregion
 
@@ -86,12 +94,12 @@ namespace XTerminal
         /// <summary>
         /// 存储当前打开的所有会话列表
         /// </summary>
-        public BindableCollection<SessionTabItemVM> OpenedSessionList { get; private set; }
+        public BindableCollection<OpenedSessionVM> OpenedSessionList { get; private set; }
 
         /// <summary>
         /// 界面上当前选中的会话
         /// </summary>
-        public OpenedSessionVM SelectedOpenedSession
+        public TerminalSessionVM SelectedOpenedSession
         {
             get { return this.selectedOpenedSession; }
             set
@@ -104,14 +112,33 @@ namespace XTerminal
             }
         }
 
+        /// <summary>
+        /// FTP选项参数树形列表
+        /// </summary>
+        public OptionTreeVM SFTPOptionsTreeVM { get; private set; }
+
+        /// <summary>
+        /// 终端选项参数树形列表
+        /// </summary>
+        public OptionTreeVM TerminalOptionsTreeVM { get; private set; }
+
         #endregion
 
         #region ModularApp
 
         protected override int OnInitialize()
         {
+            this.SFTPOptionsTreeVM = new OptionTreeVM();
+            this.TerminalOptionsTreeVM = new OptionTreeVM();
+            this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
             this.ServiceAgent = this.Factory.LookupModule<ServiceAgent>();
-            this.OpenedSessionList = new BindableCollection<SessionTabItemVM>();
+
+            #region 加载选项树形列表
+
+            this.LoadOptionsTree(this.SFTPOptionsTreeVM, this.Manifest.FTPOptionList);
+            this.LoadOptionsTree(this.TerminalOptionsTreeVM, this.Manifest.TerminalOptionList);
+
+            #endregion
 
             // 将打开页面新加到OpenedSessionTab页面上
             this.OpenedSessionList.Add(new OpenSessionVM());
@@ -125,12 +152,59 @@ namespace XTerminal
 
         #endregion
 
+        #region 实例方法
+
+        private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
+        {
+            foreach (OptionDefinition option in children)
+            {
+                OptionTreeNodeVM vm = new OptionTreeNodeVM(parentNode.Context, option)
+                {
+                    ID = option.ID,
+                    Name = option.Name,
+                    EntryClass = option.EntryClass,
+                    IsExpanded = true
+                };
+
+                parentNode.AddChildNode(vm);
+
+                this.LoadChildrenOptions(vm, option.Children);
+            }
+        }
+
+        private void LoadOptionsTree(OptionTreeVM treeVM, List<OptionDefinition> options)
+        {
+            foreach (OptionDefinition option in options)
+            {
+                OptionTreeNodeVM vm = new OptionTreeNodeVM(treeVM.Context, option)
+                {
+                    ID = option.ID,
+                    Name = option.Name,
+                    EntryClass = option.EntryClass,
+                    IsExpanded = true
+                };
+
+                treeVM.AddRootNode(vm);
+
+                this.LoadChildrenOptions(vm, option.Children);
+            }
+
+            // 默认选中第一个节点
+            TreeNodeViewModel firstNode = treeVM.Roots.FirstOrDefault();
+            if (firstNode != null)
+            {
+                firstNode.IsSelected = true;
+            }
+        }
+
+        #endregion
+
         #region 公开接口
 
-        public OpenedSessionVM OpenSession(XTermSession session, ITerminalScreen screen)
+        public TerminalSessionVM OpenSession(XTermSession session, ITerminalScreen screen)
         {
             // 新建会话ViewModel
-            OpenedSessionVM sessionVM = new OpenedSessionVM(session);
+            TerminalSessionVM sessionVM = new TerminalSessionVM(session);
             sessionVM.TerminalScreen = screen;
             sessionVM.StatusChanged += this.SessionVM_StatusChanged;
 
@@ -144,13 +218,13 @@ namespace XTerminal
             return sessionVM;
         }
 
-        public void CloseSession(OpenedSessionVM session)
+        public void CloseSession(TerminalSessionVM session)
         {
             session.StatusChanged -= this.SessionVM_StatusChanged;
             session.Close();
 
             this.OpenedSessionList.Remove(session);
-            OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
+            TerminalSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
             if (firstOpenedSession == null)
             {
                 this.OpenSession(XTermDefaultValues.DefaultSession, new TerminalScreenUserControl());
@@ -165,16 +239,16 @@ namespace XTerminal
         /// 获取所有已经打开了的会话列表
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<OpenedSessionVM> GetOpenedSessions()
+        public IEnumerable<TerminalSessionVM> GetOpenedSessions()
         {
-            return this.OpenedSessionList.OfType<OpenedSessionVM>();
+            return this.OpenedSessionList.OfType<TerminalSessionVM>();
         }
 
         #endregion
 
         #region 事件处理器
 
-        private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
+        private void SessionVM_StatusChanged(TerminalSessionVM sessionVM, SessionStatusEnum status)
         {
         }
 

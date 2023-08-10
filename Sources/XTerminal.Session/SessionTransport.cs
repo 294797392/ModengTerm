@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
 {
@@ -38,7 +39,7 @@ namespace XTerminal.Session
         private Task receiveThread;
         private bool isRunning;
 
-        private byte[] outputBuffer;
+        private byte[] readBuffer;
 
         #endregion
 
@@ -46,7 +47,9 @@ namespace XTerminal.Session
 
         public int Initialize(XTermSession initialOptions)
         {
-            this.outputBuffer = new byte[initialOptions.OutputBufferSize];
+            int bufferSize = initialOptions.GetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE);
+
+            this.readBuffer = new byte[bufferSize];
 
             this.session = SessionFactory.Create(initialOptions);
             this.session.StatusChanged += Session_StatusChanged;
@@ -131,7 +134,7 @@ namespace XTerminal.Session
 
             while (this.isRunning)
             {
-                int n = this.session.Read(this.outputBuffer);
+                int n = this.session.Read(this.readBuffer);
 
                 if (n == -1)
                 {
@@ -159,7 +162,7 @@ namespace XTerminal.Session
                     }
 
                     // 读取到了数据
-                    this.NotifyDataReceived(this.outputBuffer, n);
+                    this.NotifyDataReceived(this.readBuffer, n);
                 }
             }
         }

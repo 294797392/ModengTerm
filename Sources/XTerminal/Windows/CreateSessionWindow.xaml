@@ -6,7 +6,7 @@
         xmlns:viewmodel="clr-namespace:XTerminal.ViewModels"
         xmlns:xtermconverter="clr-namespace:XTerminal"
         mc:Ignorable="d"
-        Title="新建会话" Height="450" Width="800"
+        Title="{DynamicResource ResourceKey=UIText100}" Height="700" Width="550"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>

@@ -64,7 +64,7 @@ namespace XTerminal
             ContentControlTerminal.Content = terminalControl;
 
             // 打开Session
-            OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session, terminalControl);
+            TerminalSessionVM openedSession = XTermApp.Context.OpenSession(session, terminalControl);
             terminalControl.VideoTerminal = openedSession.VideoTerminal;
         }
 
@@ -72,7 +72,7 @@ namespace XTerminal
         /// 切换要显示的Session
         /// </summary>
         /// <param name="openedSessionVM"></param>
-        private void SwitchSession(OpenedSessionVM openedSessionVM)
+        private void SwitchSession(TerminalSessionVM openedSessionVM)
         {
             TerminalScreenUserControl terminalUserControl = openedSessionVM.TerminalScreen as TerminalScreenUserControl;
             if (ContentControlTerminal.Content == terminalUserControl)
@@ -94,7 +94,7 @@ namespace XTerminal
 
         private void ListBoxOpenedSessionTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SessionTabItemVM selectedTabItem = ListBoxOpenedSessionTab.SelectedItem as SessionTabItemVM;
+            OpenedSessionVM selectedTabItem = ListBoxOpenedSessionTab.SelectedItem as OpenedSessionVM;
             if (selectedTabItem == null)
             {
                 return;
@@ -110,9 +110,9 @@ namespace XTerminal
 
                 this.OpenSession();
             }
-            else if (selectedTabItem is OpenedSessionVM)
+            else if (selectedTabItem is TerminalSessionVM)
             {
-                this.SwitchSession(selectedTabItem as OpenedSessionVM);
+                this.SwitchSession(selectedTabItem as TerminalSessionVM);
             }
             else
             {
@@ -124,7 +124,7 @@ namespace XTerminal
         private void PathClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             FrameworkElement element = sender as FrameworkElement;
-            OpenedSessionVM openedSession = element.Tag as OpenedSessionVM;
+            TerminalSessionVM openedSession = element.Tag as TerminalSessionVM;
             if (openedSession == null)
             {
                 return;
@@ -140,7 +140,7 @@ namespace XTerminal
 
         private void MenuItemCreateSession_Click(object sender, RoutedEventArgs e)
         {
-            CreateSessionWindow window = new CreateSessionWindow();
+            CreateSessionOptionTreeWindow window = new CreateSessionOptionTreeWindow();
             window.Owner = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (!(bool)window.ShowDialog())
@@ -188,7 +188,7 @@ namespace XTerminal
             {
                 return this.DataTemplateOpenSession;
             }
-            else if (item is OpenedSessionVM)
+            else if (item is TerminalSessionVM)
             {
                 return this.DataTemplateOpenedSession;
             }

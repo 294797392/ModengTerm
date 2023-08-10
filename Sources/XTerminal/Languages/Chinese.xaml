@@ -8,5 +8,8 @@
     <sys:String x:Key="UIText4">删除</sys:String>
     <sys:String x:Key="UIText5">编辑</sys:String>
     <sys:String x:Key="UIText6">关于</sys:String>
+    
+    
+    <sys:String x:Key="UIText100">新建会话</sys:String>
 
 </ResourceDictionary>

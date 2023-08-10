@@ -7,7 +7,7 @@ using System.Threading;
 using System.Windows;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
@@ -89,7 +89,27 @@ namespace XTerminal
         private SynchronizationContext uiSyncContext;
 
         private XTermSession sessionInfo;
-        private MouseOptions mouseOptions;
+
+        #region 鼠标参数
+
+        /// <summary>
+        /// 鼠标滚轮滚动一次，滚动几行
+        /// </summary>
+        private int scrollDelta;
+
+        /// <summary>
+        /// 记录滚动条滚动到底的时候，滚动条的值
+        /// </summary>
+        private int scrollMax;
+
+        /// <summary>
+        /// 记录当前滚动条滚动的值
+        /// 也就是当前Surface上渲染的第一行的PhysicsRow
+        /// 默认值是0
+        /// </summary>
+        private int scrollValue;
+
+        #endregion
 
         /// <summary>
         /// DECAWM是否启用
@@ -136,18 +156,6 @@ namespace XTerminal
         /// </summary>
         private VTHistoryLine lastHistoryLine;
 
-        /// <summary>
-        /// 记录滚动条滚动到底的时候，滚动条的值
-        /// </summary>
-        private int scrollMax;
-
-        /// <summary>
-        /// 记录当前滚动条滚动的值
-        /// 也就是当前Surface上渲染的第一行的PhysicsRow
-        /// 默认值是0
-        /// </summary>
-        private int scrollValue;
-
         #endregion
 
         #region SelectionRange
@@ -181,7 +189,7 @@ namespace XTerminal
         /// <summary>
         /// 输入编码方式
         /// </summary>
-        private Encoding inputEncoding;
+        private Encoding outputEncoding;
 
         #endregion
 
@@ -273,12 +281,11 @@ namespace XTerminal
         public void Initialize(XTermSession sessionInfo)
         {
             this.sessionInfo = sessionInfo;
-            this.mouseOptions = sessionInfo.MouseOptions;
-            this.inputEncoding = Encoding.GetEncoding(sessionInfo.InputEncoding);
+            this.outputEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
             this.uiSyncContext = SynchronizationContext.Current;
 
             // DECAWM
-            this.autoWrapMode = sessionInfo.TerminalOptions.DECPrivateAutoWrapMode;
+            this.autoWrapMode = false;
 
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
@@ -287,13 +294,13 @@ namespace XTerminal
 
             this.isRunning = true;
 
-            this.terminalRows = sessionInfo.TerminalOptions.Rows;
-            this.terminalColumns = sessionInfo.TerminalOptions.Columns;
+            this.terminalRows = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            this.terminalColumns = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
             #region 初始化键盘
 
             this.Keyboard = new VTKeyboard();
-            this.Keyboard.Encoding = Encoding.GetEncoding(sessionInfo.InputEncoding);
+            this.Keyboard.Encoding = this.outputEncoding;
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
 
@@ -323,14 +330,14 @@ namespace XTerminal
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                ColumnSize = this.sessionInfo.TerminalOptions.Columns,
-                RowSize = this.sessionInfo.TerminalOptions.Rows,
-                DECPrivateAutoWrapMode = this.sessionInfo.TerminalOptions.DECPrivateAutoWrapMode,
-                CursorStyle = this.sessionInfo.MouseOptions.CursorStyle,
-                Interval = this.sessionInfo.MouseOptions.CursorInterval,
-                FontFamily = sessionInfo.AppearanceOptions.FontFamily,
-                FontSize = sessionInfo.AppearanceOptions.FontSize,
-                Foreground = sessionInfo.AppearanceOptions.Foreground
+                ColumnSize = this.terminalColumns,
+                RowSize = this.terminalRows,
+                DECPrivateAutoWrapMode = false,
+                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.CURSOR_STYLE),
+                Interval = sessionInfo.GetOption<int>(OptionKeyEnum.CURSOR_INTERVAL),
+                FontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY),
+                FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.THEME_FONT_SIZE),
+                Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR)
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument", Surface = this.TerminalScreen.CreateSurface() };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument", Surface = this.TerminalScreen.CreateSurface() };
@@ -427,7 +434,7 @@ namespace XTerminal
                 return ResponseCode.SUCCESS;
             }
 
-            byte[] bytes = this.inputEncoding.GetBytes(text);
+            byte[] bytes = this.outputEncoding.GetBytes(text);
 
             int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
@@ -1670,14 +1677,14 @@ namespace XTerminal
                     return;
                 }
 
-                if (this.scrollValue < this.mouseOptions.ScrollDelta)
+                if (this.scrollValue < this.scrollDelta)
                 {
                     // 一次可以全部滚完并且还有剩余
                     this.ScrollToHistory(0);
                 }
                 else
                 {
-                    this.ScrollToHistory(this.scrollValue - this.mouseOptions.ScrollDelta);
+                    this.ScrollToHistory(this.scrollValue - this.scrollDelta);
                 }
             }
             else
@@ -1693,9 +1700,9 @@ namespace XTerminal
                 // 剩余可以往下滚动的行数
                 int remainScroll = this.scrollMax - this.scrollValue;
 
-                if (remainScroll >= this.mouseOptions.ScrollDelta)
+                if (remainScroll >= this.scrollDelta)
                 {
-                    this.ScrollToHistory(this.scrollValue + this.mouseOptions.ScrollDelta);
+                    this.ScrollToHistory(this.scrollValue + this.scrollDelta);
                 }
                 else
                 {

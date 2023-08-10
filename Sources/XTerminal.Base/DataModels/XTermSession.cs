@@ -7,8 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Base.DataModels.Session;
-using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base.DataModels
@@ -26,47 +24,49 @@ namespace XTerminal.Base.DataModels
         public int SessionType { get; set; }
 
         /// <summary>
-        /// 从通道里读取数据的缓冲区大小
+        /// 所有的选项列表
+        /// Key参见OptionKeyEnum
         /// </summary>
-        [JsonProperty("outputBufferSize")]
-        public int OutputBufferSize { get; set; }
-
-        /// <summary>
-        /// 输入字符的编码方式
-        /// </summary>
-        [JsonProperty("inputEncoding")]
-        public string InputEncoding { get; set; }
-
-        /// <summary>
-        /// 终端设置
-        /// </summary>
-        [JsonProperty("terminalOptions")]
-        public TerminalOptions TerminalOptions { get; set; }
-
-        /// <summary>
-        /// 外观设置
-        /// </summary>
-        [JsonProperty("appearanceOptions")]
-        public AppearanceOptions AppearanceOptions { get; set; }
-
-        /// <summary>
-        /// 会话详细信息
-        /// </summary>
-        [JsonProperty("authOptions")]
-        public ConnectionOptions ConnectionOptions { get; set; }
-
-        /// <summary>
-        /// 光标信息
-        /// </summary>
-        [JsonProperty("cursorOptions")]
-        public MouseOptions MouseOptions { get; set; }
+        [JsonProperty("options")]
+        public List<SessionOption> Options { get; private set; }
 
         public XTermSession()
         {
-            this.ConnectionOptions = new ConnectionOptions();
-            this.MouseOptions = new MouseOptions();
-            this.TerminalOptions = new TerminalOptions();
-            this.AppearanceOptions = new AppearanceOptions();
+            this.Options = new List<SessionOption>();
+        }
+
+        public T GetOption<T>(OptionKeyEnum key)
+        {
+            SessionOption sessionOption = this.Options.FirstOrDefault(v => v.Key == (int)key);
+            if (sessionOption == null)
+            {
+                return default(T);
+            }
+
+            Type t = typeof(T);
+            if (t.IsEnum)
+            {
+                return (T)Enum.Parse(t, sessionOption.Value);
+            }
+            else
+            {
+                return (T)Convert.ChangeType(sessionOption.Value, typeof(T));
+            }
+        }
+
+        public void SetOption<T>(OptionKeyEnum key, T value)
+        {
+            SessionOption sessionOption = this.Options.FirstOrDefault(v => v.Key == (int)key);
+            if (sessionOption == null)
+            {
+                sessionOption = new SessionOption()
+                {
+                    Key = (int)key,
+                };
+                this.Options.Add(sessionOption);
+            }
+
+            sessionOption.Value = value.ToString();
         }
     }
 }

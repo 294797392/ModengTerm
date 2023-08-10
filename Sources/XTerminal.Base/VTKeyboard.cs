@@ -252,7 +252,7 @@ namespace XTerminal.Base
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
             this.SetCursorKeyMode(false);
-            this.Encoding = Encoding.GetEncoding(XTermDefaultValues.DefaultInputEncoding);
+            this.Encoding = Encoding.GetEncoding(XTermDefaultValues.DefaultOutputEncoding);
         }
 
         #endregion

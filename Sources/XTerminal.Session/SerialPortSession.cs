@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Base.DataModels.Session;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
 {
@@ -37,14 +37,13 @@ namespace XTerminal.Session
 
         public override int Open()
         {
-            ConnectionOptions sessionProperties = this.options.ConnectionOptions;
-
-            string portName = sessionProperties.ServerAddress;
+            string portName = this.options.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
+            int baudRate = this.options.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
 
             try
             {
                 this.serialPort = new SerialPort(portName);
-                this.serialPort.BaudRate = sessionProperties.BaudRate;
+                this.serialPort.BaudRate = baudRate;
                 this.serialPort.Open();
             }
             catch (Exception ex)

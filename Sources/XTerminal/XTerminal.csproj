@@ -92,7 +92,22 @@
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
     <Compile Include="ServiceAgents\FileServiceAgent.cs" />
     <Compile Include="ServiceAgents\ServiceAgent.cs" />
+    <Compile Include="UserControls\FileExplorerUserControl.xaml.cs">
+      <DependentUpon>FileExplorerUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\IViewportFiller.cs" />
+    <Compile Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml.cs">
+      <DependentUpon>SerialPortOptionsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\OptionsUserControl\SSHOptionsUserControl.xaml.cs">
+      <DependentUpon>SSHOptionsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\OptionsUserControl\TerminalOptionsUserControl.xaml.cs">
+      <DependentUpon>TerminalOptionsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\OptionsUserControl\ThemeOptionsUserControl.xaml.cs">
+      <DependentUpon>ThemeOptionsUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\TerminalScreenUserControl.xaml.cs">
       <DependentUpon>TerminalScreenUserControl.xaml</DependentUpon>
     </Compile>
@@ -102,18 +117,27 @@
     <Compile Include="VideoTerminal.cs" />
     <Compile Include="ViewModels\CollectionItem\CollectionItemVM.cs" />
     <Compile Include="ViewModels\CollectionItem\TextItemVM.cs" />
+    <Compile Include="ViewModels\CreateSessionVM.cs" />
     <Compile Include="ViewModels\GroupVM.cs" />
-    <Compile Include="ViewModels\OpenedSessionVM.cs" />
+    <Compile Include="ViewModels\OptionTreeVM.cs" />
+    <Compile Include="ViewModels\OptionTreeNodeVM.cs" />
+    <Compile Include="ViewModels\SFTPSessionVM.cs" />
+    <Compile Include="ViewModels\SFTP\DirectoryNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\FileNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\SftpNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\SftpTreeViewModelContext.cs" />
+    <Compile Include="ViewModels\SFTP\SftpTreeVM.cs" />
+    <Compile Include="ViewModels\TerminalSessionVM.cs" />
     <Compile Include="ViewModels\OpenSessionVM.cs" />
     <Compile Include="ViewModels\CollectionVM.cs" />
-    <Compile Include="ViewModels\SessionTabItemVM.cs" />
+    <Compile Include="ViewModels\OpenedSessionVM.cs" />
     <Compile Include="ViewModels\SessionTypeVM.cs" />
     <Compile Include="ViewModels\XTermSessionVM.cs" />
     <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\CreateSessionWindow.xaml.cs">
-      <DependentUpon>CreateSessionWindow.xaml</DependentUpon>
+    <Compile Include="Windows\CreateSessionOptionTreeWindow.xaml.cs">
+      <DependentUpon>CreateSessionOptionTreeWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\TestWindow.xaml.cs">
       <DependentUpon>TestWindow.xaml</DependentUpon>
@@ -127,6 +151,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Styles\OptionsDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Themes.Default.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -135,11 +163,35 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UserControls\FileExplorerUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\SSHOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\TerminalOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\ThemeOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\ViewportUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\CreateSessionOptionTreeWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -166,10 +218,6 @@
     <Page Include="UserControls\TerminalScreenUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\CreateSessionWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\TestWindow.xaml">
       <SubType>Designer</SubType>

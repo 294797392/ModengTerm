@@ -77,7 +77,7 @@ namespace XTerminal
 
         private void ButtonCreateSession_Click(object sender, RoutedEventArgs e)
         {
-            CreateSessionWindow window = new CreateSessionWindow();
+            CreateSessionOptionTreeWindow window = new CreateSessionOptionTreeWindow();
             window.Owner = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (!(bool)window.ShowDialog())

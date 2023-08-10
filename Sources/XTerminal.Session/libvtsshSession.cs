@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Base.DataModels.Session;
-using XTerminal.Base.DataModels.SessionOptions;
 
 namespace XTerminal.Session
 {
@@ -37,23 +35,23 @@ namespace XTerminal.Session
             this.statusChangedDlg = new libvt.vtssh_status_changed_callback(this.StatusChangedCallback);
             this.dataReceivedDlg = new libvt.vtssh_data_received_callback(this.DataReceivedCallback);
 
-            ConnectionOptions sessionProperty = this.options.ConnectionOptions;
-            TerminalOptions terminalProperties = this.options.TerminalOptions;
+            //ConnectionOptions sessionProperty = this.options.ConnectionOptions;
+            //TerminalOptions terminalProperties = this.options.TerminalOptions;
 
-            libvt.vtssh_options vtssh_Options = new libvt.vtssh_options()
-            {
-                serverip = Encoding.ASCII.GetBytes(sessionProperty.ServerAddress),
-                serverport = sessionProperty.ServerPort,
-                username = Encoding.ASCII.GetBytes(sessionProperty.UserName),
-                password = Encoding.ASCII.GetBytes(sessionProperty.Password),
-                term = Encoding.ASCII.GetBytes(terminalProperties.GetTerminalName()),
-                term_columns = terminalProperties.Columns,
-                term_rows = terminalProperties.Rows,
-                auth = libvt.vtssh_auth_enum.VTSSH_AUTH_PASSWORD,
-                on_data_received = this.dataReceivedDlg,
-                on_status_changed = this.statusChangedDlg
-            };
-            this.vtssh_options_ptr = MarshalUtils.CreateStructurePointer(vtssh_Options);
+            //libvt.vtssh_options vtssh_Options = new libvt.vtssh_options()
+            //{
+            //    serverip = Encoding.ASCII.GetBytes(sessionProperty.ServerAddress),
+            //    serverport = sessionProperty.ServerPort,
+            //    username = Encoding.ASCII.GetBytes(sessionProperty.UserName),
+            //    password = Encoding.ASCII.GetBytes(sessionProperty.Password),
+            //    term = Encoding.ASCII.GetBytes(terminalProperties.GetTerminalName()),
+            //    term_columns = terminalProperties.Columns,
+            //    term_rows = terminalProperties.Rows,
+            //    auth = libvt.vtssh_auth_enum.VTSSH_AUTH_PASSWORD,
+            //    on_data_received = this.dataReceivedDlg,
+            //    on_status_changed = this.statusChangedDlg
+            //};
+            //this.vtssh_options_ptr = MarshalUtils.CreateStructurePointer(vtssh_Options);
         }
 
         #endregion

@@ -19,6 +19,12 @@ namespace XTerminal
                 return "未知";
             }
 
+            string v = value.ToString();
+            if (string.IsNullOrEmpty(v))
+            {
+                return "未知";
+            }
+
             switch ((SSHAuthTypeEnum)value)
             {
                 case SSHAuthTypeEnum.None: return "不需要身份验证";

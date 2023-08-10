@@ -43,19 +43,25 @@ namespace XTerminal.Session
         #region 属性
 
         /// <summary>
-        /// 终端可以显示的行数
-        /// </summary>
-        public int Rows { get { return this.options.TerminalOptions.Rows; } }
-
-        /// <summary>
-        /// 终端可以显示的列数
-        /// </summary>
-        public int Columns { get { return this.options.TerminalOptions.Columns; } }
-
-        /// <summary>
         /// 通道类型
         /// </summary>
         public SessionTypeEnum Type { get { return (SessionTypeEnum)this.options.SessionType; } }
+
+        /// <summary>
+        /// 终端行数
+        /// </summary>
+        public int Rows
+        {
+            get { return this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW); }
+        }
+
+        /// <summary>
+        /// 终端列数
+        /// </summary>
+        public int Columns
+        {
+            get { return this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_COL); }
+        }
 
         #endregion
 

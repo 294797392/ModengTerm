@@ -12,10 +12,6 @@ namespace XTerminal.ViewModels
     public class XTermSessionVM : ItemViewModel
     {
         private SessionTypeEnum type;
-        private string host;
-        private int port;
-        private string userName;
-        private string password;
         private DateTime creationTime;
 
         /// <summary>
@@ -28,58 +24,6 @@ namespace XTerminal.ViewModels
             {
                 this.type = value;
                 this.NotifyPropertyChanged("Type");
-            }
-        }
-
-        /// <summary>
-        /// 要连接的主机名
-        /// </summary>
-        public string Host
-        {
-            get { return this.host; }
-            set
-            {
-                this.host = value;
-                this.NotifyPropertyChanged("Host");
-            }
-        }
-
-        /// <summary>
-        /// 要连接的主机端口号
-        /// </summary>
-        public int Port
-        {
-            get { return this.port; }
-            set
-            {
-                this.port = value;
-                this.NotifyPropertyChanged("Port");
-            }
-        }
-
-        /// <summary>
-        /// 用户名
-        /// </summary>
-        public string UserName
-        {
-            get { return this.userName; }
-            set
-            {
-                this.userName = value;
-                this.NotifyPropertyChanged("UserName");
-            }
-        }
-
-        /// <summary>
-        /// 密码
-        /// </summary>
-        public string Password
-        {
-            get { return this.password; }
-            set
-            {
-                this.password = value;
-                this.NotifyPropertyChanged("Password");
             }
         }
 
@@ -99,11 +43,6 @@ namespace XTerminal.ViewModels
             }
         }
 
-        /// <summary>
-        /// 身份验证类型
-        /// </summary>
-        public int AuthType { get; set; }
-
         public XTermSession Session { get; private set; }
 
         public XTermSessionVM(XTermSession session)
@@ -114,11 +53,6 @@ namespace XTerminal.ViewModels
             this.Description = session.Description;
             this.CreationTime = session.CreationTime;
             this.Type = (SessionTypeEnum)session.SessionType;
-            this.AuthType = session.ConnectionOptions.SSHAuthType;
-            this.Host = session.ConnectionOptions.ServerAddress;
-            this.Port = session.ConnectionOptions.ServerPort;
-            this.UserName = session.ConnectionOptions.UserName;
-            this.Password = session.ConnectionOptions.Password;
         }
     }
 }

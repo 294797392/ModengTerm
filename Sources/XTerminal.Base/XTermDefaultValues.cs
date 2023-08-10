@@ -5,8 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using XTerminal.Base.DataModels;
-using XTerminal.Base.DataModels.Session;
-using XTerminal.Base.DataModels.SessionOptions;
 using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base
@@ -30,7 +28,7 @@ namespace XTerminal.Base
         /// <summary>
         /// 每次读取的数据缓冲区大小
         /// </summary>
-        public const int ReadBufferSize = 256;
+        public const int DefaultReadBufferSize = 256;
 
         /// <summary>
         /// 默认打开的会话
@@ -40,29 +38,12 @@ namespace XTerminal.Base
             ID = Guid.Empty.ToString(),
             Name = "命令行",
             SessionType = (int)SessionTypeEnum.Win32CommandLine,
-            MouseOptions = new MouseOptions()
-            {
-                CursorStyle = VTCursorStyles.Line,
-                CursorInterval = XTermDefaultValues.DefaultCursorBlinkInterval
-            },
-            OutputBufferSize = XTermDefaultValues.DefaultOutptBufferSize,
-            InputEncoding = XTermDefaultValues.DefaultInputEncoding,
-            TerminalOptions = new TerminalOptions()
-            {
-                DECPrivateAutoWrapMode = false,
-                Columns = XTermDefaultValues.DefaultTerminalColumns,
-                Rows = XTermDefaultValues.DefaultTerminalRows,
-                Type = (int)TerminalTypeEnum.XTerm256Color
-            },
-            ConnectionOptions = new ConnectionOptions()
         };
 
         /// <summary>
         /// 默认的输入编码方式
         /// </summary>
-        public const string DefaultInputEncoding = "UTF-8";
-
-        public const int DefaultOutptBufferSize = 8192;
+        public const string DefaultOutputEncoding = "UTF-8";
 
         public const int DefaultTerminalColumns = 80;
         public const int DefaultTerminalRows = 24;
@@ -95,7 +76,7 @@ namespace XTerminal.Base
         /// <summary>
         /// 滚轮滚动一下翻两行
         /// </summary>
-        public const int DefaultScrollSensitivity = 2;
+        public const int DefaultScrollDelta = 2;
 
         #region 终端字体
 
