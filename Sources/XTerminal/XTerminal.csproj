@@ -131,11 +131,15 @@
     <Compile Include="ViewModels\SFTPSessionVM.cs" />
     <Compile Include="ViewModels\SFTP\DirectoryNodeVM.cs" />
     <Compile Include="ViewModels\SFTP\FileNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemNodeTypeEnum.cs" />
     <Compile Include="ViewModels\SFTP\FileSystemTreeNodeVM.cs" />
     <Compile Include="ViewModels\SFTP\FileSystemTreeVMContext.cs" />
     <Compile Include="ViewModels\SFTP\FileSystemTreeVM.cs" />
     <Compile Include="ViewModels\SFTP\LocalFileSystemTreeVM.cs" />
     <Compile Include="ViewModels\SFTP\SftpFileSystemTreeVM.cs" />
+    <Compile Include="ViewModels\SFTP\TransferFileVM.cs" />
+    <Compile Include="ViewModels\SFTP\TransferStatusEnum.cs" />
+    <Compile Include="ViewModels\SFTP\TransferTypeEnum.cs" />
     <Compile Include="ViewModels\TerminalSessionVM.cs" />
     <Compile Include="ViewModels\OpenSessionVM.cs" />
     <Compile Include="ViewModels\CollectionVM.cs" />

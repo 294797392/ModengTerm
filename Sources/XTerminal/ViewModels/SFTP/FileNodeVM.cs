@@ -9,6 +9,8 @@ namespace XTerminal.ViewModels.SFTP
 {
     public class FileNodeVM : FileSystemTreeNodeVM
     {
+        public override FileSystemNodeTypeEnum Type => FileSystemNodeTypeEnum.File;
+
         public FileNodeVM(TreeViewModelContext context, object data = null) :
             base(context, data)
         { }

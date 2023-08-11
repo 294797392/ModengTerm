@@ -26,6 +26,7 @@ namespace XTerminal.ViewModels
         #region 实例变量
 
         private SftpClient sftpClient;
+        private XTermSession session;
 
         #endregion
 
@@ -55,12 +56,14 @@ namespace XTerminal.ViewModels
 
         public override int Open(XTermSession session)
         {
-            this.sftpClient = new SftpClient("ubuntu-dev", "oheiheiheiheihei", "18612538605");
-            this.sftpClient.Connect();
+            this.session = session;
 
-            this.ServerTreeVM = new SftpFileSystemTreeVM(this.sftpClient);
-            this.ServerTreeVM.InitialDirectory = session.GetOption<string>(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY);
-            this.ServerTreeVM.Initialize();
+            //this.sftpClient = new SftpClient("ubuntu-dev", "oheiheiheiheihei", "18612538605");
+            //this.sftpClient.Connect();
+
+            //this.ServerTreeVM = new SftpFileSystemTreeVM(this.sftpClient);
+            //this.ServerTreeVM.InitialDirectory = session.GetOption<string>(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY);
+            //this.ServerTreeVM.Initialize();
 
             this.ClientTreeVM = new LocalFileSystemTreeVM();
             this.ClientTreeVM.InitialDirectory = session.GetOption<string>(OptionKeyEnum.SFTP_CLIENT_INITIAL_DIRECTORY);

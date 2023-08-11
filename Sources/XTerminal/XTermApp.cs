@@ -208,6 +208,9 @@ namespace XTerminal
 
             // 新建会话ViewModel
             OpenedSessionVM sessionVM = this.CreateOpenedSessionVM(session);
+            sessionVM.ID = Guid.NewGuid().ToString();
+            sessionVM.Name = session.Name;
+            sessionVM.Description = session.Description;
             sessionVM.Content = sessionContent;
             sessionVM.StatusChanged += this.SessionVM_StatusChanged;
             sessionVM.Open(session);

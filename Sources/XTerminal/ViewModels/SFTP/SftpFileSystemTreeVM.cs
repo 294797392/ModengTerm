@@ -21,7 +21,7 @@ namespace XTerminal.ViewModels.SFTP
             throw new NotImplementedException();
         }
 
-        public override void LoadSubDirectory(string directory)
+        public override IEnumerable<FileSystemTreeNodeVM> GetDirectory(string directory)
         {
             throw new NotImplementedException();
         }

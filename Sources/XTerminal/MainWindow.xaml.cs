@@ -177,13 +177,9 @@ namespace XTerminal
             {
                 return this.DataTemplateOpenSession;
             }
-            else if (item is TerminalSessionVM)
-            {
-                return this.DataTemplateOpenedSession;
-            }
             else
             {
-                return base.SelectTemplate(item, container);
+                return this.DataTemplateOpenedSession;
             }
         }
     }

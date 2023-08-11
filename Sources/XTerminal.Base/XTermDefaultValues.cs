@@ -91,6 +91,11 @@ namespace XTerminal.Base
         public const string SFTPServerInitialDirectory = "/";
         public static readonly string SFTPClientInitialDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
 
+        /// <summary>
+        /// 最多记录100个历史目录
+        /// </summary>
+        public const int MaxHistoryDirectory = 100;
+
         #endregion
     }
 }

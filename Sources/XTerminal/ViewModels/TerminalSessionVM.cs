@@ -45,11 +45,6 @@ namespace XTerminal.ViewModels
         }
 
         /// <summary>
-        /// 会话类型
-        /// </summary>
-        public SessionTypeEnum Type { get; set; }
-
-        /// <summary>
         /// 该会话所维护的终端
         /// </summary>
         public VideoTerminal VideoTerminal { get { return this.videoTerminal; } }
@@ -72,10 +67,6 @@ namespace XTerminal.ViewModels
         public override int Open(XTermSession session)
         {
             this.session = session;
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = session.Name;
-            this.Description = session.Description;
-            this.Type = (SessionTypeEnum)session.SessionType;
 
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;

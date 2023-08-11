@@ -2643,11 +2643,6 @@
             存储所有节点列表
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.TreeViewModelContext.NodeList">
-            <summary>
-            获取树形列表里的所有的节点列表
-            </summary>
-        </member>
         <member name="P:WPFToolkit.MVVM.TreeViewModelContext.SelectedItem">
             <summary>
             当前选中的节点
@@ -2675,12 +2670,10 @@
             </summary>
             <param name="nodeID"></param>
         </member>
-        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.QueryNode``1(System.Func{``0,System.Boolean})">
+        <member name="M:WPFToolkit.MVVM.TreeViewModelContext.ClearNode">
             <summary>
-            根据条件查询节点，如果没查询到则返回null
+            清空所有节点
             </summary>
-            <param name="predicate"></param>
-            <returns></returns>
         </member>
         <member name="T:WPFToolkit.MVVM.TreeNodeViewModel">
             <summary>
@@ -2732,6 +2725,13 @@
             控制该节点是否显示
             </summary>
         </member>
+        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.#ctor(WPFToolkit.MVVM.TreeViewModelContext,System.Object)">
+            <summary>
+            构造方法
+            </summary>
+            <param name="context">树形列表上下文信息</param>
+            <param name="data">该节点所包含的数据</param>
+        </member>
         <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.AddChildNode(WPFToolkit.MVVM.TreeNodeViewModel)">
             <summary>
             增加一个子节点
@@ -2743,11 +2743,6 @@
             删除一个子节点
             </summary>
             <param name="node">要删除的子节点</param>
-        </member>
-        <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.OnInitialized">
-            <summary>
-            当子节点加载完毕的时候触发
-            </summary>
         </member>
         <member name="T:WPFToolkit.MVVM.TreeViewModel`1">
             <summary>
@@ -2791,11 +2786,11 @@
             </summary>
             <param name="root">要增加的根节点</param>
         </member>
-        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.RemoveRootNode(WPFToolkit.MVVM.TreeNodeViewModel)">
+        <member name="M:WPFToolkit.MVVM.TreeViewModel`1.ClearRootNode">
             <summary>
-            删除一个根节点
+            删除所有节点
+            包括清空缓存的节点
             </summary>
-            <param name="root"></param>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModel`1.TryGetNode(System.String,WPFToolkit.MVVM.TreeNodeViewModel@)">
             <summary>
@@ -2835,6 +2830,21 @@
         <member name="F:WPFToolkit.MVVM.ViewModelBase.description">
             <summary>
             冗余Description属性
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ViewModelBase.Name">
+            <summary>
+            名字
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ViewModelBase.Description">
+            <summary>
+            描述信息
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.ViewModelBase.ID">
+            <summary>
+            唯一标识符
             </summary>
         </member>
         <member name="T:WPFToolkit.MarkupExtensions.EnumItemsSource">

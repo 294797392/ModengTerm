@@ -96,8 +96,9 @@
             </Grid.RowDefinitions>
 
             <!-- 打开的终端列表Tab页 -->
-            <ListBox Grid.Row="0" x:Name="ListBoxOpenedSessionTab" DataContext="{Binding Source={x:Static local:XTermApp.Context}}" ItemsSource="{Binding Path=OpenedSessionList}"
-                     SelectedItem="{Binding Path=SelectedOpenedSession}" SelectionChanged="ListBoxOpenedSessionTab_SelectionChanged"
+            <ListBox Grid.Row="0" x:Name="ListBoxOpenedSessionTab" DataContext="{Binding Source={x:Static local:XTermApp.Context}}" 
+                     ItemsSource="{Binding Path=OpenedSessionList}" SelectedItem="{Binding Path=SelectedOpenedSession}" 
+                     SelectionChanged="ListBoxOpenedSessionTab_SelectionChanged"
                      Style="{StaticResource ResourceKey=StyleListBoxTerminalWindowList}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
