@@ -27,7 +27,7 @@ namespace XTerminal.UserControls
             InitializeComponent();
         }
 
-        #region IViewportFiller
+        #region SessionContent
 
         public override int Open(XTermSession session)
         {

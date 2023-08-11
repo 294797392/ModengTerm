@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -82,6 +83,13 @@ namespace XTerminal.Base
 
         public static readonly Brush Foreground = Brushes.Black;
         public static readonly double FontSize = 14;
+
+        #endregion
+
+        #region SFTP
+
+        public const string SFTPServerInitialDirectory = "/";
+        public static readonly string SFTPClientInitialDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory);
 
         #endregion
     }

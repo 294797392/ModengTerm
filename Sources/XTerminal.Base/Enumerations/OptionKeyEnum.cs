@@ -36,6 +36,10 @@ namespace XTerminal.Base.Enumerations
         CURSOR_STYLE,
         CURSOR_INTERVAL,
 
-        MOUSE_SCROLL_DELTA
+        MOUSE_SCROLL_DELTA,
+
+
+        SFTP_SERVER_INITIAL_DIRECTORY,
+        SFTP_CLIENT_INITIAL_DIRECTORY
     }
 }

@@ -18,6 +18,8 @@ namespace XTerminal.ViewModels
 {
     public class CreateSessionVM : ViewModelBase
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionVM");
+
         #region 实例变量
 
         private string sshPort;
@@ -34,6 +36,9 @@ namespace XTerminal.ViewModels
         private OptionTreeVM optionTreeVM;
 
         private string mouseScrollDelta;
+
+        private string sftpServerInitialDir;
+        private string sftpClientInitialDir;
 
         #endregion
 
@@ -248,6 +253,39 @@ namespace XTerminal.ViewModels
             }
         }
 
+
+        /// <summary>
+        /// SFTP初始目录
+        /// </summary>
+        public string SFTPServerInitialDirectory
+        {
+            get { return this.sftpServerInitialDir; }
+            set
+            {
+                if (this.sftpServerInitialDir != value)
+                {
+                    this.sftpServerInitialDir = value;
+                    this.NotifyPropertyChanged("SFTPInitialDirectory");
+                }
+            }
+        }
+
+        /// <summary>
+        /// SFTP客户端初始化目录
+        /// </summary>
+        public string SFTPClientInitialDirectory
+        {
+            get { return this.sftpClientInitialDir; }
+            set
+            {
+                if (this.sftpClientInitialDir != value)
+                {
+                    this.sftpClientInitialDir = value;
+                    this.NotifyPropertyChanged("SFTPClientInitialDirectory");
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -294,6 +332,10 @@ namespace XTerminal.ViewModels
             this.ForegroundList.SelectedItem = this.ForegroundList.FirstOrDefault();
 
             this.MouseScrollDelta = XTermDefaultValues.DefaultScrollDelta.ToString();
+
+            this.SFTPServerInitialDirectory = XTermDefaultValues.SFTPServerInitialDirectory;
+            this.SFTPClientInitialDirectory = XTermDefaultValues.SFTPClientInitialDirectory;
+
         }
 
         #endregion
@@ -467,6 +509,28 @@ namespace XTerminal.ViewModels
             return true;
         }
 
+        private bool GetSFTPOptions(XTermSession session)
+        {
+            string serverInitialDir = this.SFTPServerInitialDirectory;
+            if (string.IsNullOrEmpty(serverInitialDir))
+            {
+                serverInitialDir = XTermDefaultValues.SFTPServerInitialDirectory;
+            }
+
+            string clientInitialDir = this.SFTPClientInitialDirectory;
+            if (string.IsNullOrEmpty(clientInitialDir) ||
+                !Directory.Exists(clientInitialDir))
+            {
+                clientInitialDir = XTermDefaultValues.SFTPClientInitialDirectory;
+            }
+
+            session.SetOption<string>(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY, serverInitialDir);
+            session.SetOption<string>(OptionKeyEnum.SFTP_CLIENT_INITIAL_DIRECTORY, clientInitialDir);
+
+            return true;
+        }
+
+
 
         private bool CollectOptions(XTermSession session)
         {
@@ -501,6 +565,15 @@ namespace XTerminal.ViewModels
                             return false;
                         }
                         break;
+                    }
+
+                case SessionTypeEnum.SFTP:
+                    {
+                        if(!this.GetSFTPOptions(session))
+                        {
+                            return false;
+                        }
+                        return true;
                     }
 
                 default:

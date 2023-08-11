@@ -33,6 +33,6 @@ namespace XTerminal.Base.Enumerations
         /// <summary>
         /// SFTP会话
         /// </summary>
-        SFTP
+        SFTP = 4
     }
 }

@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="XTerminal.UserControls.FileSystemTreeUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:XTerminal.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="StyleTreeViewItemLocal" TargetType="{x:Type TreeViewItem}">
+                <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </Style>
+
+            <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateLocal" ItemsSource="{Binding Path=Children}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Image Grid.Column="0"/>
+
+                    <TextBlock Grid.Column="1" Text="{Binding Path=Name}"/>
+
+                </Grid>
+            </HierarchicalDataTemplate>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TreeView Grid.Column="0" ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemLocal}">
+            
+        </TreeView>
+
+        <ListBox Grid.Column="2"/>
+
+    </Grid>
+</UserControl>

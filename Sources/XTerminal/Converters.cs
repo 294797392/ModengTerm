@@ -72,6 +72,7 @@ namespace XTerminal
                 case SessionTypeEnum.libvtssh:
                 case SessionTypeEnum.SSH: return "SSH";
                 case SessionTypeEnum.Win32CommandLine: return "命令行";
+                case SessionTypeEnum.SFTP: return "SFTP";
 
                 default:
                     throw new NotImplementedException();

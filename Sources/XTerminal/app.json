@@ -32,6 +32,14 @@
             "description": "",
             "icon": "",
             "type": 3
+        },
+
+        {
+            "id": "4",
+            "name": "SFTP",
+            "description": "",
+            "icon": "",
+            "type": 4
         }
     ],
 

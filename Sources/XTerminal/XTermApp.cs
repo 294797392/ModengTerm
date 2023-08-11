@@ -204,11 +204,15 @@ namespace XTerminal
 
         public OpenedSessionVM OpenSession(XTermSession session)
         {
+            SessionContent sessionContent = SessionContentFactory.Create(session);
+
             // 新建会话ViewModel
             OpenedSessionVM sessionVM = this.CreateOpenedSessionVM(session);
-            sessionVM.Content = SessionContentFactory.Create(session);
+            sessionVM.Content = sessionContent;
             sessionVM.StatusChanged += this.SessionVM_StatusChanged;
             sessionVM.Open(session);
+
+            sessionContent.DataContext = sessionVM;
 
             // 添加到界面上，因为最后一个元素是打开Session的TabItem，所以要添加到倒数第二个元素的位置
             this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);

@@ -7,7 +7,7 @@ using WPFToolkit.MVVM;
 
 namespace XTerminal.ViewModels.SFTP
 {
-    public class FileNodeVM : SftpNodeVM
+    public class FileNodeVM : FileSystemTreeNodeVM
     {
         public FileNodeVM(TreeViewModelContext context, object data = null) :
             base(context, data)

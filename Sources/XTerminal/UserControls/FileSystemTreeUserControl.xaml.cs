@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace XTerminal.UserControls
 {
     /// <summary>
-    /// FileExplorerUserControl.xaml 的交互逻辑
+    /// FileSystemTreeUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class FileExplorerUserControl : UserControl
+    public partial class FileSystemTreeUserControl : UserControl
     {
-        public FileExplorerUserControl()
+        public FileSystemTreeUserControl()
         {
             InitializeComponent();
         }

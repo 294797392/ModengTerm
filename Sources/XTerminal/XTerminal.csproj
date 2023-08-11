@@ -53,11 +53,17 @@
     <Reference Include="log4net">
       <HintPath>..\..\Dependence\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Expression.Interactions">
+      <HintPath>..\..\Dependence\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity">
+      <HintPath>..\..\Dependence\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -92,8 +98,8 @@
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
     <Compile Include="ServiceAgents\FileServiceAgent.cs" />
     <Compile Include="ServiceAgents\ServiceAgent.cs" />
-    <Compile Include="UserControls\FileExplorerUserControl.xaml.cs">
-      <DependentUpon>FileExplorerUserControl.xaml</DependentUpon>
+    <Compile Include="UserControls\FileSystemTreeUserControl.xaml.cs">
+      <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\SessionContent.cs" />
     <Compile Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml.cs">
@@ -125,9 +131,11 @@
     <Compile Include="ViewModels\SFTPSessionVM.cs" />
     <Compile Include="ViewModels\SFTP\DirectoryNodeVM.cs" />
     <Compile Include="ViewModels\SFTP\FileNodeVM.cs" />
-    <Compile Include="ViewModels\SFTP\SftpNodeVM.cs" />
-    <Compile Include="ViewModels\SFTP\SftpTreeViewModelContext.cs" />
-    <Compile Include="ViewModels\SFTP\SftpTreeVM.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemTreeNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemTreeVMContext.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemTreeVM.cs" />
+    <Compile Include="ViewModels\SFTP\LocalFileSystemTreeVM.cs" />
+    <Compile Include="ViewModels\SFTP\SftpFileSystemTreeVM.cs" />
     <Compile Include="ViewModels\TerminalSessionVM.cs" />
     <Compile Include="ViewModels\OpenSessionVM.cs" />
     <Compile Include="ViewModels\CollectionVM.cs" />
@@ -164,7 +172,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UserControls\FileExplorerUserControl.xaml">
+    <Page Include="UserControls\FileSystemTreeUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
