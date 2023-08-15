@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
+using XTerminal.Base.SftpTrasmit;
 
 namespace XTerminal.ViewModels.SFTP
 {
@@ -12,15 +13,15 @@ namespace XTerminal.ViewModels.SFTP
     /// </summary>
     public class TransferFileVM : ItemViewModel
     {
-        private TransferTypeEnum type;
-        private TransferStatusEnum status;
+        private SftpTransmitTypeEnum type;
+        private TransmitStatusEnum status;
         private double progress;
         private long size;
         private string localPath;
         private string remotePath;
         private double speed;
 
-        public TransferTypeEnum Type
+        public SftpTransmitTypeEnum Type
         {
             get { return this.type; }
             set
@@ -33,7 +34,7 @@ namespace XTerminal.ViewModels.SFTP
             }
         }
 
-        public TransferStatusEnum Status
+        public TransmitStatusEnum Status
         {
             get { return this.status; }
             set

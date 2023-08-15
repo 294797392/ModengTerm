@@ -294,6 +294,7 @@ namespace XTerminal
 
             this.isRunning = true;
 
+            this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
             this.terminalRows = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             this.terminalColumns = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 

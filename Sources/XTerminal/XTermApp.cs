@@ -83,11 +83,6 @@ namespace XTerminal
         #region 属性
 
         /// <summary>
-        /// 此App不异步初始化
-        /// </summary>
-        protected override bool AsyncInitializing => false;
-
-        /// <summary>
         /// 访问服务的代理
         /// </summary>
         public ServiceAgent ServiceAgent { get; private set; }

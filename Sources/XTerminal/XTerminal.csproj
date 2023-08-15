@@ -125,10 +125,12 @@
     <Compile Include="ViewModels\CollectionItem\CollectionItemVM.cs" />
     <Compile Include="ViewModels\CollectionItem\TextItemVM.cs" />
     <Compile Include="ViewModels\CreateSessionVM.cs" />
+    <Compile Include="ViewModels\DelegateCommand.cs" />
     <Compile Include="ViewModels\GroupVM.cs" />
     <Compile Include="ViewModels\OptionTreeVM.cs" />
     <Compile Include="ViewModels\OptionTreeNodeVM.cs" />
     <Compile Include="ViewModels\SFTPSessionVM.cs" />
+    <Compile Include="ViewModels\SFTP\ContextMenuItemVM.cs" />
     <Compile Include="ViewModels\SFTP\DirectoryNodeVM.cs" />
     <Compile Include="ViewModels\SFTP\FileNodeVM.cs" />
     <Compile Include="ViewModels\SFTP\FileSystemNodeTypeEnum.cs" />
@@ -138,8 +140,6 @@
     <Compile Include="ViewModels\SFTP\LocalFileSystemTreeVM.cs" />
     <Compile Include="ViewModels\SFTP\SftpFileSystemTreeVM.cs" />
     <Compile Include="ViewModels\SFTP\TransferFileVM.cs" />
-    <Compile Include="ViewModels\SFTP\TransferStatusEnum.cs" />
-    <Compile Include="ViewModels\SFTP\TransferTypeEnum.cs" />
     <Compile Include="ViewModels\TerminalSessionVM.cs" />
     <Compile Include="ViewModels\OpenSessionVM.cs" />
     <Compile Include="ViewModels\CollectionVM.cs" />

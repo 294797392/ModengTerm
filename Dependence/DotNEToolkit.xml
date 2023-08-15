@@ -159,6 +159,15 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:DotNEToolkit.DataModels.BizModel">
+            <summary>
+            存储业务相关的数据模型
+            也可以看成是运行时数据模型
+            
+            业务模型在软件设计中的层次结构：
+            DataBase -> DataModel -> BizModel -> AppLogic
+            </summary>
+        </member>
         <member name="T:DotNEToolkit.DataModels.ModelBaseInt">
             <summary>
             ID是int类型的数据模型
@@ -454,6 +463,11 @@
             <param name="g"></param>
             <param name=""></param>
         </member>
+        <member name="T:DotNEToolkit.Media.Video.VideoDecodeType">
+            <summary>
+            视频解码器类型
+            </summary>
+        </member>
         <member name="T:DotNEToolkit.Media.Video.libvlcPlay">
             <summary>
             封装vlc视频播放器
@@ -488,34 +502,11 @@
             播放器会自动使用缓冲区里的视频流数据
             </summary>
         </member>
-        <member name="F:DotNEToolkit.Media.Video.VideoPlay.DefaultTimeout">
-            <summary>
-            默认的播放超时时间是5秒钟
-            </summary>
-        </member>
         <member name="F:DotNEToolkit.Media.Video.VideoPlay.EV_EOF">
             <summary>
             视频播放结束
             当播放的是文件的时候，才可能会触发这个事件
             </summary>
-        </member>
-        <member name="F:DotNEToolkit.Media.Video.VideoPlay.timeout">
-            <summary>
-            播放超时时间
-            如果超过这个时间还是没有取到视频流，那么默认超时，采取的操作是关闭播放器
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Media.Video.VideoPlay.Hwnd">
-            <summary>
-            渲染视频的窗口句柄
-            音频写Inptr.Zero
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Media.Video.VideoPlay.Write(System.Byte[])">
-            <summary>
-            写入媒体数据
-            </summary>
-            <param name="videoData"></param>
         </member>
         <member name="T:DotNEToolkit.Media.Video.VideoPlayType">
             <summary>
@@ -527,14 +518,42 @@
             使用libvlc播放
             </summary>
         </member>
+        <member name="F:DotNEToolkit.Media.MediaPlay.DefaultTimeout">
+            <summary>
+            默认的播放超时时间是5秒钟
+            </summary>
+        </member>
         <member name="E:DotNEToolkit.Media.MediaPlay.StatusChanged">
             <summary>
             播放器状态发生改变的时候触发
             </summary>
         </member>
+        <member name="F:DotNEToolkit.Media.MediaPlay.timeout">
+            <summary>
+            播放超时时间
+            如果超过这个时间还是没有取到视频流，那么默认超时，采取的操作是关闭播放器
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Media.MediaPlay.Hwnd">
+            <summary>
+            渲染视频的窗口句柄
+            音频写Inptr.Zero
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Media.MediaPlay.FileURI">
+            <summary>
+            指定要播放的文件的路径
+            可以是网络路径
+            </summary>
+        </member>
         <member name="P:DotNEToolkit.Media.MediaPlay.Format">
             <summary>
             该播放器支持的格式
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Media.MediaPlay.PlayStatus">
+            <summary>
+            当前播放状态
             </summary>
         </member>
         <member name="M:DotNEToolkit.Media.MediaPlay.Start">
@@ -548,15 +567,15 @@
             停止播放
             </summary>
         </member>
+        <member name="M:DotNEToolkit.Media.MediaPlay.Write(System.Byte[])">
+            <summary>
+            写入媒体数据
+            </summary>
+            <param name="videoData"></param>
+        </member>
         <member name="T:DotNEToolkit.Media.MediaPlayFactory">
             <summary>
             创建返回值是MediaPlay的播放器实例
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Media.MediaPlayStatus.Completed">
-            <summary>
-            播放结束
-            播放本地音视频文件的时候触发
             </summary>
         </member>
         <member name="M:DotNEToolkit.Media.MediaRecord.Start">
@@ -572,7 +591,7 @@
         </member>
         <member name="P:DotNEToolkit.Media.MediaStream.Size">
             <summary>
-            当前的数据大小
+            当前的数据总大小
             </summary>
         </member>
         <member name="P:DotNEToolkit.Media.MediaStream.IsClosed">
@@ -580,14 +599,24 @@
             流是否被关闭
             </summary>
         </member>
-        <member name="M:DotNEToolkit.Media.MediaStream.Read(System.Int32,System.Byte[]@)">
+        <member name="M:DotNEToolkit.Media.MediaStream.Read(System.Byte[])">
             <summary>
-            从缓冲区里拿到小于等于requestSize长度的数据
+            从缓冲区里拿到小于等于buffer长度的数据
             如果缓冲区里没有数据，那么会返回false，否则返回true
-            注意buffer的长度有可能比requestSize小
+            注意buffer的长度有可能比buffer.Length小
             </summary>
-            <param name="requestSize">要获取的数据长度</param>
             <param name="buffer">存储视频数据的缓冲区</param>
+            <returns>
+            0：没取到数据
+            大于0：取到的数据大小
+            </returns>
+        </member>
+        <member name="M:DotNEToolkit.Media.MediaStream.Read2(System.Byte[])">
+            <summary>
+            从缓冲区里拿到等于buffer长度的数据
+            如果当前缓冲区的大小小于buffer，那么直接返回0
+            </summary>
+            <param name="buffer"></param>
             <returns></returns>
         </member>
         <member name="M:DotNEToolkit.Media.MediaStream.ReadAll">
@@ -608,37 +637,22 @@
             清空缓冲区中的所有数据
             </summary>
         </member>
-        <member name="M:DotNEToolkit.Media.MediaStream.Read(System.Int32,System.Int32,System.Byte[]@)">
-            <summary>
-            使用一个超时时间读取数据
-            </summary>
-            <param name="requestSize"></param>
-            <param name="timeout"></param>
-            <param name="buffer"></param>
-            <returns></returns>
-        </member>
         <member name="T:DotNEToolkit.Media.AVFormats">
             <summary>
             定义音视频格式
             </summary>
         </member>
-        <member name="F:DotNEToolkit.Media.AVFormats.Unkown">
-            <summary>
-            未知格式
-            播放器会自动检测
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Media.AVFormats.H264">
+        <member name="F:DotNEToolkit.Media.AVFormats.AV_FORMAT_H264">
             <summary>
             H264视频格式
             </summary>
         </member>
-        <member name="F:DotNEToolkit.Media.AVFormats.PCM">
+        <member name="F:DotNEToolkit.Media.AVFormats.AV_FORMAT_PCM">
             <summary>
             PCM音频原始数据格式
             </summary>
         </member>
-        <member name="F:DotNEToolkit.Media.AVFormats.G711_ALAW">
+        <member name="F:DotNEToolkit.Media.AVFormats.AV_FORMAT_G711_ALAW">
             <summary>
             G711音频编码方式
             </summary>
@@ -656,6 +670,7 @@
         <member name="P:DotNEToolkit.Media.Audio.AudioPlay.SamplesPerSec">
             <summary>
             采样率
+            每秒钟的采样次数
             </summary>
         </member>
         <member name="P:DotNEToolkit.Media.Audio.AudioPlay.BitsPerSample">
@@ -679,13 +694,6 @@
             缓冲区里的数据是一秒钟的音频数据
             </summary>
         </member>
-        <member name="M:DotNEToolkit.Media.Audio.AudioPlay.PlayFile(System.String)">
-            <summary>
-            播放一个音频文件
-            该方法是同步方法，会阻塞当前线程直到音频文件播放完了为止
-            </summary>
-            <param name="fileURI">要播放的音频文件的地址</param>
-        </member>
         <member name="T:DotNEToolkit.Media.Audio.AudioPlayType">
             <summary>
             录音机类型
@@ -699,6 +707,11 @@
         <member name="F:DotNEToolkit.Media.Audio.AudioPlayType.libvlc">
             <summary>
             使用libvlc播放音频
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Media.Audio.AudioPlayType.WaveAPI">
+            <summary>
+            使用WaveAPI
             </summary>
         </member>
         <member name="T:DotNEToolkit.Media.Audio.AudioRecordType">
@@ -719,6 +732,12 @@
         <member name="T:DotNEToolkit.Media.Audio.AudioRecordFactory">
             <summary>
             录音机工厂
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Media.Audio.DirectSoundPlay.syncContext">
+            <summary>
+            创建DirectSound实例的线程要和播放在同一个线程操作
+            不然播放的时候会崩溃，报E_NOINTERFACE的错误
             </summary>
         </member>
         <member name="T:DotNEToolkit.Media.Audio.WaveAPIRecord">
@@ -929,6 +948,562 @@
             <param name="ulaw"></param>
             <returns></returns>
         </member>
+        <member name="T:DotNEToolkit.Modular.Attributes.ModuleInputAttribute">
+            <summary>
+            定义模块的输入参数
+            1. 工作流设计器使用
+            2. 方便开发者一眼就可以看到模块有哪些输出值
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.Key">
+            <summary>
+            参数的键
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.ValueType">
+            <summary>
+            参数类型
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.Description">
+            <summary>
+            参数描述
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.Optional">
+            <summary>
+            该参数是否是可选参数
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.IsClass">
+            <summary>
+            表示该输入是否是一个类类型
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.#ctor(System.String,System.String,System.Type,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="description"></param>
+            <param name="key"></param>
+            <param name="valueType"></param>
+            <param name="optional">true：可空，false：不可空</param>
+        </member>
+        <member name="M:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.#ctor(System.String,System.Type,System.Boolean)">
+            <summary>
+            当输入是一个类类型使用
+            </summary>
+            <param name="description"></param>
+            <param name="optional"></param>
+        </member>
+        <member name="M:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.#ctor(System.String,System.Boolean)">
+            <summary>
+            当输入是一个属性类型的时候使用
+            </summary>
+            <param name="description"></param>
+            <param name="optional"></param>
+        </member>
+        <member name="T:DotNEToolkit.Modular.Attributes.ModulePropertyAttribute">
+            <summary>
+            表示一个模块的公开属性
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.Attributes.ModuleActionAttribute">
+            <summary>
+            表示一个模块的调用操作
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.Attributes.ModuleActionAttribute.Name">
+            <summary>
+            动作的名字
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.Attributes.ModuleActionAttribute.Manually">
+            <summary>
+            是否在界面上手动触发
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.Attributes.ModuleInstanceAttribute">
+            <summary>
+            工作流设计器使用
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.Attributes.ModuleOutputAttribute">
+            <summary>
+            定义模块的输出数据
+            1. 工作流设计器使用
+            2. 方便开发者一眼就可以看到模块有哪些输出值
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleFactoryOptions.AsyncInitializing">
+            <summary>
+            是否使用异步加载模块
+            默认true
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleFactoryOptions.ModuleList">
+            <summary>
+            要加载的模块列表
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleFactoryOptions.ReInitializeInterval">
+            <summary>
+            当初始化某个模块失败的时候，会重新初始化
+            这个值指定重新初始化模块的间隔时间，单位是毫秒，默认2000
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.AppModule`1">
+            <summary>
+            在Module基础上实现一个ModularApp里的Module
+            </summary>
+            <typeparam name="TApp"></typeparam>
+            <typeparam name="TManifest"></typeparam>
+        </member>
+        <member name="P:DotNEToolkit.Modular.AppModule`1.AppManifest">
+            <summary>
+            该Module所属的AppManifest
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleEventDlg">
+            <summary>
+            处理模块事件的委托
+            </summary>
+            <param name="sender">发布该事件的模块实例</param>
+            <param name="eventArgs">事件参数</param>
+        </member>
+        <member name="T:DotNEToolkit.Modular.EventRollbackDlg">
+            <summary>
+            当事件执行失败的时候，要执行的回滚操作
+            </summary>
+            <param name="sender"></param>
+            <param name="args"></param>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleExtensions">
+            <summary>
+            模块的附加功能
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleExtensions.SetupWCFHttpService``1(DotNEToolkit.Modular.ModuleBase,System.EventHandler,System.EventHandler,System.ServiceModel.Web.WebServiceHost@)">
+            <summary>
+            快速初始化一个WCF WebService
+            </summary>
+            <typeparam name="TServiceContract"></typeparam>
+            <param name="webModule"></param>
+            <param name="openedDlg"></param>
+            <param name="closedDlg"></param>
+            <param name="svchost"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.IConfigReader.Initialize(System.String)">
+            <summary>
+            初始化Reader
+            </summary>
+            <param name="configPath"></param>
+        </member>
+        <member name="M:DotNEToolkit.Modular.IConfigReader.ReadValue(System.String)">
+            <summary>
+            读取配置项
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DotNEToolkit.Modular.IModuleInstance">
+            <summary>
+            模块实例公共接口
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.IModuleInstance.Status">
+            <summary>
+            模块状态
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.IModuleInstance.ID">
+            <summary>
+            模块ID
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.IModuleInstance.Name">
+            <summary>
+            模块名称
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.IModuleInstance.Description">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.IModuleInstance.Definition">
+            <summary>
+            描述文件
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.IModuleInstance.Factory">
+            <summary>
+            所属的工厂
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.IModuleInstance.Initialize">
+            <summary>
+            初始化模块
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.IModuleInstance.Release">
+            <summary>
+            释放模块
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleBase">
+            <summary>
+            表示一个抽象的模块
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleBase.logger">
+            <summary>
+            日志记录器
+            </summary>
+        </member>
+        <member name="E:DotNEToolkit.Modular.ModuleBase.OnEvent">
+            <summary>
+            当有事件触发的时候触发
+            int:EventTyep
+            object:EventParam
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.Status">
+            <summary>
+            模块当前的状态
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.ID">
+            <summary>
+            模块ID
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.Name">
+            <summary>
+            模块名字
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.Description">
+            <summary>
+            模块的描述信息
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.Definition">
+            <summary>
+            模块的定义
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.Factory">
+            <summary>
+            模块所属工厂
+            在ModuleFactory里被赋值
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.Properties">
+            <summary>
+            模块当前的输出参数
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleBase.InputParameters">
+            <summary>
+            模块的输入参数
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.#ctor">
+            <summary>
+            构造方法
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.Initialize">
+            <summary>
+            初始化模块
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.Release">
+            <summary>
+            释放模块占用的资源
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.NotifyEvent(System.Int32,System.Object)">
+            <summary>
+            通知外部模块有事件触发
+            </summary>
+            <param name="eventType"></param>
+            <param name="eventParam"></param>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.GetParameter``1(System.String,``0)">
+            <summary>
+            读取该模块的输入参数
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.SetParameter``1(System.String,``0)">
+            <summary>
+            设置参数
+            注意如果设置的参数是类类型，那么会先把类序列化成字符串
+            所以不能序列化带有状态的类，只能序列化一些数据模型类
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.OnInitialize">
+            <summary>
+            子类初始化
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleBase.OnRelease">
+            <summary>
+            子类释放资源
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleDefinition">
+            <summary>
+            存储模块的信息
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleDefinition.ID">
+            <summary>
+            模块ID
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleDefinition.Name">
+            <summary>
+            模块名字
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleDefinition.Description">
+            <summary>
+            描述
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleDefinition.MetadataID">
+            <summary>
+            组件类型ID
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleDefinition.ClassName">
+            <summary>
+            模块的完整类型名
+            如果该值不为空，那么优先根据该值去创建实例
+            如果该值为空，那么会根据MetadataID去创建实例
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleDefinition.Flags">
+            <summary>
+            模块的标志位
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleDefinition.InputParameters">
+            <summary>
+            输入配置参数
+            执行模块的构造方法的时候，会动态把所依赖的模块实例反射并赋值给该模块的属性
+            避免了每次都要调用LookupModule去查找模块，麻烦
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleDefinition.#ctor">
+            <summary>
+            构造方法
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleDefinition.HasFlag(System.Int32)">
+            <summary>
+            判断该模块是否包含指定的选项
+            </summary>
+            <param name="flag"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleDefinition.SetFlag(System.Int32)">
+            <summary>
+            设置该模块的选项
+            </summary>
+            <param name="flag"></param>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleDefinition.CloneInputParameters">
+            <summary>
+            克隆一份输入参数
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleFactory">
+            <summary>
+            模块工厂
+            </summary>
+        </member>
+        <member name="E:DotNEToolkit.Modular.ModuleFactory.Initialized">
+            <summary>
+            当所有模块都加载完成的时候触发
+            只有在异步加载模块的时候才会触发
+            </summary>
+        </member>
+        <member name="E:DotNEToolkit.Modular.ModuleFactory.ModuleStatusChanged">
+            <summary>
+            当模块状态改变的时候触发
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleFactory.moduleList">
+            <summary>
+            存储已经加载了的模块
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleFactory.MetadataList">
+            <summary>
+            所有模块的元数据信息
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.#ctor">
+            <summary>
+            构造方法
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.InitializeModule(DotNEToolkit.Modular.ModuleBase,System.Int32,DotNEToolkit.Modular.ModuleBase)">
+            <summary>
+            初始化一个模块，会解析依赖项
+            </summary>
+            <param name="moduleInst">要初始化的模块</param>
+            <param name="interval">
+            > 0  : 重新初始化的间隔时间，如果初始化失败，那么会一直初始化
+            = -1 : 失败直接返回，不尝试重新初始化
+            </param>
+            <param name="baseModule">当前初始化的模块</param>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.CreateModuleInstance(System.Collections.Generic.IEnumerable{DotNEToolkit.Modular.ModuleDefinition})">
+            <summary>
+            创建模块的实例
+            只创建实例，不调用Initialize方法
+            </summary>
+            <param name="initialModules"></param>
+            <returns>返回创建了的模块个数</returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.LookupModuleMetadatas">
+            <summary>
+            读取所有的类型定义
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.CreateFactory(DotNEToolkit.Modular.ModuleFactoryOptions)">
+            <summary>
+            创建一个空的工厂
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.Initialize">
+            <summary>
+            初始化ModuleFactory
+            1. 根据Options加载模块
+            
+            同步加载：如果初始化摸个模块失败，那么就返回FAILED
+            异步加载：永远返回SUCCESS
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.LookupModule``1(System.String)">
+            <summary>
+            根据ID查找系统中可用的组件
+            如果ID为空，则返回第一个可用的组件
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.LookupModule``1">
+            <summary>
+            查找指定类型的组件，如果有多个，则返回第一个
+            </summary>
+            <typeparam name="TModuleInstance"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.LookupModule(System.Type)">
+            <summary>
+            根据模块类型获取对应的模块实例
+            </summary>
+            <param name="targetType">要获取的模块类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.CreateModuleInstance">
+            <summary>
+            创建所有模块的实例
+            只创建实例，不初始化
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Modular.ModuleFactory.InitializeModuleInstance">
+            <summary>
+            根据同步或者异步配置，来初始化模块
+            ModuleFactoryOptions.AsyncInitializing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleFlags">
+            <summary>
+            模块的标志位
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleFlags.Disabled">
+            <summary>
+            模块被禁用
+            告诉ModuleFactory不要加载该模块
+            该模块不会被加到缓存里
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleStatus">
+            <summary>
+            表示一个模块的状态
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleStatus.UnInitialized">
+            <summary>
+            空闲状态
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleStatus.Initialized">
+            <summary>
+            模块初始化成功
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleStatus.InitializeFailed">
+            <summary>
+            初始化失败
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleStatus.Initializing">
+            <summary>
+            初始化中
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Modular.ModuleStatus.InitializeException">
+            <summary>
+            初始化异常
+            </summary>
+        </member>
+        <member name="T:DotNEToolkit.Modular.ModuleMetadata">
+            <summary>
+            存储模块的元数据信息
+            ModuleFactory通过TypeID找到ModuleMetadata，然后动态创建模块实例
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleMetadata.ID">
+            <summary>
+            唯一标志符
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleMetadata.Name">
+            <summary>
+            模块的默认的名字
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Modular.ModuleMetadata.ClassName">
+            <summary>
+            模块的完整类型名
+            </summary>
+        </member>
         <member name="T:DotNEToolkit.Excels.ReadOptions">
             <summary>
             指定对Excel里的空列的处理方式
@@ -955,17 +1530,49 @@
             向源文件追加新文件
             </summary>
         </member>
+        <member name="T:DotNEToolkit.Utility.CSVSplitters">
+            <summary>
+            CSV文件的分隔符
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Utility.CSVSplitters.Unkown">
+            <summary>
+            未知
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Utility.CSVSplitters.Comma">
+            <summary>
+            逗号分隔
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Utility.CSVSplitters.Space">
+            <summary>
+            空格分隔
+            </summary>
+        </member>
+        <member name="F:DotNEToolkit.Utility.CSVSplitters.Tab">
+            <summary>
+            Tab键分隔
+            </summary>
+        </member>
         <member name="T:DotNEToolkit.Utility.CSVUtils">
             <summary>
             提供操作CSV格式文件的方法
             </summary>
         </member>
-        <member name="M:DotNEToolkit.Utility.CSVUtils.TableData2CSV(System.String,DotNEToolkit.TableData)">
+        <member name="F:DotNEToolkit.Utility.CSVUtils.CSVSplitter">
+            <summary>
+            CSV文件一行的分隔符
+            有的CSV文件是用逗号，有的是用空格分隔
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Utility.CSVUtils.TableData2CSVFile(DotNEToolkit.TableData,System.String,DotNEToolkit.Utility.CSVSplitters)">
             <summary>
             把TableData保存成一个CSV文件
             </summary>
             <param name="tableData"></param>
             <param name="csvPath"></param>
+            <param name="splitter">CSV文件的分隔符</param>
         </member>
         <member name="M:DotNEToolkit.Utility.CSVUtils.CSV2TableData(System.String)">
             <summary>
@@ -980,7 +1587,7 @@
             <param name="csvFile"></param>
             <returns></returns>
         </member>
-        <member name="M:DotNEToolkit.Utility.CSVUtils.CSV2Excel(System.String,System.String,DotNEToolkit.Excels.WriteOptions)">
+        <member name="M:DotNEToolkit.Utility.CSVUtils.CSVFile2Excel(System.String,System.String,DotNEToolkit.Excels.WriteOptions)">
             <summary>
             把CSV文件转换成Excel
             </summary>
@@ -989,13 +1596,70 @@
             <param name="options">写入Excel文件的选项</param>
             <returns></returns>
         </member>
-        <member name="M:DotNEToolkit.Utility.CSVUtils.CSVContent2Excel(System.String,System.String,DotNEToolkit.Excels.WriteOptions)">
+        <member name="M:DotNEToolkit.Utility.CSVUtils.CSV2Excel(System.String,System.String,DotNEToolkit.Excels.WriteOptions)">
             <summary>
             把CSV文件内容转换成Excel
             </summary>
             <param name="csvText"></param>
             <param name="excelPath"></param>
             <param name="options">写入Excel文件的选项</param>
+        </member>
+        <member name="M:DotNEToolkit.Utility.CSVUtils.CSVFile2Objects``1(System.String,DotNEToolkit.Utility.CSVSplitters)">
+            <summary>
+            把一个CSV文件转换成一个对象集合
+            要使用CSVColumnAttribute把类里的属性和CSV文件里的字段映射起来
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="csvPath"></param>
+            <param name="splitter">CSV文件分隔符</param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Utility.ImageUtils.FlipY(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            RGB24图像左右翻转
+            </summary>
+            <param name="rgbBytes"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="M:DotNEToolkit.Utility.ImageUtils.FlipX(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            RGB24图像上下翻转
+            </summary>
+            <param name="rgbBytes"></param>
+            <param name="width"></param>
+            <param name="height"></param>
+        </member>
+        <member name="T:DotNEToolkit.Utility.NumbericUtils">
+            <summary>
+            操作数字的帮助函数
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.Utility.NumbericUtils.FixedDecimal(System.Double,System.Int32)">
+            <summary>
+            保留num位小数，会四舍五入
+            </summary>
+            <param name="src"></param>
+            <param name="num"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Utility.NumbericUtils.IsHexadecimal(System.Char)">
+            <summary>
+            判断一个字符是否是十六进制字符
+            </summary>
+            <param name="ch"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Utility.NumbericUtils.AccumulateTo(System.Int32,System.Int32)">
+            <summary>
+            函数功能：
+            如果value是437，ch是2，那么返回的结果就是4372
+            
+            从terminal项目拷贝
+            </summary>
+            <param name="value"></param>
+            <param name="add"></param>
+            <returns></returns>
         </member>
         <member name="F:DotNEToolkit.Utility.ExcelVersions.Xls">
             <summary>
@@ -1012,21 +1676,21 @@
             封装Excel文件的导入，导出功能
             </summary>
         </member>
-        <member name="M:DotNEToolkit.Utility.ExcelUtils.Excel2TableData(System.String)">
+        <member name="M:DotNEToolkit.Utility.ExcelUtils.ExcelFile2TableData(System.String)">
             <summary>
             Excel文件转换成TableData
             </summary>
             <param name="excelPath">要转换的Excel文件的完整路径</param>
             <returns></returns>
         </member>
-        <member name="M:DotNEToolkit.Utility.ExcelUtils.Excel2CSV(System.String,System.String)">
+        <member name="M:DotNEToolkit.Utility.ExcelUtils.ExcelFile2CSVFile(System.String,System.String,DotNEToolkit.Utility.CSVSplitters)">
             <summary>
             Excel文件转换成CSV
             </summary>
             <param name="excelPath">要转换的Excel文件的完整路径</param>
             <param name="csvPath">要保存的CSV文件的完整路径</param>
         </member>
-        <member name="M:DotNEToolkit.Utility.ExcelUtils.TableData2Excel(System.String,DotNEToolkit.TableData,DotNEToolkit.Excels.WriteOptions,System.String,DotNEToolkit.Utility.ExcelVersions)">
+        <member name="M:DotNEToolkit.Utility.ExcelUtils.TableData2ExcelFile(System.String,DotNEToolkit.TableData,DotNEToolkit.Excels.WriteOptions,System.String,DotNEToolkit.Utility.ExcelVersions)">
             <summary>
             TableData转成Excel文件
             </summary>
@@ -1037,7 +1701,7 @@
             <param name="version"></param>
             <returns></returns>
         </member>
-        <member name="M:DotNEToolkit.Utility.ExcelUtils.DataTable2Excel(System.String,System.Data.DataTable,DotNEToolkit.Excels.WriteOptions,System.String,DotNEToolkit.Utility.ExcelVersions)">
+        <member name="M:DotNEToolkit.Utility.ExcelUtils.DataTable2ExcelFile(System.String,System.Data.DataTable,DotNEToolkit.Excels.WriteOptions,System.String,DotNEToolkit.Utility.ExcelVersions)">
             <summary>
             DataTable转成Excel文件
             </summary>
@@ -1057,6 +1721,14 @@
             <param name="options"></param>
             <param name="sheetName"></param>
             <param name="version"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.Utility.ExcelUtils.ExcelFile2Objects``1(System.String)">
+            <summary>
+            Excel文件转Object列表
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="excelPath"></param>
             <returns></returns>
         </member>
         <member name="F:DotNEToolkit.Utility.HexNumberOptions.None">
@@ -1115,6 +1787,16 @@
             获取所有网卡的MAC地址
             </summary>
             <returns></returns>
+        </member>
+        <member name="P:DotNEToolkit.Utility.PropertyAttribute`1.Property">
+            <summary>
+            该特性所对应的属性信息
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.Utility.PropertyAttribute`1.Attribute">
+            <summary>
+            该属性所拥有的特性实例
+            </summary>
         </member>
         <member name="T:DotNEToolkit.Utility.ReflectionUtils">
             <summary>
@@ -1532,541 +2214,17 @@
             语法错误状态
             </summary>
         </member>
-        <member name="T:DotNEToolkit.Modular.AppModule`2">
-            <summary>
-            实现一个ModularApp里的Module
-            </summary>
-            <typeparam name="TApp"></typeparam>
-            <typeparam name="TManifest"></typeparam>
-        </member>
-        <member name="P:DotNEToolkit.Modular.AppModule`2.App">
-            <summary>
-            该Module所属的App
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.AppModule`2.AppManifest">
-            <summary>
-            该Module所属的AppManifest
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleEventDlg">
-            <summary>
-            处理模块事件的委托
-            </summary>
-            <param name="sender">发布该事件的模块实例</param>
-            <param name="eventArgs">事件参数</param>
-        </member>
-        <member name="T:DotNEToolkit.Modular.EventRollbackDlg">
-            <summary>
-            当事件执行失败的时候，要执行的回滚操作
-            </summary>
-            <param name="sender"></param>
-            <param name="args"></param>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleExtensions">
-            <summary>
-            模块的附加功能
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleExtensions.SetupWCFHttpService``1(DotNEToolkit.Modular.ModuleBase,System.EventHandler,System.EventHandler,System.ServiceModel.Web.WebServiceHost@)">
-            <summary>
-            快速初始化一个WCF WebService
-            </summary>
-            <typeparam name="TServiceContract"></typeparam>
-            <param name="webModule"></param>
-            <param name="openedDlg"></param>
-            <param name="closedDlg"></param>
-            <param name="svchost"></param>
-            <returns></returns>
-        </member>
-        <member name="T:DotNEToolkit.Modular.Attributes.ModuleInputAttribute">
-            <summary>
-            定义模块的输入参数
-            1. 工作流设计器使用
-            2. 方便开发者一眼就可以看到模块有哪些输出值
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.Key">
-            <summary>
-            参数的键
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.ValueType">
-            <summary>
-            参数类型
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.Description">
-            <summary>
-            参数描述
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.Optional">
-            <summary>
-            该参数是否是可选参数
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.IsClass">
-            <summary>
-            表示该输入是否是一个类类型
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.#ctor(System.String,System.String,System.Type,System.Boolean)">
-            <summary>
-            
-            </summary>
-            <param name="description"></param>
-            <param name="key"></param>
-            <param name="valueType"></param>
-            <param name="optional">true：可空，false：不可空</param>
-        </member>
-        <member name="M:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.#ctor(System.String,System.Type,System.Boolean)">
-            <summary>
-            当输入是一个类类型使用
-            </summary>
-            <param name="description"></param>
-            <param name="optional"></param>
-        </member>
-        <member name="M:DotNEToolkit.Modular.Attributes.ModuleInputAttribute.#ctor(System.String,System.Boolean)">
-            <summary>
-            当输入是一个属性类型的时候使用
-            </summary>
-            <param name="description"></param>
-            <param name="optional"></param>
-        </member>
-        <member name="T:DotNEToolkit.Modular.Attributes.ModulePropertyAttribute">
-            <summary>
-            表示一个模块的公开属性
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Modular.Attributes.ModuleActionAttribute">
-            <summary>
-            表示一个模块的调用操作
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.Attributes.ModuleActionAttribute.Name">
-            <summary>
-            动作的名字
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.Attributes.ModuleActionAttribute.Manually">
-            <summary>
-            是否在界面上手动触发
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Modular.Attributes.ModuleInstanceAttribute">
-            <summary>
-            工作流设计器使用
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Modular.Attributes.ModuleOutputAttribute">
-            <summary>
-            定义模块的输出数据
-            1. 工作流设计器使用
-            2. 方便开发者一眼就可以看到模块有哪些输出值
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.IConfigReader.Initialize(System.String)">
-            <summary>
-            初始化Reader
-            </summary>
-            <param name="configPath"></param>
-        </member>
-        <member name="M:DotNEToolkit.Modular.IConfigReader.ReadValue(System.String)">
-            <summary>
-            读取配置项
-            </summary>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
-        <member name="T:DotNEToolkit.Modular.IModuleInstance">
-            <summary>
-            模块实例公共接口
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.IModuleInstance.Status">
-            <summary>
-            模块状态
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.IModuleInstance.ID">
-            <summary>
-            模块ID
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.IModuleInstance.Name">
-            <summary>
-            模块名称
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.IModuleInstance.Description">
-            <summary>
-            描述
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.IModuleInstance.Definition">
-            <summary>
-            描述文件
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.IModuleInstance.Factory">
-            <summary>
-            所属的工厂
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.IModuleInstance.Initialize">
-            <summary>
-            初始化模块
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.IModuleInstance.Release">
-            <summary>
-            释放模块
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleBase">
-            <summary>
-            表示一个抽象的模块
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleBase.logger">
-            <summary>
-            日志记录器
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.Status">
-            <summary>
-            模块当前的状态
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.ID">
-            <summary>
-            模块ID
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.Name">
-            <summary>
-            模块名字
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.Description">
-            <summary>
-            模块的描述信息
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.Definition">
-            <summary>
-            模块的定义
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.Factory">
-            <summary>
-            模块所属工厂
-            在ModuleFactory里被赋值
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.Properties">
-            <summary>
-            模块当前的输出参数
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleBase.InputParameters">
-            <summary>
-            模块的输入参数
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleBase.#ctor">
-            <summary>
-            构造方法
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleBase.Initialize">
-            <summary>
-            初始化模块
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleBase.Release">
-            <summary>
-            释放模块占用的资源
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleBase.GetParameter``1(System.String,``0)">
-            <summary>
-            读取该模块的输入参数
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="key"></param>
-            <param name="defaultValue"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleBase.SetParameter``1(System.String,``0)">
-            <summary>
-            设置参数
-            注意如果设置的参数是类类型，那么会先把类序列化成字符串
-            所以不能序列化带有状态的类，只能序列化一些数据模型类
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="key"></param>
-            <param name="value"></param>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleBase.OnInitialize">
-            <summary>
-            子类初始化
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleBase.OnRelease">
-            <summary>
-            子类释放资源
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleDefinition">
-            <summary>
-            存储模块的信息
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleDefinition.ID">
-            <summary>
-            模块ID
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleDefinition.Name">
-            <summary>
-            模块名字
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleDefinition.Description">
-            <summary>
-            描述
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleDefinition.MetadataID">
-            <summary>
-            组件类型ID
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleDefinition.ClassName">
-            <summary>
-            模块的完整类型名
-            如果该值不为空，那么优先根据该值去创建实例
-            如果该值为空，那么会根据MetadataID去创建实例
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleDefinition.Flags">
-            <summary>
-            模块的标志位
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleDefinition.InputParameters">
-            <summary>
-            输入配置参数
-            执行模块的构造方法的时候，会动态把所依赖的模块实例反射并赋值给该模块的属性
-            避免了每次都要调用LookupModule去查找模块，麻烦
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleDefinition.#ctor">
-            <summary>
-            构造方法
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleDefinition.HasFlag(System.Int32)">
-            <summary>
-            判断该模块是否包含指定的选项
-            </summary>
-            <param name="flag"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleDefinition.SetFlag(System.Int32)">
-            <summary>
-            设置该模块的选项
-            </summary>
-            <param name="flag"></param>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleDefinition.CloneInputParameters">
-            <summary>
-            克隆一份输入参数
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleFactory">
-            <summary>
-            模块工厂
-            </summary>
-        </member>
-        <member name="E:DotNEToolkit.Modular.ModuleFactory.Initialized">
-            <summary>
-            当所有模块都加载完成的时候触发
-            只有在异步加载模块的时候才会触发
-            </summary>
-        </member>
-        <member name="E:DotNEToolkit.Modular.ModuleFactory.ModuleStatusChanged">
-            <summary>
-            当模块状态改变的时候触发
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleFactory.moduleList">
-            <summary>
-            存储已经加载了的模块
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleFactory.MetadataList">
-            <summary>
-            所有模块的元数据信息
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.#ctor">
-            <summary>
-            构造方法
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.InitializeModule(DotNEToolkit.Modular.ModuleBase,System.Int32,DotNEToolkit.Modular.ModuleBase)">
-            <summary>
-            初始化一个模块，会解析依赖项
-            </summary>
-            <param name="moduleInst">要初始化的模块</param>
-            <param name="interval">
-            > 0  : 重新初始化的间隔时间，如果初始化失败，那么会一直初始化
-            = -1 : 失败直接返回，不尝试重新初始化
-            </param>
-            <param name="baseModule">当前初始化的模块</param>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.CreateModuleInstance(System.Collections.Generic.IEnumerable{DotNEToolkit.Modular.ModuleDefinition})">
-            <summary>
-            创建模块的实例
-            只创建实例，不调用Initialize方法
-            </summary>
-            <param name="initialModules"></param>
-            <returns>返回创建了的模块个数</returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.LookupModuleMetadatas">
-            <summary>
-            读取所有的类型定义
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.CreateFactory">
-            <summary>
-            创建一个空的工厂
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.CreateFactory(System.Collections.Generic.IEnumerable{DotNEToolkit.Modular.ModuleDefinition})">
-            <summary>
-            创建一个模块工厂并同步初始化模块实例
-            如果初始化某个模块失败，那么返回null
-            只有当所有模块都初始化成功后才会返回true
-            </summary>
-            <param name="initialModules">要初始化的模块实例</param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.CreateFactory2(System.Collections.Generic.IEnumerable{DotNEToolkit.Modular.ModuleDefinition})">
-            <summary>
-            创建一个模块工厂，创建模块实例，但是不初始化它
-            </summary>
-            <param name="initialModules"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.SetupModulesAsync(System.Collections.Generic.IEnumerable{DotNEToolkit.Modular.ModuleDefinition},System.Int32)">
-            <summary>
-            异步加载模块
-            如果模块连接失败，该函数会自动重连模块
-            </summary>
-            <param name="initialModules"></param>
-            <param name="interval">自动重连模块的间隔时间</param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.LookupModule``1(System.String)">
-            <summary>
-            根据ID查找系统中可用的组件
-            如果ID为空，则返回第一个可用的组件
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="id"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Modular.ModuleFactory.LookupModule``1">
-            <summary>
-            查找指定类型的组件，如果有多个，则返回第一个
-            </summary>
-            <typeparam name="TModuleInstance"></typeparam>
-            <returns></returns>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleFlags">
-            <summary>
-            模块的标志位
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleFlags.Disabled">
-            <summary>
-            模块被禁用
-            告诉ModuleFactory不要加载该模块
-            该模块不会被加到缓存里
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleFlags.NotInitial">
-            <summary>
-            不初始化
-            该模块会被加到缓存里，但是不调用初始化
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleStatus">
-            <summary>
-            表示一个模块的状态
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleStatus.UnInitialized">
-            <summary>
-            空闲状态
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleStatus.Initialized">
-            <summary>
-            模块初始化成功
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleStatus.InitializeFailed">
-            <summary>
-            初始化失败
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleStatus.Initializing">
-            <summary>
-            初始化中
-            </summary>
-        </member>
-        <member name="F:DotNEToolkit.Modular.ModuleStatus.InitializeException">
-            <summary>
-            初始化异常
-            </summary>
-        </member>
-        <member name="T:DotNEToolkit.Modular.ModuleMetadata">
-            <summary>
-            存储模块的元数据信息
-            ModuleFactory通过TypeID找到ModuleMetadata，然后动态创建模块实例
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleMetadata.ID">
-            <summary>
-            唯一标志符
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleMetadata.Name">
-            <summary>
-            模块的默认的名字
-            </summary>
-        </member>
-        <member name="P:DotNEToolkit.Modular.ModuleMetadata.ClassName">
-            <summary>
-            模块的完整类型名
-            </summary>
-        </member>
         <member name="T:DotNEToolkit.AppManifest">
             <summary>
             App清单文件
+            清单文件里只存储不可变的数据
+            可变数据属于配置数据，调用ModularApp的GetConfig个SetConfig接口进行读写
+            </summary>
+        </member>
+        <member name="P:DotNEToolkit.AppManifest.AsynchronousInitialization">
+            <summary>
+            是否异步初始化模块
+            默认不异步，默认用同步初始化
             </summary>
         </member>
         <member name="P:DotNEToolkit.AppManifest.ModuleList">
@@ -2074,23 +2232,23 @@
             配置文件里的所有的模块列表
             </summary>
         </member>
-        <member name="P:DotNEToolkit.AppManifest.AppModuleList">
+        <member name="P:DotNEToolkit.AppManifest.SettingPath">
             <summary>
-            所有AppModule模块列表
-            暂时没实现
+            App的配置文件路径
+            </summary>
+        </member>
+        <member name="M:DotNEToolkit.AppManifest.#ctor">
+            <summary>
+            构造方法
             </summary>
         </member>
         <member name="T:DotNEToolkit.ModularApp`2">
             <summary>
             封装一个基于模块化（ModuleFactory）实现的App开发框架
+            1. 实现了AppModule的依赖注入功能
             </summary>
             <typeparam name="TApp"></typeparam>
             <typeparam name="TManifest"></typeparam>
-        </member>
-        <member name="P:DotNEToolkit.ModularApp`2.AppModules">
-            <summary>
-            暂时没实现
-            </summary>
         </member>
         <member name="P:DotNEToolkit.ModularApp`2.Factory">
             <summary>
@@ -2105,6 +2263,7 @@
         <member name="M:DotNEToolkit.ModularApp`2.Initialize">
             <summary>
             初始化App
+            自动读取App.config文件里的appConfig里配置的配置文件路径
             </summary>
             <returns></returns>
         </member>
@@ -2120,7 +2279,7 @@
             使用AppManifest的实例初始化App
             </summary>
             <param name="configFile">指定配置文件的完整路径，当调用SaveManifest的时候，将会使用该路径进行保存</param>
-            <param name="manifest"></param>
+            <param name="manifest">要初始化的App清单</param>
             <returns></returns>
         </member>
         <member name="M:DotNEToolkit.ModularApp`2.Release">
@@ -2132,6 +2291,23 @@
             <summary>
             保存Manifest文件
             </summary>
+        </member>
+        <member name="M:DotNEToolkit.ModularApp`2.WriteSetting``1(System.String,``0)">
+            <summary>
+            写入并保存配置文件
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:DotNEToolkit.ModularApp`2.ReadSetting``1(System.String,``0)">
+            <summary>
+            读取配置文件里的配置
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="key"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
         </member>
         <member name="M:DotNEToolkit.ModularApp`2.OnInitialize">
             <summary>
@@ -2688,37 +2864,6 @@
             <summary>
             重置指针状态
             </summary>
-        </member>
-        <member name="T:DotNEToolkit.Numberics">
-            <summary>
-            操作数字的帮助函数
-            </summary>
-        </member>
-        <member name="M:DotNEToolkit.Numberics.FixedDecimal(System.Double,System.Int32)">
-            <summary>
-            保留num位小数，会四舍五入
-            </summary>
-            <param name="src"></param>
-            <param name="num"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Numberics.IsHexadecimal(System.Char)">
-            <summary>
-            判断一个字符是否是十六进制字符
-            </summary>
-            <param name="ch"></param>
-            <returns></returns>
-        </member>
-        <member name="M:DotNEToolkit.Numberics.AccumulateTo(System.Int32,System.Int32)">
-            <summary>
-            函数功能：
-            如果value是437，ch是2，那么返回的结果就是4372
-            
-            从terminal项目拷贝
-            </summary>
-            <param name="value"></param>
-            <param name="add"></param>
-            <returns></returns>
         </member>
         <member name="T:DotNEToolkit.MarshalUtils">
             <summary>
@@ -3704,12 +3849,14 @@
             封装对流的一些操作
             </summary>
         </member>
-        <member name="M:DotNEToolkit.StreamUtils.ReadFull(System.IO.Stream,System.Byte[])">
+        <member name="M:DotNEToolkit.StreamUtils.ReadFull(System.IO.Stream,System.Byte[],System.Int32,System.Int32)">
             <summary>
             从流中读取数据，一直读满size个字节为止
             </summary>
             <param name="stream"></param>
-            <param name="bytes"></param>
+            <param name="bytes">存储读取道的数据的缓冲区</param>
+            <param name="offset">要读取的数据偏移量</param>
+            <param name="size">要读取的字节数，如果为0，那么读取bytes.Length个字节</param>
             <returns></returns>
         </member>
         <member name="T:DotNEToolkit.SocketUtils">
@@ -3724,10 +3871,18 @@
             </summary>
             <param name="socket"></param>
             <param name="data"></param>
-            <param name="timeout">超时时间，如果超过此时间还没有收到完整的数据，那么就返回false</param>
+            <param name="timeout">超时时间，如果读取数据的时候超过此时间还没读到，那么就返回false</param>
             <returns></returns>
         </member>
-        <member name="M:DotNEToolkit.SocketUtils.SendFull(System.Net.Sockets.Socket,System.Byte[])">
+        <member name="M:DotNEToolkit.SocketUtils.SendFull(System.Net.Sockets.Socket,System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            发送一段完整的数据
+            </summary>
+            <param name="socket"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.SocketUtils.SendFull(System.Net.Sockets.Socket,System.Byte[],System.Int32)">
             <summary>
             发送一段完整的数据
             </summary>
@@ -3971,6 +4126,16 @@
             <typeparam name="TObject">要写入的对象类型</typeparam>
             <param name="filePath">要保存的文件路径</param>
             <param name="obj">要写入的对象实例</param>
+        </member>
+        <member name="M:DotNEToolkit.JSONHelper.CloneObject``2(``0)">
+            <summary>
+            克隆一个对象
+            先把inputObject转换成JSON字符串，再把JSON字符串转成TOutput类型的对象
+            </summary>
+            <typeparam name="TInput"></typeparam>
+            <typeparam name="TOutput"></typeparam>
+            <param name="inputObject"></param>
+            <returns></returns>
         </member>
         <member name="T:DotNEToolkit.JSONDatabase">
             <summary>
@@ -4508,26 +4673,26 @@
         </member>
         <member name="M:DotNEToolkit.TableData.GetRows">
             <summary>
-            获取最后一行的位置
+            获取从行数
             </summary>
             <returns></returns>
         </member>
         <member name="M:DotNEToolkit.TableData.GetColumns">
             <summary>
-            获取最后一列的位置
+            获取总列数
             </summary>
             <returns></returns>
         </member>
         <member name="M:DotNEToolkit.TableData.GetRows(System.Int32)">
             <summary>
-            获取某一列的最后一个行的位置
+            获取某一列的总行数
             </summary>
             <param name="column"></param>
             <returns></returns>
         </member>
         <member name="M:DotNEToolkit.TableData.GetColumns(System.Int32)">
             <summary>
-            获取某一行的最后一列的位置
+            获取某一行的总列数
             </summary>
             <param name="row"></param>
             <returns></returns>
@@ -4544,6 +4709,19 @@
             创建一个TableData的实例
             </summary>
             <returns>TableData实例</returns>
+        </member>
+        <member name="M:DotNEToolkit.TableData.ConvertToObjects``1">
+            <summary>
+            转换成ObjectList
+            </summary>
+            <typeparam name="T"></typeparam>
+            <returns></returns>
+        </member>
+        <member name="M:DotNEToolkit.TableData.GetRowData(System.Int32)">
+            <summary>
+            获取一行里的所有数据
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:DotNEToolkit.TcpFramework.IDataResolver">
             <summary>
@@ -5286,6 +5464,22 @@
             </summary>
             <param name="session"></param>
         </member>
+        <member name="M:DotNEToolkit.Win32APIHelper.GetWindowText(System.IntPtr,System.Int32,System.Int32)">
+            <summary>
+            获取某个窗口中，某个位置的控件上的文本
+            </summary>
+            <param name="hWnd">要获取的窗口的句柄</param>
+            <param name="x">要获取文本的控件的x坐标</param>
+            <param name="y">要获取文本的控件的y坐标</param>
+            <returns>获取到的文本</returns>
+        </member>
+        <member name="M:DotNEToolkit.Win32APIHelper.ShowFileProperties(System.String)">
+            <summary>
+            显示文件或者目录的属性对话框
+            </summary>
+            <param name="Filename"></param>
+            <returns></returns>
+        </member>
         <member name="F:DotNEToolkit.Iphlpapi.TCP_TABLE_CLASS.TCP_TABLE_BASIC_ALL">
             <summary>
             MIB_TCPTABLE
@@ -5332,15 +5526,6 @@
             </summary>
             <param name="hModule">dll模块指针</param>
             <returns>释放释放成功</returns>
-        </member>
-        <member name="M:DotNEToolkit.Win32APIHelper.GetWindowText(System.IntPtr,System.Int32,System.Int32)">
-            <summary>
-            获取某个窗口中，某个位置的控件上的文本
-            </summary>
-            <param name="hWnd">要获取的窗口的句柄</param>
-            <param name="x">要获取文本的控件的x坐标</param>
-            <param name="y">要获取文本的控件的y坐标</param>
-            <returns>获取到的文本</returns>
         </member>
         <member name="T:DotNEToolkit.MMSYSERR">
             <summary>
@@ -5660,12 +5845,12 @@
             <param name="filePath"></param>
             <returns></returns>
         </member>
-        <member name="T:DotNEToolkit.WinUser">
+        <member name="T:DotNEToolkit.User32">
             <summary>
             WinUser.h
             </summary>
         </member>
-        <member name="M:DotNEToolkit.WinUser.RegisterDeviceNotification(System.IntPtr,System.IntPtr,System.Int32)">
+        <member name="M:DotNEToolkit.User32.RegisterDeviceNotification(System.IntPtr,System.IntPtr,System.Int32)">
             <summary>
             
             </summary>
@@ -5676,7 +5861,7 @@
             </param>
             <returns></returns>
         </member>
-        <member name="M:DotNEToolkit.WinUser.UnregisterDeviceNotification(System.IntPtr)">
+        <member name="M:DotNEToolkit.User32.UnregisterDeviceNotification(System.IntPtr)">
             <summary>
             Closes the specified device notification handle.
             </summary>

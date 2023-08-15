@@ -39,7 +39,12 @@ namespace XTerminal.Base.Enumerations
         MOUSE_SCROLL_DELTA,
 
 
+        SFTP_SERVER_ADDRESS,
+        SFTP_SERVER_PORT,
+        SFTP_USER_NAME,
+        SFTP_USER_PASSWORD,
+        SFTP_AUTH_TYPE,
         SFTP_SERVER_INITIAL_DIRECTORY,
-        SFTP_CLIENT_INITIAL_DIRECTORY
+        SFTP_CLIENT_INITIAL_DIRECTORY,
     }
 }

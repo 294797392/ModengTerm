@@ -4,18 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.ViewModels.SFTP
+namespace XTerminal.Base.SftpTrasmit
 {
-    public enum TransferTypeEnum
+    public enum SftpTransmitTypeEnum
     {
         /// <summary>
-        /// 向SFTP服务器上传文件
+        /// 从Sftp服务器下载文件到本地
         /// </summary>
-        Upload,
+        Download,
 
         /// <summary>
-        /// 从SFTP服务器下载文件
+        /// 从本地上传文件到Sftp服务器
         /// </summary>
-        Download
+        Upload
     }
 }

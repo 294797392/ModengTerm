@@ -1,8 +1,11 @@
-﻿using System;
+﻿using DotNEToolkit;
+using Renci.SshNet;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 using XTerminal.Base;
@@ -24,6 +27,8 @@ namespace XTerminal.ViewModels.SFTP
         #endregion
 
         #region 属性
+
+        public SftpClient SftpClient { get; internal set; }
 
         /// <summary>
         /// 初始目录
@@ -62,14 +67,27 @@ namespace XTerminal.ViewModels.SFTP
         /// </summary>
         public DirectoryNodeVM BackupDirectory { get; private set; }
 
+        /// <summary>
+        /// 右键菜单列表
+        /// </summary>
+        public BindableCollection<ContextMenuItemVM> ContextMenus { get; private set; }
+
+        #endregion
+
+        #region 构造方法
+
+        public FileSystemTreeVM()
+        {
+            this.ContextMenus = new BindableCollection<ContextMenuItemVM>();
+            this.historyDirs = new Queue<string>();
+        }
+
         #endregion
 
         #region 公开接口
 
         public void Initialize()
         {
-            this.historyDirs = new Queue<string>();
-
             this.CurrentDirectory = this.InitialDirectory;
             this.BackupDirectory = new DirectoryNodeVM(this.Context)
             {
@@ -86,32 +104,6 @@ namespace XTerminal.ViewModels.SFTP
         #endregion
 
         #region 实例方法
-
-        /// <summary>
-        /// 进入某个目录
-        /// </summary>
-        /// <param name="directory"></param>
-        private void EnterDirectory(string directory)
-        {
-            // 重新加载文件系统树形列表
-            this.ClearRootNode();
-
-            this.BackupDirectory.FullPath = this.GetParentDirectory(directory);
-            if (!string.IsNullOrEmpty(this.BackupDirectory.FullPath))
-            {
-                this.AddRootNode(this.BackupDirectory);
-            }
-
-            // 获取子目录列表
-            IEnumerable<FileSystemTreeNodeVM> fileList = this.GetDirectory(directory);
-            foreach (FileSystemTreeNodeVM fsNode in fileList)
-            {
-                this.AddRootNode(fsNode);
-            }
-
-            // 更新当前目录
-            this.CurrentDirectory = directory;
-        }
 
         /// <summary>
         /// 获取当前目录的上一级目录
@@ -144,9 +136,46 @@ namespace XTerminal.ViewModels.SFTP
             this.historyDirs.Enqueue(directory);
         }
 
+        private void TransferSelectedItem(object parameter)
+        {
+            FileSystemTreeNodeVM selectedNode = parameter as FileSystemTreeNodeVM;
+            if (selectedNode == null)
+            {
+                return;
+            }
+        }
+
         #endregion
 
         #region 事件处理器
+
+        /// <summary>
+        /// 进入某个目录
+        /// </summary>
+        /// <param name="directory"></param>
+        public void EnterDirectory(string directory)
+        {
+            // 重新加载文件系统树形列表
+            this.ClearRootNode();
+
+            this.BackupDirectory.FullPath = this.GetParentDirectory(directory);
+            if (!string.IsNullOrEmpty(this.BackupDirectory.FullPath))
+            {
+                // 没有父目录，说明到顶级目录了
+                // 有父目录才把返回上一级加进去
+                this.AddRootNode(this.BackupDirectory);
+            }
+
+            // 获取子目录列表
+            IEnumerable<FileSystemTreeNodeVM> fileList = this.GetDirectory(directory);
+            foreach (FileSystemTreeNodeVM fsNode in fileList)
+            {
+                this.AddRootNode(fsNode);
+            }
+
+            // 更新当前目录
+            this.CurrentDirectory = directory;
+        }
 
         /// <summary>
         /// 进入当前选中的目录里
@@ -214,6 +243,13 @@ namespace XTerminal.ViewModels.SFTP
         /// </summary>
         /// <param name="directory"></param>
         public abstract IEnumerable<FileSystemTreeNodeVM> GetDirectory(string directory);
+
+        /// <summary>
+        /// 传输指定的文件
+        /// </summary>
+        /// <param name="fsNode"></param>
+        /// <returns></returns>
+        //public abstract int TransferFile(FileSystemTreeNodeVM fsNode);
 
         #endregion
     }

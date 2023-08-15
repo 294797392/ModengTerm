@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:XTerminal.UserControls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+             xmlns:vm="clr-namespace:XTerminal.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -33,6 +34,20 @@
 
                 </Grid>
             </HierarchicalDataTemplate>
+
+            <ContextMenu x:Key="ContextMenuList" ItemsSource="{Binding Path=ContextMenus}">
+                <ContextMenu.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Path=Name}"/>
+                    </DataTemplate>
+                </ContextMenu.ItemTemplate>
+                <ContextMenu.ItemContainerStyle>
+                    <Style TargetType="{x:Type MenuItem}">
+                        <Setter Property="Command" Value="{Binding Path=Command}"/>
+                        <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=DataContext}"/>
+                    </Style>
+                </ContextMenu.ItemContainerStyle>
+            </ContextMenu>
 
         </ResourceDictionary>
     </UserControl.Resources>
@@ -62,20 +77,21 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <DataGrid AutoGenerateColumns="False" SelectionMode="Single" SelectionUnit="FullRow" IsReadOnly="True"
-                      ItemsSource="{Binding Path=Roots}">
-                
+            <DataGrid AutoGenerateColumns="False" SelectionMode="Extended" SelectionUnit="FullRow" IsReadOnly="True"
+                      ItemsSource="{Binding Path=Roots}" ContextMenu="{StaticResource ResourceKey=ContextMenuList}">
+
                 <DataGrid.ItemContainerStyle>
                     <Style TargetType="{x:Type DataGridRow}">
                         <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Style>
                 </DataGrid.ItemContainerStyle>
-                
+
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
                         <ei:CallMethodAction MethodName="EnterDirectory" TargetObject="{Binding}"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
+
                 <DataGrid.Columns>
 
                     <DataGridTemplateColumn Header="名称" Width="*">
