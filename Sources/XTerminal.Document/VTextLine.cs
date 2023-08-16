@@ -99,7 +99,7 @@ namespace XTerminal.Document
         {
             get
             {
-                string text = XDocumentUtils.BuildText(this.characters);
+                string text = VDocumentUtils.BuildText(this.characters);
                 return text.Length == 0 ? " " : text;
             }
         }
@@ -461,6 +461,7 @@ namespace XTerminal.Document
         {
             VTCharacter.CopyTo(this.characters, historyLine.Characters);
             this.PhysicsRow = historyLine.PhysicsRow;
+            this.Columns = VDocumentUtils.GetColumns(this.characters);
 
             this.SetRenderDirty(true);
         }

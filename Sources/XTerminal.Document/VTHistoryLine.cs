@@ -19,7 +19,7 @@ namespace XTerminal.Document
         {
             get
             {
-                return XDocumentUtils.BuildText(this.Characters);
+                return VDocumentUtils.BuildText(this.Characters);
             }
         }
 

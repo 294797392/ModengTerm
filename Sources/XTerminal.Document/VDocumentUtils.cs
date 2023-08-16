@@ -7,7 +7,7 @@ using XTerminal.Parser;
 
 namespace XTerminal.Document
 {
-    public static class XDocumentUtils
+    public static class VDocumentUtils
     {
         public static VTextDecorations VTAction2TextDecoration(VTActions actions, out bool unset)
         {
@@ -85,6 +85,23 @@ namespace XTerminal.Document
             }
 
             return text;
+        }
+
+        /// <summary>
+        /// 获取字符列表一共占多少列
+        /// </summary>
+        /// <param name="characters"></param>
+        /// <returns></returns>
+        public static int GetColumns(IEnumerable<VTCharacter> characters)
+        {
+            int columns = 0;
+
+            foreach (VTCharacter character in characters)
+            {
+                columns += character.ColumnSize;
+            }
+
+            return columns;
         }
     }
 }

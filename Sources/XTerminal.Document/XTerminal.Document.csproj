@@ -79,7 +79,7 @@
     <Compile Include="VTPointCollection.cs" />
     <Compile Include="VTRect.cs" />
     <Compile Include="VTextSelection.cs" />
-    <Compile Include="XDocumentUtils.cs" />
+    <Compile Include="VDocumentUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">

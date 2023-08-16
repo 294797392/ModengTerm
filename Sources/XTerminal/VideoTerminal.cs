@@ -517,8 +517,6 @@ namespace XTerminal
             }
         }
 
-        private int cuont = 0;
-
         /// <summary>
         /// update anything about ui
         /// 如果需要布局则进行布局
@@ -588,7 +586,6 @@ namespace XTerminal
                         // 当前显示的是主缓冲区，那么光标在最后一行的时候才更新
                         if (this.ScrollAtBottom)
                         {
-                            logger.ErrorFormat("渲染光标, {0}", cuont++);
                             this.Cursor.OffsetY = this.ActiveLine.OffsetY;
                             VTRect rect = this.ActiveSurface.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
                             this.Cursor.OffsetX = rect.Right;
@@ -1251,7 +1248,7 @@ namespace XTerminal
                 case VTActions.DefaultBackground:
                     {
                         bool unset;
-                        VTextDecorations decoration = XDocumentUtils.VTAction2TextDecoration(action, out unset);
+                        VTextDecorations decoration = VDocumentUtils.VTAction2TextDecoration(action, out unset);
                         VTextAttribute textAttribute = this.ActiveLine.Attributes.FirstOrDefault(v => v.Decoration == decoration);
                         if (textAttribute == null)
                         {
@@ -1735,7 +1732,7 @@ namespace XTerminal
                         {
                             return;
                         }
-                        XDocumentUtils.GetSegement(lineHit.Text, characterIndex, out startIndex, out endIndex);
+                        VDocumentUtils.GetSegement(lineHit.Text, characterIndex, out startIndex, out endIndex);
                         break;
                     }
 
