@@ -15,15 +15,13 @@ namespace XTerminal.Document
     /// </summary>
     public class VTHistoryLine
     {
-        ///// <summary>
-        ///// 获取该文本行的宽度
-        ///// </summary>
-        //public double Width { get; private set; }
-
-        ///// <summary>
-        ///// 获取该文本行的高度
-        ///// </summary>
-        //public double Height { get; private set; }
+        public string Text
+        {
+            get
+            {
+                return XDocumentUtils.BuildText(this.Characters);
+            }
+        }
 
         /// <summary>
         /// 行索引，从0开始
@@ -41,19 +39,14 @@ namespace XTerminal.Document
         public VTHistoryLine NextLine { get; internal set; }
 
         /// <summary>
-        /// 该行显示的文本，冻结的时候更新
-        /// </summary>
-        public string Text { get; private set; }
-
-        /// <summary>
         /// 该行的所有字符
         /// 显示历史行的时候用到
         /// </summary>
-        public IEnumerable<VTCharacter> Characters { get; private set; }
+        public List<VTCharacter> Characters { get; private set; }
 
         private VTHistoryLine()
         {
-
+            this.Characters = new List<VTCharacter>();
         }
 
         /// <summary>
@@ -64,12 +57,9 @@ namespace XTerminal.Document
         /// <param name="sourceLine">要冻结的行</param>
         public void SetVTextLine(VTextLine sourceLine)
         {
-            //this.Width = sourceLine.Width;
-            //this.Height = sourceLine.Height;
-            this.Text = sourceLine.Text;
             this.PhysicsRow = sourceLine.PhysicsRow;
             // 复制一份字符列表
-            this.Characters = CloneCharacters(sourceLine.Characters);
+            VTCharacter.CopyTo(this.Characters, sourceLine.Characters);
         }
 
         public static List<VTCharacter> CloneCharacters(IEnumerable<VTCharacter> source)

@@ -74,5 +74,17 @@ namespace XTerminal.Document
                 break;
             }
         }
+
+        public static string BuildText(IEnumerable<VTCharacter> characters)
+        {
+            string text = string.Empty;
+
+            foreach (VTCharacter character in characters)
+            {
+                text += character.Character;
+            }
+
+            return text;
+        }
     }
 }

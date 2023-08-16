@@ -60,15 +60,11 @@ namespace XTerminal.Rendering
         {
             VTextLine textLine = this.DocumentElement as VTextLine;
 
-            //text = string.Format("{0} - {1}", this.ID, text);
-
             FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
 
             this.Offset = new Vector(0, textLine.OffsetY);
 
             DrawingUtils.UpdateTextMetrics(textLine, formattedText);
-
-            //logger.InfoFormat("Render:{0}", text);
 
             //// 遍历链表，给每个TextBlock设置样式
             //VTextBlock current = this.TextLine.First;

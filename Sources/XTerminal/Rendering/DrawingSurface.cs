@@ -99,6 +99,18 @@ namespace XTerminal.Rendering
 
         private VTRect CommonMeasureLine(VTextLine textLine, int startIndex, int count)
         {
+            int totalChars = textLine.Characters.Count;
+            if (startIndex + count > totalChars)
+            {
+                startIndex = 0;
+                count = totalChars;
+            }
+
+            if (startIndex == 0 && count == 0)
+            {
+                return new VTRect();
+            }
+
             FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
             Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, count);
             return new VTRect(geometry.Bounds.Left, geometry.Bounds.Top, geometry.Bounds.Width, geometry.Bounds.Height);
@@ -143,6 +155,7 @@ namespace XTerminal.Rendering
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Offset = new Vector(drawable.OffsetX, drawable.OffsetY);
+            drawable.SetArrangeDirty(false);
         }
 
         public void SetOpacity(VTDocumentElement drawable, double opacity)

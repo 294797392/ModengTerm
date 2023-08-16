@@ -52,7 +52,7 @@ namespace XTerminal.Document
         /// 渲染字符会比对字符重新Arrange要慢很多，因为在渲染的时候，系统需要对字符进行排版操作，这个步骤很耗时。为了优化性能，尽可能不去渲染就不要渲染
         /// Arrange本质上就是把排版好了并且渲染好了的字符移动一下位置
         /// </summary>
-        //public bool IsArrangeDirty { get; private set; }
+        public bool IsArrangeDirty { get; private set; }
 
 
         /// <summary>
@@ -85,6 +85,14 @@ namespace XTerminal.Document
 
                 // 需要render的时候也说明需要measure
                 this.IsMeasureDirty = isDirty;
+            }
+        }
+
+        public void SetArrangeDirty(bool isDirty)
+        {
+            if (this.IsArrangeDirty != isDirty)
+            {
+                this.IsArrangeDirty = isDirty;
             }
         }
     }

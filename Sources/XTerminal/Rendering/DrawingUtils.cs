@@ -71,8 +71,11 @@ namespace XTerminal.Rendering
         /// <returns></returns>
         public static FormattedText CreateFormattedText(VTextLine textLine)
         {
+            //string text = string.Format("{0} - {1}", textLine.ID, textLine.Text);
+            string text = textLine.Text;
+
             DrawingLine drawingLine = textLine.DrawingContext as DrawingLine;
-            FormattedText formattedText = new FormattedText(textLine.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
+            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
                 textLine.Style.FontSize, drawingLine.foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
             return formattedText;
         }

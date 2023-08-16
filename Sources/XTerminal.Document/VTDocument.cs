@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
+using static XTerminal.Document.VTextLine;
 
 namespace XTerminal.Document
 {
@@ -724,6 +725,43 @@ namespace XTerminal.Document
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// 把一行移动到指定位置
+        /// 不考虑ScrollMargin
+        /// </summary>
+        /// <param name="textLine"></param>
+        /// <param name="options"></param>
+        public void MoveLine(VTextLine textLine, MoveOptions options)
+        {
+            switch (options)
+            {
+                case MoveOptions.MoveToFirst:
+                    {
+                        textLine.Remove();
+                        VTextLine firstLine = this.FirstLine;
+                        this.FirstLine.PreviousLine = textLine;
+                        this.FirstLine = textLine;
+                        textLine.NextLine = firstLine;
+                        break;
+                    }
+
+                case MoveOptions.MoveToLast:
+                    {
+                        textLine.Remove();
+                        VTextLine lastLine = this.LastLine;
+                        this.LastLine.NextLine = textLine;
+                        this.LastLine = textLine;
+                        textLine.PreviousLine = lastLine;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
         }
 
         #endregion

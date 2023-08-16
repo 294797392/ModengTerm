@@ -89,5 +89,46 @@ namespace XTerminal.Document
         {
             CharacterQueue.Enqueue(character);
         }
+
+        /// <summary>
+        /// 把copyFrom拷贝到copyTo，保证VTCharacter的数量和值是相同的
+        /// </summary>
+        /// <param name="copyTo"></param>
+        /// <param name="copyFrom"></param>
+        public static void CopyTo(List<VTCharacter> copyTo, List<VTCharacter> copyFrom)
+        {
+            // copyTo比copyFrom多的或者少的字符个数
+            int value = Math.Abs(copyTo.Count - copyFrom.Count);
+
+            if (copyTo.Count > copyFrom.Count)
+            {
+                // 删除多余的字符
+                for (int i = 0; i < value; i++)
+                {
+                    VTCharacter character = copyTo[0];
+                    copyTo.Remove(character);
+                    VTCharacter.Recycle(character);
+                }
+            }
+            else if (copyTo.Count < copyFrom.Count)
+            {
+                // 补齐字符
+                for (int i = 0; i < value; i++)
+                {
+                    VTCharacter character = VTCharacter.CreateNull();
+                    copyTo.Add(character);
+                }
+            }
+
+            for (int i = 0; i < copyFrom.Count; i++)
+            {
+                VTCharacter toCopy = copyTo[i];
+                VTCharacter fromCopy = copyFrom[i];
+
+                toCopy.Character = fromCopy.Character;
+                toCopy.ColumnSize = fromCopy.ColumnSize;
+                toCopy.Flags = fromCopy.Flags;
+            }
+        }
     }
 }

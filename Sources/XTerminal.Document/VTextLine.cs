@@ -99,7 +99,7 @@ namespace XTerminal.Document
         {
             get
             {
-                string text = this.GetText();
+                string text = XDocumentUtils.BuildText(this.characters);
                 return text.Length == 0 ? " " : text;
             }
         }
@@ -107,7 +107,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 获取该行字符的只读集合
         /// </summary>
-        public IEnumerable<VTCharacter> Characters { get { return this.characters; } }
+        public List<VTCharacter> Characters { get { return this.characters; } }
 
         /// <summary>
         /// 该行文本的装饰信息
@@ -133,18 +133,6 @@ namespace XTerminal.Document
 
         #region 实例方法
 
-        private string GetText()
-        {
-            string text = string.Empty;
-
-            foreach (VTCharacter character in this.characters)
-            {
-                text += character.Character;
-            }
-
-            return text;
-        }
-
         /// <summary>
         /// 查找某列的字符
         /// 注意一个字符可能占两列
@@ -165,7 +153,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 将该节点从VTDocument里移除
         /// </summary>
-        private void Remove()
+        internal void Remove()
         {
             VTextLine previous = this.PreviousLine;
             VTextLine next = this.NextLine;
@@ -471,8 +459,7 @@ namespace XTerminal.Document
         /// <param name="historyLine">要应用的历史行数据</param>
         public void SetHistory(VTHistoryLine historyLine)
         {
-            this.characters.Clear();
-            this.characters.AddRange(historyLine.Characters);
+            VTCharacter.CopyTo(this.characters, historyLine.Characters);
             this.PhysicsRow = historyLine.PhysicsRow;
 
             this.SetRenderDirty(true);
@@ -491,40 +478,6 @@ namespace XTerminal.Document
 
             // 要补齐的字符数
             this.PrintCharacter(VTCharacter.CreateNull(), columns - 1);
-        }
-
-        /// <summary>
-        /// 把该行移动到指定位置
-        /// 不考虑ScrollMargin
-        /// </summary>
-        /// <param name="options"></param>
-        public void Move(MoveOptions options)
-        {
-            switch (options) 
-            {
-                case MoveOptions.MoveToFirst:
-                    {
-                        this.Remove();
-                        VTextLine firstLine = this.OwnerDocument.FirstLine;
-                        this.OwnerDocument.FirstLine.PreviousLine = this;
-                        this.OwnerDocument.FirstLine = this;
-                        this.NextLine = firstLine;
-                        break;
-                    }
-
-                case MoveOptions.MoveToLast:
-                    {
-                        this.Remove();
-                        VTextLine lastLine = this.OwnerDocument.LastLine;
-                        this.OwnerDocument.LastLine.NextLine = this;
-                        this.OwnerDocument.LastLine = this;
-                        this.PreviousLine = lastLine;
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         #endregion

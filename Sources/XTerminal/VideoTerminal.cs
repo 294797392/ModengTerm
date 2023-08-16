@@ -517,6 +517,8 @@ namespace XTerminal
             }
         }
 
+        private int cuont = 0;
+
         /// <summary>
         /// update anything about ui
         /// 如果需要布局则进行布局
@@ -579,23 +581,34 @@ namespace XTerminal
 
                 #region 渲染光标
 
-                if (this.CursorCol == 0)
+                if (this.Cursor.IsArrangeDirty)
                 {
-                    // 当前光标在第一列，那么光标偏移量直接变成0
-                    this.Cursor.OffsetX = 0;
-                    this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                    this.ActiveSurface.Arrange(this.Cursor);
-                }
-                else
-                {
-                    int characterIndex = this.ActiveLine.FindCharacterIndex(this.CursorCol - 1);
-                    if (characterIndex >= 0)
+                    if (this.activeDocument == this.mainDocument)
                     {
-                        this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                        VTRect rect = this.ActiveSurface.MeasureLine(this.ActiveLine, characterIndex, 1);
-                        this.Cursor.OffsetX = rect.Right;
-                        this.ActiveSurface.Arrange(this.Cursor);
+                        // 当前显示的是主缓冲区，那么光标在最后一行的时候才更新
+                        if (this.ScrollAtBottom)
+                        {
+                            logger.ErrorFormat("渲染光标, {0}", cuont++);
+                            this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                            VTRect rect = this.ActiveSurface.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
+                            this.Cursor.OffsetX = rect.Right;
+                        }
+                        else
+                        {
+                            this.Cursor.OffsetX = int.MinValue;
+                            this.Cursor.OffsetX = int.MinValue;
+                        }
                     }
+                    else
+                    {
+                        // 备用缓冲区，光标可以随意显示
+                        // 备用缓冲区没有滚动这个功能
+                        this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                        VTRect rect = this.ActiveSurface.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
+                        this.Cursor.OffsetX = rect.Right;
+                    }
+
+                    this.ActiveSurface.Arrange(this.Cursor);
                 }
 
                 #endregion
@@ -625,16 +638,6 @@ namespace XTerminal
 
             }, null);
 
-            if (this.activeDocument == this.mainDocument)
-            {
-                if (this.ScrollAtBottom)
-                {
-                    // 滚动到底了，说明是ActiveLine就是当前正在输入的行
-                    // 更新下历史行的大小和文字，不然在从历史行滚动回VTextLine的时候会没有数据
-                    this.lastHistoryLine.SetVTextLine(this.ActiveLine);
-                }
-            }
-
             document.SetArrangeDirty(false);
         }
 
@@ -658,7 +661,7 @@ namespace XTerminal
 
             #region 更新要显示的行
 
-            if (scrolledRows >= terminalRows)
+            if (scrolledRows >= this.terminalRows)
             {
                 // 先找到Surface上要显示的第一行数据
                 VTHistoryLine historyLine;
@@ -672,7 +675,7 @@ namespace XTerminal
                 // 找到后面的行数显示
                 VTHistoryLine currentHistory = historyLine;
                 VTextLine currentTextLine = this.activeDocument.FirstLine;
-                for (int i = 0; i < terminalRows; i++)
+                for (int i = 0; i < this.terminalRows; i++)
                 {
                     // 直接使用VTHistoryLine的List<VTCharacter>的引用
                     // 冻结状态下的VTextLine不会再有修改了
@@ -684,48 +687,31 @@ namespace XTerminal
             }
             else
             {
-                // 算出来移动前的第一行/最后一行与移动后的第一行/最后一行的差值
-                // 这个差值就是TextSelection.Geometry的OffsetY
-                VTextLine line1 = null;
-                VTextLine line2 = null;
-
                 // 此时说明只需要更新移动出去的行就可以了
                 if (newScroll > oldScroll)
                 {
-                    line1 = this.activeDocument.FirstLine;
-
                     // 往下滚动，把上面的拿到下面，从第一行开始
                     for (int i = 0; i < scrolledRows; i++)
                     {
-                        VTHistoryLine historyLine = this.historyLines[oldScroll + terminalRows + i];
+                        VTHistoryLine historyLine = this.historyLines[oldScroll + this.terminalRows + i];
 
                         // 该值永远是第一行，因为下面被Move到最后一行了
                         VTextLine firstLine = this.activeDocument.FirstLine;
-
-                        firstLine.Move(VTextLine.MoveOptions.MoveToLast);
-
                         firstLine.SetHistory(historyLine);
+                        this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
                     }
-
-                    line2 = this.activeDocument.FirstLine;
                 }
                 else
                 {
-                    line1 = this.activeDocument.LastLine;
-
                     // 往上滚动，把下面的拿到上面，从最后一行开始
                     for (int i = 1; i <= scrolledRows; i++)
                     {
                         VTHistoryLine historyLine = this.historyLines[oldScroll - i];
 
                         VTextLine lastLine = this.activeDocument.LastLine;
-
-                        lastLine.Move(VTextLine.MoveOptions.MoveToFirst);
-
                         lastLine.SetHistory(historyLine);
+                        this.activeDocument.MoveLine(lastLine, VTextLine.MoveOptions.MoveToFirst);
                     }
-
-                    line2 = this.activeDocument.LastLine;
                 }
             }
 
@@ -735,16 +721,17 @@ namespace XTerminal
 
             #region 如果有TextSelection，那么更新TextSelection
 
-            // 只有当前是主缓冲区才支持用鼠标滚轮滚动
-            // 备用缓冲区不支持，也就是说VIM，man这种程序不支持用鼠标滚轮
-            if (this.activeDocument == this.mainDocument)
+            if (!this.textSelection.IsEmpty)
             {
-                if (!this.textSelection.IsEmpty)
-                {
-                    // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
-                    this.textSelection.SetRenderDirty(true);
-                }
+                // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
+                this.textSelection.SetRenderDirty(true);
             }
+
+            #endregion
+
+            #region 重绘光标
+
+            this.Cursor.SetArrangeDirty(true);
 
             #endregion
 
@@ -1017,6 +1004,16 @@ namespace XTerminal
                         // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
                         // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
 
+                        if (this.activeDocument == this.mainDocument)
+                        {
+                            // 用户输入的时候，如果滚动条没滚动到底，那么先把滚动条滚动到底
+                            // 不然会出现在VTDocument当前的最后一行打印字符的问题
+                            if (!this.ScrollAtBottom)
+                            {
+                                this.ScrollToHistory(this.scrollMax);
+                            }
+                        }
+
                         char ch = Convert.ToChar(parameter);
                         VTDebug.WriteAction("Print:{0}, Cursor={1},{2}", ch, this.CursorRow, this.CursorCol);
                         VTCharacter character = this.CreateCharacter(parameter);
@@ -1069,13 +1066,13 @@ namespace XTerminal
                             // 有几种特殊情况：
                             // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
 
-                            #region 更新当前的最后一个历史行
+                            #region 更新历史行
 
                             this.lastHistoryLine.SetVTextLine(oldLastLine);
 
                             #endregion
 
-                            #region 再创建新行对应的历史行
+                            #region 创建新行对应的历史行
 
                             // 再创建最新行的历史行
                             int newHistoryRow = newLastLine.PhysicsRow;
@@ -1502,16 +1499,26 @@ namespace XTerminal
 
         private void VTSession_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
-            //string str = string.Join(",", bytes.Select(v => v.ToString()).ToList());
-            //logger.InfoFormat("Received, {0}", str);
             this.vtParser.ProcessCharacters(bytes, size);
 
-            // 全部字符都处理完了之后，只渲染一次
+            // 下次渲染的时候重新渲染光标
+            this.Cursor.SetArrangeDirty(true);
 
+            // 全部字符都处理完了之后，只渲染一次
             this.PerformDrawing(this.activeDocument);
-            //logger.ErrorFormat("receivedCounter = {0}", this.dataReceivedCounter++);
-            //this.activeDocument.Print();
-            //logger.ErrorFormat("TotalRows = {0}", this.activeDocument.TotalRows);
+
+            // 更新最新的历史行
+            // 解决当一次性打印多个字符的时候，不需要每打印一个字符就更新历史行，而是等所有字符都打印完了再更新
+            // 不要在Print事件里保存历史记录，因为可能会连续触发多次Print事件
+            // 触发完多次Print事件后，会最后触发一次PerformDrawing，在PerformDrawing完了再保存最后一行历史行
+            if (this.activeDocument == this.mainDocument)
+            {
+                VTextLine lastTextLine = this.mainDocument.FindLine(this.lastHistoryLine.PhysicsRow);
+                if (lastTextLine != null)
+                {
+                    this.lastHistoryLine.SetVTextLine(lastTextLine);
+                }
+            }
         }
 
         private void VTSession_StatusChanged(object client, SessionStatusEnum status)
