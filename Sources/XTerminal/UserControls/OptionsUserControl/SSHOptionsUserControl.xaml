@@ -54,7 +54,7 @@
         </ComboBox>
 
         <TextBlock Grid.Row="3" Grid.Column="0" x:Name="TextBlockSSHUserName" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxSSHUserName" Template="{Binding Path=SSHUserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxSSHUserName" Text="{Binding Path=SSHUserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
         <TextBlock Grid.Row="4" Grid.Column="0" x:Name="TextBlockSSHPassword" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <PasswordBox Grid.Row="4" Grid.Column="1" x:Name="PasswordBoxSSHPassword" Tag="{Binding Path=SSHPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChanged="PasswordBoxSSHPassword_PasswordChanged" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>
