@@ -52,11 +52,10 @@
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="HighlightGeometry\HighlightGeometryBuilder.cs" />
-    <Compile Include="Rendering\TextPointerPositions.cs" />
     <Compile Include="Rendering\ITerminalSurface.cs" />
     <Compile Include="Rendering\ITerminalScreen.cs" />
-    <Compile Include="Rendering\ScrollOrientations.cs" />
     <Compile Include="HitTestHelper.cs" />
+    <Compile Include="Rendering\VTextMeter.cs" />
     <Compile Include="VTCharacterFlags.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />
@@ -70,7 +69,7 @@
     <Compile Include="VTDocument.cs" />
     <Compile Include="VTDocumentElement.cs" />
     <Compile Include="VTextLineState.cs" />
-    <Compile Include="VTElementMetrics.cs" />
+    <Compile Include="VTextMetrics.cs" />
     <Compile Include="VTextLine.cs" />
     <Compile Include="VTextOptions.cs" />
     <Compile Include="VTextStyle.cs" />
@@ -95,8 +94,6 @@
       <Name>XTerminal.Parser</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Extension\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

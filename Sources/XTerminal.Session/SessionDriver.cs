@@ -12,7 +12,7 @@ namespace XTerminal.Session
     /// <summary>
     /// 管理与远程主机的连接
     /// </summary>
-    public abstract class SessionBase
+    public abstract class SessionDriver
     {
         #region 常量
 
@@ -31,7 +31,7 @@ namespace XTerminal.Session
 
         #region 实例变量
 
-        protected XTermSession options;
+        protected XTermSession session;
 
         /// <summary>
         /// 当前会话状态
@@ -45,31 +45,30 @@ namespace XTerminal.Session
         /// <summary>
         /// 通道类型
         /// </summary>
-        public SessionTypeEnum Type { get { return (SessionTypeEnum)this.options.SessionType; } }
+        public SessionTypeEnum Type { get { return (SessionTypeEnum)this.session.SessionType; } }
 
         /// <summary>
-        /// 终端行数
+        /// 获取当前Session的状态
         /// </summary>
-        public int Rows
+        public SessionStatusEnum Status
         {
-            get { return this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW); }
-        }
-
-        /// <summary>
-        /// 终端列数
-        /// </summary>
-        public int Columns
-        {
-            get { return this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_COL); }
+            get { return this.status; }
+            internal set
+            {
+                if (this.status != value)
+                {
+                    this.status = value;
+                }
+            }
         }
 
         #endregion
 
         #region 构造方法
 
-        public SessionBase(XTermSession options)
+        public SessionDriver(XTermSession session)
         {
-            this.options = options;
+            this.session = session;
         }
 
         #endregion
@@ -102,6 +101,13 @@ namespace XTerminal.Session
         /// 返回读取到的字节数，如果读取失败则返回-1
         /// </returns>
         internal abstract int Read(byte[] buffer);
+
+        /// <summary>
+        /// 重置终端大小
+        /// </summary>
+        /// <param name="row">新的行数</param>
+        /// <param name="col">新的列数</param>
+        public abstract void Resize(int row, int col);
 
         #endregion
 

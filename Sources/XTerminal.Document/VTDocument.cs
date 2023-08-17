@@ -46,12 +46,38 @@ namespace XTerminal.Document
         /// <summary>
         /// 可视区域的最大列数
         /// </summary>
-        public int ColumnSize { get { return this.options.ColumnSize; } }
+        public int ColumnSize
+        {
+            get
+            {
+                return this.options.ColumnSize;
+            }
+            private set
+            {
+                if (this.options.ColumnSize != value)
+                {
+                    this.options.ColumnSize = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 可视区域的最大行数
         /// </summary>
-        public int RowSize { get { return this.options.RowSize; } }
+        public int RowSize
+        {
+            get
+            {
+                return this.options.RowSize;
+            }
+            private set
+            {
+                if (this.options.RowSize != value)
+                {
+                    this.options.RowSize = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 当光标在该范围内就得滚动
@@ -118,7 +144,7 @@ namespace XTerminal.Document
 
             VTextLine firstLine = new VTextLine(this)
             {
-                ID = "0",
+                ID = 0,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
@@ -157,11 +183,11 @@ namespace XTerminal.Document
         {
             VTextLine textLine = new VTextLine(this)
             {
-                ID = row.ToString(),
+                ID = row,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
-                Style = new VTextStyle() 
+                Style = new VTextStyle()
                 {
                     FontSize = this.options.FontSize,
                     FontFamily = this.options.FontFamily,
@@ -762,6 +788,47 @@ namespace XTerminal.Document
             }
 
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
+        }
+
+        /// <summary>
+        /// 重置终端大小
+        /// TODO：是否要考虑scrollMargin？目前没考虑scrollMargin
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        public void Resize(int row, int col)
+        {
+            if (this.RowSize != row) 
+            {
+                int rows = Math.Abs(this.RowSize - row);
+
+                if (this.RowSize < row)
+                {
+                    // 往后追加文本行
+                    for (int i = 0; i < rows; i++)
+                    {
+                        this.CreateNextLine(this.LastLine.ID + 1);
+                    }
+                }
+                else
+                {
+                    // 从前面删除文本行
+                    for (int i = 0; i < rows; i++)
+                    {
+                        this.Surface.Delete(this.FirstLine);
+                        this.FirstLine.Remove();
+                    }
+
+                    this.SetArrangeDirty(true);
+                }
+
+                this.RowSize = row;
+            }
+
+            if (this.ColumnSize != col)
+            {
+                this.ColumnSize = col;
+            }
         }
 
         #endregion

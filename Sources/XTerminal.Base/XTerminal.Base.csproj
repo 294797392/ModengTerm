@@ -60,6 +60,7 @@
     <Compile Include="Definitions\FontFamilyDefinition.cs" />
     <Compile Include="Definitions\FontSizeDefinition.cs" />
     <Compile Include="Definitions\OptionDefinition.cs" />
+    <Compile Include="Definitions\TerminalSizeModeEnum.cs" />
     <Compile Include="Definitions\ThemeDefinition.cs" />
     <Compile Include="Enumerations\OptionKeyEnum.cs" />
     <Compile Include="Enumerations\SFTPAuthTypeEnum.cs" />

@@ -10,7 +10,7 @@ using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Base.DataModels
 {
-    public class SessionOption : ModelBase
+    public class SessionOption
     {
         /// <summary>
         /// 选项类型

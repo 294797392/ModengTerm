@@ -24,8 +24,6 @@ namespace XTerminal.Rendering
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DocumentRenderer");
 
-        private static readonly Point ZeroPoint = new Point();
-
         #endregion
 
         #region 实例变量
@@ -43,11 +41,6 @@ namespace XTerminal.Rendering
         {
             get { return this.visuals.Count; }
         }
-
-        /// <summary>
-        /// 获取相对于整个显示器屏幕的Canvas边界框
-        /// </summary>
-        public VTRect BoundaryRelativeToDesktop { get; internal set; }
 
         #endregion
 
@@ -97,65 +90,33 @@ namespace XTerminal.Rendering
             return drawingObject;
         }
 
-        private VTRect CommonMeasureLine(VTextLine textLine, int startIndex, int count)
-        {
-            int totalChars = textLine.Characters.Count;
-            if (startIndex + count > totalChars)
-            {
-                startIndex = 0;
-                count = totalChars;
-            }
-
-            if (startIndex == 0 && count == 0)
-            {
-                return new VTRect();
-            }
-
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
-            Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, count);
-            return new VTRect(geometry.Bounds.Left, geometry.Bounds.Top, geometry.Bounds.Width, geometry.Bounds.Height);
-        }
-
         #endregion
 
         #region ITerminalSurface
 
-        public void MeasureLine(VTextLine textLine)
+        public void Delete(VTDocumentElement drawable)
         {
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
-            DrawingUtils.UpdateTextMetrics(textLine, formattedText);
-            textLine.SetMeasureDirty(false);
-        }
+            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
+            if(drawingObject == null)
+            {
+                return;
+            }
 
-        /// <summary>
-        /// 测量某个渲染模型的大小
-        /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息
-        /// </summary>
-        /// <param name="textLine">要测量的数据模型</param>
-        /// <param name="maxCharacters">要测量的最大字符数</param>
-        /// <returns></returns>
-        public VTRect MeasureLine(VTextLine textLine, int startIndex, int count)
-        {
-            return this.CommonMeasureLine(textLine, startIndex, count);
-        }
-
-        public VTRect MeasureCharacter(VTextLine textLine, int characterIndex)
-        {
-            return this.CommonMeasureLine(textLine, characterIndex, 1);
+            this.visuals.Remove(drawingObject);
+            drawingObject.Release();
+            drawable.DrawingContext = null;
         }
 
         public void Draw(VTDocumentElement drawable)
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Draw();
-            drawable.SetRenderDirty(false);
         }
 
         public void Arrange(VTDocumentElement drawable)
         {
             DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
             drawingObject.Offset = new Vector(drawable.OffsetX, drawable.OffsetY);
-            drawable.SetArrangeDirty(false);
         }
 
         public void SetOpacity(VTDocumentElement drawable, double opacity)

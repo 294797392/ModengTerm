@@ -17,7 +17,7 @@
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="20"/>
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Row="0" x:Name="GridContent" 
@@ -34,7 +34,8 @@
                     </ContextMenu>
                 </Grid.ContextMenu>
 
-                <ContentControl x:Name="ContentControlSurface" SizeChanged="ContentControlSurface_SizeChanged"/>
+                <ContentControl x:Name="ContentControlSurface" Margin="5,5,0,5"
+                                SizeChanged="ContentControlSurface_SizeChanged"/>
             </Grid>
 
             <!-- Slider模拟滚动条 -->

@@ -461,9 +461,9 @@ namespace XTerminal.ViewModels
                 return false;
             }
 
-            session.SetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
-            session.SetOption<string>(OptionKeyEnum.THEME_FONT_COLOR, this.ForegroundList.SelectedItem.Value);
-            session.SetOption<int>(OptionKeyEnum.THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR, this.ForegroundList.SelectedItem.Value);
+            session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.CURSOR_STYLE, (int)VTCursorStyles.Line);
             session.SetOption<int>(OptionKeyEnum.CURSOR_INTERVAL, XTermDefaultValues.CURSOR_BLINK_INTERVAL);
 

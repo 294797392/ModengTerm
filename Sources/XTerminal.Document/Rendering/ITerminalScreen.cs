@@ -14,6 +14,11 @@ namespace XTerminal.Document.Rendering
     public interface ITerminalScreen
     {
         /// <summary>
+        /// 获取相对于整个显示器屏幕的Canvas边界框
+        /// </summary>
+        VTRect BoundaryRelativeToDesktop { get; }
+
+        /// <summary>
         /// 当用户按下按键的时候要触发这个事件
         /// IVideoTerminal：触发事件的VideoTerminal
         /// VTKeys：用户按下的键盘按键
@@ -66,6 +71,12 @@ namespace XTerminal.Document.Rendering
         /// <param name="options">渲染选项</param>
         /// <returns></returns>
         ITerminalSurface CreateSurface();
+
+        /// <summary>
+        /// 获取文本测量器
+        /// </summary>
+        /// <returns></returns>
+        VTextMeter GetTextMeter();
 
         /// <summary>
         /// 切换要显示的Canvas

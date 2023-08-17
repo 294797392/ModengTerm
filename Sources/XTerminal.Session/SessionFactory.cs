@@ -9,7 +9,7 @@ namespace XTerminal.Session
 {
     public static class SessionFactory
     {
-        public static SessionBase Create(XTermSession options)
+        public static SessionDriver Create(XTermSession options)
         {
             switch ((SessionTypeEnum)options.SessionType)
             {

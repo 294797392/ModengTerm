@@ -13,7 +13,7 @@ namespace XTerminal.Session
     /// <summary>
     /// 使用Rench.SshNet库实现的ssh会话
     /// </summary>
-    public class SshNetSession : SessionBase
+    public class SshNetSession : SessionDriver
     {
         #region 类变量
 
@@ -45,17 +45,17 @@ namespace XTerminal.Session
 
         #endregion
 
-        #region SessionBase
+        #region SessionDriver
 
         public override int Open()
         {
             #region 初始化身份验证方式
 
-            SSHAuthTypeEnum authType = this.options.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_AUTH_TYPE);
-            string userName = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME);
-            string password = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_PASSWORD);
-            string privateKeyFile = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_PRIVATE_KEY_FILE);
-            string passphrase = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_Passphrase);
+            SSHAuthTypeEnum authType = this.session.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_AUTH_TYPE);
+            string userName = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME);
+            string password = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_PASSWORD);
+            string privateKeyFile = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_PRIVATE_KEY_FILE);
+            string passphrase = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_Passphrase);
 
             AuthenticationMethod authentication = null;
             switch (authType)
@@ -91,8 +91,8 @@ namespace XTerminal.Session
 
             #region 连接服务器
 
-            string serverAddress = this.options.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
-            int serverPort = this.options.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
+            string serverAddress = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
+            int serverPort = this.session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
             ConnectionInfo connectionInfo = new ConnectionInfo(serverAddress, serverPort, userName, authentication);
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
@@ -102,10 +102,10 @@ namespace XTerminal.Session
 
             #region 创建终端
 
-            string terminalType = this.options.GetOption<string>(OptionKeyEnum.SSH_TERM_TYPE);
-            int columns = this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-            int rows = this.options.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            int outputBufferSize = this.options.GetOption<int>(OptionKeyEnum.WRITE_BUFFER_SIZE);
+            string terminalType = this.session.GetOption<string>(OptionKeyEnum.SSH_TERM_TYPE);
+            int columns = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+            int rows = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            int outputBufferSize = this.session.GetOption<int>(OptionKeyEnum.WRITE_BUFFER_SIZE);
             this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, outputBufferSize, null);
 
             #endregion
@@ -139,6 +139,11 @@ namespace XTerminal.Session
         internal override int Read(byte[] buffer)
         {
             return this.stream.Read(buffer, 0, buffer.Length);
+        }
+
+        public override void Resize(int row, int col)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

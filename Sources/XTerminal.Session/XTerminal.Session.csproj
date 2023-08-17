@@ -57,7 +57,7 @@
     <Compile Include="SerialPortSession.cs" />
     <Compile Include="SessionTransport.cs" />
     <Compile Include="SshNetSession.cs" />
-    <Compile Include="SessionBase.cs" />
+    <Compile Include="SessionDriver.cs" />
     <Compile Include="SessionFactory.cs" />
     <Compile Include="SessionStatusEnum.cs" />
     <Compile Include="WinptySession.cs" />

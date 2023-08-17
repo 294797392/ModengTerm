@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
 {
@@ -222,7 +223,7 @@ namespace XTerminal.Session
     /// <summary>
     /// 使用winpty库实现与Windows命令行通信
     /// </summary>
-    public class WinptySession : SessionBase
+    public class WinptySession : SessionDriver
     {
         #region 类变量
 
@@ -248,7 +249,7 @@ namespace XTerminal.Session
 
         #endregion
 
-        #region SessionBase
+        #region SessionDriver
 
         public override int Open()
         {
@@ -262,7 +263,10 @@ namespace XTerminal.Session
                 return ResponseCode.FAILED;
             }
 
-            winpty.winpty_config_set_initial_size(this.winpty_config, this.Columns, this.Rows);
+            // 设置终端初始大小
+            int cols = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+            int rows = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            winpty.winpty_config_set_initial_size(this.winpty_config, cols, rows);
 
             // winpty_error也没用
             this.winpty_handle = winpty.winpty_open(this.winpty_config, out winpty_error);
@@ -339,6 +343,15 @@ namespace XTerminal.Session
         internal override int Read(byte[] buffer)
         {
             return this.outputStream.Read(buffer, 0, buffer.Length);
+        }
+
+        public override void Resize(int row, int col)
+        {
+            IntPtr err;
+            if (!winpty.winpty_set_size(this.winpty_handle, col, row, out err))
+            {
+                this.HandleWinptyError("winpty_set_size", err);
+            }
         }
 
         #endregion

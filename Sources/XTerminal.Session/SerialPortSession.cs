@@ -10,7 +10,7 @@ using XTerminal.Base.Enumerations;
 
 namespace XTerminal.Session
 {
-    public class SerialPortSession : SessionBase
+    public class SerialPortSession : SessionDriver
     {
         #region 类变量
 
@@ -33,12 +33,12 @@ namespace XTerminal.Session
 
         #endregion
 
-        #region SessionBase
+        #region SessionDriver
 
         public override int Open()
         {
-            string portName = this.options.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
-            int baudRate = this.options.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
+            string portName = this.session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
+            int baudRate = this.session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
 
             try
             {
@@ -82,6 +82,10 @@ namespace XTerminal.Session
         internal override int Read(byte[] buffer)
         {
             return this.serialPort.Read(buffer, 0, buffer.Length);
+        }
+
+        public override void Resize(int row, int col)
+        {
         }
 
         #endregion

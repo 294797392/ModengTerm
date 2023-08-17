@@ -67,12 +67,12 @@ namespace XTerminal
         /// <summary>
         /// 切换要显示的Session
         /// </summary>
-        /// <param name="openedSessionVM"></param>
-        private void SwitchSession(OpenedSessionVM openedSessionVM)
+        /// <param name="switchTo">要切换显示的Session</param>
+        private void SwitchSession(OpenedSessionVM switchTo)
         {
-            if (ContentControlTerminal.Content != openedSessionVM.Content)
+            if (ContentControlTerminal.Content != switchTo.Content)
             {
-                ContentControlTerminal.Content = openedSessionVM.Content;
+                ContentControlTerminal.Content = switchTo.Content;
             }
         }
 

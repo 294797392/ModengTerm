@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -50,10 +51,13 @@ namespace XTerminal.UserControls
         private VTInputEvent inputEvent;
         private int scrollbarCursorDownValue;
         private bool cursorDown;
+        private WPFTextMeter textMeter;
 
         #endregion
 
         #region 属性
+
+        public VTRect BoundaryRelativeToDesktop { get; private set; }
 
         /// <summary>
         /// 该屏幕所显示的终端
@@ -283,12 +287,10 @@ namespace XTerminal.UserControls
         private void ContentControlSurface_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             // 每次大小改变的时候重新计算下渲染区域的边界框
-            DrawingSurface drawingSurface = this.ContentControlSurface.Content as DrawingSurface;
-            Point leftTop = drawingSurface.PointToScreen(new Point(0, 0));
-            drawingSurface.BoundaryRelativeToDesktop = new VTRect(leftTop.X, leftTop.Y, this.ActualWidth, this.ActualHeight);
+            Point leftTop = ContentControlSurface.PointToScreen(new Point(0, 0));
+            this.BoundaryRelativeToDesktop = new VTRect(leftTop.X, leftTop.Y, ContentControlSurface.ActualWidth, ContentControlSurface.ActualHeight);
 
-            //VTRect newRect = this.GetBoundary();
-            //this.VTSizeChanged(this, newRect);
+            this.VTSizeChanged(this, this.BoundaryRelativeToDesktop);
         }
 
 
@@ -322,6 +324,16 @@ namespace XTerminal.UserControls
         {
             DrawingSurface canvas = new DrawingSurface();
             return canvas;
+        }
+
+        public VTextMeter GetTextMeter()
+        {
+            if (this.textMeter == null)
+            {
+                this.textMeter = new WPFTextMeter();
+            }
+
+            return this.textMeter;
         }
 
         public void SwitchSurface(ITerminalSurface remove, ITerminalSurface add)

@@ -10,7 +10,7 @@ using XTerminal.Base.DataModels;
 
 namespace XTerminal.Session
 {
-    public class libvtsshSession : SessionBase
+    public class libvtsshSession : SessionDriver
     {
         #region 类变量
 
@@ -56,7 +56,7 @@ namespace XTerminal.Session
 
         #endregion
 
-        #region VTChannel
+        #region SessionDriver
 
         public override int Open()
         {
@@ -98,6 +98,11 @@ namespace XTerminal.Session
         }
 
         internal override int Read(byte[] buffer)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Resize(int row, int col)
         {
             throw new NotImplementedException();
         }

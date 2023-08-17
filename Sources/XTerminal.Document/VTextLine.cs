@@ -52,20 +52,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 该行唯一标识符
         /// </summary>
-        public string ID { get; internal set; }
+        public int ID { get; internal set; }
 
         /// <summary>
         /// 行索引，从0开始
         /// </summary>
         public int PhysicsRow { get; set; }
-
-        /// <summary>
-        /// 列大小
-        /// 规定终端一行里的字符数不能超过列数
-        /// 超过列数要按照手册里定义的标准来执行动作
-        /// 在linux里使用stty size获取
-        /// </summary>
-        public int ColumnSize { get; set; }
 
         /// <summary>
         /// 已经显示了的列数
@@ -124,7 +116,6 @@ namespace XTerminal.Document
         /// <param name="owner">该行所属的文档</param>
         public VTextLine(VTDocument owner) : base(owner)
         {
-            this.ColumnSize = owner.ColumnSize;
             this.characters = new List<VTCharacter>();
             this.Attributes = new List<VTextAttribute>();
         }
@@ -276,7 +267,7 @@ namespace XTerminal.Document
                 oldCharacte.Flags = character.Flags;
             }
 
-            if (column == this.ColumnSize - 1)
+            if (column == this.OwnerDocument.ColumnSize - 1)
             {
                 //logger.ErrorFormat("光标在最右边");
                 // 此时说明光标在最右边

@@ -95,6 +95,7 @@
     <Compile Include="Rendering\DrawingObject.cs" />
     <Compile Include="Rendering\DrawingUtils.cs" />
     <Compile Include="Rendering\DrawingSurface.cs" />
+    <Compile Include="Rendering\WPFTextMeter.cs" />
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
     <Compile Include="ServiceAgents\FileServiceAgent.cs" />
     <Compile Include="ServiceAgents\ServiceAgent.cs" />

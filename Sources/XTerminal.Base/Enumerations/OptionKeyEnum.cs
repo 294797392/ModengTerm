@@ -8,9 +8,17 @@ namespace XTerminal.Base.Enumerations
 {
     public enum OptionKeyEnum
     {
-        SSH_TERM_ROW,
-        SSH_TERM_COL,
-        SSH_TERM_TYPE,
+        #region SSH 0 - 500
+
+        SSH_TERM_ROW = 0,
+        SSH_TERM_COL = 1,
+        SSH_TERM_TYPE = 2,
+        SSH_TERM_SIZE_MODE = 3,
+
+        SSH_THEME_FONT_FAMILY = 6,
+        SSH_THEME_FONT_SIZE = 7,
+        SSH_THEME_FONT_COLOR = 8,
+
         SSH_SERVER_ADDR,
         SSH_SERVER_PORT,
         SSH_SERVER_USER_NAME,
@@ -19,12 +27,14 @@ namespace XTerminal.Base.Enumerations
         SSH_SERVER_Passphrase,
         SSH_AUTH_TYPE,
 
+        #endregion
+
+        #region 串口 501 - 1000
+
         SERIAL_PORT_NAME,
         SERIAL_PORT_BAUD_RATE,
 
-        THEME_FONT_FAMILY,
-        THEME_FONT_SIZE,
-        THEME_FONT_COLOR,
+        #endregion
 
         /// <summary>
         /// 输出编码格式
@@ -38,13 +48,16 @@ namespace XTerminal.Base.Enumerations
 
         MOUSE_SCROLL_DELTA,
 
+        #region SFTP 10000 - 11000
 
-        SFTP_SERVER_ADDRESS,
-        SFTP_SERVER_PORT,
-        SFTP_USER_NAME,
-        SFTP_USER_PASSWORD,
-        SFTP_AUTH_TYPE,
-        SFTP_SERVER_INITIAL_DIRECTORY,
-        SFTP_CLIENT_INITIAL_DIRECTORY,
+        SFTP_SERVER_ADDRESS = 10000,
+        SFTP_SERVER_PORT = 10001,
+        SFTP_USER_NAME = 10002,
+        SFTP_USER_PASSWORD = 10003,
+        SFTP_AUTH_TYPE = 10004,
+        SFTP_SERVER_INITIAL_DIRECTORY = 10005,
+        SFTP_CLIENT_INITIAL_DIRECTORY = 10006,
+
+        #endregion
     }
 }

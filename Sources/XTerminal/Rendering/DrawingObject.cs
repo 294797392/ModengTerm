@@ -40,6 +40,9 @@ namespace XTerminal.Rendering
 
         protected abstract void OnInitialize(VTDocumentElement element);
 
+        protected virtual void OnRelease()
+        { }
+
         #endregion
 
         #region 公开接口
@@ -58,6 +61,13 @@ namespace XTerminal.Rendering
             this.Draw(dc);
 
             dc.Close();
+        }
+
+        public void Release()
+        {
+            this.OnRelease();
+
+            this.DocumentElement = null;
         }
 
         #endregion

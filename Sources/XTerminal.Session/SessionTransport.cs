@@ -34,42 +34,48 @@ namespace XTerminal.Session
 
         #region 实例变量
 
-        private SessionBase session;
+        private SessionDriver driver;
 
         private Task receiveThread;
         private bool isRunning;
 
         private byte[] readBuffer;
 
+        private int row;
+        private int col;
+
         #endregion
 
         #region 公开接口
 
-        public int Initialize(XTermSession initialOptions)
+        public int Initialize(XTermSession session)
         {
-            int bufferSize = initialOptions.GetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE);
-
+            int bufferSize = session.GetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE);
             this.readBuffer = new byte[bufferSize];
+            this.row = session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
-            this.session = SessionFactory.Create(initialOptions);
-            this.session.StatusChanged += Session_StatusChanged;
+            this.driver = SessionFactory.Create(session);
+            this.driver.StatusChanged += Session_StatusChanged;
 
             return ResponseCode.SUCCESS;
         }
 
         public void Release()
         {
-            this.session.StatusChanged -= this.Session_StatusChanged;
-            this.session = null;
+            this.driver.StatusChanged -= this.Session_StatusChanged;
+            this.driver = null;
         }
 
         public int Open()
         {
-            int code = this.session.Open();
+            int code = this.driver.Open();
             if (code != ResponseCode.SUCCESS)
             {
                 return code;
             }
+
+            this.driver.Status = SessionStatusEnum.Connected;
 
             this.isRunning = true;
             this.receiveThread = Task.Factory.StartNew(this.ReceiveThreadProc);
@@ -80,14 +86,19 @@ namespace XTerminal.Session
         {
             this.isRunning = false;
             this.receiveThread.Wait();
-            this.session.Close();
+            this.driver.Close();
         }
 
         public int Write(byte[] bytes)
         {
+            if (!this.CheckDriverStatus())
+            {
+                return ResponseCode.SUCCESS;
+            }
+
             try
             {
-                this.session.Write(bytes);
+                this.driver.Write(bytes);
                 return ResponseCode.SUCCESS;
             }
             catch (Exception ex)
@@ -97,9 +108,42 @@ namespace XTerminal.Session
             }
         }
 
+        /// <summary>
+        /// 重置终端大小
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        public void Resize(int row, int col)
+        {
+            if (!this.CheckDriverStatus())
+            {
+                return;
+            }
+
+            if (this.row == row && this.col == col) 
+            {
+                return;
+            }
+
+            this.driver.Resize(row, col);
+
+            this.row = row;
+            this.col = col;
+        }
+
         #endregion
 
         #region 实例方法
+
+        private bool CheckDriverStatus()
+        {
+            if (this.driver.Status != SessionStatusEnum.Connected)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         private void NotifyDataReceived(byte[] bytes, int size)
         {
@@ -134,7 +178,7 @@ namespace XTerminal.Session
 
             while (this.isRunning)
             {
-                int n = this.session.Read(this.readBuffer);
+                int n = this.driver.Read(this.readBuffer);
 
                 if (n == -1)
                 {

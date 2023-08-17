@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
@@ -90,7 +92,7 @@ namespace XTerminal
 
         private XTermSession sessionInfo;
 
-        #region 鼠标参数
+        #region Mouse
 
         /// <summary>
         /// 鼠标滚轮滚动一次，滚动几行
@@ -122,20 +124,6 @@ namespace XTerminal
         /// 闪烁光标的线程
         /// </summary>
         private Thread cursorBlinkingThread;
-
-        #region Terminal Info
-
-        /// <summary>
-        /// 当前终端可以显示的总行数
-        /// </summary>
-        private int terminalRows;
-
-        /// <summary>
-        /// 当前终端可以显示的总列数
-        /// </summary>
-        private int terminalColumns;
-
-        #endregion
 
         #region History & Scroll
 
@@ -190,6 +178,8 @@ namespace XTerminal
         /// 输入编码方式
         /// </summary>
         private Encoding outputEncoding;
+
+        private VTextMeter textMeter;
 
         #endregion
 
@@ -295,8 +285,8 @@ namespace XTerminal
             this.isRunning = true;
 
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
-            this.terminalRows = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            this.terminalColumns = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+
+            this.textMeter = this.TerminalScreen.GetTextMeter();
 
             #region 初始化键盘
 
@@ -304,18 +294,6 @@ namespace XTerminal
             this.Keyboard.Encoding = this.outputEncoding;
             this.Keyboard.SetAnsiMode(true);
             this.Keyboard.SetKeypadMode(false);
-
-            #endregion
-
-            #region 注册事件
-
-            this.TerminalScreen.InputEvent += this.OnInputEvent;
-            this.TerminalScreen.ScrollChanged += this.OnScrollChanged;
-            this.TerminalScreen.VTMouseDown += this.OnMouseDown;
-            this.TerminalScreen.VTMouseMove += this.OnMouseMove;
-            this.TerminalScreen.VTMouseUp += this.OnMouseUp;
-            this.TerminalScreen.VTMouseWheel += this.OnMouseWheel;
-            this.TerminalScreen.VTMouseDoubleClick += this.OnMouseDoubleClick;
 
             #endregion
 
@@ -327,18 +305,34 @@ namespace XTerminal
 
             #endregion
 
+            #region 初始化TerminalScreen
+
+            this.TerminalScreen.InputEvent += this.OnInputEvent;
+            this.TerminalScreen.ScrollChanged += this.OnScrollChanged;
+            this.TerminalScreen.VTMouseDown += this.OnMouseDown;
+            this.TerminalScreen.VTMouseMove += this.OnMouseMove;
+            this.TerminalScreen.VTMouseUp += this.OnMouseUp;
+            this.TerminalScreen.VTMouseWheel += this.OnMouseWheel;
+            this.TerminalScreen.VTMouseDoubleClick += this.OnMouseDoubleClick;
+            this.TerminalScreen.VTSizeChanged += this.TerminalScreen_VTSizeChanged;
+
+            #endregion
+
             #region 初始化文档模型
+
+            int rows = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            int cols = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                ColumnSize = this.terminalColumns,
-                RowSize = this.terminalRows,
+                ColumnSize = cols,
+                RowSize = rows,
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.CURSOR_STYLE),
                 Interval = sessionInfo.GetOption<int>(OptionKeyEnum.CURSOR_INTERVAL),
-                FontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY),
-                FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.THEME_FONT_SIZE),
-                Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR)
+                FontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY),
+                FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
+                Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR)
             };
             this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument", Surface = this.TerminalScreen.CreateSurface() };
             this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument", Surface = this.TerminalScreen.CreateSurface() };
@@ -387,6 +381,7 @@ namespace XTerminal
             this.TerminalScreen.VTMouseUp -= this.OnMouseUp;
             this.TerminalScreen.VTMouseWheel -= this.OnMouseWheel;
             this.TerminalScreen.VTMouseDoubleClick -= this.OnMouseDoubleClick;
+            this.TerminalScreen.VTSizeChanged -= this.TerminalScreen_VTSizeChanged;
 
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
@@ -549,18 +544,21 @@ namespace XTerminal
                     {
                         // 此时说明该行有字符变化，需要重绘
                         this.ActiveSurface.Draw(next);
+                        next.SetRenderDirty(false);
                         //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);
                     }
                     else if (next.IsMeasureDirty)
                     {
                         // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                        this.ActiveSurface.MeasureLine(next);
+                        this.textMeter.MeasureLine(next);
+                        next.SetMeasureDirty(false);
                     }
 
                     // 更新行偏移量
                     if (arrangeDirty)
                     {
                         this.ActiveSurface.Arrange(next);
+                        next.SetArrangeDirty(false);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -579,7 +577,7 @@ namespace XTerminal
 
                 #region 渲染光标
 
-                if (this.Cursor.IsArrangeDirty)
+                if (this.Cursor.IsDirty)
                 {
                     if (this.activeDocument == this.mainDocument)
                     {
@@ -587,7 +585,7 @@ namespace XTerminal
                         if (this.ScrollAtBottom)
                         {
                             this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                            VTRect rect = this.ActiveSurface.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
+                            VTRect rect = this.textMeter.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
                             this.Cursor.OffsetX = rect.Right;
                         }
                         else
@@ -601,7 +599,7 @@ namespace XTerminal
                         // 备用缓冲区，光标可以随意显示
                         // 备用缓冲区没有滚动这个功能
                         this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                        VTRect rect = this.ActiveSurface.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
+                        VTRect rect = this.textMeter.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
                         this.Cursor.OffsetX = rect.Right;
                     }
 
@@ -623,12 +621,12 @@ namespace XTerminal
 
                 #region 更新选中高亮几何图形
 
-                if (!this.textSelection.IsEmpty && this.textSelection.IsRenderDirty)
+                if (!this.textSelection.IsEmpty && this.textSelection.IsDirty)
                 {
                     // 此时的VTextLine测量数据都是最新的
                     this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
                     this.ActiveSurface.Draw(this.textSelection);
-                    this.textSelection.SetRenderDirty(false);
+                    this.textSelection.SetDirty(false);
                 }
 
                 #endregion
@@ -656,9 +654,12 @@ namespace XTerminal
             // 需要进行滚动的行数
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
+            // 终端行大小
+            int rows = this.activeDocument.RowSize;
+
             #region 更新要显示的行
 
-            if (scrolledRows >= this.terminalRows)
+            if (scrolledRows >= rows)
             {
                 // 先找到Surface上要显示的第一行数据
                 VTHistoryLine historyLine;
@@ -672,7 +673,7 @@ namespace XTerminal
                 // 找到后面的行数显示
                 VTHistoryLine currentHistory = historyLine;
                 VTextLine currentTextLine = this.activeDocument.FirstLine;
-                for (int i = 0; i < this.terminalRows; i++)
+                for (int i = 0; i < rows; i++)
                 {
                     // 直接使用VTHistoryLine的List<VTCharacter>的引用
                     // 冻结状态下的VTextLine不会再有修改了
@@ -690,7 +691,7 @@ namespace XTerminal
                     // 往下滚动，把上面的拿到下面，从第一行开始
                     for (int i = 0; i < scrolledRows; i++)
                     {
-                        VTHistoryLine historyLine = this.historyLines[oldScroll + this.terminalRows + i];
+                        VTHistoryLine historyLine = this.historyLines[oldScroll + rows + i];
 
                         // 该值永远是第一行，因为下面被Move到最后一行了
                         VTextLine firstLine = this.activeDocument.FirstLine;
@@ -721,14 +722,14 @@ namespace XTerminal
             if (!this.textSelection.IsEmpty)
             {
                 // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
-                this.textSelection.SetRenderDirty(true);
+                this.textSelection.SetDirty(true);
             }
 
             #endregion
 
             #region 重绘光标
 
-            this.Cursor.SetArrangeDirty(true);
+            this.Cursor.SetDirty(true);
 
             #endregion
 
@@ -830,7 +831,7 @@ namespace XTerminal
 
             int characterIndex;
             VTRect characterBounds;
-            if (!HitTestHelper.HitTestVTCharacter(this.ActiveSurface, cursorLine, mouseX, out characterIndex, out characterBounds))
+            if (!HitTestHelper.HitTestVTCharacter(this.textMeter, cursorLine, mouseX, out characterIndex, out characterBounds))
             {
                 return false;
             }
@@ -885,8 +886,8 @@ namespace XTerminal
                 VTextPointer leftPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.Start : selection.End;
                 VTextPointer rightPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.End : selection.Start;
 
-                VTRect leftBounds = this.ActiveSurface.MeasureCharacter(textLine, leftPointer.CharacterIndex);
-                VTRect rightBounds = this.ActiveSurface.MeasureCharacter(textLine, rightPointer.CharacterIndex);
+                VTRect leftBounds = this.textMeter.MeasureCharacter(textLine, leftPointer.CharacterIndex);
+                VTRect rightBounds = this.textMeter.MeasureCharacter(textLine, rightPointer.CharacterIndex);
 
                 double x = leftBounds.Left;
                 double y = textLine.OffsetY;
@@ -898,7 +899,7 @@ namespace XTerminal
                 return;
             }
 
-            VTRect container = document.Surface.BoundaryRelativeToDesktop;
+            VTRect container = this.TerminalScreen.BoundaryRelativeToDesktop;
 
             // 下面处理选中了多行的状态
             VTextPointer topPointer = selection.Start.PhysicsRow > selection.End.PhysicsRow ? selection.End : selection.Start;
@@ -911,8 +912,8 @@ namespace XTerminal
             {
                 // 此时说明选中的内容都在屏幕里
                 // 构建上边和下边的矩形
-                VTRect topBounds = this.ActiveSurface.MeasureCharacter(topLine, topPointer.CharacterIndex);
-                VTRect bottomBounds = this.ActiveSurface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
+                VTRect topBounds = this.textMeter.MeasureCharacter(topLine, topPointer.CharacterIndex);
+                VTRect bottomBounds = this.textMeter.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
 
                 // 第一行的矩形
                 selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
@@ -930,7 +931,7 @@ namespace XTerminal
             if (topLine != null && bottomLine == null)
             {
                 // 选中的内容有一部分被移到屏幕外了，滚动条往上移动
-                VTRect topBounds = this.ActiveSurface.MeasureCharacter(topLine, topPointer.CharacterIndex);
+                VTRect topBounds = this.textMeter.MeasureCharacter(topLine, topPointer.CharacterIndex);
 
                 // 第一行的矩形
                 selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
@@ -944,7 +945,7 @@ namespace XTerminal
             if (topLine == null && bottomLine != null)
             {
                 // 选中的内容有一部分被移到屏幕外了，滚动条往下移动
-                VTRect bottomBounds = this.ActiveSurface.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
+                VTRect bottomBounds = this.textMeter.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
 
                 // 最后一行的矩形
                 selection.Geometry.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
@@ -1083,7 +1084,7 @@ namespace XTerminal
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = newHistoryRow - this.terminalRows + 1;
+                            int scrollMax = newHistoryRow - this.activeDocument.RowSize + 1;
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
@@ -1093,7 +1094,7 @@ namespace XTerminal
                                 // 如果当前有选中的内容，那么把选中内容设置为脏状态，下次在渲染的时候会更新
                                 if (!this.textSelection.IsEmpty)
                                 {
-                                    this.textSelection.SetRenderDirty(true);
+                                    this.textSelection.SetDirty(true);
                                 }
                             }
 
@@ -1429,7 +1430,7 @@ namespace XTerminal
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = this.terminalRows;
+                        int lines = this.activeDocument.RowSize;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
@@ -1496,10 +1497,12 @@ namespace XTerminal
 
         private void VTSession_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
+            logger.ErrorFormat("收到数据:{0}", Guid.NewGuid());
+
             this.vtParser.ProcessCharacters(bytes, size);
 
             // 下次渲染的时候重新渲染光标
-            this.Cursor.SetArrangeDirty(true);
+            this.Cursor.SetDirty(true);
 
             // 全部字符都处理完了之后，只渲染一次
             this.PerformDrawing(this.activeDocument);
@@ -1588,7 +1591,7 @@ namespace XTerminal
                 this.ActiveSurface.Arrange(this.textSelection);
             }
 
-            VTRect surfaceRect = this.ActiveSurface.BoundaryRelativeToDesktop;
+            VTRect surfaceRect = this.TerminalScreen.BoundaryRelativeToDesktop;
 
             // 如果还没有测量起始字符，那么测量起始字符
             if (this.textSelection.Start.CharacterIndex == -1)
@@ -1728,7 +1731,7 @@ namespace XTerminal
                         // 选中单词
                         int characterIndex;
                         VTRect characterBounds;
-                        if (!HitTestHelper.HitTestVTCharacter(this.ActiveSurface, lineHit, mouseX, out characterIndex, out characterBounds))
+                        if (!HitTestHelper.HitTestVTCharacter(this.textMeter, lineHit, mouseX, out characterIndex, out characterBounds))
                         {
                             return;
                         }
@@ -1760,6 +1763,39 @@ namespace XTerminal
             this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
 
             this.ActiveSurface.Draw(this.textSelection);
+        }
+
+        private void TerminalScreen_VTSizeChanged(ITerminalScreen screen, VTRect size)
+        {
+            // 如果是固定大小的终端，那么什么都不做
+            TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
+            if (sizeMode == TerminalSizeModeEnum.Fixed)
+            {
+                return;
+            }
+
+            // 自适应屏幕大小
+            // 计算一共有多少行，和每行之间的间距是多少
+            int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
+            string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
+            VTextMetrics metrics = this.textMeter.MeasureText(" ", fontSize, fontFamily);
+
+            // 终端控件的初始宽度和高度，在打开Session的时候动态设置
+            int rows = (int)Math.Floor(size.Height / metrics.Height);
+            int cols = (int)Math.Floor(size.Width / metrics.Width);
+
+            this.mainDocument.Resize(rows, cols);
+            this.alternateDocument.Resize(rows, cols);
+
+            // 重绘光标
+            this.Cursor.SetDirty(true);
+
+            // 如果是修改列大小，那么会自动触发重绘
+            // 如果是修改行，那么不会自动触发重绘，要手动重绘
+            // 这里偷个懒，不管修改的是列还是行都重绘一次
+            this.PerformDrawing(this.activeDocument);
+
+            this.sessionTransport.Resize(rows, cols);
         }
 
         #endregion

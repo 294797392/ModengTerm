@@ -16,6 +16,11 @@ namespace XTerminal.Document
 
         private StringBuilder textBuilder;
 
+        /// <summary>
+        /// 是否需要重绘
+        /// </summary>
+        public bool IsDirty { get; private set; }
+
         public override VTDocumentElements Type => VTDocumentElements.SelectionRange;
 
         /// <summary>
@@ -141,6 +146,14 @@ namespace XTerminal.Document
             }
 
             return this.textBuilder.ToString();
+        }
+
+        public void SetDirty(bool isDirty)
+        {
+            if (this.IsDirty != isDirty)
+            {
+                this.IsDirty = isDirty;
+            }
         }
 
         #region 实例方法

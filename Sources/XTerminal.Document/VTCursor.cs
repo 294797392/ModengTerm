@@ -18,6 +18,11 @@ namespace XTerminal.Document
         public override VTDocumentElements Type => VTDocumentElements.Cursor;
 
         /// <summary>
+        /// 是否需要重绘
+        /// </summary>
+        public bool IsDirty { get; private set; }
+
+        /// <summary>
         /// 光标所在列
         /// </summary>
         public int Column { get; internal set; }
@@ -51,5 +56,13 @@ namespace XTerminal.Document
         /// 是否是显示状态
         /// </summary>
         public bool IsVisible { get; set; }
+
+        public void SetDirty(bool isDirty)
+        {
+            if (this.IsDirty != isDirty)
+            {
+                this.IsDirty = isDirty;
+            }
+        }
     }
 }
