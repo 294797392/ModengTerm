@@ -12,7 +12,7 @@ namespace XTerminal.Document.Rendering
     public interface ITerminalSurface
     {
         /// <summary>
-        /// 释放渲染对象
+        /// 删除并释放渲染对象
         /// </summary>
         void Delete(VTDocumentElement drawable);
 

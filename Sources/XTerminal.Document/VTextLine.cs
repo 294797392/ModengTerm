@@ -172,6 +172,31 @@ namespace XTerminal.Document
             this.NextLine = null;
         }
 
+        /// <summary>
+        /// 把一行挂载到该行后面
+        /// </summary>
+        /// <param name="textLine"></param>
+        internal void Append(VTextLine textLine)
+        {
+            VTextLine next = this.NextLine;
+
+            if (next != null)
+            {
+                // 该行的下一行不为空，说明该行不是最后一行
+                next.PreviousLine = textLine;
+            }
+            else
+            {
+                // 如果该行的下一行是空，那么说明是最后一行
+                // 此时要更新最后一行
+                this.OwnerDocument.LastLine = textLine;
+            }
+
+            this.NextLine = textLine;
+            textLine.PreviousLine = this;
+            textLine.NextLine = next;
+        }
+
         #endregion
 
         #region 公开接口
@@ -267,12 +292,12 @@ namespace XTerminal.Document
                 oldCharacte.Flags = character.Flags;
             }
 
-            if (column == this.OwnerDocument.ColumnSize - 1)
-            {
-                //logger.ErrorFormat("光标在最右边");
-                // 此时说明光标在最右边
-                this.CursorAtRightMargin = true;
-            }
+            //if (column == this.OwnerDocument.ColumnSize - 1)
+            //{
+            //    //logger.ErrorFormat("光标在最右边");
+            //    // 此时说明光标在最右边
+            //    this.CursorAtRightMargin = true;
+            //}
 
             this.SetRenderDirty(true);
             //}
@@ -293,7 +318,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                //logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
                 return;
             }
 
@@ -413,13 +438,13 @@ namespace XTerminal.Document
         /// <summary>
         /// 往前找到下一个VTextLine
         /// </summary>
-        /// <param name="rows">向前几行</param>
+        /// <param name="nrows">向前几行</param>
         /// <returns></returns>
-        public VTextLine FindNext(int rows)
+        public VTextLine FindNext(int nrows)
         {
             VTextLine current = this;
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < nrows; i++)
             {
                 current = current.NextLine;
             }
@@ -430,13 +455,13 @@ namespace XTerminal.Document
         /// <summary>
         /// 往后找到上一个VTextLine
         /// </summary>
-        /// <param name="rows">向后几行</param>
+        /// <param name="nrows">向后几行</param>
         /// <returns></returns>
-        public VTextLine FindPrevious(int rows)
+        public VTextLine FindPrevious(int nrows)
         {
             VTextLine current = this;
 
-            for (int i = 0; i < rows; i++)
+            for (int i = 0; i < nrows; i++)
             {
                 current = current.PreviousLine;
             }

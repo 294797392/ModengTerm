@@ -25,14 +25,6 @@ namespace XTerminal.Document
         public bool IsRenderDirty { get; private set; }
 
         /// <summary>
-        /// 元素是否需要重新布局
-        /// 有可能一个元素需要重新布局，但是不需要重新渲染
-        /// 渲染字符会比对字符重新Arrange要慢很多，因为在渲染的时候，系统需要对字符进行排版操作，这个步骤很耗时。为了优化性能，尽可能不去渲染就不要渲染
-        /// Arrange本质上就是把排版好了并且渲染好了的字符移动一下位置
-        /// </summary>
-        public bool IsArrangeDirty { get; private set; }
-
-        /// <summary>
         /// 文本的测量信息
         /// </summary>
         public VTextMetrics Metrics { get; set; }
@@ -89,14 +81,6 @@ namespace XTerminal.Document
 
                 // 需要render的时候也说明需要measure
                 this.IsMeasureDirty = isDirty;
-            }
-        }
-
-        public void SetArrangeDirty(bool isDirty)
-        {
-            if (this.IsArrangeDirty != isDirty)
-            {
-                this.IsArrangeDirty = isDirty;
             }
         }
     }

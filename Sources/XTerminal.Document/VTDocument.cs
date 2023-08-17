@@ -27,6 +27,11 @@ namespace XTerminal.Document
         /// </summary>
         internal VTDocumentOptions options;
 
+        private int rowSize;
+        private int colSize;
+
+        private int lineId;
+
         #endregion
 
         #region 属性
@@ -42,42 +47,6 @@ namespace XTerminal.Document
         public VTCursor Cursor { get; private set; }
 
         public bool DECPrivateAutoWrapMode { get; set; }
-
-        /// <summary>
-        /// 可视区域的最大列数
-        /// </summary>
-        public int ColumnSize
-        {
-            get
-            {
-                return this.options.ColumnSize;
-            }
-            private set
-            {
-                if (this.options.ColumnSize != value)
-                {
-                    this.options.ColumnSize = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 可视区域的最大行数
-        /// </summary>
-        public int RowSize
-        {
-            get
-            {
-                return this.options.RowSize;
-            }
-            private set
-            {
-                if (this.options.RowSize != value)
-                {
-                    this.options.RowSize = value;
-                }
-            }
-        }
 
         /// <summary>
         /// 当光标在该范围内就得滚动
@@ -128,6 +97,9 @@ namespace XTerminal.Document
         {
             this.options = options;
 
+            this.rowSize = this.options.RowSize;
+            this.colSize = this.options.ColumnSize;
+
             this.Cursor = new VTCursor()
             {
                 Blinking = true,
@@ -142,19 +114,7 @@ namespace XTerminal.Document
 
             #region 初始化第一行，并设置链表首尾指针
 
-            VTextLine firstLine = new VTextLine(this)
-            {
-                ID = 0,
-                OffsetX = 0,
-                OffsetY = 0,
-                DECPrivateAutoWrapMode = options.DECPrivateAutoWrapMode,
-                Style = new VTextStyle()
-                {
-                    FontFamily = options.FontFamily,
-                    FontSize = options.FontSize,
-                    Foreground = options.Foreground
-                }
-            };
+            VTextLine firstLine = this.CreateLine();
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
             this.ActiveLine = firstLine;
@@ -164,7 +124,8 @@ namespace XTerminal.Document
             // 默认创建80行，可见区域也是80行
             for (int i = 1; i < options.RowSize; i++)
             {
-                this.CreateNextLine(i);
+                VTextLine textLine = this.CreateLine();
+                this.LastLine.Append(textLine);
             }
 
             // 更新可视区域
@@ -176,14 +137,15 @@ namespace XTerminal.Document
         #region 实例方法
 
         /// <summary>
-        /// 创建一个新行并将新行挂到链表的最后一个节点后面
+        /// 创建一个新行，该行不挂在链表上
         /// </summary>
+        /// <param name="id"></param>
         /// <returns></returns>
-        private void CreateNextLine(int row)
+        private VTextLine CreateLine()
         {
             VTextLine textLine = new VTextLine(this)
             {
-                ID = row,
+                ID = this.lineId++,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
@@ -195,9 +157,7 @@ namespace XTerminal.Document
                 },
             };
 
-            this.LastLine.NextLine = textLine;
-            textLine.PreviousLine = this.LastLine;
-            this.LastLine = textLine;
+            return textLine;
         }
 
         /// <summary>
@@ -703,6 +663,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 设置光标位置和activeLine
+        /// row和column从0开始计数，0表示第一行或者第一列
         /// </summary>
         /// <param name="row">要设置的行</param>
         /// <param name="column">要设置的列</param>
@@ -792,42 +753,62 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 重置终端大小
-        /// TODO：是否要考虑scrollMargin？目前没考虑scrollMargin
+        /// 需要考虑scrollMargin
         /// </summary>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        public void Resize(int row, int col)
+        /// <param name="rowSize">终端的新的行数</param>
+        /// <param name="colSize">终端的新的列数</param>
+        public void Resize(int rowSize, int colSize)
         {
-            if (this.RowSize != row) 
+            if (this.rowSize != rowSize) 
             {
-                int rows = Math.Abs(this.RowSize - row);
+                int rows = Math.Abs(this.rowSize - rowSize);
 
-                if (this.RowSize < row)
+                if (this.rowSize < rowSize)
                 {
                     // 往后追加文本行
+
+                    // 找到滚动区域内的最后一行，在该行后添加新行
+                    this.LastLine.SetRenderDirty(true);
                     for (int i = 0; i < rows; i++)
                     {
-                        this.CreateNextLine(this.LastLine.ID + 1);
+                        VTextLine textLine = this.CreateLine();
+                        this.LastLine.Append(textLine);
+                        textLine.SetRenderDirty(true);
                     }
                 }
                 else
                 {
-                    // 从前面删除文本行
-                    for (int i = 0; i < rows; i++)
+                    if (this.ActiveLine == this.LastLine)
                     {
-                        this.Surface.Delete(this.FirstLine);
-                        this.FirstLine.Remove();
-                    }
+                        // 此时说明光标在最后一行，那么就从第一行开始删除
+                        for (int i = 0; i < rows; i++)
+                        {
+                            this.Surface.Delete(this.FirstLine);
+                            this.FirstLine.Remove();
+                        }
 
-                    this.SetArrangeDirty(true);
+                        // 移动ActiveLine到最后一行
+                        this.SetCursor(rowSize - 1, this.Cursor.Column);
+                    }
+                    else
+                    {
+                        // 光标不在最后一行，那么从最后一行开始删除
+                        for (int i = 0; i < rows; i++)
+                        {
+                            this.Surface.Delete(this.LastLine);
+                            this.LastLine.Remove();
+                        }
+                    }
                 }
 
-                this.RowSize = row;
+                this.SetArrangeDirty(true);
+
+                this.rowSize = rowSize;
             }
 
-            if (this.ColumnSize != col)
+            if (this.colSize != colSize)
             {
-                this.ColumnSize = col;
+                this.colSize = colSize;
             }
         }
 

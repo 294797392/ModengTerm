@@ -163,6 +163,22 @@ namespace XTerminal
             //VTDebug.Enabled = CheckBoxEnableDebugMode.IsChecked.Value;
         }
 
+        private void MenuItemDebugWindow_Click(object sender, RoutedEventArgs e)
+        {
+            SessionContent sessionContent = ContentControlTerminal.Content as SessionContent;
+            TerminalSessionVM terminalSession = sessionContent.DataContext as TerminalSessionVM;
+            if(terminalSession == null)
+            {
+                return;
+            }
+
+            DebugWindow debugWindow = new DebugWindow();
+            debugWindow.VideoTerminal = terminalSession.VideoTerminal;
+            debugWindow.Owner = this;
+            debugWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            debugWindow.ShowDialog();
+        }
+
         #endregion
     }
 

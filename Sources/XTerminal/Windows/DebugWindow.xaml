@@ -1,0 +1,31 @@
+﻿<Window x:Class="XTerminal.Windows.DebugWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:XTerminal.Windows"
+        mc:Ignorable="d"
+        Title="DebugWindow" Height="450" Width="800">
+
+    <Window.Resources>
+        <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+            <Setter Property="MinWidth" Value="70"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="3,0,3,0"/>
+            <Setter Property="Padding" Value="5,0,5,0"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Button Content="ResizeTerminal" Click="ButtonResizeTerminal_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

@@ -92,6 +92,16 @@ namespace XTerminal
 
         private XTermSession sessionInfo;
 
+        /// <summary>
+        /// 当前终端行数
+        /// </summary>
+        private int rows;
+
+        /// <summary>
+        /// 当前终端列数
+        /// </summary>
+        private int cols;
+
         #region Mouse
 
         /// <summary>
@@ -251,6 +261,15 @@ namespace XTerminal
             }
         }
 
+        public SessionTransport SessionTransport { get { return this.sessionTransport; } }
+
+        public int RowSize { get { return this.rows; } }
+        
+        public int ColumnSize
+        {
+            get { return this.cols; }
+        }
+
         #endregion
 
         #region 构造方法
@@ -271,7 +290,6 @@ namespace XTerminal
         public void Initialize(XTermSession sessionInfo)
         {
             this.sessionInfo = sessionInfo;
-            this.outputEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
             this.uiSyncContext = SynchronizationContext.Current;
 
             // DECAWM
@@ -281,12 +299,14 @@ namespace XTerminal
             this.historyLines = new Dictionary<int, VTHistoryLine>();
             this.TextOptions = new VTextOptions();
             this.textSelection = new VTextSelection();
+            this.textMeter = this.TerminalScreen.GetTextMeter();
 
             this.isRunning = true;
 
+            this.outputEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
-
-            this.textMeter = this.TerminalScreen.GetTextMeter();
+            this.rows = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            this.cols = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
             #region 初始化键盘
 
@@ -320,13 +340,10 @@ namespace XTerminal
 
             #region 初始化文档模型
 
-            int rows = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            int cols = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                ColumnSize = cols,
-                RowSize = rows,
+                ColumnSize = this.cols,
+                RowSize = this.rows,
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.CURSOR_STYLE),
                 Interval = sessionInfo.GetOption<int>(OptionKeyEnum.CURSOR_INTERVAL),
@@ -558,7 +575,6 @@ namespace XTerminal
                     if (arrangeDirty)
                     {
                         this.ActiveSurface.Arrange(next);
-                        next.SetArrangeDirty(false);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -655,7 +671,7 @@ namespace XTerminal
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
             // 终端行大小
-            int rows = this.activeDocument.RowSize;
+            int rows = this.rows;
 
             #region 更新要显示的行
 
@@ -1049,10 +1065,6 @@ namespace XTerminal
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
                         this.activeDocument.LineFeed();
 
-                        VTextLine oldLastLine = this.ActiveLine.PreviousLine;
-                        VTextLine newLastLine = this.ActiveLine;
-                        newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
-
                         // 换行之后记录历史行
                         // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
                         // MainScrrenBuffer和AlternateScrrenBuffer里的行分别记录
@@ -1060,6 +1072,10 @@ namespace XTerminal
                         // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
                         if (this.activeDocument == this.mainDocument)
                         {
+                            VTextLine oldLastLine = this.ActiveLine.PreviousLine;
+                            VTextLine newLastLine = this.ActiveLine;
+                            newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
+
                             // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里冻结一下换行之前的历史行的数据，冻结之后，该历史行的数据就不会再更改了
                             // 有几种特殊情况：
                             // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
@@ -1084,7 +1100,7 @@ namespace XTerminal
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = newHistoryRow - this.activeDocument.RowSize + 1;
+                            int scrollMax = newHistoryRow - this.rows + 1;
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
@@ -1430,7 +1446,7 @@ namespace XTerminal
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = this.activeDocument.RowSize;
+                        int lines = this.rows;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
@@ -1497,8 +1513,6 @@ namespace XTerminal
 
         private void VTSession_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
-            logger.ErrorFormat("收到数据:{0}", Guid.NewGuid());
-
             this.vtParser.ProcessCharacters(bytes, size);
 
             // 下次渲染的时候重新渲染光标
@@ -1781,11 +1795,22 @@ namespace XTerminal
             VTextMetrics metrics = this.textMeter.MeasureText(" ", fontSize, fontFamily);
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置
-            int rows = (int)Math.Floor(size.Height / metrics.Height);
-            int cols = (int)Math.Floor(size.Width / metrics.Width);
+            int newRows = (int)Math.Floor(size.Height / metrics.Height);
+            int newCols = (int)Math.Floor(size.Width / metrics.Width);
 
-            this.mainDocument.Resize(rows, cols);
-            this.alternateDocument.Resize(rows, cols);
+            // 如果行和列都没变化，那么就什么都不做
+            bool rowChanged = this.rows != newRows;
+            bool colChanged = this.cols != newCols;
+            if (!rowChanged && !colChanged)
+            {
+                return;
+            }
+
+            VTDebug.WriteAction("resize, oldRow = {0}, oldCol = {1}, newRow = {2}, newCol = {3}", this.rows, this.cols, newRows, newCols);
+
+            // 对Document执行Resize
+            this.mainDocument.Resize(newRows, newCols);
+            this.alternateDocument.Resize(newRows, newCols);
 
             // 重绘光标
             this.Cursor.SetDirty(true);
@@ -1795,7 +1820,10 @@ namespace XTerminal
             // 这里偷个懒，不管修改的是列还是行都重绘一次
             this.PerformDrawing(this.activeDocument);
 
-            this.sessionTransport.Resize(rows, cols);
+            this.sessionTransport.Resize(newRows, newCols);
+
+            this.cols = newCols;
+            this.rows = newRows;
         }
 
         #endregion

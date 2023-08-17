@@ -83,6 +83,7 @@
 
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于XTerminal" Click="MenuItemAbout_Click"/>
+                    <MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>
                 </MenuItem>
 
             </Menu>
