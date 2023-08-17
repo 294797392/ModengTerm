@@ -143,7 +143,7 @@ namespace XTerminal.Session
 
         public override void Resize(int row, int col)
         {
-            throw new NotImplementedException();
+            this.stream.SendWindowChangeRequest((uint)col, (uint)row, 0, 0);
         }
 
         #endregion

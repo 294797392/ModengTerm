@@ -706,6 +706,16 @@ namespace Renci.SshNet
             Write(line + "\r");
         }
 
+        public void SendWindowChangeRequest(uint columns, uint rows, uint width, uint height)
+        {
+            if (_channel == null)
+            {
+                throw new ObjectDisposedException("ShellStream");
+            }
+
+            _channel.SendWindowChangeRequest(columns, rows, width, height);
+        }
+
         /// <summary>
         /// Releases the unmanaged resources used by the <see cref="Stream"/> and optionally releases the managed resources.
         /// </summary>

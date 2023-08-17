@@ -1809,6 +1809,7 @@ namespace XTerminal
             VTDebug.WriteAction("resize, oldRow = {0}, oldCol = {1}, newRow = {2}, newCol = {3}", this.rows, this.cols, newRows, newCols);
 
             // 对Document执行Resize
+            // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样
             this.mainDocument.Resize(newRows, newCols);
             this.alternateDocument.Resize(newRows, newCols);
 

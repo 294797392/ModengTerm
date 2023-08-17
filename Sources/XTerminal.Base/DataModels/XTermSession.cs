@@ -66,7 +66,7 @@ namespace XTerminal.Base.DataModels
                 this.Options.Add(sessionOption);
             }
 
-            sessionOption.Value = value.ToString();
+            sessionOption.Value = value == null ? string.Empty : value.ToString();
         }
     }
 }
