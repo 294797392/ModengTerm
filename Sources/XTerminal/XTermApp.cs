@@ -5,15 +5,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utils;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
+using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.ServiceAgents;
 using XTerminal.Session;
@@ -228,7 +231,7 @@ namespace XTerminal
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
             if (firstOpenedSession == null)
             {
-                this.OpenSession(XTermDefaultValues.DefaultSession);
+                this.OpenSession(XTermConsts.DefaultSession);
             }
             else
             {

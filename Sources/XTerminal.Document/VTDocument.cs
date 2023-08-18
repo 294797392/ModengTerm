@@ -109,7 +109,7 @@ namespace XTerminal.Document
                 Row = 0,
                 Column = 0,
                 Style = options.CursorStyle,
-                Interval = options.Interval
+                BlinkSpeed = options.BlinkSpeed,
             };
 
             #region 初始化第一行，并设置链表首尾指针

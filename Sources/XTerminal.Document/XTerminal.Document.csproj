@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="HighlightGeometry\HighlightGeometryBuilder.cs" />
+    <Compile Include="Rendering\IDrawingContext.cs" />
     <Compile Include="Rendering\ITerminalSurface.cs" />
     <Compile Include="Rendering\ITerminalScreen.cs" />
     <Compile Include="HitTestHelper.cs" />

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:XTerminal.UserControls.OptionsUserControl"
+             xmlns:converter="clr-namespace:XTerminal"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -12,11 +13,17 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/XTerminal;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <converter:VTCursorStyle2StringConverter x:Key="VTCursorStyle2StringConverter"/>
+            <converter:VTCursorSpeed2StringConverter x:Key="VTCursorSpeed2StringConverter"/>
+
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
@@ -65,6 +72,28 @@
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Path=Name}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Grid.Row="4" Grid.Column="0" Text="光标样式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <ComboBox Grid.Row="4" Grid.Column="1" x:Name="ComboBoxCursorStyle" DataContext="{Binding Path=FontSizeList}"
+                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=VTCursorStyle2StringConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <TextBlock Grid.Row="5" Grid.Column="0" Text="闪烁速度：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <ComboBox Grid.Row="5" Grid.Column="1" x:Name="ComboBoxCursorSpeed" DataContext="{Binding Path=FontSizeList}"
+                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=VTCursorSpeed2StringConverter}}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>

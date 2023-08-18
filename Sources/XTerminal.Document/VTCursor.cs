@@ -53,9 +53,19 @@ namespace XTerminal.Document
         public int Interval { get; set; }
 
         /// <summary>
+        /// 闪烁速度
+        /// </summary>
+        public VTCursorSpeeds BlinkSpeed { get; set; }
+
+        /// <summary>
         /// 是否是显示状态
         /// </summary>
         public bool IsVisible { get; set; }
+
+        /// <summary>
+        /// 光标对应的Surface
+        /// </summary>
+        public ITerminalSurface OwnerSurface { get; set; }
 
         public void SetDirty(bool isDirty)
         {

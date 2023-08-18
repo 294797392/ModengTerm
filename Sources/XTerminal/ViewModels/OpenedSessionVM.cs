@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Enumerations;
 using XTerminal.Session;
 using XTerminal.UserControls;
 

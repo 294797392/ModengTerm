@@ -18,6 +18,14 @@ namespace XTerminal.Base.Enumerations
         SSH_THEME_FONT_FAMILY = 6,
         SSH_THEME_FONT_SIZE = 7,
         SSH_THEME_FONT_COLOR = 8,
+        /// <summary>
+        /// 光标闪烁速度
+        /// </summary>
+        SSH_THEME_CURSOR_SPEED,
+        /// <summary>
+        /// 光标样式
+        /// </summary>
+        SSH_THEME_CURSOR_STYLE,
 
         SSH_SERVER_ADDR,
         SSH_SERVER_PORT,
@@ -42,9 +50,6 @@ namespace XTerminal.Base.Enumerations
         WRITE_ENCODING,
         WRITE_BUFFER_SIZE,
         READ_BUFFER_SIZE,
-
-        CURSOR_STYLE,
-        CURSOR_INTERVAL,
 
         MOUSE_SCROLL_DELTA,
 

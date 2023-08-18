@@ -32,9 +32,9 @@ namespace XTerminal.Document
         public VTCursorStyles CursorStyle { get; set; }
 
         /// <summary>
-        /// 光标闪烁间隔时间
+        /// 光标闪烁速度
         /// </summary>
-        public int Interval { get; set; }
+        public VTCursorSpeeds BlinkSpeed { get; set; }
 
         /// <summary>
         /// 文本前景色

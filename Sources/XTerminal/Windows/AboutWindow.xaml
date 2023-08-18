@@ -33,7 +33,7 @@
 
             <TextBlock Text="微信：294797392" Style="{StaticResource ResourceKey=StyleTextBlockContact}"/>
 
-            <TextBlock Text="Gitee：https://gitee.com/zyfalreadyexsit/terminal.git" Style="{StaticResource ResourceKey=StyleTextBlockContact}"/>
+            <!--<TextBlock Text="Gitee：https://gitee.com/zyfalreadyexsit/terminal.git" Style="{StaticResource ResourceKey=StyleTextBlockContact}"/>-->
 
         </StackPanel>
 

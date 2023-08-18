@@ -10,17 +10,30 @@ using XTerminal.Base.Enumerations;
 
 namespace XTerminal
 {
-    public class SSHAuthTextConverter : IValueConverter
+    public static class EnumConverterUtils
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public static bool CheckValue(object value)
         {
             if (value == null)
             {
-                return "未知";
+                return false;
             }
 
             string v = value.ToString();
             if (string.IsNullOrEmpty(v))
+            {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    public class SSHAuthTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!EnumConverterUtils.CheckValue(value))
             {
                 return "未知";
             }
@@ -74,6 +87,57 @@ namespace XTerminal
                 case SessionTypeEnum.Win32CommandLine: return "命令行";
                 case SessionTypeEnum.SFTP: return "SFTP";
 
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class VTCursorStyle2StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!EnumConverterUtils.CheckValue(value))
+            {
+                return "未知";
+            }
+
+            switch ((VTCursorStyles)value)
+            {
+                case VTCursorStyles.Block: return "block";
+                case VTCursorStyles.Line: return "line";
+                case VTCursorStyles.None: return "none";
+                case VTCursorStyles.Underscore: return "underscore";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class VTCursorSpeed2StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!EnumConverterUtils.CheckValue(value))
+            {
+                return "未知";
+            }
+
+            switch ((VTCursorSpeeds)value)
+            {
+                case VTCursorSpeeds.HighSpeed: return "快";
+                case VTCursorSpeeds.LowSpeed: return "慢";
+                case VTCursorSpeeds.NormalSpeed: return "普通";
                 default:
                     throw new NotImplementedException();
             }

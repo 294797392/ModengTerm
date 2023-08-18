@@ -62,6 +62,7 @@
     <Compile Include="Definitions\OptionDefinition.cs" />
     <Compile Include="Definitions\TerminalSizeModeEnum.cs" />
     <Compile Include="Definitions\ThemeDefinition.cs" />
+    <Compile Include="Enumerations\VTCursorSpeeds.cs" />
     <Compile Include="Enumerations\OptionKeyEnum.cs" />
     <Compile Include="Enumerations\SFTPAuthTypeEnum.cs" />
     <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="VTKeyboard.cs" />
     <Compile Include="VTKeys.cs" />
     <Compile Include="VTModifierKeys.cs" />
-    <Compile Include="XTermDefaultValues.cs" />
+    <Compile Include="XTermConsts.cs" />
     <Compile Include="XTermUtils.cs" />
   </ItemGroup>
   <ItemGroup>

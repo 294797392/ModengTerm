@@ -253,7 +253,6 @@ namespace XTerminal.ViewModels
             }
         }
 
-
         /// <summary>
         /// SFTP初始目录
         /// </summary>
@@ -286,6 +285,10 @@ namespace XTerminal.ViewModels
             }
         }
 
+        public BindableCollection<VTCursorStyles> CursorStyles { get; private set; }
+
+        public BindableCollection<VTCursorSpeeds> CursorSpeeds { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -302,24 +305,26 @@ namespace XTerminal.ViewModels
             }
             this.SelectedSessionType = this.SessionTypeList.FirstOrDefault();
 
-            this.TerminalRows = XTermDefaultValues.TerminalRows.ToString();
-            this.TerminalColumns = XTermDefaultValues.TerminalColumns.ToString();
+            this.TerminalRows = XTermConsts.TerminalRows.ToString();
+            this.TerminalColumns = XTermConsts.TerminalColumns.ToString();
             this.TerminalTypeList = new BindableCollection<TerminalTypeEnum>();
             this.TerminalTypeList.AddRange(Enum.GetValues(typeof(TerminalTypeEnum)).Cast<TerminalTypeEnum>());
-            this.TerminalTypeList.SelectedItem = XTermDefaultValues.DefaultTerminalType;
+            this.TerminalTypeList.SelectedItem = XTermConsts.DefaultTerminalType;
 
             this.SSHAuthTypeList = new BindableCollection<SSHAuthTypeEnum>();
             this.SSHAuthTypeList.AddRange(Enum.GetValues(typeof(SSHAuthTypeEnum)).Cast<SSHAuthTypeEnum>());
             this.SSHAuthTypeList.SelectedItem = this.SSHAuthTypeList.FirstOrDefault();
-            this.SSHServerPort = XTermDefaultValues.DefaultSSHPort.ToString();
+            this.SSHServerPort = XTermConsts.DefaultSSHPort.ToString();
 
             this.PortList = new BindableCollection<string>();
             this.PortList.AddRange(SerialPort.GetPortNames());
             this.PortList.SelectedItem = this.PortList.FirstOrDefault();
 
             this.BaudRateList = new BindableCollection<string>();
-            this.BaudRateList.AddRange(XTermDefaultValues.DefaultSerialPortBaudRates);
+            this.BaudRateList.AddRange(XTermConsts.DefaultSerialPortBaudRates);
             this.BaudRateList.SelectedItem = this.BaudRateList.FirstOrDefault();
+
+            #region Theme
 
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
             this.FontFamilyList.AddRange(XTermApp.Context.Manifest.FontFamilyList);
@@ -330,12 +335,18 @@ namespace XTerminal.ViewModels
             this.ForegroundList = new BindableCollection<ColorDefinition>();
             this.ForegroundList.AddRange(XTermApp.Context.Manifest.ForegroundList);
             this.ForegroundList.SelectedItem = this.ForegroundList.FirstOrDefault();
+            this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
+            this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
+            this.CursorSpeeds.SelectedItem = VTCursorSpeeds.NormalSpeed;
+            this.CursorStyles = new BindableCollection<VTCursorStyles>();
+            this.CursorStyles.AddRange(Enum.GetValues(typeof(VTCursorStyles)).Cast<VTCursorStyles>());
 
-            this.MouseScrollDelta = XTermDefaultValues.DefaultScrollDelta.ToString();
+            #endregion
 
-            this.SFTPServerInitialDirectory = XTermDefaultValues.SFTPServerInitialDirectory;
-            this.SFTPClientInitialDirectory = XTermDefaultValues.SFTPClientInitialDirectory;
+            this.MouseScrollDelta = XTermConsts.DefaultScrollDelta.ToString();
 
+            this.SFTPServerInitialDirectory = XTermConsts.SFTPServerInitialDirectory;
+            this.SFTPClientInitialDirectory = XTermConsts.SFTPClientInitialDirectory;
         }
 
         #endregion
@@ -344,9 +355,9 @@ namespace XTerminal.ViewModels
 
         private string GetTerminalName(TerminalTypeEnum type)
         {
-            switch(type)
+            switch (type)
             {
-                case TerminalTypeEnum.VT100:return "vt100";
+                case TerminalTypeEnum.VT100: return "vt100";
                 case TerminalTypeEnum.VT220: return "vt220";
                 case TerminalTypeEnum.XTerm: return "xterm";
                 case TerminalTypeEnum.XTerm256Color: return "xterm-256color";
@@ -365,7 +376,7 @@ namespace XTerminal.ViewModels
 
             int port;
             if (!int.TryParse(this.sshPort, out port) ||
-                port < XTermDefaultValues.MIN_PORT || port > XTermDefaultValues.MAX_PORT)
+                port < XTermConsts.MIN_PORT || port > XTermConsts.MAX_PORT)
             {
                 MessageBoxUtils.Info("请输入正确的端口号");
                 return false;
@@ -477,8 +488,8 @@ namespace XTerminal.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR, this.ForegroundList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
-            session.SetOption<int>(OptionKeyEnum.CURSOR_STYLE, (int)VTCursorStyles.Line);
-            session.SetOption<int>(OptionKeyEnum.CURSOR_INTERVAL, XTermDefaultValues.CURSOR_BLINK_INTERVAL);
+            session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
+            session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
 
             return true;
         }
@@ -503,8 +514,8 @@ namespace XTerminal.ViewModels
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
             session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
-            session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, XTermDefaultValues.DefaultOutputEncoding);
-            session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, XTermDefaultValues.DefaultReadBufferSize);
+            session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, XTermConsts.DefaultOutputEncoding);
+            session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, XTermConsts.DefaultReadBufferSize);
 
             return true;
         }
@@ -514,7 +525,7 @@ namespace XTerminal.ViewModels
             int scrollDelta;
             if (!int.TryParse(this.MouseScrollDelta, out scrollDelta))
             {
-                scrollDelta = XTermDefaultValues.DefaultScrollDelta;
+                scrollDelta = XTermConsts.DefaultScrollDelta;
             }
 
             session.SetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, scrollDelta);
@@ -527,14 +538,14 @@ namespace XTerminal.ViewModels
             string serverInitialDir = this.SFTPServerInitialDirectory;
             if (string.IsNullOrEmpty(serverInitialDir))
             {
-                serverInitialDir = XTermDefaultValues.SFTPServerInitialDirectory;
+                serverInitialDir = XTermConsts.SFTPServerInitialDirectory;
             }
 
             string clientInitialDir = this.SFTPClientInitialDirectory;
             if (string.IsNullOrEmpty(clientInitialDir) ||
                 !Directory.Exists(clientInitialDir))
             {
-                clientInitialDir = XTermDefaultValues.SFTPClientInitialDirectory;
+                clientInitialDir = XTermConsts.SFTPClientInitialDirectory;
             }
 
             session.SetOption<string>(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY, serverInitialDir);
@@ -582,7 +593,7 @@ namespace XTerminal.ViewModels
 
                 case SessionTypeEnum.SFTP:
                     {
-                        if(!this.GetSFTPOptions(session))
+                        if (!this.GetSFTPOptions(session))
                         {
                             return false;
                         }

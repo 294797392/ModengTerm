@@ -128,7 +128,7 @@ namespace XTerminal.ViewModels.SFTP
         /// <param name="directory"></param>
         private void AddHistoryDirectory(string directory)
         {
-            if (this.historyDirs.Count == XTermDefaultValues.MaxHistoryDirectory)
+            if (this.historyDirs.Count == XTermConsts.MaxHistoryDirectory)
             {
                 this.historyDirs.Dequeue();
             }

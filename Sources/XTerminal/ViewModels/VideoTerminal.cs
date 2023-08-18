@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
@@ -50,6 +51,12 @@ namespace XTerminal
         private static readonly byte[] CPR_CursorPositionReportResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
         //private static readonly byte[] CPR_CursorPositionReportResponse = new byte[5] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0' };
         private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
+
+        private static DispatcherTimer BlinkCursorTimer;
+        /// <summary>
+        /// 要闪烁的光标列表
+        /// </summary>
+        private static List<VTCursor> CursorList;
 
         #endregion
 
@@ -130,11 +137,6 @@ namespace XTerminal
         private bool autoWrapMode;
 
         private bool xtermBracketedPasteMode;
-
-        /// <summary>
-        /// 闪烁光标的线程
-        /// </summary>
-        private Thread cursorBlinkingThread;
 
         #region History & Scroll
 
@@ -298,6 +300,17 @@ namespace XTerminal
 
         #region 构造方法
 
+        static VideoTerminal()
+        {
+            // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
+
+            //BlinkCursorTimer = new DispatcherTimer();
+            //BlinkCursorTimer.Interval = TimeSpan.FromMilliseconds(XTermConsts.HighSpeedBlinkInterval);
+            //BlinkCursorTimer.Tick += BlinkCursorThread_Tick;
+            //BlinkCursorTimer.IsEnabled = false;
+            //BlinkCursorTimer.Start();
+        }
+
         public VideoTerminal()
         {
 
@@ -369,8 +382,8 @@ namespace XTerminal
                 ColumnSize = this.colSize,
                 RowSize = this.rowSize,
                 DECPrivateAutoWrapMode = false,
-                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.CURSOR_STYLE),
-                Interval = sessionInfo.GetOption<int>(OptionKeyEnum.CURSOR_INTERVAL),
+                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
+                BlinkSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
                 FontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY),
                 FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
                 Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR)
@@ -388,9 +401,6 @@ namespace XTerminal
             #region 初始化光标
 
             this.ActiveSurface.Draw(this.Cursor);
-            this.cursorBlinkingThread = new Thread(this.CursorBlinkingThreadProc);
-            this.cursorBlinkingThread.IsBackground = true;
-            this.cursorBlinkingThread.Start();
             // 先初始化备用缓冲区的光标渲染上下文
             this.alternateDocument.Surface.Draw(this.alternateDocument.Cursor);
 
@@ -428,8 +438,6 @@ namespace XTerminal
 
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
-
-            this.cursorBlinkingThread.Join();
 
             this.sessionTransport.StatusChanged -= this.VTSession_StatusChanged;
             this.sessionTransport.DataReceived -= this.VTSession_DataReceived;
@@ -1590,7 +1598,7 @@ namespace XTerminal
             }
         }
 
-        private void CursorBlinkingThreadProc()
+        private void BackgroundWorkerProc()
         {
             while (this.isRunning)
             {
@@ -1615,7 +1623,11 @@ namespace XTerminal
                 {
                     Thread.Sleep(cursor.Interval);
                 }
+
+                logger.ErrorFormat("渲染光标 {0}", Guid.NewGuid());
             }
+
+            logger.ErrorFormat("渲染光标线程运行结束");
         }
 
 
@@ -1872,6 +1884,26 @@ namespace XTerminal
 
             this.ColumnSize = newCols;
             this.RowSize = newRows;
+        }
+
+
+        /// <summary>
+        /// 光标闪烁线程
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void BlinkCursorThread_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+            }
+            catch (Exception ex)
+            {
+                logger.Error("BlinkCursorThread运行异常", ex);
+            }
+            finally
+            {
+            }
         }
 
         #endregion

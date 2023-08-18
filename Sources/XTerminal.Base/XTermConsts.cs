@@ -13,8 +13,16 @@ namespace XTerminal.Base
     /// <summary>
     /// XTerminal使用的默认值
     /// </summary>
-    public static class XTermDefaultValues
+    public static class XTermConsts
     {
+        #region 光标闪烁时间
+
+        public const int LowSpeedBlinkInterval = 1200;
+        public const int NormalSpeedBlinkInterval = 800;
+        public const int HighSpeedBlinkInterval = 400;
+
+        #endregion
+
         public const int MIN_PORT = 1;
         public const int MAX_PORT = 65535;
 
