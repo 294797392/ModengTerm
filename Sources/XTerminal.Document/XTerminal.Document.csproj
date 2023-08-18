@@ -52,9 +52,9 @@
   <ItemGroup>
     <Compile Include="DefaultValues.cs" />
     <Compile Include="HighlightGeometry\HighlightGeometryBuilder.cs" />
-    <Compile Include="Rendering\IDrawingContext.cs" />
-    <Compile Include="Rendering\ITerminalSurface.cs" />
-    <Compile Include="Rendering\ITerminalScreen.cs" />
+    <Compile Include="Rendering\IDrawingObject.cs" />
+    <Compile Include="Rendering\IDrawingCanvas.cs" />
+    <Compile Include="Rendering\IVideoTerminal.cs" />
     <Compile Include="HitTestHelper.cs" />
     <Compile Include="Rendering\VTextMeter.cs" />
     <Compile Include="VTCharacterFlags.cs" />

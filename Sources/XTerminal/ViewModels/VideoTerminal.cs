@@ -172,6 +172,7 @@ namespace XTerminal
         /// </summary>
         private bool selectionState;
 
+        private IDrawingCanvas selectionCanvas;
         /// <summary>
         /// 存储选中的文本信息
         /// </summary>
@@ -197,7 +198,7 @@ namespace XTerminal
         /// <summary>
         /// 提供终端屏幕的功能
         /// </summary>
-        private ITerminalScreen terminalScreen;
+        private IVideoTerminal videoTerminal;
 
         #endregion
 
@@ -233,7 +234,7 @@ namespace XTerminal
         /// <summary>
         /// 当前终端显示的画面
         /// </summary>
-        public ITerminalSurface ActiveSurface { get { return this.activeDocument.Surface; } }
+        public IDrawingCanvas ActiveCanvas { get { return this.activeDocument.Canvas; } }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -328,15 +329,14 @@ namespace XTerminal
         {
             this.sessionInfo = sessionInfo;
             this.uiSyncContext = SynchronizationContext.Current;
-            this.terminalScreen = this.Content as ITerminalScreen;
+            this.videoTerminal = this.Content as IVideoTerminal;
 
             // DECAWM
             this.autoWrapMode = false;
 
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
-            this.textSelection = new VTextSelection();
-            this.textMeter = this.terminalScreen.GetTextMeter();
+            this.textMeter = this.videoTerminal.GetTextMeter();
 
             this.isRunning = true;
 
@@ -364,14 +364,14 @@ namespace XTerminal
 
             #region 初始化TerminalScreen
 
-            this.terminalScreen.InputEvent += this.OnInputEvent;
-            this.terminalScreen.ScrollChanged += this.OnScrollChanged;
-            this.terminalScreen.VTMouseDown += this.OnMouseDown;
-            this.terminalScreen.VTMouseMove += this.OnMouseMove;
-            this.terminalScreen.VTMouseUp += this.OnMouseUp;
-            this.terminalScreen.VTMouseWheel += this.OnMouseWheel;
-            this.terminalScreen.VTMouseDoubleClick += this.OnMouseDoubleClick;
-            this.terminalScreen.VTSizeChanged += this.TerminalScreen_VTSizeChanged;
+            this.videoTerminal.InputEvent += this.OnInputEvent;
+            this.videoTerminal.ScrollChanged += this.OnScrollChanged;
+            this.videoTerminal.VTMouseDown += this.OnMouseDown;
+            this.videoTerminal.VTMouseMove += this.OnMouseMove;
+            this.videoTerminal.VTMouseUp += this.OnMouseUp;
+            this.videoTerminal.VTMouseWheel += this.OnMouseWheel;
+            this.videoTerminal.VTMouseDoubleClick += this.OnMouseDoubleClick;
+            this.videoTerminal.VTSizeChanged += this.TerminalScreen_VTSizeChanged;
 
             #endregion
 
@@ -388,21 +388,30 @@ namespace XTerminal
                 FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
                 Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR)
             };
-            this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument", Surface = this.terminalScreen.CreateSurface() };
-            this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument", Surface = this.terminalScreen.CreateSurface() };
+            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas()) { Name = "MainDocument" };
+            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas()) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
             this.firstHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.firstHistoryLine;
             this.lastHistoryLine = this.firstHistoryLine;
-            this.terminalScreen.SwitchSurface(null, this.activeDocument.Surface);
+            this.videoTerminal.AddCanvas(this.mainDocument.Canvas);
+
+            #endregion
+
+            #region 初始化TextSelection
+
+            this.selectionCanvas = this.videoTerminal.CreateCanvas();
+            this.videoTerminal.AddCanvas(this.selectionCanvas);
+            this.textSelection = new VTextSelection();
+            this.textSelection.DrawingContext = this.selectionCanvas.CreateDrawingObject(this.textSelection);
 
             #endregion
 
             #region 初始化光标
 
-            this.ActiveSurface.Draw(this.Cursor);
+            this.activeDocument.Cursor.Draw();
             // 先初始化备用缓冲区的光标渲染上下文
-            this.alternateDocument.Surface.Draw(this.alternateDocument.Cursor);
+            this.alternateDocument.Cursor.Draw();
 
             #endregion
 
@@ -427,14 +436,14 @@ namespace XTerminal
         {
             this.isRunning = false;
 
-            this.terminalScreen.InputEvent -= this.OnInputEvent;
-            this.terminalScreen.ScrollChanged -= this.OnScrollChanged;
-            this.terminalScreen.VTMouseDown -= this.OnMouseDown;
-            this.terminalScreen.VTMouseMove -= this.OnMouseMove;
-            this.terminalScreen.VTMouseUp -= this.OnMouseUp;
-            this.terminalScreen.VTMouseWheel -= this.OnMouseWheel;
-            this.terminalScreen.VTMouseDoubleClick -= this.OnMouseDoubleClick;
-            this.terminalScreen.VTSizeChanged -= this.TerminalScreen_VTSizeChanged;
+            this.videoTerminal.InputEvent -= this.OnInputEvent;
+            this.videoTerminal.ScrollChanged -= this.OnScrollChanged;
+            this.videoTerminal.VTMouseDown -= this.OnMouseDown;
+            this.videoTerminal.VTMouseMove -= this.OnMouseMove;
+            this.videoTerminal.VTMouseUp -= this.OnMouseUp;
+            this.videoTerminal.VTMouseWheel -= this.OnMouseWheel;
+            this.videoTerminal.VTMouseDoubleClick -= this.OnMouseDoubleClick;
+            this.videoTerminal.VTSizeChanged -= this.TerminalScreen_VTSizeChanged;
 
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
@@ -507,7 +516,7 @@ namespace XTerminal
 
             this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
 
-            this.ActiveSurface.Draw(this.textSelection);
+            this.textSelection.Draw();
         }
 
         /// <summary>
@@ -594,7 +603,7 @@ namespace XTerminal
                     if (next.IsRenderDirty)
                     {
                         // 此时说明该行有字符变化，需要重绘
-                        this.ActiveSurface.Draw(next);
+                        next.Draw();
                         next.SetRenderDirty(false);
                         //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);
                     }
@@ -608,7 +617,7 @@ namespace XTerminal
                     // 更新行偏移量
                     if (arrangeDirty)
                     {
-                        this.ActiveSurface.Arrange(next);
+                        next.Arrange(next.OffsetX, next.OffsetY);
                     }
 
                     // 更新下一个文本行的Y偏移量
@@ -654,7 +663,7 @@ namespace XTerminal
                         this.Cursor.OffsetX = rect.Right;
                     }
 
-                    this.ActiveSurface.Arrange(this.Cursor);
+                    this.Cursor.Arrange(this.Cursor.OffsetX, this.Cursor.OffsetY);
                     this.Cursor.SetDirty(false);
                 }
 
@@ -663,10 +672,10 @@ namespace XTerminal
                 #region 移动滚动条
 
                 int scrollMax, scrollValue;
-                this.terminalScreen.GetScrollInfo(out scrollMax, out scrollValue);
+                this.videoTerminal.GetScrollInfo(out scrollMax, out scrollValue);
                 if (this.scrollMax != scrollMax || this.scrollValue != scrollValue)
                 {
-                    this.terminalScreen.SetScrollInfo(this.scrollMax, this.scrollValue);
+                    this.videoTerminal.SetScrollInfo(this.scrollMax, this.scrollValue);
                 }
 
                 #endregion
@@ -677,7 +686,7 @@ namespace XTerminal
                 {
                     // 此时的VTextLine测量数据都是最新的
                     this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-                    this.ActiveSurface.Draw(this.textSelection);
+                    this.textSelection.Draw();
                     this.textSelection.SetDirty(false);
                 }
 
@@ -962,7 +971,7 @@ namespace XTerminal
                 return;
             }
 
-            VTRect container = this.terminalScreen.BoundaryRelativeToDesktop;
+            VTRect container = this.videoTerminal.BoundaryRelativeToDesktop;
 
             // 下面处理选中了多行的状态
             VTextPointer topPointer = selection.Start.PhysicsRow > selection.End.PhysicsRow ? selection.End : selection.Start;
@@ -1035,7 +1044,7 @@ namespace XTerminal
         /// 当用户按下按键的时候触发
         /// </summary>
         /// <param name="terminal"></param>
-        private void OnInputEvent(ITerminalScreen canvasPanel, VTInputEvent evt)
+        private void OnInputEvent(IVideoTerminal canvasPanel, VTInputEvent evt)
         {
             byte[] bytes = this.Keyboard.TranslateInput(evt);
             if (bytes == null)
@@ -1432,9 +1441,10 @@ namespace XTerminal
                     {
                         VTDebug.WriteAction("UseAlternateScreenBuffer");
 
-                        ITerminalSurface remove = this.mainDocument.Surface;
-                        ITerminalSurface add = this.alternateDocument.Surface;
-                        this.terminalScreen.SwitchSurface(remove, add);
+                        IDrawingCanvas remove = this.mainDocument.Canvas;
+                        IDrawingCanvas add = this.alternateDocument.Canvas;
+                        this.videoTerminal.RemoveCanvas(remove);
+                        this.videoTerminal.AddCanvas(add);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1447,9 +1457,10 @@ namespace XTerminal
                     {
                         VTDebug.WriteAction("UseMainScreenBuffer");
 
-                        ITerminalSurface remove = this.alternateDocument.Surface;
-                        ITerminalSurface add = this.mainDocument.Surface;
-                        this.terminalScreen.SwitchSurface(remove, add);
+                        IDrawingCanvas remove = this.alternateDocument.Canvas;
+                        IDrawingCanvas add = this.mainDocument.Canvas;
+                        this.videoTerminal.RemoveCanvas(remove);
+                        this.videoTerminal.AddCanvas(add);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
@@ -1612,7 +1623,7 @@ namespace XTerminal
 
                     this.uiSyncContext.Send((state) =>
                     {
-                        this.ActiveSurface.SetOpacity(cursor, opacity);
+                        cursor.SetOpacity(opacity);
                     }, null);
                 }
                 catch (Exception e)
@@ -1636,18 +1647,18 @@ namespace XTerminal
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="scrollValue">滚动到的行数</param>
-        private void OnScrollChanged(ITerminalScreen arg1, int scrollValue)
+        private void OnScrollChanged(IVideoTerminal arg1, int scrollValue)
         {
             this.ScrollToHistory(scrollValue);
         }
 
-        private void OnMouseDown(ITerminalScreen screen, VTPoint mousePosition)
+        private void OnMouseDown(IVideoTerminal screen, VTPoint mousePosition)
         {
             this.isMouseDown = true;
             this.mouseDownPos = mousePosition;
         }
 
-        private void OnMouseMove(ITerminalScreen arg1, VTPoint mousePosition)
+        private void OnMouseMove(IVideoTerminal arg1, VTPoint mousePosition)
         {
             if (!this.isMouseDown)
             {
@@ -1659,11 +1670,11 @@ namespace XTerminal
                 // 此时说明开始选中操作
                 this.selectionState = true;
                 this.textSelection.Reset();
-                this.ActiveSurface.Draw(this.textSelection);
-                this.ActiveSurface.Arrange(this.textSelection);
+                this.textSelection.Draw();
+                this.textSelection.Arrange(this.textSelection.OffsetX, this.textSelection.OffsetY);
             }
 
-            VTRect surfaceRect = this.terminalScreen.BoundaryRelativeToDesktop;
+            VTRect surfaceRect = this.videoTerminal.BoundaryRelativeToDesktop;
 
             // 如果还没有测量起始字符，那么测量起始字符
             if (this.textSelection.Start.CharacterIndex == -1)
@@ -1721,18 +1732,18 @@ namespace XTerminal
             // 此时的VTextLine测量数据都是最新的
             // 主缓冲区和备用缓冲区都支持选中
             this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-            this.ActiveSurface.Draw(this.textSelection);
+            this.textSelection.Draw();
 
             #endregion
         }
 
-        private void OnMouseUp(ITerminalScreen arg1, VTPoint mousePosition)
+        private void OnMouseUp(IVideoTerminal arg1, VTPoint mousePosition)
         {
             this.isMouseDown = false;
             this.selectionState = false;
         }
 
-        private void OnMouseWheel(ITerminalScreen screen, bool upper)
+        private void OnMouseWheel(IVideoTerminal screen, bool upper)
         {
             // 只有主缓冲区才可以用鼠标滚轮进行滚动
             if (this.activeDocument != this.mainDocument)
@@ -1786,7 +1797,7 @@ namespace XTerminal
             }
         }
 
-        private void OnMouseDoubleClick(ITerminalScreen screen, double mouseX, double mouseY, int clickCount)
+        private void OnMouseDoubleClick(IVideoTerminal screen, double mouseX, double mouseY, int clickCount)
         {
             int startIndex = 0, endIndex = 0;
 
@@ -1834,10 +1845,10 @@ namespace XTerminal
 
             this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
 
-            this.ActiveSurface.Draw(this.textSelection);
+            this.textSelection.Draw();
         }
 
-        private void TerminalScreen_VTSizeChanged(ITerminalScreen screen, VTRect size)
+        private void TerminalScreen_VTSizeChanged(IVideoTerminal screen, VTRect size)
         {
             // 如果是固定大小的终端，那么什么都不做
             TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);

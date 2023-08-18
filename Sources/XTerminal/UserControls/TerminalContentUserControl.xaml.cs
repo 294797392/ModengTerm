@@ -26,7 +26,7 @@ namespace XTerminal.UserControls
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalContentUserControl : SessionContent, ITerminalScreen
+    public partial class TerminalContentUserControl : SessionContent, IVideoTerminal
     {
         #region 类变量
 
@@ -36,14 +36,14 @@ namespace XTerminal.UserControls
 
         #region 公开事件
 
-        public event Action<ITerminalScreen, VTInputEvent> InputEvent;
-        public event Action<ITerminalScreen, int> ScrollChanged;
-        public event Action<ITerminalScreen, VTPoint> VTMouseMove;
-        public event Action<ITerminalScreen, VTPoint> VTMouseDown;
-        public event Action<ITerminalScreen, VTPoint> VTMouseUp;
-        public event Action<ITerminalScreen, bool> VTMouseWheel;
-        public event Action<ITerminalScreen, VTRect> VTSizeChanged;
-        public event Action<ITerminalScreen, double, double, int> VTMouseDoubleClick;
+        public event Action<IVideoTerminal, VTInputEvent> InputEvent;
+        public event Action<IVideoTerminal, int> ScrollChanged;
+        public event Action<IVideoTerminal, VTPoint> VTMouseMove;
+        public event Action<IVideoTerminal, VTPoint> VTMouseDown;
+        public event Action<IVideoTerminal, VTPoint> VTMouseUp;
+        public event Action<IVideoTerminal, bool> VTMouseWheel;
+        public event Action<IVideoTerminal, VTRect> VTSizeChanged;
+        public event Action<IVideoTerminal, double, double, int> VTMouseDoubleClick;
 
         #endregion
 
@@ -312,27 +312,25 @@ namespace XTerminal.UserControls
 
         #region ITerminalScreen
 
-        public ITerminalSurface CreateSurface()
+        public IDrawingCanvas CreateCanvas()
         {
             DrawingSurface canvas = new DrawingSurface();
             return canvas;
         }
 
-        public VTextMeter GetTextMeter()
+        public void AddCanvas(IDrawingCanvas canvas)
         {
-            if (this.textMeter == null)
+            this.Dispatcher.Invoke(() => 
             {
-                this.textMeter = new WPFTextMeter();
-            }
-
-            return this.textMeter;
+                ContentControlSurface.Children.Add(canvas as UIElement);
+            });
         }
 
-        public void SwitchSurface(ITerminalSurface remove, ITerminalSurface add)
+        public void RemoveCanvas(IDrawingCanvas canvas)
         {
-            this.Dispatcher.Invoke(() =>
+            base.Dispatcher.Invoke(() => 
             {
-                ContentControlSurface.Content = add;
+                ContentControlSurface.Children.Remove(canvas as UIElement);
             });
         }
 
@@ -357,6 +355,16 @@ namespace XTerminal.UserControls
             {
                 this.SliderScrolbar.Value = scrollValue;
             }
+        }
+
+        public VTextMeter GetTextMeter()
+        {
+            if (this.textMeter == null)
+            {
+                this.textMeter = new WPFTextMeter();
+            }
+
+            return this.textMeter;
         }
 
         #endregion

@@ -20,13 +20,15 @@ namespace VideoTerminal.Rendering
         private StreamGeometry selectionGeometry;
         private Pen pen;
         private Brush brush;
+        private VTextSelection textSelection;
 
         public DrawingSelection()
         {
         }
 
-        protected override void OnInitialize(VTDocumentElement element)
+        protected override void OnInitialize(VTDocumentElement documentElement)
         {
+            this.textSelection = documentElement as VTextSelection;
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
             this.brush = DefaultSelectionBrush;
@@ -34,11 +36,9 @@ namespace VideoTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextSelection selectionRange = this.DocumentElement as VTextSelection;
-
             StreamGeometryContext sgc = this.selectionGeometry.Open();
 
-            foreach (VTRect bounds in selectionRange.Geometry)
+            foreach (VTRect bounds in this.textSelection.Geometry)
             {
                 sgc.BeginFigure(new Point(bounds.LeftTop.X, bounds.LeftTop.Y), true, true);
                 sgc.LineTo(new Point(bounds.RightTop.X, bounds.RightTop.Y), true, true);

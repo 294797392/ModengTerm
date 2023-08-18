@@ -34,16 +34,17 @@
                     </ContextMenu>
                 </Grid.ContextMenu>
 
-                <ContentControl x:Name="ContentControlSurface" Margin="5,5,0,5"
-                                SizeChanged="ContentControlSurface_SizeChanged"/>
+                <Grid x:Name="ContentControlSurface" Margin="5,5,0,5"
+                      SizeChanged="ContentControlSurface_SizeChanged"/>
+                
             </Grid>
 
             <!-- Slider模拟滚动条 -->
             <Slider Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" 
-                Minimum="0" Maximum="0" Delay="500" Cursor="Arrow"
-                PreviewMouseMove="SliderScrolbar_PreviewMouseMove"
-                PreviewMouseUp="SliderScrolbar_PreviewMouseUp"
-                PreviewMouseDown="SliderScrolbar_PreviewMouseDown">
+                    Minimum="0" Maximum="0" Delay="500" Cursor="Arrow"
+                    PreviewMouseMove="SliderScrolbar_PreviewMouseMove"
+                    PreviewMouseUp="SliderScrolbar_PreviewMouseUp"
+                    PreviewMouseDown="SliderScrolbar_PreviewMouseDown">
                 <Slider.LayoutTransform>
                     <RotateTransform Angle="90"/>
                 </Slider.LayoutTransform>

@@ -13,19 +13,20 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class DrawingObject : DrawingVisual
+    public abstract class DrawingObject : DrawingVisual, IDrawingObject
     {
+        #region 实例变量
+
+        private VTDocumentElement documentElement;
+
+        #endregion
+
         #region 属性
 
         public string ID { get; protected set; }
 
-        /// <summary>
-        /// 和该渲染对象关联的渲染模型的信息
-        /// </summary>
-        public VTDocumentElement DocumentElement { get; private set; }
-
         #endregion
-        
+
         #region 构造方法
 
         public DrawingObject()
@@ -34,11 +35,11 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        #region 受保护方法
+        #region 抽象方法
 
         protected abstract void Draw(DrawingContext dc);
 
-        protected abstract void OnInitialize(VTDocumentElement element);
+        protected abstract void OnInitialize(VTDocumentElement documentElement);
 
         protected virtual void OnRelease()
         { }
@@ -47,11 +48,11 @@ namespace XTerminal.Rendering
 
         #region 公开接口
 
-        public void Initialize(VTDocumentElement element)
+        public void Initialize(VTDocumentElement documentElement)
         {
-            this.DocumentElement = element;
+            this.documentElement = documentElement;
 
-            this.OnInitialize(element);
+            this.OnInitialize(documentElement);
         }
 
         public virtual void Draw()
@@ -66,8 +67,16 @@ namespace XTerminal.Rendering
         public void Release()
         {
             this.OnRelease();
+        }
 
-            this.DocumentElement = null;
+        public void SetOpacity(double opacity)
+        {
+            this.Opacity = opacity;
+        }
+
+        public void Arrange(double x, double y)
+        {
+            this.Offset = new Vector(x, y);
         }
 
         #endregion

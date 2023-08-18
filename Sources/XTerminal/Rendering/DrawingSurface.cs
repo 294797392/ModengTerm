@@ -18,11 +18,11 @@ namespace XTerminal.Rendering
     /// <summary>
     /// 用来渲染终端输出的表面
     /// </summary>
-    public class DrawingSurface : FrameworkElement, ITerminalSurface
+    public class DrawingSurface : FrameworkElement, IDrawingCanvas
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("DocumentRenderer");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingSurface");
 
         #endregion
 
@@ -94,35 +94,15 @@ namespace XTerminal.Rendering
 
         #region ITerminalSurface
 
-        public void Delete(VTDocumentElement drawable)
+        public IDrawingObject CreateDrawingObject(VTDocumentElement documentElement)
         {
-            DrawingObject drawingObject = drawable.DrawingContext as DrawingObject;
-            if(drawingObject == null)
-            {
-                return;
-            }
+            return this.EnsureDrawingObject(documentElement);
+        }
 
-            this.visuals.Remove(drawingObject);
+        public void DeleteDrawingObject(IDrawingObject drawingObject)
+        {
             drawingObject.Release();
-            drawable.DrawingContext = null;
-        }
-
-        public void Draw(VTDocumentElement drawable)
-        {
-            DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
-            drawingObject.Draw();
-        }
-
-        public void Arrange(VTDocumentElement drawable)
-        {
-            DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
-            drawingObject.Offset = new Vector(drawable.OffsetX, drawable.OffsetY);
-        }
-
-        public void SetOpacity(VTDocumentElement drawable, double opacity)
-        {
-            DrawingObject drawingObject = this.EnsureDrawingObject(drawable);
-            drawingObject.Opacity = opacity;
+            this.visuals.Remove(drawingObject as DrawingObject);
         }
 
         protected override void OnRender(DrawingContext drawingContext)

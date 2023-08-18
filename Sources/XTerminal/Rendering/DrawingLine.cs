@@ -24,6 +24,8 @@ namespace XTerminal.Rendering
         internal Typeface typeface;
         internal Brush foreground;
 
+        private VTextLine textLine;
+
         #endregion
 
         #region 属性
@@ -46,9 +48,9 @@ namespace XTerminal.Rendering
 
         #region DrawingObject
 
-        protected override void OnInitialize(VTDocumentElement element)
+        protected override void OnInitialize(VTDocumentElement documentElement)
         {
-            VTextLine textLine = element as VTextLine;
+            this.textLine = documentElement as VTextLine;
 
             FontFamily fontFamily = new FontFamily(textLine.Style.FontFamily);
             this.typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
@@ -58,13 +60,11 @@ namespace XTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            VTextLine textLine = this.DocumentElement as VTextLine;
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine);
 
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
+            this.Offset = new Vector(0, this.textLine.OffsetY);
 
-            this.Offset = new Vector(0, textLine.OffsetY);
-
-            DrawingUtils.UpdateTextMetrics(textLine, formattedText);
+            DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
 
             //// 遍历链表，给每个TextBlock设置样式
             //VTextBlock current = this.TextLine.First;

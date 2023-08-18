@@ -21,6 +21,9 @@ namespace XTerminal.Base
         public const int NormalSpeedBlinkInterval = 800;
         public const int HighSpeedBlinkInterval = 400;
 
+        public const VTCursorSpeeds DefaultCursorBlinkSpeed = VTCursorSpeeds.NormalSpeed;
+        public const VTCursorStyles DefaultCursorStyle = VTCursorStyles.Line;
+
         #endregion
 
         public const int MIN_PORT = 1;
@@ -76,11 +79,6 @@ namespace XTerminal.Base
         /// 默认的SSH服务端口号
         /// </summary>
         public const int DefaultSSHPort = 22;
-
-        /// <summary>
-        /// 默认的光标闪烁间隔时间是500毫秒
-        /// </summary>
-        public const int DefaultCursorBlinkInterval = 500;
 
         /// <summary>
         /// 滚轮滚动一下翻两行

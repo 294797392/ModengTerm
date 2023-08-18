@@ -21,6 +21,8 @@ namespace XTerminal.Rendering
         private static readonly double LineWidth = 2;
         private static readonly double UnderscoreWidth = 3;
 
+        private VTCursor cursor;
+
         /// <summary>
         /// TODO:先把光标高度写死，后面再优化..
         /// </summary>
@@ -28,17 +30,16 @@ namespace XTerminal.Rendering
 
         protected override void OnInitialize(VTDocumentElement element)
         {
+            this.cursor = element as VTCursor;
         }
 
         protected override void Draw(DrawingContext dc)
         {
-            VTCursor cursor = this.DocumentElement as VTCursor;
+            this.Offset = new Vector(this.cursor.OffsetX, this.cursor.OffsetY);
 
-            this.Offset = new Vector(cursor.OffsetX, cursor.OffsetY);
+            Brush brush = DrawingUtils.VTForeground2Brush(this.cursor.Color);
 
-            Brush brush = DrawingUtils.VTForeground2Brush(cursor.Color);
-
-            switch (cursor.Style)
+            switch (this.cursor.Style)
             {
                 case VTCursorStyles.Block:
                     {
@@ -55,6 +56,11 @@ namespace XTerminal.Rendering
                 case VTCursorStyles.Underscore:
                     {
                         dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, 5));
+                        break;
+                    }
+
+                case VTCursorStyles.None:
+                    {
                         break;
                     }
 

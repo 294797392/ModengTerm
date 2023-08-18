@@ -32,7 +32,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 用来保存不同平台的绘图上下文信息
         /// </summary>
-        public object DrawingContext { get; set; }
+        public IDrawingObject DrawingContext { get; set; }
 
         /// <summary>
         /// 该元素左上角的X坐标
@@ -46,6 +46,37 @@ namespace XTerminal.Document
 
         public VTDocumentElement()
         {
+        }
+
+        public void SetOpacity(double opacity)
+        {
+            if (this.DrawingContext == null)
+            {
+                // 不允许出现这种情况，一旦出现，就需要彻底解决
+                throw new NotImplementedException();
+            }
+
+            this.DrawingContext.SetOpacity(opacity);
+        }
+
+        public void Draw()
+        {
+            if (this.DrawingContext == null)
+            {
+                throw new NotImplementedException();
+            }
+
+            this.DrawingContext.Draw();
+        }
+
+        public void Arrange(double x, double y)
+        {
+            if (this.DrawingContext == null)
+            {
+                throw new NotImplementedException();
+            }
+
+            this.DrawingContext.Arrange(x, y);
         }
     }
 }

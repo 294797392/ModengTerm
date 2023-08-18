@@ -62,11 +62,6 @@ namespace XTerminal.Document
         /// </summary>
         public bool IsVisible { get; set; }
 
-        /// <summary>
-        /// 光标对应的Surface
-        /// </summary>
-        public ITerminalSurface OwnerSurface { get; set; }
-
         public void SetDirty(bool isDirty)
         {
             if (this.IsDirty != isDirty)

@@ -82,7 +82,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 渲染该文档的Surface
         /// </summary>
-        public ITerminalSurface Surface { get; set; }
+        public IDrawingCanvas Canvas { get; private set; }
 
         /// <summary>
         /// 是否需要重新布局
@@ -93,9 +93,10 @@ namespace XTerminal.Document
 
         #region 构造方法
 
-        public VTDocument(VTDocumentOptions options)
+        public VTDocument(VTDocumentOptions options, IDrawingCanvas surface)
         {
             this.options = options;
+            this.Canvas = surface;
 
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
@@ -111,6 +112,7 @@ namespace XTerminal.Document
                 Style = options.CursorStyle,
                 BlinkSpeed = options.BlinkSpeed,
             };
+            this.Cursor.DrawingContext = this.Canvas.CreateDrawingObject(this.Cursor);
 
             #region 初始化第一行，并设置链表首尾指针
 
@@ -156,6 +158,8 @@ namespace XTerminal.Document
                     Foreground = this.options.Foreground
                 },
             };
+
+            textLine.DrawingContext = this.Canvas.CreateDrawingObject(textLine);
 
             return textLine;
         }
@@ -785,7 +789,7 @@ namespace XTerminal.Document
                         // 此时ActiveLine不变
                         for (int i = 0; i < rows; i++)
                         {
-                            this.Surface.Delete(this.FirstLine);
+                            this.Canvas.DeleteDrawingObject(this.FirstLine.DrawingContext);
                             this.FirstLine.Remove();
                         }
 
@@ -799,7 +803,7 @@ namespace XTerminal.Document
                         // ActiveLine貌似也不变
                         for (int i = 0; i < rows; i++)
                         {
-                            this.Surface.Delete(this.LastLine);
+                            this.Canvas.DeleteDrawingObject(this.LastLine.DrawingContext);
                             this.LastLine.Remove();
                         }
                     }

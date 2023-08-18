@@ -337,9 +337,10 @@ namespace XTerminal.ViewModels
             this.ForegroundList.SelectedItem = this.ForegroundList.FirstOrDefault();
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
             this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
-            this.CursorSpeeds.SelectedItem = VTCursorSpeeds.NormalSpeed;
+            this.CursorSpeeds.SelectedItem = XTermConsts.DefaultCursorBlinkSpeed;
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
             this.CursorStyles.AddRange(Enum.GetValues(typeof(VTCursorStyles)).Cast<VTCursorStyles>());
+            this.CursorStyles.SelectedItem = XTermConsts.DefaultCursorStyle;
 
             #endregion
 
