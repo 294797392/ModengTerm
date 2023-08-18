@@ -93,10 +93,10 @@ namespace XTerminal.Document
 
         #region 构造方法
 
-        public VTDocument(VTDocumentOptions options, IDrawingCanvas surface)
+        public VTDocument(VTDocumentOptions options, IDrawingCanvas canvas)
         {
             this.options = options;
-            this.Canvas = surface;
+            this.Canvas = canvas;
 
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;

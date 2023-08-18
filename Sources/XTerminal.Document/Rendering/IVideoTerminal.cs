@@ -90,10 +90,6 @@ namespace XTerminal.Document.Rendering
         /// <param name="maximum">滚动条的最大值</param>
         void SetScrollInfo(int maximum, int scrollValue);
 
-        /// <summary>
-        /// 获取文本测量器
-        /// </summary>
-        /// <returns></returns>
-        VTextMeter GetTextMeter();
+        VTextMetrics MeasureText(string text, double fontSize, string fontFamily);
     }
 }

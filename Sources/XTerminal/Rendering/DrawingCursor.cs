@@ -31,12 +31,13 @@ namespace XTerminal.Rendering
         protected override void OnInitialize(VTDocumentElement element)
         {
             this.cursor = element as VTCursor;
+
+            // 先画出来，不然永远不会显示鼠标元素
+            this.Draw();
         }
 
         protected override void Draw(DrawingContext dc)
         {
-            this.Offset = new Vector(this.cursor.OffsetX, this.cursor.OffsetY);
-
             Brush brush = DrawingUtils.VTForeground2Brush(this.cursor.Color);
 
             switch (this.cursor.Style)

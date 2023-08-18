@@ -54,9 +54,9 @@
     <Compile Include="HighlightGeometry\HighlightGeometryBuilder.cs" />
     <Compile Include="Rendering\IDrawingObject.cs" />
     <Compile Include="Rendering\IDrawingCanvas.cs" />
+    <Compile Include="Rendering\IDrawingObjectText.cs" />
     <Compile Include="Rendering\IVideoTerminal.cs" />
     <Compile Include="HitTestHelper.cs" />
-    <Compile Include="Rendering\VTextMeter.cs" />
     <Compile Include="VTCharacterFlags.cs" />
     <Compile Include="VTextAttribute.cs" />
     <Compile Include="VTextElement.cs" />

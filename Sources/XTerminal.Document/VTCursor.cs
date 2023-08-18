@@ -15,12 +15,12 @@ namespace XTerminal.Document
     /// </summary>
     public class VTCursor : VTDocumentElement
     {
-        public override VTDocumentElements Type => VTDocumentElements.Cursor;
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTCursor");
 
-        /// <summary>
-        /// 是否需要重绘
-        /// </summary>
-        public bool IsDirty { get; private set; }
+        private bool visibleChanged;
+        private bool isVisible;
+
+        public override VTDocumentElements Type => VTDocumentElements.Cursor;
 
         /// <summary>
         /// 光标所在列
@@ -60,13 +60,44 @@ namespace XTerminal.Document
         /// <summary>
         /// 是否是显示状态
         /// </summary>
-        public bool IsVisible { get; set; }
-
-        public void SetDirty(bool isDirty)
+        public bool IsVisible 
         {
-            if (this.IsDirty != isDirty)
+            get { return this.isVisible; }
+            set
             {
-                this.IsDirty = isDirty;
+                if (this.isVisible != value)
+                {
+                    this.isVisible = value;
+
+                    if (!this.visibleChanged)
+                    {
+                        this.visibleChanged = true;
+                    }
+                }
+            }
+        }
+
+        public override void RequestInvalidate()
+        {
+            if (this.arrangeDirty)
+            {
+                this.DrawingContext.Arrange(this.OffsetX, this.OffsetY);
+
+                this.arrangeDirty = false;
+            }
+
+            if (this.visibleChanged)
+            {
+                if (this.isVisible)
+                {
+                    this.DrawingContext.SetOpacity(1);
+                }
+                else
+                {
+                    this.DrawingContext.SetOpacity(0);
+                }
+
+                this.visibleChanged = false;
             }
         }
     }

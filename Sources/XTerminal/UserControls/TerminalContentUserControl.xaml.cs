@@ -52,7 +52,6 @@ namespace XTerminal.UserControls
         private VTInputEvent inputEvent;
         private int scrollbarCursorDownValue;
         private bool cursorDown;
-        private WPFTextMeter textMeter;
 
         private VideoTerminal videoTerminal;
 
@@ -310,7 +309,7 @@ namespace XTerminal.UserControls
 
         #endregion
 
-        #region ITerminalScreen
+        #region IVideoTerminal
 
         public IDrawingCanvas CreateCanvas()
         {
@@ -357,14 +356,19 @@ namespace XTerminal.UserControls
             }
         }
 
-        public VTextMeter GetTextMeter()
+        public VTextMetrics MeasureText(string text, double fontSize, string fontFamily)
         {
-            if (this.textMeter == null)
-            {
-                this.textMeter = new WPFTextMeter();
-            }
+            Typeface typeface = new Typeface(new FontFamily(fontFamily), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
+                fontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
 
-            return this.textMeter;
+            VTextMetrics metrics = new VTextMetrics()
+            {
+                Height = formattedText.Height,
+                Width = formattedText.WidthIncludingTrailingWhitespace
+            };
+
+            return metrics;
         }
 
         #endregion

@@ -34,13 +34,6 @@ namespace XTerminal.Rendering
             return new VTRect(geometry.Bounds.Left, geometry.Bounds.Top, geometry.Bounds.Width, geometry.Bounds.Height);
         }
 
-        public override void MeasureLine(VTextLine textLine)
-        {
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
-            DrawingUtils.UpdateTextMetrics(textLine, formattedText);
-            textLine.SetMeasureDirty(false);
-        }
-
         /// <summary>
         /// 测量某个渲染模型的大小
         /// TODO：如果测量的是字体，要考虑到对字体应用样式后的测量信息

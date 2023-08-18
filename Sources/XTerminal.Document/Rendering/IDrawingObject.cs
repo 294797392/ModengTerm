@@ -25,7 +25,6 @@ namespace XTerminal.Document.Rendering
         /// <summary>
         /// 重绘
         /// </summary>
-        /// <param name="documentElement">绘图模型</param>
         void Draw();
 
         /// <summary>

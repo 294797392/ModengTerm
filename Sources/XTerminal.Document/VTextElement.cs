@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Document.Rendering;
 
 namespace XTerminal.Document
 {
@@ -13,16 +14,16 @@ namespace XTerminal.Document
     public abstract class VTextElement : VTDocumentElement
     {
         /// <summary>
-        /// 元素是否需要重新测量
-        /// </summary>
-        public bool IsMeasureDirty { get; private set; }
-
-        /// <summary>
         /// 元素是否需要重新渲染
         /// 对于VTextLine来说，Render分两步，第一步是对文字进行排版，第二部是画，排版操作是很耗时的
         /// Render的同时也会进行Measure操作
         /// </summary>
-        public bool IsRenderDirty { get; private set; }
+        private bool renderDirty;
+
+        /// <summary>
+        /// 元素是否需要重新测量
+        /// </summary>
+        private bool isMeasureDirty;
 
         /// <summary>
         /// 文本的测量信息
@@ -64,24 +65,79 @@ namespace XTerminal.Document
             this.Metrics = new VTextMetrics();
         }
 
-
         public void SetMeasureDirty(bool isDirty)
         {
-            if (this.IsMeasureDirty != isDirty)
+            if (this.isMeasureDirty != isDirty)
             {
-                this.IsMeasureDirty = isDirty;
+                this.isMeasureDirty = isDirty;
             }
         }
 
         public void SetRenderDirty(bool isDirty)
         {
-            if (this.IsRenderDirty != isDirty)
+            if (this.renderDirty != isDirty)
             {
-                this.IsRenderDirty = isDirty;
+                this.renderDirty = isDirty;
 
                 // 需要render的时候也说明需要measure
-                this.IsMeasureDirty = isDirty;
+                this.isMeasureDirty = isDirty;
             }
         }
+
+        #region VTDocumentElement
+
+        public override void RequestInvalidate()
+        {
+            if (base.arrangeDirty)
+            {
+                this.DrawingContext.Arrange(this.OffsetX, this.OffsetY);
+
+                base.arrangeDirty = false;
+            }
+
+            if (this.renderDirty)
+            {
+                this.DrawingContext.Draw();
+
+                this.renderDirty = false;
+            }
+
+            if (this.isMeasureDirty) 
+            {
+                IDrawingObjectText objectText = this.DrawingContext as IDrawingObjectText;
+                
+                objectText.MeasureLine();
+
+                this.isMeasureDirty = false;
+            }
+        }
+
+        /// <summary>
+        /// 测量指定文本里的子文本的矩形框
+        /// </summary>
+        /// <param name="startIndex">要测量的起始字符索引</param>
+        /// <param name="count">要测量的最大字符数，0为全部测量</param>
+        /// <returns></returns>
+        public VTRect MeasureLine(int startIndex, int count)
+        {
+            IDrawingObjectText objectText = this.DrawingContext as IDrawingObjectText;
+
+            return objectText.MeasureLine(startIndex, count);
+        }
+
+        /// <summary>
+        /// 测量一行里某个字符的测量信息
+        /// 注意该接口只能测量出来X偏移量，Y偏移量需要外部根据高度自己计算
+        /// </summary>
+        /// <param name="characterIndex">要测量的字符</param>
+        /// <returns>文本坐标，X=文本左边的X偏移量，Y永远是0，因为边界框是相对于该行的</returns>
+        public VTRect MeasureCharacter(int characterIndex)
+        {
+            IDrawingObjectText objectText = this.DrawingContext as IDrawingObjectText;
+
+            return objectText.MeasureCharacter(characterIndex);
+        }
+
+        #endregion
     }
 }

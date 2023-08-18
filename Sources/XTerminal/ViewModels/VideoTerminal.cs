@@ -54,9 +54,9 @@ namespace XTerminal
 
         private static DispatcherTimer BlinkCursorTimer;
         /// <summary>
-        /// 要闪烁的光标列表
+        /// 存储当前客户端里所有的光标列表
         /// </summary>
-        private static List<VTCursor> CursorList;
+        private static List<VideoTerminal> VideoTerminals;
 
         #endregion
 
@@ -193,8 +193,6 @@ namespace XTerminal
         /// </summary>
         private Encoding outputEncoding;
 
-        private VTextMeter textMeter;
-
         /// <summary>
         /// 提供终端屏幕的功能
         /// </summary>
@@ -268,8 +266,8 @@ namespace XTerminal
         public int RowSize
         {
             get
-            { 
-                return this.rowSize; 
+            {
+                return this.rowSize;
             }
             private set
             {
@@ -285,11 +283,11 @@ namespace XTerminal
         {
             get
             {
-                return this.colSize; 
+                return this.colSize;
             }
             private set
             {
-                if(this.colSize != value)
+                if (this.colSize != value)
                 {
                     this.colSize = value;
                     this.NotifyPropertyChanged("ColumnSize");
@@ -305,11 +303,13 @@ namespace XTerminal
         {
             // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
 
-            //BlinkCursorTimer = new DispatcherTimer();
-            //BlinkCursorTimer.Interval = TimeSpan.FromMilliseconds(XTermConsts.HighSpeedBlinkInterval);
-            //BlinkCursorTimer.Tick += BlinkCursorThread_Tick;
-            //BlinkCursorTimer.IsEnabled = false;
-            //BlinkCursorTimer.Start();
+            VideoTerminals = new List<VideoTerminal>();
+
+            BlinkCursorTimer = new DispatcherTimer();
+            BlinkCursorTimer.Interval = TimeSpan.FromMilliseconds(XTermConsts.HighSpeedBlinkInterval);
+            BlinkCursorTimer.Tick += BlinkCursorThread_Tick;
+            BlinkCursorTimer.IsEnabled = false;
+            BlinkCursorTimer.Start();
         }
 
         public VideoTerminal()
@@ -336,7 +336,6 @@ namespace XTerminal
 
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
-            this.textMeter = this.videoTerminal.GetTextMeter();
 
             this.isRunning = true;
 
@@ -375,6 +374,15 @@ namespace XTerminal
 
             #endregion
 
+            #region 初始化TextSelection
+
+            this.selectionCanvas = this.videoTerminal.CreateCanvas();
+            this.videoTerminal.AddCanvas(this.selectionCanvas);
+            this.textSelection = new VTextSelection();
+            this.textSelection.DrawingContext = this.selectionCanvas.CreateDrawingObject(this.textSelection);
+
+            #endregion
+
             #region 初始化文档模型
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
@@ -398,20 +406,11 @@ namespace XTerminal
 
             #endregion
 
-            #region 初始化TextSelection
-
-            this.selectionCanvas = this.videoTerminal.CreateCanvas();
-            this.videoTerminal.AddCanvas(this.selectionCanvas);
-            this.textSelection = new VTextSelection();
-            this.textSelection.DrawingContext = this.selectionCanvas.CreateDrawingObject(this.textSelection);
-
-            #endregion
-
             #region 初始化光标
 
-            this.activeDocument.Cursor.Draw();
+            this.activeDocument.Cursor.RequestInvalidate();
             // 先初始化备用缓冲区的光标渲染上下文
-            this.alternateDocument.Cursor.Draw();
+            this.alternateDocument.Cursor.RequestInvalidate();
 
             #endregion
 
@@ -426,6 +425,9 @@ namespace XTerminal
 
             #endregion
 
+            VideoTerminals.Add(this);
+            BlinkCursorTimer.IsEnabled = true;
+
             return ResponseCode.SUCCESS;
         }
 
@@ -435,6 +437,9 @@ namespace XTerminal
         public override void Close()
         {
             this.isRunning = false;
+
+            VideoTerminals.Remove(this);
+            BlinkCursorTimer.IsEnabled = false;
 
             this.videoTerminal.InputEvent -= this.OnInputEvent;
             this.videoTerminal.ScrollChanged -= this.OnScrollChanged;
@@ -506,17 +511,8 @@ namespace XTerminal
         /// </summary>
         public void SelectAll()
         {
-            this.textSelection.Reset();
-
-            this.textSelection.Start.CharacterIndex = 0;
-            this.textSelection.Start.PhysicsRow = 0;
-
-            this.textSelection.End.CharacterIndex = this.lastHistoryLine.Text.Length - 1;
-            this.textSelection.End.PhysicsRow = this.lastHistoryLine.PhysicsRow;
-
-            this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-
-            this.textSelection.Draw();
+            this.textSelection.SetRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop, 0, 0, this.lastHistoryLine.PhysicsRow, this.lastHistoryLine.Text.Length - 1);
+            this.textSelection.RequestInvalidate();
         }
 
         /// <summary>
@@ -587,8 +583,6 @@ namespace XTerminal
             // 当前行的Y方向偏移量
             double offsetY = 0;
 
-            bool arrangeDirty = document.IsArrangeDirty;
-
             this.uiSyncContext.Send((state) =>
             {
                 #region 渲染文档
@@ -600,25 +594,7 @@ namespace XTerminal
                     // 更新Y偏移量信息
                     next.OffsetY = offsetY;
 
-                    if (next.IsRenderDirty)
-                    {
-                        // 此时说明该行有字符变化，需要重绘
-                        next.Draw();
-                        next.SetRenderDirty(false);
-                        //logger.ErrorFormat("renderCounter = {0}", this.renderCounter++);
-                    }
-                    else if (next.IsMeasureDirty)
-                    {
-                        // 字符没有变化，那么只重新测量然后更新一下文本的偏移量就好了
-                        this.textMeter.MeasureLine(next);
-                        next.SetMeasureDirty(false);
-                    }
-
-                    // 更新行偏移量
-                    if (arrangeDirty)
-                    {
-                        next.Arrange(next.OffsetX, next.OffsetY);
-                    }
+                    next.RequestInvalidate();
 
                     // 更新下一个文本行的Y偏移量
                     offsetY += next.Height;
@@ -634,38 +610,34 @@ namespace XTerminal
 
                 #endregion
 
-                #region 渲染光标
+                #region 更新光标位置
 
-                if (this.Cursor.IsDirty)
+                if (this.activeDocument == this.mainDocument)
                 {
-                    if (this.activeDocument == this.mainDocument)
+                    // 当前显示的是主缓冲区，那么光标在最后一行的时候才更新
+                    if (this.ScrollAtBottom)
                     {
-                        // 当前显示的是主缓冲区，那么光标在最后一行的时候才更新
-                        if (this.ScrollAtBottom)
-                        {
-                            this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                            VTRect rect = this.textMeter.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
-                            this.Cursor.OffsetX = rect.Right;
-                        }
-                        else
-                        {
-                            // 此时说明有滚动，有滚动的情况下直接隐藏光标
-                            this.Cursor.OffsetX = int.MinValue;
-                            this.Cursor.OffsetX = int.MinValue;
-                        }
+                        this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                        VTRect rect = this.ActiveLine.MeasureLine(this.CursorCol, 1);
+                        this.Cursor.OffsetX = rect.Right;
                     }
                     else
                     {
-                        // 备用缓冲区，光标可以随意显示
-                        // 备用缓冲区没有滚动这个功能
-                        this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                        VTRect rect = this.textMeter.MeasureLine(this.ActiveLine, this.ActiveLine.Characters.Count, 1);
-                        this.Cursor.OffsetX = rect.Right;
+                        // 此时说明有滚动，有滚动的情况下直接隐藏光标
+                        this.Cursor.OffsetX = int.MinValue;
+                        this.Cursor.OffsetX = int.MinValue;
                     }
-
-                    this.Cursor.Arrange(this.Cursor.OffsetX, this.Cursor.OffsetY);
-                    this.Cursor.SetDirty(false);
                 }
+                else
+                {
+                    // 备用缓冲区，光标可以随意显示
+                    // 备用缓冲区没有滚动这个功能
+                    this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                    VTRect rect = this.ActiveLine.MeasureLine(this.ActiveLine.Characters.Count, 1);
+                    this.Cursor.OffsetX = rect.Right;
+                }
+
+                this.Cursor.RequestInvalidate();
 
                 #endregion
 
@@ -682,12 +654,10 @@ namespace XTerminal
 
                 #region 更新选中高亮几何图形
 
-                if (!this.textSelection.IsEmpty && this.textSelection.IsDirty)
+                if (!this.textSelection.IsEmpty)
                 {
-                    // 此时的VTextLine测量数据都是最新的
-                    this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-                    this.textSelection.Draw();
-                    this.textSelection.SetDirty(false);
+                    this.textSelection.UpdateRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop);
+                    this.textSelection.RequestInvalidate();
                 }
 
                 #endregion
@@ -794,14 +764,8 @@ namespace XTerminal
             if (!this.textSelection.IsEmpty)
             {
                 // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
-                this.textSelection.SetDirty(true);
+                this.textSelection.RequestInvalidate();
             }
-
-            #endregion
-
-            #region 重绘光标
-
-            this.Cursor.SetDirty(true);
 
             #endregion
 
@@ -903,7 +867,7 @@ namespace XTerminal
 
             int characterIndex;
             VTRect characterBounds;
-            if (!HitTestHelper.HitTestVTCharacter(this.textMeter, cursorLine, mouseX, out characterIndex, out characterBounds))
+            if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out characterBounds))
             {
                 return false;
             }
@@ -931,108 +895,6 @@ namespace XTerminal
             else
             {
                 return VTCharacter.Create(Convert.ToChar(ch), 1, VTCharacterFlags.SingleByteChar);
-            }
-        }
-
-        /// <summary>
-        /// 根据当前滚动条的状态和选中状态重新构建高亮几何图形
-        /// </summary>
-        /// <param name="document">当前显示的文档</param>
-        /// <param name="selection">鼠标命中信息</param>
-        /// <param name="container">相对于电脑屏幕的渲染文本的容器位置</param>
-        private void UpdateSelectionGeometry(VTDocument document, VTextSelection selection)
-        {
-            selection.Geometry.Clear();
-
-            // 单独处理选中的是同一行的情况
-            if (selection.Start.PhysicsRow == selection.End.PhysicsRow)
-            {
-                // 找到对应的文本行
-                VTextLine textLine = document.FindLine(selection.Start.PhysicsRow);
-                if (textLine == null)
-                {
-                    // 当选中了一行之后，然后该行被移动到屏幕外了，会出现这种情况
-                    return;
-                }
-
-                VTextPointer leftPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.Start : selection.End;
-                VTextPointer rightPointer = selection.Start.CharacterIndex < selection.End.CharacterIndex ? selection.End : selection.Start;
-
-                VTRect leftBounds = this.textMeter.MeasureCharacter(textLine, leftPointer.CharacterIndex);
-                VTRect rightBounds = this.textMeter.MeasureCharacter(textLine, rightPointer.CharacterIndex);
-
-                double x = leftBounds.Left;
-                double y = textLine.OffsetY;
-                double width = rightBounds.Right - leftBounds.Left;
-                double height = textLine.Height;
-
-                VTRect bounds = new VTRect(x, y, width, height);
-                selection.Geometry.Add(bounds);
-                return;
-            }
-
-            VTRect container = this.videoTerminal.BoundaryRelativeToDesktop;
-
-            // 下面处理选中了多行的状态
-            VTextPointer topPointer = selection.Start.PhysicsRow > selection.End.PhysicsRow ? selection.End : selection.Start;
-            VTextPointer bottomPointer = selection.Start.PhysicsRow > selection.End.PhysicsRow ? selection.Start : selection.End;
-
-            VTextLine topLine = document.FindLine(topPointer.PhysicsRow);
-            VTextLine bottomLine = document.FindLine(bottomPointer.PhysicsRow);
-
-            if (topLine != null && bottomLine != null)
-            {
-                // 此时说明选中的内容都在屏幕里
-                // 构建上边和下边的矩形
-                VTRect topBounds = this.textMeter.MeasureCharacter(topLine, topPointer.CharacterIndex);
-                VTRect bottomBounds = this.textMeter.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
-
-                // 第一行的矩形
-                selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
-
-                // 中间的矩形
-                double y = topLine.OffsetY + topBounds.Height;
-                double height = bottomLine.OffsetY - (topLine.OffsetY + topBounds.Height);
-                selection.Geometry.Add(new VTRect(0, y, container.Width, height));
-
-                // 最后一行的矩形
-                selection.Geometry.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
-                return;
-            }
-
-            if (topLine != null && bottomLine == null)
-            {
-                // 选中的内容有一部分被移到屏幕外了，滚动条往上移动
-                VTRect topBounds = this.textMeter.MeasureCharacter(topLine, topPointer.CharacterIndex);
-
-                // 第一行的矩形
-                selection.Geometry.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
-
-                // 剩下的矩形
-                double height = document.LastLine.Bounds.Bottom - topLine.Bounds.Bottom;
-                selection.Geometry.Add(new VTRect(0, topLine.Bounds.Bottom, container.Width, height));
-                return;
-            }
-
-            if (topLine == null && bottomLine != null)
-            {
-                // 选中的内容有一部分被移到屏幕外了，滚动条往下移动
-                VTRect bottomBounds = this.textMeter.MeasureCharacter(bottomLine, bottomPointer.CharacterIndex);
-
-                // 最后一行的矩形
-                selection.Geometry.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
-
-                // 剩下的矩形
-                selection.Geometry.Add(new VTRect(0, 0, container.Width, bottomLine.OffsetY));
-                return;
-            }
-
-            if (topPointer.PhysicsRow < document.FirstLine.PhysicsRow &&
-                bottomPointer.PhysicsRow > document.LastLine.PhysicsRow)
-            {
-                // 这种情况下说明当前显示的内容被全部选择了
-                selection.Geometry.Add(new VTRect(0, 0, container.Width, document.LastLine.Bounds.Bottom));
-                return;
             }
         }
 
@@ -1162,12 +1024,6 @@ namespace XTerminal
                                 // 更新滚动条的值
                                 this.scrollMax = scrollMax;
                                 this.scrollValue = scrollMax;
-
-                                // 如果当前有选中的内容，那么把选中内容设置为脏状态，下次在渲染的时候会更新
-                                if (!this.textSelection.IsEmpty)
-                                {
-                                    this.textSelection.SetDirty(true);
-                                }
                             }
 
                             #endregion
@@ -1580,9 +1436,6 @@ namespace XTerminal
                 logger.Error("ProcessCharacters异常", ex);
             }
 
-            // 下次渲染的时候重新渲染光标
-            this.Cursor.SetDirty(true);
-
             // 全部字符都处理完了之后，只渲染一次
             this.PerformDrawing(this.activeDocument);
 
@@ -1607,38 +1460,6 @@ namespace XTerminal
             {
                 this.SessionStatusChanged(this, status);
             }
-        }
-
-        private void BackgroundWorkerProc()
-        {
-            while (this.isRunning)
-            {
-                VTCursor cursor = this.Cursor;
-
-                cursor.IsVisible = !cursor.IsVisible;
-
-                try
-                {
-                    double opacity = cursor.IsVisible ? 1 : 0;
-
-                    this.uiSyncContext.Send((state) =>
-                    {
-                        cursor.SetOpacity(opacity);
-                    }, null);
-                }
-                catch (Exception e)
-                {
-                    logger.ErrorFormat(string.Format("渲染光标异常, {0}", e));
-                }
-                finally
-                {
-                    Thread.Sleep(cursor.Interval);
-                }
-
-                logger.ErrorFormat("渲染光标 {0}", Guid.NewGuid());
-            }
-
-            logger.ErrorFormat("渲染光标线程运行结束");
         }
 
 
@@ -1670,8 +1491,6 @@ namespace XTerminal
                 // 此时说明开始选中操作
                 this.selectionState = true;
                 this.textSelection.Reset();
-                this.textSelection.Draw();
-                this.textSelection.Arrange(this.textSelection.OffsetX, this.textSelection.OffsetY);
             }
 
             VTRect surfaceRect = this.videoTerminal.BoundaryRelativeToDesktop;
@@ -1731,8 +1550,8 @@ namespace XTerminal
 
             // 此时的VTextLine测量数据都是最新的
             // 主缓冲区和备用缓冲区都支持选中
-            this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-            this.textSelection.Draw();
+            this.textSelection.UpdateRange(this.activeDocument, surfaceRect);
+            this.textSelection.RequestInvalidate();
 
             #endregion
         }
@@ -1814,7 +1633,7 @@ namespace XTerminal
                         // 选中单词
                         int characterIndex;
                         VTRect characterBounds;
-                        if (!HitTestHelper.HitTestVTCharacter(this.textMeter, lineHit, mouseX, out characterIndex, out characterBounds))
+                        if (!HitTestHelper.HitTestVTCharacter(lineHit, mouseX, out characterIndex, out characterBounds))
                         {
                             return;
                         }
@@ -1843,9 +1662,8 @@ namespace XTerminal
             this.textSelection.End.CharacterIndex = endIndex;
             this.textSelection.End.PhysicsRow = lineHit.PhysicsRow;
 
-            this.UpdateSelectionGeometry(this.activeDocument, this.textSelection);
-
-            this.textSelection.Draw();
+            this.textSelection.UpdateRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop);
+            this.textSelection.RequestInvalidate();
         }
 
         private void TerminalScreen_VTSizeChanged(IVideoTerminal screen, VTRect size)
@@ -1861,7 +1679,7 @@ namespace XTerminal
             // 计算一共有多少行，和每行之间的间距是多少
             int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
-            VTextMetrics metrics = this.textMeter.MeasureText(" ", fontSize, fontFamily);
+            VTextMetrics metrics = this.videoTerminal.MeasureText(" ", fontSize, fontFamily);
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置
             int newRows = (int)Math.Floor(size.Height / metrics.Height);
@@ -1883,9 +1701,6 @@ namespace XTerminal
             this.mainDocument.Resize(newRows, newCols);
             this.alternateDocument.Resize(newRows, newCols);
 
-            // 重绘光标
-            this.Cursor.SetDirty(true);
-
             // 如果是修改列大小，那么会自动触发重绘
             // 如果是修改行，那么不会自动触发重绘，要手动重绘
             // 这里偷个懒，不管修改的是列还是行都重绘一次
@@ -1905,15 +1720,25 @@ namespace XTerminal
         /// <param name="e"></param>
         private static void BlinkCursorThread_Tick(object sender, EventArgs e)
         {
-            try
+            foreach (VideoTerminal vt in VideoTerminals)
             {
-            }
-            catch (Exception ex)
-            {
-                logger.Error("BlinkCursorThread运行异常", ex);
-            }
-            finally
-            {
+                // 先找到终端显示的是哪个光标（主缓冲区还是备用缓冲区）
+
+                VTCursor cursor = vt.activeDocument.Cursor;
+
+                cursor.IsVisible = !cursor.IsVisible;
+
+                try
+                {
+                    cursor.RequestInvalidate();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("RequestInvalidate Cursor运行异常", ex);
+                }
+                finally
+                {
+                }
             }
         }
 
