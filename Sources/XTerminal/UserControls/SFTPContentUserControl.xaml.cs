@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.ViewModels;
 
 namespace XTerminal.UserControls
 {
@@ -29,7 +30,7 @@ namespace XTerminal.UserControls
 
         #region SessionContent
 
-        public override int Open(XTermSession session)
+        public override int Open(OpenedSessionVM session)
         {
             return ResponseCode.SUCCESS;
         }

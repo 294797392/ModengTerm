@@ -62,12 +62,6 @@ namespace XTerminal.Document
             VTCharacter.CopyTo(this.Characters, sourceLine.Characters);
         }
 
-        public static List<VTCharacter> CloneCharacters(IEnumerable<VTCharacter> source)
-        {
-            string json = JsonConvert.SerializeObject(source);
-            return JsonConvert.DeserializeObject<List<VTCharacter>>(json);
-        }
-
         /// <summary>
         /// 从VTextLine创建一个VTHistoryLine
         /// </summary>

@@ -19,6 +19,7 @@ using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Rendering;
 using XTerminal.Session;
+using XTerminal.ViewModels;
 
 namespace XTerminal.UserControls
 {
@@ -53,16 +54,13 @@ namespace XTerminal.UserControls
         private bool cursorDown;
         private WPFTextMeter textMeter;
 
+        private VideoTerminal videoTerminal;
+
         #endregion
 
         #region 属性
 
         public VTRect BoundaryRelativeToDesktop { get; private set; }
-
-        /// <summary>
-        /// 该屏幕所显示的终端
-        /// </summary>
-        public VideoTerminal VideoTerminal { get; set; }
 
         #endregion
 
@@ -119,7 +117,7 @@ namespace XTerminal.UserControls
         /// </summary>
         public void Copy()
         {
-            this.VideoTerminal.CopySelection();
+            this.videoTerminal.CopySelection();
         }
 
         /// <summary>
@@ -127,12 +125,12 @@ namespace XTerminal.UserControls
         /// </summary>
         private void Paste()
         {
-            this.VideoTerminal.Paste();
+            this.videoTerminal.Paste();
         }
 
         private void SelectAll()
         {
-            this.VideoTerminal.SelectAll();
+            this.videoTerminal.SelectAll();
         }
 
         #endregion
@@ -310,12 +308,6 @@ namespace XTerminal.UserControls
             this.SelectAll();
         }
 
-
-        private void CheckBoxEnableDebugMode_CheckedChanged(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         #endregion
 
         #region ITerminalScreen
@@ -371,8 +363,10 @@ namespace XTerminal.UserControls
 
         #region SessionContent
 
-        public override int Open(XTermSession session)
+        public override int Open(OpenedSessionVM session)
         {
+            this.videoTerminal = session as VideoTerminal;
+
             return ResponseCode.SUCCESS;
         }
 

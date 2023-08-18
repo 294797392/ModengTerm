@@ -470,6 +470,21 @@ namespace XTerminal.Document
         }
 
         /// <summary>
+        /// 如果该行的列不足n个，那么补齐空字符直到有n列
+        /// </summary>
+        /// <param name="columns">要补齐到的列数。是从1开始的列数，而不是从0开始</param>
+        public void PadColumns(int columns)
+        {
+            if (this.Columns >= columns)
+            {
+                return;
+            }
+
+            // 要补齐的字符数
+            this.PrintCharacter(VTCharacter.CreateNull(), columns - 1);
+        }
+
+        /// <summary>
         /// 把一个历史行的数据应用到VTextLine上
         /// </summary>
         /// <param name="historyLine">要应用的历史行数据</param>
@@ -483,18 +498,17 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 如果该行的列不足n个，那么补齐空字符直到有n列
+        /// 把该行设置为空行
+        /// 回收所有的字符，并重置数据
         /// </summary>
-        /// <param name="columns">要补齐到的列数。是从1开始的列数，而不是从0开始</param>
-        public void PadColumns(int columns)
+        public void SetEmpty()
         {
-            if (this.Columns >= columns)
-            {
-                return;
-            }
+            VTCharacter.Recycle(this.characters);
+            this.characters.Clear();
+            this.Columns = 0;
+            this.PhysicsRow = -1;
 
-            // 要补齐的字符数
-            this.PrintCharacter(VTCharacter.CreateNull(), columns - 1);
+            this.SetRenderDirty(true);
         }
 
         #endregion

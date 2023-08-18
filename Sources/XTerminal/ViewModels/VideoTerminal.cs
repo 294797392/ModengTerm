@@ -15,13 +15,14 @@ using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 using XTerminal.Rendering;
 using XTerminal.Session;
+using XTerminal.ViewModels;
 
 namespace XTerminal
 {
     /// <summary>
     /// 处理虚拟终端的所有逻辑
     /// </summary>
-    public class VideoTerminal
+    public class VideoTerminal : OpenedSessionVM
     {
         private enum OutsideScrollResult
         {
@@ -95,12 +96,12 @@ namespace XTerminal
         /// <summary>
         /// 当前终端行数
         /// </summary>
-        private int rows;
+        private int rowSize;
 
         /// <summary>
         /// 当前终端列数
         /// </summary>
-        private int cols;
+        private int colSize;
 
         #region Mouse
 
@@ -191,6 +192,11 @@ namespace XTerminal
 
         private VTextMeter textMeter;
 
+        /// <summary>
+        /// 提供终端屏幕的功能
+        /// </summary>
+        private ITerminalScreen terminalScreen;
+
         #endregion
 
         #region 属性
@@ -223,21 +229,14 @@ namespace XTerminal
         public int CursorCol { get { return this.Cursor.Column; } }
 
         /// <summary>
-        /// 渲染终端输出的画布
+        /// 当前终端显示的画面
         /// </summary>
         public ITerminalSurface ActiveSurface { get { return this.activeDocument.Surface; } }
-
-        /// <summary>
-        /// 文档画布容器
-        /// </summary>
-        public ITerminalScreen TerminalScreen { get; set; }
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
         /// </summary>
         public VTKeyboard Keyboard { get; private set; }
-
-        public VTextOptions TextOptions { get; private set; }
 
         /// <summary>
         /// 获取当前滚动条是否滚动到底了
@@ -263,11 +262,36 @@ namespace XTerminal
 
         public SessionTransport SessionTransport { get { return this.sessionTransport; } }
 
-        public int RowSize { get { return this.rows; } }
-        
+        public int RowSize
+        {
+            get
+            { 
+                return this.rowSize; 
+            }
+            private set
+            {
+                if (this.rowSize != value)
+                {
+                    this.rowSize = value;
+                    this.NotifyPropertyChanged("RowSize");
+                }
+            }
+        }
+
         public int ColumnSize
         {
-            get { return this.cols; }
+            get
+            {
+                return this.colSize; 
+            }
+            private set
+            {
+                if(this.colSize != value)
+                {
+                    this.colSize = value;
+                    this.NotifyPropertyChanged("ColumnSize");
+                }
+            }
         }
 
         #endregion
@@ -287,26 +311,26 @@ namespace XTerminal
         /// 初始化终端模拟器
         /// </summary>
         /// <param name="sessionInfo"></param>
-        public void Initialize(XTermSession sessionInfo)
+        public override int Open(XTermSession sessionInfo)
         {
             this.sessionInfo = sessionInfo;
             this.uiSyncContext = SynchronizationContext.Current;
+            this.terminalScreen = this.Content as ITerminalScreen;
 
             // DECAWM
             this.autoWrapMode = false;
 
             // 初始化变量
             this.historyLines = new Dictionary<int, VTHistoryLine>();
-            this.TextOptions = new VTextOptions();
             this.textSelection = new VTextSelection();
-            this.textMeter = this.TerminalScreen.GetTextMeter();
+            this.textMeter = this.terminalScreen.GetTextMeter();
 
             this.isRunning = true;
 
             this.outputEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
-            this.rows = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            this.cols = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+            this.rowSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            this.colSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
             #region 初始化键盘
 
@@ -327,14 +351,14 @@ namespace XTerminal
 
             #region 初始化TerminalScreen
 
-            this.TerminalScreen.InputEvent += this.OnInputEvent;
-            this.TerminalScreen.ScrollChanged += this.OnScrollChanged;
-            this.TerminalScreen.VTMouseDown += this.OnMouseDown;
-            this.TerminalScreen.VTMouseMove += this.OnMouseMove;
-            this.TerminalScreen.VTMouseUp += this.OnMouseUp;
-            this.TerminalScreen.VTMouseWheel += this.OnMouseWheel;
-            this.TerminalScreen.VTMouseDoubleClick += this.OnMouseDoubleClick;
-            this.TerminalScreen.VTSizeChanged += this.TerminalScreen_VTSizeChanged;
+            this.terminalScreen.InputEvent += this.OnInputEvent;
+            this.terminalScreen.ScrollChanged += this.OnScrollChanged;
+            this.terminalScreen.VTMouseDown += this.OnMouseDown;
+            this.terminalScreen.VTMouseMove += this.OnMouseMove;
+            this.terminalScreen.VTMouseUp += this.OnMouseUp;
+            this.terminalScreen.VTMouseWheel += this.OnMouseWheel;
+            this.terminalScreen.VTMouseDoubleClick += this.OnMouseDoubleClick;
+            this.terminalScreen.VTSizeChanged += this.TerminalScreen_VTSizeChanged;
 
             #endregion
 
@@ -342,8 +366,8 @@ namespace XTerminal
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                ColumnSize = this.cols,
-                RowSize = this.rows,
+                ColumnSize = this.colSize,
+                RowSize = this.rowSize,
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.CURSOR_STYLE),
                 Interval = sessionInfo.GetOption<int>(OptionKeyEnum.CURSOR_INTERVAL),
@@ -351,13 +375,13 @@ namespace XTerminal
                 FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
                 Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR)
             };
-            this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument", Surface = this.TerminalScreen.CreateSurface() };
-            this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument", Surface = this.TerminalScreen.CreateSurface() };
+            this.mainDocument = new VTDocument(documentOptions) { Name = "MainDocument", Surface = this.terminalScreen.CreateSurface() };
+            this.alternateDocument = new VTDocument(documentOptions) { Name = "AlternateDocument", Surface = this.terminalScreen.CreateSurface() };
             this.activeDocument = this.mainDocument;
             this.firstHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.firstHistoryLine;
             this.lastHistoryLine = this.firstHistoryLine;
-            this.TerminalScreen.SwitchSurface(null, this.activeDocument.Surface);
+            this.terminalScreen.SwitchSurface(null, this.activeDocument.Surface);
 
             #endregion
 
@@ -382,23 +406,25 @@ namespace XTerminal
             this.sessionTransport = transport;
 
             #endregion
+
+            return ResponseCode.SUCCESS;
         }
 
         /// <summary>
         /// 释放资源
         /// </summary>
-        public void Release()
+        public override void Close()
         {
             this.isRunning = false;
 
-            this.TerminalScreen.InputEvent -= this.OnInputEvent;
-            this.TerminalScreen.ScrollChanged -= this.OnScrollChanged;
-            this.TerminalScreen.VTMouseDown -= this.OnMouseDown;
-            this.TerminalScreen.VTMouseMove -= this.OnMouseMove;
-            this.TerminalScreen.VTMouseUp -= this.OnMouseUp;
-            this.TerminalScreen.VTMouseWheel -= this.OnMouseWheel;
-            this.TerminalScreen.VTMouseDoubleClick -= this.OnMouseDoubleClick;
-            this.TerminalScreen.VTSizeChanged -= this.TerminalScreen_VTSizeChanged;
+            this.terminalScreen.InputEvent -= this.OnInputEvent;
+            this.terminalScreen.ScrollChanged -= this.OnScrollChanged;
+            this.terminalScreen.VTMouseDown -= this.OnMouseDown;
+            this.terminalScreen.VTMouseMove -= this.OnMouseMove;
+            this.terminalScreen.VTMouseUp -= this.OnMouseUp;
+            this.terminalScreen.VTMouseWheel -= this.OnMouseWheel;
+            this.terminalScreen.VTMouseDoubleClick -= this.OnMouseDoubleClick;
+            this.terminalScreen.VTSizeChanged -= this.TerminalScreen_VTSizeChanged;
 
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
@@ -606,6 +632,7 @@ namespace XTerminal
                         }
                         else
                         {
+                            // 此时说明有滚动，有滚动的情况下直接隐藏光标
                             this.Cursor.OffsetX = int.MinValue;
                             this.Cursor.OffsetX = int.MinValue;
                         }
@@ -620,6 +647,7 @@ namespace XTerminal
                     }
 
                     this.ActiveSurface.Arrange(this.Cursor);
+                    this.Cursor.SetDirty(false);
                 }
 
                 #endregion
@@ -627,10 +655,10 @@ namespace XTerminal
                 #region 移动滚动条
 
                 int scrollMax, scrollValue;
-                this.TerminalScreen.GetScrollInfo(out scrollMax, out scrollValue);
+                this.terminalScreen.GetScrollInfo(out scrollMax, out scrollValue);
                 if (this.scrollMax != scrollMax || this.scrollValue != scrollValue)
                 {
-                    this.TerminalScreen.SetScrollInfo(this.scrollMax, this.scrollValue);
+                    this.terminalScreen.SetScrollInfo(this.scrollMax, this.scrollValue);
                 }
 
                 #endregion
@@ -671,7 +699,7 @@ namespace XTerminal
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
             // 终端行大小
-            int rows = this.rows;
+            int rows = this.rowSize;
 
             #region 更新要显示的行
 
@@ -707,11 +735,22 @@ namespace XTerminal
                     // 往下滚动，把上面的拿到下面，从第一行开始
                     for (int i = 0; i < scrolledRows; i++)
                     {
-                        VTHistoryLine historyLine = this.historyLines[oldScroll + rows + i];
-
                         // 该值永远是第一行，因为下面被Move到最后一行了
                         VTextLine firstLine = this.activeDocument.FirstLine;
-                        firstLine.SetHistory(historyLine);
+
+                        VTHistoryLine historyLine;
+                        if (this.historyLines.TryGetValue(oldScroll + rows + i, out historyLine))
+                        {
+                            firstLine.SetHistory(historyLine);
+                        }
+                        else
+                        {
+                            // 当扩大终端行数之后，然后把滚动条拖上去，然后输入字符的时候，会出现没有历史行的情况
+                            // 因为扩大行数的时候会新增加行，但是这些行并是空行，并没有对应的历史记录
+                            // 所以这里就直接清空行
+                            firstLine.SetEmpty();
+                        }
+
                         this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
                     }
                 }
@@ -915,7 +954,7 @@ namespace XTerminal
                 return;
             }
 
-            VTRect container = this.TerminalScreen.BoundaryRelativeToDesktop;
+            VTRect container = this.terminalScreen.BoundaryRelativeToDesktop;
 
             // 下面处理选中了多行的状态
             VTextPointer topPointer = selection.Start.PhysicsRow > selection.End.PhysicsRow ? selection.End : selection.Start;
@@ -1029,7 +1068,7 @@ namespace XTerminal
                         }
 
                         char ch = Convert.ToChar(parameter);
-                        VTDebug.WriteAction("Print:{0}, Cursor={1},{2}", ch, this.CursorRow, this.CursorCol);
+                        VTDebug.WriteAction("Print:{0}({1}), Cursor={2},{3}", ch, Convert.ToInt32(parameter), this.CursorRow, this.CursorCol);
                         VTCharacter character = this.CreateCharacter(parameter);
                         this.activeDocument.PrintCharacter(this.ActiveLine, character, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + character.ColumnSize);
@@ -1100,7 +1139,7 @@ namespace XTerminal
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = newHistoryRow - this.rows + 1;
+                            int scrollMax = newHistoryRow - this.rowSize + 1;
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
@@ -1387,7 +1426,7 @@ namespace XTerminal
 
                         ITerminalSurface remove = this.mainDocument.Surface;
                         ITerminalSurface add = this.alternateDocument.Surface;
-                        this.TerminalScreen.SwitchSurface(remove, add);
+                        this.terminalScreen.SwitchSurface(remove, add);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1402,7 +1441,7 @@ namespace XTerminal
 
                         ITerminalSurface remove = this.alternateDocument.Surface;
                         ITerminalSurface add = this.mainDocument.Surface;
-                        this.TerminalScreen.SwitchSurface(remove, add);
+                        this.terminalScreen.SwitchSurface(remove, add);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
@@ -1446,7 +1485,7 @@ namespace XTerminal
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = this.rows;
+                        int lines = this.rowSize;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
@@ -1513,7 +1552,14 @@ namespace XTerminal
 
         private void VTSession_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
-            this.vtParser.ProcessCharacters(bytes, size);
+            try
+            {
+                this.vtParser.ProcessCharacters(bytes, size);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ProcessCharacters异常", ex);
+            }
 
             // 下次渲染的时候重新渲染光标
             this.Cursor.SetDirty(true);
@@ -1605,7 +1651,7 @@ namespace XTerminal
                 this.ActiveSurface.Arrange(this.textSelection);
             }
 
-            VTRect surfaceRect = this.TerminalScreen.BoundaryRelativeToDesktop;
+            VTRect surfaceRect = this.terminalScreen.BoundaryRelativeToDesktop;
 
             // 如果还没有测量起始字符，那么测量起始字符
             if (this.textSelection.Start.CharacterIndex == -1)
@@ -1799,17 +1845,18 @@ namespace XTerminal
             int newCols = (int)Math.Floor(size.Width / metrics.Width);
 
             // 如果行和列都没变化，那么就什么都不做
-            bool rowChanged = this.rows != newRows;
-            bool colChanged = this.cols != newCols;
+            bool rowChanged = this.rowSize != newRows;
+            bool colChanged = this.colSize != newCols;
             if (!rowChanged && !colChanged)
             {
                 return;
             }
 
-            VTDebug.WriteAction("resize, oldRow = {0}, oldCol = {1}, newRow = {2}, newCol = {3}", this.rows, this.cols, newRows, newCols);
+            VTDebug.WriteAction("resize, oldRow = {0}, oldCol = {1}, newRow = {2}, newCol = {3}", this.rowSize, this.colSize, newRows, newCols);
 
             // 对Document执行Resize
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样
+            // 遇到过一种情况：如果终端名称不正确，比如XTerm，那么当行数增加的时候，光标会移动到该行的最右边，终端名称改成xterm就没问题了
             this.mainDocument.Resize(newRows, newCols);
             this.alternateDocument.Resize(newRows, newCols);
 
@@ -1823,8 +1870,8 @@ namespace XTerminal
 
             this.sessionTransport.Resize(newRows, newCols);
 
-            this.cols = newCols;
-            this.rows = newRows;
+            this.ColumnSize = newCols;
+            this.RowSize = newRows;
         }
 
         #endregion

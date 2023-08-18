@@ -52,15 +52,22 @@
 
         <!-- 状态栏 -->
         <Grid Grid.Row="1" x:Name="GridStatusbar">
-            <Border Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Grid.ColumnSpan="9999"
+                    Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
                     BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
                     BorderThickness="0,1,0,0"/>
 
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                <TextBlock Text="{Binding Path=RowSize}"/>
+                <TextBlock Text=" x "/>
+                <TextBlock Text="{Binding Path=ColumnSize}"/>
             </StackPanel>
-
-            <CheckBox x:Name="CheckBoxEnableDebugMode" Content="调试模式" VerticalAlignment="Center" Checked="CheckBoxEnableDebugMode_CheckedChanged"
-                      Unchecked="CheckBoxEnableDebugMode_CheckedChanged" Visibility="Collapsed"/>
 
         </Grid>
 

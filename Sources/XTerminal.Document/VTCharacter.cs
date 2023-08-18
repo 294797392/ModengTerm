@@ -90,6 +90,14 @@ namespace XTerminal.Document
             CharacterQueue.Enqueue(character);
         }
 
+        public static void Recycle(IEnumerable<VTCharacter> characters) 
+        {
+            foreach (VTCharacter character in characters)
+            {
+                VTCharacter.Recycle(character);
+            }
+        }
+
         /// <summary>
         /// 把copyFrom拷贝到copyTo，保证VTCharacter的数量和值是相同的
         /// </summary>

@@ -22,7 +22,9 @@ namespace XTerminal.ViewModels
 
         private SessionStatusEnum status;
         private VideoTerminal videoTerminal;
-        private Base.DataModels.XTermSession session;
+        private XTermSession session;
+        private int rowSize;
+        private int colSize;
 
         #endregion
 
@@ -49,6 +51,38 @@ namespace XTerminal.ViewModels
         /// </summary>
         public VideoTerminal VideoTerminal { get { return this.videoTerminal; } }
 
+        /// <summary>
+        /// 当前终端显示的行数
+        /// </summary>
+        public int RowSize
+        {
+            get { return this.rowSize; }
+            set
+            {
+                if (this.rowSize != value)
+                {
+                    this.rowSize = value;
+                    this.NotifyPropertyChanged("RowSize");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 当前终端显示的列数
+        /// </summary>
+        public int ColumnSize
+        {
+            get { return this.colSize; }
+            set
+            {
+                if(this.colSize != value)
+                {
+                    this.colSize = value;
+                    this.NotifyPropertyChanged("ColumnSize");
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -70,6 +104,7 @@ namespace XTerminal.ViewModels
 
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.SessionStatusChanged += this.VideoTerminal_SessionStatusChanged;
+            this.videoTerminal.SizeChanged += this.VideoTerminal_SizeChanged;
             this.videoTerminal.TerminalScreen = this.Content as ITerminalScreen;
             this.videoTerminal.Initialize(this.session);
 

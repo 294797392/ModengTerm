@@ -62,6 +62,7 @@ namespace XTerminal
         {
             OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session);
             ContentControlTerminal.Content = openedSession.Content;
+            openedSession.Content.Open(openedSession);
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace XTerminal
         private void PathClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             FrameworkElement element = sender as FrameworkElement;
-            TerminalSessionVM openedSession = element.Tag as TerminalSessionVM;
+            VideoTerminal openedSession = element.Tag as VideoTerminal;
             if (openedSession == null)
             {
                 return;
@@ -166,14 +167,14 @@ namespace XTerminal
         private void MenuItemDebugWindow_Click(object sender, RoutedEventArgs e)
         {
             SessionContent sessionContent = ContentControlTerminal.Content as SessionContent;
-            TerminalSessionVM terminalSession = sessionContent.DataContext as TerminalSessionVM;
+            VideoTerminal terminalSession = sessionContent.DataContext as VideoTerminal;
             if(terminalSession == null)
             {
                 return;
             }
 
             DebugWindow debugWindow = new DebugWindow();
-            debugWindow.VideoTerminal = terminalSession.VideoTerminal;
+            debugWindow.VideoTerminal = terminalSession;
             debugWindow.Owner = this;
             debugWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             debugWindow.ShowDialog();

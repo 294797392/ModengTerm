@@ -71,7 +71,6 @@
     <Compile Include="VTextLineState.cs" />
     <Compile Include="VTextMetrics.cs" />
     <Compile Include="VTextLine.cs" />
-    <Compile Include="VTextOptions.cs" />
     <Compile Include="VTextStyle.cs" />
     <Compile Include="VTHistoryLine.cs" />
     <Compile Include="VTPoint.cs" />

@@ -122,7 +122,7 @@
     <Compile Include="UserControls\SFTPContentUserControl.xaml.cs">
       <DependentUpon>SFTPContentUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="VideoTerminal.cs" />
+    <Compile Include="ViewModels\VideoTerminal.cs" />
     <Compile Include="ViewModels\CollectionItem\CollectionItemVM.cs" />
     <Compile Include="ViewModels\CollectionItem\TextItemVM.cs" />
     <Compile Include="ViewModels\CreateSessionVM.cs" />
@@ -141,7 +141,6 @@
     <Compile Include="ViewModels\SFTP\LocalFileSystemTreeVM.cs" />
     <Compile Include="ViewModels\SFTP\SftpFileSystemTreeVM.cs" />
     <Compile Include="ViewModels\SFTP\TransferFileVM.cs" />
-    <Compile Include="ViewModels\TerminalSessionVM.cs" />
     <Compile Include="ViewModels\OpenSessionVM.cs" />
     <Compile Include="ViewModels\CollectionVM.cs" />
     <Compile Include="ViewModels\OpenedSessionVM.cs" />

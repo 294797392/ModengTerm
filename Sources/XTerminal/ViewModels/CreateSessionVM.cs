@@ -342,6 +342,19 @@ namespace XTerminal.ViewModels
 
         #region 实例方法
 
+        private string GetTerminalName(TerminalTypeEnum type)
+        {
+            switch(type)
+            {
+                case TerminalTypeEnum.VT100:return "vt100";
+                case TerminalTypeEnum.VT220: return "vt220";
+                case TerminalTypeEnum.XTerm: return "xterm";
+                case TerminalTypeEnum.XTerm256Color: return "xterm-256color";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         private bool GetSSHSessionOptions(XTermSession session)
         {
             if (string.IsNullOrEmpty(this.SSHServerAddress))
@@ -489,7 +502,7 @@ namespace XTerminal.ViewModels
 
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
-            session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, terminalType.ToString());
+            session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
             session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, XTermDefaultValues.DefaultOutputEncoding);
             session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, XTermDefaultValues.DefaultReadBufferSize);
 

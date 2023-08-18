@@ -258,7 +258,7 @@ namespace XTerminal
                 case SessionTypeEnum.SSH:
                 case SessionTypeEnum.Win32CommandLine:
                     {
-                        return new TerminalSessionVM();
+                        return new VideoTerminal();
                     }
 
                 case SessionTypeEnum.SFTP:

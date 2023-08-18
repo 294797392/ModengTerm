@@ -765,34 +765,38 @@ namespace XTerminal.Document
 
                 if (this.rowSize < rowSize)
                 {
-                    // 往后追加文本行
+                    // 扩大了行数
 
                     // 找到滚动区域内的最后一行，在该行后添加新行
-                    this.LastLine.SetRenderDirty(true);
+                    // 此时ActiveLine不变
                     for (int i = 0; i < rows; i++)
                     {
                         VTextLine textLine = this.CreateLine();
                         this.LastLine.Append(textLine);
-                        textLine.SetRenderDirty(true);
                     }
                 }
                 else
                 {
+                    // 减少了行数
+
                     if (this.ActiveLine == this.LastLine)
                     {
                         // 此时说明光标在最后一行，那么就从第一行开始删除
+                        // 此时ActiveLine不变
                         for (int i = 0; i < rows; i++)
                         {
                             this.Surface.Delete(this.FirstLine);
                             this.FirstLine.Remove();
                         }
 
-                        // 移动ActiveLine到最后一行
-                        this.SetCursor(rowSize - 1, this.Cursor.Column);
+                        // 注意当光标在最后一行的时候，Cursor.Row是会减少的，这里更新一下Cursor.Row
+                        // 虽然Row变了，但是ActiveLine没变
+                        this.SetCursor(this.Cursor.Row - rows, this.Cursor.Column);
                     }
                     else
                     {
                         // 光标不在最后一行，那么从最后一行开始删除
+                        // ActiveLine貌似也不变
                         for (int i = 0; i < rows; i++)
                         {
                             this.Surface.Delete(this.LastLine);
