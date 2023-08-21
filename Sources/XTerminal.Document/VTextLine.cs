@@ -318,7 +318,7 @@ namespace XTerminal.Document
         {
             if (column >= this.Columns)
             {
-                //logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
                 return;
             }
 

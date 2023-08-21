@@ -205,6 +205,7 @@ namespace XTerminal
         /// <summary>
         /// activeDocument的光标信息
         /// 该坐标是基于ViewableDocument的坐标
+        /// Cursor的位置是下一个要打印的字符的位置
         /// </summary>
         private VTCursor Cursor { get { return this.activeDocument.Cursor; } }
 
@@ -1157,7 +1158,6 @@ namespace XTerminal
 
                 #region 文本特效
 
-
                 case VTActions.Bold:
                 case VTActions.BoldUnset:
                 case VTActions.Underline:
@@ -1190,7 +1190,9 @@ namespace XTerminal
 
                         if (unset)
                         {
-                            textAttribute.EndColumn = this.CursorCol;
+                            // 因为光标所在列是下一个要打印的字符的列，所以这里要减1
+                            // 有可能在第0列就设置了Unset，这种情况要处理一下
+                            textAttribute.EndColumn = this.CursorCol == 0 ? 0 : this.CursorCol - 1;
                             textAttribute.Unset = true;
 
                             logger.ErrorFormat("{0}, start = {1}, end = {2}, parameter = {3}", action, textAttribute.StartColumn, textAttribute.EndColumn, textAttribute.Parameter);

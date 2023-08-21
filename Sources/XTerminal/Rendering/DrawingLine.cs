@@ -95,8 +95,22 @@ namespace XTerminal.Rendering
 
             DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
 
+            #region 画文本装饰
+
             foreach (VTextAttribute textAttribute in this.textLine.Attributes)
             {
+                int startIndex = this.textLine.FindCharacterIndex(textAttribute.StartColumn);
+                int endIndex = this.textLine.FindCharacterIndex(textAttribute.EndColumn);
+                if (startIndex == -1 || endIndex == -1)
+                {
+                    continue;
+                }
+
+                if (startIndex > endIndex)
+                {
+                    continue;
+                }
+
                 switch (textAttribute.Decoration)
                 {
                     case VTextDecorations.Foreground:
@@ -106,17 +120,9 @@ namespace XTerminal.Rendering
                                 continue;
                             }
 
-                            int startIndex = this.textLine.FindCharacterIndex(textAttribute.StartColumn);
-                            int endIndex = this.textLine.FindCharacterIndex(textAttribute.EndColumn - 1);
-                            if (startIndex == -1 || endIndex == -1)
-                            {
-                                continue;
-                            }
-
-                            logger.ErrorFormat("startIndex = {0}, endIndex = {1}", startIndex, endIndex);
-
                             VTColors color = (VTColors)textAttribute.Parameter;
                             Brush brush = DrawingUtils.VTColor2Brush(color);
+                            logger.ErrorFormat("{0},{1}", startIndex, endIndex);
                             formattedText.SetForegroundBrush(brush, startIndex, endIndex - startIndex + 1);
                             break;
                         }
@@ -126,15 +132,7 @@ namespace XTerminal.Rendering
                 }
             }
 
-            //// 遍历链表，给每个TextBlock设置样式
-            //VTextBlock current = this.TextLine.First;
-
-            //while (current != null)
-            //{
-            //    // TODO：设置样式
-
-            //    current = current.Next;
-            //}
+            #endregion
 
             dc.DrawText(formattedText, new Point());
         }

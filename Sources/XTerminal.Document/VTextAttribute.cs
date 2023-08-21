@@ -49,11 +49,13 @@ namespace XTerminal.Document
     {
         /// <summary>
         /// 该装饰的起始列
+        /// 从0开始计数
         /// </summary>
         public int StartColumn { get; set; }
 
         /// <summary>
         /// 该装饰的结束列
+        /// 从0开始计数
         /// </summary>
         public int EndColumn { get; set; }
 
@@ -61,7 +63,7 @@ namespace XTerminal.Document
         /// 该文本的装饰
         /// </summary>
         public VTextDecorations Decoration { get; set; }
-        
+
         /// <summary>
         /// 装饰对应的参数
         /// </summary>
