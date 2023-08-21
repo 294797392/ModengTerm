@@ -599,12 +599,6 @@ namespace XTerminal
                     // 更新下一个文本行的Y偏移量
                     offsetY += next.Height;
 
-                    // 如果最后一行渲染完毕了，那么就退出
-                    if (next == document.LastLine)
-                    {
-                        break;
-                    }
-
                     next = next.NextLine;
                 }
 
@@ -618,7 +612,7 @@ namespace XTerminal
                     if (this.ScrollAtBottom)
                     {
                         this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                        VTRect rect = this.ActiveLine.MeasureLine(this.CursorCol, 1);
+                        VTRect rect = this.ActiveLine.MeasureLine(this.CursorCol - 1, 1);
                         this.Cursor.OffsetX = rect.Right;
                     }
                     else
@@ -633,7 +627,7 @@ namespace XTerminal
                     // 备用缓冲区，光标可以随意显示
                     // 备用缓冲区没有滚动这个功能
                     this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                    VTRect rect = this.ActiveLine.MeasureLine(this.ActiveLine.Characters.Count, 1);
+                    VTRect rect = this.ActiveLine.MeasureLine(this.CursorCol - 1, 1);
                     this.Cursor.OffsetX = rect.Right;
                 }
 

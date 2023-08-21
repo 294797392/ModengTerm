@@ -19,18 +19,42 @@ namespace XTerminal.Document
 
         private bool visibleChanged;
         private bool isVisible;
+        private int column;
+        private int row;
 
         public override VTDocumentElements Type => VTDocumentElements.Cursor;
 
         /// <summary>
         /// 光标所在列
         /// </summary>
-        public int Column { get; internal set; }
+        public int Column
+        {
+            get { return this.column; }
+            internal set
+            {
+                if (this.column!= value)
+                {
+                    this.column = value;
+                    this.SetArrangeDirty(true);
+                }
+            }
+        }
 
         /// <summary>
         /// 光标所在行
         /// </summary>
-        public int Row { get; internal set; }
+        public int Row
+        {
+            get { return this.row; }
+            internal set
+            {
+                if (this.row != value)
+                {
+                    this.row = value;
+                    this.SetArrangeDirty(true);
+                }
+            }
+        }
 
         /// <summary>
         /// 光标类型

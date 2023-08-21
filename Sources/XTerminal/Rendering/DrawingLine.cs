@@ -52,6 +52,11 @@ namespace XTerminal.Rendering
 
         private static VTRect CommonMeasureLine(VTextLine textLine, int startIndex, int count)
         {
+            if (startIndex < 0)
+            {
+                startIndex = 0;
+            }
+
             int totalChars = textLine.Characters.Count;
             if (startIndex + count > totalChars)
             {
