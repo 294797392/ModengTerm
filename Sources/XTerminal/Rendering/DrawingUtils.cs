@@ -21,7 +21,7 @@ namespace XTerminal.Rendering
         {
         }
 
-        public static Brush VTForeground2Brush(VTColors foreground)
+        public static Brush VTColor2Brush(VTColors foreground)
         {
             switch (foreground)
             {

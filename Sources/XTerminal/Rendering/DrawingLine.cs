@@ -10,6 +10,7 @@ using System.Windows.Media.TextFormatting;
 using XTerminal.Base;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
+using XTerminal.Parser;
 
 namespace XTerminal.Rendering
 {
@@ -93,6 +94,37 @@ namespace XTerminal.Rendering
             this.Offset = new Vector(0, this.textLine.OffsetY);
 
             DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
+
+            foreach (VTextAttribute textAttribute in this.textLine.Attributes)
+            {
+                switch (textAttribute.Decoration)
+                {
+                    case VTextDecorations.Foreground:
+                        {
+                            if (textAttribute.Parameter == null)
+                            {
+                                continue;
+                            }
+
+                            int startIndex = this.textLine.FindCharacterIndex(textAttribute.StartColumn);
+                            int endIndex = this.textLine.FindCharacterIndex(textAttribute.EndColumn - 1);
+                            if (startIndex == -1 || endIndex == -1)
+                            {
+                                continue;
+                            }
+
+                            logger.ErrorFormat("startIndex = {0}, endIndex = {1}", startIndex, endIndex);
+
+                            VTColors color = (VTColors)textAttribute.Parameter;
+                            Brush brush = DrawingUtils.VTColor2Brush(color);
+                            formattedText.SetForegroundBrush(brush, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
+            }
 
             //// 遍历链表，给每个TextBlock设置样式
             //VTextBlock current = this.TextLine.First;

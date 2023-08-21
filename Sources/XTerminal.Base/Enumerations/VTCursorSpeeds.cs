@@ -13,9 +13,9 @@ namespace XTerminal.Base.Enumerations
     public enum VTCursorSpeeds
     {
         /// <summary>
-        /// 低速
+        /// 高速闪烁
         /// </summary>
-        LowSpeed,
+        HighSpeed,
 
         /// <summary>
         /// 中速
@@ -23,8 +23,8 @@ namespace XTerminal.Base.Enumerations
         NormalSpeed,
 
         /// <summary>
-        /// 高速闪烁
+        /// 低速
         /// </summary>
-        HighSpeed
+        LowSpeed,
     }
 }

@@ -1157,6 +1157,7 @@ namespace XTerminal
 
                 #region 文本特效
 
+
                 case VTActions.Bold:
                 case VTActions.BoldUnset:
                 case VTActions.Underline:
@@ -1170,22 +1171,29 @@ namespace XTerminal
                 case VTActions.Background:
                 case VTActions.DefaultBackground:
                     {
+                        // Foreground和DefaultForeground的CharacterIndex可能都是0，并且颜色也是空的
+                        // 注意在渲染的时候要处理这种情况
+
                         bool unset;
                         VTextDecorations decoration = VDocumentUtils.VTAction2TextDecoration(action, out unset);
-                        VTextAttribute textAttribute = this.ActiveLine.Attributes.FirstOrDefault(v => v.Decoration == decoration);
+                        VTextAttribute textAttribute = this.ActiveLine.Attributes.FirstOrDefault(v => v.Decoration == decoration && !v.Unset);
                         if (textAttribute == null)
                         {
                             textAttribute = new VTextAttribute()
                             {
-                                StartCharacter = this.CursorCol,
+                                StartColumn = this.CursorCol,
                                 Decoration = decoration,
+                                Parameter = parameter
                             };
+                            this.ActiveLine.Attributes.Add(textAttribute);
                         }
 
                         if (unset)
                         {
-                            textAttribute.EndCharacter = this.CursorCol;
-                            textAttribute.Completed = true;
+                            textAttribute.EndColumn = this.CursorCol;
+                            textAttribute.Unset = true;
+
+                            logger.ErrorFormat("{0}, start = {1}, end = {2}, parameter = {3}", action, textAttribute.StartColumn, textAttribute.EndColumn, textAttribute.Parameter);
                         }
                         break;
                     }
@@ -1709,6 +1717,7 @@ namespace XTerminal
 
         /// <summary>
         /// 光标闪烁线程
+        /// 所有的光标都在这一个线程运行
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -1716,8 +1725,6 @@ namespace XTerminal
         {
             foreach (VideoTerminal vt in VideoTerminals)
             {
-                // 先找到终端显示的是哪个光标（主缓冲区还是备用缓冲区）
-
                 VTCursor cursor = vt.activeDocument.Cursor;
 
                 cursor.IsVisible = !cursor.IsVisible;

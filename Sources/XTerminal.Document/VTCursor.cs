@@ -67,19 +67,25 @@ namespace XTerminal.Document
         public bool Blinking { get; set; }
 
         /// <summary>
-        /// 光标颜色
-        /// </summary>
-        public VTColors Color { get; set; }
-
-        /// <summary>
         /// 光标闪烁的间隔时间，单位是毫秒
         /// </summary>
         public int Interval { get; set; }
 
         /// <summary>
+        /// 光标颜色
+        /// </summary>
+        public VTColors Color { get; set; }
+
+        /// <summary>
         /// 闪烁速度
         /// </summary>
         public VTCursorSpeeds BlinkSpeed { get; set; }
+
+        /// <summary>
+        /// 剩余多少时间要闪烁一次
+        /// 光标定时器每运行一次就减1，减到0的时候就闪烁一下并恢复初始值
+        /// </summary>
+        public int BlinkRemain { get; set; }
 
         /// <summary>
         /// 是否是显示状态

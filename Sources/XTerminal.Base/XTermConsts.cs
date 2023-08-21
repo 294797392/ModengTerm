@@ -35,7 +35,7 @@ namespace XTerminal.Base
         public const int CURSOR_BLINK_INTERVAL = 500;
         public const int TerminalColumns = 80;
         public const int TerminalRows = 24;
-        public const TerminalTypeEnum DefaultTerminalType = TerminalTypeEnum.XTerm;
+        public const TerminalTypeEnum DefaultTerminalType = TerminalTypeEnum.XTerm256Color;
 
         /// <summary>
         /// 每次读取的数据缓冲区大小

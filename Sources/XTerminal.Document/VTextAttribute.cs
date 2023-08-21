@@ -48,29 +48,26 @@ namespace XTerminal.Document
     public class VTextAttribute
     {
         /// <summary>
-        /// 该装饰的起始字符索引
+        /// 该装饰的起始列
         /// </summary>
-        public int StartCharacter { get; set; }
+        public int StartColumn { get; set; }
 
         /// <summary>
-        /// 该装饰的结束字符索引
+        /// 该装饰的结束列
         /// </summary>
-        public int EndCharacter { get; set; }
-
-        /// <summary>
-        /// 字符数量，一个多字节字符算一个字符
-        /// </summary>
-        public int Characters { get { return this.EndCharacter - this.StartCharacter; } }
+        public int EndColumn { get; set; }
 
         /// <summary>
         /// 该文本的装饰
         /// </summary>
         public VTextDecorations Decoration { get; set; }
-
+        
         /// <summary>
-        /// 该属性是否已设置完成
+        /// 装饰对应的参数
         /// </summary>
-        public bool Completed { get; set; }
+        public object Parameter { get; set; }
+
+        public bool Unset { get; set; }
 
         public VTextAttribute() 
         {

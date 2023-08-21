@@ -111,6 +111,7 @@ namespace XTerminal.Document
                 Column = 0,
                 Style = options.CursorStyle,
                 BlinkSpeed = options.BlinkSpeed,
+                BlinkRemain = (int)options.BlinkSpeed
             };
             this.Cursor.DrawingContext = this.Canvas.CreateDrawingObject(this.Cursor);
 
@@ -763,7 +764,7 @@ namespace XTerminal.Document
         /// <param name="colSize">终端的新的列数</param>
         public void Resize(int rowSize, int colSize)
         {
-            if (this.rowSize != rowSize) 
+            if (this.rowSize != rowSize)
             {
                 int rows = Math.Abs(this.rowSize - rowSize);
 

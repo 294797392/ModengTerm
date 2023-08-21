@@ -38,7 +38,7 @@ namespace XTerminal.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            Brush brush = DrawingUtils.VTForeground2Brush(this.cursor.Color);
+            Brush brush = DrawingUtils.VTColor2Brush(this.cursor.Color);
 
             switch (this.cursor.Style)
             {
