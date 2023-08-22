@@ -8,25 +8,25 @@ using XTerminal.Enumerations;
 
 namespace XTerminal
 {
-    public static class TerminalUtils
+    public static class XTermUtils
     {
-        private static StringBuilder ContentBuilder = new StringBuilder();
+        private static StringBuilder DocumentBuilder = new StringBuilder();
 
-        private static void BuildContentLine(VTHistoryLine historyLine, int startIndex, int endIndex, StringBuilder builder, SaveFormatEnum format)
+        private static void BuildLine(VTHistoryLine historyLine, int startIndex, int endIndex, StringBuilder builder, SaveFormatEnum format)
         {
             string text = VDocumentUtils.BuildLine(historyLine.Characters);
             builder.AppendLine(text.Substring(startIndex, endIndex - startIndex + 1));
         }
 
-        public static string BuildContent(VTHistoryLine startLine, VTHistoryLine endLine, int startCharIndex, int endCharIndex, SaveFormatEnum format)
+        public static string BuildDocument(VTHistoryLine startLine, VTHistoryLine endLine, int startCharIndex, int endCharIndex, SaveFormatEnum format)
         {
-            ContentBuilder.Clear();
+            DocumentBuilder.Clear();
 
             // 当前只选中了一行
             if (startLine == endLine)
             {
-                BuildContentLine(startLine, startCharIndex, endCharIndex, ContentBuilder, format);
-                return ContentBuilder.ToString();
+                BuildLine(startLine, startCharIndex, endCharIndex, DocumentBuilder, format);
+                return DocumentBuilder.ToString();
             }
 
             VTHistoryLine current = startLine;
@@ -35,16 +35,16 @@ namespace XTerminal
             {
                 if (current == startLine)
                 {
-                    BuildContentLine(current, startCharIndex, current.Characters.Count - 1, ContentBuilder, format);
+                    BuildLine(current, startCharIndex, current.Characters.Count - 1, DocumentBuilder, format);
                 }
                 else if (current == endLine)
                 {
-                    BuildContentLine(current, 0, endCharIndex, ContentBuilder, format);
+                    BuildLine(current, 0, endCharIndex, DocumentBuilder, format);
                     break;
                 }
                 else
                 {
-                    BuildContentLine(current, 0, current.Characters.Count - 1, ContentBuilder, format);
+                    BuildLine(current, 0, current.Characters.Count - 1, DocumentBuilder, format);
                 }
 
                 current = current.NextLine;
@@ -55,7 +55,7 @@ namespace XTerminal
                 // TODO：加上HTML的头部和尾部标签，和一些脚本
             }
 
-            return ContentBuilder.ToString();
+            return DocumentBuilder.ToString();
         }
     }
 }

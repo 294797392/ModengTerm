@@ -5,8 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Threading;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
@@ -15,7 +13,6 @@ using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Enumerations;
 using XTerminal.Parser;
-using XTerminal.Rendering;
 using XTerminal.Session;
 using XTerminal.ViewModels;
 
@@ -457,7 +454,7 @@ namespace XTerminal
             int startIndex, endIndex;
             this.AdjustSelection(out startLine, out endLine, out startIndex, out endIndex);
 
-            string text = TerminalUtils.BuildContent(startLine, endLine, startIndex, endIndex, SaveFormatEnum.TextFormat);
+            string text = XTermUtils.BuildDocument(startLine, endLine, startIndex, endIndex, SaveFormatEnum.TextFormat);
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
@@ -546,7 +543,7 @@ namespace XTerminal
                 return false;
             }
 
-            string content = TerminalUtils.BuildContent(startLine, endLine, startIndex, endIndex, format);
+            string content = XTermUtils.BuildDocument(startLine, endLine, startIndex, endIndex, format);
             try
             {
                 File.WriteAllText(filePath, content);
