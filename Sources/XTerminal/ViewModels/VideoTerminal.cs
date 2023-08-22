@@ -13,6 +13,7 @@ using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
+using XTerminal.Enumerations;
 using XTerminal.Parser;
 using XTerminal.Rendering;
 using XTerminal.Session;
@@ -51,12 +52,6 @@ namespace XTerminal
         private static readonly byte[] CPR_CursorPositionReportResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
         //private static readonly byte[] CPR_CursorPositionReportResponse = new byte[5] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0' };
         private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
-
-        private static DispatcherTimer BlinkCursorTimer;
-        /// <summary>
-        /// 存储当前客户端里所有的光标列表
-        /// </summary>
-        private static List<VideoTerminal> VideoTerminals;
 
         #endregion
 
@@ -236,6 +231,11 @@ namespace XTerminal
         public IDrawingCanvas ActiveCanvas { get { return this.activeDocument.Canvas; } }
 
         /// <summary>
+        /// 当前终端显示的文档
+        /// </summary>
+        public VTDocument ActiveDocument { get { return this.activeDocument; } }
+
+        /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
         /// </summary>
         public VTKeyboard Keyboard { get; private set; }
@@ -299,19 +299,6 @@ namespace XTerminal
         #endregion
 
         #region 构造方法
-
-        static VideoTerminal()
-        {
-            // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
-
-            VideoTerminals = new List<VideoTerminal>();
-
-            BlinkCursorTimer = new DispatcherTimer();
-            BlinkCursorTimer.Interval = TimeSpan.FromMilliseconds(XTermConsts.HighSpeedBlinkInterval);
-            BlinkCursorTimer.Tick += BlinkCursorThread_Tick;
-            BlinkCursorTimer.IsEnabled = false;
-            BlinkCursorTimer.Start();
-        }
 
         public VideoTerminal()
         {
@@ -426,9 +413,6 @@ namespace XTerminal
 
             #endregion
 
-            VideoTerminals.Add(this);
-            BlinkCursorTimer.IsEnabled = true;
-
             return ResponseCode.SUCCESS;
         }
 
@@ -438,9 +422,6 @@ namespace XTerminal
         public override void Close()
         {
             this.isRunning = false;
-
-            VideoTerminals.Remove(this);
-            BlinkCursorTimer.IsEnabled = false;
 
             this.videoTerminal.InputEvent -= this.OnInputEvent;
             this.videoTerminal.ScrollChanged -= this.OnScrollChanged;
@@ -472,13 +453,11 @@ namespace XTerminal
         /// </summary>
         public void CopySelection()
         {
-            if (this.textSelection.IsEmpty)
-            {
-                logger.WarnFormat("CopySelection失败, 起始字符索引或者结束字符索引小于0");
-                return;
-            }
+            VTHistoryLine startLine, endLine;
+            int startIndex, endIndex;
+            this.AdjustSelection(out startLine, out endLine, out startIndex, out endIndex);
 
-            string text = this.textSelection.GetText(this.historyLines);
+            string text = TerminalUtils.BuildContent(startLine, endLine, startIndex, endIndex, SaveFormatEnum.TextFormat);
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
@@ -512,33 +491,125 @@ namespace XTerminal
         /// </summary>
         public void SelectAll()
         {
-            this.textSelection.SetRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop, 0, 0, this.lastHistoryLine.PhysicsRow, this.lastHistoryLine.Text.Length - 1);
+            this.textSelection.SetRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop, 0, 0, this.lastHistoryLine.PhysicsRow, this.lastHistoryLine.Characters.Count - 1);
             this.textSelection.RequestInvalidate();
         }
 
         /// <summary>
-        /// 保存成HTML文档
-        /// 带有颜色的
+        /// 把终端的内容保存到文件
         /// </summary>
+        /// <param name="saveMode"></param>
+        /// <param name="format"></param>
         /// <param name="filePath"></param>
-        public void SaveAsHtml(string filePath)
+        /// <returns></returns>
+        public bool SaveToFile(SaveModeEnum saveMode, SaveFormatEnum format, string filePath)
         {
+            VTHistoryLine startLine = null, endLine = null;
+            int startIndex = 0, endIndex = 0;
 
-        }
+            switch (saveMode)
+            {
+                case SaveModeEnum.SaveAll:
+                    {
+                        startLine = this.firstHistoryLine;
+                        endLine = this.lastHistoryLine;
+                        startIndex = 0;
+                        endIndex = endLine.Characters.Count - 1;
+                        break;
+                    }
 
-        /// <summary>
-        /// 保存成普通文本文档
-        /// </summary>
-        /// <param name="filePath"></param>
-        public void SaveAsText(string filePath)
-        {
-            string text = this.textSelection.GetText(this.historyLines);
-            File.WriteAllText(filePath, text);
+                case SaveModeEnum.SaveScreen:
+                    {
+                        this.historyLines.TryGetValue(this.activeDocument.FirstLine.PhysicsRow, out startLine);
+                        this.historyLines.TryGetValue(this.activeDocument.LastLine.PhysicsRow, out endLine);
+                        startIndex = 0;
+                        if (endLine != null)
+                        {
+                            endIndex = endLine.Characters.Count - 1;
+                        }
+                        break;
+                    }
+
+                case SaveModeEnum.SaveSelected:
+                    {
+                        this.AdjustSelection(out startLine, out endLine, out startIndex, out endIndex);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            if (startLine == null || endLine == null)
+            {
+                logger.ErrorFormat("保存文件失败, satrtLine或endLine为空");
+                return false;
+            }
+
+            string content = TerminalUtils.BuildContent(startLine, endLine, startIndex, endIndex, format);
+            try
+            {
+                File.WriteAllText(filePath, content);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("写入文件异常", ex);
+                return false;
+            }
+
+            return true;
         }
 
         #endregion
 
         #region 实例方法
+
+        private void AdjustSelection(out VTHistoryLine topLine, out VTHistoryLine bottomLine, out int startIndex, out int endIndex)
+        {
+            topLine = null;
+            bottomLine = null;
+            startIndex = -1;
+            endIndex = -1;
+
+            if (this.textSelection.IsEmpty)
+            {
+                logger.WarnFormat("CopySelection失败, 选中内容为空");
+                return;
+            }
+
+            VTextPointer startPointer = this.textSelection.Start;
+            VTextPointer endPointer = this.textSelection.End;
+
+            // 找到起始行和结束行
+            if (!this.historyLines.TryGetValue(startPointer.PhysicsRow, out topLine) ||
+                !this.historyLines.TryGetValue(endPointer.PhysicsRow, out bottomLine))
+            {
+                logger.WarnFormat("CopySelection失败, 未找到选中的起始历史行或结束历史行");
+                return;
+            }
+
+            startIndex = startPointer.CharacterIndex;
+            endIndex = endPointer.CharacterIndex;
+
+            // 要考虑鼠标从下往上选中的情况
+            // 如果鼠标从下往上选中，那么此时下面的VTextPointer是起始，上面的VTextPointer是结束
+            if (topLine.PhysicsRow > bottomLine.PhysicsRow)
+            {
+                VTHistoryLine tempLine = topLine;
+                topLine = bottomLine;
+                bottomLine = tempLine;
+
+                startIndex = endPointer.CharacterIndex;
+                endIndex = startPointer.CharacterIndex;
+            }
+            else if (topLine.PhysicsRow == bottomLine.PhysicsRow)
+            {
+                // 注意要处理鼠标从右向左选中的情况
+                // 如果鼠标是从右向左进行选中，那么Start就是Selection的右边，End就是Selection的左边
+                startIndex = Math.Min(startPointer.CharacterIndex, endPointer.CharacterIndex);
+                endIndex = Math.Max(startPointer.CharacterIndex, endPointer.CharacterIndex);
+            }
+        }
 
         private void PerformDeviceStatusReport(StatusType statusType)
         {
@@ -607,29 +678,22 @@ namespace XTerminal
 
                 #region 更新光标位置
 
-                if (this.activeDocument == this.mainDocument)
+                // 如果显示的是主缓冲区，那么光标在最后一行的时候才更新
+                // 如果显示的是备用缓冲区，光标可以在任意一个位置显示，那么直接渲染光标
+                if (this.activeDocument == this.alternateDocument || this.ScrollAtBottom)
                 {
-                    // 当前显示的是主缓冲区，那么光标在最后一行的时候才更新
-                    if (this.ScrollAtBottom)
-                    {
-                        this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                        VTRect rect = this.ActiveLine.MeasureLine(this.CursorCol - 1, 1);
-                        this.Cursor.OffsetX = rect.Right;
-                    }
-                    else
-                    {
-                        // 此时说明有滚动，有滚动的情况下直接隐藏光标
-                        this.Cursor.OffsetX = int.MinValue;
-                        this.Cursor.OffsetX = int.MinValue;
-                    }
+                    this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                    // 有可能有中文字符，一个中文字符占用2列
+                    // 先通过光标所在列找到真正的字符所在列
+                    int characterIndex = this.ActiveLine.FindCharacterIndex(this.CursorCol - 1);
+                    VTRect rect = this.ActiveLine.MeasureLine(characterIndex, 1);
+                    this.Cursor.OffsetX = rect.Right;
                 }
                 else
                 {
-                    // 备用缓冲区，光标可以随意显示
-                    // 备用缓冲区没有滚动这个功能
-                    this.Cursor.OffsetY = this.ActiveLine.OffsetY;
-                    VTRect rect = this.ActiveLine.MeasureLine(this.CursorCol - 1, 1);
-                    this.Cursor.OffsetX = rect.Right;
+                    // 此时说明有滚动，有滚动的情况下直接隐藏光标
+                    this.Cursor.OffsetX = int.MinValue;
+                    this.Cursor.OffsetX = int.MinValue;
                 }
 
                 this.Cursor.RequestInvalidate();
@@ -1125,6 +1189,10 @@ namespace XTerminal
                             // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
                             row = parameters[0] - 1;
                             col = parameters[1] - 1;
+
+                            // 刚打开VIM就按空格键，此时VIM会响应一个CursorPosition向右移动一个单位的事件
+                            // 此时要把光标向右移动一个单位
+                            this.ActiveLine.PadColumns(parameters[1]);
                         }
                         else
                         {
@@ -1195,7 +1263,7 @@ namespace XTerminal
                             textAttribute.EndColumn = this.CursorCol == 0 ? 0 : this.CursorCol - 1;
                             textAttribute.Unset = true;
 
-                            logger.ErrorFormat("{0}, start = {1}, end = {2}, parameter = {3}", action, textAttribute.StartColumn, textAttribute.EndColumn, textAttribute.Parameter);
+                            VTDebug.WriteAction("{0}, start = {1}, end = {2}, parameter = {3}", action, textAttribute.StartColumn, textAttribute.EndColumn, textAttribute.Parameter);
                         }
                         break;
                     }
@@ -1702,6 +1770,7 @@ namespace XTerminal
             // 对Document执行Resize
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样
             // 遇到过一种情况：如果终端名称不正确，比如XTerm，那么当行数增加的时候，光标会移动到该行的最右边，终端名称改成xterm就没问题了
+            // 目前的实现思路是：如果是减少行，那么从第一行开始删除；如果是增加行，那么从最后一行开始新建行。不考虑ScrollMargin
             this.mainDocument.Resize(newRows, newCols);
             this.alternateDocument.Resize(newRows, newCols);
 
@@ -1716,34 +1785,6 @@ namespace XTerminal
             this.RowSize = newRows;
         }
 
-
-        /// <summary>
-        /// 光标闪烁线程
-        /// 所有的光标都在这一个线程运行
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void BlinkCursorThread_Tick(object sender, EventArgs e)
-        {
-            foreach (VideoTerminal vt in VideoTerminals)
-            {
-                VTCursor cursor = vt.activeDocument.Cursor;
-
-                cursor.IsVisible = !cursor.IsVisible;
-
-                try
-                {
-                    cursor.RequestInvalidate();
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("RequestInvalidate Cursor运行异常", ex);
-                }
-                finally
-                {
-                }
-            }
-        }
 
         #endregion
     }

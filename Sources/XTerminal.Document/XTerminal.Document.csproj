@@ -50,7 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DefaultValues.cs" />
     <Compile Include="HighlightGeometry\HighlightGeometryBuilder.cs" />
     <Compile Include="Rendering\IDrawingObject.cs" />
     <Compile Include="Rendering\IDrawingCanvas.cs" />
@@ -94,6 +93,8 @@
       <Name>XTerminal.Parser</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Enumerations\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

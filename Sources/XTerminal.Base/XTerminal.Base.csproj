@@ -83,7 +83,6 @@
     <Compile Include="VTKeys.cs" />
     <Compile Include="VTModifierKeys.cs" />
     <Compile Include="XTermConsts.cs" />
-    <Compile Include="XTermUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">

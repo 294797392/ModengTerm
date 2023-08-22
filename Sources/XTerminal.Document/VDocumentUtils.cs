@@ -75,7 +75,12 @@ namespace XTerminal.Document
             }
         }
 
-        public static string BuildText(IEnumerable<VTCharacter> characters)
+        /// <summary>
+        /// 把一组VTCharacter转换成一个文本行字符串
+        /// </summary>
+        /// <param name="characters"></param>
+        /// <returns></returns>
+        public static string BuildLine(IEnumerable<VTCharacter> characters)
         {
             string text = string.Empty;
 

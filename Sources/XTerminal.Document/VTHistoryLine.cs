@@ -15,13 +15,13 @@ namespace XTerminal.Document
     /// </summary>
     public class VTHistoryLine
     {
-        public string Text
-        {
-            get
-            {
-                return VDocumentUtils.BuildText(this.Characters);
-            }
-        }
+        //public string Text
+        //{
+        //    get
+        //    {
+        //        return VDocumentUtils.BuildText(this.Characters);
+        //    }
+        //}
 
         /// <summary>
         /// 行索引，从0开始

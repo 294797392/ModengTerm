@@ -91,7 +91,7 @@ namespace XTerminal.Document
         {
             get
             {
-                string text = VDocumentUtils.BuildText(this.characters);
+                string text = VDocumentUtils.BuildLine(this.characters);
                 return text.Length == 0 ? " " : text;
             }
         }

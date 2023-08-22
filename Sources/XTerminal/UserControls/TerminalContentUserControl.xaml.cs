@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -17,6 +18,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
+using XTerminal.Enumerations;
 using XTerminal.Rendering;
 using XTerminal.Session;
 using XTerminal.ViewModels;
@@ -130,6 +132,15 @@ namespace XTerminal.UserControls
         private void SelectAll()
         {
             this.videoTerminal.SelectAll();
+        }
+
+        private void SaveToFile(SaveModeEnum saveMode, SaveFormatEnum format)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            if ((bool)saveFileDialog.ShowDialog())
+            {
+                this.videoTerminal.SaveToFile(saveMode, format, saveFileDialog.FileName);
+            }
         }
 
         #endregion
@@ -305,6 +316,38 @@ namespace XTerminal.UserControls
         private void MenuItemSelectAll_Click(object sender, RoutedEventArgs e)
         {
             this.SelectAll();
+        }
+
+
+
+        private void MenuItemSaveScreenToTextFile_Click(object sender, RoutedEventArgs e)
+        {
+            this.SaveToFile(SaveModeEnum.SaveScreen, SaveFormatEnum.TextFormat);
+        }
+
+        private void MenuItemSaveScreenToHtmlFile_Click(object sender, RoutedEventArgs e)
+        {
+            this.SaveToFile(SaveModeEnum.SaveScreen, SaveFormatEnum.HtmlFormat);
+        }
+
+        private void MenuItemSaveSelectedToTextFile_Click(object sender, RoutedEventArgs e)
+        {
+            this.SaveToFile(SaveModeEnum.SaveSelected, SaveFormatEnum.TextFormat);
+        }
+
+        private void MenuItemSaveSelectedToHtmlFile_Click(object sender, RoutedEventArgs e)
+        {
+            this.SaveToFile(SaveModeEnum.SaveSelected, SaveFormatEnum.HtmlFormat);
+        }
+
+        private void MenuItemSaveAllToTextFile_Click(object sender, RoutedEventArgs e)
+        {
+            this.SaveToFile(SaveModeEnum.SaveAll, SaveFormatEnum.TextFormat);
+        }
+
+        private void MenuItemSaveAllToHtmlFile_Click(object sender, RoutedEventArgs e)
+        {
+            this.SaveToFile(SaveModeEnum.SaveAll, SaveFormatEnum.HtmlFormat);
         }
 
         #endregion

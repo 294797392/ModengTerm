@@ -81,6 +81,8 @@ namespace XTerminal
 
         private OpenedSessionVM selectedOpenedSession;
 
+        private DispatcherTimer drawCursorTimer;
+
         #endregion
 
         #region 属性
@@ -141,6 +143,18 @@ namespace XTerminal
 
             // 将打开页面新加到OpenedSessionTab页面上
             this.OpenedSessionList.Add(new OpenSessionVM());
+
+            #region 启动后台工作线程
+
+            // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
+
+            this.drawCursorTimer = new DispatcherTimer();
+            this.drawCursorTimer.Interval = TimeSpan.FromMilliseconds(XTermConsts.HighSpeedBlinkInterval);
+            this.drawCursorTimer.Tick += DrawCursorTimer_Tick;
+            this.drawCursorTimer.IsEnabled = false;
+            this.drawCursorTimer.Start();
+
+            #endregion
 
             return ResponseCode.SUCCESS;
         }
@@ -219,6 +233,15 @@ namespace XTerminal
             this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);
             this.SelectedOpenedSession = sessionVM;
 
+            // 启动光标渲染线程
+            if (sessionVM is VideoTerminal)
+            {
+                if (!this.drawCursorTimer.IsEnabled)
+                {
+                    this.drawCursorTimer.IsEnabled = true;
+                }
+            }
+
             return sessionVM;
         }
 
@@ -226,7 +249,7 @@ namespace XTerminal
         {
             session.StatusChanged -= this.SessionVM_StatusChanged;
             session.Close();
-
+            
             this.OpenedSessionList.Remove(session);
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
             if (firstOpenedSession == null)
@@ -280,6 +303,48 @@ namespace XTerminal
 
         private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
         {
+        }
+
+        /// <summary>
+        /// 光标闪烁线程
+        /// 所有的光标都在这一个线程运行
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DrawCursorTimer_Tick(object sender, EventArgs e)
+        {
+            IEnumerable<VideoTerminal> vtlist = this.OpenedSessionList.OfType<VideoTerminal>();
+
+            bool hasVt = false;
+
+            foreach (VideoTerminal vt in vtlist)
+            {
+                VTCursor cursor = vt.ActiveDocument.Cursor;
+
+                cursor.IsVisible = !cursor.IsVisible;
+
+                try
+                {
+                    cursor.RequestInvalidate();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("RequestInvalidate Cursor运行异常", ex);
+                }
+                finally
+                {
+                }
+
+                if (!hasVt)
+                {
+                    hasVt = true;
+                }
+            }
+
+            if (!hasVt)
+            {
+                this.drawCursorTimer.IsEnabled = false;
+            }
         }
 
         #endregion
