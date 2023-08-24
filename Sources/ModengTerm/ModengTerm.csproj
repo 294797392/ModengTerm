@@ -1,0 +1,318 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ModengTerm</RootNamespace>
+    <AssemblyName>ModengTerm</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <Win32Resource>
+    </Win32Resource>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\Dependence\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions">
+      <HintPath>..\..\Dependence\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity">
+      <HintPath>..\..\Dependence\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WPFToolkit">
+      <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Converters.cs" />
+    <Compile Include="Enumerations\SaveFormatEnum.cs" />
+    <Compile Include="Enumerations\SaveModeEnum.cs" />
+    <Compile Include="Enumerations\SessionModeEnum.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Rendering\DrawingCursor.cs" />
+    <Compile Include="Rendering\DrawingLine.cs" />
+    <Compile Include="Rendering\DrawingSelection.cs" />
+    <Compile Include="Rendering\DrawingObject.cs" />
+    <Compile Include="Rendering\DrawingUtils.cs" />
+    <Compile Include="Rendering\DrawingSurface.cs" />
+    <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
+    <Compile Include="ServiceAgents\FileServiceAgent.cs" />
+    <Compile Include="ServiceAgents\ServiceAgent.cs" />
+    <Compile Include="XTermUtils.cs" />
+    <Compile Include="UserControls\FileSystemTreeUserControl.xaml.cs">
+      <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\SessionContent.cs" />
+    <Compile Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml.cs">
+      <DependentUpon>SerialPortOptionsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\OptionsUserControl\SSHOptionsUserControl.xaml.cs">
+      <DependentUpon>SSHOptionsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\OptionsUserControl\TerminalOptionsUserControl.xaml.cs">
+      <DependentUpon>TerminalOptionsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\OptionsUserControl\ThemeOptionsUserControl.xaml.cs">
+      <DependentUpon>ThemeOptionsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\SessionContentFactory.cs" />
+    <Compile Include="UserControls\TerminalContentUserControl.xaml.cs">
+      <DependentUpon>TerminalContentUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\SFTPContentUserControl.xaml.cs">
+      <DependentUpon>SFTPContentUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\VideoTerminal.cs" />
+    <Compile Include="ViewModels\CollectionItem\CollectionItemVM.cs" />
+    <Compile Include="ViewModels\CollectionItem\TextItemVM.cs" />
+    <Compile Include="ViewModels\CreateSessionVM.cs" />
+    <Compile Include="ViewModels\DelegateCommand.cs" />
+    <Compile Include="ViewModels\GroupVM.cs" />
+    <Compile Include="ViewModels\OptionTreeVM.cs" />
+    <Compile Include="ViewModels\OptionTreeNodeVM.cs" />
+    <Compile Include="ViewModels\SFTPSessionVM.cs" />
+    <Compile Include="ViewModels\SFTP\ContextMenuItemVM.cs" />
+    <Compile Include="ViewModels\SFTP\DirectoryNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\FileNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemNodeTypeEnum.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemTreeNodeVM.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemTreeVMContext.cs" />
+    <Compile Include="ViewModels\SFTP\FileSystemTreeVM.cs" />
+    <Compile Include="ViewModels\SFTP\LocalFileSystemTreeVM.cs" />
+    <Compile Include="ViewModels\SFTP\SftpFileSystemTreeVM.cs" />
+    <Compile Include="ViewModels\SFTP\TransferFileVM.cs" />
+    <Compile Include="ViewModels\OpenSessionVM.cs" />
+    <Compile Include="ViewModels\CollectionVM.cs" />
+    <Compile Include="ViewModels\OpenedSessionVM.cs" />
+    <Compile Include="ViewModels\SessionTypeVM.cs" />
+    <Compile Include="ViewModels\XTermSessionVM.cs" />
+    <Compile Include="Windows\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\CreateSessionOptionTreeWindow.xaml.cs">
+      <DependentUpon>CreateSessionOptionTreeWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\DebugWindow.xaml.cs">
+      <DependentUpon>DebugWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TestWindow.xaml.cs">
+      <DependentUpon>TestWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XTermApp.cs" />
+    <Page Include="Languages\Chinese.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Styles\OptionsDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Themes.Default.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Themes.XShell.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\FileSystemTreeUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\SSHOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\TerminalOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\OptionsUserControl\ThemeOptionsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\SFTPContentUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\CreateSessionOptionTreeWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\DebugWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SessionListWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Windows\SessionListWindow.xaml.cs">
+      <DependentUpon>SessionListWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Themes.Ubuntu.Ambiance.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\TerminalContentUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TestWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <None Include="app.config" />
+    <AppDesigner Include="Properties\" />
+    <None Include="app.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Resource Include="Fonts\Ubuntu-B.ttf" />
+    <Resource Include="Fonts\Ubuntu-BI.ttf" />
+    <Resource Include="Fonts\Ubuntu-C.ttf" />
+    <Resource Include="Fonts\Ubuntu-L.ttf" />
+    <Resource Include="Fonts\Ubuntu-LI.ttf" />
+    <Resource Include="Fonts\Ubuntu-M.ttf" />
+    <Resource Include="Fonts\Ubuntu-MI.ttf" />
+    <Resource Include="Fonts\Ubuntu-R.ttf" />
+    <Resource Include="Fonts\Ubuntu-RI.ttf" />
+    <Resource Include="Fonts\UbuntuMono-B.ttf" />
+    <Resource Include="Fonts\UbuntuMono-BI.ttf" />
+    <Resource Include="Fonts\UbuntuMono-R.ttf" />
+    <Resource Include="Fonts\UbuntuMono-RI.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\CONTRIBUTING.txt" />
+    <Resource Include="Fonts\copyright.txt" />
+    <Resource Include="Fonts\FONTLOG.txt" />
+    <Resource Include="Fonts\LICENCE-FAQ.txt" />
+    <Resource Include="Fonts\LICENCE.txt" />
+    <Resource Include="Fonts\README.txt" />
+    <Resource Include="Fonts\TRADEMARKS.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj">
+      <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
+      <Name>ModengTerm.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ModengTerm.VideoTerminal\ModengTerm.VideoTerminal.csproj">
+      <Project>{8d8c6c2d-8249-49b8-aa04-72d908836388}</Project>
+      <Name>ModengTerm.VideoTerminal</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
+      <Project>{fad04a41-2dbb-49ec-a8ed-fbd0dc62d26c}</Project>
+      <Name>Renci.SshNet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties app_1json__JsonSchema="https://beaujs.com/schema.json" />
+    </VisualStudio>
+  </ProjectExtensions>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(SolutionDir)..\Dependence\winpty\32\* $(TargetDir) /y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

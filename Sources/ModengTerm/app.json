@@ -1,0 +1,114 @@
+﻿{
+    "modules": [
+        {
+            "ID": "1",
+            "Name": "服务代理",
+            "ClassName": "XTerminal.ServiceAgents.FileServiceAgent, ModengTerm",
+            "Inputs": {
+            }
+        }
+    ],
+
+    "sessions": [
+        {
+            "id": "1",
+            "name": "SSH",
+            "description": "",
+            "icon": "",
+            "type": 1
+        },
+
+        {
+            "id": "2",
+            "name": "Windows命令行",
+            "description": "",
+            "icon": "",
+            "type": 0
+        },
+
+        {
+            "id": "3",
+            "name": "串口",
+            "description": "",
+            "icon": "",
+            "type": 3
+        },
+
+        {
+            "id": "4",
+            "name": "SFTP",
+            "description": "",
+            "icon": "",
+            "type": 4
+        }
+    ],
+
+    "foreground": [
+        {
+            "id": "1",
+            "name": "黑色",
+            "value": "black"
+        }
+    ],
+
+    "fontSize": [
+        {
+            "id": "1",
+            "name": "14号",
+            "value": 14
+        }
+    ],
+
+    "fontFamily": [
+        {
+            "id": "1",
+            "name": "宋体",
+            "value": "宋体"
+        }
+    ],
+
+    "ftpOptions": [
+        {
+            "id": "",
+            "name": ""
+        }
+    ],
+
+    "terminalOptions": [
+        {
+            "id": "5392E378-684F-476E-AF4D-90F04C321F66",
+            "name": "连接设置",
+            "entryClass": "XTerminal.UserControls.OptionsUserControl.SSHOptionsUserControl, ModengTerm",
+            "children": [
+                {
+                    "id": "1BFBE907-A25B-47BD-B319-968789E5F4E7",
+                    "name": "SSH",
+                    "entryClass": "XTerminal.UserControls.OptionsUserControl.SSHOptionsUserControl, ModengTerm"
+                },
+                {
+                    "id": "32D1B929-FA7F-44BE-860B-75BD8AFF5F9C",
+                    "name": "串口",
+                    "entryClass": "XTerminal.UserControls.OptionsUserControl.SerialPortOptionsUserControl, ModengTerm"
+                }
+            ]
+        },
+
+        {
+            "id": "1CD8D138-F31B-49FC-A9B8-D4099AC7C13C",
+            "name": "终端",
+            "entryClass": "XTerminal.UserControls.OptionsUserControl.TerminalOptionsUserControl, ModengTerm",
+            "children": [
+                {
+                    "id": "6DC5CF04-1292-4AF3-B344-06661552BF6E",
+                    "name": "鼠标"
+                }
+            ]
+        },
+
+        {
+            "id": "E0CB3399-4E46-4AA2-985F-4ED6F64879E4",
+            "name": "外观主题",
+            "entryClass": "XTerminal.UserControls.OptionsUserControl.ThemeOptionsUserControl, ModengTerm"
+        }
+    ]
+}

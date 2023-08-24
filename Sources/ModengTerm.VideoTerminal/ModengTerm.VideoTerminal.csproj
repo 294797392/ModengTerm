@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8D8C6C2D-8249-49B8-AA04-72D908836388}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ModengTerm.VideoTerminal</RootNamespace>
+    <AssemblyName>ModengTerm.VideoTerminal</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\Dependence\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Document\HighlightGeometry\HighlightGeometryBuilder.cs" />
+    <Compile Include="Document\HitTestHelper.cs" />
+    <Compile Include="Loggering\LogFileTypeEnum.cs" />
+    <Compile Include="Loggering\Logger.cs" />
+    <Compile Include="Loggering\LoggerManager.cs" />
+    <Compile Include="Rendering\IDrawingCanvas.cs" />
+    <Compile Include="Rendering\IDrawingObject.cs" />
+    <Compile Include="Rendering\IDrawingObjectText.cs" />
+    <Compile Include="Rendering\IVideoTerminal.cs" />
+    <Compile Include="Rendering\RenderingOptions.cs" />
+    <Compile Include="Document\VDocumentUtils.cs" />
+    <Compile Include="Document\VFontWeight.cs" />
+    <Compile Include="Document\VTCharacter.cs" />
+    <Compile Include="Document\VTCharacterFlags.cs" />
+    <Compile Include="Document\VTCursor.cs" />
+    <Compile Include="Document\VTDocument.cs" />
+    <Compile Include="Document\VTDocumentElement.cs" />
+    <Compile Include="Document\VTDocumentOptions.cs" />
+    <Compile Include="Document\VTextAttribute.cs" />
+    <Compile Include="Document\VTextElement.cs" />
+    <Compile Include="Document\VTextLine.cs" />
+    <Compile Include="Document\VTextLineState.cs" />
+    <Compile Include="Document\VTextMetrics.cs" />
+    <Compile Include="Document\VTextPointer.cs" />
+    <Compile Include="Document\VTextSelection.cs" />
+    <Compile Include="Document\VTextStyle.cs" />
+    <Compile Include="Document\VTHistoryLine.cs" />
+    <Compile Include="Document\VTPoint.cs" />
+    <Compile Include="Document\VTPointCollection.cs" />
+    <Compile Include="Document\VTRect.cs" />
+    <Compile Include="Parser\VTActions.cs" />
+    <Compile Include="Parser\VTColors.cs" />
+    <Compile Include="Parser\VTCursorKeyMode.cs" />
+    <Compile Include="Parser\VTDefinitions.cs" />
+    <Compile Include="Parser\VTKeypadMode.cs" />
+    <Compile Include="Parser\VTMode.cs" />
+    <Compile Include="Parser\VTParameter.cs" />
+    <Compile Include="Parser\VTParser.cs" />
+    <Compile Include="Parser\VTParserDispatch.cs" />
+    <Compile Include="Parser\VTParserEventDlg.cs" />
+    <Compile Include="Parser\VTStates.cs" />
+    <Compile Include="Parser\Xterm256Color.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Session\libvt.cs" />
+    <Compile Include="Session\libvtsshSession.cs" />
+    <Compile Include="Session\SerialPortSession.cs" />
+    <Compile Include="Session\SessionDriver.cs" />
+    <Compile Include="Session\SessionFactory.cs" />
+    <Compile Include="Session\SessionStatusEnum.cs" />
+    <Compile Include="Session\SessionTransport.cs" />
+    <Compile Include="Session\SshNetSession.cs" />
+    <Compile Include="Session\WinptySession.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj">
+      <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
+      <Name>ModengTerm.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
+      <Project>{fad04a41-2dbb-49ec-a8ed-fbd0dc62d26c}</Project>
+      <Name>Renci.SshNet</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
