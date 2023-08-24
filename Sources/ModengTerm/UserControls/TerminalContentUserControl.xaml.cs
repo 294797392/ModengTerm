@@ -1,4 +1,7 @@
 ﻿using Microsoft.Win32;
+using ModengTerm.Rendering;
+using ModengTerm.VideoTerminal;
+using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -19,7 +22,6 @@ using XTerminal.Base.DataModels;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Enumerations;
-using XTerminal.Rendering;
 using XTerminal.Session;
 using XTerminal.ViewModels;
 
@@ -36,32 +38,21 @@ namespace XTerminal.UserControls
 
         #endregion
 
-        #region 公开事件
-
-        public event Action<IVideoTerminal, VTInputEvent> InputEvent;
-        public event Action<IVideoTerminal, int> ScrollChanged;
-        public event Action<IVideoTerminal, VTPoint> VTMouseMove;
-        public event Action<IVideoTerminal, VTPoint> VTMouseDown;
-        public event Action<IVideoTerminal, VTPoint> VTMouseUp;
-        public event Action<IVideoTerminal, bool> VTMouseWheel;
-        public event Action<IVideoTerminal, VTRect> VTSizeChanged;
-        public event Action<IVideoTerminal, double, double, int> VTMouseDoubleClick;
-
-        #endregion
-
         #region 实例变量
 
-        private VTInputEvent inputEvent;
-        private int scrollbarCursorDownValue;
-        private bool cursorDown;
+        private UserInput userInput;
 
         private VideoTerminal videoTerminal;
+
+        private MouseDownHandler mouseDownDlg;
+        private MouseMoveHandler mouseMoveDlg;
+        private MouseUpHandler mouseUpDlg;
+        private MouseWheelHandler mouseWheelDlg;
+        private SizeChangedHandler sizeChangedDlg;
 
         #endregion
 
         #region 属性
-
-        public VTRect BoundaryRelativeToDesktop { get; private set; }
 
         #endregion
 
@@ -80,58 +71,10 @@ namespace XTerminal.UserControls
 
         private void InitializeUserControl()
         {
-            this.inputEvent = new VTInputEvent();
+            this.userInput = new UserInput();
             this.Background = Brushes.Transparent;
             this.Focusable = true;
             base.Cursor = Cursors.IBeam;
-        }
-
-        private void NotifyInputEvent(VTInputEvent evt)
-        {
-            if (this.InputEvent != null)
-            {
-                this.InputEvent(this, evt);
-            }
-        }
-
-        private void HandleScrollEvent()
-        {
-            if (!this.cursorDown)
-            {
-                return;
-            }
-
-            int newValue = Convert.ToInt32(SliderScrolbar.Value);
-            if (newValue != this.scrollbarCursorDownValue)
-            {
-                if (this.ScrollChanged != null)
-                {
-                    this.ScrollChanged(this, newValue);
-                }
-            }
-
-            this.scrollbarCursorDownValue = newValue;
-        }
-
-        /// <summary>
-        /// 复制
-        /// </summary>
-        public void Copy()
-        {
-            this.videoTerminal.CopySelection();
-        }
-
-        /// <summary>
-        /// 粘贴
-        /// </summary>
-        private void Paste()
-        {
-            this.videoTerminal.Paste();
-        }
-
-        private void SelectAll()
-        {
-            this.videoTerminal.SelectAll();
         }
 
         private void SaveToFile(SaveModeEnum saveMode, SaveFormatEnum format)
@@ -159,11 +102,12 @@ namespace XTerminal.UserControls
         {
             base.OnPreviewTextInput(e);
 
-            this.inputEvent.CapsLock = Console.CapsLock;
-            this.inputEvent.Key = VTKeys.None;
-            this.inputEvent.Text = e.Text;
-            this.inputEvent.Modifiers = VTModifierKeys.None;
-            this.NotifyInputEvent(this.inputEvent);
+            this.userInput.CapsLock = Console.CapsLock;
+            this.userInput.Key = VTKeys.None;
+            this.userInput.Text = e.Text;
+            this.userInput.Modifiers = VTModifierKeys.None;
+
+            this.videoTerminal.HandleInput(this.userInput);
 
             e.Handled = true;
 
@@ -207,11 +151,11 @@ namespace XTerminal.UserControls
                 }
 
                 VTKeys vtKey = DrawingUtils.ConvertToVTKey(e.Key);
-                this.inputEvent.CapsLock = Console.CapsLock;
-                this.inputEvent.Key = vtKey;
-                this.inputEvent.Text = null;
-                this.inputEvent.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-                this.NotifyInputEvent(this.inputEvent);
+                this.userInput.CapsLock = Console.CapsLock;
+                this.userInput.Key = vtKey;
+                this.userInput.Text = null;
+                this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+                this.videoTerminal.HandleInput(this.userInput);
             }
         }
 
@@ -226,8 +170,9 @@ namespace XTerminal.UserControls
         {
             base.OnMouseWheel(e);
 
-            this.VTMouseWheel(this, e.Delta > 0);
+            this.mouseWheelDlg(this, e.Delta > 0);
         }
+
 
         /// <summary>
         /// 重写了这个事件后，就会触发鼠标相关的事件
@@ -241,22 +186,9 @@ namespace XTerminal.UserControls
         }
 
 
-
-        private void SliderScrolbar_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void SliderScrolbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.cursorDown = true;
-            this.scrollbarCursorDownValue = Convert.ToInt32(SliderScrolbar.Value);
-        }
-
-        private void SliderScrolbar_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            this.HandleScrollEvent();
-        }
-
-        private void SliderScrolbar_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-        {
-            this.HandleScrollEvent();
-            this.cursorDown = false;
+            this.videoTerminal.ScrollTo((int)e.NewValue);
         }
 
 
@@ -266,12 +198,7 @@ namespace XTerminal.UserControls
             Point p = e.GetPosition(this);
 
             GridContent.CaptureMouse();
-            this.VTMouseDown(this, new VTPoint(p.X, p.Y));
-
-            if (e.ClickCount > 1)
-            {
-                this.VTMouseDoubleClick(this, p.X, p.Y, e.ClickCount);
-            }
+            this.mouseDownDlg(this, new VTPoint(p.X, p.Y), e.ClickCount);
         }
 
         private void GridContent_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -279,14 +206,14 @@ namespace XTerminal.UserControls
             if (GridContent.IsMouseCaptured)
             {
                 Point p = e.GetPosition(this);
-                this.VTMouseMove(this, new VTPoint(p.X, p.Y));
+                this.mouseMoveDlg(this, new VTPoint(p.X, p.Y));
             }
         }
 
         private void GridContent_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Point p = e.GetPosition(this);
-            this.VTMouseUp(this, new VTPoint(p.X, p.Y));
+            this.mouseUpDlg(this, new VTPoint(p.X, p.Y));
             GridContent.ReleaseMouseCapture();
         }
 
@@ -296,29 +223,26 @@ namespace XTerminal.UserControls
         {
             // 每次大小改变的时候重新计算下渲染区域的边界框
             Point leftTop = ContentControlSurface.PointToScreen(new Point(0, 0));
-            this.BoundaryRelativeToDesktop = new VTRect(leftTop.X, leftTop.Y, ContentControlSurface.ActualWidth, ContentControlSurface.ActualHeight);
-
-            this.VTSizeChanged(this, this.BoundaryRelativeToDesktop);
+            VTRect vtRect = new VTRect(leftTop.X, leftTop.Y, ContentControlSurface.ActualWidth, ContentControlSurface.ActualHeight);
+            this.sizeChangedDlg(this, vtRect);
         }
 
 
 
         private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
         {
-            this.Copy();
+            this.videoTerminal.CopySelection();
         }
 
         private void MenuItemPaste_Click(object sender, RoutedEventArgs e)
         {
-            this.Paste();
+            this.videoTerminal.Paste();
         }
 
         private void MenuItemSelectAll_Click(object sender, RoutedEventArgs e)
         {
-            this.SelectAll();
+            this.videoTerminal.SelectAll();
         }
-
-
 
         private void MenuItemSaveScreenToTextFile_Click(object sender, RoutedEventArgs e)
         {
@@ -348,6 +272,28 @@ namespace XTerminal.UserControls
         private void MenuItemSaveAllToHtmlFile_Click(object sender, RoutedEventArgs e)
         {
             this.SaveToFile(SaveModeEnum.SaveAll, SaveFormatEnum.HtmlFormat);
+        }
+
+        private void MenuItemDrawingMode_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            if (MenuItemDrawingMode.IsChecked)
+            {
+                // 绘图模式
+                this.mouseDownDlg = this.videoTerminal.OnDrawingMouseDown;
+                this.mouseMoveDlg = this.videoTerminal.OnDrawingMouseMove;
+                this.mouseUpDlg = this.videoTerminal.OnDrawingMouseUp;
+                this.mouseWheelDlg = this.videoTerminal.OnDrawingMouseWheel;
+                this.sizeChangedDlg = this.videoTerminal.OnDrawingSizeChanged;
+            }
+            else
+            {
+                // 非绘图模式
+                this.mouseDownDlg = this.videoTerminal.OnMouseDown;
+                this.mouseMoveDlg = this.videoTerminal.OnMouseMove;
+                this.mouseUpDlg = this.videoTerminal.OnMouseUp;
+                this.mouseWheelDlg = this.videoTerminal.OnMouseWheel;
+                this.sizeChangedDlg = this.videoTerminal.OnSizeChanged;
+            }
         }
 
         #endregion
@@ -388,14 +334,14 @@ namespace XTerminal.UserControls
         /// <param name="maximum">滚动条的最大值</param>
         public void SetScrollInfo(int maximum, int scrollValue)
         {
-            if (this.SliderScrolbar.Maximum != maximum)
+            if (SliderScrolbar.Maximum != maximum)
             {
-                this.SliderScrolbar.Maximum = maximum;
+                SliderScrolbar.Maximum = maximum;
             }
 
-            if (this.SliderScrolbar.Value != scrollValue)
+            if (SliderScrolbar.Value != scrollValue)
             {
-                this.SliderScrolbar.Value = scrollValue;
+                SliderScrolbar.Value = scrollValue;
             }
         }
 
@@ -421,6 +367,12 @@ namespace XTerminal.UserControls
         public override int Open(OpenedSessionVM session)
         {
             this.videoTerminal = session as VideoTerminal;
+
+            this.mouseDownDlg = this.videoTerminal.OnMouseDown;
+            this.mouseMoveDlg = this.videoTerminal.OnMouseMove;
+            this.mouseUpDlg = this.videoTerminal.OnMouseUp;
+            this.mouseWheelDlg = this.videoTerminal.OnMouseWheel;
+            this.sizeChangedDlg = this.videoTerminal.OnSizeChanged;
 
             return ResponseCode.SUCCESS;
         }

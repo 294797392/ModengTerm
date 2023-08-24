@@ -9,7 +9,7 @@ using XTerminal.Base;
 using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 
-namespace XTerminal.Rendering
+namespace ModengTerm.Rendering
 {
     /// <summary>
     /// 光标的渲染模型

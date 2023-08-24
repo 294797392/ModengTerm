@@ -7,8 +7,8 @@
     <ProjectGuid>{8D8C6C2D-8249-49B8-AA04-72D908836388}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModengTerm.VideoTerminal</RootNamespace>
-    <AssemblyName>ModengTerm.VideoTerminal</AssemblyName>
+    <RootNamespace>ModengTerm.Terminal</RootNamespace>
+    <AssemblyName>ModengTerm.Terminal</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
+    <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
+    <Compile Include="EventHandlers.cs" />
     <Compile Include="Document\HighlightGeometry\HighlightGeometryBuilder.cs" />
     <Compile Include="Document\HitTestHelper.cs" />
     <Compile Include="Loggering\LogFileTypeEnum.cs" />
@@ -80,18 +83,18 @@
     <Compile Include="Document\VTPoint.cs" />
     <Compile Include="Document\VTPointCollection.cs" />
     <Compile Include="Document\VTRect.cs" />
-    <Compile Include="Parser\VTActions.cs" />
-    <Compile Include="Parser\VTColors.cs" />
-    <Compile Include="Parser\VTCursorKeyMode.cs" />
-    <Compile Include="Parser\VTDefinitions.cs" />
-    <Compile Include="Parser\VTKeypadMode.cs" />
-    <Compile Include="Parser\VTMode.cs" />
-    <Compile Include="Parser\VTParameter.cs" />
-    <Compile Include="Parser\VTParser.cs" />
-    <Compile Include="Parser\VTParserDispatch.cs" />
-    <Compile Include="Parser\VTParserEventDlg.cs" />
-    <Compile Include="Parser\VTStates.cs" />
-    <Compile Include="Parser\Xterm256Color.cs" />
+    <Compile Include="Parsing\VTActions.cs" />
+    <Compile Include="Parsing\VTColors.cs" />
+    <Compile Include="Parsing\VTCursorKeyMode.cs" />
+    <Compile Include="Parsing\VTDefinitions.cs" />
+    <Compile Include="Parsing\VTKeypadMode.cs" />
+    <Compile Include="Parsing\VTMode.cs" />
+    <Compile Include="Parsing\VTParameter.cs" />
+    <Compile Include="Parsing\VTParser.cs" />
+    <Compile Include="Parsing\VTParserDispatch.cs" />
+    <Compile Include="Parsing\VTParserEventDlg.cs" />
+    <Compile Include="Parsing\VTStates.cs" />
+    <Compile Include="Parsing\Xterm256Color.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Session\libvt.cs" />
     <Compile Include="Session\libvtsshSession.cs" />
@@ -102,6 +105,10 @@
     <Compile Include="Session\SessionTransport.cs" />
     <Compile Include="Session\SshNetSession.cs" />
     <Compile Include="Session\WinptySession.cs" />
+    <Compile Include="UserInput.cs" />
+    <Compile Include="VTKeyboard.cs" />
+    <Compile Include="VTKeys.cs" />
+    <Compile Include="VTModifierKeys.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj">

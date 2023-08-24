@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvt", "libvt\msvc\libvt.v
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Renci.SshNet", "Renci.SshNet\Renci.SshNet.csproj", "{FAD04A41-2DBB-49EC-A8ED-FBD0DC62D26C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.VideoTerminal", "ModengTerm.VideoTerminal\ModengTerm.VideoTerminal.csproj", "{8D8C6C2D-8249-49B8-AA04-72D908836388}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.Terminal", "ModengTerm.VideoTerminal\ModengTerm.Terminal.csproj", "{8D8C6C2D-8249-49B8-AA04-72D908836388}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm", "ModengTerm\ModengTerm.csproj", "{6DD46C6E-E3B3-4F5A-BEA0-E03893A1CEE4}"
 EndProject

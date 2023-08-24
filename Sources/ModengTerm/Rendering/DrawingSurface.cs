@@ -9,11 +9,10 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using VideoTerminal.Rendering;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 
-namespace XTerminal.Rendering
+namespace ModengTerm.Rendering
 {
     /// <summary>
     /// 用来渲染终端输出的表面
@@ -72,6 +71,7 @@ namespace XTerminal.Rendering
                 case VTDocumentElements.Cursor: return new DrawingCursor();
                 case VTDocumentElements.SelectionRange: return new DrawingSelection();
                 case VTDocumentElements.TextLine: return new DrawingLine();
+                case VTDocumentElements.Rectangle: return new DrawingRectangle();
                 default:
                     throw new NotImplementedException();
             }
@@ -92,7 +92,7 @@ namespace XTerminal.Rendering
 
         #endregion
 
-        #region ITerminalSurface
+        #region IDrawingCanvas
 
         public IDrawingObject CreateDrawingObject(VTDocumentElement documentElement)
         {
@@ -112,6 +112,11 @@ namespace XTerminal.Rendering
             // 调试用，看这个Surface有多大
             //drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
+
+        #endregion
+
+        #region 事件处理器
+
 
         #endregion
     }

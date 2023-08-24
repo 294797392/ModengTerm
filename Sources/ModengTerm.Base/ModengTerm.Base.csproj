@@ -78,10 +78,6 @@
     <Compile Include="SftpTrasmit\SftpTransmit.cs" />
     <Compile Include="SftpTrasmit\TransmitStatusEnum.cs" />
     <Compile Include="VTDebug.cs" />
-    <Compile Include="VTInputEvent.cs" />
-    <Compile Include="VTKeyboard.cs" />
-    <Compile Include="VTKeys.cs" />
-    <Compile Include="VTModifierKeys.cs" />
     <Compile Include="XTermConsts.cs" />
     <Compile Include="MTermManifest.cs" />
   </ItemGroup>

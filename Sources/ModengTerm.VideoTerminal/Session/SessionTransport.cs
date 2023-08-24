@@ -46,6 +46,22 @@ namespace XTerminal.Session
 
         #endregion
 
+        /// <summary>
+        /// 获取当前Session的连接状态
+        /// </summary>
+        public SessionStatusEnum Status
+        {
+            get
+            {
+                if (this.driver == null) 
+                {
+                    return SessionStatusEnum.Disconnected;
+                }
+
+                return this.driver.Status;
+            }
+        }
+
         #region 公开接口
 
         public int Initialize(XTermSession session)

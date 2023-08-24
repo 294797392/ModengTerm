@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Base
+namespace ModengTerm.VideoTerminal
 {
     /// <summary>
     /// 存储输入事件
     /// 你需要把你使用的GUI框架（WPF,Winform...etc）的键盘事件转换成VTInputEventArgs
     /// </summary>
-    public class VTInputEvent
+    public class UserInput
     {
         /// <summary>
         /// 经过输入法处理后的字符串（用户输入的中文字符），如果没有则填null

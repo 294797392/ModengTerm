@@ -14,58 +14,6 @@ namespace XTerminal.Document.Rendering
     public interface IVideoTerminal
     {
         /// <summary>
-        /// 获取相对于整个显示器屏幕的Canvas边界框
-        /// </summary>
-        VTRect BoundaryRelativeToDesktop { get; }
-
-        /// <summary>
-        /// 当用户按下按键的时候要触发这个事件
-        /// IVideoTerminal：触发事件的VideoTerminal
-        /// VTKeys：用户按下的键盘按键
-        /// VTModifierKeys：用户按下的控制按键（ctrl，alt...etc）
-        /// string：用户输入的中文字符串，如果没有则写null
-        /// </summary>
-        event Action<IVideoTerminal, VTInputEvent> InputEvent;
-
-        /// <summary>
-        /// 当用户拖动滚动条的时候触发
-        /// int:滚动条移动到的行数
-        /// </summary>
-        event Action<IVideoTerminal, int> ScrollChanged;
-
-        /// <summary>
-        /// 鼠标移动的时候触发
-        /// 在鼠标移动出Panel外的时候，也会触发
-        /// </summary>
-        event Action<IVideoTerminal, VTPoint> VTMouseMove;
-
-        /// <summary>
-        /// 鼠标按下的时候触发
-        /// </summary>
-        event Action<IVideoTerminal, VTPoint> VTMouseDown;
-
-        /// <summary>
-        /// 鼠标抬起的时候触发
-        /// </summary>
-        event Action<IVideoTerminal, VTPoint> VTMouseUp;
-
-        /// <summary>
-        /// 当鼠标双击的时候触发
-        /// </summary>
-        event Action<IVideoTerminal, double, double, int> VTMouseDoubleClick;
-
-        /// <summary>
-        /// 鼠标滚轮滚动的时候触发
-        /// 如果向上滚动则为true，否则为false
-        /// </summary>
-        event Action<IVideoTerminal, bool> VTMouseWheel;
-
-        /// <summary>
-        /// 当终端屏幕大小改变的时候触发
-        /// </summary>
-        event Action<IVideoTerminal, VTRect> VTSizeChanged;
-
-        /// <summary>
         /// 创建一个画板用来渲染文档
         /// </summary>
         /// <param name="options">渲染选项</param>

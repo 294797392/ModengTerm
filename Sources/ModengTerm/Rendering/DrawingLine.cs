@@ -12,7 +12,7 @@ using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 
-namespace XTerminal.Rendering
+namespace ModengTerm.Rendering
 {
     public class DrawingLine : DrawingObject, IDrawingObjectText
     {

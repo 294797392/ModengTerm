@@ -85,6 +85,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters.cs" />
+    <Compile Include="Enumerations\DrawModeEnum.cs" />
     <Compile Include="Enumerations\SaveFormatEnum.cs" />
     <Compile Include="Enumerations\SaveModeEnum.cs" />
     <Compile Include="Enumerations\SessionModeEnum.cs" />
@@ -93,6 +94,7 @@
     </Compile>
     <Compile Include="Rendering\DrawingCursor.cs" />
     <Compile Include="Rendering\DrawingLine.cs" />
+    <Compile Include="Rendering\DrawingRectangle.cs" />
     <Compile Include="Rendering\DrawingSelection.cs" />
     <Compile Include="Rendering\DrawingObject.cs" />
     <Compile Include="Rendering\DrawingUtils.cs" />
@@ -100,6 +102,7 @@
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
     <Compile Include="ServiceAgents\FileServiceAgent.cs" />
     <Compile Include="ServiceAgents\ServiceAgent.cs" />
+    <Compile Include="ViewModels\VideoTerminal.Drawing.cs" />
     <Compile Include="XTermUtils.cs" />
     <Compile Include="UserControls\FileSystemTreeUserControl.xaml.cs">
       <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
@@ -156,9 +159,6 @@
     </Compile>
     <Compile Include="Windows\DebugWindow.xaml.cs">
       <DependentUpon>DebugWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\TestWindow.xaml.cs">
-      <DependentUpon>TestWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="XTermApp.cs" />
     <Page Include="Languages\Chinese.xaml">
@@ -241,10 +241,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\TestWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -286,9 +282,9 @@
       <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
       <Name>ModengTerm.Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ModengTerm.VideoTerminal\ModengTerm.VideoTerminal.csproj">
+    <ProjectReference Include="..\ModengTerm.VideoTerminal\ModengTerm.Terminal.csproj">
       <Project>{8d8c6c2d-8249-49b8-aa04-72d908836388}</Project>
-      <Name>ModengTerm.VideoTerminal</Name>
+      <Name>ModengTerm.Terminal</Name>
     </ProjectReference>
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
       <Project>{fad04a41-2dbb-49ec-a8ed-fbd0dc62d26c}</Project>

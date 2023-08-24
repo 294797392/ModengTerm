@@ -8,7 +8,7 @@ using System.Windows.Media;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 
-namespace XTerminal.Rendering
+namespace ModengTerm.Rendering
 {
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）

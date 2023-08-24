@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using XTerminal.Base;
 
-namespace XTerminal.Base
+namespace ModengTerm.VideoTerminal
 {
     /// <summary>
     /// 把不同模式下的键盘按键转换成要发送给终端的字节序列
@@ -293,7 +293,7 @@ namespace XTerminal.Base
         /// 代码参考terminal - terminalInput.cpp
         /// </summary>
         /// <returns></returns>
-        public byte[] TranslateInput(VTInputEvent evt)
+        public byte[] TranslateInput(UserInput evt)
         {
             if (evt.Key == VTKeys.None)
             {

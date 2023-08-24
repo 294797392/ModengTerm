@@ -1,10 +1,12 @@
-﻿using System;
+﻿using ModengTerm.VideoTerminal;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows;
+using XTerminal;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
@@ -16,12 +18,12 @@ using XTerminal.Parser;
 using XTerminal.Session;
 using XTerminal.ViewModels;
 
-namespace XTerminal
+namespace ModengTerm.ViewModels
 {
     /// <summary>
     /// 处理虚拟终端的所有逻辑
     /// </summary>
-    public class VideoTerminal : OpenedSessionVM
+    public partial class VideoTerminal : OpenedSessionVM
     {
         private enum OutsideScrollResult
         {
@@ -192,6 +194,11 @@ namespace XTerminal
         /// </summary>
         private VTKeyboard keyboard;
 
+        /// <summary>
+        /// 终端渲染区域相对于整个桌面的位置
+        /// </summary>
+        private VTRect vtRect;
+
         #endregion
 
         #region 属性
@@ -337,19 +344,6 @@ namespace XTerminal
 
             #endregion
 
-            #region 初始化TerminalScreen
-
-            this.videoTerminal.InputEvent += this.OnInputEvent;
-            this.videoTerminal.ScrollChanged += this.OnScrollChanged;
-            this.videoTerminal.VTMouseDown += this.OnMouseDown;
-            this.videoTerminal.VTMouseMove += this.OnMouseMove;
-            this.videoTerminal.VTMouseUp += this.OnMouseUp;
-            this.videoTerminal.VTMouseWheel += this.OnMouseWheel;
-            this.videoTerminal.VTMouseDoubleClick += this.OnMouseDoubleClick;
-            this.videoTerminal.VTSizeChanged += this.TerminalScreen_VTSizeChanged;
-
-            #endregion
-
             #region 初始化TextSelection
 
             this.selectionCanvas = this.videoTerminal.CreateCanvas();
@@ -411,15 +405,6 @@ namespace XTerminal
         {
             this.isRunning = false;
 
-            this.videoTerminal.InputEvent -= this.OnInputEvent;
-            this.videoTerminal.ScrollChanged -= this.OnScrollChanged;
-            this.videoTerminal.VTMouseDown -= this.OnMouseDown;
-            this.videoTerminal.VTMouseMove -= this.OnMouseMove;
-            this.videoTerminal.VTMouseUp -= this.OnMouseUp;
-            this.videoTerminal.VTMouseWheel -= this.OnMouseWheel;
-            this.videoTerminal.VTMouseDoubleClick -= this.OnMouseDoubleClick;
-            this.videoTerminal.VTSizeChanged -= this.TerminalScreen_VTSizeChanged;
-
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
 
@@ -479,7 +464,7 @@ namespace XTerminal
         /// </summary>
         public void SelectAll()
         {
-            this.textSelection.SetRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop, 0, 0, this.lastHistoryLine.PhysicsRow, this.lastHistoryLine.Characters.Count - 1);
+            this.textSelection.SetRange(this.activeDocument, this.vtRect, 0, 0, this.lastHistoryLine.PhysicsRow, this.lastHistoryLine.Characters.Count - 1);
             this.textSelection.RequestInvalidate();
         }
 
@@ -546,6 +531,46 @@ namespace XTerminal
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 把终端内容滚动到某个位置
+        /// </summary>
+        /// <param name="scrollValue"></param>
+        public void ScrollTo(int scrollValue)
+        {
+            if (this.scrollValue == scrollValue)
+            {
+                return;
+            }
+
+            this.ScrollToHistory(scrollValue);
+        }
+
+        /// <summary>
+        /// 处理用户输入
+        /// 用户每输入一个字符，就调用一次这个函数
+        /// </summary>
+        /// <param name="input">用户输入信息</param>
+        public void HandleInput(UserInput input)
+        {
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
+            byte[] bytes = this.keyboard.TranslateInput(input);
+            if (bytes == null)
+            {
+                return;
+            }
+
+            // 这里输入的都是键盘按键
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
+            }
         }
 
         #endregion
@@ -703,7 +728,7 @@ namespace XTerminal
 
                 if (!this.textSelection.IsEmpty)
                 {
-                    this.textSelection.UpdateRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop);
+                    this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
                     this.textSelection.RequestInvalidate();
                 }
 
@@ -721,6 +746,12 @@ namespace XTerminal
         /// <param name="scrollValue">要显示的第一行历史记录</param>
         private void ScrollToHistory(int scrollValue)
         {
+            // 只有主缓冲区可以滚动
+            if (this.activeDocument != this.mainDocument)
+            {
+                return;
+            }
+
             // 要滚动到的值
             int newScroll = scrollValue;
             // 滚动之前的值
@@ -948,26 +979,6 @@ namespace XTerminal
         #endregion
 
         #region 事件处理器
-
-        /// <summary>
-        /// 当用户按下按键的时候触发
-        /// </summary>
-        /// <param name="terminal"></param>
-        private void OnInputEvent(IVideoTerminal canvasPanel, VTInputEvent evt)
-        {
-            byte[] bytes = this.keyboard.TranslateInput(evt);
-            if (bytes == null)
-            {
-                return;
-            }
-
-            // 这里输入的都是键盘按键
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
-            }
-        }
 
         private void VtParser_ActionEvent(VTActions action, object parameter)
         {
@@ -1523,23 +1534,68 @@ namespace XTerminal
         }
 
 
-        /// <summary>
-        /// 当滚动条滚动的时候触发
-        /// </summary>
-        /// <param name="arg1"></param>
-        /// <param name="scrollValue">滚动到的行数</param>
-        private void OnScrollChanged(IVideoTerminal arg1, int scrollValue)
+        public void OnMouseDown(IVideoTerminal vt, VTPoint location, int clickCount)
         {
-            this.ScrollToHistory(scrollValue);
+            if (clickCount == 1)
+            {
+                this.isMouseDown = true;
+                this.mouseDownPos = location;
+            }
+            else
+            {
+                // 双击就是选中单词
+                // 三击就是选中整行内容
+
+                int startIndex = 0, endIndex = 0;
+
+                VTextLine lineHit = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, location.Y);
+                if (lineHit == null)
+                {
+                    return;
+                }
+
+                switch (clickCount)
+                {
+                    case 2:
+                        {
+                            // 选中单词
+                            int characterIndex;
+                            VTRect characterBounds;
+                            if (!HitTestHelper.HitTestVTCharacter(lineHit, location.X, out characterIndex, out characterBounds))
+                            {
+                                return;
+                            }
+                            VDocumentUtils.GetSegement(lineHit.Text, characterIndex, out startIndex, out endIndex);
+                            break;
+                        }
+
+                    case 3:
+                        {
+                            // 选中一整行
+                            startIndex = 0;
+                            endIndex = lineHit.Text.Length - 1;
+                            break;
+                        }
+
+                    default:
+                        {
+                            return;
+                        }
+                }
+
+                this.textSelection.Reset();
+                this.textSelection.Start.CharacterIndex = startIndex;
+                this.textSelection.Start.PhysicsRow = lineHit.PhysicsRow;
+
+                this.textSelection.End.CharacterIndex = endIndex;
+                this.textSelection.End.PhysicsRow = lineHit.PhysicsRow;
+
+                this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
+                this.textSelection.RequestInvalidate();
+            }
         }
 
-        private void OnMouseDown(IVideoTerminal screen, VTPoint mousePosition)
-        {
-            this.isMouseDown = true;
-            this.mouseDownPos = mousePosition;
-        }
-
-        private void OnMouseMove(IVideoTerminal arg1, VTPoint mousePosition)
+        public void OnMouseMove(IVideoTerminal vt, VTPoint location)
         {
             if (!this.isMouseDown)
             {
@@ -1553,12 +1609,10 @@ namespace XTerminal
                 this.textSelection.Reset();
             }
 
-            VTRect surfaceRect = this.videoTerminal.BoundaryRelativeToDesktop;
-
             // 如果还没有测量起始字符，那么测量起始字符
             if (this.textSelection.Start.CharacterIndex == -1)
             {
-                if (!this.GetTextPointer(mousePosition, surfaceRect, this.textSelection.Start))
+                if (!this.GetTextPointer(location, this.vtRect, this.textSelection.Start))
                 {
                     // 没有命中起始字符，那么直接返回啥都不做
                     //logger.DebugFormat("没命中起始字符");
@@ -1568,7 +1622,7 @@ namespace XTerminal
 
             // 首先检测鼠标是否在Surface边界框的外面
             // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
-            OutsideScrollResult scrollResult = this.ScrollIfCursorOutsideSurface(mousePosition, surfaceRect);
+            OutsideScrollResult scrollResult = this.ScrollIfCursorOutsideSurface(location, this.vtRect);
 
             // 整理思路是算出来StartTextPointer和EndTextPointer之间的几何图形
             // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
@@ -1576,7 +1630,7 @@ namespace XTerminal
             VTextPointer endPointer = this.textSelection.End;
 
             // 得到当前鼠标的命中信息
-            if (!this.GetTextPointer(mousePosition, surfaceRect, endPointer))
+            if (!this.GetTextPointer(location, this.vtRect, endPointer))
             {
                 // 只有在没有Outside滚动的时候，才返回
                 // Outside滚动会导致GetTextPointer失败，虽然失败，还是要更新SelectionRange
@@ -1610,19 +1664,19 @@ namespace XTerminal
 
             // 此时的VTextLine测量数据都是最新的
             // 主缓冲区和备用缓冲区都支持选中
-            this.textSelection.UpdateRange(this.activeDocument, surfaceRect);
+            this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
             this.textSelection.RequestInvalidate();
 
             #endregion
         }
 
-        private void OnMouseUp(IVideoTerminal arg1, VTPoint mousePosition)
+        public void OnMouseUp(IVideoTerminal vt, VTPoint location)
         {
             this.isMouseDown = false;
             this.selectionState = false;
         }
 
-        private void OnMouseWheel(IVideoTerminal screen, bool upper)
+        public void OnMouseWheel(IVideoTerminal vt, bool upper)
         {
             // 只有主缓冲区才可以用鼠标滚轮进行滚动
             if (this.activeDocument != this.mainDocument)
@@ -1676,58 +1730,10 @@ namespace XTerminal
             }
         }
 
-        private void OnMouseDoubleClick(IVideoTerminal screen, double mouseX, double mouseY, int clickCount)
+        public void OnSizeChanged(IVideoTerminal vt, VTRect vtRect)
         {
-            int startIndex = 0, endIndex = 0;
+            this.vtRect = vtRect;
 
-            VTextLine lineHit = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseY);
-            if (lineHit == null)
-            {
-                return;
-            }
-
-            switch (clickCount)
-            {
-                case 2:
-                    {
-                        // 选中单词
-                        int characterIndex;
-                        VTRect characterBounds;
-                        if (!HitTestHelper.HitTestVTCharacter(lineHit, mouseX, out characterIndex, out characterBounds))
-                        {
-                            return;
-                        }
-                        VDocumentUtils.GetSegement(lineHit.Text, characterIndex, out startIndex, out endIndex);
-                        break;
-                    }
-
-                case 3:
-                    {
-                        // 选中一整行
-                        startIndex = 0;
-                        endIndex = lineHit.Text.Length - 1;
-                        break;
-                    }
-
-                default:
-                    {
-                        return;
-                    }
-            }
-
-            this.textSelection.Reset();
-            this.textSelection.Start.CharacterIndex = startIndex;
-            this.textSelection.Start.PhysicsRow = lineHit.PhysicsRow;
-
-            this.textSelection.End.CharacterIndex = endIndex;
-            this.textSelection.End.PhysicsRow = lineHit.PhysicsRow;
-
-            this.textSelection.UpdateRange(this.activeDocument, this.videoTerminal.BoundaryRelativeToDesktop);
-            this.textSelection.RequestInvalidate();
-        }
-
-        private void TerminalScreen_VTSizeChanged(IVideoTerminal screen, VTRect size)
-        {
             // 如果是固定大小的终端，那么什么都不做
             TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
             if (sizeMode == TerminalSizeModeEnum.Fixed)
@@ -1742,8 +1748,8 @@ namespace XTerminal
             VTextMetrics metrics = this.videoTerminal.MeasureText(" ", fontSize, fontFamily);
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置
-            int newRows = (int)Math.Floor(size.Height / metrics.Height);
-            int newCols = (int)Math.Floor(size.Width / metrics.Width);
+            int newRows = (int)Math.Floor(vtRect.Height / metrics.Height);
+            int newCols = (int)Math.Floor(vtRect.Width / metrics.Width);
 
             // 如果行和列都没变化，那么就什么都不做
             bool rowChanged = this.rowSize != newRows;
@@ -1772,7 +1778,6 @@ namespace XTerminal
             this.ColumnSize = newCols;
             this.RowSize = newRows;
         }
-
 
         #endregion
     }

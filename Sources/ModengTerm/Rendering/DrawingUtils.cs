@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.VideoTerminal;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -7,11 +8,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using XTerminal;
 using XTerminal.Base;
 using XTerminal.Document;
 using XTerminal.Parser;
 
-namespace XTerminal.Rendering
+namespace ModengTerm.Rendering
 {
     public static class DrawingUtils
     {

@@ -16,7 +16,12 @@ namespace XTerminal.Document
 
         Cursor,
 
-        SelectionRange
+        SelectionRange,
+
+        /// <summary>
+        /// 矩形
+        /// </summary>
+        Rectangle
     }
 
     /// <summary>

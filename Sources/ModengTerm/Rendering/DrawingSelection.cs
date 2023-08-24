@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using XTerminal.Document;
-using XTerminal.Rendering;
 
-namespace VideoTerminal.Rendering
+namespace ModengTerm.Rendering
 {
     /// <summary>
     /// 用来画光标选中的文本的Drawable
