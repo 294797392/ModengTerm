@@ -18,7 +18,7 @@ namespace ModengTerm.Rendering
 
         protected override void OnInitialize(VTDocumentElement documentElement)
         {
-            this.rectangle = documentElement.DrawingContext as VTDocumentRectangle;
+            this.rectangle = documentElement as VTDocumentRectangle;
         }
 
         protected override void Draw(DrawingContext dc)

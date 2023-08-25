@@ -327,6 +327,9 @@ namespace ModengTerm.ViewModels
             this.rowSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             this.colSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
+            // 初始化绘图
+            this.InitializeDrawing();
+
             #region 初始化键盘
 
             this.keyboard = new VTKeyboard();

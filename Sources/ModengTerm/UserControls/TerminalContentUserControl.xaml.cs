@@ -74,7 +74,6 @@ namespace XTerminal.UserControls
             this.userInput = new UserInput();
             this.Background = Brushes.Transparent;
             this.Focusable = true;
-            base.Cursor = Cursors.IBeam;
         }
 
         private void SaveToFile(SaveModeEnum saveMode, SaveFormatEnum format)

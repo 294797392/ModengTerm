@@ -58,13 +58,10 @@
                                 </Grid>
                             </MenuItem.Header>
                         </MenuItem>
-sss
                     </ContextMenu>
                 </Grid.ContextMenu>
 
-                <Grid x:Name="ContentControlSurface" Margin="5,5,0,5"
-                      SizeChanged="ContentControlSurface_SizeChanged">
-                </Grid>
+                <Grid x:Name="ContentControlSurface" Margin="5,5,0,5" SizeChanged="ContentControlSurface_SizeChanged"/>
 
             </Grid>
 

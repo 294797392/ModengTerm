@@ -14,7 +14,7 @@ namespace XTerminal.Document.Rendering
         /// <summary>
         /// 创建一个渲染对象
         /// </summary>
-        /// <returns></returns>
+        /// <returns>绘图对象</returns>
         IDrawingObject CreateDrawingObject(VTDocumentElement element);
 
         /// <summary>
