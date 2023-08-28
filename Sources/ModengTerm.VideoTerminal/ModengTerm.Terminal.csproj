@@ -57,14 +57,19 @@
   <ItemGroup>
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
-    <Compile Include="Enumerations\SaveFormatEnum.cs" />
     <Compile Include="Enumerations\SaveModeEnum.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Document\HighlightGeometry\HighlightGeometryBuilder.cs" />
     <Compile Include="Document\HitTestHelper.cs" />
+    <Compile Include="Loggering\FilterTypeEnum.cs" />
+    <Compile Include="Loggering\KeywordFilter.cs" />
     <Compile Include="Loggering\LogFileTypeEnum.cs" />
-    <Compile Include="Loggering\Logger.cs" />
+    <Compile Include="Loggering\LoggerContext.cs" />
+    <Compile Include="Loggering\LoggerFilter.cs" />
+    <Compile Include="Loggering\LoggerFilterFactory.cs" />
     <Compile Include="Loggering\LoggerManager.cs" />
+    <Compile Include="Loggering\LoggerOptions.cs" />
+    <Compile Include="Loggering\NoneFilter.cs" />
     <Compile Include="Rendering\IDrawingCanvas.cs" />
     <Compile Include="Rendering\IDrawingObject.cs" />
     <Compile Include="Rendering\IDrawingObjectText.cs" />

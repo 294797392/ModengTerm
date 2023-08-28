@@ -4,21 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Enumerations
+namespace ModengTerm.Terminal.Loggering
 {
     /// <summary>
-    /// 定义保存格式
+    /// 日志内容过滤类型
     /// </summary>
-    public enum SaveFormatEnum
+    public enum FilterTypeEnum
     {
         /// <summary>
-        /// 纯文本文件格式
+        /// 不过滤
         /// </summary>
-        TextFormat,
+        None,
 
         /// <summary>
-        /// Html格式
+        /// 关键字过滤
         /// </summary>
-        HtmlFormat
+        Keyword,
     }
 }

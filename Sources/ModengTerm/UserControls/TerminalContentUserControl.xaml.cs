@@ -77,12 +77,12 @@ namespace XTerminal.UserControls
             this.Focusable = true;
         }
 
-        private void SaveToFile(SaveModeEnum saveMode, SaveFormatEnum format)
+        private void SaveToFile(SaveModeEnum saveMode, LogFileTypeEnum fileType)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             if ((bool)saveFileDialog.ShowDialog())
             {
-                this.videoTerminal.SaveToFile(saveMode, format, saveFileDialog.FileName);
+                this.videoTerminal.SaveToFile(saveMode, fileType, saveFileDialog.FileName);
             }
         }
 
@@ -244,32 +244,32 @@ namespace XTerminal.UserControls
 
         private void MenuItemSaveScreenToTextFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveScreen, SaveFormatEnum.TextFormat);
+            this.SaveToFile(SaveModeEnum.SaveScreen, LogFileTypeEnum.Text);
         }
 
         private void MenuItemSaveScreenToHtmlFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveScreen, SaveFormatEnum.HtmlFormat);
+            this.SaveToFile(SaveModeEnum.SaveScreen, LogFileTypeEnum.Html);
         }
 
         private void MenuItemSaveSelectedToTextFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveSelected, SaveFormatEnum.TextFormat);
+            this.SaveToFile(SaveModeEnum.SaveSelected, LogFileTypeEnum.Text);
         }
 
         private void MenuItemSaveSelectedToHtmlFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveSelected, SaveFormatEnum.HtmlFormat);
+            this.SaveToFile(SaveModeEnum.SaveSelected, LogFileTypeEnum.Html);
         }
 
         private void MenuItemSaveAllToTextFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveAll, SaveFormatEnum.TextFormat);
+            this.SaveToFile(SaveModeEnum.SaveAll, LogFileTypeEnum.Text);
         }
 
         private void MenuItemSaveAllToHtmlFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveAll, SaveFormatEnum.HtmlFormat);
+            this.SaveToFile(SaveModeEnum.SaveAll, LogFileTypeEnum.Html);
         }
 
         private void MenuItemDrawingMode_CheckedChanged(object sender, RoutedEventArgs e)

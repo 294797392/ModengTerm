@@ -138,17 +138,17 @@ namespace ModengTerm.Terminal.ViewModels
         /// Row(scrollValue) -> VTextLine
         /// 注意该字典里保存的是mainDocument的历史行，alternateDocument没有保存，需要单独考虑alternateDocument
         /// </summary>
-        private Dictionary<int, VTHistoryLine> historyLines;
+        internal Dictionary<int, VTHistoryLine> historyLines;
 
         /// <summary>
         /// 历史行的第一行
         /// </summary>
-        private VTHistoryLine firstHistoryLine;
+        internal VTHistoryLine firstHistoryLine;
 
         /// <summary>
         /// 历史行的最后一行
         /// </summary>
-        private VTHistoryLine lastHistoryLine;
+        internal VTHistoryLine lastHistoryLine;
 
         #endregion
 
@@ -432,7 +432,7 @@ namespace ModengTerm.Terminal.ViewModels
             int startIndex, endIndex;
             this.AdjustSelection(out startLine, out endLine, out startIndex, out endIndex);
 
-            string text = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, SaveFormatEnum.TextFormat);
+            string text = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, LogFileTypeEnum.Text);
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
@@ -474,10 +474,10 @@ namespace ModengTerm.Terminal.ViewModels
         /// 把终端的内容保存到文件
         /// </summary>
         /// <param name="saveMode"></param>
-        /// <param name="format"></param>
+        /// <param name="fileType"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public bool SaveToFile(SaveModeEnum saveMode, SaveFormatEnum format, string filePath)
+        public bool SaveToFile(SaveModeEnum saveMode, LogFileTypeEnum fileType, string filePath)
         {
             VTHistoryLine startLine = null, endLine = null;
             int startIndex = 0, endIndex = 0;
@@ -521,7 +521,7 @@ namespace ModengTerm.Terminal.ViewModels
                 return false;
             }
 
-            string content = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, format);
+            string content = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, fileType);
             try
             {
                 File.WriteAllText(filePath, content);
@@ -1054,6 +1054,8 @@ namespace ModengTerm.Terminal.ViewModels
                             VTextLine newLastLine = this.ActiveLine;
                             newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
 
+                            VTHistoryLine oldHistoryLine = this.lastHistoryLine;
+
                             // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里冻结一下换行之前的历史行的数据，冻结之后，该历史行的数据就不会再更改了
                             // 有几种特殊情况：
                             // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
@@ -1068,9 +1070,9 @@ namespace ModengTerm.Terminal.ViewModels
 
                             // 再创建最新行的历史行
                             int newHistoryRow = newLastLine.PhysicsRow;
-                            VTHistoryLine newHistory = VTHistoryLine.Create(newLastLine.PhysicsRow, this.lastHistoryLine, this.ActiveLine);
-                            this.historyLines[newHistoryRow] = newHistory;
-                            this.lastHistoryLine = newHistory;
+                            VTHistoryLine newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, this.lastHistoryLine, this.ActiveLine);
+                            this.historyLines[newHistoryRow] = newHistoryLine;
+                            this.lastHistoryLine = newHistoryLine;
 
                             #endregion
 

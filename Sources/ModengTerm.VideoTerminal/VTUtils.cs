@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Loggering;
 using System.Text;
 using XTerminal.Document;
 
@@ -6,23 +7,39 @@ namespace ModengTerm.Terminal
 {
     internal static class VTUtils
     {
-        private static StringBuilder DocumentBuilder = new StringBuilder();
+        private static readonly StringBuilder Builder = new StringBuilder();
 
-        private static void BuildLine(VTHistoryLine historyLine, int startIndex, int endIndex, StringBuilder builder, SaveFormatEnum format)
+        private static void BuildLine(VTHistoryLine historyLine, int startIndex, int endIndex, StringBuilder builder, LogFileTypeEnum fileType,LoggerFilter filter = null)
         {
             string text = VDocumentUtils.BuildLine(historyLine.Characters);
+
+            if (filter != null) 
+            {
+                if (!filter.Filter(text))
+                {
+                    return;
+                }
+            }
+
             builder.AppendLine(text.Substring(startIndex, endIndex - startIndex + 1));
         }
 
-        public static string BuildDocument(VTHistoryLine startLine, VTHistoryLine endLine, int startCharIndex, int endCharIndex, SaveFormatEnum format)
+        public static string BuildDocument(VTHistoryLine startLine, VTHistoryLine endLine, int startCharIndex, int endCharIndex, LogFileTypeEnum fileType, LoggerFilter filter = null)
         {
-            DocumentBuilder.Clear();
+            Builder.Clear();
 
+            BuildDocument(startLine, endLine, startCharIndex, endCharIndex, Builder, fileType, filter);
+
+            return Builder.ToString();
+        }
+
+        public static void BuildDocument(VTHistoryLine startLine, VTHistoryLine endLine, int startCharIndex, int endCharIndex, StringBuilder builder, LogFileTypeEnum fileType, LoggerFilter filter = null)
+        {
             // 当前只选中了一行
             if (startLine == endLine)
             {
-                BuildLine(startLine, startCharIndex, endCharIndex, DocumentBuilder, format);
-                return DocumentBuilder.ToString();
+                BuildLine(startLine, startCharIndex, endCharIndex, builder, fileType, filter);
+                return;
             }
 
             VTHistoryLine current = startLine;
@@ -31,27 +48,21 @@ namespace ModengTerm.Terminal
             {
                 if (current == startLine)
                 {
-                    BuildLine(current, startCharIndex, current.Characters.Count - 1, DocumentBuilder, format);
+                    BuildLine(current, startCharIndex, current.Characters.Count - 1, builder, fileType, filter);
                 }
                 else if (current == endLine)
                 {
-                    BuildLine(current, 0, endCharIndex, DocumentBuilder, format);
+                    BuildLine(current, 0, endCharIndex, builder, fileType, filter);
                     break;
                 }
                 else
                 {
-                    BuildLine(current, 0, current.Characters.Count - 1, DocumentBuilder, format);
+                    BuildLine(current, 0, current.Characters.Count - 1, builder, fileType, filter);
                 }
 
                 current = current.NextLine;
             }
-
-            if (format == SaveFormatEnum.HtmlFormat)
-            {
-                // TODO：加上HTML的头部和尾部标签，和一些脚本
-            }
-
-            return DocumentBuilder.ToString();
         }
     }
 }
+

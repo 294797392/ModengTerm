@@ -3,6 +3,7 @@ using ModengTerm.Base;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Document;
 
-namespace ModengTerm.Terminal
+namespace ModengTerm.Terminal.Loggering
 {
     public class LoggerManager : AppModule<MTermManifest>
     {
@@ -23,7 +24,12 @@ namespace ModengTerm.Terminal
         #region 实例变量
 
         private Thread writeThread;
+        private List<LoggerContext> loggerList;
+        private List<LoggerContext> loggerListCopy;
         private bool changed;
+        private object listLock;
+        private ManualResetEvent loggerEvent;
+        private bool allPaused;
 
         #endregion
 
@@ -31,6 +37,11 @@ namespace ModengTerm.Terminal
 
         protected override int OnInitialize()
         {
+            this.loggerEvent = new ManualResetEvent(false);
+            this.listLock = new object();
+            this.loggerList = new List<LoggerContext>();
+            this.loggerListCopy = new List<LoggerContext>();
+
             this.writeThread = new Thread(this.WriteThreadProc);
             this.writeThread.IsBackground = true;
             this.writeThread.Start();
@@ -45,21 +56,78 @@ namespace ModengTerm.Terminal
 
         #endregion
 
+        #region 实例方法
+
+        #endregion
+
         #region 公开接口
 
-        public void Start(VideoTerminal vt)
+        public void Start(VideoTerminal vt, LoggerOptions options)
         {
-            
+            LoggerFilter filter = LoggerFilterFactory.Create(options.FilterType);
+            filter.FilterText = options.FilterText;
+
+            LoggerContext loggerContext = new LoggerContext()
+            {
+                Options = options,
+                VideoTerminal = vt,
+                Filter = filter,
+                NextLine = 0,
+                Builder = new StringBuilder()
+            };
+
+            lock (this.listLock)
+            {
+                this.changed = true;
+                this.loggerList.Add(loggerContext);
+            }
+
+            this.loggerEvent.Set();
         }
 
         public void Stop(VideoTerminal vt)
-        { }
+        {
+            LoggerContext loggerContext = this.loggerList.FirstOrDefault(v => v.VideoTerminal == vt);
+            if (loggerContext != null)
+            {
+                lock (this.listLock)
+                {
+                    loggerContext.Dispose();
+                    this.loggerList.Remove(loggerContext);
+                    this.changed = true;
+                }
+            }
+        }
 
         public void Pause(VideoTerminal vt)
-        { }
+        {
+            LoggerContext loggerContext = this.loggerList.FirstOrDefault(v => v.VideoTerminal == vt);
+            if (loggerContext == null)
+            {
+                logger.WarnFormat("LoggerPause失败, 未找到Logger");
+                return;
+            }
+
+            loggerContext.IsPaused = true;
+
+            this.allPaused = this.loggerList.All(v => v.IsPaused);
+        }
 
         public void Resume(VideoTerminal vt)
-        { }
+        {
+            LoggerContext loggerContext = this.loggerList.FirstOrDefault(v => v.VideoTerminal == vt);
+            if (loggerContext == null)
+            {
+                logger.WarnFormat("LoggerResume失败, 未找到Logger");
+                return;
+            }
+
+            loggerContext.IsPaused = false;
+
+            this.allPaused = false;
+
+            this.loggerEvent.Set();
+        }
 
         #endregion
 
@@ -69,13 +137,64 @@ namespace ModengTerm.Terminal
         {
             while (true)
             {
-                try
+                if (this.changed)
                 {
+                    lock (this.listLock)
+                    {
+                        this.loggerListCopy.Clear();
+                        this.loggerListCopy.AddRange(this.loggerList);
+                        this.changed = false;
+                    }
+                }
 
-                }
-                catch (Exception ex)
+                if (this.loggerListCopy.Count == 0 || this.allPaused)
                 {
+                    this.loggerEvent.Reset();
+                    this.loggerEvent.WaitOne();
                 }
+
+                foreach (LoggerContext context in this.loggerListCopy)
+                {
+                    VideoTerminal vt = context.VideoTerminal;
+
+                    // 最后一行不记录，只记录到倒数第二行
+                    // 因为最后一行的数据有可能会变化
+
+                    try
+                    {
+                        if (vt.lastHistoryLine.PhysicsRow == context.NextLine)
+                        {
+                            continue;
+                        }
+
+                        VTHistoryLine startLine = vt.historyLines[context.NextLine];
+                        VTHistoryLine endLine = vt.lastHistoryLine.PreviousLine;
+
+                        // 先对日志进行过滤
+                        VTUtils.BuildDocument(startLine, endLine, 0, endLine.Characters.Count - 1, context.Builder, context.FileType, context.Filter);
+
+                        string text = context.Builder.ToString();
+
+                        try
+                        {
+                            File.AppendAllText(context.FilePath, text);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error("保存日志文件异常", ex);
+                        }
+
+                        context.Builder.Clear();
+
+                        context.NextLine = vt.lastHistoryLine.PhysicsRow;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("Logger运行异常", ex);
+                    }
+                }
+
+                Thread.Sleep(3000);
             }
         }
 
