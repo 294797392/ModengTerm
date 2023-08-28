@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 
-namespace ModengTerm.ViewModels
+namespace ModengTerm.Terminal.ViewModels
 {
     public partial class VideoTerminal
     {
@@ -19,11 +19,17 @@ namespace ModengTerm.ViewModels
 
         private DrawStateEnum drawState;
         private VTDocumentGraphics drawGraphics;
+
+        /// <summary>
+        /// physicsRow -> GraphicsList
+        /// </summary>
+        private Dictionary<int, List<VTDocumentGraphics>> graphicsMap;
         private List<VTDocumentGraphics> graphicsList;
 
         private void InitializeDrawing()
         {
             this.graphicsList = new List<VTDocumentGraphics>();
+            this.graphicsMap = new Dictionary<int, List<VTDocumentGraphics>>();
         }
 
         private VTDocumentGraphics CreateGraphics(VTDocumentElements type)
@@ -62,7 +68,7 @@ namespace ModengTerm.ViewModels
 
         public void OnDrawingMouseMove(IVideoTerminal vt, VTPoint location)
         {
-            if (this.drawGraphics == null)
+            if (this.drawState != DrawStateEnum.Drawing)
             {
                 return;
             }
@@ -72,11 +78,19 @@ namespace ModengTerm.ViewModels
 
         public void OnDrawingMouseUp(IVideoTerminal vt, VTPoint location)
         {
-            this.drawState = DrawStateEnum.None;
-
             this.drawGraphics.OnMouseUp(location, this.mouseDownPos);
 
-            this.drawGraphics.Position.PhysicsRow = this.ActiveDocument.FirstLine.PhysicsRow;
+            this.drawGraphics.PhysicsRow = this.ActiveDocument.FirstLine.PhysicsRow;
+
+            List<VTDocumentGraphics> graphicsList;
+            if (!this.graphicsMap.TryGetValue(this.drawGraphics.PhysicsRow, out graphicsList))
+            {
+                graphicsList = new List<VTDocumentGraphics>();
+                this.graphicsMap[this.drawGraphics.PhysicsRow] = graphicsList;
+            }
+            graphicsList.Add(this.drawGraphics);
+
+            this.drawState = DrawStateEnum.None;
 
             this.drawGraphics = null;
         }
@@ -86,5 +100,17 @@ namespace ModengTerm.ViewModels
 
         public void OnDrawingSizeChanged(IVideoTerminal vt, VTRect vtRect)
         { }
+
+        private void ScrollGraphics(VTDocument document)
+        {
+            VTextLine current = document.FirstLine;
+
+            while (current != null)
+            {
+                List<VTDocumentGraphics> graphicsList;
+
+                current = current.NextLine;
+            }
+        }
     }
 }

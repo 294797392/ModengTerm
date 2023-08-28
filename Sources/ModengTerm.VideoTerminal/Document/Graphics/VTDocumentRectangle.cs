@@ -15,34 +15,6 @@ namespace ModengTerm.Terminal.Document.Graphics
 
         private double width;
         private double height;
-        private double x;
-        private double y;
-
-        public double X
-        {
-            get { return this.x; }
-            set
-            {
-                if (this.x != value)
-                {
-                    this.x = value;
-                    this.SetRenderDirty(true);
-                }
-            }
-        }
-
-        public double Y
-        {
-            get { return this.y; }
-            set
-            {
-                if (this.y != value)
-                {
-                    this.y = value;
-                    this.SetRenderDirty(true);
-                }
-            }
-        }
 
         public double Width
         {
@@ -72,14 +44,17 @@ namespace ModengTerm.Terminal.Document.Graphics
 
         public override void OnMouseDown(VTPoint location)
         {
-            this.X = location.X;
-            this.Y = location.Y;
+            this.OffsetX = location.X;
+            this.OffsetY = location.Y;
         }
 
         public override void OnMouseMove(VTPoint location, VTPoint mouseDown)
         {
             this.Width = Math.Abs(mouseDown.X - location.X);
             this.Height = Math.Abs(mouseDown.Y - location.Y);
+
+            this.OffsetX = Math.Min(location.X, mouseDown.X);
+            this.OffsetY = Math.Min(location.Y, mouseDown.Y);
 
             this.RequestInvalidate();
         }

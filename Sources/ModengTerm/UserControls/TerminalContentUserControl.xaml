@@ -19,11 +19,7 @@
                 <ColumnDefinition Width="20"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Row="0" x:Name="GridContent" 
-                  PreviewMouseLeftButtonDown="GridContent_PreviewMouseLeftButtonDown"
-                  PreviewMouseMove="GridContent_PreviewMouseMove"
-                  PreviewMouseLeftButtonUp="GridContent_PreviewMouseLeftButtonUp"
-                  Background="Transparent">
+            <Grid Grid.Row="0" Background="Transparent">
 
                 <Grid.ContextMenu>
                     <ContextMenu>
@@ -61,7 +57,11 @@
                     </ContextMenu>
                 </Grid.ContextMenu>
 
-                <Grid x:Name="ContentControlSurface" Margin="5,5,0,5" SizeChanged="ContentControlSurface_SizeChanged"/>
+                <Grid x:Name="GridCanvasList" Margin="5,5,0,5" 
+                      PreviewMouseLeftButtonDown="GridCanvasList_PreviewMouseLeftButtonDown"
+                      PreviewMouseMove="GridCanvasList_PreviewMouseMove"
+                      PreviewMouseLeftButtonUp="GridCanvasList_PreviewMouseLeftButtonUp"
+                      SizeChanged="GridCanvasList_SizeChanged"/>
 
             </Grid>
 

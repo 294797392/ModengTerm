@@ -1,4 +1,4 @@
-﻿using ModengTerm.VideoTerminal;
+﻿using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,12 +13,11 @@ using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
-using XTerminal.Enumerations;
 using XTerminal.Parser;
 using XTerminal.Session;
 using XTerminal.ViewModels;
 
-namespace ModengTerm.ViewModels
+namespace ModengTerm.Terminal.ViewModels
 {
     /// <summary>
     /// 处理虚拟终端的所有逻辑
@@ -433,7 +432,7 @@ namespace ModengTerm.ViewModels
             int startIndex, endIndex;
             this.AdjustSelection(out startLine, out endLine, out startIndex, out endIndex);
 
-            string text = XTermUtils.BuildDocument(startLine, endLine, startIndex, endIndex, SaveFormatEnum.TextFormat);
+            string text = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, SaveFormatEnum.TextFormat);
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
@@ -522,7 +521,7 @@ namespace ModengTerm.ViewModels
                 return false;
             }
 
-            string content = XTermUtils.BuildDocument(startLine, endLine, startIndex, endIndex, format);
+            string content = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, format);
             try
             {
                 File.WriteAllText(filePath, content);

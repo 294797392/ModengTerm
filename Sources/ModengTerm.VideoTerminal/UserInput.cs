@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ModengTerm.VideoTerminal
+namespace ModengTerm.Terminal
 {
     /// <summary>
     /// 存储输入事件

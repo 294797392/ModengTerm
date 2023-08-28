@@ -1,7 +1,8 @@
 ﻿using Microsoft.Win32;
 using ModengTerm.Rendering;
-using ModengTerm.VideoTerminal;
-using ModengTerm.ViewModels;
+using ModengTerm.Terminal;
+using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -192,37 +193,35 @@ namespace XTerminal.UserControls
 
 
 
-        private void GridContent_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void GridCanvasList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Point p = e.GetPosition(this);
+            Point p = e.GetPosition(GridCanvasList);
 
-            GridContent.CaptureMouse();
+            GridCanvasList.CaptureMouse();
             this.mouseDownDlg(this, new VTPoint(p.X, p.Y), e.ClickCount);
         }
 
-        private void GridContent_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void GridCanvasList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (GridContent.IsMouseCaptured)
+            if (GridCanvasList.IsMouseCaptured)
             {
-                Point p = e.GetPosition(this);
+                Point p = e.GetPosition(GridCanvasList);
                 this.mouseMoveDlg(this, new VTPoint(p.X, p.Y));
             }
         }
 
-        private void GridContent_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void GridCanvasList_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            Point p = e.GetPosition(this);
+            Point p = e.GetPosition(GridCanvasList);
             this.mouseUpDlg(this, new VTPoint(p.X, p.Y));
-            GridContent.ReleaseMouseCapture();
+            GridCanvasList.ReleaseMouseCapture();
         }
 
-
-
-        private void ContentControlSurface_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void GridCanvasList_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             // 每次大小改变的时候重新计算下渲染区域的边界框
-            Point leftTop = ContentControlSurface.PointToScreen(new Point(0, 0));
-            VTRect vtRect = new VTRect(leftTop.X, leftTop.Y, ContentControlSurface.ActualWidth, ContentControlSurface.ActualHeight);
+            Point leftTop = GridCanvasList.PointToScreen(new Point(0, 0));
+            VTRect vtRect = new VTRect(leftTop.X, leftTop.Y, GridCanvasList.ActualWidth, GridCanvasList.ActualHeight);
             this.sizeChangedDlg(this, vtRect);
         }
 
@@ -309,7 +308,7 @@ namespace XTerminal.UserControls
         {
             this.Dispatcher.Invoke(() => 
             {
-                ContentControlSurface.Children.Add(canvas as UIElement);
+                GridCanvasList.Children.Add(canvas as UIElement);
             });
         }
 
@@ -317,7 +316,7 @@ namespace XTerminal.UserControls
         {
             base.Dispatcher.Invoke(() => 
             {
-                ContentControlSurface.Children.Remove(canvas as UIElement);
+                GridCanvasList.Children.Remove(canvas as UIElement);
             });
         }
 

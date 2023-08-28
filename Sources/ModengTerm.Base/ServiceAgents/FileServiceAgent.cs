@@ -1,14 +1,14 @@
 ﻿using DotNEToolkit;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.Session;
 
-namespace XTerminal.ServiceAgents
+namespace ModengTerm.Base.ServiceAgents
 {
     /// <summary>
     /// 对本体文件数据库进行管理
@@ -24,6 +24,21 @@ namespace XTerminal.ServiceAgents
 
         protected override void OnRelease()
         {
+        }
+
+        public override MTermManifest GetManifest()
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.json");
+
+            try
+            {
+                return JSONHelper.ParseFile<MTermManifest>(path);
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("加载AppManifest异常, {0}, {1}", path, ex);
+                return default(MTermManifest);
+            }
         }
 
         #region Session管理

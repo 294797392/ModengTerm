@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
-using ModengTerm.ViewModels;
+using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Terminal.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,6 @@ using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
-using XTerminal.ServiceAgents;
 using XTerminal.Session;
 using XTerminal.UserControls;
 using XTerminal.ViewModels;
@@ -261,7 +261,7 @@ namespace XTerminal
 
         #region 事件处理器
 
-        private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
+        private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, int status)
         {
         }
 

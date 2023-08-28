@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 
-namespace ModengTerm.VideoTerminal
+namespace ModengTerm.Terminal
 {
     public delegate void MouseDownHandler(IVideoTerminal vt, VTPoint location, int clickCount);
     public delegate void MouseMoveHandler(IVideoTerminal vt, VTPoint location);

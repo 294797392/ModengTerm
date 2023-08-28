@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Document;
 
-namespace ModengTerm.VideoTerminal
+namespace ModengTerm.Terminal
 {
     /// <summary>
     /// 实现一个终端历史记录的日志记录器

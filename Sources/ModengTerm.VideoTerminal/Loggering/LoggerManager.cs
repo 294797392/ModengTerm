@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit.Modular;
 using ModengTerm.Base;
+using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Document;
 
-namespace ModengTerm.VideoTerminal
+namespace ModengTerm.Terminal
 {
     public class LoggerManager : AppModule<MTermManifest>
     {
@@ -22,6 +23,7 @@ namespace ModengTerm.VideoTerminal
         #region 实例变量
 
         private Thread writeThread;
+        private bool changed;
 
         #endregion
 
@@ -43,9 +45,23 @@ namespace ModengTerm.VideoTerminal
 
         #endregion
 
-        public void Write(VTHistoryLine line)
+        #region 公开接口
+
+        public void Start(VideoTerminal vt)
         {
+            
         }
+
+        public void Stop(VideoTerminal vt)
+        { }
+
+        public void Pause(VideoTerminal vt)
+        { }
+
+        public void Resume(VideoTerminal vt)
+        { }
+
+        #endregion
 
         #region 事件处理器
 

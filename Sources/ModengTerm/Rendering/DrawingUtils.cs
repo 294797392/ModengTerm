@@ -1,4 +1,4 @@
-﻿using ModengTerm.VideoTerminal;
+﻿using ModengTerm.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

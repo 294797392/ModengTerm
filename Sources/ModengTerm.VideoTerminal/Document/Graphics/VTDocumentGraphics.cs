@@ -7,21 +7,6 @@ using XTerminal.Document;
 
 namespace ModengTerm.Terminal.Document.Graphics
 {
-    public class VTGraphicsPosition
-    {
-        public int PhysicsRow { get; set; }
-
-        /// <summary>
-        /// 相对于PhysicsRow的X偏移量
-        /// </summary>
-        public double OffsetX { get; set; }
-
-        /// <summary>
-        /// 相对于PhysicsRow的Y偏移量
-        /// </summary>
-        public double OffsetY { get; set; }
-    }
-
     public abstract class VTDocumentGraphics : VTDocumentElement
     {
         private bool isRenderDirty;
@@ -36,7 +21,7 @@ namespace ModengTerm.Terminal.Document.Graphics
         /// <summary>
         /// 描述该图形的位置
         /// </summary>
-        public VTGraphicsPosition Position { get; private set; }
+        public int PhysicsRow { get; set; }
 
         #endregion
 
@@ -44,7 +29,6 @@ namespace ModengTerm.Terminal.Document.Graphics
 
         public VTDocumentGraphics()
         {
-            this.Position = new VTGraphicsPosition();
         }
 
         #endregion

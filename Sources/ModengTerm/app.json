@@ -3,7 +3,7 @@
         {
             "ID": "1",
             "Name": "服务代理",
-            "ClassName": "XTerminal.ServiceAgents.FileServiceAgent, ModengTerm",
+            "ClassName": "ModengTerm.Base.ServiceAgents.FileServiceAgent, ModengTerm.Base",
             "Inputs": {
             }
         }

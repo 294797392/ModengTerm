@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Enumerations
+namespace ModengTerm.Terminal.Enumerations
 {
     /// <summary>
     /// 定义保存格式

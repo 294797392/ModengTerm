@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WPFToolkit.MVVM;
 
-namespace VideoTerminal.ViewModels
+namespace ModengTerm.Base.ServiceAgents
 {
-    public class UpdatePropertiesVM : ViewModelBase
+    public class CloudServiceAgent// : ServiceAgent
     {
-
     }
 }

@@ -1,4 +1,4 @@
-﻿using ModengTerm.ViewModels;
+﻿using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +63,12 @@ namespace XTerminal
         {
             OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session);
             ContentControlTerminal.Content = openedSession.Content;
-            openedSession.Content.Open(openedSession);
+
+            SessionContent sessionContent = openedSession.Content as SessionContent;
+            if (sessionContent != null)
+            {
+                sessionContent.Open(openedSession);
+            }
         }
 
         /// <summary>
@@ -169,7 +174,7 @@ namespace XTerminal
         {
             SessionContent sessionContent = ContentControlTerminal.Content as SessionContent;
             VideoTerminal terminalSession = sessionContent.DataContext as VideoTerminal;
-            if(terminalSession == null)
+            if (terminalSession == null)
             {
                 return;
             }

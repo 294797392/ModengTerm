@@ -57,7 +57,7 @@ namespace XTerminal.Windows
         {
             this.contentMap = new Dictionary<string, Control>();
 
-            base.DataContext = new CreateSessionVM();
+            base.DataContext = new CreateSessionVM(XTermApp.Context.ServiceAgent);
         }
 
         #endregion

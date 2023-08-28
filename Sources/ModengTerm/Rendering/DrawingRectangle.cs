@@ -23,7 +23,7 @@ namespace ModengTerm.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            dc.DrawRectangle(Brushes.Transparent, Pen, new Rect(this.rectangle.X, this.rectangle.Y, this.rectangle.Width, this.rectangle.Height));
+            dc.DrawRectangle(Brushes.Transparent, Pen, new Rect(0, 0, this.rectangle.Width, this.rectangle.Height));
         }
     }
 }

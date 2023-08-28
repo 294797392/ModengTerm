@@ -6,9 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
-using XTerminal.Session;
 
-namespace XTerminal.ServiceAgents
+namespace ModengTerm.Base.ServiceAgents
 {
     /// <summary>
     /// 远程服务器代理
@@ -18,10 +17,13 @@ namespace XTerminal.ServiceAgents
     /// </summary>
     public abstract class ServiceAgent : ModuleBase
     {
-        public List<SessionDefinition> GetSessionDefinitions()
-        {
-            return XTermApp.Context.Manifest.SessionList;
-        }
+        /// <summary>
+        /// 获取app清单配置文件
+        /// </summary>
+        /// <returns></returns>
+        public abstract MTermManifest GetManifest();
+
+        #region Session管理
 
         /// <summary>
         /// 获取所有的会话列表
@@ -49,5 +51,7 @@ namespace XTerminal.ServiceAgents
         /// <param name="session"></param>
         /// <returns></returns>
         public abstract int UpdateSession(XTermSession session);
+
+        #endregion
     }
 }

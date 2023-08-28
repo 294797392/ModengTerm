@@ -1,4 +1,6 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base;
+using ModengTerm.Base.ServiceAgents;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,6 +42,8 @@ namespace XTerminal.ViewModels
         private string sftpServerInitialDir;
         private string sftpClientInitialDir;
 
+        private ServiceAgent serviceAgent;
+
         #endregion
 
         #region 属性
@@ -65,13 +69,13 @@ namespace XTerminal.ViewModels
                         case SessionTypeEnum.SSH:
                         case SessionTypeEnum.Win32CommandLine:
                             {
-                                this.OptionTreeVM = XTermApp.Context.TerminalOptionsTreeVM;
+                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 break;
                             }
 
                         case SessionTypeEnum.SFTP:
                             {
-                                this.OptionTreeVM = XTermApp.Context.SFTPOptionsTreeVM;
+                                this.OptionTreeVM = this.SFTPOptionsTreeVM;
                                 break;
                             }
 
@@ -235,6 +239,10 @@ namespace XTerminal.ViewModels
             }
         }
 
+        public OptionTreeVM TerminalOptionsTreeVM { get; private set; }
+
+        public OptionTreeVM SFTPOptionsTreeVM { get; private set; }
+
         /// <summary>
         /// 终端类型列表
         /// </summary>
@@ -293,13 +301,16 @@ namespace XTerminal.ViewModels
 
         #region 构造方法
 
-        public CreateSessionVM()
+        public CreateSessionVM(ServiceAgent serviceAgent)
         {
+            this.serviceAgent = serviceAgent;
+
+            MTermManifest appManifest = serviceAgent.GetManifest();
+
             this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
 
             this.SessionTypeList = new BindableCollection<SessionTypeVM>();
-            List<SessionDefinition> sessions = XTermApp.Context.ServiceAgent.GetSessionDefinitions();
-            foreach (SessionDefinition session in sessions)
+            foreach (SessionDefinition session in appManifest.SessionList)
             {
                 this.SessionTypeList.Add(new SessionTypeVM(session));
             }
@@ -327,13 +338,13 @@ namespace XTerminal.ViewModels
             #region Theme
 
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
-            this.FontFamilyList.AddRange(XTermApp.Context.Manifest.FontFamilyList);
+            this.FontFamilyList.AddRange(appManifest.FontFamilyList);
             this.FontFamilyList.SelectedItem = this.FontFamilyList.FirstOrDefault();
             this.FontSizeList = new BindableCollection<FontSizeDefinition>();
-            this.FontSizeList.AddRange(XTermApp.Context.Manifest.FontSizeList);
+            this.FontSizeList.AddRange(appManifest.FontSizeList);
             this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
             this.ForegroundList = new BindableCollection<ColorDefinition>();
-            this.ForegroundList.AddRange(XTermApp.Context.Manifest.ForegroundList);
+            this.ForegroundList.AddRange(appManifest.ForegroundList);
             this.ForegroundList.SelectedItem = this.ForegroundList.FirstOrDefault();
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
             this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
