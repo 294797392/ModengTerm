@@ -1250,12 +1250,7 @@ namespace ModengTerm.Terminal.ViewModels
                         VTextAttribute textAttribute = this.ActiveLine.Attributes.FirstOrDefault(v => v.Decoration == decoration && !v.Unset);
                         if (textAttribute == null)
                         {
-                            textAttribute = new VTextAttribute()
-                            {
-                                StartColumn = this.CursorCol,
-                                Decoration = decoration,
-                                Parameter = parameter
-                            };
+                            textAttribute = VTextAttribute.Create();
                             this.ActiveLine.Attributes.Add(textAttribute);
                         }
 
@@ -1266,7 +1261,18 @@ namespace ModengTerm.Terminal.ViewModels
                             textAttribute.EndColumn = this.CursorCol == 0 ? 0 : this.CursorCol - 1;
                             textAttribute.Unset = true;
 
-                            VTDebug.WriteAction("{0}, start = {1}, end = {2}, parameter = {3}", action, textAttribute.StartColumn, textAttribute.EndColumn, textAttribute.Parameter);
+                            //if (action == VTActions.BoldUnset)
+                            //{
+                            //    logger.ErrorFormat("{0}, start = {1}, end = {2}, parameter = {3}", action, textAttribute.StartColumn, textAttribute.EndColumn, textAttribute.Parameter);
+                            //}
+                        }
+                        else
+                        {
+                            // 如果连续多次设置了文本属性，那么更新。不更新的话会显示不正确
+                            // 比如连续两次Bold就会运行到这里
+                            textAttribute.StartColumn = this.CursorCol;
+                            textAttribute.Decoration = decoration;
+                            textAttribute.Parameter = parameter;
                         }
                         break;
                     }

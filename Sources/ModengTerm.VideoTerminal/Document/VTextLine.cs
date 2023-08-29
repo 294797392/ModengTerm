@@ -491,6 +491,7 @@ namespace XTerminal.Document
         public void SetHistory(VTHistoryLine historyLine)
         {
             VTCharacter.CopyTo(this.characters, historyLine.Characters);
+            VTextAttribute.CopyTo(this.Attributes, historyLine.Attributes);
             this.PhysicsRow = historyLine.PhysicsRow;
             this.Columns = VDocumentUtils.GetColumns(this.characters);
 

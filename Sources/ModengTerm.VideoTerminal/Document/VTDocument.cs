@@ -273,6 +273,7 @@ namespace XTerminal.Document
             }
 
             // 清空新行的文本特效，不然可能会遗留之前的文本特效
+            VTextAttribute.Recycle(this.ActiveLine.Attributes);
             this.ActiveLine.Attributes.Clear();
         }
 
@@ -346,6 +347,7 @@ namespace XTerminal.Document
             }
 
             // 清空新行的文本特效，不然可能会遗留之前的文本特效
+            VTextAttribute.Recycle(this.ActiveLine.Attributes);
             this.ActiveLine.Attributes.Clear();
         }
 

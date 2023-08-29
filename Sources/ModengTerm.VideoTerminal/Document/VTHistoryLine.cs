@@ -36,9 +36,15 @@ namespace XTerminal.Document
         /// </summary>
         public List<VTCharacter> Characters { get; private set; }
 
+        /// <summary>
+        /// 文本特效
+        /// </summary>
+        public List<VTextAttribute> Attributes { get; private set; }
+
         private VTHistoryLine()
         {
             this.Characters = new List<VTCharacter>();
+            this.Attributes = new List<VTextAttribute>();
         }
 
         /// <summary>
@@ -52,6 +58,7 @@ namespace XTerminal.Document
             this.PhysicsRow = sourceLine.PhysicsRow;
             // 复制一份字符列表
             VTCharacter.CopyTo(this.Characters, sourceLine.Characters);
+            VTextAttribute.CopyTo(this.Attributes, sourceLine.Attributes);
         }
 
         /// <summary>

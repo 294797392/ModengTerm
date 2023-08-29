@@ -20,16 +20,6 @@ namespace ModengTerm.Rendering
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingLine");
 
-        private static readonly Point ZeroPoint = new Point();
-
-        private static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
-        private static readonly Pen BlackPen = new Pen(Brushes.Black, 1);
-
-        private static readonly TextDecorationCollection UnderlineDecoration = new TextDecorationCollection()
-        {
-            new TextDecoration(TextDecorationLocation.Underline, BlackPen, 0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
-        };
-
         #endregion
 
         #region 实例变量
@@ -81,7 +71,7 @@ namespace ModengTerm.Rendering
             }
 
             FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
-            Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, count);
+            Geometry geometry = formattedText.BuildHighlightGeometry(DrawingUtils.ZeroPoint, startIndex, count);
             return new VTRect(geometry.Bounds.Left, geometry.Bounds.Top, geometry.Bounds.Width, geometry.Bounds.Height);
         }
 
@@ -100,81 +90,11 @@ namespace ModengTerm.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine);
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine, dc);
 
             DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
 
-            #region 画文本装饰
-
-            foreach (VTextAttribute textAttribute in this.textLine.Attributes)
-            {
-                int startIndex = this.textLine.FindCharacterIndex(textAttribute.StartColumn);
-                int endIndex = this.textLine.FindCharacterIndex(textAttribute.EndColumn);
-                if (startIndex == -1 || endIndex == -1)
-                {
-                    continue;
-                }
-
-                if (startIndex > endIndex)
-                {
-                    continue;
-                }
-
-                switch (textAttribute.Decoration)
-                {
-                    case VTextDecorations.Foreground:
-                        {
-                            if (textAttribute.Parameter == null)
-                            {
-                                continue;
-                            }
-
-                            VTColors color = (VTColors)textAttribute.Parameter;
-                            Brush brush = DrawingUtils.VTColor2Brush(color);
-                            formattedText.SetForegroundBrush(brush, startIndex, endIndex - startIndex + 1);
-                            break;
-                        }
-
-                    case VTextDecorations.Background:
-                        {
-                            if (textAttribute.Parameter == null)
-                            {
-                                continue;
-                            }
-
-                            VTColors color = (VTColors)textAttribute.Parameter;
-                            Brush brush = DrawingUtils.VTColor2Brush(color);
-                            Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, endIndex - startIndex + 1);
-                            dc.DrawRectangle(brush, TransparentPen, geometry.Bounds);
-                            break;
-                        }
-
-                    case VTextDecorations.Bold:
-                        {
-                            formattedText.SetFontWeight(FontWeights.Bold, startIndex, endIndex - startIndex + 1);
-                            break;
-                        }
-
-                    case VTextDecorations.Italics:
-                        {
-                            formattedText.SetFontStyle(FontStyles.Italic, startIndex, endIndex - startIndex + 1);
-                            break;
-                        }
-
-                    case VTextDecorations.Underline:
-                        {
-                            formattedText.SetTextDecorations(UnderlineDecoration, startIndex, endIndex - startIndex + 1);
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
-            }
-
-            #endregion
-
-            dc.DrawText(formattedText, ZeroPoint);
+            dc.DrawText(formattedText, DrawingUtils.ZeroPoint);
         }
 
         /// <summary>

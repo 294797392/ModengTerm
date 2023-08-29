@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,8 @@ namespace XTerminal.Document
     /// 存储终端里一个字符的信息
     /// VTCharacter保存要显示的字符信息和该字符的样式信息
     /// </summary>
-    public class VTCharacter
+    public class VTCharacter : Reusable<VTCharacter>
     {
-        private static readonly Queue<VTCharacter> CharacterQueue = new Queue<VTCharacter>();
-
         /// <summary>
         /// 字符
         /// </summary>
@@ -54,17 +53,7 @@ namespace XTerminal.Document
         /// <returns></returns>
         public static VTCharacter Create(char ch, int columnSize, VTCharacterFlags flag)
         {
-            VTCharacter character = null;
-
-            if (CharacterQueue.Count > 0)
-            {
-                character = CharacterQueue.Dequeue();
-            }
-            else
-            {
-                character = new VTCharacter();
-            }
-
+            VTCharacter character = VTCharacter.Create();
             character.Character = ch;
             character.ColumnSize = columnSize;
             character.Flags = flag;
@@ -80,64 +69,18 @@ namespace XTerminal.Document
             return Create(' ', 1, VTCharacterFlags.SingleByteChar);
         }
 
-        /// <summary>
-        /// 回收某个字符
-        /// 该字符用不到了，下次可以复用
-        /// </summary>
-        /// <param name="character">要回收到字符</param>
-        public static void Recycle(VTCharacter character)
+        public override void CopyTo(VTCharacter character)
         {
-            CharacterQueue.Enqueue(character);
+            character.Character = this.Character;
+            character.ColumnSize = this.ColumnSize;
+            character.Flags = this.Flags;
         }
 
-        public static void Recycle(IEnumerable<VTCharacter> characters)
+        public override void SetDefault()
         {
-            foreach (VTCharacter character in characters)
-            {
-                VTCharacter.Recycle(character);
-            }
-        }
-
-        /// <summary>
-        /// 把copyFrom拷贝到copyTo
-        /// 保证copyTo和copyFrom的数量和值是相同的
-        /// </summary>
-        /// <param name="copyTo"></param>
-        /// <param name="copyFrom"></param>
-        public static void CopyTo(List<VTCharacter> copyTo, List<VTCharacter> copyFrom)
-        {
-            // copyTo比copyFrom多的或者少的字符个数
-            int value = Math.Abs(copyTo.Count - copyFrom.Count);
-
-            if (copyTo.Count > copyFrom.Count)
-            {
-                // 删除多余的字符
-                for (int i = 0; i < value; i++)
-                {
-                    VTCharacter character = copyTo[0];
-                    copyTo.Remove(character);
-                    VTCharacter.Recycle(character);
-                }
-            }
-            else if (copyTo.Count < copyFrom.Count)
-            {
-                // 补齐字符
-                for (int i = 0; i < value; i++)
-                {
-                    VTCharacter character = VTCharacter.CreateNull();
-                    copyTo.Add(character);
-                }
-            }
-
-            for (int i = 0; i < copyFrom.Count; i++)
-            {
-                VTCharacter toCopy = copyTo[i];
-                VTCharacter fromCopy = copyFrom[i];
-
-                toCopy.Character = fromCopy.Character;
-                toCopy.ColumnSize = fromCopy.ColumnSize;
-                toCopy.Flags = fromCopy.Flags;
-            }
+            this.Character = (char)0;
+            this.ColumnSize = 0;
+            this.Flags = (VTCharacterFlags)0;
         }
     }
 }

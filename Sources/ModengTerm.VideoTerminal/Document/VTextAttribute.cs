@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,10 +46,8 @@ namespace XTerminal.Document
     /// <summary>
     /// 存储文本的一些属性
     /// </summary>
-    public class VTextAttribute
+    public class VTextAttribute : Reusable<VTextAttribute>
     {
-        private static readonly Queue<VTextAttribute> CharacterQueue = new Queue<VTextAttribute>();
-
         /// <summary>
         /// 该装饰的起始列
         /// 从0开始计数
@@ -73,8 +72,26 @@ namespace XTerminal.Document
 
         public bool Unset { get; set; }
 
-        public VTextAttribute() 
+        private VTextAttribute()
         {
+        }
+
+        public override void CopyTo(VTextAttribute dest)
+        {
+            dest.StartColumn = this.StartColumn;
+            dest.EndColumn = this.EndColumn;
+            dest.Decoration = this.Decoration;
+            dest.Parameter = this.Parameter;
+            dest.Unset = this.Unset;
+        }
+
+        public override void SetDefault()
+        {
+            this.StartColumn = 0;
+            this.EndColumn = 0;
+            this.Decoration = (VTextDecorations)0;
+            this.Parameter = null;
+            this.Unset = false;
         }
     }
 }

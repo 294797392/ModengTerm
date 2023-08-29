@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,6 +9,8 @@ namespace ModengTerm.Base
 {
     public static class ReusableQueue<T> where T : ICloneable<T>
     {
+        private static readonly Dictionary<Type, ConstructorInfo> ConstructorMap = new Dictionary<Type, ConstructorInfo>();
+
         private static readonly Queue<T> BaseQueue = new Queue<T>();
 
         /// <summary>
@@ -19,33 +22,46 @@ namespace ModengTerm.Base
         /// <returns></returns>
         public static T Create()
         {
-            T character = default(T);
+            T instance = default(T);
 
             if (BaseQueue.Count > 0)
             {
-                character = BaseQueue.Dequeue();
+                instance = BaseQueue.Dequeue();
+                instance.SetDefault();
             }
             else
             {
-                character = Activator.CreateInstance<T>();
+                Type t = typeof(T);
+
+                ConstructorInfo constructorInfo;
+                if (!ConstructorMap.TryGetValue(t, out constructorInfo))
+                {
+                    lock (ConstructorMap)
+                    {
+                        constructorInfo = typeof(T).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
+                        ConstructorMap[t] = constructorInfo;
+                    }
+                }
+
+                instance = (T)constructorInfo.Invoke(null);
             }
 
-            return character;
+            return instance;
         }
 
         /// <summary>
         /// 回收某个字符
         /// 该字符用不到了，下次可以复用
         /// </summary>
-        /// <param name="character">要回收到字符</param>
-        public static void Recycle(T character)
+        /// <param name="instance">要回收到字符</param>
+        public static void Recycle(T instance)
         {
-            BaseQueue.Enqueue(character);
+            BaseQueue.Enqueue(instance);
         }
 
-        public static void Recycle(IEnumerable<T> characters)
+        public static void Recycle(IEnumerable<T> instances)
         {
-            foreach (T character in characters)
+            foreach (T character in instances)
             {
                 ReusableQueue<T>.Recycle(character);
             }

@@ -19,6 +19,16 @@ namespace ModengTerm.Rendering
     {
         private static readonly BrushConverter BrushConverter = new BrushConverter();
 
+        public static readonly Point ZeroPoint = new Point();
+
+        public static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
+        public static readonly Pen BlackPen = new Pen(Brushes.Black, 1);
+
+        public static readonly TextDecorationCollection Underline = new TextDecorationCollection()
+        {
+            new TextDecoration(TextDecorationLocation.Underline, BlackPen, 0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
+        };
+
         static DrawingUtils()
         {
         }
@@ -70,8 +80,9 @@ namespace ModengTerm.Rendering
         /// 根据VTextLine生成一个FormattedText
         /// </summary>
         /// <param name="textLine"></param>
+        /// <param name="dc">画Background的时候需要</param>
         /// <returns></returns>
-        public static FormattedText CreateFormattedText(VTextLine textLine)
+        public static FormattedText CreateFormattedText(VTextLine textLine, DrawingContext dc = null)
         {
             //string text = string.Format("{0} - {1}", textLine.ID, textLine.Text);
             string text = textLine.Text;
@@ -79,6 +90,88 @@ namespace ModengTerm.Rendering
             DrawingLine drawingLine = textLine.DrawingContext as DrawingLine;
             FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
                 textLine.Style.FontSize, drawingLine.foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
+
+            #region 画文本装饰
+
+            foreach (VTextAttribute textAttribute in textLine.Attributes)
+            {
+                if (!textAttribute.Unset)
+                {
+                    // 没有设置Unset，那么不渲染
+                    continue;
+                }
+
+                int startIndex = textLine.FindCharacterIndex(textAttribute.StartColumn);
+                int endIndex = textLine.FindCharacterIndex(textAttribute.EndColumn);
+                if (startIndex == -1 || endIndex == -1)
+                {
+                    continue;
+                }
+
+                if (startIndex > endIndex)
+                {
+                    continue;
+                }
+
+                switch (textAttribute.Decoration)
+                {
+                    case VTextDecorations.Foreground:
+                        {
+                            if (textAttribute.Parameter == null)
+                            {
+                                continue;
+                            }
+
+                            VTColors color = (VTColors)textAttribute.Parameter;
+                            Brush brush = DrawingUtils.VTColor2Brush(color);
+                            formattedText.SetForegroundBrush(brush, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    case VTextDecorations.Background:
+                        {
+                            if(dc == null)
+                            {
+                                continue;
+                            }
+
+                            if (textAttribute.Parameter == null)
+                            {
+                                continue;
+                            }
+
+                            VTColors color = (VTColors)textAttribute.Parameter;
+                            Brush brush = DrawingUtils.VTColor2Brush(color);
+                            Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, endIndex - startIndex + 1);
+                            dc.DrawRectangle(brush, DrawingUtils.TransparentPen, geometry.Bounds);
+                            break;
+                        }
+
+                    case VTextDecorations.Bold:
+                        {
+                            formattedText.SetFontWeight(FontWeights.Bold, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    case VTextDecorations.Italics:
+                        {
+                            formattedText.SetFontStyle(FontStyles.Italic, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    case VTextDecorations.Underline:
+                        {
+                            formattedText.SetTextDecorations(TextDecorations.Underline, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
+            }
+
+            #endregion
+
             return formattedText;
         }
     }
