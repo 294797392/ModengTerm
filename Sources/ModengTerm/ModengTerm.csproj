@@ -97,6 +97,12 @@
     <Compile Include="Rendering\DrawingObject.cs" />
     <Compile Include="Rendering\DrawingUtils.cs" />
     <Compile Include="Rendering\DrawingSurface.cs" />
+    <Compile Include="UserControls\FavoritesUserControl.xaml.cs">
+      <DependentUpon>FavoritesUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\LoggerOptionsWindow.xaml.cs">
+      <DependentUpon>LoggerOptionsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XTermUtils.cs" />
     <Compile Include="UserControls\FileSystemTreeUserControl.xaml.cs">
       <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
@@ -151,6 +157,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UserControls\FavoritesUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\FileSystemTreeUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -184,6 +194,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\DebugWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\LoggerOptionsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -2,14 +2,19 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <sys:String x:Key="UIText1">XTerm终端模拟器</sys:String>
+    <sys:String x:Key="UIText1">ModengTerm终端模拟器</sys:String>
     <sys:String x:Key="UIText2">打开会话</sys:String>
     <sys:String x:Key="UIText3">新建</sys:String>
     <sys:String x:Key="UIText4">删除</sys:String>
     <sys:String x:Key="UIText5">编辑</sys:String>
     <sys:String x:Key="UIText6">关于</sys:String>
-    
-    
+
+
     <sys:String x:Key="UIText100">新建会话</sys:String>
+
+    <!-- 日志记录参数窗口 100 - 500 -->
+
+    <!-- 终端右键菜单 501 - 1000 -->
+
 
 </ResourceDictionary>

@@ -135,8 +135,16 @@ namespace ModengTerm.Terminal.Loggering
 
         private void WriteThreadProc()
         {
+            logger.InfoFormat("日志记录线程启动成功");
+
             while (true)
             {
+                if (this.loggerListCopy.Count == 0 || this.allPaused)
+                {
+                    this.loggerEvent.Reset();
+                    this.loggerEvent.WaitOne();
+                }
+
                 if (this.changed)
                 {
                     lock (this.listLock)
@@ -145,12 +153,6 @@ namespace ModengTerm.Terminal.Loggering
                         this.loggerListCopy.AddRange(this.loggerList);
                         this.changed = false;
                     }
-                }
-
-                if (this.loggerListCopy.Count == 0 || this.allPaused)
-                {
-                    this.loggerEvent.Reset();
-                    this.loggerEvent.WaitOne();
                 }
 
                 foreach (LoggerContext context in this.loggerListCopy)

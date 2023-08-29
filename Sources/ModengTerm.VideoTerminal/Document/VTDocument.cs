@@ -271,6 +271,9 @@ namespace XTerminal.Document
                 this.SetCursor(this.Cursor.Row + 1, this.Cursor.Column);
                 this.ActiveLine.SetRenderDirty(true);
             }
+
+            // 清空新行的文本特效，不然可能会遗留之前的文本特效
+            this.ActiveLine.Attributes.Clear();
         }
 
         /// <summary>
@@ -341,6 +344,9 @@ namespace XTerminal.Document
                 this.SetCursor(this.Cursor.Row - 1, this.Cursor.Column);
                 this.ActiveLine.SetRenderDirty(true);
             }
+
+            // 清空新行的文本特效，不然可能会遗留之前的文本特效
+            this.ActiveLine.Attributes.Clear();
         }
 
         /// <summary>

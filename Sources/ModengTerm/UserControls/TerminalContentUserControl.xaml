@@ -23,20 +23,31 @@
 
                 <Grid.ContextMenu>
                     <ContextMenu>
+                        <MenuItem Header="日志">
+                            <MenuItem Header="启动" Click="MenuItemStartLogger_Click"/>
+                            <MenuItem Header="停止" Click="MenuItemStopLogger_Click"/>
+                            <MenuItem Header="暂停" Click="MenuItemPauseLogger_Click"/>
+                            <MenuItem Header="继续" Click="MenuItemResumeLogger_Click"/>
+                            <MenuItem Header="打开日志文件夹" Click="MenuItemOpenLoggerDirectory_Click"/>
+                        </MenuItem>
+                        
                         <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
                         <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
                         <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>
                         <MenuItem Header="保存当前屏幕内容">
                             <MenuItem Header="文本文件" Click="MenuItemSaveScreenToTextFile_Click"/>
                             <MenuItem Header="Html文件" Click="MenuItemSaveScreenToHtmlFile_Click"/>
+                            <MenuItem Header="收藏夹" Click="MenuItemSaveScreenToFavorites"/>
                         </MenuItem>
                         <MenuItem Header="保存选中内容">
                             <MenuItem Header="文本文件" Click="MenuItemSaveSelectedToTextFile_Click"/>
                             <MenuItem Header="Html文件" Click="MenuItemSaveSelectedToHtmlFile_Click"/>
+                            <MenuItem Header="收藏夹" Click="MenuItemSaveSelectedToFavorites"/>
                         </MenuItem>
                         <MenuItem Header="保存所有内容">
                             <MenuItem Header="文本文件" Click="MenuItemSaveAllToTextFile_Click"/>
                             <MenuItem Header="Html文件" Click="MenuItemSaveAllToHtmlFile_Click"/>
+                            <MenuItem Header="收藏夹" Click="MenuItemSaveAllToFavorites"/>
                         </MenuItem>
 
                         <MenuItem x:Name="MenuItemDrawingMode" IsCheckable="True" 

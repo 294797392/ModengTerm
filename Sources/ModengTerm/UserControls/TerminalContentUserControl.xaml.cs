@@ -2,7 +2,9 @@
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -242,6 +244,8 @@ namespace XTerminal.UserControls
             this.videoTerminal.SelectAll();
         }
 
+        #region 保存日志
+
         private void MenuItemSaveScreenToTextFile_Click(object sender, RoutedEventArgs e)
         {
             this.SaveToFile(SaveModeEnum.SaveScreen, LogFileTypeEnum.Text);
@@ -271,6 +275,57 @@ namespace XTerminal.UserControls
         {
             this.SaveToFile(SaveModeEnum.SaveAll, LogFileTypeEnum.Html);
         }
+
+        private void MenuItemSaveScreenToFavorites(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItemSaveSelectedToFavorites(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void MenuItemSaveAllToFavorites(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        #endregion
+
+        #region 日志记录
+
+        private void MenuItemStartLogger_Click(object sender, RoutedEventArgs e)
+        {
+            LoggerOptionsWindow window = new LoggerOptionsWindow();
+            window.Owner = Window.GetWindow(this);
+            if ((bool)window.ShowDialog())
+            {
+                XTermApp.Context.LoggerManager.Start(this.videoTerminal, window.Options);
+            }
+        }
+
+        private void MenuItemStopLogger_Click(object sender, RoutedEventArgs e)
+        {
+            XTermApp.Context.LoggerManager.Stop(this.videoTerminal);
+        }
+
+        private void MenuItemPauseLogger_Click(object sender, RoutedEventArgs e)
+        {
+            XTermApp.Context.LoggerManager.Pause(this.videoTerminal);
+        }
+
+        private void MenuItemResumeLogger_Click(object sender, RoutedEventArgs e)
+        {
+            XTermApp.Context.LoggerManager.Resume(this.videoTerminal);
+        }
+
+        private void MenuItemOpenLoggerDirectory_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        #endregion
 
         private void MenuItemDrawingMode_CheckedChanged(object sender, RoutedEventArgs e)
         {

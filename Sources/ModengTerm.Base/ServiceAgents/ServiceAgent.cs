@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit.Modular;
+using ModengTerm.Base.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,6 +52,18 @@ namespace ModengTerm.Base.ServiceAgents
         /// <param name="session"></param>
         /// <returns></returns>
         public abstract int UpdateSession(XTermSession session);
+
+        #endregion
+
+        #region Favorites管理
+
+        public abstract List<Favorites> GetFavorites();
+
+        public abstract int AddFavorites(Favorites favorites);
+
+        public abstract int DeleteFavorites(string favId);
+
+        public abstract int UpdateFavorites(Favorites favorites);
 
         #endregion
     }

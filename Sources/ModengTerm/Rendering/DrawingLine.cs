@@ -22,6 +22,14 @@ namespace ModengTerm.Rendering
 
         private static readonly Point ZeroPoint = new Point();
 
+        private static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
+        private static readonly Pen BlackPen = new Pen(Brushes.Black, 1);
+
+        private static readonly TextDecorationCollection UnderlineDecoration = new TextDecorationCollection()
+        {
+            new TextDecoration(TextDecorationLocation.Underline, BlackPen, 0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
+        };
+
         #endregion
 
         #region 实例变量
@@ -30,6 +38,8 @@ namespace ModengTerm.Rendering
         internal Brush foreground;
 
         private VTextLine textLine;
+
+        private TextDecorationCollection textDecorations;
 
         #endregion
 
@@ -80,6 +90,7 @@ namespace ModengTerm.Rendering
         protected override void OnInitialize(VTDocumentElement documentElement)
         {
             this.textLine = documentElement as VTextLine;
+            this.textDecorations = new TextDecorationCollection();
 
             FontFamily fontFamily = new FontFamily(textLine.Style.FontFamily);
             this.typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
@@ -90,8 +101,6 @@ namespace ModengTerm.Rendering
         protected override void Draw(DrawingContext dc)
         {
             FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine);
-
-            this.Offset = new Vector(0, this.textLine.OffsetY);
 
             DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
 
@@ -122,8 +131,39 @@ namespace ModengTerm.Rendering
 
                             VTColors color = (VTColors)textAttribute.Parameter;
                             Brush brush = DrawingUtils.VTColor2Brush(color);
-                            logger.ErrorFormat("{0},{1}", startIndex, endIndex);
                             formattedText.SetForegroundBrush(brush, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    case VTextDecorations.Background:
+                        {
+                            if (textAttribute.Parameter == null)
+                            {
+                                continue;
+                            }
+
+                            VTColors color = (VTColors)textAttribute.Parameter;
+                            Brush brush = DrawingUtils.VTColor2Brush(color);
+                            Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, endIndex - startIndex + 1);
+                            dc.DrawRectangle(brush, TransparentPen, geometry.Bounds);
+                            break;
+                        }
+
+                    case VTextDecorations.Bold:
+                        {
+                            formattedText.SetFontWeight(FontWeights.Bold, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    case VTextDecorations.Italics:
+                        {
+                            formattedText.SetFontStyle(FontStyles.Italic, startIndex, endIndex - startIndex + 1);
+                            break;
+                        }
+
+                    case VTextDecorations.Underline:
+                        {
+                            formattedText.SetTextDecorations(UnderlineDecoration, startIndex, endIndex - startIndex + 1);
                             break;
                         }
 
@@ -134,7 +174,7 @@ namespace ModengTerm.Rendering
 
             #endregion
 
-            dc.DrawText(formattedText, new Point());
+            dc.DrawText(formattedText, ZeroPoint);
         }
 
         /// <summary>

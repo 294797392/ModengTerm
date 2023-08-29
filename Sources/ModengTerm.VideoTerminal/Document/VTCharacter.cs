@@ -12,7 +12,7 @@ namespace XTerminal.Document
     /// </summary>
     public class VTCharacter
     {
-        private static Queue<VTCharacter> CharacterQueue = new Queue<VTCharacter>();
+        private static readonly Queue<VTCharacter> CharacterQueue = new Queue<VTCharacter>();
 
         /// <summary>
         /// 字符
@@ -90,7 +90,7 @@ namespace XTerminal.Document
             CharacterQueue.Enqueue(character);
         }
 
-        public static void Recycle(IEnumerable<VTCharacter> characters) 
+        public static void Recycle(IEnumerable<VTCharacter> characters)
         {
             foreach (VTCharacter character in characters)
             {
@@ -99,7 +99,8 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 把copyFrom拷贝到copyTo，保证VTCharacter的数量和值是相同的
+        /// 把copyFrom拷贝到copyTo
+        /// 保证copyTo和copyFrom的数量和值是相同的
         /// </summary>
         /// <param name="copyTo"></param>
         /// <param name="copyFrom"></param>

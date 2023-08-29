@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base.DataModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -100,5 +101,62 @@ namespace ModengTerm.Base.ServiceAgents
         }
 
         #endregion
+
+        public override List<Favorites> GetFavorites()
+        {
+            try
+            {
+                return JSONDatabase.SelectAll<Favorites>();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetFavorites异常", ex);
+                return new List<Favorites>();
+            }
+        }
+
+        public override int AddFavorites(Favorites favorites)
+        {
+            try
+            {
+                JSONDatabase.Insert<Favorites>(favorites);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AddFavorites异常", ex);
+                return ResponseCode.FAILED;
+            }
+
+        }
+
+        public override int DeleteFavorites(string favId)
+        {
+            try
+            {
+                JSONDatabase.Delete<Favorites>(v => v.ID == favId);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("DeleteFavorites异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        public override int UpdateFavorites(Favorites favorites)
+        {
+            try
+            {
+                return JSONDatabase.Update<Favorites>(v => v.ID == favorites.ID, favorites);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("UpdateFavorites异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
     }
 }

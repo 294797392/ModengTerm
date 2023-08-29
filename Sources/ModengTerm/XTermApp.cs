@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
 using Newtonsoft.Json;
 using System;
@@ -45,6 +46,11 @@ namespace XTerminal
         public ServiceAgent ServiceAgent { get; private set; }
 
         /// <summary>
+        /// 日志记录器
+        /// </summary>
+        public LoggerManager LoggerManager { get; private set; }
+
+        /// <summary>
         /// 存储当前打开的所有会话列表
         /// </summary>
         public BindableCollection<OpenedSessionVM> OpenedSessionList { get; private set; }
@@ -85,6 +91,7 @@ namespace XTerminal
             this.TerminalOptionsTreeVM = new OptionTreeVM();
             this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
             this.ServiceAgent = this.Factory.LookupModule<ServiceAgent>();
+            this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
 
             #region 加载选项树形列表
 

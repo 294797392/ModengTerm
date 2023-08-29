@@ -118,6 +118,7 @@
     <Compile Include="Session\SshNetSession.cs" />
     <Compile Include="Session\WinptySession.cs" />
     <Compile Include="UserInput.cs" />
+    <Compile Include="ViewModels\FavoritesVM.cs" />
     <Compile Include="ViewModels\VideoTerminal.cs" />
     <Compile Include="ViewModels\VideoTerminal.Drawing.cs" />
     <Compile Include="VTKeyboard.cs" />
@@ -139,5 +140,6 @@
       <Name>Renci.SshNet</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

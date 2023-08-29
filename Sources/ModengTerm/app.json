@@ -1,9 +1,17 @@
 ﻿{
     "modules": [
         {
-            "ID": "1",
+            "ID": "81E8E64C-85B8-40CF-AFED-399236BC1426",
             "Name": "服务代理",
             "ClassName": "ModengTerm.Base.ServiceAgents.FileServiceAgent, ModengTerm.Base",
+            "Inputs": {
+            }
+        },
+
+        {
+            "ID": "62FC12DD-32F4-47E6-BD5C-AB84D01A1309",
+            "Name": "日志记录器",
+            "ClassName": "ModengTerm.Terminal.Loggering.LoggerManager, ModengTerm.Terminal",
             "Inputs": {
             }
         }

@@ -47,6 +47,8 @@ namespace XTerminal.Document
     /// </summary>
     public class VTextAttribute
     {
+        private static readonly Queue<VTextAttribute> CharacterQueue = new Queue<VTextAttribute>();
+
         /// <summary>
         /// 该装饰的起始列
         /// 从0开始计数
