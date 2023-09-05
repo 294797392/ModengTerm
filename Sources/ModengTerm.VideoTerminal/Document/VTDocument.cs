@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -104,7 +105,7 @@ namespace XTerminal.Document
             this.Cursor = new VTCursor()
             {
                 Blinking = true,
-                Color = VTColors.DarkBlack,
+                Color = VTColor.DarkBlack,
                 OffsetX = 0,
                 OffsetY = 0,
                 Row = 0,

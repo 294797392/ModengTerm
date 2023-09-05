@@ -17,6 +17,9 @@ namespace ModengTerm.Base
         /// <param name="dest">要复制到的目标对象</param>
         public abstract void CopyTo(T dest);
 
+        /// <summary>
+        /// 把该对象的值设置为初始值
+        /// </summary>
         public abstract void SetDefault();
 
         public static T Create() 

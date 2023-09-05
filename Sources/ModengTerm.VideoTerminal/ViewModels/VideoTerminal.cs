@@ -1007,7 +1007,7 @@ namespace ModengTerm.Terminal.ViewModels
                         }
 
                         char ch = Convert.ToChar(parameter);
-                        VTDebug.WriteAction("Print:{0}({1}), Cursor={2},{3}", ch, Convert.ToInt32(parameter), this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, string.Format("{0},{1},{2}", ch, this.CursorRow, this.CursorCol));
                         VTCharacter character = this.CreateCharacter(parameter);
                         this.activeDocument.PrintCharacter(this.ActiveLine, character, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + character.ColumnSize);
@@ -1018,8 +1018,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         // CR
                         // 把光标移动到行开头
+                        VTDebug.Context.WriteAction(action, string.Format("{0},{1}", this.CursorRow, this.CursorCol));
                         this.activeDocument.SetCursor(this.CursorRow, 0);
-                        VTDebug.WriteAction("CarriageReturn, Cursor={0},{1}", this.CursorRow, this.CursorCol);
                         break;
                     }
 
@@ -1029,6 +1029,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         // LF
                         // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
+
+                        VTDebug.Context.WriteAction(action, string.Format("{0},{1}", this.CursorRow, this.CursorCol));
 
                         if (this.activeDocument == this.mainDocument)
                         {
@@ -1090,8 +1092,6 @@ namespace ModengTerm.Terminal.ViewModels
 
                             #endregion
                         }
-
-                        VTDebug.WriteAction("LF/FF/VT, Cursor={0},{1}, {2}", this.CursorRow, this.CursorCol, action);
                         break;
                     }
 
@@ -1101,7 +1101,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 在用man命令的时候会触发这个指令
                         // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
                         this.activeDocument.ReverseLineFeed();
-                        VTDebug.WriteAction("ReverseLineFeed");
+                        VTDebug.Context.WriteAction(action, string.Empty);
                         break;
                     }
 
@@ -1117,7 +1117,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        VTDebug.WriteAction("EL_EraseLine, eraseType = {0}, 从光标位置{1},{2}开始erase", eraseType, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", eraseType, this.CursorRow, this.CursorCol);
                         this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
                         break;
                     }
@@ -1126,7 +1126,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        VTDebug.WriteAction("ED_EraseDisplay, eraseType = {0}, Cursor={1},{2}", eraseType, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", eraseType, this.CursorRow, this.CursorCol);
                         this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, eraseType);
                         break;
                     }
@@ -1141,8 +1141,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case VTActions.BS:
                     {
+                        VTDebug.Context.WriteAction(action, "{0},{1}", this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol - 1);
-                        VTDebug.WriteAction("CursorBackward, Cursor = {0}, {1}", this.CursorRow, this.CursorCol);
                         break;
                     }
 
@@ -1150,8 +1150,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol - n);
-                        VTDebug.WriteAction("CursorBackward, Cursor = {0}, {1}, n = {2}", this.CursorRow, this.CursorCol, n);
                         break;
                     }
 
@@ -1159,8 +1159,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + n);
-                        VTDebug.WriteAction("CUF_CursorForward, Cursor = {0}, {1}, n = {2}", this.CursorRow, this.CursorCol, n);
                         break;
                     }
 
@@ -1168,8 +1168,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow - n, this.CursorCol);
-                        VTDebug.WriteAction("CUU_CursorUp, Cursor = {0}, {1}, n = {2}", this.CursorRow, this.CursorCol, n);
                         break;
                     }
 
@@ -1177,8 +1177,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow + n, this.CursorCol);
-                        VTDebug.WriteAction("CUD_CursorDown, Cursor = {0}, {1}, n = {2}", this.CursorRow, this.CursorCol, n);
                         break;
                     }
 
@@ -1202,7 +1202,7 @@ namespace ModengTerm.Terminal.ViewModels
                             // 如果没有参数，那么说明就是定位到原点(0,0)
                         }
 
-                        VTDebug.WriteAction("CUP_CursorPosition, row = {0}, col = {1}", row, col);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2},{3}", row, col, this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(row, col);
                         break;
                     }
@@ -1215,13 +1215,12 @@ namespace ModengTerm.Terminal.ViewModels
                         int n = VTParameter.GetParameter(parameters, 0, -1);
                         if (n == -1)
                         {
-                            VTDebug.WriteAction("CHA_CursorHorizontalAbsolute失败");
-                            return;
+                            break;
                         }
 
                         this.ActiveLine.PadColumns(n);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, n - 1);
-                        VTDebug.WriteAction("CHA_CursorHorizontalAbsolute, targetColumn = {0}", n);
                         break;
                     }
 
@@ -1241,48 +1240,26 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.DefaultForeground:
                 case VTActions.Background:
                 case VTActions.DefaultBackground:
+                case VTActions.ForegroundRGB:
+                case VTActions.BackgroundRGB:
                     {
-                        // Foreground和DefaultForeground的CharacterIndex可能都是0，并且颜色也是空的
-                        // 注意在渲染的时候要处理这种情况
-
-                        bool unset;
-                        VTextDecorations decoration = VDocumentUtils.VTAction2TextDecoration(action, out unset);
-                        VTextAttribute textAttribute = this.ActiveLine.Attributes.FirstOrDefault(v => v.Decoration == decoration && !v.Unset);
-                        if (textAttribute == null)
-                        {
-                            textAttribute = VTextAttribute.Create();
-                            this.ActiveLine.Attributes.Add(textAttribute);
-                        }
-
-                        if (unset)
-                        {
-                            // 因为光标所在列是下一个要打印的字符的列，所以这里要减1
-                            // 有可能在第0列就设置了Unset，这种情况要处理一下
-                            textAttribute.EndColumn = this.CursorCol == 0 ? 0 : this.CursorCol - 1;
-                            textAttribute.Unset = true;
-
-                            //if (action == VTActions.BoldUnset)
-                            //{
-                            //    logger.ErrorFormat("{0}, start = {1}, end = {2}, parameter = {3}", action, textAttribute.StartColumn, textAttribute.EndColumn, textAttribute.Parameter);
-                            //}
-                        }
-                        else
-                        {
-                            // 如果连续多次设置了文本属性，那么更新。不更新的话会显示不正确
-                            // 比如连续两次Bold就会运行到这里
-                            textAttribute.StartColumn = this.CursorCol;
-                            textAttribute.Decoration = decoration;
-                            textAttribute.Parameter = parameter;
-                        }
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2},{3}", this.CursorRow, this.CursorCol, parameter == null ? string.Empty : parameter.ToString(), this.ActiveLine.PhysicsRow);
+                        VTextAttribute textAttribute = VTextAttribute.Create();
+                        textAttribute.Decoration = VDocumentUtils.VTAction2TextDecoration(action);
+                        textAttribute.Parameter = parameter;
+                        textAttribute.StartColumn = this.CursorCol;
+                        this.ActiveLine.Attributes.Add(textAttribute);
                         break;
                     }
 
-                case VTActions.DefaultAttributes:
                 case VTActions.Faint:
                 case VTActions.CrossedOutUnset:
                 case VTActions.ReverseVideo:
                 case VTActions.ReverseVideoUnset:
-                    break;
+                    {
+                        logger.ErrorFormat(string.Format("未执行的VTAction, {0}", action));
+                        break;
+                    }
 
                 #endregion
 
@@ -1291,7 +1268,7 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.DECANM_AnsiMode:
                     {
                         bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.WriteAction("DECANM_AnsiMode, enable = {0}", enable);
+                        VTDebug.Context.WriteAction(action,"{0}", enable);
                         this.keyboard.SetAnsiMode(enable);
                         break;
                     }
@@ -1299,21 +1276,21 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.DECCKM_CursorKeysMode:
                     {
                         bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.WriteAction("DECCKM_CursorKeysMode, enable = {0}", enable);
+                        VTDebug.Context.WriteAction(action, "{0}", enable);
                         this.keyboard.SetCursorKeyMode(enable);
                         break;
                     }
 
                 case VTActions.DECKPAM_KeypadApplicationMode:
                     {
-                        VTDebug.WriteAction("DECKPAM_KeypadApplicationMode");
+                        VTDebug.Context.WriteAction(action, string.Empty);
                         this.keyboard.SetKeypadMode(true);
                         break;
                     }
 
                 case VTActions.DECKPNM_KeypadNumericMode:
                     {
-                        VTDebug.WriteAction("DECKPNM_KeypadNumericMode");
+                        VTDebug.Context.WriteAction(action, string.Empty);
                         this.keyboard.SetKeypadMode(false);
                         break;
                     }
@@ -1321,16 +1298,16 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.DECAWM_AutoWrapMode:
                     {
                         bool enable = Convert.ToBoolean(parameter);
+                        VTDebug.Context.WriteAction(action, "{0}", enable);
                         this.autoWrapMode = enable;
-                        VTDebug.WriteAction("DECAWM_AutoWrapMode, enable = {0}", enable);
                         this.activeDocument.DECPrivateAutoWrapMode = enable;
                         break;
                     }
 
                 case VTActions.XTERM_BracketedPasteMode:
                     {
+                        logger.ErrorFormat("未实现XTERM_BracketedPasteMode");
                         this.xtermBracketedPasteMode = Convert.ToBoolean(parameter);
-                        VTDebug.WriteAction("未实现XTERM_BracketedPasteMode");
                         break;
                     }
 
@@ -1353,7 +1330,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 从指定位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.WriteAction("DCH_DeleteCharacter, {0}, cursorPos = {1}", count, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", count, this.CursorRow, this.CursorCol);
                         this.activeDocument.DeleteCharacter(this.ActiveLine, this.CursorCol, count);
                         break;
                     }
@@ -1364,7 +1341,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.WriteAction("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
+                        logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
                         break;
                     }
 
@@ -1376,7 +1353,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case VTActions.UseAlternateScreenBuffer:
                     {
-                        VTDebug.WriteAction("UseAlternateScreenBuffer");
+                        VTDebug.Context.WriteAction(action, string.Empty);
 
                         IDrawingCanvas remove = this.mainDocument.Canvas;
                         IDrawingCanvas add = this.alternateDocument.Canvas;
@@ -1392,7 +1369,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case VTActions.UseMainScreenBuffer:
                     {
-                        VTDebug.WriteAction("UseMainScreenBuffer");
+                        VTDebug.Context.WriteAction(action, string.Empty);
 
                         IDrawingCanvas remove = this.alternateDocument.Canvas;
                         IDrawingCanvas add = this.mainDocument.Canvas;
@@ -1410,14 +1387,14 @@ namespace ModengTerm.Terminal.ViewModels
 
                         List<int> parameters = parameter as List<int>;
                         StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
-                        VTDebug.WriteAction("DSR_DeviceStatusReport, statusType = {0}", statusType);
+                        VTDebug.Context.WriteAction(action, "{0}", statusType);
                         this.PerformDeviceStatusReport(statusType);
                         break;
                     }
 
                 case VTActions.DA_DeviceAttributes:
                     {
-                        VTDebug.WriteAction("DA_DeviceAttributes");
+                        VTDebug.Context.WriteAction(action, string.Empty);
                         this.sessionTransport.Write(DA_DeviceAttributesResponse);
                         break;
                     }
@@ -1449,17 +1426,17 @@ namespace ModengTerm.Terminal.ViewModels
 
                         if (bottomMargin < 0 || topMargin < 0)
                         {
-                            VTDebug.WriteAction("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                             return;
                         }
                         if (topMargin >= bottomMargin)
                         {
-                            VTDebug.WriteAction("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
                             return;
                         }
                         if (bottomMargin > lines)
                         {
-                            VTDebug.WriteAction("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
+                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
                             return;
                         }
 
@@ -1467,7 +1444,7 @@ namespace ModengTerm.Terminal.ViewModels
                         int marginTop = topMargin == 1 ? 0 : topMargin;
                         // 如果bottomMargin等于控制台高度，那么就表示使用默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
                         int marginBottom = lines - bottomMargin;
-                        VTDebug.WriteAction("SetScrollingRegion, topMargin = {0}, bottomMargin = {1}", marginTop, marginBottom);
+                        VTDebug.Context.WriteAction(action, "topMargin = {0}, bottomMargin = {1}", marginTop, marginBottom);
                         this.activeDocument.SetScrollMargin(marginTop, marginBottom);
                         break;
                     }
@@ -1477,7 +1454,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
                         List<int> parameters = parameter as List<int>;
                         int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.WriteAction("IL_InsertLine, lines = {0}", lines);
+                        VTDebug.Context.WriteAction(action, "{0}", lines);
                         if (lines > 0)
                         {
                             this.activeDocument.InsertLines(this.ActiveLine, lines);
@@ -1490,7 +1467,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 从缓冲区中删除<n> 行，从光标所在的行开始。
                         List<int> parameters = parameter as List<int>;
                         int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.WriteAction("DL_DeleteLine, lines = {0}", lines);
+                        VTDebug.Context.WriteAction(action, "{0}", lines);
                         if (lines > 0)
                         {
                             this.activeDocument.DeleteLines(this.ActiveLine, lines);
@@ -1500,8 +1477,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 default:
                     {
-                        VTDebug.WriteAction("未执行的VTAction, {0}", action);
-                        break;
+                        throw new NotImplementedException(string.Format("未执行的VTAction, {0}", action));
                     }
             }
         }
@@ -1769,7 +1745,7 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            VTDebug.WriteAction("resize, oldRow = {0}, oldCol = {1}, newRow = {2}, newCol = {3}", this.rowSize, this.colSize, newRows, newCols);
+            logger.InfoFormat("resize, oldRow = {0}, oldCol = {1}, newRow = {2}, newCol = {3}", this.rowSize, this.colSize, newRows, newCols);
 
             // 对Document执行Resize
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样

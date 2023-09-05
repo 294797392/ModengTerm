@@ -97,6 +97,9 @@
                     BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
                     BorderThickness="0,1,0,0"/>
 
+            <CheckBox Grid.Column="0" x:Name="CheckBoxStartLogger" VerticalAlignment="Center" Content="记录日志" 
+                      Margin="0,0,5,0" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked"/>
+
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"
                         HorizontalAlignment="Center">
                 <TextBlock Text="{Binding Path=RowSize}"/>

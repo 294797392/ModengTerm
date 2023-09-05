@@ -24,12 +24,20 @@ namespace ModengTerm.Rendering
 
         #region 实例变量
 
+        /// <summary>
+        /// 默认文本样式
+        /// </summary>
         internal Typeface typeface;
+
+        /// <summary>
+        /// 默认的文本前景色
+        /// </summary>
         internal Brush foreground;
 
+        /// <summary>
+        /// 关联的VTextLine
+        /// </summary>
         private VTextLine textLine;
-
-        private TextDecorationCollection textDecorations;
 
         #endregion
 
@@ -80,11 +88,9 @@ namespace ModengTerm.Rendering
         protected override void OnInitialize(VTDocumentElement documentElement)
         {
             this.textLine = documentElement as VTextLine;
-            this.textDecorations = new TextDecorationCollection();
 
             FontFamily fontFamily = new FontFamily(textLine.Style.FontFamily);
             this.typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-
             this.foreground = DrawingUtils.ConvertBrush(textLine.Style.Foreground);
         }
 

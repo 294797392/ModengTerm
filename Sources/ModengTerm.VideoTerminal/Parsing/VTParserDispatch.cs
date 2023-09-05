@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,9 +22,6 @@ namespace XTerminal.Parser
         #endregion
 
         #region 实例变量
-
-        //private ICursorState cursorState;
-        //private IPresentationDevice presentationDevice;     // 保存主屏幕
 
         #endregion
 
@@ -120,15 +118,13 @@ namespace XTerminal.Parser
                 case ASCIITable.SO:
                     {
                         // 这两个不知道是什么意思
-                        logger.WarnFormat("未处理的SI和SI");
+                        logger.ErrorFormat("未处理的SI和SI");
                         break;
                     }
 
                 default:
                     {
                         throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
-                        //this.NotifyActionEvent(VTActions.Print, char.ToString((char)ch));
-                        break;
                     }
             }
         }
@@ -371,8 +367,7 @@ namespace XTerminal.Parser
                     }
 
                 default:
-                    logger.ErrorFormat("未实现EscAction, {0}", code);
-                    break;
+                    throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
             }
         }
 
@@ -390,8 +385,7 @@ namespace XTerminal.Parser
             switch (code)
             {
                 default:
-                    logger.WarnFormat("未实现VT52ActionCodes:{0}", code);
-                    break;
+                    throw new NotImplementedException(string.Format("未实现VT52ActionCodes:{0}", code));
             }
         }
 
@@ -402,6 +396,11 @@ namespace XTerminal.Parser
         /// <summary>
         /// 代码从terminal里复制
         /// AdaptDispatch::SetGraphicsRendition
+        /// 
+        /// SGR - Modifies the graphical rendering options applied to the next
+        //   characters written into the buffer.
+        //       - Options include colors, invert, underlines, and other "font style"
+        //         type options.
         /// </summary>
         /// <param name="parameters"></param>
         private void PerformSetGraphicsRendition(List<int> parameters)
@@ -417,7 +416,7 @@ namespace XTerminal.Parser
                     case GraphicsOptions.Off:
                         {
                             // 关闭字体效果
-                            this.NotifyActionEvent(VTActions.DefaultAttributes);
+                            //this.NotifyActionEvent(VTActions.DefaultAttributes);
                             this.NotifyActionEvent(VTActions.DefaultBackground);
                             this.NotifyActionEvent(VTActions.DefaultForeground);
                             break;
@@ -458,61 +457,63 @@ namespace XTerminal.Parser
                     case GraphicsOptions.Overline: this.NotifyActionEvent(VTActions.Overlined); break;
                     case GraphicsOptions.NoOverline: this.NotifyActionEvent(VTActions.OverlinedUnset); break;
 
-                    case GraphicsOptions.ForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkBlack); break;
-                    case GraphicsOptions.ForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkBlue); break;
-                    case GraphicsOptions.ForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkGreen); break;
-                    case GraphicsOptions.ForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkCyan); break;
-                    case GraphicsOptions.ForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkRed); break;
-                    case GraphicsOptions.ForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkMagenta); break;
-                    case GraphicsOptions.ForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkYellow); break;
-                    case GraphicsOptions.ForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTColors.DarkWhite); break;
+                    case GraphicsOptions.ForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkBlack); break;
+                    case GraphicsOptions.ForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkBlue); break;
+                    case GraphicsOptions.ForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkGreen); break;
+                    case GraphicsOptions.ForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkCyan); break;
+                    case GraphicsOptions.ForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkRed); break;
+                    case GraphicsOptions.ForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkMagenta); break;
+                    case GraphicsOptions.ForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkYellow); break;
+                    case GraphicsOptions.ForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkWhite); break;
 
-                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTColors.DarkWhite); break;
-                    case GraphicsOptions.BackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTColors.DarkBlue); break;
-                    case GraphicsOptions.BackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTColors.DarkGreen); break;
-                    case GraphicsOptions.BackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTColors.DarkCyan); break;
-                    case GraphicsOptions.BackgroundRed: this.NotifyActionEvent(VTActions.Background, VTColors.DarkRed); break;
-                    case GraphicsOptions.BackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTColors.DarkMagenta); break;
-                    case GraphicsOptions.BackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTColors.DarkYellow); break;
-                    case GraphicsOptions.BackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTColors.DarkWhite); break;
+                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTColor.DarkWhite); break;
+                    case GraphicsOptions.BackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTColor.DarkBlue); break;
+                    case GraphicsOptions.BackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTColor.DarkGreen); break;
+                    case GraphicsOptions.BackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTColor.DarkCyan); break;
+                    case GraphicsOptions.BackgroundRed: this.NotifyActionEvent(VTActions.Background, VTColor.DarkRed); break;
+                    case GraphicsOptions.BackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTColor.DarkMagenta); break;
+                    case GraphicsOptions.BackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTColor.DarkYellow); break;
+                    case GraphicsOptions.BackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTColor.DarkWhite); break;
 
-                    case GraphicsOptions.BrightForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightWhite); break;
-                    case GraphicsOptions.BrightForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightBlue); break;
-                    case GraphicsOptions.BrightForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightGreen); break;
-                    case GraphicsOptions.BrightForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightCyan); break;
-                    case GraphicsOptions.BrightForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightRed); break;
-                    case GraphicsOptions.BrightForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightMagenta); break;
-                    case GraphicsOptions.BrightForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightYellow); break;
-                    case GraphicsOptions.BrightForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTColors.BrightWhite); break;
+                    case GraphicsOptions.BrightForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightWhite); break;
+                    case GraphicsOptions.BrightForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightBlue); break;
+                    case GraphicsOptions.BrightForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightGreen); break;
+                    case GraphicsOptions.BrightForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightCyan); break;
+                    case GraphicsOptions.BrightForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightRed); break;
+                    case GraphicsOptions.BrightForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightMagenta); break;
+                    case GraphicsOptions.BrightForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightYellow); break;
+                    case GraphicsOptions.BrightForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightWhite); break;
 
-                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTColors.BrightWhite); break;
-                    case GraphicsOptions.BrightBackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTColors.BrightBlue); break;
-                    case GraphicsOptions.BrightBackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTColors.BrightGreen); break;
-                    case GraphicsOptions.BrightBackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTColors.BrightCyan); break;
-                    case GraphicsOptions.BrightBackgroundRed: this.NotifyActionEvent(VTActions.Background, VTColors.BrightRed); break;
-                    case GraphicsOptions.BrightBackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTColors.BrightMagenta); break;
-                    case GraphicsOptions.BrightBackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTColors.BrightYellow); break;
-                    case GraphicsOptions.BrightBackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTColors.BrightWhite); break;
+                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTColor.BrightWhite); break;
+                    case GraphicsOptions.BrightBackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTColor.BrightBlue); break;
+                    case GraphicsOptions.BrightBackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTColor.BrightGreen); break;
+                    case GraphicsOptions.BrightBackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTColor.BrightCyan); break;
+                    case GraphicsOptions.BrightBackgroundRed: this.NotifyActionEvent(VTActions.Background, VTColor.BrightRed); break;
+                    case GraphicsOptions.BrightBackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTColor.BrightMagenta); break;
+                    case GraphicsOptions.BrightBackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTColor.BrightYellow); break;
+                    case GraphicsOptions.BrightBackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTColor.BrightWhite); break;
 
                     case GraphicsOptions.ForegroundExtended:
                         {
-                            byte r, g, b;
-                            i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), true, out r, out g, out b);
-                            //this.NotifyActionEvent(VTActions.ForegroundRGB, r, g, b);
+                            VTColor rgbColor;
+                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
+                            this.NotifyActionEvent(VTActions.ForegroundRGB, rgbColor);
                             break;
                         }
 
                     case GraphicsOptions.BackgroundExtended:
                         {
-                            byte r, g, b;
-                            i += this.SetRgbColorsHelper(parameters.Skip(i + 1).ToList(), false, out r, out g, out b);
-                            //this.NotifyActionEvent(VTActions.BackgroundRGB, r, g, b);
+                            VTColor rgbColor;
+                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
+                            this.NotifyActionEvent(VTActions.BackgroundRGB, rgbColor);
                             break;
                         }
 
                     default:
-                        logger.WarnFormat("未实现的SGRCode = {0}", option);
-                        break;
+                        {
+                            logger.ErrorFormat(string.Format("未实现的SGRCode = {0}", option));
+                            break;
+                        }
                 }
             }
         }
@@ -524,34 +525,32 @@ namespace XTerminal.Parser
         ///      Xterm index will use the param that follows to use a color from the preset 256 color xterm color table.
         /// </summary>
         /// <param name="parameters"></param>
-        /// <param name="foreground"></param>
-        /// <param name="r"></param>
-        /// <param name="g"></param>
-        /// <param name="b"></param>
+        /// <param name="paramIndex">从第几个参数开始使用</param>
+        /// <param name="rgbColor"></param>
         /// <returns></returns>
-        private int SetRgbColorsHelper(List<int> parameters, bool foreground, out byte r, out byte g, out byte b)
+        private int SetRgbColorsHelper(List<int> parameters, int paramIndex, out VTColor rgbColor)
         {
-            r = 0; b = 0; g = 0;
+            rgbColor = null;
 
             int optionsConsumed = 1;
-            GraphicsOptions options = (GraphicsOptions)parameters[0];
+            GraphicsOptions options = (GraphicsOptions)parameters[paramIndex];
             if (options == GraphicsOptions.RGBColorOrFaint)
             {
                 // 这里使用RGB颜色
                 optionsConsumed = 4;
-                r = (byte)parameters[1];
-                g = (byte)parameters[2];
-                b = (byte)parameters[3];
+                rgbColor = VTColor.Create((byte)parameters[paramIndex + 1], (byte)parameters[paramIndex + 2], (byte)parameters[paramIndex + 3]);
             }
             else if (options == GraphicsOptions.BlinkOrXterm256Index)
             {
                 // 这里使用xterm颜色表里的颜色
                 optionsConsumed = 2;
-                int tableIndex = parameters[1];
+                int tableIndex = parameters.Count > paramIndex ? parameters[paramIndex + 1] : 0;
                 if (tableIndex <= 255)
                 {
+                    byte r, g, b;
                     byte index = (byte)tableIndex;
                     Xterm256Color.ConvertRGB(index, out r, out g, out b);
+                    rgbColor = VTColor.Create(r, g, b);
                 }
             }
             return optionsConsumed;
@@ -639,8 +638,7 @@ namespace XTerminal.Parser
                     //    }
 
                     default:
-                        logger.ErrorFormat("未实现DECSETPrivateMode, {0}", mode);
-                        break;
+                        throw new NotImplementedException(string.Format("未实现DECSETPrivateMode, {0}", mode));
                 }
             }
 

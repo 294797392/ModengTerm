@@ -16,31 +16,47 @@ namespace XTerminal.Document
         /// 加粗字体
         /// </summary>
         Bold,
+        BoldUnset,
 
         /// <summary>
         /// 下划线
         /// </summary>
         Underline,
+        UnderlineUnset,
 
         /// <summary>
         /// 斜体
         /// </summary>
         Italics,
+        ItalicsUnset,
 
         /// <summary>
         /// 双下划线
         /// </summary>
         DoublyUnderlined,
+        DoublyUnderlinedUnset,
 
         /// <summary>
         /// 字体背景颜色
         /// </summary>
         Background,
+        BackgroundUnset,
 
         /// <summary>
         /// 字体颜色
         /// </summary>
-        Foreground
+        Foreground,
+        ForegroundUnset,
+
+        /// <summary>
+        /// 用RGB设置前景色
+        /// </summary>
+        ForegroundRGB,
+
+        /// <summary>
+        /// 用RGB设置背景色
+        /// </summary>
+        BackgroundRGB,
     }
 
     /// <summary>
@@ -49,16 +65,10 @@ namespace XTerminal.Document
     public class VTextAttribute : Reusable<VTextAttribute>
     {
         /// <summary>
-        /// 该装饰的起始列
+        /// 该装饰的起始列，包含该列
         /// 从0开始计数
         /// </summary>
         public int StartColumn { get; set; }
-
-        /// <summary>
-        /// 该装饰的结束列
-        /// 从0开始计数
-        /// </summary>
-        public int EndColumn { get; set; }
 
         /// <summary>
         /// 该文本的装饰
@@ -70,8 +80,9 @@ namespace XTerminal.Document
         /// </summary>
         public object Parameter { get; set; }
 
-        public bool Unset { get; set; }
-
+        /// <summary>
+        /// 请使用VTextAttribute.Create创建实例
+        /// </summary>
         private VTextAttribute()
         {
         }
@@ -79,19 +90,15 @@ namespace XTerminal.Document
         public override void CopyTo(VTextAttribute dest)
         {
             dest.StartColumn = this.StartColumn;
-            dest.EndColumn = this.EndColumn;
             dest.Decoration = this.Decoration;
             dest.Parameter = this.Parameter;
-            dest.Unset = this.Unset;
         }
 
         public override void SetDefault()
         {
             this.StartColumn = 0;
-            this.EndColumn = 0;
             this.Decoration = (VTextDecorations)0;
             this.Parameter = null;
-            this.Unset = false;
         }
     }
 }

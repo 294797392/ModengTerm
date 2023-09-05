@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -17,10 +18,6 @@ namespace XTerminal.Parser
         /// </summary>
         Print,
 
-        /// <summary>
-        /// 还原字体属性
-        /// </summary>
-        DefaultAttributes,
         DefaultBackground,
         DefaultForeground,
 

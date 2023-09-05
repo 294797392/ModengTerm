@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit.Extentions;
+using ModengTerm.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;

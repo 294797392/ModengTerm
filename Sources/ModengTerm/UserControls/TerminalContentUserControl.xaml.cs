@@ -436,5 +436,17 @@ namespace XTerminal.UserControls
         }
 
         #endregion
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            if (CheckBoxStartLogger.IsChecked.Value)
+            {
+                VTDebug.Context.StartLogger(VTDebugCategoryEnum.Action);
+            }
+            else
+            {
+                VTDebug.Context.StopLogger(VTDebugCategoryEnum.Action);
+            }
+        }
     }
 }

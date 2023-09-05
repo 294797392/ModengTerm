@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -74,7 +75,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 光标颜色
         /// </summary>
-        public VTColors Color { get; set; }
+        public VTColor Color { get; set; }
 
         /// <summary>
         /// 闪烁速度

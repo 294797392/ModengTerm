@@ -96,7 +96,6 @@
     <Compile Include="Document\VTPointCollection.cs" />
     <Compile Include="Document\VTRect.cs" />
     <Compile Include="Parsing\VTActions.cs" />
-    <Compile Include="Parsing\VTColors.cs" />
     <Compile Include="Parsing\VTCursorKeyMode.cs" />
     <Compile Include="Parsing\VTDefinitions.cs" />
     <Compile Include="Parsing\VTKeypadMode.cs" />
@@ -121,6 +120,8 @@
     <Compile Include="ViewModels\FavoritesVM.cs" />
     <Compile Include="ViewModels\VideoTerminal.cs" />
     <Compile Include="ViewModels\VideoTerminal.Drawing.cs" />
+    <Compile Include="VTColor.cs" />
+    <Compile Include="VTDebug.cs" />
     <Compile Include="VTKeyboard.cs" />
     <Compile Include="VTKeys.cs" />
     <Compile Include="VTModifierKeys.cs" />

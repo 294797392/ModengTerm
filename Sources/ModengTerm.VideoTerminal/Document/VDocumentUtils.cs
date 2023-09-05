@@ -9,29 +9,24 @@ namespace XTerminal.Document
 {
     public static class VDocumentUtils
     {
-        public static VTextDecorations VTAction2TextDecoration(VTActions actions, out bool unset)
+        public static VTextDecorations VTAction2TextDecoration(VTActions actions)
         {
-            unset = false;
-
             switch (actions)
             {
                 case VTActions.Bold: return VTextDecorations.Bold;
-                case VTActions.BoldUnset: unset = true; return VTextDecorations.Bold;
-
+                case VTActions.BoldUnset: return VTextDecorations.BoldUnset;
                 case VTActions.Underline: return VTextDecorations.Underline;
-                case VTActions.UnderlineUnset: unset = true; return VTextDecorations.Underline;
-
+                case VTActions.UnderlineUnset: return VTextDecorations.UnderlineUnset;
                 case VTActions.Italics: return VTextDecorations.Italics;
-                case VTActions.ItalicsUnset: unset = true; return VTextDecorations.Italics;
-
+                case VTActions.ItalicsUnset: return VTextDecorations.ItalicsUnset;
                 case VTActions.DoublyUnderlined: return VTextDecorations.DoublyUnderlined;
-                case VTActions.DoublyUnderlinedUnset: unset = true; return VTextDecorations.DoublyUnderlined;
-
+                case VTActions.DoublyUnderlinedUnset: return VTextDecorations.DoublyUnderlinedUnset;
                 case VTActions.Background: return VTextDecorations.Background;
-                case VTActions.DefaultBackground: unset = true; return VTextDecorations.Background;
-
+                case VTActions.BackgroundRGB: return VTextDecorations.BackgroundRGB;
+                case VTActions.DefaultBackground: return VTextDecorations.BackgroundUnset;
                 case VTActions.Foreground: return VTextDecorations.Foreground;
-                case VTActions.DefaultForeground: unset = true; return VTextDecorations.Foreground;
+                case VTActions.ForegroundRGB: return VTextDecorations.ForegroundRGB;
+                case VTActions.DefaultForeground: return VTextDecorations.ForegroundUnset;
 
                 default:
                     throw new NotImplementedException();

@@ -17,6 +17,8 @@ namespace ModengTerm.Rendering
 {
     public static class DrawingUtils
     {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("DrawingUtils");
+
         private static readonly BrushConverter BrushConverter = new BrushConverter();
 
         public static readonly Point ZeroPoint = new Point();
@@ -24,40 +26,35 @@ namespace ModengTerm.Rendering
         public static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
         public static readonly Pen BlackPen = new Pen(Brushes.Black, 1);
 
-        public static readonly TextDecorationCollection Underline = new TextDecorationCollection()
+        private static readonly Dictionary<VTColor, Brush> VTColorBrushMap = new Dictionary<VTColor, Brush>()
         {
-            new TextDecoration(TextDecorationLocation.Underline, BlackPen, 0, TextDecorationUnit.FontRecommended, TextDecorationUnit.FontRecommended)
+            { VTColor.BrightBlack, Brushes.Black }, { VTColor.BrightBlue, Brushes.Blue }, { VTColor.BrightCyan, Brushes.Cyan },
+            { VTColor.BrightGreen, Brushes.Green }, { VTColor.BrightMagenta, Brushes.Magenta }, { VTColor.BrightRed, Brushes.Red },
+            { VTColor.BrightWhite, Brushes.White }, { VTColor.BrightYellow, Brushes.Yellow },
+
+            { VTColor.DarkBlack, Brushes.Black }, { VTColor.DarkBlue, Brushes.Red }, { VTColor.DarkCyan, Brushes.DarkCyan },
+            { VTColor.DarkGreen, Brushes.LightGreen }, { VTColor.DarkMagenta, Brushes.DarkMagenta }, { VTColor.DarkRed, Brushes.DarkRed },
+            { VTColor.DarkWhite, Brushes.White }, { VTColor.DarkYellow, Brushes.Yellow }
         };
 
         static DrawingUtils()
         {
         }
 
-        public static Brush VTColor2Brush(VTColors foreground)
+        public static Brush VTColor2Brush(VTColor color)
         {
-            switch (foreground)
+            if (color == null) 
             {
-                case VTColors.BrightBlack: return Brushes.Black;
-                case VTColors.BrightBlue: return Brushes.Blue;
-                case VTColors.BrightCyan: return Brushes.Cyan;
-                case VTColors.BrightGreen: return Brushes.Green;
-                case VTColors.BrightMagenta: return Brushes.Magenta;
-                case VTColors.BrightRed: return Brushes.Red;
-                case VTColors.BrightWhite: return Brushes.White;
-                case VTColors.BrightYellow: return Brushes.Yellow;
-
-                case VTColors.DarkBlack: return Brushes.Black;
-                case VTColors.DarkBlue: return Brushes.DarkBlue;
-                case VTColors.DarkCyan: return Brushes.DarkCyan;
-                case VTColors.DarkGreen: return Brushes.DarkGreen;
-                case VTColors.DarkMagenta: return Brushes.DarkMagenta;
-                case VTColors.DarkRed: return Brushes.DarkRed;
-                case VTColors.DarkWhite: return Brushes.White;
-                case VTColors.DarkYellow: return Brushes.Yellow;
-
-                default:
-                    throw new NotImplementedException();
+                return null;
             }
+
+            Brush brush;
+            if (!VTColorBrushMap.TryGetValue(color, out brush))
+            {
+                brush = new SolidColorBrush(Color.FromRgb(color.R, color.G, color.B));
+                VTColorBrushMap[color] = brush;
+            }
+            return brush;
         }
 
         public static void UpdateTextMetrics(VTextLine textLine, FormattedText formattedText)
@@ -84,7 +81,6 @@ namespace ModengTerm.Rendering
         /// <returns></returns>
         public static FormattedText CreateFormattedText(VTextLine textLine, DrawingContext dc = null)
         {
-            //string text = string.Format("{0} - {1}", textLine.ID, textLine.Text);
             string text = textLine.Text;
 
             DrawingLine drawingLine = textLine.DrawingContext as DrawingLine;
@@ -95,73 +91,67 @@ namespace ModengTerm.Rendering
 
             foreach (VTextAttribute textAttribute in textLine.Attributes)
             {
-                if (!textAttribute.Unset)
-                {
-                    // 没有设置Unset，那么不渲染
-                    continue;
-                }
-
                 int startIndex = textLine.FindCharacterIndex(textAttribute.StartColumn);
-                int endIndex = textLine.FindCharacterIndex(textAttribute.EndColumn);
-                if (startIndex == -1 || endIndex == -1)
+                if (startIndex < 0)
                 {
+                    // 有可能会找不到对应的字符索引
                     continue;
                 }
 
-                if (startIndex > endIndex)
-                {
-                    continue;
-                }
+                int count = text.Length - startIndex; // 剩余字符数
 
                 switch (textAttribute.Decoration)
                 {
                     case VTextDecorations.Foreground:
                         {
-                            if (textAttribute.Parameter == null)
+                            VTColor color = textAttribute.Parameter as VTColor;
+                            Brush brush = DrawingUtils.VTColor2Brush(color);
+                            //logger.ErrorFormat("Foreground startIndex = {0}, count = {1}, total = {2}", startIndex, count, text.Length);
+                            formattedText.SetForegroundBrush(brush, startIndex, count);
+                            break;
+                        }
+                    case VTextDecorations.ForegroundRGB:
+                        {
+                            if (textAttribute.Parameter == null) 
                             {
                                 continue;
                             }
 
-                            VTColors color = (VTColors)textAttribute.Parameter;
+                            VTColor color = textAttribute.Parameter as VTColor;
                             Brush brush = DrawingUtils.VTColor2Brush(color);
-                            formattedText.SetForegroundBrush(brush, startIndex, endIndex - startIndex + 1);
+                            formattedText.SetForegroundBrush(brush, startIndex, count);
+                            break;
+                        }
+                    case VTextDecorations.ForegroundUnset:
+                        {
+                            //logger.ErrorFormat("ForegroundUnset startIndex = {0}, count = {1}, total = {2}, {3}", startIndex, count, text.Length, textAttribute.StartColumn);
+                            formattedText.SetForegroundBrush(drawingLine.foreground, startIndex, count);
                             break;
                         }
 
+                    case VTextDecorations.BackgroundRGB:
                     case VTextDecorations.Background:
+                    case VTextDecorations.BackgroundUnset:
                         {
-                            if(dc == null)
-                            {
-                                continue;
-                            }
-
-                            if (textAttribute.Parameter == null)
-                            {
-                                continue;
-                            }
-
-                            VTColors color = (VTColors)textAttribute.Parameter;
-                            Brush brush = DrawingUtils.VTColor2Brush(color);
-                            Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, endIndex - startIndex + 1);
-                            dc.DrawRectangle(brush, DrawingUtils.TransparentPen, geometry.Bounds);
+                            // 背景颜色最后画, 因为文本的粗细会影响到背景颜色的大小
                             break;
                         }
 
                     case VTextDecorations.Bold:
                         {
-                            formattedText.SetFontWeight(FontWeights.Bold, startIndex, endIndex - startIndex + 1);
+                            //formattedText.SetFontWeight(FontWeights.Bold, startIndex, count);
                             break;
                         }
 
                     case VTextDecorations.Italics:
                         {
-                            formattedText.SetFontStyle(FontStyles.Italic, startIndex, endIndex - startIndex + 1);
+                            formattedText.SetFontStyle(FontStyles.Italic, startIndex, count);
                             break;
                         }
 
                     case VTextDecorations.Underline:
                         {
-                            formattedText.SetTextDecorations(TextDecorations.Underline, startIndex, endIndex - startIndex + 1);
+                            formattedText.SetTextDecorations(TextDecorations.Underline, startIndex, count);
                             break;
                         }
 
@@ -171,6 +161,48 @@ namespace ModengTerm.Rendering
             }
 
             #endregion
+
+            //if (dc != null)
+            //{
+            //    // 画背景颜色
+            //    // 背景颜色要在最后画，因为文本的粗细会影响到背景颜色的大小
+            //    foreach (VTextAttribute textAttribute in textLine.Attributes)
+            //    {
+            //        if (textAttribute.Decoration != VTextDecorations.Background &&
+            //            textAttribute.Decoration != VTextDecorations.BackgroundRGB &&
+            //            textAttribute.Decoration != VTextDecorations.BackgroundUnset)
+            //        {
+            //            continue;
+            //        }
+
+            //        int startIndex = textLine.FindCharacterIndex(textAttribute.StartColumn);
+            //        if (startIndex < 0)
+            //        {
+            //            continue;
+            //        }
+
+            //        int count = text.Length - startIndex;
+            //        Brush brush = null;
+
+            //        if (textAttribute.Decoration == VTextDecorations.Background)
+            //        {
+            //            VTColor color = textAttribute.Parameter as VTColor;
+            //            brush = DrawingUtils.VTColor2Brush(color);
+            //        }
+            //        else if (textAttribute.Decoration == VTextDecorations.BackgroundRGB)
+            //        {
+            //            VTColor color = textAttribute.Parameter as VTColor;
+            //            brush = DrawingUtils.VTColor2Brush(color);
+            //        }
+            //        else if(textAttribute.Decoration == VTextDecorations.BackgroundUnset)
+            //        {
+            //            brush = Brushes.Black;
+            //        }
+
+            //        Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, startIndex, count);
+            //        dc.DrawRectangle(brush, DrawingUtils.TransparentPen, geometry.Bounds);
+            //    }
+            //}
 
             return formattedText;
         }

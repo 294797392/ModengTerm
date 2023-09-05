@@ -84,7 +84,6 @@
     <Compile Include="SftpTrasmit\SftpTransmitTypeEnum.cs" />
     <Compile Include="SftpTrasmit\SftpTransmit.cs" />
     <Compile Include="SftpTrasmit\TransmitStatusEnum.cs" />
-    <Compile Include="VTDebug.cs" />
     <Compile Include="XTermConsts.cs" />
     <Compile Include="MTermManifest.cs" />
   </ItemGroup>
