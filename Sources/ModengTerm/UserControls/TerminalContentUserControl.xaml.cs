@@ -437,15 +437,20 @@ namespace XTerminal.UserControls
 
         #endregion
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        private void ListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (CheckBoxStartLogger.IsChecked.Value)
+            UIElement element = sender as UIElement;
+            if (!element.IsMouseCaptured)
             {
-                VTDebug.Context.StartLogger(VTDebugCategoryEnum.Action);
+                Mouse.Capture(element, CaptureMode.SubTree);
             }
             else
             {
-                VTDebug.Context.StopLogger(VTDebugCategoryEnum.Action);
+                if (e.OriginalSource != element)
+                {
+                    Mouse.Capture(null);
+                    ToggleButtonLoggerSetting.IsChecked = false;
+                }
             }
         }
     }

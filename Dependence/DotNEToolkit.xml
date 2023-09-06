@@ -4042,7 +4042,7 @@
             </summary>
             <param name="list"></param>
             <param name="separator">指定要使用的分隔符</param>
-            <returns></returns>
+            <returns>返回拼接口的字符串，该字符串最后没有分隔符</returns>
         </member>
         <member name="M:DotNEToolkit.CollectionUtils.HasDuplicated(System.Collections.Generic.List{System.String})">
             <summary>

@@ -118,7 +118,7 @@ namespace XTerminal.Document
 
             #region 初始化第一行，并设置链表首尾指针
 
-            VTextLine firstLine = this.CreateLine();
+            VTextLine firstLine = this.CreateLine(0);
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
             this.ActiveLine = firstLine;
@@ -128,7 +128,7 @@ namespace XTerminal.Document
             // 默认创建80行，可见区域也是80行
             for (int i = 1; i < options.RowSize; i++)
             {
-                VTextLine textLine = this.CreateLine();
+                VTextLine textLine = this.CreateLine(i);
                 this.LastLine.Append(textLine);
             }
 
@@ -145,7 +145,7 @@ namespace XTerminal.Document
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private VTextLine CreateLine()
+        private VTextLine CreateLine(int physicsRow)
         {
             VTextLine textLine = new VTextLine(this)
             {
@@ -153,6 +153,7 @@ namespace XTerminal.Document
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
+                PhysicsRow = physicsRow,
                 Style = new VTextStyle()
                 {
                     FontSize = this.options.FontSize,
@@ -785,7 +786,7 @@ namespace XTerminal.Document
                     // 此时ActiveLine不变
                     for (int i = 0; i < rows; i++)
                     {
-                        VTextLine textLine = this.CreateLine();
+                        VTextLine textLine = this.CreateLine(this.LastLine.PhysicsRow + 1);
                         this.LastLine.Append(textLine);
                     }
                 }

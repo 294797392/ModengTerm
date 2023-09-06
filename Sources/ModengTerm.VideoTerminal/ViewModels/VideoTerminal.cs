@@ -1484,6 +1484,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void VTSession_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
+            VTDebug.Context.WriteRawRead(bytes, size);
+
             try
             {
                 this.vtParser.ProcessCharacters(bytes, size);

@@ -16,7 +16,9 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 执行动作的日志
         /// </summary>
-        Action
+        Action,
+
+        RawRead
     }
 
     /// <summary>
@@ -27,12 +29,16 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 存储日志分类的上下文信息
         /// </summary>
-        private class LogCategory
+        public class LogCategory
         {
+            private bool enabled;
+
+            public string Name { get; set; }
+
             /// <summary>
             /// 日志分类
             /// </summary>
-            public VTDebugCategoryEnum Category { get; set; }
+            public VTDebugCategoryEnum Category { get; private set; }
 
             /// <summary>
             /// 日志文件的完整路径
@@ -42,52 +48,81 @@ namespace ModengTerm.Terminal
             /// <summary>
             /// 是否记录该类型的日志
             /// </summary>
-            public bool Enabled { get; set; }
-
-            public LogCategory()
+            public bool Enabled
             {
+                get { return this.enabled; }
+                set
+                {
+                    if (this.enabled != value)
+                    {
+                        this.enabled = value;
+
+                        if (value)
+                        {
+                            this.OnStart();
+                        }
+                        else
+                        {
+                            this.OnStop();
+                        }
+                    }
+                }
             }
+
+            public LogCategory(VTDebugCategoryEnum category)
+            {
+                this.Category = category;
+                this.Name = this.Category.ToString();
+            }
+
+            public void OnStart()
+            {
+                if (File.Exists(this.FilePath))
+                {
+                    try
+                    {
+                        File.Delete(this.FilePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("删除日志文件异常", ex);
+                    }
+                }
+            }
+
+            public void OnStop()
+            { }
         }
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDebug");
 
         private LogCategory actionCategory;
-        private Dictionary<VTDebugCategoryEnum, LogCategory> categoryMap = new Dictionary<VTDebugCategoryEnum, LogCategory>();
+        private LogCategory rawReadCategory;
+        private Dictionary<VTDebugCategoryEnum, LogCategory> categoryMap;
+        public List<LogCategory> Categories { get; private set; }
 
         public VTDebug()
         {
+            this.Categories = new List<LogCategory>();
+            this.categoryMap = new Dictionary<VTDebugCategoryEnum, LogCategory>();
+
             this.actionCategory = this.CreateCategory(VTDebugCategoryEnum.Action);
+            this.rawReadCategory = this.CreateCategory(VTDebugCategoryEnum.RawRead);
         }
 
         private LogCategory CreateCategory(VTDebugCategoryEnum categoryEnum)
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("log_{0}.txt", categoryEnum.ToString()));
 
-            LogCategory category = new LogCategory()
+            LogCategory category = new LogCategory(categoryEnum)
             {
-                Category = categoryEnum,
                 FilePath = filePath
             };
 
             this.categoryMap[categoryEnum] = category;
+            this.Categories.Add(category);
 
             return category;
-        }
-
-        public void StartLogger(VTDebugCategoryEnum categoryEnum)
-        {
-            LogCategory category = this.categoryMap[categoryEnum];
-            category.Enabled = true;
-            if (File.Exists(category.FilePath))
-            {
-                File.Delete(category.FilePath);
-            }
-        }
-
-        public void StopLogger(VTDebugCategoryEnum categoryEnum)
-        {
-            LogCategory category = this.categoryMap[categoryEnum];
-            category.Enabled = false;
         }
 
         public void WriteAction(VTActions action, string format, params object[] param)
@@ -101,6 +136,17 @@ namespace ModengTerm.Terminal
             string log = string.Format("[{0},{1}]", action, message);
             File.AppendAllText(this.actionCategory.FilePath, log);
             File.AppendAllText(this.actionCategory.FilePath, "\r\n");
+        }
+
+        public void WriteRawRead(byte[] bytes, int size)
+        {
+            if (!this.rawReadCategory.Enabled)
+            {
+                return;
+            }
+
+            string message = bytes.Take(size).Select(v => ((int)v).ToString()).Join(",");
+            File.AppendAllText(this.rawReadCategory.FilePath, message + ",");
         }
     }
 }

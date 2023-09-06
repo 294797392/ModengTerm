@@ -394,8 +394,10 @@ namespace XTerminal.Parser
         #region 实例方法
 
         /// <summary>
-        /// 代码从terminal里复制
+        /// 代码参考自microsoft/terminal项目
         /// AdaptDispatch::SetGraphicsRendition
+        /// 和terminal项目不同的地方是，这里会判断parameters里是否包含参数，如果不包含参数，那么它会被视为单个0参数
+        /// 参考自：https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences - 文本格式
         /// 
         /// SGR - Modifies the graphical rendering options applied to the next
         //   characters written into the buffer.
@@ -405,6 +407,12 @@ namespace XTerminal.Parser
         /// <param name="parameters"></param>
         private void PerformSetGraphicsRendition(List<int> parameters)
         {
+            if (parameters.Count == 0)
+            {
+                // 如果未指定任何参数，它会被视为单个 0 参数
+                parameters.Add(0);
+            }
+
             int size = parameters.Count;
 
             for (int i = 0; i < size; i++)
@@ -511,8 +519,7 @@ namespace XTerminal.Parser
 
                     default:
                         {
-                            logger.ErrorFormat(string.Format("未实现的SGRCode = {0}", option));
-                            break;
+                            throw new NotImplementedException(string.Format("未实现的SGRCode = {0}", option));
                         }
                 }
             }

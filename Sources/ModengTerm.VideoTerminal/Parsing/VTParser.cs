@@ -260,7 +260,7 @@ namespace XTerminal.Parser
 
                         default:
                             {
-                                break;
+                                throw new NotImplementedException();
                             }
                     }
                 }
