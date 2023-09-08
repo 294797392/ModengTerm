@@ -18,8 +18,8 @@ namespace XTerminal.Parser
         /// </summary>
         Print,
 
-        DefaultBackground,
-        DefaultForeground,
+        BackgroundUnset,
+        ForegroundUnset,
 
         /// <summary>
         /// 字体设置为粗体
@@ -93,16 +93,6 @@ namespace XTerminal.Parser
         /// </summary>
         ReverseVideo,
         ReverseVideoUnset,
-
-        /// <summary>
-        /// 用RGB表示前景色
-        /// </summary>
-        ForegroundRGB,
-
-        /// <summary>
-        /// 用RGB表示背景色
-        /// </summary>
-        BackgroundRGB,
 
         /// <summary>
         /// CR - Performs a carriage return.

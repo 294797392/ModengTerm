@@ -207,7 +207,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// 该坐标是基于ViewableDocument的坐标
         /// Cursor的位置是下一个要打印的字符的位置
         /// </summary>
-        private VTCursor Cursor { get { return this.activeDocument.Cursor; } }
+        public VTCursor Cursor { get { return this.activeDocument.Cursor; } }
 
         /// <summary>
         /// 获取当前光标所在行
@@ -229,11 +229,6 @@ namespace ModengTerm.Terminal.ViewModels
         /// 当前终端显示的画面
         /// </summary>
         public IDrawingCanvas ActiveCanvas { get { return this.activeDocument.Canvas; } }
-
-        /// <summary>
-        /// 当前终端显示的文档
-        /// </summary>
-        public VTDocument ActiveDocument { get { return this.activeDocument; } }
 
         /// <summary>
         /// 获取当前滚动条是否滚动到底了
@@ -368,8 +363,8 @@ namespace ModengTerm.Terminal.ViewModels
                 FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
                 Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR)
             };
-            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas()) { Name = "MainDocument" };
-            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas()) { Name = "AlternateDocument" };
+            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas(), false) { Name = "MainDocument" };
+            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas(), true) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
             this.firstHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.firstHistoryLine;
@@ -693,25 +688,29 @@ namespace ModengTerm.Terminal.ViewModels
 
                 #region 更新光标位置
 
+                VTCursor cursor = document.Cursor;
+                int cursorCol = cursor.Column;
+                VTextLine activeLine = document.ActiveLine;
+
                 // 如果显示的是主缓冲区，那么光标在最后一行的时候才更新
                 // 如果显示的是备用缓冲区，光标可以在任意一个位置显示，那么直接渲染光标
-                if (this.activeDocument == this.alternateDocument || this.ScrollAtBottom)
+                if (document == this.alternateDocument || this.ScrollAtBottom)
                 {
-                    this.Cursor.OffsetY = this.ActiveLine.OffsetY;
+                    cursor.OffsetY = activeLine.OffsetY;
                     // 有可能有中文字符，一个中文字符占用2列
                     // 先通过光标所在列找到真正的字符所在列
-                    int characterIndex = this.ActiveLine.FindCharacterIndex(this.CursorCol - 1);
-                    VTRect rect = this.ActiveLine.MeasureLine(characterIndex, 1);
-                    this.Cursor.OffsetX = rect.Right;
+                    int characterIndex = activeLine.FindCharacterIndex(cursorCol - 1);
+                    VTRect rect = activeLine.MeasureLine(characterIndex, 1);
+                    cursor.OffsetX = rect.Right;
                 }
                 else
                 {
                     // 此时说明有滚动，有滚动的情况下直接隐藏光标
-                    this.Cursor.OffsetX = int.MinValue;
-                    this.Cursor.OffsetX = int.MinValue;
+                    cursor.OffsetX = int.MinValue;
+                    cursor.OffsetX = int.MinValue;
                 }
 
-                this.Cursor.RequestInvalidate();
+                cursor.RequestInvalidate();
 
                 #endregion
 
@@ -1007,7 +1006,7 @@ namespace ModengTerm.Terminal.ViewModels
                         }
 
                         char ch = Convert.ToChar(parameter);
-                        VTDebug.Context.WriteAction(action, string.Format("{0},{1},{2}", ch, this.CursorRow, this.CursorCol));
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, ch);
                         VTCharacter character = this.CreateCharacter(parameter);
                         this.activeDocument.PrintCharacter(this.ActiveLine, character, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + character.ColumnSize);
@@ -1018,7 +1017,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         // CR
                         // 把光标移动到行开头
-                        VTDebug.Context.WriteAction(action, string.Format("{0},{1}", this.CursorRow, this.CursorCol));
+                        VTDebug.Context.WriteAction(action, "{0},{1}", this.CursorRow, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, 0);
                         break;
                     }
@@ -1030,7 +1029,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // LF
                         // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
 
-                        VTDebug.Context.WriteAction(action, string.Format("{0},{1}", this.CursorRow, this.CursorCol));
+                        VTDebug.Context.WriteAction(action, "{0},{1}", this.CursorRow, this.CursorCol);
 
                         if (this.activeDocument == this.mainDocument)
                         {
@@ -1150,7 +1149,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol - n);
                         break;
                     }
@@ -1159,7 +1158,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + n);
                         break;
                     }
@@ -1168,7 +1167,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
                         this.activeDocument.SetCursor(this.CursorRow - n, this.CursorCol);
                         break;
                     }
@@ -1177,7 +1176,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
                         this.activeDocument.SetCursor(this.CursorRow + n, this.CursorCol);
                         break;
                     }
@@ -1202,7 +1201,7 @@ namespace ModengTerm.Terminal.ViewModels
                             // 如果没有参数，那么说明就是定位到原点(0,0)
                         }
 
-                        VTDebug.Context.WriteAction(action, "{0},{1},{2},{3}", row, col, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2},{3}", this.CursorRow, this.CursorCol, row, col);
                         this.activeDocument.SetCursor(row, col);
                         break;
                     }
@@ -1219,7 +1218,7 @@ namespace ModengTerm.Terminal.ViewModels
                         }
 
                         this.ActiveLine.PadColumns(n);
-                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", n, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteAction(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
                         this.activeDocument.SetCursor(this.CursorRow, n - 1);
                         break;
                     }
@@ -1237,18 +1236,18 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.DoublyUnderlined:
                 case VTActions.DoublyUnderlinedUnset:
                 case VTActions.Foreground:
-                case VTActions.DefaultForeground:
+                case VTActions.ForegroundUnset:
                 case VTActions.Background:
-                case VTActions.DefaultBackground:
-                case VTActions.ForegroundRGB:
-                case VTActions.BackgroundRGB:
+                case VTActions.BackgroundUnset:
                     {
                         VTDebug.Context.WriteAction(action, "{0},{1},{2},{3}", this.CursorRow, this.CursorCol, parameter == null ? string.Empty : parameter.ToString(), this.ActiveLine.PhysicsRow);
-                        VTextAttribute textAttribute = VTextAttribute.Create();
-                        textAttribute.Decoration = VDocumentUtils.VTAction2TextDecoration(action);
-                        textAttribute.Parameter = parameter;
-                        textAttribute.StartColumn = this.CursorCol;
-                        this.ActiveLine.Attributes.Add(textAttribute);
+
+                        // 打开VIM的时候，VIM会在打印第一行的~号的时候设置验色，然后把剩余的行全部打印，也就是说设置一次颜色可以对多行都生效
+                        // 所以这里要记录下如果当前有文本特效被设置了，那么在行改变的时候也需要设置文本特效
+
+                        bool unset;
+                        VTextDecorations decorations = VTUtils.VTAction2TextDecoration(action, out unset);
+                        this.activeDocument.SetTextDecoration(decorations, parameter, unset);
                         break;
                     }
 
@@ -1268,7 +1267,7 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.DECANM_AnsiMode:
                     {
                         bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.Context.WriteAction(action,"{0}", enable);
+                        VTDebug.Context.WriteAction(action, "{0}", enable);
                         this.keyboard.SetAnsiMode(enable);
                         break;
                     }
@@ -1667,7 +1666,8 @@ namespace ModengTerm.Terminal.ViewModels
         public void OnMouseWheel(IVideoTerminal vt, bool upper)
         {
             // 只有主缓冲区才可以用鼠标滚轮进行滚动
-            if (this.activeDocument != this.mainDocument)
+            // 备用缓冲区不可以滚动
+            if (this.activeDocument.IsAlternate)
             {
                 return;
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -104,7 +105,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 该行文本的装饰信息
         /// </summary>
-        public List<VTextAttribute> Attributes { get; private set; }
+        public List<VTextDecoration> Decorations { get; private set; }
 
         #endregion
 
@@ -117,7 +118,7 @@ namespace XTerminal.Document
         public VTextLine(VTDocument owner) : base(owner)
         {
             this.characters = new List<VTCharacter>();
-            this.Attributes = new List<VTextAttribute>();
+            this.Decorations = new List<VTextDecoration>();
         }
 
         #endregion
@@ -380,7 +381,8 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 删除整行字符
+        /// 1. 删除整行字符
+        /// 2. 删除整行文本装饰
         /// </summary>
         public void DeleteAll()
         {
@@ -391,6 +393,13 @@ namespace XTerminal.Document
 
             this.characters.Clear();
             this.Columns = 0;
+
+            foreach (VTextDecoration decoration in this.Decorations)
+            {
+                VTextDecoration.Recycle(decoration);
+            }
+
+            this.Decorations.Clear();
 
             this.SetRenderDirty(true);
         }
@@ -491,9 +500,9 @@ namespace XTerminal.Document
         public void SetHistory(VTHistoryLine historyLine)
         {
             VTCharacter.CopyTo(this.characters, historyLine.Characters);
-            VTextAttribute.CopyTo(this.Attributes, historyLine.Attributes);
+            VTextDecoration.CopyTo(this.Decorations, historyLine.Attributes);
             this.PhysicsRow = historyLine.PhysicsRow;
-            this.Columns = VDocumentUtils.GetColumns(this.characters);
+            this.Columns = VTUtils.GetColumns(this.characters);
 
             this.SetRenderDirty(true);
         }

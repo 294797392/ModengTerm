@@ -1,7 +1,10 @@
 ﻿using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
+using System;
+using System.Collections.Generic;
 using System.Text;
 using XTerminal.Document;
+using XTerminal.Parser;
 
 namespace ModengTerm.Terminal
 {
@@ -9,11 +12,11 @@ namespace ModengTerm.Terminal
     {
         private static readonly StringBuilder Builder = new StringBuilder();
 
-        private static void BuildLine(VTHistoryLine historyLine, int startIndex, int endIndex, StringBuilder builder, LogFileTypeEnum fileType,LoggerFilter filter = null)
+        private static void BuildLine(VTHistoryLine historyLine, int startIndex, int endIndex, StringBuilder builder, LogFileTypeEnum fileType, LoggerFilter filter = null)
         {
             string text = VDocumentUtils.BuildLine(historyLine.Characters);
 
-            if (filter != null) 
+            if (filter != null)
             {
                 if (!filter.Filter(text))
                 {
@@ -62,6 +65,48 @@ namespace ModengTerm.Terminal
 
                 current = current.NextLine;
             }
+        }
+
+
+        public static VTextDecorations VTAction2TextDecoration(VTActions actions, out bool unset)
+        {
+            unset = false;
+
+            switch (actions)
+            {
+                case VTActions.Bold: return VTextDecorations.Bold;
+                case VTActions.BoldUnset: unset = true; return VTextDecorations.Bold;
+                case VTActions.Underline: return VTextDecorations.Underline;
+                case VTActions.UnderlineUnset: unset = true; return VTextDecorations.Underline;
+                case VTActions.Italics: return VTextDecorations.Italics;
+                case VTActions.ItalicsUnset: unset = true; return VTextDecorations.Italics;
+                case VTActions.DoublyUnderlined: return VTextDecorations.DoublyUnderlined;
+                case VTActions.DoublyUnderlinedUnset: unset = true; return VTextDecorations.DoublyUnderlined;
+                case VTActions.Background: return VTextDecorations.Background;
+                case VTActions.BackgroundUnset: unset = true; return VTextDecorations.Background;
+                case VTActions.Foreground: return VTextDecorations.Foreground;
+                case VTActions.ForegroundUnset: unset = true; return VTextDecorations.Foreground;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 获取字符列表一共占多少列
+        /// </summary>
+        /// <param name="characters"></param>
+        /// <returns></returns>
+        public static int GetColumns(IEnumerable<VTCharacter> characters)
+        {
+            int columns = 0;
+
+            foreach (VTCharacter character in characters)
+            {
+                columns += character.ColumnSize;
+            }
+
+            return columns;
         }
     }
 }

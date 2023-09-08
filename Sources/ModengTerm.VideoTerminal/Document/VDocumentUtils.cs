@@ -9,29 +9,6 @@ namespace XTerminal.Document
 {
     public static class VDocumentUtils
     {
-        public static VTextDecorations VTAction2TextDecoration(VTActions actions)
-        {
-            switch (actions)
-            {
-                case VTActions.Bold: return VTextDecorations.Bold;
-                case VTActions.BoldUnset: return VTextDecorations.BoldUnset;
-                case VTActions.Underline: return VTextDecorations.Underline;
-                case VTActions.UnderlineUnset: return VTextDecorations.UnderlineUnset;
-                case VTActions.Italics: return VTextDecorations.Italics;
-                case VTActions.ItalicsUnset: return VTextDecorations.ItalicsUnset;
-                case VTActions.DoublyUnderlined: return VTextDecorations.DoublyUnderlined;
-                case VTActions.DoublyUnderlinedUnset: return VTextDecorations.DoublyUnderlinedUnset;
-                case VTActions.Background: return VTextDecorations.Background;
-                case VTActions.BackgroundRGB: return VTextDecorations.BackgroundRGB;
-                case VTActions.DefaultBackground: return VTextDecorations.BackgroundUnset;
-                case VTActions.Foreground: return VTextDecorations.Foreground;
-                case VTActions.ForegroundRGB: return VTextDecorations.ForegroundRGB;
-                case VTActions.DefaultForeground: return VTextDecorations.ForegroundUnset;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
 
         public static void GetSegement(string text, int characterIndex, out int startIndex, out int endIndex)
         {
@@ -85,23 +62,6 @@ namespace XTerminal.Document
             }
 
             return text;
-        }
-
-        /// <summary>
-        /// 获取字符列表一共占多少列
-        /// </summary>
-        /// <param name="characters"></param>
-        /// <returns></returns>
-        public static int GetColumns(IEnumerable<VTCharacter> characters)
-        {
-            int columns = 0;
-
-            foreach (VTCharacter character in characters)
-            {
-                columns += character.ColumnSize;
-            }
-
-            return columns;
         }
     }
 }

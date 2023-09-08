@@ -425,13 +425,13 @@ namespace XTerminal.Parser
                         {
                             // 关闭字体效果
                             //this.NotifyActionEvent(VTActions.DefaultAttributes);
-                            this.NotifyActionEvent(VTActions.DefaultBackground);
-                            this.NotifyActionEvent(VTActions.DefaultForeground);
+                            this.NotifyActionEvent(VTActions.BackgroundUnset);
+                            this.NotifyActionEvent(VTActions.ForegroundUnset);
                             break;
                         }
 
-                    case GraphicsOptions.ForegroundDefault: this.NotifyActionEvent(VTActions.DefaultForeground); break;
-                    case GraphicsOptions.BackgroundDefault: this.NotifyActionEvent(VTActions.DefaultBackground); break;
+                    case GraphicsOptions.ForegroundDefault: this.NotifyActionEvent(VTActions.ForegroundUnset); break;
+                    case GraphicsOptions.BackgroundDefault: this.NotifyActionEvent(VTActions.BackgroundUnset); break;
                     case GraphicsOptions.BoldBright: this.NotifyActionEvent(VTActions.Bold); break;
                     case GraphicsOptions.RGBColorOrFaint: this.NotifyActionEvent(VTActions.Faint); break;// 降低颜色强度
                     case GraphicsOptions.NotBoldOrFaint:
@@ -505,7 +505,7 @@ namespace XTerminal.Parser
                         {
                             VTColor rgbColor;
                             i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            this.NotifyActionEvent(VTActions.ForegroundRGB, rgbColor);
+                            this.NotifyActionEvent(VTActions.Foreground, rgbColor);
                             break;
                         }
 
@@ -513,7 +513,7 @@ namespace XTerminal.Parser
                         {
                             VTColor rgbColor;
                             i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            this.NotifyActionEvent(VTActions.BackgroundRGB, rgbColor);
+                            this.NotifyActionEvent(VTActions.Background, rgbColor);
                             break;
                         }
 

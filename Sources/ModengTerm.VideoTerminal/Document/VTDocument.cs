@@ -1,4 +1,6 @@
-﻿using ModengTerm.Terminal;
+﻿using DotNEToolkit.Utility;
+using ModengTerm.Terminal;
+using ModengTerm.Terminal.Document;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,10 +30,21 @@ namespace XTerminal.Document
         /// </summary>
         internal VTDocumentOptions options;
 
+        /// <summary>
+        /// 当前终端屏幕的总行数
+        /// </summary>
         private int rowSize;
+
+        /// <summary>
+        /// 当前终端屏幕的总列数
+        /// </summary>
         private int colSize;
 
         private int lineId;
+
+        private List<VTextDecorationState> decorationStates;
+
+        private VTextLine activeLine;
 
         #endregion
 
@@ -63,7 +76,30 @@ namespace XTerminal.Document
         /// 当前光标所在行
         /// 通过SetCursor函数设置
         /// </summary>
-        public VTextLine ActiveLine { get; private set; }
+        public VTextLine ActiveLine
+        {
+            get { return this.activeLine; }
+            private set
+            {
+                if (this.activeLine != value)
+                {
+                    this.activeLine = value;
+
+                    // 此时必须保证Column是最新的，也就是说在设置光标的时候，需要先设置Column，再设置Row
+                    // 因为这个时候要检测是否有文本特效，给行增加文本特效
+
+                    foreach (VTextDecorationState vds in this.decorationStates)
+                    {
+                        if (!vds.AlreadySet)
+                        {
+                            continue;
+                        }
+
+                        this.SetTextDecoration(vds.Decoration, vds.Parameter, vds.Unset);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 文档里的第一行
@@ -90,17 +126,31 @@ namespace XTerminal.Document
         /// </summary>
         public bool IsArrangeDirty { get; private set; }
 
+        /// <summary>
+        /// 是否是备用缓冲区
+        /// </summary>
+        public bool IsAlternate { get; private set; }
+
         #endregion
 
         #region 构造方法
 
-        public VTDocument(VTDocumentOptions options, IDrawingCanvas canvas)
+        public VTDocument(VTDocumentOptions options, IDrawingCanvas canvas, bool isAlternate)
         {
             this.options = options;
             this.Canvas = canvas;
+            this.IsAlternate = isAlternate;
 
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
+
+            this.decorationStates = new List<VTextDecorationState>();
+            IEnumerable<VTextDecorations> textDecorations = Enum.GetValues(typeof(VTextDecorations)).Cast<VTextDecorations>();
+            foreach (VTextDecorations decorations in textDecorations)
+            {
+                VTextDecorationState decorationState = new VTextDecorationState(decorations);
+                this.decorationStates.Add(decorationState);
+            }
 
             this.Cursor = new VTCursor()
             {
@@ -275,8 +325,8 @@ namespace XTerminal.Document
             }
 
             // 清空新行的文本特效，不然可能会遗留之前的文本特效
-            VTextAttribute.Recycle(this.ActiveLine.Attributes);
-            this.ActiveLine.Attributes.Clear();
+            VTextDecoration.Recycle(this.ActiveLine.Decorations);
+            this.ActiveLine.Decorations.Clear();
         }
 
         /// <summary>
@@ -349,12 +399,13 @@ namespace XTerminal.Document
             }
 
             // 清空新行的文本特效，不然可能会遗留之前的文本特效
-            VTextAttribute.Recycle(this.ActiveLine.Attributes);
-            this.ActiveLine.Attributes.Clear();
+            VTextDecoration.Recycle(this.ActiveLine.Decorations);
+            this.ActiveLine.Decorations.Clear();
         }
 
         /// <summary>
         /// 在指定的光标位置打印一个字符
+        /// TODO：该函数里的VTCharacter没有复用，需要改进
         /// </summary>
         /// <param name="ch"></param>
         /// <param name="row"></param>
@@ -472,29 +523,46 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 从当前光标处开始删除字符，要删除的字符数由count指定
+        /// 从指定行的指定列处开始删除字符，要删除的字符数由count指定
         /// </summary>
-        /// <param name="count"></param>
+        /// <param name="textLine">要删除的字符所在行</param>
+        /// <param name="column">要删除的字符起始列</param>
+        /// <param name="count">要删除的字符个数</param>
         public void DeleteCharacter(VTextLine textLine, int column, int count)
         {
             textLine.DeleteText(column, count);
         }
 
         /// <summary>
-        /// 删除所有行
+        /// 清除数据
+        /// 1. 清除所有文本数据
+        /// 2. 清除所有的文本装饰信息
         /// </summary>
         public void DeleteAll()
         {
+            #region 删除所有文本数据
+
             VTextLine current = this.FirstLine;
             VTextLine last = this.LastLine;
 
             while (current != null)
             {
-                // 取消关联关系
                 current.DeleteAll();
 
                 current = current.NextLine;
             }
+
+            #endregion
+
+            #region 重置文本装饰状态
+
+            foreach (VTextDecorationState decorationState in this.decorationStates)
+            {
+                decorationState.AlreadySet = false;
+                decorationState.Parameter = null;
+            }
+
+            #endregion
 
             this.IsArrangeDirty = true;
         }
@@ -679,21 +747,22 @@ namespace XTerminal.Document
         /// <summary>
         /// 设置光标位置和activeLine
         /// row和column从0开始计数，0表示第一行或者第一列
-        /// </summary>
+        /// 注意必须先设置Column，再设置Row。因为在ActiveLine改变的时候，会设置文本装饰，必须保证列是最新的
+        /// /// </summary>
         /// <param name="row">要设置的行</param>
         /// <param name="column">要设置的列</param>
         public void SetCursor(int row, int column)
         {
+            if (this.Cursor.Column != column)
+            {
+                this.Cursor.Column = column;
+            }
+
             if (this.Cursor.Row != row)
             {
                 this.Cursor.Row = row;
 
                 this.ActiveLine = this.FirstLine.FindNext(row);
-            }
-
-            if (this.Cursor.Column != column)
-            {
-                this.Cursor.Column = column;
             }
         }
 
@@ -829,6 +898,77 @@ namespace XTerminal.Document
             {
                 this.colSize = colSize;
             }
+        }
+
+        /// <summary>
+        /// 设置当前行的TextDecoration
+        /// </summary>
+        /// <param name="decorations"></param>
+        /// <param name="parameter"></param>
+        /// <param name="unset"></param>
+        public void SetTextDecoration(VTextDecorations decorations, object parameter, bool unset)
+        {
+            #region 先为当前行设置TextDecoration
+
+            if (unset)
+            {
+                // 如果是unset，那么就找到当前行第一个没有关闭的Decoration并关闭
+                // 有可能会连续多次设置Foreground或Background，然后再设置一次unset，所以这里有可能会有多个未关闭的TextDecoration
+                List<VTextDecoration> decorationList = this.ActiveLine.Decorations.Where(v => v.Decoration == decorations).ToList();
+
+                foreach (VTextDecoration decoration in decorationList)
+                {
+                    if (decoration.StartColumn == this.Cursor.Column)
+                    {
+                        // 在同一列Unset，那么说明这个单元格不需要这个Decoration了，回收这个Decoration
+
+                        VTextDecoration.Recycle(decoration);
+
+                        this.ActiveLine.Decorations.Remove(decoration);
+                    }
+                    else
+                    {
+                        if (!decoration.Closed)
+                        {
+                            // 不是在同一列unset，那么清除文本装饰
+                            decoration.Closed = true;
+                            decoration.EndColumn = this.Cursor.Column == 0 ? 0 : this.Cursor.Column - 1;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // 最坏情况下，每一个单元格都包含一组TextDecoration
+                // 找到当前光标所在单元格所拥有的文本装饰
+
+                VTextDecoration decoration = this.ActiveLine.Decorations.FirstOrDefault(v => v.StartColumn == this.Cursor.Column && v.Decoration == decorations);
+
+                if (decoration == null)
+                {
+                    decoration = VTextDecoration.Create();
+                    decoration.Decoration = decorations;
+                    decoration.StartColumn = this.Cursor.Column;
+                    this.ActiveLine.Decorations.Add(decoration);
+                }
+
+                decoration.Parameter = parameter;
+            }
+
+            #endregion
+
+            #region 再把当前的TextDecoration缓存下来
+
+            // 缓存下来，后面再ActiveLine Changed的时候使用
+            VTextDecorationState decorationState = this.decorationStates[(int)decorations];
+            if (!decorationState.AlreadySet)
+            {
+                decorationState.AlreadySet = true;
+            }
+            decorationState.Parameter = parameter;
+            decorationState.Unset = unset;
+
+            #endregion
         }
 
         #endregion

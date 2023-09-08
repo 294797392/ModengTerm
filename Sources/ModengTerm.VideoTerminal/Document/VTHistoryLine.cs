@@ -39,12 +39,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 文本特效
         /// </summary>
-        public List<VTextAttribute> Attributes { get; private set; }
+        public List<VTextDecoration> Attributes { get; private set; }
 
         private VTHistoryLine()
         {
             this.Characters = new List<VTCharacter>();
-            this.Attributes = new List<VTextAttribute>();
+            this.Attributes = new List<VTextDecoration>();
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace XTerminal.Document
             this.PhysicsRow = sourceLine.PhysicsRow;
             // 复制一份字符列表
             VTCharacter.CopyTo(this.Characters, sourceLine.Characters);
-            VTextAttribute.CopyTo(this.Attributes, sourceLine.Attributes);
+            VTextDecoration.CopyTo(this.Attributes, sourceLine.Decorations);
         }
 
         /// <summary>

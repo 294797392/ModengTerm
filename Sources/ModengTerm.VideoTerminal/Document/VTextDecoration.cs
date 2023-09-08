@@ -16,59 +16,57 @@ namespace XTerminal.Document
         /// 加粗字体
         /// </summary>
         Bold,
-        BoldUnset,
 
         /// <summary>
         /// 下划线
         /// </summary>
         Underline,
-        UnderlineUnset,
 
         /// <summary>
         /// 斜体
         /// </summary>
         Italics,
-        ItalicsUnset,
 
         /// <summary>
         /// 双下划线
         /// </summary>
         DoublyUnderlined,
-        DoublyUnderlinedUnset,
 
         /// <summary>
         /// 字体背景颜色
         /// </summary>
         Background,
-        BackgroundUnset,
 
         /// <summary>
         /// 字体颜色
         /// </summary>
         Foreground,
-        ForegroundUnset,
-
-        /// <summary>
-        /// 用RGB设置前景色
-        /// </summary>
-        ForegroundRGB,
-
-        /// <summary>
-        /// 用RGB设置背景色
-        /// </summary>
-        BackgroundRGB,
     }
 
     /// <summary>
     /// 存储文本的一些属性
+    /// VTextDecoration和Row，Column的关系是，一个Cell可以包含一组VTextDecoration
     /// </summary>
-    public class VTextAttribute : Reusable<VTextAttribute>
+    public class VTextDecoration : Reusable<VTextDecoration>
     {
         /// <summary>
-        /// 该装饰的起始列，包含该列
+        /// 该装饰的起始列，渲染的时候要渲染该列
         /// 从0开始计数
         /// </summary>
         public int StartColumn { get; set; }
+
+        /// <summary>
+        /// 该装饰的结束列，渲染的时候要渲染该列
+        /// man模式下，有可能一行里面有多个下划线，如果只保存StartColumn，WPF不容易进行渲染，所以保存下EndColumn
+        /// </summary>
+        public int EndColumn { get; set; }
+
+        /// <summary>
+        /// 是否形成闭环（EndColumn不为空）
+        /// 如果没形成闭环，那么渲染整行文本
+        /// 如果形成闭环，那么只渲染StartColumn到EndColumn之间的文本
+        /// </summary>
+        public bool Closed { get; set; }
 
         /// <summary>
         /// 该文本的装饰
@@ -83,13 +81,15 @@ namespace XTerminal.Document
         /// <summary>
         /// 请使用VTextAttribute.Create创建实例
         /// </summary>
-        private VTextAttribute()
+        private VTextDecoration()
         {
         }
 
-        public override void CopyTo(VTextAttribute dest)
+        public override void CopyTo(VTextDecoration dest)
         {
             dest.StartColumn = this.StartColumn;
+            dest.EndColumn = this.EndColumn;
+            dest.Closed = this.Closed;
             dest.Decoration = this.Decoration;
             dest.Parameter = this.Parameter;
         }
@@ -97,6 +97,8 @@ namespace XTerminal.Document
         public override void SetDefault()
         {
             this.StartColumn = 0;
+            this.EndColumn = 0;
+            this.Closed = false;
             this.Decoration = (VTextDecorations)0;
             this.Parameter = null;
         }

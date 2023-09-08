@@ -284,7 +284,7 @@ namespace XTerminal
 
             foreach (VideoTerminal vt in vtlist)
             {
-                VTCursor cursor = vt.ActiveDocument.Cursor;
+                VTCursor cursor = vt.Cursor;
 
                 cursor.IsVisible = !cursor.IsVisible;
 

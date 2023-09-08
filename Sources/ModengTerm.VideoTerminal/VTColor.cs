@@ -40,6 +40,12 @@ namespace ModengTerm.Terminal
 
         public string Name { get; private set; }
 
+        /// <summary>
+        /// 如果为true，那么使用RGB三个属性表示颜色
+        /// 如果为false，那么就是预定义颜色
+        /// </summary>
+        public bool HasRgb { get; private set; }
+
         private VTColor(string name)
         {
             this.Name = name;
@@ -48,6 +54,7 @@ namespace ModengTerm.Terminal
         private VTColor(byte r, byte g, byte b)
         {
             this.Name = string.Format("R{0} G{1} B{2}", r, g, b);
+            this.HasRgb = true;
         }
 
         public static VTColor Create(byte r, byte g, byte b)

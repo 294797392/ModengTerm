@@ -80,7 +80,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.drawGraphics.OnMouseUp(location, this.mouseDownPos);
 
-            this.drawGraphics.PhysicsRow = this.ActiveDocument.FirstLine.PhysicsRow;
+            this.drawGraphics.PhysicsRow = this.activeDocument.FirstLine.PhysicsRow;
 
             List<VTDocumentGraphics> graphicsList;
             if (!this.graphicsMap.TryGetValue(this.drawGraphics.PhysicsRow, out graphicsList))

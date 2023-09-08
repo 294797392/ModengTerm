@@ -32,8 +32,8 @@ namespace ModengTerm.Rendering
             { VTColor.BrightGreen, Brushes.Green }, { VTColor.BrightMagenta, Brushes.Magenta }, { VTColor.BrightRed, Brushes.Red },
             { VTColor.BrightWhite, Brushes.White }, { VTColor.BrightYellow, Brushes.Yellow },
 
-            { VTColor.DarkBlack, Brushes.Black }, { VTColor.DarkBlue, Brushes.Red }, { VTColor.DarkCyan, Brushes.DarkCyan },
-            { VTColor.DarkGreen, Brushes.LightGreen }, { VTColor.DarkMagenta, Brushes.DarkMagenta }, { VTColor.DarkRed, Brushes.DarkRed },
+            { VTColor.DarkBlack, Brushes.Black }, { VTColor.DarkBlue, Brushes.DarkBlue }, { VTColor.DarkCyan, Brushes.DarkCyan },
+            { VTColor.DarkGreen, Brushes.DarkGreen }, { VTColor.DarkMagenta, Brushes.DarkMagenta }, { VTColor.DarkRed, Brushes.DarkRed },
             { VTColor.DarkWhite, Brushes.White }, { VTColor.DarkYellow, Brushes.Yellow }
         };
 
@@ -89,7 +89,7 @@ namespace ModengTerm.Rendering
 
             #region 画文本装饰
 
-            foreach (VTextAttribute textAttribute in textLine.Attributes)
+            foreach (VTextDecoration textAttribute in textLine.Decorations)
             {
                 int startIndex = textLine.FindCharacterIndex(textAttribute.StartColumn);
                 if (startIndex < 0)
@@ -98,7 +98,17 @@ namespace ModengTerm.Rendering
                     continue;
                 }
 
-                int count = text.Length - startIndex; // 剩余字符数
+                // 计算要渲染的字符数
+                int count = 0;
+                if (textAttribute.Closed)
+                {
+                    int endIndex = textLine.FindCharacterIndex(textAttribute.EndColumn);
+                    count = endIndex - startIndex + 1;
+                }
+                else
+                {
+                    count = text.Length - startIndex;
+                }
 
                 switch (textAttribute.Decoration)
                 {
@@ -106,32 +116,11 @@ namespace ModengTerm.Rendering
                         {
                             VTColor color = textAttribute.Parameter as VTColor;
                             Brush brush = DrawingUtils.VTColor2Brush(color);
-                            //logger.ErrorFormat("Foreground startIndex = {0}, count = {1}, total = {2}", startIndex, count, text.Length);
                             formattedText.SetForegroundBrush(brush, startIndex, count);
                             break;
                         }
-                    case VTextDecorations.ForegroundRGB:
-                        {
-                            if (textAttribute.Parameter == null) 
-                            {
-                                continue;
-                            }
 
-                            VTColor color = textAttribute.Parameter as VTColor;
-                            Brush brush = DrawingUtils.VTColor2Brush(color);
-                            formattedText.SetForegroundBrush(brush, startIndex, count);
-                            break;
-                        }
-                    case VTextDecorations.ForegroundUnset:
-                        {
-                            //logger.ErrorFormat("ForegroundUnset startIndex = {0}, count = {1}, total = {2}, {3}", startIndex, count, text.Length, textAttribute.StartColumn);
-                            formattedText.SetForegroundBrush(drawingLine.foreground, startIndex, count);
-                            break;
-                        }
-
-                    case VTextDecorations.BackgroundRGB:
                     case VTextDecorations.Background:
-                    case VTextDecorations.BackgroundUnset:
                         {
                             // 背景颜色最后画, 因为文本的粗细会影响到背景颜色的大小
                             break;
