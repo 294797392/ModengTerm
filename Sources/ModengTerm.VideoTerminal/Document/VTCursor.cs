@@ -27,6 +27,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 光标所在列
+        /// 从0开始
         /// </summary>
         public int Column
         {
@@ -43,6 +44,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 光标所在行
+        /// 从0开始
         /// </summary>
         public int Row
         {

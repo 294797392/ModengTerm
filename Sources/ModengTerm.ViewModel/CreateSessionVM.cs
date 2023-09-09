@@ -239,9 +239,9 @@ namespace XTerminal.ViewModels
             }
         }
 
-        public OptionTreeVM TerminalOptionsTreeVM { get; private set; }
+        public OptionTreeVM TerminalOptionsTreeVM { get; set; }
 
-        public OptionTreeVM SFTPOptionsTreeVM { get; private set; }
+        public OptionTreeVM SFTPOptionsTreeVM { get; set; }
 
         /// <summary>
         /// 终端类型列表
@@ -309,6 +309,13 @@ namespace XTerminal.ViewModels
 
             this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
 
+            // 加载参数树形列表
+            this.SFTPOptionsTreeVM = new OptionTreeVM();
+            this.TerminalOptionsTreeVM = new OptionTreeVM();
+            this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
+            this.LoadOptionsTree(this.TerminalOptionsTreeVM, appManifest.TerminalOptionList);
+            this.OptionTreeVM = this.TerminalOptionsTreeVM;
+
             this.SessionTypeList = new BindableCollection<SessionTypeVM>();
             foreach (SessionDefinition session in appManifest.SessionList)
             {
@@ -364,6 +371,49 @@ namespace XTerminal.ViewModels
         #endregion
 
         #region 实例方法
+
+        private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
+        {
+            foreach (OptionDefinition option in children)
+            {
+                OptionTreeNodeVM vm = new OptionTreeNodeVM(parentNode.Context, option)
+                {
+                    ID = option.ID,
+                    Name = option.Name,
+                    EntryClass = option.EntryClass,
+                    IsExpanded = true
+                };
+
+                parentNode.AddChildNode(vm);
+
+                this.LoadChildrenOptions(vm, option.Children);
+            }
+        }
+
+        private void LoadOptionsTree(OptionTreeVM treeVM, List<OptionDefinition> options)
+        {
+            foreach (OptionDefinition option in options)
+            {
+                OptionTreeNodeVM vm = new OptionTreeNodeVM(treeVM.Context, option)
+                {
+                    ID = option.ID,
+                    Name = option.Name,
+                    EntryClass = option.EntryClass,
+                    IsExpanded = true
+                };
+
+                treeVM.AddRootNode(vm);
+
+                this.LoadChildrenOptions(vm, option.Children);
+            }
+
+            // 默认选中第一个节点
+            TreeNodeViewModel firstNode = treeVM.Roots.FirstOrDefault();
+            if (firstNode != null)
+            {
+                firstNode.IsSelected = true;
+            }
+        }
 
         private string GetTerminalName(TerminalTypeEnum type)
         {

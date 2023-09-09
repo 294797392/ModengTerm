@@ -46,10 +46,9 @@ namespace ModengTerm.Terminal.ViewModels
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VideoTerminal");
 
-        private static readonly byte[] OS_OperationStatusResponse = new byte[4] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)'n' };
-        private static readonly byte[] CPR_CursorPositionReportResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
-        //private static readonly byte[] CPR_CursorPositionReportResponse = new byte[5] { (byte)'\x1b', (byte)'[', (byte)'0', (byte)';', (byte)'0' };
-        private static readonly byte[] DA_DeviceAttributesResponse = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
+        private static readonly byte[] OS_OperatingStatusData = new byte[4] { 0x1b, (byte)'[', (byte)'0', (byte)'n' };
+        private static readonly byte[] CPR_CursorPositionReportData = new byte[6] { 0x1b, (byte)'[', (byte)'0', (byte)';', (byte)'0', (byte)'R' };
+        private static readonly byte[] DA_DeviceAttributesData = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
 
         #endregion
 
@@ -562,6 +561,8 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
+            VTDebug.Context.WriteSend(VTSendTypeEnum.UserInput, bytes);
+
             // 这里输入的都是键盘按键
             int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
@@ -628,7 +629,9 @@ namespace ModengTerm.Terminal.ViewModels
                 case StatusType.OS_OperatingStatus:
                     {
                         // Result ("OK") is CSI 0 n
-                        this.sessionTransport.Write(OS_OperationStatusResponse);
+                        VTDebug.Context.WriteAction(VTActions.DSR_DeviceStatusReport, "{0}", statusType);
+                        VTDebug.Context.WriteSend(VTSendTypeEnum.DSR_DeviceStatusReport, statusType, OS_OperatingStatusData);
+                        this.sessionTransport.Write(OS_OperatingStatusData);
                         break;
                     }
 
@@ -636,12 +639,15 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         // 打开VIM后会收到这个请求
 
+                        // 1,1 is the top - left corner of the viewport in VT - speak, so add 1
                         // Result is CSI ? r ; c R
-                        int cursorRow = this.CursorRow;
-                        int cursorCol = this.CursorCol;
-                        CPR_CursorPositionReportResponse[3] = (byte)cursorRow;
-                        CPR_CursorPositionReportResponse[5] = (byte)cursorCol;
-                        this.sessionTransport.Write(CPR_CursorPositionReportResponse);
+                        int cursorRow = this.CursorRow + 1;
+                        int cursorCol = this.CursorCol + 1;
+                        VTDebug.Context.WriteAction(VTActions.DSR_DeviceStatusReport, "{0},{1},{2}", statusType, cursorRow, cursorCol);
+                        CPR_CursorPositionReportData[3] = 1; //(byte)cursorRow;
+                        CPR_CursorPositionReportData[5] = 1;//(byte)cursorCol;
+                        VTDebug.Context.WriteSend(VTSendTypeEnum.DSR_DeviceStatusReport, statusType, CPR_CursorPositionReportData);
+                        this.sessionTransport.Write(CPR_CursorPositionReportData);
                         break;
                     }
 
@@ -1227,6 +1233,13 @@ namespace ModengTerm.Terminal.ViewModels
 
                 #region 文本特效
 
+                case VTActions.UnsetAll:
+                    {
+                        // 重置所有文本装饰
+                        this.activeDocument.UnsetAllTextDecoration();
+                        break;
+                    }
+
                 case VTActions.Bold:
                 case VTActions.BoldUnset:
                 case VTActions.Underline:
@@ -1386,7 +1399,6 @@ namespace ModengTerm.Terminal.ViewModels
 
                         List<int> parameters = parameter as List<int>;
                         StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
-                        VTDebug.Context.WriteAction(action, "{0}", statusType);
                         this.PerformDeviceStatusReport(statusType);
                         break;
                     }
@@ -1394,7 +1406,8 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.DA_DeviceAttributes:
                     {
                         VTDebug.Context.WriteAction(action, string.Empty);
-                        this.sessionTransport.Write(DA_DeviceAttributesResponse);
+                        VTDebug.Context.WriteSend(VTSendTypeEnum.DA_DeviceAttributes, DA_DeviceAttributesData);
+                        this.sessionTransport.Write(DA_DeviceAttributesData);
                         break;
                     }
 

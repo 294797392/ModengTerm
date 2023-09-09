@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XTerminal.Windows"
-        xmlns:viewmodel="clr-namespace:XTerminal.ViewModels"
         xmlns:xtermconverter="clr-namespace:XTerminal"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText100}" 
@@ -14,7 +13,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/XTerminal;component/Styles/OptionsDictionary.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions"

@@ -71,34 +71,15 @@ namespace XTerminal
             }
         }
 
-        /// <summary>
-        /// FTP选项参数树形列表
-        /// </summary>
-        public OptionTreeVM SFTPOptionsTreeVM { get; private set; }
-
-        /// <summary>
-        /// 终端选项参数树形列表
-        /// </summary>
-        public OptionTreeVM TerminalOptionsTreeVM { get; private set; }
-
         #endregion
 
         #region ModularApp
 
         protected override int OnInitialize()
         {
-            this.SFTPOptionsTreeVM = new OptionTreeVM();
-            this.TerminalOptionsTreeVM = new OptionTreeVM();
             this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
             this.ServiceAgent = this.Factory.LookupModule<ServiceAgent>();
             this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
-
-            #region 加载选项树形列表
-
-            this.LoadOptionsTree(this.SFTPOptionsTreeVM, this.Manifest.FTPOptionList);
-            this.LoadOptionsTree(this.TerminalOptionsTreeVM, this.Manifest.TerminalOptionList);
-
-            #endregion
 
             // 将打开页面新加到OpenedSessionTab页面上
             this.OpenedSessionList.Add(new OpenSessionVM());
@@ -125,49 +106,6 @@ namespace XTerminal
         #endregion
 
         #region 实例方法
-
-        private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
-        {
-            foreach (OptionDefinition option in children)
-            {
-                OptionTreeNodeVM vm = new OptionTreeNodeVM(parentNode.Context, option)
-                {
-                    ID = option.ID,
-                    Name = option.Name,
-                    EntryClass = option.EntryClass,
-                    IsExpanded = true
-                };
-
-                parentNode.AddChildNode(vm);
-
-                this.LoadChildrenOptions(vm, option.Children);
-            }
-        }
-
-        private void LoadOptionsTree(OptionTreeVM treeVM, List<OptionDefinition> options)
-        {
-            foreach (OptionDefinition option in options)
-            {
-                OptionTreeNodeVM vm = new OptionTreeNodeVM(treeVM.Context, option)
-                {
-                    ID = option.ID,
-                    Name = option.Name,
-                    EntryClass = option.EntryClass,
-                    IsExpanded = true
-                };
-
-                treeVM.AddRootNode(vm);
-
-                this.LoadChildrenOptions(vm, option.Children);
-            }
-
-            // 默认选中第一个节点
-            TreeNodeViewModel firstNode = treeVM.Roots.FirstOrDefault();
-            if (firstNode != null)
-            {
-                firstNode.IsSelected = true;
-            }
-        }
 
         #endregion
 

@@ -970,6 +970,17 @@ namespace XTerminal.Document
 
             #endregion
         }
+        
+        /// <summary>
+        /// 重置所有的文本特效
+        /// </summary>
+        public void UnsetAllTextDecoration()
+        {
+            foreach (VTextDecorationState decorationState in this.decorationStates)
+            {
+                this.SetTextDecoration(decorationState.Decoration, null, true);
+            }
+        }
 
         #endregion
     }

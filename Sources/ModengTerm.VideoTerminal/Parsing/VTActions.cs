@@ -18,9 +18,6 @@ namespace XTerminal.Parser
         /// </summary>
         Print,
 
-        BackgroundUnset,
-        ForegroundUnset,
-
         /// <summary>
         /// 字体设置为粗体
         /// </summary>
@@ -56,12 +53,14 @@ namespace XTerminal.Parser
         /// 用Color表示要设置的前景色
         /// </summary>
         Foreground,
+        ForegroundUnset,
 
         /// <summary>
         /// 设置背景色
         /// 用Color表示要设置的背景色
         /// </summary>
         Background,
+        BackgroundUnset,
 
         /// <summary>
         /// 降低颜色强度
@@ -93,6 +92,11 @@ namespace XTerminal.Parser
         /// </summary>
         ReverseVideo,
         ReverseVideoUnset,
+
+        /// <summary>
+        /// 重置所有的文本装饰
+        /// </summary>
+        UnsetAll,
 
         /// <summary>
         /// CR - Performs a carriage return.

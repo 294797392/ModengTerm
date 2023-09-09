@@ -421,12 +421,10 @@ namespace XTerminal.Parser
 
                 switch ((GraphicsOptions)option)
                 {
+                    // 将所有属性返回到修改前的默认状态
                     case GraphicsOptions.Off:
                         {
-                            // 关闭字体效果
-                            //this.NotifyActionEvent(VTActions.DefaultAttributes);
-                            this.NotifyActionEvent(VTActions.BackgroundUnset);
-                            this.NotifyActionEvent(VTActions.ForegroundUnset);
+                            this.NotifyActionEvent(VTActions.UnsetAll);
                             break;
                         }
 
