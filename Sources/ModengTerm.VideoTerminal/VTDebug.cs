@@ -14,19 +14,14 @@ namespace ModengTerm.Terminal
     public enum VTDebugCategoryEnum
     {
         /// <summary>
-        /// 执行动作的日志
+        /// ModengTerm和SSH主机交互的日志
         /// </summary>
-        Action,
+        Interactive,
 
         /// <summary>
         /// 记录从SSH主机收到的原始数据
         /// </summary>
         RawRead,
-
-        /// <summary>
-        /// 记录发送给SSH主机的原始数据
-        /// </summary>
-        Send,
     }
 
     public enum VTSendTypeEnum
@@ -122,9 +117,8 @@ namespace ModengTerm.Terminal
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDebug");
 
-        private LogCategory actionCategory;
+        private LogCategory interactiveCategory;
         private LogCategory rawReadCategory;
-        private LogCategory rawWriteCategory;
         private Dictionary<VTDebugCategoryEnum, LogCategory> categoryMap;
         public List<LogCategory> Categories { get; private set; }
 
@@ -133,9 +127,8 @@ namespace ModengTerm.Terminal
             this.Categories = new List<LogCategory>();
             this.categoryMap = new Dictionary<VTDebugCategoryEnum, LogCategory>();
 
-            this.actionCategory = this.CreateCategory(VTDebugCategoryEnum.Action);
+            this.interactiveCategory = this.CreateCategory(VTDebugCategoryEnum.Interactive);
             this.rawReadCategory = this.CreateCategory(VTDebugCategoryEnum.RawRead);
-            this.rawWriteCategory = this.CreateCategory(VTDebugCategoryEnum.Send);
         }
 
         private LogCategory CreateCategory(VTDebugCategoryEnum categoryEnum)
@@ -163,18 +156,48 @@ namespace ModengTerm.Terminal
             return true;
         }
 
-        public void WriteAction(VTActions action, string format, params object[] param)
+        public void WriteInteractive(VTActions action, string format, params object[] param)
         {
-            if (!this.CanWrite(this.actionCategory))
+            if (!this.CanWrite(this.interactiveCategory))
             {
                 return;
             }
 
             string message = string.Format(format, param);
-            string log = string.Format("[{0},{1}]", action, message);
-            File.AppendAllText(this.actionCategory.FilePath, log);
-            File.AppendAllText(this.actionCategory.FilePath, "\r\n");
+            string log = string.Format("<- [{0},{1}]", action, message);
+            File.AppendAllText(this.interactiveCategory.FilePath, log);
+            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
         }
+
+        public void WriteInteractive(VTSendTypeEnum type, byte[] bytes)
+        {
+            if (!this.CanWrite(this.interactiveCategory))
+            {
+                return;
+            }
+
+            string message = type == VTSendTypeEnum.UserInput ?
+                bytes.Select(v => ((char)v).ToString()).Join(",") :
+                bytes.Select(v => ((int)v).ToString()).Join(",");
+
+            string log = string.Format("-> [{0},{1}]", type, message);
+            File.AppendAllText(this.interactiveCategory.FilePath, log);
+            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
+        }
+
+        public void WriteInteractive(VTSendTypeEnum type, StatusType statusType, byte[] bytes)
+        {
+            if (!this.CanWrite(this.interactiveCategory))
+            {
+                return;
+            }
+
+            string message = bytes.Select(v => ((int)v).ToString()).Join(",");
+            string log = string.Format("-> [{0},{1},{2}]", type, statusType, message);
+            File.AppendAllText(this.interactiveCategory.FilePath, log);
+            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
+        }
+
 
         public void WriteRawRead(byte[] bytes, int size)
         {
@@ -185,35 +208,6 @@ namespace ModengTerm.Terminal
 
             string message = bytes.Take(size).Select(v => ((int)v).ToString()).Join(",");
             File.AppendAllText(this.rawReadCategory.FilePath, message + ",");
-        }
-
-        public void WriteSend(VTSendTypeEnum type, byte[] bytes)
-        {
-            if (!this.CanWrite(this.rawWriteCategory))
-            {
-                return;
-            }
-
-            string message = type == VTSendTypeEnum.UserInput ?
-                bytes.Select(v => ((char)v).ToString()).Join(",") :
-                bytes.Select(v => ((int)v).ToString()).Join(",");
-
-            string log = string.Format("[{0},{1}]", type, message);
-            File.AppendAllText(this.rawWriteCategory.FilePath, log);
-            File.AppendAllText(this.rawWriteCategory.FilePath, "\r\n");
-        }
-
-        public void WriteSend(VTSendTypeEnum type, StatusType statusType, byte[] bytes)
-        {
-            if (!this.CanWrite(this.rawWriteCategory))
-            {
-                return;
-            }
-
-            string message = bytes.Select(v => ((int)v).ToString()).Join(",");
-            string log = string.Format("[{0},{1},{2}]", type, statusType, message);
-            File.AppendAllText(this.rawWriteCategory.FilePath, log);
-            File.AppendAllText(this.rawWriteCategory.FilePath, "\r\n");
         }
     }
 }

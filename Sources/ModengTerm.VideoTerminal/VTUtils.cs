@@ -68,24 +68,24 @@ namespace ModengTerm.Terminal
         }
 
 
-        public static VTextDecorations VTAction2TextDecoration(VTActions actions, out bool unset)
+        public static VTextDecorationEnum VTAction2TextDecoration(VTActions actions, out bool unset)
         {
             unset = false;
 
             switch (actions)
             {
-                case VTActions.Bold: return VTextDecorations.Bold;
-                case VTActions.BoldUnset: unset = true; return VTextDecorations.Bold;
-                case VTActions.Underline: return VTextDecorations.Underline;
-                case VTActions.UnderlineUnset: unset = true; return VTextDecorations.Underline;
-                case VTActions.Italics: return VTextDecorations.Italics;
-                case VTActions.ItalicsUnset: unset = true; return VTextDecorations.Italics;
-                case VTActions.DoublyUnderlined: return VTextDecorations.DoublyUnderlined;
-                case VTActions.DoublyUnderlinedUnset: unset = true; return VTextDecorations.DoublyUnderlined;
-                case VTActions.Background: return VTextDecorations.Background;
-                case VTActions.BackgroundUnset: unset = true; return VTextDecorations.Background;
-                case VTActions.Foreground: return VTextDecorations.Foreground;
-                case VTActions.ForegroundUnset: unset = true; return VTextDecorations.Foreground;
+                case VTActions.Bold: return VTextDecorationEnum.Bold;
+                case VTActions.BoldUnset: unset = true; return VTextDecorationEnum.Bold;
+                case VTActions.Underline: return VTextDecorationEnum.Underline;
+                case VTActions.UnderlineUnset: unset = true; return VTextDecorationEnum.Underline;
+                case VTActions.Italics: return VTextDecorationEnum.Italics;
+                case VTActions.ItalicsUnset: unset = true; return VTextDecorationEnum.Italics;
+                case VTActions.DoublyUnderlined: return VTextDecorationEnum.DoublyUnderlined;
+                case VTActions.DoublyUnderlinedUnset: unset = true; return VTextDecorationEnum.DoublyUnderlined;
+                case VTActions.Background: return VTextDecorationEnum.Background;
+                case VTActions.BackgroundUnset: unset = true; return VTextDecorationEnum.Background;
+                case VTActions.Foreground: return VTextDecorationEnum.Foreground;
+                case VTActions.ForegroundUnset: unset = true; return VTextDecorationEnum.Foreground;
 
                 default:
                     throw new NotImplementedException();

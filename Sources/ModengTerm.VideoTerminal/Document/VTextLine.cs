@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Terminal;
+using ModengTerm.Terminal.Document;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,6 +44,8 @@ namespace XTerminal.Document
         /// 存储该行的字符列表
         /// </summary>
         private List<VTCharacter> characters;
+
+        private int[] decorationVersions;
 
         #endregion
 
@@ -119,6 +122,7 @@ namespace XTerminal.Document
         {
             this.characters = new List<VTCharacter>();
             this.Decorations = new List<VTextDecoration>();
+            this.decorationVersions = new int[Enum.GetValues(typeof(VTextDecorationEnum)).Length];
         }
 
         #endregion
@@ -509,16 +513,92 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 把该行设置为空行
-        /// 回收所有的字符，并重置数据
+        /// 回收所有的字符和属性，并重置数据
         /// </summary>
         public void SetEmpty()
         {
+            // 清空字符
             VTCharacter.Recycle(this.characters);
             this.characters.Clear();
             this.Columns = 0;
             this.PhysicsRow = -1;
 
+            // 清空属性列表
+            VTextDecoration.Recycle(this.Decorations);
+            this.Decorations.Clear();
+
             this.SetRenderDirty(true);
+        }
+
+        public void ApplyDecorations(IEnumerable<VTextDecorationState> decorationStates)
+        {
+            foreach (VTextDecorationState decorationState in decorationStates)
+            {
+                int currentVersion = this.decorationVersions[(int)decorationState.Decoration];
+                int newVersion = decorationState.Version;
+                if (currentVersion == newVersion)
+                {
+                    continue;
+                }
+
+                VTCursor cursor = this.OwnerDocument.Cursor;
+
+                if (decorationState.Unset)
+                {
+                    // 取消设置属性
+
+                    List<VTextDecoration> decorations = this.Decorations.Where(v => v.Decoration == decorationState.Decoration).ToList();
+                    foreach (VTextDecoration decoration in decorations)
+                    {
+                        if (decoration.StartColumn == cursor.Column)
+                        {
+                            VTextDecoration.Recycle(decoration);
+                            // 取消设置列和设置列是同一列, 说明该列不用设置, 直接删除
+                            this.Decorations.Remove(decoration);
+                        }
+                        else
+                        {
+                            if (!decoration.Closed)
+                            {
+                                // 不合法的直接删除
+                                // 目前只遇到过一种情况会出现结束列小于开始列：
+                                // 1. 打开VIM，输入"1234"
+                                // 2. 保存然后关闭
+                                // 3. 打开VIM，输入123abc（最终显示的是123abc"1234"）
+                                if (cursor.Column < decoration.StartColumn)
+                                {
+                                    VTextDecoration.Recycle(decoration);
+                                    this.Decorations.Remove(decoration);
+                                    continue;
+                                }
+
+                                decoration.Closed = true;
+                                decoration.EndColumn = cursor.Column == 0 ? 0 : cursor.Column - 1;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // 设置属性
+
+                    VTextDecoration decoration = this.Decorations.FirstOrDefault(v => v.StartColumn == cursor.Column);
+                    if (decoration == null)
+                    {
+                        decoration = VTextDecoration.Create();
+                        decoration.StartColumn = cursor.Column;
+                        this.Decorations.Add(decoration);
+                    }
+
+                    decoration.Decoration = decorationState.Decoration;
+                    decoration.Closed = false;
+                    decoration.EndColumn = 0;
+                    decoration.Parameter = decorationState.Parameter;
+                }
+
+                // 更新该行的文本属性的版本号
+                this.decorationVersions[(int)decorationState.Decoration] = newVersion;
+            }
         }
 
         #endregion

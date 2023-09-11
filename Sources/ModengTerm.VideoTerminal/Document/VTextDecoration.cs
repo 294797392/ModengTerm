@@ -10,7 +10,7 @@ namespace XTerminal.Document
     /// <summary>
     /// 定义文本装饰
     /// </summary>
-    public enum VTextDecorations
+    public enum VTextDecorationEnum
     {
         /// <summary>
         /// 加粗字体
@@ -71,7 +71,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 该文本的装饰
         /// </summary>
-        public VTextDecorations Decoration { get; set; }
+        public VTextDecorationEnum Decoration { get; set; }
 
         /// <summary>
         /// 装饰对应的参数
@@ -99,7 +99,7 @@ namespace XTerminal.Document
             this.StartColumn = 0;
             this.EndColumn = 0;
             this.Closed = false;
-            this.Decoration = (VTextDecorations)0;
+            this.Decoration = (VTextDecorationEnum)0;
             this.Parameter = null;
         }
     }

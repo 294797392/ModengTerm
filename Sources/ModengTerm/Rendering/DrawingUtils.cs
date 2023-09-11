@@ -112,33 +112,40 @@ namespace ModengTerm.Rendering
 
                 switch (textAttribute.Decoration)
                 {
-                    case VTextDecorations.Foreground:
+                    case VTextDecorationEnum.Foreground:
                         {
                             VTColor color = textAttribute.Parameter as VTColor;
                             Brush brush = DrawingUtils.VTColor2Brush(color);
-                            formattedText.SetForegroundBrush(brush, startIndex, count);
+                            try
+                            {
+                                formattedText.SetForegroundBrush(brush, startIndex, count);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("{0},{1},{2}", startIndex, count, brush);
+                            }
                             break;
                         }
 
-                    case VTextDecorations.Background:
+                    case VTextDecorationEnum.Background:
                         {
                             // 背景颜色最后画, 因为文本的粗细会影响到背景颜色的大小
                             break;
                         }
 
-                    case VTextDecorations.Bold:
+                    case VTextDecorationEnum.Bold:
                         {
                             //formattedText.SetFontWeight(FontWeights.Bold, startIndex, count);
                             break;
                         }
 
-                    case VTextDecorations.Italics:
+                    case VTextDecorationEnum.Italics:
                         {
                             formattedText.SetFontStyle(FontStyles.Italic, startIndex, count);
                             break;
                         }
 
-                    case VTextDecorations.Underline:
+                    case VTextDecorationEnum.Underline:
                         {
                             formattedText.SetTextDecorations(TextDecorations.Underline, startIndex, count);
                             break;

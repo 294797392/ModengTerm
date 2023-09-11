@@ -15,13 +15,7 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 文本装饰类型
         /// </summary>
-        public VTextDecorations Decoration { get; private set; }
-
-        /// <summary>
-        /// 是否至少设置了一次该参数
-        /// 如果一次都没设置，那么就不用设置该文本装饰
-        /// </summary>
-        public bool AlreadySet { get; set; }
+        public VTextDecorationEnum Decoration { get; private set; }
 
         /// <summary>
         /// 文本装饰对应的参数
@@ -30,7 +24,12 @@ namespace ModengTerm.Terminal.Document
 
         public bool Unset { get; set; }
 
-        public VTextDecorationState(VTextDecorations decoration)
+        /// <summary>
+        /// 版本号
+        /// </summary>
+        public int Version { get; set; }
+
+        public VTextDecorationState(VTextDecorationEnum decoration)
         {
             this.Decoration = decoration;
         }

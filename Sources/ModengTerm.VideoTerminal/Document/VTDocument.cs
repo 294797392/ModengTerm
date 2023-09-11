@@ -3,6 +3,7 @@ using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,8 @@ namespace XTerminal.Document
         private int colSize;
 
         private int lineId;
+
+        private List<VTextDecorationState> decorationStates;
 
         #endregion
 
@@ -104,6 +107,11 @@ namespace XTerminal.Document
         /// </summary>
         public bool IsAlternate { get; private set; }
 
+        /// <summary>
+        /// 存储当前的文本属性状态
+        /// </summary>
+        public ReadOnlyCollection<VTextDecorationState> DecorationStates { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -116,6 +124,10 @@ namespace XTerminal.Document
 
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
+
+            IEnumerable<VTextDecorationEnum> decorationEnums = Enum.GetValues(typeof(VTextDecorationEnum)).Cast<VTextDecorationEnum>();
+            this.decorationStates = decorationEnums.OrderBy(v => v).Select(v => new VTextDecorationState(v)).ToList();
+            this.DecorationStates = new ReadOnlyCollection<VTextDecorationState>(this.decorationStates);
 
             this.Cursor = new VTCursor()
             {
@@ -519,16 +531,6 @@ namespace XTerminal.Document
 
             #endregion
 
-            #region 重置文本装饰状态
-
-            foreach (VTextDecorationState decorationState in this.decorationStates)
-            {
-                decorationState.AlreadySet = false;
-                decorationState.Parameter = null;
-            }
-
-            #endregion
-
             this.IsArrangeDirty = true;
         }
 
@@ -862,88 +864,6 @@ namespace XTerminal.Document
             if (this.colSize != colSize)
             {
                 this.colSize = colSize;
-            }
-        }
-
-        /// <summary>
-        /// 设置当前行的TextDecoration
-        /// </summary>
-        /// <param name="decorations"></param>
-        /// <param name="parameter"></param>
-        /// <param name="unset"></param>
-        public void SetTextDecoration(VTextDecorations decorations, object parameter, bool unset)
-        {
-            #region 先为当前行设置TextDecoration
-
-            if (unset)
-            {
-                // 如果是unset，那么就找到当前行第一个没有关闭的Decoration并关闭
-                // 有可能会连续多次设置Foreground或Background，然后再设置一次unset，所以这里有可能会有多个未关闭的TextDecoration
-                List<VTextDecoration> decorationList = this.ActiveLine.Decorations.Where(v => v.Decoration == decorations).ToList();
-
-                foreach (VTextDecoration decoration in decorationList)
-                {
-                    if (decoration.StartColumn == this.Cursor.Column)
-                    {
-                        // 在同一列Unset，那么说明这个单元格不需要这个Decoration了，回收这个Decoration
-
-                        VTextDecoration.Recycle(decoration);
-
-                        this.ActiveLine.Decorations.Remove(decoration);
-                    }
-                    else
-                    {
-                        if (!decoration.Closed)
-                        {
-                            // 不是在同一列unset，那么清除文本装饰
-                            decoration.Closed = true;
-                            decoration.EndColumn = this.Cursor.Column == 0 ? 0 : this.Cursor.Column - 1;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // 最坏情况下，每一个单元格都包含一组TextDecoration
-                // 找到当前光标所在单元格所拥有的文本装饰
-
-                VTextDecoration decoration = this.ActiveLine.Decorations.FirstOrDefault(v => v.StartColumn == this.Cursor.Column && v.Decoration == decorations);
-
-                if (decoration == null)
-                {
-                    decoration = VTextDecoration.Create();
-                    decoration.Decoration = decorations;
-                    decoration.StartColumn = this.Cursor.Column;
-                    this.ActiveLine.Decorations.Add(decoration);
-                }
-
-                decoration.Parameter = parameter;
-            }
-
-            #endregion
-
-            #region 再把当前的TextDecoration缓存下来
-
-            // 缓存下来，后面再ActiveLine Changed的时候使用
-            VTextDecorationState decorationState = this.decorationStates[(int)decorations];
-            if (!decorationState.AlreadySet)
-            {
-                decorationState.AlreadySet = true;
-            }
-            decorationState.Parameter = parameter;
-            decorationState.Unset = unset;
-
-            #endregion
-        }
-        
-        /// <summary>
-        /// 重置所有的文本特效
-        /// </summary>
-        public void UnsetAllTextDecoration()
-        {
-            foreach (VTextDecorationState decorationState in this.decorationStates)
-            {
-                this.SetTextDecoration(decorationState.Decoration, null, true);
             }
         }
 
