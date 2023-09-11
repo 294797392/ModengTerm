@@ -42,10 +42,6 @@ namespace XTerminal.Document
 
         private int lineId;
 
-        private List<VTextDecorationState> decorationStates;
-
-        private VTextLine activeLine;
-
         #endregion
 
         #region 属性
@@ -76,30 +72,7 @@ namespace XTerminal.Document
         /// 当前光标所在行
         /// 通过SetCursor函数设置
         /// </summary>
-        public VTextLine ActiveLine
-        {
-            get { return this.activeLine; }
-            private set
-            {
-                if (this.activeLine != value)
-                {
-                    this.activeLine = value;
-
-                    // 此时必须保证Column是最新的，也就是说在设置光标的时候，需要先设置Column，再设置Row
-                    // 因为这个时候要检测是否有文本特效，给行增加文本特效
-
-                    foreach (VTextDecorationState vds in this.decorationStates)
-                    {
-                        if (!vds.AlreadySet)
-                        {
-                            continue;
-                        }
-
-                        this.SetTextDecoration(vds.Decoration, vds.Parameter, vds.Unset);
-                    }
-                }
-            }
-        }
+        public VTextLine ActiveLine { get; private set; }
 
         /// <summary>
         /// 文档里的第一行
@@ -143,14 +116,6 @@ namespace XTerminal.Document
 
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
-
-            this.decorationStates = new List<VTextDecorationState>();
-            IEnumerable<VTextDecorations> textDecorations = Enum.GetValues(typeof(VTextDecorations)).Cast<VTextDecorations>();
-            foreach (VTextDecorations decorations in textDecorations)
-            {
-                VTextDecorationState decorationState = new VTextDecorationState(decorations);
-                this.decorationStates.Add(decorationState);
-            }
 
             this.Cursor = new VTCursor()
             {
