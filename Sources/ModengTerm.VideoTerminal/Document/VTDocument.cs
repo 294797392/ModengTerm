@@ -128,7 +128,7 @@ namespace XTerminal.Document
             this.Cursor = new VTCursor()
             {
                 Blinking = true,
-                Color = VTColor.DarkBlack,
+                Color = options.CursorColor,
                 OffsetX = 0,
                 OffsetY = 0,
                 Row = 0,

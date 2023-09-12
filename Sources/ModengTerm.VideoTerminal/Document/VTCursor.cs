@@ -77,7 +77,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 光标颜色
         /// </summary>
-        public VTColor Color { get; set; }
+        public string Color { get; set; }
 
         /// <summary>
         /// 闪烁速度

@@ -18,7 +18,7 @@ namespace XTerminal.Document.Rendering
         /// </summary>
         /// <param name="options">渲染选项</param>
         /// <returns></returns>
-        IDrawingDocument CreateDocument(VTDocumentOptions options);
+        IDrawingDocument CreateDocument();
 
         void AddCanvas(IDrawingDocument canvas);
 

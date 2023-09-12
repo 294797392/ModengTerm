@@ -20,7 +20,11 @@ namespace XTerminal.Base.Enumerations
         SSH_THEME_FONT_FAMILY = 100,
         SSH_THEME_FONT_SIZE = 101,
         SSH_THEME_FONT_COLOR = 102,
-        
+        /// <summary>
+        /// 背景颜色
+        /// </summary>
+        SSH_THEME_BACK_COLOR = 105,
+
         /// <summary>
         /// 光标闪烁速度
         /// </summary>
@@ -31,10 +35,7 @@ namespace XTerminal.Base.Enumerations
         /// </summary>
         SSH_THEME_CURSOR_STYLE = 104,
 
-        /// <summary>
-        /// 背景颜色
-        /// </summary>
-        SSH_THEME_BACK_COLOR = 105,
+        SSH_THEME_CURSOR_COLOR = 106,
 
         // Server 201 - 300
         SSH_SERVER_ADDR = 201,

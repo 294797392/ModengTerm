@@ -18,16 +18,10 @@ namespace ModengTerm.Base
         public List<SessionDefinition> SessionList { get; private set; }
 
         /// <summary>
-        /// 定义ModengTerm支持的文本颜色
+        /// 定义ModengTerm支持的颜色
         /// </summary>
-        [JsonProperty("foreground")]
-        public List<ColorDefinition> ForegroundList { get; private set; }
-
-        /// <summary>
-        /// 定义ModengTerm支持的背景颜色
-        /// </summary>
-        [JsonProperty("background")]
-        public List<ColorDefinition> BackgroundList { get; private set; }
+        [JsonProperty("colorList")]
+        public List<ColorDefinition> ColorList { get; private set; }
 
         /// <summary>
         /// XTerminal支持的文字大小列表
@@ -56,8 +50,7 @@ namespace ModengTerm.Base
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
-            this.ForegroundList = new List<ColorDefinition>();
-            this.BackgroundList = new List<ColorDefinition>();
+            this.ColorList = new List<ColorDefinition>();
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
             this.ThemeList = new List<ThemeDefinition>();

@@ -9,12 +9,12 @@ namespace XTerminal.ViewModels
 {
     public class OpenSessionVM : OpenedSessionVM
     {
-        public override void Close()
+        protected override int OnOpen(XTermSession sessionInfo)
         {
             throw new NotImplementedException();
         }
 
-        public override int Open(XTermSession session)
+        protected override void OnClose()
         {
             throw new NotImplementedException();
         }

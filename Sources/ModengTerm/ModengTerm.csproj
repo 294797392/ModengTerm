@@ -105,7 +105,7 @@
     <Compile Include="Windows\LoggerOptionsWindow.xaml.cs">
       <DependentUpon>LoggerOptionsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XTermUtils.cs" />
+    <Compile Include="MTermUtils.cs" />
     <Compile Include="UserControls\FileSystemTreeUserControl.xaml.cs">
       <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
     </Compile>

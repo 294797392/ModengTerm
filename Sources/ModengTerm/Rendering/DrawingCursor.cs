@@ -21,42 +21,43 @@ namespace ModengTerm.Rendering
         private static readonly double LineWidth = 2;
         private static readonly double UnderscoreWidth = 3;
 
-        private VTCursor cursor;
-
         /// <summary>
         /// TODO:先把光标高度写死，后面再优化..
         /// </summary>
         private static readonly double CursorHeight = 15;
 
+        private VTCursor cursor;
+        private Brush brush;
+
         protected override void OnInitialize(VTDocumentElement element)
         {
             this.cursor = element as VTCursor;
+            this.brush = MTermUtils.GetBrush(this.cursor.Color);
 
             // 先画出来，不然永远不会显示鼠标元素
+            // 因为光标闪烁只会移动光标的位置和显示/隐藏光标，并不会重新Draw光标
             this.Draw();
         }
 
         protected override void Draw(DrawingContext dc)
         {
-            Brush brush = DrawingUtils.VTColor2Brush(this.cursor.Color);
-
             switch (this.cursor.Style)
             {
                 case VTCursorStyles.Block:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, BlockWidth, CursorHeight));
+                        dc.DrawRectangle(this.brush, TransparentPen, new Rect(0, 0, BlockWidth, CursorHeight));
                         break;
                     }
 
                 case VTCursorStyles.Line:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, LineWidth, CursorHeight));
+                        dc.DrawRectangle(this.brush, TransparentPen, new Rect(0, 0, LineWidth, CursorHeight));
                         break;
                     }
 
                 case VTCursorStyles.Underscore:
                     {
-                        dc.DrawRectangle(brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, 5));
+                        dc.DrawRectangle(this.brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, 5));
                         break;
                     }
 

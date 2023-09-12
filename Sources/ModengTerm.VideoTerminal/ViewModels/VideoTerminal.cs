@@ -303,7 +303,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// 初始化终端模拟器
         /// </summary>
         /// <param name="sessionInfo"></param>
-        public override int Open(XTermSession sessionInfo)
+        protected override int OnOpen(XTermSession sessionInfo)
         {
             this.sessionInfo = sessionInfo;
             this.uiSyncContext = SynchronizationContext.Current;
@@ -344,7 +344,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化TextSelection
 
-            this.selectionCanvas = this.videoTerminal.CreateDocument(null);
+            this.selectionCanvas = this.videoTerminal.CreateDocument();
             this.videoTerminal.AddCanvas(this.selectionCanvas);
             this.textSelection = new VTextSelection();
             this.textSelection.DrawingContext = this.selectionCanvas.CreateDrawingObject(this.textSelection);
@@ -359,14 +359,15 @@ namespace ModengTerm.Terminal.ViewModels
                 RowSize = this.rowSize,
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
+                CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
                 BlinkSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
                 FontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY),
                 FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
                 ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR),
                 BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR)
             };
-            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(documentOptions), false) { Name = "MainDocument" };
-            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(documentOptions), true) { Name = "AlternateDocument" };
+            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), false) { Name = "MainDocument" };
+            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), true) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
             this.firstHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.firstHistoryLine;
@@ -400,7 +401,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 释放资源
         /// </summary>
-        public override void Close()
+        protected override void OnClose()
         {
             this.isRunning = false;
 

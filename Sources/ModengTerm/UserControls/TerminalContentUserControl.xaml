@@ -86,6 +86,8 @@
                     </ContextMenu>
                 </Grid.ContextMenu>
 
+                <Border x:Name="BorderBackground"/>
+
                 <Grid x:Name="GridCanvasList" Margin="5,5,0,5" 
                       PreviewMouseLeftButtonDown="GridCanvasList_PreviewMouseLeftButtonDown"
                       PreviewMouseMove="GridCanvasList_PreviewMouseMove"

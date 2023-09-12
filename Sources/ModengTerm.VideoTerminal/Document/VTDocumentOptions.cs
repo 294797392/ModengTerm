@@ -37,6 +37,11 @@ namespace XTerminal.Document
         public VTCursorSpeeds BlinkSpeed { get; set; }
 
         /// <summary>
+        /// 光标颜色
+        /// </summary>
+        public string CursorColor { get; set; }
+
+        /// <summary>
         /// 文本前景色
         /// </summary>
         public string ForegroundColor { get; set; }

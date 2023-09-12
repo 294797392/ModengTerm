@@ -49,7 +49,6 @@ namespace XTerminal.ViewModels
         #region 实例变量
 
         private SftpClient sftpClient;
-        private XTermSession session;
         private string serverAddress;
         private int serverPort;
         private SftpTransmitter transmitter;
@@ -117,10 +116,8 @@ namespace XTerminal.ViewModels
 
         #region 公开接口
 
-        public override int Open(XTermSession session)
+        protected override int OnOpen(XTermSession session)
         {
-            this.session = session;
-
             this.TransferFileList = new BindableCollection<TransferFileVM>();
 
             #region 连接SFTP服务器
@@ -187,7 +184,7 @@ namespace XTerminal.ViewModels
             return ResponseCode.SUCCESS;
         }
 
-        public override void Close()
+        protected override void OnClose()
         {
             this.transmitter.StatusChanged -= this.Transmitter_StatusChanged;
             this.transmitter.Release();

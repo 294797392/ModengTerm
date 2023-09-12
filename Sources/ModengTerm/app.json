@@ -51,29 +51,16 @@
         }
     ],
 
-    "foreground": [
-        {
-            "id": "1",
-            "name": "黑色",
-            "value": "black"
-        },
+    "colorList": [
         {
             "id": "1",
             "name": "白色",
             "value": "white"
-        }
-    ],
-
-    "background": [
-        {
-            "id": "1",
-            "name": "黑色",
-            "value": "black"
         },
         {
-            "id": "1",
-            "name": "白色",
-            "value": "white"
+            "id": "2",
+            "name": "黑色",
+            "value": "black"
         }
     ],
 

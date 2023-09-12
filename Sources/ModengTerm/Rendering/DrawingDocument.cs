@@ -60,6 +60,14 @@ namespace ModengTerm.Rendering
             return this.visuals[index];
         }
 
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            base.OnRender(drawingContext);
+
+            // 调试用，看这个Surface有多大
+            //drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
+        }
+
         #endregion
 
         #region 实例方法
@@ -92,7 +100,7 @@ namespace ModengTerm.Rendering
 
         #endregion
 
-        #region IDrawingCanvas
+        #region IDrawingDocument
 
         public IDrawingObject CreateDrawingObject(VTDocumentElement documentElement)
         {
@@ -103,14 +111,6 @@ namespace ModengTerm.Rendering
         {
             drawingObject.Release();
             this.visuals.Remove(drawingObject as DrawingObject);
-        }
-
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            base.OnRender(drawingContext);
-
-            // 调试用，看这个Surface有多大
-            //drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
         #endregion

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ModengTerm;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
@@ -22,6 +23,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Enumerations;
@@ -353,7 +355,7 @@ namespace XTerminal.UserControls
 
         #region IVideoTerminal
 
-        public IDrawingDocument CreateDocument(VTDocumentOptions options)
+        public IDrawingDocument CreateDocument()
         {
             DrawingDocument document = new DrawingDocument();
             return document;
@@ -432,15 +434,18 @@ namespace XTerminal.UserControls
 
         #region SessionContent
 
-        public override int Open(OpenedSessionVM session)
+        public override int Open(OpenedSessionVM sessionVM)
         {
-            this.videoTerminal = session as VideoTerminal;
+            this.videoTerminal = sessionVM as VideoTerminal;
 
             this.mouseDownDlg = this.videoTerminal.OnMouseDown;
             this.mouseMoveDlg = this.videoTerminal.OnMouseMove;
             this.mouseUpDlg = this.videoTerminal.OnMouseUp;
             this.mouseWheelDlg = this.videoTerminal.OnMouseWheel;
             this.sizeChangedDlg = this.videoTerminal.OnSizeChanged;
+
+            string background = sessionVM.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
+            BorderBackground.Background = MTermUtils.GetBrush(background);
 
             return ResponseCode.SUCCESS;
         }

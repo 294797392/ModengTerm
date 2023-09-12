@@ -301,6 +301,11 @@ namespace ModengTerm.ViewModels
 
         public BindableCollection<VTCursorSpeeds> CursorSpeeds { get; private set; }
 
+        /// <summary>
+        /// 光标颜色
+        /// </summary>
+        public BindableCollection<ColorDefinition> CursorColors { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -361,13 +366,13 @@ namespace ModengTerm.ViewModels
             
             // 字体颜色
             this.ForegroundList = new BindableCollection<ColorDefinition>();
-            this.ForegroundList.AddRange(appManifest.ForegroundList);
+            this.ForegroundList.AddRange(appManifest.ColorList);
             this.ForegroundList.SelectedItem = this.ForegroundList.FirstOrDefault();
 
             // 背景颜色
             this.BackgroundList = new BindableCollection<ColorDefinition>();
-            this.BackgroundList.AddRange(appManifest.BackgroundList);
-            this.BackgroundList.SelectedItem = this.BackgroundList.FirstOrDefault();
+            this.BackgroundList.AddRange(appManifest.ColorList);
+            this.BackgroundList.SelectedItem = this.BackgroundList.Skip(1).FirstOrDefault(); // 背景颜色和字体颜色翻转
 
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
             this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
@@ -376,6 +381,10 @@ namespace ModengTerm.ViewModels
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
             this.CursorStyles.AddRange(Enum.GetValues(typeof(VTCursorStyles)).Cast<VTCursorStyles>());
             this.CursorStyles.SelectedItem = XTermConsts.DefaultCursorStyle;
+
+            this.CursorColors = new BindableCollection<ColorDefinition>();
+            this.CursorColors.AddRange(appManifest.ColorList);
+            this.CursorColors.SelectedItem = this.CursorColors.FirstOrDefault();
 
             #endregion
 
@@ -573,9 +582,10 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR, this.ForegroundList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.BackgroundList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.BackgroundList.SelectedItem.Value);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR, this.CursorColors.SelectedItem.Value);
 
             return true;
         }

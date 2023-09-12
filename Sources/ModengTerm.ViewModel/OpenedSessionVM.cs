@@ -28,10 +28,26 @@ namespace XTerminal.ViewModels
         /// </summary>
         public DependencyObject Content { get; set; }
 
+        /// <summary>
+        /// 对应的会话信息
+        /// </summary>
+        public XTermSession Session { get; private set; }
+
         #endregion
 
-        public abstract int Open(XTermSession session);
+        public int Open(XTermSession session)
+        {
+            this.Session = session;
 
-        public abstract void Close();
+            return this.OnOpen(session);
+        }
+
+        public void Close()
+        {
+            this.OnClose();
+        }
+
+        protected abstract int OnOpen(XTermSession sessionInfo);
+        protected abstract void OnClose();
     }
 }
