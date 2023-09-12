@@ -18,11 +18,11 @@ namespace XTerminal.Document.Rendering
         /// </summary>
         /// <param name="options">渲染选项</param>
         /// <returns></returns>
-        IDrawingCanvas CreateCanvas();
+        IDrawingDocument CreateDocument(VTDocumentOptions options);
 
-        void AddCanvas(IDrawingCanvas canvas);
+        void AddCanvas(IDrawingDocument canvas);
 
-        void RemoveCanvas(IDrawingCanvas canvas);
+        void RemoveCanvas(IDrawingDocument canvas);
 
         /// <summary>
         /// 获取滚动条信息
@@ -38,6 +38,19 @@ namespace XTerminal.Document.Rendering
         /// <param name="maximum">滚动条的最大值</param>
         void SetScrollInfo(int maximum, int scrollValue);
 
+        /// <summary>
+        /// 设置滚动条是否可见
+        /// </summary>
+        /// <param name="visible"></param>
+        void SetScrollVisible(bool visible);
+
+        /// <summary>
+        /// 测量文本
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="fontSize"></param>
+        /// <param name="fontFamily"></param>
+        /// <returns></returns>
         VTextMetrics MeasureText(string text, double fontSize, string fontFamily);
     }
 }

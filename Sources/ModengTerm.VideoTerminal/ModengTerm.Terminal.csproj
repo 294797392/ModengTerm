@@ -71,7 +71,7 @@
     <Compile Include="Loggering\LoggerManager.cs" />
     <Compile Include="Loggering\LoggerOptions.cs" />
     <Compile Include="Loggering\NoneFilter.cs" />
-    <Compile Include="Rendering\IDrawingCanvas.cs" />
+    <Compile Include="Rendering\IDrawingDocument.cs" />
     <Compile Include="Rendering\IDrawingObject.cs" />
     <Compile Include="Rendering\IDrawingObjectText.cs" />
     <Compile Include="Rendering\IVideoTerminal.cs" />

@@ -10,19 +10,14 @@ namespace XTerminal.Base.Definitions
     public class FontFamilyDefinition
     {
         /// <summary>
-        /// 颜色ID
-        /// </summary>
-        [JsonProperty("id")]
-        public string ID { get; set; }
-
-        /// <summary>
-        /// 颜色名字
+        /// 字体名字
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
 
         /// <summary>
-        /// 颜色值
+        /// 字体名字
+        /// 加载字体的时候使用这个属性来加载
         /// </summary>
         [JsonProperty("value")]
         public string Value { get; set; }

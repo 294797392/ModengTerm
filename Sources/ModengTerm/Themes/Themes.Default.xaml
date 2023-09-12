@@ -14,4 +14,6 @@
     <SolidColorBrush x:Key="BrushStatusBarBackground" Color="#E0E0E0"/>
     <SolidColorBrush x:Key="BrushStatsuBarBorder" Color="Silver"/>
 
+    <SolidColorBrush x:Key="BrushBackground1" Color="#938E8E" Opacity="0.7"/>
+
 </ResourceDictionary>

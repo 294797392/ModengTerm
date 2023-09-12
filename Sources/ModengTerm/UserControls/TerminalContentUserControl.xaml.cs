@@ -353,23 +353,23 @@ namespace XTerminal.UserControls
 
         #region IVideoTerminal
 
-        public IDrawingCanvas CreateCanvas()
+        public IDrawingDocument CreateDocument(VTDocumentOptions options)
         {
-            DrawingSurface canvas = new DrawingSurface();
-            return canvas;
+            DrawingDocument document = new DrawingDocument();
+            return document;
         }
 
-        public void AddCanvas(IDrawingCanvas canvas)
+        public void AddCanvas(IDrawingDocument canvas)
         {
-            this.Dispatcher.Invoke(() => 
+            this.Dispatcher.Invoke(() =>
             {
                 GridCanvasList.Children.Add(canvas as UIElement);
             });
         }
 
-        public void RemoveCanvas(IDrawingCanvas canvas)
+        public void RemoveCanvas(IDrawingDocument canvas)
         {
-            base.Dispatcher.Invoke(() => 
+            base.Dispatcher.Invoke(() =>
             {
                 GridCanvasList.Children.Remove(canvas as UIElement);
             });
@@ -396,6 +396,21 @@ namespace XTerminal.UserControls
             {
                 SliderScrolbar.Value = scrollValue;
             }
+        }
+
+        public void SetScrollVisible(bool visible)
+        {
+            base.Dispatcher.Invoke(() =>
+            {
+                if (visible)
+                {
+                    SliderScrolbar.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    SliderScrolbar.Visibility = Visibility.Collapsed;
+                }
+            });
         }
 
         public VTextMetrics MeasureText(string text, double fontSize, string fontFamily)
@@ -432,7 +447,7 @@ namespace XTerminal.UserControls
 
         public override void Close()
         {
-            
+
         }
 
         #endregion

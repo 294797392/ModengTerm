@@ -8,7 +8,8 @@
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="800" Height="600" WindowStartupLocation="CenterScreen"
-        MinWidth="800" MinHeight="600" Loaded="Window_Loaded">
+        MinWidth="800" MinHeight="600" Loaded="Window_Loaded"
+        WindowState="Maximized">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -78,10 +79,8 @@
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
                 </MenuItem>
 
-                <ToggleButton x:Name="ToggleButtonInsert" Content="插入"/>
-
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem Header="关于XTerminal" Click="MenuItemAbout_Click"/>
+                    <MenuItem Header="关于ModengTerm" Click="MenuItemAbout_Click"/>
                     <MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>
                 </MenuItem>
 

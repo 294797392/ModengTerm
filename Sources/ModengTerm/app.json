@@ -56,6 +56,24 @@
             "id": "1",
             "name": "黑色",
             "value": "black"
+        },
+        {
+            "id": "1",
+            "name": "白色",
+            "value": "white"
+        }
+    ],
+
+    "background": [
+        {
+            "id": "1",
+            "name": "黑色",
+            "value": "black"
+        },
+        {
+            "id": "1",
+            "name": "白色",
+            "value": "white"
         }
     ],
 
@@ -69,7 +87,6 @@
 
     "fontFamily": [
         {
-            "id": "1",
             "name": "宋体",
             "value": "宋体"
         }

@@ -4,19 +4,22 @@ using ModengTerm.Base.ServiceAgents;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing.Text;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
+using XTerminal.ViewModels;
 
-namespace XTerminal.ViewModels
+namespace ModengTerm.ViewModels
 {
     public class CreateSessionVM : ViewModelBase
     {
@@ -109,6 +112,7 @@ namespace XTerminal.ViewModels
         public BindableCollection<FontFamilyDefinition> FontFamilyList { get; private set; }
         public BindableCollection<FontSizeDefinition> FontSizeList { get; private set; }
         public BindableCollection<ColorDefinition> ForegroundList { get; private set; }
+        public BindableCollection<ColorDefinition> BackgroundList { get; private set; }
 
         /// <summary>
         /// SSH端口号
@@ -346,16 +350,29 @@ namespace XTerminal.ViewModels
 
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
             this.FontFamilyList.AddRange(appManifest.FontFamilyList);
+            // 加载系统已安装的所有字体
+            InstalledFontCollection installedFont = new InstalledFontCollection();
+            this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
             this.FontFamilyList.SelectedItem = this.FontFamilyList.FirstOrDefault();
+
             this.FontSizeList = new BindableCollection<FontSizeDefinition>();
             this.FontSizeList.AddRange(appManifest.FontSizeList);
             this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
+            
+            // 字体颜色
             this.ForegroundList = new BindableCollection<ColorDefinition>();
             this.ForegroundList.AddRange(appManifest.ForegroundList);
             this.ForegroundList.SelectedItem = this.ForegroundList.FirstOrDefault();
+
+            // 背景颜色
+            this.BackgroundList = new BindableCollection<ColorDefinition>();
+            this.BackgroundList.AddRange(appManifest.BackgroundList);
+            this.BackgroundList.SelectedItem = this.BackgroundList.FirstOrDefault();
+
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
             this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
             this.CursorSpeeds.SelectedItem = XTermConsts.DefaultCursorBlinkSpeed;
+            
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
             this.CursorStyles.AddRange(Enum.GetValues(typeof(VTCursorStyles)).Cast<VTCursorStyles>());
             this.CursorStyles.SelectedItem = XTermConsts.DefaultCursorStyle;
@@ -498,7 +515,7 @@ namespace XTerminal.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_SERVER_PASSWORD, this.SSHPassword);
             session.SetOption<string>(OptionKeyEnum.SSH_SERVER_PRIVATE_KEY_FILE, this.SSHPrivateKeyFile);
             session.SetOption<string>(OptionKeyEnum.SSH_SERVER_Passphrase, this.SSHPassphrase);
-            session.SetOption<int>(OptionKeyEnum.SSH_AUTH_TYPE, (int)authType);
+            session.SetOption<int>(OptionKeyEnum.SSH_SERVER_AUTH_TYPE, (int)authType);
 
             return true;
         }
@@ -547,11 +564,18 @@ namespace XTerminal.ViewModels
                 return false;
             }
 
+            if (this.BackgroundList.SelectedItem == null) 
+            {
+                MessageBoxUtils.Info("请选择背景颜色");
+                return false;
+            }
+
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR, this.ForegroundList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.BackgroundList.SelectedItem.Value);
 
             return true;
         }

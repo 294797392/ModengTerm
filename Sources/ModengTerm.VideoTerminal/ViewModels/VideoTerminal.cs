@@ -166,7 +166,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private bool selectionState;
 
-        private IDrawingCanvas selectionCanvas;
+        private IDrawingDocument selectionCanvas;
         /// <summary>
         /// 存储选中的文本信息
         /// </summary>
@@ -229,7 +229,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 当前终端显示的画面
         /// </summary>
-        public IDrawingCanvas ActiveCanvas { get { return this.activeDocument.Canvas; } }
+        public IDrawingDocument ActiveCanvas { get { return this.activeDocument.Canvas; } }
 
         /// <summary>
         /// 获取当前滚动条是否滚动到底了
@@ -344,7 +344,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化TextSelection
 
-            this.selectionCanvas = this.videoTerminal.CreateCanvas();
+            this.selectionCanvas = this.videoTerminal.CreateDocument(null);
             this.videoTerminal.AddCanvas(this.selectionCanvas);
             this.textSelection = new VTextSelection();
             this.textSelection.DrawingContext = this.selectionCanvas.CreateDrawingObject(this.textSelection);
@@ -362,10 +362,11 @@ namespace ModengTerm.Terminal.ViewModels
                 BlinkSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
                 FontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY),
                 FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
-                Foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR)
+                ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR),
+                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR)
             };
-            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas(), false) { Name = "MainDocument" };
-            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateCanvas(), true) { Name = "AlternateDocument" };
+            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(documentOptions), false) { Name = "MainDocument" };
+            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(documentOptions), true) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
             this.firstHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
             this.historyLines[0] = this.firstHistoryLine;
@@ -908,55 +909,71 @@ namespace ModengTerm.Terminal.ViewModels
         /// 使用像素坐标对VTextLine做命中测试
         /// </summary>
         /// <param name="mousePosition">鼠标坐标</param>
-        /// <param name="surfaceBoundary">相对于电脑显示器的画布的边界框，也是鼠标的限定范围</param>
+        /// <param name="vtRect">相对于电脑显示器的画布的边界框，也是鼠标的限定范围</param>
         /// <param name="pointer">存储命中测试结果的变量</param>
         /// <remarks>如果传递进来的鼠标位置在窗口外，那么会把鼠标限定在距离鼠标最近的Surface边缘处</remarks>
         /// <returns>
         /// 是否获取成功
         /// 当光标不在某一行或者不在某个字符上的时候，就获取失败
         /// </returns>
-        private bool GetTextPointer(VTPoint mousePosition, VTRect surfaceBoundary, VTextPointer pointer)
+        private bool GetTextPointer(VTPoint mousePosition, VTRect vtRect, VTextPointer pointer)
         {
             double mouseX = mousePosition.X;
             double mouseY = mousePosition.Y;
 
-            if (mouseX < 0)
-            {
-                mouseX = 0;
-            }
-            if (mouseX > surfaceBoundary.Width)
-            {
-                mouseX = surfaceBoundary.Width;
-            }
+            VTDocument document = this.activeDocument;
+
+            #region 先计算鼠标位于哪一行上
+
+            VTextLine cursorLine = null;
 
             if (mouseY < 0)
             {
-                mouseY = 0;
+                // 光标在画布的上面，那么命中的行数就是第一行
+                cursorLine = document.FirstLine;
             }
-            if (mouseY > surfaceBoundary.Height)
+            else if (mouseY > vtRect.Height)
             {
-                mouseY = surfaceBoundary.Height;
+                // 光标在画布的下面，那么命中的行数是最后一行
+                cursorLine = document.LastLine;
             }
-
-            #region 先找到鼠标所在行
-
-            VTextLine cursorLine = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseY);
-            if (cursorLine == null)
+            else
             {
-                // 这里说明鼠标没有在任何一行上
-                logger.DebugFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
-                return false;
+                // 光标在画布中，那么做命中测试
+                // 找到鼠标所在行
+                cursorLine = HitTestHelper.HitTestVTextLine(document.FirstLine, mouseY);
+                if (cursorLine == null)
+                {
+                    // 这里说明鼠标没有在任何一行上
+                    logger.DebugFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
+                    return false;
+                }
             }
 
             #endregion
 
             #region 再计算鼠标悬浮于哪个字符上
 
-            int characterIndex;
-            VTRect characterBounds;
-            if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out characterBounds))
+            int characterIndex = 0;
+
+            if (mouseX < 0)
             {
-                return false;
+                // 鼠标在画布左边，那么悬浮的就是第一个字符
+                characterIndex = 0;
+            }
+            if (mouseX > vtRect.Width)
+            {
+                // 鼠标在画布右边，那么悬浮的就是最后一个字符
+                characterIndex = cursorLine.Characters.Count;
+            }
+            else
+            {
+                // 鼠标的水平方向在画布中间，那么做字符命中测试
+                VTRect characterBounds;
+                if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out characterBounds))
+                {
+                    return false;
+                }
             }
 
             #endregion
@@ -1387,8 +1404,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        IDrawingCanvas remove = this.mainDocument.Canvas;
-                        IDrawingCanvas add = this.alternateDocument.Canvas;
+                        IDrawingDocument remove = this.mainDocument.Canvas;
+                        IDrawingDocument add = this.alternateDocument.Canvas;
                         this.videoTerminal.RemoveCanvas(remove);
                         this.videoTerminal.AddCanvas(add);
 
@@ -1396,6 +1413,9 @@ namespace ModengTerm.Terminal.ViewModels
                         this.alternateDocument.SetScrollMargin(0, 0);
                         this.alternateDocument.DeleteAll();
                         this.activeDocument = this.alternateDocument;
+
+                        this.textSelection.Reset();
+                        this.videoTerminal.SetScrollVisible(false);
                         break;
                     }
 
@@ -1403,13 +1423,16 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        IDrawingCanvas remove = this.alternateDocument.Canvas;
-                        IDrawingCanvas add = this.mainDocument.Canvas;
+                        IDrawingDocument remove = this.alternateDocument.Canvas;
+                        IDrawingDocument add = this.mainDocument.Canvas;
                         this.videoTerminal.RemoveCanvas(remove);
                         this.videoTerminal.AddCanvas(add);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
+
+                        this.textSelection.Reset();
+                        this.videoTerminal.SetScrollVisible(true);
                         break;
                     }
 
@@ -1581,7 +1604,7 @@ namespace ModengTerm.Terminal.ViewModels
                             // 选中单词
 
                             VTextData textData = lineHit.BuildData();
-                            
+
                             int characterIndex;
                             VTRect characterBounds;
                             if (!HitTestHelper.HitTestVTCharacter(lineHit, location.X, out characterIndex, out characterBounds))
@@ -1597,7 +1620,7 @@ namespace ModengTerm.Terminal.ViewModels
                             // 选中一整行
 
                             VTextData textData = lineHit.BuildData();
-                            
+
                             startIndex = 0;
                             endIndex = textData.Text.Length - 1;
                             break;
@@ -1655,15 +1678,11 @@ namespace ModengTerm.Terminal.ViewModels
             VTextPointer startPointer = this.textSelection.Start;
             VTextPointer endPointer = this.textSelection.End;
 
-            // 得到当前鼠标的命中信息
+            // 更新当前鼠标的命中信息，保存在endPointer里
             if (!this.GetTextPointer(location, this.vtRect, endPointer))
             {
-                // 只有在没有Outside滚动的时候，才返回
-                // Outside滚动会导致GetTextPointer失败，虽然失败，还是要更新SelectionRange
-                if (scrollResult == OutsideScrollResult.None)
-                {
-                    return;
-                }
+                // 命中失败，不更新
+                return;
             }
 
             #region 起始字符和结束字符测量出来的索引位置都是-1，啥都不做
@@ -1689,7 +1708,7 @@ namespace ModengTerm.Terminal.ViewModels
             #region 计算并重新渲染选中内容的几何图形，要考虑到滚动条滚动的情况
 
             // 此时的VTextLine测量数据都是最新的
-            // 主缓冲区和备用缓冲区都支持选中
+            // 主缓冲区和备用缓冲区都支持选中，但是备用缓冲区不支持滚动
             this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
             this.textSelection.RequestInvalidate();
 

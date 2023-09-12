@@ -61,6 +61,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity">
       <HintPath>..\..\Dependence\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -96,10 +97,11 @@
     <Compile Include="Rendering\DrawingSelection.cs" />
     <Compile Include="Rendering\DrawingObject.cs" />
     <Compile Include="Rendering\DrawingUtils.cs" />
-    <Compile Include="Rendering\DrawingSurface.cs" />
+    <Compile Include="Rendering\DrawingDocument.cs" />
     <Compile Include="UserControls\FavoritesUserControl.xaml.cs">
       <DependentUpon>FavoritesUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\CreateSessionVM.cs" />
     <Compile Include="Windows\LoggerOptionsWindow.xaml.cs">
       <DependentUpon>LoggerOptionsWindow.xaml</DependentUpon>
     </Compile>

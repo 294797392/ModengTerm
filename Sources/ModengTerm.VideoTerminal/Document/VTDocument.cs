@@ -93,7 +93,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 渲染该文档的Surface
         /// </summary>
-        public IDrawingCanvas Canvas { get; private set; }
+        public IDrawingDocument Canvas { get; private set; }
 
         /// <summary>
         /// 是否需要重新布局
@@ -114,7 +114,7 @@ namespace XTerminal.Document
 
         #region 构造方法
 
-        public VTDocument(VTDocumentOptions options, IDrawingCanvas canvas, bool isAlternate)
+        public VTDocument(VTDocumentOptions options, IDrawingDocument canvas, bool isAlternate)
         {
             this.options = options;
             this.Canvas = canvas;
@@ -181,7 +181,7 @@ namespace XTerminal.Document
                 {
                     FontSize = this.options.FontSize,
                     FontFamily = this.options.FontFamily,
-                    Foreground = this.options.Foreground
+                    Foreground = this.options.ForegroundColor
                 },
             };
 

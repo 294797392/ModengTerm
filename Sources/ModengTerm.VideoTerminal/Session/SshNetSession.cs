@@ -51,7 +51,7 @@ namespace XTerminal.Session
         {
             #region 初始化身份验证方式
 
-            SSHAuthTypeEnum authType = this.session.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_AUTH_TYPE);
+            SSHAuthTypeEnum authType = this.session.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_SERVER_AUTH_TYPE);
             string userName = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME);
             string password = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_PASSWORD);
             string privateKeyFile = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_PRIVATE_KEY_FILE);

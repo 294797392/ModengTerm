@@ -9,7 +9,7 @@ namespace XTerminal.Document.Rendering
     /// <summary>
     /// 表示一个用来渲染终端输出的表面
     /// </summary>
-    public interface IDrawingCanvas
+    public interface IDrawingDocument
     {
         /// <summary>
         /// 创建一个渲染对象

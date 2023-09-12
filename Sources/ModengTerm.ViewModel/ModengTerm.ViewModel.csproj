@@ -51,7 +51,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreateSessionVM.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="GroupVM.cs" />
     <Compile Include="OpenedSessionVM.cs" />

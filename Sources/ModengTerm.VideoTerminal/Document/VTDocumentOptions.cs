@@ -39,7 +39,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 文本前景色
         /// </summary>
-        public string Foreground { get; set; }
+        public string ForegroundColor { get; set; }
 
         /// <summary>
         /// 字体样式
@@ -50,5 +50,10 @@ namespace XTerminal.Document
         /// 字体大小
         /// </summary>
         public int FontSize { get; set; }
+
+        /// <summary>
+        /// 背景颜色
+        /// </summary>
+        public string BackgroundColor { get; set; }
     }
 }

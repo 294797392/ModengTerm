@@ -10,30 +10,40 @@ namespace XTerminal.Base.Enumerations
     {
         #region SSH 0 - 500
 
+        // Terminal 0 - 99
         SSH_TERM_ROW = 0,
         SSH_TERM_COL = 1,
         SSH_TERM_TYPE = 2,
         SSH_TERM_SIZE_MODE = 3,
 
-        SSH_THEME_FONT_FAMILY = 6,
-        SSH_THEME_FONT_SIZE = 7,
-        SSH_THEME_FONT_COLOR = 8,
+        // Theme 100 - 200
+        SSH_THEME_FONT_FAMILY = 100,
+        SSH_THEME_FONT_SIZE = 101,
+        SSH_THEME_FONT_COLOR = 102,
+        
         /// <summary>
         /// 光标闪烁速度
         /// </summary>
-        SSH_THEME_CURSOR_SPEED,
+        SSH_THEME_CURSOR_SPEED = 103,
+        
         /// <summary>
         /// 光标样式
         /// </summary>
-        SSH_THEME_CURSOR_STYLE,
+        SSH_THEME_CURSOR_STYLE = 104,
 
-        SSH_SERVER_ADDR,
+        /// <summary>
+        /// 背景颜色
+        /// </summary>
+        SSH_THEME_BACK_COLOR = 105,
+
+        // Server 201 - 300
+        SSH_SERVER_ADDR = 201,
         SSH_SERVER_PORT,
         SSH_SERVER_USER_NAME,
         SSH_SERVER_PASSWORD,
         SSH_SERVER_PRIVATE_KEY_FILE,
         SSH_SERVER_Passphrase,
-        SSH_AUTH_TYPE,
+        SSH_SERVER_AUTH_TYPE,
 
         #endregion
 

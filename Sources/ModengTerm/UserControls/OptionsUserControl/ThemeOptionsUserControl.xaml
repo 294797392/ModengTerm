@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/XTerminal;component/Styles/OptionsDictionary.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <converter:VTCursorStyle2StringConverter x:Key="VTCursorStyle2StringConverter"/>
@@ -21,62 +21,70 @@
     </UserControl.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="主题：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxThemes" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        <StackPanel Orientation="Vertical">
+            <GroupBox Header="字体和颜色">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="字体：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxFontFamily" DataContext="{Binding Path=FontFamilyList}"
-                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="字体：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxFontFamily" DataContext="{Binding Path=FontFamilyList}"
+                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="字体颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxForeground" DataContext="{Binding Path=ForegroundList}"
-                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="字体颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxForeground" DataContext="{Binding Path=ForegroundList}"
+                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="字体大小：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxFontSize" DataContext="{Binding Path=FontSizeList}"
-                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="字体大小：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <ComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxFontSize" DataContext="{Binding Path=FontSizeList}"
+                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="光标样式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="背景颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxBackground" DataContext="{Binding Path=BackgroundList}"
+                              ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+
+        <!--<TextBlock Grid.Row="4" Grid.Column="0" Text="光标样式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <ComboBox Grid.Row="4" Grid.Column="1" x:Name="ComboBoxCursorStyle" DataContext="{Binding Path=FontSizeList}"
                   ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   Style="{StaticResource ResourceKey=StyleComboBoxValue}">
@@ -96,7 +104,7 @@
                     <TextBlock Text="{Binding Converter={StaticResource ResourceKey=VTCursorSpeed2StringConverter}}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
-        </ComboBox>
+        </ComboBox>-->
 
     </Grid>
 </UserControl>

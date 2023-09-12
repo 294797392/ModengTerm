@@ -92,6 +92,8 @@ namespace XTerminal.Document
             this.endPhysicsRow = -1;
 
             this.container = NullRect;
+
+            this.SetArrangeDirty(true);
         }
 
         /// <summary>
