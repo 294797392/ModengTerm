@@ -20,6 +20,7 @@ static char SGR[5] = { 0x1b, '[', '3', '1', 'm' };
 
 static char TEST[99999] = { 104,101,108,112,32,118,101,114,115,105,111,110,56,27,91,51,52,109,60,69,110,116,101,114,62,27,91,109,'a','b' };
 
+static char TAB[1] = { 0x9 };
 
 
 static void TestDCH()
@@ -62,7 +63,9 @@ int main()
     //char v[1] = { 32 };
     //printf(v);
     //printf(" red foreground using SGR.31.\r\n");
-    printf(TEST);
+    //printf(TEST);
+
+    printf(TAB);
 
 	char read[1024];
 	fgets(read, sizeof(read), stdin);

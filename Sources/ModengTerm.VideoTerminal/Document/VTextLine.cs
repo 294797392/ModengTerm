@@ -89,26 +89,9 @@ namespace XTerminal.Document
         public bool CursorAtRightMargin { get; private set; }
 
         /// <summary>
-        /// 获取该行的文本，如果字符数量是0，那么返回一个空白字符，目的是可以测量出来文本的测量信息
-        /// </summary>
-        public string Text
-        {
-            get
-            {
-                string text = VDocumentUtils.BuildLine(this.characters);
-                return text.Length == 0 ? " " : text;
-            }
-        }
-
-        /// <summary>
         /// 获取该行字符的只读集合
         /// </summary>
         public List<VTCharacter> Characters { get { return this.characters; } }
-
-        /// <summary>
-        /// 该行文本的装饰信息
-        /// </summary>
-        public List<VTextDecoration> Decorations { get; private set; }
 
         #endregion
 
@@ -121,8 +104,7 @@ namespace XTerminal.Document
         public VTextLine(VTDocument owner) : base(owner)
         {
             this.characters = new List<VTCharacter>();
-            this.Decorations = new List<VTextDecoration>();
-            this.decorationVersions = new int[Enum.GetValues(typeof(VTextDecorationEnum)).Length];
+            this.decorationVersions = new int[Enum.GetValues(typeof(VTextAttributes)).Length];
         }
 
         #endregion
@@ -282,19 +264,17 @@ namespace XTerminal.Document
             {
                 // 不相差列，说明要在已有列中替换字符
                 // 替换指定列的文本
-                VTCharacter oldCharacte = this.FindCharacter(column);
-                if (oldCharacte == null)
+                VTCharacter oldCharacter = this.FindCharacter(column);
+                if (oldCharacter == null)
                 {
                     logger.ErrorFormat("PrintCharacter失败, FindCharacter失败, column = {0}", column);
                     return;
                 }
 
-                int delta = character.ColumnSize - oldCharacte.ColumnSize;
+                int delta = character.ColumnSize - oldCharacter.ColumnSize;
                 this.Columns += delta;
 
-                oldCharacte.Character = character.Character;
-                oldCharacte.ColumnSize = character.ColumnSize;
-                oldCharacte.Flags = character.Flags;
+                character.CopyTo(oldCharacter);
             }
 
             //if (column == this.OwnerDocument.ColumnSize - 1)
@@ -341,7 +321,6 @@ namespace XTerminal.Document
             {
                 VTCharacter toDelete = this.characters[startIndex];
                 this.characters.Remove(toDelete);
-                VTCharacter.Recycle(toDelete);
 
                 // 更新显示的列数
                 this.Columns -= toDelete.ColumnSize;
@@ -375,7 +354,6 @@ namespace XTerminal.Document
             {
                 VTCharacter toDelete = this.characters[startIndex];
                 this.characters.Remove(toDelete);
-                VTCharacter.Recycle(toDelete);
 
                 // 更新显示的列数
                 this.Columns -= toDelete.ColumnSize;
@@ -390,20 +368,8 @@ namespace XTerminal.Document
         /// </summary>
         public void DeleteAll()
         {
-            foreach (VTCharacter character in this.characters)
-            {
-                VTCharacter.Recycle(character);
-            }
-
             this.characters.Clear();
             this.Columns = 0;
-
-            foreach (VTextDecoration decoration in this.Decorations)
-            {
-                VTextDecoration.Recycle(decoration);
-            }
-
-            this.Decorations.Clear();
 
             this.SetRenderDirty(true);
         }
@@ -503,8 +469,8 @@ namespace XTerminal.Document
         /// <param name="historyLine">要应用的历史行数据</param>
         public void SetHistory(VTHistoryLine historyLine)
         {
-            VTCharacter.CopyTo(this.characters, historyLine.Characters);
-            VTextDecoration.CopyTo(this.Decorations, historyLine.Attributes);
+            this.characters.Clear();
+            this.characters.AddRange(historyLine.Characters);
             this.PhysicsRow = historyLine.PhysicsRow;
             this.Columns = VTUtils.GetColumns(this.characters);
 
@@ -518,87 +484,54 @@ namespace XTerminal.Document
         public void SetEmpty()
         {
             // 清空字符
-            VTCharacter.Recycle(this.characters);
             this.characters.Clear();
             this.Columns = 0;
             this.PhysicsRow = -1;
 
-            // 清空属性列表
-            VTextDecoration.Recycle(this.Decorations);
-            this.Decorations.Clear();
-
             this.SetRenderDirty(true);
         }
 
-        public void ApplyDecorations(IEnumerable<VTextDecorationState> decorationStates)
+        public VTextData BuildData()
         {
-            foreach (VTextDecorationState decorationState in decorationStates)
+            VTextData textData = new VTextData();
+
+            for (int i = 0; i < this.Characters.Count; i++)
             {
-                int currentVersion = this.decorationVersions[(int)decorationState.Decoration];
-                int newVersion = decorationState.Version;
-                if (currentVersion == newVersion)
+                VTCharacter character = this.Characters[i];
+
+                textData.Text += character.Character;
+
+                foreach (VTextAttributeState attributeState in character.AttributeList)
                 {
-                    continue;
-                }
+                    VTextAttribute attribute = textData.Attributes.FirstOrDefault(v => v.Attribute == attributeState.Attribute && v.Parameter == attributeState.Parameter && !v.Closed);
 
-                VTCursor cursor = this.OwnerDocument.Cursor;
-
-                if (decorationState.Unset)
-                {
-                    // 取消设置属性
-
-                    List<VTextDecoration> decorations = this.Decorations.Where(v => v.Decoration == decorationState.Decoration).ToList();
-                    foreach (VTextDecoration decoration in decorations)
+                    if (attributeState.Enabled)
                     {
-                        if (decoration.StartColumn == cursor.Column)
+                        // 启用状态
+                        if (attribute == null)
                         {
-                            VTextDecoration.Recycle(decoration);
-                            // 取消设置列和设置列是同一列, 说明该列不用设置, 直接删除
-                            this.Decorations.Remove(decoration);
-                        }
-                        else
-                        {
-                            if (!decoration.Closed)
+                            attribute = new VTextAttribute()
                             {
-                                // 不合法的直接删除
-                                // 目前只遇到过一种情况会出现结束列小于开始列：
-                                // 1. 打开VIM，输入"1234"
-                                // 2. 保存然后关闭
-                                // 3. 打开VIM，输入123abc（最终显示的是123abc"1234"）
-                                if (cursor.Column < decoration.StartColumn)
-                                {
-                                    VTextDecoration.Recycle(decoration);
-                                    this.Decorations.Remove(decoration);
-                                    continue;
-                                }
-
-                                decoration.Closed = true;
-                                decoration.EndColumn = cursor.Column == 0 ? 0 : cursor.Column - 1;
-                            }
+                                Attribute = attributeState.Attribute,
+                                StartIndex = i,
+                                Parameter = attributeState.Parameter
+                            };
+                            textData.Attributes.Add(attribute);
+                        }
+                        attribute.Count++;
+                    }
+                    else
+                    {
+                        // 禁用状态
+                        if (attribute != null)
+                        {
+                            attribute.Closed = true;
                         }
                     }
                 }
-                else
-                {
-                    // 设置属性
-
-                    VTextDecoration decoration = this.Decorations.FirstOrDefault(v => v.StartColumn == cursor.Column);
-                    if (decoration == null)
-                    {
-                        decoration = VTextDecoration.Create();
-                        decoration.StartColumn = cursor.Column;
-                        this.Decorations.Add(decoration);
-                    }
-
-                    decoration.Decoration = decorationState.Decoration;
-                    decoration.Closed = false;
-                    decoration.EndColumn = 0;
-                    decoration.Parameter = decorationState.Parameter;
-                }
-
-                // 更新该行的文本属性的版本号
-                this.decorationVersions[(int)decorationState.Decoration] = newVersion;
             }
+
+            return textData;
         }
 
         #endregion

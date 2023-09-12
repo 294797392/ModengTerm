@@ -36,29 +36,21 @@ namespace XTerminal.Document
         /// </summary>
         public List<VTCharacter> Characters { get; private set; }
 
-        /// <summary>
-        /// 文本特效
-        /// </summary>
-        public List<VTextDecoration> Attributes { get; private set; }
-
         private VTHistoryLine()
         {
             this.Characters = new List<VTCharacter>();
-            this.Attributes = new List<VTextDecoration>();
         }
 
         /// <summary>
         /// 设置该历史行的数据
-        /// 当某一行已经显示完成的时候需要冻结
-        /// 冻结操作会把要冻结的行里的数据复制到VTHistoryLine里
         /// </summary>
-        /// <param name="sourceLine">要冻结的行</param>
-        public void SetVTextLine(VTextLine sourceLine)
+        /// <param name="textLine">要设置的行</param>
+        public void SetVTextLine(VTextLine textLine)
         {
-            this.PhysicsRow = sourceLine.PhysicsRow;
+            this.PhysicsRow = textLine.PhysicsRow;
             // 复制一份字符列表
-            VTCharacter.CopyTo(this.Characters, sourceLine.Characters);
-            VTextDecoration.CopyTo(this.Attributes, sourceLine.Decorations);
+            this.Characters.Clear();
+            this.Characters.AddRange(textLine.Characters);
         }
 
         /// <summary>

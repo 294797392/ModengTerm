@@ -57,7 +57,7 @@
   <ItemGroup>
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
-    <Compile Include="Document\VTextDecorationState.cs" />
+    <Compile Include="Document\VTextData.cs" />
     <Compile Include="Enumerations\SaveModeEnum.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Document\HighlightGeometry\HighlightGeometryBuilder.cs" />
@@ -84,7 +84,7 @@
     <Compile Include="Document\VTDocument.cs" />
     <Compile Include="Document\VTDocumentElement.cs" />
     <Compile Include="Document\VTDocumentOptions.cs" />
-    <Compile Include="Document\VTextDecoration.cs" />
+    <Compile Include="Document\VTextAttribute.cs" />
     <Compile Include="Document\VTextElement.cs" />
     <Compile Include="Document\VTextLine.cs" />
     <Compile Include="Document\VTextLineState.cs" />

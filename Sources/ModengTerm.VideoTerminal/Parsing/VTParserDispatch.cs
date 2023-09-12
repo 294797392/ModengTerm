@@ -65,7 +65,6 @@ namespace XTerminal.Parser
                 case ASCIITable.BEL:
                     {
                         // 响铃
-                        logger.DebugFormat("Action - BEL");
                         this.NotifyActionEvent(VTActions.PlayBell);
                         break;
                     }
@@ -80,21 +79,18 @@ namespace XTerminal.Parser
                 case ASCIITable.TAB:
                     {
                         // tab键
-                        logger.DebugFormat("Action - Tab");
                         this.NotifyActionEvent(VTActions.ForwardTab);
                         break;
                     }
 
                 case ASCIITable.CR:
                     {
-                        //logger.DebugFormat("Action - CR");
                         this.NotifyActionEvent(VTActions.CarriageReturn);
                         break;
                     }
 
                 case ASCIITable.LF:
                     {
-                        //logger.DebugFormat("Action - LF");
                         this.NotifyActionEvent(VTActions.LF);
                         break;
                     }

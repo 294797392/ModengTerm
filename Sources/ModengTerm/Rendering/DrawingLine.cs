@@ -97,9 +97,7 @@ namespace ModengTerm.Rendering
         protected override void Draw(DrawingContext dc)
         {
             FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine, dc);
-
             DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
-
             dc.DrawText(formattedText, DrawingUtils.ZeroPoint);
         }
 

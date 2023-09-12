@@ -973,15 +973,15 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         /// <param name="ch">多字节或者单字节的字符</param>
         /// <returns></returns>
-        private VTCharacter CreateCharacter(object ch)
+        private VTCharacter CreateCharacter(object ch, List<VTextAttributeState> attributeStates)
         {
             if (ch is char)
             {
-                return VTCharacter.Create(Convert.ToChar(ch), 2, VTCharacterFlags.MulitByteChar);
+                return VTCharacter.Create(Convert.ToChar(ch), 2, VTCharacterFlags.MulitByteChar, attributeStates);
             }
             else
             {
-                return VTCharacter.Create(Convert.ToChar(ch), 1, VTCharacterFlags.SingleByteChar);
+                return VTCharacter.Create(Convert.ToChar(ch), 1, VTCharacterFlags.SingleByteChar, attributeStates);
             }
         }
 
@@ -1013,13 +1013,10 @@ namespace ModengTerm.Terminal.ViewModels
                             }
                         }
 
-                        // 每次打印字符的时候都应用一下当前的文本属性
-                        this.ActiveLine.ApplyDecorations(this.activeDocument.DecorationStates);
-
                         // 创建并打印新的字符
                         char ch = Convert.ToChar(parameter);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, ch);
-                        VTCharacter character = this.CreateCharacter(parameter);
+                        VTCharacter character = this.CreateCharacter(parameter, this.activeDocument.AttributeStates);
                         this.activeDocument.PrintCharacter(this.ActiveLine, character, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + character.ColumnSize);
                         break;
@@ -1119,6 +1116,20 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.PlayBell:
                     {
                         // 响铃
+                        break;
+                    }
+
+                case VTActions.ForwardTab:
+                    {
+                        // 执行TAB键的动作（在当前光标位置处打印4个空格）
+                        // 微软的terminal项目里说，如果光标在该行的最右边，那么再次执行TAB的时候光标会自动移动到下一行，目前先不这么做
+
+                        int tabSize = 4;
+                        for (int i = 0; i < tabSize; i++)
+                        {
+                            this.VtParser_ActionEvent(VTActions.Print, ' ');
+                        }
+
                         break;
                     }
 
@@ -1241,17 +1252,10 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case VTActions.UnsetAll:
                     {
-                        // 重置所有文本装饰并更新版本号
-
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        ReadOnlyCollection<VTextDecorationState> decorationStates = this.activeDocument.DecorationStates;
-                        foreach (VTextDecorationState decorationState in decorationStates)
-                        {
-                            decorationState.Unset = true;
-                            decorationState.Version++;
-                            decorationState.Parameter = null;
-                        }
+                        // 重置所有文本装饰
+                        this.activeDocument.ClearAttribute();
                         break;
                     }
 
@@ -1272,17 +1276,11 @@ namespace ModengTerm.Terminal.ViewModels
 
                         // 打开VIM的时候，VIM会在打印第一行的~号的时候设置验色，然后把剩余的行全部打印，也就是说设置一次颜色可以对多行都生效
                         // 所以这里要记录下如果当前有文本特效被设置了，那么在行改变的时候也需要设置文本特效
-
-                        bool unset;
-                        VTextDecorationEnum decorations = VTUtils.VTAction2TextDecoration(action, out unset);
-
                         // 缓存下来，每次打印字符的时候都要对ActiveLine Apply一下
-                        ReadOnlyCollection<VTextDecorationState> decorationStates = this.activeDocument.DecorationStates;
-                        VTextDecorationState decorationState = decorationStates[(int)decorations];
-                        decorationState.Parameter = parameter;
-                        decorationState.Unset = unset;
-                        // 更新属性状态的版本号，下次打印字符的时候，ActiveLine里的文本版本号会和最新的版本号做比对，如果不一致则更新文本属性
-                        decorationState.Version++;
+
+                        bool enabled;
+                        VTextAttributes attribute = VTUtils.VTAction2TextAttribute(action, out enabled);
+                        this.activeDocument.SetAttribute(attribute, enabled, parameter);
                         break;
                     }
 
@@ -1581,21 +1579,27 @@ namespace ModengTerm.Terminal.ViewModels
                     case 2:
                         {
                             // 选中单词
+
+                            VTextData textData = lineHit.BuildData();
+                            
                             int characterIndex;
                             VTRect characterBounds;
                             if (!HitTestHelper.HitTestVTCharacter(lineHit, location.X, out characterIndex, out characterBounds))
                             {
                                 return;
                             }
-                            VDocumentUtils.GetSegement(lineHit.Text, characterIndex, out startIndex, out endIndex);
+                            VDocumentUtils.GetSegement(textData.Text, characterIndex, out startIndex, out endIndex);
                             break;
                         }
 
                     case 3:
                         {
                             // 选中一整行
+
+                            VTextData textData = lineHit.BuildData();
+                            
                             startIndex = 0;
-                            endIndex = lineHit.Text.Length - 1;
+                            endIndex = textData.Text.Length - 1;
                             break;
                         }
 
@@ -1768,6 +1772,8 @@ namespace ModengTerm.Terminal.ViewModels
             // 计算一共有多少行，和每行之间的间距是多少
             int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
+
+            // 使用空白字符计算一行的高度，然后用屏幕高度除以一行的高度
             VTextMetrics metrics = this.videoTerminal.MeasureText(" ", fontSize, fontFamily);
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置

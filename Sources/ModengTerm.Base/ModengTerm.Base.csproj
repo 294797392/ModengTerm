@@ -75,8 +75,6 @@
     <Compile Include="ICloneable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseCode.cs" />
-    <Compile Include="Reusable.cs" />
-    <Compile Include="ReusableQueue.cs" />
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />
     <Compile Include="ServiceAgents\FileServiceAgent.cs" />
     <Compile Include="ServiceAgents\ServiceAgent.cs" />

@@ -1,4 +1,6 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit;
+using ModengTerm.Base;
+using ModengTerm.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,7 @@ namespace XTerminal.Document
     /// 存储终端里一个字符的信息
     /// VTCharacter保存要显示的字符信息和该字符的样式信息
     /// </summary>
-    public class VTCharacter : Reusable<VTCharacter>
+    public class VTCharacter
     {
         /// <summary>
         /// 字符
@@ -30,16 +32,15 @@ namespace XTerminal.Document
         /// </summary>
         public VTCharacterFlags Flags { get; set; }
 
+        /// <summary>
+        /// 存储该字符的文本属性列表
+        /// </summary>
+        public List<VTextAttributeState> AttributeList { get; private set; }
+
         #region 构造方法
 
         private VTCharacter()
-        { }
-
-        private VTCharacter(char character, int columnSize, VTCharacterFlags flag)
         {
-            this.Character = character;
-            this.ColumnSize = columnSize;
-            this.Flags = flag;
         }
 
         #endregion
@@ -51,12 +52,17 @@ namespace XTerminal.Document
         /// 该方法会首先从缓存里取字符，如果缓存里没有空闲字符，那么创建一个新的
         /// </remarks>
         /// <returns></returns>
-        public static VTCharacter Create(char ch, int columnSize, VTCharacterFlags flag)
+        public static VTCharacter Create(char ch, int columnSize, VTCharacterFlags flag, List<VTextAttributeState> attributeStates)
         {
-            VTCharacter character = VTCharacter.Create();
+            VTCharacter character = new VTCharacter();
+            character.AttributeList = VTUtils.CreateTextAttributeStates();
             character.Character = ch;
             character.ColumnSize = columnSize;
             character.Flags = flag;
+            if (attributeStates != null)
+            {
+                VTUtils.CopyAttributeState(attributeStates, character.AttributeList);
+            }
             return character;
         }
 
@@ -66,21 +72,19 @@ namespace XTerminal.Document
         /// <returns></returns>
         public static VTCharacter CreateNull()
         {
-            return Create(' ', 1, VTCharacterFlags.SingleByteChar);
+            return Create(' ', 1, VTCharacterFlags.SingleByteChar, null);
         }
 
-        public override void CopyTo(VTCharacter character)
+        /// <summary>
+        /// 把该字符数据拷贝到指定的字符里
+        /// </summary>
+        /// <param name="character">要拷贝到的字符</param>
+        public void CopyTo(VTCharacter character)
         {
             character.Character = this.Character;
             character.ColumnSize = this.ColumnSize;
             character.Flags = this.Flags;
-        }
-
-        public override void SetDefault()
-        {
-            this.Character = (char)0;
-            this.ColumnSize = 0;
-            this.Flags = (VTCharacterFlags)0;
+            VTUtils.CopyAttributeState(this.AttributeList, character.AttributeList);
         }
     }
 }

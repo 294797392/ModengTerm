@@ -43,8 +43,6 @@ namespace XTerminal.Document
 
         private int lineId;
 
-        private List<VTextDecorationState> decorationStates;
-
         #endregion
 
         #region 属性
@@ -108,9 +106,9 @@ namespace XTerminal.Document
         public bool IsAlternate { get; private set; }
 
         /// <summary>
-        /// 存储当前的文本属性状态
+        /// 当前应用的文本属性
         /// </summary>
-        public ReadOnlyCollection<VTextDecorationState> DecorationStates { get; private set; }
+        public List<VTextAttributeState> AttributeStates { get; private set; }
 
         #endregion
 
@@ -125,9 +123,7 @@ namespace XTerminal.Document
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
 
-            IEnumerable<VTextDecorationEnum> decorationEnums = Enum.GetValues(typeof(VTextDecorationEnum)).Cast<VTextDecorationEnum>();
-            this.decorationStates = decorationEnums.OrderBy(v => v).Select(v => new VTextDecorationState(v)).ToList();
-            this.DecorationStates = new ReadOnlyCollection<VTextDecorationState>(this.decorationStates);
+            this.AttributeStates = VTUtils.CreateTextAttributeStates();
 
             this.Cursor = new VTCursor()
             {
@@ -206,30 +202,6 @@ namespace XTerminal.Document
             }
         }
 
-        /// <summary>
-        /// 把当前Document的可显示区域打印到日志里，方便调试
-        /// </summary>
-        public void Print()
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.AppendLine();
-
-            VTextLine next = this.FirstLine;
-            while (next != null)
-            {
-                builder.AppendLine(next.Text);
-
-                if (next == this.LastLine)
-                {
-                    break;
-                }
-
-                next = next.NextLine;
-            }
-
-            logger.FatalFormat(builder.ToString());
-        }
-
         #endregion
 
         #region 公开接口
@@ -300,10 +272,6 @@ namespace XTerminal.Document
                 this.SetCursor(this.Cursor.Row + 1, this.Cursor.Column);
                 this.ActiveLine.SetRenderDirty(true);
             }
-
-            // 清空新行的文本特效，不然可能会遗留之前的文本特效
-            VTextDecoration.Recycle(this.ActiveLine.Decorations);
-            this.ActiveLine.Decorations.Clear();
         }
 
         /// <summary>
@@ -374,10 +342,6 @@ namespace XTerminal.Document
                 this.SetCursor(this.Cursor.Row - 1, this.Cursor.Column);
                 this.ActiveLine.SetRenderDirty(true);
             }
-
-            // 清空新行的文本特效，不然可能会遗留之前的文本特效
-            VTextDecoration.Recycle(this.ActiveLine.Decorations);
-            this.ActiveLine.Decorations.Clear();
         }
 
         /// <summary>
@@ -822,6 +786,7 @@ namespace XTerminal.Document
                     // 此时ActiveLine不变
                     for (int i = 0; i < rows; i++)
                     {
+                        // TODO：这里PhysicsRow会有问题，先把滚动条往上移动，然后扩大行数，PhysicsRow就不对了
                         VTextLine textLine = this.CreateLine(this.LastLine.PhysicsRow + 1);
                         this.LastLine.Append(textLine);
                     }
@@ -864,6 +829,31 @@ namespace XTerminal.Document
             if (this.colSize != colSize)
             {
                 this.colSize = colSize;
+            }
+        }
+
+        /// <summary>
+        /// 设置当前要应用的文本装饰
+        /// </summary>
+        /// <param name="attribute">要应用的装饰类型</param>
+        /// <param name="unset">是否应用该装饰</param>
+        /// <param name="parameter">该状态对应的参数</param>
+        public void SetAttribute(VTextAttributes attribute, bool enabled, object parameter)
+        {
+            VTextAttributeState attributeState = this.AttributeStates[(int)attribute];
+            attributeState.Enabled = enabled;
+            attributeState.Parameter = parameter;
+        }
+
+        /// <summary>
+        /// 清空当前应用的文本装饰
+        /// </summary>
+        public void ClearAttribute()
+        {
+            foreach (VTextAttributeState attributeState in this.AttributeStates)
+            {
+                attributeState.Parameter = null;
+                attributeState.Enabled = false;
             }
         }
 

@@ -1,10 +1,12 @@
-﻿using ModengTerm.Terminal.Enumerations;
+﻿using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using XTerminal.Document;
 using XTerminal.Parser;
+using System.Linq;
 
 namespace ModengTerm.Terminal
 {
@@ -67,25 +69,24 @@ namespace ModengTerm.Terminal
             }
         }
 
-
-        public static VTextDecorationEnum VTAction2TextDecoration(VTActions actions, out bool unset)
+        public static VTextAttributes VTAction2TextAttribute(VTActions actions, out bool enabled)
         {
-            unset = false;
+            enabled = true;
 
             switch (actions)
             {
-                case VTActions.Bold: return VTextDecorationEnum.Bold;
-                case VTActions.BoldUnset: unset = true; return VTextDecorationEnum.Bold;
-                case VTActions.Underline: return VTextDecorationEnum.Underline;
-                case VTActions.UnderlineUnset: unset = true; return VTextDecorationEnum.Underline;
-                case VTActions.Italics: return VTextDecorationEnum.Italics;
-                case VTActions.ItalicsUnset: unset = true; return VTextDecorationEnum.Italics;
-                case VTActions.DoublyUnderlined: return VTextDecorationEnum.DoublyUnderlined;
-                case VTActions.DoublyUnderlinedUnset: unset = true; return VTextDecorationEnum.DoublyUnderlined;
-                case VTActions.Background: return VTextDecorationEnum.Background;
-                case VTActions.BackgroundUnset: unset = true; return VTextDecorationEnum.Background;
-                case VTActions.Foreground: return VTextDecorationEnum.Foreground;
-                case VTActions.ForegroundUnset: unset = true; return VTextDecorationEnum.Foreground;
+                case VTActions.Bold: return VTextAttributes.Bold;
+                case VTActions.BoldUnset: enabled = false; return VTextAttributes.Bold;
+                case VTActions.Underline: return VTextAttributes.Underline;
+                case VTActions.UnderlineUnset: enabled = false; return VTextAttributes.Underline;
+                case VTActions.Italics: return VTextAttributes.Italics;
+                case VTActions.ItalicsUnset: enabled = false; return VTextAttributes.Italics;
+                case VTActions.DoublyUnderlined: return VTextAttributes.DoublyUnderlined;
+                case VTActions.DoublyUnderlinedUnset: enabled = false; return VTextAttributes.DoublyUnderlined;
+                case VTActions.Background: return VTextAttributes.Background;
+                case VTActions.BackgroundUnset: enabled = false; return VTextAttributes.Background;
+                case VTActions.Foreground: return VTextAttributes.Foreground;
+                case VTActions.ForegroundUnset: enabled = false; return VTextAttributes.Foreground;
 
                 default:
                     throw new NotImplementedException();
@@ -107,6 +108,34 @@ namespace ModengTerm.Terminal
             }
 
             return columns;
+        }
+
+        public static List<VTextAttributeState> CreateTextAttributeStates()
+        {
+            List<VTextAttributeState> attributeStates = new List<VTextAttributeState>();
+
+            IEnumerable<VTextAttributes> attributes = Enum.GetValues(typeof(VTextAttributes)).Cast<VTextAttributes>().OrderBy(v => v);
+
+            foreach (VTextAttributes attribute in attributes)
+            {
+                VTextAttributeState attributeState = new VTextAttributeState(attribute);
+
+                attributeStates.Add(attributeState);
+            }
+
+            return attributeStates;
+        }
+
+        public static void CopyAttributeState(List<VTextAttributeState> copyFroms, List<VTextAttributeState> copyTos)
+        {
+            for (int i = 0; i < copyFroms.Count; i++)
+            {
+                VTextAttributeState copyFrom = copyFroms[i];
+                VTextAttributeState copyTo = copyTos[i];
+
+                copyTo.Enabled = copyFrom.Enabled;
+                copyTo.Parameter = copyFrom.Parameter;
+            }
         }
     }
 }
