@@ -8,12 +8,12 @@ using System.Windows.Media;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Base
+namespace ModengTerm.Base
 {
     /// <summary>
     /// XTerminal使用的默认值
     /// </summary>
-    public static class XTermConsts
+    public static class MTermConsts
     {
         #region 光标闪烁时间
 
@@ -73,6 +73,11 @@ namespace XTerminal.Base
             "57600",
             "115200",
             "921600"
+        };
+
+        public static readonly List<int> DefaultSerialPortDataBits = new List<int>() 
+        {
+            5, 6, 7, 8
         };
 
         /// <summary>

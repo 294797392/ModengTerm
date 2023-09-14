@@ -217,6 +217,8 @@ namespace Renci.SshNet
         {
             var i = 0;
 
+            _dataReceived.WaitOne();
+
             lock (_incoming)
             {
                 for (; i < count && _incoming.Count > 0; i++)

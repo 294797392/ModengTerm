@@ -41,8 +41,6 @@ namespace XTerminal.Document
         /// </summary>
         private int colSize;
 
-        private int lineId;
-
         #endregion
 
         #region 属性
@@ -173,7 +171,6 @@ namespace XTerminal.Document
         {
             VTextLine textLine = new VTextLine(this)
             {
-                ID = this.lineId++,
                 OffsetX = 0,
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,

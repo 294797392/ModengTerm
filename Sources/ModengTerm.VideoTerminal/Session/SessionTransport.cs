@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,7 +37,7 @@ namespace XTerminal.Session
 
         private SessionDriver driver;
 
-        private Task receiveThread;
+        private Task backgroundTask;
         private bool isRunning;
 
         private byte[] readBuffer;
@@ -46,21 +47,14 @@ namespace XTerminal.Session
 
         #endregion
 
+        #region 属性
+
         /// <summary>
         /// 获取当前Session的连接状态
         /// </summary>
-        public SessionStatusEnum Status
-        {
-            get
-            {
-                if (this.driver == null) 
-                {
-                    return SessionStatusEnum.Disconnected;
-                }
+        public SessionStatusEnum Status { get; private set; }
 
-                return this.driver.Status;
-            }
-        }
+        #endregion
 
         #region 公开接口
 
@@ -72,42 +66,42 @@ namespace XTerminal.Session
             this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
             this.driver = SessionFactory.Create(session);
-            this.driver.StatusChanged += Session_StatusChanged;
 
             return ResponseCode.SUCCESS;
         }
 
         public void Release()
         {
-            this.driver.StatusChanged -= this.Session_StatusChanged;
             this.driver = null;
         }
 
-        public int Open()
+        /// <summary>
+        /// 异步打开与远程主机的连接
+        /// </summary>
+        /// <returns></returns>
+        public int OpenAsync()
         {
-            int code = this.driver.Open();
-            if (code != ResponseCode.SUCCESS)
-            {
-                return code;
-            }
-
-            this.driver.Status = SessionStatusEnum.Connected;
-
             this.isRunning = true;
-            this.receiveThread = Task.Factory.StartNew(this.ReceiveThreadProc);
+            this.backgroundTask = Task.Factory.StartNew(this.BackgroundTaskProc);
             return ResponseCode.SUCCESS;
         }
 
         public void Close()
         {
             this.isRunning = false;
-            this.receiveThread.Wait();
+
+            if (!this.CheckStatus())
+            {
+                return;
+            }
+
+            this.backgroundTask.Wait();
             this.driver.Close();
         }
 
         public int Write(byte[] bytes)
         {
-            if (!this.CheckDriverStatus())
+            if (!this.CheckStatus())
             {
                 return ResponseCode.SUCCESS;
             }
@@ -116,6 +110,16 @@ namespace XTerminal.Session
             {
                 this.driver.Write(bytes);
                 return ResponseCode.SUCCESS;
+            }
+            catch (InvalidOperationException ex)
+            {
+                logger.Error("发送数据异常", ex);
+                return ResponseCode.FAILED;
+            }
+            catch (TimeoutException ex)
+            {
+                logger.Error("发送数据异常", ex);
+                return ResponseCode.FAILED;
             }
             catch (Exception ex)
             {
@@ -129,31 +133,53 @@ namespace XTerminal.Session
         /// </summary>
         /// <param name="row"></param>
         /// <param name="col"></param>
-        public void Resize(int row, int col)
+        public int Resize(int row, int col)
         {
-            if (!this.CheckDriverStatus())
+            if (!this.CheckStatus())
             {
-                return;
+                return ResponseCode.FAILED;
             }
 
-            if (this.row == row && this.col == col) 
+            if (this.row == row && this.col == col)
             {
-                return;
+                return ResponseCode.SUCCESS;
             }
 
-            this.driver.Resize(row, col);
+            try
+            {
+                this.driver.Resize(row, col);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Resize异常", ex);
+                return ResponseCode.FAILED;
+            }
 
             this.row = row;
             this.col = col;
+
+            return ResponseCode.SUCCESS;
         }
 
         #endregion
 
         #region 实例方法
 
-        private bool CheckDriverStatus()
+        /// <summary>
+        /// 检查当前连接状态
+        /// </summary>
+        /// <returns>
+        /// true：已连接，可以执行其他操作
+        /// false：未连接，不能执行其他操作
+        /// </returns>
+        private bool CheckStatus()
         {
-            if (this.driver.Status != SessionStatusEnum.Connected)
+            if (this.driver == null)
+            {
+                return false;
+            }
+
+            if (this.Status != SessionStatusEnum.Connected)
             {
                 return false;
             }
@@ -169,32 +195,48 @@ namespace XTerminal.Session
             }
         }
 
-        protected void NotifyStatusChanged(SessionStatusEnum status)
+        private void NotifyStatusChanged(SessionStatusEnum status)
         {
+            if (this.Status == status)
+            {
+                return;
+            }
+
+            this.Status = status;
             if (this.StatusChanged != null)
             {
                 this.StatusChanged(this, status);
             }
         }
 
-        #endregion
-
-        #region 事件处理器
-
-        private void Session_StatusChanged(object sender, SessionStatusEnum status)
-        {
-            this.NotifyStatusChanged(status);
-        }
-
-        private void ReceiveThreadProc()
+        private void SessionLoop()
         {
             // 没读取道数据的次数
             // 如果超过3次，那么就判断为已经断开连接
             int zeros = 0;
+            int n = 0;
 
             while (this.isRunning)
             {
-                int n = this.driver.Read(this.readBuffer);
+                try
+                {
+                    n = this.driver.Read(this.readBuffer);
+                }
+                catch (InvalidOperationException ex)
+                {
+                    logger.Error("读取数据异常", ex);
+                    break;
+                }
+                catch (TimeoutException ex)
+                {
+                    logger.Error("读取数据异常", ex);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("读取数据异常", ex);
+                    break;
+                }
 
                 if (n == -1)
                 {
@@ -204,9 +246,10 @@ namespace XTerminal.Session
                 {
                     // 没读取到数据
                     zeros++;
-                    if (zeros > 3)
+                    if (zeros > 10)
                     {
                         // 读取失败，直接断线处理
+                        break;
                     }
                     else
                     {
@@ -216,7 +259,7 @@ namespace XTerminal.Session
                 else
                 {
                     // 重置zero计数器
-                    if(zeros != 0)
+                    if (zeros != 0)
                     {
                         zeros = 0;
                     }
@@ -225,6 +268,49 @@ namespace XTerminal.Session
                     this.NotifyDataReceived(this.readBuffer, n);
                 }
             }
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        private void BackgroundTaskProc()
+        {
+            logger.InfoFormat("Session线程启动成功");
+
+            int code = ResponseCode.SUCCESS;
+
+            // 先连接远程主机
+            this.NotifyStatusChanged(SessionStatusEnum.Connecting);
+
+            try
+            {
+                if ((code = this.driver.Open()) != ResponseCode.SUCCESS)
+                {
+                    this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("连接失败", ex);
+                this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+                return;
+            }
+
+            this.NotifyStatusChanged(SessionStatusEnum.Connected);
+
+            // 连接成功之后开始从远程主机读取数据
+            // 读取失败会返回
+            this.SessionLoop();
+
+            // 此时连接失败
+            this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+
+            this.driver.Close();
+            this.isRunning = false;
+
+            logger.InfoFormat("退出Session线程");
         }
 
         #endregion

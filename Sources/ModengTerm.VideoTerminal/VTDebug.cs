@@ -158,15 +158,7 @@ namespace ModengTerm.Terminal
 
         public void WriteInteractive(VTActions action, string format, params object[] param)
         {
-            if (!this.CanWrite(this.interactiveCategory))
-            {
-                return;
-            }
-
-            string message = string.Format(format, param);
-            string log = string.Format("<- [{0},{1}]", action, message);
-            File.AppendAllText(this.interactiveCategory.FilePath, log);
-            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
+            this.WriteInteractive(action.ToString(), format, param);
         }
 
         public void WriteInteractive(VTSendTypeEnum type, byte[] bytes)
@@ -194,6 +186,19 @@ namespace ModengTerm.Terminal
 
             string message = bytes.Select(v => ((int)v).ToString()).Join(",");
             string log = string.Format("-> [{0},{1},{2}]", type, statusType, message);
+            File.AppendAllText(this.interactiveCategory.FilePath, log);
+            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
+        }
+
+        public void WriteInteractive(string action, string format, params object[] param)
+        {
+            if (!this.CanWrite(this.interactiveCategory))
+            {
+                return;
+            }
+
+            string message = string.Format(format, param);
+            string log = string.Format("<- [{0},{1}]", action, message);
             File.AppendAllText(this.interactiveCategory.FilePath, log);
             File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
         }

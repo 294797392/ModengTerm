@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base;
 using Renci.SshNet;
 using System;
 using System.Collections.Generic;
@@ -128,7 +129,7 @@ namespace XTerminal.ViewModels.SFTP
         /// <param name="directory"></param>
         private void AddHistoryDirectory(string directory)
         {
-            if (this.historyDirs.Count == XTermConsts.MaxHistoryDirectory)
+            if (this.historyDirs.Count == MTermConsts.MaxHistoryDirectory)
             {
                 this.historyDirs.Dequeue();
             }

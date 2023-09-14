@@ -12,14 +12,14 @@ namespace XTerminal.Base.Enumerations
     public enum SSHAuthTypeEnum
     {
         /// <summary>
-        /// 不需要验证，直接输入IP地址和端口号就可以
-        /// </summary>
-        None,
-
-        /// <summary>
         /// 密码验证
         /// </summary>
         Password,
+
+        /// <summary>
+        /// 不需要验证，直接输入IP地址和端口号就可以
+        /// </summary>
+        None,
 
         /// <summary>
         /// 私钥验证

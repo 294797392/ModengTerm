@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -252,7 +253,7 @@ namespace ModengTerm.Terminal
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
             this.SetCursorKeyMode(false);
-            this.Encoding = Encoding.GetEncoding(XTermConsts.DefaultOutputEncoding);
+            this.Encoding = Encoding.GetEncoding(MTermConsts.DefaultOutputEncoding);
         }
 
         #endregion

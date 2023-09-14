@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Session
+namespace ModengTerm.Base.Enumerations
 {
     /// <summary>
     /// 表示会话的连接状态
@@ -11,18 +11,23 @@ namespace XTerminal.Session
     public enum SessionStatusEnum
     {
         /// <summary>
-        /// 数据流处于初始化状态
+        /// 连接中
         /// </summary>
         Connecting,
 
         /// <summary>
-        /// 所有准备工作已就绪，可以开始解析终端数据流了
+        /// 已连接
         /// </summary>
         Connected,
 
         /// <summary>
-        /// 断开连接
+        /// 连接已断开
         /// </summary>
-        Disconnected
+        Disconnected,
+
+        /// <summary>
+        /// 连接失败
+        /// </summary>
+        ConnectionError
     }
 }

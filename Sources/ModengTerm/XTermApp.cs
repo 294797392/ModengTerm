@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
@@ -89,7 +90,7 @@ namespace XTerminal
             // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
 
             this.drawCursorTimer = new DispatcherTimer();
-            this.drawCursorTimer.Interval = TimeSpan.FromMilliseconds(XTermConsts.HighSpeedBlinkInterval);
+            this.drawCursorTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.HighSpeedBlinkInterval);
             this.drawCursorTimer.Tick += DrawCursorTimer_Tick;
             this.drawCursorTimer.IsEnabled = false;
             this.drawCursorTimer.Start();
@@ -151,7 +152,7 @@ namespace XTerminal
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
             if (firstOpenedSession == null)
             {
-                this.OpenSession(XTermConsts.DefaultSession);
+                this.OpenSession(MTermConsts.DefaultSession);
             }
             else
             {
@@ -206,7 +207,7 @@ namespace XTerminal
 
         #region 事件处理器
 
-        private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, int status)
+        private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
         {
         }
 

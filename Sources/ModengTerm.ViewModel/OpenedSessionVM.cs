@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,13 @@ namespace XTerminal.ViewModels
         /// <summary>
         /// 会话状态改变的时候触发
         /// </summary>
-        public event Action<OpenedSessionVM, int> StatusChanged;
+        public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
+
+        #endregion
+
+        #region 实例变量
+
+        private SessionStatusEnum status;
 
         #endregion
 
@@ -32,6 +39,22 @@ namespace XTerminal.ViewModels
         /// 对应的会话信息
         /// </summary>
         public XTermSession Session { get; private set; }
+
+        /// <summary>
+        /// 与会话的连接状态
+        /// </summary>
+        public SessionStatusEnum Status
+        {
+            get { return this.status; }
+            private set
+            {
+                if (this.status != value)
+                {
+                    this.status = value;
+                    this.NotifyPropertyChanged("Status");
+                }
+            }
+        }
 
         #endregion
 
@@ -49,5 +72,20 @@ namespace XTerminal.ViewModels
 
         protected abstract int OnOpen(XTermSession sessionInfo);
         protected abstract void OnClose();
+
+        protected void NotifyStatusChanged(SessionStatusEnum status)
+        {
+            if (this.status == status)
+            {
+                return;
+            }
+
+            this.Status = status;
+
+            if (this.StatusChanged != null)
+            {
+                this.StatusChanged(this, status);
+            }
+        }
     }
 }

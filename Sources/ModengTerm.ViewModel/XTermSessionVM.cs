@@ -13,6 +13,7 @@ namespace XTerminal.ViewModels
     {
         private SessionTypeEnum type;
         private DateTime creationTime;
+        private string hostName;
 
         /// <summary>
         /// 会话类型
@@ -43,6 +44,22 @@ namespace XTerminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 主机名
+        /// </summary>
+        public string HostName
+        {
+            get { return this.hostName; }
+            set
+            {
+                if (this.hostName != value)
+                {
+                    this.hostName = value;
+                    this.NotifyPropertyChanged("HostName");
+                }
+            }
+        }
+
         public XTermSession Session { get; private set; }
 
         public XTermSessionVM(XTermSession session)
@@ -53,6 +70,29 @@ namespace XTerminal.ViewModels
             this.Description = session.Description;
             this.CreationTime = session.CreationTime;
             this.Type = (SessionTypeEnum)session.SessionType;
+
+            switch((SessionTypeEnum)session.SessionType)
+            {
+                case SessionTypeEnum.SerialPort:
+                    {
+                        this.HostName = session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
+                        break;
+                    }
+
+                case SessionTypeEnum.SSH:
+                    {
+                        this.HostName = session.GetOption<string>(OptionKeyEnum.SFTP_SERVER_ADDRESS);
+                        break;
+                    }
+
+                case SessionTypeEnum.Win32CommandLine:
+                    {
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

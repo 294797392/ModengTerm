@@ -41,14 +41,6 @@
             "icon": "",
             "type": 3
         },
-
-        {
-            "id": "4",
-            "name": "SFTP",
-            "description": "",
-            "icon": "",
-            "type": 4
-        }
     ],
 
     "colorList": [
@@ -66,9 +58,33 @@
 
     "fontSize": [
         {
-            "id": "1",
+            "id": "12",
+            "name": "12号",
+            "value": 12
+        },
+
+        {
+            "id": "14",
             "name": "14号",
             "value": 14
+        },
+
+        {
+            "id": "16",
+            "name": "16号",
+            "value": 16
+        },
+
+        {
+            "id": "18",
+            "name": "18号",
+            "value": 18
+        },
+
+        {
+            "id": "20",
+            "name": "20号",
+            "value": 20
         }
     ],
 
@@ -101,17 +117,17 @@
             ]
         },
 
-        {
-            "id": "1CD8D138-F31B-49FC-A9B8-D4099AC7C13C",
-            "name": "终端",
-            "entryClass": "XTerminal.UserControls.OptionsUserControl.TerminalOptionsUserControl, ModengTerm",
-            "children": [
-                {
-                    "id": "6DC5CF04-1292-4AF3-B344-06661552BF6E",
-                    "name": "鼠标"
-                }
-            ]
-        },
+        //{
+        //    "id": "1CD8D138-F31B-49FC-A9B8-D4099AC7C13C",
+        //    "name": "终端",
+        //    "entryClass": "XTerminal.UserControls.OptionsUserControl.TerminalOptionsUserControl, ModengTerm",
+        //    "children": [
+        //        {
+        //            "id": "6DC5CF04-1292-4AF3-B344-06661552BF6E",
+        //            "name": "鼠标"
+        //        }
+        //    ]
+        //},
 
         {
             "id": "E0CB3399-4E46-4AA2-985F-4ED6F64879E4",
@@ -123,7 +139,7 @@
     "themes": [
         {
             "id": "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827",
-            "name": "xshell - NewBlack",
+            "name": "Xshell - NewBlack",
             "colorTable": {
                 "BrightBlack": "54,52,46",
                 "BrightRed": "165,100,52",

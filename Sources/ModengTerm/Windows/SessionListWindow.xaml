@@ -81,7 +81,7 @@
                         <DataGridTemplateColumn Header="主机名" Width="1*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Path=Host}"/>
+                                    <TextBlock Text="{Binding Path=HostName}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

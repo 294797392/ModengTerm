@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -55,8 +56,6 @@ namespace ModengTerm.Terminal.ViewModels
         #endregion
 
         #region 公开事件
-
-        public event Action<VideoTerminal, SessionStatusEnum> SessionStatusChanged;
 
         #endregion
 
@@ -191,6 +190,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// 终端渲染区域相对于整个桌面的位置
         /// </summary>
         private VTRect vtRect;
+
+        private SessionStatusEnum status;
 
         #endregion
 
@@ -393,10 +394,10 @@ namespace ModengTerm.Terminal.ViewModels
             #region 连接终端通道
 
             SessionTransport transport = new SessionTransport();
-            transport.StatusChanged += this.VTSession_StatusChanged;
-            transport.DataReceived += this.VTSession_DataReceived;
+            transport.StatusChanged += this.SessionTransport_StatusChanged;
+            transport.DataReceived += this.SessionTransport_DataReceived;
             transport.Initialize(sessionInfo);
-            transport.Open();
+            transport.OpenAsync();
             this.sessionTransport = transport;
 
             #endregion
@@ -414,8 +415,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
 
-            this.sessionTransport.StatusChanged -= this.VTSession_StatusChanged;
-            this.sessionTransport.DataReceived -= this.VTSession_DataReceived;
+            this.sessionTransport.StatusChanged -= this.SessionTransport_StatusChanged;
+            this.sessionTransport.DataReceived -= this.SessionTransport_DataReceived;
             this.sessionTransport.Close();
             this.sessionTransport.Release();
 
@@ -641,16 +642,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
 
             this.activeDocument.SetArrangeDirty(true);
-
-            #endregion
-
-            #region 如果有TextSelection，那么更新TextSelection
-
-            if (!this.textSelection.IsEmpty)
-            {
-                // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
-                this.textSelection.RequestInvalidate();
-            }
 
             #endregion
 
@@ -1583,7 +1574,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void VTSession_DataReceived(SessionTransport client, byte[] bytes, int size)
+        private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
             VTDebug.Context.WriteRawRead(bytes, size);
 
@@ -1613,12 +1604,36 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void VTSession_StatusChanged(object client, SessionStatusEnum status)
+        private void SessionTransport_StatusChanged(object client, SessionStatusEnum status)
         {
             logger.InfoFormat("会话状态发生改变, {0}", status);
-            if (this.SessionStatusChanged != null)
+
+            base.NotifyStatusChanged(status);
+
+            switch (status)
             {
-                this.SessionStatusChanged(this, status);
+                case SessionStatusEnum.Connected:
+                    {
+                        break;
+                    }
+
+                case SessionStatusEnum.Connecting:
+                    {
+                        break;
+                    }
+
+                case SessionStatusEnum.ConnectionError:
+                    {
+                        break;
+                    }
+
+                case SessionStatusEnum.Disconnected:
+                    {
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
             }
         }
 
@@ -1856,7 +1871,10 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            logger.InfoFormat("resize, oldRow = {0}, oldCol = {1}, newRow = {2}, newCol = {3}", this.rowSize, this.colSize, newRows, newCols);
+            VTDebug.Context.WriteInteractive("ResizeTerminal", "{0},{1},{2},{3}", this.rowSize, this.colSize, newRows, newCols);
+
+            // 缩放前先滚动到底，不然会有问题
+            this.ScrollToBottom();
 
             // 对Document执行Resize
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样
@@ -1865,11 +1883,12 @@ namespace ModengTerm.Terminal.ViewModels
             this.mainDocument.Resize(newRows, newCols);
             this.alternateDocument.Resize(newRows, newCols);
 
-            // 如果是修改列大小，那么会自动触发重绘
-            // 如果是修改行，那么不会自动触发重绘，要手动重绘
+            // 如果是修改行大小，那么会自动触发重绘
+            // 如果是修改列，那么不会自动触发重绘，要手动重绘
             // 这里偷个懒，不管修改的是列还是行都重绘一次
             this.PerformDrawing(this.activeDocument);
 
+            // 给SSH主机发个Resiz指令
             this.sessionTransport.Resize(newRows, newCols);
 
             this.ColumnSize = newCols;

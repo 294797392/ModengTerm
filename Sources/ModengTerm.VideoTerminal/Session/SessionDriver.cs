@@ -11,6 +11,9 @@ namespace XTerminal.Session
 {
     /// <summary>
     /// 管理与远程主机的连接
+    /// SessionDriver的所有操作都是阻塞的
+    /// 由SessionTransport封装为非阻塞接口
+    /// 上层调用SessionTransport接口来和SessionDriver打交道
     /// </summary>
     public abstract class SessionDriver
     {
@@ -25,18 +28,11 @@ namespace XTerminal.Session
 
         #region 公开事件
 
-        public event Action<object, SessionStatusEnum> StatusChanged;
-
         #endregion
 
         #region 实例变量
 
         protected XTermSession session;
-
-        /// <summary>
-        /// 当前会话状态
-        /// </summary>
-        private SessionStatusEnum status;
 
         #endregion
 
@@ -46,21 +42,6 @@ namespace XTerminal.Session
         /// 通道类型
         /// </summary>
         public SessionTypeEnum Type { get { return (SessionTypeEnum)this.session.SessionType; } }
-
-        /// <summary>
-        /// 获取当前Session的状态
-        /// </summary>
-        public SessionStatusEnum Status
-        {
-            get { return this.status; }
-            internal set
-            {
-                if (this.status != value)
-                {
-                    this.status = value;
-                }
-            }
-        }
 
         #endregion
 
@@ -77,6 +58,7 @@ namespace XTerminal.Session
 
         /// <summary>
         /// 打开会话
+        /// 该操作是同步操作
         /// </summary>
         /// <returns></returns>
         public abstract int Open();
@@ -95,6 +77,7 @@ namespace XTerminal.Session
 
         /// <summary>
         /// 从会话里同步读取数据
+        /// 读取失败抛异常，由SessionTransport统一处理
         /// </summary>
         /// <param name="buffer"></param>
         /// <returns>
@@ -112,21 +95,6 @@ namespace XTerminal.Session
         #endregion
 
         #region 实例方法
-
-        protected void NotifyStatusChanged(SessionStatusEnum status)
-        {
-            if (this.status == status)
-            {
-                return;
-            }
-
-            this.status = status;
-
-            if (this.StatusChanged != null)
-            {
-                this.StatusChanged(this, status);
-            }
-        }
 
         #endregion
     }

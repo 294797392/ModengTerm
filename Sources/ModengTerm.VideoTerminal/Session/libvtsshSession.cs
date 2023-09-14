@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -129,7 +130,6 @@ namespace XTerminal.Session
 
         private void StatusChangedCallback(IntPtr ssh, libvt.vtssh_status_enum status)
         {
-            this.NotifyStatusChanged(this.GetVTChannelState(status));
         }
 
         private void DataReceivedCallback(IntPtr ssh, IntPtr data, int datasize)

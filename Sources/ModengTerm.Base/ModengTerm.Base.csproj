@@ -63,6 +63,7 @@
     <Compile Include="Definitions\FontSizeDefinition.cs" />
     <Compile Include="Definitions\OptionDefinition.cs" />
     <Compile Include="Definitions\TerminalSizeModeEnum.cs" />
+    <Compile Include="Enumerations\SessionStatusEnum.cs" />
     <Compile Include="Enumerations\VTCursorSpeeds.cs" />
     <Compile Include="Enumerations\OptionKeyEnum.cs" />
     <Compile Include="Enumerations\SFTPAuthTypeEnum.cs" />
@@ -82,7 +83,7 @@
     <Compile Include="SftpTrasmit\SftpTransmitTypeEnum.cs" />
     <Compile Include="SftpTrasmit\SftpTransmit.cs" />
     <Compile Include="SftpTrasmit\TransmitStatusEnum.cs" />
-    <Compile Include="XTermConsts.cs" />
+    <Compile Include="MTermConsts.cs" />
     <Compile Include="MTermManifest.cs" />
   </ItemGroup>
   <ItemGroup>

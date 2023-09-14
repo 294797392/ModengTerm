@@ -123,17 +123,9 @@ namespace XTerminal.Session
 
         public override int Write(byte[] bytes)
         {
-            try
-            {
-                this.stream.Write(bytes, 0, bytes.Length);
-                this.stream.Flush();
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ShellStream.Write异常", ex);
-                return ResponseCode.FAILED;
-            }
+            this.stream.Write(bytes, 0, bytes.Length);
+            this.stream.Flush();
+            return ResponseCode.SUCCESS;
         }
 
         internal override int Read(byte[] buffer)

@@ -26,6 +26,14 @@ namespace ModengTerm.ViewModels
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionVM");
 
+        /// <summary>
+        /// 优先选择这些字体
+        /// </summary>
+        public static readonly List<string> DefaultFontFamilies = new List<string>()
+        {
+            "宋体", "微软雅黑", "Yahei", "Consolas"
+        };
+
         #region 实例变量
 
         private string sshPort;
@@ -97,16 +105,6 @@ namespace ModengTerm.ViewModels
         /// 会话类型列表
         /// </summary>
         public ObservableCollection<SessionTypeVM> SessionTypeList { get; private set; }
-
-        /// <summary>
-        /// 端口号列表
-        /// </summary>
-        public BindableCollection<string> PortList { get; private set; }
-
-        /// <summary>
-        /// 波特率列表
-        /// </summary>
-        public BindableCollection<string> BaudRateList { get; private set; }
 
         /// <summary>
         /// SSH的身份验证方式
@@ -296,15 +294,6 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public BindableCollection<VTCursorStyles> CursorStyles { get; private set; }
-
-        public BindableCollection<VTCursorSpeeds> CursorSpeeds { get; private set; }
-
-        /// <summary>
-        /// 光标颜色
-        /// </summary>
-        public BindableCollection<ColorDefinition> CursorColors { get; private set; }
-
         #region 主题相关
 
         /// <summary>
@@ -341,6 +330,37 @@ namespace ModengTerm.ViewModels
         public BindableCollection<FontFamilyDefinition> FontFamilyList { get; private set; }
         public BindableCollection<FontSizeDefinition> FontSizeList { get; private set; }
 
+        public BindableCollection<VTCursorStyles> CursorStyles { get; private set; }
+
+        public BindableCollection<VTCursorSpeeds> CursorSpeeds { get; private set; }
+
+        /// <summary>
+        /// 光标颜色
+        /// </summary>
+        public BindableCollection<ColorDefinition> CursorColors { get; private set; }
+
+        #endregion
+
+        #region 串口相关
+
+        /// <summary>
+        /// 端口号列表
+        /// </summary>
+        public BindableCollection<string> PortList { get; private set; }
+
+        /// <summary>
+        /// 波特率列表
+        /// </summary>
+        public BindableCollection<string> BaudRateList { get; private set; }
+
+        public BindableCollection<int> DataBitsList { get; private set; }
+
+        public BindableCollection<StopBits> StopBitsList { get; private set; }
+
+        public BindableCollection<Parity> ParityList { get; private set; }
+
+        public BindableCollection<Handshake> HandshakeList { get; private set; }
+
         #endregion
 
         #endregion
@@ -369,24 +389,44 @@ namespace ModengTerm.ViewModels
             }
             this.SelectedSessionType = this.SessionTypeList.FirstOrDefault();
 
-            this.TerminalRows = XTermConsts.TerminalRows.ToString();
-            this.TerminalColumns = XTermConsts.TerminalColumns.ToString();
+            this.TerminalRows = MTermConsts.TerminalRows.ToString();
+            this.TerminalColumns = MTermConsts.TerminalColumns.ToString();
             this.TerminalTypeList = new BindableCollection<TerminalTypeEnum>();
             this.TerminalTypeList.AddRange(Enum.GetValues(typeof(TerminalTypeEnum)).Cast<TerminalTypeEnum>());
-            this.TerminalTypeList.SelectedItem = XTermConsts.DefaultTerminalType;
+            this.TerminalTypeList.SelectedItem = MTermConsts.DefaultTerminalType;
 
             this.SSHAuthTypeList = new BindableCollection<SSHAuthTypeEnum>();
             this.SSHAuthTypeList.AddRange(Enum.GetValues(typeof(SSHAuthTypeEnum)).Cast<SSHAuthTypeEnum>());
             this.SSHAuthTypeList.SelectedItem = this.SSHAuthTypeList.FirstOrDefault();
-            this.SSHServerPort = XTermConsts.DefaultSSHPort.ToString();
+            this.SSHServerPort = MTermConsts.DefaultSSHPort.ToString();
+
+            #region 串口
 
             this.PortList = new BindableCollection<string>();
             this.PortList.AddRange(SerialPort.GetPortNames());
             this.PortList.SelectedItem = this.PortList.FirstOrDefault();
 
             this.BaudRateList = new BindableCollection<string>();
-            this.BaudRateList.AddRange(XTermConsts.DefaultSerialPortBaudRates);
+            this.BaudRateList.AddRange(MTermConsts.DefaultSerialPortBaudRates);
             this.BaudRateList.SelectedItem = this.BaudRateList.FirstOrDefault();
+
+            this.DataBitsList = new BindableCollection<int>();
+            this.DataBitsList.AddRange(MTermConsts.DefaultSerialPortDataBits);
+            this.DataBitsList.SelectedItem = this.DataBitsList.LastOrDefault(); // LastOrDfault是8
+
+            this.StopBitsList = new BindableCollection<StopBits>();
+            this.StopBitsList.AddRange(Enum.GetValues(typeof(StopBits)).Cast<StopBits>());
+            this.StopBitsList.SelectedItem = StopBits.One;
+
+            this.ParityList = new BindableCollection<Parity>();
+            this.ParityList.AddRange(Enum.GetValues(typeof(Parity)).Cast<Parity>());
+            this.ParityList.SelectedItem = Parity.None;
+
+            this.HandshakeList = new BindableCollection<Handshake>();
+            this.HandshakeList.AddRange(Enum.GetValues(typeof(Handshake)).Cast<Handshake>());
+            this.HandshakeList.SelectedItem = Handshake.None;
+
+            #endregion
 
             #region Theme
 
@@ -395,7 +435,7 @@ namespace ModengTerm.ViewModels
             // 加载系统已安装的所有字体
             InstalledFontCollection installedFont = new InstalledFontCollection();
             this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
-            this.FontFamilyList.SelectedItem = this.FontFamilyList.FirstOrDefault();
+            this.FontFamilyList.SelectedItem = this.GetDefaultFontFamily();
 
             this.FontSizeList = new BindableCollection<FontSizeDefinition>();
             this.FontSizeList.AddRange(appManifest.FontSizeList);
@@ -403,11 +443,11 @@ namespace ModengTerm.ViewModels
 
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
             this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
-            this.CursorSpeeds.SelectedItem = XTermConsts.DefaultCursorBlinkSpeed;
+            this.CursorSpeeds.SelectedItem = MTermConsts.DefaultCursorBlinkSpeed;
 
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
             this.CursorStyles.AddRange(Enum.GetValues(typeof(VTCursorStyles)).Cast<VTCursorStyles>());
-            this.CursorStyles.SelectedItem = XTermConsts.DefaultCursorStyle;
+            this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
 
             this.CursorColors = new BindableCollection<ColorDefinition>();
             this.CursorColors.AddRange(appManifest.ColorList);
@@ -421,15 +461,29 @@ namespace ModengTerm.ViewModels
 
             #endregion
 
-            this.MouseScrollDelta = XTermConsts.DefaultScrollDelta.ToString();
+            this.MouseScrollDelta = MTermConsts.DefaultScrollDelta.ToString();
 
-            this.SFTPServerInitialDirectory = XTermConsts.SFTPServerInitialDirectory;
-            this.SFTPClientInitialDirectory = XTermConsts.SFTPClientInitialDirectory;
+            this.SFTPServerInitialDirectory = MTermConsts.SFTPServerInitialDirectory;
+            this.SFTPClientInitialDirectory = MTermConsts.SFTPClientInitialDirectory;
         }
 
         #endregion
 
         #region 实例方法
+
+        private FontFamilyDefinition GetDefaultFontFamily()
+        {
+            foreach (string fontFamily in DefaultFontFamilies)
+            {
+                FontFamilyDefinition defaultFont = this.FontFamilyList.FirstOrDefault(v => v.Value == fontFamily);
+                if (defaultFont != null) 
+                {
+                    return defaultFont;
+                }
+            }
+
+            return null;
+        }
 
         private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
         {
@@ -497,7 +551,7 @@ namespace ModengTerm.ViewModels
 
             int port;
             if (!int.TryParse(this.sshPort, out port) ||
-                port < XTermConsts.MIN_PORT || port > XTermConsts.MAX_PORT)
+                port < MTermConsts.MIN_PORT || port > MTermConsts.MAX_PORT)
             {
                 MessageBoxUtils.Info("请输入正确的端口号");
                 return false;
@@ -582,6 +636,10 @@ namespace ModengTerm.ViewModels
 
             session.SetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME, portName);
             session.SetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE, baudRate);
+            session.SetOption<int>(OptionKeyEnum.SERIAL_PORT_DATA_BITS, this.DataBitsList.SelectedItem);
+            session.SetOption<StopBits>(OptionKeyEnum.SERIAL_PORT_STOP_BITS, this.StopBitsList.SelectedItem);
+            session.SetOption<Parity>(OptionKeyEnum.SERIAL_PORT_PARITY, this.ParityList.SelectedItem);
+            session.SetOption<Handshake>(OptionKeyEnum.SERIAL_PORT_HANDSHAKE, this.HandshakeList.SelectedItem);
 
             return true;
         }
@@ -639,8 +697,8 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
             session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
-            session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, XTermConsts.DefaultOutputEncoding);
-            session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, XTermConsts.DefaultReadBufferSize);
+            session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, MTermConsts.DefaultOutputEncoding);
+            session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
 
             return true;
         }
@@ -650,7 +708,7 @@ namespace ModengTerm.ViewModels
             int scrollDelta;
             if (!int.TryParse(this.MouseScrollDelta, out scrollDelta))
             {
-                scrollDelta = XTermConsts.DefaultScrollDelta;
+                scrollDelta = MTermConsts.DefaultScrollDelta;
             }
 
             session.SetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, scrollDelta);
@@ -663,14 +721,14 @@ namespace ModengTerm.ViewModels
             string serverInitialDir = this.SFTPServerInitialDirectory;
             if (string.IsNullOrEmpty(serverInitialDir))
             {
-                serverInitialDir = XTermConsts.SFTPServerInitialDirectory;
+                serverInitialDir = MTermConsts.SFTPServerInitialDirectory;
             }
 
             string clientInitialDir = this.SFTPClientInitialDirectory;
             if (string.IsNullOrEmpty(clientInitialDir) ||
                 !Directory.Exists(clientInitialDir))
             {
-                clientInitialDir = XTermConsts.SFTPClientInitialDirectory;
+                clientInitialDir = MTermConsts.SFTPClientInitialDirectory;
             }
 
             session.SetOption<string>(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY, serverInitialDir);
@@ -774,6 +832,7 @@ namespace ModengTerm.ViewModels
             XTermSession session = new XTermSession()
             {
                 ID = Guid.NewGuid().ToString(),
+                CreationTime = DateTime.Now,
                 Name = this.Name,
                 SessionType = (int)sessionType.Type
             };

@@ -39,11 +39,19 @@ namespace XTerminal.Session
         {
             string portName = this.session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
             int baudRate = this.session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
+            int dataBits = this.session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_DATA_BITS);
+            StopBits stopBits = this.session.GetOption<StopBits>(OptionKeyEnum.SERIAL_PORT_STOP_BITS);
+            Parity parity = this.session.GetOption<Parity>(OptionKeyEnum.SERIAL_PORT_PARITY);
+            Handshake handshake = this.session.GetOption<Handshake>(OptionKeyEnum.SERIAL_PORT_HANDSHAKE);
 
             try
             {
                 this.serialPort = new SerialPort(portName);
                 this.serialPort.BaudRate = baudRate;
+                this.serialPort.DataBits = dataBits;
+                this.serialPort.StopBits = stopBits;
+                this.serialPort.Parity = parity;
+                this.serialPort.Handshake = handshake;
                 this.serialPort.Open();
             }
             catch (Exception ex)
@@ -51,8 +59,6 @@ namespace XTerminal.Session
                 logger.ErrorFormat("串口打开失败, {0}, {1}", portName, ex);
                 return ResponseCode.FAILED;
             }
-
-            this.NotifyStatusChanged(SessionStatusEnum.Connected);
 
             return ResponseCode.SUCCESS;
         }
@@ -65,17 +71,7 @@ namespace XTerminal.Session
 
         public override int Write(byte[] bytes)
         {
-            try
-            {
-                this.serialPort.Write(bytes, 0, bytes.Length);
-            }
-            catch (Exception ex)
-            {
-                this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
-                logger.Error("写入串口异常", ex);
-                return ResponseCode.FAILED;
-            }
-
+            this.serialPort.Write(bytes, 0, bytes.Length);
             return ResponseCode.SUCCESS;
         }
 

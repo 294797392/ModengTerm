@@ -54,6 +54,10 @@ namespace XTerminal.Base.Enumerations
 
         SERIAL_PORT_NAME,
         SERIAL_PORT_BAUD_RATE,
+        SERIAL_PORT_DATA_BITS,
+        SERIAL_PORT_STOP_BITS,
+        SERIAL_PORT_PARITY,
+        SERIAL_PORT_HANDSHAKE,
 
         #endregion
 

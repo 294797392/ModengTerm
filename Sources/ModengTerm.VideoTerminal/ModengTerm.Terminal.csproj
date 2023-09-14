@@ -114,7 +114,6 @@
     <Compile Include="Session\SerialPortSession.cs" />
     <Compile Include="Session\SessionDriver.cs" />
     <Compile Include="Session\SessionFactory.cs" />
-    <Compile Include="Session\SessionStatusEnum.cs" />
     <Compile Include="Session\SessionTransport.cs" />
     <Compile Include="Session\SshNetSession.cs" />
     <Compile Include="Session\WinptySession.cs" />
