@@ -47,11 +47,6 @@ namespace XTerminal.Document
         public VTSize CursorSize { get; set; }
 
         /// <summary>
-        /// 文本前景色
-        /// </summary>
-        public string ForegroundColor { get; set; }
-
-        /// <summary>
         /// 字体样式
         /// </summary>
         public string FontFamily { get; set; }
@@ -62,8 +57,18 @@ namespace XTerminal.Document
         public int FontSize { get; set; }
 
         /// <summary>
+        /// 文本前景色
+        /// </summary>
+        public string ForegroundColor { get; set; }
+
+        /// <summary>
         /// 背景颜色
         /// </summary>
         public string BackgroundColor { get; set; }
+
+        /// <summary>
+        /// 颜色表
+        /// </summary>
+        public Dictionary<string, string> ColorTable { get; set; }
     }
 }

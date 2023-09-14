@@ -142,7 +142,7 @@ namespace XTerminal.Document
 
             #region 初始化第一行，并设置链表首尾指针
 
-            VTextLine firstLine = this.CreateLine(0);
+            VTextLine firstLine = this.CreateTextLine(0);
             this.FirstLine = firstLine;
             this.LastLine = firstLine;
             this.ActiveLine = firstLine;
@@ -152,7 +152,7 @@ namespace XTerminal.Document
             // 默认创建80行，可见区域也是80行
             for (int i = 1; i < options.RowSize; i++)
             {
-                VTextLine textLine = this.CreateLine(i);
+                VTextLine textLine = this.CreateTextLine(i);
                 this.LastLine.Append(textLine);
             }
 
@@ -169,7 +169,7 @@ namespace XTerminal.Document
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        private VTextLine CreateLine(int physicsRow)
+        private VTextLine CreateTextLine(int physicsRow)
         {
             VTextLine textLine = new VTextLine(this)
             {
@@ -182,7 +182,8 @@ namespace XTerminal.Document
                 {
                     FontSize = this.options.FontSize,
                     FontFamily = this.options.FontFamily,
-                    Foreground = this.options.ForegroundColor
+                    Foreground = this.options.ForegroundColor,
+                    ColorTable = this.options.ColorTable
                 },
             };
 
@@ -794,7 +795,7 @@ namespace XTerminal.Document
                     for (int i = 0; i < rows; i++)
                     {
                         // TODO：这里PhysicsRow会有问题，先把滚动条往上移动，然后扩大行数，PhysicsRow就不对了
-                        VTextLine textLine = this.CreateLine(this.LastLine.PhysicsRow + 1);
+                        VTextLine textLine = this.CreateTextLine(this.LastLine.PhysicsRow + 1);
                         this.LastLine.Append(textLine);
                     }
                 }

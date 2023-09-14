@@ -28,5 +28,14 @@ namespace XTerminal.Document
         /// 文本的颜色
         /// </summary>
         public string Foreground { get; set; }
+
+        /// <summary>
+        /// 颜色表
+        /// </summary>
+        public Dictionary<string, string> ColorTable { get; set; }
+
+        public VTextStyle() 
+        {
+        }
     }
 }

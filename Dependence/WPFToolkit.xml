@@ -2251,6 +2251,11 @@
             </summary>
             <typeparam name="T"></typeparam>
         </member>
+        <member name="E:WPFToolkit.MVVM.BindableCollection`1.SelectionChanged">
+            <summary>
+            当选项改变的时候触发
+            </summary>
+        </member>
         <member name="P:WPFToolkit.MVVM.BindableCollection`1.SelectedItem">
             <summary>
             当前选中的项

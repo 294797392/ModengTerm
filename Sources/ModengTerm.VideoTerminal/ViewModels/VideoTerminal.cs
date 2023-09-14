@@ -363,8 +363,9 @@ namespace ModengTerm.Terminal.ViewModels
                 CursorSize = new VTSize(cursorSize.Width, cursorSize.Height),
                 FontFamily = fontFamily,
                 FontSize = fontSize,
-                ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR),
-                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR)
+                ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR),
+                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
+                ColorTable = sessionInfo.GetOption<Dictionary<string, string>>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE)
             };
             this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), false) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), true) { Name = "AlternateDocument" };

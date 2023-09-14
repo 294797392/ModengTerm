@@ -20,42 +20,13 @@ namespace ModengTerm.Rendering
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("DrawingUtils");
 
-        private static readonly BrushConverter BrushConverter = new BrushConverter();
-
         public static readonly Point ZeroPoint = new Point();
 
         public static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
         public static readonly Pen BlackPen = new Pen(Brushes.Black, 1);
 
-        private static readonly Dictionary<VTColor, Brush> VTColorBrushMap = new Dictionary<VTColor, Brush>()
-        {
-            { VTColor.BrightBlack, Brushes.Black }, { VTColor.BrightBlue, Brushes.Blue }, { VTColor.BrightCyan, Brushes.Cyan },
-            { VTColor.BrightGreen, Brushes.Green }, { VTColor.BrightMagenta, Brushes.Magenta }, { VTColor.BrightRed, Brushes.Red },
-            { VTColor.BrightWhite, Brushes.White }, { VTColor.BrightYellow, Brushes.Yellow },
-
-            { VTColor.DarkBlack, Brushes.Black }, { VTColor.DarkBlue, Brushes.DarkBlue }, { VTColor.DarkCyan, Brushes.DarkCyan },
-            { VTColor.DarkGreen, Brushes.DarkGreen }, { VTColor.DarkMagenta, Brushes.DarkMagenta }, { VTColor.DarkRed, Brushes.DarkRed },
-            { VTColor.DarkWhite, Brushes.White }, { VTColor.DarkYellow, Brushes.Yellow }
-        };
-
         static DrawingUtils()
         {
-        }
-
-        public static Brush VTColor2Brush(VTColor color)
-        {
-            if (color == null)
-            {
-                return null;
-            }
-
-            Brush brush;
-            if (!VTColorBrushMap.TryGetValue(color, out brush))
-            {
-                brush = new SolidColorBrush(Color.FromRgb(color.R, color.G, color.B));
-                VTColorBrushMap[color] = brush;
-            }
-            return brush;
         }
 
         public static void UpdateTextMetrics(VTextLine textLine, FormattedText formattedText)
@@ -69,15 +40,11 @@ namespace ModengTerm.Rendering
             return (VTKeys)key;
         }
 
-        public static Brush ConvertBrush(string colorName)
-        {
-            return (Brush)BrushConverter.ConvertFrom(colorName);
-        }
-
         /// <summary>
         /// 根据VTextLine生成一个FormattedText
         /// </summary>
         /// <param name="textLine"></param>
+        /// <param name="colorTable">颜色表，使用颜色表里的颜色来渲染带颜色的文本</param>
         /// <param name="dc">画Background的时候需要</param>
         /// <returns></returns>
         public static FormattedText CreateFormattedText(VTextLine textLine, DrawingContext dc = null)
@@ -104,7 +71,7 @@ namespace ModengTerm.Rendering
                     case VTextAttributes.Foreground:
                         {
                             VTColor color = textAttribute.Parameter as VTColor;
-                            Brush brush = DrawingUtils.VTColor2Brush(color);
+                            Brush brush = MTermUtils.GetBrush(color, textLine.Style.ColorTable);
                             formattedText.SetForegroundBrush(brush, textAttribute.StartIndex, textAttribute.Count);
                             break;
                         }
@@ -152,7 +119,7 @@ namespace ModengTerm.Rendering
                     }
 
                     VTColor color = textAttribute.Parameter as VTColor;
-                    Brush brush = DrawingUtils.VTColor2Brush(color);
+                    Brush brush = MTermUtils.GetBrush(color, textLine.Style.ColorTable);
                     Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, textAttribute.StartIndex, textAttribute.Count);
                     dc.DrawRectangle(brush, DrawingUtils.TransparentPen, geometry.Bounds);
                 }

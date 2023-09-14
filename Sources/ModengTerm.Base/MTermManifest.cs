@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base.DataModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace ModengTerm.Base
         public List<SessionDefinition> SessionList { get; private set; }
 
         /// <summary>
-        /// 定义ModengTerm支持的颜色
+        /// 定义ModengTerm支持的默认颜色
         /// </summary>
         [JsonProperty("colorList")]
         public List<ColorDefinition> ColorList { get; private set; }
@@ -39,7 +40,7 @@ namespace ModengTerm.Base
         /// 主题列表
         /// </summary>
         [JsonProperty("themes")]
-        public List<ThemeDefinition> ThemeList { get; private set; }
+        public List<Theme> ThemeList { get; private set; }
 
         [JsonProperty("ftpOptions")]
         public List<OptionDefinition> FTPOptionList { get; private set; }
@@ -53,7 +54,7 @@ namespace ModengTerm.Base
             this.ColorList = new List<ColorDefinition>();
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
-            this.ThemeList = new List<ThemeDefinition>();
+            this.ThemeList = new List<Theme>();
             this.FTPOptionList = new List<OptionDefinition>();
             this.TerminalOptionList = new List<OptionDefinition>();
         }

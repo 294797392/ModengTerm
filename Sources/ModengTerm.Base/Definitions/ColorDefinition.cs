@@ -23,6 +23,7 @@ namespace XTerminal.Base.Definitions
 
         /// <summary>
         /// 颜色值
+        /// 格式为r,g,b
         /// </summary>
         [JsonProperty("value")]
         public string Value { get; set; }

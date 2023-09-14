@@ -1,4 +1,5 @@
-﻿using DotNEToolkit.DataModels;
+﻿using DotNEToolkit;
+using DotNEToolkit.DataModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -46,11 +47,12 @@ namespace XTerminal.Base.DataModels
             Type t = typeof(T);
             if (t.IsEnum)
             {
-                return (T)Enum.Parse(t, sessionOption.Value);
+                string value = JSONHelper.Parse<string>(sessionOption.Value);
+                return (T)Enum.Parse(t, value);
             }
             else
             {
-                return (T)Convert.ChangeType(sessionOption.Value, typeof(T));
+                return JSONHelper.Parse<T>(sessionOption.Value);
             }
         }
 
@@ -66,7 +68,7 @@ namespace XTerminal.Base.DataModels
                 this.Options.Add(sessionOption);
             }
 
-            sessionOption.Value = value == null ? string.Empty : value.ToString();
+            sessionOption.Value = JsonConvert.SerializeObject(value);
         }
     }
 }

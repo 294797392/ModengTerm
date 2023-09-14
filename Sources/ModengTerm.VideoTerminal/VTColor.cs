@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,32 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal
 {
-    public class VTColor
+    public class NamedColor : VTColor
+    {
+        public NamedColor(string name)
+        {
+            this.Name = name;
+        }
+    }
+
+    public class Xterm256Color : VTColor
+    {
+        public byte R { get; private set; }
+
+        public byte G { get; private set; }
+
+        public byte B { get; private set; }
+
+        public Xterm256Color(byte r, byte g, byte b)
+        {
+            this.Name = string.Format("{0},{1},{2}", r, g, b);
+            this.R = r;
+            this.G = g;
+            this.B = b;
+        }
+    }
+
+    public abstract class VTColor
     {
         /// <summary>
         /// Key -> Color
@@ -15,47 +41,24 @@ namespace ModengTerm.Terminal
         /// </summary>
         private static Dictionary<int, VTColor> colorMap = new Dictionary<int, VTColor>();
 
-        public static readonly VTColor DarkBlack = new VTColor("DarkBlack");
-        public static readonly VTColor DarkRed = new VTColor("DarkRed");
-        public static readonly VTColor DarkGreen = new VTColor("DarkGreen");
-        public static readonly VTColor DarkYellow = new VTColor("DarkYellow");
-        public static readonly VTColor DarkBlue = new VTColor("DarkBlue");
-        public static readonly VTColor DarkMagenta = new VTColor("DarkMagenta");
-        public static readonly VTColor DarkCyan = new VTColor("DarkCyan");
-        public static readonly VTColor DarkWhite = new VTColor("DarkWhite");
-        public static readonly VTColor BrightBlack = new VTColor("BrightBlack");
-        public static readonly VTColor BrightRed = new VTColor("BrightRed");
-        public static readonly VTColor BrightGreen = new VTColor("BrightGreen");
-        public static readonly VTColor BrightYellow = new VTColor("BrightYellow");
-        public static readonly VTColor BrightBlue = new VTColor("BrightBlue");
-        public static readonly VTColor BrightMagenta = new VTColor("BrightMagenta");
-        public static readonly VTColor BrightCyan = new VTColor("BrightCyan");
-        public static readonly VTColor BrightWhite = new VTColor("BrightWhite");
+        public static readonly VTColor DarkBlack = new NamedColor("DarkBlack");
+        public static readonly VTColor DarkRed = new NamedColor("DarkRed");
+        public static readonly VTColor DarkGreen = new NamedColor("DarkGreen");
+        public static readonly VTColor DarkYellow = new NamedColor("DarkYellow");
+        public static readonly VTColor DarkBlue = new NamedColor("DarkBlue");
+        public static readonly VTColor DarkMagenta = new NamedColor("DarkMagenta");
+        public static readonly VTColor DarkCyan = new NamedColor("DarkCyan");
+        public static readonly VTColor DarkWhite = new NamedColor("DarkWhite");
+        public static readonly VTColor BrightBlack = new NamedColor("BrightBlack");
+        public static readonly VTColor BrightRed = new NamedColor("BrightRed");
+        public static readonly VTColor BrightGreen = new NamedColor("BrightGreen");
+        public static readonly VTColor BrightYellow = new NamedColor("BrightYellow");
+        public static readonly VTColor BrightBlue = new NamedColor("BrightBlue");
+        public static readonly VTColor BrightMagenta = new NamedColor("BrightMagenta");
+        public static readonly VTColor BrightCyan = new NamedColor("BrightCyan");
+        public static readonly VTColor BrightWhite = new NamedColor("BrightWhite");
 
-        public byte R { get; private set; }
-
-        public byte G { get; private set; }
-
-        public byte B { get; private set; }
-
-        public string Name { get; private set; }
-
-        /// <summary>
-        /// 如果为true，那么使用RGB三个属性表示颜色
-        /// 如果为false，那么就是预定义颜色
-        /// </summary>
-        public bool HasRgb { get; private set; }
-
-        private VTColor(string name)
-        {
-            this.Name = name;
-        }
-
-        private VTColor(byte r, byte g, byte b)
-        {
-            this.Name = string.Format("R{0} G{1} B{2}", r, g, b);
-            this.HasRgb = true;
-        }
+        public string Name { get; protected set; }
 
         public static VTColor Create(byte r, byte g, byte b)
         {
@@ -63,7 +66,7 @@ namespace ModengTerm.Terminal
             VTColor color;
             if (!colorMap.TryGetValue(key, out color))
             {
-                color = new VTColor(r, g, b);
+                color = new Xterm256Color(r, g, b);
                 colorMap[key] = color;
             }
             return color;

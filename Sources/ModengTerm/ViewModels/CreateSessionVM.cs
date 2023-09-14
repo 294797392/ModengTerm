@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using System;
 using System.Collections.Generic;
@@ -46,6 +47,9 @@ namespace ModengTerm.ViewModels
         private string sftpClientInitialDir;
 
         private ServiceAgent serviceAgent;
+
+        private Brush backgroundBrush;
+        private Brush foregroundBrush;
 
         #endregion
 
@@ -108,11 +112,6 @@ namespace ModengTerm.ViewModels
         /// SSH的身份验证方式
         /// </summary>
         public BindableCollection<SSHAuthTypeEnum> SSHAuthTypeList { get; private set; }
-
-        public BindableCollection<FontFamilyDefinition> FontFamilyList { get; private set; }
-        public BindableCollection<FontSizeDefinition> FontSizeList { get; private set; }
-        public BindableCollection<ColorDefinition> ForegroundList { get; private set; }
-        public BindableCollection<ColorDefinition> BackgroundList { get; private set; }
 
         /// <summary>
         /// SSH端口号
@@ -306,6 +305,44 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<ColorDefinition> CursorColors { get; private set; }
 
+        #region 主题相关
+
+        /// <summary>
+        /// 支持的主题列表
+        /// </summary>
+        public BindableCollection<Theme> ThemeList { get; private set; }
+
+        public Brush BackgroundBrush
+        {
+            get { return this.backgroundBrush; }
+            set
+            {
+                if (this.backgroundBrush != value)
+                {
+                    this.backgroundBrush = value;
+                    this.NotifyPropertyChanged("BackgroundBrush");
+                }
+            }
+        }
+
+        public Brush ForegroundBrush
+        {
+            get { return this.foregroundBrush; }
+            set
+            {
+                if (this.foregroundBrush != value)
+                {
+                    this.foregroundBrush = value;
+                    this.NotifyPropertyChanged("ForegroundBrush");
+                }
+            }
+        }
+
+        public BindableCollection<FontFamilyDefinition> FontFamilyList { get; private set; }
+        public BindableCollection<FontSizeDefinition> FontSizeList { get; private set; }
+
+        #endregion
+
         #endregion
 
         #region 构造方法
@@ -363,21 +400,11 @@ namespace ModengTerm.ViewModels
             this.FontSizeList = new BindableCollection<FontSizeDefinition>();
             this.FontSizeList.AddRange(appManifest.FontSizeList);
             this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
-            
-            // 字体颜色
-            this.ForegroundList = new BindableCollection<ColorDefinition>();
-            this.ForegroundList.AddRange(appManifest.ColorList);
-            this.ForegroundList.SelectedItem = this.ForegroundList.FirstOrDefault();
-
-            // 背景颜色
-            this.BackgroundList = new BindableCollection<ColorDefinition>();
-            this.BackgroundList.AddRange(appManifest.ColorList);
-            this.BackgroundList.SelectedItem = this.BackgroundList.Skip(1).FirstOrDefault(); // 背景颜色和字体颜色翻转
 
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
             this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
             this.CursorSpeeds.SelectedItem = XTermConsts.DefaultCursorBlinkSpeed;
-            
+
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
             this.CursorStyles.AddRange(Enum.GetValues(typeof(VTCursorStyles)).Cast<VTCursorStyles>());
             this.CursorStyles.SelectedItem = XTermConsts.DefaultCursorStyle;
@@ -385,6 +412,12 @@ namespace ModengTerm.ViewModels
             this.CursorColors = new BindableCollection<ColorDefinition>();
             this.CursorColors.AddRange(appManifest.ColorList);
             this.CursorColors.SelectedItem = this.CursorColors.FirstOrDefault();
+
+            // 最后加载ThemeList，因为在ThemeList_SelectionChanged事件里需要用到其他Theme字段的数据
+            this.ThemeList = new BindableCollection<Theme>();
+            this.ThemeList.AddRange(appManifest.ThemeList);
+            this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
+            this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
 
             #endregion
 
@@ -561,31 +594,27 @@ namespace ModengTerm.ViewModels
                 return false;
             }
 
-            if (this.ForegroundList.SelectedItem == null)
-            {
-                MessageBoxUtils.Info("请选择字体颜色");
-                return false;
-            }
-
             if (this.FontSizeList.SelectedItem == null)
             {
                 MessageBoxUtils.Info("请选择字号");
                 return false;
             }
 
-            if (this.BackgroundList.SelectedItem == null) 
+            if (this.ThemeList.SelectedItem == null)
             {
-                MessageBoxUtils.Info("请选择背景颜色");
+                MessageBoxUtils.Info("请选择主题");
                 return false;
             }
 
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR, this.ForegroundList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.BackgroundList.SelectedItem.Value);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.ThemeList.SelectedItem.BackgroundColor);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ThemeList.SelectedItem.ForegroundColor);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR, this.CursorColors.SelectedItem.Value);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_ID, this.ThemeList.SelectedItem.ID);
+            session.SetOption<Dictionary<string, string>>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
 
             return true;
         }
@@ -708,6 +737,21 @@ namespace ModengTerm.ViewModels
             }
 
             return true;
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        private void ThemeList_SelectionChanged(Theme oldValue, Theme newValue)
+        {
+            if (newValue == null)
+            {
+                return;
+            }
+
+            this.BackgroundBrush = MTermUtils.GetBrush(newValue.BackgroundColor);
+            this.ForegroundBrush = MTermUtils.GetBrush(newValue.ForegroundColor);
         }
 
         #endregion

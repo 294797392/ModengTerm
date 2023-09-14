@@ -33,6 +33,7 @@ namespace XTerminal
         private static void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
             logger.Error(e.Exception);
+            MessageBox.Show("客户端运行出现错误, 请联系开发者");
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
