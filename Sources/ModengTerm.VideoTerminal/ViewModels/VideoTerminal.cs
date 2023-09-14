@@ -112,16 +112,9 @@ namespace ModengTerm.Terminal.ViewModels
         private int scrollDelta;
 
         /// <summary>
-        /// 记录滚动条滚动到底的时候，滚动条的值
+        /// 存储滚动条的信息
         /// </summary>
-        private int scrollMax;
-
-        /// <summary>
-        /// 记录当前滚动条滚动的值
-        /// 也就是当前Surface上渲染的第一行的PhysicsRow
-        /// 默认值是0
-        /// </summary>
-        private int scrollValue;
+        private VTScrollInfo scrollInfo;
 
         #endregion
 
@@ -238,7 +231,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             get
             {
-                return this.scrollValue == this.scrollMax;
+                return this.scrollInfo.ScrollValue == this.scrollInfo.ScrollMax;
             }
         }
 
@@ -249,7 +242,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             get
             {
-                return this.scrollValue == 0;
+                return this.scrollInfo.ScrollValue == 0;
             }
         }
 
@@ -353,6 +346,12 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化文档模型
 
+            int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
+            string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
+
+            // 计算光标大小
+            VTextMetrics cursorSize = this.videoTerminal.MeasureText(" ", fontSize, fontFamily);
+
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
                 ColumnSize = this.colSize,
@@ -360,9 +359,10 @@ namespace ModengTerm.Terminal.ViewModels
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
-                BlinkSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
-                FontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY),
-                FontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
+                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
+                CursorSize = new VTSize(cursorSize.Width, cursorSize.Height),
+                FontFamily = fontFamily,
+                FontSize = fontSize,
                 ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_COLOR),
                 BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR)
             };
@@ -379,8 +379,13 @@ namespace ModengTerm.Terminal.ViewModels
             #region 初始化光标
 
             this.activeDocument.Cursor.RequestInvalidate();
-            // 先初始化备用缓冲区的光标渲染上下文
             this.alternateDocument.Cursor.RequestInvalidate();
+
+            #endregion
+
+            #region 初始化滚动条
+
+            this.scrollInfo = new VTScrollInfo();
 
             #endregion
 
@@ -428,7 +433,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             VTHistoryLine startLine, endLine;
             int startIndex, endIndex;
-            this.AdjustSelection(out startLine, out endLine, out startIndex, out endIndex);
+            this.NormalizeSelection(out startLine, out endLine, out startIndex, out endIndex);
 
             string text = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, LogFileTypeEnum.Text);
 
@@ -505,7 +510,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case SaveModeEnum.SaveSelected:
                     {
-                        this.AdjustSelection(out startLine, out endLine, out startIndex, out endIndex);
+                        this.NormalizeSelection(out startLine, out endLine, out startIndex, out endIndex);
                         break;
                     }
 
@@ -534,17 +539,125 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 把终端内容滚动到某个位置
+        /// 滚动到指定的历史记录
+        /// 并更新UI上的滚动条位置
         /// </summary>
-        /// <param name="scrollValue"></param>
-        public void ScrollTo(int scrollValue)
+        /// <param name="scrollValue">要显示的第一行历史记录</param>
+        public void ScrollToHistory(int scrollValue)
         {
-            if (this.scrollValue == scrollValue)
+            // 只有主缓冲区可以滚动
+            if (this.activeDocument.IsAlternate)
             {
                 return;
             }
 
-            this.ScrollToHistory(scrollValue);
+            // 要滚动的值和当前值是一样的，也不滚动
+            if (this.scrollInfo.ScrollValue == scrollValue)
+            {
+                return;
+            }
+
+            // 要滚动到的值
+            int newScroll = scrollValue;
+            // 滚动之前的值
+            int oldScroll = this.scrollInfo.ScrollValue; ;
+
+            // 更新当前滚动条的值，一定要先更新，因为DrawDocument函数会用到该值
+            this.scrollInfo.ScrollValue = scrollValue;
+
+            // 需要进行滚动的行数
+            int scrolledRows = Math.Abs(newScroll - oldScroll);
+
+            // 终端行大小
+            int rows = this.rowSize;
+
+            #region 更新要显示的行
+
+            if (scrolledRows >= rows)
+            {
+                // 此时说明把所有行都滚动到屏幕外了，需要重新显示所有行
+
+                // 先找到屏幕上要显示的第一行数据
+                VTHistoryLine historyLine;
+                if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
+                {
+                    logger.ErrorFormat("ScrollTo失败, 找不到对应的VTHistoryLine, scrollValue = {0}", scrollValue);
+                    return;
+                }
+
+                // 找到后面的行数显示
+                VTHistoryLine currentHistory = historyLine;
+                VTextLine currentTextLine = this.activeDocument.FirstLine;
+                for (int i = 0; i < rows; i++)
+                {
+                    // 直接使用VTHistoryLine的List<VTCharacter>的引用
+                    // 冻结状态下的VTextLine不会再有修改了
+                    // 非冻结状态(ActiveLine)需要重新创建一个集合
+                    currentTextLine.SetHistory(currentHistory);
+                    currentHistory = currentHistory.NextLine;
+                    currentTextLine = currentTextLine.NextLine;
+                }
+            }
+            else
+            {
+                // 此时说明只需要更新移动出去的行就可以了
+                if (newScroll > oldScroll)
+                {
+                    // 往下滚动，把上面的拿到下面，从第一行开始
+                    for (int i = 0; i < scrolledRows; i++)
+                    {
+                        // 该值永远是第一行，因为下面被Move到最后一行了
+                        VTextLine firstLine = this.activeDocument.FirstLine;
+
+                        VTHistoryLine historyLine;
+                        if (this.historyLines.TryGetValue(oldScroll + rows + i, out historyLine))
+                        {
+                            firstLine.SetHistory(historyLine);
+                        }
+                        else
+                        {
+                            // 当扩大终端行数之后，然后把滚动条拖上去，然后输入字符的时候，会出现没有历史行的情况
+                            // 因为扩大行数的时候会新增加行，但是这些行是空行，并没有对应的历史记录
+                            // 所以这里就直接清空行
+                            firstLine.SetEmpty();
+                        }
+
+                        this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
+                    }
+                }
+                else
+                {
+                    // 往上滚动，把下面的拿到上面，从最后一行开始
+                    for (int i = 1; i <= scrolledRows; i++)
+                    {
+                        VTHistoryLine historyLine = this.historyLines[oldScroll - i];
+
+                        VTextLine lastLine = this.activeDocument.LastLine;
+                        lastLine.SetHistory(historyLine);
+                        this.activeDocument.MoveLine(lastLine, VTextLine.MoveOptions.MoveToFirst);
+                    }
+                }
+            }
+
+            this.activeDocument.SetArrangeDirty(true);
+
+            #endregion
+
+            #region 如果有TextSelection，那么更新TextSelection
+
+            if (!this.textSelection.IsEmpty)
+            {
+                // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
+                this.textSelection.RequestInvalidate();
+            }
+
+            #endregion
+
+            #region 重新渲染
+
+            this.PerformDrawing(this.activeDocument);
+
+            #endregion
         }
 
         /// <summary>
@@ -579,7 +692,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 实例方法
 
-        private void AdjustSelection(out VTHistoryLine topLine, out VTHistoryLine bottomLine, out int startIndex, out int endIndex)
+        private void NormalizeSelection(out VTHistoryLine topLine, out VTHistoryLine bottomLine, out int startIndex, out int endIndex)
         {
             topLine = null;
             bottomLine = null;
@@ -704,7 +817,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 // 如果显示的是主缓冲区，那么光标在最后一行的时候才更新
                 // 如果显示的是备用缓冲区，光标可以在任意一个位置显示，那么直接渲染光标
-                if (document == this.alternateDocument || this.ScrollAtBottom)
+                if (document.IsAlternate || this.ScrollAtBottom)
                 {
                     cursor.OffsetY = activeLine.OffsetY;
                     // 有可能有中文字符，一个中文字符占用2列
@@ -726,143 +839,27 @@ namespace ModengTerm.Terminal.ViewModels
 
                 #region 移动滚动条
 
-                int scrollMax, scrollValue;
-                this.videoTerminal.GetScrollInfo(out scrollMax, out scrollValue);
-                if (this.scrollMax != scrollMax || this.scrollValue != scrollValue)
+                if (this.scrollInfo.Dirty)
                 {
-                    this.videoTerminal.SetScrollInfo(this.scrollMax, this.scrollValue);
+                    this.videoTerminal.SetScrollInfo(this.scrollInfo);
+                    this.scrollInfo.SetDirty(false);
                 }
 
                 #endregion
 
-                #region 更新选中高亮几何图形
+                #region 更新选中区域
 
                 if (!this.textSelection.IsEmpty)
                 {
                     this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
-                    this.textSelection.RequestInvalidate();
                 }
+                this.textSelection.RequestInvalidate();
 
                 #endregion
 
             }, null);
 
             document.SetArrangeDirty(false);
-        }
-
-        /// <summary>
-        /// 滚动到指定的历史记录
-        /// 并更新UI上的滚动条位置
-        /// </summary>
-        /// <param name="scrollValue">要显示的第一行历史记录</param>
-        private void ScrollToHistory(int scrollValue)
-        {
-            // 只有主缓冲区可以滚动
-            if (this.activeDocument != this.mainDocument)
-            {
-                return;
-            }
-
-            // 要滚动到的值
-            int newScroll = scrollValue;
-            // 滚动之前的值
-            int oldScroll = this.scrollValue;
-
-            // 更新当前滚动条的值，一定要先更新，因为DrawDocument函数会用到该值
-            this.scrollValue = scrollValue;
-
-            // 需要进行滚动的行数
-            int scrolledRows = Math.Abs(newScroll - oldScroll);
-
-            // 终端行大小
-            int rows = this.rowSize;
-
-            #region 更新要显示的行
-
-            if (scrolledRows >= rows)
-            {
-                // 先找到Surface上要显示的第一行数据
-                VTHistoryLine historyLine;
-                if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
-                {
-                    logger.ErrorFormat("ScrollTo失败, 找不到对应的VTHistoryLine, scrollValue = {0}", scrollValue);
-                    return;
-                }
-
-                // 此时说明把所有行都滚动到Surface外了，需要重新显示所有行
-                // 找到后面的行数显示
-                VTHistoryLine currentHistory = historyLine;
-                VTextLine currentTextLine = this.activeDocument.FirstLine;
-                for (int i = 0; i < rows; i++)
-                {
-                    // 直接使用VTHistoryLine的List<VTCharacter>的引用
-                    // 冻结状态下的VTextLine不会再有修改了
-                    // 非冻结状态(ActiveLine)需要重新创建一个集合
-                    currentTextLine.SetHistory(currentHistory);
-                    currentHistory = currentHistory.NextLine;
-                    currentTextLine = currentTextLine.NextLine;
-                }
-            }
-            else
-            {
-                // 此时说明只需要更新移动出去的行就可以了
-                if (newScroll > oldScroll)
-                {
-                    // 往下滚动，把上面的拿到下面，从第一行开始
-                    for (int i = 0; i < scrolledRows; i++)
-                    {
-                        // 该值永远是第一行，因为下面被Move到最后一行了
-                        VTextLine firstLine = this.activeDocument.FirstLine;
-
-                        VTHistoryLine historyLine;
-                        if (this.historyLines.TryGetValue(oldScroll + rows + i, out historyLine))
-                        {
-                            firstLine.SetHistory(historyLine);
-                        }
-                        else
-                        {
-                            // 当扩大终端行数之后，然后把滚动条拖上去，然后输入字符的时候，会出现没有历史行的情况
-                            // 因为扩大行数的时候会新增加行，但是这些行是空行，并没有对应的历史记录
-                            // 所以这里就直接清空行
-                            firstLine.SetEmpty();
-                        }
-
-                        this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
-                    }
-                }
-                else
-                {
-                    // 往上滚动，把下面的拿到上面，从最后一行开始
-                    for (int i = 1; i <= scrolledRows; i++)
-                    {
-                        VTHistoryLine historyLine = this.historyLines[oldScroll - i];
-
-                        VTextLine lastLine = this.activeDocument.LastLine;
-                        lastLine.SetHistory(historyLine);
-                        this.activeDocument.MoveLine(lastLine, VTextLine.MoveOptions.MoveToFirst);
-                    }
-                }
-            }
-
-            this.activeDocument.SetArrangeDirty(true);
-
-            #endregion
-
-            #region 如果有TextSelection，那么更新TextSelection
-
-            if (!this.textSelection.IsEmpty)
-            {
-                // 把文本选中标记为脏数据，在下次渲染的时候会重新渲染文本选中
-                this.textSelection.RequestInvalidate();
-            }
-
-            #endregion
-
-            #region 重新渲染
-
-            this.PerformDrawing(this.activeDocument);
-
-            #endregion
         }
 
         /// <summary>
@@ -884,7 +881,7 @@ namespace ModengTerm.Terminal.ViewModels
                 if (!this.ScrollAtTop)
                 {
                     // 不在最上面，往上滚动一行
-                    scrollTarget = this.scrollValue - 1;
+                    scrollTarget = this.scrollInfo.ScrollValue - 1;
                     scrollResult = OutsideScrollResult.ScrollTop;
                 }
             }
@@ -893,7 +890,7 @@ namespace ModengTerm.Terminal.ViewModels
                 // 光标在容器下面
                 if (!this.ScrollAtBottom)
                 {
-                    scrollTarget = this.scrollValue + 1;
+                    scrollTarget = this.scrollInfo.ScrollValue + 1;
                     scrollResult = OutsideScrollResult.ScrollDown;
                 }
             }
@@ -1003,6 +1000,14 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        private void ScrollToBottom()
+        {
+            if (!this.ScrollAtBottom)
+            {
+                this.ScrollToHistory(this.scrollInfo.ScrollMax);
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -1021,14 +1026,11 @@ namespace ModengTerm.Terminal.ViewModels
                         // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
                         // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
 
-                        if (this.activeDocument == this.mainDocument)
+                        if (!this.activeDocument.IsAlternate)
                         {
                             // 用户输入的时候，如果滚动条没滚动到底，那么先把滚动条滚动到底
                             // 不然会出现在VTDocument当前的最后一行打印字符的问题
-                            if (!this.ScrollAtBottom)
-                            {
-                                this.ScrollToHistory(this.scrollMax);
-                            }
+                            this.ScrollToBottom();
                         }
 
                         // 创建并打印新的字符
@@ -1058,13 +1060,10 @@ namespace ModengTerm.Terminal.ViewModels
 
                         VTDebug.Context.WriteInteractive(action, "{0},{1}", this.CursorRow, this.CursorCol);
 
-                        if (this.activeDocument == this.mainDocument)
+                        if (!this.activeDocument.IsAlternate)
                         {
                             // 如果滚动条不在最底部，那么先把滚动条滚动到底
-                            if (!this.ScrollAtBottom)
-                            {
-                                this.ScrollToHistory(this.scrollMax);
-                            }
+                            this.ScrollToBottom();
                         }
 
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
@@ -1082,7 +1081,14 @@ namespace ModengTerm.Terminal.ViewModels
                             VTextLine newLastLine = this.ActiveLine;
                             newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
 
-                            VTHistoryLine oldHistoryLine = this.lastHistoryLine;
+                            //VTHistoryLine oldHistoryLine = this.historyLines[oldLastLine.PhysicsRow];
+                            //VTHistoryLine newHistoryLine;
+                            //if (!this.historyLines.TryGetValue(newLastLine.PhysicsRow, out newHistoryLine))
+                            //{
+                            //    newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, oldHistoryLine, this.ActiveLine);
+                            //    this.historyLines[newLastLine.PhysicsRow] = newHistoryLine;
+                            //    this.lastHistoryLine = newHistoryLine;
+                            //}
 
                             // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里冻结一下换行之前的历史行的数据，冻结之后，该历史行的数据就不会再更改了
                             // 有几种特殊情况：
@@ -1112,8 +1118,8 @@ namespace ModengTerm.Terminal.ViewModels
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
-                                this.scrollMax = scrollMax;
-                                this.scrollValue = scrollMax;
+                                this.scrollInfo.ScrollMax = scrollMax;
+                                this.scrollInfo.ScrollValue = scrollMax;
                             }
 
                             #endregion
@@ -1157,7 +1163,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", eraseType, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, eraseType);
                         this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
                         break;
                     }
@@ -1166,8 +1172,42 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         List<int> parameters = parameter as List<int>;
                         EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", eraseType, this.CursorRow, this.CursorCol);
-                        this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, eraseType);
+                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, eraseType);
+
+                        switch (eraseType)
+                        {
+                            case EraseType.Scrollback:
+                                {
+                                    // 相关命令：clear
+                                    // Erase Saved Lines
+                                    // 模拟xshell的操作，把当前行移动到可视区域的第一行
+                                    // 因为该动作会修改滚动条的数据，所以在VideoTerminal里执行
+
+                                    // 此时滚动条不一定在最底边，如果滚动条不在最底边，先滚动到最底边
+                                    //this.ScrollToBottom();
+
+                                    //VTextLine firstLine = this.activeDocument.FirstLine;
+                                    //VTextLine lastLine = this.activeDocument.LastLine;
+
+                                    //// 当前终端里显示的行数
+                                    //int lines = lastLine.PhysicsRow - firstLine.PhysicsRow + 1;
+
+                                    //// 把当前终端里显示的行数全部放到滚动区域上面
+                                    //this.scrollInfo.ScrollMax += lines;
+                                    //this.scrollInfo.ScrollValue = this.scrollInfo.ScrollMax;
+
+                                    // 这里只更新数据模型，所有对UI的操作在处理完数据后一次性在UI线程执行
+
+                                    break;
+                                }
+
+                            default:
+                                {
+                                    this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, eraseType);
+                                    break;
+                                }
+                        }
+
                         break;
                     }
 
@@ -1731,6 +1771,9 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
+            int scrollValue = this.scrollInfo.ScrollValue;
+            int scrollMax = this.scrollInfo.ScrollMax;
+
             if (upper)
             {
                 // 向上滚动
@@ -1742,14 +1785,14 @@ namespace ModengTerm.Terminal.ViewModels
                     return;
                 }
 
-                if (this.scrollValue < this.scrollDelta)
+                if (scrollValue < this.scrollDelta)
                 {
                     // 一次可以全部滚完并且还有剩余
                     this.ScrollToHistory(0);
                 }
                 else
                 {
-                    this.ScrollToHistory(this.scrollValue - this.scrollDelta);
+                    this.ScrollToHistory(scrollValue - this.scrollDelta);
                 }
             }
             else
@@ -1763,16 +1806,16 @@ namespace ModengTerm.Terminal.ViewModels
                 }
 
                 // 剩余可以往下滚动的行数
-                int remainScroll = this.scrollMax - this.scrollValue;
+                int remainScroll = scrollMax - scrollValue;
 
                 if (remainScroll >= this.scrollDelta)
                 {
-                    this.ScrollToHistory(this.scrollValue + this.scrollDelta);
+                    this.ScrollToHistory(scrollValue + this.scrollDelta);
                 }
                 else
                 {
                     // 直接滚动到底
-                    this.ScrollToHistory(this.scrollMax);
+                    this.ScrollToHistory(scrollMax);
                 }
             }
         }

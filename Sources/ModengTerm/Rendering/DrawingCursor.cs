@@ -21,18 +21,41 @@ namespace ModengTerm.Rendering
         private static readonly double LineWidth = 2;
         private static readonly double UnderscoreWidth = 3;
 
-        /// <summary>
-        /// TODO:先把光标高度写死，后面再优化..
-        /// </summary>
-        private static readonly double CursorHeight = 15;
-
         private VTCursor cursor;
         private Brush brush;
+        private Rect rect;
 
         protected override void OnInitialize(VTDocumentElement element)
         {
             this.cursor = element as VTCursor;
             this.brush = MTermUtils.GetBrush(this.cursor.Color);
+
+            switch (this.cursor.Style)
+            {
+                case VTCursorStyles.Block:
+                    {
+                        this.rect = new Rect(0, 0, BlockWidth, this.cursor.Size.Height);
+                        break;
+                    }
+
+                case VTCursorStyles.Line:
+                    {
+                        this.rect = new Rect(0, 0, LineWidth, this.cursor.Size.Height);
+                        break;
+                    }
+
+                case VTCursorStyles.Underscore:
+                    {
+                        this.rect = new Rect(0, 0, UnderscoreWidth, 5);
+                        break;
+                    }
+
+                default:
+                    {
+                        this.rect = new Rect();
+                        break;
+                    }
+            }
 
             // 先画出来，不然永远不会显示鼠标元素
             // 因为光标闪烁只会移动光标的位置和显示/隐藏光标，并不会重新Draw光标
@@ -41,34 +64,7 @@ namespace ModengTerm.Rendering
 
         protected override void Draw(DrawingContext dc)
         {
-            switch (this.cursor.Style)
-            {
-                case VTCursorStyles.Block:
-                    {
-                        dc.DrawRectangle(this.brush, TransparentPen, new Rect(0, 0, BlockWidth, CursorHeight));
-                        break;
-                    }
-
-                case VTCursorStyles.Line:
-                    {
-                        dc.DrawRectangle(this.brush, TransparentPen, new Rect(0, 0, LineWidth, CursorHeight));
-                        break;
-                    }
-
-                case VTCursorStyles.Underscore:
-                    {
-                        dc.DrawRectangle(this.brush, TransparentPen, new Rect(0, 0, UnderscoreWidth, 5));
-                        break;
-                    }
-
-                case VTCursorStyles.None:
-                    {
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
+            dc.DrawRectangle(this.brush, TransparentPen, this.rect);
         }
     }
 }

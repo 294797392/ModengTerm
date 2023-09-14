@@ -53,7 +53,7 @@ namespace XTerminal.Document
         public string Name { get; set; }
 
         /// <summary>
-        /// 记录文档中光标的位置
+        /// 记录光标信息
         /// </summary>
         public VTCursor Cursor { get; private set; }
 
@@ -134,8 +134,9 @@ namespace XTerminal.Document
                 Row = 0,
                 Column = 0,
                 Style = options.CursorStyle,
-                BlinkSpeed = options.BlinkSpeed,
-                BlinkRemain = (int)options.BlinkSpeed
+                BlinkSpeed = options.CursorSpeed,
+                BlinkRemain = (int)options.CursorSpeed,
+                Size = options.CursorSize
             };
             this.Cursor.DrawingContext = this.Canvas.CreateDrawingObject(this.Cursor);
 
@@ -393,6 +394,12 @@ namespace XTerminal.Document
 
         }
 
+        /// <summary>
+        /// 执行EraseDisplay指令
+        /// </summary>
+        /// <param name="textLine">当前光标所在行</param>
+        /// <param name="column">当前的光标位置</param>
+        /// <param name="eraseType"></param>
         public void EraseDisplay(VTextLine textLine, int column, EraseType eraseType)
         {
             switch (eraseType)
@@ -445,8 +452,8 @@ namespace XTerminal.Document
 
                 case EraseType.All:
                     {
+                        // 相关命令：clear
                         // 删除显示的全部字符，所有行都被删除，changed to single-width，光标不移动
-
                         VTextLine next = this.FirstLine;
                         while (next != null)
                         {

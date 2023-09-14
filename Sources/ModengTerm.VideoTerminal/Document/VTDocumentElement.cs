@@ -21,7 +21,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 矩形
         /// </summary>
-        Rectangle
+        Rectangle,
+
+        /// <summary>
+        /// 滚动条
+        /// </summary>
+        Scrollbar
     }
 
     /// <summary>

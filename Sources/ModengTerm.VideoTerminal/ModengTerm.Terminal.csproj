@@ -58,6 +58,7 @@
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
     <Compile Include="Document\VTextData.cs" />
+    <Compile Include="Document\VTScrollInfo.cs" />
     <Compile Include="Enumerations\SaveModeEnum.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Document\HighlightGeometry\HighlightGeometryBuilder.cs" />

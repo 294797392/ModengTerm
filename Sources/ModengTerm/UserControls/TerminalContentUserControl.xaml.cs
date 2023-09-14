@@ -2,6 +2,7 @@
 using ModengTerm;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
+using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
@@ -192,7 +193,7 @@ namespace XTerminal.UserControls
 
         private void SliderScrolbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.videoTerminal.ScrollTo((int)e.NewValue);
+            this.videoTerminal.ScrollToHistory((int)e.NewValue);
         }
 
 
@@ -377,26 +378,26 @@ namespace XTerminal.UserControls
             });
         }
 
-        public void GetScrollInfo(out int maximum, out int scrollValue)
+        public void GetScrollInfo(ref VTScrollInfo scrollInfo)
         {
-            maximum = (int)SliderScrolbar.Maximum;
-            scrollValue = (int)SliderScrolbar.Value;
+            scrollInfo.ScrollMax = (int)SliderScrolbar.Maximum;
+            scrollInfo.ScrollValue = (int)SliderScrolbar.Value;
         }
 
         /// <summary>
         /// 更新滚动信息
         /// </summary>
         /// <param name="maximum">滚动条的最大值</param>
-        public void SetScrollInfo(int maximum, int scrollValue)
+        public void SetScrollInfo(VTScrollInfo scrollInfo)
         {
-            if (SliderScrolbar.Maximum != maximum)
+            if (SliderScrolbar.Maximum != scrollInfo.ScrollMax)
             {
-                SliderScrolbar.Maximum = maximum;
+                SliderScrolbar.Maximum = scrollInfo.ScrollMax;
             }
 
-            if (SliderScrolbar.Value != scrollValue)
+            if (SliderScrolbar.Value != scrollInfo.ScrollValue)
             {
-                SliderScrolbar.Value = scrollValue;
+                SliderScrolbar.Value = scrollInfo.ScrollValue;
             }
         }
 

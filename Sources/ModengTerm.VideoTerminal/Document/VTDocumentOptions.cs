@@ -34,12 +34,17 @@ namespace XTerminal.Document
         /// <summary>
         /// 光标闪烁速度
         /// </summary>
-        public VTCursorSpeeds BlinkSpeed { get; set; }
+        public VTCursorSpeeds CursorSpeed { get; set; }
 
         /// <summary>
         /// 光标颜色
         /// </summary>
         public string CursorColor { get; set; }
+        
+        /// <summary>
+        /// 光标高度
+        /// </summary>
+        public VTSize CursorSize { get; set; }
 
         /// <summary>
         /// 文本前景色

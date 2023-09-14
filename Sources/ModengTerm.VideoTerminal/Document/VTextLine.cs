@@ -503,7 +503,7 @@ namespace XTerminal.Document
 
                 foreach (VTextAttributeState attributeState in character.AttributeList)
                 {
-                    VTextAttribute attribute = textData.Attributes.FirstOrDefault(v => v.Attribute == attributeState.Attribute && v.Parameter == attributeState.Parameter && !v.Closed);
+                    VTextAttribute attribute = textData.Attributes.FirstOrDefault(v => v.Attribute == attributeState.Attribute && !v.Closed);
 
                     if (attributeState.Enabled)
                     {
@@ -517,6 +517,29 @@ namespace XTerminal.Document
                                 Parameter = attributeState.Parameter
                             };
                             textData.Attributes.Add(attribute);
+                        }
+                        else
+                        {
+                            // 颜色比较特殊，有可能连续多次设置不同的颜色
+                            if (attributeState.Attribute == VTextAttributes.Background ||
+                                attributeState.Attribute == VTextAttributes.Foreground)
+                            {
+                                // 如果设置的是颜色的话，并且当前字符的颜色和最后一次设置的颜色不一样，那么要先关闭最后一次设置的颜色
+                                // attribute是最后一次设置的颜色，attributeState是当前字符的颜色
+                                if (attribute.Parameter != attributeState.Parameter)
+                                {
+                                    attribute.Closed = true;
+
+                                    // 关闭后创建一个新的Attribute
+                                    attribute = new VTextAttribute()
+                                    {
+                                        Attribute = attributeState.Attribute,
+                                        StartIndex = i,
+                                        Parameter = attributeState.Parameter
+                                    };
+                                    textData.Attributes.Add(attribute);
+                                }
+                            }
                         }
                         attribute.Count++;
                     }

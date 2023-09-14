@@ -116,7 +116,7 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 根据当前的TextPointer信息更新文本选中范围
+        /// 根据当前的TextPointer信息更新选中区域的形状
         /// 虽然TextPointer的数值是一样的，但是当移动了滚动条之后，选中区域的显示就不一样了
         /// </summary>
         /// <param name="document"></param>

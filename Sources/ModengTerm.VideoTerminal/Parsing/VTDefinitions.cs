@@ -101,6 +101,12 @@ namespace XTerminal.Parser
         /// 删除光标所在整行字符
         /// </summary>
         All = 2,
+
+        /// <summary>
+        /// 删除所有已经保存了的行
+        /// 相当于把当前行移动到可视区域的第一行
+        /// Erase Saved Lines
+        /// </summary>
         Scrollback = 3
     }
 

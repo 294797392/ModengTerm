@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -27,16 +28,15 @@ namespace XTerminal.Document.Rendering
         /// <summary>
         /// 获取滚动条信息
         /// </summary>
-        /// <param name="maximum">滚动条最大值</param>
-        /// <param name="scrollValue">当前滚动条的值</param>
+        /// <param name="scrollInfo">存储滚动条信息</param>
         /// <returns></returns>
-        void GetScrollInfo(out int maximum, out int scrollValue);
+        void GetScrollInfo(ref VTScrollInfo scrollInfo);
 
         /// <summary>
         /// 更新滚动条的信息
         /// </summary>
-        /// <param name="maximum">滚动条的最大值</param>
-        void SetScrollInfo(int maximum, int scrollValue);
+        /// <param name="scrollInfo">要设置的滚动条信息</param>
+        void SetScrollInfo(VTScrollInfo scrollInfo);
 
         /// <summary>
         /// 设置滚动条是否可见

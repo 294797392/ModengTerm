@@ -65,6 +65,11 @@ namespace XTerminal.Document
         public VTCursorStyles Style { get; set; }
 
         /// <summary>
+        /// 光标大小
+        /// </summary>
+        public VTSize Size { get; set; }
+
+        /// <summary>
         /// 是否闪烁
         /// </summary>
         public bool Blinking { get; set; }
