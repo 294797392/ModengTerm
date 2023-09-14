@@ -1000,6 +1000,9 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 把滚动条移动到最下面
+        /// </summary>
         private void ScrollToBottom()
         {
             if (!this.ScrollAtBottom)
@@ -1077,22 +1080,14 @@ namespace ModengTerm.Terminal.ViewModels
                         // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
                         if (this.activeDocument == this.mainDocument)
                         {
+                            // 1. 更新旧的最后一行的历史行数据
+                            // 2. 创建新的历史行
+
                             VTextLine oldLastLine = this.ActiveLine.PreviousLine;
                             VTextLine newLastLine = this.ActiveLine;
                             newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
 
-                            //VTHistoryLine oldHistoryLine = this.historyLines[oldLastLine.PhysicsRow];
-                            //VTHistoryLine newHistoryLine;
-                            //if (!this.historyLines.TryGetValue(newLastLine.PhysicsRow, out newHistoryLine))
-                            //{
-                            //    newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, oldHistoryLine, this.ActiveLine);
-                            //    this.historyLines[newLastLine.PhysicsRow] = newHistoryLine;
-                            //    this.lastHistoryLine = newHistoryLine;
-                            //}
-
-                            // 可以确保换行之前的行已经被用户输入完了，不会被更改了，所以这里冻结一下换行之前的历史行的数据，冻结之后，该历史行的数据就不会再更改了
-                            // 有几种特殊情况：
-                            // 1. 如果主机一次性返回了多行数据，那么有可能前面的几行都没有测量，所以这里要先判断上一行是否有测量过
+                            VTHistoryLine oldHistoryLine = this.historyLines[oldLastLine.PhysicsRow];
 
                             #region 更新历史行
 
@@ -1102,11 +1097,17 @@ namespace ModengTerm.Terminal.ViewModels
 
                             #region 创建新行对应的历史行
 
-                            // 再创建最新行的历史行
-                            int newHistoryRow = newLastLine.PhysicsRow;
-                            VTHistoryLine newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, this.lastHistoryLine, this.ActiveLine);
-                            this.historyLines[newHistoryRow] = newHistoryLine;
-                            this.lastHistoryLine = newHistoryLine;
+                            // 注意，当执行ED_EraseDisplay - EraseType.Scrollback动作的时候，会执行和LF一模一样的动作，历史行也会被创建
+                            // 所以有可能新的历史行是已经存在的，所以这里需要判断
+                            // EraseType.Scrollback的功能是把当前保存的行都显示到屏幕外面
+
+                            VTHistoryLine newHistoryLine;
+                            if (!this.historyLines.TryGetValue(newLastLine.PhysicsRow, out newHistoryLine))
+                            {
+                                newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, oldHistoryLine, this.ActiveLine);
+                                this.historyLines[newLastLine.PhysicsRow] = newHistoryLine;
+                                this.lastHistoryLine = newHistoryLine;
+                            }
 
                             #endregion
 
@@ -1114,7 +1115,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = newHistoryRow - this.rowSize + 1;
+                            int scrollMax = this.lastHistoryLine.PhysicsRow - this.rowSize + 1;
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
@@ -1124,6 +1125,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             #endregion
                         }
+
                         break;
                     }
 
@@ -1178,25 +1180,27 @@ namespace ModengTerm.Terminal.ViewModels
                         {
                             case EraseType.Scrollback:
                                 {
-                                    // 相关命令：clear
+                                    // 相关命令：
+                                    // MainDocument：clear
+                                    // AlternateDocument：暂无
+
                                     // Erase Saved Lines
                                     // 模拟xshell的操作，把当前行移动到可视区域的第一行
                                     // 因为该动作会修改滚动条的数据，所以在VideoTerminal里执行
 
-                                    // 此时滚动条不一定在最底边，如果滚动条不在最底边，先滚动到最底边
-                                    //this.ScrollToBottom();
+                                    VTextLine firstLine = this.activeDocument.FirstLine;
+                                    VTextLine lastLine = this.activeDocument.LastLine;
 
-                                    //VTextLine firstLine = this.activeDocument.FirstLine;
-                                    //VTextLine lastLine = this.activeDocument.LastLine;
+                                    // 当前终端里显示的行数
+                                    int lines = lastLine.PhysicsRow - firstLine.PhysicsRow;
 
-                                    //// 当前终端里显示的行数
-                                    //int lines = lastLine.PhysicsRow - firstLine.PhysicsRow + 1;
-
-                                    //// 把当前终端里显示的行数全部放到滚动区域上面
-                                    //this.scrollInfo.ScrollMax += lines;
-                                    //this.scrollInfo.ScrollValue = this.scrollInfo.ScrollMax;
-
-                                    // 这里只更新数据模型，所有对UI的操作在处理完数据后一次性在UI线程执行
+                                    // 把当前终端里显示的行数全部放到滚动区域上面
+                                    // 实现方式是打印空行即可
+                                    // 此时如果滚动条不在最底边，没关系，LF动作会把滚动条滚动到最底边
+                                    for (int i = 0; i < lines; i++)
+                                    {
+                                        this.VtParser_ActionEvent(VTActions.LF, null);
+                                    }
 
                                     break;
                                 }
