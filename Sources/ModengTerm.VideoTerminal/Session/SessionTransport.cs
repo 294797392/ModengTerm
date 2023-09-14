@@ -72,6 +72,18 @@ namespace XTerminal.Session
 
         public void Release()
         {
+            if (this.driver == null)
+            {
+                return;
+            }
+
+            if (this.driver is SshNetSession)
+            {
+                SshNetSession sshNetSession = this.driver as SshNetSession;
+                sshNetSession.Stream.DataReceived -= Stream_DataReceived;
+                sshNetSession.Stream.ErrorOccurred -= Stream_ErrorOccurred;
+            }
+
             this.driver = null;
         }
 
@@ -96,7 +108,7 @@ namespace XTerminal.Session
             }
 
             this.backgroundTask.Wait();
-            this.driver.Close();
+            this.CloseDriver();
         }
 
         public int Write(byte[] bytes)
@@ -111,18 +123,10 @@ namespace XTerminal.Session
                 this.driver.Write(bytes);
                 return ResponseCode.SUCCESS;
             }
-            catch (InvalidOperationException ex)
-            {
-                logger.Error("发送数据异常", ex);
-                return ResponseCode.FAILED;
-            }
-            catch (TimeoutException ex)
-            {
-                logger.Error("发送数据异常", ex);
-                return ResponseCode.FAILED;
-            }
             catch (Exception ex)
             {
+                this.Close();
+                this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
                 logger.Error("发送数据异常", ex);
                 return ResponseCode.FAILED;
             }
@@ -151,6 +155,8 @@ namespace XTerminal.Session
             }
             catch (Exception ex)
             {
+                this.Close();
+                this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
                 logger.Error("Resize异常", ex);
                 return ResponseCode.FAILED;
             }
@@ -164,6 +170,12 @@ namespace XTerminal.Session
         #endregion
 
         #region 实例方法
+
+        private void CloseDriver()
+        {
+            this.driver.Close();
+            this.isRunning = false;
+        }
 
         /// <summary>
         /// 检查当前连接状态
@@ -246,9 +258,16 @@ namespace XTerminal.Session
                 else if (n == 0)
                 {
                     // 0的话继续读取
-                    // SshNet的Read方法是异步的，导致为0的话也得继续读
-                    // 需要优化
-                    Thread.Sleep(50);
+                    zeros++;
+                    if (zeros > 3)
+                    {
+                        // 大于3次直接退出
+                        break;
+                    }
+                    else
+                    {
+                        Thread.Sleep(50);
+                    }
                 }
                 else
                 {
@@ -294,6 +313,16 @@ namespace XTerminal.Session
 
             this.NotifyStatusChanged(SessionStatusEnum.Connected);
 
+            // SshNet使用回调获取数据，所以这里直接返回
+            if (this.driver is SshNetSession)
+            {
+                SshNetSession sshNetSession = this.driver as SshNetSession;
+                sshNetSession.Stream.DataReceived += Stream_DataReceived;
+                sshNetSession.Stream.ErrorOccurred += Stream_ErrorOccurred;
+                logger.InfoFormat("退出Session线程");
+                return;
+            }
+
             // 连接成功之后开始从远程主机读取数据
             // 读取失败会返回
             this.SessionLoop();
@@ -305,6 +334,18 @@ namespace XTerminal.Session
             this.isRunning = false;
 
             logger.InfoFormat("退出Session线程");
+        }
+
+        private void Stream_ErrorOccurred(object sender, Renci.SshNet.Common.ExceptionEventArgs e)
+        {
+            logger.Error("SshNet Stream_ErrorOccurred", e.Exception);
+            this.CloseDriver();
+            this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+        }
+
+        private void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)
+        {
+            this.NotifyDataReceived(e.Data, e.Data.Length);
         }
 
         #endregion

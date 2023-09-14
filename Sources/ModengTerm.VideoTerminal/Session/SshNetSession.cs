@@ -1,4 +1,5 @@
 ﻿using Renci.SshNet;
+using Renci.SshNet.Common;
 using System;
 using System.IO;
 using XTerminal.Base;
@@ -26,6 +27,8 @@ namespace XTerminal.Session
         #endregion
 
         #region 属性
+
+        public ShellStream Stream { get { return this.stream; } }
 
         #endregion
 
@@ -127,11 +130,8 @@ namespace XTerminal.Session
 
         internal override int Read(byte[] buffer)
         {
-            if (this.stream.Length == 0)
-            {
-                return 0;
-            }
-
+            // SshNet必须使用异步方式，不可以同步读取
+            throw new InvalidOperationException();
             return this.stream.Read(buffer, 0, buffer.Length);
         }
 
@@ -143,6 +143,10 @@ namespace XTerminal.Session
         #endregion
 
         #region 实例方法
+
+        #endregion
+
+        #region 事件处理器
 
         #endregion
     }
