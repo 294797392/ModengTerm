@@ -241,20 +241,14 @@ namespace XTerminal.Session
                 if (n == -1)
                 {
                     // 读取失败，直接断线处理
+                    break;
                 }
                 else if (n == 0)
                 {
-                    // 没读取到数据
-                    zeros++;
-                    if (zeros > 10)
-                    {
-                        // 读取失败，直接断线处理
-                        break;
-                    }
-                    else
-                    {
-                        Thread.Sleep(50);
-                    }
+                    // 0的话继续读取
+                    // SshNet的Read方法是异步的，导致为0的话也得继续读
+                    // 需要优化
+                    Thread.Sleep(50);
                 }
                 else
                 {

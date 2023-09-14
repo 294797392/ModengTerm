@@ -1,9 +1,6 @@
 ﻿using Renci.SshNet;
-using Renci.SshNet.Common;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
@@ -130,6 +127,11 @@ namespace XTerminal.Session
 
         internal override int Read(byte[] buffer)
         {
+            if (this.stream.Length == 0)
+            {
+                return 0;
+            }
+
             return this.stream.Read(buffer, 0, buffer.Length);
         }
 
