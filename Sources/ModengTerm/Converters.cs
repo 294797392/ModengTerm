@@ -8,7 +8,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal
+namespace ModengTerm
 {
     public static class EnumConverterUtils
     {

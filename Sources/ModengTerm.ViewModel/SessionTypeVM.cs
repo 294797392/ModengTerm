@@ -7,7 +7,7 @@ using WPFToolkit.MVVM;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.ViewModels
+namespace ModengTerm.ViewModels
 {
     public class SessionTypeVM : ItemViewModel
     {

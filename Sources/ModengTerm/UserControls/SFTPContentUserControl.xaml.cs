@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.ViewModels;
 
 namespace XTerminal.UserControls
 {

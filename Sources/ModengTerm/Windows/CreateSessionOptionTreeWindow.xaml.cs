@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm;
 using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
-using XTerminal.ViewModels;
 
 namespace XTerminal.Windows
 {
@@ -58,9 +58,9 @@ namespace XTerminal.Windows
         {
             this.contentMap = new Dictionary<string, Control>();
 
-            CreateSessionVM createSessionVM = new CreateSessionVM(XTermApp.Context.ServiceAgent);
+            CreateSessionVM createSessionVM = new CreateSessionVM(MTermApp.Context.ServiceAgent);
 
-            base.DataContext = new CreateSessionVM(XTermApp.Context.ServiceAgent);
+            base.DataContext = new CreateSessionVM(MTermApp.Context.ServiceAgent);
         }
 
         #endregion

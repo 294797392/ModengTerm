@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm", "ModengTerm\Mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.Base", "ModengTerm.Base\ModengTerm.Base.csproj", "{F2C5BC95-5839-4C8F-9923-3512FE2DDEA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.ViewModel", "ModengTerm.ViewModel\ModengTerm.ViewModel.csproj", "{66602C53-AD9B-4A9D-9D1D-98F41C5796C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.ViewModels", "ModengTerm.ViewModel\ModengTerm.ViewModels.csproj", "{66602C53-AD9B-4A9D-9D1D-98F41C5796C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

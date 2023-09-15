@@ -1,4 +1,6 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm;
+using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,6 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 using XTerminal.UserControls;
-using XTerminal.ViewModels;
 using XTerminal.Windows;
 
 namespace XTerminal
@@ -46,7 +47,7 @@ namespace XTerminal
             ListBoxOpenedSessionTab.ItemTemplateSelector = this.templateSelector;
         }
 
-        private void OpenSession()
+        private void CreateSession()
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
             sessionListWindow.Owner = this;
@@ -55,31 +56,7 @@ namespace XTerminal
             {
                 XTermSession session = sessionListWindow.SelectedSession;
 
-                this.OpenSession(session);
-            }
-        }
-
-        private void OpenSession(XTermSession session)
-        {
-            OpenedSessionVM openedSession = XTermApp.Context.OpenSession(session);
-            ContentControlTerminal.Content = openedSession.Content;
-
-            SessionContent sessionContent = openedSession.Content as SessionContent;
-            if (sessionContent != null)
-            {
-                sessionContent.Open(openedSession);
-            }
-        }
-
-        /// <summary>
-        /// 切换要显示的Session
-        /// </summary>
-        /// <param name="switchTo">要切换显示的Session</param>
-        private void SwitchSession(OpenedSessionVM switchTo)
-        {
-            if (ContentControlTerminal.Content != switchTo.Content)
-            {
-                ContentControlTerminal.Content = switchTo.Content;
+                MTermApp.Context.OpenSession(session, ContentControlSession);
             }
         }
 
@@ -89,7 +66,7 @@ namespace XTerminal
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.OpenSession();
+            this.CreateSession();
         }
 
         private void ListBoxOpenedSessionTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -108,11 +85,10 @@ namespace XTerminal
                     ListBoxOpenedSessionTab.SelectedItem = e.RemovedItems[0];
                 }
 
-                this.OpenSession();
+                this.CreateSession();
             }
             else
             {
-                this.SwitchSession(selectedTabItem);
             }
         }
 
@@ -126,12 +102,12 @@ namespace XTerminal
                 return;
             }
 
-            XTermApp.Context.CloseSession(openedSession);
+            MTermApp.Context.CloseSession(openedSession);
         }
 
         private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)
         {
-            this.OpenSession();
+            this.CreateSession();
         }
 
         private void MenuItemCreateSession_Click(object sender, RoutedEventArgs e)
@@ -147,7 +123,7 @@ namespace XTerminal
             XTermSession session = window.Session;
 
             // 在数据库里新建会话
-            int code = XTermApp.Context.ServiceAgent.AddSession(session);
+            int code = MTermApp.Context.ServiceAgent.AddSession(session);
             if (code != ResponseCode.SUCCESS)
             {
                 MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
@@ -155,7 +131,7 @@ namespace XTerminal
             }
 
             // 打开会话
-            this.OpenSession(session);
+            this.CreateSession();
         }
 
         private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
@@ -172,7 +148,7 @@ namespace XTerminal
 
         private void MenuItemDebugWindow_Click(object sender, RoutedEventArgs e)
         {
-            SessionContent sessionContent = ContentControlTerminal.Content as SessionContent;
+            SessionContent sessionContent = ContentControlSession.Content as SessionContent;
             VideoTerminal terminalSession = sessionContent.DataContext as VideoTerminal;
             if (terminalSession == null)
             {

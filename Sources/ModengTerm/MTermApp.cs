@@ -1,9 +1,11 @@
 ﻿using DotNEToolkit;
+using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -25,11 +27,10 @@ using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Session;
 using XTerminal.UserControls;
-using XTerminal.ViewModels;
 
-namespace XTerminal
+namespace ModengTerm
 {
-    public class XTermApp : ModularApp<XTermApp, MTermManifest>, INotifyPropertyChanged
+    public class MTermApp : ModularApp<MTermApp, MTermManifest>, INotifyPropertyChanged
     {
         #region 实例变量
 
@@ -83,7 +84,7 @@ namespace XTerminal
             this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
 
             // 将打开页面新加到OpenedSessionTab页面上
-            this.OpenedSessionList.Add(new OpenSessionVM());
+            this.OpenedSessionList.Add(new OpenSessionVM(null));
 
             #region 启动后台工作线程
 
@@ -112,47 +113,26 @@ namespace XTerminal
 
         #region 公开接口
 
-        public OpenedSessionVM OpenSession(XTermSession session)
+        public void OpenSession(XTermSession session, ContentControl container)
         {
-            SessionContent content = SessionContentFactory.Create(session);
-
-            // 新建会话ViewModel
-            OpenedSessionVM sessionVM = this.CreateOpenedSessionVM(session);
-            sessionVM.ID = Guid.NewGuid().ToString();
-            sessionVM.Name = session.Name;
-            sessionVM.Description = session.Description;
-            sessionVM.Content = content;
-            sessionVM.StatusChanged += this.SessionVM_StatusChanged;
-            sessionVM.Open(session);
-
-            content.DataContext = sessionVM;
-
-            // 添加到界面上，因为最后一个元素是打开Session的TabItem，所以要添加到倒数第二个元素的位置
-            this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);
-            this.SelectedOpenedSession = sessionVM;
-
-            // 启动光标渲染线程
-            if (sessionVM is VideoTerminal)
-            {
-                if (!this.drawCursorTimer.IsEnabled)
-                {
-                    this.drawCursorTimer.IsEnabled = true;
-                }
-            }
-
-            return sessionVM;
+            // 先初始化UI，等UI显示出来在打开Session
+            // 因为初始化终端需要知道当前的界面大小，从而计算行大小和列大小
+            SessionContent sessionContent = SessionContentFactory.Create(session);
+            sessionContent.Open(session);
+            sessionContent.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
+            container.Content = sessionContent;
         }
 
         public void CloseSession(OpenedSessionVM session)
         {
-            session.StatusChanged -= this.SessionVM_StatusChanged;
+            session.StatusChanged -= this.OpenedSessionVM_StatusChanged;
             session.Close();
+            (session.Content as SessionContent).Close();
 
             this.OpenedSessionList.Remove(session);
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
             if (firstOpenedSession == null)
             {
-                this.OpenSession(MTermConsts.DefaultSession);
             }
             else
             {
@@ -181,33 +161,11 @@ namespace XTerminal
 
         #region 实例方法
 
-        private OpenedSessionVM CreateOpenedSessionVM(XTermSession session)
-        {
-            switch ((SessionTypeEnum)session.SessionType)
-            {
-                case SessionTypeEnum.libvtssh:
-                case SessionTypeEnum.SerialPort:
-                case SessionTypeEnum.SSH:
-                case SessionTypeEnum.Win32CommandLine:
-                    {
-                        return new VideoTerminal();
-                    }
-
-                case SessionTypeEnum.SFTP:
-                    {
-                        return new SFTPSessionVM();
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         #endregion
 
         #region 事件处理器
 
-        private void SessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
+        private void OpenedSessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
         {
         }
 
@@ -237,6 +195,35 @@ namespace XTerminal
                 }
                 finally
                 {
+                }
+            }
+        }
+
+        private void SessionContent_Loaded(object sender, RoutedEventArgs e)
+        {
+            // 此时所有的界面都加载完了，可以真正打开Session了
+            SessionContent content = sender as SessionContent;
+            XTermSession session = content.Session;
+
+            OpenedSessionVM sessionVM = OpenedSessionVMFactory.Create(session);
+            sessionVM.ID = Guid.NewGuid().ToString();
+            sessionVM.Name = session.Name;
+            sessionVM.Description = session.Description;
+            sessionVM.Content = content;
+            sessionVM.StatusChanged += this.OpenedSessionVM_StatusChanged;
+            sessionVM.Open();
+            content.DataContext = sessionVM;
+
+            // 添加到界面上，因为最后一个元素是打开Session的TabItem，所以要添加到倒数第二个元素的位置
+            this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);
+            this.SelectedOpenedSession = sessionVM;
+            
+            // 启动光标渲染线程
+            if (sessionVM is VideoTerminal)
+            {
+                if (!this.drawCursorTimer.IsEnabled)
+                {
+                    this.drawCursorTimer.IsEnabled = true;
                 }
             }
         }

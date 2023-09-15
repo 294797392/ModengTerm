@@ -5,11 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.DataModels;
 
-namespace XTerminal.ViewModels
+namespace ModengTerm.ViewModels
 {
     public class OpenSessionVM : OpenedSessionVM
     {
-        protected override int OnOpen(XTermSession sessionInfo)
+        public OpenSessionVM(XTermSession session) :
+            base(session)
+        { }
+
+        protected override int OnOpen()
         {
             throw new NotImplementedException();
         }

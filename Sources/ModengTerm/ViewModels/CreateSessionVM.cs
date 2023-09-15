@@ -18,7 +18,6 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
-using XTerminal.ViewModels;
 
 namespace ModengTerm.ViewModels
 {
@@ -697,6 +696,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
             session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
+            session.SetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.AutoFit);
             session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, MTermConsts.DefaultOutputEncoding);
             session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
 

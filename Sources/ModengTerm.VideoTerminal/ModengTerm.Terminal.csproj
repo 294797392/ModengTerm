@@ -133,9 +133,9 @@
       <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
       <Name>ModengTerm.Base</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ModengTerm.ViewModel\ModengTerm.ViewModel.csproj">
+    <ProjectReference Include="..\ModengTerm.ViewModel\ModengTerm.ViewModels.csproj">
       <Project>{66602c53-ad9b-4a9d-9d1d-98f41c5796c7}</Project>
-      <Name>ModengTerm.ViewModel</Name>
+      <Name>ModengTerm.ViewModels</Name>
     </ProjectReference>
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
       <Project>{fad04a41-2dbb-49ec-a8ed-fbd0dc62d26c}</Project>

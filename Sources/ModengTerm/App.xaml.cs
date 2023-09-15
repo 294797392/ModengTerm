@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -41,7 +42,7 @@ namespace XTerminal
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
             PixelsPerDip = VisualTreeHelper.GetDpi(new DrawingVisual()).PixelsPerDip;
 
-            XTermApp.Context.Initialize("app.json");
+            MTermApp.Context.Initialize("app.json");
         }
     }
 }

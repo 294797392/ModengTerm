@@ -1,4 +1,6 @@
 ﻿using DotNEToolkit;
+using ModengTerm;
+using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -7,7 +9,6 @@ using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
-using XTerminal.ViewModels;
 using XTerminal.Windows;
 
 namespace XTerminal
@@ -51,7 +52,7 @@ namespace XTerminal
 
         private void InitializeWindow()
         {
-            List<XTermSession> sessions = XTermApp.Context.ServiceAgent.GetSessions();
+            List<XTermSession> sessions = MTermApp.Context.ServiceAgent.GetSessions();
 
             BindableCollection<XTermSessionVM> sessionVMs = new BindableCollection<XTermSessionVM>();
 
@@ -88,7 +89,7 @@ namespace XTerminal
             XTermSession session = window.Session;
 
             // 在数据库里新建会话
-            int code = XTermApp.Context.ServiceAgent.AddSession(session);
+            int code = MTermApp.Context.ServiceAgent.AddSession(session);
             if (code != ResponseCode.SUCCESS)
             {
                 MessageBoxUtils.Error("新建会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
@@ -113,7 +114,7 @@ namespace XTerminal
                 return;
             }
 
-            int code = XTermApp.Context.ServiceAgent.DeleteSession(selectedSession.ID.ToString());
+            int code = MTermApp.Context.ServiceAgent.DeleteSession(selectedSession.ID.ToString());
             if (code != ResponseCode.SUCCESS)
             {
                 MessageBoxUtils.Error("删除会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));

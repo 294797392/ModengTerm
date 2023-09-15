@@ -52,5 +52,12 @@ namespace XTerminal.Document.Rendering
         /// <param name="fontFamily"></param>
         /// <returns></returns>
         VTextMetrics MeasureText(string text, double fontSize, string fontFamily);
+
+        /// <summary>
+        /// 获取终端屏幕的显示区域
+        /// 相对于整个显示器的位置
+        /// </summary>
+        /// <returns></returns>
+        VTRect GetDisplayRect();
     }
 }

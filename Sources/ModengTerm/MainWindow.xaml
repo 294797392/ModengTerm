@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
-        xmlns:local="clr-namespace:XTerminal"
+        xmlns:local="clr-namespace:ModengTerm"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="800" Height="600" WindowStartupLocation="CenterScreen"
@@ -95,7 +95,7 @@
             </Grid.RowDefinitions>
 
             <!-- 打开的终端列表Tab页 -->
-            <ListBox Grid.Row="0" x:Name="ListBoxOpenedSessionTab" DataContext="{Binding Source={x:Static local:XTermApp.Context}}" 
+            <ListBox Grid.Row="0" x:Name="ListBoxOpenedSessionTab" DataContext="{Binding Source={x:Static local:MTermApp.Context}}" 
                      ItemsSource="{Binding Path=OpenedSessionList}" SelectedItem="{Binding Path=SelectedOpenedSession}" 
                      SelectionChanged="ListBoxOpenedSessionTab_SelectionChanged"
                      Style="{StaticResource ResourceKey=StyleListBoxTerminalWindowList}">
@@ -107,7 +107,7 @@
             </ListBox>
 
             <!-- 终端展示页面 -->
-            <ContentControl Grid.Row="1" x:Name="ContentControlTerminal"/>
+            <ContentControl Grid.Row="1" x:Name="ContentControlSession" />
 
         </Grid>
 

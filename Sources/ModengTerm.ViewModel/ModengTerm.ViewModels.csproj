@@ -7,8 +7,8 @@
     <ProjectGuid>{66602C53-AD9B-4A9D-9D1D-98F41C5796C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModengTerm.ViewModel</RootNamespace>
-    <AssemblyName>ModengTerm.ViewModel</AssemblyName>
+    <RootNamespace>ModengTerm.ViewModels</RootNamespace>
+    <AssemblyName>ModengTerm.ViewModels</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -59,17 +59,6 @@
     <Compile Include="OptionTreeVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionTypeVM.cs" />
-    <Compile Include="SFTPSessionVM.cs" />
-    <Compile Include="SFTP\ContextMenuItemVM.cs" />
-    <Compile Include="SFTP\DirectoryNodeVM.cs" />
-    <Compile Include="SFTP\FileNodeVM.cs" />
-    <Compile Include="SFTP\FileSystemNodeTypeEnum.cs" />
-    <Compile Include="SFTP\FileSystemTreeNodeVM.cs" />
-    <Compile Include="SFTP\FileSystemTreeVM.cs" />
-    <Compile Include="SFTP\FileSystemTreeVMContext.cs" />
-    <Compile Include="SFTP\LocalFileSystemTreeVM.cs" />
-    <Compile Include="SFTP\SftpFileSystemTreeVM.cs" />
-    <Compile Include="SFTP\TransferFileVM.cs" />
     <Compile Include="XTermSessionVM.cs" />
   </ItemGroup>
   <ItemGroup>

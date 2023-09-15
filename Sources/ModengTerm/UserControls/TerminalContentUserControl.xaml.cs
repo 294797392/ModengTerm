@@ -6,6 +6,7 @@ using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModels;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,6 @@ using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Enumerations;
 using XTerminal.Session;
-using XTerminal.ViewModels;
 
 namespace XTerminal.UserControls
 {
@@ -49,12 +49,6 @@ namespace XTerminal.UserControls
         private UserInput userInput;
 
         private VideoTerminal videoTerminal;
-
-        private MouseDownHandler mouseDownDlg;
-        private MouseMoveHandler mouseMoveDlg;
-        private MouseUpHandler mouseUpDlg;
-        private MouseWheelHandler mouseWheelDlg;
-        private SizeChangedHandler sizeChangedDlg;
 
         #endregion
 
@@ -173,9 +167,14 @@ namespace XTerminal.UserControls
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+
             base.OnMouseWheel(e);
 
-            this.mouseWheelDlg(this, e.Delta > 0);
+            this.videoTerminal.OnMouseWheel(this, e.Delta > 0);
         }
 
 
@@ -193,41 +192,58 @@ namespace XTerminal.UserControls
 
         private void SliderScrolbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.videoTerminal.ScrollToHistory((int)e.NewValue);
+            this.videoTerminal.ScrollTo((int)e.NewValue);
         }
 
 
 
         private void GridCanvasList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+
             Point p = e.GetPosition(GridCanvasList);
 
             GridCanvasList.CaptureMouse();
-            this.mouseDownDlg(this, new VTPoint(p.X, p.Y), e.ClickCount);
+            this.videoTerminal.OnMouseDown(this, new VTPoint(p.X, p.Y), e.ClickCount);
         }
 
         private void GridCanvasList_PreviewMouseMove(object sender, MouseEventArgs e)
         {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+
             if (GridCanvasList.IsMouseCaptured)
             {
                 Point p = e.GetPosition(GridCanvasList);
-                this.mouseMoveDlg(this, new VTPoint(p.X, p.Y));
+                this.videoTerminal.OnMouseMove(this, new VTPoint(p.X, p.Y));
             }
         }
 
         private void GridCanvasList_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+
             Point p = e.GetPosition(GridCanvasList);
-            this.mouseUpDlg(this, new VTPoint(p.X, p.Y));
+            this.videoTerminal.OnMouseUp(this, new VTPoint(p.X, p.Y));
             GridCanvasList.ReleaseMouseCapture();
         }
 
         private void GridCanvasList_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            // 每次大小改变的时候重新计算下渲染区域的边界框
-            Point leftTop = GridCanvasList.PointToScreen(new Point(0, 0));
-            VTRect vtRect = new VTRect(leftTop.X, leftTop.Y, GridCanvasList.ActualWidth, GridCanvasList.ActualHeight);
-            this.sizeChangedDlg(this, vtRect);
+            if(this.videoTerminal==null)
+            {
+                return;
+            }
+
+            this.videoTerminal.OnSizeChanged(this, this.GetDisplayRect());
         }
 
 
@@ -304,23 +320,23 @@ namespace XTerminal.UserControls
             window.Owner = Window.GetWindow(this);
             if ((bool)window.ShowDialog())
             {
-                XTermApp.Context.LoggerManager.Start(this.videoTerminal, window.Options);
+                MTermApp.Context.LoggerManager.Start(this.videoTerminal, window.Options);
             }
         }
 
         private void MenuItemStopLogger_Click(object sender, RoutedEventArgs e)
         {
-            XTermApp.Context.LoggerManager.Stop(this.videoTerminal);
+            MTermApp.Context.LoggerManager.Stop(this.videoTerminal);
         }
 
         private void MenuItemPauseLogger_Click(object sender, RoutedEventArgs e)
         {
-            XTermApp.Context.LoggerManager.Pause(this.videoTerminal);
+            MTermApp.Context.LoggerManager.Pause(this.videoTerminal);
         }
 
         private void MenuItemResumeLogger_Click(object sender, RoutedEventArgs e)
         {
-            XTermApp.Context.LoggerManager.Resume(this.videoTerminal);
+            MTermApp.Context.LoggerManager.Resume(this.videoTerminal);
         }
 
         private void MenuItemOpenLoggerDirectory_Click(object sender, RoutedEventArgs e)
@@ -332,24 +348,11 @@ namespace XTerminal.UserControls
 
         private void MenuItemDrawingMode_CheckedChanged(object sender, RoutedEventArgs e)
         {
-            if (MenuItemDrawingMode.IsChecked)
-            {
-                // 绘图模式
-                this.mouseDownDlg = this.videoTerminal.OnDrawingMouseDown;
-                this.mouseMoveDlg = this.videoTerminal.OnDrawingMouseMove;
-                this.mouseUpDlg = this.videoTerminal.OnDrawingMouseUp;
-                this.mouseWheelDlg = this.videoTerminal.OnDrawingMouseWheel;
-                this.sizeChangedDlg = this.videoTerminal.OnDrawingSizeChanged;
-            }
-            else
-            {
-                // 非绘图模式
-                this.mouseDownDlg = this.videoTerminal.OnMouseDown;
-                this.mouseMoveDlg = this.videoTerminal.OnMouseMove;
-                this.mouseUpDlg = this.videoTerminal.OnMouseUp;
-                this.mouseWheelDlg = this.videoTerminal.OnMouseWheel;
-                this.sizeChangedDlg = this.videoTerminal.OnSizeChanged;
-            }
+        }
+
+        private void SessionContent_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            this.videoTerminal = base.DataContext as VideoTerminal;
         }
 
         #endregion
@@ -431,27 +434,25 @@ namespace XTerminal.UserControls
             return metrics;
         }
 
+        public VTRect GetDisplayRect()
+        {
+            Point leftTop = GridCanvasList.PointToScreen(new Point(0, 0));
+            return new VTRect(leftTop.X, leftTop.Y, GridCanvasList.ActualWidth, GridCanvasList.ActualHeight);
+        }
+
         #endregion
 
         #region SessionContent
 
-        public override int Open(OpenedSessionVM sessionVM)
+        protected override int OnOpen(XTermSession session)
         {
-            this.videoTerminal = sessionVM as VideoTerminal;
-
-            this.mouseDownDlg = this.videoTerminal.OnMouseDown;
-            this.mouseMoveDlg = this.videoTerminal.OnMouseMove;
-            this.mouseUpDlg = this.videoTerminal.OnMouseUp;
-            this.mouseWheelDlg = this.videoTerminal.OnMouseWheel;
-            this.sizeChangedDlg = this.videoTerminal.OnSizeChanged;
-
-            string background = sessionVM.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
+            string background = session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             BorderBackground.Background = MTermUtils.GetBrush(background);
 
             return ResponseCode.SUCCESS;
         }
 
-        public override void Close()
+        protected override void OnClose()
         {
 
         }

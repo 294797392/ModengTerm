@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace XTerminal.ViewModels
+namespace ModengTerm.ViewModels
 {
     public class OptionTreeVM : TreeViewModel<TreeViewModelContext>
     {

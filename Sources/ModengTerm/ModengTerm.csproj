@@ -91,6 +91,7 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OpenedSessionVMFactory.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
     <Compile Include="Rendering\DrawingLine.cs" />
     <Compile Include="Rendering\DrawingRectangle.cs" />
@@ -101,14 +102,14 @@
     <Compile Include="UserControls\FavoritesUserControl.xaml.cs">
       <DependentUpon>FavoritesUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\FileSystemTreeUserControl.xaml.cs">
+      <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\CreateSessionVM.cs" />
     <Compile Include="Windows\LoggerOptionsWindow.xaml.cs">
       <DependentUpon>LoggerOptionsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="MTermUtils.cs" />
-    <Compile Include="UserControls\FileSystemTreeUserControl.xaml.cs">
-      <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UserControls\SessionContent.cs" />
     <Compile Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml.cs">
       <DependentUpon>SerialPortOptionsUserControl.xaml</DependentUpon>
@@ -126,9 +127,6 @@
     <Compile Include="UserControls\TerminalContentUserControl.xaml.cs">
       <DependentUpon>TerminalContentUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\SFTPContentUserControl.xaml.cs">
-      <DependentUpon>SFTPContentUserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
@@ -138,7 +136,7 @@
     <Compile Include="Windows\DebugWindow.xaml.cs">
       <DependentUpon>DebugWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="XTermApp.cs" />
+    <Compile Include="MTermApp.cs" />
     <Page Include="Languages\Chinese.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -165,7 +163,7 @@
     </Page>
     <Page Include="UserControls\FileSystemTreeUserControl.xaml">
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
     </Page>
     <Page Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml">
       <SubType>Designer</SubType>
@@ -180,10 +178,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\OptionsUserControl\ThemeOptionsUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\SFTPContentUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -272,9 +266,9 @@
       <Project>{8d8c6c2d-8249-49b8-aa04-72d908836388}</Project>
       <Name>ModengTerm.Terminal</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ModengTerm.ViewModel\ModengTerm.ViewModel.csproj">
+    <ProjectReference Include="..\ModengTerm.ViewModel\ModengTerm.ViewModels.csproj">
       <Project>{66602c53-ad9b-4a9d-9d1d-98f41c5796c7}</Project>
-      <Name>ModengTerm.ViewModel</Name>
+      <Name>ModengTerm.ViewModels</Name>
     </ProjectReference>
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
       <Project>{fad04a41-2dbb-49ec-a8ed-fbd0dc62d26c}</Project>

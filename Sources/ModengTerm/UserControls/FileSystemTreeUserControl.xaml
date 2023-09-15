@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:XTerminal.UserControls"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
-             xmlns:vm="clr-namespace:XTerminal.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 

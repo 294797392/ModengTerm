@@ -61,12 +61,11 @@ namespace XTerminal.Session
         public int Initialize(XTermSession session)
         {
             int bufferSize = session.GetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE);
-            this.readBuffer = new byte[bufferSize];
             this.row = session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-
+            
+            this.readBuffer = new byte[bufferSize];
             this.driver = SessionFactory.Create(session);
-
             return ResponseCode.SUCCESS;
         }
 

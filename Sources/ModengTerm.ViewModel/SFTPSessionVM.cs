@@ -17,7 +17,7 @@ using XTerminal.Base.Enumerations;
 using XTerminal.Base.SftpTrasmit;
 using XTerminal.ViewModels.SFTP;
 
-namespace XTerminal.ViewModels
+namespace ModengTerm.ViewModels
 {
     /// <summary>
     /// 维护一个打开的Sftp会话

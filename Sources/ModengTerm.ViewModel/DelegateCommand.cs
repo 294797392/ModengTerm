@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace XTerminal.ViewModels
+namespace ModengTerm.ViewModels
 {
     public class DelegateCommand : ICommand
     {

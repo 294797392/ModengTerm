@@ -9,7 +9,7 @@ using WPFToolkit.MVVM;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.ViewModels
+namespace ModengTerm.ViewModels
 {
     public abstract class OpenedSessionVM : ItemViewModel
     {
@@ -25,6 +25,7 @@ namespace XTerminal.ViewModels
         #region 实例变量
 
         private SessionStatusEnum status;
+        private DependencyObject content;
 
         #endregion
 
@@ -33,7 +34,18 @@ namespace XTerminal.ViewModels
         /// <summary>
         /// 界面上的控件
         /// </summary>
-        public DependencyObject Content { get; set; }
+        public DependencyObject Content 
+        {
+            get { return this.content; }
+            set
+            {
+                if (this.content != value)
+                {
+                    this.content = value;
+                    this.NotifyPropertyChanged("Content");
+                }
+            }
+        }
 
         /// <summary>
         /// 对应的会话信息
@@ -58,11 +70,14 @@ namespace XTerminal.ViewModels
 
         #endregion
 
-        public int Open(XTermSession session)
+        public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
+        }
 
-            return this.OnOpen(session);
+        public int Open()
+        {
+            return this.OnOpen();
         }
 
         public void Close()
@@ -70,7 +85,7 @@ namespace XTerminal.ViewModels
             this.OnClose();
         }
 
-        protected abstract int OnOpen(XTermSession sessionInfo);
+        protected abstract int OnOpen();
         protected abstract void OnClose();
 
         protected void NotifyStatusChanged(SessionStatusEnum status)

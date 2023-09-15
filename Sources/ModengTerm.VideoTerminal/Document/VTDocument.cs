@@ -773,7 +773,9 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 重置终端大小
-        /// 需要考虑scrollMargin
+        /// 模仿Xshell的做法，如果是扩大，那么就多显示几行；如果是缩小，那么就少显示几行
+        /// 注意terminal项目的做法和Xshell不一样。这里我们模仿Xshell的做法
+        /// 是否需要考虑scrollMargin?目前没考虑
         /// </summary>
         /// <param name="rowSize">终端的新的行数</param>
         /// <param name="colSize">终端的新的列数</param>
