@@ -923,22 +923,19 @@ namespace ModengTerm.Terminal.ViewModels
         /// <returns>如果进行了滚动，那么返回true，如果因为某种原因没进行滚动，那么返回false</returns>
         private bool ScrollToHistory(int scrollValue)
         {
-            // 只移动主缓冲区
-            VTDocument scrollDocument = this.mainDocument;
-
             // 要滚动的值和当前值是一样的，也不滚动
             if (this.scrollInfo.ScrollValue == scrollValue)
             {
                 return false;
             }
 
+            // 只移动主缓冲区
+            VTDocument scrollDocument = this.mainDocument;
+
             // 要滚动到的值
             int newScroll = scrollValue;
             // 滚动之前的值
-            int oldScroll = this.scrollInfo.ScrollValue; ;
-
-            // 更新当前滚动条的值，一定要先更新，因为DrawDocument函数会用到该值
-            this.scrollInfo.ScrollValue = scrollValue;
+            int oldScroll = this.scrollInfo.ScrollValue;
 
             // 需要进行滚动的行数
             int scrolledRows = Math.Abs(newScroll - oldScroll);
@@ -1017,6 +1014,9 @@ namespace ModengTerm.Terminal.ViewModels
             scrollDocument.SetArrangeDirty(true);
 
             #endregion
+
+            // 更新当前滚动条的值
+            this.scrollInfo.ScrollValue = scrollValue;
 
             return true;
         }
@@ -1124,7 +1124,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             VTextLine oldLastLine = this.ActiveLine.PreviousLine;
                             VTextLine newLastLine = this.ActiveLine;
-                            newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
+                            //newLastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
 
                             VTHistoryLine oldHistoryLine = this.historyLines[oldLastLine.PhysicsRow];
 
@@ -1232,14 +1232,19 @@ namespace ModengTerm.Terminal.ViewModels
                                     VTextLine lastLine = this.activeDocument.LastLine;
 
                                     // 当前终端里显示的行数
-                                    //int lines = this.ActiveLine.PhysicsRow - firstLine.PhysicsRow;
-                                    int lines = lastLine.PhysicsRow - firstLine.PhysicsRow;
+                                    int lines = this.ActiveLine.PhysicsRow - firstLine.PhysicsRow;
 
                                     // 把当前终端里显示的行数全部放到滚动区域上面
+
+                                    // 先做换行动作，换行完光标在往下的lines行
                                     for (int i = 0; i < lines; i++)
                                     {
-                                        this.VtParser_ActionEvent(VTActions.LF, null);
+                                        this.activeDocument.LineFeed();
                                     }
+
+                                    // 然后增加滚动最大值，滚动到最底边
+                                    this.scrollInfo.ScrollMax += lines;
+                                    this.ScrollToBottom();
 
                                     break;
                                 }

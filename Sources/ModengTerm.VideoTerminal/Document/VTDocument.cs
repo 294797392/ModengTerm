@@ -262,6 +262,12 @@ namespace XTerminal.Document
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
                 this.ActiveLine.DeleteAll();
 
+                // 只更新主缓冲区的物理行数
+                if (!this.IsAlternate)
+                {
+                    this.ActiveLine.PhysicsRow = this.ActiveLine.PreviousLine.PhysicsRow + 1;
+                }
+
                 this.SetArrangeDirty(true);
             }
             else
@@ -328,6 +334,12 @@ namespace XTerminal.Document
                 // 如果不删除的话，在man程序下有可能会显示重叠的信息
                 // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
                 this.ActiveLine.DeleteAll();
+
+                // 只更新主缓冲区的物理行数
+                if (!this.IsAlternate)
+                {
+                    this.ActiveLine.PhysicsRow = this.ActiveLine.NextLine.PhysicsRow - 1;
+                }
 
                 this.SetArrangeDirty(true);
             }
@@ -736,6 +748,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 把一行移动到指定位置
         /// 不考虑ScrollMargin
+        /// 注意该方法会更新被移动的行的PhysicsRow
         /// </summary>
         /// <param name="textLine"></param>
         /// <param name="options"></param>
@@ -750,6 +763,7 @@ namespace XTerminal.Document
                         this.FirstLine.PreviousLine = textLine;
                         this.FirstLine = textLine;
                         textLine.NextLine = firstLine;
+                        textLine.PhysicsRow = firstLine.PhysicsRow - 1;
                         break;
                     }
 
@@ -760,6 +774,7 @@ namespace XTerminal.Document
                         this.LastLine.NextLine = textLine;
                         this.LastLine = textLine;
                         textLine.PreviousLine = lastLine;
+                        textLine.PhysicsRow = lastLine.PhysicsRow + 1;
                         break;
                     }
 
