@@ -53,6 +53,39 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
+        /// <summary>
+        /// 获取滚动条是否包含可滚动的内容
+        /// </summary>
+        public bool HasScroll
+        {
+            get
+            {
+                return this.ScrollMax > 0;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前滚动条是否滚动到底了
+        /// </summary>
+        public bool ScrollAtBottom
+        {
+            get
+            {
+                return this.ScrollValue == this.ScrollMax;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前滚动条是否滚动到顶了
+        /// </summary>
+        public bool ScrollAtTop
+        {
+            get
+            {
+                return this.ScrollValue == 0;
+            }
+        }
+
         internal void SetDirty(bool dirty)
         {
             if (this.dirty != dirty)

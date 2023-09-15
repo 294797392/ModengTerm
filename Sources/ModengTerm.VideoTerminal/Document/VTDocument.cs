@@ -683,7 +683,6 @@ namespace XTerminal.Document
         /// <summary>
         /// 设置光标位置和activeLine
         /// row和column从0开始计数，0表示第一行或者第一列
-        /// 注意必须先设置Column，再设置Row。因为在ActiveLine改变的时候，会设置文本装饰，必须保证列是最新的
         /// /// </summary>
         /// <param name="row">要设置的行</param>
         /// <param name="column">要设置的列</param>
@@ -771,19 +770,17 @@ namespace XTerminal.Document
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
         }
 
-        /// <summary>
-        /// 重置终端大小
-        /// 模仿Xshell的做法，如果是扩大，那么就多显示几行；如果是缩小，那么就少显示几行
-        /// 注意terminal项目的做法和Xshell不一样。这里我们模仿Xshell的做法
-        /// 是否需要考虑scrollMargin?目前没考虑
-        /// </summary>
-        /// <param name="rowSize">终端的新的行数</param>
-        /// <param name="colSize">终端的新的列数</param>
-        public void Resize(int rowSize, int colSize)
+        public int terminalResize(int rowSize, int colSize)
         {
+            if (this.colSize != colSize)
+            {
+                this.colSize = colSize;
+            }
+
             if (this.rowSize != rowSize)
             {
-                int rows = Math.Abs(this.rowSize - rowSize);
+                int rows1 = rowSize - this.rowSize;
+                int rows = Math.Abs(rows1);
 
                 if (this.rowSize < rowSize)
                 {
@@ -793,7 +790,6 @@ namespace XTerminal.Document
                     // 此时ActiveLine不变
                     for (int i = 0; i < rows; i++)
                     {
-                        // TODO：这里PhysicsRow会有问题，先把滚动条往上移动，然后扩大行数，PhysicsRow就不对了
                         VTextLine textLine = this.CreateTextLine(this.LastLine.PhysicsRow + 1);
                         this.LastLine.Append(textLine);
                     }
@@ -814,6 +810,79 @@ namespace XTerminal.Document
 
                         // 注意当光标在最后一行的时候，Cursor.Row是会减少的，这里更新一下Cursor.Row
                         // 虽然Row变了，但是ActiveLine没变
+                        this.SetCursor(this.Cursor.Row - rows, this.Cursor.Column);
+                    }
+                    else
+                    {
+                        // 光标不在最后一行，那么从最后一行开始删除
+                        // ActiveLine貌似也不变
+                        for (int i = 0; i < rows; i++)
+                        {
+                            this.Canvas.DeleteDrawingObject(this.LastLine.DrawingContext);
+                            this.LastLine.Remove();
+                        }
+                    }
+                }
+
+                this.SetArrangeDirty(true);
+
+                this.rowSize = rowSize;
+
+                return rows1;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// 重置终端大小
+        /// 模仿Xshell的做法：
+        /// 1. 扩大行的时候，如果有滚动内容，那么显示滚动内容。如果没有滚动内容，则直接在后面扩大。
+        /// 2. 减少行的时候，如果有滚动内容，那么减少滚动内容。
+        /// 3. ActiveLine保持不变
+        /// 调用这个函数的时候保证此时文档已经滚动到底
+        /// 是否需要考虑scrollMargin?目前没考虑
+        /// </summary>
+        /// <param name="rowSize">终端的新的行数</param>
+        /// <param name="colSize">终端的新的列数</param>
+        public void Resize(int rowSize, int colSize)
+        {
+            if (this.rowSize != rowSize)
+            {
+                int rows = Math.Abs(this.rowSize - rowSize);
+
+                if (this.rowSize < rowSize)
+                {
+                    // 扩大了行数
+
+                    // 找到滚动区域内的最后一行，在该行后添加新行
+                    for (int i = 0; i < rows; i++)
+                    {
+                        VTextLine textLine = this.CreateTextLine(this.LastLine.PhysicsRow + 1);
+                        this.LastLine.Append(textLine);
+                    }
+
+                    // 增加行数之后，鼠标所在行也变了，更新ActiveLine
+                    // 后面SSH主机会发送Print命令，在ActiveLine上打字
+                    this.SetCursor(this.Cursor.Row + rows, this.Cursor.Column);
+                }
+                else
+                {
+                    // 减少了行数
+
+                    if (this.ActiveLine == this.LastLine)
+                    {
+                        // 此时说明光标在最后一行，那么就从第一行开始删除
+                        // 此时ActiveLine不变
+                        for (int i = 0; i < rows; i++)
+                        {
+                            this.Canvas.DeleteDrawingObject(this.FirstLine.DrawingContext);
+                            this.FirstLine.Remove();
+                        }
+
+                        // 注意当光标在最后一行的时候，Cursor.Row是会减少的，这里更新一下Cursor.Row
+                        // 虽然Row变了，但是ActiveLine没变
+                        // 后面SSH主机会发送Print命令，在ActiveLine上打字
                         this.SetCursor(this.Cursor.Row - rows, this.Cursor.Column);
                     }
                     else

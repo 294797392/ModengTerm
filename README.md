@@ -29,6 +29,7 @@ XTerminal的目标是为开发者提供一个方便的，舒适的，用着爽�
 * Control Functions for Coded Character Sets Ecma-048.pdf  
 * https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences  
 * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html  
+* https://www.xfree86.org/4.8.0/ctlseqs.html  
 * https://invisible-island.net/xterm/  
 * https://vt100.net/emu/dec_ansi_parser  
 * 虚拟终端/控制台/Shell介绍：https://cloud.tencent.com/developer/news/304629  

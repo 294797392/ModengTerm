@@ -179,6 +179,34 @@ namespace XTerminal.Document
             textLine.NextLine = next;
         }
 
+        /// <summary>
+        /// 把一行挂载到该行前面
+        /// </summary>
+        /// <param name="textLine"></param>
+        internal void Prepend(VTextLine textLine)
+        {
+            // 分两种情况去处理：
+            // 1. 该行是第一行，那么需要更新FirstLine指针
+            // 2. 该行不是第一行
+
+            if (this == this.OwnerDocument.FirstLine)
+            {
+                // 该行是第一行
+                this.OwnerDocument.FirstLine = textLine;
+                textLine.NextLine = this;
+                this.PreviousLine = textLine;
+            }
+            else
+            {
+                // 该行不是第一行
+                VTextLine previous = this.PreviousLine;
+                previous.NextLine = textLine;
+                textLine.PreviousLine = previous;
+                textLine.NextLine = this;
+                this.PreviousLine = textLine;
+            }
+        }
+
         #endregion
 
         #region 公开接口

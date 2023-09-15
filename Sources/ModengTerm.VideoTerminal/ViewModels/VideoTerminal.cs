@@ -225,7 +225,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             get
             {
-                return this.scrollInfo.ScrollValue == this.scrollInfo.ScrollMax;
+                return this.scrollInfo.ScrollAtBottom;
             }
         }
 
@@ -236,7 +236,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             get
             {
-                return this.scrollInfo.ScrollValue == 0;
+                return this.scrollInfo.ScrollAtTop;
             }
         }
 
@@ -343,7 +343,7 @@ namespace ModengTerm.Terminal.ViewModels
                 default:
                     throw new NotImplementedException();
             }
-            
+
             #endregion
 
             #region 初始化键盘
@@ -923,11 +923,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// <returns>如果进行了滚动，那么返回true，如果因为某种原因没进行滚动，那么返回false</returns>
         private bool ScrollToHistory(int scrollValue)
         {
-            // 只有主缓冲区可以滚动
-            if (this.activeDocument.IsAlternate)
-            {
-                return false;
-            }
+            // 只移动主缓冲区
+            VTDocument scrollDocument = this.mainDocument;
 
             // 要滚动的值和当前值是一样的，也不滚动
             if (this.scrollInfo.ScrollValue == scrollValue)
@@ -947,7 +944,7 @@ namespace ModengTerm.Terminal.ViewModels
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
             // 终端行大小
-            int rows = this.rowSize;
+            int rows = scrollDocument.LastLine.PhysicsRow - scrollDocument.FirstLine.PhysicsRow + 1;
 
             #region 更新要显示的行
 
@@ -965,7 +962,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 // 找到后面的行数显示
                 VTHistoryLine currentHistory = historyLine;
-                VTextLine currentTextLine = this.activeDocument.FirstLine;
+                VTextLine currentTextLine = scrollDocument.FirstLine;
                 for (int i = 0; i < rows; i++)
                 {
                     // 直接使用VTHistoryLine的List<VTCharacter>的引用
@@ -985,7 +982,7 @@ namespace ModengTerm.Terminal.ViewModels
                     for (int i = 0; i < scrolledRows; i++)
                     {
                         // 该值永远是第一行，因为下面被Move到最后一行了
-                        VTextLine firstLine = this.activeDocument.FirstLine;
+                        VTextLine firstLine = scrollDocument.FirstLine;
 
                         VTHistoryLine historyLine;
                         if (this.historyLines.TryGetValue(oldScroll + rows + i, out historyLine))
@@ -1000,7 +997,7 @@ namespace ModengTerm.Terminal.ViewModels
                             firstLine.SetEmpty();
                         }
 
-                        this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
+                        scrollDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
                     }
                 }
                 else
@@ -1010,14 +1007,14 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTHistoryLine historyLine = this.historyLines[oldScroll - i];
 
-                        VTextLine lastLine = this.activeDocument.LastLine;
+                        VTextLine lastLine = scrollDocument.LastLine;
                         lastLine.SetHistory(historyLine);
-                        this.activeDocument.MoveLine(lastLine, VTextLine.MoveOptions.MoveToFirst);
+                        scrollDocument.MoveLine(lastLine, VTextLine.MoveOptions.MoveToFirst);
                     }
                 }
             }
 
-            this.activeDocument.SetArrangeDirty(true);
+            scrollDocument.SetArrangeDirty(true);
 
             #endregion
 
@@ -1025,7 +1022,7 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 把滚动条移动到最下面
+        /// 把主缓冲区滚动到底
         /// </summary>
         private void ScrollToBottom()
         {
@@ -1133,15 +1130,11 @@ namespace ModengTerm.Terminal.ViewModels
 
                             #region 更新历史行
 
-                            this.lastHistoryLine.SetVTextLine(oldLastLine);
+                            oldHistoryLine.SetVTextLine(oldLastLine);
 
                             #endregion
 
                             #region 创建新行对应的历史行
-
-                            // 注意，当执行ED_EraseDisplay - EraseType.Scrollback动作的时候，会执行和LF一模一样的动作，历史行也会被创建
-                            // 所以有可能新的历史行是已经存在的，所以这里需要判断
-                            // EraseType.Scrollback的功能是把当前保存的行都显示到屏幕外面
 
                             VTHistoryLine newHistoryLine;
                             if (!this.historyLines.TryGetValue(newLastLine.PhysicsRow, out newHistoryLine))
@@ -1150,6 +1143,11 @@ namespace ModengTerm.Terminal.ViewModels
                                 this.historyLines[newLastLine.PhysicsRow] = newHistoryLine;
                                 this.lastHistoryLine = newHistoryLine;
                             }
+                            else
+                            {
+                                // 如果运行到这里那就有可能会有问题，要查查到底是什么问题
+                                logger.FatalFormat("what?");
+                            }
 
                             #endregion
 
@@ -1157,7 +1155,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = this.lastHistoryLine.PhysicsRow - this.rowSize + 1;
+                            int scrollMax = newHistoryLine.PhysicsRow - this.rowSize + 1;
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
@@ -1234,11 +1232,10 @@ namespace ModengTerm.Terminal.ViewModels
                                     VTextLine lastLine = this.activeDocument.LastLine;
 
                                     // 当前终端里显示的行数
+                                    //int lines = this.ActiveLine.PhysicsRow - firstLine.PhysicsRow;
                                     int lines = lastLine.PhysicsRow - firstLine.PhysicsRow;
 
                                     // 把当前终端里显示的行数全部放到滚动区域上面
-                                    // 实现方式是打印空行即可
-                                    // 此时如果滚动条不在最底边，没关系，LF动作会把滚动条滚动到最底边
                                     for (int i = 0; i < lines; i++)
                                     {
                                         this.VtParser_ActionEvent(VTActions.LF, null);
@@ -1933,6 +1930,31 @@ namespace ModengTerm.Terminal.ViewModels
             this.mainDocument.Resize(newRows, newCols);
             this.alternateDocument.Resize(newRows, newCols);
 
+            // 行数改变之后，对于主缓冲区来说滚动的最大值是会变化的：
+            // 1. 当行数增加，那么滚动的最大值会减少
+            // 2. 当行数减少，那么滚动的最大值会增加
+            // 所以要更新下滚动条的信息
+
+            // ScrollMax大于0表示当前显示的内容已经超出了rowSize
+            if (this.scrollInfo.HasScroll)
+            {
+                // 说明有滚动
+                int rows = newRows - this.rowSize;
+                if (rows > 0)
+                {
+                    // 增加了行数
+                    int targetScroll = this.scrollInfo.ScrollValue - rows;
+                    this.ScrollToHistory(targetScroll);
+                    this.scrollInfo.ScrollMax -= rows;
+                }
+                else
+                {
+                    // 减少了行数
+                    this.scrollInfo.ScrollMax += rows;
+                    this.scrollInfo.ScrollValue += rows;
+                }
+            }
+
             // 如果是修改行大小，那么会自动触发重绘
             // 如果是修改列，那么不会自动触发重绘，要手动重绘
             // 这里偷个懒，不管修改的是列还是行都重绘一次
@@ -1941,8 +1963,8 @@ namespace ModengTerm.Terminal.ViewModels
             // 给SSH主机发个Resiz指令
             this.sessionTransport.Resize(newRows, newCols);
 
-            this.ColumnSize = newCols;
-            this.RowSize = newRows;
+            this.colSize = newCols;
+            this.rowSize = newRows;
         }
 
         #endregion

@@ -27,7 +27,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 光标所在列
-        /// 从0开始
+        /// 从0开始，最大值是终端的ColumnSize - 1
         /// </summary>
         public int Column
         {
@@ -44,7 +44,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 光标所在行
-        /// 从0开始
+        /// 从0开始，最大值是终端的RowSize - 1
         /// </summary>
         public int Row
         {
