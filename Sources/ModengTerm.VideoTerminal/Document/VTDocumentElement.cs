@@ -49,7 +49,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 用来保存不同平台的绘图上下文信息
         /// </summary>
-        public IDrawingObject DrawingContext { get; set; }
+        public IDrawingObject DrawingObject { get; set; }
 
         /// <summary>
         /// 该元素左上角的X坐标

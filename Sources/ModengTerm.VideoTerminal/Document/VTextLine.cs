@@ -387,7 +387,6 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 1. 删除整行字符
-        /// 2. 删除整行文本装饰
         /// </summary>
         public void DeleteAll()
         {

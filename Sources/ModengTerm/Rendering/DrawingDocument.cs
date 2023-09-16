@@ -87,12 +87,12 @@ namespace ModengTerm.Rendering
 
         private DrawingObject EnsureDrawingObject(VTDocumentElement documentElement)
         {
-            DrawingObject drawingObject = documentElement.DrawingContext as DrawingObject;
+            DrawingObject drawingObject = documentElement.DrawingObject as DrawingObject;
             if (drawingObject == null)
             {
                 drawingObject = this.CreateDrawingObject(documentElement.Type);
                 drawingObject.Initialize(documentElement);
-                documentElement.DrawingContext = drawingObject;
+                documentElement.DrawingObject = drawingObject;
                 this.visuals.Add(drawingObject);
             }
             return drawingObject;

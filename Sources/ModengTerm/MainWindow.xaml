@@ -7,9 +7,8 @@
         xmlns:local="clr-namespace:ModengTerm"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
-        Width="800" Height="600" WindowStartupLocation="CenterScreen"
-        MinWidth="800" MinHeight="600" Loaded="Window_Loaded"
-        WindowState="Maximized">
+        Width="800" Height="200" WindowStartupLocation="CenterScreen"
+        MinWidth="800" MinHeight="200" Loaded="Window_Loaded">
 
     <Window.Resources>
         <ResourceDictionary>

@@ -119,7 +119,7 @@ namespace XTerminal.Document
         {
             if (this.arrangeDirty)
             {
-                this.DrawingContext.Arrange(this.OffsetX, this.OffsetY);
+                this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
 
                 this.arrangeDirty = false;
             }
@@ -128,11 +128,11 @@ namespace XTerminal.Document
             {
                 if (this.isVisible)
                 {
-                    this.DrawingContext.SetOpacity(1);
+                    this.DrawingObject.SetOpacity(1);
                 }
                 else
                 {
-                    this.DrawingContext.SetOpacity(0);
+                    this.DrawingObject.SetOpacity(0);
                 }
 
                 this.visibleChanged = false;

@@ -167,12 +167,12 @@ namespace XTerminal.UserControls
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
+            base.OnMouseWheel(e);
+
             if (this.videoTerminal == null)
             {
                 return;
             }
-
-            base.OnMouseWheel(e);
 
             this.videoTerminal.OnMouseWheel(this, e.Delta > 0);
         }

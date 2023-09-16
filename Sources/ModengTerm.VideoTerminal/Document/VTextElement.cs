@@ -90,21 +90,21 @@ namespace XTerminal.Document
         {
             if (base.arrangeDirty)
             {
-                this.DrawingContext.Arrange(this.OffsetX, this.OffsetY);
+                this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
 
                 base.arrangeDirty = false;
             }
 
             if (this.renderDirty)
             {
-                this.DrawingContext.Draw();
+                this.DrawingObject.Draw();
 
                 this.renderDirty = false;
             }
 
             if (this.isMeasureDirty) 
             {
-                IDrawingObjectText objectText = this.DrawingContext as IDrawingObjectText;
+                IDrawingObjectText objectText = this.DrawingObject as IDrawingObjectText;
                 
                 objectText.MeasureLine();
 
@@ -120,7 +120,7 @@ namespace XTerminal.Document
         /// <returns></returns>
         public VTRect MeasureLine(int startIndex, int count)
         {
-            IDrawingObjectText objectText = this.DrawingContext as IDrawingObjectText;
+            IDrawingObjectText objectText = this.DrawingObject as IDrawingObjectText;
 
             return objectText.MeasureLine(startIndex, count);
         }
@@ -133,7 +133,7 @@ namespace XTerminal.Document
         /// <returns>文本坐标，X=文本左边的X偏移量，Y永远是0，因为边界框是相对于该行的</returns>
         public VTRect MeasureCharacter(int characterIndex)
         {
-            IDrawingObjectText objectText = this.DrawingContext as IDrawingObjectText;
+            IDrawingObjectText objectText = this.DrawingObject as IDrawingObjectText;
 
             return objectText.MeasureCharacter(characterIndex);
         }

@@ -223,7 +223,7 @@ namespace XTerminal.Document
         {
             if (this.arrangeDirty)
             {
-                this.DrawingContext.Draw();
+                this.DrawingObject.Draw();
 
                 this.arrangeDirty = false;
             }

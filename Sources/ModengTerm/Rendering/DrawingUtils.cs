@@ -58,7 +58,7 @@ namespace ModengTerm.Rendering
                 textData.Text = " ";
             }
 
-            DrawingLine drawingLine = textLine.DrawingContext as DrawingLine;
+            DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
             FormattedText formattedText = new FormattedText(textData.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
                 textLine.Style.FontSize, drawingLine.foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
 

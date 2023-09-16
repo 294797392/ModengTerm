@@ -136,7 +136,7 @@ namespace XTerminal.Document
                 BlinkRemain = (int)options.CursorSpeed,
                 Size = options.CursorSize
             };
-            this.Cursor.DrawingContext = this.Canvas.CreateDrawingObject(this.Cursor);
+            this.Cursor.DrawingObject = this.Canvas.CreateDrawingObject(this.Cursor);
 
             #region 初始化第一行，并设置链表首尾指针
 
@@ -184,7 +184,7 @@ namespace XTerminal.Document
                 },
             };
 
-            textLine.DrawingContext = this.Canvas.CreateDrawingObject(textLine);
+            textLine.DrawingObject = this.Canvas.CreateDrawingObject(textLine);
 
             return textLine;
         }
@@ -494,7 +494,6 @@ namespace XTerminal.Document
         /// <summary>
         /// 清除数据
         /// 1. 清除所有文本数据
-        /// 2. 清除所有的文本装饰信息
         /// </summary>
         public void DeleteAll()
         {
@@ -512,7 +511,8 @@ namespace XTerminal.Document
 
             #endregion
 
-            this.IsArrangeDirty = true;
+            // 为什么需要Arrange？
+            //this.IsArrangeDirty = true;
         }
 
         /// <summary>
@@ -819,7 +819,7 @@ namespace XTerminal.Document
                         // 此时ActiveLine不变
                         for (int i = 0; i < rows; i++)
                         {
-                            this.Canvas.DeleteDrawingObject(this.FirstLine.DrawingContext);
+                            this.Canvas.DeleteDrawingObject(this.FirstLine.DrawingObject);
                             this.FirstLine.Remove();
                         }
 
@@ -833,7 +833,7 @@ namespace XTerminal.Document
                         // ActiveLine貌似也不变
                         for (int i = 0; i < rows; i++)
                         {
-                            this.Canvas.DeleteDrawingObject(this.LastLine.DrawingContext);
+                            this.Canvas.DeleteDrawingObject(this.LastLine.DrawingObject);
                             this.LastLine.Remove();
                         }
                     }
@@ -866,9 +866,14 @@ namespace XTerminal.Document
             {
                 int rows = Math.Abs(this.rowSize - rowSize);
 
+                // 扩大或者缩小行数之后，第一行应该显示的物理行数
+                int firstRow = 0;
+                int activeRow = this.ActiveLine.PhysicsRow;
+
                 if (this.rowSize < rowSize)
                 {
                     // 扩大了行数
+                    firstRow = Math.Max(0, this.FirstLine.PhysicsRow - rows);
 
                     // 找到滚动区域内的最后一行，在该行后添加新行
                     for (int i = 0; i < rows; i++)
@@ -876,40 +881,53 @@ namespace XTerminal.Document
                         VTextLine textLine = this.CreateTextLine(this.LastLine.PhysicsRow + 1);
                         this.LastLine.Append(textLine);
                     }
-
-                    // 增加行数之后，鼠标所在行也变了，更新ActiveLine
-                    // 后面SSH主机会发送Print命令，在ActiveLine上打字
-                    this.SetCursor(this.Cursor.Row + rows, this.Cursor.Column);
                 }
                 else
                 {
                     // 减少了行数
 
-                    if (this.ActiveLine == this.LastLine)
+                    // 此时滚动条必定是在最低面
+                    int scrollMax = this.FirstLine.PhysicsRow;
+                    if (scrollMax > 0)
                     {
-                        // 此时说明光标在最后一行，那么就从第一行开始删除
-                        // 此时ActiveLine不变
-                        for (int i = 0; i < rows; i++)
-                        {
-                            this.Canvas.DeleteDrawingObject(this.FirstLine.DrawingContext);
-                            this.FirstLine.Remove();
-                        }
-
-                        // 注意当光标在最后一行的时候，Cursor.Row是会减少的，这里更新一下Cursor.Row
-                        // 虽然Row变了，但是ActiveLine没变
-                        // 后面SSH主机会发送Print命令，在ActiveLine上打字
-                        this.SetCursor(this.Cursor.Row - rows, this.Cursor.Column);
+                        firstRow = scrollMax + rows;
                     }
                     else
                     {
-                        // 光标不在最后一行，那么从最后一行开始删除
-                        // ActiveLine貌似也不变
-                        for (int i = 0; i < rows; i++)
+                        int count = this.LastLine.PhysicsRow - this.ActiveLine.PhysicsRow;
+                        if (rows <= count)
                         {
-                            this.Canvas.DeleteDrawingObject(this.LastLine.DrawingContext);
-                            this.LastLine.Remove();
+                            firstRow = 0;
+                        }
+                        else
+                        {
+                            firstRow = (rows - count);
                         }
                     }
+
+                    // 从最后一行开始删除
+                    for (int i = 0; i < rows; i++)
+                    {
+                        this.Canvas.DeleteDrawingObject(this.LastLine.DrawingObject);
+                        this.LastLine.Remove();
+                    }
+                }
+
+                // 更新每一行的索引并清空每一行的数据
+                // 1. 如果缓冲区是主缓冲区，那么显示历史记录
+                // 2. 如果缓冲区是备用缓冲区，那么SSH主机会重新打印所有字符
+                VTextLine currentLine = this.FirstLine;
+                for (int i = 0; i < rowSize; i++)
+                {
+                    currentLine.PhysicsRow = firstRow + i;
+
+                    // 重新设置光标所在行
+                    if (currentLine.PhysicsRow == activeRow)
+                    {
+                        this.SetCursor(i, this.Cursor.Column);
+                    }
+
+                    currentLine = currentLine.NextLine;
                 }
 
                 this.SetArrangeDirty(true);

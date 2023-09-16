@@ -45,14 +45,14 @@ namespace ModengTerm.Terminal.Document.Graphics
         {
             if (this.isRenderDirty)
             {
-                this.DrawingContext.Draw();
+                this.DrawingObject.Draw();
 
                 this.isRenderDirty = false;
             }
 
             if (this.arrangeDirty)
             {
-                this.DrawingContext.Arrange(this.OffsetX, this.OffsetY);
+                this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
 
                 this.arrangeDirty = false;
             }
