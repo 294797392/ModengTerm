@@ -675,6 +675,30 @@ namespace XTerminal.Document
         }
 
         /// <summary>
+        /// 在指定行的指定位置处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
+        /// </summary>
+        /// <param name="textLine">要插入空白字符的行</param>
+        /// <param name="column">要插入的字符的列</param>
+        /// <param name="characters">要插入的空白字符的个数</param>
+        public void InsertCharacters(VTextLine textLine, int column, int characters)
+        {
+            for (int i = 0; i < characters; i++)
+            {
+                // 先找到当前光标处的字符索引
+                int characterIndex = this.ActiveLine.FindCharacterIndex(column);
+
+                // 创建新的字符
+                VTCharacter character = VTCharacter.CreateNull();
+
+                // 插入到光标处
+                this.ActiveLine.InsertCharacter(characterIndex, character);
+
+                // 如果溢出了列宽，那么删除溢出的字符
+                this.ActiveLine.TrimEnd(this.colSize);
+            }
+        }
+
+        /// <summary>
         /// 设置可滚动区域的大小
         /// </summary>
         /// <param name="marginTop">可滚动区域的上边距</param>
@@ -783,70 +807,6 @@ namespace XTerminal.Document
             }
 
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
-        }
-
-        public int terminalResize(int rowSize, int colSize)
-        {
-            if (this.colSize != colSize)
-            {
-                this.colSize = colSize;
-            }
-
-            if (this.rowSize != rowSize)
-            {
-                int rows1 = rowSize - this.rowSize;
-                int rows = Math.Abs(rows1);
-
-                if (this.rowSize < rowSize)
-                {
-                    // 扩大了行数
-
-                    // 找到滚动区域内的最后一行，在该行后添加新行
-                    // 此时ActiveLine不变
-                    for (int i = 0; i < rows; i++)
-                    {
-                        VTextLine textLine = this.CreateTextLine(this.LastLine.PhysicsRow + 1);
-                        this.LastLine.Append(textLine);
-                    }
-                }
-                else
-                {
-                    // 减少了行数
-
-                    if (this.ActiveLine == this.LastLine)
-                    {
-                        // 此时说明光标在最后一行，那么就从第一行开始删除
-                        // 此时ActiveLine不变
-                        for (int i = 0; i < rows; i++)
-                        {
-                            this.Canvas.DeleteDrawingObject(this.FirstLine.DrawingObject);
-                            this.FirstLine.Remove();
-                        }
-
-                        // 注意当光标在最后一行的时候，Cursor.Row是会减少的，这里更新一下Cursor.Row
-                        // 虽然Row变了，但是ActiveLine没变
-                        this.SetCursor(this.Cursor.Row - rows, this.Cursor.Column);
-                    }
-                    else
-                    {
-                        // 光标不在最后一行，那么从最后一行开始删除
-                        // ActiveLine貌似也不变
-                        for (int i = 0; i < rows; i++)
-                        {
-                            this.Canvas.DeleteDrawingObject(this.LastLine.DrawingObject);
-                            this.LastLine.Remove();
-                        }
-                    }
-                }
-
-                this.SetArrangeDirty(true);
-
-                this.rowSize = rowSize;
-
-                return rows1;
-            }
-
-            return 0;
         }
 
         /// <summary>

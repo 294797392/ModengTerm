@@ -245,7 +245,7 @@ namespace XTerminal.Parser
 
                 case CSIActionCodes.ICH_InsertCharacter:
                     {
-                        logger.ErrorFormat("未实现CSIDispatch - ICH_InsertCharacter, {0}", parameters[0]);
+                        this.NotifyActionEvent(VTActions.ICH_InsertCharacter, parameters);
                         break;
                     }
 
@@ -359,6 +359,12 @@ namespace XTerminal.Parser
                         //    Moves the cursor up one line, and tries to keep its position in the line
                         logger.DebugFormat("ESCDispatch - RI_ReverseLineFeed");
                         this.NotifyActionEvent(VTActions.RI_ReverseLineFeed);
+                        break;
+                    }
+
+                case (EscActionCodes)230:
+                    {
+                        logger.FatalFormat("terminal没实现的EscActionCodes - 230");
                         break;
                     }
 

@@ -47,6 +47,11 @@ namespace XTerminal.Document
 
         private int[] decorationVersions;
 
+        /// <summary>
+        /// 已经显示了的列数
+        /// </summary>
+        private int columns;
+
         #endregion
 
         #region 属性
@@ -57,11 +62,6 @@ namespace XTerminal.Document
         /// 行索引，从0开始
         /// </summary>
         public int PhysicsRow { get; set; }
-
-        /// <summary>
-        /// 已经显示了的列数
-        /// </summary>
-        public int Columns { get; private set; }
 
         /// <summary>
         /// 上一个文本行
@@ -261,27 +261,27 @@ namespace XTerminal.Document
             // 更新文本
 
             // 算出来要打印的列与当前行的最后一列之间相差多少列
-            int value = column + 1 - this.Columns;
+            int value = column + 1 - this.columns;
 
             // 只相差一列，说明是在该行最后一个字符的后面打印字符，可以直接添加字符
             if (value == 1)
             {
                 this.characters.Add(character);
-                this.Columns += character.ColumnSize;
+                this.columns += character.ColumnSize;
             }
             else if (value > 1)
             {
                 // 相差了多列，那么创建空字符填充相差的列，然后在指定位置打印要打印的字符
-                int count = column - this.Columns;
+                int count = column - this.columns;
 
                 for (int i = 0; i < count - 1; i++)
                 {
                     VTCharacter nullCharacter = VTCharacter.CreateNull();
                     this.characters.Add(nullCharacter);
-                    this.Columns += nullCharacter.ColumnSize;
+                    this.columns += nullCharacter.ColumnSize;
                 }
                 this.characters.Add(character);
-                this.Columns += character.ColumnSize;
+                this.columns += character.ColumnSize;
             }
             else
             {
@@ -295,7 +295,7 @@ namespace XTerminal.Document
                 }
 
                 int delta = character.ColumnSize - oldCharacter.ColumnSize;
-                this.Columns += delta;
+                this.columns += delta;
 
                 character.CopyTo(oldCharacter);
             }
@@ -324,7 +324,7 @@ namespace XTerminal.Document
         /// <param name="column">要删除的列</param>
         public void DeleteText(int column)
         {
-            if (column >= this.Columns)
+            if (column >= this.columns)
             {
                 logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
                 return;
@@ -346,7 +346,7 @@ namespace XTerminal.Document
                 this.characters.Remove(toDelete);
 
                 // 更新显示的列数
-                this.Columns -= toDelete.ColumnSize;
+                this.columns -= toDelete.ColumnSize;
             }
 
             this.SetRenderDirty(true);
@@ -359,7 +359,7 @@ namespace XTerminal.Document
         /// <param name="count">要删除的字符个数</param>
         public void DeleteText(int column, int count)
         {
-            if (column >= this.Columns)
+            if (column >= this.columns)
             {
                 logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
                 return;
@@ -379,7 +379,7 @@ namespace XTerminal.Document
                 this.characters.Remove(toDelete);
 
                 // 更新显示的列数
-                this.Columns -= toDelete.ColumnSize;
+                this.columns -= toDelete.ColumnSize;
             }
 
             this.SetRenderDirty(true);
@@ -391,7 +391,7 @@ namespace XTerminal.Document
         public void DeleteAll()
         {
             this.characters.Clear();
-            this.Columns = 0;
+            this.columns = 0;
 
             this.SetRenderDirty(true);
         }
@@ -402,7 +402,7 @@ namespace XTerminal.Document
         /// <param name="column"></param>
         public void Erase(int column)
         {
-            if (column + 1 > this.Columns)
+            if (column + 1 > this.columns)
             {
                 return;
             }
@@ -418,7 +418,7 @@ namespace XTerminal.Document
             {
                 VTCharacter character = this.characters[i];
 
-                this.Columns -= character.ColumnSize - 1;
+                this.columns -= character.ColumnSize - 1;
 
                 character.Character = ' ';
                 character.ColumnSize = 1;
@@ -476,7 +476,7 @@ namespace XTerminal.Document
         /// <param name="columns">要补齐到的列数。是从1开始的列数，而不是从0开始</param>
         public void PadColumns(int columns)
         {
-            if (this.Columns >= columns)
+            if (this.columns >= columns)
             {
                 return;
             }
@@ -494,23 +494,48 @@ namespace XTerminal.Document
             this.characters.Clear();
             this.characters.AddRange(historyLine.Characters);
             this.PhysicsRow = historyLine.PhysicsRow;
-            this.Columns = VTUtils.GetColumns(this.characters);
+            this.columns = VTUtils.GetColumns(this.characters);
 
             this.SetRenderDirty(true);
         }
 
         /// <summary>
-        /// 把该行设置为空行
-        /// 回收所有的字符和属性，并重置数据
+        /// 从右边开始删除字符，直到该行字符小于等于指定的列数
         /// </summary>
-        public void SetEmpty()
+        /// <param name="maxCol">该行最大列数</param>
+        public void TrimEnd(int columns)
         {
-            // 清空字符
-            this.characters.Clear();
-            this.Columns = 0;
-            this.PhysicsRow = -1;
+            if (this.columns <= columns)
+            {
+                return;
+            }
 
-            this.SetRenderDirty(true);
+            // 要删除的列数
+            int cols = this.columns - columns;
+            while (cols > 0)
+            {
+                VTCharacter character = this.characters.LastOrDefault();
+                if (character == null)
+                {
+                    break;
+                }
+
+                cols -= character.ColumnSize;
+                this.columns -= character.ColumnSize;
+
+                this.characters.Remove(character);
+            }
+        }
+
+        /// <summary>
+        /// 在指定字符索引处插入一个字符
+        /// </summary>
+        /// <param name="characterIndex">要插入字符的字符索引</param>
+        /// <param name="character">要插入的字符</param>
+        public void InsertCharacter(int characterIndex, VTCharacter character)
+        {
+            this.characters.Insert(characterIndex, character);
+            this.columns += character.ColumnSize;
         }
 
         public VTextData BuildData()

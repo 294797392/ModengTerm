@@ -1473,11 +1473,16 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case VTActions.ICH_InsertCharacter:
                     {
+                        // 相关命令：
+                        // MainDocument：sudo apt install pstat，然后回车，最后按方向键上回到历史命令
+                        // AlternateDocument：暂无
+
+                        // Insert Ps (Blank) Character(s) (default = 1) (ICH).
                         // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
-                        logger.ErrorFormat("未实现InsertCharacters, {0}, cursorPos = {1}", count, this.CursorCol);
+                        this.activeDocument.InsertCharacters(this.ActiveLine, this.CursorCol, count);
                         break;
                     }
 
