@@ -1596,6 +1596,17 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
+                case VTActions.DECSLRM_SetLeftRightMargins:
+                    {
+                        List<int> parameters = parameter as List<int>;
+                        int leftMargin = VTParameter.GetParameter(parameters, 0, 0);
+                        int rightMargin = VTParameter.GetParameter(parameters, 1, 0);
+
+                        VTDebug.Context.WriteInteractive(action, "leftMargin = {0}, rightMargin = {1}", leftMargin, rightMargin);
+                        logger.ErrorFormat("未实现DECSLRM_SetLeftRightMargins");
+                        break;
+                    }
+
                 case VTActions.IL_InsertLine:
                     {
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
@@ -1706,6 +1717,11 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.isMouseDown = true;
                 this.mouseDownPos = location;
+
+                // 点击的时候先清除选中区域
+                this.textSelection.Reset();
+                this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
+                this.textSelection.RequestInvalidate();
             }
             else
             {

@@ -131,11 +131,11 @@ namespace XTerminal.Parser
         /// <param name="finalByte">Final Byte</param>
         private void ActionCSIDispatch(int finalByte, List<int> parameters)
         {
-            CSIActionCodes code = (CSIActionCodes)finalByte;
+            CsiActionCodes code = (CsiActionCodes)finalByte;
 
             switch (code)
             {
-                case CSIActionCodes.SGR_SetGraphicsRendition:
+                case CsiActionCodes.SGR_SetGraphicsRendition:
                     {
                         // Modifies the graphical rendering options applied to the next characters written into the buffer.
                         // Options include colors, invert, underlines, and other "font style" type options.
@@ -143,19 +143,19 @@ namespace XTerminal.Parser
                         break;
                     }
 
-                case CSIActionCodes.DECRST_PrivateModeReset:
+                case CsiActionCodes.DECRST_PrivateModeReset:
                     {
                         this.PerformDECPrivateMode(parameters, false);
                         break;
                     }
 
-                case CSIActionCodes.DECSET_PrivateModeSet:
+                case CsiActionCodes.DECSET_PrivateModeSet:
                     {
                         this.PerformDECPrivateMode(parameters, true);
                         break;
                     }
 
-                case CSIActionCodes.ED_EraseDisplay:
+                case CsiActionCodes.ED_EraseDisplay:
                     {
                         /// <summary>
                         /// This sequence erases some or all of the characters in the display according to the parameter. Any complete line erased by this sequence will return that line to single width mode. Editor Function
@@ -170,37 +170,37 @@ namespace XTerminal.Parser
                         break;
                     }
 
-                case CSIActionCodes.HVP_HorizontalVerticalPosition:
+                case CsiActionCodes.HVP_HorizontalVerticalPosition:
                     {
                         logger.ErrorFormat("CSIDispatch - HVP_HorizontalVerticalPosition");
                         break;
                     }
 
-                case CSIActionCodes.CUP_CursorPosition:
+                case CsiActionCodes.CUP_CursorPosition:
                     {
                         this.NotifyActionEvent(VTActions.CUP_CursorPosition, parameters);
                         break;
                     }
 
-                case CSIActionCodes.CUF_CursorForward:
+                case CsiActionCodes.CUF_CursorForward:
                     {
                         this.NotifyActionEvent(VTActions.CUF_CursorForward, parameters);
                         break;
                     }
 
-                case CSIActionCodes.CUU_CursorUp:
+                case CsiActionCodes.CUU_CursorUp:
                     {
                         this.NotifyActionEvent(VTActions.CUU_CursorUp, parameters);
                         break;
                     }
 
-                case CSIActionCodes.CUD_CursorDown:
+                case CsiActionCodes.CUD_CursorDown:
                     {
                         this.NotifyActionEvent(VTActions.CUD_CursorDown, parameters);
                         break;
                     }
 
-                case CSIActionCodes.DTTERM_WindowManipulation:
+                case CsiActionCodes.DTTERM_WindowManipulation:
                     {
                         /// <summary>
                         /// Set Top and Bottom Margins
@@ -213,7 +213,7 @@ namespace XTerminal.Parser
                         break;
                     }
 
-                case CSIActionCodes.DECSTBM_SetScrollingRegion:
+                case CsiActionCodes.DECSTBM_SetScrollingRegion:
                     {
                         /// <summary>
                         /// Set Top and Bottom Margins
@@ -227,35 +227,48 @@ namespace XTerminal.Parser
                         // bottomMargin：is the line number for the bottom margin.
                         // Default: Pb = current number of lines per screen
                         this.NotifyActionEvent(VTActions.DECSTBM_SetScrollingRegion, parameters);
-                        //throw new NotImplementedException();
                         break;
                     }
 
-                case CSIActionCodes.EL_EraseLine:
+                case CsiActionCodes.DECSLRM_SetLeftRightMargins:
+                    {
+                        /// Note that CSI s is dispatched as SetLeftRightScrollingMargins rather
+                        // than CursorSaveState, so we don't test that here. The CursorSaveState
+                        // will only be triggered by this sequence (in AdaptDispatch) when the
+                        // Left-Right-Margin mode (DECLRMM) is disabled.
+
+                        // 当DECLRMM启用的时候，执行设置左右边距的动作
+                        // 当DECLRMM没启用的时候，执行CursorSaveState动作
+
+                        this.NotifyActionEvent(VTActions.DECSLRM_SetLeftRightMargins, parameters);
+                        break;
+                    }
+
+                case CsiActionCodes.EL_EraseLine:
                     {
                         this.NotifyActionEvent(VTActions.EL_EraseLine, parameters);
                         break;
                     }
 
-                case CSIActionCodes.DCH_DeleteCharacter:
+                case CsiActionCodes.DCH_DeleteCharacter:
                     {
                         this.NotifyActionEvent(VTActions.DCH_DeleteCharacter, parameters);
                         break;
                     }
 
-                case CSIActionCodes.ICH_InsertCharacter:
+                case CsiActionCodes.ICH_InsertCharacter:
                     {
                         this.NotifyActionEvent(VTActions.ICH_InsertCharacter, parameters);
                         break;
                     }
 
-                case CSIActionCodes.DSR_DeviceStatusReport:
+                case CsiActionCodes.DSR_DeviceStatusReport:
                     {
                         this.NotifyActionEvent(VTActions.DSR_DeviceStatusReport, parameters);
                         break;
                     }
 
-                case CSIActionCodes.DA_DeviceAttributes:
+                case CsiActionCodes.DA_DeviceAttributes:
                     {
                         /*****************************************************************
                          *    CSI Ps c Send Device Attributes(Primary DA).
@@ -301,19 +314,19 @@ namespace XTerminal.Parser
                         break;
                     }
 
-                case CSIActionCodes.IL_InsertLine:
+                case CsiActionCodes.IL_InsertLine:
                     {
                         this.NotifyActionEvent(VTActions.IL_InsertLine, parameters);
                         break;
                     }
 
-                case CSIActionCodes.DL_DeleteLine:
+                case CsiActionCodes.DL_DeleteLine:
                     {
                         this.NotifyActionEvent(VTActions.DL_DeleteLine, parameters);
                         break;
                     }
 
-                case CSIActionCodes.CHA_CursorHorizontalAbsolute:
+                case CsiActionCodes.CHA_CursorHorizontalAbsolute:
                     {
                         this.NotifyActionEvent(VTActions.CHA_CursorHorizontalAbsolute, parameters);
                         break;
@@ -357,7 +370,6 @@ namespace XTerminal.Parser
                     {
                         // Performs a "Reverse line feed", essentially, the opposite of '\n'.
                         //    Moves the cursor up one line, and tries to keep its position in the line
-                        logger.DebugFormat("ESCDispatch - RI_ReverseLineFeed");
                         this.NotifyActionEvent(VTActions.RI_ReverseLineFeed);
                         break;
                     }

@@ -122,7 +122,7 @@ namespace XTerminal.Parser
     /// <summary>
     /// 定义CSI命令
     /// </summary>
-    internal enum CSIActionCodes
+    internal enum CsiActionCodes
     {
         ICH_InsertCharacter = '@',
         CUU_CursorUp = 'A',
@@ -197,7 +197,7 @@ namespace XTerminal.Parser
         /// 默认的边距和页面大小一致
         /// </summary>
         DECSTBM_SetScrollingRegion = 'r',
-        ANSISYSSC_CursorSave = 's', // NOTE: Overlaps with DECLRMM/DECSLRM. Fix when/if implemented.
+        DECSLRM_SetLeftRightMargins = 's',
 
         /// <summary>
         /// 执行与窗口相关的操作

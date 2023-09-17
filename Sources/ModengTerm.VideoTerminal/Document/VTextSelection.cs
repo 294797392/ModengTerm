@@ -73,7 +73,7 @@ namespace XTerminal.Document
         #endregion
 
         /// <summary>
-        /// 重置选中的状态
+        /// 清除选中的区域
         /// </summary>
         public void Reset()
         {
