@@ -28,7 +28,9 @@ namespace XTerminal.Session
 
         #region 属性
 
-        public ShellStream Stream { get { return this.stream; } }
+        public EventHandler<ShellDataEventArgs> DataReceived { get; set; }
+
+        public EventHandler<ExceptionEventArgs> ErrorOccurred { get; set; }
 
         #endregion
 
@@ -107,6 +109,9 @@ namespace XTerminal.Session
             int rows = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             int outputBufferSize = this.session.GetOption<int>(OptionKeyEnum.WRITE_BUFFER_SIZE);
             this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, outputBufferSize, null);
+            this.stream.DataReceived += this.DataReceived;
+            this.stream.ErrorOccurred += this.ErrorOccurred;
+            this.stream.Open();
 
             #endregion
 
@@ -115,8 +120,8 @@ namespace XTerminal.Session
 
         public override void Close()
         {
-            this.sshClient.Disconnect();
-
+            this.stream.DataReceived -= this.DataReceived;
+            this.stream.ErrorOccurred -= this.ErrorOccurred;
             this.stream.Dispose();
             this.sshClient.Disconnect();
         }

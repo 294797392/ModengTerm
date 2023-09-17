@@ -321,13 +321,14 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化终端大小
 
+            this.vtRect = this.videoTerminal.GetDisplayRect();
+
             this.sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
             switch (this.sizeMode)
             {
                 case TerminalSizeModeEnum.AutoFit:
                     {
-                        VTRect vtc = this.videoTerminal.GetDisplayRect();
-                        this.CalculateAutoFitSize(vtc, out this.rowSize, out this.colSize);
+                        this.CalculateAutoFitSize(this.vtRect, out this.rowSize, out this.colSize);
 
                         // 算完真正的终端大小之后重新设置一下参数，因为在SessionDriver里是直接使用SessionInfo里的参数的
                         sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.rowSize);
@@ -1775,10 +1776,15 @@ namespace ModengTerm.Terminal.ViewModels
                 this.textSelection.Reset();
             }
 
+            // 整理思路是算出来StartTextPointer和EndTextPointer之间的几何图形
+            // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
+            VTextPointer startPointer = this.textSelection.Start;
+            VTextPointer endPointer = this.textSelection.End;
+
             // 如果还没有测量起始字符，那么测量起始字符
             if (this.textSelection.Start.CharacterIndex == -1)
             {
-                if (!this.GetTextPointer(location, this.vtRect, this.textSelection.Start))
+                if (!this.GetTextPointer(location, this.vtRect, startPointer))
                 {
                     // 没有命中起始字符，那么直接返回啥都不做
                     //logger.DebugFormat("没命中起始字符");
@@ -1789,11 +1795,6 @@ namespace ModengTerm.Terminal.ViewModels
             // 首先检测鼠标是否在Surface边界框的外面
             // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
             this.ScrollIfCursorOutsideSurface(location, this.vtRect);
-
-            // 整理思路是算出来StartTextPointer和EndTextPointer之间的几何图形
-            // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
-            VTextPointer startPointer = this.textSelection.Start;
-            VTextPointer endPointer = this.textSelection.End;
 
             // 更新当前鼠标的命中信息，保存在endPointer里
             if (!this.GetTextPointer(location, this.vtRect, endPointer))

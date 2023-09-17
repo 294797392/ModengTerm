@@ -63,9 +63,16 @@ namespace XTerminal.Session
             int bufferSize = session.GetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE);
             this.row = session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-            
+
             this.readBuffer = new byte[bufferSize];
             this.driver = SessionFactory.Create(session);
+            if (this.driver is SshNetSession)
+            {
+                SshNetSession sshNetSession = this.driver as SshNetSession;
+                sshNetSession.DataReceived = this.Stream_DataReceived;
+                sshNetSession.ErrorOccurred = this.Stream_ErrorOccurred;
+            }
+
             return ResponseCode.SUCCESS;
         }
 
@@ -79,8 +86,8 @@ namespace XTerminal.Session
             if (this.driver is SshNetSession)
             {
                 SshNetSession sshNetSession = this.driver as SshNetSession;
-                sshNetSession.Stream.DataReceived -= Stream_DataReceived;
-                sshNetSession.Stream.ErrorOccurred -= Stream_ErrorOccurred;
+                sshNetSession.DataReceived = null;
+                sshNetSession.ErrorOccurred = null;
             }
 
             this.driver = null;
@@ -316,8 +323,8 @@ namespace XTerminal.Session
             if (this.driver is SshNetSession)
             {
                 SshNetSession sshNetSession = this.driver as SshNetSession;
-                sshNetSession.Stream.DataReceived += Stream_DataReceived;
-                sshNetSession.Stream.ErrorOccurred += Stream_ErrorOccurred;
+                sshNetSession.DataReceived = Stream_DataReceived;
+                sshNetSession.ErrorOccurred = Stream_ErrorOccurred;
                 logger.InfoFormat("退出Session线程");
                 return;
             }

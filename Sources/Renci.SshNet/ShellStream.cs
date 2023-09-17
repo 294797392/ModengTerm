@@ -26,6 +26,14 @@ namespace Renci.SshNet
         private AutoResetEvent _dataReceived = new AutoResetEvent(false);
         private bool _isDisposed;
 
+        private string _terminalName;
+        private uint _columns;
+        private uint _rows;
+        private uint _width;
+        private uint _height;
+        private IDictionary<TerminalModes, uint> _terminalModeValues;
+
+
         /// <summary>
         /// Occurs when data was received.
         /// </summary>
@@ -80,6 +88,13 @@ namespace Renci.SshNet
         /// <exception cref="SshException">The request to start a shell was not accepted by the server.</exception>
         internal ShellStream(ISession session, string terminalName, uint columns, uint rows, uint width, uint height, IDictionary<TerminalModes, uint> terminalModeValues, int bufferSize)
         {
+            _terminalName = terminalName;
+            _columns = columns;
+            _rows = rows;
+            _width = width;
+            _height = height;
+            _terminalModeValues = terminalModeValues;
+
             _encoding = session.ConnectionInfo.Encoding;
             _session = session;
             _bufferSize = bufferSize;
@@ -91,11 +106,14 @@ namespace Renci.SshNet
             _channel.Closed += Channel_Closed;
             _session.Disconnected += Session_Disconnected;
             _session.ErrorOccured += Session_ErrorOccured;
+        }
 
+        public void Open()
+        {
             try
             {
                 _channel.Open();
-                if (!_channel.SendPseudoTerminalRequest(terminalName, columns, rows, width, height, terminalModeValues))
+                if (!_channel.SendPseudoTerminalRequest(_terminalName, _columns, _rows, _width, _height, _terminalModeValues))
                 {
                     throw new SshException("The pseudo-terminal request was not accepted by the server. Consult the server log for more information.");
                 }
@@ -106,7 +124,7 @@ namespace Renci.SshNet
             }
             catch
             {
-                UnsubscribeFromSessionEvents(session);
+                UnsubscribeFromSessionEvents(_session);
                 _channel.Dispose();
                 throw;
             }
