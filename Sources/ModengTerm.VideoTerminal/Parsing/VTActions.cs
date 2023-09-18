@@ -165,6 +165,10 @@ namespace XTerminal.Parser
         /// 移动光标
         /// </summary>
         CUP_CursorPosition,
+        /// <summary>
+        /// 效果和CUP_CursorPosition一样
+        /// </summary>
+        HVP_HorizontalVerticalPosition,
 
         #region DECPrivateMode
 
@@ -209,6 +213,9 @@ namespace XTerminal.Parser
         DECSTBM_SetScrollingRegion,
         DECSLRM_SetLeftRightMargins,
         IL_InsertLine,
-        DL_DeleteLine
+        DL_DeleteLine,
+
+        DECSC_CursorSave,
+        DECRC_CursorRestore
     }
 }

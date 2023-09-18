@@ -41,6 +41,11 @@ namespace XTerminal.Document
         /// </summary>
         private int colSize;
 
+        /// <summary>
+        /// 保存光标状态
+        /// </summary>
+        private VTCursorState cursorState;
+
         #endregion
 
         #region 属性
@@ -108,6 +113,8 @@ namespace XTerminal.Document
         /// </summary>
         public List<VTextAttributeState> AttributeStates { get; private set; }
 
+        public VTCursorState CursorState { get { return this.cursorState; } }
+
         #endregion
 
         #region 构造方法
@@ -117,6 +124,7 @@ namespace XTerminal.Document
             this.options = options;
             this.Canvas = canvas;
             this.IsAlternate = isAlternate;
+            this.cursorState = new VTCursorState();
 
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
@@ -201,6 +209,23 @@ namespace XTerminal.Document
             }
         }
 
+        /// <summary>
+        /// 给定第一行的行号，重新设置所有行的行号
+        /// </summary>
+        /// <param name="newFirstRow">要设置的第一行的行号</param>
+        private void ResetPhysicsRow(int newFirstRow)
+        {
+            this.FirstLine.PhysicsRow = newFirstRow;
+
+            VTextLine currentLine = this.FirstLine.NextLine;
+            while (currentLine != null)
+            {
+                currentLine.PhysicsRow = currentLine.PreviousLine.PhysicsRow + 1;
+
+                currentLine = currentLine.NextLine;
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -214,6 +239,8 @@ namespace XTerminal.Document
             // 可滚动区域的第一行和最后一行
             VTextLine head = this.FirstLine.FindNext(this.ScrollMarginTop);
             VTextLine last = this.LastLine.FindPrevious(this.ScrollMarginBottom);
+            VTextLine oldFirstLine = this.FirstLine;
+            VTextLine oldLastLine = this.LastLine;
 
             // 光标所在行是可滚动区域的最后一行
             if (last == this.ActiveLine)
@@ -262,10 +289,20 @@ namespace XTerminal.Document
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
                 this.ActiveLine.DeleteAll();
 
-                // 只更新主缓冲区的物理行数
+                // 物理行号和scrollMargin无关
                 if (!this.IsAlternate)
                 {
-                    this.ActiveLine.PhysicsRow = this.ActiveLine.PreviousLine.PhysicsRow + 1;
+                    // this.FirstLine.PhysicsRow > 0表示滚动了一行
+
+                    if (this.ScrollMarginTop != 0 || this.ScrollMarginBottom != 0)
+                    {
+                        // 有margin需要全部重新设置
+                        this.ResetPhysicsRow(oldFirstLine.PhysicsRow + 1);
+                    }
+                    else
+                    {
+                        this.LastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
+                    }
                 }
 
                 this.SetArrangeDirty(true);
@@ -287,6 +324,8 @@ namespace XTerminal.Document
             // 可滚动区域的第一行和最后一行
             VTextLine head = this.FirstLine.FindNext(this.ScrollMarginTop);
             VTextLine last = this.LastLine.FindPrevious(this.ScrollMarginBottom);
+            VTextLine oldFirstLine = this.FirstLine;
+            VTextLine oldLastLine = this.LastLine;
 
             if (head == this.ActiveLine)
             {
@@ -334,12 +373,6 @@ namespace XTerminal.Document
                 // 如果不删除的话，在man程序下有可能会显示重叠的信息
                 // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
                 this.ActiveLine.DeleteAll();
-
-                // 只更新主缓冲区的物理行数
-                if (!this.IsAlternate)
-                {
-                    this.ActiveLine.PhysicsRow = this.ActiveLine.NextLine.PhysicsRow - 1;
-                }
 
                 this.SetArrangeDirty(true);
             }
@@ -924,6 +957,17 @@ namespace XTerminal.Document
                 attributeState.Parameter = null;
                 attributeState.Enabled = false;
             }
+        }
+
+        public void CursorSave()
+        {
+            this.cursorState.Row = this.Cursor.Row;
+            this.cursorState.Column = this.Cursor.Column;
+        }
+
+        public void CursorRestore()
+        {
+            this.SetCursor(this.cursorState.Row, this.cursorState.Column);
         }
 
         #endregion

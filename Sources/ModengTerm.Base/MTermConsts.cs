@@ -88,7 +88,7 @@ namespace ModengTerm.Base
         /// <summary>
         /// 滚轮滚动一下翻两行
         /// </summary>
-        public const int DefaultScrollDelta = 2;
+        public const int DefaultScrollDelta = 1;
 
         #region 终端字体
 

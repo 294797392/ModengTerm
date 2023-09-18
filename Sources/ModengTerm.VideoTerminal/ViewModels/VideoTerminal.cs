@@ -1141,8 +1141,10 @@ namespace ModengTerm.Terminal.ViewModels
                             }
                             else
                             {
-                                // 如果运行到这里那就有可能会有问题，要查查到底是什么问题
-                                logger.FatalFormat("what? {0}", newLastLine.PhysicsRow);
+                                // 已经存在就更新
+                                newHistoryLine.SetVTextLine(newLastLine);
+                                //logger.FatalFormat("HistoryLine Exist, Row = {0}", newLastLine.PhysicsRow);
+                                //VTDebug.Context.WriteInteractive("ERROR", "HistoryLine Exist, Row = {0}", newLastLine.PhysicsRow);
                             }
 
                             #endregion
@@ -1259,7 +1261,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 #endregion
 
-                #region 光标移动
+                #region 光标操作
 
                 // 下面的光标移动指令不能进行VTDocument的滚动
                 // 光标的移动坐标是相对于可视区域内的坐标
@@ -1308,6 +1310,7 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
+                case VTActions.HVP_HorizontalVerticalPosition:
                 case VTActions.CUP_CursorPosition:
                     {
                         List<int> parameters = parameter as List<int>;
@@ -1316,12 +1319,16 @@ namespace ModengTerm.Terminal.ViewModels
                         if (parameters.Count == 2)
                         {
                             // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
-                            row = parameters[0] - 1;
-                            col = parameters[1] - 1;
+                            int newrow = parameters[0];
+                            int newcol = parameters[1];
+
+                            // 测试中发现在ubuntu系统上执行apt install或者apt remove命令，HVP会发送0列过来，这里处理一下，如果遇到参数是0，那么就直接变成0
+                            row = newrow == 0 ? 0 : newrow - 1;
+                            col = newcol == 0 ? 0 : newcol - 1;
 
                             // 刚打开VIM就按空格键，此时VIM会响应一个CursorPosition向右移动一个单位的事件
                             // 此时要把光标向右移动一个单位
-                            this.ActiveLine.PadColumns(parameters[1]);
+                            this.ActiveLine.PadColumns(newcol);
                         }
                         else
                         {
@@ -1344,9 +1351,26 @@ namespace ModengTerm.Terminal.ViewModels
                             break;
                         }
 
-                        this.ActiveLine.PadColumns(n);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
+
+                        this.ActiveLine.PadColumns(n);
                         this.activeDocument.SetCursor(this.CursorRow, n - 1);
+                        break;
+                    }
+
+                case VTActions.DECSC_CursorSave:
+                    {
+                        VTDebug.Context.WriteInteractive(action, "{0},{1}", this.CursorRow, this.CursorCol);
+
+                        // 收到这个指令的时候把光标状态保存一下，等下次收到DECRC_CursorRestore再还原保存了的光标状态
+                        this.activeDocument.CursorSave();
+                        break;
+                    }
+
+                case VTActions.DECRC_CursorRestore:
+                    {
+                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2},{3}", this.CursorRow, this.CursorCol, this.activeDocument.CursorState.Row, this.activeDocument.CursorState.Column);
+                        this.activeDocument.CursorRestore();
                         break;
                     }
 
@@ -1591,7 +1615,7 @@ namespace ModengTerm.Terminal.ViewModels
                         int marginTop = topMargin == 1 ? 0 : topMargin;
                         // 如果bottomMargin等于控制台高度，那么就表示使用默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
                         int marginBottom = lines - bottomMargin;
-                        VTDebug.Context.WriteInteractive(action, "topMargin = {0}, bottomMargin = {1}", marginTop, marginBottom);
+                        VTDebug.Context.WriteInteractive(action, "topMargin1 = {0}, bottomMargin1 = {1}, topMargin2 = {2}, bottomMargin2 = {3}", topMargin, bottomMargin, marginTop, marginBottom);
                         this.activeDocument.SetScrollMargin(marginTop, marginBottom);
                         break;
                     }

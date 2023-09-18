@@ -172,7 +172,7 @@ namespace XTerminal.Parser
 
                 case CsiActionCodes.HVP_HorizontalVerticalPosition:
                     {
-                        logger.ErrorFormat("CSIDispatch - HVP_HorizontalVerticalPosition");
+                        this.NotifyActionEvent(VTActions.HVP_HorizontalVerticalPosition, parameters);
                         break;
                     }
 
@@ -354,6 +354,18 @@ namespace XTerminal.Parser
 
             switch (code)
             {
+                case EscActionCodes.DECSC_CursorSave:
+                    {
+                        this.NotifyActionEvent(VTActions.DECSC_CursorSave);
+                        break;
+                    }
+
+                case EscActionCodes.DECRC_CursorRestore:
+                    {
+                        this.NotifyActionEvent(VTActions.DECRC_CursorRestore);
+                        break;
+                    }
+
                 case EscActionCodes.DECKPAM_KeypadApplicationMode:
                     {
                         this.NotifyActionEvent(VTActions.DECKPAM_KeypadApplicationMode);

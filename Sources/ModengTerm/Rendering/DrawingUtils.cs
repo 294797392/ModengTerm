@@ -59,7 +59,7 @@ namespace ModengTerm.Rendering
             }
 
             DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
-            FormattedText formattedText = new FormattedText(textData.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
+            FormattedText formattedText = new FormattedText(string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
                 textLine.Style.FontSize, drawingLine.foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
 
             #region 画文本装饰

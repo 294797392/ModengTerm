@@ -287,17 +287,20 @@ namespace XTerminal.Document
             {
                 // 不相差列，说明要在已有列中替换字符
                 // 替换指定列的文本
-                VTCharacter oldCharacter = this.FindCharacter(column);
-                if (oldCharacter == null)
+                int characterIndex = this.FindCharacterIndex(column);
+                if (characterIndex < 0)
                 {
-                    logger.ErrorFormat("PrintCharacter失败, FindCharacter失败, column = {0}", column);
+                    logger.ErrorFormat("PrintCharacter失败, FindCharacterIndex失败, column = {0}", column);
                     return;
                 }
 
-                int delta = character.ColumnSize - oldCharacter.ColumnSize;
-                this.columns += delta;
+                VTCharacter oldCharacter = this.characters[characterIndex];
 
-                character.CopyTo(oldCharacter);
+                this.characters.RemoveAt(characterIndex);
+                this.columns -= oldCharacter.ColumnSize;
+                
+                this.characters.Insert(characterIndex, character);
+                this.columns += character.ColumnSize;
             }
 
             //if (column == this.OwnerDocument.ColumnSize - 1)
@@ -420,8 +423,10 @@ namespace XTerminal.Document
 
                 this.columns -= character.ColumnSize - 1;
 
+                // TODO：这里是否需要回收字符以便于节省内存占用？
                 character.Character = ' ';
                 character.ColumnSize = 1;
+                character.AttributeList.Clear();
                 character.Flags = VTCharacterFlags.SingleByteChar;
             }
 
