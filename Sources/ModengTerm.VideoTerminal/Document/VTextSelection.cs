@@ -25,8 +25,6 @@ namespace XTerminal.Document
         private StringBuilder textBuilder;
 
         private VTDocument document;
-        private int startPhysicsRow;
-        private int endPhysicsRow;
         private VTRect container;
 
         #endregion
@@ -88,8 +86,6 @@ namespace XTerminal.Document
             this.End.PhysicsRow = -1;
 
             this.document = null;
-            this.startPhysicsRow = -1;
-            this.endPhysicsRow = -1;
 
             this.container = NullRect;
 
@@ -108,8 +104,6 @@ namespace XTerminal.Document
             this.End.PhysicsRow = endPhysicsRow;
             this.End.CharacterIndex = endCharacterIndex;
             this.document = document;
-            this.startPhysicsRow = document.FirstLine.PhysicsRow;
-            this.endPhysicsRow = document.LastLine.PhysicsRow;
             this.container = container;
 
             this.UpdateRange(document, container);
@@ -216,6 +210,39 @@ namespace XTerminal.Document
                 // 这种情况下说明当前显示的内容被全部选择了
                 this.Geometry.Add(new VTRect(0, 0, container.Width, document.LastLine.Bounds.Bottom));
                 return;
+            }
+        }
+
+        public void Normalize(out int topRow, out int bottomRow, out int startIndex, out int endIndex)
+        {
+            if (this.Start.PhysicsRow == this.End.PhysicsRow)
+            {
+                topRow = this.Start.PhysicsRow;
+                bottomRow = this.End.PhysicsRow;
+
+                // 注意要处理鼠标从右向左选中的情况
+                // 如果鼠标是从右向左进行选中，那么Start就是Selection的右边，End就是Selection的左边
+                startIndex = Math.Min(this.Start.CharacterIndex, this.End.CharacterIndex);
+                endIndex = Math.Max(this.Start.CharacterIndex, this.End.CharacterIndex);
+            }
+            else
+            {
+                // 要考虑鼠标从下往上选中的情况
+                // 如果鼠标从下往上选中，那么此时下面的VTextPointer是起始，上面的VTextPointer是结束
+                if (this.Start.PhysicsRow > this.End.PhysicsRow)
+                {
+                    topRow = this.End.PhysicsRow;
+                    bottomRow = this.Start.PhysicsRow;
+                    startIndex = this.End.CharacterIndex;
+                    endIndex = this.Start.CharacterIndex;
+                }
+                else
+                {
+                    topRow = this.Start.PhysicsRow;
+                    bottomRow = this.End.PhysicsRow;
+                    startIndex = this.Start.CharacterIndex;
+                    endIndex = this.End.CharacterIndex;
+                }
             }
         }
 

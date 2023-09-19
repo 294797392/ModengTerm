@@ -11,6 +11,7 @@ using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
@@ -78,10 +80,20 @@ namespace XTerminal.UserControls
 
         private void SaveToFile(SaveModeEnum saveMode, LogFileTypeEnum fileType)
         {
+            string text = this.videoTerminal.BuildContent(saveMode, fileType);
+
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             if ((bool)saveFileDialog.ShowDialog())
             {
-                this.videoTerminal.SaveToFile(saveMode, fileType, saveFileDialog.FileName);
+                try
+                {
+                    File.WriteAllText(saveFileDialog.FileName, text);
+                }
+                catch (Exception ex) 
+                {
+                    logger.Error("保存日志异常", ex);
+                    MessageBoxUtils.Error("保存失败");
+                }
             }
         }
 
@@ -267,12 +279,12 @@ namespace XTerminal.UserControls
 
         private void MenuItemSaveScreenToTextFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveScreen, LogFileTypeEnum.Text);
+            this.SaveToFile(SaveModeEnum.SaveDocument, LogFileTypeEnum.Text);
         }
 
         private void MenuItemSaveScreenToHtmlFile_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveScreen, LogFileTypeEnum.Html);
+            this.SaveToFile(SaveModeEnum.SaveDocument, LogFileTypeEnum.Html);
         }
 
         private void MenuItemSaveSelectedToTextFile_Click(object sender, RoutedEventArgs e)

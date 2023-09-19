@@ -19,17 +19,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 行索引，从0开始
         /// </summary>
-        public int PhysicsRow { get; private set; }
-
-        /// <summary>
-        /// 上一行
-        /// </summary>
-        public VTHistoryLine PreviousLine { get; internal set; }
-
-        /// <summary>
-        /// 下一行
-        /// </summary>
-        public VTHistoryLine NextLine { get; internal set; }
+        public int PhysicsRow { get; set; }
 
         /// <summary>
         /// 该行的所有字符
@@ -42,35 +32,22 @@ namespace XTerminal.Document
             this.Characters = new List<VTCharacter>();
         }
 
-        /// <summary>
-        /// 设置该历史行的数据
-        /// </summary>
-        /// <param name="textLine">要设置的行</param>
-        public void SetVTextLine(VTextLine textLine)
+        ///// <summary>
+        ///// 设置该历史行的数据
+        ///// </summary>
+        ///// <param name="textLine">要设置的行</param>
+        //public void SetVTextLine(VTextLine textLine)
+        //{
+        //    this.PhysicsRow = textLine.PhysicsRow;
+        //    // 复制一份字符列表
+        //    VTUtils.CopyCharacter(textLine.Characters, this.Characters);
+        //}
+
+        public static VTHistoryLine Create(VTextLine textLine)
         {
-            this.PhysicsRow = textLine.PhysicsRow;
-            // 复制一份字符列表
-            VTUtils.CopyCharacter(textLine.Characters, this.Characters);
-        }
-
-        /// <summary>
-        /// 从VTextLine创建一个VTHistoryLine
-        /// </summary>
-        /// <param name="fromLine"></param>
-        /// <returns></returns>
-        public static VTHistoryLine Create(int row, VTHistoryLine previousLine, VTextLine sourceLine)
-        {
-            VTHistoryLine historyLine = new VTHistoryLine()
-            {
-                PhysicsRow = row,
-                PreviousLine = previousLine
-            };
-
-            if (previousLine != null)
-            {
-                previousLine.NextLine = historyLine;
-            }
-
+            VTHistoryLine historyLine = new VTHistoryLine();
+            historyLine.PhysicsRow = textLine.PhysicsRow;
+            VTUtils.CopyCharacter(textLine.Characters, historyLine.Characters);
             return historyLine;
         }
     }

@@ -11,7 +11,7 @@ namespace ModengTerm.Terminal.Enumerations
         /// <summary>
         /// 保存当前屏幕的内容
         /// </summary>
-        SaveScreen,
+        SaveDocument,
 
         /// <summary>
         /// 保存选中的内容

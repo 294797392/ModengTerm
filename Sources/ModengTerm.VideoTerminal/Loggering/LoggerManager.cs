@@ -139,62 +139,62 @@ namespace ModengTerm.Terminal.Loggering
 
             while (true)
             {
-                if (this.loggerListCopy.Count == 0 || this.allPaused)
-                {
-                    this.loggerEvent.Reset();
-                    this.loggerEvent.WaitOne();
-                }
+                //if (this.loggerListCopy.Count == 0 || this.allPaused)
+                //{
+                //    this.loggerEvent.Reset();
+                //    this.loggerEvent.WaitOne();
+                //}
 
-                if (this.changed)
-                {
-                    lock (this.listLock)
-                    {
-                        this.loggerListCopy.Clear();
-                        this.loggerListCopy.AddRange(this.loggerList);
-                        this.changed = false;
-                    }
-                }
+                //if (this.changed)
+                //{
+                //    lock (this.listLock)
+                //    {
+                //        this.loggerListCopy.Clear();
+                //        this.loggerListCopy.AddRange(this.loggerList);
+                //        this.changed = false;
+                //    }
+                //}
 
-                foreach (LoggerContext context in this.loggerListCopy)
-                {
-                    VideoTerminal vt = context.VideoTerminal;
+                //foreach (LoggerContext context in this.loggerListCopy)
+                //{
+                //    VideoTerminal vt = context.VideoTerminal;
 
-                    // 最后一行不记录，只记录到倒数第二行
-                    // 因为最后一行的数据有可能会变化
+                //    // 最后一行不记录，只记录到倒数第二行
+                //    // 因为最后一行的数据有可能会变化
 
-                    try
-                    {
-                        if (vt.lastHistoryLine.PhysicsRow == context.NextLine)
-                        {
-                            continue;
-                        }
+                //    try
+                //    {
+                //        if (vt.lastHistoryLine.PhysicsRow == context.NextLine)
+                //        {
+                //            continue;
+                //        }
 
-                        VTHistoryLine startLine = vt.historyLines[context.NextLine];
-                        VTHistoryLine endLine = vt.lastHistoryLine.PreviousLine;
+                //        VTHistoryLine startLine = vt.historyLines[context.NextLine];
+                //        VTHistoryLine endLine = vt.lastHistoryLine.PreviousLine;
 
-                        // 先对日志进行过滤
-                        VTUtils.BuildDocument(startLine, endLine, 0, endLine.Characters.Count - 1, context.Builder, context.FileType, context.Filter);
+                //        // 先对日志进行过滤
+                //        VTUtils.BuildDocument(startLine, endLine, 0, endLine.Characters.Count - 1, context.Builder, context.FileType, context.Filter);
 
-                        string text = context.Builder.ToString();
+                //        string text = context.Builder.ToString();
 
-                        try
-                        {
-                            File.AppendAllText(context.FilePath, text);
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.Error("保存日志文件异常", ex);
-                        }
+                //        try
+                //        {
+                //            File.AppendAllText(context.FilePath, text);
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            logger.Error("保存日志文件异常", ex);
+                //        }
 
-                        context.Builder.Clear();
+                //        context.Builder.Clear();
 
-                        context.NextLine = vt.lastHistoryLine.PhysicsRow;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("Logger运行异常", ex);
-                    }
-                }
+                //        context.NextLine = vt.lastHistoryLine.PhysicsRow;
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //        logger.Error("Logger运行异常", ex);
+                //    }
+                //}
 
                 Thread.Sleep(3000);
             }

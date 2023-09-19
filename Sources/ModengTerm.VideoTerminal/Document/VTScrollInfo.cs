@@ -15,6 +15,7 @@ namespace ModengTerm.Terminal.Document
         private bool dirty;
         private int scrollMax;
         private int scrollValue;
+        private int scrollMin;
 
         public bool Dirty { get { return this.dirty; } }
 

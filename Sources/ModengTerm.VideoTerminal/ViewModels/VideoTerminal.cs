@@ -103,26 +103,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool xtermBracketedPasteMode;
 
-        #region History & Scroll
-
-        /// <summary>
-        /// 存储所有的历史行
-        /// Row(scrollValue) -> VTextLine
-        /// 注意该字典里保存的是mainDocument的历史行，alternateDocument没有保存，需要单独考虑alternateDocument
-        /// </summary>
-        internal Dictionary<int, VTHistoryLine> historyLines;
-
-        /// <summary>
-        /// 历史行的第一行
-        /// </summary>
-        internal VTHistoryLine firstHistoryLine;
-
-        /// <summary>
-        /// 历史行的最后一行
-        /// </summary>
-        internal VTHistoryLine lastHistoryLine;
-
-        #endregion
+        private VTScrollback scrollback;
 
         #region SelectionRange
 
@@ -310,7 +291,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.autoWrapMode = false;
 
             // 初始化变量
-            this.historyLines = new Dictionary<int, VTHistoryLine>();
 
             this.isRunning = true;
 
@@ -318,6 +298,13 @@ namespace ModengTerm.Terminal.ViewModels
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
             this.fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             this.fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
+
+            #region 初始化历史记录管理器
+
+            this.scrollback = new VTMemoryScrollback();
+            this.scrollback.Initialize();
+
+            #endregion
 
             #region 初始化终端大小
 
@@ -401,9 +388,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), false) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), true) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
-            this.firstHistoryLine = VTHistoryLine.Create(0, null, this.ActiveLine);
-            this.historyLines[0] = this.firstHistoryLine;
-            this.lastHistoryLine = this.firstHistoryLine;
             this.videoTerminal.AddCanvas(this.mainDocument.Canvas);
 
             #endregion
@@ -453,9 +437,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.mainDocument.Dispose();
             this.alternateDocument.Dispose();
 
-            this.historyLines.Clear();
-            this.firstHistoryLine = null;
-            this.lastHistoryLine = null;
+            this.scrollback.Release();
         }
 
         /// <summary>
@@ -463,11 +445,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void CopySelection()
         {
-            VTHistoryLine startLine, endLine;
-            int startIndex, endIndex;
-            this.NormalizeSelection(out startLine, out endLine, out startIndex, out endIndex);
-
-            string text = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, LogFileTypeEnum.Text);
+            string text = this.BuildContent(SaveModeEnum.SaveSelected, LogFileTypeEnum.Text);
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
@@ -501,7 +479,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void SelectAll()
         {
-            this.textSelection.SetRange(this.activeDocument, this.vtRect, 0, 0, this.lastHistoryLine.PhysicsRow, this.lastHistoryLine.Characters.Count - 1);
+            VTHistoryLine lastHistoryLine = this.scrollback.LastLine;
+
+            this.textSelection.SetRange(this.activeDocument, this.vtRect, 0, 0, lastHistoryLine.PhysicsRow, lastHistoryLine.Characters.Count - 1);
             this.textSelection.RequestInvalidate();
         }
 
@@ -512,37 +492,76 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="fileType"></param>
         /// <param name="filePath"></param>
         /// <returns></returns>
-        public bool SaveToFile(SaveModeEnum saveMode, LogFileTypeEnum fileType, string filePath)
+        public string BuildContent(SaveModeEnum saveMode, LogFileTypeEnum fileType)
         {
-            VTHistoryLine startLine = null, endLine = null;
+            List<List<VTCharacter>> characters = new List<List<VTCharacter>>();
             int startIndex = 0, endIndex = 0;
 
             switch (saveMode)
             {
                 case SaveModeEnum.SaveAll:
                     {
-                        startLine = this.firstHistoryLine;
-                        endLine = this.lastHistoryLine;
-                        startIndex = 0;
-                        endIndex = endLine.Characters.Count - 1;
+                        if (this.activeDocument.IsAlternate)
+                        {
+                            // 备用缓冲区直接保存VTextLine
+                            VTextLine current = this.activeDocument.FirstLine;
+                            while (current != null)
+                            {
+                                characters.Add(current.Characters);
+                                current = current.NextLine;
+                            }
+
+                            startIndex = 0;
+                            endIndex = Math.Max(0, this.activeDocument.LastLine.Characters.Count - 1);
+                        }
+                        else
+                        {
+                            List<VTHistoryLine> historyLines;
+                            if (!this.scrollback.TryGetHistories(this.scrollback.FirstLine.PhysicsRow, this.scrollback.LastLine.PhysicsRow, out historyLines))
+                            {
+                                logger.ErrorFormat("SaveAll失败, 有的历史记录为空");
+                                return string.Empty;
+                            }
+
+                            characters.AddRange(historyLines.Select(v => v.Characters));
+                            startIndex = 0;
+                            endIndex = this.scrollback.LastLine.Characters.Count - 1;
+                        }
                         break;
                     }
 
-                case SaveModeEnum.SaveScreen:
+                case SaveModeEnum.SaveDocument:
                     {
-                        this.historyLines.TryGetValue(this.activeDocument.FirstLine.PhysicsRow, out startLine);
-                        this.historyLines.TryGetValue(this.activeDocument.LastLine.PhysicsRow, out endLine);
-                        startIndex = 0;
-                        if (endLine != null)
+                        VTextLine current = this.activeDocument.FirstLine;
+                        while (current != null)
                         {
-                            endIndex = endLine.Characters.Count - 1;
+                            characters.Add(current.Characters);
+                            current = current.NextLine;
                         }
+
+                        startIndex = 0;
+                        endIndex = Math.Max(0, this.activeDocument.LastLine.Characters.Count - 1);
                         break;
                     }
 
                 case SaveModeEnum.SaveSelected:
                     {
-                        this.NormalizeSelection(out startLine, out endLine, out startIndex, out endIndex);
+                        if (this.textSelection.IsEmpty)
+                        {
+                            return string.Empty;
+                        }
+
+                        int topRow, bottomRow;
+                        this.textSelection.Normalize(out topRow, out bottomRow, out startIndex, out endIndex);
+
+                        List<VTHistoryLine> historyLines;
+                        if (!this.scrollback.TryGetHistories(topRow, bottomRow - topRow + 1, out historyLines))
+                        {
+                            logger.ErrorFormat("SaveSelected失败, 有的历史记录为空");
+                            return string.Empty;
+                        }
+
+                        characters.AddRange(historyLines.Select(v => v.Characters));
                         break;
                     }
 
@@ -550,24 +569,7 @@ namespace ModengTerm.Terminal.ViewModels
                     throw new NotImplementedException();
             }
 
-            if (startLine == null || endLine == null)
-            {
-                logger.ErrorFormat("保存文件失败, satrtLine或endLine为空");
-                return false;
-            }
-
-            string content = VTUtils.BuildDocument(startLine, endLine, startIndex, endIndex, fileType);
-            try
-            {
-                File.WriteAllText(filePath, content);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("写入文件异常", ex);
-                return false;
-            }
-
-            return true;
+            return VTUtils.BuildContent(characters, startIndex, endIndex, fileType);
         }
 
         /// <summary>
@@ -613,53 +615,6 @@ namespace ModengTerm.Terminal.ViewModels
         #endregion
 
         #region 实例方法
-
-        private void NormalizeSelection(out VTHistoryLine topLine, out VTHistoryLine bottomLine, out int startIndex, out int endIndex)
-        {
-            topLine = null;
-            bottomLine = null;
-            startIndex = -1;
-            endIndex = -1;
-
-            if (this.textSelection.IsEmpty)
-            {
-                logger.WarnFormat("CopySelection失败, 选中内容为空");
-                return;
-            }
-
-            VTextPointer startPointer = this.textSelection.Start;
-            VTextPointer endPointer = this.textSelection.End;
-
-            // 找到起始行和结束行
-            if (!this.historyLines.TryGetValue(startPointer.PhysicsRow, out topLine) ||
-                !this.historyLines.TryGetValue(endPointer.PhysicsRow, out bottomLine))
-            {
-                logger.WarnFormat("CopySelection失败, 未找到选中的起始历史行或结束历史行");
-                return;
-            }
-
-            startIndex = startPointer.CharacterIndex;
-            endIndex = endPointer.CharacterIndex;
-
-            // 要考虑鼠标从下往上选中的情况
-            // 如果鼠标从下往上选中，那么此时下面的VTextPointer是起始，上面的VTextPointer是结束
-            if (topLine.PhysicsRow > bottomLine.PhysicsRow)
-            {
-                VTHistoryLine tempLine = topLine;
-                topLine = bottomLine;
-                bottomLine = tempLine;
-
-                startIndex = endPointer.CharacterIndex;
-                endIndex = startPointer.CharacterIndex;
-            }
-            else if (topLine.PhysicsRow == bottomLine.PhysicsRow)
-            {
-                // 注意要处理鼠标从右向左选中的情况
-                // 如果鼠标是从右向左进行选中，那么Start就是Selection的右边，End就是Selection的左边
-                startIndex = Math.Min(startPointer.CharacterIndex, endPointer.CharacterIndex);
-                endIndex = Math.Max(startPointer.CharacterIndex, endPointer.CharacterIndex);
-            }
-        }
 
         private void PerformDeviceStatusReport(StatusType statusType)
         {
@@ -953,24 +908,18 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 // 此时说明把所有行都滚动到屏幕外了，需要重新显示所有行
 
-                // 先找到屏幕上要显示的第一行数据
-                VTHistoryLine historyLine;
-                if (!this.historyLines.TryGetValue(scrollValue, out historyLine))
-                {
-                    logger.ErrorFormat("ScrollTo失败, 找不到对应的VTHistoryLine, scrollValue = {0}", scrollValue);
-                    return false;
-                }
-
-                // 找到后面的行数显示
-                VTHistoryLine currentHistory = historyLine;
+                // 遍历显示
                 VTextLine currentTextLine = scrollDocument.FirstLine;
                 for (int i = 0; i < rows; i++)
                 {
-                    // 直接使用VTHistoryLine的List<VTCharacter>的引用
-                    // 冻结状态下的VTextLine不会再有修改了
-                    // 非冻结状态(ActiveLine)需要重新创建一个集合
-                    currentTextLine.SetHistory(currentHistory);
-                    currentHistory = currentHistory.NextLine;
+                    VTHistoryLine historyLine;
+                    if (!this.scrollback.TryGetHistory(scrollValue + i, out historyLine))
+                    {
+                        // 百分之百不可能找不到
+                        throw new NotImplementedException();
+                    }
+
+                    currentTextLine.SetHistory(historyLine);
                     currentTextLine = currentTextLine.NextLine;
                 }
             }
@@ -991,7 +940,7 @@ namespace ModengTerm.Terminal.ViewModels
                         scrollDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
 
                         VTHistoryLine historyLine;
-                        if (this.historyLines.TryGetValue(lastRow + i, out historyLine))
+                        if (this.scrollback.TryGetHistory(lastRow + i, out historyLine))
                         {
                             firstLine.SetHistory(historyLine);
                         }
@@ -1012,7 +961,12 @@ namespace ModengTerm.Terminal.ViewModels
 
                     for (int i = 0; i < scrolledRows; i++)
                     {
-                        VTHistoryLine historyLine = this.historyLines[firstRow - i];
+                        VTHistoryLine historyLine;
+                        if (!this.scrollback.TryGetHistory(firstRow - i, out historyLine))
+                        {
+                            // 百分之百不可能找不到！！！
+                            throw new NotImplementedException();
+                        }
 
                         VTextLine lastLine = scrollDocument.LastLine;
                         lastLine.SetHistory(historyLine);
@@ -1132,32 +1086,9 @@ namespace ModengTerm.Terminal.ViewModels
                             VTextLine oldLastLine = this.ActiveLine.PreviousLine;
                             VTextLine newLastLine = this.ActiveLine;
 
-                            VTHistoryLine oldHistoryLine = this.historyLines[oldLastLine.PhysicsRow];
-
-                            #region 更新历史行
-
-                            oldHistoryLine.SetVTextLine(oldLastLine);
-
-                            #endregion
-
-                            #region 创建新行对应的历史行
-
-                            VTHistoryLine newHistoryLine;
-                            if (!this.historyLines.TryGetValue(newLastLine.PhysicsRow, out newHistoryLine))
-                            {
-                                newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, oldHistoryLine, newLastLine);
-                                this.historyLines[newLastLine.PhysicsRow] = newHistoryLine;
-                                this.lastHistoryLine = newHistoryLine;
-                            }
-                            else
-                            {
-                                // 已经存在就更新
-                                newHistoryLine.SetVTextLine(newLastLine);
-                                //logger.FatalFormat("HistoryLine Exist, Row = {0}", newLastLine.PhysicsRow);
-                                //VTDebug.Context.WriteInteractive("ERROR", "HistoryLine Exist, Row = {0}", newLastLine.PhysicsRow);
-                            }
-
-                            #endregion
+                            // 更新旧的最后一行和新的最后一行的历史记录
+                            this.scrollback.UpdateHistory(oldLastLine);
+                            this.scrollback.UpdateHistory(newLastLine);
 
                             #region 更新滚动条的值
 
@@ -1696,11 +1627,7 @@ namespace ModengTerm.Terminal.ViewModels
             // 触发完多次Print事件后，会最后触发一次PerformDrawing，在PerformDrawing完了再保存最后一行历史行
             if (this.activeDocument == this.mainDocument)
             {
-                VTextLine lastTextLine = this.mainDocument.FindLine(this.lastHistoryLine.PhysicsRow);
-                if (lastTextLine != null)
-                {
-                    this.lastHistoryLine.SetVTextLine(lastTextLine);
-                }
+                this.scrollback.UpdateHistory(this.ActiveLine);
             }
         }
 
@@ -1775,27 +1702,23 @@ namespace ModengTerm.Terminal.ViewModels
                     case 2:
                         {
                             // 选中单词
-
-                            VTextData textData = lineHit.BuildData();
-
+                            string text = VTUtils.CreatePlainText(lineHit.Characters);
                             int characterIndex;
                             VTRect characterBounds;
                             if (!HitTestHelper.HitTestVTCharacter(lineHit, location.X, out characterIndex, out characterBounds))
                             {
                                 return;
                             }
-                            VDocumentUtils.GetSegement(textData.Text, characterIndex, out startIndex, out endIndex);
+                            VDocumentUtils.GetSegement(text, characterIndex, out startIndex, out endIndex);
                             break;
                         }
 
                     case 3:
                         {
                             // 选中一整行
-
-                            VTextData textData = lineHit.BuildData();
-
+                            string text = VTUtils.CreatePlainText(lineHit.Characters);
                             startIndex = 0;
-                            endIndex = textData.Text.Length - 1;
+                            endIndex = text.Length - 1;
                             break;
                         }
 
@@ -2002,7 +1925,7 @@ namespace ModengTerm.Terminal.ViewModels
                 while (currentLine != null)
                 {
                     VTHistoryLine historyLine;
-                    if (this.historyLines.TryGetValue(currentLine.PhysicsRow, out historyLine))
+                    if (this.scrollback.TryGetHistory(currentLine.PhysicsRow, out historyLine))
                     {
                         currentLine.SetHistory(historyLine);
                     }

@@ -8,9 +8,9 @@ using XTerminal.Document;
 namespace ModengTerm.Terminal.Document
 {
     /// <summary>
-    /// 存储文本数据
+    /// 存储格式化后的文本数据
     /// </summary>
-    public class VTextData
+    public class VTFormattedText
     {
         /// <summary>
         /// 文本字符串
@@ -22,7 +22,7 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public List<VTextAttribute> Attributes { get; private set; }
 
-        public VTextData()
+        public VTFormattedText()
         {
             this.Text = string.Empty;
             this.Attributes = new List<VTextAttribute>();

@@ -19,6 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
@@ -30,6 +31,10 @@
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="列数：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="1" Grid.Column="1" x:Name="TextBoxTerminalColumns" Text="{Binding Path=TerminalColumns, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="回滚行数：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextBoxMaxScrollback" Text="{Binding Path=MaxScrollback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
     </Grid>
 
 </UserControl>

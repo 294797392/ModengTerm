@@ -253,7 +253,7 @@ namespace ModengTerm.Terminal
             this.SetAnsiMode(true);
             this.SetKeypadMode(false);
             this.SetCursorKeyMode(false);
-            this.Encoding = Encoding.GetEncoding(MTermConsts.DefaultOutputEncoding);
+            this.Encoding = Encoding.GetEncoding(MTermConsts.DefaultWriteEncoding);
         }
 
         #endregion

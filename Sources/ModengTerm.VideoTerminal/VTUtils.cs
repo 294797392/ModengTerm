@@ -10,62 +10,59 @@ using System.Linq;
 
 namespace ModengTerm.Terminal
 {
-    internal static class VTUtils
+    public static class VTUtils
     {
-        private static readonly StringBuilder Builder = new StringBuilder();
-
-        private static void BuildLine(VTHistoryLine historyLine, int startIndex, int endIndex, StringBuilder builder, LogFileTypeEnum fileType, LoggerFilter filter = null)
+        private static void BuildPlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count)
         {
-            string text = VDocumentUtils.BuildLine(historyLine.Characters);
-
-            if (filter != null)
+            string text = VTUtils.CreatePlainText(characters, startIndex, count);
+            if (string.IsNullOrEmpty(text))
             {
-                if (!filter.Filter(text))
-                {
-                    return;
-                }
+                builder.AppendLine();
             }
-
-            builder.AppendLine(text.Substring(startIndex, endIndex - startIndex + 1));
+            else
+            {
+                builder.AppendLine(text);
+            }
         }
 
-        public static string BuildDocument(VTHistoryLine startLine, VTHistoryLine endLine, int startCharIndex, int endCharIndex, LogFileTypeEnum fileType, LoggerFilter filter = null)
+        public static string BuildContent(List<List<VTCharacter>> charactersList, int startCharIndex, int endCharIndex, LogFileTypeEnum fileType)
         {
-            Builder.Clear();
-
-            BuildDocument(startLine, endLine, startCharIndex, endCharIndex, Builder, fileType, filter);
-
-            return Builder.ToString();
-        }
-
-        public static void BuildDocument(VTHistoryLine startLine, VTHistoryLine endLine, int startCharIndex, int endCharIndex, StringBuilder builder, LogFileTypeEnum fileType, LoggerFilter filter = null)
-        {
-            // 当前只选中了一行
-            if (startLine == endLine)
+            switch (fileType)
             {
-                BuildLine(startLine, startCharIndex, endCharIndex, builder, fileType, filter);
-                return;
-            }
+                case LogFileTypeEnum.Text:
+                    {
+                        if (charactersList.Count == 1)
+                        {
+                            // 只有一行
+                            return VTUtils.CreatePlainText(charactersList[0], startCharIndex, endCharIndex - startCharIndex + 1);
+                        }
+                        else
+                        {
+                            StringBuilder builder = new StringBuilder();
 
-            VTHistoryLine current = startLine;
+                            // 第一行
+                            List<VTCharacter> first = charactersList.FirstOrDefault();
+                            VTUtils.BuildPlainText(first, builder, startCharIndex, first.Count - startCharIndex);
 
-            while (current != null)
-            {
-                if (current == startLine)
-                {
-                    BuildLine(current, startCharIndex, current.Characters.Count - 1, builder, fileType, filter);
-                }
-                else if (current == endLine)
-                {
-                    BuildLine(current, 0, endCharIndex, builder, fileType, filter);
-                    break;
-                }
-                else
-                {
-                    BuildLine(current, 0, current.Characters.Count - 1, builder, fileType, filter);
-                }
+                            // 中间的行
+                            for (int i = 1; i < charactersList.Count - 1; i++)
+                            {
+                                List<VTCharacter> characters = charactersList[i];
+                                VTUtils.BuildPlainText(characters, builder, 0, characters.Count);
+                            }
 
-                current = current.NextLine;
+                            // 最后一行
+                            List<VTCharacter> last = charactersList.LastOrDefault();
+                            VTUtils.BuildPlainText(last, builder, 0, endCharIndex + 1);
+
+                            return builder.ToString();
+                        }
+                    }
+
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
             }
         }
 
@@ -154,6 +151,112 @@ namespace ModengTerm.Terminal
 
                 copyTos.Add(character);
             }
+        }
+
+        /// <summary>
+        /// 创建带有样式的文本
+        /// </summary>
+        /// <param name="characters"></param>
+        /// <returns></returns>
+        public static VTFormattedText CreateFormattedText(List<VTCharacter> characters)
+        {
+            VTFormattedText formattedText = new VTFormattedText();
+
+            for (int i = 0; i < characters.Count; i++)
+            {
+                VTCharacter character = characters[i];
+
+                formattedText.Text += character.Character;
+
+                foreach (VTextAttributeState attributeState in character.AttributeList)
+                {
+                    VTextAttribute attribute = formattedText.Attributes.FirstOrDefault(v => v.Attribute == attributeState.Attribute && !v.Closed);
+
+                    if (attributeState.Enabled)
+                    {
+                        // 启用状态
+                        if (attribute == null)
+                        {
+                            attribute = new VTextAttribute()
+                            {
+                                Attribute = attributeState.Attribute,
+                                StartIndex = i,
+                                Parameter = attributeState.Parameter
+                            };
+                            formattedText.Attributes.Add(attribute);
+                        }
+                        else
+                        {
+                            // 颜色比较特殊，有可能连续多次设置不同的颜色
+                            if (attributeState.Attribute == VTextAttributes.Background ||
+                                attributeState.Attribute == VTextAttributes.Foreground)
+                            {
+                                // 如果设置的是颜色的话，并且当前字符的颜色和最后一次设置的颜色不一样，那么要先关闭最后一次设置的颜色
+                                // attribute是最后一次设置的颜色，attributeState是当前字符的颜色
+                                if (attribute.Parameter != attributeState.Parameter)
+                                {
+                                    attribute.Closed = true;
+
+                                    // 关闭后创建一个新的Attribute
+                                    attribute = new VTextAttribute()
+                                    {
+                                        Attribute = attributeState.Attribute,
+                                        StartIndex = i,
+                                        Parameter = attributeState.Parameter
+                                    };
+                                    formattedText.Attributes.Add(attribute);
+                                }
+                            }
+                        }
+                        attribute.Count++;
+                    }
+                    else
+                    {
+                        // 禁用状态
+                        if (attribute != null)
+                        {
+                            attribute.Closed = true;
+                        }
+                    }
+                }
+            }
+
+            return formattedText;
+        }
+
+        /// <summary>
+        /// 创建裸文本
+        /// </summary>
+        /// <param name="characters"></param>
+        /// <returns></returns>
+        public static string CreatePlainText(IEnumerable<VTCharacter> characters)
+        {
+            string text = string.Empty;
+
+            foreach (VTCharacter character in characters)
+            {
+                text += character.Character;
+            }
+
+            return text;
+        }
+
+        public static string CreatePlainText(List<VTCharacter> characters, int startIndex, int count)
+        {
+            string text = string.Empty;
+
+            for (int i = 0; i < count; i++)
+            {
+                text += characters[startIndex + i].Character;
+            }
+
+            return text;
+        }
+
+        public static string CreatePlainText(List<VTCharacter> characters, int startIndex)
+        {
+            int count = characters.Count - startIndex;
+            return CreatePlainText(characters, startIndex, count);
         }
     }
 }

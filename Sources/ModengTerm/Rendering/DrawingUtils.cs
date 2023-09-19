@@ -49,7 +49,7 @@ namespace ModengTerm.Rendering
         /// <returns></returns>
         public static FormattedText CreateFormattedText(VTextLine textLine, DrawingContext dc = null)
         {
-            VTextData textData = textLine.BuildData();
+            VTFormattedText textData = VTUtils.CreateFormattedText(textLine.Characters);
 
             // 如果文本是空的那么无法测量出来高度
             // 空白字符可以测量出来高度

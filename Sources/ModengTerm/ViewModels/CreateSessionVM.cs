@@ -44,6 +44,7 @@ namespace ModengTerm.ViewModels
 
         private string terminalRows;
         private string terminalColumns;
+        private string maxScrollback;
 
         private SessionTypeVM selectedSessionType;
         private OptionTreeVM optionTreeVM;
@@ -223,6 +224,19 @@ namespace ModengTerm.ViewModels
             }
         }
 
+        public string MaxScrollback 
+        {
+            get { return this.maxScrollback; }
+            set
+            {
+                if (this.maxScrollback != value) 
+                {
+                    this.maxScrollback = value;
+                    this.NotifyPropertyChanged("MaxScrollback");
+                }
+            }
+        }
+
         /// <summary>
         /// 当前要显示的选项配置树形列表ViewModel
         /// </summary>
@@ -388,11 +402,16 @@ namespace ModengTerm.ViewModels
             }
             this.SelectedSessionType = this.SessionTypeList.FirstOrDefault();
 
+            #region 终端
+
             this.TerminalRows = MTermConsts.TerminalRows.ToString();
             this.TerminalColumns = MTermConsts.TerminalColumns.ToString();
             this.TerminalTypeList = new BindableCollection<TerminalTypeEnum>();
             this.TerminalTypeList.AddRange(Enum.GetValues(typeof(TerminalTypeEnum)).Cast<TerminalTypeEnum>());
             this.TerminalTypeList.SelectedItem = MTermConsts.DefaultTerminalType;
+            this.MaxScrollback = MTermConsts.DefaultTerminalScrollback.ToString();
+
+            #endregion
 
             this.SSHAuthTypeList = new BindableCollection<SSHAuthTypeEnum>();
             this.SSHAuthTypeList.AddRange(Enum.GetValues(typeof(SSHAuthTypeEnum)).Cast<SSHAuthTypeEnum>());
@@ -691,14 +710,22 @@ namespace ModengTerm.ViewModels
                 return false;
             }
 
+            int scrollback;
+            if (!int.TryParse(this.MaxScrollback, out scrollback))
+            {
+                MessageBoxUtils.Info("请输入正确的回滚行数");
+                return false;
+            }
+
             TerminalTypeEnum terminalType = this.TerminalTypeList.SelectedItem;
 
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
             session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
             session.SetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.AutoFit);
-            session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, MTermConsts.DefaultOutputEncoding);
+            session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
             session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
+            session.SetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK, scrollback);
 
             return true;
         }

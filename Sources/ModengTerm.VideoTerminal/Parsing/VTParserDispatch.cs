@@ -58,7 +58,9 @@ namespace XTerminal.Parser
                 case ASCIITable.NUL:
                     {
                         // do nothing
-                        logger.ErrorFormat("Action - NUL");
+                        // VT applications expect to be able to write NUL
+                        // and have _nothing_ happen. Filter the NULs here, so they don't fill the
+                        // buffer with empty spaces.
                         break;
                     }
 
@@ -114,13 +116,15 @@ namespace XTerminal.Parser
                 case ASCIITable.SO:
                     {
                         // 这两个不知道是什么意思
-                        logger.ErrorFormat("未处理的SI和SI");
+                        logger.FatalFormat("未处理的SI和SI");
                         break;
                     }
 
                 default:
                     {
-                        throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
+                        this.NotifyActionEvent(VTActions.Print, ch);
+                        break;
+                        //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
                     }
             }
         }

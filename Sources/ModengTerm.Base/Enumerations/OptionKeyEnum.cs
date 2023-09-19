@@ -61,6 +61,15 @@ namespace XTerminal.Base.Enumerations
 
         #endregion
 
+        #region 终端通用
+
+        /// <summary>
+        /// 最多可以回滚的行数
+        /// </summary>
+        TERM_MAX_SCROLLBACK,
+
+        #endregion
+
         /// <summary>
         /// 输出编码格式
         /// </summary>

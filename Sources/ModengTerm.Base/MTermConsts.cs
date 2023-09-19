@@ -40,7 +40,7 @@ namespace ModengTerm.Base
         /// <summary>
         /// 每次读取的数据缓冲区大小
         /// </summary>
-        public const int DefaultReadBufferSize = 256;
+        public const int DefaultReadBufferSize = 8192;
 
         /// <summary>
         /// 默认打开的会话
@@ -55,10 +55,11 @@ namespace ModengTerm.Base
         /// <summary>
         /// 默认的输入编码方式
         /// </summary>
-        public const string DefaultOutputEncoding = "UTF-8";
+        public const string DefaultWriteEncoding = "UTF-8";
 
         public const int DefaultTerminalColumns = 80;
         public const int DefaultTerminalRows = 24;
+        public const int DefaultTerminalScrollback = 99999;
 
         /// <summary>
         /// 默认的串口波特率列表

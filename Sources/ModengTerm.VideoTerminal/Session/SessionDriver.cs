@@ -43,10 +43,6 @@ namespace XTerminal.Session
         /// </summary>
         public SessionTypeEnum Type { get { return (SessionTypeEnum)this.session.SessionType; } }
 
-        public int ColumnSize { get; set; }
-        
-        public int RowSize { get; set; }
-
         #endregion
 
         #region 构造方法
