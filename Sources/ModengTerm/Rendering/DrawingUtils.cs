@@ -21,9 +21,15 @@ namespace ModengTerm.Rendering
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("DrawingUtils");
 
         public static readonly Point ZeroPoint = new Point();
+        private static readonly string[] Splitter = new string[] { "," };
 
         public static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
         public static readonly Pen BlackPen = new Pen(Brushes.Black, 1);
+
+        /// <summary>
+        /// RGB字符串 -> Brush
+        /// </summary>
+        private static readonly Dictionary<string, Brush> BrushMap = new Dictionary<string, Brush>();
 
         static DrawingUtils()
         {
@@ -38,6 +44,57 @@ namespace ModengTerm.Rendering
         public static VTKeys ConvertToVTKey(Key key)
         {
             return (VTKeys)key;
+        }
+
+
+
+        /// <summary>
+        /// VTColor转Brush
+        /// </summary>
+        /// <param name="vtc"></param>
+        /// <param name="colorTable"></param>
+        /// <returns></returns>
+        public static Brush GetBrush(VTColor vtc, Dictionary<string, string> colorTable)
+        {
+            string rgbKey = string.Empty;
+
+            if (vtc is RgbColor)
+            {
+                rgbKey = vtc.Name;
+            }
+            else if (vtc is NamedColor)
+            {
+                rgbKey = colorTable[vtc.Name];
+            }
+
+            return DrawingUtils.GetBrush(rgbKey);
+        }
+
+        /// <summary>
+        /// rgb字符串转Brush
+        /// </summary>
+        /// <param name="rgb">
+        /// 用逗号分隔的rgb字符串
+        /// 例如：255,255,255
+        /// </param>
+        /// <returns></returns>
+        public static Brush GetBrush(string rgbKey)
+        {
+            Brush brush;
+            if (!BrushMap.TryGetValue(rgbKey, out brush))
+            {
+                string[] values = rgbKey.Split(Splitter, StringSplitOptions.RemoveEmptyEntries);
+
+                byte r = byte.Parse(values[0]);
+                byte g = byte.Parse(values[1]);
+                byte b = byte.Parse(values[2]);
+
+                Color color = Color.FromRgb(r, g, b);
+                brush = new SolidColorBrush(color);
+                BrushMap[rgbKey] = brush;
+            }
+
+            return brush;
         }
 
         /// <summary>
@@ -74,7 +131,7 @@ namespace ModengTerm.Rendering
                     case VTextAttributes.Foreground:
                         {
                             VTColor color = textAttribute.Parameter as VTColor;
-                            Brush brush = MTermUtils.GetBrush(color, textLine.Style.ColorTable);
+                            Brush brush = DrawingUtils.GetBrush(color, textLine.Style.ColorTable);
                             formattedText.SetForegroundBrush(brush, textAttribute.StartIndex, textAttribute.Count);
                             break;
                         }
@@ -122,7 +179,7 @@ namespace ModengTerm.Rendering
                     }
 
                     VTColor color = textAttribute.Parameter as VTColor;
-                    Brush brush = MTermUtils.GetBrush(color, textLine.Style.ColorTable);
+                    Brush brush = DrawingUtils.GetBrush(color, textLine.Style.ColorTable);
                     Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, textAttribute.StartIndex, textAttribute.Count);
                     dc.DrawRectangle(brush, DrawingUtils.TransparentPen, geometry.Bounds);
                 }

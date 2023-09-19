@@ -459,7 +459,7 @@ namespace XTerminal.UserControls
         protected override int OnOpen(XTermSession session)
         {
             string background = session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
-            BorderBackground.Background = MTermUtils.GetBrush(background);
+            BorderBackground.Background = DrawingUtils.GetBrush(background);
 
             return ResponseCode.SUCCESS;
         }

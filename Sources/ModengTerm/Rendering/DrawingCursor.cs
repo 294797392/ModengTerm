@@ -28,7 +28,7 @@ namespace ModengTerm.Rendering
         protected override void OnInitialize(VTDocumentElement element)
         {
             this.cursor = element as VTCursor;
-            this.brush = MTermUtils.GetBrush(this.cursor.Color);
+            this.brush = DrawingUtils.GetBrush(this.cursor.Color);
 
             switch (this.cursor.Style)
             {

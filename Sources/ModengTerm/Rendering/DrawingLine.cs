@@ -91,7 +91,7 @@ namespace ModengTerm.Rendering
 
             FontFamily fontFamily = new FontFamily(textLine.Style.FontFamily);
             this.typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            this.foreground = MTermUtils.GetBrush(textLine.Style.Foreground);
+            this.foreground = DrawingUtils.GetBrush(textLine.Style.Foreground);
         }
 
         protected override void Draw(DrawingContext dc)

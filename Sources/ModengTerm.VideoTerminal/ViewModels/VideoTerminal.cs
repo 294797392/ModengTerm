@@ -1340,6 +1340,8 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.ForegroundUnset:
                 case VTActions.Background:
                 case VTActions.BackgroundUnset:
+                case VTActions.ReverseVideo:
+                case VTActions.ReverseVideoUnset:
                     {
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2},{3}", this.CursorRow, this.CursorCol, parameter == null ? string.Empty : parameter.ToString(), this.ActiveLine.PhysicsRow);
 
@@ -1347,16 +1349,27 @@ namespace ModengTerm.Terminal.ViewModels
                         // 所以这里要记录下如果当前有文本特效被设置了，那么在行改变的时候也需要设置文本特效
                         // 缓存下来，每次打印字符的时候都要对ActiveLine Apply一下
 
-                        bool enabled;
-                        VTextAttributes attribute = VTUtils.VTAction2TextAttribute(action, out enabled);
-                        this.activeDocument.SetAttribute(attribute, enabled, parameter);
+                        if (action == VTActions.ReverseVideo)
+                        {
+                            string foreground = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
+                            string background = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
+                            VTColor backColor = VTColor.CreateFromRgbKey(foreground);
+                            VTColor foreColor = VTColor.CreateFromRgbKey(background);
+                            this.activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
+                            this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
+                        }
+                        else
+                        {
+                            bool enabled;
+                            VTextAttributes attribute = VTUtils.VTAction2TextAttribute(action, out enabled);
+                            this.activeDocument.SetAttribute(attribute, enabled, parameter);
+                        }
                         break;
                     }
 
                 case VTActions.Faint:
+                case VTActions.CrossedOut:
                 case VTActions.CrossedOutUnset:
-                case VTActions.ReverseVideo:
-                case VTActions.ReverseVideoUnset:
                     {
                         logger.ErrorFormat(string.Format("未执行的VTAction, {0}", action));
                         break;

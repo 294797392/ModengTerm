@@ -2,6 +2,7 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -835,8 +836,8 @@ namespace ModengTerm.ViewModels
                 return;
             }
 
-            this.BackgroundBrush = MTermUtils.GetBrush(newValue.BackgroundColor);
-            this.ForegroundBrush = MTermUtils.GetBrush(newValue.ForegroundColor);
+            this.BackgroundBrush = DrawingUtils.GetBrush(newValue.BackgroundColor);
+            this.ForegroundBrush = DrawingUtils.GetBrush(newValue.ForegroundColor);
         }
 
         #endregion
