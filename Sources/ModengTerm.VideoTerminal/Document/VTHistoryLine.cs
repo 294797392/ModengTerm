@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Terminal;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -49,8 +50,7 @@ namespace XTerminal.Document
         {
             this.PhysicsRow = textLine.PhysicsRow;
             // 复制一份字符列表
-            this.Characters.Clear();
-            this.Characters.AddRange(textLine.Characters);
+            VTUtils.CopyCharacter(textLine.Characters, this.Characters);
         }
 
         /// <summary>

@@ -735,11 +735,12 @@ namespace ModengTerm.Terminal.ViewModels
 
                 VTCursor cursor = document.Cursor;
                 int cursorCol = cursor.Column;
-                VTextLine activeLine = document.ActiveLine;
+                VTextLine activeLine = document.FindLine(document.ActivePhysicsRow);
 
                 // 如果显示的是主缓冲区，那么光标在最后一行的时候才更新
                 // 如果显示的是备用缓冲区，光标可以在任意一个位置显示，那么直接渲染光标
-                if (document.IsAlternate || this.ScrollAtBottom)
+
+                if (activeLine != null)
                 {
                     cursor.OffsetY = activeLine.OffsetY;
                     // 有可能有中文字符，一个中文字符占用2列
@@ -985,12 +986,21 @@ namespace ModengTerm.Terminal.ViewModels
 
                     for (int i = 0; i < scrolledRows; i++)
                     {
-                        VTHistoryLine historyLine = this.historyLines[lastRow + i];
-
                         // 该值永远是第一行，因为下面被Move到最后一行了
                         VTextLine firstLine = scrollDocument.FirstLine;
-                        firstLine.SetHistory(historyLine);
                         scrollDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
+
+                        VTHistoryLine historyLine;
+                        if (this.historyLines.TryGetValue(lastRow + i, out historyLine))
+                        {
+                            firstLine.SetHistory(historyLine);
+                        }
+                        else
+                        {
+                            // 有可能会找不到，找不到就清空
+                            // 打开终端 -> clear -> 滚到最上面 -> 再往下滚，就会复现
+                            firstLine.EraseAll();
+                        }
                     }
                 }
                 else
@@ -1135,7 +1145,7 @@ namespace ModengTerm.Terminal.ViewModels
                             VTHistoryLine newHistoryLine;
                             if (!this.historyLines.TryGetValue(newLastLine.PhysicsRow, out newHistoryLine))
                             {
-                                newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, oldHistoryLine, this.ActiveLine);
+                                newHistoryLine = VTHistoryLine.Create(newLastLine.PhysicsRow, oldHistoryLine, newLastLine);
                                 this.historyLines[newLastLine.PhysicsRow] = newHistoryLine;
                                 this.lastHistoryLine = newHistoryLine;
                             }
@@ -1153,7 +1163,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = this.mainDocument.LastLine.PhysicsRow - this.rowSize + 1;
+                            int scrollMax = this.mainDocument.FirstLine.PhysicsRow;
                             if (scrollMax > 0)
                             {
                                 // 更新滚动条的值
@@ -1224,27 +1234,27 @@ namespace ModengTerm.Terminal.ViewModels
 
                                     // Erase Saved Lines
                                     // 模拟xshell的操作，把当前行移动到可视区域的第一行
-                                    // 因为该动作会修改滚动条的数据，所以在VideoTerminal里执行
 
-                                    //VTextLine firstLine = this.activeDocument.FirstLine;
-                                    //VTextLine lastLine = this.activeDocument.LastLine;
+                                    VTextLine firstLine = this.activeDocument.FirstLine;
+                                    VTextLine lastLine = this.activeDocument.LastLine;
 
-                                    //// 当前终端里显示的行数
-                                    //int lines = this.ActiveLine.PhysicsRow - firstLine.PhysicsRow;
+                                    // 当前终端里显示的行数
+                                    int lines = this.ActiveLine.PhysicsRow - firstLine.PhysicsRow;
 
-                                    //// 把当前终端里显示的行数全部放到滚动区域上面
+                                    // 把当前终端里显示的行数全部放到滚动区域上面
+                                    // 先做换行动作，换行完光标在往下的lines行
+                                    for (int i = 0; i < lines; i++)
+                                    {
+                                        firstLine.EraseAll();
+                                        this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
+                                        firstLine = this.activeDocument.FirstLine;
+                                    }
 
-                                    //// 先做换行动作，换行完光标在往下的lines行
-                                    //for (int i = 0; i < lines; i++)
-                                    //{
-                                    //    this.activeDocument.LineFeed();
-                                    //}
+                                    this.activeDocument.DirtyAll();
 
-                                    //// 然后增加滚动最大值，滚动到最底边
-                                    //this.scrollInfo.ScrollMax += lines;
-                                    //this.ScrollToBottom();
-
-                                    logger.Fatal("EraseType.Scrollback未实现");
+                                    int scrollMax = this.activeDocument.FirstLine.PhysicsRow;
+                                    this.scrollInfo.ScrollMax = scrollMax;
+                                    this.scrollInfo.ScrollValue = scrollMax;
 
                                     break;
                                 }
@@ -1527,7 +1537,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
-                        this.alternateDocument.DeleteAll();
+                        this.alternateDocument.EraseAll();
                         this.activeDocument = this.alternateDocument;
 
                         this.textSelection.Reset();
@@ -2000,7 +2010,7 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         // 没有找到要显示的滚动区域外的内容，说明已经全部显示了
                         // 但是还是要继续循环下去，因为相当于是把底部的文本行拿到了最上面，此时底部的文本行需要清空
-                        currentLine.DeleteAll();
+                        currentLine.EraseAll();
                     }
 
                     currentLine = currentLine.NextLine;
@@ -2012,7 +2022,7 @@ namespace ModengTerm.Terminal.ViewModels
             #region 处理备用缓冲区
 
             // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
-            this.alternateDocument.DeleteAll();
+            this.alternateDocument.EraseAll();
 
             #endregion
 

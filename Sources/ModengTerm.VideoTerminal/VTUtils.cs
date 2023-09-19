@@ -137,6 +137,23 @@ namespace ModengTerm.Terminal
                 copyTo.Parameter = copyFrom.Parameter;
             }
         }
+
+        public static void CopyCharacter(List<VTCharacter> copyFroms, List<VTCharacter> copyTos)
+        {
+            copyTos.Clear();
+            for (int i = 0; i < copyFroms.Count; i++)
+            {
+                VTCharacter copyFrom = copyFroms[i];
+                VTCharacter character = VTCharacter.CreateNull();
+
+                // 拷贝VTCharacter
+                VTUtils.CopyAttributeState(copyFrom.AttributeList, character.AttributeList);
+                character.Character = copyFrom.Character;
+                character.ColumnSize = copyFrom.ColumnSize;
+                character.Flags = copyFrom.Flags;
+
+                copyTos.Add(character);
+            }
+        }
     }
 }
-

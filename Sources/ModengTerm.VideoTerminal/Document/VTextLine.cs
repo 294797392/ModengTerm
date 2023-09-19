@@ -322,88 +322,10 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 删除指定列的字符
-        /// </summary>
-        /// <param name="column">要删除的列</param>
-        public void DeleteText(int column)
-        {
-            if (column >= this.columns)
-            {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
-                return;
-            }
-
-            int startIndex = this.FindCharacterIndex(column);
-            if (startIndex == -1)
-            {
-                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
-                logger.FatalFormat("DeleteText失败, startIndex == -1, column = {0}", column);
-                return;
-            }
-
-            int remain = this.characters.Count - startIndex;
-
-            for (int i = 0; i < remain; i++)
-            {
-                VTCharacter toDelete = this.characters[startIndex];
-                this.characters.Remove(toDelete);
-
-                // 更新显示的列数
-                this.columns -= toDelete.ColumnSize;
-            }
-
-            this.SetRenderDirty(true);
-        }
-
-        /// <summary>
-        /// 删除指定列处的字符
-        /// </summary>
-        /// <param name="column">从此处开始删除字符</param>
-        /// <param name="count">要删除的字符个数</param>
-        public void DeleteText(int column, int count)
-        {
-            if (column >= this.columns)
-            {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
-                return;
-            }
-
-            int startIndex = this.FindCharacterIndex(column);
-            if (startIndex == -1)
-            {
-                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
-                logger.FatalFormat("DeleteText失败, startIndex == -1, column = {0}, count = {1}", column, count);
-                return;
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                VTCharacter toDelete = this.characters[startIndex];
-                this.characters.Remove(toDelete);
-
-                // 更新显示的列数
-                this.columns -= toDelete.ColumnSize;
-            }
-
-            this.SetRenderDirty(true);
-        }
-
-        /// <summary>
-        /// 1. 删除整行字符
-        /// </summary>
-        public void DeleteAll()
-        {
-            this.characters.Clear();
-            this.columns = 0;
-
-            this.SetRenderDirty(true);
-        }
-
-        /// <summary>
-        /// 从指定的位置开始使用空白字符串填充剩下的所有字符（包括指定位置处的字符）
+        /// 从指定位置用空白符填充该行所有字符（包括指定位置处的字符）
         /// </summary>
         /// <param name="column"></param>
-        public void Erase(int column)
+        public void EraseAll(int column)
         {
             if (column + 1 > this.columns)
             {
@@ -438,7 +360,40 @@ namespace XTerminal.Document
         /// </summary>
         public void EraseAll()
         {
-            this.Erase(0);
+            this.EraseAll(0);
+        }
+
+        /// <summary>
+        /// 用空白字符填充指定列处的字符
+        /// </summary>
+        /// <param name="column">从此处开始填充字符</param>
+        /// <param name="count">要填充的字符个数</param>
+        public void EraseRange(int column, int count)
+        {
+            if (column >= this.columns)
+            {
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                return;
+            }
+
+            int startIndex = this.FindCharacterIndex(column);
+            if (startIndex == -1)
+            {
+                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
+                logger.FatalFormat("DeleteText失败, startIndex == -1, column = {0}, count = {1}", column, count);
+                return;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                VTCharacter character = this.characters[startIndex];
+                character.Character = ' ';
+                character.ColumnSize = 1;
+                character.AttributeList.Clear();
+                character.Flags = VTCharacterFlags.SingleByteChar;
+            }
+
+            this.SetRenderDirty(true);
         }
 
         /// <summary>
@@ -496,8 +451,7 @@ namespace XTerminal.Document
         /// <param name="historyLine">要应用的历史行数据</param>
         public void SetHistory(VTHistoryLine historyLine)
         {
-            this.characters.Clear();
-            this.characters.AddRange(historyLine.Characters);
+            VTUtils.CopyCharacter(historyLine.Characters, this.characters);
             this.PhysicsRow = historyLine.PhysicsRow;
             this.columns = VTUtils.GetColumns(this.characters);
 

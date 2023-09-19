@@ -46,6 +46,11 @@ namespace XTerminal.Document
         /// </summary>
         private VTCursorState cursorState;
 
+        /// <summary>
+        /// 光标所在的物理行数
+        /// </summary>
+        private int activePhysicsRow;
+
         #endregion
 
         #region 属性
@@ -71,6 +76,11 @@ namespace XTerminal.Document
         /// 当光标在该范围内就得滚动
         /// </summary>
         public int ScrollMarginBottom { get; private set; }
+
+        /// <summary>
+        /// 光标所在物理行数
+        /// </summary>
+        public int ActivePhysicsRow { get { return this.activePhysicsRow; } }
 
         /// <summary>
         /// 当前光标所在行
@@ -243,6 +253,7 @@ namespace XTerminal.Document
             VTextLine oldLastLine = this.LastLine;
 
             // 光标所在行是可滚动区域的最后一行
+            // 也表示即将滚动
             if (last == this.ActiveLine)
             {
                 // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
@@ -287,7 +298,7 @@ namespace XTerminal.Document
 
                 // 下移之后，删除整行数据，终端会重新打印该行数据的
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
-                this.ActiveLine.DeleteAll();
+                this.ActiveLine.EraseAll();
 
                 // 物理行号和scrollMargin无关
                 if (!this.IsAlternate)
@@ -304,6 +315,8 @@ namespace XTerminal.Document
                         this.LastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
                     }
                 }
+
+                this.activePhysicsRow = this.ActiveLine.PhysicsRow;
 
                 this.SetArrangeDirty(true);
             }
@@ -372,7 +385,7 @@ namespace XTerminal.Document
                 // 上移之后，删除整行数据，终端会重新打印该行数据的
                 // 如果不删除的话，在man程序下有可能会显示重叠的信息
                 // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
-                this.ActiveLine.DeleteAll();
+                this.ActiveLine.EraseAll();
 
                 this.SetArrangeDirty(true);
             }
@@ -413,21 +426,21 @@ namespace XTerminal.Document
                 case EraseType.ToEnd:
                     {
                         // 删除从当前光标处到该行结尾的所有字符
-                        textLine.DeleteText(column);
+                        textLine.EraseAll(column);
                         break;
                     }
 
                 case EraseType.FromBeginning:
                     {
                         // 删除从行首到当前光标处的内容
-                        textLine.DeleteText(0, column);
+                        textLine.EraseRange(0, column);
                         break;
                     }
 
                 case EraseType.All:
                     {
                         // 删除光标所在整行
-                        textLine.DeleteAll();
+                        textLine.EraseAll();
                         break;
                     }
 
@@ -457,13 +470,13 @@ namespace XTerminal.Document
                         }
 
                         // 先删第一行
-                        textLine.Erase(column);
+                        textLine.EraseAll(column);
 
                         // 再删剩下的行
                         VTextLine next = textLine.NextLine;
                         while (next != null)
                         {
-                            next.Erase(0);
+                            next.EraseAll(0);
 
                             next = next.NextLine;
                         }
@@ -480,7 +493,7 @@ namespace XTerminal.Document
                             return;
                         }
 
-                        textLine.Erase(0);
+                        textLine.EraseAll(0);
 
                         VTextLine next = this.FirstLine;
                         while (next != null && next != textLine)
@@ -513,22 +526,7 @@ namespace XTerminal.Document
             }
         }
 
-        /// <summary>
-        /// 从指定行的指定列处开始删除字符，要删除的字符数由count指定
-        /// </summary>
-        /// <param name="textLine">要删除的字符所在行</param>
-        /// <param name="column">要删除的字符起始列</param>
-        /// <param name="count">要删除的字符个数</param>
-        public void DeleteCharacter(VTextLine textLine, int column, int count)
-        {
-            textLine.DeleteText(column, count);
-        }
-
-        /// <summary>
-        /// 清除数据
-        /// 1. 清除所有文本数据
-        /// </summary>
-        public void DeleteAll()
+        public void EraseAll()
         {
             #region 删除所有文本数据
 
@@ -537,15 +535,23 @@ namespace XTerminal.Document
 
             while (current != null)
             {
-                current.DeleteAll();
+                current.EraseAll();
 
                 current = current.NextLine;
             }
 
             #endregion
+        }
 
-            // 为什么需要Arrange？
-            //this.IsArrangeDirty = true;
+        /// <summary>
+        /// 从指定行的指定列处开始删除字符，要删除的字符数由count指定
+        /// </summary>
+        /// <param name="textLine">要删除的字符所在行</param>
+        /// <param name="column">要删除的字符起始列</param>
+        /// <param name="count">要删除的字符个数</param>
+        public void DeleteCharacter(VTextLine textLine, int column, int count)
+        {
+            textLine.EraseRange(column, count);
         }
 
         /// <summary>
@@ -603,7 +609,7 @@ namespace XTerminal.Document
                 node2.PreviousLine = node1Prev;
                 node1Prev = node1.PreviousLine;
                 node1Next = node1.NextLine;
-                node2.DeleteAll();  // 把新行清空
+                node2.EraseAll();  // 把新行清空
 
                 // 更新下半部分
                 node2Prev.NextLine = node2Next;
@@ -678,7 +684,7 @@ namespace XTerminal.Document
                 {
                     node2Next.PreviousLine = node1;
                 }
-                node1.DeleteAll();
+                node1.EraseAll();
 
                 // 更新FirstLine
                 if (this.ScrollMarginTop == 0)
@@ -767,6 +773,8 @@ namespace XTerminal.Document
                 this.Cursor.Row = row;
 
                 this.ActiveLine = this.FirstLine.FindNext(row);
+
+                this.activePhysicsRow = this.ActiveLine.PhysicsRow;
             }
         }
 
@@ -816,22 +824,22 @@ namespace XTerminal.Document
                 case MoveOptions.MoveToFirst:
                     {
                         textLine.Remove();
-                        VTextLine firstLine = this.FirstLine;
+                        VTextLine oldFirstLine = this.FirstLine;
                         this.FirstLine.PreviousLine = textLine;
                         this.FirstLine = textLine;
-                        textLine.NextLine = firstLine;
-                        textLine.PhysicsRow = firstLine.PhysicsRow - 1;
+                        textLine.NextLine = oldFirstLine;
+                        textLine.PhysicsRow = oldFirstLine.PhysicsRow - 1;
                         break;
                     }
 
                 case MoveOptions.MoveToLast:
                     {
                         textLine.Remove();
-                        VTextLine lastLine = this.LastLine;
+                        VTextLine oldLastLine = this.LastLine;
                         this.LastLine.NextLine = textLine;
                         this.LastLine = textLine;
-                        textLine.PreviousLine = lastLine;
-                        textLine.PhysicsRow = lastLine.PhysicsRow + 1;
+                        textLine.PreviousLine = oldLastLine;
+                        textLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
                         break;
                     }
 

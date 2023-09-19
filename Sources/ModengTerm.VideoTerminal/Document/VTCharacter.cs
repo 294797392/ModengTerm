@@ -74,17 +74,5 @@ namespace XTerminal.Document
         {
             return Create(' ', 1, VTCharacterFlags.SingleByteChar, null);
         }
-
-        /// <summary>
-        /// 把该字符数据拷贝到指定的字符里
-        /// </summary>
-        /// <param name="character">要拷贝到的字符</param>
-        public void CopyTo(VTCharacter character)
-        {
-            character.Character = this.Character;
-            character.ColumnSize = this.ColumnSize;
-            character.Flags = this.Flags;
-            VTUtils.CopyAttributeState(this.AttributeList, character.AttributeList);
-        }
     }
 }
