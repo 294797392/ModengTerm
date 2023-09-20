@@ -52,6 +52,8 @@ namespace XTerminal.Document
         /// </summary>
         private int columns;
 
+        private int physicsRow;
+
         #endregion
 
         #region 属性
@@ -61,7 +63,20 @@ namespace XTerminal.Document
         /// <summary>
         /// 行索引，从0开始
         /// </summary>
-        public int PhysicsRow { get; set; }
+        public int PhysicsRow 
+        {
+            get { return this.physicsRow; }
+            set
+            {
+                if (this.physicsRow != value)
+                {
+                    // TODO：正式出版本的时候要删除这里
+                    // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
+                    this.physicsRow = value;
+                    this.SetRenderDirty(true);
+                }
+            }
+        }
 
         /// <summary>
         /// 上一个文本行

@@ -1368,6 +1368,7 @@ namespace ModengTerm.Terminal.ViewModels
                     }
 
                 case VTActions.Faint:
+                case VTActions.FaintUnset:
                 case VTActions.CrossedOut:
                 case VTActions.CrossedOutUnset:
                     {
@@ -1616,6 +1617,8 @@ namespace ModengTerm.Terminal.ViewModels
                         throw new NotImplementedException(string.Format("未执行的VTAction, {0}", action));
                     }
             }
+
+            this.PerformDrawing(this.activeDocument);
         }
 
         private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)

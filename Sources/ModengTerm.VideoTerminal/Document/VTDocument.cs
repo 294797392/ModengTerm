@@ -331,6 +331,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 反向换行
+        /// 反向换行不增加新行，也不减少新行，保持总行数不变
         /// </summary>
         public void ReverseLineFeed()
         {
@@ -386,6 +387,14 @@ namespace XTerminal.Document
                 // 如果不删除的话，在man程序下有可能会显示重叠的信息
                 // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
                 this.ActiveLine.EraseAll();
+
+                // 物理行号和scrollMargin无关
+                if (!this.IsAlternate)
+                {
+                    this.ResetPhysicsRow(oldFirstLine.PhysicsRow);
+                }
+
+                this.activePhysicsRow = this.ActiveLine.PhysicsRow;
 
                 this.SetArrangeDirty(true);
             }
