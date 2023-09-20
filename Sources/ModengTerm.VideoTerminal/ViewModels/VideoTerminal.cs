@@ -744,9 +744,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// 当光标在容器外面移动的时候，进行滚动
         /// </summary>
         /// <param name="mousePosition">当前鼠标的坐标</param>
-        /// <param name="surfaceBoundary">相对于电脑显示器的画布的边界框</param>
+        /// <param name="vtc">相对于电脑显示器的画布的边界框</param>
         /// <returns>是否执行了滚动动作</returns>
-        private void ScrollIfCursorOutsideSurface(VTPoint mousePosition, VTRect surfaceBoundary)
+        private void ScrollIfCursorOutsideDocument(VTPoint mousePosition, VTRect vtc)
         {
             // 要滚动到的目标行
             int scrollTarget = -1;
@@ -760,7 +760,7 @@ namespace ModengTerm.Terminal.ViewModels
                     scrollTarget = this.scrollInfo.ScrollValue - 1;
                 }
             }
-            else if (mousePosition.Y > surfaceBoundary.Height)
+            else if (mousePosition.Y > vtc.Height)
             {
                 // 光标在容器下面
                 if (!this.ScrollAtBottom)
@@ -780,14 +780,14 @@ namespace ModengTerm.Terminal.ViewModels
         /// 使用像素坐标对VTextLine做命中测试
         /// </summary>
         /// <param name="mousePosition">鼠标坐标</param>
-        /// <param name="vtRect">相对于电脑显示器的画布的边界框，也是鼠标的限定范围</param>
+        /// <param name="vtc">相对于电脑显示器的画布的边界框，也是鼠标的限定范围</param>
         /// <param name="pointer">存储命中测试结果的变量</param>
         /// <remarks>如果传递进来的鼠标位置在窗口外，那么会把鼠标限定在距离鼠标最近的Surface边缘处</remarks>
         /// <returns>
         /// 是否获取成功
         /// 当光标不在某一行或者不在某个字符上的时候，就获取失败
         /// </returns>
-        private bool GetTextPointer(VTPoint mousePosition, VTRect vtRect, VTextPointer pointer)
+        private bool GetTextPointer(VTPoint mousePosition, VTRect vtc, VTextPointer pointer)
         {
             double mouseX = mousePosition.X;
             double mouseY = mousePosition.Y;
@@ -803,7 +803,7 @@ namespace ModengTerm.Terminal.ViewModels
                 // 光标在画布的上面，那么命中的行数就是第一行
                 cursorLine = document.FirstLine;
             }
-            else if (mouseY > vtRect.Height)
+            else if (mouseY > vtc.Height)
             {
                 // 光标在画布的下面，那么命中的行数是最后一行
                 cursorLine = document.LastLine;
@@ -832,7 +832,7 @@ namespace ModengTerm.Terminal.ViewModels
                 // 鼠标在画布左边，那么悬浮的就是第一个字符
                 characterIndex = 0;
             }
-            if (mouseX > vtRect.Width)
+            if (mouseX > vtc.Width)
             {
                 // 鼠标在画布右边，那么悬浮的就是最后一个字符
                 characterIndex = cursorLine.Characters.Count;
@@ -843,6 +843,7 @@ namespace ModengTerm.Terminal.ViewModels
                 VTRect characterBounds;
                 if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out characterBounds))
                 {
+                    // 没有命中字符
                     return false;
                 }
             }
@@ -1617,8 +1618,6 @@ namespace ModengTerm.Terminal.ViewModels
                         throw new NotImplementedException(string.Format("未执行的VTAction, {0}", action));
                     }
             }
-
-            this.PerformDrawing(this.activeDocument);
         }
 
         private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)
@@ -1788,7 +1787,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 首先检测鼠标是否在Surface边界框的外面
             // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
-            this.ScrollIfCursorOutsideSurface(location, this.vtRect);
+            this.ScrollIfCursorOutsideDocument(location, this.vtRect);
 
             // 更新当前鼠标的命中信息，保存在endPointer里
             if (!this.GetTextPointer(location, this.vtRect, endPointer))

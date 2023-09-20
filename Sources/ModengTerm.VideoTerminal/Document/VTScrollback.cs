@@ -27,7 +27,7 @@ namespace ModengTerm.Terminal.Document
             VTHistoryLine historyLine;
             if (!this.TryGetHistory(textLine.PhysicsRow, out historyLine))
             {
-                historyLine = this.CreateHistory(textLine);
+                historyLine = new VTHistoryLine();
 
                 if (textLine.PhysicsRow == 0)
                 {
@@ -38,6 +38,9 @@ namespace ModengTerm.Terminal.Document
                 {
                     this.LastLine = historyLine;
                 }
+
+                this.UpdateHistory(textLine, historyLine);
+                this.AddHistory(historyLine);
             }
             else
             {
@@ -89,12 +92,17 @@ namespace ModengTerm.Terminal.Document
         public abstract bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine);
 
         /// <summary>
-        /// 创建一个新行
+        /// 增加一个历史行
+        /// </summary>
+        /// <param name="historyLine">要增加的历史行</param>
+        /// <returns></returns>
+        protected abstract void AddHistory(VTHistoryLine historyLine);
+
+        /// <summary>
+        /// 更新一个历史行
         /// </summary>
         /// <param name="textLine">历史行对应的文本行</param>
-        /// <returns></returns>
-        protected abstract VTHistoryLine CreateHistory(VTextLine textLine);
-
+        /// <param name="historyLine">要更新的历史行</param>
         protected abstract void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine);
     }
 
@@ -122,11 +130,9 @@ namespace ModengTerm.Terminal.Document
             this.historyLines.Clear();
         }
 
-        protected override VTHistoryLine CreateHistory(VTextLine textLine)
+        protected override void AddHistory(VTHistoryLine historyLine)
         {
-            VTHistoryLine historyLine = VTHistoryLine.Create(textLine);
-            this.historyLines[textLine.PhysicsRow] = historyLine;
-            return historyLine;
+            this.historyLines[historyLine.PhysicsRow] = historyLine;
         }
 
         protected override void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine)
@@ -156,7 +162,7 @@ namespace ModengTerm.Terminal.Document
             throw new NotImplementedException();
         }
 
-        protected override VTHistoryLine CreateHistory(VTextLine textLine)
+        protected override void AddHistory(VTHistoryLine historyLine)
         {
             throw new NotImplementedException();
         }

@@ -15,27 +15,43 @@
                 
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="StyleTextBlockContact" TargetType="{x:Type TextBlock}">
+            <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+
+            <Style x:Key="StyleTextBlockValue" TargetType="{x:Type TextBlock}">
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="Margin" Value="0,5,0,5"/>
+                <Setter Property="Margin" Value="5,0,0,0"/>
             </Style>
-            
+
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
 
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <TextBlock Text="作者联系方式：" Style="{StaticResource ResourceKey=StyleTextBlockContact}"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="作者微信：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="294797392" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Gitee：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="https://gitee.com/zyfalreadyexsit/terminal-release.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
-            <TextBlock Text="微信：294797392" Style="{StaticResource ResourceKey=StyleTextBlockContact}"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="软件版本号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TextBlockSoftwareVersion" Text="" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
-            <!--<TextBlock Text="Gitee：https://gitee.com/zyfalreadyexsit/terminal.git" Style="{StaticResource ResourceKey=StyleTextBlockContact}"/>-->
-
-        </StackPanel>
+        </Grid>
 
     </Grid>
 </Window>

@@ -862,7 +862,7 @@ namespace ModengTerm.ViewModels
                 ID = Guid.NewGuid().ToString(),
                 CreationTime = DateTime.Now,
                 Name = this.Name,
-                SessionType = (int)sessionType.Type
+                SessionType = (int)sessionType.Type,
             };
 
             if (!this.CollectOptions(session))

@@ -81,7 +81,7 @@ namespace ModengTerm.ViewModels
 
                 case SessionTypeEnum.SSH:
                     {
-                        this.HostName = session.GetOption<string>(OptionKeyEnum.SFTP_SERVER_ADDRESS);
+                        this.HostName = session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
                         break;
                     }
 

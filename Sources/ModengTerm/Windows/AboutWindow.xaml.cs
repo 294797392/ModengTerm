@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,6 +23,13 @@ namespace XTerminal.Windows
         public AboutWindow()
         {
             InitializeComponent();
+
+            this.InitializeWindow();
+        }
+
+        private void InitializeWindow()
+        {
+            TextBlockSoftwareVersion.Text = Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
     }
 }

@@ -51,18 +51,18 @@ namespace XTerminal.Document
         /// </summary>
         /// <param name="textLine">要做字符命中测试的行</param>
         /// <param name="cursorX">要做命中测试的X偏移量</param>
-        /// <param name="index">被命中的字符的索引</param>
-        /// <param name="bounds">被命中的字符的边界框信息</param>
+        /// <param name="characterHitIndex">被命中的字符的索引</param>
+        /// <param name="characterHitBounds">被命中的字符的边界框信息</param>
         /// <returns>命中成功返回true，失败返回false</returns>
-        public static bool HitTestVTCharacter(VTextLine textLine, double cursorX, out int index, out VTRect bounds)
+        public static bool HitTestVTCharacter(VTextLine textLine, double cursorX, out int characterHitIndex, out VTRect characterHitBounds)
         {
             // 命中测试流程是一个一个字符做边界框的判断
             // 先测量第一个字符的边界框，然后判断xPos是否在该边界框里
             // 然后测量第一个和第二个字符的边界框，然后再判断
             // ...以此类推，直到命中为止
 
-            index = -1;
-            bounds = EmptyRect;
+            characterHitIndex = -1;
+            characterHitBounds = EmptyRect;
 
             for (int i = 0; i < textLine.Characters.Count; i++)
             {
@@ -71,8 +71,8 @@ namespace XTerminal.Document
                 if (characterBounds.Left <= cursorX && characterBounds.Right >= cursorX)
                 {
                     // 鼠标命中了字符，使用命中的字符的边界框
-                    index = i;
-                    bounds = characterBounds;
+                    characterHitIndex = i;
+                    characterHitBounds = characterBounds;
                     return true;
                 }
             }

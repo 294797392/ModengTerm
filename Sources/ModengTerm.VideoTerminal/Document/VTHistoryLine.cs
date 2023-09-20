@@ -27,28 +27,9 @@ namespace XTerminal.Document
         /// </summary>
         public List<VTCharacter> Characters { get; private set; }
 
-        private VTHistoryLine()
+        public VTHistoryLine()
         {
             this.Characters = new List<VTCharacter>();
-        }
-
-        ///// <summary>
-        ///// 设置该历史行的数据
-        ///// </summary>
-        ///// <param name="textLine">要设置的行</param>
-        //public void SetVTextLine(VTextLine textLine)
-        //{
-        //    this.PhysicsRow = textLine.PhysicsRow;
-        //    // 复制一份字符列表
-        //    VTUtils.CopyCharacter(textLine.Characters, this.Characters);
-        //}
-
-        public static VTHistoryLine Create(VTextLine textLine)
-        {
-            VTHistoryLine historyLine = new VTHistoryLine();
-            historyLine.PhysicsRow = textLine.PhysicsRow;
-            VTUtils.CopyCharacter(textLine.Characters, historyLine.Characters);
-            return historyLine;
         }
     }
 }
