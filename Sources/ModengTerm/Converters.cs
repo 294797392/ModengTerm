@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Document;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -138,6 +139,56 @@ namespace ModengTerm
                 case VTCursorSpeeds.HighSpeed: return "快";
                 case VTCursorSpeeds.LowSpeed: return "慢";
                 case VTCursorSpeeds.NormalSpeed: return "普通";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class FindScopes2StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!EnumConverterUtils.CheckValue(value))
+            {
+                return "未知";
+            }
+
+            switch ((FindScopes)value)
+            {
+                case FindScopes.All: return "查找全部";
+                case FindScopes.Document: return "查找当前文档";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class FindStartups2StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!EnumConverterUtils.CheckValue(value))
+            {
+                return "未知";
+            }
+
+            switch ((FindStartups)value)
+            {
+                case FindStartups.FromBegin: return "从头开始查找";
+                case FindStartups.FromEnd: return "从结尾开始查找";
+                case FindStartups.CurrentToEnd: return "从当前位置往下查找";
+                case FindStartups.CurrentToBegin: return "从当前位置往上查找";
                 default:
                     throw new NotImplementedException();
             }

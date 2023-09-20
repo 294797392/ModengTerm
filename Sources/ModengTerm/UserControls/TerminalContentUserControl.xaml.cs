@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using DotNEToolkit;
+using Microsoft.Win32;
 using ModengTerm;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
@@ -78,18 +79,33 @@ namespace XTerminal.UserControls
             this.Focusable = true;
         }
 
-        private void SaveToFile(SaveModeEnum saveMode, LogFileTypeEnum fileType)
+        private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
         {
-            string text = this.videoTerminal.BuildContent(saveMode, fileType);
+            switch (filterIndex)
+            {
+                case 1: return LogFileTypeEnum.PlainText;
+                case 2: return LogFileTypeEnum.HTML;
 
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void SaveToFile(ContentScopeEnum saveMode)
+        {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
+            saveFileDialog.FileName = string.Format("{0}_{1}", this.videoTerminal.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
             if ((bool)saveFileDialog.ShowDialog())
             {
+                LogFileTypeEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
+
                 try
                 {
+                    string text = this.videoTerminal.CreateContent(saveMode, fileType);
                     File.WriteAllText(saveFileDialog.FileName, text);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     logger.Error("保存日志异常", ex);
                     MessageBoxUtils.Error("保存失败");
@@ -250,7 +266,7 @@ namespace XTerminal.UserControls
 
         private void GridCanvasList_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if(this.videoTerminal==null)
+            if (this.videoTerminal == null)
             {
                 return;
             }
@@ -277,49 +293,19 @@ namespace XTerminal.UserControls
 
         #region 保存日志
 
-        private void MenuItemSaveScreenToTextFile_Click(object sender, RoutedEventArgs e)
+        private void MenuItemSaveDocument_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveDocument, LogFileTypeEnum.Text);
+            this.SaveToFile(ContentScopeEnum.SaveDocument);
         }
 
-        private void MenuItemSaveScreenToHtmlFile_Click(object sender, RoutedEventArgs e)
+        private void MenuItemSaveSelected_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveDocument, LogFileTypeEnum.Html);
+            this.SaveToFile(ContentScopeEnum.SaveSelected);
         }
 
-        private void MenuItemSaveSelectedToTextFile_Click(object sender, RoutedEventArgs e)
+        private void MenuItemSaveAll_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(SaveModeEnum.SaveSelected, LogFileTypeEnum.Text);
-        }
-
-        private void MenuItemSaveSelectedToHtmlFile_Click(object sender, RoutedEventArgs e)
-        {
-            this.SaveToFile(SaveModeEnum.SaveSelected, LogFileTypeEnum.Html);
-        }
-
-        private void MenuItemSaveAllToTextFile_Click(object sender, RoutedEventArgs e)
-        {
-            this.SaveToFile(SaveModeEnum.SaveAll, LogFileTypeEnum.Text);
-        }
-
-        private void MenuItemSaveAllToHtmlFile_Click(object sender, RoutedEventArgs e)
-        {
-            this.SaveToFile(SaveModeEnum.SaveAll, LogFileTypeEnum.Html);
-        }
-
-        private void MenuItemSaveScreenToFavorites(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void MenuItemSaveSelectedToFavorites(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void MenuItemSaveAllToFavorites(object sender, RoutedEventArgs e)
-        {
-
+            this.SaveToFile(ContentScopeEnum.SaveAll);
         }
 
         #endregion
@@ -362,9 +348,18 @@ namespace XTerminal.UserControls
         {
         }
 
-        private void SessionContent_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// 查找
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItemFind_Click(object sender, RoutedEventArgs e)
         {
-            this.videoTerminal = base.DataContext as VideoTerminal;
+            FindWindowVM viewModel = new FindWindowVM(this.videoTerminal);
+
+            FindWindow findWindow = new FindWindow(viewModel);
+            findWindow.Owner = Window.GetWindow(this);
+            findWindow.Show();
         }
 
         #endregion
@@ -456,17 +451,20 @@ namespace XTerminal.UserControls
 
         #region SessionContent
 
-        protected override int OnOpen(XTermSession session)
+        protected override int OnOpen(OpenedSessionVM viewModel)
         {
-            string background = session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
+            string background = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
+
+            this.videoTerminal = viewModel as VideoTerminal;
+            this.videoTerminal.Open();
 
             return ResponseCode.SUCCESS;
         }
 
         protected override void OnClose()
         {
-
+            this.videoTerminal.Close();
         }
 
         #endregion

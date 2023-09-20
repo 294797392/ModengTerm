@@ -43,6 +43,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,10 +59,12 @@
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
     <Compile Include="Document\VTCursorState.cs" />
+    <Compile Include="Document\VTFindOptions.cs" />
     <Compile Include="Document\VTFormattedText.cs" />
     <Compile Include="Document\VTScrollback.cs" />
     <Compile Include="Document\VTScrollInfo.cs" />
-    <Compile Include="Enumerations\SaveModeEnum.cs" />
+    <Compile Include="Document\VTFindResult.cs" />
+    <Compile Include="Enumerations\ContentScopeEnum.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Document\HighlightGeometry\HighlightGeometryBuilder.cs" />
     <Compile Include="Document\HitTestHelper.cs" />
@@ -80,7 +83,6 @@
     <Compile Include="Rendering\IVideoTerminal.cs" />
     <Compile Include="Rendering\RenderingOptions.cs" />
     <Compile Include="Document\VDocumentUtils.cs" />
-    <Compile Include="Document\VFontWeight.cs" />
     <Compile Include="Document\VTCharacter.cs" />
     <Compile Include="Document\VTCharacterFlags.cs" />
     <Compile Include="Document\VTCursor.cs" />
@@ -121,6 +123,7 @@
     <Compile Include="Session\WinptySession.cs" />
     <Compile Include="UserInput.cs" />
     <Compile Include="ViewModels\FavoritesVM.cs" />
+    <Compile Include="ViewModels\FindWindowVM.cs" />
     <Compile Include="ViewModels\VideoTerminal.cs" />
     <Compile Include="ViewModels\VideoTerminal.Drawing.cs" />
     <Compile Include="VTColor.cs" />

@@ -7,8 +7,7 @@
                       xmlns:terminal="clr-namespace:ModengTerm.Terminal;assembly=ModengTerm.Terminal"
                       xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-                      DataContextChanged="SessionContent_DataContextChanged">
+             d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
 
@@ -53,21 +52,10 @@
                         <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
                         <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
                         <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>
-                        <MenuItem Header="保存当前屏幕内容">
-                            <MenuItem Header="文本文件" Click="MenuItemSaveScreenToTextFile_Click"/>
-                            <MenuItem Header="Html文件" Click="MenuItemSaveScreenToHtmlFile_Click" Visibility="Collapsed"/>
-                            <MenuItem Header="收藏夹" Click="MenuItemSaveScreenToFavorites" Visibility="Collapsed"/>
-                        </MenuItem>
-                        <MenuItem Header="保存选中内容">
-                            <MenuItem Header="文本文件" Click="MenuItemSaveSelectedToTextFile_Click"/>
-                            <MenuItem Header="Html文件" Click="MenuItemSaveSelectedToHtmlFile_Click" Visibility="Collapsed"/>
-                            <MenuItem Header="收藏夹" Click="MenuItemSaveSelectedToFavorites" Visibility="Collapsed"/>
-                        </MenuItem>
-                        <MenuItem Header="保存所有内容">
-                            <MenuItem Header="文本文件" Click="MenuItemSaveAllToTextFile_Click"/>
-                            <MenuItem Header="Html文件" Click="MenuItemSaveAllToHtmlFile_Click" Visibility="Collapsed"/>
-                            <MenuItem Header="收藏夹" Click="MenuItemSaveAllToFavorites" Visibility="Collapsed"/>
-                        </MenuItem>
+                        <MenuItem Header="查找..." Click="MenuItemFind_Click"/>
+                        <MenuItem Header="保存当前屏幕内容" Click="MenuItemSaveDocument_Click"/>
+                        <MenuItem Header="保存选中内容" Click="MenuItemSaveSelected_Click"/>
+                        <MenuItem Header="保存所有内容" Click="MenuItemSaveAll_Click"/>
 
                         <MenuItem x:Name="MenuItemDrawingMode" IsCheckable="True" Visibility="Collapsed"
                                   Checked="MenuItemDrawingMode_CheckedChanged"

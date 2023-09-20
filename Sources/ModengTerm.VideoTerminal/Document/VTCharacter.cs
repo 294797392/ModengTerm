@@ -34,6 +34,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 存储该字符的文本属性列表
+        /// TODO：考虑使用32位int存储所有的属性状态，这样可以节省内存
         /// </summary>
         public List<VTextAttributeState> AttributeList { get; private set; }
 

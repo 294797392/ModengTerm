@@ -74,6 +74,7 @@
     <Compile Include="Enumerations\TerminalTypeEnum.cs" />
     <Compile Include="Enumerations\VTCursorStyles.cs" />
     <Compile Include="ICloneable.cs" />
+    <Compile Include="MTermUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseCode.cs" />
     <Compile Include="ServiceAgents\CloudServiceAgent.cs" />

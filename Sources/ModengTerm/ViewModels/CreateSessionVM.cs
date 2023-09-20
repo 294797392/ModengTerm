@@ -225,12 +225,12 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public string MaxScrollback 
+        public string MaxScrollback
         {
             get { return this.maxScrollback; }
             set
             {
-                if (this.maxScrollback != value) 
+                if (this.maxScrollback != value)
                 {
                     this.maxScrollback = value;
                     this.NotifyPropertyChanged("MaxScrollback");
@@ -415,7 +415,7 @@ namespace ModengTerm.ViewModels
             #endregion
 
             this.SSHAuthTypeList = new BindableCollection<SSHAuthTypeEnum>();
-            this.SSHAuthTypeList.AddRange(Enum.GetValues(typeof(SSHAuthTypeEnum)).Cast<SSHAuthTypeEnum>());
+            this.SSHAuthTypeList.AddRange(MTermUtils.GetEnumValues<SSHAuthTypeEnum>());
             this.SSHAuthTypeList.SelectedItem = this.SSHAuthTypeList.FirstOrDefault();
             this.SSHServerPort = MTermConsts.DefaultSSHPort.ToString();
 
@@ -434,15 +434,15 @@ namespace ModengTerm.ViewModels
             this.DataBitsList.SelectedItem = this.DataBitsList.LastOrDefault(); // LastOrDfault是8
 
             this.StopBitsList = new BindableCollection<StopBits>();
-            this.StopBitsList.AddRange(Enum.GetValues(typeof(StopBits)).Cast<StopBits>());
+            this.StopBitsList.AddRange(MTermUtils.GetEnumValues<StopBits>());
             this.StopBitsList.SelectedItem = StopBits.One;
 
             this.ParityList = new BindableCollection<Parity>();
-            this.ParityList.AddRange(Enum.GetValues(typeof(Parity)).Cast<Parity>());
+            this.ParityList.AddRange(MTermUtils.GetEnumValues<Parity>());
             this.ParityList.SelectedItem = Parity.None;
 
             this.HandshakeList = new BindableCollection<Handshake>();
-            this.HandshakeList.AddRange(Enum.GetValues(typeof(Handshake)).Cast<Handshake>());
+            this.HandshakeList.AddRange(MTermUtils.GetEnumValues<Handshake>());
             this.HandshakeList.SelectedItem = Handshake.None;
 
             #endregion
@@ -461,11 +461,11 @@ namespace ModengTerm.ViewModels
             this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
 
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
-            this.CursorSpeeds.AddRange(Enum.GetValues(typeof(VTCursorSpeeds)).Cast<VTCursorSpeeds>());
+            this.CursorSpeeds.AddRange(MTermUtils.GetEnumValues<VTCursorSpeeds>());
             this.CursorSpeeds.SelectedItem = MTermConsts.DefaultCursorBlinkSpeed;
 
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
-            this.CursorStyles.AddRange(Enum.GetValues(typeof(VTCursorStyles)).Cast<VTCursorStyles>());
+            this.CursorStyles.AddRange(MTermUtils.GetEnumValues<VTCursorStyles>());
             this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
 
             this.CursorColors = new BindableCollection<ColorDefinition>();
@@ -495,7 +495,7 @@ namespace ModengTerm.ViewModels
             foreach (string fontFamily in DefaultFontFamilies)
             {
                 FontFamilyDefinition defaultFont = this.FontFamilyList.FirstOrDefault(v => v.Value == fontFamily);
-                if (defaultFont != null) 
+                if (defaultFont != null)
                 {
                     return defaultFont;
                 }

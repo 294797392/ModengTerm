@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,12 +24,18 @@ namespace ModengTerm.Terminal
 
         public byte B { get; private set; }
 
+        /// <summary>
+        /// 获取该颜色的Html表示的字符串
+        /// </summary>
+        public string Html { get; set; }
+
         public RgbColor(byte r, byte g, byte b)
         {
             this.Name = string.Format("{0},{1},{2}", r, g, b);
             this.R = r;
             this.G = g;
             this.B = b;
+            this.Html = ColorTranslator.ToHtml(Color.FromArgb(r, g, b));
         }
     }
 

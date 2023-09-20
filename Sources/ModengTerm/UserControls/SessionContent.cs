@@ -1,4 +1,6 @@
-﻿using ModengTerm.ViewModels;
+﻿using ModengTerm;
+using ModengTerm.Base.Enumerations;
+using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,28 +13,30 @@ namespace XTerminal.UserControls
 {
     public abstract class SessionContent : UserControl
     {
-        protected XTermSession session;
+        public OpenedSessionVM ViewModel { get; private set; }
 
-        public XTermSession Session
+        public XTermSession Session { get; set; }
+
+        public int Open()
         {
-            get { return this.session; }
-        }
+            this.ViewModel = OpenedSessionVMFactory.Create(this.Session);
+            this.ViewModel.ID = Guid.NewGuid().ToString();
+            this.ViewModel.Name = this.Session.Name;
+            this.ViewModel.Description = this.Session.Description;
+            this.ViewModel.Content = this;
+            base.DataContext = this.ViewModel;
 
-        public int Open(XTermSession session)
-        {
-            this.session = session;
-
-            return this.OnOpen(session);
+            return this.OnOpen(this.ViewModel);
         }
 
         public void Close()
         {
-            this.session = null;
+            this.Session = null;
 
             this.OnClose();
         }
 
-        protected abstract int OnOpen(XTermSession session);
+        protected abstract int OnOpen(OpenedSessionVM sessionVM);
         protected abstract void OnClose();
     }
 }

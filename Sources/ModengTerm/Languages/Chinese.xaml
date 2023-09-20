@@ -15,5 +15,8 @@
 
     <!-- 终端右键菜单 1001 - 1500 -->
 
+    <!-- 查找窗口 2000 - 3000 -->
+    <sys:String x:Key="UIText2000">查找</sys:String>
+
 
 </ResourceDictionary>

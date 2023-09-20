@@ -69,6 +69,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 是否结束
+        /// 渲染的使用用不到，创建VTFormattedText的时候用到
         /// </summary>
         public bool Closed { get; set; }
     }

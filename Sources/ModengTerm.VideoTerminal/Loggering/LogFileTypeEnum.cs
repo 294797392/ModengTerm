@@ -11,11 +11,11 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 文本文件日志
         /// </summary>
-        Text,
+        PlainText,
 
         /// <summary>
         /// HTML格式的日志
         /// </summary>
-        Html
+        HTML
     }
 }

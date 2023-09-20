@@ -118,16 +118,15 @@ namespace ModengTerm
             // 先初始化UI，等UI显示出来在打开Session
             // 因为初始化终端需要知道当前的界面大小，从而计算行大小和列大小
             SessionContent sessionContent = SessionContentFactory.Create(session);
-            sessionContent.Open(session);
+            sessionContent.Session = session;
             sessionContent.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
             container.Content = sessionContent;
         }
 
         public void CloseSession(OpenedSessionVM session)
         {
-            session.StatusChanged -= this.OpenedSessionVM_StatusChanged;
-            session.Close();
-            (session.Content as SessionContent).Close();
+            SessionContent sessionContent = session.Content as SessionContent;
+            sessionContent.Close();
 
             this.OpenedSessionList.Remove(session);
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
@@ -165,10 +164,6 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        private void OpenedSessionVM_StatusChanged(OpenedSessionVM sessionVM, SessionStatusEnum status)
-        {
-        }
-
         /// <summary>
         /// 光标闪烁线程
         /// 所有的光标都在这一个线程运行
@@ -203,16 +198,14 @@ namespace ModengTerm
         {
             // 此时所有的界面都加载完了，可以真正打开Session了
             SessionContent content = sender as SessionContent;
-            XTermSession session = content.Session;
 
-            OpenedSessionVM sessionVM = OpenedSessionVMFactory.Create(session);
-            sessionVM.ID = Guid.NewGuid().ToString();
-            sessionVM.Name = session.Name;
-            sessionVM.Description = session.Description;
-            sessionVM.Content = content;
-            sessionVM.StatusChanged += this.OpenedSessionVM_StatusChanged;
-            sessionVM.Open();
-            content.DataContext = sessionVM;
+            int code = content.Open();
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("打开会话失败, {0}", code);
+            }
+
+            OpenedSessionVM sessionVM = content.ViewModel;
 
             // 添加到界面上，因为最后一个元素是打开Session的TabItem，所以要添加到倒数第二个元素的位置
             this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);

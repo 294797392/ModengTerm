@@ -10,9 +10,70 @@ using System.Linq;
 
 namespace ModengTerm.Terminal
 {
+    public class CreateContentParameter
+    {
+        public List<List<VTCharacter>> CharactersList { get; set; }
+
+        public int StartCharacterIndex { get; set; }
+
+        public int EndCharacterIndex { get; set; }
+
+        public LogFileTypeEnum ContentType { get; set; }
+
+        public Dictionary<string, string> ColorTable { get; set; }
+
+        public string SessionName { get; set; }
+
+        /// <summary>
+        /// 终端背景颜色
+        /// </summary>
+        public string Background { get; set; }
+
+        /// <summary>
+        /// 终端前景色（文本默认颜色）
+        /// </summary>
+        public string Foreground { get; set; }
+
+        public string FontFamily { get; set; }
+
+        public double FontSize { get; set; }
+    }
+
     public static class VTUtils
     {
-        private static void BuildPlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count)
+        private delegate void CreateLineDelegate(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter);
+        private const string HtmlTemplate =
+            "<html>" +
+            "<head>" +
+            "<title>{0}</title>" +
+            "</head>" +
+            "<body style='background-color:{2};font-size:{3}px;font-family:{4};color:{5};'>{1}</body>" +
+            "</html>";
+
+        /// <summary>
+        /// VTColor转成HtmlColor
+        /// </summary>
+        /// <param name="vtc"></param>
+        /// <param name="colorTable"></param>
+        /// <returns></returns>
+        private static string GetHtmlColor(VTColor vtc, Dictionary<string, string> colorTable)
+        {
+            RgbColor rgbColor = null;
+
+            if (vtc is NamedColor)
+            {
+                string rgbKey = colorTable[vtc.Name];
+                rgbColor = VTColor.CreateFromRgbKey(rgbKey) as RgbColor;
+            }
+            else if (vtc is RgbColor)
+            {
+                rgbColor = vtc as RgbColor;
+            }
+
+            return rgbColor.Html;
+        }
+
+        private static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter)
         {
             string text = VTUtils.CreatePlainText(characters, startIndex, count);
             if (string.IsNullOrEmpty(text))
@@ -25,45 +86,120 @@ namespace ModengTerm.Terminal
             }
         }
 
-        public static string BuildContent(List<List<VTCharacter>> charactersList, int startCharIndex, int endCharIndex, LogFileTypeEnum fileType)
+        private static void CreateHtml(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter)
+        {
+            if (characters.Count == 0)
+            {
+                builder.AppendLine("<br>");
+                return;
+            }
+
+            Dictionary<string, string> colorTable = parameter.ColorTable;
+
+            for (int i = 0; i < count; i++)
+            {
+                VTCharacter character = characters[i];
+
+                builder.Append("<span style='");
+
+                foreach (VTextAttributeState attribute in character.AttributeList)
+                {
+                    if (!attribute.Enabled)
+                    {
+                        continue;
+                    }
+
+                    switch (attribute.Attribute)
+                    {
+                        case VTextAttributes.Background:
+                            {
+                                VTColor vtc = attribute.Parameter as VTColor;
+                                string color = GetHtmlColor(vtc, colorTable);
+                                builder.AppendFormat("background-color:{0};", color);
+                                break;
+                            }
+
+                        case VTextAttributes.Foreground:
+                            {
+                                VTColor vtc = attribute.Parameter as VTColor;
+                                string color = GetHtmlColor(vtc, colorTable);
+                                builder.AppendFormat("color:{0};", color);
+                                break;
+                            }
+
+                        case VTextAttributes.Underline:
+                            {
+                                builder.Append("text-decoration:underline;");
+                                break;
+                            }
+
+                        default:
+                            break;
+                    }
+                }
+
+                builder.AppendFormat("'>{0}</span>", character.Character);
+            }
+
+            builder.AppendLine("</br>");
+        }
+
+        private static CreateLineDelegate GetCreateLineDelegate(LogFileTypeEnum fileType)
         {
             switch (fileType)
             {
-                case LogFileTypeEnum.Text:
-                    {
-                        if (charactersList.Count == 1)
-                        {
-                            // 只有一行
-                            return VTUtils.CreatePlainText(charactersList[0], startCharIndex, endCharIndex - startCharIndex + 1);
-                        }
-                        else
-                        {
-                            StringBuilder builder = new StringBuilder();
-
-                            // 第一行
-                            List<VTCharacter> first = charactersList.FirstOrDefault();
-                            VTUtils.BuildPlainText(first, builder, startCharIndex, first.Count - startCharIndex);
-
-                            // 中间的行
-                            for (int i = 1; i < charactersList.Count - 1; i++)
-                            {
-                                List<VTCharacter> characters = charactersList[i];
-                                VTUtils.BuildPlainText(characters, builder, 0, characters.Count);
-                            }
-
-                            // 最后一行
-                            List<VTCharacter> last = charactersList.LastOrDefault();
-                            VTUtils.BuildPlainText(last, builder, 0, endCharIndex + 1);
-
-                            return builder.ToString();
-                        }
-                    }
-
+                case LogFileTypeEnum.HTML: return CreateHtml;
+                case LogFileTypeEnum.PlainText: return CreatePlainText;
                 default:
-                    {
-                        throw new NotImplementedException();
-                    }
+                    throw new NotImplementedException();
             }
+        }
+
+
+
+
+
+        public static string CreateContent(CreateContentParameter parameter)
+        {
+            List<List<VTCharacter>> charactersList = parameter.CharactersList;
+            LogFileTypeEnum fileType = parameter.ContentType;
+            int startCharIndex = parameter.StartCharacterIndex;
+            int endCharIndex = parameter.EndCharacterIndex;
+
+            CreateLineDelegate createLine = VTUtils.GetCreateLineDelegate(fileType);
+            StringBuilder builder = new StringBuilder();
+
+            if (charactersList.Count == 1)
+            {
+                // 只有一行
+                createLine(charactersList[0], builder, startCharIndex, endCharIndex - startCharIndex + 1, parameter);
+            }
+            else
+            {
+                // 第一行
+                List<VTCharacter> first = charactersList.FirstOrDefault();
+                createLine(first, builder, startCharIndex, first.Count - startCharIndex, parameter);
+
+                // 中间的行
+                for (int i = 1; i < charactersList.Count - 1; i++)
+                {
+                    List<VTCharacter> characters = charactersList[i];
+                    createLine(characters, builder, 0, characters.Count, parameter);
+                }
+
+                // 最后一行
+                List<VTCharacter> last = charactersList.LastOrDefault();
+                createLine(last, builder, 0, endCharIndex + 1, parameter);
+            }
+
+            if (fileType == LogFileTypeEnum.HTML)
+            {
+                string htmlBackground = VTUtils.GetHtmlColor(VTColor.CreateFromRgbKey(parameter.Background), parameter.ColorTable);
+                string htmlForeground = VTUtils.GetHtmlColor(VTColor.CreateFromRgbKey(parameter.Foreground), parameter.ColorTable);
+                return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground, parameter.FontSize, parameter.FontFamily, htmlForeground);
+            }
+
+            return builder.ToString();
         }
 
         public static VTextAttributes VTAction2TextAttribute(VTActions actions, out bool enabled)
@@ -160,13 +296,13 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <param name="characters"></param>
         /// <returns></returns>
-        public static VTFormattedText CreateFormattedText(List<VTCharacter> characters)
+        public static VTFormattedText CreateFormattedText(List<VTCharacter> characters, int startIndex, int count)
         {
             VTFormattedText formattedText = new VTFormattedText();
 
-            for (int i = 0; i < characters.Count; i++)
+            for (int i = 0; i < count; i++)
             {
-                VTCharacter character = characters[i];
+                VTCharacter character = characters[startIndex + i];
 
                 formattedText.Text += character.Character;
 
@@ -226,25 +362,34 @@ namespace ModengTerm.Terminal
             return formattedText;
         }
 
+        public static VTFormattedText CreateFormattedText(List<VTCharacter> characters)
+        {
+            return VTUtils.CreateFormattedText(characters, 0, characters.Count);
+        }
+
         /// <summary>
         /// 创建裸文本
         /// </summary>
         /// <param name="characters"></param>
         /// <returns></returns>
-        public static string CreatePlainText(IEnumerable<VTCharacter> characters)
+        public static string CreatePlainText(List<VTCharacter> characters)
         {
-            string text = string.Empty;
+            return CreatePlainText(characters, 0, characters.Count);
+        }
 
-            foreach (VTCharacter character in characters)
-            {
-                text += character.Character;
-            }
-
-            return text;
+        public static string CreatePlainText(List<VTCharacter> characters, int startIndex)
+        {
+            int count = characters.Count - startIndex;
+            return CreatePlainText(characters, startIndex, count);
         }
 
         public static string CreatePlainText(List<VTCharacter> characters, int startIndex, int count)
         {
+            if (characters.Count == 0)
+            {
+                return string.Empty;
+            }
+
             string text = string.Empty;
 
             for (int i = 0; i < count; i++)
@@ -253,12 +398,6 @@ namespace ModengTerm.Terminal
             }
 
             return text;
-        }
-
-        public static string CreatePlainText(List<VTCharacter> characters, int startIndex)
-        {
-            int count = characters.Count - startIndex;
-            return CreatePlainText(characters, startIndex, count);
         }
     }
 }

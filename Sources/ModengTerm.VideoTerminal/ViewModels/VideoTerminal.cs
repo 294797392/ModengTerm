@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using XTerminal;
 using XTerminal.Base;
@@ -33,10 +34,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         private static readonly byte[] OS_OperatingStatusData = new byte[4] { 0x1b, (byte)'[', (byte)'0', (byte)'n' };
         private static readonly byte[] DA_DeviceAttributesData = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
-
-        #endregion
-
-        #region 公开事件
 
         #endregion
 
@@ -135,13 +132,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         #endregion
 
-        #region 文本样式
-
-        private double fontSize;
-        private string fontFamily;
-
-        #endregion
-
         /// <summary>
         /// 是否正在运行
         /// </summary>
@@ -166,6 +156,21 @@ namespace ModengTerm.Terminal.ViewModels
         /// 终端渲染区域相对于整个桌面的位置
         /// </summary>
         private VTRect vtRect;
+
+        /// <summary>
+        /// 终端颜色表
+        /// ColorName -> RgbKey
+        /// </summary>
+        private Dictionary<string, string> colorTable;
+        private string background;
+        private string foreground;
+        private double fontSize;
+        private string fontFamily;
+
+        /// <summary>
+        /// 是否正在查找
+        /// </summary>
+        private bool find;
 
         #endregion
 
@@ -220,6 +225,11 @@ namespace ModengTerm.Terminal.ViewModels
                 return this.scrollInfo.ScrollAtTop;
             }
         }
+
+        /// <summary>
+        /// 获取滚动数据
+        /// </summary>
+        public VTScrollback Scrollback { get { return this.scrollback; } }
 
         public VTDocument ActiveDocument { get { return this.activeDocument; } }
 
@@ -298,6 +308,9 @@ namespace ModengTerm.Terminal.ViewModels
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
             this.fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             this.fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
+            this.colorTable = sessionInfo.GetOption<Dictionary<string, string>>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
+            this.background = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
+            this.foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
 
             #region 初始化历史记录管理器
 
@@ -381,9 +394,9 @@ namespace ModengTerm.Terminal.ViewModels
                 CursorSize = new VTSize(cursorSize.Width, cursorSize.Height),
                 FontFamily = fontFamily,
                 FontSize = fontSize,
-                ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR),
-                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
-                ColorTable = sessionInfo.GetOption<Dictionary<string, string>>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE)
+                ForegroundColor = this.foreground,
+                BackgroundColor = this.background,
+                ColorTable = this.colorTable
             };
             this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), false) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), true) { Name = "AlternateDocument" };
@@ -445,7 +458,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void CopySelection()
         {
-            string text = this.BuildContent(SaveModeEnum.SaveSelected, LogFileTypeEnum.Text);
+            string text = this.CreateContent(ContentScopeEnum.SaveSelected, LogFileTypeEnum.PlainText);
 
             // 调用剪贴板API复制到剪贴板
             Clipboard.SetText(text);
@@ -486,20 +499,19 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 把终端的内容保存到文件
+        /// 根据scope生成内容
         /// </summary>
-        /// <param name="saveMode"></param>
+        /// <param name="scope"></param>
         /// <param name="fileType"></param>
-        /// <param name="filePath"></param>
         /// <returns></returns>
-        public string BuildContent(SaveModeEnum saveMode, LogFileTypeEnum fileType)
+        public string CreateContent(ContentScopeEnum scope, LogFileTypeEnum fileType)
         {
             List<List<VTCharacter>> characters = new List<List<VTCharacter>>();
             int startIndex = 0, endIndex = 0;
 
-            switch (saveMode)
+            switch (scope)
             {
-                case SaveModeEnum.SaveAll:
+                case ContentScopeEnum.SaveAll:
                     {
                         if (this.activeDocument.IsAlternate)
                         {
@@ -530,7 +542,7 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
-                case SaveModeEnum.SaveDocument:
+                case ContentScopeEnum.SaveDocument:
                     {
                         VTextLine current = this.activeDocument.FirstLine;
                         while (current != null)
@@ -544,7 +556,7 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
-                case SaveModeEnum.SaveSelected:
+                case ContentScopeEnum.SaveSelected:
                     {
                         if (this.textSelection.IsEmpty)
                         {
@@ -569,7 +581,21 @@ namespace ModengTerm.Terminal.ViewModels
                     throw new NotImplementedException();
             }
 
-            return VTUtils.BuildContent(characters, startIndex, endIndex, fileType);
+            CreateContentParameter parameter = new CreateContentParameter()
+            {
+                SessionName = this.Session.Name,
+                CharactersList = characters,
+                StartCharacterIndex = startIndex,
+                EndCharacterIndex = endIndex,
+                ColorTable = this.colorTable,
+                ContentType = fileType,
+                Background = this.background,
+                FontSize = this.fontSize,
+                FontFamily = this.fontFamily,
+                Foreground = this.foreground
+            };
+
+            return VTUtils.CreateContent(parameter);
         }
 
         /// <summary>

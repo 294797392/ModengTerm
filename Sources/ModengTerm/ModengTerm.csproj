@@ -106,10 +106,12 @@
       <DependentUpon>FileSystemTreeUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\CreateSessionVM.cs" />
+    <Compile Include="Windows\FindWindow.xaml.cs">
+      <DependentUpon>FindWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\LoggerOptionsWindow.xaml.cs">
       <DependentUpon>LoggerOptionsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MTermUtils.cs" />
     <Compile Include="UserControls\SessionContent.cs" />
     <Compile Include="UserControls\OptionsUserControl\SerialPortOptionsUserControl.xaml.cs">
       <DependentUpon>SerialPortOptionsUserControl.xaml</DependentUpon>
@@ -190,6 +192,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\DebugWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\FindWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
