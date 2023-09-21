@@ -43,9 +43,9 @@ namespace ModengTerm.Terminal.ViewModels
                             ID = Guid.NewGuid().ToString(),
                         };
 
-                        this.ActiveCanvas.CreateDrawingObject(rectangle);
+                        //this.ActiveCanvas.CreateDrawingObject(rectangle);
 
-                        this.graphicsList.Add(rectangle);
+                        //this.graphicsList.Add(rectangle);
 
                         return rectangle;
                     }

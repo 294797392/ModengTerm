@@ -33,7 +33,7 @@ namespace ModengTerm.Rendering
             this.brush = DefaultSelectionBrush;
         }
 
-        protected override void Draw(DrawingContext dc)
+        protected override void OnDraw(DrawingContext dc)
         {
             StreamGeometryContext sgc = this.selectionGeometry.Open();
 

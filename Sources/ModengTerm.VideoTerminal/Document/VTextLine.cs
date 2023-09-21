@@ -45,14 +45,14 @@ namespace XTerminal.Document
         /// </summary>
         private List<VTCharacter> characters;
 
-        private int[] decorationVersions;
-
         /// <summary>
         /// 已经显示了的列数
         /// </summary>
         private int columns;
 
         private int physicsRow;
+
+        private List<VTMatches> matchesList;
 
         #endregion
 
@@ -70,10 +70,12 @@ namespace XTerminal.Document
             {
                 if (this.physicsRow != value)
                 {
-                    // TODO：正式出版本的时候要删除这里
-                    // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
                     this.physicsRow = value;
+#if DEBUG
+                    // TODO：正式出版本的时候要删除这里，不然会影响运行速度
+                    // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
                     this.SetRenderDirty(true);
+#endif
                 }
             }
         }
@@ -103,6 +105,22 @@ namespace XTerminal.Document
         /// </summary>
         public List<VTCharacter> Characters { get { return this.characters; } }
 
+        /// <summary>
+        /// 匹配到的文本索引
+        /// </summary>
+        public List<VTMatches> MatchesList 
+        {
+            get { return this.matchesList; }
+            set
+            {
+                if (this.matchesList != value)
+                {
+                    this.matchesList = value;
+                    this.SetRenderDirty(true);
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -114,7 +132,6 @@ namespace XTerminal.Document
         public VTextLine(VTDocument owner) : base(owner)
         {
             this.characters = new List<VTCharacter>();
-            this.decorationVersions = new int[Enum.GetValues(typeof(VTextAttributes)).Length];
         }
 
         #endregion
@@ -513,5 +530,45 @@ namespace XTerminal.Document
         }
 
         #endregion
+
+        protected override void OnRender()
+        {
+            if (this.matchesList != null && this.matchesList.Count > 0)
+            {
+                // 先拷贝要显示的字符
+                List<VTCharacter> characters = new List<VTCharacter>();
+                VTUtils.CopyCharacter(this.Characters, characters);
+
+                foreach (VTMatches matches in this.MatchesList)
+                {
+                    #region 更新前景色和背景色
+
+                    // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
+                    // TODO：有可能背景不是纯色，而是图片或者视频
+                    for (int i = 0; i < matches.Length; i++)
+                    {
+                        VTCharacter character = this.characters[matches.Index + i];
+
+                        VTextAttributeState foregroundAttribute = character.AttributeList[(int)VTextAttributes.Foreground];
+                        foregroundAttribute.Enabled = true;
+                        foregroundAttribute.Parameter = this.Style.BackColor;
+
+                        VTextAttributeState backgroundAttribute = character.AttributeList[(int)VTextAttributes.Background];
+                        backgroundAttribute.Enabled = true;
+                        backgroundAttribute.Parameter = this.Style.ForeColor;
+                    }
+
+                    #endregion
+
+                    VTRect rect = this.MeasureTextBlock(matches.Index, matches.Length);
+
+                    VTFormattedText formattedText = VTUtils.CreateFormattedText(this.characters, matches.Index, matches.Length);
+                    formattedText.OffsetX = rect.Left;
+                    formattedText.OffsetY = this.OffsetY;
+
+                    matches.FormattedText = formattedText;
+                }
+            }
+        }
     }
 }

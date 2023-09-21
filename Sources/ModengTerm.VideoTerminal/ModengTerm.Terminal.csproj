@@ -59,9 +59,10 @@
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
     <Compile Include="Document\VTCursorState.cs" />
+    <Compile Include="Document\VTMatches.cs" />
     <Compile Include="ViewModels\VTFindOptions.cs" />
     <Compile Include="Document\VTFormattedText.cs" />
-    <Compile Include="Document\VTScrollback.cs" />
+    <Compile Include="Document\VTHistory.cs" />
     <Compile Include="Document\VTScrollInfo.cs" />
     <Compile Include="Enumerations\ContentScopeEnum.cs" />
     <Compile Include="EventHandlers.cs" />
@@ -122,7 +123,7 @@
     <Compile Include="Session\WinptySession.cs" />
     <Compile Include="UserInput.cs" />
     <Compile Include="ViewModels\FavoritesVM.cs" />
-    <Compile Include="ViewModels\FindWindowVM.cs" />
+    <Compile Include="ViewModels\FindVM.cs" />
     <Compile Include="ViewModels\VideoTerminal.cs" />
     <Compile Include="ViewModels\VideoTerminal.Drawing.cs" />
     <Compile Include="VTColor.cs" />

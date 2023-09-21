@@ -12,18 +12,23 @@ namespace ModengTerm.Rendering
 {
     public class DrawingRectangle : DrawingObject
     {
-        private static readonly Pen Pen = new Pen(Brushes.Black, 1);
+        private Pen pen;
+        private Brush backBrush;
 
         private VTDocumentRectangle rectangle;
 
         protected override void OnInitialize(VTDocumentElement documentElement)
         {
             this.rectangle = documentElement as VTDocumentRectangle;
+
+            Brush penBrush = DrawingUtils.GetBrush(this.rectangle.BorderColor);
+            this.pen = new Pen(penBrush, this.rectangle.BorderWidth);
+            this.backBrush = DrawingUtils.GetBrush(this.rectangle.Background);
         }
 
-        protected override void Draw(DrawingContext dc)
+        protected override void OnDraw(DrawingContext dc)
         {
-            dc.DrawRectangle(Brushes.Transparent, Pen, new Rect(0, 0, this.rectangle.Width, this.rectangle.Height));
+            dc.DrawRectangle(this.backBrush, this.pen, new Rect(0, 0, this.rectangle.Width, this.rectangle.Height));
         }
     }
 }

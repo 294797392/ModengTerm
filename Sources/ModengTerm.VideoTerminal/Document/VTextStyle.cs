@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,11 +15,6 @@ namespace XTerminal.Document
         /// </summary>
         public string FontFamily { get; set; }
 
-        ///// <summary>
-        ///// 字体粗细
-        ///// </summary>
-        //public VFontWeight FontWeight { get; set; }
-
         /// <summary>
         /// 字体大小
         /// </summary>
@@ -28,6 +24,15 @@ namespace XTerminal.Document
         /// 文本的颜色
         /// </summary>
         public string Foreground { get; set; }
+
+        /// <summary>
+        /// 文本颜色
+        /// </summary>
+        public VTColor ForeColor { get; set; }
+
+        public string Background { get; set; }
+
+        public VTColor BackColor { get; set; }
 
         /// <summary>
         /// 颜色表

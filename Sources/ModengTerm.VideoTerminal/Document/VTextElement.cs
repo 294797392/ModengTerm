@@ -84,12 +84,26 @@ namespace XTerminal.Document
             }
         }
 
+        /// <summary>
+        /// 准备渲染数据
+        /// </summary>
+        protected virtual void OnRender()
+        { }
+
+        /// <summary>
+        /// 计算OffsetX和OffsetY
+        /// </summary>
+        protected virtual void OnArrange()
+        { }
+
         #region VTDocumentElement
 
         public override void RequestInvalidate()
         {
             if (base.arrangeDirty)
             {
+                this.OnArrange();
+
                 this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
 
                 base.arrangeDirty = false;
@@ -97,15 +111,17 @@ namespace XTerminal.Document
 
             if (this.renderDirty)
             {
+                this.OnRender();
+
                 this.DrawingObject.Draw();
 
                 this.renderDirty = false;
             }
 
-            if (this.isMeasureDirty) 
+            if (this.isMeasureDirty)
             {
                 IDrawingObjectText objectText = this.DrawingObject as IDrawingObjectText;
-                
+
                 objectText.MeasureLine();
 
                 this.isMeasureDirty = false;
@@ -118,11 +134,11 @@ namespace XTerminal.Document
         /// <param name="startIndex">要测量的起始字符索引</param>
         /// <param name="count">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        public VTRect MeasureLine(int startIndex, int count)
+        public VTRect MeasureTextBlock(int startIndex, int count)
         {
             IDrawingObjectText objectText = this.DrawingObject as IDrawingObjectText;
 
-            return objectText.MeasureLine(startIndex, count);
+            return objectText.MeasureTextBlock(startIndex, count);
         }
 
         /// <summary>

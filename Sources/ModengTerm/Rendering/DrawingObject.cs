@@ -37,12 +37,12 @@ namespace ModengTerm.Rendering
 
         #region 抽象方法
 
-        protected abstract void Draw(DrawingContext dc);
-
         protected abstract void OnInitialize(VTDocumentElement documentElement);
 
         protected virtual void OnRelease()
         { }
+
+        protected abstract void OnDraw(DrawingContext dc);
 
         #endregion
 
@@ -55,11 +55,11 @@ namespace ModengTerm.Rendering
             this.OnInitialize(documentElement);
         }
 
-        public virtual void Draw()
+        public void Draw()
         {
             DrawingContext dc = this.RenderOpen();
 
-            this.Draw(dc);
+            this.OnDraw(dc);
 
             dc.Close();
         }

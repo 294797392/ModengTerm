@@ -21,5 +21,10 @@ namespace XTerminal.Document.Rendering
         /// 删除并释放渲染对象
         /// </summary>
         void DeleteDrawingObject(IDrawingObject drawingObject);
+
+        /// <summary>
+        /// 删除所有的渲染对象
+        /// </summary>
+        void DeleteDrawingObjects();
     }
 }

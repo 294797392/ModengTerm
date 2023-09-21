@@ -12,10 +12,19 @@ namespace XTerminal.Document
     /// </summary>
     public enum VTDocumentElements
     {
+        /// <summary>
+        /// 文本行
+        /// </summary>
         TextLine,
 
+        /// <summary>
+        /// 光标
+        /// </summary>
         Cursor,
 
+        /// <summary>
+        /// 选中区域
+        /// </summary>
         SelectionRange,
 
         /// <summary>
@@ -26,7 +35,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 滚动条
         /// </summary>
-        Scrollbar
+        Scrollbar,
     }
 
     /// <summary>

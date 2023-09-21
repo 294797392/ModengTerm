@@ -24,7 +24,7 @@ namespace XTerminal.Document.Rendering
         /// <param name="startIndex">要测量的起始字符索引</param>
         /// <param name="count">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        VTRect MeasureLine(int startIndex, int count);
+        VTRect MeasureTextBlock(int startIndex, int count);
 
         /// <summary>
         /// 测量一行里某个字符的测量信息

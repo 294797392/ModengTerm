@@ -106,7 +106,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 渲染该文档的Surface
         /// </summary>
-        public IDrawingDocument Canvas { get; private set; }
+        public IDrawingDocument Drawing { get; private set; }
 
         /// <summary>
         /// 是否需要重新布局
@@ -132,7 +132,7 @@ namespace XTerminal.Document
         public VTDocument(VTDocumentOptions options, IDrawingDocument canvas, bool isAlternate)
         {
             this.options = options;
-            this.Canvas = canvas;
+            this.Drawing = canvas;
             this.IsAlternate = isAlternate;
             this.cursorState = new VTCursorState();
 
@@ -154,7 +154,7 @@ namespace XTerminal.Document
                 BlinkRemain = (int)options.CursorSpeed,
                 Size = options.CursorSize
             };
-            this.Cursor.DrawingObject = this.Canvas.CreateDrawingObject(this.Cursor);
+            this.Cursor.DrawingObject = this.Drawing.CreateDrawingObject(this.Cursor);
 
             #region 初始化第一行，并设置链表首尾指针
 
@@ -198,11 +198,14 @@ namespace XTerminal.Document
                     FontSize = this.options.FontSize,
                     FontFamily = this.options.FontFamily,
                     Foreground = this.options.ForegroundColor,
-                    ColorTable = this.options.ColorTable
+                    ColorTable = this.options.ColorTable,
+                    ForeColor = VTColor.CreateFromRgbKey(this.options.ForegroundColor),
+                    Background = this.options.BackgroundColor,
+                    BackColor = VTColor.CreateFromRgbKey(this.options.BackgroundColor)
                 },
             };
 
-            textLine.DrawingObject = this.Canvas.CreateDrawingObject(textLine);
+            textLine.DrawingObject = this.Drawing.CreateDrawingObject(textLine);
 
             return textLine;
         }
@@ -870,7 +873,7 @@ namespace XTerminal.Document
         /// </summary>
         /// <param name="rowSize">终端的新的行数</param>
         /// <param name="colSize">终端的新的列数</param>
-        public void Resize(int rowSize, int colSize)
+        public void Resize(int rowSize, int colSize, int scrollMin, int scrollMax)
         {
             if (this.rowSize != rowSize)
             {
@@ -883,7 +886,7 @@ namespace XTerminal.Document
                 if (this.rowSize < rowSize)
                 {
                     // 扩大了行数
-                    firstRow = Math.Max(0, this.FirstLine.PhysicsRow - rows);
+                    firstRow = Math.Max(scrollMin, this.FirstLine.PhysicsRow - rows);
 
                     // 找到滚动区域内的最后一行，在该行后添加新行
                     for (int i = 0; i < rows; i++)
@@ -897,7 +900,6 @@ namespace XTerminal.Document
                     // 减少了行数
 
                     // 此时滚动条必定是在最低面
-                    int scrollMax = this.FirstLine.PhysicsRow;
                     if (scrollMax > 0)
                     {
                         firstRow = scrollMax + rows;
@@ -918,7 +920,7 @@ namespace XTerminal.Document
                     // 从最后一行开始删除
                     for (int i = 0; i < rows; i++)
                     {
-                        this.Canvas.DeleteDrawingObject(this.LastLine.DrawingObject);
+                        this.Drawing.DeleteDrawingObject(this.LastLine.DrawingObject);
                         this.LastLine.Remove();
                     }
                 }

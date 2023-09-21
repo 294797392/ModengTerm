@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:XTerminal.UserControls"
                       xmlns:terminal="clr-namespace:ModengTerm.Terminal;assembly=ModengTerm.Terminal"
                       xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
+                      xmlns:rendering="clr-namespace:ModengTerm.Rendering"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 

@@ -22,6 +22,16 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public List<VTextAttribute> Attributes { get; private set; }
 
+        /// <summary>
+        /// X偏移量，可选参数
+        /// </summary>
+        public double OffsetX { get; set; }
+
+        /// <summary>
+        /// Y偏移量，可选参数
+        /// </summary>
+        public double OffsetY { get; set; }
+
         public VTFormattedText()
         {
             this.Text = string.Empty;

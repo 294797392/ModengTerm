@@ -21,7 +21,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -92,7 +92,9 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="OpenedSessionVMFactory.cs" />
+    <Compile Include="Rendering\DrawingCanvas.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
+    <Compile Include="Rendering\DrawingObjectFactory.cs" />
     <Compile Include="Rendering\DrawingLine.cs" />
     <Compile Include="Rendering\DrawingRectangle.cs" />
     <Compile Include="Rendering\DrawingSelection.cs" />

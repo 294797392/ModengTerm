@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Document.Graphics;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.ViewModels;
 using System;
@@ -67,7 +68,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// UI线程上下文
         /// </summary>
-        private SynchronizationContext uiSyncContext;
+        internal SynchronizationContext uiSyncContext;
 
         /// <summary>
         /// 当前终端行数
@@ -100,8 +101,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool xtermBracketedPasteMode;
 
-        private VTScrollback scrollback;
-
         #region SelectionRange
 
         /// <summary>
@@ -115,11 +114,29 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private bool selectionState;
 
-        private IDrawingDocument selectionCanvas;
         /// <summary>
         /// 存储选中的文本信息
         /// </summary>
         private VTextSelection textSelection;
+
+        #endregion
+
+        private IDrawingDocument mainCanvas;
+        private IDrawingDocument alternateCanvas;
+
+        #region 最上层的备用图形
+
+        /// <summary>
+        /// 用来画：
+        /// 1. 当搜索到一个关键字之后，高亮显示该关键字
+        /// 2. 文本选中区域
+        /// </summary>
+        internal IDrawingDocument topMostCanvas;
+
+        /// <summary>
+        /// 放到一个集合里做渲染操作
+        /// </summary>
+        internal List<VTDocumentElement> topMostElements;
 
         #endregion
 
@@ -162,10 +179,10 @@ namespace ModengTerm.Terminal.ViewModels
         /// ColorName -> RgbKey
         /// </summary>
         private Dictionary<string, string> colorTable;
-        private string background;
-        private string foreground;
-        private double fontSize;
-        private string fontFamily;
+        internal string background;
+        internal string foreground;
+        internal double fontSize;
+        internal string fontFamily;
         private int scrollbackMax; // 最多可以有多少滚动行数
 
         #endregion
@@ -196,11 +213,6 @@ namespace ModengTerm.Terminal.ViewModels
         public int CursorCol { get { return this.Cursor.Column; } }
 
         /// <summary>
-        /// 当前终端显示的画面
-        /// </summary>
-        public IDrawingDocument ActiveCanvas { get { return this.activeDocument.Canvas; } }
-
-        /// <summary>
         /// 获取当前滚动条是否滚动到底了
         /// </summary>
         public bool ScrollAtBottom
@@ -222,10 +234,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        /// <summary>
-        /// 获取滚动数据
-        /// </summary>
-        public VTScrollback Scrollback { get { return this.scrollback; } }
+        public VTScrollInfo ScrollInfo { get { return this.scrollInfo; } }
 
         public VTDocument ActiveDocument { get { return this.activeDocument; } }
 
@@ -308,11 +317,18 @@ namespace ModengTerm.Terminal.ViewModels
             this.background = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             this.foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
             this.scrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK);
+            this.mainCanvas = this.videoTerminal.CreateDocument();
+            this.alternateCanvas = this.videoTerminal.CreateDocument();
+            this.topMostCanvas = this.videoTerminal.CreateDocument();
+            this.topMostElements = new List<VTDocumentElement>();
+
+            this.videoTerminal.AddCanvas(this.topMostCanvas);
 
             #region 初始化历史记录管理器
 
-            this.scrollback = new VTMemoryScrollback();
-            this.scrollback.Initialize();
+            this.scrollInfo = new VTScrollInfo(this.videoTerminal);
+            this.scrollInfo.ScrollbackMax = this.scrollbackMax;
+            this.scrollInfo.Initialize();
 
             #endregion
 
@@ -365,10 +381,8 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化TextSelection
 
-            this.selectionCanvas = this.videoTerminal.CreateDocument();
-            this.videoTerminal.AddCanvas(this.selectionCanvas);
             this.textSelection = new VTextSelection();
-            this.textSelection.DrawingObject = this.selectionCanvas.CreateDrawingObject(this.textSelection);
+            this.topMostCanvas.CreateDrawingObject(this.textSelection);
 
             #endregion
 
@@ -395,10 +409,10 @@ namespace ModengTerm.Terminal.ViewModels
                 BackgroundColor = this.background,
                 ColorTable = this.colorTable
             };
-            this.mainDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), false) { Name = "MainDocument" };
-            this.alternateDocument = new VTDocument(documentOptions, this.videoTerminal.CreateDocument(), true) { Name = "AlternateDocument" };
+            this.mainDocument = new VTDocument(documentOptions, this.mainCanvas, false) { Name = "MainDocument" };
+            this.alternateDocument = new VTDocument(documentOptions, this.alternateCanvas, true) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
-            this.videoTerminal.AddCanvas(this.mainDocument.Canvas);
+            this.videoTerminal.AddCanvas(this.mainDocument.Drawing);
 
             #endregion
 
@@ -406,12 +420,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.activeDocument.Cursor.RequestInvalidate();
             this.alternateDocument.Cursor.RequestInvalidate();
-
-            #endregion
-
-            #region 初始化滚动条
-
-            this.scrollInfo = new VTScrollInfo();
 
             #endregion
 
@@ -447,7 +455,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.mainDocument.Dispose();
             this.alternateDocument.Dispose();
 
-            this.scrollback.Release();
+            this.scrollInfo.Release();
         }
 
         /// <summary>
@@ -489,9 +497,10 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void SelectAll()
         {
-            VTHistoryLine lastHistoryLine = this.scrollback.LastLine;
+            VTHistoryLine startHistoryLine = this.scrollInfo.FirstLine;
+            VTHistoryLine lastHistoryLine = this.scrollInfo.LastLine;
 
-            this.textSelection.SetRange(this.activeDocument, this.vtRect, 0, 0, lastHistoryLine.PhysicsRow, lastHistoryLine.Characters.Count - 1);
+            this.textSelection.SetRange(this.activeDocument, this.vtRect, startHistoryLine.PhysicsRow, 0, lastHistoryLine.PhysicsRow, lastHistoryLine.Characters.Count - 1);
             this.textSelection.RequestInvalidate();
         }
 
@@ -526,7 +535,7 @@ namespace ModengTerm.Terminal.ViewModels
                         else
                         {
                             List<VTHistoryLine> historyLines;
-                            if (!this.scrollback.TryGetHistories(this.scrollback.FirstLine.PhysicsRow, this.scrollback.LastLine.PhysicsRow, out historyLines))
+                            if (!this.scrollInfo.TryGetHistories(this.scrollInfo.FirstLine.PhysicsRow, this.scrollInfo.LastLine.PhysicsRow, out historyLines))
                             {
                                 logger.ErrorFormat("SaveAll失败, 有的历史记录为空");
                                 return string.Empty;
@@ -534,7 +543,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             characters.AddRange(historyLines.Select(v => v.Characters));
                             startIndex = 0;
-                            endIndex = this.scrollback.LastLine.Characters.Count - 1;
+                            endIndex = this.scrollInfo.LastLine.Characters.Count - 1;
                         }
                         break;
                     }
@@ -564,7 +573,7 @@ namespace ModengTerm.Terminal.ViewModels
                         this.textSelection.Normalize(out topRow, out bottomRow, out startIndex, out endIndex);
 
                         List<VTHistoryLine> historyLines;
-                        if (!this.scrollback.TryGetHistories(topRow, bottomRow - topRow + 1, out historyLines))
+                        if (!this.scrollInfo.TryGetHistories(topRow, bottomRow - topRow + 1, out historyLines))
                         {
                             logger.ErrorFormat("SaveSelected失败, 有的历史记录为空");
                             return string.Empty;
@@ -724,7 +733,7 @@ namespace ModengTerm.Terminal.ViewModels
                     // 有可能有中文字符，一个中文字符占用2列
                     // 先通过光标所在列找到真正的字符所在列
                     int characterIndex = activeLine.FindCharacterIndex(cursorCol - 1);
-                    VTRect rect = activeLine.MeasureLine(characterIndex, 1);
+                    VTRect rect = activeLine.MeasureTextBlock(characterIndex, 1);
                     cursor.OffsetX = rect.Right;
                 }
                 else
@@ -740,11 +749,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 #region 移动滚动条
 
-                if (this.scrollInfo.Dirty)
-                {
-                    this.videoTerminal.SetScrollInfo(this.scrollInfo);
-                    this.scrollInfo.SetDirty(false);
-                }
+                this.scrollInfo.RequestInvalidate();
 
                 #endregion
 
@@ -912,6 +917,13 @@ namespace ModengTerm.Terminal.ViewModels
                 return false;
             }
 
+            // 判断要滚动的目标值合法性
+            if (scrollValue > this.scrollInfo.ScrollMax ||
+                scrollValue < this.scrollInfo.ScrollMin)
+            {
+                return false;
+            }
+
             // 只移动主缓冲区
             VTDocument scrollDocument = this.mainDocument;
 
@@ -937,7 +949,7 @@ namespace ModengTerm.Terminal.ViewModels
                 for (int i = 0; i < rows; i++)
                 {
                     VTHistoryLine historyLine;
-                    if (!this.scrollback.TryGetHistory(scrollValue + i, out historyLine))
+                    if (!this.scrollInfo.TryGetHistory(scrollValue + i, out historyLine))
                     {
                         // 百分之百不可能找不到
                         throw new NotImplementedException();
@@ -964,7 +976,7 @@ namespace ModengTerm.Terminal.ViewModels
                         scrollDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
 
                         VTHistoryLine historyLine;
-                        if (this.scrollback.TryGetHistory(lastRow + i, out historyLine))
+                        if (this.scrollInfo.TryGetHistory(lastRow + i, out historyLine))
                         {
                             firstLine.SetHistory(historyLine);
                         }
@@ -986,7 +998,7 @@ namespace ModengTerm.Terminal.ViewModels
                     for (int i = 0; i < scrolledRows; i++)
                     {
                         VTHistoryLine historyLine;
-                        if (!this.scrollback.TryGetHistory(firstRow - i, out historyLine))
+                        if (!this.scrollInfo.TryGetHistory(firstRow - i, out historyLine))
                         {
                             // 百分之百不可能找不到！！！
                             throw new NotImplementedException();
@@ -1111,8 +1123,8 @@ namespace ModengTerm.Terminal.ViewModels
                             VTextLine newLastLine = this.ActiveLine;
 
                             // 更新旧的最后一行和新的最后一行的历史记录
-                            this.scrollback.UpdateHistory(oldLastLine);
-                            this.scrollback.UpdateHistory(newLastLine);
+                            this.scrollInfo.UpdateHistory(oldLastLine);
+                            this.scrollInfo.UpdateHistory(newLastLine);
 
                             #region 更新滚动条的值
 
@@ -1121,17 +1133,8 @@ namespace ModengTerm.Terminal.ViewModels
                             int scrollMax = this.mainDocument.FirstLine.PhysicsRow;
                             if (scrollMax > 0)
                             {
-                                //if (scrollMax > this.scrollbackMax)
-                                //{
-                                //    // 超出了最多可以滚动的条数
-                                //    this.scrollback.RemoveFirst();
-                                //}
-                                //else
-                                //{
-                                // 可滚动条数在范围内，更细滚动条的值
                                 this.scrollInfo.ScrollMax = scrollMax;
                                 this.scrollInfo.ScrollValue = scrollMax;
-                                //}
                             }
 
                             #endregion
@@ -1142,11 +1145,12 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case VTActions.RI_ReverseLineFeed:
                     {
+                        VTDebug.Context.WriteInteractive(action, string.Empty);
+
                         // 和LineFeed相反，也就是把光标往上移一个位置
                         // 在用man命令的时候会触发这个指令
                         // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
                         this.activeDocument.ReverseLineFeed();
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
                         break;
                     }
 
@@ -1507,8 +1511,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        IDrawingDocument remove = this.mainDocument.Canvas;
-                        IDrawingDocument add = this.alternateDocument.Canvas;
+                        IDrawingDocument remove = this.mainDocument.Drawing;
+                        IDrawingDocument add = this.alternateDocument.Drawing;
                         this.videoTerminal.RemoveCanvas(remove);
                         this.videoTerminal.AddCanvas(add);
 
@@ -1526,8 +1530,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        IDrawingDocument remove = this.alternateDocument.Canvas;
-                        IDrawingDocument add = this.mainDocument.Canvas;
+                        IDrawingDocument remove = this.alternateDocument.Drawing;
+                        IDrawingDocument add = this.mainDocument.Drawing;
                         this.videoTerminal.RemoveCanvas(remove);
                         this.videoTerminal.AddCanvas(add);
 
@@ -1673,7 +1677,7 @@ namespace ModengTerm.Terminal.ViewModels
             // 触发完多次Print事件后，会最后触发一次PerformDrawing，在PerformDrawing完了再保存最后一行历史行
             if (this.activeDocument == this.mainDocument)
             {
-                this.scrollback.UpdateHistory(this.ActiveLine);
+                this.scrollInfo.UpdateHistory(this.ActiveLine);
             }
         }
 
@@ -1884,7 +1888,7 @@ namespace ModengTerm.Terminal.ViewModels
                 if (scrollValue < this.scrollDelta)
                 {
                     // 一次可以全部滚完并且还有剩余
-                    this.ScrollToHistory(0);
+                    this.ScrollToHistory(this.scrollInfo.ScrollMin);
                 }
                 else
                 {
@@ -1954,24 +1958,26 @@ namespace ModengTerm.Terminal.ViewModels
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样
             // 遇到过一种情况：如果终端名称不正确，比如XTerm，那么当行数增加的时候，光标会移动到该行的最右边，终端名称改成xterm就没问题了
             // 目前的实现思路是：如果是减少行，那么从第一行开始删除；如果是增加行，那么从最后一行开始新建行。不考虑ScrollMargin
-            this.mainDocument.Resize(newRows, newCols);
-            this.alternateDocument.Resize(newRows, newCols);
+            int scrollMin = this.scrollInfo.ScrollMin;
+            int scrollMax = this.scrollInfo.ScrollMax;
+            this.mainDocument.Resize(newRows, newCols, scrollMin, scrollMax);
+            this.alternateDocument.Resize(newRows, newCols, 0, 0);
 
             #region 处理主缓冲区
 
             // 第一行的值就是滚动条的最大值
-            int scrollMax = this.mainDocument.FirstLine.PhysicsRow;
-            if (this.scrollInfo.ScrollMax != scrollMax)
+            int newScrollMax = this.mainDocument.FirstLine.PhysicsRow;
+            if (this.scrollInfo.ScrollMax != newScrollMax)
             {
-                this.scrollInfo.ScrollMax = scrollMax;
-                this.scrollInfo.ScrollValue = scrollMax;
+                this.scrollInfo.ScrollMax = newScrollMax;
+                this.scrollInfo.ScrollValue = newScrollMax;
 
                 // 从第一行开始重新渲染显示终端内容
                 VTextLine currentLine = this.mainDocument.FirstLine;
                 while (currentLine != null)
                 {
                     VTHistoryLine historyLine;
-                    if (this.scrollback.TryGetHistory(currentLine.PhysicsRow, out historyLine))
+                    if (this.scrollInfo.TryGetHistory(currentLine.PhysicsRow, out historyLine))
                     {
                         currentLine.SetHistory(historyLine);
                     }

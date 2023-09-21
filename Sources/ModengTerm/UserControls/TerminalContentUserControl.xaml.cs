@@ -52,6 +52,7 @@ namespace XTerminal.UserControls
         private UserInput userInput;
 
         private VideoTerminal videoTerminal;
+        private FindVM vtFind;
 
         #endregion
 
@@ -355,9 +356,7 @@ namespace XTerminal.UserControls
         /// <param name="e"></param>
         private void MenuItemFind_Click(object sender, RoutedEventArgs e)
         {
-            FindWindowVM viewModel = new FindWindowVM(this.videoTerminal);
-
-            FindWindow findWindow = new FindWindow(viewModel);
+            FindWindow findWindow = new FindWindow(this.vtFind);
             findWindow.Owner = Window.GetWindow(this);
             findWindow.Show();
         }
@@ -400,6 +399,13 @@ namespace XTerminal.UserControls
         /// <param name="maximum">滚动条的最大值</param>
         public void SetScrollInfo(VTScrollInfo scrollInfo)
         {
+            SliderScrolbar.ValueChanged -= this.SliderScrolbar_ValueChanged;
+
+            if (SliderScrolbar.Minimum != scrollInfo.ScrollMin)
+            {
+                SliderScrolbar.Minimum = scrollInfo.ScrollMin;
+            }
+
             if (SliderScrolbar.Maximum != scrollInfo.ScrollMax)
             {
                 SliderScrolbar.Maximum = scrollInfo.ScrollMax;
@@ -409,6 +415,8 @@ namespace XTerminal.UserControls
             {
                 SliderScrolbar.Value = scrollInfo.ScrollValue;
             }
+
+            SliderScrolbar.ValueChanged += this.SliderScrolbar_ValueChanged;
         }
 
         public void SetScrollVisible(bool visible)
@@ -458,6 +466,8 @@ namespace XTerminal.UserControls
 
             this.videoTerminal = viewModel as VideoTerminal;
             this.videoTerminal.Open();
+
+            this.vtFind = new FindVM(this.videoTerminal);
 
             return ResponseCode.SUCCESS;
         }

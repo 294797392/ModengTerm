@@ -27,12 +27,14 @@ namespace ModengTerm.Base.DataModels
 
         /// <summary>
         /// 背景颜色
+        /// 格式是r,g,b
         /// </summary>
         [JsonProperty("backgroundColor")]
         public string BackgroundColor { get; set; }
 
         /// <summary>
         /// 默认前景色
+        /// 格式是r,g,b
         /// </summary>
         [JsonProperty("foregroundColor")]
         public string ForegroundColor { get; set; }

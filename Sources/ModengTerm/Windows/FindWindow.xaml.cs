@@ -23,31 +23,60 @@ namespace ModengTerm.Windows
     /// </summary>
     public partial class FindWindow : Window
     {
-        public event Action<VTHistoryLine> FindCompleted;
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("FindWindow");
 
-        private FindWindowVM viewModel;
+        private FindVM viewModel;
+        private bool finding;
 
-        public FindWindow(FindWindowVM vm)
+        public FindWindow(FindVM vm)
         {
             InitializeComponent();
 
             this.InitializeWindow(vm);
         }
 
-        private void InitializeWindow(FindWindowVM vm)
+        private void InitializeWindow(FindVM vm)
         {
             this.viewModel = vm;
             base.DataContext = vm;
         }
 
+        private void FindAsync(bool findOnce)
+        {
+            if (this.finding)
+            {
+                return;
+            }
+
+            this.viewModel.FindOnce = findOnce;
+
+            Task.Factory.StartNew(() =>
+            {
+                this.finding = true;
+
+                try
+                {
+                    this.viewModel.PerformFind();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("查找异常", ex);
+                }
+                finally
+                {
+                    this.finding = false;
+                }
+            });
+        }
+
         private void ButtonFind_Click(object sender, RoutedEventArgs e)
         {
-            this.viewModel.Find(true);
+            this.FindAsync(true);
         }
 
         private void ButtonFindAll_Click(object sender, RoutedEventArgs e)
         {
-            this.viewModel.Find(false);
+            this.FindAsync(false);
         }
     }
 }

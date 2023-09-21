@@ -62,7 +62,7 @@ namespace ModengTerm.Rendering
             this.Draw();
         }
 
-        protected override void Draw(DrawingContext dc)
+        protected override void OnDraw(DrawingContext dc)
         {
             dc.DrawRectangle(this.brush, TransparentPen, this.rect);
         }

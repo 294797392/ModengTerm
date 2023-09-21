@@ -9,7 +9,7 @@ namespace ModengTerm.Terminal.Document.Graphics
 {
     public abstract class VTDocumentGraphics : VTDocumentElement
     {
-        private bool isRenderDirty;
+        protected bool isRenderDirty;
 
         #region 属性
 

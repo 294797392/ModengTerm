@@ -42,6 +42,21 @@ namespace ModengTerm.Terminal.Document.Graphics
             }
         }
 
+        /// <summary>
+        /// 边框颜色
+        /// </summary>
+        public string BorderColor { get; set; }
+
+        /// <summary>
+        /// 边框粗细
+        /// </summary>
+        public int BorderWidth { get; set; }
+
+        /// <summary>
+        /// 背景颜色
+        /// </summary>
+        public string Background { get; set; }
+
         public override void OnMouseDown(VTPoint location)
         {
             this.OffsetX = location.X;

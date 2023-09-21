@@ -21,7 +21,7 @@ namespace ModengTerm.Rendering
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingSurface");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingDocument");
 
         #endregion
 
@@ -72,25 +72,12 @@ namespace ModengTerm.Rendering
 
         #region 实例方法
 
-        private DrawingObject CreateDrawingObject(VTDocumentElements type)
-        {
-            switch (type)
-            {
-                case VTDocumentElements.Cursor: return new DrawingCursor();
-                case VTDocumentElements.SelectionRange: return new DrawingSelection();
-                case VTDocumentElements.TextLine: return new DrawingLine();
-                case VTDocumentElements.Rectangle: return new DrawingRectangle();
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         private DrawingObject EnsureDrawingObject(VTDocumentElement documentElement)
         {
             DrawingObject drawingObject = documentElement.DrawingObject as DrawingObject;
             if (drawingObject == null)
             {
-                drawingObject = this.CreateDrawingObject(documentElement.Type);
+                drawingObject = DrawingObjectFactory.CreateDrawingObject(documentElement.Type);
                 drawingObject.Initialize(documentElement);
                 documentElement.DrawingObject = drawingObject;
                 this.visuals.Add(drawingObject);
@@ -111,6 +98,15 @@ namespace ModengTerm.Rendering
         {
             drawingObject.Release();
             this.visuals.Remove(drawingObject as DrawingObject);
+        }
+
+        public void DeleteDrawingObjects()
+        {
+            foreach (DrawingObject drawingObject in this.visuals.Cast<DrawingObject>())
+            {
+                drawingObject.Release();
+            }
+            this.visuals.Clear();
         }
 
         #endregion
