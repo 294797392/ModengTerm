@@ -59,11 +59,10 @@
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
     <Compile Include="Document\VTCursorState.cs" />
-    <Compile Include="Document\VTFindOptions.cs" />
+    <Compile Include="ViewModels\VTFindOptions.cs" />
     <Compile Include="Document\VTFormattedText.cs" />
     <Compile Include="Document\VTScrollback.cs" />
     <Compile Include="Document\VTScrollInfo.cs" />
-    <Compile Include="Document\VTFindResult.cs" />
     <Compile Include="Enumerations\ContentScopeEnum.cs" />
     <Compile Include="EventHandlers.cs" />
     <Compile Include="Document\HighlightGeometry\HighlightGeometryBuilder.cs" />

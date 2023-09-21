@@ -42,12 +42,12 @@ namespace ModengTerm.Windows
 
         private void ButtonFind_Click(object sender, RoutedEventArgs e)
         {
-            this.viewModel.Find();
+            this.viewModel.Find(true);
         }
 
         private void ButtonFindAll_Click(object sender, RoutedEventArgs e)
         {
-            this.viewModel.Find();
+            this.viewModel.Find(false);
         }
     }
 }

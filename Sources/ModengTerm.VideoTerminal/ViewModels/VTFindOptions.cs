@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Document
+namespace ModengTerm.Terminal.ViewModels
 {
     /// <summary>
     /// 查找范围
@@ -12,12 +12,12 @@ namespace ModengTerm.Terminal.Document
     public enum FindScopes
     {
         /// <summary>
-        /// 只查找当前显示的文档
+        /// 只查找当前显示的内容
         /// </summary>
         Document,
 
         /// <summary>
-        /// 查找所有
+        /// 查找所有内容
         /// </summary>
         All
     }

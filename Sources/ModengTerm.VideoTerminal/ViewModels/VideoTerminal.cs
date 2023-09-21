@@ -166,11 +166,7 @@ namespace ModengTerm.Terminal.ViewModels
         private string foreground;
         private double fontSize;
         private string fontFamily;
-
-        /// <summary>
-        /// 是否正在查找
-        /// </summary>
-        private bool find;
+        private int scrollbackMax; // 最多可以有多少滚动行数
 
         #endregion
 
@@ -311,6 +307,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.colorTable = sessionInfo.GetOption<Dictionary<string, string>>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
             this.background = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             this.foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
+            this.scrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK);
 
             #region 初始化历史记录管理器
 
@@ -1124,9 +1121,17 @@ namespace ModengTerm.Terminal.ViewModels
                             int scrollMax = this.mainDocument.FirstLine.PhysicsRow;
                             if (scrollMax > 0)
                             {
-                                // 更新滚动条的值
+                                //if (scrollMax > this.scrollbackMax)
+                                //{
+                                //    // 超出了最多可以滚动的条数
+                                //    this.scrollback.RemoveFirst();
+                                //}
+                                //else
+                                //{
+                                // 可滚动条数在范围内，更细滚动条的值
                                 this.scrollInfo.ScrollMax = scrollMax;
                                 this.scrollInfo.ScrollValue = scrollMax;
+                                //}
                             }
 
                             #endregion

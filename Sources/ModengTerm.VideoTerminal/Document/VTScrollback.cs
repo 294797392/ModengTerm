@@ -49,6 +49,23 @@ namespace ModengTerm.Terminal.Document
         }
 
         /// <summary>
+        /// 移除第一行并更新第一行的指针
+        /// </summary>
+        public void RemoveFirst()
+        {
+            this.RemoveHistory(this.FirstLine);
+
+            VTHistoryLine firstLine;
+            if (!this.TryGetHistory(this.FirstLine.PhysicsRow + 1, out firstLine))
+            {
+                // 不可能发生
+                throw new NotImplementedException();
+            }
+
+            this.FirstLine = firstLine;
+        }
+
+        /// <summary>
         /// 从指定行开始获取指定的行数
         /// </summary>
         /// <param name="startRow"></param>
@@ -71,6 +88,10 @@ namespace ModengTerm.Terminal.Document
 
             return true;
         }
+
+
+
+
 
 
         /// <summary>
@@ -104,6 +125,8 @@ namespace ModengTerm.Terminal.Document
         /// <param name="textLine">历史行对应的文本行</param>
         /// <param name="historyLine">要更新的历史行</param>
         protected abstract void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine);
+
+        protected abstract void RemoveHistory(VTHistoryLine historyLine);
     }
 
     /// <summary>
@@ -140,6 +163,11 @@ namespace ModengTerm.Terminal.Document
             historyLine.PhysicsRow = textLine.PhysicsRow;
             VTUtils.CopyCharacter(textLine.Characters, historyLine.Characters);
         }
+
+        protected override void RemoveHistory(VTHistoryLine historyLine)
+        {
+            this.historyLines.Remove(historyLine.PhysicsRow);
+        }
     }
 
     /// <summary>
@@ -158,6 +186,11 @@ namespace ModengTerm.Terminal.Document
         }
 
         public override bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void RemoveHistory(VTHistoryLine historyLine)
         {
             throw new NotImplementedException();
         }
