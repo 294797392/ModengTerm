@@ -20,6 +20,7 @@ namespace ModengTerm.Rendering
                 case VTDocumentElements.SelectionRange: return new DrawingSelection();
                 case VTDocumentElements.TextLine: return new DrawingLine();
                 case VTDocumentElements.Rectangle: return new DrawingRectangle();
+                case VTDocumentElements.MatchesLine: return new DrawingMatchesLine();
                 default:
                     throw new NotImplementedException();
             }

@@ -85,6 +85,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\MTermWindow.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="Enumerations\DrawModeEnum.cs" />
     <Compile Include="Enumerations\SessionModeEnum.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="OpenedSessionVMFactory.cs" />
     <Compile Include="Rendering\DrawingCanvas.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
+    <Compile Include="Rendering\DrawingMatchesLine.cs" />
     <Compile Include="Rendering\DrawingObjectFactory.cs" />
     <Compile Include="Rendering\DrawingLine.cs" />
     <Compile Include="Rendering\DrawingRectangle.cs" />

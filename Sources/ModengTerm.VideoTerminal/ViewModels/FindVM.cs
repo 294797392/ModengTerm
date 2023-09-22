@@ -15,13 +15,16 @@ namespace ModengTerm.Terminal.ViewModels
 {
     public class FindVM : ViewModelBase
     {
-        private class MatchedLine
+        /// <summary>
+        /// 存储匹配到的结果
+        /// </summary>
+        private class MatchResult
         {
             public List<VTMatches> Matches { get; private set; }
 
             public int PhysicsRow { get; set; }
 
-            public MatchedLine(int physicsRow)
+            public MatchResult(int physicsRow)
             {
                 this.PhysicsRow = physicsRow;
                 this.Matches = new List<VTMatches>();
@@ -38,12 +41,12 @@ namespace ModengTerm.Terminal.ViewModels
         private VideoTerminal videoTerminal;
 
         /// <summary>
-        /// 存储当前要搜索的行数的物理行号
+        /// 存储当前要搜索的第一行物理行号
         /// </summary>
         private int startRow;
 
         /// <summary>
-        /// 存储一共要搜索多少行
+        /// 存储当前要搜索的最后一行物理行号
         /// </summary>
         private int endRow;
 
@@ -65,11 +68,41 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 存储当前命中匹配到的行
         /// </summary>
-        private List<MatchedLine> matchedLines;
+        private List<MatchResult> matchResult;
+
+        private VTMatchesLine matchesLine;
+
+        /// <summary>
+        /// 是否停止查找
+        /// 当窗口关闭的时候会设置该值为true
+        /// 再次查找的时候会设置该值为false
+        /// </summary>
+        private bool stopFind;
+
+        /// <summary>
+        /// 查找提示
+        /// </summary>
+        private string message;
 
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 显示当前查找状态
+        /// </summary>
+        public string Message
+        {
+            get { return this.message; }
+            set
+            {
+                if (this.message != value)
+                {
+                    this.message = value;
+                    this.NotifyPropertyChanged("Message");
+                }
+            }
+        }
 
         public BindableCollection<FindScopes> FindScopeList { get; private set; }
 
@@ -150,7 +183,10 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.FindStartupList = new BindableCollection<FindStartups>();
             this.FindStartupList.AddRange(MTermUtils.GetEnumValues<FindStartups>());
-            this.matchedLines = new List<MatchedLine>();
+            this.matchResult = new List<MatchResult>();
+
+            this.matchesLine = new VTMatchesLine();
+            this.videoTerminal.topMostCanvas.CreateDrawingObject(this.matchesLine);
         }
 
         #endregion
@@ -162,7 +198,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         /// <param name="matchIndex">物理行号</param>
         /// <returns></returns>
-        private MatchedLine MatchLine(int matchIndex)
+        private MatchResult MatchLine(int matchIndex)
         {
             VTHistoryLine historyLine;
             if (!this.videoTerminal.ScrollInfo.TryGetHistory(matchIndex, out historyLine))
@@ -183,7 +219,7 @@ namespace ModengTerm.Terminal.ViewModels
                     return null;
                 }
 
-                MatchedLine matchedLine = new MatchedLine(matchIndex);
+                MatchResult matchedLine = new MatchResult(matchIndex);
 
                 do
                 {
@@ -209,7 +245,7 @@ namespace ModengTerm.Terminal.ViewModels
                     return null;
                 }
 
-                MatchedLine matchedLine = new MatchedLine(matchIndex);
+                MatchResult matchedLine = new MatchResult(matchIndex);
                 matchedLine.Matches.Add(new VTMatches(this.keyword.Length, matchedIndex));
 
                 startIndex = matchedIndex + this.keyword.Length;
@@ -237,7 +273,7 @@ namespace ModengTerm.Terminal.ViewModels
             if (this.endRow >= this.startRow)
             {
                 // 说明从上往下找
-                nextIndex = this.findIndex;
+                nextIndex = this.findIndex + this.startRow;
             }
             else
             {
@@ -268,35 +304,44 @@ namespace ModengTerm.Terminal.ViewModels
         /// 让滚动条滚动到一行处
         /// </summary>
         /// <param name="matches"></param>
-        private void ScrollToMatches(MatchedLine matches)
+        private void ScrollToMatches(MatchResult matches)
         {
-            VTScrollInfo scrollInfo = this.videoTerminal.ScrollInfo;
-
-            int scrollTo = matches.PhysicsRow - this.videoTerminal.RowSize / 2;
-            if (scrollTo < scrollInfo.ScrollMin)
+            // 如果命中的行已经在当前文档里显示出来了，那么就不滚动了
+            // 如果没显示再滚动
+            VTextLine matchesLine = this.videoTerminal.ActiveDocument.FindLine(matches.PhysicsRow);
+            if (matchesLine == null)
             {
-                scrollTo = scrollInfo.ScrollMin;
-            }
-            else if (scrollTo > scrollInfo.ScrollMax)
-            {
-                scrollTo = scrollInfo.ScrollMax;
-            }
+                VTScrollInfo scrollInfo = this.videoTerminal.ScrollInfo;
 
-            this.videoTerminal.ScrollTo(scrollTo);
+                int scrollTo = matches.PhysicsRow - this.videoTerminal.RowSize / 2;
+                if (scrollTo < scrollInfo.ScrollMin)
+                {
+                    scrollTo = scrollInfo.ScrollMin;
+                }
+                else if (scrollTo > scrollInfo.ScrollMax)
+                {
+                    scrollTo = scrollInfo.ScrollMax;
+                }
+
+                this.videoTerminal.ScrollTo(scrollTo);
+            }
         }
 
         /// <summary>
         /// 高亮显示匹配的项
         /// </summary>
         /// <param name="matches"></param>
-        private void HighlightMatches(MatchedLine matches)
+        private void HighlightMatches(MatchResult matches)
         {
             VTextLine textLine = this.videoTerminal.ActiveDocument.FindLine(matches.PhysicsRow);
-            textLine.MatchesList = matches.Matches;
+
+            this.matchesLine.MatchesList = matches.Matches;
+            this.matchesLine.TextLine = textLine;
+            this.matchesLine.OffsetY = textLine.OffsetY;
 
             this.videoTerminal.uiSyncContext.Send((state) =>
             {
-                textLine.RequestInvalidate();
+                this.matchesLine.RequestInvalidate();
             }, null);
         }
 
@@ -304,8 +349,10 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 公开接口
 
-        public void PerformFind()
+        public void Find()
         {
+            this.Message = string.Empty;
+
             if (string.IsNullOrEmpty(this.Keyword))
             {
                 return;
@@ -385,17 +432,24 @@ namespace ModengTerm.Terminal.ViewModels
                 this.dirty = false;
             }
 
-            this.matchedLines.Clear();
+            this.stopFind = false;
+            this.matchResult.Clear();
 
             while (true)
             {
+                if (this.stopFind)
+                {
+                    // 停止查找
+                    break;
+                }
+
                 int matchIndex = this.GetNextMatchIndex();
                 if (matchIndex < 0)
                 {
                     // 到底了
                     if (this.FindOnce)
                     {
-                        MTMessageBox.Info("已经找到最后一行了");
+                        this.Message = "已经找到最后一行了";
                     }
                     else
                     {
@@ -404,7 +458,7 @@ namespace ModengTerm.Terminal.ViewModels
                     return;
                 }
 
-                MatchedLine matches = this.MatchLine(this.findIndex);
+                MatchResult matches = this.MatchLine(matchIndex);
                 if (matches == null)
                 {
                     // 没找到，继续找
@@ -420,10 +474,23 @@ namespace ModengTerm.Terminal.ViewModels
                     }
                     else
                     {
-                        this.matchedLines.Add(matches);
+                        this.matchResult.Add(matches);
                     }
                 }
             }
+        }
+
+        public void Reset()
+        {
+            this.stopFind = true;
+            this.dirty = true;
+            this.matchesLine.MatchesList = null;
+            this.matchesLine.OffsetX = 0;
+            this.matchesLine.OffsetY = 0;
+            this.matchesLine.TextBlocks.Clear();
+            this.matchesLine.TextLine = null;
+            this.matchesLine.RequestInvalidate();
+            this.Message = string.Empty;
         }
 
         #endregion

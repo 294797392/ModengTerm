@@ -36,6 +36,11 @@ namespace XTerminal.Document
         /// 滚动条
         /// </summary>
         Scrollbar,
+
+        /// <summary>
+        /// 匹配的行
+        /// </summary>
+        MatchesLine
     }
 
     /// <summary>

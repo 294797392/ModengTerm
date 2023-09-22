@@ -18,12 +18,6 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public int Index { get; set; }
 
-        /// <summary>
-        /// 匹配的文本对应的格式化文本信息，动态生成
-        /// 渲染的时候会用到
-        /// </summary>
-        public VTFormattedText FormattedText { get; set; }
-
         public VTMatches(int length, int index)
         {
             this.Length = length;

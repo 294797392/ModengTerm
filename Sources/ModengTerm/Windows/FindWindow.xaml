@@ -1,15 +1,17 @@
-﻿<Window x:Class="ModengTerm.Windows.FindWindow"
+﻿<mcontrols:MTermWindow x:Class="ModengTerm.Windows.FindWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Windows"
+        xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
         xmlns:converter="clr-namespace:ModengTerm"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText2000}" 
         Height="230" Width="400" ResizeMode="NoResize"
-        WindowStartupLocation="CenterOwner">
-
+        WindowStartupLocation="CenterOwner"
+        Closed="Window_Closed">
+    
     <Window.Resources>
         
         <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
@@ -87,11 +89,22 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" 
-                    Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="查找" Click="ButtonFind_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
-            <Button Content="查找全部" Click="ButtonFindAll_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
-        </StackPanel>
+        <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="{Binding Path=Message}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="Red" FontWeight="Bold"/>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="查找" Click="ButtonFind_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Visibility="Collapsed" Content="查找全部" Click="ButtonFindAll_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            </StackPanel>
+
+        </Grid>
+        
 
     </Grid>
-</Window>
+</mcontrols:MTermWindow>

@@ -371,15 +371,15 @@ namespace XTerminal.UserControls
             return document;
         }
 
-        public void AddCanvas(IDrawingDocument canvas)
+        public void InsertDocument(int index, IDrawingDocument document)
         {
             this.Dispatcher.Invoke(() =>
             {
-                GridCanvasList.Children.Add(canvas as UIElement);
+                GridCanvasList.Children.Insert(0, document as UIElement);
             });
         }
 
-        public void RemoveCanvas(IDrawingDocument canvas)
+        public void RemoveDocument(IDrawingDocument canvas)
         {
             base.Dispatcher.Invoke(() =>
             {

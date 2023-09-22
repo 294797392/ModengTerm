@@ -46,7 +46,7 @@ namespace ModengTerm.Terminal
         /// 使用32位整形表示key
         /// 如果颜色使用RGB表示，那么RGB占32位整形的低24位
         /// </summary>
-        private static Dictionary<int, VTColor> colorMap = new Dictionary<int, VTColor>();
+        private static readonly Dictionary<string, VTColor> colorMap = new Dictionary<string, VTColor>();
         private static readonly string[] Splitter = new string[] { "," };
 
         public static readonly VTColor DarkBlack = new NamedColor("DarkBlack");
@@ -66,18 +66,24 @@ namespace ModengTerm.Terminal
         public static readonly VTColor BrightCyan = new NamedColor("BrightCyan");
         public static readonly VTColor BrightWhite = new NamedColor("BrightWhite");
 
+        /// <summary>
+        /// r,g,b
+        /// </summary>
         public string Name { get; protected set; }
 
         public static VTColor CreateFromRgb(byte r, byte g, byte b)
         {
-            int key = 0 | r << 8 | g << 8 | b;
-            VTColor color;
-            if (!colorMap.TryGetValue(key, out color))
-            {
-                color = new RgbColor(r, g, b);
-                colorMap[key] = color;
-            }
-            return color;
+            string rgbKey = string.Format("{0},{1},{2}", r, g, b);
+            return VTColor.CreateFromRgbKey(rgbKey);
+
+            //int key = 0 | r << 8 | g << 8 | b;
+            //VTColor color;
+            //if (!colorMap.TryGetValue(key, out color))
+            //{
+            //    color = new RgbColor(r, g, b);
+            //    colorMap[key] = color;
+            //}
+            //return color;
         }
 
         /// <summary>
@@ -87,13 +93,18 @@ namespace ModengTerm.Terminal
         /// <returns></returns>
         public static VTColor CreateFromRgbKey(string rgbKey)
         {
-            string[] values = rgbKey.Split(Splitter, StringSplitOptions.RemoveEmptyEntries);
+            VTColor vtc;
+            if (!colorMap.TryGetValue(rgbKey, out vtc))
+            {
+                string[] values = rgbKey.Split(Splitter, StringSplitOptions.RemoveEmptyEntries);
 
-            byte r = byte.Parse(values[0]);
-            byte g = byte.Parse(values[1]);
-            byte b = byte.Parse(values[2]);
-
-            return VTColor.CreateFromRgb(r, g, b);
+                byte r = byte.Parse(values[0]);
+                byte g = byte.Parse(values[1]);
+                byte b = byte.Parse(values[2]);
+                vtc = new RgbColor(r, g, b);
+                colorMap[rgbKey] = vtc;
+            }
+            return vtc;
         }
 
         public override string ToString()

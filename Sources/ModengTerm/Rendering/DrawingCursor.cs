@@ -25,9 +25,9 @@ namespace ModengTerm.Rendering
         private Brush brush;
         private Rect rect;
 
-        protected override void OnInitialize(VTDocumentElement element)
+        protected override void OnInitialize()
         {
-            this.cursor = element as VTCursor;
+            this.cursor = this.documentElement as VTCursor;
             this.brush = DrawingUtils.GetBrush(this.cursor.Color);
 
             switch (this.cursor.Style)

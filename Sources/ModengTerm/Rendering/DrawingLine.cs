@@ -64,12 +64,11 @@ namespace ModengTerm.Rendering
 
         #region IDrawingObjectText
 
-        protected override void OnInitialize(VTDocumentElement documentElement)
+        protected override void OnInitialize()
         {
-            this.textLine = documentElement as VTextLine;
+            this.textLine = this.documentElement as VTextLine;
 
-            FontFamily fontFamily = new FontFamily(textLine.Style.FontFamily);
-            this.typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            this.typeface = DrawingUtils.GetTypeface(this.textLine.Style);
             this.foreground = DrawingUtils.GetBrush(textLine.Style.Foreground);
         }
 
@@ -78,18 +77,6 @@ namespace ModengTerm.Rendering
             FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine, dc);
             DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
             dc.DrawText(formattedText, DrawingUtils.ZeroPoint);
-
-            // 如果有匹配项则渲染匹配项
-            if (this.textLine.MatchesList != null &&
-                this.textLine.MatchesList.Count > 0)
-            {
-                foreach (VTMatches matches in this.textLine.MatchesList)
-                {
-                    FormattedText text = this.CreateFormattedText(matches.FormattedText, dc);
-
-                    dc.DrawText(text, new Point(matches.FormattedText.OffsetX, this.Offset.Y));
-                }
-            }
         }
 
         /// <summary>
@@ -155,74 +142,6 @@ namespace ModengTerm.Rendering
             FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
             Geometry geometry = formattedText.BuildHighlightGeometry(DrawingUtils.ZeroPoint, startIndex, count);
             return new VTRect(geometry.Bounds.Left, geometry.Bounds.Top, geometry.Bounds.Width, geometry.Bounds.Height);
-        }
-
-        private FormattedText CreateFormattedText(VTFormattedText textData, DrawingContext dc)
-        {
-            FormattedText formattedText = new FormattedText(textData.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, this.typeface,
-                this.textLine.Style.FontSize, this.foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
-
-            #region 画文本装饰
-
-            foreach (VTextAttribute textAttribute in textData.Attributes)
-            {
-                switch (textAttribute.Attribute)
-                {
-                    case VTextAttributes.Foreground:
-                        {
-                            VTColor color = textAttribute.Parameter as VTColor;
-                            Brush brush = DrawingUtils.GetBrush(color, textLine.Style.ColorTable);
-                            formattedText.SetForegroundBrush(brush, textAttribute.StartIndex, textAttribute.Count);
-                            break;
-                        }
-
-                    case VTextAttributes.Background:
-                        {
-                            // 背景颜色最后画, 因为文本的粗细会影响到背景颜色的大小
-                            break;
-                        }
-
-                    case VTextAttributes.Bold:
-                        {
-                            //formattedText.SetFontWeight(FontWeights.Bold, startIndex, count);
-                            break;
-                        }
-
-                    case VTextAttributes.Italics:
-                        {
-                            formattedText.SetFontStyle(FontStyles.Italic, textAttribute.StartIndex, textAttribute.Count);
-                            break;
-                        }
-
-                    case VTextAttributes.Underline:
-                        {
-                            formattedText.SetTextDecorations(TextDecorations.Underline, textAttribute.StartIndex, textAttribute.Count);
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
-            }
-
-            #endregion
-
-            // 画背景颜色
-            // 背景颜色要在最后画，因为文本的粗细会影响到背景颜色的大小
-            foreach (VTextAttribute textAttribute in textData.Attributes)
-            {
-                if (textAttribute.Attribute != VTextAttributes.Background)
-                {
-                    continue;
-                }
-
-                VTColor color = textAttribute.Parameter as VTColor;
-                Brush brush = DrawingUtils.GetBrush(color, textLine.Style.ColorTable);
-                Geometry geometry = formattedText.BuildHighlightGeometry(new Point(textData.OffsetX, textData.OffsetY), textAttribute.StartIndex, textAttribute.Count);
-                dc.DrawRectangle(brush, DrawingUtils.TransparentPen, geometry.Bounds);
-            }
-
-            return formattedText;
         }
 
         #endregion

@@ -197,11 +197,9 @@ namespace XTerminal.Document
                 {
                     FontSize = this.options.FontSize,
                     FontFamily = this.options.FontFamily,
-                    Foreground = this.options.ForegroundColor,
                     ColorTable = this.options.ColorTable,
-                    ForeColor = VTColor.CreateFromRgbKey(this.options.ForegroundColor),
+                    Foreground = this.options.ForegroundColor,
                     Background = this.options.BackgroundColor,
-                    BackColor = VTColor.CreateFromRgbKey(this.options.BackgroundColor)
                 },
             };
 

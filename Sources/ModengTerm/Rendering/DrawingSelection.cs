@@ -25,9 +25,9 @@ namespace ModengTerm.Rendering
         {
         }
 
-        protected override void OnInitialize(VTDocumentElement documentElement)
+        protected override void OnInitialize()
         {
-            this.textSelection = documentElement as VTextSelection;
+            this.textSelection = this.documentElement as VTextSelection;
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
             this.brush = DefaultSelectionBrush;

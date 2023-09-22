@@ -21,9 +21,9 @@ namespace XTerminal.Document.Rendering
         /// <returns></returns>
         IDrawingDocument CreateDocument();
 
-        void AddCanvas(IDrawingDocument canvas);
+        void InsertDocument(int index, IDrawingDocument document);
 
-        void RemoveCanvas(IDrawingDocument canvas);
+        void RemoveDocument(IDrawingDocument canvas);
 
         /// <summary>
         /// 获取滚动条信息

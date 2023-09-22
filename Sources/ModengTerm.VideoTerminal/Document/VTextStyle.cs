@@ -21,18 +21,14 @@ namespace XTerminal.Document
         public double FontSize { get; set; }
 
         /// <summary>
-        /// 文本的颜色
+        /// 终端的前景色
         /// </summary>
         public string Foreground { get; set; }
 
         /// <summary>
-        /// 文本颜色
+        /// 终端的背景色
         /// </summary>
-        public VTColor ForeColor { get; set; }
-
         public string Background { get; set; }
-
-        public VTColor BackColor { get; set; }
 
         /// <summary>
         /// 颜色表

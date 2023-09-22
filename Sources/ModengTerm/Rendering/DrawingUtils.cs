@@ -30,6 +30,7 @@ namespace ModengTerm.Rendering
         /// RGB字符串 -> Brush
         /// </summary>
         private static readonly Dictionary<string, Brush> BrushMap = new Dictionary<string, Brush>();
+        private static readonly Dictionary<string, Typeface> TypefaceMap = new Dictionary<string, Typeface>();
 
         static DrawingUtils()
         {
@@ -46,7 +47,17 @@ namespace ModengTerm.Rendering
             return (VTKeys)key;
         }
 
-
+        public static Typeface GetTypeface(VTextStyle textStyle)
+        {
+            Typeface typeface;
+            if (!TypefaceMap.TryGetValue(textStyle.FontFamily, out typeface))
+            {
+                FontFamily fontFamily = new FontFamily(textStyle.FontFamily);
+                typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+                TypefaceMap[textStyle.FontFamily] = typeface;
+            }
+            return typeface;
+        }
 
         /// <summary>
         /// VTColor转Brush
@@ -101,7 +112,6 @@ namespace ModengTerm.Rendering
         /// 根据VTextLine生成一个FormattedText
         /// </summary>
         /// <param name="textLine"></param>
-        /// <param name="colorTable">颜色表，使用颜色表里的颜色来渲染带颜色的文本</param>
         /// <param name="dc">画Background的时候需要</param>
         /// <returns></returns>
         public static FormattedText CreateFormattedText(VTextLine textLine, DrawingContext dc = null)
@@ -115,23 +125,38 @@ namespace ModengTerm.Rendering
                 textData.Text = " ";
             }
 
-            //string text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
-            string text = textData.Text;
+            textData.Text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
 
-            DrawingLine drawingLine = textLine.DrawingObject as DrawingLine;
-            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, drawingLine.typeface,
-                textLine.Style.FontSize, drawingLine.foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
+            textData.Style = textLine.Style;
+
+            return DrawingUtils.CreateFormattedText(textData, dc);
+        }
+
+        /// <summary>
+        /// 根据VTextLine生成一个FormattedText
+        /// </summary>
+        /// <param name="textBlock"></param>
+        /// <param name="dc">画Background的时候需要</param>
+        /// <returns></returns>
+        public static FormattedText CreateFormattedText(VTFormattedText textBlock, DrawingContext dc = null)
+        {
+            VTextStyle textStyle = textBlock.Style;
+            Brush foreground = DrawingUtils.GetBrush(textStyle.Foreground);
+            Typeface typeface = DrawingUtils.GetTypeface(textStyle);
+
+            FormattedText formattedText = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
+                textStyle.FontSize, foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
 
             #region 画文本装饰
 
-            foreach (VTextAttribute textAttribute in textData.Attributes)
+            foreach (VTextAttribute textAttribute in textBlock.Attributes)
             {
                 switch (textAttribute.Attribute)
                 {
                     case VTextAttributes.Foreground:
                         {
                             VTColor color = textAttribute.Parameter as VTColor;
-                            Brush brush = DrawingUtils.GetBrush(color, textLine.Style.ColorTable);
+                            Brush brush = DrawingUtils.GetBrush(color, textStyle.ColorTable);
                             formattedText.SetForegroundBrush(brush, textAttribute.StartIndex, textAttribute.Count);
                             break;
                         }
@@ -171,7 +196,7 @@ namespace ModengTerm.Rendering
             {
                 // 画背景颜色
                 // 背景颜色要在最后画，因为文本的粗细会影响到背景颜色的大小
-                foreach (VTextAttribute textAttribute in textData.Attributes)
+                foreach (VTextAttribute textAttribute in textBlock.Attributes)
                 {
                     if (textAttribute.Attribute != VTextAttributes.Background)
                     {
@@ -179,9 +204,9 @@ namespace ModengTerm.Rendering
                     }
 
                     VTColor color = textAttribute.Parameter as VTColor;
-                    Brush brush = DrawingUtils.GetBrush(color, textLine.Style.ColorTable);
-                    Geometry geometry = formattedText.BuildHighlightGeometry(ZeroPoint, textAttribute.StartIndex, textAttribute.Count);
-                    dc.DrawRectangle(brush, DrawingUtils.TransparentPen, geometry.Bounds);
+                    Brush brush = DrawingUtils.GetBrush(color, textStyle.ColorTable);
+                    Geometry geometry = formattedText.BuildHighlightGeometry(new Point(textBlock.OffsetX, textBlock.OffsetY), textAttribute.StartIndex, textAttribute.Count);
+                    dc.DrawRectangle(brush, null, geometry.Bounds);
                 }
             }
 

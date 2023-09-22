@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Controls;
+using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using System;
@@ -21,7 +22,7 @@ namespace ModengTerm.Windows
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindWindow : Window
+    public partial class FindWindow : MTermWindow
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FindWindow");
 
@@ -56,7 +57,7 @@ namespace ModengTerm.Windows
 
                 try
                 {
-                    this.viewModel.PerformFind();
+                    this.viewModel.Find();
                 }
                 catch (Exception ex)
                 {
@@ -77,6 +78,11 @@ namespace ModengTerm.Windows
         private void ButtonFindAll_Click(object sender, RoutedEventArgs e)
         {
             this.FindAsync(false);
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            this.viewModel.Reset();
         }
     }
 }

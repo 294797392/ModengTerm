@@ -17,7 +17,7 @@ namespace ModengTerm.Rendering
     {
         #region 实例变量
 
-        private VTDocumentElement documentElement;
+        protected VTDocumentElement documentElement;
 
         #endregion
 
@@ -37,7 +37,7 @@ namespace ModengTerm.Rendering
 
         #region 抽象方法
 
-        protected abstract void OnInitialize(VTDocumentElement documentElement);
+        protected abstract void OnInitialize();
 
         protected virtual void OnRelease()
         { }
@@ -52,7 +52,7 @@ namespace ModengTerm.Rendering
         {
             this.documentElement = documentElement;
 
-            this.OnInitialize(documentElement);
+            this.OnInitialize();
         }
 
         public void Draw()

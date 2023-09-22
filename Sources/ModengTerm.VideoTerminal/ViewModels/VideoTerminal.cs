@@ -322,7 +322,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.topMostCanvas = this.videoTerminal.CreateDocument();
             this.topMostElements = new List<VTDocumentElement>();
 
-            this.videoTerminal.AddCanvas(this.topMostCanvas);
+            this.videoTerminal.InsertDocument(0, this.topMostCanvas);
 
             #region 初始化历史记录管理器
 
@@ -412,7 +412,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.mainDocument = new VTDocument(documentOptions, this.mainCanvas, false) { Name = "MainDocument" };
             this.alternateDocument = new VTDocument(documentOptions, this.alternateCanvas, true) { Name = "AlternateDocument" };
             this.activeDocument = this.mainDocument;
-            this.videoTerminal.AddCanvas(this.mainDocument.Drawing);
+            this.videoTerminal.InsertDocument(0, this.mainDocument.Drawing);
 
             #endregion
 
@@ -1513,8 +1513,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         IDrawingDocument remove = this.mainDocument.Drawing;
                         IDrawingDocument add = this.alternateDocument.Drawing;
-                        this.videoTerminal.RemoveCanvas(remove);
-                        this.videoTerminal.AddCanvas(add);
+                        this.videoTerminal.RemoveDocument(remove);
+                        this.videoTerminal.InsertDocument(0, add);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1532,8 +1532,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         IDrawingDocument remove = this.alternateDocument.Drawing;
                         IDrawingDocument add = this.mainDocument.Drawing;
-                        this.videoTerminal.RemoveCanvas(remove);
-                        this.videoTerminal.AddCanvas(add);
+                        this.videoTerminal.RemoveDocument(remove);
+                        this.videoTerminal.InsertDocument(0, add);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;

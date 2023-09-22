@@ -52,8 +52,6 @@ namespace XTerminal.Document
 
         private int physicsRow;
 
-        private List<VTMatches> matchesList;
-
         #endregion
 
         #region 属性
@@ -104,22 +102,6 @@ namespace XTerminal.Document
         /// 获取该行字符的只读集合
         /// </summary>
         public List<VTCharacter> Characters { get { return this.characters; } }
-
-        /// <summary>
-        /// 匹配到的文本索引
-        /// </summary>
-        public List<VTMatches> MatchesList 
-        {
-            get { return this.matchesList; }
-            set
-            {
-                if (this.matchesList != value)
-                {
-                    this.matchesList = value;
-                    this.SetRenderDirty(true);
-                }
-            }
-        }
 
         #endregion
 
@@ -388,7 +370,8 @@ namespace XTerminal.Document
         }
 
         /// <summary>
-        /// 用空白符填充该行所有字符
+        /// 清除该行所有字符
+        /// 做法是用空白符填充该行所有字符
         /// </summary>
         public void EraseAll()
         {
@@ -531,44 +514,44 @@ namespace XTerminal.Document
 
         #endregion
 
-        protected override void OnRender()
-        {
-            if (this.matchesList != null && this.matchesList.Count > 0)
-            {
-                // 先拷贝要显示的字符
-                List<VTCharacter> characters = new List<VTCharacter>();
-                VTUtils.CopyCharacter(this.Characters, characters);
+        //protected override void OnRender()
+        //{
+        //    if (this.matchesList != null && this.matchesList.Count > 0)
+        //    {
+        //        // 先拷贝要显示的字符
+        //        List<VTCharacter> characters = new List<VTCharacter>();
+        //        VTUtils.CopyCharacter(this.Characters, characters);
 
-                foreach (VTMatches matches in this.MatchesList)
-                {
-                    #region 更新前景色和背景色
+        //        foreach (VTMatches matches in this.MatchesList)
+        //        {
+        //            #region 更新前景色和背景色
 
-                    // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
-                    // TODO：有可能背景不是纯色，而是图片或者视频
-                    for (int i = 0; i < matches.Length; i++)
-                    {
-                        VTCharacter character = this.characters[matches.Index + i];
+        //            // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
+        //            // TODO：有可能背景不是纯色，而是图片或者视频
+        //            for (int i = 0; i < matches.Length; i++)
+        //            {
+        //                VTCharacter character = characters[matches.Index + i];
 
-                        VTextAttributeState foregroundAttribute = character.AttributeList[(int)VTextAttributes.Foreground];
-                        foregroundAttribute.Enabled = true;
-                        foregroundAttribute.Parameter = this.Style.BackColor;
+        //                VTextAttributeState foregroundAttribute = character.AttributeList[(int)VTextAttributes.Foreground];
+        //                foregroundAttribute.Enabled = true;
+        //                foregroundAttribute.Parameter = this.Style.BackColor;
 
-                        VTextAttributeState backgroundAttribute = character.AttributeList[(int)VTextAttributes.Background];
-                        backgroundAttribute.Enabled = true;
-                        backgroundAttribute.Parameter = this.Style.ForeColor;
-                    }
+        //                VTextAttributeState backgroundAttribute = character.AttributeList[(int)VTextAttributes.Background];
+        //                backgroundAttribute.Enabled = true;
+        //                backgroundAttribute.Parameter = this.Style.ForeColor;
+        //            }
 
-                    #endregion
+        //            #endregion
 
-                    VTRect rect = this.MeasureTextBlock(matches.Index, matches.Length);
+        //            VTRect rect = this.MeasureTextBlock(matches.Index, matches.Length);
 
-                    VTFormattedText formattedText = VTUtils.CreateFormattedText(this.characters, matches.Index, matches.Length);
-                    formattedText.OffsetX = rect.Left;
-                    formattedText.OffsetY = this.OffsetY;
+        //            VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
+        //            formattedText.OffsetX = rect.Left;
+        //            formattedText.OffsetY = this.OffsetY;
 
-                    matches.FormattedText = formattedText;
-                }
-            }
-        }
+        //            matches.FormattedText = formattedText;
+        //        }
+        //    }
+        //}
     }
 }

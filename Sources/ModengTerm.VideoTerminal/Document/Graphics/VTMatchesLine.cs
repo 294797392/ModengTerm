@@ -10,13 +10,13 @@ namespace ModengTerm.Terminal.Document.Graphics
     /// <summary>
     /// 用来渲染一个VTextLine里的文本块
     /// </summary>
-    public class VTMatchesLine : VTextElement
+    public class VTMatchesLine : VTDocumentElement
     {
         #region 实例变量
 
         private VTextLine textLine;
-        private List<int> matchedIndexs;
-        private List<VTCharacter> characters;
+
+        private List<VTMatches> matchesList;
 
         private bool dirty;
 
@@ -24,7 +24,7 @@ namespace ModengTerm.Terminal.Document.Graphics
 
         #region 属性
 
-        public override VTDocumentElements Type => VTDocumentElements.MatchesText;
+        public override VTDocumentElements Type => VTDocumentElements.MatchesLine;
 
         /// <summary>
         /// 该文本块关联的文本行
@@ -34,57 +34,40 @@ namespace ModengTerm.Terminal.Document.Graphics
             get { return this.textLine; }
             set
             {
-                this.textLine = value;
-                this.SetDirty(true);
+                if (this.textLine != value)
+                {
+                    this.textLine = value;
+                    this.SetDirty(true);
+                }
             }
         }
 
-        /// <summary>
-        /// 起始字符索引
-        /// </summary>
-        public List<int> MatchedIndexs
+        public List<VTMatches> MatchesList
         {
-            get { return this.matchedIndexs; }
+            get { return this.matchesList; }
             set
             {
-                if (this.matchedIndexs != value)
+                if (this.matchesList != value)
                 {
-                    this.matchedIndexs = value;
-
+                    this.matchesList = value;
                     this.SetDirty(true);
                 }
             }
         }
 
         /// <summary>
-        /// 每个匹配项的长度
-        /// </summary>
-        public int Length { get; set; }
-
-        /// <summary>
-        /// 当前终端的背景颜色
-        /// </summary>
-        public VTColor Background { get; set; }
-
-        /// <summary>
-        /// 当前终端的前景色
-        /// </summary>
-        public VTColor Foreground { get; set; }
-
-        /// <summary>
         /// 匹配的文本块
+        /// 用来渲染图形
         /// </summary>
-        public List<VTFormattedText> MatchedBlocks { get; private set; }
+        public List<VTFormattedText> TextBlocks { get; private set; }
 
         #endregion
 
         #region 构造方法
 
-        public VTMatchesLine(VTDocument owner) :
-            base(owner)
+        public VTMatchesLine()
         {
-            this.characters = new List<VTCharacter>();
-            this.MatchedBlocks = new List<VTFormattedText>();
+            this.TextBlocks = new List<VTFormattedText>();
         }
 
         #endregion
@@ -96,60 +79,67 @@ namespace ModengTerm.Terminal.Document.Graphics
             if (this.dirty != dirty)
             {
                 this.dirty = dirty;
-
-                base.SetRenderDirty(true);
             }
         }
 
         #endregion
 
-        #region VTextElement
+        #region VTDocumentElement
 
         public override void RequestInvalidate()
         {
-            if (!this.dirty)
+            if (this.arrangeDirty)
             {
-                return;
+                this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
+
+                this.arrangeDirty = false;
             }
 
-            this.MatchedBlocks.Clear();
-
-            // 先拷贝要显示的字符
-            VTUtils.CopyCharacter(this.TextLine.Characters, this.characters);
-
-            foreach (int startIndex in this.MatchedIndexs)
+            if (this.dirty)
             {
-                #region 更新前景色和背景色
+                this.TextBlocks.Clear();
 
-                // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
-                // TODO：有可能背景不是纯色，而是图片或者视频
-                for (int i = 0; i < this.Length; i++)
+                if (this.matchesList != null && this.matchesList.Count > 0)
                 {
-                    VTCharacter character = this.characters[startIndex + i];
+                    // 先拷贝要显示的字符
+                    List<VTCharacter> characters = new List<VTCharacter>();
+                    VTUtils.CopyCharacter(this.textLine.Characters, characters);
 
-                    VTextAttributeState foregroundAttribute = character.AttributeList[(int)VTextAttributes.Foreground];
-                    foregroundAttribute.Enabled = true;
-                    foregroundAttribute.Parameter = VTColor.DarkGreen;// this.Background;
+                    foreach (VTMatches matches in this.MatchesList)
+                    {
+                        #region 更新前景色和背景色
 
-                    VTextAttributeState backgroundAttribute = character.AttributeList[(int)VTextAttributes.Background];
-                    backgroundAttribute.Enabled = true;
-                    backgroundAttribute.Parameter = VTColor.DarkGreen;// this.Foreground;
+                        // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
+                        // TODO：有可能背景不是纯色，而是图片或者视频
+                        for (int i = 0; i < matches.Length; i++)
+                        {
+                            VTCharacter character = characters[matches.Index + i];
+
+                            VTextAttributeState foregroundAttribute = character.AttributeList[(int)VTextAttributes.Foreground];
+                            foregroundAttribute.Enabled = true;
+                            foregroundAttribute.Parameter = VTColor.CreateFromRgbKey(this.textLine.Style.Background);
+
+                            VTextAttributeState backgroundAttribute = character.AttributeList[(int)VTextAttributes.Background];
+                            backgroundAttribute.Enabled = true;
+                            backgroundAttribute.Parameter = VTColor.CreateFromRgbKey(this.textLine.Style.Foreground);
+                        }
+
+                        #endregion
+
+                        VTRect rect = this.textLine.MeasureTextBlock(matches.Index, matches.Length);
+
+                        VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
+                        formattedText.OffsetX = rect.Left;
+                        formattedText.Style = this.textLine.Style;
+
+                        this.TextBlocks.Add(formattedText);
+                    }
                 }
 
-                #endregion
+                this.DrawingObject.Draw();
 
-                VTRect rect = this.textLine.MeasureTextBlock(startIndex, this.Length);
-
-                VTFormattedText formattedText = VTUtils.CreateFormattedText(this.characters, startIndex, this.Length);
-                formattedText.OffsetX = rect.Left;
-                formattedText.OffsetY = this.textLine.OffsetY;
-
-                this.MatchedBlocks.Add(formattedText);
+                this.dirty = false;
             }
-
-            base.RequestInvalidate();
-
-            this.SetDirty(false);
         }
 
         #endregion

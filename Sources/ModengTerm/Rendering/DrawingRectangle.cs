@@ -17,9 +17,9 @@ namespace ModengTerm.Rendering
 
         private VTDocumentRectangle rectangle;
 
-        protected override void OnInitialize(VTDocumentElement documentElement)
+        protected override void OnInitialize()
         {
-            this.rectangle = documentElement as VTDocumentRectangle;
+            this.rectangle = this.documentElement as VTDocumentRectangle;
 
             Brush penBrush = DrawingUtils.GetBrush(this.rectangle.BorderColor);
             this.pen = new Pen(penBrush, this.rectangle.BorderWidth);

@@ -32,6 +32,11 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public double OffsetY { get; set; }
 
+        /// <summary>
+        /// 默认文本样式
+        /// </summary>
+        public VTextStyle Style { get; set; }
+
         public VTFormattedText()
         {
             this.Text = string.Empty;
