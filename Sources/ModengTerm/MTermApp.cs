@@ -186,7 +186,7 @@ namespace ModengTerm
             {
                 VTCursor cursor = vt.Cursor;
 
-                cursor.IsVisible = !cursor.IsVisible;
+                cursor.BlinkState = !cursor.BlinkState;
 
                 try
                 {

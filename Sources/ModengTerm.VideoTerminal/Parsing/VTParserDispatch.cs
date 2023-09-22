@@ -651,7 +651,6 @@ namespace XTerminal.Parser
                     case DECPrivateMode.ATT610_StartCursorBlink:
                         {
                             // 控制是否要闪烁光标
-                            logger.DebugFormat("DECPrivateMode - ATT610_StartCursorBlink");
                             this.NotifyActionEvent(VTActions.ATT610_StartCursorBlink, enable);
                             break;
                         }
@@ -659,7 +658,6 @@ namespace XTerminal.Parser
                     case DECPrivateMode.DECTCEM_TextCursorEnableMode:
                         {
                             // 控制是否要显示光标
-                            logger.DebugFormat("DECPrivateMode - DECTCEM_TextCursorEnableMode");
                             this.NotifyActionEvent(VTActions.DECTCEM_TextCursorEnableMode, enable);
                             break;
                         }

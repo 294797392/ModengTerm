@@ -138,7 +138,7 @@ namespace ModengTerm.Terminal
                     }
                 }
 
-                builder.AppendFormat("'>{0}</span>", character.Character);
+                builder.AppendFormat("'>{0}</span>", character.Character == ' ' ? "&nbsp" : character.Character.ToString());
             }
 
             builder.AppendLine("</br>");

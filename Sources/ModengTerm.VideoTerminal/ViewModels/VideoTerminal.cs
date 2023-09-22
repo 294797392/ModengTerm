@@ -759,31 +759,9 @@ namespace ModengTerm.Terminal.ViewModels
 
                 #endregion
 
-                #region 更新光标位置
+                #region 重绘光标
 
                 VTCursor cursor = document.Cursor;
-                int cursorCol = cursor.Column;
-                VTextLine activeLine = document.FindLine(document.ActivePhysicsRow);
-
-                // 如果显示的是主缓冲区，那么光标在最后一行的时候才更新
-                // 如果显示的是备用缓冲区，光标可以在任意一个位置显示，那么直接渲染光标
-
-                if (activeLine != null)
-                {
-                    cursor.OffsetY = activeLine.OffsetY;
-                    // 有可能有中文字符，一个中文字符占用2列
-                    // 先通过光标所在列找到真正的字符所在列
-                    int characterIndex = activeLine.FindCharacterIndex(cursorCol - 1);
-                    VTRect rect = activeLine.MeasureTextBlock(characterIndex, 1);
-                    cursor.OffsetX = rect.Right;
-                }
-                else
-                {
-                    // 此时说明有滚动，有滚动的情况下直接隐藏光标
-                    cursor.OffsetX = int.MinValue;
-                    cursor.OffsetX = int.MinValue;
-                }
-
                 cursor.RequestInvalidate();
 
                 #endregion
@@ -1506,18 +1484,24 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case VTActions.XTERM_BracketedPasteMode:
                     {
-                        logger.ErrorFormat("未实现XTERM_BracketedPasteMode");
                         this.xtermBracketedPasteMode = Convert.ToBoolean(parameter);
+                        VTDebug.Context.WriteInteractive(action, "{0}", this.xtermBracketedPasteMode);
                         break;
                     }
 
                 case VTActions.ATT610_StartCursorBlink:
                     {
+                        bool enable = Convert.ToBoolean(parameter);
+                        VTDebug.Context.WriteInteractive(action, "{0}", enable);
+                        this.Cursor.AllowBlink = enable;
                         break;
                     }
 
                 case VTActions.DECTCEM_TextCursorEnableMode:
                     {
+                        bool enable = Convert.ToBoolean(parameter);
+                        VTDebug.Context.WriteInteractive(action, "{0}", enable);
+                        this.Cursor.IsVisible = enable;
                         break;
                     }
 

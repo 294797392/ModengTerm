@@ -18,6 +18,7 @@ namespace ModengTerm.Rendering
         #region 实例变量
 
         protected VTDocumentElement documentElement;
+        private bool visible = true;
 
         #endregion
 
@@ -77,6 +78,25 @@ namespace ModengTerm.Rendering
         public void Arrange(double x, double y)
         {
             this.Offset = new Vector(x, y);
+        }
+
+        public void SetVisible(bool visible)
+        {
+            if (this.visible == visible)
+            {
+                return;
+            }
+
+            if (visible)
+            {
+                this.Opacity = 1;
+            }
+            else
+            {
+                this.Opacity = 0;
+            }
+
+            this.visible = visible;
         }
 
         #endregion

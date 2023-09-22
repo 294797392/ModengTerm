@@ -39,5 +39,11 @@ namespace XTerminal.Document.Rendering
         /// <param name="x"></param>
         /// <param name="y"></param>
         void Arrange(double x, double y);
+
+        /// <summary>
+        /// 设置是否显示该元素
+        /// </summary>
+        /// <param name="visible"></param>
+        void SetVisible(bool visible);
     }
 }

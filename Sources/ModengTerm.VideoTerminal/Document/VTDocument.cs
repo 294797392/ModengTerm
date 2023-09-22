@@ -146,9 +146,8 @@ namespace XTerminal.Document
 
             this.AttributeStates = VTUtils.CreateTextAttributeStates();
 
-            this.Cursor = new VTCursor()
+            this.Cursor = new VTCursor(this)
             {
-                Blinking = true,
                 Color = options.CursorColor,
                 OffsetX = 0,
                 OffsetY = 0,
@@ -156,8 +155,10 @@ namespace XTerminal.Document
                 Column = 0,
                 Style = options.CursorStyle,
                 BlinkSpeed = options.CursorSpeed,
-                BlinkRemain = (int)options.CursorSpeed,
-                Size = options.CursorSize
+                Size = options.CursorSize,
+                AllowBlink = true,
+                IsVisible = true,
+                BlinkState = true
             };
             this.Cursor.DrawingObject = this.Drawing.CreateDrawingObject(this.Cursor);
 
