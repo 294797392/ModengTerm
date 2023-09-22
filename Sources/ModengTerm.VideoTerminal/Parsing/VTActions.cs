@@ -141,6 +141,8 @@ namespace XTerminal.Parser
         /// </summary>
         CHA_CursorHorizontalAbsolute,
 
+        VPA_VerticalLinePositionAbsolute,
+
         /// <summary>
         /// 退格
         /// </summary>

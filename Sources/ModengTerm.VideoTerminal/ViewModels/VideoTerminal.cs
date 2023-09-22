@@ -1,7 +1,9 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Document.Graphics;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Session;
 using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -20,7 +22,6 @@ using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
-using XTerminal.Session;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -605,11 +606,11 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 处理用户输入
+        /// 向SSH主机发送用户输入
         /// 用户每输入一个字符，就调用一次这个函数
         /// </summary>
         /// <param name="input">用户输入信息</param>
-        public void HandleInput(UserInput input)
+        public void SendInput(UserInput input)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
@@ -1284,6 +1285,18 @@ namespace ModengTerm.Terminal.ViewModels
                         int n = VTParameter.GetParameter(parameters, 0, 1);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
                         this.activeDocument.SetCursor(this.CursorRow + n, this.CursorCol);
+                        break;
+                    }
+
+                case VTActions.VPA_VerticalLinePositionAbsolute:
+                    {
+                        // 绝对垂直行位置 光标在当前列中垂直移动到第 <n> 个位置
+                        // 保持列不变，把光标移动到指定的行处
+                        List<int> parameters = parameter as List<int>;
+                        int row = VTParameter.GetParameter(parameters, 0, 1);
+                        row = Math.Max(0, row - 1);
+                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, row);
+                        this.activeDocument.SetCursor(row, this.CursorCol);
                         break;
                     }
 

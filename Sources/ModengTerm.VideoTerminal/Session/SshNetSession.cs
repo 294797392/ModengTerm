@@ -1,4 +1,5 @@
-﻿using Renci.SshNet;
+﻿using ModengTerm.Base.DataModels;
+using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
 using System.IO;
@@ -6,7 +7,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Session
+namespace ModengTerm.Terminal.Session
 {
     /// <summary>
     /// 使用Rench.SshNet库实现的ssh会话

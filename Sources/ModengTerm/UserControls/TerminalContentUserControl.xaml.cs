@@ -32,7 +32,6 @@ using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Enumerations;
-using XTerminal.Session;
 
 namespace XTerminal.UserControls
 {
@@ -118,6 +117,30 @@ namespace XTerminal.UserControls
 
         #region 公开接口
 
+        /// <summary>
+        /// 向SSH服务器发送输入
+        /// </summary>
+        /// <param name="userInput"></param>
+        private void SendUserInput(UserInput userInput)
+        {
+            if (MenuItemSendAll.IsChecked)
+            {
+                foreach (VideoTerminal vt in MTermApp.Context.OpenedTerminals)
+                {
+                    if (vt == this.videoTerminal)
+                    {
+                        continue;
+                    }
+
+                    vt.SendInput(userInput);
+                }
+            }
+            else
+            {
+                this.videoTerminal.SendInput(userInput);
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -135,7 +158,7 @@ namespace XTerminal.UserControls
             this.userInput.Text = e.Text;
             this.userInput.Modifiers = VTModifierKeys.None;
 
-            this.videoTerminal.HandleInput(this.userInput);
+            this.SendUserInput(this.userInput);
 
             e.Handled = true;
 
@@ -183,7 +206,7 @@ namespace XTerminal.UserControls
                 this.userInput.Key = vtKey;
                 this.userInput.Text = null;
                 this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-                this.videoTerminal.HandleInput(this.userInput);
+                this.SendUserInput(this.userInput);
             }
         }
 

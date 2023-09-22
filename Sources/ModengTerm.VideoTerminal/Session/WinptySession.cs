@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base.DataModels;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,7 +12,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Session
+namespace ModengTerm.Terminal.Session
 {
     /// <summary>
     /// Native API wrapper for WinPty.

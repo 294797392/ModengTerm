@@ -7,6 +7,8 @@ using XTerminal.Base.Enumerations;
 using ModengTerm.ViewModels;
 using ModengTerm.Terminal.ViewModels;
 using XTerminal.Base.DataModels;
+using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 
 namespace ModengTerm
 {
@@ -19,7 +21,7 @@ namespace ModengTerm
         /// <returns></returns>
         public static OpenedSessionVM Create(XTermSession session)
         {
-            switch ((SessionTypeEnum)session.SessionType)
+            switch ((SessionTypeEnum)session.Type)
             {
                 case SessionTypeEnum.libvtssh:
                 case SessionTypeEnum.SerialPort:

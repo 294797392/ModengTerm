@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;

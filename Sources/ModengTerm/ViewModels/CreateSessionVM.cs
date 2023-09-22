@@ -1,6 +1,8 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Rendering;
 using System;
@@ -862,7 +864,7 @@ namespace ModengTerm.ViewModels
                 ID = Guid.NewGuid().ToString(),
                 CreationTime = DateTime.Now,
                 Name = this.Name,
-                SessionType = (int)sessionType.Type,
+                Type = (int)sessionType.Type,
             };
 
             if (!this.CollectOptions(session))

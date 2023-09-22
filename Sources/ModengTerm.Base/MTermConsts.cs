@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -49,7 +51,7 @@ namespace ModengTerm.Base
         {
             ID = Guid.Empty.ToString(),
             Name = "命令行",
-            SessionType = (int)SessionTypeEnum.Win32CommandLine,
+            Type = (int)SessionTypeEnum.Win32CommandLine,
         };
 
         /// <summary>

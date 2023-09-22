@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using ModengTerm.Base.Enumerations;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Base.Definitions
+namespace ModengTerm.Base.Definitions
 {
     public class SessionDefinition
     {

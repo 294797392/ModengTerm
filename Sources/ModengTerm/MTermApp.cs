@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm;
 using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.Loggering;
@@ -25,7 +26,6 @@ using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
-using XTerminal.Session;
 using XTerminal.UserControls;
 
 namespace ModengTerm
@@ -57,6 +57,8 @@ namespace ModengTerm
         /// </summary>
         public BindableCollection<OpenedSessionVM> OpenedSessionList { get; private set; }
 
+        public BindableCollection<VideoTerminal> OpenedTerminals { get; private set; }
+
         /// <summary>
         /// 界面上当前选中的会话
         /// </summary>
@@ -80,6 +82,7 @@ namespace ModengTerm
         protected override int OnInitialize()
         {
             this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
+            this.OpenedTerminals = new BindableCollection<VideoTerminal>();
             this.ServiceAgent = this.Factory.LookupModule<ServiceAgent>();
             this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
 
@@ -127,6 +130,11 @@ namespace ModengTerm
         {
             SessionContent sessionContent = session.Content as SessionContent;
             sessionContent.Close();
+
+            if (MTermUtils.IsTerminal((SessionTypeEnum)sessionContent.Session.Type))
+            {
+                this.OpenedTerminals.Remove(sessionContent.ViewModel as VideoTerminal);
+            }
 
             this.OpenedSessionList.Remove(session);
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
@@ -203,6 +211,13 @@ namespace ModengTerm
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("打开会话失败, {0}", code);
+            }
+
+            // 如果是终端类型的，加入到终端列表里
+            // 方便“发送到所有”功能
+            if (MTermUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
+            {
+                this.OpenedTerminals.Add(content.ViewModel as VideoTerminal);
             }
 
             OpenedSessionVM sessionVM = content.ViewModel;

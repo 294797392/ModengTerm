@@ -313,7 +313,6 @@ namespace XTerminal.Parser
                               DECPCCM, DECVCCM) are ignored.
                         ********************************************************************/
 
-                        logger.DebugFormat("CSIActionCodes - DA_DeviceAttributes");
                         this.NotifyActionEvent(VTActions.DA_DeviceAttributes);
                         break;
                     }
@@ -333,6 +332,12 @@ namespace XTerminal.Parser
                 case CsiActionCodes.CHA_CursorHorizontalAbsolute:
                     {
                         this.NotifyActionEvent(VTActions.CHA_CursorHorizontalAbsolute, parameters);
+                        break;
+                    }
+
+                case CsiActionCodes.VPA_VerticalLinePositionAbsolute:
+                    {
+                        this.NotifyActionEvent(VTActions.VPA_VerticalLinePositionAbsolute, parameters);
                         break;
                     }
 

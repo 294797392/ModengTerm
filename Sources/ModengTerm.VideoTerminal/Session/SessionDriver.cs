@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -7,7 +9,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Session
+namespace ModengTerm.Terminal.Session
 {
     /// <summary>
     /// 管理与远程主机的连接
@@ -41,7 +43,7 @@ namespace XTerminal.Session
         /// <summary>
         /// 通道类型
         /// </summary>
-        public SessionTypeEnum Type { get { return (SessionTypeEnum)this.session.SessionType; } }
+        public SessionTypeEnum Type { get { return (SessionTypeEnum)this.session.Type; } }
 
         #endregion
 

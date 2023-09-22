@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

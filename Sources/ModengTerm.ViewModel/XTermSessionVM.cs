@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -69,9 +71,9 @@ namespace ModengTerm.ViewModels
             this.Name = session.Name;
             this.Description = session.Description;
             this.CreationTime = session.CreationTime;
-            this.Type = (SessionTypeEnum)session.SessionType;
+            this.Type = (SessionTypeEnum)session.Type;
 
-            switch((SessionTypeEnum)session.SessionType)
+            switch((SessionTypeEnum)session.Type)
             {
                 case SessionTypeEnum.SerialPort:
                     {

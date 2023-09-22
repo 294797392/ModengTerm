@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base.DataModels;
+using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
@@ -8,7 +9,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Session
+namespace ModengTerm.Terminal.Session
 {
     public class SerialPortSession : SessionDriver
     {

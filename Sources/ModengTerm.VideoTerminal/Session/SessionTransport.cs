@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Session
+namespace ModengTerm.Terminal.Session
 {
     public class SessionTransport
     {

@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using DotNEToolkit.DataModels;
+using ModengTerm.Base.Enumerations;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
+using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Base.DataModels
+namespace ModengTerm.Base.DataModels
 {
     /// <summary>
     /// 保存一个通道的配置信息
@@ -22,7 +24,7 @@ namespace XTerminal.Base.DataModels
         /// </summary>
         [EnumDataType(typeof(SessionTypeEnum))]
         [JsonProperty("type")]
-        public int SessionType { get; set; }
+        public int Type { get; set; }
 
         /// <summary>
         /// 所有的选项列表

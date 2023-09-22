@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 
-namespace XTerminal.Session
+namespace ModengTerm.Terminal.Session
 {
     public class libvtsshSession : SessionDriver
     {

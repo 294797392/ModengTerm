@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.Base.DataModels
+namespace ModengTerm.Base.DataModels
 {
     public class SessionOption
     {

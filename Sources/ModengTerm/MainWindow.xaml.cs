@@ -1,4 +1,5 @@
 ﻿using ModengTerm;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using System;
