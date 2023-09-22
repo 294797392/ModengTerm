@@ -22,10 +22,14 @@ namespace XTerminal.Document
 
         #region 实例变量
 
-        private StringBuilder textBuilder;
-
         private VTDocument document;
-        private VTRect container;
+
+        private bool dirty;
+
+        private int firstRow;
+        private int lastRow;
+        private int firstRowCharacterIndex;
+        private int lastRowCharacterIndex;
 
         #endregion
 
@@ -39,19 +43,77 @@ namespace XTerminal.Document
         public List<VTRect> Geometry { get; private set; }
 
         /// <summary>
-        /// 所选内容的开始位置
-        /// </summary>
-        public VTextPointer Start { get; private set; }
-
-        /// <summary>
-        /// 所选内容的结束位置
-        /// </summary>
-        public VTextPointer End { get; private set; }
-
-        /// <summary>
         /// 指示当前选中的内容是否为空
         /// </summary>
-        public bool IsEmpty { get { return this.Start.CharacterIndex < 0 || this.End.CharacterIndex < 0; } }
+        public bool IsEmpty { get { return this.firstRowCharacterIndex < 0 || this.lastRowCharacterIndex < 0; } }
+
+        /// <summary>
+        /// 指定当前在哪个文档上进行选中动作
+        /// </summary>
+        public VTDocument Document
+        {
+            get { return this.document; }
+            set
+            {
+                if (this.document != value)
+                {
+                    this.document = value;
+                    this.SetDirty(true);
+                }
+            }
+        }
+
+        public int FirstRow
+        {
+            get { return this.firstRow; }
+            set
+            {
+                if (this.firstRow != value)
+                {
+                    this.firstRow = value;
+                    this.SetDirty(true);
+                }
+            }
+        }
+
+        public int LastRow
+        {
+            get { return this.lastRow; }
+            set
+            {
+                if (this.lastRow != value)
+                {
+                    this.lastRow = value;
+                    this.SetDirty(true);
+                }
+            }
+        }
+
+        public int FirstRowCharacterIndex
+        {
+            get { return this.firstRowCharacterIndex; }
+            set
+            {
+                if (this.firstRowCharacterIndex != value)
+                {
+                    this.firstRowCharacterIndex = value;
+                    this.SetDirty(true);
+                }
+            }
+        }
+
+        public int LastRowCharacterIndex
+        {
+            get { return this.lastRowCharacterIndex; }
+            set
+            {
+                if (this.lastRowCharacterIndex != value)
+                {
+                    this.lastRowCharacterIndex = value;
+                    this.SetDirty(true);
+                }
+            }
+        }
 
         #endregion
 
@@ -60,53 +122,23 @@ namespace XTerminal.Document
         public VTextSelection()
         {
             this.Geometry = new List<VTRect>();
-            this.Start = new VTextPointer();
-            this.End = new VTextPointer();
-            this.textBuilder = new StringBuilder();
 
-            this.Start.CharacterIndex = -1;
-            this.End.CharacterIndex = -1;
+            this.FirstRow = -1;
+            this.LastRow = -1;
+            this.FirstRowCharacterIndex = -1;
+            this.LastRowCharacterIndex = -1;
         }
 
         #endregion
 
-        /// <summary>
-        /// 清除选中的区域
-        /// </summary>
-        public void Reset()
+        #region 实例方法
+
+        private void SetDirty(bool dirty)
         {
-            this.OffsetY = 0;
-            this.OffsetX = 0;
-
-            this.Geometry.Clear();
-
-            this.Start.CharacterIndex = -1;
-            this.Start.PhysicsRow = -1;
-            this.End.CharacterIndex = -1;
-            this.End.PhysicsRow = -1;
-
-            this.document = null;
-
-            this.container = NullRect;
-
-            this.SetArrangeDirty(true);
-        }
-
-        /// <summary>
-        /// 设置文本选中的范围
-        /// </summary>
-        /// <param name="document">要在哪个文档上设置选中范围</param>
-        /// <param name="container">Canvas相对于电脑显示器屏幕的位置</param>
-        public void SetRange(VTDocument document, VTRect container, int startPhysicsRow, int startCharacterIndex, int endPhysicsRow, int endCharacterIndex)
-        {
-            this.Start.PhysicsRow = startPhysicsRow;
-            this.Start.CharacterIndex = startCharacterIndex;
-            this.End.PhysicsRow = endPhysicsRow;
-            this.End.CharacterIndex = endCharacterIndex;
-            this.document = document;
-            this.container = container;
-
-            this.UpdateRange(document, container);
+            if (this.dirty != dirty)
+            {
+                this.dirty = dirty;
+            }
         }
 
         /// <summary>
@@ -115,25 +147,28 @@ namespace XTerminal.Document
         /// </summary>
         /// <param name="document"></param>
         /// <param name="container"></param>
-        public void UpdateRange(VTDocument document, VTRect container)
+        private void UpdateRange(VTDocument document)
         {
+            VTextPointer Start = new VTextPointer(this.firstRow, this.firstRowCharacterIndex);
+            VTextPointer End = new VTextPointer(this.lastRow, this.lastRowCharacterIndex);
+
+            VTRect container = document.Rect;
+
             this.Geometry.Clear();
 
             // 单独处理选中的是同一行的情况
-            if (this.Start.PhysicsRow == this.End.PhysicsRow)
+            if (Start.PhysicsRow == End.PhysicsRow)
             {
                 // 找到对应的文本行
-                VTextLine textLine = document.FindLine(this.Start.PhysicsRow);
+                VTextLine textLine = document.FindLine(Start.PhysicsRow);
                 if (textLine == null)
                 {
                     // 当选中了一行之后，然后该行被移动到屏幕外了，会出现这种情况
                     return;
                 }
 
-                this.SetArrangeDirty(true);
-
-                VTextPointer leftPointer = this.Start.CharacterIndex < this.End.CharacterIndex ? this.Start : this.End;
-                VTextPointer rightPointer = this.Start.CharacterIndex < this.End.CharacterIndex ? this.End : this.Start;
+                VTextPointer leftPointer = Start.CharacterIndex < End.CharacterIndex ? Start : End;
+                VTextPointer rightPointer = Start.CharacterIndex < End.CharacterIndex ? End : Start;
 
                 VTRect leftBounds = textLine.MeasureCharacter(leftPointer.CharacterIndex);
                 VTRect rightBounds = textLine.MeasureCharacter(rightPointer.CharacterIndex);
@@ -148,11 +183,9 @@ namespace XTerminal.Document
                 return;
             }
 
-            this.SetArrangeDirty(true);
-
             // 下面处理选中了多行的状态
-            VTextPointer topPointer = this.Start.PhysicsRow > this.End.PhysicsRow ? this.End : this.Start;
-            VTextPointer bottomPointer = this.Start.PhysicsRow > this.End.PhysicsRow ? this.Start : this.End;
+            VTextPointer topPointer = Start.PhysicsRow > End.PhysicsRow ? End : Start;
+            VTextPointer bottomPointer = Start.PhysicsRow > End.PhysicsRow ? Start : End;
 
             VTextLine topLine = document.FindLine(topPointer.PhysicsRow);
             VTextLine bottomLine = document.FindLine(bottomPointer.PhysicsRow);
@@ -213,46 +246,76 @@ namespace XTerminal.Document
             }
         }
 
+        #endregion
+
+        /// <summary>
+        /// 清除选中的区域
+        /// </summary>
+        public void Reset()
+        {
+            this.OffsetY = 0;
+            this.OffsetX = 0;
+
+            this.Geometry.Clear();
+
+            this.FirstRow = -1;
+            this.LastRow = -1;
+            this.FirstRowCharacterIndex = -1;
+            this.LastRowCharacterIndex = -1;
+
+            this.SetDirty(true);
+        }
+
         public void Normalize(out int topRow, out int bottomRow, out int startIndex, out int endIndex)
         {
-            if (this.Start.PhysicsRow == this.End.PhysicsRow)
+            VTextPointer Start = new VTextPointer(this.firstRow, this.firstRowCharacterIndex);
+            VTextPointer End = new VTextPointer(this.lastRow, this.lastRowCharacterIndex);
+
+            if (Start.PhysicsRow == End.PhysicsRow)
             {
-                topRow = this.Start.PhysicsRow;
-                bottomRow = this.End.PhysicsRow;
+                topRow = Start.PhysicsRow;
+                bottomRow = End.PhysicsRow;
 
                 // 注意要处理鼠标从右向左选中的情况
                 // 如果鼠标是从右向左进行选中，那么Start就是Selection的右边，End就是Selection的左边
-                startIndex = Math.Min(this.Start.CharacterIndex, this.End.CharacterIndex);
-                endIndex = Math.Max(this.Start.CharacterIndex, this.End.CharacterIndex);
+                startIndex = Math.Min(Start.CharacterIndex, End.CharacterIndex);
+                endIndex = Math.Max(Start.CharacterIndex, End.CharacterIndex);
             }
             else
             {
                 // 要考虑鼠标从下往上选中的情况
                 // 如果鼠标从下往上选中，那么此时下面的VTextPointer是起始，上面的VTextPointer是结束
-                if (this.Start.PhysicsRow > this.End.PhysicsRow)
+                if (Start.PhysicsRow > End.PhysicsRow)
                 {
-                    topRow = this.End.PhysicsRow;
-                    bottomRow = this.Start.PhysicsRow;
-                    startIndex = this.End.CharacterIndex;
-                    endIndex = this.Start.CharacterIndex;
+                    topRow = End.PhysicsRow;
+                    bottomRow = Start.PhysicsRow;
+                    startIndex = End.CharacterIndex;
+                    endIndex = Start.CharacterIndex;
                 }
                 else
                 {
-                    topRow = this.Start.PhysicsRow;
-                    bottomRow = this.End.PhysicsRow;
-                    startIndex = this.Start.CharacterIndex;
-                    endIndex = this.End.CharacterIndex;
+                    topRow = Start.PhysicsRow;
+                    bottomRow = End.PhysicsRow;
+                    startIndex = Start.CharacterIndex;
+                    endIndex = End.CharacterIndex;
                 }
             }
         }
 
         public override void RequestInvalidate()
         {
-            if (this.arrangeDirty)
+            if (this.dirty)
             {
+                this.Geometry.Clear();
+
+                if (!this.IsEmpty)
+                {
+                    this.UpdateRange(this.document);
+                }
+
                 this.DrawingObject.Draw();
 
-                this.arrangeDirty = false;
+                this.dirty = false;
             }
         }
     }

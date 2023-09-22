@@ -119,6 +119,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// 存储选中的文本信息
         /// </summary>
         private VTextSelection textSelection;
+        private VTextPointer startPointer;
+        private VTextPointer endPointer;
 
         #endregion
 
@@ -380,13 +382,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             #endregion
 
-            #region 初始化TextSelection
-
-            this.textSelection = new VTextSelection();
-            this.topMostCanvas.CreateDrawingObject(this.textSelection);
-
-            #endregion
-
             #region 初始化文档模型
 
             int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
@@ -410,10 +405,21 @@ namespace ModengTerm.Terminal.ViewModels
                 BackgroundColor = this.background,
                 ColorTable = this.colorTable
             };
-            this.mainDocument = new VTDocument(documentOptions, this.mainCanvas, false) { Name = "MainDocument" };
-            this.alternateDocument = new VTDocument(documentOptions, this.alternateCanvas, true) { Name = "AlternateDocument" };
+            this.mainDocument = new VTDocument(documentOptions, this.mainCanvas, false) { Name = "MainDocument", Rect = this.vtRect };
+            this.alternateDocument = new VTDocument(documentOptions, this.alternateCanvas, true) { Name = "AlternateDocument", Rect = this.vtRect };
             this.activeDocument = this.mainDocument;
             this.videoTerminal.InsertDocument(0, this.mainDocument.Drawing);
+
+            #endregion
+
+            #region 初始化TextSelection
+
+            this.startPointer = new VTextPointer();
+            this.endPointer = new VTextPointer();
+
+            this.textSelection = new VTextSelection();
+            this.textSelection.Document = this.activeDocument;
+            this.topMostCanvas.CreateDrawingObject(this.textSelection);
 
             #endregion
 
@@ -498,10 +504,26 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void SelectAll()
         {
-            VTHistoryLine startHistoryLine = this.scrollInfo.FirstLine;
-            VTHistoryLine lastHistoryLine = this.scrollInfo.LastLine;
+            int firstRow = 0, lastRow = 0, lastCharacterIndex = 0;
+            if (this.activeDocument.IsAlternate)
+            {
+                firstRow = this.activeDocument.FirstLine.PhysicsRow;
+                lastRow = this.activeDocument.LastLine.PhysicsRow;
+                lastCharacterIndex = this.activeDocument.LastLine.Characters.Count - 1;
+            }
+            else
+            {
+                VTHistoryLine startHistoryLine = this.scrollInfo.FirstLine;
+                VTHistoryLine lastHistoryLine = this.scrollInfo.LastLine;
+                firstRow = startHistoryLine.PhysicsRow;
+                lastRow = lastHistoryLine.PhysicsRow;
+                lastCharacterIndex = lastHistoryLine.Characters.Count - 1;
+            }
 
-            this.textSelection.SetRange(this.activeDocument, this.vtRect, startHistoryLine.PhysicsRow, 0, lastHistoryLine.PhysicsRow, lastHistoryLine.Characters.Count - 1);
+            this.textSelection.FirstRow = firstRow;
+            this.textSelection.LastRow = lastRow;
+            this.textSelection.FirstRowCharacterIndex = 0;
+            this.textSelection.LastRowCharacterIndex = lastCharacterIndex;
             this.textSelection.RequestInvalidate();
         }
 
@@ -573,14 +595,32 @@ namespace ModengTerm.Terminal.ViewModels
                         int topRow, bottomRow;
                         this.textSelection.Normalize(out topRow, out bottomRow, out startIndex, out endIndex);
 
-                        List<VTHistoryLine> historyLines;
-                        if (!this.scrollInfo.TryGetHistories(topRow, bottomRow - topRow + 1, out historyLines))
+                        if (this.activeDocument.IsAlternate)
                         {
-                            logger.ErrorFormat("SaveSelected失败, 有的历史记录为空");
-                            return string.Empty;
-                        }
+                            // 备用缓冲区没有滚动内容，只能选中当前显示出来的文档
+                            VTextLine firstLine = this.activeDocument.FindLine(topRow);
+                            while (firstLine != null)
+                            {
+                                characters.Add(firstLine.Characters);
 
-                        characters.AddRange(historyLines.Select(v => v.Characters));
+                                if (firstLine.PhysicsRow == bottomRow)
+                                {
+                                    break;
+                                }
+
+                                firstLine = firstLine.NextLine;
+                            }
+                        }
+                        else
+                        {
+                            List<VTHistoryLine> historyLines;
+                            if (!this.scrollInfo.TryGetHistories(topRow, bottomRow - topRow + 1, out historyLines))
+                            {
+                                logger.ErrorFormat("SaveSelected失败, 有的历史记录为空");
+                                return string.Empty;
+                            }
+                            characters.AddRange(historyLines.Select(v => v.Characters));
+                        }
                         break;
                     }
 
@@ -756,10 +796,6 @@ namespace ModengTerm.Terminal.ViewModels
 
                 #region 更新选中区域
 
-                if (!this.textSelection.IsEmpty)
-                {
-                    this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
-                }
                 this.textSelection.RequestInvalidate();
 
                 #endregion
@@ -1535,6 +1571,7 @@ namespace ModengTerm.Terminal.ViewModels
                         this.activeDocument = this.alternateDocument;
 
                         this.textSelection.Reset();
+                        this.textSelection.Document = this.alternateDocument;
                         this.videoTerminal.SetScrollVisible(false);
                         break;
                     }
@@ -1552,6 +1589,7 @@ namespace ModengTerm.Terminal.ViewModels
                         this.activeDocument = this.mainDocument;
 
                         this.textSelection.Reset();
+                        this.textSelection.Document = this.mainDocument;
                         this.videoTerminal.SetScrollVisible(true);
                         break;
                     }
@@ -1743,8 +1781,8 @@ namespace ModengTerm.Terminal.ViewModels
                 this.mouseDownPos = location;
 
                 // 点击的时候先清除选中区域
+                this.textSelection.Document = this.activeDocument;
                 this.textSelection.Reset();
-                this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
                 this.textSelection.RequestInvalidate();
             }
             else
@@ -1791,14 +1829,11 @@ namespace ModengTerm.Terminal.ViewModels
                         }
                 }
 
-                this.textSelection.Reset();
-                this.textSelection.Start.CharacterIndex = startIndex;
-                this.textSelection.Start.PhysicsRow = lineHit.PhysicsRow;
-
-                this.textSelection.End.CharacterIndex = endIndex;
-                this.textSelection.End.PhysicsRow = lineHit.PhysicsRow;
-
-                this.textSelection.UpdateRange(this.activeDocument, this.vtRect);
+                this.textSelection.Document = this.activeDocument;
+                this.textSelection.FirstRow = lineHit.PhysicsRow;
+                this.textSelection.FirstRowCharacterIndex = startIndex;
+                this.textSelection.LastRow = lineHit.PhysicsRow;
+                this.textSelection.LastRowCharacterIndex = endIndex;
                 this.textSelection.RequestInvalidate();
             }
         }
@@ -1815,15 +1850,17 @@ namespace ModengTerm.Terminal.ViewModels
                 // 此时说明开始选中操作
                 this.selectionState = true;
                 this.textSelection.Reset();
+                this.startPointer.CharacterIndex = -1;
+                this.startPointer.PhysicsRow = -1;
+                this.endPointer.CharacterIndex = -1;
+                this.endPointer.PhysicsRow = -1;
             }
 
-            // 整理思路是算出来StartTextPointer和EndTextPointer之间的几何图形
+            // 整体思路是算出来StartTextPointer和EndTextPointer之间的几何图形
             // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
-            VTextPointer startPointer = this.textSelection.Start;
-            VTextPointer endPointer = this.textSelection.End;
 
             // 如果还没有测量起始字符，那么测量起始字符
-            if (this.textSelection.Start.CharacterIndex == -1)
+            if (startPointer.CharacterIndex == -1)
             {
                 if (!this.GetTextPointer(location, this.vtRect, startPointer))
                 {
@@ -1866,7 +1903,12 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 重新渲染
             // PerformDrawing会更新TextSelection的形状
-            this.PerformDrawing(this.activeDocument);
+
+            this.textSelection.FirstRow = startPointer.PhysicsRow;
+            this.textSelection.FirstRowCharacterIndex = startPointer.CharacterIndex;
+            this.textSelection.LastRow = endPointer.PhysicsRow;
+            this.textSelection.LastRowCharacterIndex = endPointer.CharacterIndex;
+            this.textSelection.RequestInvalidate();
         }
 
         public void OnMouseUp(IVideoTerminal vt, VTPoint location)
@@ -1940,6 +1982,8 @@ namespace ModengTerm.Terminal.ViewModels
         {
             // 不管当前是什么状态，第一步先更新终端屏幕大小
             this.vtRect = vtc;
+            this.mainDocument.Rect = vtc;
+            this.alternateDocument.Rect = vtc;
 
             // 有可能在大小改变的时候还没连接上终端
             if (this.Status != SessionStatusEnum.Connected)

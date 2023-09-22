@@ -125,6 +125,11 @@ namespace XTerminal.Document
 
         public VTCursorState CursorState { get { return this.cursorState; } }
 
+        /// <summary>
+        /// 记录该文档在界面上的大小
+        /// </summary>
+        public VTRect Rect { get; set; }
+
         #endregion
 
         #region 构造方法

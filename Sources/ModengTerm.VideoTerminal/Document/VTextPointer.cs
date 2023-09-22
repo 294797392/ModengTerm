@@ -22,5 +22,14 @@ namespace XTerminal.Document
         /// 如果没命中，那么就是-1
         /// </summary>
         public int CharacterIndex { get; set; }
+
+        public VTextPointer()
+        { }
+
+        public VTextPointer(int physicsRow, int characterIndex)
+        {
+            this.PhysicsRow = physicsRow;
+            this.CharacterIndex = characterIndex;
+        }
     }
 }
