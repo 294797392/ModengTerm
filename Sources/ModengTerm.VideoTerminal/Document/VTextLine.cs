@@ -522,46 +522,40 @@ namespace XTerminal.Document
             this.columns += character.ColumnSize;
         }
 
+
+        /// <summary>
+        /// 删除指定列处的字符
+        /// </summary>
+        /// <param name="column">从此处开始删除字符</param>
+        /// <param name="count">要删除的字符个数</param>
+        public void DeleteCharacter(int column, int count)
+        {
+            if (column >= this.columns)
+            {
+                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
+                return;
+            }
+
+            int startIndex = this.FindCharacterIndex(column);
+            if (startIndex == -1)
+            {
+                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
+                logger.FatalFormat("DeleteText失败, startIndex == -1, column = {0}, count = {1}", column, count);
+                return;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                VTCharacter toDelete = this.characters[startIndex];
+                this.characters.Remove(toDelete);
+
+                // 更新显示的列数
+                this.columns -= toDelete.ColumnSize;
+            }
+
+            this.SetRenderDirty(true);
+        }
+
         #endregion
-
-        //protected override void OnRender()
-        //{
-        //    if (this.matchesList != null && this.matchesList.Count > 0)
-        //    {
-        //        // 先拷贝要显示的字符
-        //        List<VTCharacter> characters = new List<VTCharacter>();
-        //        VTUtils.CopyCharacter(this.Characters, characters);
-
-        //        foreach (VTMatches matches in this.MatchesList)
-        //        {
-        //            #region 更新前景色和背景色
-
-        //            // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
-        //            // TODO：有可能背景不是纯色，而是图片或者视频
-        //            for (int i = 0; i < matches.Length; i++)
-        //            {
-        //                VTCharacter character = characters[matches.Index + i];
-
-        //                VTextAttributeState foregroundAttribute = character.AttributeList[(int)VTextAttributes.Foreground];
-        //                foregroundAttribute.Enabled = true;
-        //                foregroundAttribute.Parameter = this.Style.BackColor;
-
-        //                VTextAttributeState backgroundAttribute = character.AttributeList[(int)VTextAttributes.Background];
-        //                backgroundAttribute.Enabled = true;
-        //                backgroundAttribute.Parameter = this.Style.ForeColor;
-        //            }
-
-        //            #endregion
-
-        //            VTRect rect = this.MeasureTextBlock(matches.Index, matches.Length);
-
-        //            VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
-        //            formattedText.OffsetX = rect.Left;
-        //            formattedText.OffsetY = this.OffsetY;
-
-        //            matches.FormattedText = formattedText;
-        //        }
-        //    }
-        //}
     }
 }

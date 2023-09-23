@@ -552,7 +552,7 @@ namespace XTerminal.Document
         /// <param name="count">要删除的字符个数</param>
         public void DeleteCharacter(VTextLine textLine, int column, int count)
         {
-            textLine.EraseRange(column, count);
+            textLine.DeleteCharacter(column, count);
         }
 
         /// <summary>

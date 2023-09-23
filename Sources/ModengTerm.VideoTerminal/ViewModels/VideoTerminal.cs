@@ -1533,7 +1533,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 从指定位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", count, this.CursorRow, this.CursorCol);
+                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, count);
                         this.activeDocument.DeleteCharacter(this.ActiveLine, this.CursorCol, count);
                         break;
                     }
