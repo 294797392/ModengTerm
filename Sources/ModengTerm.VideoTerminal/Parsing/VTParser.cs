@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit.Extentions;
+using ModengTerm.Terminal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -107,6 +108,8 @@ namespace XTerminal.Parser
 
         private DCSStringHandlerDlg dcsStringHandler;
 
+        private List<byte> sequenceBytes;
+
         #endregion
 
         #region 属性
@@ -133,6 +136,8 @@ namespace XTerminal.Parser
             this.parameters = new List<int>();
 
             this.state = VTStates.Ground;   // 状态机默认设置为基态
+
+            this.sequenceBytes = new List<byte>();
         }
 
         public void Release()
@@ -152,6 +157,8 @@ namespace XTerminal.Parser
             for (int i = 0; i < length; i++)
             {
                 byte ch = bytes[i];
+
+                this.sequenceBytes.Add(ch);
 
                 // 在OSCString的状态下，ESC转义字符可以用作OSC状态的结束符，所以在这里不进入ESC状态
                 if (ASCIITable.IsEscape(ch) && this.state != VTStates.OSCString)
@@ -1066,7 +1073,11 @@ namespace XTerminal.Parser
         {
             if (this.ActionEvent != null)
             {
-                this.ActionEvent(vtAction, param);
+                VTDebug.Context.Writevttest(vtAction, this.sequenceBytes);
+
+                this.ActionEvent(this, vtAction, param);
+
+                this.sequenceBytes.Clear();
             }
         }
 

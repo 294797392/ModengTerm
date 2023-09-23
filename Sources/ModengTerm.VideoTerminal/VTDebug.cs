@@ -19,6 +19,11 @@ namespace ModengTerm.Terminal
         Interactive,
 
         /// <summary>
+        /// 自动生成vttest源码的日志
+        /// </summary>
+        vttestCode,
+
+        /// <summary>
         /// 记录从SSH主机收到的原始数据
         /// </summary>
         RawRead,
@@ -118,9 +123,11 @@ namespace ModengTerm.Terminal
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDebug");
 
         private LogCategory interactiveCategory;
+        private LogCategory vttestCodeCategory;
         private LogCategory rawReadCategory;
         private Dictionary<VTDebugCategoryEnum, LogCategory> categoryMap;
         public List<LogCategory> Categories { get; private set; }
+        private int vttestCodeIndex;
 
         public VTDebug()
         {
@@ -128,6 +135,7 @@ namespace ModengTerm.Terminal
             this.categoryMap = new Dictionary<VTDebugCategoryEnum, LogCategory>();
 
             this.interactiveCategory = this.CreateCategory(VTDebugCategoryEnum.Interactive);
+            this.vttestCodeCategory = this.CreateCategory(VTDebugCategoryEnum.vttestCode);
             this.rawReadCategory = this.CreateCategory(VTDebugCategoryEnum.RawRead);
         }
 
@@ -173,8 +181,8 @@ namespace ModengTerm.Terminal
                 bytes.Select(v => ((int)v).ToString()).Join(",");
 
             string log = string.Format("-> [{0},{1}]", type, message);
-            File.AppendAllText(this.interactiveCategory.FilePath, log);
-            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
+
+            File.AppendAllText(this.interactiveCategory.FilePath, log + Environment.NewLine);
         }
 
         public void WriteInteractive(VTSendTypeEnum type, StatusType statusType, byte[] bytes)
@@ -186,8 +194,7 @@ namespace ModengTerm.Terminal
 
             string message = bytes.Select(v => ((int)v).ToString()).Join(",");
             string log = string.Format("-> [{0},{1},{2}]", type, statusType, message);
-            File.AppendAllText(this.interactiveCategory.FilePath, log);
-            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
+            File.AppendAllText(this.interactiveCategory.FilePath, log + Environment.NewLine);
         }
 
         public void WriteInteractive(string action, string format, params object[] param)
@@ -199,8 +206,30 @@ namespace ModengTerm.Terminal
 
             string message = string.Format(format, param);
             string log = string.Format("<- [{0},{1}]", action, message);
-            File.AppendAllText(this.interactiveCategory.FilePath, log);
-            File.AppendAllText(this.interactiveCategory.FilePath, "\r\n");
+            File.AppendAllText(this.interactiveCategory.FilePath, log + Environment.NewLine);
+        }
+
+
+        public void Writevttest(VTActions actions, List<byte> sequence)
+        {
+            if (!this.CanWrite(this.vttestCodeCategory))
+            {
+                return;
+            }
+
+            string message = sequence.Select(v => v.ToString()).Join(",") + ",'\\0'";
+            if (sequence.Count == 0)
+            {
+                // TODO：因为SGR序列会执行多次VTAction，执行第一次VTAction的时候sequence就被清空了
+                // 暂时先不处理这种情况，需要优化，SGR指令只调用一次VTAction
+                return;
+            }
+
+            string varName = string.Format("{0}{1}", actions, this.vttestCodeIndex++);
+
+            string log = string.Format("char {0}[] = {{{1}}};printf({2});", varName, message, varName);
+
+            File.AppendAllText(this.vttestCodeCategory.FilePath, log + Environment.NewLine);
         }
 
 

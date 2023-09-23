@@ -125,7 +125,7 @@ namespace ModengTerm.Rendering
                 textData.Text = " ";
             }
 
-            //textData.Text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
+            textData.Text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
 
             textData.Style = textLine.Style;
 

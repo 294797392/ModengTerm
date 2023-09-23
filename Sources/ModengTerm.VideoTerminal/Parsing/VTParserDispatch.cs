@@ -341,9 +341,14 @@ namespace XTerminal.Parser
                         break;
                     }
 
+                case (CsiActionCodes)'~':
+                    {
+                        logger.ErrorFormat("不需要实现的CSIAction, ~");
+                        break;
+                    }
+
                 default:
-                    logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
-                    throw new NotImplementedException();
+                    throw new NotImplementedException(string.Format("未实现CSIAction, {0}", (char)finalByte));
             }
         }
 
@@ -395,9 +400,10 @@ namespace XTerminal.Parser
                         break;
                     }
 
+                case (EscActionCodes)66:
                 case (EscActionCodes)230:
                     {
-                        logger.FatalFormat("terminal没实现的EscActionCodes - 230");
+                        logger.FatalFormat("terminal没实现的EscActionCodes - {0}", (char)code);
                         break;
                     }
 
@@ -611,7 +617,6 @@ namespace XTerminal.Parser
                 {
                     case DECPrivateMode.DECCKM_CursorKeysMode:
                         {
-                            logger.DebugFormat("DECPrivateMode - DECCKM_CursorKeysMode, enable = {0}", enable);
                             // set - Enable Application Mode, reset - Normal mode
 
                             // true表示ApplicationMode

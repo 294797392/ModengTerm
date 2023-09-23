@@ -1033,6 +1033,9 @@ namespace ModengTerm.Terminal.ViewModels
             // 更新当前滚动条的值
             this.scrollInfo.ScrollValue = scrollValue;
 
+            // 有可能光标所在行被滚动到了文档外，此时要更新ActiveLine，ActiveLine就是空的
+            scrollDocument.SetCursorPhysicsRow(scrollDocument.CursorPhysicsRow);
+
             return true;
         }
 
@@ -1069,7 +1072,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 事件处理器
 
-        private void VtParser_ActionEvent(VTActions action, object parameter)
+        private void VtParser_ActionEvent(VTParser parser, VTActions action, object parameter)
         {
             switch (action)
             {
@@ -1180,11 +1183,10 @@ namespace ModengTerm.Terminal.ViewModels
                         // 执行TAB键的动作（在当前光标位置处打印4个空格）
                         // 微软的terminal项目里说，如果光标在该行的最右边，那么再次执行TAB的时候光标会自动移动到下一行，目前先不这么做
 
+                        VTDebug.Context.WriteInteractive(action, string.Empty);
+
                         int tabSize = 4;
-                        for (int i = 0; i < tabSize; i++)
-                        {
-                            this.VtParser_ActionEvent(VTActions.Print, ' ');
-                        }
+                        this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + tabSize);
 
                         break;
                     }
@@ -1208,6 +1210,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         switch (eraseType)
                         {
+                            // In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
+                            case EraseType.All:
                             case EraseType.Scrollback:
                                 {
                                     // 相关命令：
@@ -1221,7 +1225,7 @@ namespace ModengTerm.Terminal.ViewModels
                                     VTextLine lastLine = this.activeDocument.LastLine;
 
                                     // 当前终端里显示的行数
-                                    int lines = this.ActiveLine.PhysicsRow - firstLine.PhysicsRow;
+                                    int lines = this.scrollInfo.LastLine.PhysicsRow - firstLine.PhysicsRow;
 
                                     // 把当前终端里显示的行数全部放到滚动区域上面
                                     // 先做换行动作，换行完光标在往下的lines行
@@ -1237,6 +1241,10 @@ namespace ModengTerm.Terminal.ViewModels
                                     int scrollMax = this.activeDocument.FirstLine.PhysicsRow;
                                     this.scrollInfo.ScrollMax = scrollMax;
                                     this.scrollInfo.ScrollValue = scrollMax;
+
+                                    // 重新设置光标所在行的数据
+                                    VTextLine cursorLine = this.activeDocument.FirstLine.FindNext(this.activeDocument.Cursor.Row);
+                                    this.activeDocument.SetCursorPhysicsRow(cursorLine.PhysicsRow);
 
                                     break;
                                 }
@@ -1330,6 +1338,17 @@ namespace ModengTerm.Terminal.ViewModels
                             row = newrow == 0 ? 0 : newrow - 1;
                             col = newcol == 0 ? 0 : newcol - 1;
 
+                            // 对行和列做限制
+                            if (row >= this.rowSize)
+                            {
+                                row = rowSize - 1;
+                            }
+
+                            if (col >= this.colSize)
+                            {
+                                col = colSize - 1;
+                            }
+
                             // 刚打开VIM就按空格键，此时VIM会响应一个CursorPosition向右移动一个单位的事件
                             // 此时要把光标向右移动一个单位
                             this.ActiveLine.PadColumns(newcol);
@@ -1406,7 +1425,7 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.ReverseVideo:
                 case VTActions.ReverseVideoUnset:
                     {
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2},{3}", this.CursorRow, this.CursorCol, parameter == null ? string.Empty : parameter.ToString(), this.ActiveLine.PhysicsRow);
+                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, parameter == null ? string.Empty : parameter.ToString());
 
                         // 打开VIM的时候，VIM会在打印第一行的~号的时候设置验色，然后把剩余的行全部打印，也就是说设置一次颜色可以对多行都生效
                         // 所以这里要记录下如果当前有文本特效被设置了，那么在行改变的时候也需要设置文本特效
@@ -1534,6 +1553,32 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
+                case VTActions.IL_InsertLine:
+                    {
+                        // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
+                        List<int> parameters = parameter as List<int>;
+                        int lines = VTParameter.GetParameter(parameters, 0, 1);
+                        VTDebug.Context.WriteInteractive(action, "{0}", lines);
+                        if (lines > 0)
+                        {
+                            this.activeDocument.InsertLines(this.ActiveLine, lines);
+                        }
+                        break;
+                    }
+
+                case VTActions.DL_DeleteLine:
+                    {
+                        // 从缓冲区中删除<n> 行，从光标所在的行开始。
+                        List<int> parameters = parameter as List<int>;
+                        int lines = VTParameter.GetParameter(parameters, 0, 1);
+                        VTDebug.Context.WriteInteractive(action, "{0}", lines);
+                        if (lines > 0)
+                        {
+                            this.activeDocument.DeleteLines(this.ActiveLine, lines);
+                        }
+                        break;
+                    }
+
                 #endregion
 
                 #region 上下滚动
@@ -1654,32 +1699,6 @@ namespace ModengTerm.Terminal.ViewModels
 
                         VTDebug.Context.WriteInteractive(action, "leftMargin = {0}, rightMargin = {1}", leftMargin, rightMargin);
                         logger.ErrorFormat("未实现DECSLRM_SetLeftRightMargins");
-                        break;
-                    }
-
-                case VTActions.IL_InsertLine:
-                    {
-                        // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
-                        List<int> parameters = parameter as List<int>;
-                        int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0}", lines);
-                        if (lines > 0)
-                        {
-                            this.activeDocument.InsertLines(this.ActiveLine, lines);
-                        }
-                        break;
-                    }
-
-                case VTActions.DL_DeleteLine:
-                    {
-                        // 从缓冲区中删除<n> 行，从光标所在的行开始。
-                        List<int> parameters = parameter as List<int>;
-                        int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0}", lines);
-                        if (lines > 0)
-                        {
-                            this.activeDocument.DeleteLines(this.ActiveLine, lines);
-                        }
                         break;
                     }
 

@@ -423,6 +423,11 @@ namespace XTerminal.Document
             for (int i = 0; i < nrows; i++)
             {
                 current = current.NextLine;
+
+                if (current == null)
+                {
+                    return null;
+                }
             }
 
             return current;
@@ -440,6 +445,11 @@ namespace XTerminal.Document
             for (int i = 0; i < nrows; i++)
             {
                 current = current.PreviousLine;
+
+                if (current == null)
+                {
+                    return null;
+                }
             }
 
             return current;

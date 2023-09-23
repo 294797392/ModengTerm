@@ -162,8 +162,12 @@ namespace XTerminal.Document
 
         public override void RequestInvalidate()
         {
-            VTextLine cursorLine = this.ownerDocument.FindLine(this.ownerDocument.ActivePhysicsRow);
-            if (cursorLine == null)
+            int activeRow = this.ownerDocument.CursorPhysicsRow;
+            int firstRow = this.ownerDocument.FirstLine.PhysicsRow;
+            int lastRow = this.ownerDocument.LastLine.PhysicsRow;
+            VTextLine cursorLine = this.ownerDocument.ActiveLine;
+
+            if(cursorLine == null)
             {
                 // 光标所在行不可见
                 // 此时说明有滚动，有滚动的情况下直接隐藏光标

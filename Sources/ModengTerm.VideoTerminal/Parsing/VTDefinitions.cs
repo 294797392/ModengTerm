@@ -104,7 +104,8 @@ namespace XTerminal.Parser
 
         /// <summary>
         /// 删除所有已经保存了的行
-        /// 相当于把当前行移动到可视区域的第一行
+        /// 但是我们的做法是要保存历史记录
+        /// 所以实现方式是把当前行移动到可视区域的第一行
         /// Erase Saved Lines
         /// </summary>
         Scrollback = 3

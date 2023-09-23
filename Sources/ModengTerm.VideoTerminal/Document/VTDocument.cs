@@ -49,7 +49,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 光标所在的物理行数
         /// </summary>
-        private int activePhysicsRow;
+        private int cursorPhysicsRow;
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 光标所在物理行数
         /// </summary>
-        public int ActivePhysicsRow { get { return this.activePhysicsRow; } }
+        public int CursorPhysicsRow { get { return this.cursorPhysicsRow; } }
 
         /// <summary>
         /// 当前光标所在行
@@ -323,7 +323,7 @@ namespace XTerminal.Document
                     }
                 }
 
-                this.activePhysicsRow = this.ActiveLine.PhysicsRow;
+                this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
 
                 this.SetArrangeDirty(true);
             }
@@ -401,7 +401,7 @@ namespace XTerminal.Document
                     this.ResetPhysicsRow(oldFirstLine.PhysicsRow);
                 }
 
-                this.activePhysicsRow = this.ActiveLine.PhysicsRow;
+                this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
 
                 this.SetArrangeDirty(true);
             }
@@ -513,21 +513,6 @@ namespace XTerminal.Document
 
                         VTextLine next = this.FirstLine;
                         while (next != null && next != textLine)
-                        {
-                            next.EraseAll();
-
-                            next = next.NextLine;
-                        }
-
-                        break;
-                    }
-
-                case EraseType.All:
-                    {
-                        // 相关命令：clear
-                        // 删除显示的全部字符，所有行都被删除，changed to single-width，光标不移动
-                        VTextLine next = this.FirstLine;
-                        while (next != null)
                         {
                             next.EraseAll();
 
@@ -789,8 +774,26 @@ namespace XTerminal.Document
                 this.Cursor.Row = row;
 
                 this.ActiveLine = this.FirstLine.FindNext(row);
+                this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
+            }
+        }
 
-                this.activePhysicsRow = this.ActiveLine.PhysicsRow;
+        /// <summary>
+        /// 设置光标所在物理行号
+        /// </summary>
+        /// <param name="physicsRow">光标所在物理行号</param>
+        public void SetCursorPhysicsRow(int physicsRow)
+        {
+            if (this.cursorPhysicsRow != physicsRow)
+            {
+                this.cursorPhysicsRow = physicsRow;
+            }
+
+            if (this.ActiveLine == null ||
+                this.ActiveLine.PhysicsRow != physicsRow)
+            {
+                // 如果光标所在物理行被滚动到了文档外，那么ActiveLine就是空的
+                this.ActiveLine = this.FindLine(physicsRow);
             }
         }
 
