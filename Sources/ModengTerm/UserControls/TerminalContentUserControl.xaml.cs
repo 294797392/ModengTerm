@@ -154,7 +154,7 @@ namespace XTerminal.UserControls
             base.OnPreviewTextInput(e);
 
             this.userInput.CapsLock = Console.CapsLock;
-            this.userInput.Key = VTKeys.None;
+            this.userInput.Key = VTKeys.GenericText;
             this.userInput.Text = e.Text;
             this.userInput.Modifiers = VTModifierKeys.None;
 

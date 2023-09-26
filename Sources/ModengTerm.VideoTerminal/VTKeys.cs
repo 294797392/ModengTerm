@@ -13,7 +13,7 @@ namespace ModengTerm.Terminal
         //
         // 摘要:
         //     不按任何键。
-        None = 0,
+        GenericText = 0,
         //
         // 摘要:
         //     Cancel 键。

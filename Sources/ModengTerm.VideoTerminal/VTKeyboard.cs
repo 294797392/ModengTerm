@@ -76,7 +76,6 @@ namespace ModengTerm.Terminal
             { VTKeys.OemMinus, new byte[] { (byte)'_' } }, { VTKeys.OemPlus, new byte[] { (byte)'+' } },
         };
 
-
         #region Control键按下的时候字母键映射
 
         private static readonly Dictionary<VTKeys, byte[]> ANSIKeyControlPressed = new Dictionary<VTKeys, byte[]>()
@@ -193,15 +192,43 @@ namespace ModengTerm.Terminal
         public static readonly Dictionary<VTKeys, byte[]> EditingKeypad = new Dictionary<VTKeys, byte[]>()
         {
             // insert
-            { VTKeys.Insert, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'2', (byte)'~' } },
-            { VTKeys.Delete, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'3', (byte)'~' } }, 
+            { VTKeys.Insert, Encoding.ASCII.GetBytes("\x1b[2~") },
+            { VTKeys.Delete, Encoding.ASCII.GetBytes("\x1b[3~") },
             // page up
-            { VTKeys.PageUp, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'5', (byte)'~' } },
+            { VTKeys.PageUp, Encoding.ASCII.GetBytes("\x1b[5~") },
             // page down
-            { VTKeys.Next, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'6', (byte)'~' } },
+            { VTKeys.Next, Encoding.ASCII.GetBytes("\x1b[6~") },
 
-            { VTKeys.Home, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'1', (byte)'~' } },
-            { VTKeys.End, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'4', (byte)'~' } },
+            { VTKeys.Home, Encoding.ASCII.GetBytes("\x1b[1~") },
+            { VTKeys.End, Encoding.ASCII.GetBytes("\x1b[4~") },
+        };
+
+        #endregion
+
+        #region F1 - F12
+
+        private static readonly Dictionary<VTKeys, byte[]> FunctionKeysTable = new Dictionary<VTKeys, byte[]>()
+        {
+            //// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-PC-Style-Function-Keys
+            //{ VTKeys.F1, Encoding.ASCII.GetBytes("\x1bOP~") }, // SS1 P
+            //{ VTKeys.F2, Encoding.ASCII.GetBytes("\x1bOQ~") }, // SS1 Q
+            //{ VTKeys.F3, Encoding.ASCII.GetBytes("\x1bOR~") }, // SS1 R
+            //{ VTKeys.F4, Encoding.ASCII.GetBytes("\x1bOS~") }, // SS1 S
+
+            { VTKeys.F1, Encoding.ASCII.GetBytes("\x1b[11~") }, // CSI 1 1 ~
+            { VTKeys.F2, Encoding.ASCII.GetBytes("\x1b[12~") }, // CSI 1 2 ~
+            { VTKeys.F3, Encoding.ASCII.GetBytes("\x1b[13~") }, // CSI 1 3 ~
+            { VTKeys.F4, Encoding.ASCII.GetBytes("\x1b[14~") }, // CSI 1 4 ~
+
+
+            { VTKeys.F5, Encoding.ASCII.GetBytes("\x1b[15~") },
+            { VTKeys.F6, Encoding.ASCII.GetBytes("\x1b[17~") },
+            { VTKeys.F7, Encoding.ASCII.GetBytes("\x1b[18~") },
+            { VTKeys.F8, Encoding.ASCII.GetBytes("\x1b[19~") },
+            { VTKeys.F9, Encoding.ASCII.GetBytes("\x1b[20~") },
+            { VTKeys.F10, Encoding.ASCII.GetBytes("\x1b[21~") },
+            { VTKeys.F11, Encoding.ASCII.GetBytes("\x1b[23~") },
+            { VTKeys.F12, Encoding.ASCII.GetBytes("\x1b[24~") }
         };
 
         #endregion
@@ -294,12 +321,12 @@ namespace ModengTerm.Terminal
         /// 代码参考terminal - terminalInput.cpp
         /// </summary>
         /// <returns></returns>
-        public byte[] TranslateInput(UserInput evt)
+        public byte[] TranslateInput(UserInput userInput)
         {
-            if (evt.Key == VTKeys.None)
+            if (userInput.Key == VTKeys.GenericText)
             {
                 // 这里说明是中文
-                return this.Encoding.GetBytes(evt.Text);
+                return this.Encoding.GetBytes(userInput.Text);
             }
 
             byte[] bytes = null;
@@ -312,9 +339,9 @@ namespace ModengTerm.Terminal
             {
                 #region 尝试映射光标键
 
-                if (evt.Modifiers.HasFlag(VTModifierKeys.Control))
+                if (userInput.Modifiers.HasFlag(VTModifierKeys.Control))
                 {
-                    if (CursorKeyControlPressed.TryGetValue(evt.Key, out bytes))
+                    if (CursorKeyControlPressed.TryGetValue(userInput.Key, out bytes))
                     {
                         return bytes;
                     }
@@ -323,14 +350,14 @@ namespace ModengTerm.Terminal
                 {
                     if (this.isCursorKeyApplicationMode)
                     {
-                        if (CursorKeyApplicationMode.TryGetValue(evt.Key, out bytes))
+                        if (CursorKeyApplicationMode.TryGetValue(userInput.Key, out bytes))
                         {
                             return bytes;
                         }
                     }
                     else
                     {
-                        if (CursorKeyNormalMode.TryGetValue(evt.Key, out bytes))
+                        if (CursorKeyNormalMode.TryGetValue(userInput.Key, out bytes))
                         {
                             return bytes;
                         }
@@ -343,14 +370,14 @@ namespace ModengTerm.Terminal
 
                 if (this.isKeypadApplicationMode)
                 {
-                    if (KeypadApplicationMode.TryGetValue(evt.Key, out bytes))
+                    if (KeypadApplicationMode.TryGetValue(userInput.Key, out bytes))
                     {
                         return bytes;
                     }
                 }
                 else
                 {
-                    if (KeypadNormalMode.TryGetValue(evt.Key, out bytes))
+                    if (KeypadNormalMode.TryGetValue(userInput.Key, out bytes))
                     {
                         return bytes;
                     }
@@ -360,7 +387,16 @@ namespace ModengTerm.Terminal
 
                 #region 尝试映射EditingKeypad
 
-                if (EditingKeypad.TryGetValue(evt.Key, out bytes))
+                if (EditingKeypad.TryGetValue(userInput.Key, out bytes))
+                {
+                    return bytes;
+                }
+
+                #endregion
+
+                #region 尝试映射F1 - F12
+
+                if (FunctionKeysTable.TryGetValue(userInput.Key, out bytes))
                 {
                     return bytes;
                 }
@@ -370,28 +406,28 @@ namespace ModengTerm.Terminal
                 #region 都没映射成功，使用默认映射
 
                 // 处理按住Shift键的情况
-                if (evt.Modifiers.HasFlag(VTModifierKeys.Shift))
+                if (userInput.Modifiers.HasFlag(VTModifierKeys.Shift))
                 {
-                    if (ANSIKeyShiftPressed.TryGetValue(evt.Key, out bytes))
+                    if (ANSIKeyShiftPressed.TryGetValue(userInput.Key, out bytes))
                     {
                         return bytes;
                     }
                 }
 
                 // 处理按住Control键的情况
-                if (evt.Modifiers.HasFlag(VTModifierKeys.Control)) 
+                if (userInput.Modifiers.HasFlag(VTModifierKeys.Control)) 
                 {
-                    if (ANSIKeyControlPressed.TryGetValue(evt.Key, out bytes))
+                    if (ANSIKeyControlPressed.TryGetValue(userInput.Key, out bytes))
                     {
                         return bytes;
                     }
                 }
 
                 // ANSI兼容模式
-                if (ANSIKeyTable.TryGetValue(evt.Key, out bytes))
+                if (ANSIKeyTable.TryGetValue(userInput.Key, out bytes))
                 {
                     // CapsLock打开了，说明输入的是大写字母，把小写字母转成大写字母
-                    if (evt.Key >= VTKeys.A && evt.Key <= VTKeys.Z && evt.CapsLock)
+                    if (userInput.Key >= VTKeys.A && userInput.Key <= VTKeys.Z && userInput.CapsLock)
                     {
                         upperCaseCharacter[0] = (byte)(bytes[0] - 32);
                         return upperCaseCharacter;
@@ -400,7 +436,7 @@ namespace ModengTerm.Terminal
                     return bytes;
                 }
 
-                logger.ErrorFormat("未找到Key - {0}的映射关系", evt.Key);
+                logger.ErrorFormat("未找到Key - {0}的映射关系", userInput.Key);
 
                 #endregion
             }

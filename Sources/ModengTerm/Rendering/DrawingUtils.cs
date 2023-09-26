@@ -44,7 +44,18 @@ namespace ModengTerm.Rendering
 
         public static VTKeys ConvertToVTKey(Key key)
         {
-            return (VTKeys)key;
+            switch (key)
+            {
+                case Key.System:
+                    {
+                        return VTKeys.F10;
+                    }
+
+                default:
+                    {
+                        return (VTKeys)key;
+                    }
+            }
         }
 
         public static Typeface GetTypeface(VTextStyle textStyle)
