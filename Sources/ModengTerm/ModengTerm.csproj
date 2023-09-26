@@ -241,28 +241,6 @@
     <None Include="app.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Resource Include="Fonts\Ubuntu-B.ttf" />
-    <Resource Include="Fonts\Ubuntu-BI.ttf" />
-    <Resource Include="Fonts\Ubuntu-C.ttf" />
-    <Resource Include="Fonts\Ubuntu-L.ttf" />
-    <Resource Include="Fonts\Ubuntu-LI.ttf" />
-    <Resource Include="Fonts\Ubuntu-M.ttf" />
-    <Resource Include="Fonts\Ubuntu-MI.ttf" />
-    <Resource Include="Fonts\Ubuntu-R.ttf" />
-    <Resource Include="Fonts\Ubuntu-RI.ttf" />
-    <Resource Include="Fonts\UbuntuMono-B.ttf" />
-    <Resource Include="Fonts\UbuntuMono-BI.ttf" />
-    <Resource Include="Fonts\UbuntuMono-R.ttf" />
-    <Resource Include="Fonts\UbuntuMono-RI.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Fonts\CONTRIBUTING.txt" />
-    <Resource Include="Fonts\copyright.txt" />
-    <Resource Include="Fonts\FONTLOG.txt" />
-    <Resource Include="Fonts\LICENCE-FAQ.txt" />
-    <Resource Include="Fonts\LICENCE.txt" />
-    <Resource Include="Fonts\README.txt" />
-    <Resource Include="Fonts\TRADEMARKS.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\close.png" />

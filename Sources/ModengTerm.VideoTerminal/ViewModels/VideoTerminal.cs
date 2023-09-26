@@ -8,6 +8,7 @@ using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -909,11 +910,27 @@ namespace ModengTerm.Terminal.ViewModels
         {
             if (ch is char)
             {
-                return VTCharacter.Create(Convert.ToChar(ch), 2, VTCharacterFlags.MulitByteChar, attributeStates);
+                // 说明是unicode字符
+                // 如果无法确定unicode字符的类别，那么占1列，否则占2列
+                int column = 2;
+                char c = Convert.ToChar(ch);
+                if ((c >= 0x2500 && c <= 0x259F) ||     //  Box Drawing, Block Elements
+                    (c >= 0x2000 && c <= 0x206F))       // Unicode - General Punctuation
+                {
+                    // https://symbl.cc/en/unicode/blocks/box-drawing/
+                    // https://unicodeplus.com/U+2500#:~:text=The%20unicode%20character%20U%2B2500%20%28%E2%94%80%29%20is%20named%20%22Box,Horizontal%22%20and%20belongs%20to%20the%20Box%20Drawing%20block.
+                    // gotop命令会用到Box Drawing字符，BoxDrawing字符不能用宋体，不然渲染的时候界面会乱掉。BoxDrawing字符的范围是0x2500 - 0x257F
+                    // 经过测试发现WindwosTerminal如果用宋体渲染top的话，界面也是乱的...
+
+                    column = 1;
+                }
+
+                return VTCharacter.Create(c, column, attributeStates);
             }
             else
             {
-                return VTCharacter.Create(Convert.ToChar(ch), 1, VTCharacterFlags.SingleByteChar, attributeStates);
+                // 说明是ASCII码可见字符
+                return VTCharacter.Create(Convert.ToChar(ch), 1, attributeStates);
             }
         }
 
@@ -1348,10 +1365,6 @@ namespace ModengTerm.Terminal.ViewModels
                             {
                                 col = colSize - 1;
                             }
-
-                            // 刚打开VIM就按空格键，此时VIM会响应一个CursorPosition向右移动一个单位的事件
-                            // 此时要把光标向右移动一个单位
-                            this.ActiveLine.PadColumns(newcol);
                         }
                         else
                         {
@@ -1553,6 +1566,16 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
+                case VTActions.ECH_EraseCharacters:
+                    {
+                        // 从当前光标处用空格填充n个字符
+                        // Erase Characters from the current cursor position, by replacing them with a space
+                        List<int> parameters = parameter as List<int>;
+                        int count = VTParameter.GetParameter(parameters, 0, 1);
+                        this.ActiveLine.EraseRange(this.CursorCol, count);
+                        break;
+                    }
+
                 case VTActions.IL_InsertLine:
                     {
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
@@ -1582,6 +1605,18 @@ namespace ModengTerm.Terminal.ViewModels
                 #endregion
 
                 #region 上下滚动
+
+                case VTActions.SD_ScrollDown:
+                    {
+                        // Scroll down Ps lines (default = 1) (SD), VT420.
+
+                        break;
+                    }
+
+                case VTActions.SU_ScrollUp:
+                    {
+                        break;
+                    }
 
                 #endregion
 

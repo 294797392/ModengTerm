@@ -43,6 +43,11 @@ namespace XTerminal.Document
         /// 字体颜色
         /// </summary>
         Foreground = 5,
+
+        /// <summary>
+        /// 字体
+        /// </summary>
+        FontFamily = 6
     }
 
     public class VTextAttribute

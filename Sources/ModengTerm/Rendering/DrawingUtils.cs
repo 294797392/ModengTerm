@@ -127,6 +127,14 @@ namespace ModengTerm.Rendering
 
             //textData.Text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
 
+            if (textLine.Characters.Count > 7)
+            {
+                if (textLine.Characters[3].Character == 'P' && textLine.Characters[4].Character == 'I' && textLine.Characters[5].Character == 'D')
+                {
+                    Console.WriteLine();
+                }
+            }
+
             textData.Style = textLine.Style;
 
             return DrawingUtils.CreateFormattedText(textData, dc);
@@ -182,6 +190,12 @@ namespace ModengTerm.Rendering
                     case VTextAttributes.Underline:
                         {
                             formattedText.SetTextDecorations(TextDecorations.Underline, textAttribute.StartIndex, textAttribute.Count);
+                            break;
+                        }
+
+                    case VTextAttributes.FontFamily:
+                        {
+                            formattedText.SetFontFamily(textAttribute.Parameter.ToString(), textAttribute.StartIndex, textAttribute.Count);
                             break;
                         }
 

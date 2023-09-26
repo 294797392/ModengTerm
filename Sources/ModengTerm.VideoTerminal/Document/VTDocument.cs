@@ -130,6 +130,10 @@ namespace XTerminal.Document
         /// </summary>
         public VTRect Rect { get; set; }
 
+        public int RowSize { get { return this.rowSize; } }
+
+        public int ColumnSize { get { return this.colSize; } }
+
         #endregion
 
         #region 构造方法
@@ -776,6 +780,10 @@ namespace XTerminal.Document
                 this.ActiveLine = this.FirstLine.FindNext(row);
                 this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
             }
+
+            // 保证光标所在位置是有字符的，没有字符的话光标显示就会有问题，因为测量不到行的宽度
+            // 此时ActiveLine绝对不可能为空
+            this.ActiveLine.PadColumns(column + 1);
         }
 
         /// <summary>

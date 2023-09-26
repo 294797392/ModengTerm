@@ -7,6 +7,9 @@ using System.Text;
 using XTerminal.Document;
 using XTerminal.Parser;
 using System.Linq;
+using XTerminal.Base.Definitions;
+using System.Reflection;
+using System.Windows.Media;
 
 namespace ModengTerm.Terminal
 {
@@ -327,7 +330,8 @@ namespace ModengTerm.Terminal
                         {
                             // 颜色比较特殊，有可能连续多次设置不同的颜色
                             if (attributeState.Attribute == VTextAttributes.Background ||
-                                attributeState.Attribute == VTextAttributes.Foreground)
+                                attributeState.Attribute == VTextAttributes.Foreground ||
+                                attributeState.Attribute == VTextAttributes.FontFamily)
                             {
                                 // 如果设置的是颜色的话，并且当前字符的颜色和最后一次设置的颜色不一样，那么要先关闭最后一次设置的颜色
                                 // attribute是最后一次设置的颜色，attributeState是当前字符的颜色

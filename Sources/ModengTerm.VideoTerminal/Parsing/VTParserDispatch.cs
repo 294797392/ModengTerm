@@ -341,6 +341,24 @@ namespace XTerminal.Parser
                         break;
                     }
 
+                case CsiActionCodes.SD_ScrollDown:
+                    {
+                        this.NotifyActionEvent(VTActions.SD_ScrollDown, parameters);
+                        break;
+                    }
+
+                case CsiActionCodes.SU_ScrollUp:
+                    {
+                        this.NotifyActionEvent(VTActions.SU_ScrollUp, parameters);
+                        break;
+                    }
+
+                case CsiActionCodes.ECH_EraseCharacters:
+                    {
+                        this.NotifyActionEvent(VTActions.ECH_EraseCharacters, parameters);
+                        break;
+                    }
+
                 case (CsiActionCodes)'~':
                     {
                         logger.ErrorFormat("不需要实现的CSIAction, ~");
@@ -667,18 +685,18 @@ namespace XTerminal.Parser
                             break;
                         }
 
-                    //case DECPrivateMode.DECTCEM_TextCursorEnableMode:
-                    //    {
-                    //        if (enable)
-                    //        {
-                    //            this.NotifyActionEvent(VTActions.CursorVisible);
-                    //        }
-                    //        else
-                    //        {
-                    //            this.NotifyActionEvent(VTActions.CursorHiden);
-                    //        }
-                    //        break;
-                    //    }
+
+                    case DECPrivateMode.VT200_MOUSE_MODE:
+                        {
+                            logger.FatalFormat("VT200_MOUSE_MODE有待实现");
+                            break;
+                        }
+
+                    case (DECPrivateMode)4:
+                        {
+                            logger.FatalFormat("terminal没实现DECPrivateMode - 4");
+                            break;
+                        }
 
                     default:
                         throw new NotImplementedException(string.Format("未实现DECSETPrivateMode, {0}", mode));

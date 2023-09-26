@@ -253,6 +253,11 @@ namespace XTerminal.Parser
         VT200_MOUSE_MODE = 1000,
         BUTTON_EVENT_MOUSE_MODE = 1002,
         ANY_EVENT_MOUSE_MODE = 1003,
+
+        /// <summary>
+        /// 1005和1006是和鼠标相关的
+        /// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+        /// </summary>
         UTF8_EXTENDED_MODE = 1005,
         SGR_EXTENDED_MODE = 1006,
         ALTERNATE_SCROLL = 1007,

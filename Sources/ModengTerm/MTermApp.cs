@@ -129,12 +129,11 @@ namespace ModengTerm
         public void CloseSession(OpenedSessionVM session)
         {
             SessionContent sessionContent = session.Content as SessionContent;
-            sessionContent.Close();
-
             if (MTermUtils.IsTerminal((SessionTypeEnum)sessionContent.Session.Type))
             {
                 this.OpenedTerminals.Remove(sessionContent.ViewModel as VideoTerminal);
             }
+            sessionContent.Close();
 
             this.OpenedSessionList.Remove(session);
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();

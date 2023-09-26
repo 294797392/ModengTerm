@@ -47,6 +47,7 @@ namespace XTerminal.Document
 
         /// <summary>
         /// 已经显示了的列数
+        /// 从1开始计数
         /// </summary>
         private int columns;
 
@@ -61,7 +62,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 行索引，从0开始
         /// </summary>
-        public int PhysicsRow 
+        public int PhysicsRow
         {
             get { return this.physicsRow; }
             set
@@ -262,111 +263,37 @@ namespace XTerminal.Document
         /// <param name="column">索引位置，在此处插入字符串</param>
         public void PrintCharacter(VTCharacter character, int column)
         {
-            //if (this.CursorAtRightMargin && this.DECPrivateAutoWrapMode)
-            //{
-            //    // 说明光标已经在最右边了
-            //    // 并且开启了自动换行(DECAWM)的功能，那么要自动换行
-
-            //    // 换行完了之后再重置状态
-            //    this.CursorAtRightMargin = false;
-            //}
-            //else
-            //{
-            // 更新文本
-
-            // 算出来要打印的列与当前行的最后一列之间相差多少列
-            int value = column + 1 - this.columns;
-
-            // 只相差一列，说明是在该行最后一个字符的后面打印字符，可以直接添加字符
-            if (value == 1)
+            if (column + 1 > this.columns)
             {
-                this.characters.Add(character);
-                this.columns += character.ColumnSize;
-            }
-            else if (value > 1)
-            {
-                // 相差了多列，那么创建空字符填充相差的列，然后在指定位置打印要打印的字符
-                int count = column - this.columns;
-
-                for (int i = 0; i < count - 1; i++)
-                {
-                    VTCharacter nullCharacter = VTCharacter.CreateNull();
-                    this.characters.Add(nullCharacter);
-                    this.columns += nullCharacter.ColumnSize;
-                }
-                this.characters.Add(character);
-                this.columns += character.ColumnSize;
-            }
-            else
-            {
-                // 不相差列，说明要在已有列中替换字符
-                // 替换指定列的文本
-                int characterIndex = this.FindCharacterIndex(column);
-                if (characterIndex < 0)
-                {
-                    logger.ErrorFormat("PrintCharacter失败, FindCharacterIndex失败, column = {0}", column);
-                    return;
-                }
-
-                VTCharacter oldCharacter = this.characters[characterIndex];
-
-                this.characters.RemoveAt(characterIndex);
-                this.columns -= oldCharacter.ColumnSize;
-                
-                this.characters.Insert(characterIndex, character);
-                this.columns += character.ColumnSize;
+                this.PadColumns(column + 1);
             }
 
-            //if (column == this.OwnerDocument.ColumnSize - 1)
-            //{
-            //    //logger.ErrorFormat("光标在最右边");
-            //    // 此时说明光标在最右边
-            //    this.CursorAtRightMargin = true;
-            //}
+            // 替换指定列的文本
+            int characterIndex = this.FindCharacterIndex(column);
+            if (characterIndex < 0)
+            {
+                logger.ErrorFormat("PrintCharacter失败, FindCharacterIndex失败, column = {0}", column);
+                return;
+            }
+
+            VTCharacter oldCharacter = this.characters[characterIndex];
+
+            this.characters.RemoveAt(characterIndex);
+            this.columns -= oldCharacter.ColumnSize;
+
+            this.characters.Insert(characterIndex, character);
+            this.columns += character.ColumnSize;
 
             this.SetRenderDirty(true);
-            //}
-
-            //if (this.Columns == this)
-            //{
-            //    // 光标在最右边了，下次在收到字符，要自动换行了
-            //    // 在收到移动光标指令的时候，要清除这个标志
-            //    this.CursorAtRightMargin = true;
-            //}
         }
 
         /// <summary>
         /// 从指定位置用空白符填充该行所有字符（包括指定位置处的字符）
         /// </summary>
-        /// <param name="column"></param>
+        /// <param name="column">从哪一列开始填充</param>
         public void EraseAll(int column)
         {
-            if (column + 1 > this.columns)
-            {
-                return;
-            }
-
-            int startIndex = this.FindCharacterIndex(column);
-            if (startIndex == -1)
-            {
-                logger.ErrorFormat("ReplaceToEnd失败，startIndex == -1, column = {0}", column);
-                return;
-            }
-
-            for (int i = startIndex; i < this.characters.Count; i++)
-            {
-                VTCharacter character = this.characters[i];
-
-                this.columns -= character.ColumnSize - 1;
-
-                // TODO：这里是否需要回收字符以便于节省内存占用？
-                character.Character = ' ';
-                character.ColumnSize = 1;
-                character.AttributeList.Clear();
-                character.Flags = VTCharacterFlags.SingleByteChar;
-            }
-
-            this.SetRenderDirty(true);
+            this.EraseRange(column, this.OwnerDocument.ColumnSize - column);
         }
 
         /// <summary>
@@ -375,7 +302,7 @@ namespace XTerminal.Document
         /// </summary>
         public void EraseAll()
         {
-            this.EraseAll(0);
+            this.EraseRange(0, this.OwnerDocument.ColumnSize);
         }
 
         /// <summary>
@@ -385,11 +312,11 @@ namespace XTerminal.Document
         /// <param name="count">要填充的字符个数</param>
         public void EraseRange(int column, int count)
         {
-            if (column >= this.columns)
-            {
-                logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
-                return;
-            }
+            // 先保证该行字符至少要大于等于要填充的最后一个字符
+            this.PadColumns(columns + count);
+
+            // TODO：所有被新加的字符都要沿用最后一个字符的Attribute?
+            // htop第5行的背景不会显示到最后面
 
             int startIndex = this.FindCharacterIndex(column);
             if (startIndex == -1)
@@ -401,11 +328,12 @@ namespace XTerminal.Document
 
             for (int i = 0; i < count; i++)
             {
-                VTCharacter character = this.characters[startIndex];
+                int characterIndex = startIndex + i;
+                VTCharacter character = this.characters[characterIndex];
                 character.Character = ' ';
                 character.ColumnSize = 1;
                 character.AttributeList.Clear();
-                character.Flags = VTCharacterFlags.SingleByteChar;
+                character.Flags = VTCharacterFlags.None;
             }
 
             this.SetRenderDirty(true);
@@ -467,7 +395,15 @@ namespace XTerminal.Document
             }
 
             // 要补齐的字符数
-            this.PrintCharacter(VTCharacter.CreateNull(), columns - 1);
+            int count = columns - this.columns;
+
+            // 补齐字符
+            for (int i = 0; i < count; i++)
+            {
+                this.characters.Add(VTCharacter.CreateNull());
+            }
+
+            this.columns += count;
         }
 
         /// <summary>
@@ -521,7 +457,6 @@ namespace XTerminal.Document
             this.characters.Insert(characterIndex, character);
             this.columns += character.ColumnSize;
         }
-
 
         /// <summary>
         /// 删除指定列处的字符

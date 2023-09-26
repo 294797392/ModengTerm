@@ -198,7 +198,7 @@ namespace XTerminal.Parser
         /// 从当前光标处删除字符
         /// </summary>
         DCH_DeleteCharacter,
-
+        ECH_EraseCharacters,
         /// <summary>
         /// 在当前光标处插入N个空白字符
         /// </summary>
@@ -218,6 +218,9 @@ namespace XTerminal.Parser
         DL_DeleteLine,
 
         DECSC_CursorSave,
-        DECRC_CursorRestore
+        DECRC_CursorRestore,
+
+        SD_ScrollDown,
+        SU_ScrollUp
     }
 }

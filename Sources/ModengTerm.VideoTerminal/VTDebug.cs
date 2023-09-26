@@ -217,7 +217,6 @@ namespace ModengTerm.Terminal
                 return;
             }
 
-            string message = sequence.Select(v => v.ToString()).Join(",") + ",'\\0'";
             if (sequence.Count == 0)
             {
                 // TODO：因为SGR序列会执行多次VTAction，执行第一次VTAction的时候sequence就被清空了
@@ -225,9 +224,28 @@ namespace ModengTerm.Terminal
                 return;
             }
 
-            string varName = string.Format("{0}{1}", actions, this.vttestCodeIndex++);
+            StringBuilder builder = new StringBuilder();
+            foreach (byte b in sequence)
+            {
+                if (actions == VTActions.CarriageReturn)
+                {
+                    builder.AppendFormat("'\\r',");
+                }
+                else if (actions == VTActions.LF)
+                {
+                    builder.AppendFormat("'\\n',");
+                }
+                else
+                {
+                    builder.AppendFormat("'{0}',", Convert.ToChar(b));
+                }
+            }
+            builder.Append("'\\0'");
 
-            string log = string.Format("char {0}[] = {{{1}}};printf({2});", varName, message, varName);
+            string varName = string.Format("{0}{1}", actions, this.vttestCodeIndex++);
+            string annotation = actions.ToString();
+
+            string log = string.Format("char {0}[] = {{{1}}};printf({2}); // {3}", varName, builder.ToString(), varName, actions);
 
             File.AppendAllText(this.vttestCodeCategory.FilePath, log + Environment.NewLine);
         }

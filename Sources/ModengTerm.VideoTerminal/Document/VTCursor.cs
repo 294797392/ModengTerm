@@ -171,6 +171,7 @@ namespace XTerminal.Document
             {
                 // 光标所在行不可见
                 // 此时说明有滚动，有滚动的情况下直接隐藏光标
+                // 滚动之后会调用VTDocument.SetCursorPhysicsRow重新设置光标所在物理行号，这个时候有可能ActiveLine就是空的
                 this.DrawingObject.SetVisible(false);
             }
             else
@@ -186,6 +187,7 @@ namespace XTerminal.Document
                     // 设置光标位置
                     // 有可能有中文字符，一个中文字符占用2列
                     // 先通过光标所在列找到真正的字符所在列
+                    // TODO：FindCharacterIndex此处是异步线程，可能会和处理字符线程冲突，导致异常（处理字符线程正在操作集合，Cursor线程正在查询）
                     int characterIndex = cursorLine.FindCharacterIndex(this.column - 1);
                     VTRect rect = cursorLine.MeasureTextBlock(characterIndex, 1);
                     double offsetX = rect.Right;

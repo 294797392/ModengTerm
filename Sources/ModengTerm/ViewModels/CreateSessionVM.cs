@@ -33,7 +33,7 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public static readonly List<string> DefaultFontFamilies = new List<string>()
         {
-            "宋体", "微软雅黑", "Yahei", "Consolas"
+            "Consolas", "宋体", "微软雅黑", "Yahei"
         };
 
         #region 实例变量

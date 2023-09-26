@@ -53,13 +53,13 @@ namespace XTerminal.Document
         /// 该方法会首先从缓存里取字符，如果缓存里没有空闲字符，那么创建一个新的
         /// </remarks>
         /// <returns></returns>
-        public static VTCharacter Create(char ch, int columnSize, VTCharacterFlags flag, List<VTextAttributeState> attributeStates)
+        public static VTCharacter Create(char ch, int columnSize, List<VTextAttributeState> attributeStates)
         {
             VTCharacter character = new VTCharacter();
             character.AttributeList = VTUtils.CreateTextAttributeStates();
             character.Character = ch;
             character.ColumnSize = columnSize;
-            character.Flags = flag;
+            character.Flags = VTCharacterFlags.None;
             if (attributeStates != null)
             {
                 VTUtils.CopyAttributeState(attributeStates, character.AttributeList);
@@ -73,7 +73,7 @@ namespace XTerminal.Document
         /// <returns></returns>
         public static VTCharacter CreateNull()
         {
-            return Create(' ', 1, VTCharacterFlags.SingleByteChar, null);
+            return Create(' ', 1, null);
         }
     }
 }
