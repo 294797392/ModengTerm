@@ -437,7 +437,7 @@ namespace XTerminal.Document
         /// 在当前光标所在行开始删除字符操作
         /// </summary>
         /// <param name="textLine">要执行删除操作的行</param>
-        /// <param name="column">要删除的起始列，该列也需要删除</param>
+        /// <param name="column">光标所在列</param>
         /// <param name="eraseType">删除类型</param>
         public void EraseLine(VTextLine textLine, int column, EraseType eraseType)
         {
@@ -446,14 +446,14 @@ namespace XTerminal.Document
                 case EraseType.ToEnd:
                     {
                         // 删除从当前光标处到该行结尾的所有字符
-                        textLine.EraseAll(column);
+                        textLine.EraseToEnd(column);
                         break;
                     }
 
                 case EraseType.FromBeginning:
                     {
                         // 删除从行首到当前光标处的内容
-                        textLine.EraseRange(0, column);
+                        textLine.EraseFromBeginning(column);
                         break;
                     }
 
@@ -490,13 +490,13 @@ namespace XTerminal.Document
                         }
 
                         // 先删第一行
-                        textLine.EraseAll(column);
+                        textLine.EraseToEnd(column);
 
                         // 再删剩下的行
                         VTextLine next = textLine.NextLine;
                         while (next != null)
                         {
-                            next.EraseAll(0);
+                            next.EraseToEnd(0);
 
                             next = next.NextLine;
                         }
@@ -513,7 +513,7 @@ namespace XTerminal.Document
                             return;
                         }
 
-                        textLine.EraseAll(0);
+                        textLine.EraseToEnd(0);
 
                         VTextLine next = this.FirstLine;
                         while (next != null && next != textLine)
@@ -781,9 +781,12 @@ namespace XTerminal.Document
                 this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
             }
 
-            // 保证光标所在位置是有字符的，没有字符的话光标显示就会有问题，因为测量不到行的宽度
-            // 此时ActiveLine绝对不可能为空
-            this.ActiveLine.PadColumns(column + 1);
+            // 要判断下光标所在行是否为空
+            // 如果光标所在行被滚动到可视区域外了，然后执行CR指令，那么ActiveLine就是空的
+            if (this.ActiveLine != null)
+            {
+                this.ActiveLine.PadColumns(column + 1);
+            }
         }
 
         /// <summary>

@@ -222,6 +222,24 @@ namespace XTerminal.Document
             }
         }
 
+        private void EraseCharacter(int characterIndex, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                int index = characterIndex + i;
+                VTCharacter character = this.characters[index];
+                if (character.ColumnSize > 1)
+                {
+                    this.columns -= (character.ColumnSize - 1);
+                }
+
+                character.Character = ' ';
+                character.ColumnSize = 1;
+                character.Attribute = 0;
+                character.Flags = VTCharacterFlags.None;
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -291,9 +309,22 @@ namespace XTerminal.Document
         /// 从指定位置用空白符填充该行所有字符（包括指定位置处的字符）
         /// </summary>
         /// <param name="column">从哪一列开始填充</param>
-        public void EraseAll(int column)
+        public void EraseToEnd(int column)
         {
-            this.EraseRange(column, this.OwnerDocument.ColumnSize - column);
+            // TODO：所有被新加的字符都要沿用最后一个字符的Attribute?
+            // htop第5行的背景不会显示到最后面
+
+            int startIndex = this.FindCharacterIndex(column);
+            if (startIndex == -1)
+            {
+                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
+                logger.FatalFormat("EraseToEnd失败, startIndex == -1");
+                return;
+            }
+
+            int count = this.characters.Count - startIndex;
+
+            this.EraseCharacter(startIndex, count);
         }
 
         /// <summary>
@@ -302,41 +333,43 @@ namespace XTerminal.Document
         /// </summary>
         public void EraseAll()
         {
-            this.EraseRange(0, this.OwnerDocument.ColumnSize);
+            this.EraseCharacter(0, this.characters.Count);
         }
 
         /// <summary>
-        /// 用空白字符填充指定列处的字符
+        /// 删除从行首到光标处的内容
         /// </summary>
-        /// <param name="column">从此处开始填充字符</param>
-        /// <param name="count">要填充的字符个数</param>
-        public void EraseRange(int column, int count)
+        /// <param name="column">光标位置</param>
+        public void EraseFromBeginning(int column)
         {
-            // 先保证该行字符至少要大于等于要填充的最后一个字符
-            this.PadColumns(columns + count);
-
-            // TODO：所有被新加的字符都要沿用最后一个字符的Attribute?
-            // htop第5行的背景不会显示到最后面
-
-            int startIndex = this.FindCharacterIndex(column);
-            if (startIndex == -1)
+            int characterIndex = this.FindCharacterIndex(column);
+            if (characterIndex == -1)
             {
-                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
-                logger.FatalFormat("DeleteText失败, startIndex == -1, column = {0}, count = {1}", column, count);
+                // 按理说应该不会出现
+                logger.FatalFormat("EraseFromBeginning失败, startIndex == -1, column = {0}", column);
                 return;
             }
 
-            for (int i = 0; i < count; i++)
+            this.EraseCharacter(0, characterIndex);
+        }
+
+        /// <summary>
+        /// 从光标处用空格填充n个字符
+        /// </summary>
+        /// <param name="column">光标位置</param>
+        /// <param name="characterCount">要填充的字符个数</param>
+        public void EraseRange(int column, int characterCount)
+        {
+            int characterIndex = this.FindCharacterIndex(column);
+            if (characterIndex == -1)
             {
-                int characterIndex = startIndex + i;
-                VTCharacter character = this.characters[characterIndex];
-                character.Character = ' ';
-                character.ColumnSize = 1;
-                character.Attribute = 0;
-                character.Flags = VTCharacterFlags.None;
+                // 按理说应该不会出现
+                logger.FatalFormat("EraseRange失败, startIndex == -1, column = {0}", column);
+                return;
             }
 
-            this.SetRenderDirty(true);
+            this.PadColumns(characterIndex + characterCount);
+            this.EraseCharacter(characterIndex, characterCount);
         }
 
         /// <summary>
