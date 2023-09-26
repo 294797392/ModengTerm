@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 
-namespace ModengTerm.Base.ServiceAgents
+namespace ModengTerm.ServiceAgents
 {
     /// <summary>
     /// 对本体文件数据库进行管理

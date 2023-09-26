@@ -84,26 +84,12 @@ namespace XTerminal.Document
             }
         }
 
-        /// <summary>
-        /// 准备渲染数据
-        /// </summary>
-        protected virtual void OnRender()
-        { }
-
-        /// <summary>
-        /// 计算OffsetX和OffsetY
-        /// </summary>
-        protected virtual void OnArrange()
-        { }
-
         #region VTDocumentElement
 
         public override void RequestInvalidate()
         {
             if (base.arrangeDirty)
             {
-                this.OnArrange();
-
                 this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
 
                 base.arrangeDirty = false;
@@ -111,8 +97,6 @@ namespace XTerminal.Document
 
             if (this.renderDirty)
             {
-                this.OnRender();
-
                 this.DrawingObject.Draw();
 
                 this.renderDirty = false;

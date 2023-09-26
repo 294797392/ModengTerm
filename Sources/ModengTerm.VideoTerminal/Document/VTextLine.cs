@@ -332,7 +332,7 @@ namespace XTerminal.Document
                 VTCharacter character = this.characters[characterIndex];
                 character.Character = ' ';
                 character.ColumnSize = 1;
-                character.AttributeList.Clear();
+                character.Attribute = 0;
                 character.Flags = VTCharacterFlags.None;
             }
 

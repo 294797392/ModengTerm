@@ -115,13 +115,10 @@ namespace ModengTerm.Terminal.Document.Graphics
                         {
                             VTCharacter character = characters[matches.Index + i];
 
-                            VTextAttributeState foregroundAttribute = character.AttributeList[(int)VTextAttributes.Foreground];
-                            foregroundAttribute.Enabled = true;
-                            foregroundAttribute.Parameter = VTColor.CreateFromRgbKey(this.textLine.Style.Background);
-
-                            VTextAttributeState backgroundAttribute = character.AttributeList[(int)VTextAttributes.Background];
-                            backgroundAttribute.Enabled = true;
-                            backgroundAttribute.Parameter = VTColor.CreateFromRgbKey(this.textLine.Style.Foreground);
+                            VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
+                            VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
+                            character.Foreground = VTColor.CreateFromRgbKey(this.textLine.Style.Background);
+                            character.Background = VTColor.CreateFromRgbKey(this.textLine.Style.Foreground);
                         }
 
                         #endregion

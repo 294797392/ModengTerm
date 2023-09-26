@@ -250,6 +250,10 @@
       <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
       <Name>ModengTerm.Base</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ModengTerm.ServiceAgent\ModengTerm.ServiceAgents.csproj">
+      <Project>{0ba69759-28cf-4ae5-950a-a7adf593b85a}</Project>
+      <Name>ModengTerm.ServiceAgents</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ModengTerm.VideoTerminal\ModengTerm.Terminal.csproj">
       <Project>{8d8c6c2d-8249-49b8-aa04-72d908836388}</Project>
       <Name>ModengTerm.Terminal</Name>
@@ -270,7 +274,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties app_1json__JsonSchema="https://beaujs.com/schema.json" />
+      <UserProperties app_1json__JsonSchema="" />
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>

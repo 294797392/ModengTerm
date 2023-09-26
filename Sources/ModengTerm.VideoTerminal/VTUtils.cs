@@ -23,8 +23,6 @@ namespace ModengTerm.Terminal
 
         public LogFileTypeEnum ContentType { get; set; }
 
-        public Dictionary<string, string> ColorTable { get; set; }
-
         public string SessionName { get; set; }
 
         /// <summary>
@@ -53,28 +51,7 @@ namespace ModengTerm.Terminal
             "<body style='background-color:{2};font-size:{3}px;font-family:{4};color:{5};'>{1}</body>" +
             "</html>";
 
-        /// <summary>
-        /// VTColor转成HtmlColor
-        /// </summary>
-        /// <param name="vtc"></param>
-        /// <param name="colorTable"></param>
-        /// <returns></returns>
-        private static string GetHtmlColor(VTColor vtc, Dictionary<string, string> colorTable)
-        {
-            RgbColor rgbColor = null;
-
-            if (vtc is NamedColor)
-            {
-                string rgbKey = colorTable[vtc.Name];
-                rgbColor = VTColor.CreateFromRgbKey(rgbKey) as RgbColor;
-            }
-            else if (vtc is RgbColor)
-            {
-                rgbColor = vtc as RgbColor;
-            }
-
-            return rgbColor.Html;
-        }
+        private static readonly List<VTextAttributes> AllTextAttributes = Enum.GetValues(typeof(VTextAttributes)).Cast<VTextAttributes>().ToList();
 
         private static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter)
         {
@@ -97,48 +74,29 @@ namespace ModengTerm.Terminal
                 return;
             }
 
-            Dictionary<string, string> colorTable = parameter.ColorTable;
-
             for (int i = 0; i < count; i++)
             {
                 VTCharacter character = characters[i];
 
                 builder.Append("<span style='");
 
-                foreach (VTextAttributeState attribute in character.AttributeList)
+                if (VTUtils.GetTextAttribute(VTextAttributes.Background, character.Attribute))
                 {
-                    if (!attribute.Enabled)
-                    {
-                        continue;
-                    }
+                    VTColor vtc = character.Background;
+                    string color = vtc.Html;
+                    builder.AppendFormat("background-color:{0};", color);
+                }
 
-                    switch (attribute.Attribute)
-                    {
-                        case VTextAttributes.Background:
-                            {
-                                VTColor vtc = attribute.Parameter as VTColor;
-                                string color = GetHtmlColor(vtc, colorTable);
-                                builder.AppendFormat("background-color:{0};", color);
-                                break;
-                            }
+                if (VTUtils.GetTextAttribute(VTextAttributes.Foreground, character.Attribute))
+                {
+                    VTColor vtc = character.Foreground;
+                    string color = vtc.Html;
+                    builder.AppendFormat("background-color:{0};", color);
+                }
 
-                        case VTextAttributes.Foreground:
-                            {
-                                VTColor vtc = attribute.Parameter as VTColor;
-                                string color = GetHtmlColor(vtc, colorTable);
-                                builder.AppendFormat("color:{0};", color);
-                                break;
-                            }
-
-                        case VTextAttributes.Underline:
-                            {
-                                builder.Append("text-decoration:underline;");
-                                break;
-                            }
-
-                        default:
-                            break;
-                    }
+                if (VTUtils.GetTextAttribute(VTextAttributes.Underline, character.Attribute))
+                {
+                    builder.Append("text-decoration:underline;");
                 }
 
                 builder.AppendFormat("'>{0}</span>", character.Character == ' ' ? "&nbsp" : character.Character.ToString());
@@ -155,6 +113,17 @@ namespace ModengTerm.Terminal
                 case LogFileTypeEnum.PlainText: return CreatePlainText;
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        private static object GetAttributeParameter(VTextAttributes textAttributes, VTCharacter character)
+        {
+            switch (textAttributes)
+            {
+                case VTextAttributes.Background: return character.Background;
+                case VTextAttributes.Foreground: return character.Foreground;
+                default:
+                    return null;
             }
         }
 
@@ -197,8 +166,8 @@ namespace ModengTerm.Terminal
 
             if (fileType == LogFileTypeEnum.HTML)
             {
-                string htmlBackground = VTUtils.GetHtmlColor(VTColor.CreateFromRgbKey(parameter.Background), parameter.ColorTable);
-                string htmlForeground = VTUtils.GetHtmlColor(VTColor.CreateFromRgbKey(parameter.Foreground), parameter.ColorTable);
+                string htmlBackground = VTColor.CreateFromRgbKey(parameter.Background).Html;
+                string htmlForeground = VTColor.CreateFromRgbKey(parameter.Foreground).Html;
                 return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground, parameter.FontSize, parameter.FontFamily, htmlForeground);
             }
 
@@ -248,34 +217,6 @@ namespace ModengTerm.Terminal
             return columns;
         }
 
-        public static List<VTextAttributeState> CreateTextAttributeStates()
-        {
-            List<VTextAttributeState> attributeStates = new List<VTextAttributeState>();
-
-            IEnumerable<VTextAttributes> attributes = Enum.GetValues(typeof(VTextAttributes)).Cast<VTextAttributes>().OrderBy(v => v);
-
-            foreach (VTextAttributes attribute in attributes)
-            {
-                VTextAttributeState attributeState = new VTextAttributeState(attribute);
-
-                attributeStates.Add(attributeState);
-            }
-
-            return attributeStates;
-        }
-
-        public static void CopyAttributeState(List<VTextAttributeState> copyFroms, List<VTextAttributeState> copyTos)
-        {
-            for (int i = 0; i < copyFroms.Count; i++)
-            {
-                VTextAttributeState copyFrom = copyFroms[i];
-                VTextAttributeState copyTo = copyTos[i];
-
-                copyTo.Enabled = copyFrom.Enabled;
-                copyTo.Parameter = copyFrom.Parameter;
-            }
-        }
-
         public static void CopyCharacter(List<VTCharacter> copyFroms, List<VTCharacter> copyTos)
         {
             copyTos.Clear();
@@ -284,8 +225,9 @@ namespace ModengTerm.Terminal
                 VTCharacter copyFrom = copyFroms[i];
                 VTCharacter character = VTCharacter.CreateNull();
 
-                // 拷贝VTCharacter
-                VTUtils.CopyAttributeState(copyFrom.AttributeList, character.AttributeList);
+                character.Attribute = copyFrom.Attribute;
+                character.Background = copyFrom.Background;
+                character.Foreground = copyFrom.Foreground;
                 character.Character = copyFrom.Character;
                 character.ColumnSize = copyFrom.ColumnSize;
                 character.Flags = copyFrom.Flags;
@@ -309,42 +251,46 @@ namespace ModengTerm.Terminal
 
                 formattedText.Text += character.Character;
 
-                foreach (VTextAttributeState attributeState in character.AttributeList)
+                foreach (VTextAttributes textAttribute in AllTextAttributes)
                 {
-                    VTextAttribute attribute = formattedText.Attributes.FirstOrDefault(v => v.Attribute == attributeState.Attribute && !v.Closed);
+                    VTextAttribute attribute = formattedText.Attributes.FirstOrDefault(v => v.Attribute == textAttribute && !v.Closed);
 
-                    if (attributeState.Enabled)
+                    if (VTUtils.GetTextAttribute(textAttribute, character.Attribute))
                     {
+                        object parameter = GetAttributeParameter(textAttribute, character);
+
                         // 启用状态
                         if (attribute == null)
                         {
                             attribute = new VTextAttribute()
                             {
-                                Attribute = attributeState.Attribute,
+                                Attribute = textAttribute,
                                 StartIndex = i,
-                                Parameter = attributeState.Parameter
+                                Parameter = parameter
                             };
                             formattedText.Attributes.Add(attribute);
                         }
                         else
                         {
                             // 颜色比较特殊，有可能连续多次设置不同的颜色
-                            if (attributeState.Attribute == VTextAttributes.Background ||
-                                attributeState.Attribute == VTextAttributes.Foreground ||
-                                attributeState.Attribute == VTextAttributes.FontFamily)
+                            if (textAttribute == VTextAttributes.Background ||
+                                textAttribute == VTextAttributes.Foreground)
                             {
                                 // 如果设置的是颜色的话，并且当前字符的颜色和最后一次设置的颜色不一样，那么要先关闭最后一次设置的颜色
                                 // attribute是最后一次设置的颜色，attributeState是当前字符的颜色
-                                if (attribute.Parameter != attributeState.Parameter)
+
+                                GetAttributeParameter(textAttribute, character);
+
+                                if (attribute.Parameter != parameter)
                                 {
                                     attribute.Closed = true;
 
                                     // 关闭后创建一个新的Attribute
                                     attribute = new VTextAttribute()
                                     {
-                                        Attribute = attributeState.Attribute,
+                                        Attribute = textAttribute,
                                         StartIndex = i,
-                                        Parameter = attributeState.Parameter
+                                        Parameter = parameter
                                     };
                                     formattedText.Attributes.Add(attribute);
                                 }
@@ -402,6 +348,103 @@ namespace ModengTerm.Terminal
             }
 
             return text;
+        }
+
+
+        /// <summary>
+        /// 按位设置某个字符的某个属性
+        /// </summary>
+        /// <param name="textAttributes"></param>
+        /// <param name="enable"></param>
+        /// <param name="attribute"></param>
+        public static void SetTextAttribute(VTextAttributes textAttributes, bool enable, ref int attribute)
+        {
+            switch (textAttributes)
+            {
+                case VTextAttributes.Background:
+                    {
+                        attribute = enable ? attribute |= 2 : attribute &= (~2);
+                        break;
+                    }
+
+                case VTextAttributes.Bold:
+                    {
+                        attribute = enable ? attribute |= 32 : attribute &= (~32);
+                        break;
+                    }
+
+                case VTextAttributes.DoublyUnderlined:
+                    {
+                        attribute = enable ? attribute |= 4 : attribute &= (~4);
+                        break;
+                    }
+
+                case VTextAttributes.Foreground:
+                    {
+                        attribute = enable ? attribute |= 1 : attribute &= (~1);
+                        break;
+                    }
+
+                case VTextAttributes.Italics:
+                    {
+                        attribute = enable ? attribute |= 8 : attribute &= (~8);
+                        break;
+                    }
+
+                case VTextAttributes.Underline:
+                    {
+                        attribute = enable ? attribute |= 16 : attribute &= (~16);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 获取某个字符属性是否被设置了
+        /// </summary>
+        /// <param name="textAttribute">要获取的属性</param>
+        /// <param name="attribute">按位存储的属性</param>
+        /// <returns></returns>
+        public static bool GetTextAttribute(VTextAttributes textAttribute, int attribute)
+        {
+            switch (textAttribute)
+            {
+                case VTextAttributes.Background:
+                    {
+                        return (attribute >> 1 & 1) == 1;
+                    }
+
+                case VTextAttributes.Bold:
+                    {
+                        return (attribute >> 5 & 1) == 1;
+                    }
+
+                case VTextAttributes.DoublyUnderlined:
+                    {
+                        return (attribute >> 2 & 1) == 1;
+                    }
+
+                case VTextAttributes.Foreground:
+                    {
+                        return (attribute & 1) == 1;
+                    }
+
+                case VTextAttributes.Italics:
+                    {
+                        return (attribute >> 3 & 1) == 1;
+                    }
+
+                case VTextAttributes.Underline:
+                    {
+                        return (attribute >> 4 & 1) == 1;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

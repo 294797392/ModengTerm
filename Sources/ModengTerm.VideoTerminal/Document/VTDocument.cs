@@ -121,7 +121,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 当前应用的文本属性
         /// </summary>
-        public List<VTextAttributeState> AttributeStates { get; private set; }
+        public VTextAttributeState AttributeState { get; private set; }
 
         public VTCursorState CursorState { get { return this.cursorState; } }
 
@@ -148,7 +148,7 @@ namespace XTerminal.Document
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
 
-            this.AttributeStates = VTUtils.CreateTextAttributeStates();
+            this.AttributeState = new VTextAttributeState();
 
             this.Cursor = new VTCursor(this)
             {
@@ -976,9 +976,25 @@ namespace XTerminal.Document
         /// <param name="parameter">该状态对应的参数</param>
         public void SetAttribute(VTextAttributes attribute, bool enabled, object parameter)
         {
-            VTextAttributeState attributeState = this.AttributeStates[(int)attribute];
-            attributeState.Enabled = enabled;
-            attributeState.Parameter = parameter;
+            VTUtils.SetTextAttribute(attribute, enabled, ref this.AttributeState.Value);
+
+            switch (attribute)
+            {
+                case VTextAttributes.Background:
+                    {
+                        this.AttributeState.Background = parameter as VTColor;
+                        break;
+                    }
+
+                case VTextAttributes.Foreground:
+                    {
+                        this.AttributeState.Foreground = parameter as VTColor;
+                        break;
+                    }
+
+                default:
+                    break;
+            }
         }
 
         /// <summary>
@@ -986,11 +1002,7 @@ namespace XTerminal.Document
         /// </summary>
         public void ClearAttribute()
         {
-            foreach (VTextAttributeState attributeState in this.AttributeStates)
-            {
-                attributeState.Parameter = null;
-                attributeState.Enabled = false;
-            }
+            this.AttributeState.Clear();
         }
 
         public void CursorSave()

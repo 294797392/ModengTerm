@@ -162,6 +162,8 @@ namespace XTerminal.Document
 
         public override void RequestInvalidate()
         {
+            return;
+
             int activeRow = this.ownerDocument.CursorPhysicsRow;
             int firstRow = this.ownerDocument.FirstLine.PhysicsRow;
             int lastRow = this.ownerDocument.LastLine.PhysicsRow;

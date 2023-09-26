@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.Base", "ModengTe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.ViewModels", "ModengTerm.ViewModel\ModengTerm.ViewModels.csproj", "{66602C53-AD9B-4A9D-9D1D-98F41C5796C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.ServiceAgents", "ModengTerm.ServiceAgent\ModengTerm.ServiceAgents.csproj", "{0BA69759-28CF-4AE5-950A-A7ADF593B85A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,18 @@ Global
 		{66602C53-AD9B-4A9D-9D1D-98F41C5796C7}.Release|x64.Build.0 = Release|Any CPU
 		{66602C53-AD9B-4A9D-9D1D-98F41C5796C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{66602C53-AD9B-4A9D-9D1D-98F41C5796C7}.Release|x86.Build.0 = Release|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Debug|x64.Build.0 = Debug|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Debug|x86.Build.0 = Debug|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Release|x64.ActiveCfg = Release|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Release|x64.Build.0 = Release|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Release|x86.ActiveCfg = Release|Any CPU
+		{0BA69759-28CF-4AE5-950A-A7ADF593B85A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

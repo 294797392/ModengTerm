@@ -25,6 +25,17 @@ namespace XTerminal.Parser
 
         #endregion
 
+        #region 属性
+
+        /// <summary>
+        /// 颜色表
+        /// ColorIndex -> RgbKey
+        /// 当执行SGR指令的时候直接把ColorIndex映射成VTColor对象
+        /// </summary>
+        public VTColorTable ColorTable { get; set; }
+
+        #endregion
+
         #region 构造方法
 
         public VTParser()
@@ -421,7 +432,7 @@ namespace XTerminal.Parser
                 case (EscActionCodes)66:
                 case (EscActionCodes)230:
                     {
-                        logger.FatalFormat("terminal没实现的EscActionCodes - {0}", (char)code);
+                        //logger.FatalFormat("terminal没实现的EscActionCodes - {0}", (char)code);
                         break;
                     }
 
@@ -522,41 +533,41 @@ namespace XTerminal.Parser
                     case GraphicsOptions.Overline: this.NotifyActionEvent(VTActions.Overlined); break;
                     case GraphicsOptions.NoOverline: this.NotifyActionEvent(VTActions.OverlinedUnset); break;
 
-                    case GraphicsOptions.ForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkBlack); break;
-                    case GraphicsOptions.ForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkBlue); break;
-                    case GraphicsOptions.ForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkGreen); break;
-                    case GraphicsOptions.ForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkCyan); break;
-                    case GraphicsOptions.ForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkRed); break;
-                    case GraphicsOptions.ForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkMagenta); break;
-                    case GraphicsOptions.ForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkYellow); break;
-                    case GraphicsOptions.ForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTColor.DarkWhite); break;
+                    case GraphicsOptions.ForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.DarkBlack)); break;
+                    case GraphicsOptions.ForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.DarkBlue)); break;
+                    case GraphicsOptions.ForegroundGreen: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkGreen)); break;
+                    case GraphicsOptions.ForegroundCyan: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkCyan)); break;
+                    case GraphicsOptions.ForegroundRed: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkRed)); break;
+                    case GraphicsOptions.ForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkMagenta)); break;
+                    case GraphicsOptions.ForegroundYellow: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkYellow)); break;
+                    case GraphicsOptions.ForegroundWhite: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkWhite)); break;
 
-                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTColor.DarkWhite); break;
-                    case GraphicsOptions.BackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTColor.DarkBlue); break;
-                    case GraphicsOptions.BackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTColor.DarkGreen); break;
-                    case GraphicsOptions.BackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTColor.DarkCyan); break;
-                    case GraphicsOptions.BackgroundRed: this.NotifyActionEvent(VTActions.Background, VTColor.DarkRed); break;
-                    case GraphicsOptions.BackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTColor.DarkMagenta); break;
-                    case GraphicsOptions.BackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTColor.DarkYellow); break;
-                    case GraphicsOptions.BackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTColor.DarkWhite); break;
+                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkWhite)); break;
+                    case GraphicsOptions.BackgroundBlue: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkBlue)); break;
+                    case GraphicsOptions.BackgroundGreen: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkGreen)); break;
+                    case GraphicsOptions.BackgroundCyan: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkCyan)); break;
+                    case GraphicsOptions.BackgroundRed: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkRed)); break;
+                    case GraphicsOptions.BackgroundMagenta: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkMagenta)); break;
+                    case GraphicsOptions.BackgroundYellow: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkYellow)); break;
+                    case GraphicsOptions.BackgroundWhite: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkWhite)); break;
 
-                    case GraphicsOptions.BrightForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightWhite); break;
-                    case GraphicsOptions.BrightForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightBlue); break;
-                    case GraphicsOptions.BrightForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightGreen); break;
-                    case GraphicsOptions.BrightForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightCyan); break;
-                    case GraphicsOptions.BrightForegroundRed: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightRed); break;
-                    case GraphicsOptions.BrightForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightMagenta); break;
-                    case GraphicsOptions.BrightForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightYellow); break;
-                    case GraphicsOptions.BrightForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, VTColor.BrightWhite); break;
+                    case GraphicsOptions.BrightForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
+                    case GraphicsOptions.BrightForegroundBlue: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.BrightBlue)); break;
+                    case GraphicsOptions.BrightForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightGreen)); break;
+                    case GraphicsOptions.BrightForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightCyan)); break;
+                    case GraphicsOptions.BrightForegroundRed: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightRed)); break;
+                    case GraphicsOptions.BrightForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightMagenta)); break;
+                    case GraphicsOptions.BrightForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightYellow)); break;
+                    case GraphicsOptions.BrightForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
 
-                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, VTColor.BrightWhite); break;
-                    case GraphicsOptions.BrightBackgroundBlue: this.NotifyActionEvent(VTActions.Background, VTColor.BrightBlue); break;
-                    case GraphicsOptions.BrightBackgroundGreen: this.NotifyActionEvent(VTActions.Background, VTColor.BrightGreen); break;
-                    case GraphicsOptions.BrightBackgroundCyan: this.NotifyActionEvent(VTActions.Background, VTColor.BrightCyan); break;
-                    case GraphicsOptions.BrightBackgroundRed: this.NotifyActionEvent(VTActions.Background, VTColor.BrightRed); break;
-                    case GraphicsOptions.BrightBackgroundMagenta: this.NotifyActionEvent(VTActions.Background, VTColor.BrightMagenta); break;
-                    case GraphicsOptions.BrightBackgroundYellow: this.NotifyActionEvent(VTActions.Background, VTColor.BrightYellow); break;
-                    case GraphicsOptions.BrightBackgroundWhite: this.NotifyActionEvent(VTActions.Background, VTColor.BrightWhite); break;
+                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
+                    case GraphicsOptions.BrightBackgroundBlue: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightBlue)); break;
+                    case GraphicsOptions.BrightBackgroundGreen: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightGreen)); break;
+                    case GraphicsOptions.BrightBackgroundCyan: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightCyan)); break;
+                    case GraphicsOptions.BrightBackgroundRed: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightRed)); break;
+                    case GraphicsOptions.BrightBackgroundMagenta: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightMagenta)); break;
+                    case GraphicsOptions.BrightBackgroundYellow: this.NotifyActionEvent(VTActions.Background,this.ColorTable.GetColor(VTColorIndex.BrightYellow)); break;
+                    case GraphicsOptions.BrightBackgroundWhite: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
 
                     case GraphicsOptions.ForegroundExtended:
                         {

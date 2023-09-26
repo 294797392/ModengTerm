@@ -182,7 +182,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// 终端颜色表
         /// ColorName -> RgbKey
         /// </summary>
-        private Dictionary<string, string> colorTable;
+        private VTColorTable colorTable;
         internal string background;
         internal string foreground;
         internal double fontSize;
@@ -317,7 +317,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
             this.fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             this.fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
-            this.colorTable = sessionInfo.GetOption<Dictionary<string, string>>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
+            this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
             this.background = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             this.foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
             this.scrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK);
@@ -378,6 +378,7 @@ namespace ModengTerm.Terminal.ViewModels
             #region 初始化终端解析器
 
             this.vtParser = new VTParser();
+            this.vtParser.ColorTable = this.colorTable;
             this.vtParser.ActionEvent += VtParser_ActionEvent;
             this.vtParser.Initialize();
 
@@ -635,7 +636,6 @@ namespace ModengTerm.Terminal.ViewModels
                 CharactersList = characters,
                 StartCharacterIndex = startIndex,
                 EndCharacterIndex = endIndex,
-                ColorTable = this.colorTable,
                 ContentType = fileType,
                 Background = this.background,
                 FontSize = this.fontSize,
@@ -906,7 +906,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         /// <param name="ch">多字节或者单字节的字符</param>
         /// <returns></returns>
-        private VTCharacter CreateCharacter(object ch, List<VTextAttributeState> attributeStates)
+        private VTCharacter CreateCharacter(object ch, VTextAttributeState attributeState)
         {
             if (ch is char)
             {
@@ -925,12 +925,12 @@ namespace ModengTerm.Terminal.ViewModels
                     column = 1;
                 }
 
-                return VTCharacter.Create(c, column, attributeStates);
+                return VTCharacter.Create(c, column, attributeState);
             }
             else
             {
                 // 说明是ASCII码可见字符
-                return VTCharacter.Create(Convert.ToChar(ch), 1, attributeStates);
+                return VTCharacter.Create(Convert.ToChar(ch), 1, attributeState);
             }
         }
 
@@ -1113,9 +1113,10 @@ namespace ModengTerm.Terminal.ViewModels
                         // 创建并打印新的字符
                         char ch = Convert.ToChar(parameter);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, ch);
-                        VTCharacter character = this.CreateCharacter(parameter, this.activeDocument.AttributeStates);
+                        VTCharacter character = this.CreateCharacter(parameter, this.activeDocument.AttributeState);
                         this.activeDocument.PrintCharacter(this.ActiveLine, character, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + character.ColumnSize);
+
                         break;
                     }
 

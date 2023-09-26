@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -69,6 +70,6 @@ namespace XTerminal.Document
         /// <summary>
         /// 颜色表
         /// </summary>
-        public Dictionary<string, string> ColorTable { get; set; }
+        public VTColorTable ColorTable { get; set; }
     }
 }

@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModels\Theme.cs" />
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
     <Compile Include="Document\Graphics\VTMatchesLine.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="ViewModels\VideoTerminal.cs" />
     <Compile Include="ViewModels\VideoTerminal.Drawing.cs" />
     <Compile Include="VTColor.cs" />
+    <Compile Include="VTColorTable.cs" />
     <Compile Include="VTDebug.cs" />
     <Compile Include="VTKeyboard.cs" />
     <Compile Include="VTKeys.cs" />
@@ -148,9 +150,7 @@
       <Name>Renci.SshNet</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DataModels\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Fonts\consola.ttf" />
   </ItemGroup>

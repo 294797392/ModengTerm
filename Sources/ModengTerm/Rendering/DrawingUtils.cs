@@ -71,28 +71,6 @@ namespace ModengTerm.Rendering
         }
 
         /// <summary>
-        /// VTColor转Brush
-        /// </summary>
-        /// <param name="vtc"></param>
-        /// <param name="colorTable"></param>
-        /// <returns></returns>
-        public static Brush GetBrush(VTColor vtc, Dictionary<string, string> colorTable)
-        {
-            string rgbKey = string.Empty;
-
-            if (vtc is RgbColor)
-            {
-                rgbKey = vtc.Name;
-            }
-            else if (vtc is NamedColor)
-            {
-                rgbKey = colorTable[vtc.Name];
-            }
-
-            return DrawingUtils.GetBrush(rgbKey);
-        }
-
-        /// <summary>
         /// rgb字符串转Brush
         /// </summary>
         /// <param name="rgb">
@@ -138,14 +116,6 @@ namespace ModengTerm.Rendering
 
             //textData.Text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
 
-            if (textLine.Characters.Count > 7)
-            {
-                if (textLine.Characters[3].Character == 'P' && textLine.Characters[4].Character == 'I' && textLine.Characters[5].Character == 'D')
-                {
-                    Console.WriteLine();
-                }
-            }
-
             textData.Style = textLine.Style;
 
             return DrawingUtils.CreateFormattedText(textData, dc);
@@ -175,7 +145,7 @@ namespace ModengTerm.Rendering
                     case VTextAttributes.Foreground:
                         {
                             VTColor color = textAttribute.Parameter as VTColor;
-                            Brush brush = DrawingUtils.GetBrush(color, textStyle.ColorTable);
+                            Brush brush = DrawingUtils.GetBrush(color.Key);
                             formattedText.SetForegroundBrush(brush, textAttribute.StartIndex, textAttribute.Count);
                             break;
                         }
@@ -204,12 +174,6 @@ namespace ModengTerm.Rendering
                             break;
                         }
 
-                    case VTextAttributes.FontFamily:
-                        {
-                            formattedText.SetFontFamily(textAttribute.Parameter.ToString(), textAttribute.StartIndex, textAttribute.Count);
-                            break;
-                        }
-
                     default:
                         break;
                 }
@@ -229,7 +193,7 @@ namespace ModengTerm.Rendering
                     }
 
                     VTColor color = textAttribute.Parameter as VTColor;
-                    Brush brush = DrawingUtils.GetBrush(color, textStyle.ColorTable);
+                    Brush brush = DrawingUtils.GetBrush(color.Key);
                     Geometry geometry = formattedText.BuildHighlightGeometry(new Point(textBlock.OffsetX, textBlock.OffsetY), textAttribute.StartIndex, textAttribute.Count);
                     dc.DrawRectangle(brush, null, geometry.Bounds);
                 }

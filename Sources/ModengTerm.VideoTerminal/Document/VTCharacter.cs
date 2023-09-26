@@ -33,10 +33,20 @@ namespace XTerminal.Document
         public VTCharacterFlags Flags { get; set; }
 
         /// <summary>
-        /// 存储该字符的文本属性列表
-        /// TODO：考虑使用32位int存储所有的属性状态，这样可以节省内存
+        /// 按位存储该字符的属性
+        /// 支持的属性请参考VTextAttributes枚举
         /// </summary>
-        public List<VTextAttributeState> AttributeList { get; private set; }
+        public int Attribute;
+
+        /// <summary>
+        /// 按位存储RGB颜色
+        /// </summary>
+        public VTColor Background { get; set; }
+
+        /// <summary>
+        /// 按位存储RGB颜色
+        /// </summary>
+        public VTColor Foreground { get; set; }
 
         #region 构造方法
 
@@ -53,17 +63,18 @@ namespace XTerminal.Document
         /// 该方法会首先从缓存里取字符，如果缓存里没有空闲字符，那么创建一个新的
         /// </remarks>
         /// <returns></returns>
-        public static VTCharacter Create(char ch, int columnSize, List<VTextAttributeState> attributeStates)
+        public static VTCharacter Create(char ch, int columnSize, VTextAttributeState attributeState)
         {
             VTCharacter character = new VTCharacter();
-            character.AttributeList = VTUtils.CreateTextAttributeStates();
+            if (attributeState != null)
+            {
+                character.Attribute = attributeState.Value;
+                character.Background = attributeState.Background;
+                character.Foreground = attributeState.Foreground;
+            }
             character.Character = ch;
             character.ColumnSize = columnSize;
             character.Flags = VTCharacterFlags.None;
-            if (attributeStates != null)
-            {
-                VTUtils.CopyAttributeState(attributeStates, character.AttributeList);
-            }
             return character;
         }
 

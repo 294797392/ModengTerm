@@ -13,7 +13,7 @@ using XTerminal.Document;
 
 namespace ModengTerm.Terminal.Loggering
 {
-    public class LoggerManager : AppModule<MTermManifest>
+    public class LoggerManager //: AppModule<MTermManifest>
     {
         #region 类变量
 
@@ -35,7 +35,7 @@ namespace ModengTerm.Terminal.Loggering
 
         #region AppModule
 
-        protected override int OnInitialize()
+        protected int OnInitialize()
         {
             this.loggerEvent = new ManualResetEvent(false);
             this.listLock = new object();
@@ -49,7 +49,7 @@ namespace ModengTerm.Terminal.Loggering
             return ResponseCode.SUCCESS;
         }
 
-        protected override void OnRelease()
+        protected void OnRelease()
         {
             throw new NotImplementedException();
         }

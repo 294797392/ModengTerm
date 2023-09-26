@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 
-namespace ModengTerm.Base.ServiceAgents
+namespace ModengTerm.ServiceAgents
 {
     /// <summary>
     /// 远程服务器代理

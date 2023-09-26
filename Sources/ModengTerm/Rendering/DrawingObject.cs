@@ -62,7 +62,11 @@ namespace ModengTerm.Rendering
 
             this.OnDraw(dc);
 
+            DateTime start = DateTime.Now;
+
             dc.Close();
+
+            Console.WriteLine("{0}ms", (DateTime.Now - start).TotalMilliseconds);
         }
 
         public void Release()

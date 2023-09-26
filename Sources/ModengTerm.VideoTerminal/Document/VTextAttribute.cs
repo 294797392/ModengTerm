@@ -42,14 +42,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 字体颜色
         /// </summary>
-        Foreground = 5,
-
-        /// <summary>
-        /// 字体
-        /// </summary>
-        FontFamily = 6
+        Foreground = 5
     }
 
+    /// <summary>
+    /// 0 0 0 0 0 0
+    /// </summary>
     public class VTextAttribute
     {
         /// <summary>
@@ -81,18 +79,24 @@ namespace XTerminal.Document
 
     public class VTextAttributeState
     {
-        public VTextAttributes Attribute { get; private set; }
-
-        public object Parameter { get; set; }
-
         /// <summary>
-        /// 是否使用该属性
+        /// 按位存储的值
         /// </summary>
-        public bool Enabled { get; set; }
+        public int Value;
 
-        public VTextAttributeState(VTextAttributes attributes)
+        public VTColor Background { get; set; }
+
+        public VTColor Foreground { get; set; }
+
+        public VTextAttributeState()
         {
-            this.Attribute = attributes;
+        }
+
+        public void Clear()
+        {
+            this.Value = 0;
+            this.Background = null;
+            this.Foreground = null;
         }
     }
 }

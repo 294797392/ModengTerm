@@ -355,4 +355,25 @@ namespace XTerminal.Parser
         MSR_MacroSpaceReport = 16777278,
         MEM_MemoryChecksum = 16777279,
     }
+
+    public enum VTColorIndex
+    {
+        BrightBlack,
+        BrightRed,
+        BrightGreen,
+        BrightYellow,
+        BrightBlue,
+        BrightMagenta,
+        BrightCyan,
+        BrightWhite,
+
+        DarkBlack,
+        DarkRed,
+        DarkGreen,
+        DarkYellow,
+        DarkBlue,
+        DarkMagenta,
+        DarkCyan,
+        DarkWhite
+    }
 }

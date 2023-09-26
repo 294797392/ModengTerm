@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
+using ModengTerm.Terminal.DataModels;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Definitions;
 
-namespace ModengTerm.Base
+namespace ModengTerm.ServiceAgents
 {
     public class MTermManifest : AppManifest
     {

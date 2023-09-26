@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F2C5BC95-5839-4C8F-9923-3512FE2DDEA1}</ProjectGuid>
+    <ProjectGuid>{0BA69759-28CF-4AE5-950A-A7ADF593B85A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ModengTerm.Base</RootNamespace>
-    <AssemblyName>ModengTerm.Base</AssemblyName>
+    <RootNamespace>ModengTerm.ServiceAgents</RootNamespace>
+    <AssemblyName>ModengTerm.ServiceAgents</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -40,10 +40,7 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -53,41 +50,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ASCIITable.cs" />
-    <Compile Include="DataModels\Favorites.cs" />
-    <Compile Include="DataModels\FixedText.cs" />
-    <Compile Include="DataModels\GroupDM.cs" />
-    <Compile Include="DataModels\SessionOption.cs" />
-    <Compile Include="Definitions\ColorDefinition.cs" />
-    <Compile Include="Definitions\FontFamilyDefinition.cs" />
-    <Compile Include="Definitions\FontSizeDefinition.cs" />
-    <Compile Include="Definitions\OptionDefinition.cs" />
-    <Compile Include="Definitions\TerminalSizeModeEnum.cs" />
-    <Compile Include="Enumerations\SessionStatusEnum.cs" />
-    <Compile Include="Enumerations\VTCursorSpeeds.cs" />
-    <Compile Include="Enumerations\OptionKeyEnum.cs" />
-    <Compile Include="Enumerations\SFTPAuthTypeEnum.cs" />
-    <Compile Include="Enumerations\SSHAuthTypeEnum.cs" />
-    <Compile Include="DataModels\XTermSession.cs" />
-    <Compile Include="Definitions\SessionDefinition.cs" />
-    <Compile Include="Enumerations\SessionTypeEnum.cs" />
-    <Compile Include="Enumerations\TerminalTypeEnum.cs" />
-    <Compile Include="Enumerations\VTCursorStyles.cs" />
-    <Compile Include="ICloneable.cs" />
-    <Compile Include="MTermUtils.cs" />
-    <Compile Include="MTMessageBox.cs" />
+    <Compile Include="DataModels\MTermManifest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResponseCode.cs" />
-    <Compile Include="SftpTrasmit\SftpTransmitter.cs" />
-    <Compile Include="SftpTrasmit\SftpTransmitTypeEnum.cs" />
-    <Compile Include="SftpTrasmit\SftpTransmit.cs" />
-    <Compile Include="SftpTrasmit\TransmitStatusEnum.cs" />
-    <Compile Include="MTermConsts.cs" />
+    <Compile Include="CloudServiceAgent.cs" />
+    <Compile Include="FileServiceAgent.cs" />
+    <Compile Include="ServiceAgent.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj">
-      <Project>{fad04a41-2dbb-49ec-a8ed-fbd0dc62d26c}</Project>
-      <Name>Renci.SshNet</Name>
+    <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj">
+      <Project>{f2c5bc95-5839-4c8f-9923-3512fe2ddea1}</Project>
+      <Name>ModengTerm.Base</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ModengTerm.VideoTerminal\ModengTerm.Terminal.csproj">
+      <Project>{8d8c6c2d-8249-49b8-aa04-72d908836388}</Project>
+      <Name>ModengTerm.Terminal</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

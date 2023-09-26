@@ -33,7 +33,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 颜色表
         /// </summary>
-        public Dictionary<string, string> ColorTable { get; set; }
+        public VTColorTable ColorTable { get; set; }
 
         public VTextStyle() 
         {

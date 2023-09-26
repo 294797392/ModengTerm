@@ -3,7 +3,7 @@ using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Base.ServiceAgents;
+using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
@@ -84,7 +84,7 @@ namespace ModengTerm
             this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
             this.OpenedTerminals = new BindableCollection<VideoTerminal>();
             this.ServiceAgent = this.Factory.LookupModule<ServiceAgent>();
-            this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
+            //this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
 
             // 将打开页面新加到OpenedSessionTab页面上
             this.OpenedSessionList.Add(new OpenSessionVM(null));
@@ -94,10 +94,10 @@ namespace ModengTerm
             // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
 
             this.drawCursorTimer = new DispatcherTimer();
-            this.drawCursorTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.HighSpeedBlinkInterval);
-            this.drawCursorTimer.Tick += DrawCursorTimer_Tick;
-            this.drawCursorTimer.IsEnabled = false;
-            this.drawCursorTimer.Start();
+            //this.drawCursorTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.HighSpeedBlinkInterval);
+            //this.drawCursorTimer.Tick += DrawCursorTimer_Tick;
+            //this.drawCursorTimer.IsEnabled = false;
+            //this.drawCursorTimer.Start();
 
             #endregion
 
