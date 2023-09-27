@@ -92,9 +92,9 @@ namespace XTerminal
             }
         }
 
-#endregion
+        #endregion
 
-#region 事件处理器
+        #region 事件处理器
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -273,7 +273,7 @@ namespace XTerminal
             e.Handled = true;
         }
 
-#endregion
+        #endregion
     }
 
     public class OpenedSessionDataTemplateSelector : DataTemplateSelector

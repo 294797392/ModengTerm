@@ -16,6 +16,7 @@
 
             <converter:VTCursorStyle2StringConverter x:Key="VTCursorStyle2StringConverter"/>
             <converter:VTCursorSpeed2StringConverter x:Key="VTCursorSpeed2StringConverter"/>
+            <converter:WallpaperType2StringConverter x:Key="WallpaperType2StringConverter"/>
 
             <DataTemplate x:Key="DataTemplateColorSelection">
                 <StackPanel Orientation="Horizontal">
@@ -44,9 +45,10 @@
                     <RowDefinition Height="35"/>
                     <RowDefinition Height="35"/>
                     <RowDefinition Height="35"/>
+                    <RowDefinition Height="50"/>
                     <RowDefinition Height="35"/>
                     <RowDefinition Height="35"/>
-                    <RowDefinition Height="0"/>
+                    <RowDefinition Height="35"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="80"/>
@@ -89,11 +91,19 @@
                 <TextBlock Grid.Row="3" Grid.Column="0" Text="字体颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                 <Border Grid.Row="3" Grid.Column="1" Background="{Binding Path=ForegroundBrush}" Style="{StaticResource ResourceKey=StyleBorderColor}"/>
 
-                <TextBlock Grid.Row="4" Grid.Column="0" Text="背景颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <Border Grid.Row="4" Grid.Column="1" Background="{Binding Path=BackgroundBrush}" Style="{StaticResource ResourceKey=StyleBorderColor}"/>
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="背景样式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <ComboBox Grid.Row="4" Grid.Column="1" DataContext="{Binding Path=WallpaperTypeEnumList}"
+                          ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=WallpaperType2StringConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Border Grid.Row="5" Grid.Column="1" Background="{Binding Path=BackgroundBrush}" Style="{StaticResource ResourceKey=StyleBorderColor}"/>
 
-                <TextBlock Grid.Row="5" Grid.Column="0" Text="光标样式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <ComboBox Grid.Row="5" Grid.Column="1" x:Name="ComboBoxCursorStyle" DataContext="{Binding Path=CursorStyles}"
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="光标样式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <ComboBox Grid.Row="6" Grid.Column="1" x:Name="ComboBoxCursorStyle" DataContext="{Binding Path=CursorStyles}"
                               ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Style="{StaticResource ResourceKey=StyleComboBoxValue}">
                     <ComboBox.ItemTemplate>
@@ -103,13 +113,13 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
-                <TextBlock Grid.Row="6" Grid.Column="0" Text="光标颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <ComboBox Grid.Row="6" Grid.Column="1" x:Name="ComboBoxCursorColors" DataContext="{Binding Path=CursorColors}"
+                <TextBlock Grid.Row="7" Grid.Column="0" Text="光标颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <ComboBox Grid.Row="7" Grid.Column="1" x:Name="ComboBoxCursorColors" DataContext="{Binding Path=CursorColors}"
                               ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               ItemTemplate="{StaticResource ResourceKey=DataTemplateColorSelection}" Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
-                <TextBlock Grid.Row="7" Grid.Column="0" Text="闪烁速度：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <ComboBox Grid.Row="7" Grid.Column="1" x:Name="ComboBoxCursorSpeed" DataContext="{Binding Path=CursorSpeeds}"
+                <TextBlock Grid.Row="8" Grid.Column="0" Text="闪烁速度：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <ComboBox Grid.Row="8" Grid.Column="1" x:Name="ComboBoxCursorSpeed" DataContext="{Binding Path=CursorSpeeds}"
                               ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                               Style="{StaticResource ResourceKey=StyleComboBoxValue}">
                     <ComboBox.ItemTemplate>
@@ -120,7 +130,7 @@
                 </ComboBox>
 
             </Grid>
-            
+
         </StackPanel>
 
     </Grid>

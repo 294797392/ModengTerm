@@ -26,6 +26,12 @@ namespace XTerminal.Document.Rendering
         void RemoveDocument(IDrawingDocument canvas);
 
         /// <summary>
+        /// 显示或者隐藏文档
+        /// </summary>
+        /// <param name="document"></param>
+        void VisibleDocument(IDrawingDocument document, bool visible);
+
+        /// <summary>
         /// 获取滚动条信息
         /// </summary>
         /// <param name="scrollInfo">存储滚动条信息</param>

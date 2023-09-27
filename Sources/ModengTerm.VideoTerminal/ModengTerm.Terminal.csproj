@@ -42,6 +42,7 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
@@ -57,11 +58,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataModels\Theme.cs" />
+    <Compile Include="DataModels\Wallpaper.cs" />
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
     <Compile Include="Document\Graphics\VTMatchesLine.cs" />
+    <Compile Include="Document\VTFramedElement.cs" />
+    <Compile Include="Document\VTWallpaper.cs" />
     <Compile Include="Document\VTCursorState.cs" />
     <Compile Include="Document\VTMatches.cs" />
+    <Compile Include="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Include="ViewModels\VTFindOptions.cs" />
     <Compile Include="Document\VTFormattedText.cs" />
     <Compile Include="Document\VTHistory.cs" />

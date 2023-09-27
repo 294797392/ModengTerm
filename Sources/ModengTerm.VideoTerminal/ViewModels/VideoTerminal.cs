@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Document.Graphics;
 using ModengTerm.Terminal.Enumerations;
@@ -127,6 +128,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private IDrawingDocument mainCanvas;
         private IDrawingDocument alternateCanvas;
+        private IDrawingDocument backgroundCanvas;
+        private VTWallpaper wallpaper;
 
         #region 最上层的备用图形
 
@@ -183,7 +186,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// ColorName -> RgbKey
         /// </summary>
         private VTColorTable colorTable;
-        internal string background;
+        internal Wallpaper background;
         internal string foreground;
         internal double fontSize;
         internal string fontFamily;
@@ -336,7 +339,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             this.fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
             this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
-            this.background = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
+            this.background = sessionInfo.GetOption<Wallpaper>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             this.foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
             this.scrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK);
             this.mainCanvas = this.videoTerminal.CreateDocument();
@@ -422,13 +425,16 @@ namespace ModengTerm.Terminal.ViewModels
                 FontFamily = fontFamily,
                 FontSize = fontSize,
                 ForegroundColor = this.foreground,
-                BackgroundColor = this.background,
+                Background = this.background,
                 ColorTable = this.colorTable
             };
             this.mainDocument = new VTDocument(documentOptions, this.mainCanvas, false) { Name = "MainDocument", Rect = this.vtRect };
             this.alternateDocument = new VTDocument(documentOptions, this.alternateCanvas, true) { Name = "AlternateDocument", Rect = this.vtRect };
             this.activeDocument = this.mainDocument;
             this.videoTerminal.InsertDocument(0, this.mainDocument.Drawing);
+            this.videoTerminal.InsertDocument(0, this.alternateDocument.Drawing);
+            this.videoTerminal.VisibleDocument(this.mainDocument.Drawing, true);
+            this.videoTerminal.VisibleDocument(this.alternateDocument.Drawing, false);
 
             #endregion
 
@@ -447,6 +453,18 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.activeDocument.Cursor.RequestInvalidate();
             this.alternateDocument.Cursor.RequestInvalidate();
+
+            #endregion
+
+            #region 初始化背景
+
+            // 此时Inser(0)在最后一层
+            this.wallpaper = new VTWallpaper() { Wallpaper = this.background };
+            this.wallpaper.Rect = this.vtRect;
+            this.backgroundCanvas = this.videoTerminal.CreateDocument();
+            this.videoTerminal.InsertDocument(0, this.backgroundCanvas);
+            this.backgroundCanvas.CreateDrawingObject(this.wallpaper);
+            this.wallpaper.RequestInvalidate();
 
             #endregion
 
@@ -479,8 +497,11 @@ namespace ModengTerm.Terminal.ViewModels
             this.sessionTransport.Close();
             this.sessionTransport.Release();
 
-            this.mainDocument.Dispose();
-            this.alternateDocument.Dispose();
+            this.mainDocument.Release();
+            this.alternateDocument.Release();
+
+            this.topMostCanvas.DeleteDrawingObjects();
+            this.backgroundCanvas.DeleteDrawingObjects();
 
             this.scrollInfo.Release();
         }
@@ -702,6 +723,21 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.PerformDrawing(this.activeDocument);
             }
+        }
+
+        /// <summary>
+        /// 当窗口再前台显示的时候触发
+        /// </summary>
+        public void Active()
+        {
+
+        }
+
+        /// <summary>
+        /// 当窗口变成后台窗口（不显示）的时候触发
+        /// </summary>
+        public void Deactive()
+        { 
         }
 
         #endregion
@@ -1645,8 +1681,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         IDrawingDocument remove = this.mainDocument.Drawing;
                         IDrawingDocument add = this.alternateDocument.Drawing;
-                        this.videoTerminal.RemoveDocument(remove);
-                        this.videoTerminal.InsertDocument(0, add);
+                        this.videoTerminal.VisibleDocument(remove, false);
+                        this.videoTerminal.VisibleDocument(add, true);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1665,8 +1701,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         IDrawingDocument remove = this.alternateDocument.Drawing;
                         IDrawingDocument add = this.mainDocument.Drawing;
-                        this.videoTerminal.RemoveDocument(remove);
-                        this.videoTerminal.InsertDocument(0, add);
+                        this.videoTerminal.VisibleDocument(remove, false);
+                        this.videoTerminal.VisibleDocument(add, true);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
@@ -1965,7 +2001,10 @@ namespace ModengTerm.Terminal.ViewModels
             this.textSelection.FirstRowCharacterIndex = startPointer.CharacterIndex;
             this.textSelection.LastRow = endPointer.PhysicsRow;
             this.textSelection.LastRowCharacterIndex = endPointer.CharacterIndex;
-            this.textSelection.RequestInvalidate();
+
+            // 此处要全部刷新，因为有可能会触发ScrollIfCursorOutsideDocument
+            // ScrollIfCursorOutsideDocument的情况下，是滚动后的数据，所以需要刷新
+            this.PerformDrawing(this.activeDocument);
         }
 
         public void OnMouseUp(IVideoTerminal vt, VTPoint location)
@@ -2041,6 +2080,10 @@ namespace ModengTerm.Terminal.ViewModels
             this.vtRect = vtc;
             this.mainDocument.Rect = vtc;
             this.alternateDocument.Rect = vtc;
+
+            // 先刷新背景
+            this.wallpaper.Rect = vtc;
+            this.wallpaper.RequestInvalidate();
 
             // 有可能在大小改变的时候还没连接上终端
             if (this.Status != SessionStatusEnum.Connected)

@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -112,10 +113,10 @@ namespace ModengTerm
 
             switch ((VTCursorStyles)value)
             {
-                case VTCursorStyles.Block: return "block";
-                case VTCursorStyles.Line: return "line";
-                case VTCursorStyles.None: return "none";
-                case VTCursorStyles.Underscore: return "underscore";
+                case VTCursorStyles.Block: return "矩形块";
+                case VTCursorStyles.Line: return "竖线";
+                case VTCursorStyles.None: return "无";
+                case VTCursorStyles.Underscore: return "下划线";
                 default:
                     throw new NotImplementedException();
             }
@@ -191,6 +192,30 @@ namespace ModengTerm
                 case FindStartups.FromEnd: return "从结尾开始查找";
                 case FindStartups.CurrentToEnd: return "从当前位置往下查找";
                 case FindStartups.CurrentToBegin: return "从当前位置往上查找";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class WallpaperType2StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!EnumConverterUtils.CheckValue(value))
+            {
+                return "未知";
+            }
+
+            switch ((WallpaperTypeEnum)value)
+            {
+                case WallpaperTypeEnum.Live: return "动态背景";
+                case WallpaperTypeEnum.PureColor: return "纯色";
                 default:
                     throw new NotImplementedException();
             }

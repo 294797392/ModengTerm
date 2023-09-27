@@ -7,6 +7,7 @@ using ModengTerm.Rendering;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
+using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -345,6 +346,8 @@ namespace ModengTerm.ViewModels
             }
         }
 
+        public BindableCollection<WallpaperTypeEnum> WallpaperTypeEnumList { get; private set; }
+
         public BindableCollection<FontFamilyDefinition> FontFamilyList { get; private set; }
         public BindableCollection<FontSizeDefinition> FontSizeList { get; private set; }
 
@@ -475,6 +478,10 @@ namespace ModengTerm.ViewModels
             this.CursorColors = new BindableCollection<ColorDefinition>();
             this.CursorColors.AddRange(appManifest.ColorList);
             this.CursorColors.SelectedItem = this.CursorColors.FirstOrDefault();
+
+            this.WallpaperTypeEnumList = new BindableCollection<WallpaperTypeEnum>();
+            this.WallpaperTypeEnumList.AddRange(MTermUtils.GetEnumValues<WallpaperTypeEnum>());
+            this.WallpaperTypeEnumList.SelectedItem = WallpaperTypeEnum.PureColor;
 
             // 最后加载ThemeList，因为在ThemeList_SelectionChanged事件里需要用到其他Theme字段的数据
             this.ThemeList = new BindableCollection<Theme>();
@@ -689,7 +696,7 @@ namespace ModengTerm.ViewModels
 
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.ThemeList.SelectedItem.BackgroundColor);
+            session.SetOption<Wallpaper>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.ThemeList.SelectedItem.Background);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ThemeList.SelectedItem.ForegroundColor);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
@@ -840,7 +847,22 @@ namespace ModengTerm.ViewModels
                 return;
             }
 
-            this.BackgroundBrush = DrawingUtils.GetBrush(newValue.BackgroundColor);
+            Wallpaper wallpaper = newValue.Background;
+
+            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)wallpaper.Type;
+
+            switch ((WallpaperTypeEnum)wallpaper.Type)
+            {
+                case WallpaperTypeEnum.PureColor:
+                    {
+                        this.BackgroundBrush = DrawingUtils.GetBrush(wallpaper.Uri);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
             this.ForegroundBrush = DrawingUtils.GetBrush(newValue.ForegroundColor);
         }
 

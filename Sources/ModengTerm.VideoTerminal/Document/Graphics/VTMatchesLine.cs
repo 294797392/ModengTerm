@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -110,15 +111,24 @@ namespace ModengTerm.Terminal.Document.Graphics
                         #region 更新前景色和背景色
 
                         // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
-                        // TODO：有可能背景不是纯色，而是图片或者视频
                         for (int i = 0; i < matches.Length; i++)
                         {
                             VTCharacter character = characters[matches.Index + i];
 
                             VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
                             VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
-                            character.Foreground = VTColor.CreateFromRgbKey(this.textLine.Style.Background);
-                            character.Background = VTColor.CreateFromRgbKey(this.textLine.Style.Foreground);
+                            if (this.textLine.Style.Background.Type == (int)WallpaperTypeEnum.PureColor)
+                            {
+                                // 如果背景是纯色就变反色
+                                character.Foreground = VTColor.CreateFromRgbKey(this.textLine.Style.Background.Uri);
+                                character.Background = VTColor.CreateFromRgbKey(this.textLine.Style.Foreground);
+                            }
+                            else
+                            {
+                                // 如果背景不是纯色，那么就前景色用白色，背景色用黑色
+                                character.Foreground = VTColor.CreateFromRgbKey("255,255,255");
+                                character.Background = VTColor.CreateFromRgbKey("0,0,0");
+                            }
                         }
 
                         #endregion

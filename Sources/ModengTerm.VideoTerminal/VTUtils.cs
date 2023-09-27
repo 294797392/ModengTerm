@@ -10,6 +10,9 @@ using System.Linq;
 using XTerminal.Base.Definitions;
 using System.Reflection;
 using System.Windows.Media;
+using ModengTerm.Terminal.DataModels;
+using XTerminal.Base.Enumerations;
+using ModengTerm.Base;
 
 namespace ModengTerm.Terminal
 {
@@ -28,7 +31,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 终端背景颜色
         /// </summary>
-        public string Background { get; set; }
+        public Wallpaper Background { get; set; }
 
         /// <summary>
         /// 终端前景色（文本默认颜色）
@@ -127,6 +130,20 @@ namespace ModengTerm.Terminal
             }
         }
 
+        private static string GetHtmlBackground(Wallpaper termBackground)
+        {
+            switch ((WallpaperTypeEnum)termBackground.Type)
+            {
+                case WallpaperTypeEnum.PureColor:
+                    {
+                        return VTColor.CreateFromRgbKey(termBackground.Uri).Html;
+                    }
+
+                default:
+                    return string.Empty;
+            }
+        }
+
 
 
 
@@ -166,7 +183,7 @@ namespace ModengTerm.Terminal
 
             if (fileType == LogFileTypeEnum.HTML)
             {
-                string htmlBackground = VTColor.CreateFromRgbKey(parameter.Background).Html;
+                string htmlBackground = VTUtils.GetHtmlBackground(parameter.Background);
                 string htmlForeground = VTColor.CreateFromRgbKey(parameter.Foreground).Html;
                 return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground, parameter.FontSize, parameter.FontFamily, htmlForeground);
             }
@@ -442,6 +459,23 @@ namespace ModengTerm.Terminal
                         return (attribute >> 4 & 1) == 1;
                     }
 
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 根据光标闪烁速度获取闪烁间隔时间
+        /// </summary>
+        /// <param name="speed"></param>
+        /// <returns></returns>
+        public static int GetCursorInterval(VTCursorSpeeds speed)
+        {
+            switch (speed)
+            {
+                case VTCursorSpeeds.HighSpeed: return MTermConsts.HighSpeedBlinkInterval;
+                case VTCursorSpeeds.LowSpeed: return MTermConsts.LowSpeedBlinkInterval;
+                case VTCursorSpeeds.NormalSpeed: return MTermConsts.NormalSpeedBlinkInterval;
                 default:
                     throw new NotImplementedException();
             }

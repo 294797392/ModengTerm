@@ -6,31 +6,40 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 using XTerminal.Base.Enumerations;
+using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 光标的数据模型
     /// </summary>
-    public class VTCursor : VTDocumentElement
+    public class VTCursor : VTFramedElement
     {
+        #region 类变量
+
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTCursor");
+
+        #endregion
 
         #region 实例变量
 
-        private bool isVisible;
         private int column;
         private int row;
-        private bool dirty;
         private bool blinkState;
         private bool blinkAllowed;
         private VTDocument ownerDocument;
+        private int characterIndex;
 
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 是否显示光标
+        /// </summary>
+        public bool IsVisible { get; set; }
 
         public override VTDocumentElements Type => VTDocumentElements.Cursor;
 
@@ -69,6 +78,23 @@ namespace XTerminal.Document
         }
 
         /// <summary>
+        /// 光标所在位置的前一个字符索引（光标永远都是在下一个要打印的字符位置上）
+        /// 注意该字符索引不等于Column，因为有可能一个字符占多列
+        /// 在VTDocument.SetCurosr时候设置
+        /// </summary>
+        public int CharacterIndex
+        {
+            get { return this.characterIndex; }
+            set
+            {
+                if (this.characterIndex != value)
+                {
+                    this.characterIndex = value;
+                }
+            }
+        }
+
+        /// <summary>
         /// 光标类型
         /// </summary>
         public VTCursorStyles Style { get; set; }
@@ -84,44 +110,6 @@ namespace XTerminal.Document
         public string Color { get; set; }
 
         /// <summary>
-        /// 闪烁速度
-        /// </summary>
-        public VTCursorSpeeds BlinkSpeed { get; set; }
-
-        /// <summary>
-        /// 是否是显示状态
-        /// </summary>
-        public bool IsVisible
-        {
-            get { return this.isVisible; }
-            set
-            {
-                if (this.isVisible != value)
-                {
-                    this.isVisible = value;
-                    this.SetDirty(true);
-                }
-            }
-        }
-
-        /// <summary>
-        /// true表示显示
-        /// false表示隐藏
-        /// </summary>
-        public bool BlinkState
-        {
-            get { return this.blinkState; }
-            set
-            {
-                if (this.blinkState != value)
-                {
-                    this.blinkState = value;
-                    this.SetDirty(true);
-                }
-            }
-        }
-
-        /// <summary>
         /// 是否允许光标闪烁
         /// </summary>
         public bool AllowBlink
@@ -132,7 +120,6 @@ namespace XTerminal.Document
                 if (this.blinkAllowed != value)
                 {
                     this.blinkAllowed = value;
-                    this.SetDirty(true);
                 }
             }
         }
@@ -150,24 +137,15 @@ namespace XTerminal.Document
 
         #region 实例方法
 
-        private void SetDirty(bool dirty)
-        {
-            if (this.dirty != dirty)
-            {
-                this.dirty = dirty;
-            }
-        }
-
         #endregion
+
+        #region 公开接口
 
         public override void RequestInvalidate()
         {
-            int activeRow = this.ownerDocument.CursorPhysicsRow;
-            int firstRow = this.ownerDocument.FirstLine.PhysicsRow;
-            int lastRow = this.ownerDocument.LastLine.PhysicsRow;
             VTextLine cursorLine = this.ownerDocument.ActiveLine;
 
-            if(cursorLine == null)
+            if (cursorLine == null)
             {
                 // 光标所在行不可见
                 // 此时说明有滚动，有滚动的情况下直接隐藏光标
@@ -179,16 +157,15 @@ namespace XTerminal.Document
                 // 说明光标所在行可见
 
                 // 设置光标是否可以显示
-                this.DrawingObject.SetVisible(this.isVisible);
+                this.DrawingObject.SetVisible(this.IsVisible);
 
                 // 可以显示的话再执行下面的
-                if (this.isVisible)
+                if (this.IsVisible)
                 {
                     // 设置光标位置
                     // 有可能有中文字符，一个中文字符占用2列
                     // 先通过光标所在列找到真正的字符所在列
-                    // TODO：FindCharacterIndex此处是异步线程，可能会和处理字符线程冲突，导致异常（处理字符线程正在操作集合，Cursor线程正在查询）
-                    int characterIndex = cursorLine.FindCharacterIndex(this.column - 1);
+                    int characterIndex = this.characterIndex;
                     VTRect rect = cursorLine.MeasureTextBlock(characterIndex, 1);
                     double offsetX = rect.Right;
                     double offsetY = cursorLine.OffsetY;
@@ -197,15 +174,9 @@ namespace XTerminal.Document
                     // 当前可以显示光标
                     if (this.AllowBlink)
                     {
-                        // 允许光标闪烁
-                        if (this.blinkState)
-                        {
-                            this.DrawingObject.SetVisible(true);
-                        }
-                        else
-                        {
-                            this.DrawingObject.SetVisible(false);
-                        }
+                        // 允许光标闪烁，改变光标并闪烁
+                        this.blinkState = !this.blinkState;
+                        this.DrawingObject.SetVisible(this.blinkState);
                     }
                     else
                     {
@@ -214,5 +185,7 @@ namespace XTerminal.Document
                 }
             }
         }
+
+        #endregion
     }
 }

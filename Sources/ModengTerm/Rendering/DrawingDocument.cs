@@ -77,7 +77,7 @@ namespace ModengTerm.Rendering
             DrawingObject drawingObject = documentElement.DrawingObject as DrawingObject;
             if (drawingObject == null)
             {
-                drawingObject = DrawingObjectFactory.CreateDrawingObject(documentElement.Type);
+                drawingObject = DrawingObjectFactory.CreateDrawingObject(documentElement);
                 drawingObject.Initialize(documentElement);
                 documentElement.DrawingObject = drawingObject;
                 this.visuals.Add(drawingObject);
@@ -102,11 +102,12 @@ namespace ModengTerm.Rendering
 
         public void DeleteDrawingObjects()
         {
-            foreach (DrawingObject drawingObject in this.visuals.Cast<DrawingObject>())
+            List<DrawingObject> drawingObjects = this.visuals.Cast<DrawingObject>().ToList();
+
+            foreach (DrawingObject drawingObject in drawingObjects)
             {
-                drawingObject.Release();
+                this.DeleteDrawingObject(drawingObject);
             }
-            this.visuals.Clear();
         }
 
         #endregion

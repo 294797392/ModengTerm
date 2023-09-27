@@ -19,22 +19,21 @@ namespace ModengTerm.Base
     {
         #region 光标闪烁时间
 
-        public const int LowSpeedBlinkInterval = 1200;
-        public const int NormalSpeedBlinkInterval = 800;
-        public const int HighSpeedBlinkInterval = 400;
+        public const int LowSpeedBlinkInterval = 300;
+        public const int NormalSpeedBlinkInterval = 200;
+        public const int HighSpeedBlinkInterval = 100;
 
         public const VTCursorSpeeds DefaultCursorBlinkSpeed = VTCursorSpeeds.NormalSpeed;
         public const VTCursorStyles DefaultCursorStyle = VTCursorStyles.Line;
 
         #endregion
 
+        public const int DispatcherTimerInterval = 100;
+
+
         public const int MIN_PORT = 1;
         public const int MAX_PORT = 65535;
 
-        /// <summary>
-        /// 光标闪烁间隔时间
-        /// </summary>
-        public const int CURSOR_BLINK_INTERVAL = 500;
         public const int TerminalColumns = 80;
         public const int TerminalRows = 24;
         public const TerminalTypeEnum DefaultTerminalType = TerminalTypeEnum.XTerm256Color;

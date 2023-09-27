@@ -413,6 +413,14 @@ namespace XTerminal.UserControls
             });
         }
 
+        public void VisibleDocument(IDrawingDocument document, bool visible)
+        {
+            base.Dispatcher.Invoke(() =>
+            {
+                (document as FrameworkElement).Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            });
+        }
+
         public void GetScrollInfo(ref VTScrollInfo scrollInfo)
         {
             scrollInfo.ScrollMax = (int)SliderScrolbar.Maximum;
@@ -487,9 +495,6 @@ namespace XTerminal.UserControls
 
         protected override int OnOpen(OpenedSessionVM viewModel)
         {
-            string background = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
-            BorderBackground.Background = DrawingUtils.GetBrush(background);
-
             this.videoTerminal = viewModel as VideoTerminal;
             this.videoTerminal.Open();
 

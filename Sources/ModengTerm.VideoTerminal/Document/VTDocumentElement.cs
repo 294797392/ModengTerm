@@ -40,7 +40,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 匹配的行
         /// </summary>
-        MatchesLine
+        MatchesLine,
+
+        /// <summary>
+        /// 背景
+        /// </summary>
+        Wallpaper
     }
 
     /// <summary>

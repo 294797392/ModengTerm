@@ -7,7 +7,7 @@
         xmlns:xtermconverter="clr-namespace:XTerminal"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText100}" 
-        Height="800" Width="700" ResizeMode="NoResize"
+        Height="600" Width="700" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner">
 
     <Window.Resources>

@@ -30,8 +30,8 @@ namespace ModengTerm.Terminal.DataModels
         /// 背景颜色
         /// 格式是r,g,b
         /// </summary>
-        [JsonProperty("backgroundColor")]
-        public string BackgroundColor { get; set; }
+        [JsonProperty("background")]
+        public Wallpaper Background { get; set; }
 
         /// <summary>
         /// 默认前景色

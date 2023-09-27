@@ -93,7 +93,9 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="OpenedSessionVMFactory.cs" />
-    <Compile Include="Rendering\DrawingCanvas.cs" />
+    <Compile Include="Rendering\Wallpaper\DrawingWallpaper.cs" />
+    <Compile Include="Rendering\Wallpaper\DrawingWallpaperPureColor.cs" />
+    <Compile Include="Rendering\Wallpaper\DrawingWallpaperLive.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
     <Compile Include="Rendering\DrawingMatchesLine.cs" />
     <Compile Include="Rendering\DrawingObjectFactory.cs" />

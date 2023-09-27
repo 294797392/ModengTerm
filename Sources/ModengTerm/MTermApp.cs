@@ -4,6 +4,7 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.ServiceAgents;
+using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
@@ -36,7 +37,7 @@ namespace ModengTerm
 
         private OpenedSessionVM selectedOpenedSession;
 
-        private DispatcherTimer drawCursorTimer;
+        private DispatcherTimer drawFrameTimer;
 
         #endregion
 
@@ -93,11 +94,11 @@ namespace ModengTerm
 
             // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
 
-            this.drawCursorTimer = new DispatcherTimer();
-            //this.drawCursorTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.HighSpeedBlinkInterval);
-            //this.drawCursorTimer.Tick += DrawCursorTimer_Tick;
-            //this.drawCursorTimer.IsEnabled = false;
-            //this.drawCursorTimer.Start();
+            this.drawFrameTimer = new DispatcherTimer();
+            this.drawFrameTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.DispatcherTimerInterval);
+            this.drawFrameTimer.Tick += DrawFrameTimer_Tick;
+            this.drawFrameTimer.IsEnabled = false;
+            this.drawFrameTimer.Start();
 
             #endregion
 
@@ -149,7 +150,7 @@ namespace ModengTerm
             {
                 if (this.OpenedSessionList.OfType<VideoTerminal>().Count() == 0)
                 {
-                    this.drawCursorTimer.IsEnabled = false;
+                    this.drawFrameTimer.IsEnabled = false;
                 }
             }
         }
@@ -167,6 +168,28 @@ namespace ModengTerm
 
         #region 实例方法
 
+        private void ProcessFrame(double frameInterval, VTFramedElement element)
+        {
+            if (element.LeftTime <= 0)
+            {
+                // 渲染
+                try
+                {
+                    element.RequestInvalidate();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("RequestInvalidate运行异常", ex);
+                }
+
+                element.LeftTime = element.FrameInterval;
+            }
+            else
+            {
+                element.LeftTime -= frameInterval;
+            }
+        }
+
         #endregion
 
         #region 事件处理器
@@ -177,27 +200,13 @@ namespace ModengTerm
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DrawCursorTimer_Tick(object sender, EventArgs e)
+        private void DrawFrameTimer_Tick(object sender, EventArgs e)
         {
-            IEnumerable<VideoTerminal> vtlist = this.OpenedSessionList.OfType<VideoTerminal>();
+            IEnumerable<VideoTerminal> vtlist = this.OpenedTerminals;
 
             foreach (VideoTerminal vt in vtlist)
             {
-                VTCursor cursor = vt.Cursor;
-
-                cursor.BlinkState = !cursor.BlinkState;
-
-                try
-                {
-                    cursor.RequestInvalidate();
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("RequestInvalidate Cursor运行异常", ex);
-                }
-                finally
-                {
-                }
+                this.ProcessFrame(this.drawFrameTimer.Interval.TotalMilliseconds, vt.Cursor);
             }
         }
 
@@ -231,9 +240,9 @@ namespace ModengTerm
             // 启动光标渲染线程
             if (sessionVM is VideoTerminal)
             {
-                if (!this.drawCursorTimer.IsEnabled)
+                if (!this.drawFrameTimer.IsEnabled)
                 {
-                    this.drawCursorTimer.IsEnabled = true;
+                    this.drawFrameTimer.IsEnabled = true;
                 }
             }
         }

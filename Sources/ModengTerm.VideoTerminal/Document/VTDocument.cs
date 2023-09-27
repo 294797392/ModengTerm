@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit.Utility;
+using ModengTerm.Base;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
 using System;
@@ -158,11 +159,10 @@ namespace XTerminal.Document
                 Row = 0,
                 Column = 0,
                 Style = options.CursorStyle,
-                BlinkSpeed = options.CursorSpeed,
                 Size = options.CursorSize,
+                FrameInterval = VTUtils.GetCursorInterval(options.CursorSpeed),
                 AllowBlink = true,
                 IsVisible = true,
-                BlinkState = true
             };
             this.Cursor.DrawingObject = this.Drawing.CreateDrawingObject(this.Cursor);
 
@@ -209,7 +209,7 @@ namespace XTerminal.Document
                     FontFamily = this.options.FontFamily,
                     ColorTable = this.options.ColorTable,
                     Foreground = this.options.ForegroundColor,
-                    Background = this.options.BackgroundColor,
+                    Background = this.options.Background,
                 },
             };
 
@@ -250,6 +250,17 @@ namespace XTerminal.Document
         #endregion
 
         #region 公开接口
+
+        /// <summary>
+        /// 释放资源
+        /// </summary>
+        public void Release()
+        {
+            this.Drawing.DeleteDrawingObjects();
+            this.FirstLine = null;
+            this.LastLine = null;
+            this.ActiveLine = null;
+        }
 
         /// <summary>
         /// 换行
@@ -768,11 +779,6 @@ namespace XTerminal.Document
         /// <param name="column">要设置的列</param>
         public void SetCursor(int row, int column)
         {
-            if (this.Cursor.Column != column)
-            {
-                this.Cursor.Column = column;
-            }
-
             if (this.Cursor.Row != row)
             {
                 this.Cursor.Row = row;
@@ -781,11 +787,18 @@ namespace XTerminal.Document
                 this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
             }
 
+            if (this.Cursor.Column != column)
+            {
+                this.Cursor.Column = column;
+
+            }
+
             // 要判断下光标所在行是否为空
             // 如果光标所在行被滚动到可视区域外了，然后执行CR指令，那么ActiveLine就是空的
             if (this.ActiveLine != null)
             {
                 this.ActiveLine.PadColumns(column + 1);
+                this.Cursor.CharacterIndex = this.ActiveLine.FindCharacterIndex(column) - 1;
             }
         }
 
@@ -806,16 +819,6 @@ namespace XTerminal.Document
                 // 如果光标所在物理行被滚动到了文档外，那么ActiveLine就是空的
                 this.ActiveLine = this.FindLine(physicsRow);
             }
-        }
-
-        /// <summary>
-        /// 释放资源
-        /// </summary>
-        public void Dispose()
-        {
-            this.FirstLine = null;
-            this.LastLine = null;
-            this.ActiveLine = null;
         }
 
         /// <summary>

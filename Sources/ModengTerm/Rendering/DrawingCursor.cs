@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,9 +18,6 @@ namespace ModengTerm.Rendering
     public class DrawingCursor : DrawingObject
     {
         private static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
-        private static readonly double BlockWidth = 5;
-        private static readonly double LineWidth = 2;
-        private static readonly double UnderscoreWidth = 3;
 
         private VTCursor cursor;
         private Brush brush;
@@ -34,27 +32,30 @@ namespace ModengTerm.Rendering
             {
                 case VTCursorStyles.Block:
                     {
-                        this.rect = new Rect(0, 0, BlockWidth, this.cursor.Size.Height);
+                        this.rect = new Rect(0, 0, this.cursor.Size.Width, this.cursor.Size.Height);
                         break;
                     }
 
                 case VTCursorStyles.Line:
                     {
-                        this.rect = new Rect(0, 0, LineWidth, this.cursor.Size.Height);
+                        this.rect = new Rect(0, 0, 2, this.cursor.Size.Height);
                         break;
                     }
 
                 case VTCursorStyles.Underscore:
                     {
-                        this.rect = new Rect(0, 0, UnderscoreWidth, 5);
+                        this.rect = new Rect(0, this.cursor.Size.Height - 2, this.cursor.Size.Width, 2);
                         break;
                     }
 
-                default:
+                case VTCursorStyles.None:
                     {
                         this.rect = new Rect();
                         break;
                     }
+
+                default:
+                    throw new NotImplementedException();
             }
 
             // 先画出来，不然永远不会显示鼠标元素

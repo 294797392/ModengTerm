@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Terminal;
+using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,7 +66,7 @@ namespace XTerminal.Document
         /// <summary>
         /// 背景颜色
         /// </summary>
-        public string BackgroundColor { get; set; }
+        public Wallpaper Background { get; set; }
 
         /// <summary>
         /// 颜色表
