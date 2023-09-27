@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Document;
+using XTerminal.Document.Rendering;
 
 namespace ModengTerm.Rendering
 {
@@ -15,11 +16,11 @@ namespace ModengTerm.Rendering
     /// </summary>
     public static class DrawingObjectFactory
     {
-        private static DrawingObject CreateWallpaperDrawingObject(VTDocumentElement documentElement)
+        private static IDrawingObject CreateWallpaperDrawingObject(VTDocumentElement documentElement)
         {
             VTWallpaper wallpaper = documentElement as VTWallpaper;
 
-            switch ((WallpaperTypeEnum)wallpaper.Wallpaper.Type)
+            switch (wallpaper.PaperType)
             {
                 case WallpaperTypeEnum.PureColor: return new DrawingWallpaperPureColor();
                 case WallpaperTypeEnum.Live: return new DrawingWallpaperLive();
@@ -28,7 +29,7 @@ namespace ModengTerm.Rendering
             }
         }
 
-        public static DrawingObject CreateDrawingObject(VTDocumentElement documentElement)
+        public static IDrawingObject CreateDrawingObject(VTDocumentElement documentElement)
         {
             switch (documentElement.Type)
             {

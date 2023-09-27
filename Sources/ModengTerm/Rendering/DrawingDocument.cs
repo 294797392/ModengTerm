@@ -29,8 +29,6 @@ namespace ModengTerm.Rendering
 
         private VisualCollection visuals;
 
-        private RenderingOptions options;
-
         #endregion
 
         #region 属性
@@ -72,15 +70,15 @@ namespace ModengTerm.Rendering
 
         #region 实例方法
 
-        private DrawingObject EnsureDrawingObject(VTDocumentElement documentElement)
+        private IDrawingObject EnsureDrawingObject(VTDocumentElement documentElement)
         {
-            DrawingObject drawingObject = documentElement.DrawingObject as DrawingObject;
+            IDrawingObject drawingObject = documentElement.DrawingObject as IDrawingObject;
             if (drawingObject == null)
             {
                 drawingObject = DrawingObjectFactory.CreateDrawingObject(documentElement);
                 drawingObject.Initialize(documentElement);
                 documentElement.DrawingObject = drawingObject;
-                this.visuals.Add(drawingObject);
+                this.visuals.Add(drawingObject as DrawingVisual);
             }
             return drawingObject;
         }

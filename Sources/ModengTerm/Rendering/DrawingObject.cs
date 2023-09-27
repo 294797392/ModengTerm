@@ -13,12 +13,11 @@ namespace ModengTerm.Rendering
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class DrawingObject : DrawingVisual, IDrawingObject
+    public abstract class DrawingObject : FrameworkVisual, IDrawingObject
     {
         #region 实例变量
 
         protected VTDocumentElement documentElement;
-        private bool visible = true;
 
         #endregion
 
@@ -68,35 +67,6 @@ namespace ModengTerm.Rendering
         public void Release()
         {
             this.OnRelease();
-        }
-
-        public void SetOpacity(double opacity)
-        {
-            this.Opacity = opacity;
-        }
-
-        public void Arrange(double x, double y)
-        {
-            this.Offset = new Vector(x, y);
-        }
-
-        public void SetVisible(bool visible)
-        {
-            if (this.visible == visible)
-            {
-                return;
-            }
-
-            if (visible)
-            {
-                this.Opacity = 1;
-            }
-            else
-            {
-                this.Opacity = 0;
-            }
-
-            this.visible = visible;
         }
 
         #endregion

@@ -16,7 +16,7 @@ namespace ModengTerm.Terminal.Document
         /// 显示下一帧的间隔时间
         /// 有可能每一帧之间的间隔都是不一样的
         /// </summary>
-        public double FrameInterval { get; set; }
+        public double Delay { get; set; }
 
         /// <summary>
         /// 还剩余多少时间就渲染

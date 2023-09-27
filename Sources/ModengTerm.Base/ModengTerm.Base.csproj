@@ -51,6 +51,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ASCIITable.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Enumerations\SessionTypeEnum.cs" />
     <Compile Include="Enumerations\TerminalTypeEnum.cs" />
     <Compile Include="Enumerations\VTCursorStyles.cs" />
+    <Compile Include="GifParser.cs" />
     <Compile Include="ICloneable.cs" />
     <Compile Include="MTermUtils.cs" />
     <Compile Include="MTMessageBox.cs" />

@@ -19,6 +19,6 @@ namespace ModengTerm.Terminal.Enumerations
         /// <summary>
         /// 动态背景,gif动画
         /// </summary>
-        Live,
+        Live = 1,
     }
 }

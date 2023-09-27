@@ -1,33 +1,82 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using ModengTerm.Terminal.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
+using XTerminal.Document;
+using XTerminal.Document.Rendering;
 
 namespace ModengTerm.Rendering.Background
 {
     /// <summary>
-    /// 使用VideoDrawing播放视频
-    /// https://learn.microsoft.com/zh-cn/dotnet/desktop/wpf/graphics-multimedia/how-to-play-media-using-a-videodrawing?view=netframeworkdesktop-4.8
+    /// 动态壁纸
     /// </summary>
-    public class DrawingWallpaperLive : DrawingWallpaper
+    public class DrawingWallpaperLive : FrameworkVisual, IDrawingObject
     {
-        protected override void OnInitialize()
+        #region 实例变量
+
+        protected VTWallpaper wallpaper;
+        private WriteableBitmap writeableBitmap;
+        private Int32Rect dirtyRect;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// 获取该壁纸大小
+        /// </summary>
+        protected Rect Size
         {
-            base.OnInitialize();
+            get
+            {
+                // -5,-5,+5,+5是为了消除边距
+                return new Rect(-5, -5, this.wallpaper.Rect.Width + 5, this.wallpaper.Rect.Height + 5);
+            }
         }
 
-        protected override void OnRelease()
+        #endregion
+
+        #region IDrawingObject
+
+        public void Initialize(VTDocumentElement documentElement)
         {
-            base.OnRelease();
+            this.wallpaper = documentElement as VTWallpaper;
+
+            // 初始化WriteableBitmap
+            GifMetadata gifMetadata = this.wallpaper.GifMetadata;
+            DpiScale dpiScale = VisualTreeHelper.GetDpi(this);
+            this.writeableBitmap = new WriteableBitmap((int)gifMetadata.Width, (int)gifMetadata.Height, dpiScale.PixelsPerInchX, dpiScale.PixelsPerInchY, gifMetadata.PixelFormat, gifMetadata.BitmapPalette);
+
+            // 画
+            DrawingContext dc = this.RenderOpen();
+            dc.DrawImage(this.writeableBitmap, this.Size);
+            dc.Close();
+
+            this.dirtyRect = new Int32Rect(0, 0, (int)gifMetadata.Width, (int)gifMetadata.Height);
         }
 
-        protected override void OnDraw(DrawingContext dc)
+        public void Release()
         {
         }
+
+        public void Draw()
+        {
+            // 更新
+            GifFrame gifFrame = this.wallpaper.Frame;
+
+            this.writeableBitmap.Lock();
+            this.writeableBitmap.AddDirtyRect(this.dirtyRect);
+            Marshal.Copy(gifFrame.Data, 0, this.writeableBitmap.BackBuffer, gifFrame.Data.Length);
+            this.writeableBitmap.Unlock();
+        }
+
+        #endregion
     }
 }
-
-

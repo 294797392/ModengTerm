@@ -160,7 +160,7 @@ namespace XTerminal.Document
                 Column = 0,
                 Style = options.CursorStyle,
                 Size = options.CursorSize,
-                FrameInterval = VTUtils.GetCursorInterval(options.CursorSpeed),
+                Delay = VTUtils.GetCursorInterval(options.CursorSpeed),
                 AllowBlink = true,
                 IsVisible = true,
             };

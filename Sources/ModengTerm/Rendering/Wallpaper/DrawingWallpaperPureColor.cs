@@ -10,15 +10,28 @@ using XTerminal.Document;
 
 namespace ModengTerm.Rendering.Background
 {
-    public class DrawingWallpaperPureColor : DrawingWallpaper
+    public class DrawingWallpaperPureColor : DrawingObject
     {
+        private VTWallpaper wallpaper;
         private Brush brush;
+
+        /// <summary>
+        /// 获取该壁纸大小
+        /// </summary>
+        protected Rect Size
+        {
+            get
+            {
+                // -5,-5,+5,+5是为了消除边距
+                return new Rect(-5, -5, this.wallpaper.Rect.Width + 5, this.wallpaper.Rect.Height + 5);
+            }
+        }
 
         protected override void OnInitialize()
         {
-            base.OnInitialize();
+            this.wallpaper = this.documentElement as VTWallpaper;
 
-            this.brush = DrawingUtils.GetBrush(this.wallpaper.Wallpaper.Uri);
+            this.brush = DrawingUtils.GetBrush(this.wallpaper.Uri);
         }
 
         protected override void OnRelease()

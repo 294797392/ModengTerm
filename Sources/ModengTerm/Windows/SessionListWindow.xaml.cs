@@ -124,6 +124,8 @@ namespace XTerminal
 
             BindableCollection<XTermSessionVM> sessionVMs = DataGridSessionList.DataContext as BindableCollection<XTermSessionVM>;
             sessionVMs.Remove(selectedSession);
+
+            DataGridSessionList.SelectedIndex = 0;
         }
 
         private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)

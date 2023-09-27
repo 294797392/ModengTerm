@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Document;
@@ -303,6 +304,8 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        public VTWallpaper Background { get { return this.wallpaper; } }
+
         #endregion
 
         #region 构造方法
@@ -459,8 +462,13 @@ namespace ModengTerm.Terminal.ViewModels
             #region 初始化背景
 
             // 此时Inser(0)在最后一层
-            this.wallpaper = new VTWallpaper() { Wallpaper = this.background };
-            this.wallpaper.Rect = this.vtRect;
+            this.wallpaper = new VTWallpaper()
+            {
+                PaperType = (WallpaperTypeEnum)this.background.Type,
+                Uri = this.background.Uri,
+                Rect = this.vtRect,
+                GifMetadata = GifParser.GetFrames(this.background.Uri)
+            };
             this.backgroundCanvas = this.videoTerminal.CreateDocument();
             this.videoTerminal.InsertDocument(0, this.backgroundCanvas);
             this.backgroundCanvas.CreateDrawingObject(this.wallpaper);
@@ -737,7 +745,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// 当窗口变成后台窗口（不显示）的时候触发
         /// </summary>
         public void Deactive()
-        { 
+        {
         }
 
         #endregion

@@ -5,6 +5,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
@@ -94,7 +95,7 @@ namespace ModengTerm
 
             // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
 
-            this.drawFrameTimer = new DispatcherTimer();
+            this.drawFrameTimer = new DispatcherTimer(DispatcherPriority.Render);
             this.drawFrameTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.DispatcherTimerInterval);
             this.drawFrameTimer.Tick += DrawFrameTimer_Tick;
             this.drawFrameTimer.IsEnabled = false;
@@ -168,7 +169,7 @@ namespace ModengTerm
 
         #region 实例方法
 
-        private void ProcessFrame(double frameInterval, VTFramedElement element)
+        private void ProcessFrame(double elapsed, VTFramedElement element)
         {
             if (element.LeftTime <= 0)
             {
@@ -182,11 +183,11 @@ namespace ModengTerm
                     logger.Error("RequestInvalidate运行异常", ex);
                 }
 
-                element.LeftTime = element.FrameInterval;
+                element.LeftTime = element.Delay;
             }
             else
             {
-                element.LeftTime -= frameInterval;
+                element.LeftTime -= elapsed;
             }
         }
 
@@ -206,7 +207,23 @@ namespace ModengTerm
 
             foreach (VideoTerminal vt in vtlist)
             {
-                this.ProcessFrame(this.drawFrameTimer.Interval.TotalMilliseconds, vt.Cursor);
+                double elapsed = this.drawFrameTimer.Interval.TotalMilliseconds;
+
+                this.ProcessFrame(elapsed, vt.Cursor);
+
+                switch (vt.Background.PaperType)
+                {
+                    case WallpaperTypeEnum.Live:
+                        {
+                            this.ProcessFrame(elapsed, vt.Background);
+                            break;
+                        }
+
+                    default:
+                        {
+                            break;
+                        }
+                }
             }
         }
 
@@ -236,7 +253,7 @@ namespace ModengTerm
             // 添加到界面上，因为最后一个元素是打开Session的TabItem，所以要添加到倒数第二个元素的位置
             this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);
             this.SelectedOpenedSession = sessionVM;
-            
+
             // 启动光标渲染线程
             if (sessionVM is VideoTerminal)
             {

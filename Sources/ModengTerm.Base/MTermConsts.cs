@@ -28,7 +28,7 @@ namespace ModengTerm.Base
 
         #endregion
 
-        public const int DispatcherTimerInterval = 100;
+        public const int DispatcherTimerInterval = 10;
 
 
         public const int MIN_PORT = 1;
