@@ -60,7 +60,7 @@
                         <MenuItem Header="保存选中内容" Click="MenuItemSaveSelected_Click"/>
                         <MenuItem Header="保存所有内容" Click="MenuItemSaveAll_Click"/>
                         <Separator/>
-                        <MenuItem x:Name="MenuItemSendAll" Header="发送到所有会话" IsCheckable="True"/>
+                        <MenuItem x:Name="MenuItemSendAll" Header="发送到所有会话" IsCheckable="True" IsChecked="{Binding Path=SendAll, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <MenuItem x:Name="MenuItemDrawingMode" IsCheckable="True" Visibility="Collapsed"
                                   Checked="MenuItemDrawingMode_CheckedChanged"

@@ -1,5 +1,7 @@
 ﻿using ModengTerm;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Rendering;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using System;
@@ -29,7 +31,14 @@ namespace XTerminal
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region 实例变量
+
         private OpenedSessionDataTemplateSelector templateSelector;
+        private UserInput userInput;
+
+        #endregion
+
+        #region 构造方法
 
         public MainWindow()
         {
@@ -38,10 +47,13 @@ namespace XTerminal
             this.InitializeWindow();
         }
 
+        #endregion
+
         #region 实例方法
 
         private void InitializeWindow()
         {
+            this.userInput = new UserInput();
             this.templateSelector = new OpenedSessionDataTemplateSelector();
             this.templateSelector.DataTemplateOpenedSession = this.FindResource("DataTemplateOpenedSession") as DataTemplate;
             this.templateSelector.DataTemplateOpenSession = this.FindResource("DataTemplateOpenSession") as DataTemplate;
@@ -61,9 +73,28 @@ namespace XTerminal
             }
         }
 
-        #endregion
+        /// <summary>
+        /// 向SSH服务器发送输入
+        /// </summary>
+        /// <param name="userInput"></param>
+        private void SendUserInput(VideoTerminal videoTerminal, UserInput userInput)
+        {
+            if (videoTerminal.SendAll)
+            {
+                foreach (VideoTerminal vt in MTermApp.Context.OpenedTerminals)
+                {
+                    vt.SendInput(userInput);
+                }
+            }
+            else
+            {
+                videoTerminal.SendInput(userInput);
+            }
+        }
 
-        #region 事件处理器
+#endregion
+
+#region 事件处理器
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -90,6 +121,7 @@ namespace XTerminal
             }
             else
             {
+                ContentControlSession.Content = selectedTabItem.Content;
             }
         }
 
@@ -163,7 +195,85 @@ namespace XTerminal
             debugWindow.ShowDialog();
         }
 
-        #endregion
+
+
+
+        /// <summary>
+        /// 输入中文的时候会触发该事件
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
+        {
+            base.OnPreviewTextInput(e);
+
+            VideoTerminal videoTerminal = MTermApp.Context.SelectedOpenedSession as VideoTerminal;
+            if (videoTerminal == null)
+            {
+                return;
+            }
+
+            this.userInput.CapsLock = Console.CapsLock;
+            this.userInput.Key = VTKeys.GenericText;
+            this.userInput.Text = e.Text;
+            this.userInput.Modifiers = VTModifierKeys.None;
+
+            this.SendUserInput(videoTerminal, this.userInput);
+
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// 从键盘上按下按键的时候会触发
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+
+            VideoTerminal videoTerminal = MTermApp.Context.SelectedOpenedSession as VideoTerminal;
+            if (videoTerminal == null)
+            {
+                return;
+            }
+
+            if (e.Key == Key.ImeProcessed)
+            {
+                // 这些字符交给输入法处理了
+            }
+            else
+            {
+                switch (e.Key)
+                {
+                    case Key.Tab:
+                    case Key.Up:
+                    case Key.Down:
+                    case Key.Left:
+                    case Key.Right:
+                    case Key.Space:
+                        {
+                            // 防止焦点移动到其他控件上了
+                            e.Handled = true;
+                            break;
+                        }
+                }
+
+                if (e.Key != Key.ImeProcessed)
+                {
+                    e.Handled = true;
+                }
+
+                VTKeys vtKey = DrawingUtils.ConvertToVTKey(e.Key);
+                this.userInput.CapsLock = Console.CapsLock;
+                this.userInput.Key = vtKey;
+                this.userInput.Text = null;
+                this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+                this.SendUserInput(videoTerminal, this.userInput);
+            }
+
+            e.Handled = true;
+        }
+
+#endregion
     }
 
     public class OpenedSessionDataTemplateSelector : DataTemplateSelector

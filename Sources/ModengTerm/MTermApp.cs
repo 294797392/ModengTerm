@@ -206,6 +206,9 @@ namespace ModengTerm
             // 此时所有的界面都加载完了，可以真正打开Session了
             SessionContent content = sender as SessionContent;
 
+            // 要反注册事件，不然每次显示界面就会多打开一个VideoTerminal
+            content.Loaded -= this.SessionContent_Loaded;
+
             int code = content.Open();
             if (code != ResponseCode.SUCCESS)
             {

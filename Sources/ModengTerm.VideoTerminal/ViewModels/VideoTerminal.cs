@@ -189,6 +189,8 @@ namespace ModengTerm.Terminal.ViewModels
         internal string fontFamily;
         private int scrollbackMax; // 最多可以有多少滚动行数
 
+        private bool sendAll;
+
         #endregion
 
         #region 属性
@@ -278,6 +280,22 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     this.colSize = value;
                     this.NotifyPropertyChanged("ColumnSize");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 是否发送到所有终端
+        /// </summary>
+        public bool SendAll
+        {
+            get { return this.sendAll; }
+            set
+            {
+                if (this.sendAll != value)
+                {
+                    this.sendAll = value;
+                    this.NotifyPropertyChanged("SendAll");
                 }
             }
         }

@@ -74,9 +74,12 @@ namespace XTerminal.UserControls
 
         private void InitializeUserControl()
         {
+#if !DEBUG
+            ToggleButtonLoggerSetting.Visibility = Visibility.Collapsed;
+#endif
+
             this.userInput = new UserInput();
             this.Background = Brushes.Transparent;
-            this.Focusable = true;
         }
 
         private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
