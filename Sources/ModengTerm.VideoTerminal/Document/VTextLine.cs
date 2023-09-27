@@ -238,6 +238,8 @@ namespace XTerminal.Document
                 character.Attribute = 0;
                 character.Flags = VTCharacterFlags.None;
             }
+
+            this.SetRenderDirty(true);
         }
 
         #endregion
