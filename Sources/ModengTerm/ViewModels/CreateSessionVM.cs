@@ -859,6 +859,12 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
+                case WallpaperTypeEnum.Live:
+                    {
+                        // TODO：实现
+                        break;
+                    }
+
                 default:
                     throw new NotImplementedException();
             }

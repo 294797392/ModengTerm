@@ -100,9 +100,9 @@ namespace ModengTerm.Rendering
 
         public void DeleteDrawingObjects()
         {
-            List<DrawingObject> drawingObjects = this.visuals.Cast<DrawingObject>().ToList();
+            List<IDrawingObject> drawingObjects = this.visuals.Cast<IDrawingObject>().ToList();
 
-            foreach (DrawingObject drawingObject in drawingObjects)
+            foreach (IDrawingObject drawingObject in drawingObjects)
             {
                 this.DeleteDrawingObject(drawingObject);
             }

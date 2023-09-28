@@ -3,33 +3,42 @@ using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using XTerminal.Document;
 
 namespace ModengTerm.Terminal.Document
 {
     public class VTWallpaper : VTFramedElement
     {
+        #region 实例变量
+
         private string uri;
         private VTRect vtc;
-        private bool dirty;
         private int frameIndex;// 当前显示的帧序号
+
+        #endregion
+
+        #region 属性
 
         /// <summary>
         /// 壁纸Uri
         /// </summary>
-        public string Uri 
+        public string Uri
         {
             get { return this.uri; }
             set
             {
-                if (this.uri != value) 
+                if (this.uri != value)
                 {
                     this.uri = value;
-                    this.SetDirty(true);
                 }
             }
         }
@@ -45,7 +54,6 @@ namespace ModengTerm.Terminal.Document
             set
             {
                 this.vtc = value;
-                this.SetDirty(true);
             }
         }
 
@@ -61,13 +69,9 @@ namespace ModengTerm.Terminal.Document
 
         public override VTDocumentElements Type => VTDocumentElements.Wallpaper;
 
-        private void SetDirty(bool dirty)
-        {
-            if (this.dirty != dirty)
-            {
-                this.dirty = dirty;
-            }
-        }
+        #endregion
+
+        #region VTDocumentElement
 
         public override void RequestInvalidate()
         {
@@ -94,12 +98,7 @@ namespace ModengTerm.Terminal.Document
 
                 case WallpaperTypeEnum.PureColor:
                     {
-                        if (this.dirty)
-                        {
-                            this.DrawingObject.Draw();
-
-                            this.dirty = false;
-                        }
+                        this.DrawingObject.Draw();
                         break;
                     }
 
@@ -107,5 +106,7 @@ namespace ModengTerm.Terminal.Document
                     throw new NotImplementedException();
             }
         }
+
+        #endregion
     }
 }

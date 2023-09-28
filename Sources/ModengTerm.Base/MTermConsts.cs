@@ -28,8 +28,7 @@ namespace ModengTerm.Base
 
         #endregion
 
-        public const int DispatcherTimerInterval = 10;
-
+        public const int DrawFrameInterval = 50;
 
         public const int MIN_PORT = 1;
         public const int MAX_PORT = 65535;

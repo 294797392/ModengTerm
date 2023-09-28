@@ -117,18 +117,11 @@ namespace ModengTerm.Terminal.Document.Graphics
 
                             VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
                             VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
-                            if (this.textLine.Style.Background.Type == (int)WallpaperTypeEnum.PureColor)
-                            {
-                                // 如果背景是纯色就变反色
-                                character.Foreground = VTColor.CreateFromRgbKey(this.textLine.Style.Background.Uri);
-                                character.Background = VTColor.CreateFromRgbKey(this.textLine.Style.Foreground);
-                            }
-                            else
-                            {
-                                // 如果背景不是纯色，那么就前景色用白色，背景色用黑色
-                                character.Foreground = VTColor.CreateFromRgbKey("255,255,255");
-                                character.Background = VTColor.CreateFromRgbKey("0,0,0");
-                            }
+                            
+                            VTColor foreground, background;
+                            VTUtils.GetInverseVTColor(this.textLine.Style, out foreground, out background);
+                            character.Foreground = foreground;
+                            character.Background = background;
                         }
 
                         #endregion

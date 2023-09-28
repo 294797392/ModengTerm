@@ -19,11 +19,14 @@ namespace ModengTerm.Rendering.Background
     /// </summary>
     public class DrawingWallpaperLive : FrameworkVisual, IDrawingObject
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("logger");
+
         #region 实例变量
 
         protected VTWallpaper wallpaper;
         private WriteableBitmap writeableBitmap;
-        private Int32Rect dirtyRect;
+        private double oldWidth;
+        private double oldHeight;
 
         #endregion
 
@@ -32,7 +35,7 @@ namespace ModengTerm.Rendering.Background
         /// <summary>
         /// 获取该壁纸大小
         /// </summary>
-        protected Rect Size
+        private Rect Size
         {
             get
             {
@@ -40,6 +43,10 @@ namespace ModengTerm.Rendering.Background
                 return new Rect(-5, -5, this.wallpaper.Rect.Width + 5, this.wallpaper.Rect.Height + 5);
             }
         }
+
+        #endregion
+
+        #region 实例方法
 
         #endregion
 
@@ -52,14 +59,15 @@ namespace ModengTerm.Rendering.Background
             // 初始化WriteableBitmap
             GifMetadata gifMetadata = this.wallpaper.GifMetadata;
             DpiScale dpiScale = VisualTreeHelper.GetDpi(this);
-            this.writeableBitmap = new WriteableBitmap((int)gifMetadata.Width, (int)gifMetadata.Height, dpiScale.PixelsPerInchX, dpiScale.PixelsPerInchY, gifMetadata.PixelFormat, gifMetadata.BitmapPalette);
+            this.writeableBitmap = new WriteableBitmap(gifMetadata.Width, gifMetadata.Height, dpiScale.PixelsPerInchX, dpiScale.PixelsPerInchY, gifMetadata.PixelFormat, gifMetadata.BitmapPalette);
 
             // 画
             DrawingContext dc = this.RenderOpen();
             dc.DrawImage(this.writeableBitmap, this.Size);
             dc.Close();
 
-            this.dirtyRect = new Int32Rect(0, 0, (int)gifMetadata.Width, (int)gifMetadata.Height);
+            this.oldWidth = this.wallpaper.Rect.Width;
+            this.oldHeight = this.wallpaper.Rect.Height;
         }
 
         public void Release()
@@ -68,11 +76,25 @@ namespace ModengTerm.Rendering.Background
 
         public void Draw()
         {
+            if (this.oldWidth != this.wallpaper.Rect.Width ||
+                this.oldHeight != this.wallpaper.Rect.Height)
+            {
+                DrawingContext dc = this.RenderOpen();
+                dc.DrawImage(this.writeableBitmap, this.Size);
+                dc.Close();
+
+                this.oldWidth = this.wallpaper.Rect.Width;
+                this.oldHeight = this.wallpaper.Rect.Height;
+            }
+
             // 更新
             GifFrame gifFrame = this.wallpaper.Frame;
 
+            Int32Rect dirtyRect = new Int32Rect(gifFrame.Left, gifFrame.Top, gifFrame.PixelWidth, gifFrame.PixelHeight);
+            //this.writeableBitmap.WritePixels(dirtyRect, gifFrame.Data, gifFrame.PixelWidth, 0);
+
             this.writeableBitmap.Lock();
-            this.writeableBitmap.AddDirtyRect(this.dirtyRect);
+            this.writeableBitmap.AddDirtyRect(dirtyRect);
             Marshal.Copy(gifFrame.Data, 0, this.writeableBitmap.BackBuffer, gifFrame.Data.Length);
             this.writeableBitmap.Unlock();
         }

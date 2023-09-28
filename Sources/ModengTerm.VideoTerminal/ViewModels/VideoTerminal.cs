@@ -461,7 +461,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化背景
 
-            // 此时Inser(0)在最后一层
+            // 此时Inser(0)在Z顺序的最下面一层
             this.wallpaper = new VTWallpaper()
             {
                 PaperType = (WallpaperTypeEnum)this.background.Type,
@@ -731,21 +731,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.PerformDrawing(this.activeDocument);
             }
-        }
-
-        /// <summary>
-        /// 当窗口再前台显示的时候触发
-        /// </summary>
-        public void Active()
-        {
-
-        }
-
-        /// <summary>
-        /// 当窗口变成后台窗口（不显示）的时候触发
-        /// </summary>
-        public void Deactive()
-        {
         }
 
         #endregion
@@ -1509,10 +1494,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         if (action == VTActions.ReverseVideo)
                         {
-                            string foreground = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
-                            string background = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
-                            VTColor backColor = VTColor.CreateFromRgbKey(foreground);
-                            VTColor foreColor = VTColor.CreateFromRgbKey(background);
+                            VTColor foreColor, backColor;
+                            VTUtils.GetInverseVTColor(this.ActiveLine.Style, out foreColor, out backColor);
                             this.activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
                             this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
                         }

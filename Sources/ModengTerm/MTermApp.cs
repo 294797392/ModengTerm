@@ -96,10 +96,9 @@ namespace ModengTerm
             // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
 
             this.drawFrameTimer = new DispatcherTimer(DispatcherPriority.Render);
-            this.drawFrameTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.DispatcherTimerInterval);
+            this.drawFrameTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.DrawFrameInterval);
             this.drawFrameTimer.Tick += DrawFrameTimer_Tick;
             this.drawFrameTimer.IsEnabled = false;
-            this.drawFrameTimer.Start();
 
             #endregion
 
@@ -169,9 +168,11 @@ namespace ModengTerm
 
         #region 实例方法
 
-        private void ProcessFrame(double elapsed, VTFramedElement element)
+        private void ProcessFrame(int elapsed, VTFramedElement element)
         {
-            if (element.LeftTime <= 0)
+            element.Elapsed -= elapsed;
+
+            if (element.Elapsed <= 0)
             {
                 // 渲染
                 try
@@ -183,11 +184,7 @@ namespace ModengTerm
                     logger.Error("RequestInvalidate运行异常", ex);
                 }
 
-                element.LeftTime = element.Delay;
-            }
-            else
-            {
-                element.LeftTime -= elapsed;
+                element.Elapsed = element.Delay;
             }
         }
 
@@ -207,7 +204,14 @@ namespace ModengTerm
 
             foreach (VideoTerminal vt in vtlist)
             {
-                double elapsed = this.drawFrameTimer.Interval.TotalMilliseconds;
+                // 如果当前界面上没有显示终端，那么不处理帧
+                FrameworkElement frameworkElement = vt.Content as FrameworkElement;
+                if (!frameworkElement.IsLoaded)
+                {
+                    continue;
+                }
+
+                int elapsed = this.drawFrameTimer.Interval.Milliseconds;
 
                 this.ProcessFrame(elapsed, vt.Cursor);
 
