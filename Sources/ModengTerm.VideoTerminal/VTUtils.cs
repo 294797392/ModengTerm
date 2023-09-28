@@ -13,6 +13,8 @@ using System.Windows.Media;
 using ModengTerm.Terminal.DataModels;
 using XTerminal.Base.Enumerations;
 using ModengTerm.Base;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace ModengTerm.Terminal
 {
@@ -45,6 +47,14 @@ namespace ModengTerm.Terminal
 
     public static class VTUtils
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("VTUtils");
+
+        /// <summary>
+        /// 所有的嵌入的资源名字
+        /// </summary>
+        private static List<string> AllResourceNames = new List<string>();
+        private static Assembly ResourceAssembly = null;
+
         private delegate void CreateLineDelegate(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter);
         private const string HtmlTemplate =
             "<html>" +
@@ -56,6 +66,16 @@ namespace ModengTerm.Terminal
 
         private static readonly List<VTextAttributes> AllTextAttributes = Enum.GetValues(typeof(VTextAttributes)).Cast<VTextAttributes>().ToList();
         private static readonly Dictionary<string, GifMetadata> GifMetadataMap = new Dictionary<string, GifMetadata>();
+        private static readonly BitmapImage ErrorBitmapImage = null;
+
+        static VTUtils()
+        {
+            ErrorBitmapImage = new BitmapImage();
+            ErrorBitmapImage.BeginInit();
+            ErrorBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            ErrorBitmapImage.UriSource = new Uri("pack://application:,,,/ModengTerm;component/Images/error.png");
+            ErrorBitmapImage.EndInit();
+        }
 
         private static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter)
         {
@@ -135,7 +155,7 @@ namespace ModengTerm.Terminal
         {
             switch ((WallpaperTypeEnum)termBackground.Type)
             {
-                case WallpaperTypeEnum.PureColor:
+                case WallpaperTypeEnum.Color:
                     {
                         return VTColor.CreateFromRgbKey(termBackground.Uri).Html;
                     }
@@ -145,6 +165,24 @@ namespace ModengTerm.Terminal
             }
         }
 
+        private static Stream GetWallpaperStream(string uri)
+        {
+            if (ResourceAssembly == null)
+            {
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                AllResourceNames = assembly.GetManifestResourceNames().ToList();
+                ResourceAssembly = assembly;
+            }
+
+            string resourceName = AllResourceNames.FirstOrDefault(v => v.Contains(uri));
+            if (string.IsNullOrEmpty(resourceName))
+            {
+                logger.ErrorFormat("GetWallpaperMetadata失败, 资源不存在, uri = {0}", uri);
+                return null;
+            }
+
+            return ResourceAssembly.GetManifestResourceStream(resourceName);
+        }
 
 
 
@@ -491,7 +529,7 @@ namespace ModengTerm.Terminal
         /// <param name="background"></param>
         public static void GetInverseVTColor(VTextStyle textStyle, out VTColor foreground, out VTColor background)
         {
-            if (textStyle.Background.Type == (int)WallpaperTypeEnum.PureColor)
+            if (textStyle.Background.Type == (int)WallpaperTypeEnum.Color)
             {
                 // 如果背景是纯色就变反色
                 foreground = VTColor.CreateFromRgbKey(textStyle.Background.Uri);
@@ -505,15 +543,83 @@ namespace ModengTerm.Terminal
             }
         }
 
-        public static GifMetadata GetGifMetadata(string uri)
+        /// <summary>
+        /// 当Wallpaper是动态图的时候，获取动态图的元数据，用来实时渲染
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <returns></returns>
+        public static GifMetadata GetWallpaperMetadata(string uri)
         {
             GifMetadata gifMetadata;
             if (!GifMetadataMap.TryGetValue(uri, out gifMetadata))
             {
-                gifMetadata = GifParser.GetFrames(uri);
+                Stream stream = GetWallpaperStream(uri);
+                if (stream == null)
+                {
+                    return new GifMetadata();
+                }
+
+                gifMetadata = GifParser.GetFrames(uri, stream);
                 GifMetadataMap[uri] = gifMetadata;
             }
             return gifMetadata;
+        }
+
+        /// <summary>
+        /// 获取动态背景或静态背景的预览图
+        /// </summary>
+        /// <param name="paperType">标识是静态图还是动态图</param>
+        /// <param name="uri">背景图的路径</param>
+        /// <returns></returns>
+        public static BitmapSource GetWallpaperThumbnail(WallpaperTypeEnum paperType, string uri)
+        {
+            switch (paperType)
+            {
+                case WallpaperTypeEnum.Image:
+                    {
+                        return GetWallpaperBitmap(uri, 200, 200);
+                    }
+
+                case WallpaperTypeEnum.Live:
+                    {
+                        Stream stream = VTUtils.GetWallpaperStream(uri);
+                        if (stream == null)
+                        {
+                            return ErrorBitmapImage;
+                        }
+
+                        return GifParser.GetThumbnail(stream);
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 当Wallpaper是静态图的时候，获取静态图
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="pixelWidth">设置解码后的图像宽度，减少这个值可以减少内存占用</param>
+        /// <param name="pixelHeight">设置解码后的图像高度，减少这个值可以减少内存占用</param>
+        /// <returns></returns>
+        public static BitmapSource GetWallpaperBitmap(string uri, int pixelWidth = 0, int pixelHeight = 0)
+        {
+            Stream stream = VTUtils.GetWallpaperStream(uri);
+            if (stream == null)
+            {
+                return ErrorBitmapImage;
+            }
+
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.DecodePixelHeight = pixelHeight;
+            bitmapImage.DecodePixelWidth = pixelWidth;
+            bitmapImage.StreamSource = stream;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+
+            return bitmapImage;
         }
     }
 }

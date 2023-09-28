@@ -26,6 +26,11 @@ namespace ModengTerm.Rendering
             this.backBrush = DrawingUtils.GetBrush(this.rectangle.Background);
         }
 
+        protected override void OnRelease()
+        {
+        }
+
+
         protected override void OnDraw(DrawingContext dc)
         {
             dc.DrawRectangle(this.backBrush, this.pen, new Rect(0, 0, this.rectangle.Width, this.rectangle.Height));

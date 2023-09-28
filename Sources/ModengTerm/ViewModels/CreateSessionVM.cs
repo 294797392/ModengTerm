@@ -3,7 +3,6 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Rendering;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
@@ -15,15 +14,9 @@ using System.Drawing.Text;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
-using XTerminal.Base;
-using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
@@ -66,6 +59,7 @@ namespace ModengTerm.ViewModels
 
         private Visibility pureColorVisible;
         private Visibility livePaperVisible;
+        private Visibility paperVisible;
 
         #endregion
 
@@ -343,7 +337,7 @@ namespace ModengTerm.ViewModels
         /// 动态壁纸缩略图
         /// </summary>
         public BindableCollection<ColorDefinition> BackgroundLivePapers { get; private set; }
-
+        public BindableCollection<ColorDefinition> BackgroundPapers { get; private set; }
         public BindableCollection<ColorDefinition> ForegroundColors { get; private set; }
 
         public Visibility PureColorVisible
@@ -368,6 +362,19 @@ namespace ModengTerm.ViewModels
                 {
                     this.livePaperVisible = value;
                     this.NotifyPropertyChanged("LivePaperVisible");
+                }
+            }
+        }
+
+        public Visibility PaperVisible
+        {
+            get { return this.paperVisible; }
+            set
+            {
+                if (this.paperVisible != value)
+                {
+                    this.paperVisible = value;
+                    this.NotifyPropertyChanged("PaperVisible");
                 }
             }
         }
@@ -518,6 +525,10 @@ namespace ModengTerm.ViewModels
             this.BackgroundLivePapers = new BindableCollection<ColorDefinition>();
             this.BackgroundLivePapers.AddRange(appManifest.ThemeManifest.DefaultLivePapers);
             this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault(v => v.Value == selectedTheme.Background.Uri);
+
+            this.BackgroundPapers = new BindableCollection<ColorDefinition>();
+            this.BackgroundPapers.AddRange(appManifest.ThemeManifest.DefaultPapers);
+            this.BackgroundPapers.SelectedItem = this.BackgroundPapers.FirstOrDefault(v => v.Value == selectedTheme.Background.Uri);
 
             #endregion
 
@@ -732,10 +743,31 @@ namespace ModengTerm.ViewModels
             Wallpaper wallpaper = new Wallpaper()
             {
                 Type = (int)this.WallpaperTypeEnumList.SelectedItem,
-                Uri = this.WallpaperTypeEnumList.SelectedItem == WallpaperTypeEnum.Live ?
-                this.BackgroundLivePapers.SelectedItem.Value :
-                this.BackgroundPureColors.SelectedItem.Value
             };
+
+            switch (this.WallpaperTypeEnumList.SelectedItem)
+            {
+                case WallpaperTypeEnum.Color:
+                    {
+                        wallpaper.Uri = this.BackgroundPureColors.SelectedItem.Value;
+                        break;
+                    }
+
+                case WallpaperTypeEnum.Live:
+                    {
+                        wallpaper.Uri = this.BackgroundLivePapers.SelectedItem.Value;
+                        break;
+                    }
+
+                case WallpaperTypeEnum.Image:
+                    {
+                        wallpaper.Uri = this.BackgroundPapers.SelectedItem.Value;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
 
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_ID, this.ThemeList.SelectedItem.ID);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
@@ -894,26 +926,36 @@ namespace ModengTerm.ViewModels
             this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)wallpaper.Type;
             this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault(v => v.Value == wallpaper.Uri);
             this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault(v => v.Value == wallpaper.Uri);
+            this.BackgroundPapers.SelectedItem = this.BackgroundPapers.FirstOrDefault(v => v.Value == wallpaper.Uri);
             this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault(v => v.Value == newValue.ForegroundColor);
         }
 
         private void WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum oldValue, WallpaperTypeEnum newValue)
         {
+            this.LivePaperVisible = Visibility.Collapsed;
+            this.PureColorVisible = Visibility.Collapsed;
+            this.PaperVisible = Visibility.Collapsed;
+
             switch (newValue)
             {
                 case WallpaperTypeEnum.Live:
                     {
                         this.LivePaperVisible = Visibility.Visible;
-                        this.PureColorVisible = Visibility.Collapsed;
                         break;
                     }
 
-                case WallpaperTypeEnum.PureColor:
+                case WallpaperTypeEnum.Color:
                     {
-                        this.LivePaperVisible = Visibility.Collapsed;
                         this.PureColorVisible = Visibility.Visible;
                         break;
                     }
+
+                case WallpaperTypeEnum.Image:
+                    {
+                        this.PaperVisible = Visibility.Visible;
+                        break;
+                    }
+
 
                 default:
                     throw new NotImplementedException();

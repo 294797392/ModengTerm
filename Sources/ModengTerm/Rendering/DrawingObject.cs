@@ -39,8 +39,7 @@ namespace ModengTerm.Rendering
 
         protected abstract void OnInitialize();
 
-        protected virtual void OnRelease()
-        { }
+        protected abstract void OnRelease();
 
         protected abstract void OnDraw(DrawingContext dc);
 

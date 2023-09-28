@@ -95,7 +95,7 @@
     <Compile Include="OpenedSessionVMFactory.cs" />
     <Compile Include="Rendering\FrameworkVisual.cs" />
     <Compile Include="Rendering\Wallpaper\DrawingWallpaperLive.cs" />
-    <Compile Include="Rendering\Wallpaper\DrawingWallpaperPureColor.cs" />
+    <Compile Include="Rendering\Wallpaper\DrawingWallpaper.cs" />
     <Compile Include="Rendering\DrawingCursor.cs" />
     <Compile Include="Rendering\DrawingMatchesLine.cs" />
     <Compile Include="Rendering\DrawingObjectFactory.cs" />
@@ -246,6 +246,7 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\close.png" />
+    <Resource Include="Images\error.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj">
@@ -272,7 +273,6 @@
   <ItemGroup>
     <Resource Include="icon.ico" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

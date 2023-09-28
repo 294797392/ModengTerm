@@ -28,5 +28,11 @@ namespace ModengTerm.ServiceAgents.DataModels
         /// </summary>
         [JsonProperty("defaultLivePapers")]
         public List<ColorDefinition> DefaultLivePapers { get; private set; }
+
+        /// <summary>
+        /// 默认的静态背景图片
+        /// </summary>
+        [JsonProperty("defaultPapers")]
+        public List<ColorDefinition> DefaultPapers { get; private set; }
     }
 }

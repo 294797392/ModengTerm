@@ -48,6 +48,9 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public WallpaperTypeEnum PaperType { get; set; }
 
+        /// <summary>
+        /// 在set访问器里会消除文档的边距
+        /// </summary>
         public VTRect Rect
         {
             get { return this.vtc; }
@@ -66,7 +69,7 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 如果背景是Live模式，那么这里存储Gif图片的元数据
         /// </summary>
-        public GifMetadata GifMetadata { get; set; }
+        public GifMetadata Metadata { get; set; }
 
         public override VTDocumentElements Type => VTDocumentElements.Wallpaper;
 
@@ -80,15 +83,15 @@ namespace ModengTerm.Terminal.Document
             {
                 case WallpaperTypeEnum.Live:
                     {
-                        this.Frame = this.GifMetadata.Frames[this.frameIndex++];
+                        this.Frame = this.Metadata.Frames[this.frameIndex++];
 
-                        if (this.frameIndex >= this.GifMetadata.Frames.Count)
+                        if (this.frameIndex >= this.Metadata.Frames.Count)
                         {
                             this.frameIndex = 0;
                         }
                         else
                         {
-                            GifFrame nextFrame = this.GifMetadata.Frames[this.frameIndex];
+                            GifFrame nextFrame = this.Metadata.Frames[this.frameIndex];
                             this.Delay = nextFrame.Delay;
                         }
 
@@ -97,7 +100,8 @@ namespace ModengTerm.Terminal.Document
                         break;
                     }
 
-                case WallpaperTypeEnum.PureColor:
+                case WallpaperTypeEnum.Image:
+                case WallpaperTypeEnum.Color:
                     {
                         this.DrawingObject.Draw();
                         break;

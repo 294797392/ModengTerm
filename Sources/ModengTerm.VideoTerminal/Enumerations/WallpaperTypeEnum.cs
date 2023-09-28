@@ -14,11 +14,16 @@ namespace ModengTerm.Terminal.Enumerations
         /// <summary>
         /// 纯色
         /// </summary>
-        PureColor = 0,
+        Color = 0,
 
         /// <summary>
         /// 动态背景,gif动画
         /// </summary>
         Live = 1,
+
+        /// <summary>
+        /// 静态图
+        /// </summary>
+        Image
     }
 }

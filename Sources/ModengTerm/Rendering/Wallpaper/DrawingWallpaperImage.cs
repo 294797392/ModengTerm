@@ -1,35 +1,37 @@
-﻿using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Terminal;
+using ModengTerm.Terminal.Document;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
-using XTerminal.Document;
 
-namespace ModengTerm.Rendering.Background
+namespace ModengTerm.Rendering.Wallpaper
 {
-    public class DrawingWallpaperPureColor : DrawingObject
+    /// <summary>
+    /// 使用静态图片当做壁纸
+    /// </summary>
+    public class DrawingWallpaperImage : DrawingObject
     {
         private VTWallpaper wallpaper;
-        private Brush brush;
+        private ImageSource imageSource;
 
         protected override void OnInitialize()
         {
             this.wallpaper = this.documentElement as VTWallpaper;
 
-            this.brush = DrawingUtils.GetBrush(this.wallpaper.Uri);
+            this.imageSource = VTUtils.GetWallpaperBitmap(this.wallpaper.Uri);
         }
 
         protected override void OnRelease()
         {
-            base.OnRelease();
         }
 
         protected override void OnDraw(DrawingContext dc)
         {
-            dc.DrawRectangle(this.brush, null, this.wallpaper.Rect.GetRect());
+            dc.DrawImage(this.imageSource, this.wallpaper.Rect.GetRect());
         }
     }
 }

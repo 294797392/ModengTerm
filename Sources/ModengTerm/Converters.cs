@@ -219,7 +219,8 @@ namespace ModengTerm
             switch ((WallpaperTypeEnum)value)
             {
                 case WallpaperTypeEnum.Live: return "动态背景";
-                case WallpaperTypeEnum.PureColor: return "纯色";
+                case WallpaperTypeEnum.Color: return "纯色";
+                case WallpaperTypeEnum.Image: return "静态背景";
                 default:
                     throw new NotImplementedException();
             }
@@ -267,10 +268,12 @@ namespace ModengTerm
             Brush brush;
             if (!BrushCache.TryGetValue(uri, out brush))
             {
-                ImageBrush imageBrush = new ImageBrush(GifParser.GetThumbnail(uri));
+                WallpaperTypeEnum paperType = (WallpaperTypeEnum)parameter;
+
+                ImageSource imageSource = VTUtils.GetWallpaperThumbnail(paperType, uri);
+                ImageBrush imageBrush = new ImageBrush(imageSource);
                 BrushCache[uri] = imageBrush;
                 brush = imageBrush;
-
             }
             return brush;
         }

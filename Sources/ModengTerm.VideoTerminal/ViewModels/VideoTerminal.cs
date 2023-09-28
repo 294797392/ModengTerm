@@ -470,7 +470,7 @@ namespace ModengTerm.Terminal.ViewModels
             };
             if (this.wallpaper.PaperType == WallpaperTypeEnum.Live)
             {
-                this.wallpaper.GifMetadata = VTUtils.GetGifMetadata(this.background.Uri);
+                this.wallpaper.Metadata = VTUtils.GetWallpaperMetadata(this.background.Uri);
             }
             this.backgroundCanvas = this.videoTerminal.CreateDocument();
             this.videoTerminal.InsertDocument(0, this.backgroundCanvas);

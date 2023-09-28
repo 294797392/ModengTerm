@@ -1,14 +1,17 @@
-﻿using ModengTerm.Terminal;
+﻿using ModengTerm.Base;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using XTerminal;
 using XTerminal.Base;
 using XTerminal.Document;
@@ -23,8 +26,6 @@ namespace ModengTerm.Rendering
         public static readonly Point ZeroPoint = new Point();
         private static readonly string[] Splitter = new string[] { "," };
 
-        public static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
-        public static readonly Pen BlackPen = new Pen(Brushes.Black, 1);
 
         /// <summary>
         /// RGB字符串 -> Brush

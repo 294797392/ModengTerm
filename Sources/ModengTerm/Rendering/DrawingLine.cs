@@ -72,6 +72,10 @@ namespace ModengTerm.Rendering
             this.foreground = DrawingUtils.GetBrush(textLine.Style.Foreground);
         }
 
+        protected override void OnRelease()
+        {
+        }
+
         protected override void OnDraw(DrawingContext dc)
         {
             FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine, dc);

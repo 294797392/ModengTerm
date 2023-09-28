@@ -22,7 +22,8 @@ namespace ModengTerm.Rendering
 
             switch (wallpaper.PaperType)
             {
-                case WallpaperTypeEnum.PureColor: return new DrawingWallpaperPureColor();
+                case WallpaperTypeEnum.Image:
+                case WallpaperTypeEnum.Color: return new DrawingWallpaper();
                 case WallpaperTypeEnum.Live: return new DrawingWallpaperLive();
                 default:
                     throw new NotImplementedException();

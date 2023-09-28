@@ -15,11 +15,11 @@ using XTerminal.Document.Rendering;
 namespace ModengTerm.Rendering.Background
 {
     /// <summary>
-    /// 动态壁纸
+    /// 实现动态壁纸
     /// </summary>
     public class DrawingWallpaperLive : FrameworkVisual, IDrawingObject
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("logger");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingWallpaperLive");
 
         #region 实例变量
 
@@ -45,7 +45,7 @@ namespace ModengTerm.Rendering.Background
             this.wallpaper = documentElement as VTWallpaper;
 
             // 初始化WriteableBitmap
-            GifMetadata gifMetadata = this.wallpaper.GifMetadata;
+            GifMetadata gifMetadata = this.wallpaper.Metadata;
             DpiScale dpiScale = VisualTreeHelper.GetDpi(this);
             this.writeableBitmap = new WriteableBitmap(gifMetadata.Width, gifMetadata.Height, dpiScale.PixelsPerInchX, dpiScale.PixelsPerInchY, gifMetadata.PixelFormat, gifMetadata.BitmapPalette);
 
