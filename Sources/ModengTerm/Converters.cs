@@ -1,4 +1,7 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.Enumerations;
+using ModengTerm.Rendering;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
@@ -10,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
+using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm
@@ -219,6 +223,56 @@ namespace ModengTerm
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ColorDefinition2BrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            ColorDefinition colorDefinition = value as ColorDefinition;
+            if (colorDefinition == null)
+            {
+                return Brushes.Transparent;
+            }
+
+            return DrawingUtils.GetBrush(colorDefinition.Value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class LivePaperBrushConverter : IValueConverter
+    {
+        private static readonly Dictionary<string, Brush> BrushCache = new Dictionary<string, Brush>();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            ColorDefinition colorDefinition = value as ColorDefinition;
+            if (colorDefinition == null)
+            {
+                return Brushes.Transparent;
+            }
+
+            string uri = colorDefinition.Value;
+
+            Brush brush;
+            if (!BrushCache.TryGetValue(uri, out brush))
+            {
+                ImageBrush imageBrush = new ImageBrush(GifParser.GetThumbnail(uri));
+                BrushCache[uri] = imageBrush;
+                brush = imageBrush;
+
+            }
+            return brush;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

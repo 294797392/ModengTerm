@@ -29,7 +29,7 @@ namespace XTerminal.Windows
 
         #region 实例变量
 
-        private Dictionary<string, Control> contentMap;
+        private Dictionary<Type, Control> contentMap;
 
         #endregion
 
@@ -57,7 +57,7 @@ namespace XTerminal.Windows
 
         private void InitializeWindow()
         {
-            this.contentMap = new Dictionary<string, Control>();
+            this.contentMap = new Dictionary<Type, Control>();
 
             CreateSessionVM createSessionVM = new CreateSessionVM(MTermApp.Context.ServiceAgent);
 
@@ -96,19 +96,19 @@ namespace XTerminal.Windows
                 return;
             }
 
-            if (string.IsNullOrEmpty(selectedOption.EntryClass))
+            if (selectedOption.EntryType == null)
             {
                 return;
             }
 
             Control control;
-            if (!this.contentMap.TryGetValue(selectedOption.EntryClass, out control))
+            if (!this.contentMap.TryGetValue(selectedOption.EntryType, out control))
             {
                 try
                 {
-                    control = ConfigFactory<Control>.CreateInstance(selectedOption.EntryClass);
+                    control = Activator.CreateInstance(selectedOption.EntryType) as Control;
 
-                    this.contentMap[selectedOption.EntryClass] = control;
+                    this.contentMap[selectedOption.EntryType] = control;
                 }
                 catch (Exception ex)
                 {

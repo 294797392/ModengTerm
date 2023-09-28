@@ -2,6 +2,7 @@
 using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Document;
@@ -29,11 +30,31 @@ using XTerminal.Base.Enumerations;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 using XTerminal.UserControls;
+using XTerminal.UserControls.OptionsUserControl;
 
 namespace ModengTerm
 {
     public class MTermApp : ModularApp<MTermApp, MTermManifest>, INotifyPropertyChanged
     {
+        /// <summary>
+        /// C#的代码混淆工具不能进行反射，因为会修改类名，所以把要动态创建的控件实例类型写死
+        /// </summary>
+        public static readonly List<OptionDefinition> TerminalOptionList = new List<OptionDefinition>()
+        {
+            new OptionDefinition("连接设置", typeof(SSHOptionsUserControl))
+            {
+                Children = new List<OptionDefinition>()
+                {
+                    new OptionDefinition("SSH", typeof(SSHOptionsUserControl)),
+                    new OptionDefinition("串口", typeof(SerialPortOptionsUserControl))
+                }
+            },
+
+            new OptionDefinition("终端", typeof(TerminalOptionsUserControl)),
+
+            new OptionDefinition("外观主题", typeof(ThemeOptionsUserControl))
+        };
+
         #region 实例变量
 
         private OpenedSessionVM selectedOpenedSession;
@@ -85,7 +106,7 @@ namespace ModengTerm
         {
             this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
             this.OpenedTerminals = new BindableCollection<VideoTerminal>();
-            this.ServiceAgent = this.Factory.LookupModule<ServiceAgent>();
+            this.ServiceAgent = new LocalServiceAgent();
             //this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
 
             // 将打开页面新加到OpenedSessionTab页面上

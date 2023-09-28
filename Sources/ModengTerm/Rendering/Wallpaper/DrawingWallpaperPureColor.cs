@@ -15,18 +15,6 @@ namespace ModengTerm.Rendering.Background
         private VTWallpaper wallpaper;
         private Brush brush;
 
-        /// <summary>
-        /// 获取该壁纸大小
-        /// </summary>
-        protected Rect Size
-        {
-            get
-            {
-                // -5,-5,+5,+5是为了消除边距
-                return new Rect(-5, -5, this.wallpaper.Rect.Width + 5, this.wallpaper.Rect.Height + 5);
-            }
-        }
-
         protected override void OnInitialize()
         {
             this.wallpaper = this.documentElement as VTWallpaper;
@@ -41,7 +29,7 @@ namespace ModengTerm.Rendering.Background
 
         protected override void OnDraw(DrawingContext dc)
         {
-            dc.DrawRectangle(this.brush, null, this.Size);
+            dc.DrawRectangle(this.brush, null, this.wallpaper.Rect.GetRect());
         }
     }
 }

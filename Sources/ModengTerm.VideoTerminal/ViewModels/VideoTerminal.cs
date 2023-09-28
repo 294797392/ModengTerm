@@ -467,8 +467,11 @@ namespace ModengTerm.Terminal.ViewModels
                 PaperType = (WallpaperTypeEnum)this.background.Type,
                 Uri = this.background.Uri,
                 Rect = this.vtRect,
-                GifMetadata = GifParser.GetFrames(this.background.Uri)
             };
+            if (this.wallpaper.PaperType == WallpaperTypeEnum.Live)
+            {
+                this.wallpaper.GifMetadata = VTUtils.GetGifMetadata(this.background.Uri);
+            }
             this.backgroundCanvas = this.videoTerminal.CreateDocument();
             this.videoTerminal.InsertDocument(0, this.backgroundCanvas);
             this.backgroundCanvas.CreateDrawingObject(this.wallpaper);
@@ -810,7 +813,8 @@ namespace ModengTerm.Terminal.ViewModels
                 #region 重绘光标
 
                 VTCursor cursor = document.Cursor;
-                cursor.RequestInvalidate();
+                // 光标闪烁在单独线程处理，这里只改变光标位置
+                cursor.RequestInvalidatePosition();
 
                 #endregion
 

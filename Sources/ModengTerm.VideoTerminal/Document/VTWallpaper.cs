@@ -53,7 +53,8 @@ namespace ModengTerm.Terminal.Document
             get { return this.vtc; }
             set
             {
-                this.vtc = value;
+                // -5,-5,+5,+5是为了消除边距
+                this.vtc = new VTRect(-5, -5, value.Width + 5, value.Height + 5);
             }
         }
 

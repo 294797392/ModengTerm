@@ -1,14 +1,4 @@
 ﻿{
-    "modules": [
-        {
-            "ID": "81E8E64C-85B8-40CF-AFED-399236BC1426",
-            "Name": "服务代理",
-            "ClassName": "ModengTerm.ServiceAgents.FileServiceAgent, ModengTerm.ServiceAgents",
-            "Inputs": {
-            }
-        },
-    ],
-
     "sessions": [
         {
             "id": "1",
@@ -32,19 +22,6 @@
             "description": "",
             "icon": "",
             "type": 3
-        },
-    ],
-
-    "colorList": [
-        {
-            "id": "1",
-            "name": "白色",
-            "value": "255,255,255"
-        },
-        {
-            "id": "2",
-            "name": "黑色",
-            "value": "0,0,0"
         }
     ],
 
@@ -83,72 +60,66 @@
     "fontFamily": [
     ],
 
-    "ftpOptions": [
-        {
-            "id": "",
-            "name": ""
-        }
-    ],
-
-    "terminalOptions": [
-        {
-            "id": "5392E378-684F-476E-AF4D-90F04C321F66",
-            "name": "连接设置",
-            "entryClass": "XTerminal.UserControls.OptionsUserControl.SSHOptionsUserControl, ModengTerm",
-            "children": [
-                {
-                    "id": "1BFBE907-A25B-47BD-B319-968789E5F4E7",
-                    "name": "SSH",
-                    "entryClass": "XTerminal.UserControls.OptionsUserControl.SSHOptionsUserControl, ModengTerm"
+    "themeManifest": {
+        "themes": [
+            {
+                "id": "47094F38-2AFA-4620-A7BC-C6877F91A383",
+                "name": "动态主题",
+                "colorTable": {
+                    "rgbKeys": [ "0,0,0", "187,0,0", "0,100,0", "200,175,0", "30,144,245", "187,0,187", "0,205,205", "235,235,235", "85,85,85", "255,85,85", "85,255,85", "255,245,85", "80,190,255", "255,85,255", "85,255,255", "255,255,255" ]
                 },
-                {
-                    "id": "32D1B929-FA7F-44BE-860B-75BD8AFF5F9C",
-                    "name": "串口",
-                    "entryClass": "XTerminal.UserControls.OptionsUserControl.SerialPortOptionsUserControl, ModengTerm"
-                }
-            ]
-        },
-
-        {
-            "id": "1CD8D138-F31B-49FC-A9B8-D4099AC7C13C",
-            "name": "终端",
-            "entryClass": "XTerminal.UserControls.OptionsUserControl.TerminalOptionsUserControl, ModengTerm"
-        },
-
-        {
-            "id": "E0CB3399-4E46-4AA2-985F-4ED6F64879E4",
-            "name": "外观主题",
-            "entryClass": "XTerminal.UserControls.OptionsUserControl.ThemeOptionsUserControl, ModengTerm"
-        }
-    ],
-
-    "themes": [
-        {
-            "id": "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827",
-            "name": "Xshell - NewBlack",
-            "colorTable": {
-                "rgbKeys": [ "54,52,46", "165,100,52", "0,128,0", "153,150,6", "70,70,255", "123,81,117", "0,162,196", "207,216,211", "83,87,85", "207,158,114", "28,196,112", "226,226,52", "111,111,244", "169,126,173", "80,235,252", "236,238,238" ]
+                "background": {
+                    "type": 1,
+                    "uri": "E://Loading.gif"
+                },
+                "foregroundColor": "255,255,255"
             },
-            "background": {
-                "type": 0,
-                "uri": "54,52,46"
-            },
-            "foregroundColor": "236,238,238"
-        },
 
-        {
-            "id": "AC439E26-0768-4131-8F86-1D79778846DB",
-            "name": "Xshell - XTerm",
-            "colorTable": {
-                "rgbKeys": [ "0,0,0", "187,0,0", "0,100,0", "200,175,0", "30,144,245", "187,0,187", "0,205,205", "235,235,235", "85,85,85", "255,85,85", "85,255,85", "255,245,85", "80,190,255", "255,85,255", "85,255,255", "255,255,255" ]
+            {
+                "id": "7A2A6563-8C16-4E6A-9C9F-AA610E4C6827",
+                "name": "Xshell - NewBlack",
+                "colorTable": {
+                    "rgbKeys": [ "54,52,46", "165,100,52", "0,128,0", "153,150,6", "70,70,255", "123,81,117", "0,162,196", "207,216,211", "83,87,85", "207,158,114", "28,196,112", "226,226,52", "111,111,244", "169,126,173", "80,235,252", "236,238,238" ]
+                },
+                "background": {
+                    "type": 0,
+                    "uri": "54,52,46"
+                },
+                "foregroundColor": "236,238,238"
             },
-            "background": {
-                "type": 1,
-                "uri": "E://1.gif"
-                //"type": 0,
-                //"uri": "0,0,0"
+
+            {
+                "id": "AC439E26-0768-4131-8F86-1D79778846DB",
+                "name": "Xshell - XTerm",
+                "colorTable": {
+                    "rgbKeys": [ "0,0,0", "187,0,0", "0,100,0", "200,175,0", "30,144,245", "187,0,187", "0,205,205", "235,235,235", "85,85,85", "255,85,85", "85,255,85", "255,245,85", "80,190,255", "255,85,255", "85,255,255", "255,255,255" ]
+                },
+                "background": {
+                    "type": 0,
+                    "uri": "0,0,0"
+                },
+                "foregroundColor": "255,255,255"
+            }
+        ],
+
+        "defaultColors": [
+            {
+                "id": "1",
+                "name": "白色",
+                "value": "255,255,255"
             },
-            "foregroundColor": "255,255,255"
-        }
-    ]
+            {
+                "id": "2",
+                "name": "黑色",
+                "value": "0,0,0"
+            }
+        ],
+        "defaultLivePapers": [
+            {
+                "id": "1",
+                "name": "下雨天",
+                "value": "E://Loading.gif"
+            }
+        ]
+    }
 }

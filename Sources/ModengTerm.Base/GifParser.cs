@@ -12,12 +12,12 @@ namespace ModengTerm.Base
     public class GifFrame
     {
         /// <summary>
-        /// 延迟时间
+        /// 该帧与上一帧的延迟时间
         /// </summary>
         public int Delay { get; set; }
 
         /// <summary>
-        /// 原始像素数据
+        /// 处理后的可以直接显示的原始像素数据
         /// </summary>
         public byte[] Data { get; set; }
 
@@ -49,6 +49,11 @@ namespace ModengTerm.Base
 
     public class GifMetadata
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Uri { get; set; }
+
         /// <summary>
         /// 所有帧列表
         /// </summary>
@@ -103,15 +108,16 @@ namespace ModengTerm.Base
 
             using (FileStream fs = File.Open(gifPath, FileMode.Open))
             {
-                return GifParser.GetFrames(fs);
+                return GifParser.GetFrames(gifPath, fs);
             }
         }
 
-        public static GifMetadata GetFrames(Stream gifStream)
+        public static GifMetadata GetFrames(string uri, Stream gifStream)
         {
             GifBitmapDecoder decoder = new GifBitmapDecoder(gifStream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
 
             GifMetadata gifMetadata = new GifMetadata();
+            gifMetadata.Uri = uri;
             gifMetadata.Width = Convert.ToInt32(decoder.Metadata.GetQuery("/logscrdesc/Width"));
             gifMetadata.Height = Convert.ToInt32(decoder.Metadata.GetQuery("/logscrdesc/Height"));
             gifMetadata.BackgroundColorIndex = Convert.ToByte(decoder.Metadata.GetQuery("/logscrdesc/BackgroundColorIndex"));
@@ -155,11 +161,14 @@ namespace ModengTerm.Base
                             bitmapFrame.CopyPixels(frameData, frame.PixelWidth, 0);
 
                             GifFrame prevFrame = gifMetadata.Frames.LastOrDefault();
-                            for (int i = 0; i < frameData.Length; i++)
+                            if (prevFrame != null)
                             {
-                                if (frameData[i] == frame.TransparencyColorIndex)
+                                for (int i = 0; i < frameData.Length; i++)
                                 {
-                                    frameData[i] = prevFrame.Data[i];
+                                    if (frameData[i] == frame.TransparencyColorIndex)
+                                    {
+                                        frameData[i] = prevFrame.Data[i];
+                                    }
                                 }
                             }
                             break;
@@ -192,6 +201,34 @@ namespace ModengTerm.Base
             }
 
             return gifMetadata;
+        }
+
+        public static BitmapSource GetThumbnail(string gifPath)
+        {
+            if (!File.Exists(gifPath))
+            {
+                return null;
+            }
+
+            using (FileStream fs = File.Open(gifPath, FileMode.Open))
+            {
+                return GifParser.GetThumbnail(fs);
+            }
+        }
+
+        /// <summary>
+        /// 获取gif
+        /// </summary>
+        /// <returns></returns>
+        public static BitmapSource GetThumbnail(Stream gifStream)
+        {
+            GifBitmapDecoder decoder = new GifBitmapDecoder(gifStream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+            if (decoder.Thumbnail != null)
+            {
+                return decoder.Thumbnail;
+            }
+
+            return decoder.Frames.FirstOrDefault();
         }
     }
 }

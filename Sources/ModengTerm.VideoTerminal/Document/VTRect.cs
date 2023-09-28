@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace XTerminal.Document
 {
@@ -105,6 +106,11 @@ namespace XTerminal.Document
         public override string ToString()
         {
             return string.Format("x = {0}, y = {1}, width = {2}, height = {3}", this.LeftTop.X, this.LeftTop.Y, this.Width, this.Height);
+        }
+
+        public Rect GetRect()
+        {
+            return new Rect(this.X, this.Y, this.Width, this.Height);
         }
     }
 }

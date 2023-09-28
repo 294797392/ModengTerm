@@ -55,6 +55,7 @@ namespace ModengTerm.Terminal
             "</html>";
 
         private static readonly List<VTextAttributes> AllTextAttributes = Enum.GetValues(typeof(VTextAttributes)).Cast<VTextAttributes>().ToList();
+        private static readonly Dictionary<string, GifMetadata> GifMetadataMap = new Dictionary<string, GifMetadata>();
 
         private static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter)
         {
@@ -502,6 +503,17 @@ namespace ModengTerm.Terminal
                 foreground = VTColor.CreateFromRgbKey("255,255,255");
                 background = VTColor.CreateFromRgbKey("0,0,0");
             }
+        }
+
+        public static GifMetadata GetGifMetadata(string uri)
+        {
+            GifMetadata gifMetadata;
+            if (!GifMetadataMap.TryGetValue(uri, out gifMetadata))
+            {
+                gifMetadata = GifParser.GetFrames(uri);
+                GifMetadataMap[uri] = gifMetadata;
+            }
+            return gifMetadata;
         }
     }
 }

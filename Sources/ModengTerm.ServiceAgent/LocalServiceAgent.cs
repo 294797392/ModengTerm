@@ -12,9 +12,9 @@ using XTerminal.Base.DataModels;
 namespace ModengTerm.ServiceAgents
 {
     /// <summary>
-    /// 对本体文件数据库进行管理
+    /// 离线服务Agent
     /// </summary>
-    public class FileServiceAgent : ServiceAgent
+    public class LocalServiceAgent : ServiceAgent
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FileServiceAgent");
 

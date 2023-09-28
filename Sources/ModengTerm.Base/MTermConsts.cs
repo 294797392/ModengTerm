@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using XTerminal.Base.DataModels;
+using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Base
@@ -76,7 +78,7 @@ namespace ModengTerm.Base
             "921600"
         };
 
-        public static readonly List<int> DefaultSerialPortDataBits = new List<int>() 
+        public static readonly List<int> DefaultSerialPortDataBits = new List<int>()
         {
             5, 6, 7, 8
         };

@@ -141,6 +141,30 @@ namespace ModengTerm.Terminal.Document
 
         #region 公开接口
 
+        /// <summary>
+        /// 重绘光标位置
+        /// </summary>
+        public void RequestInvalidatePosition()
+        {
+            VTextLine cursorLine = this.ownerDocument.ActiveLine;
+            if (cursorLine == null)
+            {
+                return;
+            }
+
+            // 设置光标位置
+            // 有可能有中文字符，一个中文字符占用2列
+            // 先通过光标所在列找到真正的字符所在列
+            int characterIndex = this.characterIndex;
+            VTRect rect = cursorLine.MeasureTextBlock(characterIndex, 1);
+            double offsetX = rect.Right;
+            double offsetY = cursorLine.OffsetY;
+            this.DrawingObject.Arrange(offsetX, offsetY);
+        }
+
+        /// <summary>
+        /// 重绘光标闪烁
+        /// </summary>
         public override void RequestInvalidate()
         {
             VTextLine cursorLine = this.ownerDocument.ActiveLine;
@@ -162,15 +186,6 @@ namespace ModengTerm.Terminal.Document
                 // 可以显示的话再执行下面的
                 if (this.IsVisible)
                 {
-                    // 设置光标位置
-                    // 有可能有中文字符，一个中文字符占用2列
-                    // 先通过光标所在列找到真正的字符所在列
-                    int characterIndex = this.characterIndex;
-                    VTRect rect = cursorLine.MeasureTextBlock(characterIndex, 1);
-                    double offsetX = rect.Right;
-                    double offsetY = cursorLine.OffsetY;
-                    this.DrawingObject.Arrange(offsetX, offsetY);
-
                     // 当前可以显示光标
                     if (this.AllowBlink)
                     {

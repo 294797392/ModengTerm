@@ -51,9 +51,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataModels\MTermManifest.cs" />
+    <Compile Include="DataModels\ThemeManifest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CloudServiceAgent.cs" />
-    <Compile Include="FileServiceAgent.cs" />
+    <Compile Include="LocalServiceAgent.cs" />
     <Compile Include="ServiceAgent.cs" />
   </ItemGroup>
   <ItemGroup>

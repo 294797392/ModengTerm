@@ -17,7 +17,9 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Base;
@@ -62,8 +64,8 @@ namespace ModengTerm.ViewModels
 
         private ServiceAgent serviceAgent;
 
-        private Brush backgroundBrush;
-        private Brush foregroundBrush;
+        private Visibility pureColorVisible;
+        private Visibility livePaperVisible;
 
         #endregion
 
@@ -320,34 +322,6 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<Theme> ThemeList { get; private set; }
 
-        public Brush BackgroundBrush
-        {
-            get { return this.backgroundBrush; }
-            set
-            {
-                if (this.backgroundBrush != value)
-                {
-                    this.backgroundBrush = value;
-                    this.NotifyPropertyChanged("BackgroundBrush");
-                }
-            }
-        }
-
-        public Brush ForegroundBrush
-        {
-            get { return this.foregroundBrush; }
-            set
-            {
-                if (this.foregroundBrush != value)
-                {
-                    this.foregroundBrush = value;
-                    this.NotifyPropertyChanged("ForegroundBrush");
-                }
-            }
-        }
-
-        public BindableCollection<WallpaperTypeEnum> WallpaperTypeEnumList { get; private set; }
-
         public BindableCollection<FontFamilyDefinition> FontFamilyList { get; private set; }
         public BindableCollection<FontSizeDefinition> FontSizeList { get; private set; }
 
@@ -359,6 +333,44 @@ namespace ModengTerm.ViewModels
         /// 光标颜色
         /// </summary>
         public BindableCollection<ColorDefinition> CursorColors { get; private set; }
+
+        public BindableCollection<WallpaperTypeEnum> WallpaperTypeEnumList { get; private set; }
+        /// <summary>
+        /// 纯色背景缩略图
+        /// </summary>
+        public BindableCollection<ColorDefinition> BackgroundPureColors { get; private set; }
+        /// <summary>
+        /// 动态壁纸缩略图
+        /// </summary>
+        public BindableCollection<ColorDefinition> BackgroundLivePapers { get; private set; }
+
+        public BindableCollection<ColorDefinition> ForegroundColors { get; private set; }
+
+        public Visibility PureColorVisible
+        {
+            get { return this.pureColorVisible; }
+            set
+            {
+                if (this.pureColorVisible != value)
+                {
+                    this.pureColorVisible = value;
+                    this.NotifyPropertyChanged("PureColorVisible");
+                }
+            }
+        }
+
+        public Visibility LivePaperVisible
+        {
+            get { return this.livePaperVisible; }
+            set
+            {
+                if (this.livePaperVisible != value)
+                {
+                    this.livePaperVisible = value;
+                    this.NotifyPropertyChanged("LivePaperVisible");
+                }
+            }
+        }
 
         #endregion
 
@@ -396,12 +408,7 @@ namespace ModengTerm.ViewModels
 
             this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
 
-            // 加载参数树形列表
-            this.SFTPOptionsTreeVM = new OptionTreeVM();
-            this.TerminalOptionsTreeVM = new OptionTreeVM();
-            this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
-            this.LoadOptionsTree(this.TerminalOptionsTreeVM, appManifest.TerminalOptionList);
-            this.OptionTreeVM = this.TerminalOptionsTreeVM;
+            #region 会话类型
 
             this.SessionTypeList = new BindableCollection<SessionTypeVM>();
             foreach (SessionDefinition session in appManifest.SessionList)
@@ -409,6 +416,15 @@ namespace ModengTerm.ViewModels
                 this.SessionTypeList.Add(new SessionTypeVM(session));
             }
             this.SelectedSessionType = this.SessionTypeList.FirstOrDefault();
+
+            #endregion
+
+            // 加载参数树形列表
+            this.SFTPOptionsTreeVM = new OptionTreeVM();
+            this.TerminalOptionsTreeVM = new OptionTreeVM();
+            //this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
+            this.LoadOptionsTree(this.TerminalOptionsTreeVM, MTermApp.TerminalOptionList);
+            this.OptionTreeVM = this.TerminalOptionsTreeVM;
 
             #region 终端
 
@@ -456,6 +472,12 @@ namespace ModengTerm.ViewModels
 
             #region Theme
 
+            this.ThemeList = new BindableCollection<Theme>();
+            this.ThemeList.AddRange(appManifest.ThemeManifest.ThemeList);
+            this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
+            this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
+            Theme selectedTheme = this.ThemeList.SelectedItem;
+
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
             this.FontFamilyList.AddRange(appManifest.FontFamilyList);
             // 加载系统已安装的所有字体
@@ -476,18 +498,26 @@ namespace ModengTerm.ViewModels
             this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
 
             this.CursorColors = new BindableCollection<ColorDefinition>();
-            this.CursorColors.AddRange(appManifest.ColorList);
+            this.CursorColors.AddRange(appManifest.ThemeManifest.DefaultColors);
             this.CursorColors.SelectedItem = this.CursorColors.FirstOrDefault();
 
             this.WallpaperTypeEnumList = new BindableCollection<WallpaperTypeEnum>();
             this.WallpaperTypeEnumList.AddRange(MTermUtils.GetEnumValues<WallpaperTypeEnum>());
-            this.WallpaperTypeEnumList.SelectedItem = WallpaperTypeEnum.PureColor;
+            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)selectedTheme.Background.Type;
+            this.WallpaperTypeEnumList.SelectionChanged += WallpaperTypeEnumList_SelectionChanged;
+            this.WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum.Live, this.WallpaperTypeEnumList.SelectedItem);
 
-            // 最后加载ThemeList，因为在ThemeList_SelectionChanged事件里需要用到其他Theme字段的数据
-            this.ThemeList = new BindableCollection<Theme>();
-            this.ThemeList.AddRange(appManifest.ThemeList);
-            this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
-            this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
+            this.ForegroundColors = new BindableCollection<ColorDefinition>();
+            this.ForegroundColors.AddRange(appManifest.ThemeManifest.DefaultColors);
+            this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault(v => v.Value == selectedTheme.ForegroundColor);
+
+            this.BackgroundPureColors = new BindableCollection<ColorDefinition>();
+            this.BackgroundPureColors.AddRange(appManifest.ThemeManifest.DefaultColors);
+            this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault(v => v.Value == selectedTheme.Background.Uri);
+
+            this.BackgroundLivePapers = new BindableCollection<ColorDefinition>();
+            this.BackgroundLivePapers.AddRange(appManifest.ThemeManifest.DefaultLivePapers);
+            this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault(v => v.Value == selectedTheme.Background.Uri);
 
             #endregion
 
@@ -517,13 +547,18 @@ namespace ModengTerm.ViewModels
 
         private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
         {
+            if (children == null) 
+            {
+                return;
+            }
+
             foreach (OptionDefinition option in children)
             {
                 OptionTreeNodeVM vm = new OptionTreeNodeVM(parentNode.Context, option)
                 {
                     ID = option.ID,
                     Name = option.Name,
-                    EntryClass = option.EntryClass,
+                    EntryType = option.EntryType,
                     IsExpanded = true
                 };
 
@@ -541,7 +576,7 @@ namespace ModengTerm.ViewModels
                 {
                     ID = option.ID,
                     Name = option.Name,
-                    EntryClass = option.EntryClass,
+                    EntryType = option.EntryType,
                     IsExpanded = true
                 };
 
@@ -694,14 +729,22 @@ namespace ModengTerm.ViewModels
                 return false;
             }
 
+            Wallpaper wallpaper = new Wallpaper()
+            {
+                Type = (int)this.WallpaperTypeEnumList.SelectedItem,
+                Uri = this.WallpaperTypeEnumList.SelectedItem == WallpaperTypeEnum.Live ?
+                this.BackgroundLivePapers.SelectedItem.Value :
+                this.BackgroundPureColors.SelectedItem.Value
+            };
+
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_ID, this.ThemeList.SelectedItem.ID);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
-            session.SetOption<Wallpaper>(OptionKeyEnum.SSH_THEME_BACK_COLOR, this.ThemeList.SelectedItem.Background);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ThemeList.SelectedItem.ForegroundColor);
+            session.SetOption<Wallpaper>(OptionKeyEnum.SSH_THEME_BACK_COLOR, wallpaper);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ForegroundColors.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR, this.CursorColors.SelectedItem.Value);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_ID, this.ThemeList.SelectedItem.ID);
             session.SetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
 
             return true;
@@ -848,28 +891,33 @@ namespace ModengTerm.ViewModels
             }
 
             Wallpaper wallpaper = newValue.Background;
-
             this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)wallpaper.Type;
+            this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault(v => v.Value == wallpaper.Uri);
+            this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault(v => v.Value == wallpaper.Uri);
+            this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault(v => v.Value == newValue.ForegroundColor);
+        }
 
-            switch ((WallpaperTypeEnum)wallpaper.Type)
+        private void WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum oldValue, WallpaperTypeEnum newValue)
+        {
+            switch (newValue)
             {
-                case WallpaperTypeEnum.PureColor:
+                case WallpaperTypeEnum.Live:
                     {
-                        this.BackgroundBrush = DrawingUtils.GetBrush(wallpaper.Uri);
+                        this.LivePaperVisible = Visibility.Visible;
+                        this.PureColorVisible = Visibility.Collapsed;
                         break;
                     }
 
-                case WallpaperTypeEnum.Live:
+                case WallpaperTypeEnum.PureColor:
                     {
-                        // TODO：实现
+                        this.LivePaperVisible = Visibility.Collapsed;
+                        this.PureColorVisible = Visibility.Visible;
                         break;
                     }
 
                 default:
                     throw new NotImplementedException();
             }
-
-            this.ForegroundBrush = DrawingUtils.GetBrush(newValue.ForegroundColor);
         }
 
         #endregion

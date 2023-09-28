@@ -32,18 +32,6 @@ namespace ModengTerm.Rendering.Background
 
         #region 属性
 
-        /// <summary>
-        /// 获取该壁纸大小
-        /// </summary>
-        private Rect Size
-        {
-            get
-            {
-                // -5,-5,+5,+5是为了消除边距
-                return new Rect(-5, -5, this.wallpaper.Rect.Width + 5, this.wallpaper.Rect.Height + 5);
-            }
-        }
-
         #endregion
 
         #region 实例方法
@@ -63,7 +51,7 @@ namespace ModengTerm.Rendering.Background
 
             // 画
             DrawingContext dc = this.RenderOpen();
-            dc.DrawImage(this.writeableBitmap, this.Size);
+            dc.DrawImage(this.writeableBitmap, this.wallpaper.Rect.GetRect());
             dc.Close();
 
             this.oldWidth = this.wallpaper.Rect.Width;
@@ -80,7 +68,7 @@ namespace ModengTerm.Rendering.Background
                 this.oldHeight != this.wallpaper.Rect.Height)
             {
                 DrawingContext dc = this.RenderOpen();
-                dc.DrawImage(this.writeableBitmap, this.Size);
+                dc.DrawImage(this.writeableBitmap, this.wallpaper.Rect.GetRect());
                 dc.Close();
 
                 this.oldWidth = this.wallpaper.Rect.Width;
