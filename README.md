@@ -54,7 +54,8 @@ XTerminal的目标是为开发者提供一个方便的，舒适的，用着爽�
 
 
 
-
+壁纸搜索网站：
+https://wall.alphacoders.com/
 
 
 

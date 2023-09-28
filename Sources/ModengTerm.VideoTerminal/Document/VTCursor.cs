@@ -143,6 +143,7 @@ namespace ModengTerm.Terminal.Document
 
         /// <summary>
         /// 重绘光标位置
+        /// 每次收到数据渲染完之后调用
         /// </summary>
         public void RequestInvalidatePosition()
         {
@@ -164,6 +165,7 @@ namespace ModengTerm.Terminal.Document
 
         /// <summary>
         /// 重绘光标闪烁
+        /// 在闪烁定时器里调用
         /// </summary>
         public override void RequestInvalidate()
         {

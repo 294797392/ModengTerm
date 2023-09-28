@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace ModengTerm.Terminal.DataModels
 {
     /// <summary>
-    /// 终端主题配置
+    /// 主题包
     /// </summary>
-    public class Theme
+    public class ThemePackage
     {
         [JsonProperty("id")]
         public string ID { get; set; }
@@ -40,7 +40,7 @@ namespace ModengTerm.Terminal.DataModels
         [JsonProperty("foregroundColor")]
         public string ForegroundColor { get; set; }
 
-        public Theme()
+        public ThemePackage()
         {
         }
     }

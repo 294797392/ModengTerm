@@ -15,7 +15,7 @@ namespace ModengTerm.ServiceAgents.DataModels
         /// 主题列表
         /// </summary>
         [JsonProperty("themes")]
-        public List<Theme> ThemeList { get; private set; }
+        public List<ThemePackage> ThemeList { get; private set; }
 
         /// <summary>
         /// 定义ModengTerm支持的默认颜色

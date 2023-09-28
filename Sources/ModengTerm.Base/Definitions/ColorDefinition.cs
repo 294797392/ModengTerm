@@ -27,5 +27,14 @@ namespace XTerminal.Base.Definitions
         /// </summary>
         [JsonProperty("value")]
         public string Value { get; set; }
+
+        public ColorDefinition()
+        { }
+
+        public ColorDefinition(string name, string value)
+        {
+            this.Name = name;
+            this.Value = value;
+        }
     }
 }

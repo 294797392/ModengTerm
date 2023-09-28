@@ -61,6 +61,8 @@ namespace ModengTerm.ViewModels
         private Visibility livePaperVisible;
         private Visibility paperVisible;
 
+        private MTermManifest appManifest;
+
         #endregion
 
         #region 属性
@@ -314,7 +316,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 支持的主题列表
         /// </summary>
-        public BindableCollection<Theme> ThemeList { get; private set; }
+        public BindableCollection<ThemePackage> ThemeList { get; private set; }
 
         public BindableCollection<FontFamilyDefinition> FontFamilyList { get; private set; }
         public BindableCollection<FontSizeDefinition> FontSizeList { get; private set; }
@@ -413,6 +415,8 @@ namespace ModengTerm.ViewModels
 
             MTermManifest appManifest = serviceAgent.GetManifest();
 
+            this.appManifest = appManifest;
+
             this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
 
             #region 会话类型
@@ -479,11 +483,11 @@ namespace ModengTerm.ViewModels
 
             #region Theme
 
-            this.ThemeList = new BindableCollection<Theme>();
+            this.ThemeList = new BindableCollection<ThemePackage>();
             this.ThemeList.AddRange(appManifest.ThemeManifest.ThemeList);
             this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
             this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
-            Theme selectedTheme = this.ThemeList.SelectedItem;
+            ThemePackage selectedTheme = this.ThemeList.SelectedItem;
 
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
             this.FontFamilyList.AddRange(appManifest.FontFamilyList);
@@ -515,20 +519,10 @@ namespace ModengTerm.ViewModels
             this.WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum.Live, this.WallpaperTypeEnumList.SelectedItem);
 
             this.ForegroundColors = new BindableCollection<ColorDefinition>();
-            this.ForegroundColors.AddRange(appManifest.ThemeManifest.DefaultColors);
-            this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault(v => v.Value == selectedTheme.ForegroundColor);
-
             this.BackgroundPureColors = new BindableCollection<ColorDefinition>();
-            this.BackgroundPureColors.AddRange(appManifest.ThemeManifest.DefaultColors);
-            this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault(v => v.Value == selectedTheme.Background.Uri);
-
             this.BackgroundLivePapers = new BindableCollection<ColorDefinition>();
-            this.BackgroundLivePapers.AddRange(appManifest.ThemeManifest.DefaultLivePapers);
-            this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault(v => v.Value == selectedTheme.Background.Uri);
-
             this.BackgroundPapers = new BindableCollection<ColorDefinition>();
-            this.BackgroundPapers.AddRange(appManifest.ThemeManifest.DefaultPapers);
-            this.BackgroundPapers.SelectedItem = this.BackgroundPapers.FirstOrDefault(v => v.Value == selectedTheme.Background.Uri);
+            this.SwitchTheme(selectedTheme);
 
             #endregion
 
@@ -558,7 +552,7 @@ namespace ModengTerm.ViewModels
 
         private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
         {
-            if (children == null) 
+            if (children == null)
             {
                 return;
             }
@@ -851,6 +845,94 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
+        private void SwitchTheme(ThemePackage theme)
+        {
+            Wallpaper background = theme.Background;
+
+            #region 更新背景色选项
+
+            // 实现逻辑是把主题对应的颜色放到第一个位置
+            // 其他位置显示默认颜色列表
+
+            // 如果背景类型没有被选择，那么直接显示该类型下的所有默认背景
+
+            // 更新背景类型
+            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)background.Type;
+
+            this.BackgroundPureColors.SelectedItem = null;
+            this.BackgroundLivePapers.SelectedItem = null;
+            this.BackgroundPapers.SelectedItem = null;
+
+            this.BackgroundPureColors.Clear();
+            this.BackgroundLivePapers.Clear();
+            this.BackgroundPapers.Clear();
+
+            this.BackgroundPureColors.AddRange(this.appManifest.ThemeManifest.DefaultColors);
+            this.BackgroundLivePapers.AddRange(this.appManifest.ThemeManifest.DefaultLivePapers);
+            this.BackgroundPapers.AddRange(this.appManifest.ThemeManifest.DefaultPapers);
+
+            ColorDefinition originalColor = new ColorDefinition("原始背景", background.Uri);
+            BindableCollection<ColorDefinition> collection = null;
+
+            switch ((WallpaperTypeEnum)background.Type)
+            {
+                case WallpaperTypeEnum.Color:
+                    {
+                        collection = this.BackgroundPureColors;
+                        break;
+                    }
+
+                case WallpaperTypeEnum.Live:
+                    {
+                        collection = this.BackgroundLivePapers;
+                        break;
+                    }
+
+                case WallpaperTypeEnum.Image:
+                    {
+                        collection = this.BackgroundPapers;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            ColorDefinition colorDefinition = collection.FirstOrDefault(v => v.Value == background.Uri);
+            if (colorDefinition == null)
+            {
+                collection.Insert(0, originalColor);
+            }
+            else
+            {
+                int index = collection.IndexOf(colorDefinition);
+                collection.Move(index, 0);
+            }
+            collection.SelectedItem = collection.FirstOrDefault();
+
+            #endregion
+
+            #region 更新文本颜色选项
+
+            // 更新第一个原始文本颜色
+            this.ForegroundColors.SelectedItem = null;
+            this.ForegroundColors.Clear();
+            this.ForegroundColors.AddRange(this.appManifest.ThemeManifest.DefaultColors);
+
+            ColorDefinition colorDefinition1 = this.ForegroundColors.FirstOrDefault(v => v.Value == theme.ForegroundColor);
+            if (colorDefinition1 == null)
+            {
+                this.ForegroundColors.Insert(0, new ColorDefinition("原始颜色", theme.ForegroundColor));
+            }
+            else
+            {
+                int index = this.ForegroundColors.IndexOf(colorDefinition1);
+                this.ForegroundColors.Move(index, 0);
+            }
+            this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault();
+
+            #endregion
+        }
 
 
         private bool CollectOptions(XTermSession session)
@@ -915,19 +997,14 @@ namespace ModengTerm.ViewModels
 
         #region 事件处理器
 
-        private void ThemeList_SelectionChanged(Theme oldValue, Theme newValue)
+        private void ThemeList_SelectionChanged(ThemePackage oldTheme, ThemePackage newTheme)
         {
-            if (newValue == null)
+            if (newTheme == null)
             {
                 return;
             }
 
-            Wallpaper wallpaper = newValue.Background;
-            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)wallpaper.Type;
-            this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault(v => v.Value == wallpaper.Uri);
-            this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault(v => v.Value == wallpaper.Uri);
-            this.BackgroundPapers.SelectedItem = this.BackgroundPapers.FirstOrDefault(v => v.Value == wallpaper.Uri);
-            this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault(v => v.Value == newValue.ForegroundColor);
+            this.SwitchTheme(newTheme);
         }
 
         private void WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum oldValue, WallpaperTypeEnum newValue)
