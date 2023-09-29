@@ -1,5 +1,4 @@
-﻿using ModengTerm.Rendering.Background;
-using ModengTerm.Rendering.Wallpaper;
+﻿using ModengTerm.Rendering.Wallpaper;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using System;
@@ -17,20 +16,6 @@ namespace ModengTerm.Rendering
     /// </summary>
     public static class DrawingObjectFactory
     {
-        private static IDrawingObject CreateWallpaperDrawingObject(VTDocumentElement documentElement)
-        {
-            VTWallpaper wallpaper = documentElement as VTWallpaper;
-
-            switch (wallpaper.PaperType)
-            {
-                case WallpaperTypeEnum.Image: return new DrawingImagedWallpaper();
-                case WallpaperTypeEnum.Color: return new DrawingColoredWallpaper();
-                case WallpaperTypeEnum.Live: return new DrawingWallpaperLive();
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         public static IDrawingObject CreateDrawingObject(VTDocumentElement documentElement)
         {
             switch (documentElement.Type)
@@ -40,7 +25,7 @@ namespace ModengTerm.Rendering
                 case VTDocumentElements.TextLine: return new DrawingLine();
                 case VTDocumentElements.Rectangle: return new DrawingRectangle();
                 case VTDocumentElements.MatchesLine: return new DrawingMatchesLine();
-                case VTDocumentElements.Wallpaper: return DrawingObjectFactory.CreateWallpaperDrawingObject(documentElement);
+                case VTDocumentElements.Wallpaper: return new DrawingWallpaper();
 
                 default:
                     throw new NotImplementedException();

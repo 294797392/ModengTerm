@@ -1,5 +1,7 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +44,7 @@ namespace ModengTerm.Rendering.Wallpaper
         public bool SingleFrame { get; set; }
     }
 
-    public abstract class DrawingWallpaper : DrawingObject
+    public class DrawingWallpaper : DrawingObject
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingWallpaperBase");
 
@@ -58,26 +60,70 @@ namespace ModengTerm.Rendering.Wallpaper
         private EffectRenderer effectRenderer;
         private bool drawOnce;
 
+        private byte[] frameData;
+
         #endregion
 
-        /// <summary>
-        /// 获取下一帧要渲染的数据
-        /// </summary>
-        /// <returns></returns>
-        protected abstract byte[] GetNextFrame();
+        #region 实例方法
 
         /// <summary>
         /// 获取当前要绘制的壁纸的格式信息
         /// </summary>
         /// <returns></returns>
-        protected abstract WallpaperFormat GetFormat(VTWallpaper wallpaper);
+        private WallpaperFormat GetFormat()
+        {
+            switch (this.wallpaper.PaperType)
+            {
+                case WallpaperTypeEnum.Color:
+                    {
+                        VTColor vtc = VTColor.CreateFromRgbKey(wallpaper.Uri);
+                        Color color = Color.FromRgb(vtc.R, vtc.G, vtc.B);
+
+                        return new WallpaperFormat()
+                        {
+                            // 这里的宽和高设置多少无所谓，会自动拉伸
+                            Width = (int)wallpaper.Rect.Width,
+                            Height = (int)wallpaper.Rect.Height,
+                            Format = PixelFormats.Indexed8,
+                            Palette = new BitmapPalette(Enumerable.Repeat(color, 256).ToList()),
+                            SingleFrame = true
+                        };
+                    }
+
+                case WallpaperTypeEnum.Image:
+                    {
+                        BitmapSource bitmapSource = VTUtils.GetWallpaperBitmap(this.wallpaper.Uri);
+                        int bytesPerPixel = bitmapSource.Format.BitsPerPixel / 8;
+                        this.frameData = new byte[(int)bitmapSource.PixelWidth * (int)bitmapSource.PixelHeight * bytesPerPixel];
+                        bitmapSource.CopyPixels(this.frameData, (int)bitmapSource.PixelWidth * bytesPerPixel, 0);
+
+                        return new WallpaperFormat()
+                        {
+                            Format = bitmapSource.Format,
+                            SingleFrame = true,
+                            Height = bitmapSource.PixelHeight,
+                            Width = bitmapSource.PixelWidth,
+                            Palette = bitmapSource.Palette,
+                        };
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void PrepareNextFrame()
+        {
+        }
+
+        #endregion
 
         #region IDrawingObject
 
         protected override void OnInitialize()
         {
             this.wallpaper = this.documentElement as VTWallpaper;
-            this.format = this.GetFormat(this.wallpaper);
+            this.format = this.GetFormat();
 
             // 初始化WriteableBitmap
             DpiScale dpiScale = VisualTreeHelper.GetDpi(this);
@@ -124,11 +170,11 @@ namespace ModengTerm.Rendering.Wallpaper
             // 2. 有多帧，获取到这种格式的帧数据之后每次都会画
             if (!this.drawOnce || !this.format.SingleFrame)
             {
-                byte[] frameData = this.GetNextFrame();
+                this.PrepareNextFrame();
                 Int32Rect dirtyRect = new Int32Rect(0, 0, this.format.Width, this.format.Height);
                 this.writeableBitmap.Lock();
                 this.writeableBitmap.AddDirtyRect(dirtyRect);
-                Marshal.Copy(frameData, 0, this.writeableBitmap.BackBuffer, frameData.Length);
+                Marshal.Copy(this.frameData, 0, this.writeableBitmap.BackBuffer, this.frameData.Length);
                 this.writeableBitmap.Unlock();
 
                 if (!this.drawOnce)

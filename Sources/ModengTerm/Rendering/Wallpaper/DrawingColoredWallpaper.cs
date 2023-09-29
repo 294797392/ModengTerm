@@ -26,18 +26,6 @@ namespace ModengTerm.Rendering.Background
 
         protected override WallpaperFormat GetFormat(VTWallpaper wallpaper)
         {
-            VTColor vtc = VTColor.CreateFromRgbKey(wallpaper.Uri);
-            Color color = Color.FromRgb(vtc.R, vtc.G, vtc.B);
-
-            return new WallpaperFormat()
-            {
-                // 这里的宽和高设置多少无所谓，会自动拉伸
-                Width = (int)wallpaper.Rect.Width,
-                Height = (int)wallpaper.Rect.Height,
-                Format = PixelFormats.Indexed8,
-                Palette = new BitmapPalette(Enumerable.Repeat(color, 256).ToList()),
-                SingleFrame = true
-            };
         }
 
         protected override byte[] GetNextFrame()
