@@ -12,12 +12,12 @@ using System.Windows.Media.Imaging;
 using XTerminal.Document;
 using XTerminal.Document.Rendering;
 
-namespace ModengTerm.Rendering.Background
+namespace ModengTerm.Rendering.Wallpaper
 {
     /// <summary>
     /// 实现动态壁纸
     /// </summary>
-    public class DrawingWallpaperLive : FrameworkVisual, IDrawingObject
+    public class DrawingWallpaperLive : DrawingObject
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingWallpaperLive");
 
@@ -27,6 +27,8 @@ namespace ModengTerm.Rendering.Background
         private WriteableBitmap writeableBitmap;
         private double oldWidth;
         private double oldHeight;
+
+        private EffectRenderer effectRenderer;
 
         #endregion
 
@@ -40,9 +42,9 @@ namespace ModengTerm.Rendering.Background
 
         #region IDrawingObject
 
-        public void Initialize(VTDocumentElement documentElement)
+        protected override void OnInitialize()
         {
-            this.wallpaper = documentElement as VTWallpaper;
+            this.wallpaper = this.documentElement as VTWallpaper;
 
             // 初始化WriteableBitmap
             GifMetadata gifMetadata = this.wallpaper.Metadata;
@@ -56,13 +58,22 @@ namespace ModengTerm.Rendering.Background
 
             this.oldWidth = this.wallpaper.Rect.Width;
             this.oldHeight = this.wallpaper.Rect.Height;
+
+            this.effectRenderer = EffectRendererFactory.Create(this.wallpaper.Effect);
+            this.effectRenderer.Initialize(this);
         }
 
-        public void Release()
+        protected override void OnRelease()
         {
+            this.effectRenderer.Release();
         }
 
-        public void Draw()
+        protected override void OnDraw(DrawingContext dc)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Draw()
         {
             if (this.oldWidth != this.wallpaper.Rect.Width ||
                 this.oldHeight != this.wallpaper.Rect.Height)
@@ -70,7 +81,6 @@ namespace ModengTerm.Rendering.Background
                 DrawingContext dc = this.RenderOpen();
                 dc.DrawImage(this.writeableBitmap, this.wallpaper.Rect.GetRect());
                 dc.Close();
-
                 this.oldWidth = this.wallpaper.Rect.Width;
                 this.oldHeight = this.wallpaper.Rect.Height;
             }
@@ -85,6 +95,8 @@ namespace ModengTerm.Rendering.Background
             this.writeableBitmap.AddDirtyRect(dirtyRect);
             Marshal.Copy(gifFrame.Data, 0, this.writeableBitmap.BackBuffer, gifFrame.Data.Length);
             this.writeableBitmap.Unlock();
+
+            this.effectRenderer.DrawFrame();
         }
 
         #endregion

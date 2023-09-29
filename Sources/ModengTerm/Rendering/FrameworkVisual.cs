@@ -13,35 +13,6 @@ namespace ModengTerm.Rendering
     /// </summary>
     public class FrameworkVisual : DrawingVisual
     {
-        private bool visible = true;
 
-        public void SetOpacity(double opacity)
-        {
-            this.Opacity = opacity;
-        }
-
-        public void Arrange(double x, double y)
-        {
-            this.Offset = new Vector(x, y);
-        }
-
-        public void SetVisible(bool visible)
-        {
-            if (this.visible == visible)
-            {
-                return;
-            }
-
-            if (visible)
-            {
-                this.Opacity = 1;
-            }
-            else
-            {
-                this.Opacity = 0;
-            }
-
-            this.visible = visible;
-        }
     }
 }

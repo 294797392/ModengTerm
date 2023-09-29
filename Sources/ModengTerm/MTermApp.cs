@@ -244,6 +244,16 @@ namespace ModengTerm
                             break;
                         }
 
+                    case WallpaperTypeEnum.Image:
+                    case WallpaperTypeEnum.Color:
+                        {
+                            if (vt.Background.Effect != BackgroundEffectEnum.None)
+                            {
+                                this.ProcessFrame(elapsed, vt.Background);
+                            }
+                            break;
+                        }
+
                     default:
                         {
                             break;

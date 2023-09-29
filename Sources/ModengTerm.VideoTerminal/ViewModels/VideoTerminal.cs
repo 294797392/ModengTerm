@@ -467,6 +467,7 @@ namespace ModengTerm.Terminal.ViewModels
                 PaperType = (WallpaperTypeEnum)this.background.Type,
                 Uri = this.background.Uri,
                 Rect = this.vtRect,
+                Effect = (BackgroundEffectEnum)this.background.Effect
             };
             if (this.wallpaper.PaperType == WallpaperTypeEnum.Live)
             {

@@ -66,6 +66,7 @@
     <Compile Include="Document\VTWallpaper.cs" />
     <Compile Include="Document\VTCursorState.cs" />
     <Compile Include="Document\VTMatches.cs" />
+    <Compile Include="Enumerations\BackgroundEffectEnum.cs" />
     <Compile Include="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Include="ViewModels\VTFindOptions.cs" />
     <Compile Include="Document\VTFormattedText.cs" />

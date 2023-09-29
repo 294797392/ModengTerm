@@ -220,7 +220,7 @@ namespace ModengTerm
             {
                 case WallpaperTypeEnum.Live: return "动态背景";
                 case WallpaperTypeEnum.Color: return "纯色";
-                case WallpaperTypeEnum.Image: return "静态背景";
+                case WallpaperTypeEnum.Image: return "图片";
                 default:
                     throw new NotImplementedException();
             }

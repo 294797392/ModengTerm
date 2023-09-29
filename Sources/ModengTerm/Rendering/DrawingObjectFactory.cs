@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Rendering.Background;
+using ModengTerm.Rendering.Wallpaper;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using System;
@@ -22,8 +23,8 @@ namespace ModengTerm.Rendering
 
             switch (wallpaper.PaperType)
             {
-                case WallpaperTypeEnum.Image:
-                case WallpaperTypeEnum.Color: return new DrawingWallpaper();
+                case WallpaperTypeEnum.Image: return new DrawingImagedWallpaper();
+                case WallpaperTypeEnum.Color: return new DrawingColoredWallpaper();
                 case WallpaperTypeEnum.Live: return new DrawingWallpaperLive();
                 default:
                     throw new NotImplementedException();

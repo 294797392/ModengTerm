@@ -13,10 +13,11 @@ namespace ModengTerm.Rendering
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class DrawingObject : FrameworkVisual, IDrawingObject
+    public abstract class DrawingObject : DrawingVisual, IDrawingObject
     {
         #region 实例变量
 
+        private bool visible = true;
         protected VTDocumentElement documentElement;
 
         #endregion
@@ -37,10 +38,20 @@ namespace ModengTerm.Rendering
 
         #region 抽象方法
 
+        /// <summary>
+        /// DrawingObject初始化完成之后调用
+        /// </summary>
         protected abstract void OnInitialize();
 
+        /// <summary>
+        /// DrawingObjectRelease完之后调用
+        /// </summary>
         protected abstract void OnRelease();
 
+        /// <summary>
+        /// 由DrawingObject.Draw方法调用
+        /// </summary>
+        /// <param name="dc"></param>
         protected abstract void OnDraw(DrawingContext dc);
 
         #endregion
@@ -54,7 +65,10 @@ namespace ModengTerm.Rendering
             this.OnInitialize();
         }
 
-        public void Draw()
+        /// <summary>
+        /// 绘制图像
+        /// </summary>
+        public virtual void Draw()
         {
             DrawingContext dc = this.RenderOpen();
 
@@ -66,6 +80,36 @@ namespace ModengTerm.Rendering
         public void Release()
         {
             this.OnRelease();
+        }
+
+
+        public void SetOpacity(double opacity)
+        {
+            this.Opacity = opacity;
+        }
+
+        public void Arrange(double x, double y)
+        {
+            this.Offset = new Vector(x, y);
+        }
+
+        public void SetVisible(bool visible)
+        {
+            if (this.visible == visible)
+            {
+                return;
+            }
+
+            if (visible)
+            {
+                this.Opacity = 1;
+            }
+            else
+            {
+                this.Opacity = 0;
+            }
+
+            this.visible = visible;
         }
 
         #endregion

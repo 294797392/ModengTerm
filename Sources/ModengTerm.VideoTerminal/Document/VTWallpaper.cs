@@ -71,6 +71,11 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public GifMetadata Metadata { get; set; }
 
+        /// <summary>
+        /// 特效
+        /// </summary>
+        public BackgroundEffectEnum Effect { get; set; }
+
         public override VTDocumentElements Type => VTDocumentElements.Wallpaper;
 
         #endregion
