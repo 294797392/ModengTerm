@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace ModengTerm.Rendering.Wallpaper
 {
@@ -14,15 +15,15 @@ namespace ModengTerm.Rendering.Wallpaper
         /// <summary>
         /// which object to render
         /// </summary>
-        protected DrawingObject drawingObject;
+        protected ContainerVisual container;
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="drawingObject">DrawingObjectWallpaper</param>
-        public void Initialize(DrawingObject drawingObject)
+        /// <param name="container">DrawingObjectWallpaper</param>
+        public void Initialize(ContainerVisual container)
         {
-            this.drawingObject = drawingObject;
+            this.container = container;
 
             this.OnInitialize();
         }

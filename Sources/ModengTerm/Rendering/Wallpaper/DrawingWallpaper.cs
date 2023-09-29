@@ -138,9 +138,6 @@ namespace ModengTerm.Rendering.Wallpaper
 
             this.oldWidth = this.wallpaper.Rect.Width;
             this.oldHeight = this.wallpaper.Rect.Height;
-
-            this.effectRenderer = EffectRendererFactory.Create(this.wallpaper.Effect);
-            this.effectRenderer.Initialize(this);
         }
 
         protected override void OnRelease()
@@ -186,6 +183,11 @@ namespace ModengTerm.Rendering.Wallpaper
             }
 
             // 画动效
+            if (this.effectRenderer == null)
+            {
+                this.effectRenderer = EffectRendererFactory.Create(this.wallpaper.Effect);
+                this.effectRenderer.Initialize(this);
+            }
             this.effectRenderer.DrawFrame();
         }
 

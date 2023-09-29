@@ -468,7 +468,7 @@ namespace ModengTerm.Terminal.ViewModels
                 Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
                 BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR),
                 Rect = this.vtRect,
-                Effect = sessionInfo.GetOption<BackgroundEffectEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT)
+                Effect = BackgroundEffectEnum.Star,// sessionInfo.GetOption<BackgroundEffectEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT)
             };
             this.backgroundCanvas = this.videoTerminal.CreateDocument();
             this.videoTerminal.InsertDocument(0, this.backgroundCanvas);

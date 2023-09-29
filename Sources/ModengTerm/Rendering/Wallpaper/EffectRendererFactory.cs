@@ -15,6 +15,7 @@ namespace ModengTerm.Rendering.Wallpaper
             {
                 case BackgroundEffectEnum.None: return new EffectRendererNone();
                 case BackgroundEffectEnum.Snow: return new EffectRendererSnow();
+                case BackgroundEffectEnum.Star: return new EffectRendererStar();
                 default:
                     throw new NotImplementedException();
             }

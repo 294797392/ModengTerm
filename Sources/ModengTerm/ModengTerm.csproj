@@ -107,6 +107,7 @@
     <Compile Include="Rendering\Wallpaper\EffectRendererFactory.cs" />
     <Compile Include="Rendering\Wallpaper\EffectRendererNone.cs" />
     <Compile Include="Rendering\Wallpaper\EffectRendererSnow.cs" />
+    <Compile Include="Rendering\Wallpaper\EffectRendererStar.cs" />
     <Compile Include="UserControls\FavoritesUserControl.xaml.cs">
       <DependentUpon>FavoritesUserControl.xaml</DependentUpon>
     </Compile>

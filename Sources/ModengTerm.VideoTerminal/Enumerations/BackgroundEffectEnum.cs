@@ -19,6 +19,11 @@ namespace ModengTerm.Terminal.Enumerations
         /// <summary>
         /// 下雪天气
         /// </summary>
-        Snow
+        Snow,
+
+        /// <summary>
+        /// 星星特效
+        /// </summary>
+        Star
     }
 }

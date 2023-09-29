@@ -45,6 +45,12 @@ namespace ModengTerm.Terminal.DataModels
         public string BackgroundColor { get; set; }
 
         /// <summary>
+        /// 背景特效
+        /// </summary>
+        [JsonProperty("backgroundEffect")]
+        public int BackgroundEffect { get; set; }
+
+        /// <summary>
         /// 默认前景色
         /// 格式是r,g,b
         /// </summary>
