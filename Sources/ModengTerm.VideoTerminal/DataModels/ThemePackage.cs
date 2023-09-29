@@ -27,11 +27,22 @@ namespace ModengTerm.Terminal.DataModels
         public VTColorTable ColorTable { get; private set; }
 
         /// <summary>
-        /// 背景颜色
-        /// 格式是r,g,b
+        /// 背景类型
         /// </summary>
-        [JsonProperty("background")]
-        public Wallpaper Background { get; set; }
+        [JsonProperty("backgroundType")]
+        public int BackgroundType { get; set; }
+
+        /// <summary>
+        /// 背景颜色值或者是背景图片Uri
+        /// </summary>
+        [JsonProperty("backgroundUri")]
+        public string BackgroundUri { get; set; }
+
+        /// <summary>
+        /// 背景主颜色
+        /// </summary>
+        [JsonProperty("backgroundColor")]
+        public string BackgroundColor { get; set; }
 
         /// <summary>
         /// 默认前景色

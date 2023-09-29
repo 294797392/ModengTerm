@@ -514,7 +514,7 @@ namespace ModengTerm.ViewModels
 
             this.WallpaperTypeEnumList = new BindableCollection<WallpaperTypeEnum>();
             this.WallpaperTypeEnumList.AddRange(MTermUtils.GetEnumValues<WallpaperTypeEnum>());
-            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)selectedTheme.Background.Type;
+            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)selectedTheme.BackgroundType;
             this.WallpaperTypeEnumList.SelectionChanged += WallpaperTypeEnumList_SelectionChanged;
             this.WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum.Live, this.WallpaperTypeEnumList.SelectedItem);
 
@@ -734,28 +734,25 @@ namespace ModengTerm.ViewModels
                 return false;
             }
 
-            Wallpaper wallpaper = new Wallpaper()
-            {
-                Type = (int)this.WallpaperTypeEnumList.SelectedItem,
-            };
+            ColorDefinition background = null;
 
             switch (this.WallpaperTypeEnumList.SelectedItem)
             {
                 case WallpaperTypeEnum.Color:
                     {
-                        wallpaper.Uri = this.BackgroundPureColors.SelectedItem.Value;
+                        background = this.BackgroundPureColors.SelectedItem;
                         break;
                     }
 
                 case WallpaperTypeEnum.Live:
                     {
-                        wallpaper.Uri = this.BackgroundLivePapers.SelectedItem.Value;
+                        background = this.BackgroundLivePapers.SelectedItem;
                         break;
                     }
 
                 case WallpaperTypeEnum.Image:
                     {
-                        wallpaper.Uri = this.BackgroundPapers.SelectedItem.Value;
+                        background = this.BackgroundPapers.SelectedItem;
                         break;
                     }
 
@@ -766,7 +763,12 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_ID, this.ThemeList.SelectedItem.ID);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
-            session.SetOption<Wallpaper>(OptionKeyEnum.SSH_THEME_BACK_COLOR, wallpaper);
+            
+            session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE, this.WallpaperTypeEnumList.SelectedItem);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI, background.Uri);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR, background.Value);
+            session.SetOption<BackgroundEffectEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT, BackgroundEffectEnum.None);
+
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ForegroundColors.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
@@ -847,8 +849,6 @@ namespace ModengTerm.ViewModels
 
         private void SwitchTheme(ThemePackage theme)
         {
-            Wallpaper background = theme.Background;
-
             #region 更新背景色选项
 
             // 实现逻辑是把主题对应的颜色放到第一个位置
@@ -857,7 +857,7 @@ namespace ModengTerm.ViewModels
             // 如果背景类型没有被选择，那么直接显示该类型下的所有默认背景
 
             // 更新背景类型
-            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)background.Type;
+            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)theme.BackgroundType;
 
             this.BackgroundPureColors.SelectedItem = null;
             this.BackgroundLivePapers.SelectedItem = null;
@@ -871,25 +871,29 @@ namespace ModengTerm.ViewModels
             this.BackgroundLivePapers.AddRange(this.appManifest.ThemeManifest.DefaultLivePapers);
             this.BackgroundPapers.AddRange(this.appManifest.ThemeManifest.DefaultPapers);
 
-            ColorDefinition originalColor = new ColorDefinition("原始背景", background.Uri);
-            BindableCollection<ColorDefinition> collection = null;
+            ColorDefinition originalColor = new ColorDefinition("原始背景", theme.BackgroundColor, theme.BackgroundUri); // 如果默认背景列表里不存在背景实例，那么把这个加进去
+            ColorDefinition colorDefinition = null; // 存在于默认背景列表里的背景实例
+            BindableCollection<ColorDefinition> collection = null; // 默认背景列表
 
-            switch ((WallpaperTypeEnum)background.Type)
+            switch ((WallpaperTypeEnum)theme.BackgroundType)
             {
                 case WallpaperTypeEnum.Color:
                     {
+                        colorDefinition = this.BackgroundPureColors.FirstOrDefault(v => v.Value == theme.BackgroundColor);
                         collection = this.BackgroundPureColors;
                         break;
                     }
 
                 case WallpaperTypeEnum.Live:
                     {
+                        colorDefinition = this.BackgroundLivePapers.FirstOrDefault(v => v.Uri == theme.BackgroundUri);
                         collection = this.BackgroundLivePapers;
                         break;
                     }
 
                 case WallpaperTypeEnum.Image:
                     {
+                        colorDefinition = this.BackgroundPapers.FirstOrDefault(v => v.Uri == theme.BackgroundUri);
                         collection = this.BackgroundPapers;
                         break;
                     }
@@ -898,7 +902,6 @@ namespace ModengTerm.ViewModels
                     throw new NotImplementedException();
             }
 
-            ColorDefinition colorDefinition = collection.FirstOrDefault(v => v.Value == background.Uri);
             if (colorDefinition == null)
             {
                 collection.Insert(0, originalColor);
@@ -922,7 +925,7 @@ namespace ModengTerm.ViewModels
             ColorDefinition colorDefinition1 = this.ForegroundColors.FirstOrDefault(v => v.Value == theme.ForegroundColor);
             if (colorDefinition1 == null)
             {
-                this.ForegroundColors.Insert(0, new ColorDefinition("原始颜色", theme.ForegroundColor));
+                this.ForegroundColors.Insert(0, new ColorDefinition("原始颜色", theme.ForegroundColor, theme.ForegroundColor));
             }
             else
             {

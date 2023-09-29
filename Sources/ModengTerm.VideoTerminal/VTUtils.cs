@@ -33,7 +33,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 终端背景颜色
         /// </summary>
-        public Wallpaper Background { get; set; }
+        public string Background { get; set; }
 
         /// <summary>
         /// 终端前景色（文本默认颜色）
@@ -151,20 +151,6 @@ namespace ModengTerm.Terminal
             }
         }
 
-        private static string GetHtmlBackground(Wallpaper termBackground)
-        {
-            switch ((WallpaperTypeEnum)termBackground.Type)
-            {
-                case WallpaperTypeEnum.Color:
-                    {
-                        return VTColor.CreateFromRgbKey(termBackground.Uri).Html;
-                    }
-
-                default:
-                    return string.Empty;
-            }
-        }
-
         private static Stream GetWallpaperStream(string uri)
         {
             if (ResourceAssembly == null)
@@ -222,7 +208,7 @@ namespace ModengTerm.Terminal
 
             if (fileType == LogFileTypeEnum.HTML)
             {
-                string htmlBackground = VTUtils.GetHtmlBackground(parameter.Background);
+                string htmlBackground = VTColor.CreateFromRgbKey(parameter.Background).Html;
                 string htmlForeground = VTColor.CreateFromRgbKey(parameter.Foreground).Html;
                 return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground, parameter.FontSize, parameter.FontFamily, htmlForeground);
             }
@@ -517,29 +503,6 @@ namespace ModengTerm.Terminal
                 case VTCursorSpeeds.NormalSpeed: return MTermConsts.NormalSpeedBlinkInterval;
                 default:
                     throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// 根据每一行的TextStyle，获取该行的背景和文本颜色的反色
-        /// 该方法会处理当背景是动态壁纸的时候的特殊情况
-        /// </summary>
-        /// <param name="textStyle"></param>
-        /// <param name="foreground"></param>
-        /// <param name="background"></param>
-        public static void GetInverseVTColor(VTextStyle textStyle, out VTColor foreground, out VTColor background)
-        {
-            if (textStyle.Background.Type == (int)WallpaperTypeEnum.Color)
-            {
-                // 如果背景是纯色就变反色
-                foreground = VTColor.CreateFromRgbKey(textStyle.Background.Uri);
-                background = VTColor.CreateFromRgbKey(textStyle.Foreground);
-            }
-            else
-            {
-                // 如果背景不是纯色，那么就前景色用白色，背景色用黑色
-                foreground = VTColor.CreateFromRgbKey("255,255,255");
-                background = VTColor.CreateFromRgbKey("0,0,0");
             }
         }
 

@@ -58,7 +58,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataModels\ThemePackage.cs" />
-    <Compile Include="DataModels\Wallpaper.cs" />
     <Compile Include="Document\Graphics\VTDocumentGraphics.cs" />
     <Compile Include="Document\Graphics\VTDocumentRectangle.cs" />
     <Compile Include="Document\Graphics\VTMatchesLine.cs" />

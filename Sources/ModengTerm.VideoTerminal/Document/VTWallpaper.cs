@@ -29,6 +29,11 @@ namespace ModengTerm.Terminal.Document
         #region 属性
 
         /// <summary>
+        /// 背景颜色
+        /// </summary>
+        public string BackgroundColor { get; set; }
+
+        /// <summary>
         /// 壁纸Uri
         /// </summary>
         public string Uri

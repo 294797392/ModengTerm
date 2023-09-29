@@ -64,9 +64,9 @@ namespace XTerminal.Document
         public string ForegroundColor { get; set; }
 
         /// <summary>
-        /// 背景颜色
+        /// 背景色
         /// </summary>
-        public Wallpaper Background { get; set; }
+        public string BackgroundColor { get; set; }
 
         /// <summary>
         /// 颜色表

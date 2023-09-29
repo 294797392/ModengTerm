@@ -76,8 +76,10 @@ namespace ModengTerm.Rendering.Wallpaper
             {
                 case WallpaperTypeEnum.Color:
                     {
-                        VTColor vtc = VTColor.CreateFromRgbKey(wallpaper.Uri);
+                        VTColor vtc = VTColor.CreateFromRgbKey(wallpaper.BackgroundColor);
                         Color color = Color.FromRgb(vtc.R, vtc.G, vtc.B);
+
+                        this.frameData = Enumerable.Repeat((byte)0, (int)this.wallpaper.Rect.Width * (int)this.wallpaper.Rect.Height).ToArray();
 
                         return new WallpaperFormat()
                         {

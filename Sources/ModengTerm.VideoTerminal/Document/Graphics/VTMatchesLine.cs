@@ -117,11 +117,8 @@ namespace ModengTerm.Terminal.Document.Graphics
 
                             VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
                             VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
-                            
-                            VTColor foreground, background;
-                            VTUtils.GetInverseVTColor(this.textLine.Style, out foreground, out background);
-                            character.Foreground = foreground;
-                            character.Background = background;
+                            character.Foreground = VTColor.CreateFromRgbKey(this.textLine.Style.BackgroundColor);
+                            character.Background = VTColor.CreateFromRgbKey(this.textLine.Style.ForegroundColor);
                         }
 
                         #endregion

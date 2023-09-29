@@ -187,8 +187,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// ColorName -> RgbKey
         /// </summary>
         private VTColorTable colorTable;
-        internal Wallpaper background;
-        internal string foreground;
+        internal string foregroundColor;
+        internal string backgroundColor;
         internal double fontSize;
         internal string fontFamily;
         private int scrollbackMax; // 最多可以有多少滚动行数
@@ -342,8 +342,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             this.fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
             this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
-            this.background = sessionInfo.GetOption<Wallpaper>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
-            this.foreground = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
+            this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
+            this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR);
             this.scrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK);
             this.mainCanvas = this.videoTerminal.CreateDocument();
             this.alternateCanvas = this.videoTerminal.CreateDocument();
@@ -427,8 +427,8 @@ namespace ModengTerm.Terminal.ViewModels
                 CursorSize = new VTSize(cursorSize.Width, cursorSize.Height),
                 FontFamily = fontFamily,
                 FontSize = fontSize,
-                ForegroundColor = this.foreground,
-                Background = this.background,
+                ForegroundColor = this.foregroundColor,
+                BackgroundColor = this.backgroundColor,
                 ColorTable = this.colorTable
             };
             this.mainDocument = new VTDocument(documentOptions, this.mainCanvas, false) { Name = "MainDocument", Rect = this.vtRect };
@@ -464,15 +464,12 @@ namespace ModengTerm.Terminal.ViewModels
             // 此时Inser(0)在Z顺序的最下面一层
             this.wallpaper = new VTWallpaper()
             {
-                PaperType = (WallpaperTypeEnum)this.background.Type,
-                Uri = this.background.Uri,
+                PaperType = sessionInfo.GetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE),
+                Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
+                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR),
                 Rect = this.vtRect,
-                Effect = (BackgroundEffectEnum)this.background.Effect
+                Effect = sessionInfo.GetOption<BackgroundEffectEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT)
             };
-            if (this.wallpaper.PaperType == WallpaperTypeEnum.Live)
-            {
-                this.wallpaper.Metadata = VTUtils.GetWallpaperMetadata(this.background.Uri);
-            }
             this.backgroundCanvas = this.videoTerminal.CreateDocument();
             this.videoTerminal.InsertDocument(0, this.backgroundCanvas);
             this.backgroundCanvas.CreateDrawingObject(this.wallpaper);
@@ -688,10 +685,10 @@ namespace ModengTerm.Terminal.ViewModels
                 StartCharacterIndex = startIndex,
                 EndCharacterIndex = endIndex,
                 ContentType = fileType,
-                Background = this.background,
+                Background = this.backgroundColor,
                 FontSize = this.fontSize,
                 FontFamily = this.fontFamily,
-                Foreground = this.foreground
+                Foreground = this.foregroundColor
             };
 
             return VTUtils.CreateContent(parameter);
@@ -1499,8 +1496,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         if (action == VTActions.ReverseVideo)
                         {
-                            VTColor foreColor, backColor;
-                            VTUtils.GetInverseVTColor(this.ActiveLine.Style, out foreColor, out backColor);
+                            VTColor foreColor = VTColor.CreateFromRgbKey(this.backgroundColor);
+                            VTColor backColor = VTColor.CreateFromRgbKey(this.foregroundColor);
                             this.activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
                             this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
                         }

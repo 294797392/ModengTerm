@@ -28,13 +28,20 @@ namespace XTerminal.Base.Definitions
         [JsonProperty("value")]
         public string Value { get; set; }
 
+        /// <summary>
+        /// Uri
+        /// </summary>
+        [JsonProperty("uri")]
+        public string Uri { get; set; }
+
         public ColorDefinition()
         { }
 
-        public ColorDefinition(string name, string value)
+        public ColorDefinition(string name, string value, string uri)
         {
             this.Name = name;
             this.Value = value;
+            this.Uri = uri;
         }
     }
 }

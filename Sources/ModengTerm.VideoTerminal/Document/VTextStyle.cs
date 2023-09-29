@@ -24,12 +24,12 @@ namespace XTerminal.Document
         /// <summary>
         /// 终端的前景色
         /// </summary>
-        public string Foreground { get; set; }
+        public string ForegroundColor { get; set; }
 
         /// <summary>
         /// 终端的背景色
         /// </summary>
-        public Wallpaper Background { get; set; }
+        public string BackgroundColor { get; set; }
 
         /// <summary>
         /// 颜色表

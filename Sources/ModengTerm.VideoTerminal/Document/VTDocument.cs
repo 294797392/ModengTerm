@@ -208,8 +208,8 @@ namespace XTerminal.Document
                     FontSize = this.options.FontSize,
                     FontFamily = this.options.FontFamily,
                     ColorTable = this.options.ColorTable,
-                    Foreground = this.options.ForegroundColor,
-                    Background = this.options.Background,
+                    ForegroundColor = this.options.ForegroundColor,
+                    BackgroundColor = this.options.BackgroundColor,
                 },
             };
 

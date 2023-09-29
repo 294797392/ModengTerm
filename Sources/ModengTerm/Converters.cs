@@ -263,7 +263,7 @@ namespace ModengTerm
                 return Brushes.Transparent;
             }
 
-            string uri = colorDefinition.Value;
+            string uri = colorDefinition.Uri;
 
             Brush brush;
             if (!BrushCache.TryGetValue(uri, out brush))

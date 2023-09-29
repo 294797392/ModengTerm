@@ -69,7 +69,7 @@ namespace ModengTerm.Rendering
             this.textLine = this.documentElement as VTextLine;
 
             this.typeface = DrawingUtils.GetTypeface(this.textLine.Style);
-            this.foreground = DrawingUtils.GetBrush(textLine.Style.Foreground);
+            this.foreground = DrawingUtils.GetBrush(textLine.Style.ForegroundColor);
         }
 
         protected override void OnRelease()

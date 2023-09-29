@@ -131,7 +131,7 @@ namespace ModengTerm.Rendering
         public static FormattedText CreateFormattedText(VTFormattedText textBlock, DrawingContext dc = null)
         {
             VTextStyle textStyle = textBlock.Style;
-            Brush foreground = DrawingUtils.GetBrush(textStyle.Foreground);
+            Brush foreground = DrawingUtils.GetBrush(textStyle.ForegroundColor);
             Typeface typeface = DrawingUtils.GetTypeface(textStyle);
 
             FormattedText formattedText = new FormattedText(textBlock.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
