@@ -468,7 +468,7 @@ namespace ModengTerm.Terminal.ViewModels
                 Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
                 BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR),
                 Rect = this.vtRect,
-                Effect = BackgroundEffectEnum.Star,// sessionInfo.GetOption<BackgroundEffectEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT)
+                Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT)
             };
             this.backgroundCanvas = this.videoTerminal.CreateDocument();
             this.videoTerminal.InsertDocument(0, this.backgroundCanvas);
@@ -1029,14 +1029,20 @@ namespace ModengTerm.Terminal.ViewModels
                 VTextLine currentTextLine = scrollDocument.FirstLine;
                 for (int i = 0; i < rows; i++)
                 {
+                    int physicsRow = scrollValue + i;
                     VTHistoryLine historyLine;
-                    if (!this.scrollInfo.TryGetHistory(scrollValue + i, out historyLine))
+                    if (this.scrollInfo.TryGetHistory(physicsRow, out historyLine))
                     {
-                        // 百分之百不可能找不到
-                        throw new NotImplementedException();
+                        currentTextLine.SetHistory(historyLine);
+                    }
+                    else
+                    {
+                        // 执行clear指令后，因为会增加行，所以可能会找不到
+                        // 打开终端 -> 输入enter直到翻了一整页 -> 滚动到最上面 -> 输入字符，就会复现
+                        currentTextLine.PhysicsRow = physicsRow;
+                        currentTextLine.EraseAll();
                     }
 
-                    currentTextLine.SetHistory(historyLine);
                     currentTextLine = currentTextLine.NextLine;
                 }
             }
@@ -1278,41 +1284,57 @@ namespace ModengTerm.Terminal.ViewModels
                         switch (eraseType)
                         {
                             // In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
+                            // top和clear指令会执行EraseType.All，在其他的终端软件里top指令不会清空已经存在的行，而是把已经存在的行往上移动
+                            // 所以EraseType.All的动作和Scrollback一样执行
                             case EraseType.All:
                             case EraseType.Scrollback:
                                 {
-                                    // 相关命令：
-                                    // MainDocument：clear
-                                    // AlternateDocument：暂无
-
-                                    // Erase Saved Lines
-                                    // 模拟xshell的操作，把当前行移动到可视区域的第一行
-
-                                    VTextLine firstLine = this.activeDocument.FirstLine;
-                                    VTextLine lastLine = this.activeDocument.LastLine;
-
-                                    // 当前终端里显示的行数
-                                    int lines = this.scrollInfo.LastLine.PhysicsRow - firstLine.PhysicsRow;
-
-                                    // 把当前终端里显示的行数全部放到滚动区域上面
-                                    // 先做换行动作，换行完光标在往下的lines行
-                                    for (int i = 0; i < lines; i++)
+                                    if (this.activeDocument.IsAlternate)
                                     {
-                                        firstLine.EraseAll();
-                                        this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
-                                        firstLine = this.activeDocument.FirstLine;
+                                        // xterm-256color类型的终端VIM程序的PageDown和PageUp会执行EraseType.All
+                                        // 所以这里把备用缓冲区和主缓冲区分开处理
+                                        VTextLine next = this.activeDocument.FirstLine;
+                                        while (next != null)
+                                        {
+                                            next.EraseAll();
+
+                                            next = next.NextLine;
+                                        }
                                     }
+                                    else
+                                    {
+                                        // 相关命令：
+                                        // MainDocument：clear
+                                        // AlternateDocument：暂无
 
-                                    this.activeDocument.DirtyAll();
+                                        // Erase Saved Lines
+                                        // 模拟xshell的操作，把当前行移动到可视区域的第一行
 
-                                    int scrollMax = this.activeDocument.FirstLine.PhysicsRow;
-                                    this.scrollInfo.ScrollMax = scrollMax;
-                                    this.scrollInfo.ScrollValue = scrollMax;
+                                        VTextLine firstLine = this.activeDocument.FirstLine;
+                                        VTextLine lastLine = this.activeDocument.LastLine;
 
-                                    // 重新设置光标所在行的数据
-                                    VTextLine cursorLine = this.activeDocument.FirstLine.FindNext(this.activeDocument.Cursor.Row);
-                                    this.activeDocument.SetCursorPhysicsRow(cursorLine.PhysicsRow);
+                                        // 当前终端里显示的行数
+                                        int lines = this.scrollInfo.LastLine.PhysicsRow - firstLine.PhysicsRow;
 
+                                        // 把当前终端里显示的行数全部放到滚动区域上面
+                                        // 先做换行动作，换行完光标在往下的lines行
+                                        for (int i = 0; i < lines; i++)
+                                        {
+                                            firstLine.EraseAll();
+                                            this.activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
+                                            firstLine = this.activeDocument.FirstLine;
+                                        }
+
+                                        this.activeDocument.DirtyAll();
+
+                                        int scrollMax = this.activeDocument.FirstLine.PhysicsRow;
+                                        this.scrollInfo.ScrollMax = scrollMax;
+                                        this.scrollInfo.ScrollValue = scrollMax;
+
+                                        // 重新设置光标所在行的数据
+                                        VTextLine cursorLine = this.activeDocument.FirstLine.FindNext(this.activeDocument.Cursor.Row);
+                                        this.activeDocument.SetCursorPhysicsRow(cursorLine.PhysicsRow);
+                                    }
                                     break;
                                 }
 

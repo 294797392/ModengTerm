@@ -38,15 +38,15 @@
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="90"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="作者微信：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="作者微信/QQ：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
             <TextBlock Grid.Row="0" Grid.Column="1" Text="294797392" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Gitee：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="https://gitee.com/zyfalreadyexsit/terminal-release.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Text="https://gitee.com/zyfalreadyexsit/ModengTerm-Release.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
             <TextBlock Grid.Row="2" Grid.Column="0" Text="软件版本号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
             <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TextBlockSoftwareVersion" Text="" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>

@@ -62,7 +62,7 @@ namespace ModengTerm.Terminal.Document
             set
             {
                 // -5,-5,+5,+5是为了消除边距
-                this.vtc = new VTRect(-5, -5, value.Width + 5, value.Height + 5);
+                this.vtc = new VTRect(-5, -5, value.Width + 5, value.Height + 10);
             }
         }
 
@@ -79,9 +79,14 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 特效
         /// </summary>
-        public BackgroundEffectEnum Effect { get; set; }
+        public EffectTypeEnum Effect { get; set; }
 
         public override VTDocumentElements Type => VTDocumentElements.Wallpaper;
+
+        /// <summary>
+        /// 背景透明度
+        /// </summary>
+        public double Opacity { get; set; }
 
         #endregion
 

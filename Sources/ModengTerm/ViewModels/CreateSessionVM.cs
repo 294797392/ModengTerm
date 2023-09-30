@@ -330,6 +330,7 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<ColorDefinition> CursorColors { get; private set; }
 
+        public BindableCollection<EffectTypeEnum> EffectTypeEnumList { get; private set; }
         public BindableCollection<WallpaperTypeEnum> WallpaperTypeEnumList { get; private set; }
         /// <summary>
         /// 纯色背景缩略图
@@ -513,10 +514,14 @@ namespace ModengTerm.ViewModels
             this.CursorColors.SelectedItem = this.CursorColors.FirstOrDefault();
 
             this.WallpaperTypeEnumList = new BindableCollection<WallpaperTypeEnum>();
-            this.WallpaperTypeEnumList.AddRange(MTermUtils.GetEnumValues<WallpaperTypeEnum>());
+            this.WallpaperTypeEnumList.AddRange(MTermUtils.GetEnumValues<WallpaperTypeEnum>(WallpaperTypeEnum.Live));
             this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)selectedTheme.BackgroundType;
             this.WallpaperTypeEnumList.SelectionChanged += WallpaperTypeEnumList_SelectionChanged;
             this.WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum.Live, this.WallpaperTypeEnumList.SelectedItem);
+
+            this.EffectTypeEnumList = new BindableCollection<EffectTypeEnum>();
+            this.EffectTypeEnumList.AddRange(MTermUtils.GetEnumValues<EffectTypeEnum>(EffectTypeEnum.Snow));
+            this.EffectTypeEnumList.SelectedItem = EffectTypeEnum.None;
 
             this.ForegroundColors = new BindableCollection<ColorDefinition>();
             this.BackgroundPureColors = new BindableCollection<ColorDefinition>();
@@ -763,11 +768,11 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_ID, this.ThemeList.SelectedItem.ID);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
-            
+
             session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE, this.WallpaperTypeEnumList.SelectedItem);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI, background.Uri);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR, background.Value);
-            session.SetOption<BackgroundEffectEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT, BackgroundEffectEnum.None);
+            session.SetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT, this.EffectTypeEnumList.SelectedItem);
 
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ForegroundColors.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
@@ -870,6 +875,11 @@ namespace ModengTerm.ViewModels
             this.BackgroundPureColors.AddRange(this.appManifest.ThemeManifest.DefaultColors);
             this.BackgroundLivePapers.AddRange(this.appManifest.ThemeManifest.DefaultLivePapers);
             this.BackgroundPapers.AddRange(this.appManifest.ThemeManifest.DefaultPapers);
+
+            // 先保证每种样式都有一个默认选项
+            this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault();
+            this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault();
+            this.BackgroundPapers.SelectedItem = this.BackgroundPapers.FirstOrDefault();
 
             ColorDefinition originalColor = new ColorDefinition("原始背景", theme.BackgroundColor, theme.BackgroundUri); // 如果默认背景列表里不存在背景实例，那么把这个加进去
             ColorDefinition colorDefinition = null; // 存在于默认背景列表里的背景实例

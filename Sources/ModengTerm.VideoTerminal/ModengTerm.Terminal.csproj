@@ -65,7 +65,7 @@
     <Compile Include="Document\VTWallpaper.cs" />
     <Compile Include="Document\VTCursorState.cs" />
     <Compile Include="Document\VTMatches.cs" />
-    <Compile Include="Enumerations\BackgroundEffectEnum.cs" />
+    <Compile Include="Enumerations\EffectTypeEnum.cs" />
     <Compile Include="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Include="ViewModels\VTFindOptions.cs" />
     <Compile Include="Document\VTFormattedText.cs" />
@@ -156,7 +156,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="LiveWallpapers\img1.jpg" />
+    <EmbeddedResource Include="Wallpapers\img1.jpg" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Fonts\consola.ttf" />
@@ -201,7 +201,12 @@
     <EmbeddedResource Include="Fonts\UbuntuMono-RI.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="LiveWallpapers\Live_1.gif" />
+    <EmbeddedResource Include="Wallpapers\Live_1.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Wallpapers\img4.jpg" />
+    <EmbeddedResource Include="Wallpapers\img2.png" />
+    <EmbeddedResource Include="Wallpapers\img3.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -115,7 +115,7 @@ namespace ModengTerm.Terminal
                 {
                     VTColor vtc = character.Foreground;
                     string color = vtc.Html;
-                    builder.AppendFormat("background-color:{0};", color);
+                    builder.AppendFormat("color:{0};", color);
                 }
 
                 if (VTUtils.GetTextAttribute(VTextAttributes.Underline, character.Attribute))

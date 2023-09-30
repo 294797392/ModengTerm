@@ -23,6 +23,8 @@ namespace ModengTerm.Rendering.Wallpaper
 
             public RotateTransform RotateTransform { get; set; }
 
+            public Geometry Geometry { get; set; }
+
             public double XV { get; set; }
             public double YV { get; set; }
             public double XT { get; set; }
@@ -31,18 +33,10 @@ namespace ModengTerm.Rendering.Wallpaper
             public void Draw()
             {
                 DrawingContext dc = this.RenderOpen();
-                dc.DrawGeometry(this.Background, null, EffectRendererStar.STAR_GEOMETRY);
+                dc.DrawGeometry(this.Background, null, this.Geometry);
                 dc.Close();
-
-                //Rect bounds = this.ContentBounds;
-                //dc = RenderOpen();
-                //dc.DrawRectangle(Brushes.SkyBlue, null, bounds);
-                //dc.DrawGeometry(this.Background, null, EffectRendererStar.STAR_GEOMETRY);
-                //dc.Close();
             }
         }
-
-        private static readonly Geometry STAR_GEOMETRY = PathGeometry.Parse("M16.001007,0L20.944,10.533997 32,12.223022 23.998993,20.421997 25.889008,32 16.001007,26.533997 6.1109924,32 8,20.421997 0,12.223022 11.057007,10.533997z");
 
         #region 实例变量
 
@@ -78,6 +72,7 @@ namespace ModengTerm.Rendering.Wallpaper
             for (int i = 0; i < 30; i++)
             {
                 double scale = (double)this.random.Next(3, 5) / 10;
+                double rotateCenter = 32 * scale / 2; // 32是星星大小
 
                 StarVisual starVisual = new StarVisual()
                 {
@@ -89,17 +84,15 @@ namespace ModengTerm.Rendering.Wallpaper
                     YV = (double)this.random.Next(-_starVMin, _starVMax) / 60,
                     YT = this.random.Next(6, 301),
                     ScaleTransform = new ScaleTransform(scale, scale),
+                    RotateTransform = new RotateTransform(0, rotateCenter, rotateCenter),
+                    Geometry = PathGeometry.Parse("M16.001007,0L20.944,10.533997 32,12.223022 23.998993,20.421997 25.889008,32 16.001007,26.533997 6.1109924,32 8,20.421997 0,12.223022 11.057007,10.533997z"),
                 };
                 TransformGroup transformGroup = new TransformGroup();
                 transformGroup.Children.Add(starVisual.ScaleTransform);
+                transformGroup.Children.Add(starVisual.RotateTransform);
                 starVisual.Transform = transformGroup;
                 starVisual.Offset = new Vector(starVisual.OffsetX, starVisual.OffsetY);
                 starVisual.Draw();
-
-                // 32是星星大小
-                Rect starBounds = starVisual.ContentBounds;
-                starVisual.RotateTransform = new RotateTransform(0, starBounds.Width / 2, starBounds.Height / 2);
-                transformGroup.Children.Add(starVisual.RotateTransform);
 
                 this.container.Children.Add(starVisual);
             }
@@ -154,7 +147,7 @@ namespace ModengTerm.Rendering.Wallpaper
 
                 startVisual.Offset = new Vector(startVisual.OffsetX, startVisual.OffsetY);
 
-                startVisual.RotateTransform.Angle += 3;
+                startVisual.RotateTransform.Angle += 2;
             }
         }
 

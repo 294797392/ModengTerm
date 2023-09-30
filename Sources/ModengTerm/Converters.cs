@@ -232,6 +232,31 @@ namespace ModengTerm
         }
     }
 
+    public class EffectType2StringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!EnumConverterUtils.CheckValue(value))
+            {
+                return "未知";
+            }
+
+            switch ((EffectTypeEnum)value)
+            {
+                case EffectTypeEnum.None: return "无";
+                case EffectTypeEnum.Snow: return "飘雪";
+                case EffectTypeEnum.Star: return "星空";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ColorDefinition2BrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

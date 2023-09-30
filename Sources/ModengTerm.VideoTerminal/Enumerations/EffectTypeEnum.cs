@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace ModengTerm.Terminal.Enumerations
 {
     /// <summary>
-    /// 定义背景特效
+    /// 定义背景特效类型
     /// </summary>
-    public enum BackgroundEffectEnum
+    public enum EffectTypeEnum
     {
         /// <summary>
         /// 没有特效

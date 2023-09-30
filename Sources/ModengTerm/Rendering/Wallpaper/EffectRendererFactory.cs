@@ -9,13 +9,13 @@ namespace ModengTerm.Rendering.Wallpaper
 {
     public static class EffectRendererFactory
     {
-        public static EffectRenderer Create(BackgroundEffectEnum effectType)
+        public static EffectRenderer Create(EffectTypeEnum effectType)
         {
             switch (effectType)
             {
-                case BackgroundEffectEnum.None: return new EffectRendererNone();
-                case BackgroundEffectEnum.Snow: return new EffectRendererSnow();
-                case BackgroundEffectEnum.Star: return new EffectRendererStar();
+                case EffectTypeEnum.None: return new EffectRendererNone();
+                case EffectTypeEnum.Snow: return new EffectRendererSnow();
+                case EffectTypeEnum.Star: return new EffectRendererStar();
                 default:
                     throw new NotImplementedException();
             }

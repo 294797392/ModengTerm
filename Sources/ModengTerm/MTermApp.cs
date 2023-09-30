@@ -247,7 +247,7 @@ namespace ModengTerm
                     case WallpaperTypeEnum.Image:
                     case WallpaperTypeEnum.Color:
                         {
-                            if (vt.Background.Effect != BackgroundEffectEnum.None)
+                            if (vt.Background.Effect != EffectTypeEnum.None)
                             {
                                 this.ProcessFrame(elapsed, vt.Background);
                             }

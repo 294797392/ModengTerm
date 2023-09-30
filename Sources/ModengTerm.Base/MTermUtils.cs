@@ -18,6 +18,19 @@ namespace ModengTerm.Base
             return Enum.GetValues(typeof(T)).Cast<T>().ToList();
         }
 
+        public static List<T> GetEnumValues<T>(params T[] excludes) where T : Enum
+        {
+            List<T> values = GetEnumValues<T>();
+            if (excludes.Length > 0)
+            {
+                foreach (T value in excludes)
+                {
+                    values.Remove(value);
+                }
+            }
+            return values;
+        }
+
         public static bool IsTerminal(SessionTypeEnum sessionType)
         {
             switch (sessionType)

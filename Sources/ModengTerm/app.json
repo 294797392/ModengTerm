@@ -95,7 +95,7 @@
                 "backgroundType": 2,
                 "backgroundUri": "img1",
                 "backgroundColor": "255,255,255",
-                "foregroundColor": "0,0,0"
+                "foregroundColor": "255,255,255"
             }
         ],
 
@@ -124,9 +124,27 @@
         "defaultPapers": [
             {
                 "id": "1",
-                "name": "图片",
+                "name": "图片1",
                 "value": "0,0,0",
                 "uri": "img1"
+            },
+            {
+                "id": "2",
+                "name": "图片2",
+                "value": "0,0,0",
+                "uri": "img2"
+            },
+            {
+                "id": "3",
+                "name": "图片3",
+                "value": "0,0,0",
+                "uri": "img3"
+            },
+            {
+                "id": "4",
+                "name": "图片4",
+                "value": "0,0,0",
+                "uri": "img4"
             }
         ],
         "defaultLivePapers": [
