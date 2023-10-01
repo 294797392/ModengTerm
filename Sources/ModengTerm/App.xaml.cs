@@ -25,6 +25,7 @@ namespace XTerminal
 
         static App()
         {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             DotNEToolkit.Log4net.InitializeLog4net();
         }
 

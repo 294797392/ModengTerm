@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Wallpapers\img1.jpg" />
+    <None Remove="Wallpapers\img2.png" />
+    <None Remove="Wallpapers\img3.png" />
+    <None Remove="Wallpapers\img4.jpg" />
+    <None Remove="Wallpapers\Live_1.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Wallpapers\img1.jpg" />
+    <EmbeddedResource Include="Wallpapers\img2.png" />
+    <EmbeddedResource Include="Wallpapers\img3.png" />
+    <EmbeddedResource Include="Wallpapers\img4.jpg" />
+    <EmbeddedResource Include="Wallpapers\Live_1.gif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
+    <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
+    <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\Dependence\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="WPFToolkit">
+      <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

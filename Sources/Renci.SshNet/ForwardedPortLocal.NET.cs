@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Net;
 using Renci.SshNet.Abstractions;
 using Renci.SshNet.Common;
+using CountdownEvent = Renci.SshNet.Common.CountdownEvent;
 
 namespace Renci.SshNet
 {
