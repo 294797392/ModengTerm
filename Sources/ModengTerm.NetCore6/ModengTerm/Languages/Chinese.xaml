@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- 主窗口 1 - 500 -->
+    <sys:String x:Key="UIText1">ModengTerm终端模拟器</sys:String>
+    <sys:String x:Key="UIText2">打开会话</sys:String>
+    <sys:String x:Key="UIText3">新建</sys:String>
+    <sys:String x:Key="UIText4">删除</sys:String>
+    <sys:String x:Key="UIText5">编辑</sys:String>
+    <sys:String x:Key="UIText6">关于</sys:String>
+    <sys:String x:Key="UIText100">新建会话</sys:String>
+
+    <!-- 日志记录参数窗口 501 - 1000 -->
+
+    <!-- 终端右键菜单 1001 - 1500 -->
+
+    <!-- 查找窗口 2000 - 3000 -->
+    <sys:String x:Key="UIText2000">查找</sys:String>
+
+
+</ResourceDictionary>
