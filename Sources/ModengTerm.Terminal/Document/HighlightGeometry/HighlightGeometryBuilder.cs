@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Document.HighlightGeometry
+namespace ModengTerm.Terminal.HighlightGeometry
 {
     public abstract class HighlightGeometryBuilder
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 存储文档里某个元素的测量信息

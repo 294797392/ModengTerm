@@ -1,4 +1,10 @@
-﻿using ModengTerm.Terminal.Loggering;
+﻿using DotNEToolkit;
+using Microsoft.Win32;
+using ModengTerm.Base;
+using ModengTerm.Controls;
+using ModengTerm.Terminal;
+using ModengTerm.Terminal.Loggering;
+using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +24,41 @@ namespace ModengTerm.Windows
     /// <summary>
     /// LoggerOptionsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class LoggerOptionsWindow : Window
+    public partial class LoggerOptionsWindow : MTermWindow
     {
+        private LoggerOptionsVM viewModel;
+        private IVideoTerminal vt;
+
         public LoggerOptions Options { get; private set; }
 
-        public LoggerOptionsWindow()
+        public LoggerOptionsWindow(IVideoTerminal vt)
         {
             InitializeComponent();
+
+            this.InitializeWindow(vt);
+        }
+
+        private void InitializeWindow(IVideoTerminal vt)
+        {
+            this.vt = vt;
+            this.viewModel = new LoggerOptionsVM(vt);
+            base.DataContext = this.viewModel;
+        }
+
+        private void ButtonStart_Click(object sender, RoutedEventArgs e)
+        {
+            this.Options = this.viewModel.GetOptions();
+            if (this.Options == null)
+            {
+                return;
+            }
+
+            base.DialogResult = true;
+        }
+
+        private void ButtonBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            this.viewModel.BrowseFilePath();
         }
     }
 }

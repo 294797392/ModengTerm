@@ -13,7 +13,8 @@ namespace ModengTerm.Terminal.Loggering
             switch (filterType)
             {
                 case FilterTypeEnum.None: return new NoneFilter();
-                case FilterTypeEnum.Keyword: return new KeywordFilter();
+                case FilterTypeEnum.PlainText: return new KeywordFilter();
+                case FilterTypeEnum.Regexp: return new RegexpFilter();
 
                 default:
                     throw new NotImplementedException();

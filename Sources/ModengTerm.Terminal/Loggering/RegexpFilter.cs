@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Loggering
 {
-    public class KeywordFilter : LoggerFilter
+    public class RegexpFilter : LoggerFilter
     {
-        public override FilterTypeEnum Type => FilterTypeEnum.PlainText;
+        public override FilterTypeEnum Type => FilterTypeEnum.Regexp;
 
         public override bool Filter(string text)
         {
-            if (text.Contains(this.FilterText))
+            Match match = Regex.Match(text, this.FilterText);
+            if (match.Success)
             {
                 return true;
             }

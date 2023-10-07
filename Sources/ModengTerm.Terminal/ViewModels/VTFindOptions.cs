@@ -47,42 +47,4 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         CurrentToEnd
     }
-
-    /// <summary>
-    /// 存储查找参数
-    /// </summary>
-    public class VTFindOptions
-    {
-        /// <summary>
-        /// 是否忽略大小写
-        /// </summary>
-        public bool IgnoreCase { get; set; }
-
-        public bool Regexp { get; set; }
-
-        /// <summary>
-        /// 要查找的关键字
-        /// </summary>
-        public string Keyword { get; set; }
-
-        /// <summary>
-        /// 查找范围
-        /// </summary>
-        public FindScopes Scope { get; set; }
-
-        /// <summary>
-        /// 指定从哪里开始查找，怎么查找
-        /// </summary>
-        public FindStartups Startup { get; set; }
-
-        /// <summary>
-        /// 是否一次性把所有的都查找出来
-        /// </summary>
-        public bool FindAll { get; set; }
-
-        public VTFindOptions()
-        {
-
-        }
-    }
 }

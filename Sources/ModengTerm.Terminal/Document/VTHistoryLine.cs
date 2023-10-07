@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 用来存储历史的行记录

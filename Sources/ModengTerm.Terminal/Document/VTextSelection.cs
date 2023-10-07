@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Document.Rendering;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 存储鼠标选中的文本信息

@@ -18,15 +18,6 @@ namespace ModengTerm.ServiceAgents
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FileServiceAgent");
 
-        protected override int OnInitialize()
-        {
-            return ResponseCode.SUCCESS;
-        }
-
-        protected override void OnRelease()
-        {
-        }
-
         public override MTermManifest GetManifest()
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.json");

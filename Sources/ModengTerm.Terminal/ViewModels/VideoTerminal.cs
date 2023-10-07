@@ -1,29 +1,16 @@
-﻿using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Document;
-using ModengTerm.Terminal.Document.Graphics;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Loggering;
+using ModengTerm.Terminal.Rendering;
 using ModengTerm.Terminal.Session;
 using ModengTerm.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using XTerminal;
 using XTerminal.Base;
-using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
-using XTerminal.Document;
-using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 
 namespace ModengTerm.Terminal.ViewModels
@@ -31,7 +18,7 @@ namespace ModengTerm.Terminal.ViewModels
     /// <summary>
     /// 处理虚拟终端的所有逻辑
     /// </summary>
-    public partial class VideoTerminal : OpenedSessionVM
+    public class VideoTerminal : OpenedSessionVM, IVideoTerminal
     {
         #region 类变量
 
@@ -39,6 +26,12 @@ namespace ModengTerm.Terminal.ViewModels
 
         private static readonly byte[] OS_OperatingStatusData = new byte[4] { 0x1b, (byte)'[', (byte)'0', (byte)'n' };
         private static readonly byte[] DA_DeviceAttributesData = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
+
+        #endregion
+
+        #region 公开事件
+
+        public event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
 
         #endregion
 
@@ -170,7 +163,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 提供终端屏幕的功能
         /// </summary>
-        private IVideoTerminal videoTerminal;
+        private IDrawingVideoTerminal videoTerminal;
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -247,6 +240,10 @@ namespace ModengTerm.Terminal.ViewModels
         public VTScrollInfo ScrollInfo { get { return this.scrollInfo; } }
 
         public VTDocument ActiveDocument { get { return this.activeDocument; } }
+        public VTDocument MainDocument { get { return this.mainDocument; } }
+        public VTDocument AlternateDocument { get { return this.alternateDocument; } }
+
+        public IDrawingDocument TopMostDocument { get { return this.topMostCanvas; } }
 
         public SessionTransport SessionTransport { get { return this.sessionTransport; } }
 
@@ -306,6 +303,13 @@ namespace ModengTerm.Terminal.ViewModels
 
         public VTWallpaper Background { get { return this.wallpaper; } }
 
+        /// <summary>
+        /// UI线程上下文对象
+        /// </summary>
+        public SynchronizationContext UISyncContext { get { return this.uiSyncContext; } }
+
+        public VTLogger Logger { get; set; }
+
         #endregion
 
         #region 构造方法
@@ -328,7 +332,7 @@ namespace ModengTerm.Terminal.ViewModels
             XTermSession sessionInfo = this.Session;
 
             this.uiSyncContext = SynchronizationContext.Current;
-            this.videoTerminal = this.Content as IVideoTerminal;
+            this.videoTerminal = this.Content as IDrawingVideoTerminal;
 
             // DECAWM
             this.autoWrapMode = false;
@@ -1214,7 +1218,7 @@ namespace ModengTerm.Terminal.ViewModels
                             VTextLine newLastLine = this.ActiveLine;
 
                             // 更新旧的最后一行和新的最后一行的历史记录
-                            this.scrollInfo.UpdateHistory(oldLastLine);
+                            VTHistoryLine oldHistoryLine = this.scrollInfo.UpdateHistory(oldLastLine);
                             this.scrollInfo.UpdateHistory(newLastLine);
 
                             #region 更新滚动条的值
@@ -1229,6 +1233,12 @@ namespace ModengTerm.Terminal.ViewModels
                             }
 
                             #endregion
+
+                            // 触发行被完全打印的事件
+                            if (this.LinePrinted != null)
+                            {
+                                this.LinePrinted(this, oldHistoryLine);
+                            }
                         }
 
                         break;
@@ -1881,7 +1891,7 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
 
-        public void OnMouseDown(IVideoTerminal vt, VTPoint location, int clickCount)
+        public void OnMouseDown(IDrawingVideoTerminal vt, VTPoint location, int clickCount)
         {
             if (clickCount == 1)
             {
@@ -1946,7 +1956,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public void OnMouseMove(IVideoTerminal vt, VTPoint location)
+        public void OnMouseMove(IDrawingVideoTerminal vt, VTPoint location)
         {
             if (!this.isMouseDown)
             {
@@ -2022,13 +2032,13 @@ namespace ModengTerm.Terminal.ViewModels
             this.PerformDrawing(this.activeDocument);
         }
 
-        public void OnMouseUp(IVideoTerminal vt, VTPoint location)
+        public void OnMouseUp(IDrawingVideoTerminal vt, VTPoint location)
         {
             this.isMouseDown = false;
             this.selectionState = false;
         }
 
-        public void OnMouseWheel(IVideoTerminal vt, bool upper)
+        public void OnMouseWheel(IDrawingVideoTerminal vt, bool upper)
         {
             // 只有主缓冲区才可以用鼠标滚轮进行滚动
             // 备用缓冲区不可以滚动
@@ -2089,7 +2099,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.PerformDrawing(this.activeDocument);
         }
 
-        public void OnSizeChanged(IVideoTerminal vt, VTRect vtc)
+        public void OnSizeChanged(IDrawingVideoTerminal vt, VTRect vtc)
         {
             // 不管当前是什么状态，第一步先更新终端屏幕大小
             this.vtRect = vtc;

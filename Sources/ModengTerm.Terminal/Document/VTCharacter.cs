@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 存储终端里一个字符的信息

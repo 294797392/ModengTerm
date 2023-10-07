@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 
@@ -16,13 +17,22 @@ namespace ModengTerm.ServiceAgents
     /// 1. 管理分组和Session信息
     /// 2. 用户数据管理，用户登录
     /// </summary>
-    public abstract class ServiceAgent : ModuleBase
+    public abstract class ServiceAgent
     {
         /// <summary>
         /// 获取app清单配置文件
         /// </summary>
         /// <returns></returns>
         public abstract MTermManifest GetManifest();
+
+        public int Initialize()
+        {
+            return ResponseCode.SUCCESS;
+        }
+
+        public void Release()
+        {
+        }
 
         #region Session管理
 

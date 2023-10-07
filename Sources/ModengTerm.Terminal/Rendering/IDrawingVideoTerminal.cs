@@ -6,13 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
 
-namespace XTerminal.Document.Rendering
+namespace ModengTerm.Terminal.Rendering
 {
     /// <summary>
     /// 终端显示屏
     /// 显示屏里包含多个Surface，Surface用来真正渲染终端输出
     /// </summary>
-    public interface IVideoTerminal
+    public interface IDrawingVideoTerminal
     {
         /// <summary>
         /// 创建一个画板用来渲染文档

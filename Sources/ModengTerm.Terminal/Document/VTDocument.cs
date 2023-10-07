@@ -2,17 +2,17 @@
 using ModengTerm.Base;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Document.Rendering;
 using XTerminal.Parser;
-using static XTerminal.Document.VTextLine;
+using static ModengTerm.Terminal.Document.VTextLine;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 终端显示的字符的文档模型

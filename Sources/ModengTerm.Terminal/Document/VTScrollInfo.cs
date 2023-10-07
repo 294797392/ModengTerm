@@ -1,10 +1,9 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Document;
-using XTerminal.Document.Rendering;
 
 namespace ModengTerm.Terminal.Document
 {
@@ -20,7 +19,7 @@ namespace ModengTerm.Terminal.Document
         private bool dirty;
         private int scrollMax;
         private int scrollValue;
-        private IVideoTerminal vt;
+        private IDrawingVideoTerminal vt;
         private VTHistory history;
 
         #endregion
@@ -146,7 +145,7 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTScrollInfo(IVideoTerminal vt)
+        public VTScrollInfo(IDrawingVideoTerminal vt)
         {
             this.vt = vt;
         }
@@ -200,7 +199,8 @@ namespace ModengTerm.Terminal.Document
         /// 如果不存在历史记录，那么创建历史记录
         /// </summary>
         /// <param name="textLine"></param>
-        public void UpdateHistory(VTextLine textLine)
+        /// <returns>返回被更新后的历史行数据</returns>
+        public VTHistoryLine UpdateHistory(VTextLine textLine)
         {
             VTHistoryLine historyLine;
             if (!this.history.TryGetHistory(textLine.PhysicsRow, out historyLine))
@@ -224,6 +224,8 @@ namespace ModengTerm.Terminal.Document
             {
                 this.history.UpdateHistory(textLine, historyLine);
             }
+
+            return historyLine;
         }
 
         /// <summary>

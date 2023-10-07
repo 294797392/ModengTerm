@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Document.Rendering
+namespace ModengTerm.Terminal.Rendering
 {
     /// <summary>
     /// Surface渲染参数

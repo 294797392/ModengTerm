@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Document;
 
 namespace ModengTerm.Terminal.Document
 {

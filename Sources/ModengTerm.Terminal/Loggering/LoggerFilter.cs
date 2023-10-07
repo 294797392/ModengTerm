@@ -21,7 +21,10 @@ namespace ModengTerm.Terminal.Loggering
         /// <summary>
         /// 对文本进行过滤
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// true表示可以保存
+        /// false表示不能保存
+        /// </returns>
         public abstract bool Filter(string text);
     }
 }

@@ -19,6 +19,11 @@ namespace ModengTerm.Terminal.Loggering
         /// <summary>
         /// 关键字过滤
         /// </summary>
-        Keyword,
+        PlainText,
+
+        /// <summary>
+        /// 使用正则表达式过滤
+        /// </summary>
+        Regexp
     }
 }

@@ -19,4 +19,8 @@
     <sys:String x:Key="UIText2000">查找</sys:String>
 
 
+    <!-- 日志选项窗口 3001 - 4000 -->
+    <sys:String x:Key="UIText3001">日志选项</sys:String>
+
+
 </ResourceDictionary>

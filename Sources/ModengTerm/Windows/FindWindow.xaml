@@ -8,7 +8,8 @@
         xmlns:converter="clr-namespace:ModengTerm"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText2000}" 
-        Height="230" Width="400" ResizeMode="NoResize"
+        Height="Auto" Width="400" ResizeMode="NoResize"
+                       SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         Closed="Window_Closed">
     

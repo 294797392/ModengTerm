@@ -9,7 +9,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
-using XTerminal.Document;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -38,7 +37,7 @@ namespace ModengTerm.Terminal.ViewModels
         private bool ignoreCase;
         private bool regexp;
         private string keyword;
-        private VideoTerminal videoTerminal;
+        private IVideoTerminal videoTerminal;
 
         /// <summary>
         /// 存储当前要搜索的第一行物理行号
@@ -174,7 +173,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 构造方法
 
-        public FindVM(VideoTerminal vt)
+        public FindVM(IVideoTerminal vt)
         {
             this.videoTerminal = vt;
 
@@ -186,7 +185,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.matchResult = new List<MatchResult>();
 
             this.matchesLine = new VTMatchesLine();
-            this.videoTerminal.topMostCanvas.CreateDrawingObject(this.matchesLine);
+            this.videoTerminal.TopMostDocument.CreateDrawingObject(this.matchesLine);
         }
 
         #endregion
@@ -339,7 +338,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.matchesLine.TextLine = textLine;
             this.matchesLine.OffsetY = textLine.OffsetY;
 
-            this.videoTerminal.uiSyncContext.Send((state) =>
+            this.videoTerminal.UISyncContext.Send((state) =>
             {
                 this.matchesLine.RequestInvalidate();
             }, null);

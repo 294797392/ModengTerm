@@ -42,14 +42,14 @@
 
                 <Grid.ContextMenu>
                     <ContextMenu>
-                        <!--<MenuItem Header="日志">
+                        <MenuItem Header="日志">
                             <MenuItem Header="启动" Click="MenuItemStartLogger_Click"/>
                             <MenuItem Header="停止" Click="MenuItemStopLogger_Click"/>
                             <MenuItem Header="暂停" Click="MenuItemPauseLogger_Click"/>
                             <MenuItem Header="继续" Click="MenuItemResumeLogger_Click"/>
-                            <MenuItem Header="打开日志文件夹" Click="MenuItemOpenLoggerDirectory_Click"/>
-                        </MenuItem>-->
-
+                            <!--<MenuItem Header="打开日志文件夹" Click="MenuItemOpenLoggerDirectory_Click"/>-->
+                        </MenuItem>
+                        <Separator/>
                         <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
                         <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
                         <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>

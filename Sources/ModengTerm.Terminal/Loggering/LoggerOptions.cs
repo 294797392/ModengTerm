@@ -27,5 +27,11 @@ namespace ModengTerm.Terminal.Loggering
         /// 过滤内容
         /// </summary>
         public string FilterText { get; set; }
+
+        /// <summary>
+        /// true就是胡烈大小写
+        /// false就是不胡忽略大小写
+        /// </summary>
+        public bool IgnoreCase { get; set; }
     }
 }

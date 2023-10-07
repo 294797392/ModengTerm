@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Document\VTPointCollection.cs" />
+    <Compile Remove="ViewModels\VideoTerminal.Drawing.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Wallpapers\img1.jpg" />
     <None Remove="Wallpapers\img2.png" />
     <None Remove="Wallpapers\img3.png" />

@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using XTerminal;
-using XTerminal.Document;
 
 namespace ModengTerm.Rendering
 {

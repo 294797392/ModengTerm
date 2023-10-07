@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,8 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.TextFormatting;
 using XTerminal;
 using XTerminal.Base;
-using XTerminal.Document;
-using XTerminal.Document.Rendering;
 using XTerminal.Parser;
 
 namespace ModengTerm.Rendering

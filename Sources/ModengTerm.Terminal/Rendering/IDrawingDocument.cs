@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Document.Rendering
+namespace ModengTerm.Terminal.Rendering
 {
     /// <summary>
     /// 表示一个用来渲染终端输出的表面

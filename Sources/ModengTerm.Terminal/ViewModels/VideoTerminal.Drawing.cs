@@ -1,11 +1,11 @@
-﻿using ModengTerm.Terminal.Document.Graphics;
+﻿using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Document.Graphics;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Document;
-using XTerminal.Document.Rendering;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -55,7 +55,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public void OnDrawingMouseDown(IVideoTerminal vt, VTPoint location, int clickCount)
+        public void OnDrawingMouseDown(IDrawingVideoTerminal vt, VTPoint location, int clickCount)
         {
             this.drawState = DrawStateEnum.Drawing;
 
@@ -66,7 +66,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.drawGraphics.OnMouseDown(location);
         }
 
-        public void OnDrawingMouseMove(IVideoTerminal vt, VTPoint location)
+        public void OnDrawingMouseMove(IDrawingVideoTerminal vt, VTPoint location)
         {
             if (this.drawState != DrawStateEnum.Drawing)
             {
@@ -76,7 +76,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.drawGraphics.OnMouseMove(location, this.mouseDownPos);
         }
 
-        public void OnDrawingMouseUp(IVideoTerminal vt, VTPoint location)
+        public void OnDrawingMouseUp(IDrawingVideoTerminal vt, VTPoint location)
         {
             this.drawGraphics.OnMouseUp(location, this.mouseDownPos);
 
@@ -95,10 +95,10 @@ namespace ModengTerm.Terminal.ViewModels
             this.drawGraphics = null;
         }
 
-        public void OnDrawingMouseWheel(IVideoTerminal vt, bool upper)
+        public void OnDrawingMouseWheel(IDrawingVideoTerminal vt, bool upper)
         { }
 
-        public void OnDrawingSizeChanged(IVideoTerminal vt, VTRect vtRect)
+        public void OnDrawingSizeChanged(IDrawingVideoTerminal vt, VTRect vtRect)
         { }
 
         private void ScrollGraphics(VTDocument document)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -9,8 +11,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using XTerminal.Document;
-using XTerminal.Document.Rendering;
 
 namespace ModengTerm.Rendering
 {

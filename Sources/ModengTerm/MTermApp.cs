@@ -27,8 +27,6 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
-using XTerminal.Document;
-using XTerminal.Document.Rendering;
 using XTerminal.UserControls;
 using XTerminal.UserControls.OptionsUserControl;
 
@@ -107,7 +105,10 @@ namespace ModengTerm
             this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
             this.OpenedTerminals = new BindableCollection<VideoTerminal>();
             this.ServiceAgent = new LocalServiceAgent();
-            //this.LoggerManager = this.Factory.LookupModule<LoggerManager>();
+            this.ServiceAgent.Initialize();
+
+            this.LoggerManager = new LoggerManager();
+            this.LoggerManager.Initialize();
 
             // 将打开页面新加到OpenedSessionTab页面上
             this.OpenedSessionList.Add(new OpenSessionVM(null));

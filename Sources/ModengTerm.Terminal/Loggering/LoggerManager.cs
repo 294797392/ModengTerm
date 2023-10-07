@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit.Modular;
 using ModengTerm.Base;
+using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -9,50 +10,30 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Document;
 
 namespace ModengTerm.Terminal.Loggering
 {
-    public class LoggerManager //: AppModule<MTermManifest>
+    public class LoggerManager
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("LoggerManager");
+        private static log4net.ILog log4netLogger = log4net.LogManager.GetLogger("LoggerManager");
+
+        /// <summary>
+        /// 写入日志文件的间隔时间，单位是毫秒
+        /// </summary>
+        private const int WriteInterval = 3000;
 
         #endregion
 
         #region 实例变量
 
         private Thread writeThread;
-        private List<LoggerContext> loggerList;
-        private List<LoggerContext> loggerListCopy;
-        private bool changed;
-        private object listLock;
         private ManualResetEvent loggerEvent;
-        private bool allPaused;
-
-        #endregion
-
-        #region AppModule
-
-        protected int OnInitialize()
-        {
-            this.loggerEvent = new ManualResetEvent(false);
-            this.listLock = new object();
-            this.loggerList = new List<LoggerContext>();
-            this.loggerListCopy = new List<LoggerContext>();
-
-            this.writeThread = new Thread(this.WriteThreadProc);
-            this.writeThread.IsBackground = true;
-            this.writeThread.Start();
-
-            return ResponseCode.SUCCESS;
-        }
-
-        protected void OnRelease()
-        {
-            throw new NotImplementedException();
-        }
+        private List<VTLogger> loggerList;
+        private List<VTLogger> loggerListCopy;
+        private bool listChanged;
+        private object listLock;
 
         #endregion
 
@@ -62,141 +43,172 @@ namespace ModengTerm.Terminal.Loggering
 
         #region 公开接口
 
-        public void Start(VideoTerminal vt, LoggerOptions options)
+        public int Initialize()
         {
+            this.loggerEvent = new ManualResetEvent(false);
+            this.loggerList = new List<VTLogger>();
+            this.loggerListCopy = new List<VTLogger>();
+            this.listChanged = false;
+            this.listLock = new object();
+
+            this.writeThread = new Thread(this.WriteThreadProc);
+            this.writeThread.IsBackground = true;
+            this.writeThread.Start();
+
+            return ResponseCode.SUCCESS;
+        }
+
+        public void Release()
+        {
+        }
+
+        public void Start(IVideoTerminal vt, LoggerOptions options)
+        {
+            VTLogger logger = vt.Logger;
+            if (logger != null)
+            {
+                return;
+            }
+
             LoggerFilter filter = LoggerFilterFactory.Create(options.FilterType);
             filter.FilterText = options.FilterText;
 
-            LoggerContext loggerContext = new LoggerContext()
+            logger = new VTLogger()
             {
-                Options = options,
-                VideoTerminal = vt,
                 Filter = filter,
-                NextLine = 0,
-                Builder = new StringBuilder()
+                Builder = new StringBuilder(),
+                CreateLine = VTUtils.GetCreateLineDelegate(options.FileType),
+                FilePath = options.FilePath,
+                FileType = options.FileType,
+                IsPaused = false
             };
+
+            vt.Logger = logger;
+            vt.LinePrinted += this.VideoTerminal_LinePrinted;
 
             lock (this.listLock)
             {
-                this.changed = true;
-                this.loggerList.Add(loggerContext);
+                this.loggerList.Add(logger);
+                this.listChanged = true;
             }
 
             this.loggerEvent.Set();
         }
 
-        public void Stop(VideoTerminal vt)
+        public void Stop(IVideoTerminal vt)
         {
-            LoggerContext loggerContext = this.loggerList.FirstOrDefault(v => v.VideoTerminal == vt);
-            if (loggerContext != null)
+            VTLogger logger = vt.Logger;
+            if (logger == null)
             {
-                lock (this.listLock)
-                {
-                    loggerContext.Dispose();
-                    this.loggerList.Remove(loggerContext);
-                    this.changed = true;
-                }
-            }
-        }
-
-        public void Pause(VideoTerminal vt)
-        {
-            LoggerContext loggerContext = this.loggerList.FirstOrDefault(v => v.VideoTerminal == vt);
-            if (loggerContext == null)
-            {
-                logger.WarnFormat("LoggerPause失败, 未找到Logger");
                 return;
             }
 
-            loggerContext.IsPaused = true;
+            vt.Logger = null;
+            vt.LinePrinted -= this.VideoTerminal_LinePrinted;
+            logger.Dispose();
 
-            this.allPaused = this.loggerList.All(v => v.IsPaused);
+            lock (this.listLock)
+            {
+                this.loggerList.Remove(logger);
+                this.listChanged = true;
+            }
         }
 
-        public void Resume(VideoTerminal vt)
+        public void Pause(IVideoTerminal vt)
         {
-            LoggerContext loggerContext = this.loggerList.FirstOrDefault(v => v.VideoTerminal == vt);
-            if (loggerContext == null)
+            VTLogger logger = vt.Logger as VTLogger;
+            if (logger == null)
             {
-                logger.WarnFormat("LoggerResume失败, 未找到Logger");
                 return;
             }
 
-            loggerContext.IsPaused = false;
+            logger.IsPaused = true;
+        }
 
-            this.allPaused = false;
+        public void Resume(IVideoTerminal vt)
+        {
+            VTLogger logger = vt.Logger as VTLogger;
+            if (logger == null)
+            {
+                return;
+            }
 
-            this.loggerEvent.Set();
+            logger.IsPaused = false;
         }
 
         #endregion
 
         #region 事件处理器
 
+        /// <summary>
+        /// 当行被打印的时候触发
+        /// </summary>
+        /// <param name="vt">触发该事件的终端</param>
+        /// <param name="historyLine">被打印出来的行数据</param>
+        private void VideoTerminal_LinePrinted(IVideoTerminal vt, VTHistoryLine historyLine)
+        {
+            VTLogger logger = vt.Logger;
+            if (logger.IsPaused)
+            {
+                // 如果该日志记录器被暂停，那么什么都不记录
+                return;
+            }
+
+            lock (logger.Builder)
+            {
+                logger.CreateLine(historyLine.Characters, logger.Builder, 0, historyLine.Characters.Count, logger.Filter);
+            }
+        }
+
         private void WriteThreadProc()
         {
-            logger.InfoFormat("日志记录线程启动成功");
+            log4netLogger.InfoFormat("写日志线程启动成功");
 
             while (true)
             {
-                //if (this.loggerListCopy.Count == 0 || this.allPaused)
-                //{
-                //    this.loggerEvent.Reset();
-                //    this.loggerEvent.WaitOne();
-                //}
+                if (this.loggerList.Count == 0)
+                {
+                    this.loggerEvent.Reset();
+                    this.loggerEvent.WaitOne();
+                }
 
-                //if (this.changed)
-                //{
-                //    lock (this.listLock)
-                //    {
-                //        this.loggerListCopy.Clear();
-                //        this.loggerListCopy.AddRange(this.loggerList);
-                //        this.changed = false;
-                //    }
-                //}
+                if (this.listChanged)
+                {
+                    lock (this.listLock)
+                    {
+                        this.loggerListCopy.Clear();
+                        this.loggerListCopy.AddRange(this.loggerList);
+                        this.listChanged = false;
+                    }
+                }
 
-                //foreach (LoggerContext context in this.loggerListCopy)
-                //{
-                //    VideoTerminal vt = context.VideoTerminal;
+                foreach (VTLogger vtLogger in this.loggerListCopy)
+                {
+                    StringBuilder builder = vtLogger.Builder;
+                    if (builder.Length == 0)
+                    {
+                        continue;
+                    }
 
-                //    // 最后一行不记录，只记录到倒数第二行
-                //    // 因为最后一行的数据有可能会变化
+                    string content = string.Empty;
+                    lock (vtLogger.Builder)
+                    {
+                        content = builder.ToString();
+                        builder.Clear();
+                    }
+                    string filePath = vtLogger.FilePath;
 
-                //    try
-                //    {
-                //        if (vt.lastHistoryLine.PhysicsRow == context.NextLine)
-                //        {
-                //            continue;
-                //        }
+                    try
+                    {
+                        File.AppendAllText(filePath, content);
+                    }
+                    catch (Exception ex)
+                    {
+                        log4netLogger.ErrorFormat("写入日志文件异常, {0}, {1}", filePath, ex);
+                    }
+                }
 
-                //        VTHistoryLine startLine = vt.historyLines[context.NextLine];
-                //        VTHistoryLine endLine = vt.lastHistoryLine.PreviousLine;
-
-                //        // 先对日志进行过滤
-                //        VTUtils.BuildDocument(startLine, endLine, 0, endLine.Characters.Count - 1, context.Builder, context.FileType, context.Filter);
-
-                //        string text = context.Builder.ToString();
-
-                //        try
-                //        {
-                //            File.AppendAllText(context.FilePath, text);
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            logger.Error("保存日志文件异常", ex);
-                //        }
-
-                //        context.Builder.Clear();
-
-                //        context.NextLine = vt.lastHistoryLine.PhysicsRow;
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        logger.Error("Logger运行异常", ex);
-                //    }
-                //}
-
-                Thread.Sleep(3000);
+                Thread.Sleep(WriteInterval);
             }
         }
 

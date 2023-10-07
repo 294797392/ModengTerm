@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Parser;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     public class VTextStyle
     {

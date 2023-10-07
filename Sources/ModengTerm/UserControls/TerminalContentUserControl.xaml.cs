@@ -1,11 +1,13 @@
 ﻿using DotNEToolkit;
 using Microsoft.Win32;
 using ModengTerm;
+using ModengTerm.Base;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
+using ModengTerm.Terminal.Rendering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using ModengTerm.Windows;
@@ -29,8 +31,6 @@ using WPFToolkit.Utility;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
-using XTerminal.Document;
-using XTerminal.Document.Rendering;
 using XTerminal.Enumerations;
 
 namespace XTerminal.UserControls
@@ -38,7 +38,7 @@ namespace XTerminal.UserControls
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalContentUserControl : SessionContent, IVideoTerminal
+    public partial class TerminalContentUserControl : SessionContent, IDrawingVideoTerminal
     {
         #region 类变量
 
@@ -81,7 +81,7 @@ namespace XTerminal.UserControls
             this.userInput = new UserInput();
             this.Background = Brushes.Transparent;
         }
-
+        
         private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
         {
             switch (filterIndex)
@@ -93,7 +93,7 @@ namespace XTerminal.UserControls
                     throw new NotImplementedException();
             }
         }
-
+        
         private void SaveToFile(ContentScopeEnum saveMode)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -341,7 +341,7 @@ namespace XTerminal.UserControls
 
         private void MenuItemStartLogger_Click(object sender, RoutedEventArgs e)
         {
-            LoggerOptionsWindow window = new LoggerOptionsWindow();
+            LoggerOptionsWindow window = new LoggerOptionsWindow(this.videoTerminal);
             window.Owner = Window.GetWindow(this);
             if ((bool)window.ShowDialog())
             {
@@ -389,7 +389,7 @@ namespace XTerminal.UserControls
 
         #endregion
 
-        #region IVideoTerminal
+        #region IVideoTerminalRenderer
 
         public IDrawingDocument CreateDocument()
         {

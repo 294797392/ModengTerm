@@ -4,7 +4,6 @@ using ModengTerm.Terminal.Loggering;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using XTerminal.Document;
 using XTerminal.Parser;
 using System.Linq;
 using XTerminal.Base.Definitions;
@@ -45,6 +44,8 @@ namespace ModengTerm.Terminal
         public double FontSize { get; set; }
     }
 
+    public delegate void CreateLineDelegate(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, LoggerFilter filter = null);
+
     public static class VTUtils
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTUtils");
@@ -55,7 +56,6 @@ namespace ModengTerm.Terminal
         private static List<string> AllResourceNames = new List<string>();
         private static Assembly ResourceAssembly = null;
 
-        private delegate void CreateLineDelegate(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter);
         private const string HtmlTemplate =
             "<html>" +
             "<head>" +
@@ -77,9 +77,17 @@ namespace ModengTerm.Terminal
             ErrorBitmapImage.EndInit();
         }
 
-        private static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter)
+        internal static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, LoggerFilter filter = null)
         {
             string text = VTUtils.CreatePlainText(characters, startIndex, count);
+            if (filter != null)
+            {
+                if (!filter.Filter(text))
+                {
+                    return;
+                }
+            }
+
             if (string.IsNullOrEmpty(text))
             {
                 builder.AppendLine();
@@ -90,7 +98,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        private static void CreateHtml(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, CreateContentParameter parameter)
+        internal static void CreateHtml(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, LoggerFilter filter = null)
         {
             if (characters.Count == 0)
             {
@@ -98,9 +106,18 @@ namespace ModengTerm.Terminal
                 return;
             }
 
+            string text = VTUtils.CreatePlainText(characters, startIndex, count);
+            if (filter != null)
+            {
+                if (!filter.Filter(text))
+                {
+                    return;
+                }
+            }
+
             for (int i = 0; i < count; i++)
             {
-                VTCharacter character = characters[i];
+                VTCharacter character = characters[startIndex + i];
 
                 builder.Append("<span style='");
 
@@ -129,7 +146,7 @@ namespace ModengTerm.Terminal
             builder.AppendLine("</br>");
         }
 
-        private static CreateLineDelegate GetCreateLineDelegate(LogFileTypeEnum fileType)
+        internal static CreateLineDelegate GetCreateLineDelegate(LogFileTypeEnum fileType)
         {
             switch (fileType)
             {
@@ -186,24 +203,24 @@ namespace ModengTerm.Terminal
             if (charactersList.Count == 1)
             {
                 // 只有一行
-                createLine(charactersList[0], builder, startCharIndex, endCharIndex - startCharIndex + 1, parameter);
+                createLine(charactersList[0], builder, startCharIndex, endCharIndex - startCharIndex + 1);
             }
             else
             {
                 // 第一行
                 List<VTCharacter> first = charactersList.FirstOrDefault();
-                createLine(first, builder, startCharIndex, first.Count - startCharIndex, parameter);
+                createLine(first, builder, startCharIndex, first.Count - startCharIndex);
 
                 // 中间的行
                 for (int i = 1; i < charactersList.Count - 1; i++)
                 {
                     List<VTCharacter> characters = charactersList[i];
-                    createLine(characters, builder, 0, characters.Count, parameter);
+                    createLine(characters, builder, 0, characters.Count);
                 }
 
                 // 最后一行
                 List<VTCharacter> last = charactersList.LastOrDefault();
-                createLine(last, builder, 0, endCharIndex + 1, parameter);
+                createLine(last, builder, 0, endCharIndex + 1);
             }
 
             if (fileType == LogFileTypeEnum.HTML)

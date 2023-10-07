@@ -14,7 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using XTerminal;
 using XTerminal.Base;
-using XTerminal.Document;
 using XTerminal.Parser;
 
 namespace ModengTerm.Rendering

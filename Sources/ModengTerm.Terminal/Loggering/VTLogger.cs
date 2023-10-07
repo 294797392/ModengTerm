@@ -7,14 +7,11 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Loggering
 {
-    internal class LoggerContext
+    public class VTLogger
     {
-        public StringBuilder Builder { get; set; }
+        public CreateLineDelegate CreateLine { get; set; }
 
-        /// <summary>
-        /// 过滤参数
-        /// </summary>
-        public LoggerOptions Options { get; set; }
+        public StringBuilder Builder { get; set; }
 
         /// <summary>
         /// 过滤器
@@ -22,30 +19,14 @@ namespace ModengTerm.Terminal.Loggering
         public LoggerFilter Filter { get; set; }
 
         /// <summary>
-        /// 终端
-        /// </summary>
-        public VideoTerminal VideoTerminal { get; set; }
-
-        /// <summary>
         /// 文件格式
         /// </summary>
-        public LogFileTypeEnum FileType
-        {
-            get { return this.Options.FileType; }
-        }
+        public LogFileTypeEnum FileType { get; set; }
 
         /// <summary>
         /// 文件路径
         /// </summary>
-        public string FilePath
-        {
-            get { return this.Options.FilePath; }
-        }
-
-        /// <summary>
-        /// 下一次要记录的行的索引
-        /// </summary>
-        public int NextLine { get; set; }
+        public string FilePath { get; set; }
 
         public bool IsPaused { get; set; }
 

@@ -1,11 +1,11 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Document.Rendering;
 
-namespace XTerminal.Document
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 文本元素的基类

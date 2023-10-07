@@ -1,10 +1,11 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Document.Rendering
+namespace ModengTerm.Terminal.Rendering
 {
     /// <summary>
     /// 封装WPF, Winform里的画图对象

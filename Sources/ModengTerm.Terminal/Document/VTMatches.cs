@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Document
 {
+    /// <summary>
+    /// 存储与搜索的关键字匹配的数据内容
+    /// </summary>
     public class VTMatches
     {
         /// <summary>
