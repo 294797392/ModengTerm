@@ -46,6 +46,7 @@ namespace ModengTerm.ViewModels
         private string terminalRows;
         private string terminalColumns;
         private string maxScrollback;
+        private string maxCliboardHistory;
 
         private SessionTypeVM selectedSessionType;
         private OptionTreeVM optionTreeVM;
@@ -237,6 +238,25 @@ namespace ModengTerm.ViewModels
                 {
                     this.maxScrollback = value;
                     this.NotifyPropertyChanged("MaxScrollback");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 剪贴板历史记录最大数
+        /// </summary>
+        public string MaxClipboardHistory
+        {
+            get
+            {
+                return this.maxCliboardHistory;
+            }
+            set
+            {
+                if (this.maxCliboardHistory != value)
+                {
+                    this.maxCliboardHistory = value;
+                    this.NotifyPropertyChanged("MaxClipboardHistory");
                 }
             }
         }
@@ -446,6 +466,7 @@ namespace ModengTerm.ViewModels
             this.TerminalTypeList.AddRange(Enum.GetValues(typeof(TerminalTypeEnum)).Cast<TerminalTypeEnum>());
             this.TerminalTypeList.SelectedItem = MTermConsts.DefaultTerminalType;
             this.MaxScrollback = MTermConsts.DefaultTerminalScrollback.ToString();
+            this.MaxClipboardHistory = MTermConsts.DefaultMaxClipboardHistory.ToString();
 
             #endregion
 
@@ -805,6 +826,13 @@ namespace ModengTerm.ViewModels
                 return false;
             }
 
+            int maxCliboardHistory;
+            if(!int.TryParse(this.MaxClipboardHistory, out maxCliboardHistory))
+            {
+                MMessageBox.Info("请输入正确的剪贴板历史记录数");
+                return false;
+            }
+
             TerminalTypeEnum terminalType = this.TerminalTypeList.SelectedItem;
 
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
@@ -814,6 +842,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
             session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK, scrollback);
+            session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
 
             return true;
         }

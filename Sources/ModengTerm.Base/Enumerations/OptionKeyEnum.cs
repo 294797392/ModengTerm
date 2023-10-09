@@ -53,21 +53,25 @@ namespace XTerminal.Base.Enumerations
 
         #region 串口 501 - 1000
 
-        SERIAL_PORT_NAME,
-        SERIAL_PORT_BAUD_RATE,
-        SERIAL_PORT_DATA_BITS,
-        SERIAL_PORT_STOP_BITS,
-        SERIAL_PORT_PARITY,
-        SERIAL_PORT_HANDSHAKE,
+        SERIAL_PORT_NAME = 501,
+        SERIAL_PORT_BAUD_RATE = 502,
+        SERIAL_PORT_DATA_BITS = 503,
+        SERIAL_PORT_STOP_BITS = 504,
+        SERIAL_PORT_PARITY = 505,
+        SERIAL_PORT_HANDSHAKE = 506,
 
         #endregion
 
-        #region 终端通用
+        #region 终端通用 1001 - 1500
 
         /// <summary>
         /// 最多可以回滚的行数
         /// </summary>
-        TERM_MAX_SCROLLBACK,
+        TERM_MAX_SCROLLBACK = 1001,
+        /// <summary>
+        /// 最多可以保存的剪贴板历史记录数据
+        /// </summary>
+        TERM_MAX_CLIPBOARD_HISTORY = 1002,
 
         #endregion
 

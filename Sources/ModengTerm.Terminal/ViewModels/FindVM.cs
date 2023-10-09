@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Document.Graphics;
+using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -185,7 +186,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.matchResult = new List<MatchResult>();
 
             this.matchesLine = new VTMatchesLine();
-            this.videoTerminal.TopMostDocument.CreateDrawingObject(this.matchesLine);
+            this.videoTerminal.TopMostCanvas.CreateDrawingObject(this.matchesLine);
         }
 
         #endregion
@@ -310,19 +311,7 @@ namespace ModengTerm.Terminal.ViewModels
             VTextLine matchesLine = this.videoTerminal.ActiveDocument.FindLine(matches.PhysicsRow);
             if (matchesLine == null)
             {
-                VTScrollInfo scrollInfo = this.videoTerminal.ScrollInfo;
-
-                int scrollTo = matches.PhysicsRow - this.videoTerminal.RowSize / 2;
-                if (scrollTo < scrollInfo.ScrollMin)
-                {
-                    scrollTo = scrollInfo.ScrollMin;
-                }
-                else if (scrollTo > scrollInfo.ScrollMax)
-                {
-                    scrollTo = scrollInfo.ScrollMax;
-                }
-
-                this.videoTerminal.ScrollTo(scrollTo);
+                this.videoTerminal.ScrollTo(matches.PhysicsRow, ScrollOptions.ScrollToMiddle);
             }
         }
 
@@ -479,7 +468,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public void Reset()
+        public void Release()
         {
             this.stopFind = true;
             this.dirty = true;
@@ -490,6 +479,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.matchesLine.TextLine = null;
             this.matchesLine.RequestInvalidate();
             this.Message = string.Empty;
+
+            this.videoTerminal.TopMostCanvas.DeleteDrawingObject(this.matchesLine.DrawingObject);
         }
 
         #endregion

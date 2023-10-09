@@ -1,0 +1,85 @@
+﻿<Window x:Class="ModengTerm.Windows.ClipboardHistoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModengTerm.Windows"
+        xmlns:mcontrol="clr-namespace:ModengTerm.Controls"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
+        mc:Ignorable="d"
+        Title="{DynamicResource ResourceKey=UIText4001}"
+        Height="500" Width="400"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource ResourceKey=Brush500}"
+        x:Name="Window1">
+
+    <Window.Resources>
+
+        <Style x:Key="StyleMTermButtonLocal" TargetType="{x:Type mcontrol:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
+            <Setter Property="Width" Value="16"/>
+            <Setter Property="Height" Value="16"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="{x:Null}"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">
+
+            <ListBox x:Name="ListBoxClipboardHistory" DataContext="{Binding Path=HistoryList}" 
+                     ItemsSource="{Binding}" Style="{StaticResource ResourceKey=StyleListBoxClipboardHistory}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="{Binding Path=Content}"/>
+
+                            <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                                <mcontrol:MTermButton ToolTip="定位到该位置" SVGPath="{StaticResource ResourceKey=SVGIcon1}"
+                                                      Style="{StaticResource ResourceKey=StyleMTermButtonLocal}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="Locate" TargetObject="{Binding ElementName=Window1, Path=DataContext}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </mcontrol:MTermButton>
+
+                                <mcontrol:MTermButton ToolTip="发送到窗口" SVGPath="{StaticResource ResourceKey=SVGIcon2}"
+                                                      Style="{StaticResource ResourceKey=StyleMTermButtonLocal}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="SendToTerminal" TargetObject="{Binding ElementName=Window1, Path=DataContext}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </mcontrol:MTermButton>
+
+                                <mcontrol:MTermButton ToolTip="发送到所有窗口" SVGPath="{StaticResource ResourceKey=SVGIcon3}"
+                                                      Style="{StaticResource ResourceKey=StyleMTermButtonLocal}">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <ei:CallMethodAction MethodName="SendToAllTerminal" TargetObject="{Binding ElementName=Window1, Path=DataContext}"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </mcontrol:MTermButton>
+
+                            </StackPanel>
+
+                        </Grid>
+
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+        </ScrollViewer>
+
+    </Grid>
+</Window>

@@ -12,24 +12,22 @@ namespace ModengTerm.Terminal.Rendering
     /// 终端显示屏
     /// 显示屏里包含多个Surface，Surface用来真正渲染终端输出
     /// </summary>
-    public interface IDrawingVideoTerminal
+    public interface IDrawingWindow
     {
         /// <summary>
         /// 创建一个画板用来渲染文档
         /// </summary>
         /// <param name="options">渲染选项</param>
         /// <returns></returns>
-        IDrawingDocument CreateDocument();
+        IDrawingCanvas CreateCanvas();
 
-        void InsertDocument(int index, IDrawingDocument document);
-
-        void RemoveDocument(IDrawingDocument canvas);
+        void InsertCanvas(int index, IDrawingCanvas canvas);
 
         /// <summary>
         /// 显示或者隐藏文档
         /// </summary>
-        /// <param name="document"></param>
-        void VisibleDocument(IDrawingDocument document, bool visible);
+        /// <param name="canvas"></param>
+        void VisibleCanvas(IDrawingCanvas canvas, bool visible);
 
         /// <summary>
         /// 获取滚动条信息
@@ -51,13 +49,11 @@ namespace ModengTerm.Terminal.Rendering
         void SetScrollVisible(bool visible);
 
         /// <summary>
-        /// 测量文本
+        /// 获取字形信息
         /// </summary>
-        /// <param name="text"></param>
-        /// <param name="fontSize"></param>
-        /// <param name="fontFamily"></param>
+        /// <param name="textStyle">字体样式</param>
         /// <returns></returns>
-        VTextMetrics MeasureText(string text, double fontSize, string fontFamily);
+        VTypeface GetTypeface(VTextStyle textStyle);
 
         /// <summary>
         /// 获取终端屏幕的显示区域

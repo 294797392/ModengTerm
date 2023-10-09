@@ -31,6 +31,9 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 公开事件
 
+        /// <summary>
+        /// 当某一行被完整打印之后触发
+        /// </summary>
         public event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
 
         #endregion
@@ -120,9 +123,9 @@ namespace ModengTerm.Terminal.ViewModels
 
         #endregion
 
-        private IDrawingDocument mainCanvas;
-        private IDrawingDocument alternateCanvas;
-        private IDrawingDocument backgroundCanvas;
+        private IDrawingCanvas mainCanvas;
+        private IDrawingCanvas alternateCanvas;
+        private IDrawingCanvas backgroundCanvas;
         private VTWallpaper wallpaper;
 
         #region 最上层的备用图形
@@ -132,7 +135,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// 1. 当搜索到一个关键字之后，高亮显示该关键字
         /// 2. 文本选中区域
         /// </summary>
-        internal IDrawingDocument topMostCanvas;
+        internal IDrawingCanvas topMostCanvas;
 
         /// <summary>
         /// 放到一个集合里做渲染操作
@@ -163,7 +166,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 提供终端屏幕的功能
         /// </summary>
-        private IDrawingVideoTerminal videoTerminal;
+        private IDrawingWindow drawingWindow;
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -187,6 +190,11 @@ namespace ModengTerm.Terminal.ViewModels
         private int scrollbackMax; // 最多可以有多少滚动行数
 
         private bool sendAll;
+
+        /// <summary>
+        /// 保存字形信息
+        /// </summary>
+        private VTypeface typeface;
 
         #endregion
 
@@ -243,7 +251,7 @@ namespace ModengTerm.Terminal.ViewModels
         public VTDocument MainDocument { get { return this.mainDocument; } }
         public VTDocument AlternateDocument { get { return this.alternateDocument; } }
 
-        public IDrawingDocument TopMostDocument { get { return this.topMostCanvas; } }
+        public IDrawingCanvas TopMostCanvas { get { return this.topMostCanvas; } }
 
         public SessionTransport SessionTransport { get { return this.sessionTransport; } }
 
@@ -332,7 +340,7 @@ namespace ModengTerm.Terminal.ViewModels
             XTermSession sessionInfo = this.Session;
 
             this.uiSyncContext = SynchronizationContext.Current;
-            this.videoTerminal = this.Content as IDrawingVideoTerminal;
+            this.drawingWindow = this.Content as IDrawingWindow;
 
             // DECAWM
             this.autoWrapMode = false;
@@ -349,16 +357,15 @@ namespace ModengTerm.Terminal.ViewModels
             this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
             this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR);
             this.scrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK);
-            this.mainCanvas = this.videoTerminal.CreateDocument();
-            this.alternateCanvas = this.videoTerminal.CreateDocument();
-            this.topMostCanvas = this.videoTerminal.CreateDocument();
+            this.topMostCanvas = this.drawingWindow.CreateCanvas();
             this.topMostElements = new List<VTDocumentElement>();
+            this.typeface = this.drawingWindow.GetTypeface(new VTextStyle() { FontSize = this.fontSize, FontFamily = this.fontFamily });
 
-            this.videoTerminal.InsertDocument(0, this.topMostCanvas);
+            this.drawingWindow.InsertCanvas(0, this.topMostCanvas);
 
             #region 初始化历史记录管理器
 
-            this.scrollInfo = new VTScrollInfo(this.videoTerminal);
+            this.scrollInfo = new VTScrollInfo(this.drawingWindow);
             this.scrollInfo.ScrollbackMax = this.scrollbackMax;
             this.scrollInfo.Initialize();
 
@@ -366,7 +373,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化终端大小
 
-            this.vtRect = this.videoTerminal.GetDisplayRect();
+            this.vtRect = this.drawingWindow.GetDisplayRect();
 
             this.sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
             switch (this.sizeMode)
@@ -417,9 +424,6 @@ namespace ModengTerm.Terminal.ViewModels
             int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
 
-            // 计算光标大小
-            VTextMetrics cursorSize = this.videoTerminal.MeasureText(" ", fontSize, fontFamily);
-
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
                 ColumnSize = this.colSize,
@@ -428,20 +432,23 @@ namespace ModengTerm.Terminal.ViewModels
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
                 CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
-                CursorSize = new VTSize(cursorSize.Width, cursorSize.Height),
+                CursorSize = new VTSize(this.typeface.Width, this.typeface.Height),
                 FontFamily = fontFamily,
                 FontSize = fontSize,
                 ForegroundColor = this.foregroundColor,
                 BackgroundColor = this.backgroundColor,
-                ColorTable = this.colorTable
+                ColorTable = this.colorTable,
+                DrawingWindow = this.drawingWindow
             };
-            this.mainDocument = new VTDocument(documentOptions, this.mainCanvas, false) { Name = "MainDocument", Rect = this.vtRect };
-            this.alternateDocument = new VTDocument(documentOptions, this.alternateCanvas, true) { Name = "AlternateDocument", Rect = this.vtRect };
+            this.mainDocument = new VTDocument(documentOptions, false) { Name = "MainDocument", Rect = this.vtRect };
+            this.alternateDocument = new VTDocument(documentOptions, true) { Name = "AlternateDocument", Rect = this.vtRect };
+            this.mainCanvas = this.mainDocument.Canvas;
+            this.alternateCanvas = this.alternateDocument.Canvas;
             this.activeDocument = this.mainDocument;
-            this.videoTerminal.InsertDocument(0, this.mainDocument.Drawing);
-            this.videoTerminal.InsertDocument(0, this.alternateDocument.Drawing);
-            this.videoTerminal.VisibleDocument(this.mainDocument.Drawing, true);
-            this.videoTerminal.VisibleDocument(this.alternateDocument.Drawing, false);
+            this.drawingWindow.InsertCanvas(0, this.mainDocument.Canvas);
+            this.drawingWindow.InsertCanvas(0, this.alternateDocument.Canvas);
+            this.drawingWindow.VisibleCanvas(this.mainDocument.Canvas, true);
+            this.drawingWindow.VisibleCanvas(this.alternateDocument.Canvas, false);
 
             #endregion
 
@@ -474,8 +481,8 @@ namespace ModengTerm.Terminal.ViewModels
                 Rect = this.vtRect,
                 Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT)
             };
-            this.backgroundCanvas = this.videoTerminal.CreateDocument();
-            this.videoTerminal.InsertDocument(0, this.backgroundCanvas);
+            this.backgroundCanvas = this.drawingWindow.CreateCanvas();
+            this.drawingWindow.InsertCanvas(0, this.backgroundCanvas);
             this.backgroundCanvas.CreateDrawingObject(this.wallpaper);
             this.wallpaper.RequestInvalidate();
 
@@ -520,37 +527,17 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 复制当前选中的行
+        /// 获取当前使用鼠标选中的段落区域
         /// </summary>
-        public void CopySelection()
+        /// <returns></returns>
+        public VTParagraph GetSelectedParagraph()
         {
-            string text = this.CreateContent(ContentScopeEnum.SaveSelected, LogFileTypeEnum.PlainText);
-
-            // 调用剪贴板API复制到剪贴板
-            Clipboard.SetText(text);
-        }
-
-        /// <summary>
-        /// 将剪贴板的数据发送给会话
-        /// </summary>
-        /// <returns>发送成功返回SUCCESS，失败返回错误码</returns>
-        public int Paste()
-        {
-            string text = Clipboard.GetText();
-            if (string.IsNullOrEmpty(text))
+            if (this.textSelection.IsEmpty)
             {
-                return ResponseCode.SUCCESS;
+                return VTParagraph.Empty;
             }
 
-            byte[] bytes = this.outputEncoding.GetBytes(text);
-
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("粘贴数据失败, {0}", code);
-            }
-
-            return code;
+            return this.CreateParagraph(ParagraphTypeEnum.SaveSelected, LogFileTypeEnum.PlainText);
         }
 
         /// <summary>
@@ -582,19 +569,20 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 根据scope生成内容
+        /// 创建指定的段落内容
         /// </summary>
-        /// <param name="scope"></param>
-        /// <param name="fileType"></param>
+        /// <param name="paragraphType">段落类型</param>
+        /// <param name="fileType">要创建的内容格式</param>
         /// <returns></returns>
-        public string CreateContent(ContentScopeEnum scope, LogFileTypeEnum fileType)
+        public VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, LogFileTypeEnum fileType)
         {
             List<List<VTCharacter>> characters = new List<List<VTCharacter>>();
-            int startIndex = 0, endIndex = 0;
+            int startCharacterIndex = 0, endCharacterIndex = 0;
+            int firstPhysicsRow = 0, lastPhysicsRow = 0;
 
-            switch (scope)
+            switch (paragraphType)
             {
-                case ContentScopeEnum.SaveAll:
+                case ParagraphTypeEnum.SaveAll:
                     {
                         if (this.activeDocument.IsAlternate)
                         {
@@ -606,8 +594,10 @@ namespace ModengTerm.Terminal.ViewModels
                                 current = current.NextLine;
                             }
 
-                            startIndex = 0;
-                            endIndex = Math.Max(0, this.activeDocument.LastLine.Characters.Count - 1);
+                            startCharacterIndex = 0;
+                            endCharacterIndex = Math.Max(0, this.activeDocument.LastLine.Characters.Count - 1);
+                            firstPhysicsRow = this.activeDocument.FirstLine.PhysicsRow;
+                            lastPhysicsRow = this.activeDocument.LastLine.PhysicsRow;
                         }
                         else
                         {
@@ -615,17 +605,19 @@ namespace ModengTerm.Terminal.ViewModels
                             if (!this.scrollInfo.TryGetHistories(this.scrollInfo.FirstLine.PhysicsRow, this.scrollInfo.LastLine.PhysicsRow, out historyLines))
                             {
                                 logger.ErrorFormat("SaveAll失败, 有的历史记录为空");
-                                return string.Empty;
+                                return VTParagraph.Empty;
                             }
 
                             characters.AddRange(historyLines.Select(v => v.Characters));
-                            startIndex = 0;
-                            endIndex = this.scrollInfo.LastLine.Characters.Count - 1;
+                            startCharacterIndex = 0;
+                            endCharacterIndex = this.scrollInfo.LastLine.Characters.Count - 1;
+                            firstPhysicsRow = this.scrollInfo.FirstLine.PhysicsRow;
+                            lastPhysicsRow = this.scrollInfo.LastLine.PhysicsRow;
                         }
                         break;
                     }
 
-                case ContentScopeEnum.SaveDocument:
+                case ParagraphTypeEnum.SaveDocument:
                     {
                         VTextLine current = this.activeDocument.FirstLine;
                         while (current != null)
@@ -634,20 +626,24 @@ namespace ModengTerm.Terminal.ViewModels
                             current = current.NextLine;
                         }
 
-                        startIndex = 0;
-                        endIndex = Math.Max(0, this.activeDocument.LastLine.Characters.Count - 1);
+                        startCharacterIndex = 0;
+                        endCharacterIndex = Math.Max(0, this.activeDocument.LastLine.Characters.Count - 1);
+                        firstPhysicsRow = this.activeDocument.FirstLine.PhysicsRow;
+                        lastPhysicsRow = this.activeDocument.LastLine.PhysicsRow;
                         break;
                     }
 
-                case ContentScopeEnum.SaveSelected:
+                case ParagraphTypeEnum.SaveSelected:
                     {
                         if (this.textSelection.IsEmpty)
                         {
-                            return string.Empty;
+                            return VTParagraph.Empty;
                         }
 
                         int topRow, bottomRow;
-                        this.textSelection.Normalize(out topRow, out bottomRow, out startIndex, out endIndex);
+                        this.textSelection.Normalize(out topRow, out bottomRow, out startCharacterIndex, out endCharacterIndex);
+                        firstPhysicsRow = topRow;
+                        lastPhysicsRow = bottomRow;
 
                         if (this.activeDocument.IsAlternate)
                         {
@@ -671,7 +667,7 @@ namespace ModengTerm.Terminal.ViewModels
                             if (!this.scrollInfo.TryGetHistories(topRow, bottomRow - topRow + 1, out historyLines))
                             {
                                 logger.ErrorFormat("SaveSelected失败, 有的历史记录为空");
-                                return string.Empty;
+                                return VTParagraph.Empty;
                             }
                             characters.AddRange(historyLines.Select(v => v.Characters));
                         }
@@ -686,8 +682,8 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 SessionName = this.Session.Name,
                 CharactersList = characters,
-                StartCharacterIndex = startIndex,
-                EndCharacterIndex = endIndex,
+                StartCharacterIndex = startCharacterIndex,
+                EndCharacterIndex = endCharacterIndex,
                 ContentType = fileType,
                 Background = this.backgroundColor,
                 FontSize = this.fontSize,
@@ -695,7 +691,19 @@ namespace ModengTerm.Terminal.ViewModels
                 Foreground = this.foregroundColor
             };
 
-            return VTUtils.CreateContent(parameter);
+            string text = VTUtils.CreateContent(parameter);
+
+            return new VTParagraph()
+            {
+                Content = text,
+                CreationTime = DateTime.Now,
+                StartCharacterIndex = startCharacterIndex,
+                EndCharacterIndex = endCharacterIndex,
+                FirstPhysicsRow = firstPhysicsRow,
+                LastPhysicsRow = lastPhysicsRow,
+                CharacterList = characters,
+                IsAlternate = this.activeDocument.IsAlternate
+            };
         }
 
         /// <summary>
@@ -726,13 +734,65 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        public void SendInput(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            byte[] bytes = this.outputEncoding.GetBytes(text);
+
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("粘贴数据失败, {0}", code);
+            }
+        }
+
         /// <summary>
         /// 滚动并重新渲染
         /// </summary>
-        /// <param name="scrollValue">要滚动到的值</param>
-        public void ScrollTo(int scrollValue)
+        /// <param name="physicsRow">要滚动到的物理行数</param>
+        public void ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop)
         {
-            if (this.ScrollToHistory(scrollValue))
+            int scrollTo = -1;
+
+            switch (options)
+            {
+                case ScrollOptions.ScrollToTop:
+                    {
+                        scrollTo = physicsRow;
+                        break;
+                    }
+
+                case ScrollOptions.ScrollToMiddle:
+                    {
+                        scrollTo = physicsRow - this.rowSize / 2;
+                        break;
+                    }
+
+                case ScrollOptions.ScrollToBottom:
+                    {
+                        scrollTo = physicsRow - this.rowSize + 1;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            // 判断要滚动到的行是否超出了滚动最大值或者最小值
+            if (scrollTo < this.scrollInfo.ScrollMin)
+            {
+                scrollTo = this.scrollInfo.ScrollMin;
+            }
+            else if (scrollTo > this.scrollInfo.ScrollMax)
+            {
+                scrollTo = this.scrollInfo.ScrollMax;
+            }
+
+            if (this.ScrollToHistory(scrollTo))
             {
                 this.PerformDrawing(this.activeDocument);
             }
@@ -788,27 +848,11 @@ namespace ModengTerm.Terminal.ViewModels
         /// </param>
         private void PerformDrawing(VTDocument document)
         {
-            // 当前行的Y方向偏移量
-            double offsetY = 0;
-
             this.uiSyncContext.Send((state) =>
             {
                 #region 渲染文档
 
-                VTextLine next = document.FirstLine;
-
-                while (next != null)
-                {
-                    // 更新Y偏移量信息
-                    next.OffsetY = offsetY;
-
-                    next.RequestInvalidate();
-
-                    // 更新下一个文本行的Y偏移量
-                    offsetY += next.Height;
-
-                    next = next.NextLine;
-                }
+                document.RequestInvalidate();
 
                 #endregion
 
@@ -833,8 +877,6 @@ namespace ModengTerm.Terminal.ViewModels
                 #endregion
 
             }, null);
-
-            document.SetArrangeDirty(false);
         }
 
         /// <summary>
@@ -992,10 +1034,18 @@ namespace ModengTerm.Terminal.ViewModels
         /// 并更新UI上的滚动条位置
         /// 注意该方法不会重新渲染界面，只修改文档模型
         /// </summary>
-        /// <param name="scrollValue">要显示的第一行历史记录</param>
+        /// <param name="physicsRow1">要显示的第一行历史记录</param>
         /// <returns>如果进行了滚动，那么返回true，如果因为某种原因没进行滚动，那么返回false</returns>
-        private bool ScrollToHistory(int scrollValue)
+        private bool ScrollToHistory(int physicsRow1)
         {
+            // 如果是备用缓冲区则不执行滚动
+            if (this.activeDocument.IsAlternate)
+            {
+                return false;
+            }
+
+            int scrollValue = physicsRow1;
+
             // 要滚动的值和当前值是一样的，也不滚动
             if (this.scrollInfo.ScrollValue == scrollValue)
             {
@@ -1041,7 +1091,7 @@ namespace ModengTerm.Terminal.ViewModels
                     }
                     else
                     {
-                        // 执行clear指令后，因为会增加行，所以可能会找不到
+                        // 执行clear指令后，因为会增加行，所以可能会找不到对应的历史记录
                         // 打开终端 -> 输入enter直到翻了一整页 -> 滚动到最上面 -> 输入字符，就会复现
                         currentTextLine.PhysicsRow = physicsRow;
                         currentTextLine.EraseAll();
@@ -1073,7 +1123,7 @@ namespace ModengTerm.Terminal.ViewModels
                         }
                         else
                         {
-                            // 有可能会找不到，找不到就清空
+                            // 有可能会找不到该行对应的历史记录，找不到就清空
                             // 打开终端 -> clear -> 滚到最上面 -> 再往下滚，就会复现
                             firstLine.EraseAll();
                         }
@@ -1102,8 +1152,6 @@ namespace ModengTerm.Terminal.ViewModels
                 }
             }
 
-            scrollDocument.SetArrangeDirty(true);
-
             #endregion
 
             // 更新当前滚动条的值
@@ -1111,6 +1159,12 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 有可能光标所在行被滚动到了文档外，此时要更新ActiveLine，ActiveLine就是空的
             scrollDocument.SetCursorPhysicsRow(scrollDocument.CursorPhysicsRow);
+
+            // 每次滚动都需要重新刷新TextSelection区域
+            if (!this.textSelection.IsEmpty)
+            {
+                this.textSelection.SetDirty(true);
+            }
 
             return true;
         }
@@ -1136,12 +1190,10 @@ namespace ModengTerm.Terminal.ViewModels
         {
             // 自适应屏幕大小
             // 计算一共有多少行，和每行之间的间距是多少
-            // 使用空白字符计算一行的高度，然后用屏幕高度除以一行的高度
-            VTextMetrics metrics = this.videoTerminal.MeasureText(" ", this.fontSize, this.fontFamily);
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置
-            rowSize = (int)Math.Floor(vtc.Height / metrics.Height);
-            colSize = (int)Math.Floor(vtc.Width / metrics.Width);
+            rowSize = (int)Math.Floor(vtc.Height / this.typeface.Height);
+            colSize = (int)Math.Floor(vtc.Width / this.typeface.Width);
         }
 
         #endregion
@@ -1704,10 +1756,10 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        IDrawingDocument remove = this.mainDocument.Drawing;
-                        IDrawingDocument add = this.alternateDocument.Drawing;
-                        this.videoTerminal.VisibleDocument(remove, false);
-                        this.videoTerminal.VisibleDocument(add, true);
+                        IDrawingCanvas remove = this.mainDocument.Canvas;
+                        IDrawingCanvas add = this.alternateDocument.Canvas;
+                        this.drawingWindow.VisibleCanvas(remove, false);
+                        this.drawingWindow.VisibleCanvas(add, true);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1716,7 +1768,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                         this.textSelection.Reset();
                         this.textSelection.Document = this.alternateDocument;
-                        this.videoTerminal.SetScrollVisible(false);
+                        this.drawingWindow.SetScrollVisible(false);
                         break;
                     }
 
@@ -1724,17 +1776,17 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        IDrawingDocument remove = this.alternateDocument.Drawing;
-                        IDrawingDocument add = this.mainDocument.Drawing;
-                        this.videoTerminal.VisibleDocument(remove, false);
-                        this.videoTerminal.VisibleDocument(add, true);
+                        IDrawingCanvas remove = this.alternateDocument.Canvas;
+                        IDrawingCanvas add = this.mainDocument.Canvas;
+                        this.drawingWindow.VisibleCanvas(remove, false);
+                        this.drawingWindow.VisibleCanvas(add, true);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
 
                         this.textSelection.Reset();
                         this.textSelection.Document = this.mainDocument;
-                        this.videoTerminal.SetScrollVisible(true);
+                        this.drawingWindow.SetScrollVisible(true);
                         break;
                     }
 
@@ -1891,7 +1943,7 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
 
-        public void OnMouseDown(IDrawingVideoTerminal vt, VTPoint location, int clickCount)
+        public void OnMouseDown(IDrawingWindow vt, VTPoint location, int clickCount)
         {
             if (clickCount == 1)
             {
@@ -1956,7 +2008,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public void OnMouseMove(IDrawingVideoTerminal vt, VTPoint location)
+        public void OnMouseMove(IDrawingWindow vt, VTPoint location)
         {
             if (!this.isMouseDown)
             {
@@ -2032,13 +2084,13 @@ namespace ModengTerm.Terminal.ViewModels
             this.PerformDrawing(this.activeDocument);
         }
 
-        public void OnMouseUp(IDrawingVideoTerminal vt, VTPoint location)
+        public void OnMouseUp(IDrawingWindow vt, VTPoint location)
         {
             this.isMouseDown = false;
             this.selectionState = false;
         }
 
-        public void OnMouseWheel(IDrawingVideoTerminal vt, bool upper)
+        public void OnMouseWheel(IDrawingWindow vt, bool upper)
         {
             // 只有主缓冲区才可以用鼠标滚轮进行滚动
             // 备用缓冲区不可以滚动
@@ -2099,7 +2151,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.PerformDrawing(this.activeDocument);
         }
 
-        public void OnSizeChanged(IDrawingVideoTerminal vt, VTRect vtc)
+        public void OnSizeChanged(IDrawingWindow vt, VTRect vtc)
         {
             // 不管当前是什么状态，第一步先更新终端屏幕大小
             this.vtRect = vtc;

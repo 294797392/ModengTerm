@@ -19,7 +19,7 @@ namespace ModengTerm.Terminal.Document
         private bool dirty;
         private int scrollMax;
         private int scrollValue;
-        private IDrawingVideoTerminal vt;
+        private IDrawingWindow vt;
         private VTHistory history;
 
         #endregion
@@ -145,7 +145,7 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTScrollInfo(IDrawingVideoTerminal vt)
+        public VTScrollInfo(IDrawingWindow vt)
         {
             this.vt = vt;
         }

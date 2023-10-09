@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ModengTerm.Terminal.Document
+{
+    /// <summary>
+    /// 存储每种字形的信息
+    /// </summary>
+    public class VTypeface
+    {
+        /// <summary>
+        /// 该字形高度
+        /// </summary>
+        public double Height { get; set; }
+
+        /// <summary>
+        /// 字体宽度，因为每个字符的宽度可能都不是一样的
+        /// 这个宽度是空白字符的宽度
+        /// </summary>
+        public double Width { get; set; }
+    }
+}

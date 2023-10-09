@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Enumerations
 {
-    public enum ContentScopeEnum
+    public enum ParagraphTypeEnum
     {
         /// <summary>
         /// 保存当前屏幕的内容

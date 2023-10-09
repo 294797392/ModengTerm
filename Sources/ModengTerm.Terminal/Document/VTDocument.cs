@@ -105,14 +105,14 @@ namespace ModengTerm.Terminal.Document
         public bool IsEmpty { get { return this.FirstLine == null && this.LastLine == null; } }
 
         /// <summary>
-        /// 渲染该文档的Surface
+        /// 渲染该文档的Canvas
         /// </summary>
-        public IDrawingDocument Drawing { get; private set; }
+        public IDrawingCanvas Canvas { get; private set; }
 
         /// <summary>
-        /// 是否需要重新布局
+        /// 渲染Tag的Canvas
         /// </summary>
-        public bool IsArrangeDirty { get; private set; }
+        public IDrawingCanvas TagCanvas { get; private set; }
 
         /// <summary>
         /// 是否是备用缓冲区
@@ -139,12 +139,13 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTDocument(VTDocumentOptions options, IDrawingDocument canvas, bool isAlternate)
+        public VTDocument(VTDocumentOptions options, bool isAlternate)
         {
             this.options = options;
-            this.Drawing = canvas;
             this.IsAlternate = isAlternate;
             this.cursorState = new VTCursorState();
+            this.Canvas = options.DrawingWindow.CreateCanvas();
+            this.TagCanvas = options.DrawingWindow.CreateCanvas();
 
             this.rowSize = this.options.RowSize;
             this.colSize = this.options.ColumnSize;
@@ -164,7 +165,7 @@ namespace ModengTerm.Terminal.Document
                 AllowBlink = true,
                 IsVisible = true,
             };
-            this.Cursor.DrawingObject = this.Drawing.CreateDrawingObject(this.Cursor);
+            this.Cursor.DrawingObject = this.Canvas.CreateDrawingObject(this.Cursor);
 
             #region 初始化第一行，并设置链表首尾指针
 
@@ -181,9 +182,6 @@ namespace ModengTerm.Terminal.Document
                 VTextLine textLine = this.CreateTextLine(i);
                 this.LastLine.Append(textLine);
             }
-
-            // 更新可视区域
-            this.SetArrangeDirty(true);
         }
 
         #endregion
@@ -213,21 +211,9 @@ namespace ModengTerm.Terminal.Document
                 },
             };
 
-            textLine.DrawingObject = this.Drawing.CreateDrawingObject(textLine);
+            textLine.DrawingObject = this.Canvas.CreateDrawingObject(textLine);
 
             return textLine;
-        }
-
-        /// <summary>
-        /// 设置是否需要重新布局
-        /// </summary>
-        /// <param name="isDirty"></param>
-        public void SetArrangeDirty(bool isDirty)
-        {
-            if (this.IsArrangeDirty != isDirty)
-            {
-                this.IsArrangeDirty = isDirty;
-            }
         }
 
         /// <summary>
@@ -256,7 +242,7 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public void Release()
         {
-            this.Drawing.DeleteDrawingObjects();
+            this.Canvas.DeleteDrawingObjects();
             this.FirstLine = null;
             this.LastLine = null;
             this.ActiveLine = null;
@@ -339,8 +325,6 @@ namespace ModengTerm.Terminal.Document
                 }
 
                 this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
-
-                this.SetArrangeDirty(true);
             }
             else
             {
@@ -417,8 +401,6 @@ namespace ModengTerm.Terminal.Document
                 }
 
                 this.cursorPhysicsRow = this.ActiveLine.PhysicsRow;
-
-                this.SetArrangeDirty(true);
             }
             else
             {
@@ -584,8 +566,6 @@ namespace ModengTerm.Terminal.Document
 
                 current = current.NextLine;
             }
-
-            this.IsArrangeDirty = true;
         }
 
         /// <summary>
@@ -656,8 +636,6 @@ namespace ModengTerm.Terminal.Document
 
             // 更新ActiveLine
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
-
-            this.SetArrangeDirty(true);
         }
 
         /// <summary>
@@ -725,8 +703,6 @@ namespace ModengTerm.Terminal.Document
 
             // 更新ActiveLine
             this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
-
-            this.SetArrangeDirty(true);
         }
 
         /// <summary>
@@ -941,7 +917,7 @@ namespace ModengTerm.Terminal.Document
                     // 从最后一行开始删除
                     for (int i = 0; i < rows; i++)
                     {
-                        this.Drawing.DeleteDrawingObject(this.LastLine.DrawingObject);
+                        this.Canvas.DeleteDrawingObject(this.LastLine.DrawingObject);
                         this.LastLine.Remove();
                     }
                 }
@@ -962,8 +938,6 @@ namespace ModengTerm.Terminal.Document
 
                     currentLine = currentLine.NextLine;
                 }
-
-                this.SetArrangeDirty(true);
 
                 this.rowSize = rowSize;
             }
@@ -1020,6 +994,30 @@ namespace ModengTerm.Terminal.Document
         public void CursorRestore()
         {
             this.SetCursor(this.cursorState.Row, this.cursorState.Column);
+        }
+
+        /// <summary>
+        /// 重绘文档
+        /// </summary>
+        public void RequestInvalidate()
+        {
+            // 当前行的Y方向偏移量
+            double offsetY = 0;
+
+            VTextLine next = this.FirstLine;
+
+            while (next != null)
+            {
+                // 更新Y偏移量信息
+                next.OffsetY = offsetY;
+
+                next.RequestInvalidate();
+
+                // 更新下一个文本行的Y偏移量
+                offsetY += next.Height;
+
+                next = next.NextLine;
+            }
         }
 
         #endregion

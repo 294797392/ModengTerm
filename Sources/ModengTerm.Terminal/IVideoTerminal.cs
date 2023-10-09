@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Rendering;
 using System;
@@ -39,7 +40,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 始终处于最上层的Document
         /// </summary>
-        IDrawingDocument TopMostDocument { get; }
+        IDrawingCanvas TopMostCanvas { get; }
 
         /// <summary>
         /// 当前正在显示的Document
@@ -67,14 +68,21 @@ namespace ModengTerm.Terminal
         SynchronizationContext UISyncContext { get; }
 
         /// <summary>
-        /// 滚动到某个物理行
-        /// </summary>
-        /// <param name="physicsRow">要滚动到的物理行数</param>
-        void ScrollTo(int physicsRow);
-
-        /// <summary>
         /// 保存日志记录器
         /// </summary>
         VTLogger Logger { get; set; }
+
+        /// <summary>
+        /// 滚动到某个物理行
+        /// </summary>
+        /// <param name="physicsRow">要滚动到的物理行数</param>
+        /// <param name="options">滚动选项</param>
+        void ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop);
+
+        /// <summary>
+        /// 向SSH主机发送一段文本
+        /// </summary>
+        /// <param name="text"></param>
+        void SendInput(string text);
     }
 }

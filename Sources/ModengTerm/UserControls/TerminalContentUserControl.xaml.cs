@@ -38,7 +38,7 @@ namespace XTerminal.UserControls
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalContentUserControl : SessionContent, IDrawingVideoTerminal
+    public partial class TerminalContentUserControl : SessionContent, IDrawingWindow
     {
         #region 类变量
 
@@ -51,7 +51,11 @@ namespace XTerminal.UserControls
         private UserInput userInput;
 
         private VideoTerminal videoTerminal;
-        private FindVM vtFind;
+
+        /// <summary>
+        /// 提供剪贴板功能
+        /// </summary>
+        private VTClipboard clipboard;
 
         #endregion
 
@@ -94,7 +98,7 @@ namespace XTerminal.UserControls
             }
         }
         
-        private void SaveToFile(ContentScopeEnum saveMode)
+        private void SaveToFile(ParagraphTypeEnum saveMode)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
@@ -105,8 +109,8 @@ namespace XTerminal.UserControls
 
                 try
                 {
-                    string text = this.videoTerminal.CreateContent(saveMode, fileType);
-                    File.WriteAllText(saveFileDialog.FileName, text);
+                    VTParagraph paragraph = this.videoTerminal.CreateParagraph(saveMode, fileType);
+                    File.WriteAllText(saveFileDialog.FileName, paragraph.Content);
                 }
                 catch (Exception ex)
                 {
@@ -118,100 +122,7 @@ namespace XTerminal.UserControls
 
         #endregion
 
-        #region 公开接口
-
-        /// <summary>
-        /// 向SSH服务器发送输入
-        /// </summary>
-        /// <param name="userInput"></param>
-        private void SendUserInput(UserInput userInput)
-        {
-            if (MenuItemSendAll.IsChecked)
-            {
-                foreach (VideoTerminal vt in MTermApp.Context.OpenedTerminals)
-                {
-                    if (vt == this.videoTerminal)
-                    {
-                        continue;
-                    }
-
-                    vt.SendInput(userInput);
-                }
-            }
-            else
-            {
-                this.videoTerminal.SendInput(userInput);
-            }
-        }
-
-        #endregion
-
         #region 事件处理器
-
-        /// <summary>
-        /// 输入中文的时候会触发该事件
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
-        {
-            base.OnPreviewTextInput(e);
-
-            this.userInput.CapsLock = Console.CapsLock;
-            this.userInput.Key = VTKeys.GenericText;
-            this.userInput.Text = e.Text;
-            this.userInput.Modifiers = VTModifierKeys.None;
-
-            this.SendUserInput(this.userInput);
-
-            e.Handled = true;
-
-            //Console.WriteLine(e.Text);
-        }
-
-        /// <summary>
-        /// 从键盘上按下按键的时候会触发
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
-        {
-            base.OnPreviewKeyDown(e);
-
-            //Console.WriteLine(e.Key);
-
-            if (e.Key == Key.ImeProcessed)
-            {
-                // 这些字符交给输入法处理了
-            }
-            else
-            {
-                switch (e.Key)
-                {
-                    case Key.Tab:
-                    case Key.Up:
-                    case Key.Down:
-                    case Key.Left:
-                    case Key.Right:
-                    case Key.Space:
-                        {
-                            // 防止焦点移动到其他控件上了
-                            e.Handled = true;
-                            break;
-                        }
-                }
-
-                if (e.Key != Key.ImeProcessed)
-                {
-                    e.Handled = true;
-                }
-
-                VTKeys vtKey = DrawingUtils.ConvertToVTKey(e.Key);
-                this.userInput.CapsLock = Console.CapsLock;
-                this.userInput.Key = vtKey;
-                this.userInput.Text = null;
-                this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-                this.SendUserInput(this.userInput);
-            }
-        }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
@@ -231,7 +142,6 @@ namespace XTerminal.UserControls
 
             this.videoTerminal.OnMouseWheel(this, e.Delta > 0);
         }
-
 
         /// <summary>
         /// 重写了这个事件后，就会触发鼠标相关的事件
@@ -305,12 +215,22 @@ namespace XTerminal.UserControls
 
         private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
         {
-            this.videoTerminal.CopySelection();
+            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
+            if (paragraph.IsEmpty)
+            {
+                return;
+            }
+
+            this.clipboard.SetData(paragraph);
+
+            // 把数据设置到Windows剪贴板里
+            System.Windows.Clipboard.SetText(paragraph.Content);
         }
 
         private void MenuItemPaste_Click(object sender, RoutedEventArgs e)
         {
-            this.videoTerminal.Paste();
+            string text = System.Windows.Clipboard.GetText();
+            this.videoTerminal.SendInput(text);
         }
 
         private void MenuItemSelectAll_Click(object sender, RoutedEventArgs e)
@@ -322,17 +242,17 @@ namespace XTerminal.UserControls
 
         private void MenuItemSaveDocument_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(ContentScopeEnum.SaveDocument);
+            this.SaveToFile(ParagraphTypeEnum.SaveDocument);
         }
 
         private void MenuItemSaveSelected_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(ContentScopeEnum.SaveSelected);
+            this.SaveToFile(ParagraphTypeEnum.SaveSelected);
         }
 
         private void MenuItemSaveAll_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(ContentScopeEnum.SaveAll);
+            this.SaveToFile(ParagraphTypeEnum.SaveAll);
         }
 
         #endregion
@@ -371,10 +291,6 @@ namespace XTerminal.UserControls
 
         #endregion
 
-        private void MenuItemDrawingMode_CheckedChanged(object sender, RoutedEventArgs e)
-        {
-        }
-
         /// <summary>
         /// 查找
         /// </summary>
@@ -382,22 +298,40 @@ namespace XTerminal.UserControls
         /// <param name="e"></param>
         private void MenuItemFind_Click(object sender, RoutedEventArgs e)
         {
-            FindWindow findWindow = new FindWindow(this.vtFind);
+            FindVM vtFind = new FindVM(this.videoTerminal);
+            FindWindow findWindow = new FindWindow(vtFind);
             findWindow.Owner = Window.GetWindow(this);
             findWindow.Show();
         }
 
+        /// <summary>
+        /// 剪贴板历史记录
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItemClipboardHistory_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
+
+            ClipboardVM clipboardVM = new ClipboardVM(this.videoTerminal, this.clipboard);
+            clipboardVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
+
+            ClipboardHistoryWindow clipboardHistoryWindow = new ClipboardHistoryWindow(clipboardVM);
+            clipboardHistoryWindow.Owner = mainWindow;
+            clipboardHistoryWindow.Show();
+        }
+
         #endregion
 
-        #region IVideoTerminalRenderer
+        #region IDrawingWindow
 
-        public IDrawingDocument CreateDocument()
+        public IDrawingCanvas CreateCanvas()
         {
-            DrawingDocument document = new DrawingDocument();
+            DrawingCanvas document = new DrawingCanvas();
             return document;
         }
 
-        public void InsertDocument(int index, IDrawingDocument document)
+        public void InsertCanvas(int index, IDrawingCanvas document)
         {
             this.Dispatcher.Invoke(() =>
             {
@@ -405,15 +339,7 @@ namespace XTerminal.UserControls
             });
         }
 
-        public void RemoveDocument(IDrawingDocument canvas)
-        {
-            base.Dispatcher.Invoke(() =>
-            {
-                GridCanvasList.Children.Remove(canvas as UIElement);
-            });
-        }
-
-        public void VisibleDocument(IDrawingDocument document, bool visible)
+        public void VisibleCanvas(IDrawingCanvas document, bool visible)
         {
             base.Dispatcher.Invoke(() =>
             {
@@ -468,19 +394,17 @@ namespace XTerminal.UserControls
             });
         }
 
-        public VTextMetrics MeasureText(string text, double fontSize, string fontFamily)
+        public VTypeface GetTypeface(VTextStyle textStyle)
         {
-            Typeface typeface = new Typeface(new FontFamily(fontFamily), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            FormattedText formattedText = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                fontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+            Typeface typeface = DrawingUtils.GetTypeface(textStyle);
+            FormattedText formattedText = new FormattedText(" ", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
+                textStyle.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
 
-            VTextMetrics metrics = new VTextMetrics()
+            return new VTypeface() 
             {
                 Height = formattedText.Height,
                 Width = formattedText.WidthIncludingTrailingWhitespace
             };
-
-            return metrics;
         }
 
         public VTRect GetDisplayRect()
@@ -495,36 +419,28 @@ namespace XTerminal.UserControls
 
         protected override int OnOpen(OpenedSessionVM viewModel)
         {
+            this.clipboard = new VTClipboard()
+            {
+                MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
+            };
+
             this.videoTerminal = viewModel as VideoTerminal;
             this.videoTerminal.Open();
-
-            this.vtFind = new FindVM(this.videoTerminal);
 
             return ResponseCode.SUCCESS;
         }
 
         protected override void OnClose()
         {
+            // 停止对终端的日志记录
+            MTermApp.Context.LoggerManager.Stop(this.videoTerminal);
+
+            // 释放剪贴板
+            this.clipboard.Release();
+
             this.videoTerminal.Close();
         }
 
         #endregion
-
-        private void ListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            UIElement element = sender as UIElement;
-            if (!element.IsMouseCaptured)
-            {
-                Mouse.Capture(element, CaptureMode.SubTree);
-            }
-            else
-            {
-                if (e.OriginalSource != element)
-                {
-                    Mouse.Capture(null);
-                    ToggleButtonLoggerSetting.IsChecked = false;
-                }
-            }
-        }
     }
 }

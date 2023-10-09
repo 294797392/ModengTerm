@@ -24,10 +24,13 @@ namespace ModengTerm.Terminal.Loggering
         public LogFileTypeEnum FileType { get; set; }
 
         /// <summary>
-        /// 文件路径
+        /// 日志文件路径
         /// </summary>
         public string FilePath { get; set; }
 
+        /// <summary>
+        /// 标识该日志是否暂停记录
+        /// </summary>
         public bool IsPaused { get; set; }
 
         /// <summary>

@@ -7,6 +7,7 @@
                       xmlns:terminal="clr-namespace:ModengTerm.Terminal;assembly=ModengTerm.Terminal"
                       xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
                       xmlns:rendering="clr-namespace:ModengTerm.Rendering"
+                      xmlns:mterm="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -23,7 +24,7 @@
             <Setter Property="Margin" Value="3,6,3,6"/>
             <Setter Property="Width" Value="2"/>
         </Style>
-        
+
     </UserControl.Resources>
 
     <Grid>
@@ -53,6 +54,7 @@
                         <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
                         <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
                         <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>
+                        <MenuItem Header="剪贴板历史" Click="MenuItemClipboardHistory_Click"/>
                         <Separator/>
                         <MenuItem Header="查找..." Click="MenuItemFind_Click"/>
                         <Separator/>
@@ -61,22 +63,6 @@
                         <MenuItem Header="保存所有内容" Click="MenuItemSaveAll_Click"/>
                         <Separator/>
                         <MenuItem x:Name="MenuItemSendAll" Header="发送到所有会话" IsCheckable="True" IsChecked="{Binding Path=SendAll, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-
-                        <MenuItem x:Name="MenuItemDrawingMode" IsCheckable="True" Visibility="Collapsed"
-                                  Checked="MenuItemDrawingMode_CheckedChanged"
-                                  Unchecked="MenuItemDrawingMode_CheckedChanged">
-                            <MenuItem.Header>
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="30"/>
-                                        <RowDefinition Height="0"/>
-                                    </Grid.RowDefinitions>
-
-                                    <TextBlock Grid.Row="0" Text="绘图模式"/>
-
-                                </Grid>
-                            </MenuItem.Header>
-                        </MenuItem>
                     </ContextMenu>
                 </Grid.ContextMenu>
 
@@ -125,8 +111,7 @@
 
         <ListBox Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" 
                  Visibility="{Binding ElementName=ToggleButtonLoggerSetting, Path=IsChecked, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"
-                 ItemsSource="{Binding Source={x:Static terminal:VTDebug.Context}, Path=Categories}"
-                 MouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown">
+                 ItemsSource="{Binding Source={x:Static terminal:VTDebug.Context}, Path=Categories}">
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Setter Property="Height" Value="30"/>

@@ -94,6 +94,18 @@ namespace XTerminal
 
         #endregion
 
+        #region 公开接口
+
+        public void SendToAllTerminal(string text)
+        {
+            foreach (VideoTerminal vt in MTermApp.Context.OpenedTerminals)
+            {
+                vt.SendInput(text);
+            }
+        }
+
+        #endregion
+
         #region 事件处理器
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

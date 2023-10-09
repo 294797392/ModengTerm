@@ -81,7 +81,7 @@ namespace ModengTerm.Windows
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            this.viewModel.Reset();
+            this.viewModel.Release();
         }
     }
 }

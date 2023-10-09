@@ -17,7 +17,7 @@ namespace ModengTerm.Rendering
     /// <summary>
     /// 用来渲染终端输出的表面
     /// </summary>
-    public class DrawingDocument : FrameworkElement, IDrawingDocument
+    public class DrawingCanvas : FrameworkElement, IDrawingCanvas
     {
         #region 类变量
 
@@ -43,7 +43,7 @@ namespace ModengTerm.Rendering
 
         #region 构造方法
 
-        public DrawingDocument()
+        public DrawingCanvas()
         {
             this.visuals = new VisualCollection(this);
         }
@@ -107,6 +107,10 @@ namespace ModengTerm.Rendering
                 this.DeleteDrawingObject(drawingObject);
             }
         }
+
+        //public VTRect GetTextArea()
+        //{
+        //}
 
         #endregion
 

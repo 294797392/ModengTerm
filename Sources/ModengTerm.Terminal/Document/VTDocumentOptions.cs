@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,11 @@ namespace ModengTerm.Terminal.Document
 {
     public class VTDocumentOptions
     {
+        /// <summary>
+        /// 渲染客户端接口
+        /// </summary>
+        public IDrawingWindow DrawingWindow { get; set; }
+
         /// <summary>
         /// 文档所能显示的最大列数
         /// </summary>

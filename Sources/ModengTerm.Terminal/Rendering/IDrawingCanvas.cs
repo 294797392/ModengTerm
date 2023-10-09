@@ -10,7 +10,7 @@ namespace ModengTerm.Terminal.Rendering
     /// <summary>
     /// 表示一个用来渲染终端输出的表面
     /// </summary>
-    public interface IDrawingDocument
+    public interface IDrawingCanvas
     {
         /// <summary>
         /// 创建一个渲染对象
@@ -27,5 +27,11 @@ namespace ModengTerm.Terminal.Rendering
         /// 删除所有的渲染对象
         /// </summary>
         void DeleteDrawingObjects();
+
+        ///// <summary>
+        ///// 获取文本区域
+        ///// </summary>
+        ///// <returns></returns>
+        //VTRect GetTextArea();
     }
 }

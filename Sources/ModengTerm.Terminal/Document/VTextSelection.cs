@@ -132,7 +132,7 @@ namespace ModengTerm.Terminal.Document
 
         #region ÊµÀý·½·¨
 
-        private void SetDirty(bool dirty)
+        public void SetDirty(bool dirty)
         {
             if (this.dirty != dirty)
             {

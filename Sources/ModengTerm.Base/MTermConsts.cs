@@ -62,6 +62,7 @@ namespace ModengTerm.Base
         public const int DefaultTerminalColumns = 80;
         public const int DefaultTerminalRows = 24;
         public const int DefaultTerminalScrollback = 99999;
+        public const int DefaultMaxClipboardHistory = 50;
 
         /// <summary>
         /// 默认的串口波特率列表
