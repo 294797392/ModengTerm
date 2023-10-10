@@ -21,8 +21,6 @@ namespace ModengTerm.Terminal
 
         int DeleteFavorites(Favorites favorites);
 
-        int UpdateFavorites(Favorites favorites);
-
         #endregion
     }
 }

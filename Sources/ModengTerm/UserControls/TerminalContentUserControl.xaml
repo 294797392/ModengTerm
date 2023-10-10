@@ -77,6 +77,8 @@
 
             </Grid>
 
+            <Grid Grid.Row="0"></Grid>
+
             <!-- Slider模拟滚动条 -->
             <Slider Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" 
                     Minimum="0" Maximum="0" Delay="500" Cursor="Arrow" ValueChanged="SliderScrolbar_ValueChanged">
@@ -105,9 +107,9 @@
 
                 <Border Style="{StaticResource ResourceKey=StyleBorderSplitter}"/>
 
-                <TextBlock Text="{Binding Path=RowSize}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=ViewportRow}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 <TextBlock Text=" x " Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text="{Binding Path=ColumnSize}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=ViewportColumn}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
             </StackPanel>
 
         </Grid>

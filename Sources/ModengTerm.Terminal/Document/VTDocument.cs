@@ -33,14 +33,14 @@ namespace ModengTerm.Terminal.Document
         internal VTDocumentOptions options;
 
         /// <summary>
-        /// 当前终端屏幕的总行数
+        /// 可视区域内的行数
         /// </summary>
-        private int rowSize;
+        private int viewportRow;
 
         /// <summary>
-        /// 当前终端屏幕的总列数
+        /// 可视区域内的列数
         /// </summary>
-        private int colSize;
+        private int viewportColumn;
 
         /// <summary>
         /// 保存光标状态
@@ -131,10 +131,6 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public VTRect Rect { get; set; }
 
-        public int RowSize { get { return this.rowSize; } }
-
-        public int ColumnSize { get { return this.colSize; } }
-
         #endregion
 
         #region 构造方法
@@ -147,8 +143,8 @@ namespace ModengTerm.Terminal.Document
             this.Canvas = options.DrawingWindow.CreateCanvas();
             this.TagCanvas = options.DrawingWindow.CreateCanvas();
 
-            this.rowSize = this.options.RowSize;
-            this.colSize = this.options.ColumnSize;
+            this.viewportRow = this.options.RowSize;
+            this.viewportColumn = this.options.ColumnSize;
 
             this.AttributeState = new VTextAttributeState();
 
@@ -725,7 +721,7 @@ namespace ModengTerm.Terminal.Document
                 this.ActiveLine.InsertCharacter(characterIndex, character);
 
                 // 如果溢出了列宽，那么删除溢出的字符
-                this.ActiveLine.TrimEnd(this.colSize);
+                this.ActiveLine.TrimEnd(this.viewportColumn);
             }
         }
 
@@ -872,15 +868,15 @@ namespace ModengTerm.Terminal.Document
         /// <param name="colSize">终端的新的列数</param>
         public void Resize(int rowSize, int colSize, int scrollMin, int scrollMax)
         {
-            if (this.rowSize != rowSize)
+            if (this.viewportRow != rowSize)
             {
-                int rows = Math.Abs(this.rowSize - rowSize);
+                int rows = Math.Abs(this.viewportRow - rowSize);
 
                 // 扩大或者缩小行数之后，第一行应该显示的物理行数
                 int firstRow = 0;
                 int activeRow = this.ActiveLine.PhysicsRow;
 
-                if (this.rowSize < rowSize)
+                if (this.viewportRow < rowSize)
                 {
                     // 扩大了行数
                     firstRow = Math.Max(scrollMin, this.FirstLine.PhysicsRow - rows);
@@ -939,12 +935,12 @@ namespace ModengTerm.Terminal.Document
                     currentLine = currentLine.NextLine;
                 }
 
-                this.rowSize = rowSize;
+                this.viewportRow = rowSize;
             }
 
-            if (this.colSize != colSize)
+            if (this.viewportColumn != colSize)
             {
-                this.colSize = colSize;
+                this.viewportColumn = colSize;
             }
         }
 

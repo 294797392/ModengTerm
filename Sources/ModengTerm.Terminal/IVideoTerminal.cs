@@ -30,12 +30,12 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 终端行大小
         /// </summary>
-        int RowSize { get; }
+        int ViewportRow { get; }
 
         /// <summary>
         /// 终端列大小
         /// </summary>
-        int ColumnSize { get; }
+        int ViewportColumn { get; }
 
         /// <summary>
         /// 始终处于最上层的Document

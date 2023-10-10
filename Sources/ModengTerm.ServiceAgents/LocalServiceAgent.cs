@@ -138,19 +138,6 @@ namespace ModengTerm.ServiceAgents
             }
         }
 
-        public override int UpdateFavorites(Favorites favorites)
-        {
-            try
-            {
-                return JSONDatabase.Update<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), v => v.ID == favorites.ID, favorites);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("UpdateFavorites异常", ex);
-                return ResponseCode.FAILED;
-            }
-        }
-
         #region 实例方法
 
         private string GetFilePath<T>(string sessionId)

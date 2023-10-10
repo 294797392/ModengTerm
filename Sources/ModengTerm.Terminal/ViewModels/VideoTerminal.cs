@@ -73,12 +73,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 当前终端行数
         /// </summary>
-        private int rowSize;
+        private int viewportRow;
 
         /// <summary>
         /// 当前终端列数
         /// </summary>
-        private int colSize;
+        private int viewportColumn;
 
         #region Mouse
 
@@ -256,39 +256,39 @@ namespace ModengTerm.Terminal.ViewModels
         public SessionTransport SessionTransport { get { return this.sessionTransport; } }
 
         /// <summary>
-        /// 当前终端的行数
+        /// 可视区域内的行数
         /// </summary>
-        public int RowSize
+        public int ViewportRow
         {
             get
             {
-                return this.rowSize;
+                return this.viewportRow;
             }
             private set
             {
-                if (this.rowSize != value)
+                if (this.viewportRow != value)
                 {
-                    this.rowSize = value;
-                    this.NotifyPropertyChanged("RowSize");
+                    this.viewportRow = value;
+                    this.NotifyPropertyChanged("ViewportRow");
                 }
             }
         }
 
         /// <summary>
-        /// 当前终端的列数
+        /// 可视区域内的列数
         /// </summary>
-        public int ColumnSize
+        public int ViewportColumn
         {
             get
             {
-                return this.colSize;
+                return this.viewportColumn;
             }
             private set
             {
-                if (this.colSize != value)
+                if (this.viewportColumn != value)
                 {
-                    this.colSize = value;
-                    this.NotifyPropertyChanged("ColumnSize");
+                    this.viewportColumn = value;
+                    this.NotifyPropertyChanged("ViewportColumn");
                 }
             }
         }
@@ -380,18 +380,18 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 case TerminalSizeModeEnum.AutoFit:
                     {
-                        this.CalculateAutoFitSize(this.vtRect, out this.rowSize, out this.colSize);
+                        this.CalculateAutoFitSize(this.vtRect, out this.viewportRow, out this.viewportColumn);
 
                         // 算完真正的终端大小之后重新设置一下参数，因为在SessionDriver里是直接使用SessionInfo里的参数的
-                        sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.rowSize);
-                        sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, this.colSize);
+                        sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.viewportRow);
+                        sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, this.viewportColumn);
                         break;
                     }
 
                 case TerminalSizeModeEnum.Fixed:
                     {
-                        this.rowSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-                        this.colSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+                        this.viewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+                        this.viewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
                         break;
                     }
 
@@ -426,8 +426,8 @@ namespace ModengTerm.Terminal.ViewModels
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
-                ColumnSize = this.colSize,
-                RowSize = this.rowSize,
+                ColumnSize = this.viewportColumn,
+                RowSize = this.viewportRow,
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
@@ -768,13 +768,13 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case ScrollOptions.ScrollToMiddle:
                     {
-                        scrollTo = physicsRow - this.rowSize / 2;
+                        scrollTo = physicsRow - this.viewportRow / 2;
                         break;
                     }
 
                 case ScrollOptions.ScrollToBottom:
                     {
-                        scrollTo = physicsRow - this.rowSize + 1;
+                        scrollTo = physicsRow - this.viewportRow + 1;
                         break;
                     }
 
@@ -1071,7 +1071,7 @@ namespace ModengTerm.Terminal.ViewModels
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
             // 终端行大小
-            int rows = this.rowSize;
+            int rows = this.viewportRow;
 
             #region 更新要显示的行
 
@@ -1490,14 +1490,14 @@ namespace ModengTerm.Terminal.ViewModels
                             col = newcol == 0 ? 0 : newcol - 1;
 
                             // 对行和列做限制
-                            if (row >= this.rowSize)
+                            if (row >= this.viewportRow)
                             {
-                                row = rowSize - 1;
+                                row = viewportRow - 1;
                             }
 
-                            if (col >= this.colSize)
+                            if (col >= this.viewportColumn)
                             {
-                                col = colSize - 1;
+                                col = viewportColumn - 1;
                             }
                         }
                         else
@@ -1827,7 +1827,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = this.rowSize;
+                        int lines = this.viewportRow;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);
@@ -2178,12 +2178,12 @@ namespace ModengTerm.Terminal.ViewModels
             this.CalculateAutoFitSize(vtc, out newRows, out newCols);
 
             // 如果行和列都没变化，那么就什么都不做
-            if (this.rowSize == newRows && this.colSize == newCols)
+            if (this.viewportRow == newRows && this.viewportColumn == newCols)
             {
                 return;
             }
 
-            VTDebug.Context.WriteInteractive("ResizeTerminal", "{0},{1},{2},{3}", this.rowSize, this.colSize, newRows, newCols);
+            VTDebug.Context.WriteInteractive("ResizeTerminal", "{0},{1},{2},{3}", this.viewportRow, this.viewportColumn, newRows, newCols);
 
             // 缩放前先滚动到底，不然会有问题
             this.ScrollToBottom();
@@ -2244,8 +2244,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.sessionTransport.Resize(newRows, newCols);
 
             // 更新界面上的行和列
-            this.ColumnSize = newCols;
-            this.RowSize = newRows;
+            this.ViewportColumn = newCols;
+            this.ViewportRow = newRows;
         }
 
         #endregion

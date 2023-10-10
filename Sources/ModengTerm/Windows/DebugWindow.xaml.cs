@@ -31,8 +31,8 @@ namespace XTerminal.Windows
 
         private void ButtonResizeTerminal_Click(object sender, RoutedEventArgs e)
         {
-            logger.InfoFormat("Resize, row = {0}, col = {1}", this.VideoTerminal.RowSize, this.VideoTerminal.ColumnSize + 1);
-            this.VideoTerminal.SessionTransport.Resize(this.VideoTerminal.RowSize, this.VideoTerminal.ColumnSize + 1);
+            logger.InfoFormat("Resize, row = {0}, col = {1}", this.VideoTerminal.ViewportRow, this.VideoTerminal.ViewportColumn + 1);
+            this.VideoTerminal.SessionTransport.Resize(this.VideoTerminal.ViewportRow, this.VideoTerminal.ViewportColumn + 1);
         }
     }
 }

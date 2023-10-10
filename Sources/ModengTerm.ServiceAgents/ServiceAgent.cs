@@ -70,6 +70,5 @@ namespace ModengTerm.ServiceAgents
         public abstract List<Favorites> GetFavorites(string sessionId);
         public abstract int AddFavorites(Favorites favorites);
         public abstract int DeleteFavorites(Favorites favorites);
-        public abstract int UpdateFavorites(Favorites favorites);
     }
 }

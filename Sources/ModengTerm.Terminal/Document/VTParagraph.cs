@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,5 +61,13 @@ namespace ModengTerm.Terminal.Document
         /// 是否是备用缓冲区里的内容
         /// </summary>
         public bool IsAlternate { get; set; }
+
+        public IDrawingCanvas Canvas { get; set; }
+
+        public VTScrollInfo ScrollInfo { get; set; }
+
+        public VTParagraph()
+        {
+        }
     }
 }

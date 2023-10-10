@@ -27,11 +27,5 @@ namespace ModengTerm.Terminal.Rendering
         /// 删除所有的渲染对象
         /// </summary>
         void DeleteDrawingObjects();
-
-        ///// <summary>
-        ///// 获取文本区域
-        ///// </summary>
-        ///// <returns></returns>
-        //VTRect GetTextArea();
     }
 }

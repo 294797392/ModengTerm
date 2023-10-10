@@ -56,8 +56,7 @@ namespace ModengTerm.Terminal.Rendering
         VTypeface GetTypeface(VTextStyle textStyle);
 
         /// <summary>
-        /// 获取终端屏幕的显示区域
-        /// 相对于整个显示器的位置
+        /// 获取该窗口相对于桌面左上角的位置
         /// </summary>
         /// <returns></returns>
         VTRect GetDisplayRect();
