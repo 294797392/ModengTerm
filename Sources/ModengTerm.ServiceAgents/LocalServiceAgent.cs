@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,7 +17,7 @@ namespace ModengTerm.ServiceAgents
     /// </summary>
     public class LocalServiceAgent : ServiceAgent
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("FileServiceAgent");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("LocalServiceAgent");
 
         public override MTermManifest GetManifest()
         {
@@ -93,11 +94,11 @@ namespace ModengTerm.ServiceAgents
 
         #endregion
 
-        public override List<Favorites> GetFavorites()
+        public override List<Favorites> GetFavorites(string sessionId)
         {
             try
             {
-                return JSONDatabase.SelectAll<Favorites>();
+                return JSONDatabase.SelectAll<Favorites>(this.GetFilePath<Favorites>(sessionId));
             }
             catch (Exception ex)
             {
@@ -110,7 +111,7 @@ namespace ModengTerm.ServiceAgents
         {
             try
             {
-                JSONDatabase.Insert<Favorites>(favorites);
+                JSONDatabase.Insert<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), favorites);
 
                 return ResponseCode.SUCCESS;
             }
@@ -122,11 +123,11 @@ namespace ModengTerm.ServiceAgents
 
         }
 
-        public override int DeleteFavorites(string favId)
+        public override int DeleteFavorites(Favorites favorites)
         {
             try
             {
-                JSONDatabase.Delete<Favorites>(v => v.ID == favId);
+                JSONDatabase.Delete<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), v => v.ID == favorites.ID);
 
                 return ResponseCode.SUCCESS;
             }
@@ -141,7 +142,7 @@ namespace ModengTerm.ServiceAgents
         {
             try
             {
-                return JSONDatabase.Update<Favorites>(v => v.ID == favorites.ID, favorites);
+                return JSONDatabase.Update<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), v => v.ID == favorites.ID, favorites);
             }
             catch (Exception ex)
             {
@@ -149,5 +150,15 @@ namespace ModengTerm.ServiceAgents
                 return ResponseCode.FAILED;
             }
         }
+
+        #region 实例方法
+
+        private string GetFilePath<T>(string sessionId)
+        {
+            string appDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(appDataDirectory, string.Format("{0}_{1}", sessionId, typeof(T).ToString()));
+        }
+
+        #endregion
     }
 }

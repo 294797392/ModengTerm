@@ -14,5 +14,11 @@ namespace ModengTerm
             string message = string.Format(format, args);
             MessageBox.Show(message, "信息", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        public static void Error(string format, params object[] args)
+        {
+            string message = string.Format(format, args);
+            MessageBox.Show(message, "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }

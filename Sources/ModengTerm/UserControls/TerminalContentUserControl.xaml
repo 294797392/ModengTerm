@@ -54,7 +54,10 @@
                         <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
                         <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
                         <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>
-                        <MenuItem Header="剪贴板历史" Click="MenuItemClipboardHistory_Click"/>
+                        <MenuItem Header="查看剪贴板历史" Click="MenuItemClipboardHistory_Click"/>
+                        <Separator/>
+                        <MenuItem Header="加入收藏夹" Click="MenuItemAddToFavorites_Click"/>
+                        <MenuItem Header="查看收藏夹" Click="MenuItemFaviritesList_Click"/>
                         <Separator/>
                         <MenuItem Header="查找..." Click="MenuItemFind_Click"/>
                         <Separator/>

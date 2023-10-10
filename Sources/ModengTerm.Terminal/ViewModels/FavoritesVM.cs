@@ -7,8 +7,11 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.Terminal.ViewModels
 {
-    public class FavoritesVM : ViewModelBase
+    public class FavoritesVM : ParagraphsVM
     {
-
+        public FavoritesVM(ParagraphSource source, IVideoTerminal videoTerminal) : 
+            base(source, videoTerminal)
+        {
+        }
     }
 }

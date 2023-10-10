@@ -8,6 +8,9 @@ using System.Windows;
 
 namespace ModengTerm.Terminal
 {
+    /// <summary>
+    /// 剪贴板历史记录功能
+    /// </summary>
     public class VTClipboard
     {
         #region 实例变量
@@ -34,7 +37,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 剪贴板历史记录
         /// </summary>
-        public IEnumerable<VTParagraph> HistoryList { get { return this.historyList; } }
+        public List<VTParagraph> HistoryList { get { return this.historyList; } }
 
         #endregion
 

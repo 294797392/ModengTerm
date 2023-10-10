@@ -1,7 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
-using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.DataModels;
 using Newtonsoft.Json;
 using System;

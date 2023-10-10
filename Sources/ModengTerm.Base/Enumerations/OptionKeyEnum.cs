@@ -37,7 +37,7 @@ namespace XTerminal.Base.Enumerations
 
         SSH_THEME_BACKGROUND_TYPE = 110,
         SSH_THEME_BACKGROUND_URI = 111,
-        SSH_THEME_BACKGROUND_COLOR = 112,
+        SSH_THEME_BACK_COLOR = 112,
         SSH_THEME_BACKGROUND_EFFECT = 113,
 
         // Server 201 - 300

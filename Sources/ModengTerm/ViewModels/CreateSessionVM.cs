@@ -792,7 +792,7 @@ namespace ModengTerm.ViewModels
 
             session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE, this.WallpaperTypeEnumList.SelectedItem);
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI, background.Uri);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR, background.Value);
+            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, background.Value);
             session.SetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT, this.EffectTypeEnumList.SelectedItem);
 
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ForegroundColors.SelectedItem.Value);

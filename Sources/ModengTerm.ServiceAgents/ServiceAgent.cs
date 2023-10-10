@@ -1,5 +1,7 @@
 ﻿using DotNEToolkit.Modular;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Terminal;
+using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +19,7 @@ namespace ModengTerm.ServiceAgents
     /// 1. 管理分组和Session信息
     /// 2. 用户数据管理，用户登录
     /// </summary>
-    public abstract class ServiceAgent
+    public abstract class ServiceAgent : ITerminalAgent
     {
         /// <summary>
         /// 获取app清单配置文件
@@ -65,16 +67,9 @@ namespace ModengTerm.ServiceAgents
 
         #endregion
 
-        #region Favorites管理
-
-        public abstract List<Favorites> GetFavorites();
-
+        public abstract List<Favorites> GetFavorites(string sessionId);
         public abstract int AddFavorites(Favorites favorites);
-
-        public abstract int DeleteFavorites(string favId);
-
+        public abstract int DeleteFavorites(Favorites favorites);
         public abstract int UpdateFavorites(Favorites favorites);
-
-        #endregion
     }
 }

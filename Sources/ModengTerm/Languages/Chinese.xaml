@@ -22,8 +22,8 @@
     <!-- 日志选项窗口 3001 - 4000 -->
     <sys:String x:Key="UIText3001">日志选项</sys:String>
     
-    <!-- 剪贴板历史记录窗口 4001 - 4500 -->
-    <sys:String x:Key="UIText4001">剪贴板历史</sys:String>
+    <!-- 段落列表窗口 4001 - 4500 -->
+    <sys:String x:Key="UIText4001">段落列表</sys:String>
 
 
 </ResourceDictionary>

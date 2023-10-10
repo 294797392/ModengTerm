@@ -355,7 +355,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
             this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
             this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
-            this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR);
+            this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             this.scrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK);
             this.topMostCanvas = this.drawingWindow.CreateCanvas();
             this.topMostElements = new List<VTDocumentElement>();
@@ -477,7 +477,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 PaperType = sessionInfo.GetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE),
                 Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
-                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_COLOR),
+                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
                 Rect = this.vtRect,
                 Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT)
             };

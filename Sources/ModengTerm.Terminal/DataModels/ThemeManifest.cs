@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Definitions;
 
-namespace ModengTerm.ServiceAgents.DataModels
+namespace ModengTerm.Terminal.DataModels
 {
     public class ThemeManifest
     {

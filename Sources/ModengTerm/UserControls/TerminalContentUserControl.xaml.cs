@@ -3,7 +3,9 @@ using Microsoft.Win32;
 using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Rendering;
+using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
+using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
@@ -48,14 +50,17 @@ namespace XTerminal.UserControls
 
         #region 实例变量
 
-        private UserInput userInput;
-
         private VideoTerminal videoTerminal;
 
         /// <summary>
         /// 提供剪贴板功能
         /// </summary>
         private VTClipboard clipboard;
+
+        /// <summary>
+        /// 访问服务的代理
+        /// </summary>
+        private ServiceAgent serviceAgent;
 
         #endregion
 
@@ -82,7 +87,7 @@ namespace XTerminal.UserControls
             ToggleButtonLoggerSetting.Visibility = Visibility.Collapsed;
 #endif
 
-            this.userInput = new UserInput();
+            this.serviceAgent = MTermApp.Context.ServiceAgent;
             this.Background = Brushes.Transparent;
         }
         
@@ -313,12 +318,71 @@ namespace XTerminal.UserControls
         {
             MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
 
-            ClipboardVM clipboardVM = new ClipboardVM(this.videoTerminal, this.clipboard);
+            ClipboardParagraphSource clipboardParagraphSource = new ClipboardParagraphSource(this.clipboard);
+            clipboardParagraphSource.Session = this.Session;
+
+            ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this.videoTerminal);
             clipboardVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
 
-            ClipboardHistoryWindow clipboardHistoryWindow = new ClipboardHistoryWindow(clipboardVM);
-            clipboardHistoryWindow.Owner = mainWindow;
-            clipboardHistoryWindow.Show();
+            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
+            paragraphsWindow.Title = "剪贴板历史";
+            paragraphsWindow.Owner = mainWindow;
+            paragraphsWindow.Show();
+        }
+
+        /// <summary>
+        /// 添加到收藏夹
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItemAddToFavorites_Click(object sender, RoutedEventArgs e)
+        {
+            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
+            if (paragraph.IsEmpty)
+            {
+                return;
+            }
+
+            Favorites favorites = new Favorites() 
+            {
+                ID = Guid.NewGuid().ToString(),
+                Background = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
+                Foreground = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR),
+                SessionID = this.Session.ID,
+                StartCharacterIndex = paragraph.StartCharacterIndex,
+                EndCharacterIndex = paragraph.EndCharacterIndex,
+                FontSize = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
+                CharacterList = paragraph.CharacterList,
+                CreationTime = paragraph.CreationTime,
+                FontFamily = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY),
+            };
+
+            int code = this.serviceAgent.AddFavorites(favorites);
+            if(code != ResponseCode.SUCCESS) 
+            {
+                MMessageBox.Error("保存失败");
+            }
+        }
+
+        /// <summary>
+        /// 查看收藏夹列表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MenuItemFaviritesList_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
+
+            FavoritesParagraphSource favoritesParagraphSource = new FavoritesParagraphSource(this.serviceAgent);
+            favoritesParagraphSource.Session = this.Session;
+
+            FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this.videoTerminal);
+            favoritesVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
+
+            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(favoritesVM);
+            paragraphsWindow.Title = "收藏夹列表";
+            paragraphsWindow.Owner = mainWindow;
+            paragraphsWindow.Show();
         }
 
         #endregion

@@ -17,24 +17,24 @@ using System.Windows.Shapes;
 namespace ModengTerm.Windows
 {
     /// <summary>
-    /// ClipboardHistoryWindow.xaml 的交互逻辑
+    /// ParagraphsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class ClipboardHistoryWindow : Window
+    public partial class ParagraphsWindow : Window
     {
-        private ClipboardVM clipboardVM;
+        private ParagraphsVM paragraphsVM;
 
-        public ClipboardHistoryWindow(ClipboardVM clipboardVM)
+        public ParagraphsWindow(ParagraphsVM paragraphsVM)
         {
             InitializeComponent();
 
-            this.InitializeWindow(clipboardVM);
+            this.InitializeWindow(paragraphsVM);
         }
 
-        private void InitializeWindow(ClipboardVM clipboardVM)
+        private void InitializeWindow(ParagraphsVM paragraphsVM)
         {
-            this.clipboardVM = clipboardVM;
+            this.paragraphsVM = paragraphsVM;
 
-            base.DataContext = this.clipboardVM;
+            base.DataContext = this.paragraphsVM;
         }
     }
 }
