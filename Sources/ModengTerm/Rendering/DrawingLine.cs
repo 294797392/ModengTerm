@@ -16,7 +16,7 @@ using XTerminal.Parser;
 
 namespace ModengTerm.Rendering
 {
-    public class DrawingLine : DrawingObject, IDrawingObjectText
+    public class DrawingLine : DrawingObject, IDrawingTextLine
     {
         #region 类变量
 
@@ -26,24 +26,11 @@ namespace ModengTerm.Rendering
 
         #region 实例变量
 
-        /// <summary>
-        /// 默认文本样式
-        /// </summary>
-        internal Typeface typeface;
-
-        /// <summary>
-        /// 默认的文本前景色
-        /// </summary>
-        internal Brush foreground;
-
-        /// <summary>
-        /// 关联的VTextLine
-        /// </summary>
-        private VTextLine textLine;
-
         #endregion
 
         #region 属性
+
+        public VTFormattedText FormattedText { get; set; }
 
         /// <summary>
         /// 该行在ViewableDocument里的位置
@@ -65,10 +52,6 @@ namespace ModengTerm.Rendering
 
         protected override void OnInitialize()
         {
-            this.textLine = this.documentElement as VTextLine;
-
-            this.typeface = DrawingUtils.GetTypeface(this.textLine.Style);
-            this.foreground = DrawingUtils.GetBrush(textLine.Style.ForegroundColor);
         }
 
         protected override void OnRelease()
@@ -77,8 +60,7 @@ namespace ModengTerm.Rendering
 
         protected override void OnDraw(DrawingContext dc)
         {
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine, dc);
-            DrawingUtils.UpdateTextMetrics(this.textLine, formattedText);
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(this.FormattedText, dc);
             dc.DrawText(formattedText, DrawingUtils.ZeroPoint);
         }
 
@@ -88,11 +70,14 @@ namespace ModengTerm.Rendering
         /// </summary>
         /// <param name="textLine">要测量的数据模型</param>
         /// <returns></returns>
-        public void MeasureLine()
+        public VTextMetrics Measure()
         {
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(this.textLine);
-            DrawingUtils.UpdateTextMetrics(textLine, formattedText);
-            textLine.SetMeasureDirty(false);
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(this.FormattedText);
+            return new VTextMetrics() 
+            {
+                Width = formattedText.WidthIncludingTrailingWhitespace,
+                Height = formattedText.Height
+            };
         }
 
         /// <summary>
@@ -104,7 +89,7 @@ namespace ModengTerm.Rendering
         /// <returns></returns>
         public VTRect MeasureTextBlock(int startIndex, int count)
         {
-            return CommonMeasureLine(textLine, startIndex, count);
+            return CommonMeasureLine(this.FormattedText, startIndex, count);
         }
 
         /// <summary>
@@ -116,21 +101,21 @@ namespace ModengTerm.Rendering
         /// <returns>文本坐标，X=文本左边的X偏移量，Y永远是0，因为边界框是相对于该行的</returns>
         public VTRect MeasureCharacter(int characterIndex)
         {
-            return CommonMeasureLine(textLine, characterIndex, 1);
+            return CommonMeasureLine(this.FormattedText, characterIndex, 1);
         }
 
         #endregion
 
         #region 实例方法
 
-        private static VTRect CommonMeasureLine(VTextLine textLine, int startIndex, int count)
+        private static VTRect CommonMeasureLine(VTFormattedText textData, int startIndex, int count)
         {
             if (startIndex < 0)
             {
                 startIndex = 0;
             }
 
-            int totalChars = textLine.Characters.Count;
+            int totalChars = textData.Text.Length;
             if (startIndex + count > totalChars)
             {
                 startIndex = 0;
@@ -142,7 +127,7 @@ namespace ModengTerm.Rendering
                 return new VTRect();
             }
 
-            FormattedText formattedText = DrawingUtils.CreateFormattedText(textLine);
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(textData);
             Geometry geometry = formattedText.BuildHighlightGeometry(DrawingUtils.ZeroPoint, startIndex, count);
             return new VTRect(geometry.Bounds.Left, geometry.Bounds.Top, geometry.Bounds.Width, geometry.Bounds.Height);
         }

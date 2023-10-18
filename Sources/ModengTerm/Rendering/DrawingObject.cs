@@ -17,8 +17,8 @@ namespace ModengTerm.Rendering
     {
         #region 实例变量
 
-        private bool visible = true;
-        protected VTDocumentElement documentElement;
+        private Visibility visible = Visibility.Visible;
+        protected DrawingArea drawingArea;
 
         #endregion
 
@@ -58,9 +58,9 @@ namespace ModengTerm.Rendering
 
         #region 公开接口
 
-        public void Initialize(VTDocumentElement documentElement)
+        public void Initialize()
         {
-            this.documentElement = documentElement;
+            this.drawingArea = this.Parent as DrawingArea;
 
             this.OnInitialize();
         }
@@ -85,31 +85,17 @@ namespace ModengTerm.Rendering
 
         public void SetOpacity(double opacity)
         {
+            if (this.Opacity == opacity)
+            {
+                return;
+            }
+
             this.Opacity = opacity;
         }
 
         public void Arrange(double x, double y)
         {
             this.Offset = new Vector(x, y);
-        }
-
-        public void SetVisible(bool visible)
-        {
-            if (this.visible == visible)
-            {
-                return;
-            }
-
-            if (visible)
-            {
-                this.Opacity = 1;
-            }
-            else
-            {
-                this.Opacity = 0;
-            }
-
-            this.visible = visible;
         }
 
         #endregion

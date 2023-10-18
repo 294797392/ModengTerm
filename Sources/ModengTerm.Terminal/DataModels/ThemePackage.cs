@@ -56,6 +56,15 @@ namespace ModengTerm.Terminal.DataModels
         [JsonProperty("foregroundColor")]
         public string ForegroundColor { get; set; }
 
+        [JsonProperty("scrollbarThumbColor")]
+        public string ScrollbarThumbColor { get; set; }
+
+        [JsonProperty("scrollbarButtonColor")]
+        public string ScrollbarButtonColor { get; set; }
+
+        [JsonProperty("scrollbarTrackColor")]
+        public string ScrollbarTrackColor { get; set; }
+
         public ThemePackage()
         {
         }

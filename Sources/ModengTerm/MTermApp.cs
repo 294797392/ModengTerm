@@ -190,7 +190,7 @@ namespace ModengTerm
 
         #region 实例方法
 
-        private void ProcessFrame(int elapsed, VTFramedElement element)
+        private void ProcessFrame(int elapsed, IFramedElement element)
         {
             element.Elapsed -= elapsed;
 

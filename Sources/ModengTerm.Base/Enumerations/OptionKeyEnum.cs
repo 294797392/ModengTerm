@@ -40,6 +40,12 @@ namespace XTerminal.Base.Enumerations
         SSH_THEME_BACK_COLOR = 112,
         SSH_THEME_BACKGROUND_EFFECT = 113,
 
+        /// <summary>
+        /// 文档边距
+        /// </summary>
+        SSH_THEME_DOCUMENT_PADDING = 114,
+        SSH_THEME_SCROLLBAR_STYLE = 116,
+
         // Server 201 - 300
         SSH_SERVER_ADDR = 201,
         SSH_SERVER_PORT,

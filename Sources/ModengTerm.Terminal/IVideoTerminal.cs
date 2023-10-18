@@ -40,22 +40,12 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 始终处于最上层的Document
         /// </summary>
-        IDrawingCanvas TopMostCanvas { get; }
+        IDrawingDocument TopMostCanvas { get; }
 
         /// <summary>
         /// 当前正在显示的Document
         /// </summary>
         VTDocument ActiveDocument { get; }
-
-        /// <summary>
-        /// 主缓冲区的Document
-        /// </summary>
-        VTDocument MainDocument { get; }
-
-        /// <summary>
-        /// 备用缓冲区的Document
-        /// </summary>
-        VTDocument AlternateDocument { get; }
 
         /// <summary>
         /// 获取终端的滚动信息

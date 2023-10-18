@@ -17,7 +17,7 @@ namespace ModengTerm.Rendering
     /// <summary>
     /// 用来渲染终端输出的表面
     /// </summary>
-    public class DrawingCanvas : FrameworkElement, IDrawingCanvas
+    public class DrawingArea : FrameworkElement
     {
         #region 类变量
 
@@ -43,7 +43,7 @@ namespace ModengTerm.Rendering
 
         #region 构造方法
 
-        public DrawingCanvas()
+        public DrawingArea()
         {
             this.visuals = new VisualCollection(this);
         }
@@ -66,57 +66,40 @@ namespace ModengTerm.Rendering
             //drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
-        #endregion
-
-        #region 实例方法
-
-        private IDrawingObject EnsureDrawingObject(VTDocumentElement documentElement)
+        protected override Size MeasureOverride(Size availableSize)
         {
-            IDrawingObject drawingObject = documentElement.DrawingObject as IDrawingObject;
-            if (drawingObject == null)
+            DrawingFrameworkObject drawingFrameworkObject = this.GetVisual<DrawingFrameworkObject>();
+            if (drawingFrameworkObject == null)
             {
-                drawingObject = DrawingObjectFactory.CreateDrawingObject(documentElement);
-                drawingObject.Initialize(documentElement);
-                documentElement.DrawingObject = drawingObject;
-                this.visuals.Add(drawingObject as DrawingVisual);
+                // DrawingArea测量之后 DrawingObject才有大小，才会占据Grid的空间，不然GridColumn的宽度一直是0，会导致元素显示不出来
+                return base.MeasureOverride(availableSize);
             }
-            return drawingObject;
-        }
-
-        #endregion
-
-        #region IDrawingDocument
-
-        public IDrawingObject CreateDrawingObject(VTDocumentElement documentElement)
-        {
-            return this.EnsureDrawingObject(documentElement);
-        }
-
-        public void DeleteDrawingObject(IDrawingObject drawingObject)
-        {
-            drawingObject.Release();
-            this.visuals.Remove(drawingObject as DrawingObject);
-        }
-
-        public void DeleteDrawingObjects()
-        {
-            List<IDrawingObject> drawingObjects = this.visuals.Cast<IDrawingObject>().ToList();
-
-            foreach (IDrawingObject drawingObject in drawingObjects)
+            else
             {
-                this.DeleteDrawingObject(drawingObject);
+                return new Size(drawingFrameworkObject.Width, drawingFrameworkObject.Height);
             }
         }
 
-        //public VTRect GetTextArea()
-        //{
-        //}
-
         #endregion
 
-        #region 事件处理器
+        public void AddVisual(DrawingObject drawingObject)
+        {
+            this.visuals.Add(drawingObject);
+        }
 
+        public void RemoveVisual(DrawingObject drawingObject)
+        {
+            this.visuals.Remove(drawingObject);
+        }
 
-        #endregion
+        public List<Visual> GetAllVisual()
+        {
+            return this.visuals.Cast<Visual>().ToList();
+        }
+
+        public TVisual GetVisual<TVisual>() where TVisual : DrawingObject
+        {
+            return this.visuals.OfType<TVisual>().FirstOrDefault();
+        }
     }
 }

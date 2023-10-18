@@ -71,7 +71,10 @@
                 "backgroundType": 0,
                 "backgroundUri": "54,52,46",
                 "backgroundColor": "54,52,46",
-                "foregroundColor": "236,238,238"
+                "foregroundColor": "236,238,238",
+                "scrollbarTrackColor": "226,221,221",
+                "scrollbarButtonColor": "153,153,153",
+                "scrollbarThumbColor": "77,77,77"
             },
 
             {

@@ -65,6 +65,16 @@ namespace ModengTerm.Base
         public const int DefaultMaxClipboardHistory = 50;
 
         /// <summary>
+        /// 文档内边距
+        /// </summary>
+        public const int DefaultDocumentPadding = 5;
+
+        /// <summary>
+        /// 滚动条宽度
+        /// </summary>
+        public const int DefaultScrollbarWidth = 10;
+
+        /// <summary>
         /// 默认的串口波特率列表
         /// </summary>
         public static readonly List<string> DefaultSerialPortBaudRates = new List<string>()

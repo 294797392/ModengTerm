@@ -18,6 +18,10 @@ namespace XTerminal.UserControls
 
         public XTermSession Session { get; set; }
 
+        /// <summary>
+        /// 控件被完全Loaded的时候调用
+        /// </summary>
+        /// <returns></returns>
         public int Open()
         {
             this.ViewModel = OpenedSessionVMFactory.Create(this.Session);

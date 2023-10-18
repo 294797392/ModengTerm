@@ -35,6 +35,7 @@ namespace XTerminal
 
         private static void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
+            Console.WriteLine(e.Exception);
             logger.Error(e.Exception);
             MessageBox.Show("客户端运行出现错误, 请联系作者");
         }

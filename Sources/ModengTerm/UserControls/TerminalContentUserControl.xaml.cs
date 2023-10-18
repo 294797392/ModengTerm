@@ -90,7 +90,7 @@ namespace XTerminal.UserControls
             this.serviceAgent = MTermApp.Context.ServiceAgent;
             this.Background = Brushes.Transparent;
         }
-        
+
         private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
         {
             switch (filterIndex)
@@ -102,7 +102,7 @@ namespace XTerminal.UserControls
                     throw new NotImplementedException();
             }
         }
-        
+
         private void SaveToFile(ParagraphTypeEnum saveMode)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -213,7 +213,7 @@ namespace XTerminal.UserControls
                 return;
             }
 
-            this.videoTerminal.OnSizeChanged(this, this.GetDisplayRect());
+            this.videoTerminal.OnSizeChanged(this, this.GetSize());
         }
 
 
@@ -343,7 +343,7 @@ namespace XTerminal.UserControls
                 return;
             }
 
-            Favorites favorites = new Favorites() 
+            Favorites favorites = new Favorites()
             {
                 ID = Guid.NewGuid().ToString(),
                 Background = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
@@ -358,7 +358,7 @@ namespace XTerminal.UserControls
             };
 
             int code = this.serviceAgent.AddFavorites(favorites);
-            if(code != ResponseCode.SUCCESS) 
+            if (code != ResponseCode.SUCCESS)
             {
                 MMessageBox.Error("保存失败");
             }
@@ -389,72 +389,29 @@ namespace XTerminal.UserControls
 
         #region IDrawingWindow
 
-        public IDrawingCanvas CreateCanvas()
+        public IDrawingDocument CreateCanvas()
         {
-            DrawingCanvas document = new DrawingCanvas();
-            return document;
+            DrawingDocument canvas = new DrawingDocument();
+            return canvas;
         }
 
-        public void InsertCanvas(int index, IDrawingCanvas document)
+        public void InsertCanvas(int index, IDrawingDocument document)
         {
             this.Dispatcher.Invoke(() =>
             {
-                GridCanvasList.Children.Insert(0, document as UIElement);
+                FrameworkElement element = document as FrameworkElement;
+                GridCanvasList.Children.Insert(0, element);
+
+                // 添加到子节点里之后马上加载模板，不然后面新建DrawingObject的时候模板还没加载，找不到drawArea
+                element.ApplyTemplate();
             });
         }
 
-        public void VisibleCanvas(IDrawingCanvas document, bool visible)
+        public void VisibleCanvas(IDrawingDocument document, bool visible)
         {
             base.Dispatcher.Invoke(() =>
             {
                 (document as FrameworkElement).Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-            });
-        }
-
-        public void GetScrollInfo(ref VTScrollInfo scrollInfo)
-        {
-            scrollInfo.ScrollMax = (int)SliderScrolbar.Maximum;
-            scrollInfo.ScrollValue = (int)SliderScrolbar.Value;
-        }
-
-        /// <summary>
-        /// 更新滚动信息
-        /// </summary>
-        /// <param name="maximum">滚动条的最大值</param>
-        public void SetScrollInfo(VTScrollInfo scrollInfo)
-        {
-            SliderScrolbar.ValueChanged -= this.SliderScrolbar_ValueChanged;
-
-            if (SliderScrolbar.Minimum != scrollInfo.ScrollMin)
-            {
-                SliderScrolbar.Minimum = scrollInfo.ScrollMin;
-            }
-
-            if (SliderScrolbar.Maximum != scrollInfo.ScrollMax)
-            {
-                SliderScrolbar.Maximum = scrollInfo.ScrollMax;
-            }
-
-            if (SliderScrolbar.Value != scrollInfo.ScrollValue)
-            {
-                SliderScrolbar.Value = scrollInfo.ScrollValue;
-            }
-
-            SliderScrolbar.ValueChanged += this.SliderScrolbar_ValueChanged;
-        }
-
-        public void SetScrollVisible(bool visible)
-        {
-            base.Dispatcher.Invoke(() =>
-            {
-                if (visible)
-                {
-                    SliderScrolbar.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    SliderScrolbar.Visibility = Visibility.Collapsed;
-                }
             });
         }
 
@@ -464,17 +421,16 @@ namespace XTerminal.UserControls
             FormattedText formattedText = new FormattedText(" ", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
                 textStyle.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
 
-            return new VTypeface() 
+            return new VTypeface()
             {
                 Height = formattedText.Height,
-                Width = formattedText.WidthIncludingTrailingWhitespace
+                SpaceWidth = formattedText.WidthIncludingTrailingWhitespace
             };
         }
 
-        public VTRect GetDisplayRect()
+        public VTSize GetSize()
         {
-            Point leftTop = GridCanvasList.PointToScreen(new Point(0, 0));
-            return new VTRect(leftTop.X, leftTop.Y, GridCanvasList.ActualWidth, GridCanvasList.ActualHeight);
+            return new VTSize(GridCanvasList.ActualWidth, GridCanvasList.ActualHeight);
         }
 
         #endregion

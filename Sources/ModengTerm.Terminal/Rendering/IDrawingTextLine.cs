@@ -10,14 +10,19 @@ namespace ModengTerm.Terminal.Rendering
     /// <summary>
     /// 在DrawingObejct的基础上新增了测量文本的接口
     /// </summary>
-    public interface IDrawingObjectText : IDrawingObject
+    public interface IDrawingTextLine : IDrawingObject
     {
+        /// <summary>
+        /// 要渲染的文本
+        /// </summary>
+        VTFormattedText FormattedText { get; set; }
+
         /// <summary>
         /// 测量某个文本行的大小
         /// 测量后的结果存储在VTextLine.Metrics属性里
         /// </summary>
         /// <returns></returns>
-        void MeasureLine();
+        VTextMetrics Measure();
 
         /// <summary>
         /// 测量指定文本里的子文本的矩形框

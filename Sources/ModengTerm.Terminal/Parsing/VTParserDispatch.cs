@@ -542,7 +542,7 @@ namespace XTerminal.Parser
                     case GraphicsOptions.ForegroundYellow: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkYellow)); break;
                     case GraphicsOptions.ForegroundWhite: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkWhite)); break;
 
-                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkWhite)); break;
+                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkBlack)); break;
                     case GraphicsOptions.BackgroundBlue: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkBlue)); break;
                     case GraphicsOptions.BackgroundGreen: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkGreen)); break;
                     case GraphicsOptions.BackgroundCyan: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkCyan)); break;
@@ -560,7 +560,7 @@ namespace XTerminal.Parser
                     case GraphicsOptions.BrightForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightYellow)); break;
                     case GraphicsOptions.BrightForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
 
-                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
+                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightBlack)); break;
                     case GraphicsOptions.BrightBackgroundBlue: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightBlue)); break;
                     case GraphicsOptions.BrightBackgroundGreen: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightGreen)); break;
                     case GraphicsOptions.BrightBackgroundCyan: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightCyan)); break;

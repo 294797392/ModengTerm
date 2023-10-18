@@ -15,20 +15,27 @@ namespace ModengTerm.Rendering
     /// </summary>
     public static class DrawingObjectFactory
     {
-        public static IDrawingObject CreateDrawingObject(VTDocumentElement documentElement)
+        public static IDrawingObject CreateDrawingObject(VTDocumentElements type)
         {
-            switch (documentElement.Type)
+            switch (type)
             {
                 case VTDocumentElements.Cursor: return new DrawingCursor();
                 case VTDocumentElements.SelectionRange: return new DrawingSelection();
                 case VTDocumentElements.TextLine: return new DrawingLine();
-                case VTDocumentElements.Rectangle: return new DrawingRectangle();
                 case VTDocumentElements.MatchesLine: return new DrawingMatchesLine();
                 case VTDocumentElements.Wallpaper: return new DrawingWallpaper();
+                case VTDocumentElements.Scrollbar: return new DrawingScrollbar();
 
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public static TDrawingObject CreateDrawingObject<TDrawingObject>(VTDocumentElements type)
+            where TDrawingObject : IDrawingObject
+        {
+            IDrawingObject drawingObject = CreateDrawingObject(type);
+            return (TDrawingObject)drawingObject;
         }
     }
 }

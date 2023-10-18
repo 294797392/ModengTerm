@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,15 @@ namespace ModengTerm.Rendering
     /// <summary>
     /// 用来画光标选中的文本的Drawable
     /// </summary>
-    public class DrawingSelection : DrawingObject
+    public class DrawingSelection : DrawingObject, IDrawingSelection
     {
         private static readonly Brush DefaultSelectionBrush = Application.Current.FindResource("BrushSelectionBackground") as Brush;
 
         private StreamGeometry selectionGeometry;
         private Pen pen;
         private Brush brush;
-        private VTextSelection textSelection;
+
+        public List<VTRect> Geometry { get; set; }
 
         public DrawingSelection()
         {
@@ -27,7 +29,6 @@ namespace ModengTerm.Rendering
 
         protected override void OnInitialize()
         {
-            this.textSelection = this.documentElement as VTextSelection;
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
             this.brush = DefaultSelectionBrush;
@@ -41,7 +42,7 @@ namespace ModengTerm.Rendering
         {
             StreamGeometryContext sgc = this.selectionGeometry.Open();
 
-            foreach (VTRect bounds in this.textSelection.Geometry)
+            foreach (VTRect bounds in this.Geometry)
             {
                 sgc.BeginFigure(new Point(bounds.LeftTop.X, bounds.LeftTop.Y), true, true);
                 sgc.LineTo(new Point(bounds.RightTop.X, bounds.RightTop.Y), true, true);

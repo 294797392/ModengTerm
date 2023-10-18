@@ -338,7 +338,7 @@ namespace ModengTerm.Terminal
                                 // 如果设置的是颜色的话，并且当前字符的颜色和最后一次设置的颜色不一样，那么要先关闭最后一次设置的颜色
                                 // attribute是最后一次设置的颜色，attributeState是当前字符的颜色
 
-                                GetAttributeParameter(textAttribute, character);
+                                //object parameter = GetAttributeParameter(textAttribute, character);
 
                                 if (attribute.Parameter != parameter)
                                 {
@@ -600,6 +600,23 @@ namespace ModengTerm.Terminal
             bitmapImage.EndInit();
 
             return bitmapImage;
+        }
+
+
+        /// <summary>
+        /// 根据当前屏幕大小计算终端的自适应大小
+        /// </summary>
+        /// <param name="documentSize">文档显示区域的大小</param>
+        /// <param name="rowSize">计算出来的终端行数</param>
+        /// <param name="colSize">计算出来的终端列数</param>
+        public static void CalculateAutoFitSize(VTSize documentSize, VTypeface typeface, out int rowSize, out int colSize)
+        {
+            // 自适应屏幕大小
+            // 计算一共有多少行，和每行之间的间距是多少
+
+            // 终端控件的初始宽度和高度，在打开Session的时候动态设置
+            rowSize = (int)Math.Floor(documentSize.Height / typeface.Height);
+            colSize = (int)Math.Floor(documentSize.Width / typeface.SpaceWidth);
         }
     }
 }

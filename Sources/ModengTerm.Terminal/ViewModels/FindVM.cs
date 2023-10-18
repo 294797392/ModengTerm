@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Terminal.Document;
-using ModengTerm.Terminal.Document.Graphics;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
@@ -185,8 +184,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.FindStartupList.AddRange(MTermUtils.GetEnumValues<FindStartups>());
             this.matchResult = new List<MatchResult>();
 
-            this.matchesLine = new VTMatchesLine();
-            this.videoTerminal.TopMostCanvas.CreateDrawingObject(this.matchesLine);
+            this.matchesLine = new VTMatchesLine(this.videoTerminal.TopMostCanvas);
+            this.matchesLine.Initialize();
         }
 
         #endregion
@@ -306,13 +305,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="matches"></param>
         private void ScrollToMatches(MatchResult matches)
         {
-            // 如果命中的行已经在当前文档里显示出来了，那么就不滚动了
-            // 如果没显示再滚动
-            VTextLine matchesLine = this.videoTerminal.ActiveDocument.FindLine(matches.PhysicsRow);
-            if (matchesLine == null)
-            {
-                this.videoTerminal.ScrollTo(matches.PhysicsRow, ScrollOptions.ScrollToMiddle);
-            }
+            // 让matches行显示到最中间
+            this.videoTerminal.ScrollTo(matches.PhysicsRow, ScrollOptions.ScrollToMiddle);
         }
 
         /// <summary>
@@ -476,10 +470,10 @@ namespace ModengTerm.Terminal.ViewModels
             this.matchesLine.OffsetX = 0;
             this.matchesLine.OffsetY = 0;
             this.matchesLine.TextBlocks.Clear();
-            this.matchesLine.TextLine = null;
             this.matchesLine.RequestInvalidate();
             this.Message = string.Empty;
 
+            this.matchesLine.Release();
             this.videoTerminal.TopMostCanvas.DeleteDrawingObject(this.matchesLine.DrawingObject);
         }
 

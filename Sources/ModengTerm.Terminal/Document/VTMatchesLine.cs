@@ -1,16 +1,17 @@
 ﻿using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Document.Graphics
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
     /// 用来渲染一个VTextLine里的文本块
     /// </summary>
-    public class VTMatchesLine : VTDocumentElement
+    public class VTMatchesLine : VTElement<IDrawingMatchesLine>
     {
         #region 实例变量
 
@@ -31,26 +32,26 @@ namespace ModengTerm.Terminal.Document.Graphics
         /// </summary>
         public VTextLine TextLine
         {
-            get { return this.textLine; }
+            get { return textLine; }
             set
             {
-                if (this.textLine != value)
+                if (textLine != value)
                 {
-                    this.textLine = value;
-                    this.SetDirty(true);
+                    textLine = value;
+                    SetDirty(true);
                 }
             }
         }
 
         public List<VTMatches> MatchesList
         {
-            get { return this.matchesList; }
+            get { return matchesList; }
             set
             {
-                if (this.matchesList != value)
+                if (matchesList != value)
                 {
-                    this.matchesList = value;
-                    this.SetDirty(true);
+                    matchesList = value;
+                    SetDirty(true);
                 }
             }
         }
@@ -59,15 +60,25 @@ namespace ModengTerm.Terminal.Document.Graphics
         /// 匹配的文本块
         /// 用来渲染图形
         /// </summary>
-        public List<VTFormattedText> TextBlocks { get; private set; }
+        public List<VTFormattedText> TextBlocks
+        {
+            get { return this.DrawingObject.TextBlocks; }
+            private set
+            {
+                if (this.DrawingObject.TextBlocks != value)
+                {
+                    this.DrawingObject.TextBlocks = value;
+                }
+            }
+        }
 
         #endregion
 
         #region 构造方法
 
-        public VTMatchesLine()
+        public VTMatchesLine(IDrawingDocument ownerCanvas) :
+            base(ownerCanvas)
         {
-            this.TextBlocks = new List<VTFormattedText>();
         }
 
         #endregion
@@ -86,6 +97,17 @@ namespace ModengTerm.Terminal.Document.Graphics
 
         #region VTDocumentElement
 
+        public override void Initialize()
+        {
+            TextBlocks = new List<VTFormattedText>();
+            this.DrawingObject.Initialize();
+        }
+
+        public override void Release()
+        {
+            this.DrawingObject.Release();
+        }
+
         public override void RequestInvalidate()
         {
             if (this.arrangeDirty)
@@ -95,17 +117,17 @@ namespace ModengTerm.Terminal.Document.Graphics
                 this.arrangeDirty = false;
             }
 
-            if (this.dirty)
+            if (dirty)
             {
                 this.TextBlocks.Clear();
 
-                if (this.matchesList != null && this.matchesList.Count > 0)
+                if (matchesList != null && matchesList.Count > 0)
                 {
                     // 先拷贝要显示的字符
                     List<VTCharacter> characters = new List<VTCharacter>();
-                    VTUtils.CopyCharacter(this.textLine.Characters, characters);
+                    VTUtils.CopyCharacter(textLine.Characters, characters);
 
-                    foreach (VTMatches matches in this.MatchesList)
+                    foreach (VTMatches matches in MatchesList)
                     {
                         #region 更新前景色和背景色
 
@@ -116,17 +138,17 @@ namespace ModengTerm.Terminal.Document.Graphics
 
                             VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
                             VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
-                            character.Foreground = VTColor.CreateFromRgbKey(this.textLine.Style.BackgroundColor);
-                            character.Background = VTColor.CreateFromRgbKey(this.textLine.Style.ForegroundColor);
+                            character.Foreground = VTColor.CreateFromRgbKey(textLine.Style.BackgroundColor);
+                            character.Background = VTColor.CreateFromRgbKey(textLine.Style.ForegroundColor);
                         }
 
                         #endregion
 
-                        VTRect rect = this.textLine.MeasureTextBlock(matches.Index, matches.Length);
+                        VTRect rect = textLine.MeasureTextBlock(matches.Index, matches.Length);
 
                         VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
                         formattedText.OffsetX = rect.Left;
-                        formattedText.Style = this.textLine.Style;
+                        formattedText.Style = textLine.Style;
 
                         this.TextBlocks.Add(formattedText);
                     }
@@ -134,7 +156,7 @@ namespace ModengTerm.Terminal.Document.Graphics
 
                 this.DrawingObject.Draw();
 
-                this.dirty = false;
+                dirty = false;
             }
         }
 

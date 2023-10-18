@@ -1,3 +1,4 @@
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace ModengTerm.Terminal.Document
     /// <summary>
     /// 存储鼠标选中的文本信息
     /// </summary>
-    public class VTextSelection : VTDocumentElement
+    public class VTextSelection : VTDocumentElement<IDrawingSelection>
     {
         #region 类变量
 
@@ -20,8 +21,6 @@ namespace ModengTerm.Terminal.Document
         #endregion
 
         #region 实例变量
-
-        private VTDocument document;
 
         private bool dirty;
 
@@ -39,28 +38,12 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 选中内容的几何表示形式
         /// </summary>
-        public List<VTRect> Geometry { get; private set; }
+        public List<VTRect> Geometry { get { return this.DrawingObject.Geometry; } set { this.DrawingObject.Geometry = value; } }
 
         /// <summary>
         /// 指示当前选中的内容是否为空
         /// </summary>
         public bool IsEmpty { get { return this.firstRowCharacterIndex < 0 || this.lastRowCharacterIndex < 0; } }
-
-        /// <summary>
-        /// 指定当前在哪个文档上进行选中动作
-        /// </summary>
-        public VTDocument Document
-        {
-            get { return this.document; }
-            set
-            {
-                if (this.document != value)
-                {
-                    this.document = value;
-                    this.SetDirty(true);
-                }
-            }
-        }
 
         public int FirstRow
         {
@@ -118,14 +101,9 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTextSelection()
+        public VTextSelection(VTDocument ownerDocument) :
+            base(ownerDocument)
         {
-            this.Geometry = new List<VTRect>();
-
-            this.FirstRow = -1;
-            this.LastRow = -1;
-            this.FirstRowCharacterIndex = -1;
-            this.LastRowCharacterIndex = -1;
         }
 
         #endregion
@@ -146,12 +124,14 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         /// <param name="document"></param>
         /// <param name="container"></param>
-        private void UpdateRange(VTDocument document)
+        private void UpdateGeometry()
         {
+            VTDocument document = this.ownerDocument;
+
             VTextPointer Start = new VTextPointer(this.firstRow, this.firstRowCharacterIndex);
             VTextPointer End = new VTextPointer(this.lastRow, this.lastRowCharacterIndex);
 
-            VTRect container = document.Rect;
+            VTRect container = document.DrawingObject.GetDocumentRect();
 
             this.Geometry.Clear();
 
@@ -301,6 +281,26 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
+        #region VTElement
+
+        public override void Initialize()
+        {
+            this.Geometry = new List<VTRect>();
+
+            this.FirstRow = -1;
+            this.LastRow = -1;
+            this.FirstRowCharacterIndex = -1;
+            this.LastRowCharacterIndex = -1;
+
+            this.Geometry = new List<VTRect>();
+            this.DrawingObject.Initialize();
+        }
+
+        public override void Release()
+        {
+            this.DrawingObject.Release();
+        }
+
         public override void RequestInvalidate()
         {
             if (this.dirty)
@@ -309,7 +309,7 @@ namespace ModengTerm.Terminal.Document
 
                 if (!this.IsEmpty)
                 {
-                    this.UpdateRange(this.document);
+                    this.UpdateGeometry();
                 }
 
                 this.DrawingObject.Draw();
@@ -317,5 +317,7 @@ namespace ModengTerm.Terminal.Document
                 this.dirty = false;
             }
         }
+
+        #endregion
     }
 }

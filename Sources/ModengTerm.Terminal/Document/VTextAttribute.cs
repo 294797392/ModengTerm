@@ -92,7 +92,10 @@ namespace ModengTerm.Terminal.Document
         {
         }
 
-        public void Clear()
+        /// <summary>
+        /// 重置数据
+        /// </summary>
+        public void Reset()
         {
             this.Value = 0;
             this.Background = null;

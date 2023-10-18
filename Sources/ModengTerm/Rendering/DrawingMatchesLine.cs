@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
-using ModengTerm.Terminal.Document.Graphics;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,13 +13,12 @@ using XTerminal;
 
 namespace ModengTerm.Rendering
 {
-    public class DrawingMatchesLine : DrawingObject
+    public class DrawingMatchesLine : DrawingObject, IDrawingMatchesLine
     {
-        private VTMatchesLine matchesLine;
+        public List<VTFormattedText> TextBlocks { get; set; }
 
         protected override void OnInitialize()
         {
-            this.matchesLine = this.documentElement as VTMatchesLine;
         }
 
         protected override void OnRelease()
@@ -28,7 +27,7 @@ namespace ModengTerm.Rendering
 
         protected override void OnDraw(DrawingContext dc)
         {
-            foreach (VTFormattedText textBlock in this.matchesLine.TextBlocks)
+            foreach (VTFormattedText textBlock in this.TextBlocks)
             {
                 FormattedText formattedText = DrawingUtils.CreateFormattedText(textBlock, dc);
 

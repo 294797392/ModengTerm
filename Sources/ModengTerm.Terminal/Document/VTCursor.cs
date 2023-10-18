@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Terminal;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace ModengTerm.Terminal.Document
     /// <summary>
     /// 光标的数据模型
     /// </summary>
-    public class VTCursor : VTFramedElement
+    public class VTCursor : VTFramedDocumentElement<IDrawingCursor>
     {
         #region 类变量
 
@@ -93,21 +94,6 @@ namespace ModengTerm.Terminal.Document
         }
 
         /// <summary>
-        /// 光标类型
-        /// </summary>
-        public VTCursorStyles Style { get; set; }
-
-        /// <summary>
-        /// 光标大小
-        /// </summary>
-        public VTSize Size { get; set; }
-
-        /// <summary>
-        /// 光标颜色
-        /// </summary>
-        public string Color { get; set; }
-
-        /// <summary>
         /// 是否允许光标闪烁
         /// </summary>
         public bool AllowBlink
@@ -126,7 +112,8 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTCursor(VTDocument ownerDocument)
+        public VTCursor(VTDocument ownerDocument) : 
+            base(ownerDocument)
         {
             this.ownerDocument = ownerDocument;
         }
@@ -138,6 +125,19 @@ namespace ModengTerm.Terminal.Document
         #endregion
 
         #region 公开接口
+
+        public override void Initialize()
+        {
+            this.DrawingObject.Color = ownerDocument.options.CursorColor;
+            this.DrawingObject.Size = ownerDocument.options.CursorSize;
+            this.DrawingObject.Style = ownerDocument.options.CursorStyle;
+            this.DrawingObject.Initialize();
+        }
+
+        public override void Release()
+        {
+            this.DrawingObject.Release();
+        }
 
         /// <summary>
         /// 重绘光标位置
@@ -174,14 +174,14 @@ namespace ModengTerm.Terminal.Document
                 // 光标所在行不可见
                 // 此时说明有滚动，有滚动的情况下直接隐藏光标
                 // 滚动之后会调用VTDocument.SetCursorPhysicsRow重新设置光标所在物理行号，这个时候有可能ActiveLine就是空的
-                this.DrawingObject.SetVisible(false);
+                this.DrawingObject.SetOpacity(0);
             }
             else
             {
                 // 说明光标所在行可见
 
                 // 设置光标是否可以显示
-                this.DrawingObject.SetVisible(this.IsVisible);
+                this.DrawingObject.SetOpacity(this.IsVisible ? 1 : 0);
 
                 // 可以显示的话再执行下面的
                 if (this.IsVisible)
@@ -191,7 +191,7 @@ namespace ModengTerm.Terminal.Document
                     {
                         // 允许光标闪烁，改变光标并闪烁
                         this.blinkState = !this.blinkState;
-                        this.DrawingObject.SetVisible(this.blinkState);
+                        this.DrawingObject.SetOpacity(this.blinkState ? 1 : 0);
                     }
                     else
                     {

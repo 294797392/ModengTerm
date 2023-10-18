@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,7 +14,7 @@ namespace ModengTerm.Terminal.Document
     /// <summary>
     /// 存储当前Surface里显示的一行信息
     /// </summary>
-    public class VTextLine : VTextElement
+    public class VTextLine : VTDocumentElement<IDrawingTextLine>
     {
         /// <summary>
         /// 指定要把行移动到的位置
@@ -34,6 +35,18 @@ namespace ModengTerm.Terminal.Document
         #region 实例变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTextLine");
+
+        /// <summary>
+        /// 元素是否需要重新渲染
+        /// 对于VTextLine来说，Render分两步，第一步是对文字进行排版，第二部是画，排版操作是很耗时的
+        /// Render的同时也会进行Measure操作
+        /// </summary>
+        private bool renderDirty;
+
+        /// <summary>
+        /// 元素是否需要重新测量
+        /// </summary>
+        private bool isMeasureDirty;
 
         #endregion
 
@@ -103,6 +116,35 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public List<VTCharacter> Characters { get { return this.characters; } }
 
+        /// <summary>
+        /// 文本的测量信息
+        /// </summary>
+        public VTextMetrics Metrics { get; private set; }
+
+        /// <summary>
+        /// 获取该文本块的宽度
+        /// </summary>
+        public double Width { get { return this.Metrics.Width; } }
+
+        /// <summary>
+        /// 该行高度，当DECAWM被设置的时候，终端里的一行如果超出了列数，那么会自动换行
+        /// 当一行的字符超过终端的列数的时候，DECAWM指令指定了超出的字符要如何处理
+        /// DECAWM SET：超出后要在新的一行上从头开始显示字符
+        /// DECAWM RESET：超出后在该行的第一个字符处开始显示字符
+        /// </summary>
+        public double Height { get { return this.Metrics.Height; } }
+
+        /// <summary>
+        /// 获取该文本的边界框信息
+        /// 在画完之后会更新测量的矩形框信息
+        /// </summary>
+        public VTRect Bounds { get { return new VTRect(this.OffsetX, this.OffsetY, this.Width, this.Height); } }
+
+        /// <summary>
+        /// 文本样式
+        /// </summary>
+        public VTextStyle Style { get; set; }
+
         #endregion
 
         #region 构造方法
@@ -111,9 +153,11 @@ namespace ModengTerm.Terminal.Document
         /// 
         /// </summary>
         /// <param name="owner">该行所属的文档</param>
-        public VTextLine(VTDocument owner) : base(owner)
+        public VTextLine(VTDocument owner) : 
+            base(owner)
         {
             this.characters = new List<VTCharacter>();
+            this.Metrics = new VTextMetrics();
         }
 
         #endregion
@@ -149,13 +193,13 @@ namespace ModengTerm.Terminal.Document
             {
                 // 说明是第一行
                 next.PreviousLine = null;
-                this.OwnerDocument.FirstLine = next;
+                this.ownerDocument.FirstLine = next;
             }
             else if (next == null)
             {
                 // 说明是最后一行
                 previous.NextLine = null;
-                this.OwnerDocument.LastLine = previous;
+                this.ownerDocument.LastLine = previous;
             }
             else
             {
@@ -185,7 +229,7 @@ namespace ModengTerm.Terminal.Document
             {
                 // 如果该行的下一行是空，那么说明是最后一行
                 // 此时要更新最后一行
-                this.OwnerDocument.LastLine = textLine;
+                this.ownerDocument.LastLine = textLine;
             }
 
             this.NextLine = textLine;
@@ -203,10 +247,10 @@ namespace ModengTerm.Terminal.Document
             // 1. 该行是第一行，那么需要更新FirstLine指针
             // 2. 该行不是第一行
 
-            if (this == this.OwnerDocument.FirstLine)
+            if (this == this.ownerDocument.FirstLine)
             {
                 // 该行是第一行
-                this.OwnerDocument.FirstLine = textLine;
+                this.ownerDocument.FirstLine = textLine;
                 textLine.NextLine = this;
                 this.PreviousLine = textLine;
             }
@@ -523,6 +567,107 @@ namespace ModengTerm.Terminal.Document
             }
 
             this.SetRenderDirty(true);
+        }
+
+        public void SetMeasureDirty(bool isDirty)
+        {
+            if (this.isMeasureDirty != isDirty)
+            {
+                this.isMeasureDirty = isDirty;
+            }
+        }
+
+        public void SetRenderDirty(bool isDirty)
+        {
+            if (this.renderDirty != isDirty)
+            {
+                this.renderDirty = isDirty;
+
+                // 需要render的时候也说明需要measure
+                this.isMeasureDirty = isDirty;
+            }
+        }
+
+        #endregion
+
+        #region VTDocumentElement
+
+        public override void Initialize()
+        {
+            this.DrawingObject.Initialize();
+        }
+
+        public override void Release()
+        {
+            this.DrawingObject.Release();
+        }
+
+        public override void RequestInvalidate()
+        {
+            if (base.arrangeDirty)
+            {
+                this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
+
+                base.arrangeDirty = false;
+            }
+
+            if (this.renderDirty)
+            {
+                VTFormattedText formattedText = VTUtils.CreateFormattedText(this.characters);
+                formattedText.Style = this.Style;
+
+                // 如果文本是空的那么无法测量出来高度
+                // 空白字符可以测量出来高度
+                if (formattedText.Text == null) 
+                {
+                    formattedText.Text = " ";
+                }
+
+                // 把物理行号打印出来，调试用
+                //textData.Text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
+
+                this.DrawingObject.FormattedText = formattedText;
+
+                this.DrawingObject.Draw();
+
+                this.renderDirty = false;
+            }
+
+            if (this.isMeasureDirty)
+            {
+                IDrawingTextLine objectText = this.DrawingObject as IDrawingTextLine;
+
+                VTextMetrics textMetrics = objectText.Measure();
+                this.Metrics = textMetrics;
+
+                this.isMeasureDirty = false;
+            }
+        }
+
+        /// <summary>
+        /// 测量指定文本里的子文本的矩形框
+        /// </summary>
+        /// <param name="startIndex">要测量的起始字符索引</param>
+        /// <param name="count">要测量的最大字符数，0为全部测量</param>
+        /// <returns></returns>
+        public VTRect MeasureTextBlock(int startIndex, int count)
+        {
+            IDrawingTextLine objectText = this.DrawingObject as IDrawingTextLine;
+
+            return objectText.MeasureTextBlock(startIndex, count);
+        }
+
+        /// <summary>
+        /// 测量一行里某个字符的测量信息
+        /// 注意该接口只能测量出来X偏移量，Y偏移量需要外部根据高度自己计算
+        /// </summary>
+        /// <param name="characterIndex">要测量的字符</param>
+        /// <returns>文本坐标，X=文本左边的X偏移量，Y永远是0，因为边界框是相对于该行的</returns>
+        public VTRect MeasureCharacter(int characterIndex)
+        {
+            IDrawingTextLine objectText = this.DrawingObject as IDrawingTextLine;
+
+            return objectText.MeasureCharacter(characterIndex);
         }
 
         #endregion

@@ -1,11 +1,14 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:mcontrols="clr-namespace:ModengTerm.Controls">
+    xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
+    xmlns:mrendering="clr-namespace:ModengTerm.Rendering">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/WPFToolkit;component/ClearDefaultStyles.xaml"/>
     </ResourceDictionary.MergedDictionaries>
+
+    <mrendering:DocumentPaddingConverter x:Key="DocumentPaddingConverter"/>
 
     <!-- 通用控件 -->
 
@@ -49,6 +52,30 @@
         </Setter>
     </Style>
 
+    <Style x:Key="StyleDrawingDocument" TargetType="{x:Type mrendering:DrawingDocument}">
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type mrendering:DrawingDocument}">
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <mrendering:DrawingArea Grid.Column="0" x:Name="PART_Document"
+                                                Margin="{TemplateBinding DocumentPadding, Converter={StaticResource ResourceKey=DocumentPaddingConverter}}"/>
+
+                        <mrendering:DrawingArea Grid.Column="1" x:Name="PART_Scrollbar"/>
+
+                    </Grid>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 
 

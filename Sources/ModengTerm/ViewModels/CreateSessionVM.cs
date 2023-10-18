@@ -7,6 +7,7 @@ using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -401,6 +402,10 @@ namespace ModengTerm.ViewModels
                 }
             }
         }
+
+        public string ScrollbarThumbColor { get; set; }
+        public string ScrollbarButtonColor { get; set; }
+        public string ScrollbarTrackColor { get; set; }
 
         #endregion
 
@@ -801,6 +806,15 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR, this.CursorColors.SelectedItem.Value);
             session.SetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
 
+            ScrollbarStyle scrollbarStyle = new ScrollbarStyle()
+            {
+                ButtonColor = this.ScrollbarButtonColor,
+                ThumbColor = this.ScrollbarThumbColor,
+                TrackColor = this.ScrollbarTrackColor,
+                Width = MTermConsts.DefaultScrollbarWidth
+            };
+            session.SetOption<ScrollbarStyle>(OptionKeyEnum.SSH_THEME_SCROLLBAR_STYLE, scrollbarStyle);
+
             return true;
         }
 
@@ -843,6 +857,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
+            session.SetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, MTermConsts.DefaultDocumentPadding);
 
             return true;
         }
@@ -972,6 +987,14 @@ namespace ModengTerm.ViewModels
                 this.ForegroundColors.Move(index, 0);
             }
             this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault();
+
+            #endregion
+
+            #region 更新滚动条选项
+
+            this.ScrollbarButtonColor = theme.ScrollbarButtonColor;
+            this.ScrollbarThumbColor = theme.ScrollbarThumbColor;
+            this.ScrollbarTrackColor = theme.ScrollbarTrackColor;
 
             #endregion
         }

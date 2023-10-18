@@ -34,10 +34,6 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="20"/>
-            </Grid.ColumnDefinitions>
 
             <Grid Grid.Row="0" Background="Transparent">
 
@@ -69,23 +65,13 @@
                     </ContextMenu>
                 </Grid.ContextMenu>
 
-                <Grid x:Name="GridCanvasList" Margin="5,5,0,5"
+                <Grid x:Name="GridCanvasList"
                       PreviewMouseLeftButtonDown="GridCanvasList_PreviewMouseLeftButtonDown"
                       PreviewMouseMove="GridCanvasList_PreviewMouseMove"
                       PreviewMouseLeftButtonUp="GridCanvasList_PreviewMouseLeftButtonUp"
                       SizeChanged="GridCanvasList_SizeChanged"/>
 
             </Grid>
-
-            <Grid Grid.Row="0"></Grid>
-
-            <!-- Slider模拟滚动条 -->
-            <Slider Grid.Column="1" x:Name="SliderScrolbar" Interval="1" IsSnapToTickEnabled="True" 
-                    Minimum="0" Maximum="0" Delay="500" Cursor="Arrow" ValueChanged="SliderScrolbar_ValueChanged">
-                <Slider.LayoutTransform>
-                    <RotateTransform Angle="90"/>
-                </Slider.LayoutTransform>
-            </Slider>
         </Grid>
 
         <!-- 状态栏 -->

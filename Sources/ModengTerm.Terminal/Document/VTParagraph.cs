@@ -62,12 +62,47 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public bool IsAlternate { get; set; }
 
-        public IDrawingCanvas Canvas { get; set; }
+        /// <summary>
+        /// 用来渲染该段落的画布
+        /// </summary>
+        public IDrawingDocument Canvas { get; set; }
 
+        /// <summary>
+        /// 滚动条信息
+        /// </summary>
         public VTScrollInfo ScrollInfo { get; set; }
+
+        /// <summary>
+        /// 可视区域内的第一行数据
+        /// </summary>
+        public VTextLine FirstLine { get; set; }
+
+        /// <summary>
+        /// 可视区域内的最后一行数据
+        /// </summary>
+        public VTextLine LastLine { get; set; }
+
+        /// <summary>
+        /// 文本选中信息
+        /// </summary>
+        public VTextSelection TextSelection { get; set; }
 
         public VTParagraph()
         {
         }
+
+        /// <summary>
+        /// 请求重绘该段落
+        /// </summary>
+        public void RequestInvalidate()
+        {
+        }
     }
 }
+
+
+
+
+
+
+

@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Terminal.Document;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,36 +15,40 @@ namespace ModengTerm.Rendering
     /// <summary>
     /// 光标的渲染模型
     /// </summary>
-    public class DrawingCursor : DrawingObject
+    public class DrawingCursor : DrawingObject, IDrawingCursor
     {
         private static readonly Pen TransparentPen = new Pen(Brushes.Transparent, 0);
 
-        private VTCursor cursor;
         private Brush brush;
         private Rect rect;
 
+        public VTCursorStyles Style { get; set; }
+
+        public VTSize Size { get; set; }
+
+        public string Color { get; set; }
+
         protected override void OnInitialize()
         {
-            this.cursor = this.documentElement as VTCursor;
-            this.brush = DrawingUtils.GetBrush(this.cursor.Color);
+            this.brush = DrawingUtils.GetBrush(this.Color);
 
-            switch (this.cursor.Style)
+            switch (this.Style)
             {
                 case VTCursorStyles.Block:
                     {
-                        this.rect = new Rect(0, 0, this.cursor.Size.Width, this.cursor.Size.Height);
+                        this.rect = new Rect(0, 0, this.Size.Width, this.Size.Height);
                         break;
                     }
 
                 case VTCursorStyles.Line:
                     {
-                        this.rect = new Rect(0, 0, 2, this.cursor.Size.Height);
+                        this.rect = new Rect(0, 0, 2, this.Size.Height);
                         break;
                     }
 
                 case VTCursorStyles.Underscore:
                     {
-                        this.rect = new Rect(0, this.cursor.Size.Height - 2, this.cursor.Size.Width, 2);
+                        this.rect = new Rect(0, this.Size.Height - 2, this.Size.Width, 2);
                         break;
                     }
 

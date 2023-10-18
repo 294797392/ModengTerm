@@ -7,24 +7,12 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Document
 {
-    /// <summary>
-    /// 存储滚动条的信息
-    /// </summary>
-    public class VTScrollInfo : VTDocumentElement
+    public abstract class VTScrollInfo : VTDocumentElement<IDrawingScrollbar>
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTScrollInfo");
-
-        #region 实例变量
-
-        private bool dirty;
+        protected bool dirty;
         private int scrollMax;
         private int scrollValue;
-        private IDrawingWindow vt;
-        private VTHistory history;
-
-        #endregion
-
-        #region 属性
+        protected VTHistory history;
 
         public override VTDocumentElements Type => VTDocumentElements.Scrollbar;
 
@@ -134,27 +122,21 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 可滚动内容的第一行记录
         /// </summary>
-        public VTHistoryLine FirstLine { get; private set; }
+        public VTHistoryLine FirstLine { get; protected set; }
 
         /// <summary>
         /// 可滚动内容的最后一行记录
         /// </summary>
-        public VTHistoryLine LastLine { get; private set; }
+        public VTHistoryLine LastLine { get; protected set; }
 
-        #endregion
-
-        #region 构造方法
-
-        public VTScrollInfo(IDrawingWindow vt)
+        public VTScrollInfo(VTDocument ownerDocument) :
+            base(ownerDocument)
         {
-            this.vt = vt;
         }
-
-        #endregion
 
         #region 实例方法
 
-        private void SetDirty(bool dirty)
+        protected void SetDirty(bool dirty)
         {
             if (this.dirty != dirty)
             {
@@ -182,17 +164,6 @@ namespace ModengTerm.Terminal.Document
         #endregion
 
         #region 公开接口
-
-        public int Initialize()
-        {
-            this.history = new VTMemoryHistory();
-            return this.history.Initialize();
-        }
-
-        public void Release()
-        {
-            this.history.Release();
-        }
 
         /// <summary>
         /// 更新文本行对应的历史记录
@@ -264,13 +235,124 @@ namespace ModengTerm.Terminal.Document
 
         #endregion
 
+        public static VTScrollInfo Create(bool isAlternate, VTDocument ownerDocument)
+        {
+            if (isAlternate)
+            {
+                return new VTAlternateScrollInfo(ownerDocument);
+            }
+            else
+            {
+                return new VTMainScrollInfo(ownerDocument);
+            }
+        }
+    }
+
+    public class VTAlternateScrollInfo : VTScrollInfo
+    {
+        public override VTDocumentElements Type => VTDocumentElements.Scrollbar;
+
+        public VTAlternateScrollInfo(VTDocument ownerDocument) :
+            base(ownerDocument)
+        {
+        }
+
+        public override void Initialize()
+        {
+            this.history = new VTMemoryHistory();
+            this.history.Initialize();
+        }
+
+        public override void Release()
+        {
+        }
+
+        public override void RequestInvalidate()
+        {
+        }
+    }
+
+    /// <summary>
+    /// 存储滚动条的信息
+    /// </summary>
+    public class VTMainScrollInfo : VTScrollInfo
+    {
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTMainScrollInfo");
+
+        #region 实例变量
+
+        private ScrollbarStyle style;
+
+        #endregion
+
+        #region 属性
+
+        #endregion
+
+        #region 构造方法
+
+        public VTMainScrollInfo(VTDocument ownerDocument) :
+            base(ownerDocument)
+        {
+        }
+
+        #endregion
+
         #region VTDocumentElement
+
+        public override void Initialize()
+        {
+            this.history = new VTMemoryHistory();
+            this.history.Initialize();
+
+            this.style = this.ownerDocument.options.ScrollbarStyle;
+
+            // 这个width和height用来计算DecreaseRect和IncreaseRect
+            double width = this.style.Width;
+            double height = this.ownerDocument.Height;
+
+            // 因为初始化的时候不需要显示滚动条，所以width和height设置成0
+            this.DrawingObject.Width = 0;
+            this.DrawingObject.Height = 0;
+            this.DrawingObject.Style = this.style;
+            this.DrawingObject.DecreaseRect = new VTRect(0, 0, 0, width);
+            this.DrawingObject.IncreaseRect = new VTRect(0, height - width, width, width);
+            this.DrawingObject.Initialize();
+        }
+
+        public override void Release()
+        {
+            this.history.Release();
+
+            this.DrawingObject.Release();
+        }
 
         public override void RequestInvalidate()
         {
             if (this.dirty)
             {
-                this.vt.SetScrollInfo(this);
+                if (this.ScrollValue == 0)
+                {
+                    this.DrawingObject.Width = 0;
+                    this.DrawingObject.Height = 0;
+                }
+                else
+                {
+                    this.DrawingObject.Width = this.style.Width;
+                    this.DrawingObject.Height = this.ownerDocument.Height;
+
+                    //double totalHeight = this.Height - 2 - this.Width * 2;
+
+                    //// 滑动条的高度 = 内容可视区高度 / 内容实际区高度 * 滑道高度
+                    //double thumbHeight = this.ownerDocument.ViewportRow / this.ScrollMax + this.ownerDocument.ViewportRow * totalHeight;
+
+                    //// 滚动条的顶部距离=滑动条的高度/滑道高度*实际内容区域顶部距离
+                    //double thumbTop = thumbHeight / totalHeight * this.ScrollValue;
+
+                    //this.DrawingObject.ThumbRect = new VTRect(1, thumbTop + this.DrawingObject.DecreaseRect.Bottom, this.DrawingObject.DecreaseRect.Width, thumbHeight);
+
+                    this.DrawingObject.Draw();
+                }
 
                 this.dirty = false;
             }

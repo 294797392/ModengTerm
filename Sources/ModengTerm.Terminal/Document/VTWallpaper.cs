@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -15,12 +16,11 @@ using System.Windows.Media.Imaging;
 
 namespace ModengTerm.Terminal.Document
 {
-    public class VTWallpaper : VTFramedElement
+    public class VTWallpaper : VTFramedElement<IDrawingWallpaper>
     {
         #region 实例变量
 
         private string uri;
-        private VTRect vtc;
         private int frameIndex;// 当前显示的帧序号
 
         #endregion
@@ -53,19 +53,6 @@ namespace ModengTerm.Terminal.Document
         public WallpaperTypeEnum PaperType { get; set; }
 
         /// <summary>
-        /// 在set访问器里会消除文档的边距
-        /// </summary>
-        public VTRect Rect
-        {
-            get { return this.vtc; }
-            set
-            {
-                // -5,-5,+5,+5是为了消除边距
-                this.vtc = new VTRect(-5, -5, value.Width + 5, value.Height + 10);
-            }
-        }
-
-        /// <summary>
         /// 当前要显示的帧
         /// </summary>
         public GifFrame Frame { get; private set; }
@@ -87,9 +74,39 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public double Opacity { get; set; }
 
+        /// <summary>
+        /// 背景显示区域
+        /// 相对于DrawingWindow的区域
+        /// </summary>
+        public VTRect Rect { get; set; }
+
         #endregion
 
-        #region VTDocumentElement
+        #region 构造方法
+
+        public VTWallpaper(IDrawingDocument drawingDocument)
+            : base(drawingDocument)
+        {
+        }
+
+        #endregion
+
+        #region VTElement
+
+        public override void Initialize()
+        {
+            this.DrawingObject.Uri = this.Uri;
+            this.DrawingObject.BackgroundColor = this.BackgroundColor;
+            this.DrawingObject.PaperType = this.PaperType;
+            this.DrawingObject.EffectType = this.Effect;
+            this.DrawingObject.Rect = this.Rect;
+            this.DrawingObject.Initialize();
+        }
+
+        public override void Release()
+        {
+            this.DrawingObject.Release();
+        }
 
         public override void RequestInvalidate()
         {
@@ -117,6 +134,12 @@ namespace ModengTerm.Terminal.Document
                 case WallpaperTypeEnum.Image:
                 case WallpaperTypeEnum.Color:
                     {
+                        if (this.DrawingObject.Rect.Width != this.Rect.Width ||
+                            this.DrawingObject.Rect.Height != this.Rect.Height)
+                        {
+                            this.DrawingObject.Rect = this.Rect;
+                        }
+
                         this.DrawingObject.Draw();
                         break;
                     }

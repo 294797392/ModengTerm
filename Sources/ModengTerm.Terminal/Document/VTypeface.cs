@@ -17,9 +17,10 @@ namespace ModengTerm.Terminal.Document
         public double Height { get; set; }
 
         /// <summary>
-        /// 字体宽度，因为每个字符的宽度可能都不是一样的
+        /// 空白字符的宽度
+        /// 注意每个字符的宽度可能都不是一样的
         /// 这个宽度是空白字符的宽度
         /// </summary>
-        public double Width { get; set; }
+        public double SpaceWidth { get; set; }
     }
 }

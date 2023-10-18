@@ -2,6 +2,7 @@
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,13 +43,12 @@ namespace ModengTerm.Rendering.Wallpaper
         public bool SingleFrame { get; set; }
     }
 
-    public class DrawingWallpaper : DrawingObject
+    public class DrawingWallpaper : DrawingObject, IDrawingWallpaper
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingWallpaperBase");
 
         #region 实例变量
 
-        protected VTWallpaper wallpaper;
         protected WallpaperFormat format;
 
         private WriteableBitmap writeableBitmap;
@@ -56,9 +56,23 @@ namespace ModengTerm.Rendering.Wallpaper
         private double oldHeight;
 
         private EffectRenderer effectRenderer;
+
+        /// <summary>
+        /// 是否已经画了一次
+        /// </summary>
         private bool drawOnce;
 
         private byte[] frameData;
+
+        #endregion
+
+        #region 属性
+
+        public VTRect Rect { get; set; }
+        public WallpaperTypeEnum PaperType { get; set; }
+        public EffectTypeEnum EffectType { get; set; }
+        public string BackgroundColor { get; set; }
+        public string Uri { get; set; }
 
         #endregion
 
@@ -70,20 +84,20 @@ namespace ModengTerm.Rendering.Wallpaper
         /// <returns></returns>
         private WallpaperFormat GetFormat()
         {
-            switch (this.wallpaper.PaperType)
+            switch (this.PaperType)
             {
                 case WallpaperTypeEnum.Color:
                     {
-                        VTColor vtc = VTColor.CreateFromRgbKey(wallpaper.BackgroundColor);
+                        VTColor vtc = VTColor.CreateFromRgbKey(this.BackgroundColor);
                         Color color = Color.FromRgb(vtc.R, vtc.G, vtc.B);
 
-                        this.frameData = Enumerable.Repeat((byte)0, (int)this.wallpaper.Rect.Width * (int)this.wallpaper.Rect.Height).ToArray();
+                        this.frameData = Enumerable.Repeat((byte)0, (int)this.Rect.Width * (int)this.Rect.Height).ToArray();
 
                         return new WallpaperFormat()
                         {
                             // 这里的宽和高设置多少无所谓，会自动拉伸
-                            Width = (int)wallpaper.Rect.Width,
-                            Height = (int)wallpaper.Rect.Height,
+                            Width = (int)this.Rect.Width,
+                            Height = (int)this.Rect.Height,
                             Format = PixelFormats.Indexed8,
                             Palette = new BitmapPalette(Enumerable.Repeat(color, 256).ToList()),
                             SingleFrame = true
@@ -92,7 +106,7 @@ namespace ModengTerm.Rendering.Wallpaper
 
                 case WallpaperTypeEnum.Image:
                     {
-                        BitmapSource bitmapSource = VTUtils.GetWallpaperBitmap(this.wallpaper.Uri);
+                        BitmapSource bitmapSource = VTUtils.GetWallpaperBitmap(this.Uri);
                         int bytesPerPixel = bitmapSource.Format.BitsPerPixel / 8;
                         this.frameData = new byte[(int)bitmapSource.PixelWidth * (int)bitmapSource.PixelHeight * bytesPerPixel];
                         bitmapSource.CopyPixels(this.frameData, (int)bitmapSource.PixelWidth * bytesPerPixel, 0);
@@ -122,7 +136,6 @@ namespace ModengTerm.Rendering.Wallpaper
 
         protected override void OnInitialize()
         {
-            this.wallpaper = this.documentElement as VTWallpaper;
             this.format = this.GetFormat();
 
             // 初始化WriteableBitmap
@@ -131,11 +144,11 @@ namespace ModengTerm.Rendering.Wallpaper
 
             // 画
             DrawingContext dc = this.RenderOpen();
-            dc.DrawImage(this.writeableBitmap, this.wallpaper.Rect.GetRect());
+            dc.DrawImage(this.writeableBitmap, this.Rect.GetRect());
             dc.Close();
 
-            this.oldWidth = this.wallpaper.Rect.Width;
-            this.oldHeight = this.wallpaper.Rect.Height;
+            this.oldWidth = this.Rect.Width;
+            this.oldHeight = this.Rect.Height;
         }
 
         protected override void OnRelease()
@@ -150,15 +163,15 @@ namespace ModengTerm.Rendering.Wallpaper
 
         public override void Draw()
         {
-            if (this.oldWidth != this.wallpaper.Rect.Width ||
-                this.oldHeight != this.wallpaper.Rect.Height)
+            if (this.oldWidth != this.Rect.Width ||
+                this.oldHeight != this.Rect.Height)
             {
                 // 这段代码可以重绘并让writeableBitmap填充元素
                 DrawingContext dc = this.RenderOpen();
-                dc.DrawImage(this.writeableBitmap, this.wallpaper.Rect.GetRect());
+                dc.DrawImage(this.writeableBitmap, this.Rect.GetRect());
                 dc.Close();
-                this.oldWidth = this.wallpaper.Rect.Width;
-                this.oldHeight = this.wallpaper.Rect.Height;
+                this.oldWidth = this.Rect.Width;
+                this.oldHeight = this.Rect.Height;
             }
 
             // 重绘当前帧
@@ -183,7 +196,7 @@ namespace ModengTerm.Rendering.Wallpaper
             // 画动效
             if (this.effectRenderer == null)
             {
-                this.effectRenderer = EffectRendererFactory.Create(this.wallpaper.Effect);
+                this.effectRenderer = EffectRendererFactory.Create(this.EffectType);
                 this.effectRenderer.Initialize(this);
             }
             this.effectRenderer.DrawFrame();

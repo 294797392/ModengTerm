@@ -85,6 +85,14 @@ namespace ModengTerm.Terminal.Document
             this.Height = height;
         }
 
+        public VTRect(double x, double y, VTSize size)
+        {
+            this.X = x;
+            this.Y = y;
+            this.Width = size.Width;
+            this.Height = size.Height;
+        }
+
         /// <summary>
         /// 测试是否在水平位置包含X
         /// </summary>
@@ -111,6 +119,21 @@ namespace ModengTerm.Terminal.Document
         public Rect GetRect()
         {
             return new Rect(this.X, this.Y, this.Width, this.Height);
+        }
+
+        public VTSize GetSize() 
+        {
+            return new VTSize(this.Width, this.Height);
+        }
+
+        /// <summary>
+        /// 保持中心点不变，向四周扩大相同的距离
+        /// </summary>
+        /// <param name="value">要扩大的距离</param>
+        /// <returns></returns>
+        public VTRect Extend(double value)
+        {
+            return new VTRect(this.X - value, this.Y - value, this.Width + value * 2, this.Height + value * 2);
         }
     }
 }
