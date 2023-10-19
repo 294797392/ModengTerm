@@ -110,6 +110,11 @@ namespace ModengTerm.Rendering
 
         private static VTRect CommonMeasureLine(VTFormattedText textData, int startIndex, int count)
         {
+            if (textData == null)
+            {
+                return new VTRect();
+            }
+
             if (startIndex < 0)
             {
                 startIndex = 0;

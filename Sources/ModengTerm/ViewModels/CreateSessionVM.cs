@@ -806,15 +806,6 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR, this.CursorColors.SelectedItem.Value);
             session.SetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
 
-            ScrollbarStyle scrollbarStyle = new ScrollbarStyle()
-            {
-                ButtonColor = this.ScrollbarButtonColor,
-                ThumbColor = this.ScrollbarThumbColor,
-                TrackColor = this.ScrollbarTrackColor,
-                Width = MTermConsts.DefaultScrollbarWidth
-            };
-            session.SetOption<ScrollbarStyle>(OptionKeyEnum.SSH_THEME_SCROLLBAR_STYLE, scrollbarStyle);
-
             return true;
         }
 

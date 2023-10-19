@@ -65,11 +65,7 @@
                     </ContextMenu>
                 </Grid.ContextMenu>
 
-                <Grid x:Name="GridCanvasList"
-                      PreviewMouseLeftButtonDown="GridCanvasList_PreviewMouseLeftButtonDown"
-                      PreviewMouseMove="GridCanvasList_PreviewMouseMove"
-                      PreviewMouseLeftButtonUp="GridCanvasList_PreviewMouseLeftButtonUp"
-                      SizeChanged="GridCanvasList_SizeChanged"/>
+                <Grid x:Name="GridDocumentList"/>
 
             </Grid>
         </Grid>

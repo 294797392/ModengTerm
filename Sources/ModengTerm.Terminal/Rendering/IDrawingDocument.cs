@@ -15,7 +15,17 @@ namespace ModengTerm.Terminal.Rendering
         /// <summary>
         /// 该文档的内容距离边框的距离
         /// </summary>
-        double DocumentPadding { get; set; }
+        double ContentPadding { get; set; }
+
+        /// <summary>
+        /// 获取文档里的滚动条
+        /// </summary>
+        IDrawingScrollbar Scrollbar { get; }
+
+        /// <summary>
+        /// 设置滚动条的可见性
+        /// </summary>
+        bool ScrollbarVisible { get; set; }
 
         /// <summary>
         /// 创建一个渲染对象
@@ -34,10 +44,10 @@ namespace ModengTerm.Terminal.Rendering
         void DeleteDrawingObjects();
 
         /// <summary>
-        /// Document由DocumentArea和ScrollbarArea组成
-        /// 这个函数的作用是获取相对于整个Document，DocumentArea的大小（也就是显示文档的区域，不包含滚动条和其他的区域）
+        /// Document由ContentArea和Scrollbar组成
+        /// 这个函数的作用是获取相对于整个Document，ContentArea的大小（也就是显示文档的区域，不包含滚动条和其他的区域）
         /// </summary>
         /// <returns></returns>
-        VTRect GetDocumentRect();
+        VTRect GetContentRect();
     }
 }

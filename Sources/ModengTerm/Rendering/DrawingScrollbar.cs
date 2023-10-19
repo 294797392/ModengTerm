@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
 namespace ModengTerm.Rendering
 {
-    public class DrawingScrollbar : DrawingFrameworkObject, IDrawingScrollbar
+    public class DrawingScrollbar : ScrollBar, IDrawingScrollbar
     {
         #region 实例变量
 
@@ -22,43 +23,76 @@ namespace ModengTerm.Rendering
 
         #region IDrawingScrollbar
 
-        public VTRect IncreaseRect { get; set; }
-        public VTRect DecreaseRect { get; set; }
-        public VTRect ThumbRect { get; set; }
-        public bool HasScroll { get; set; }
-        public ScrollbarStyle Style { get; set; }
+        public int ViewportRow
+        {
+            get { return (int)base.ViewportSize; }
+            set
+            {
+                if (base.ViewportSize != value)
+                {
+                    base.ViewportSize = value;
+                }
+            }
+        }
+
+        public new double Maximum
+        {
+            get { return base.Maximum; }
+            set
+            {
+                if (base.Maximum != value)
+                {
+                    base.Maximum = value;
+                }
+            }
+        }
 
         #endregion
 
-        protected override void OnInitialize()
+        public DrawingScrollbar() 
         {
-            this.trackBrush = DrawingUtils.GetBrush(this.Style.TrackColor);
-            this.thumbBrush = DrawingUtils.GetBrush(this.Style.ThumbColor);
-            this.buttonBrush = DrawingUtils.GetBrush(this.Style.ButtonColor);
+            base.Style = Application.Current.FindResource("StyleDrawingScrollBar") as Style;
         }
 
-        protected override void OnRelease()
+        public void Initialize()
+        {
+            base.LargeChange = 1;
+            base.SmallChange = 1;
+        }
+
+        public void Release()
         {
         }
 
-        protected override void OnDraw(DrawingContext dc)
+        public void SetOpacity(double opacity)
         {
-            if (this.Width <= 0 || this.Height <= 0)
+            base.Opacity = opacity;
+        }
+
+        public void Arrange(double x, double y)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Draw()
+        {
+
+        }
+
+        protected override void OnValueChanged(double oldValue, double newValue)
+        {
+            double newvalue = Math.Round(newValue, 0);
+            if (newvalue > this.Maximum)
             {
-                return;
+                newvalue = this.Maximum;
             }
 
-            // 背景
-            dc.DrawRectangle(this.trackBrush, null, new Rect(0, 0, this.Width, this.Height));
+            // feel free to add code to test against the min, too. 
+            this.Value = newvalue;
 
-            // 上面的拖动标
-            dc.DrawRectangle(this.buttonBrush, null, this.DecreaseRect.GetRect());
-
-            // 下面的拖动标
-            dc.DrawRectangle(this.buttonBrush, null, this.IncreaseRect.GetRect());
-
-            // 中间的拖动标
-            dc.DrawRectangle(this.thumbBrush, null, this.ThumbRect.GetRect());
+            // base.OnValueChanged会触发ValueChanged事件
+            // base.OnValueChanged使用传入的newValue作为ValueChanged事件的参数
+            base.OnValueChanged(oldValue, newvalue);
         }
     }
 }

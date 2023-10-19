@@ -290,6 +290,7 @@ namespace ModengTerm.Terminal.ViewModels
             double documentPadding = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
 
             this.topMostCanvas = this.drawingWindow.CreateCanvas();
+            this.topMostCanvas.ScrollbarVisible = false;
             this.drawingWindow.InsertCanvas(0, this.topMostCanvas);
 
             #region 初始化键盘
@@ -316,9 +317,11 @@ namespace ModengTerm.Terminal.ViewModels
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
 
             this.mainDrawingDocument = this.drawingWindow.CreateCanvas();
-            this.mainDrawingDocument.DocumentPadding = documentPadding;
+            this.mainDrawingDocument.ContentPadding = documentPadding;
+            this.mainDrawingDocument.ScrollbarVisible = true;
             this.alternateDrawingDocument = this.drawingWindow.CreateCanvas();
-            this.alternateDrawingDocument.DocumentPadding = documentPadding;
+            this.alternateDrawingDocument.ContentPadding = documentPadding;
+            this.alternateDrawingDocument.ScrollbarVisible = false;
             this.drawingWindow.InsertCanvas(0, this.mainDrawingDocument);
             this.drawingWindow.InsertCanvas(0, this.alternateDrawingDocument);
             this.drawingWindow.VisibleCanvas(this.mainDrawingDocument, true);
@@ -371,13 +374,11 @@ namespace ModengTerm.Terminal.ViewModels
                 BackgroundColor = this.backgroundColor,
                 ColorTable = this.colorTable,
                 ScrollDelta = this.scrollDelta,
-                ScrollbarStyle = sessionInfo.GetOption<ScrollbarStyle>(OptionKeyEnum.SSH_THEME_SCROLLBAR_STYLE),
+                ScrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
                 Typeface = typeface,
                 SizeMode = this.sizeMode,
                 Session = this.Session,
                 Padding = documentPadding,
-                Width = windowSize.Width,
-                Height = windowSize.Height
             };
             this.mainDocument = new VTDocument(documentOptions, this.mainDrawingDocument, false) { Name = "MainDocument" };
             this.mainDocument.Initialize();
@@ -398,6 +399,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 此时Inser(0)在Z顺序的最下面一层
             this.backgroundDrawingDocument = this.drawingWindow.CreateCanvas();
+            this.backgroundDrawingDocument.ScrollbarVisible = false;
             this.drawingWindow.InsertCanvas(0, this.backgroundDrawingDocument);
 
             this.wallpaper = new VTWallpaper(this.backgroundDrawingDocument)
@@ -406,7 +408,7 @@ namespace ModengTerm.Terminal.ViewModels
                 Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
                 BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
                 Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT),
-                Rect = this.activeDocument.GetWallpaperRect()
+                Rect = new VTRect(0, 0, windowSize)
             };
             this.wallpaper.Initialize();
             this.wallpaper.RequestInvalidate();
@@ -447,6 +449,9 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.topMostCanvas.DeleteDrawingObjects();
             this.backgroundDrawingDocument.DeleteDrawingObjects();
+
+            this.drawingWindow.RemoveDocument(this.mainDrawingDocument);
+            this.drawingWindow.RemoveDocument(this.alternateDrawingDocument);
         }
 
         /// <summary>
@@ -533,6 +538,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
 
             this.activeDocument.ScrollTo(physicsRow, options);
+            this.activeDocument.RequestInvalidate();
         }
 
         #endregion
@@ -1377,8 +1383,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// 当窗口大小改变的时候触发
         /// </summary>
         /// <param name="vt"></param>
-        /// <param name="newSize">窗口的新大小</param>
-        public void OnSizeChanged(IDrawingWindow vt, VTSize newSize)
+        /// <param name="contentSize">新的内存区域大小</param>
+        public void OnSizeChanged(IDrawingWindow vt, VTSize contentSize)
         {
             // 有可能在大小改变的时候还没连接上终端
             if (this.Status != SessionStatusEnum.Connected)
@@ -1386,20 +1392,13 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            this.mainDocument.Width = newSize.Width;
-            this.mainDocument.Height = newSize.Height;
-            this.alternateDocument.Width = newSize.Width;
-            this.alternateDocument.Height = newSize.Height;
-
-            // 真正渲染文档的大小
-            VTSize contentSize = this.activeDocument.GetContentRect().GetSize();
-
             // 重新设置文档大小
             this.mainDocument.Resize(contentSize);
             this.alternateDocument.Resize(contentSize);
 
             // 重绘背景
-            this.wallpaper.Rect = this.activeDocument.GetWallpaperRect();
+            VTSize windowSize = this.drawingWindow.GetSize();
+            this.wallpaper.Rect = new VTRect(0, 0, windowSize);
             this.wallpaper.RequestInvalidate();
 
             // 给SSH主机发个Resiz指令

@@ -9,9 +9,12 @@ namespace ModengTerm.Terminal.Document
 {
     public abstract class VTScrollInfo : VTDocumentElement<IDrawingScrollbar>
     {
+        internal static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTScrollInfo");
+
         protected bool dirty;
         private int scrollMax;
         private int scrollValue;
+        private int viewportRow;
         protected VTHistory history;
 
         public override VTDocumentElements Type => VTDocumentElements.Scrollbar;
@@ -116,6 +119,22 @@ namespace ModengTerm.Terminal.Document
             get
             {
                 return this.ScrollValue == this.ScrollMin;
+            }
+        }
+
+        /// <summary>
+        /// 可视区域的行数
+        /// </summary>
+        public int ViewportRow 
+        {
+            get { return this.viewportRow; }
+            set
+            {
+                if (this.viewportRow != value) 
+                {
+                    this.viewportRow = value;
+                    this.SetDirty(true);
+                }
             }
         }
 
@@ -261,6 +280,8 @@ namespace ModengTerm.Terminal.Document
         {
             this.history = new VTMemoryHistory();
             this.history.Initialize();
+
+            this.DrawingObject.SetOpacity(0);
         }
 
         public override void Release()
@@ -277,11 +298,9 @@ namespace ModengTerm.Terminal.Document
     /// </summary>
     public class VTMainScrollInfo : VTScrollInfo
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTMainScrollInfo");
-
         #region 实例变量
 
-        private ScrollbarStyle style;
+        private bool display;
 
         #endregion
 
@@ -298,25 +317,18 @@ namespace ModengTerm.Terminal.Document
 
         #endregion
 
-        #region VTDocumentElement
+        #region VTScrollInfo
 
         public override void Initialize()
         {
             this.history = new VTMemoryHistory();
             this.history.Initialize();
 
-            this.style = this.ownerDocument.options.ScrollbarStyle;
-
-            // 这个width和height用来计算DecreaseRect和IncreaseRect
-            double width = this.style.Width;
-            double height = this.ownerDocument.Height;
-
-            // 因为初始化的时候不需要显示滚动条，所以width和height设置成0
-            this.DrawingObject.Width = 0;
-            this.DrawingObject.Height = 0;
-            this.DrawingObject.Style = this.style;
-            this.DrawingObject.DecreaseRect = new VTRect(0, 0, 0, width);
-            this.DrawingObject.IncreaseRect = new VTRect(0, height - width, width, width);
+            this.DrawingObject.Maximum = 0;
+            this.DrawingObject.Value = 0;
+            this.DrawingObject.ViewportRow = this.ViewportRow;
+            this.display = false;
+            this.DrawingObject.SetOpacity(0);
             this.DrawingObject.Initialize();
         }
 
@@ -331,27 +343,23 @@ namespace ModengTerm.Terminal.Document
         {
             if (this.dirty)
             {
-                if (this.ScrollValue == 0)
+                if (!this.HasScroll)
                 {
-                    this.DrawingObject.Width = 0;
-                    this.DrawingObject.Height = 0;
+                    // 此时说明没有滚动，那么隐藏滚动条
+                    this.DrawingObject.SetOpacity(0);
+                    this.display = false;
                 }
                 else
                 {
-                    this.DrawingObject.Width = this.style.Width;
-                    this.DrawingObject.Height = this.ownerDocument.Height;
+                    if (!this.display)
+                    {
+                        this.DrawingObject.SetOpacity(1);
+                        this.display = true;
+                    }
 
-                    //double totalHeight = this.Height - 2 - this.Width * 2;
-
-                    //// 滑动条的高度 = 内容可视区高度 / 内容实际区高度 * 滑道高度
-                    //double thumbHeight = this.ownerDocument.ViewportRow / this.ScrollMax + this.ownerDocument.ViewportRow * totalHeight;
-
-                    //// 滚动条的顶部距离=滑动条的高度/滑道高度*实际内容区域顶部距离
-                    //double thumbTop = thumbHeight / totalHeight * this.ScrollValue;
-
-                    //this.DrawingObject.ThumbRect = new VTRect(1, thumbTop + this.DrawingObject.DecreaseRect.Bottom, this.DrawingObject.DecreaseRect.Width, thumbHeight);
-
-                    this.DrawingObject.Draw();
+                    this.DrawingObject.ViewportRow = this.ViewportRow;
+                    this.DrawingObject.Maximum = this.ScrollMax;
+                    this.DrawingObject.Value = this.ScrollValue;
                 }
 
                 this.dirty = false;

@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -160,60 +161,80 @@ namespace XTerminal.UserControls
         }
 
 
-        private void SliderScrolbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            this.videoTerminal.ScrollTo((int)e.NewValue);
-        }
 
-
-
-        private void GridCanvasList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ContentArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (this.videoTerminal == null)
             {
                 return;
             }
 
-            Point p = e.GetPosition(GridCanvasList);
-
-            GridCanvasList.CaptureMouse();
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            Point p = e.GetPosition(frameworkElement);
+            frameworkElement.CaptureMouse();
             this.videoTerminal.OnMouseDown(this, new VTPoint(p.X, p.Y), e.ClickCount);
         }
 
-        private void GridCanvasList_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void ContentArea_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (this.videoTerminal == null)
             {
                 return;
             }
 
-            if (GridCanvasList.IsMouseCaptured)
-            {
-                Point p = e.GetPosition(GridCanvasList);
-                this.videoTerminal.OnMouseMove(this, new VTPoint(p.X, p.Y));
-            }
-        }
-
-        private void GridCanvasList_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            Point p = e.GetPosition(GridCanvasList);
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            Point p = e.GetPosition(frameworkElement);
             this.videoTerminal.OnMouseUp(this, new VTPoint(p.X, p.Y));
-            GridCanvasList.ReleaseMouseCapture();
+            frameworkElement.ReleaseMouseCapture();
         }
 
-        private void GridCanvasList_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void ContentArea_MouseMove(object sender, MouseEventArgs e)
         {
             if (this.videoTerminal == null)
             {
                 return;
             }
 
-            this.videoTerminal.OnSizeChanged(this, this.GetSize());
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            if (!frameworkElement.IsMouseCaptured)
+            {
+                return;
+            }
+
+            Point p = e.GetPosition(frameworkElement);
+            this.videoTerminal.OnMouseMove(this, new VTPoint(p.X, p.Y));
+        }
+
+        private void ContentArea_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            this.videoTerminal.OnSizeChanged(this, new VTSize(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
+        }
+
+        private void ContentArea_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            this.videoTerminal.OnMouseWheel(this, e.Delta > 0);
+        }
+
+        private void Scrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (this.videoTerminal == null)
+            {
+                return;
+            }
+
+            this.videoTerminal.ScrollTo((int)e.NewValue);
         }
 
 
@@ -391,8 +412,8 @@ namespace XTerminal.UserControls
 
         public IDrawingDocument CreateCanvas()
         {
-            DrawingDocument canvas = new DrawingDocument();
-            return canvas;
+            DrawingDocument drawingDocument = new DrawingDocument();
+            return drawingDocument;
         }
 
         public void InsertCanvas(int index, IDrawingDocument document)
@@ -400,11 +421,39 @@ namespace XTerminal.UserControls
             this.Dispatcher.Invoke(() =>
             {
                 FrameworkElement element = document as FrameworkElement;
-                GridCanvasList.Children.Insert(0, element);
+                GridDocumentList.Children.Insert(0, element);
 
                 // 添加到子节点里之后马上加载模板，不然后面新建DrawingObject的时候模板还没加载，找不到drawArea
                 element.ApplyTemplate();
+
+                DrawingDocument drawingDocument = element as DrawingDocument;
+
+                ContentArea contentArea = drawingDocument.ContentArea;
+                contentArea.MouseLeftButtonDown += ContentArea_MouseLeftButtonDown;
+                contentArea.MouseLeftButtonUp += ContentArea_MouseLeftButtonUp;
+                contentArea.MouseMove += ContentArea_MouseMove;
+                contentArea.SizeChanged += ContentArea_SizeChanged;
+                contentArea.MouseWheel += ContentArea_MouseWheel;
+
+                DrawingScrollbar scrollbar = drawingDocument.Scrollbar as DrawingScrollbar;
+                scrollbar.ValueChanged += Scrollbar_ValueChanged;
             });
+        }
+
+        public void RemoveDocument(IDrawingDocument document)
+        {
+            DrawingDocument drawingDocument = document as DrawingDocument;
+            ContentArea contentArea = drawingDocument.ContentArea;
+            contentArea.MouseLeftButtonDown -= ContentArea_MouseLeftButtonDown;
+            contentArea.MouseLeftButtonUp -= ContentArea_MouseLeftButtonUp;
+            contentArea.MouseMove -= ContentArea_MouseMove;
+            contentArea.SizeChanged -= ContentArea_SizeChanged;
+            contentArea.MouseWheel -= ContentArea_MouseWheel;
+
+            DrawingScrollbar scrollbar = drawingDocument.Scrollbar as DrawingScrollbar;
+            scrollbar.ValueChanged -= Scrollbar_ValueChanged;
+
+            GridDocumentList.Children.Remove(drawingDocument);
         }
 
         public void VisibleCanvas(IDrawingDocument document, bool visible)
@@ -430,7 +479,7 @@ namespace XTerminal.UserControls
 
         public VTSize GetSize()
         {
-            return new VTSize(GridCanvasList.ActualWidth, GridCanvasList.ActualHeight);
+            return new VTSize(GridDocumentList.ActualWidth, GridDocumentList.ActualHeight);
         }
 
         #endregion

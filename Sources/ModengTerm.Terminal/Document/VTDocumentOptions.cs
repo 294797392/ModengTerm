@@ -17,16 +17,6 @@ namespace ModengTerm.Terminal.Document
     public class VTDocumentOptions
     {
         /// <summary>
-        /// 整个文档的宽度，包含滚动条
-        /// </summary>
-        public double Width { get; set; }
-
-        /// <summary>
-        /// 整个文档的高度，包含滚动条
-        /// </summary>
-        public double Height { get; set; }
-
-        /// <summary>
         /// 文档所属会话
         /// </summary>
         public XTermSession Session { get; set; }
@@ -37,14 +27,14 @@ namespace ModengTerm.Terminal.Document
         public VTypeface Typeface { get; set; }
 
         /// <summary>
-        /// 滚动条样式
-        /// </summary>
-        public ScrollbarStyle ScrollbarStyle { get; set; }
-
-        /// <summary>
         /// 鼠标滚轮滚动一次，滚动几行
         /// </summary>
         public int ScrollDelta { get; set; }
+
+        /// <summary>
+        /// 最多保存多少条历史记录
+        /// </summary>
+        public int ScrollbackMax { get; set; }
 
         /// <summary>
         /// 文档内边距

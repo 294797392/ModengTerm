@@ -18,7 +18,7 @@ namespace ModengTerm.Rendering
         #region 实例变量
 
         private Visibility visible = Visibility.Visible;
-        protected DrawingArea drawingArea;
+        protected ContentArea drawingArea;
 
         #endregion
 
@@ -60,7 +60,7 @@ namespace ModengTerm.Rendering
 
         public void Initialize()
         {
-            this.drawingArea = this.Parent as DrawingArea;
+            this.drawingArea = this.Parent as ContentArea;
 
             this.OnInitialize();
         }

@@ -196,16 +196,6 @@ namespace ModengTerm.Terminal.Document
 
         public int ViewportColumn { get { return this.viewportColumn; } }
 
-        /// <summary>
-        /// 整个窗口的大小，包含滚动条
-        /// </summary>
-        public double Width { get; set; }
-
-        /// <summary>
-        /// 整个窗口的大小，包含滚动条
-        /// </summary>
-        public double Height { get; set; }
-
         #endregion
 
         #region 构造方法
@@ -226,9 +216,6 @@ namespace ModengTerm.Terminal.Document
             this.viewportColumn = this.options.ViewportColumn;
 
             this.AttributeState = new VTextAttributeState();
-
-            this.Width = options.Width;
-            this.Height = options.Height;
         }
 
         #endregion
@@ -626,33 +613,6 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
-        /// <summary>
-        /// 获取渲染内容的区域
-        /// </summary>
-        /// <returns></returns>
-        internal VTRect GetContentRect()
-        {
-            VTRect contentRect = new VTRect(0, 0, this.Width, this.Height);
-
-            if (this.Scrollbar.HasScroll)
-            {
-                // 此时说明滚动条显示了，文档渲染区域要减去滚动条宽度
-                contentRect.Width -= this.options.ScrollbarStyle.Width;
-            }
-
-            return contentRect;
-        }
-
-        /// <summary>
-        /// 获取要显示的壁纸的位置
-        /// 壁纸包含了所有区域
-        /// </summary>
-        /// <returns></returns>
-        internal VTRect GetWallpaperRect()
-        {
-            return new VTRect(0, 0, this.Width, this.Height);
-        }
-
         #endregion
 
         #region 公开接口
@@ -677,6 +637,8 @@ namespace ModengTerm.Terminal.Document
             this.Selection.Initialize();
 
             this.Scrollbar = VTScrollInfo.Create(this.IsAlternate, this);
+            this.Scrollbar.ViewportRow = this.options.ViewportRow;
+            this.Scrollbar.ScrollbackMax = this.options.ScrollbackMax;
             this.Scrollbar.Initialize();
 
             #region 初始化第一行，并设置链表首尾指针
@@ -1366,6 +1328,9 @@ namespace ModengTerm.Terminal.Document
             int scrollMax = this.Scrollbar.ScrollMax;
             this.Resize(newRows, newCols, scrollMin, scrollMax);
 
+            // 更新滚动条
+            this.Scrollbar.ViewportRow = newRows;
+
             if (this.IsAlternate)
             {
                 #region 处理备用缓冲区
@@ -1847,7 +1812,7 @@ namespace ModengTerm.Terminal.Document
             // 整体思路是算出来StartTextPointer和EndTextPointer之间的几何图形
             // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
 
-            VTRect vtRect = this.DrawingObject.GetDocumentRect();
+            VTRect vtRect = this.DrawingObject.GetContentRect();
 
             // 如果还没有测量起始字符，那么测量起始字符
             if (startPointer.CharacterIndex == -1)

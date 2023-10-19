@@ -11,7 +11,7 @@ namespace ModengTerm.Terminal.Document
     /// 表示一个UI元素
     /// </summary>
     /// <typeparam name="TDrawingObject"></typeparam>
-    public abstract class VTElement<TDrawingObject> 
+    public abstract class VTElement<TDrawingObject>
         where TDrawingObject : IDrawingObject
     {
         #region 实例变量
@@ -72,7 +72,16 @@ namespace ModengTerm.Terminal.Document
         public VTElement(IDrawingDocument drawingDocument)
         {
             this.drawingDocument = drawingDocument;
-            this.DrawingObject = drawingDocument.CreateDrawingObject<TDrawingObject>(this.Type);
+
+            if (this.Type == VTDocumentElements.Scrollbar)
+            {
+                // Scrollbar就不用创建了，因为Scrollbar默认就是存在的
+                this.DrawingObject = (TDrawingObject)this.drawingDocument.Scrollbar;
+            }
+            else
+            {
+                this.DrawingObject = drawingDocument.CreateDrawingObject<TDrawingObject>(this.Type);
+            }
         }
 
         #endregion

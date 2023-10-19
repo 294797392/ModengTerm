@@ -44,7 +44,6 @@ namespace XTerminal.Base.Enumerations
         /// 文档边距
         /// </summary>
         SSH_THEME_DOCUMENT_PADDING = 114,
-        SSH_THEME_SCROLLBAR_STYLE = 116,
 
         // Server 201 - 300
         SSH_SERVER_ADDR = 201,

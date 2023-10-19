@@ -7,53 +7,21 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Rendering
 {
-    /// <summary>
-    /// 存储Scrollbar的样式
-    /// </summary>
-    public class ScrollbarStyle
-    {
-        public string ThumbColor { get; set; }
-
-        public string TrackColor { get; set; }
-
-        public string ButtonColor { get; set; }
-
-        /// <summary>
-        /// 滚动条宽度
-        /// </summary>
-        public double Width { get; set; }
-    }
-
     public interface IDrawingScrollbar : IDrawingObject
     {
         /// <summary>
-        /// 滚动条样式
+        /// 最多可以滚动到的值
         /// </summary>
-        ScrollbarStyle Style { get; set; }
+        double Maximum { get; set; }
 
         /// <summary>
-        /// 滚动条高度
+        /// 当前滚动到的值
         /// </summary>
-        double Height { get; set; }
+        double Value { get; set; }
 
         /// <summary>
-        /// 滚动条宽度
+        /// 可视区域的行数
         /// </summary>
-        double Width { get; set; }
-
-        /// <summary>
-        /// 滚动条下面的按钮大小
-        /// </summary>
-        VTRect IncreaseRect { get; set; }
-
-        /// <summary>
-        /// 滚动条上面的按钮大小
-        /// </summary>
-        VTRect DecreaseRect { get; set; }
-
-        /// <summary>
-        /// 滚动条的大小
-        /// </summary>
-        VTRect ThumbRect { get; set; }
+        int ViewportRow { get; set; }
     }
 }

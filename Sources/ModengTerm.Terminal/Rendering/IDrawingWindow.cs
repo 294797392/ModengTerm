@@ -23,6 +23,8 @@ namespace ModengTerm.Terminal.Rendering
 
         void InsertCanvas(int index, IDrawingDocument canvas);
 
+        void RemoveDocument(IDrawingDocument document);
+
         /// <summary>
         /// 显示或者隐藏文档
         /// </summary>

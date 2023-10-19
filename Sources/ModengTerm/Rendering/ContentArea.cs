@@ -17,7 +17,7 @@ namespace ModengTerm.Rendering
     /// <summary>
     /// 用来渲染终端输出的表面
     /// </summary>
-    public class DrawingArea : FrameworkElement
+    public class ContentArea : FrameworkElement
     {
         #region 类变量
 
@@ -43,7 +43,7 @@ namespace ModengTerm.Rendering
 
         #region 构造方法
 
-        public DrawingArea()
+        public ContentArea()
         {
             this.visuals = new VisualCollection(this);
         }
@@ -64,20 +64,6 @@ namespace ModengTerm.Rendering
 
             // 调试用，看这个Surface有多大
             //drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
-        }
-
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            DrawingFrameworkObject drawingFrameworkObject = this.GetVisual<DrawingFrameworkObject>();
-            if (drawingFrameworkObject == null)
-            {
-                // DrawingArea测量之后 DrawingObject才有大小，才会占据Grid的空间，不然GridColumn的宽度一直是0，会导致元素显示不出来
-                return base.MeasureOverride(availableSize);
-            }
-            else
-            {
-                return new Size(drawingFrameworkObject.Width, drawingFrameworkObject.Height);
-            }
         }
 
         #endregion

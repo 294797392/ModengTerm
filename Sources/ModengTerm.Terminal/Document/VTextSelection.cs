@@ -131,7 +131,7 @@ namespace ModengTerm.Terminal.Document
             VTextPointer Start = new VTextPointer(this.firstRow, this.firstRowCharacterIndex);
             VTextPointer End = new VTextPointer(this.lastRow, this.lastRowCharacterIndex);
 
-            VTRect container = document.DrawingObject.GetDocumentRect();
+            VTRect container = document.DrawingObject.GetContentRect();
 
             this.Geometry.Clear();
 

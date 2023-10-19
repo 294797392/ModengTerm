@@ -6,32 +6,50 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 
 namespace ModengTerm.Rendering
 {
-    [TemplatePart(Name = "PART_Document", Type = typeof(DrawingArea))]
-    [TemplatePart(Name = "PART_Scrollbar", Type = typeof(DrawingArea))]
+    [TemplatePart(Name = "PART_ContentArea", Type = typeof(ContentArea))]
+    [TemplatePart(Name = "PART_Scrollbar", Type = typeof(DrawingScrollbar))]
     public class DrawingDocument : Control, IDrawingDocument
     {
         #region 实例变量
 
-        private DrawingArea documentArea;
-        private DrawingArea scrollbarArea;
+        private ContentArea contentArea;
+        private DrawingScrollbar scrollbar;
 
         #endregion
 
         #region 属性
 
-        public double DocumentPadding
+        /// <summary>
+        /// 用来渲染内容的区域
+        /// </summary>
+        public ContentArea ContentArea { get { return this.contentArea; } }
+
+        public IDrawingScrollbar Scrollbar { get { return this.scrollbar; } }
+
+        public double ContentPadding
         {
-            get { return (double)GetValue(DocumentPaddingProperty); }
-            set { SetValue(DocumentPaddingProperty, value); }
+            get { return (double)GetValue(ContentPaddingProperty); }
+            set { SetValue(ContentPaddingProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for DocumentPadding.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DocumentPaddingProperty =
-            DependencyProperty.Register("DocumentPadding", typeof(double), typeof(DrawingDocument), new PropertyMetadata(0.0D));
+        public static readonly DependencyProperty ContentPaddingProperty =
+            DependencyProperty.Register("ContentPadding", typeof(double), typeof(DrawingDocument), new PropertyMetadata(0.0D));
+
+        public bool ScrollbarVisible
+        {
+            get { return (bool)GetValue(ScrollbarVisibleProperty); }
+            set { SetValue(ScrollbarVisibleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ScrollbarVisible.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ScrollbarVisibleProperty =
+            DependencyProperty.Register("ScrollbarVisible", typeof(bool), typeof(DrawingDocument), new PropertyMetadata(false));
 
         #endregion
 
@@ -49,26 +67,19 @@ namespace ModengTerm.Rendering
         public TDrawingObject CreateDrawingObject<TDrawingObject>(VTDocumentElements type) where TDrawingObject : IDrawingObject
         {
             TDrawingObject drawingObject = DrawingObjectFactory.CreateDrawingObject<TDrawingObject>(type);
-            if (type == VTDocumentElements.Scrollbar)
-            {
-                scrollbarArea.AddVisual(drawingObject as DrawingObject);
-            }
-            else
-            {
-                documentArea.AddVisual(drawingObject as DrawingObject);
-            }
+            contentArea.AddVisual(drawingObject as DrawingObject);
             return drawingObject;
         }
 
         public void DeleteDrawingObject(IDrawingObject drawingObject)
         {
             drawingObject.Release();
-            documentArea.RemoveVisual(drawingObject as DrawingObject);
+            contentArea.RemoveVisual(drawingObject as DrawingObject);
         }
 
         public void DeleteDrawingObjects()
         {
-            List<IDrawingObject> drawingObjects = documentArea.GetAllVisual().Cast<IDrawingObject>().ToList();
+            List<IDrawingObject> drawingObjects = contentArea.GetAllVisual().Cast<IDrawingObject>().ToList();
 
             foreach (IDrawingObject drawingObject in drawingObjects)
             {
@@ -76,10 +87,10 @@ namespace ModengTerm.Rendering
             }
         }
 
-        public VTRect GetDocumentRect()
+        public VTRect GetContentRect()
         {
-            Point leftTop = documentArea.TranslatePoint(new Point(), this);
-            return new VTRect(leftTop.X, leftTop.Y, documentArea.ActualWidth, documentArea.ActualHeight);
+            Point leftTop = contentArea.TranslatePoint(new Point(), this);
+            return new VTRect(leftTop.X, leftTop.Y, contentArea.ActualWidth, contentArea.ActualHeight);
         }
 
         #endregion
@@ -94,14 +105,14 @@ namespace ModengTerm.Rendering
         {
             base.OnApplyTemplate();
 
-            documentArea = Template.FindName("PART_Document", this) as DrawingArea;
-            scrollbarArea = Template.FindName("PART_Scrollbar", this) as DrawingArea;
+            this.contentArea = Template.FindName("PART_ContentArea", this) as ContentArea;
+            this.scrollbar = Template.FindName("PART_Scrollbar", this) as DrawingScrollbar;
         }
 
         #endregion
     }
 
-    public class DocumentPaddingConverter : IValueConverter
+    public class ContentPaddingConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
