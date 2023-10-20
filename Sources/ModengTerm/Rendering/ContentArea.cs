@@ -62,8 +62,14 @@ namespace ModengTerm.Rendering
         {
             base.OnRender(drawingContext);
 
-            // 调试用，看这个Surface有多大
-            //drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
+            drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
+
+            //// 调试用，看这个Surface有多大
+            //if (this.VisualChildrenCount > 20)
+            //{
+            //    Console.WriteLine("渲染高度 = {0}", this.ActualHeight);
+            //    drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
+            //}
         }
 
         #endregion

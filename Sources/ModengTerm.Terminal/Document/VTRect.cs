@@ -18,6 +18,11 @@ namespace ModengTerm.Terminal.Document
             this.Width = w;
             this.Height = h;
         }
+
+        public VTSize Offset(double offset)
+        {
+            return new VTSize(this.Width + offset, this.Height + offset);
+        }
     }
 
     public struct VTRect

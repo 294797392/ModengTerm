@@ -112,7 +112,7 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTCursor(VTDocument ownerDocument) : 
+        public VTCursor(VTDocument ownerDocument) :
             base(ownerDocument)
         {
             this.ownerDocument = ownerDocument;
@@ -155,6 +155,7 @@ namespace ModengTerm.Terminal.Document
             // 有可能有中文字符，一个中文字符占用2列
             // 先通过光标所在列找到真正的字符所在列
             int characterIndex = this.characterIndex;
+            // 字符大于0才去测量
             VTRect rect = cursorLine.MeasureTextBlock(characterIndex, 1);
             double offsetX = rect.Right;
             double offsetY = cursorLine.OffsetY;

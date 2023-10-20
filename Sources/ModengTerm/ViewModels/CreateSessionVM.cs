@@ -848,7 +848,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
-            session.SetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, MTermConsts.DefaultDocumentPadding);
+            session.SetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN, MTermConsts.DefaultContentMargin);
 
             return true;
         }

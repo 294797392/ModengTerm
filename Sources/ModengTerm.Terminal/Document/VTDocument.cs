@@ -582,8 +582,8 @@ namespace ModengTerm.Terminal.Document
                     // 从最后一行开始删除
                     for (int i = 0; i < rows; i++)
                     {
-                        this.DrawingObject.DeleteDrawingObject(this.LastLine.DrawingObject);
                         this.LastLine.Remove();
+                        this.LastLine.Release();
                     }
                 }
 
@@ -1728,7 +1728,7 @@ namespace ModengTerm.Terminal.Document
 
         #region 事件处理器
 
-        public void OnMouseDown(IDrawingWindow vt, VTPoint location, int clickCount)
+        public void OnMouseDown(VTPoint location, int clickCount)
         {
             if (clickCount == 1)
             {
@@ -1791,7 +1791,7 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
-        public void OnMouseMove(IDrawingWindow vt, VTPoint location)
+        public void OnMouseMove(VTPoint location)
         {
             if (!this.isMouseDown)
             {
@@ -1869,13 +1869,13 @@ namespace ModengTerm.Terminal.Document
             this.RequestInvalidate();
         }
 
-        public void OnMouseUp(IDrawingWindow vt, VTPoint location)
+        public void OnMouseUp(VTPoint location)
         {
             this.isMouseDown = false;
             this.selectionState = false;
         }
 
-        public void OnMouseWheel(IDrawingWindow vt, bool upper)
+        public void OnMouseWheel(bool upper)
         {
             // 只有主缓冲区才可以用鼠标滚轮进行滚动
             // 备用缓冲区不可以滚动

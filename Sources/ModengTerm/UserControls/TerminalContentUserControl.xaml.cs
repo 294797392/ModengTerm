@@ -137,18 +137,6 @@ namespace XTerminal.UserControls
             this.Focus();
         }
 
-        protected override void OnMouseWheel(MouseWheelEventArgs e)
-        {
-            base.OnMouseWheel(e);
-
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            this.videoTerminal.OnMouseWheel(this, e.Delta > 0);
-        }
-
         /// <summary>
         /// 重写了这个事件后，就会触发鼠标相关的事件
         /// </summary>
@@ -159,85 +147,6 @@ namespace XTerminal.UserControls
         {
             return new PointHitTestResult(this, hitTestParameters.HitPoint);
         }
-
-
-
-        private void ContentArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            Point p = e.GetPosition(frameworkElement);
-            frameworkElement.CaptureMouse();
-            this.videoTerminal.OnMouseDown(this, new VTPoint(p.X, p.Y), e.ClickCount);
-        }
-
-        private void ContentArea_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            Point p = e.GetPosition(frameworkElement);
-            this.videoTerminal.OnMouseUp(this, new VTPoint(p.X, p.Y));
-            frameworkElement.ReleaseMouseCapture();
-        }
-
-        private void ContentArea_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            if (!frameworkElement.IsMouseCaptured)
-            {
-                return;
-            }
-
-            Point p = e.GetPosition(frameworkElement);
-            this.videoTerminal.OnMouseMove(this, new VTPoint(p.X, p.Y));
-        }
-
-        private void ContentArea_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            this.videoTerminal.OnSizeChanged(this, new VTSize(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
-        }
-
-        private void ContentArea_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            this.videoTerminal.OnMouseWheel(this, e.Delta > 0);
-        }
-
-        private void Scrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (this.videoTerminal == null)
-            {
-                return;
-            }
-
-            this.videoTerminal.ScrollTo((int)e.NewValue);
-        }
-
-
 
         private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
         {
@@ -425,34 +334,12 @@ namespace XTerminal.UserControls
 
                 // 添加到子节点里之后马上加载模板，不然后面新建DrawingObject的时候模板还没加载，找不到drawArea
                 element.ApplyTemplate();
-
-                DrawingDocument drawingDocument = element as DrawingDocument;
-
-                ContentArea contentArea = drawingDocument.ContentArea;
-                contentArea.MouseLeftButtonDown += ContentArea_MouseLeftButtonDown;
-                contentArea.MouseLeftButtonUp += ContentArea_MouseLeftButtonUp;
-                contentArea.MouseMove += ContentArea_MouseMove;
-                contentArea.SizeChanged += ContentArea_SizeChanged;
-                contentArea.MouseWheel += ContentArea_MouseWheel;
-
-                DrawingScrollbar scrollbar = drawingDocument.Scrollbar as DrawingScrollbar;
-                scrollbar.ValueChanged += Scrollbar_ValueChanged;
             });
         }
 
         public void RemoveDocument(IDrawingDocument document)
         {
             DrawingDocument drawingDocument = document as DrawingDocument;
-            ContentArea contentArea = drawingDocument.ContentArea;
-            contentArea.MouseLeftButtonDown -= ContentArea_MouseLeftButtonDown;
-            contentArea.MouseLeftButtonUp -= ContentArea_MouseLeftButtonUp;
-            contentArea.MouseMove -= ContentArea_MouseMove;
-            contentArea.SizeChanged -= ContentArea_SizeChanged;
-            contentArea.MouseWheel -= ContentArea_MouseWheel;
-
-            DrawingScrollbar scrollbar = drawingDocument.Scrollbar as DrawingScrollbar;
-            scrollbar.ValueChanged -= Scrollbar_ValueChanged;
-
             GridDocumentList.Children.Remove(drawingDocument);
         }
 

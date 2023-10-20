@@ -63,7 +63,10 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
-        public TDrawingObject DrawingObject { get; protected set; }
+        /// <summary>
+        /// 对应的绘图对象
+        /// </summary>
+        protected TDrawingObject DrawingObject { get; set; }
 
         #endregion
 

@@ -54,34 +54,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="StyleDrawingDocument" TargetType="{x:Type mrendering:DrawingDocument}">
-        <Setter Property="Template">
-            <Setter.Value>
-
-                <ControlTemplate TargetType="{x:Type mrendering:DrawingDocument}">
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <mrendering:ContentArea Grid.Column="0" x:Name="PART_ContentArea"
-                                                Margin="{TemplateBinding ContentPadding, Converter={StaticResource ResourceKey=ContentPaddingConverter}}"/>
-
-                        <mrendering:DrawingScrollbar Grid.Column="1" x:Name="PART_Scrollbar" Visibility="{TemplateBinding ScrollbarVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
-
-                    </Grid>
-
-                </ControlTemplate>
-
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-
-
-
     <Style x:Key="StyleDrawingScrollBar" TargetType="{x:Type mrendering:DrawingScrollbar}">
         <Style.Resources>
             <!-- 拖动标样式 -->
@@ -231,6 +203,35 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style x:Key="StyleDrawingDocument" TargetType="{x:Type mrendering:DrawingDocument}">
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type mrendering:DrawingDocument}">
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <mrendering:ContentArea Grid.Column="0" x:Name="PART_ContentArea"
+                                                Margin="{TemplateBinding ContentMargin, Converter={StaticResource ResourceKey=ContentPaddingConverter}}"/>
+
+                        <mrendering:DrawingScrollbar Grid.Column="1" x:Name="PART_Scrollbar" Style="{StaticResource ResourceKey=StyleDrawingScrollBar}"
+                                                     Visibility="{TemplateBinding ScrollbarVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
+
+                    </Grid>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
 
 
 

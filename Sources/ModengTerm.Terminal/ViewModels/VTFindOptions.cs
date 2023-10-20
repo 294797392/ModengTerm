@@ -36,15 +36,5 @@ namespace ModengTerm.Terminal.ViewModels
         /// 从最后一行开始向上查找
         /// </summary>
         FromEnd,
-
-        /// <summary>
-        /// 从当前位置向上查找
-        /// </summary>
-        CurrentToBegin,
-
-        /// <summary>
-        /// 从当前位置向下查找
-        /// </summary>
-        CurrentToEnd
     }
 }

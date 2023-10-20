@@ -35,6 +35,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
 
+        public event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
+
         #endregion
 
         #region 实例变量
@@ -99,17 +101,6 @@ namespace ModengTerm.Terminal.ViewModels
         private IDrawingDocument alternateDrawingDocument;
         private IDrawingDocument backgroundDrawingDocument;
         private VTWallpaper wallpaper;
-
-        #region 最上层的备用图形
-
-        /// <summary>
-        /// 用来画：
-        /// 1. 当搜索到一个关键字之后，高亮显示该关键字
-        /// 2. 文本选中区域
-        /// </summary>
-        internal IDrawingDocument topMostCanvas;
-
-        #endregion
 
         #region Termimal
 
@@ -182,8 +173,6 @@ namespace ModengTerm.Terminal.ViewModels
         public VTScrollInfo ScrollInfo { get { return this.activeDocument.Scrollbar; } }
 
         public VTDocument ActiveDocument { get { return this.activeDocument; } }
-
-        public IDrawingDocument TopMostCanvas { get { return this.topMostCanvas; } }
 
         /// <summary>
         /// 可视区域内的行数
@@ -287,11 +276,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
             this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             VTypeface typeface = this.drawingWindow.GetTypeface(new VTextStyle() { FontSize = this.fontSize, FontFamily = this.fontFamily });
-            double documentPadding = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
-
-            this.topMostCanvas = this.drawingWindow.CreateCanvas();
-            this.topMostCanvas.ScrollbarVisible = false;
-            this.drawingWindow.InsertCanvas(0, this.topMostCanvas);
+            double contentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
 
             #region 初始化键盘
 
@@ -315,13 +300,26 @@ namespace ModengTerm.Terminal.ViewModels
 
             int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
+            VTEventHandler eventHandler = new VTEventHandler()
+            {
+                OnScrollChanged = this.OnScrollChanged,
+                OnSizeChanged = this.OnSizeChanged,
+                OnMouseDown = this.OnMouseDown,
+                OnMouseMove = this.OnMouseMove,
+                OnMouseUp = this.OnMouseUp,
+                OnMouseWheel = this.OnMouseWheel
+            };
 
             this.mainDrawingDocument = this.drawingWindow.CreateCanvas();
-            this.mainDrawingDocument.ContentPadding = documentPadding;
+            this.mainDrawingDocument.Name = "MainDocument";
+            this.mainDrawingDocument.ContentMargin = contentMargin;
             this.mainDrawingDocument.ScrollbarVisible = true;
+            this.mainDrawingDocument.AddEventHandler(eventHandler);
             this.alternateDrawingDocument = this.drawingWindow.CreateCanvas();
-            this.alternateDrawingDocument.ContentPadding = documentPadding;
+            this.alternateDrawingDocument.Name = "AlternateDocument";
+            this.alternateDrawingDocument.ContentMargin = contentMargin;
             this.alternateDrawingDocument.ScrollbarVisible = false;
+            this.alternateDrawingDocument.AddEventHandler(eventHandler);
             this.drawingWindow.InsertCanvas(0, this.mainDrawingDocument);
             this.drawingWindow.InsertCanvas(0, this.alternateDrawingDocument);
             this.drawingWindow.VisibleCanvas(this.mainDrawingDocument, true);
@@ -332,13 +330,16 @@ namespace ModengTerm.Terminal.ViewModels
             // 先获取文档显示区域的像素大小
             VTSize windowSize = this.drawingWindow.GetSize();
 
+            // 真正的内容显示区域大小不包含边距
+            VTSize contentArea = windowSize.Offset(-contentMargin * 2);
+
             // 然后根据显示区域的像素大小和每个字符的宽度和高度动态计算终端的行和列
             this.sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
             switch (this.sizeMode)
             {
                 case TerminalSizeModeEnum.AutoFit:
                     {
-                        VTUtils.CalculateAutoFitSize(windowSize, typeface, out this.viewportRow, out this.viewportColumn);
+                        VTUtils.CalculateAutoFitSize(contentArea, typeface, out this.viewportRow, out this.viewportColumn);
 
                         // 算完真正的终端大小之后重新设置一下参数，因为在SessionDriver里是直接使用SessionInfo里的参数的
                         sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.viewportRow);
@@ -378,7 +379,7 @@ namespace ModengTerm.Terminal.ViewModels
                 Typeface = typeface,
                 SizeMode = this.sizeMode,
                 Session = this.Session,
-                Padding = documentPadding,
+                Padding = contentMargin,
             };
             this.mainDocument = new VTDocument(documentOptions, this.mainDrawingDocument, false) { Name = "MainDocument" };
             this.mainDocument.Initialize();
@@ -399,6 +400,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 此时Inser(0)在Z顺序的最下面一层
             this.backgroundDrawingDocument = this.drawingWindow.CreateCanvas();
+            this.backgroundDrawingDocument.Name = "BackgroundDocument";
             this.backgroundDrawingDocument.ScrollbarVisible = false;
             this.drawingWindow.InsertCanvas(0, this.backgroundDrawingDocument);
 
@@ -447,7 +449,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.mainDocument.Release();
             this.alternateDocument.Release();
 
-            this.topMostCanvas.DeleteDrawingObjects();
             this.backgroundDrawingDocument.DeleteDrawingObjects();
 
             this.drawingWindow.RemoveDocument(this.mainDrawingDocument);
@@ -1184,6 +1185,7 @@ namespace ModengTerm.Terminal.ViewModels
                         this.activeDocument = this.alternateDocument;
 
                         this.alternateDocument.Selection.Reset();
+                        this.DocumentChanged?.Invoke(this, this.mainDocument, this.alternateDocument);
                         break;
                     }
 
@@ -1200,6 +1202,7 @@ namespace ModengTerm.Terminal.ViewModels
                         this.activeDocument = this.mainDocument;
 
                         this.mainDocument.Selection.Reset();
+                        this.DocumentChanged?.Invoke(this, this.alternateDocument, this.mainDocument);
                         break;
                     }
 
@@ -1359,24 +1362,24 @@ namespace ModengTerm.Terminal.ViewModels
             base.NotifyStatusChanged(status);
         }
 
-        public void OnMouseWheel(IDrawingWindow vt, bool upper)
+        public void OnMouseWheel(bool upper)
         {
-            this.activeDocument.OnMouseWheel(vt, upper);
+            this.activeDocument.OnMouseWheel(upper);
         }
 
-        public void OnMouseDown(IDrawingWindow vt, VTPoint p, int clickCount)
+        public void OnMouseDown(VTPoint p, int clickCount)
         {
-            this.activeDocument.OnMouseDown(vt, p, clickCount);
+            this.activeDocument.OnMouseDown(p, clickCount);
         }
 
-        public void OnMouseMove(IDrawingWindow vt, VTPoint p)
+        public void OnMouseMove(VTPoint p)
         {
-            this.activeDocument.OnMouseMove(vt, p);
+            this.activeDocument.OnMouseMove(p);
         }
 
-        public void OnMouseUp(IDrawingWindow vt, VTPoint p)
+        public void OnMouseUp(VTPoint p)
         {
-            this.activeDocument.OnMouseUp(vt, p);
+            this.activeDocument.OnMouseUp(p);
         }
 
         /// <summary>
@@ -1384,7 +1387,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         /// <param name="vt"></param>
         /// <param name="contentSize">新的内存区域大小</param>
-        public void OnSizeChanged(IDrawingWindow vt, VTSize contentSize)
+        public void OnSizeChanged(VTSize contentSize)
         {
             // 有可能在大小改变的时候还没连接上终端
             if (this.Status != SessionStatusEnum.Connected)
@@ -1407,6 +1410,16 @@ namespace ModengTerm.Terminal.ViewModels
             // 更新界面
             this.ViewportRow = this.activeDocument.ViewportRow;
             this.ViewportColumn = this.activeDocument.ViewportColumn;
+        }
+
+        private void OnScrollChanged(int scrollValue)
+        {
+            if (this.activeDocument.IsAlternate)
+            {
+                return;
+            }
+
+            this.ScrollTo(scrollValue);
         }
 
         #endregion

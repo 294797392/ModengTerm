@@ -23,6 +23,16 @@ namespace ModengTerm.Terminal
         event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
 
         /// <summary>
+        /// 当前显示的文档改变的时候触发
+        /// 一个终端有两个文档，分别是主文档（MainDocument）和备用文档（AlternateDocument）
+        /// 默认情况下显示主文档，VIM，Man等程序会用到备用文档
+        /// 
+        /// 第一个VTDocument是oldDocument，意思是切换之前显示的Document
+        /// 第二个VTDocument是newDocument，意思是切换之后显示的Document
+        /// </summary>
+        event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
+
+        /// <summary>
         /// 终端对应的会话信息
         /// </summary>
         XTermSession Session { get; }
@@ -36,11 +46,6 @@ namespace ModengTerm.Terminal
         /// 终端列大小
         /// </summary>
         int ViewportColumn { get; }
-
-        /// <summary>
-        /// 始终处于最上层的Document
-        /// </summary>
-        IDrawingDocument TopMostCanvas { get; }
 
         /// <summary>
         /// 当前正在显示的Document

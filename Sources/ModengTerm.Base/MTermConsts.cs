@@ -65,9 +65,9 @@ namespace ModengTerm.Base
         public const int DefaultMaxClipboardHistory = 50;
 
         /// <summary>
-        /// 文档内边距
+        /// 文档外边距
         /// </summary>
-        public const int DefaultDocumentPadding = 5;
+        public const int DefaultContentMargin = 5;
 
         /// <summary>
         /// 滚动条宽度

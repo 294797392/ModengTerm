@@ -7,15 +7,37 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Rendering
 {
+    public class VTEventHandler
+    {
+        public delegate void MouseWheelDelegate(bool upper);
+        public delegate void MouseDownDelegate(VTPoint location, int clickCount);
+        public delegate void MouseMoveDelegate(VTPoint location);
+        public delegate void MouseUpDelegate(VTPoint location);
+        public delegate void SizeChangedDelegate(VTSize contentSize);
+        public delegate void ScrollChangedDelegate(int scrollValue);
+
+        public MouseWheelDelegate OnMouseWheel;
+        public MouseDownDelegate OnMouseDown;
+        public MouseMoveDelegate OnMouseMove;
+        public MouseUpDelegate OnMouseUp;
+        public SizeChangedDelegate OnSizeChanged;
+        public ScrollChangedDelegate OnScrollChanged;
+    }
+
     /// <summary>
     /// 表示一个用来渲染终端输出的表面
     /// </summary>
     public interface IDrawingDocument
     {
         /// <summary>
+        /// 该文档的名字，调试用
+        /// </summary>
+        string Name { get; set; }
+
+        /// <summary>
         /// 该文档的内容距离边框的距离
         /// </summary>
-        double ContentPadding { get; set; }
+        double ContentMargin { get; set; }
 
         /// <summary>
         /// 获取文档里的滚动条
@@ -49,5 +71,11 @@ namespace ModengTerm.Terminal.Rendering
         /// </summary>
         /// <returns></returns>
         VTRect GetContentRect();
+
+        /// <summary>
+        /// 注册该文档的事件
+        /// </summary>
+        /// <param name="eventHandler"></param>
+        void AddEventHandler(VTEventHandler eventHandler);
     }
 }

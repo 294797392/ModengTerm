@@ -11,7 +11,7 @@ namespace ModengTerm.Terminal.Document
     /// <summary>
     /// 用来渲染一个VTextLine里的文本块
     /// </summary>
-    public class VTMatchesLine : VTElement<IDrawingMatchesLine>
+    public class VTMatchesLine : VTDocumentElement<IDrawingMatchesLine>
     {
         #region 实例变量
 
@@ -43,6 +43,9 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
+        /// <summary>
+        /// 存储匹配的元素列表
+        /// </summary>
         public List<VTMatches> MatchesList
         {
             get { return matchesList; }
@@ -76,8 +79,8 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTMatchesLine(IDrawingDocument ownerCanvas) :
-            base(ownerCanvas)
+        public VTMatchesLine(VTDocument ownerDocument) :
+            base(ownerDocument)
         {
         }
 
@@ -105,6 +108,7 @@ namespace ModengTerm.Terminal.Document
 
         public override void Release()
         {
+            this.drawingDocument.DeleteDrawingObject(this.DrawingObject);
             this.DrawingObject.Release();
         }
 

@@ -43,7 +43,7 @@ namespace XTerminal.Base.Enumerations
         /// <summary>
         /// 文档边距
         /// </summary>
-        SSH_THEME_DOCUMENT_PADDING = 114,
+        SSH_THEME_CONTENT_MARGIN = 114,
 
         // Server 201 - 300
         SSH_SERVER_ADDR = 201,

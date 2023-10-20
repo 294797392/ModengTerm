@@ -51,7 +51,6 @@ namespace ModengTerm.Rendering
 
         public DrawingScrollbar() 
         {
-            base.Style = Application.Current.FindResource("StyleDrawingScrollBar") as Style;
         }
 
         public void Initialize()

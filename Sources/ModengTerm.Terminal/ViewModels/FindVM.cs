@@ -177,6 +177,8 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.videoTerminal = vt;
 
+            this.videoTerminal.DocumentChanged += VideoTerminal_DocumentChanged;
+
             this.FindScopeList = new BindableCollection<FindScopes>();
             this.FindScopeList.AddRange(MTermUtils.GetEnumValues<FindScopes>());
 
@@ -184,7 +186,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.FindStartupList.AddRange(MTermUtils.GetEnumValues<FindStartups>());
             this.matchResult = new List<MatchResult>();
 
-            this.matchesLine = new VTMatchesLine(this.videoTerminal.TopMostCanvas);
+            this.matchesLine = new VTMatchesLine(this.videoTerminal.ActiveDocument);
             this.matchesLine.Initialize();
         }
 
@@ -321,10 +323,19 @@ namespace ModengTerm.Terminal.ViewModels
             this.matchesLine.TextLine = textLine;
             this.matchesLine.OffsetY = textLine.OffsetY;
 
-            this.videoTerminal.UISyncContext.Send((state) =>
-            {
-                this.matchesLine.RequestInvalidate();
-            }, null);
+            this.matchesLine.RequestInvalidate();
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        private void VideoTerminal_DocumentChanged(IVideoTerminal vt, VTDocument oldDocument, VTDocument newDocument)
+        {
+            this.matchesLine.Release();
+
+            this.matchesLine = new VTMatchesLine(newDocument);
+            this.matchesLine.Initialize();
         }
 
         #endregion
@@ -387,23 +398,6 @@ namespace ModengTerm.Terminal.ViewModels
                             break;
                         }
 
-                    case FindStartups.CurrentToBegin:
-                        {
-                            // 从当前位置往上找，用当前内容的最后一行的索引
-                            this.findIndex = 0;
-                            this.startRow = lastRow;
-                            this.endRow = firstRow;
-                            break;
-                        }
-
-                    case FindStartups.CurrentToEnd:
-                        {
-                            this.findIndex = 0;
-                            this.startRow = firstRow;
-                            this.endRow = lastRow;
-                            break;
-                        }
-
                     default:
                         throw new NotImplementedException();
                 }
@@ -450,8 +444,11 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     if (FindOnce)
                     {
-                        this.ScrollToMatches(matches);
-                        this.HighlightMatches(matches);
+                        this.videoTerminal.UISyncContext.Send((state) =>
+                        {
+                            this.ScrollToMatches(matches);
+                            this.HighlightMatches(matches);
+                        }, null);
                         break;
                     }
                     else
@@ -471,10 +468,10 @@ namespace ModengTerm.Terminal.ViewModels
             this.matchesLine.OffsetY = 0;
             this.matchesLine.TextBlocks.Clear();
             this.matchesLine.RequestInvalidate();
+            this.matchesLine.Release();
             this.Message = string.Empty;
 
-            this.matchesLine.Release();
-            this.videoTerminal.TopMostCanvas.DeleteDrawingObject(this.matchesLine.DrawingObject);
+            this.videoTerminal.DocumentChanged -= this.VideoTerminal_DocumentChanged;
         }
 
         #endregion

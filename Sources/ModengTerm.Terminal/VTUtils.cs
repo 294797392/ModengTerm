@@ -606,17 +606,20 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 根据当前屏幕大小计算终端的自适应大小
         /// </summary>
-        /// <param name="documentSize">文档显示区域的大小</param>
+        /// <param name="contentArea">文档显示区域的大小</param>
+        /// <param name="typeface">字体信息</param>
         /// <param name="rowSize">计算出来的终端行数</param>
         /// <param name="colSize">计算出来的终端列数</param>
-        public static void CalculateAutoFitSize(VTSize documentSize, VTypeface typeface, out int rowSize, out int colSize)
+        public static void CalculateAutoFitSize(VTSize contentArea, VTypeface typeface, out int rowSize, out int colSize)
         {
             // 自适应屏幕大小
             // 计算一共有多少行，和每行之间的间距是多少
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置
-            rowSize = (int)Math.Floor(documentSize.Height / typeface.Height);
-            colSize = (int)Math.Floor(documentSize.Width / typeface.SpaceWidth);
+            rowSize = (int)Math.Floor(contentArea.Height / typeface.Height);
+            colSize = (int)Math.Floor(contentArea.Width / typeface.SpaceWidth);
+
+            //Console.WriteLine("height = {0}, characterHeight = {1}, rows = {2}", contentArea.Height, typeface.Height, rowSize);
         }
     }
 }

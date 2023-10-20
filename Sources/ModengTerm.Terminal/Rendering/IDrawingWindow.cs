@@ -17,7 +17,6 @@ namespace ModengTerm.Terminal.Rendering
         /// <summary>
         /// 创建一个画板用来渲染文档
         /// </summary>
-        /// <param name="options">渲染选项</param>
         /// <returns></returns>
         IDrawingDocument CreateCanvas();
 

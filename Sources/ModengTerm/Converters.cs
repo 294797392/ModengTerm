@@ -192,10 +192,8 @@ namespace ModengTerm
 
             switch ((FindStartups)value)
             {
-                case FindStartups.FromBegin: return "从头开始查找";
-                case FindStartups.FromEnd: return "从结尾开始查找";
-                case FindStartups.CurrentToEnd: return "从当前位置往下查找";
-                case FindStartups.CurrentToBegin: return "从当前位置往上查找";
+                case FindStartups.FromBegin: return "从上往下查找";
+                case FindStartups.FromEnd: return "从下往上查找";
                 default:
                     throw new NotImplementedException();
             }
