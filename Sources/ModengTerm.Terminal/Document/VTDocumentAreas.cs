@@ -4,27 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Base.Enumerations
+namespace ModengTerm.Terminal.Document
 {
     /// <summary>
-    /// 定义光标闪烁速度等级
-    /// 每种速度对应的间隔时间请参考XTermDefaultValues.XXXXBlinkInterval
+    /// 定义文档所包含的区域
     /// </summary>
-    public enum VTCursorSpeeds
+    public enum VTDocumentAreas
     {
         /// <summary>
-        /// 高速闪烁
+        /// 相对于整个文档区域的坐标
         /// </summary>
-        HighSpeed,
+        AllDocument,
 
         /// <summary>
-        /// 中速
+        /// 相对于书签的坐标
         /// </summary>
-        NormalSpeed,
+        BookmarkArea,
 
         /// <summary>
-        /// 低速
+        /// 相对于文档内容区域的坐标
         /// </summary>
-        LowSpeed,
+        ContentArea,
     }
 }

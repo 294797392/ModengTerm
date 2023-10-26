@@ -75,16 +75,6 @@ namespace ModengTerm.Terminal.Document
         public VTElement(IDrawingDocument drawingDocument)
         {
             this.drawingDocument = drawingDocument;
-
-            if (this.Type == VTDocumentElements.Scrollbar)
-            {
-                // Scrollbar就不用创建了，因为Scrollbar默认就是存在的
-                this.DrawingObject = (TDrawingObject)this.drawingDocument.Scrollbar;
-            }
-            else
-            {
-                this.DrawingObject = drawingDocument.CreateDrawingObject<TDrawingObject>(this.Type);
-            }
         }
 
         #endregion
@@ -94,12 +84,41 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 初始化
         /// </summary>
-        public abstract void Initialize();
+        public void Initialize()
+        {
+            if (this.Type == VTDocumentElements.Scrollbar)
+            {
+                // Scrollbar就不用创建了，因为Scrollbar默认就是存在的
+                this.DrawingObject = (TDrawingObject)this.drawingDocument.Scrollbar;
+            }
+            else
+            {
+                this.DrawingObject = drawingDocument.CreateDrawingObject<TDrawingObject>(this.Type);
+            }
+
+            this.OnInitialize();
+
+            this.DrawingObject.Initialize();
+        }
 
         /// <summary>
         /// 释放资源
         /// </summary>
-        public abstract void Release();
+        public void Release()
+        {
+            this.OnRelease();
+
+            this.DrawingObject.Release();
+        }
+
+        /// <summary>
+        /// 在这个阶段，DrawingObject已经被创建出来了
+        /// 子类需要做的事情就是对DrawingObject里的一些属性和字段进行初始化赋值
+        /// 子类不需要调用DrawingObject的Initialize方法，OnInitialize完之后会自动调用DrawingObject.Initialize
+        /// </summary>
+        protected abstract void OnInitialize();
+
+        protected abstract void OnRelease();
 
         /// <summary>
         /// 请求重绘

@@ -34,7 +34,7 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 默认文本样式
         /// </summary>
-        public VTextStyle Style { get; set; }
+        public VTypeface Style { get; set; }
 
         public VTFormattedText()
         {

@@ -65,6 +65,8 @@ namespace ModengTerm.ViewModels
 
         private MTermManifest appManifest;
 
+        private bool bookmarkVisible;
+
         #endregion
 
         #region 属性
@@ -406,6 +408,22 @@ namespace ModengTerm.ViewModels
         public string ScrollbarThumbColor { get; set; }
         public string ScrollbarButtonColor { get; set; }
         public string ScrollbarTrackColor { get; set; }
+
+        /// <summary>
+        /// 是否显示书签
+        /// </summary>
+        public bool BookmarkVisible
+        {
+            get { return this.bookmarkVisible; }
+            set
+            {
+                if (this.bookmarkVisible != value)
+                {
+                    this.bookmarkVisible = value;
+                    this.NotifyPropertyChanged("BookmarkVisible");
+                }
+            }
+        }
 
         #endregion
 
@@ -806,6 +824,8 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR, this.CursorColors.SelectedItem.Value);
             session.SetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
 
+            session.SetOption<string>(OptionKeyEnum.SSH_BOOKMARK_COLOR, this.ThemeList.SelectedItem.BookmarkColor);
+
             return true;
         }
 
@@ -849,6 +869,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
             session.SetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN, MTermConsts.DefaultContentMargin);
+            session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, this.BookmarkVisible);
 
             return true;
         }

@@ -40,7 +40,12 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 背景
         /// </summary>
-        Wallpaper
+        Wallpaper,
+
+        /// <summary>
+        /// 书签
+        /// </summary>
+        Bookmark
     }
 
     /// <summary>
@@ -52,6 +57,15 @@ namespace ModengTerm.Terminal.Document
         #region 实例变量
 
         protected VTDocument ownerDocument;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// 该行所属的文档
+        /// </summary>
+        public VTDocument OwnerDocument { get { return this.ownerDocument; } }
 
         #endregion
 

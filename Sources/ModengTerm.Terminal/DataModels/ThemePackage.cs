@@ -65,6 +65,12 @@ namespace ModengTerm.Terminal.DataModels
         [JsonProperty("scrollbarTrackColor")]
         public string ScrollbarTrackColor { get; set; }
 
+        /// <summary>
+        /// 书签颜色
+        /// </summary>
+        [JsonProperty("bookmarkColor")]
+        public string BookmarkColor { get; set; }
+
         public ThemePackage()
         {
         }

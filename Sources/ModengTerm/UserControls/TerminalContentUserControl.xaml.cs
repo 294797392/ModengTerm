@@ -63,6 +63,16 @@ namespace XTerminal.UserControls
         /// </summary>
         private ServiceAgent serviceAgent;
 
+        /// <summary>
+        /// 记录当鼠标按下的时候的文本行
+        /// </summary>
+        private VTextLine mouseDownLine;
+
+        /// <summary>
+        /// 书签管理器
+        /// </summary>
+        private VTBookmark bookmarkMgr;
+
         #endregion
 
         #region 属性
@@ -135,6 +145,9 @@ namespace XTerminal.UserControls
             base.OnMouseDown(e);
 
             this.Focus();
+
+            // 记录鼠标所在行
+            this.mouseDownLine = this.videoTerminal.ActiveDocument.GetCursorLine();
         }
 
         /// <summary>
@@ -177,17 +190,17 @@ namespace XTerminal.UserControls
 
         private void MenuItemSaveDocument_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(ParagraphTypeEnum.SaveDocument);
+            this.SaveToFile(ParagraphTypeEnum.Viewport);
         }
 
         private void MenuItemSaveSelected_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(ParagraphTypeEnum.SaveSelected);
+            this.SaveToFile(ParagraphTypeEnum.Selected);
         }
 
         private void MenuItemSaveAll_Click(object sender, RoutedEventArgs e)
         {
-            this.SaveToFile(ParagraphTypeEnum.SaveAll);
+            this.SaveToFile(ParagraphTypeEnum.AllDocument);
         }
 
         #endregion
@@ -260,6 +273,8 @@ namespace XTerminal.UserControls
             paragraphsWindow.Show();
         }
 
+        #region 收藏夹
+
         /// <summary>
         /// 添加到收藏夹
         /// </summary>
@@ -276,15 +291,12 @@ namespace XTerminal.UserControls
             Favorites favorites = new Favorites()
             {
                 ID = Guid.NewGuid().ToString(),
-                Background = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
-                Foreground = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR),
+                Typeface = this.videoTerminal.ActiveDocument.Typeface,
                 SessionID = this.Session.ID,
                 StartCharacterIndex = paragraph.StartCharacterIndex,
                 EndCharacterIndex = paragraph.EndCharacterIndex,
-                FontSize = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE),
                 CharacterList = paragraph.CharacterList,
                 CreationTime = paragraph.CreationTime,
-                FontFamily = this.Session.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY),
             };
 
             int code = this.serviceAgent.AddFavorites(favorites);
@@ -314,6 +326,61 @@ namespace XTerminal.UserControls
             paragraphsWindow.Owner = mainWindow;
             paragraphsWindow.Show();
         }
+
+        #endregion
+
+        #region 书签
+
+        private void MeuItemAddBookmark_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.mouseDownLine == null)
+            {
+                return;
+            }
+
+            this.bookmarkMgr.AddBookmark(this.mouseDownLine);
+
+            this.videoTerminal.AddBookmark(this.mouseDownLine, VTBookmarkStates.Enabled);
+        }
+
+        private void MeuItemRemoveBookmark_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.mouseDownLine == null)
+            {
+                return;
+            }
+
+            this.bookmarkMgr.RemoveBookmark(this.mouseDownLine);
+
+            this.videoTerminal.AddBookmark(this.mouseDownLine, VTBookmarkStates.None);
+        }
+
+        private void MenuItemBookmarkList_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
+
+            BookmarkParagraphSource bookmarkParagraphSource = new BookmarkParagraphSource(this.bookmarkMgr);
+
+            BookmarksVM bookmarksVM = new BookmarksVM(bookmarkParagraphSource, this.videoTerminal);
+            bookmarksVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
+
+            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(bookmarksVM);
+            paragraphsWindow.Title = "书签列表";
+            paragraphsWindow.Owner = mainWindow;
+            paragraphsWindow.Show();
+        }
+
+        private void MenuItemDisplayBookmark_Click(object sender, RoutedEventArgs e)
+        {
+            this.videoTerminal.SetBookmarkVisible(true);
+        }
+
+        private void MenuItemHidenBookmark_Click(object sender, RoutedEventArgs e)
+        {
+            this.videoTerminal.SetBookmarkVisible(false);
+        }
+
+        #endregion
 
         #endregion
 
@@ -351,14 +418,16 @@ namespace XTerminal.UserControls
             });
         }
 
-        public VTypeface GetTypeface(VTextStyle textStyle)
+        public VTypeface GetTypeface(double fontSize, string fontFamily)
         {
-            Typeface typeface = DrawingUtils.GetTypeface(textStyle);
+            Typeface typeface = DrawingUtils.GetTypeface(fontFamily);
             FormattedText formattedText = new FormattedText(" ", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                textStyle.FontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+                fontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
 
             return new VTypeface()
             {
+                FontSize = fontSize,
+                FontFamily = fontFamily,
                 Height = formattedText.Height,
                 SpaceWidth = formattedText.WidthIncludingTrailingWhitespace
             };
@@ -379,6 +448,8 @@ namespace XTerminal.UserControls
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
+
+            this.bookmarkMgr = new VTBookmark(this.Session);
 
             this.videoTerminal = viewModel as VideoTerminal;
             this.videoTerminal.Open();

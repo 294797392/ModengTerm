@@ -23,6 +23,6 @@ namespace ModengTerm.Terminal.Rendering
         /// <summary>
         /// 光标大小
         /// </summary>
-        VTSize Size { get; set; }
+        VTRect Size { get; set; }
     }
 }

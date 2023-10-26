@@ -80,6 +80,7 @@ namespace ModengTerm.Terminal.Document
         {
             historyLine.PhysicsRow = textLine.PhysicsRow;
             VTUtils.CopyCharacter(textLine.Characters, historyLine.Characters);
+            historyLine.BookmarkState = textLine.BookmarkState;
         }
 
         public override void RemoveHistory(VTHistoryLine historyLine)

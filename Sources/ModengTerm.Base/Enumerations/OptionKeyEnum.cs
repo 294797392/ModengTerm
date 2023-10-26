@@ -45,6 +45,12 @@ namespace XTerminal.Base.Enumerations
         /// </summary>
         SSH_THEME_CONTENT_MARGIN = 114,
 
+        /// <summary>
+        /// 是否显示书签
+        /// </summary>
+        SSH_BOOKMARK_VISIBLE = 115,
+        SSH_BOOKMARK_COLOR = 116,
+
         // Server 201 - 300
         SSH_SERVER_ADDR = 201,
         SSH_SERVER_PORT,

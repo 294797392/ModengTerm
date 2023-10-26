@@ -52,8 +52,17 @@
                         <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>
                         <MenuItem Header="查看剪贴板历史" Click="MenuItemClipboardHistory_Click"/>
                         <Separator/>
-                        <MenuItem Header="加入收藏夹" Click="MenuItemAddToFavorites_Click"/>
-                        <MenuItem Header="查看收藏夹" Click="MenuItemFaviritesList_Click"/>
+                        <MenuItem Header="收藏夹">
+                            <MenuItem Header="加入收藏夹" Click="MenuItemAddToFavorites_Click"/>
+                            <MenuItem Header="查看收藏夹" Click="MenuItemFaviritesList_Click"/>
+                        </MenuItem>
+                        <MenuItem Header="书签">
+                            <MenuItem Header="新建书签" Click="MeuItemAddBookmark_Click"/>
+                            <MenuItem Header="删除书签" Click="MeuItemRemoveBookmark_Click"/>
+                            <MenuItem Header="查看书签列表" Click="MenuItemBookmarkList_Click"/>
+                            <MenuItem Header="显示书签栏" Click="MenuItemDisplayBookmark_Click"/>
+                            <MenuItem Header="隐藏书签栏" Click="MenuItemHidenBookmark_Click"/>
+                        </MenuItem>
                         <Separator/>
                         <MenuItem Header="查找..." Click="MenuItemFind_Click"/>
                         <Separator/>

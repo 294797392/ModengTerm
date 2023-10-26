@@ -65,6 +65,12 @@ namespace ModengTerm.Terminal.Document
 
         private int physicsRow;
 
+        private VTBookmarkStates bookmarkState;
+
+        private IDrawingBookmark drawingBookmark;
+
+        private bool isBookmarkDirty;
+
         #endregion
 
         #region 属性
@@ -143,7 +149,23 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 文本样式
         /// </summary>
-        public VTextStyle Style { get; set; }
+        public VTypeface Style { get; set; }
+
+        /// <summary>
+        /// 该行书签状态
+        /// </summary>
+        public VTBookmarkStates BookmarkState
+        {
+            get { return this.bookmarkState; }
+            set
+            {
+                if (this.bookmarkState != value)
+                {
+                    this.bookmarkState = value;
+                    this.SetBookmarkDirty(true);
+                }
+            }
+        }
 
         #endregion
 
@@ -153,7 +175,7 @@ namespace ModengTerm.Terminal.Document
         /// 
         /// </summary>
         /// <param name="owner">该行所属的文档</param>
-        public VTextLine(VTDocument owner) : 
+        public VTextLine(VTDocument owner) :
             base(owner)
         {
             this.characters = new List<VTCharacter>();
@@ -283,6 +305,14 @@ namespace ModengTerm.Terminal.Document
             }
 
             this.SetRenderDirty(true);
+        }
+
+        private void SetBookmarkDirty(bool dirty)
+        {
+            if (this.isBookmarkDirty != dirty)
+            {
+                this.isBookmarkDirty = dirty;
+            }
         }
 
         #endregion
@@ -493,6 +523,7 @@ namespace ModengTerm.Terminal.Document
             VTUtils.CopyCharacter(historyLine.Characters, this.characters);
             this.PhysicsRow = historyLine.PhysicsRow;
             this.columns = VTUtils.GetColumns(this.characters);
+            this.BookmarkState = historyLine.BookmarkState;
 
             this.SetRenderDirty(true);
         }
@@ -588,29 +619,42 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
+        /// <summary>
+        /// 复用该行对象
+        /// 该方法会重置该行的数据为默认值
+        /// </summary>
+        internal void Recycle()
+        {
+            this.EraseAll();
+
+            this.BookmarkState = VTBookmarkStates.None;
+        }
+
         #endregion
 
         #region VTDocumentElement
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
-            this.DrawingObject.Initialize();
+            this.drawingBookmark = this.ownerDocument.DrawingObject.CreateDrawingObject<IDrawingBookmark>(VTDocumentElements.Bookmark);
+            this.drawingBookmark.Color = this.ownerDocument.options.BookmarkColor;
+            this.drawingBookmark.Height = this.ownerDocument.options.Typeface.Height * 0.8;
+            this.drawingBookmark.Width = Math.Min(10, this.ownerDocument.options.Typeface.Height * 0.7);
+            this.drawingBookmark.OffsetX = 5;
+            this.drawingBookmark.OffsetY = this.ownerDocument.options.Typeface.Height * 0.1;
+            this.drawingBookmark.Initialize();
+            this.drawingBookmark.SetOpacity(0); // 先画出来，但是隐藏掉，后续添加或者删除书签只改变显隐即可
+            this.drawingBookmark.Draw();
         }
 
-        public override void Release()
+        protected override void OnRelease()
         {
-            this.DrawingObject.Release();
+            this.drawingBookmark.Release();
+            this.drawingDocument.DeleteDrawingObject(this.DrawingObject);
         }
 
         public override void RequestInvalidate()
         {
-            if (base.arrangeDirty)
-            {
-                this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
-
-                base.arrangeDirty = false;
-            }
-
             if (this.renderDirty)
             {
                 VTFormattedText formattedText = VTUtils.CreateFormattedText(this.characters);
@@ -618,7 +662,7 @@ namespace ModengTerm.Terminal.Document
 
                 // 如果文本是空的那么无法测量出来高度
                 // 空白字符可以测量出来高度
-                if (formattedText.Text == null) 
+                if (formattedText.Text == null)
                 {
                     formattedText.Text = " ";
                 }
@@ -641,6 +685,38 @@ namespace ModengTerm.Terminal.Document
                 this.Metrics = textMetrics;
 
                 this.isMeasureDirty = false;
+            }
+
+            if (this.isBookmarkDirty)
+            {
+                switch (this.bookmarkState)
+                {
+                    case VTBookmarkStates.Enabled:
+                        {
+                            this.drawingBookmark.SetOpacity(1);
+                            break;
+                        }
+
+                    case VTBookmarkStates.None:
+                        {
+                            this.drawingBookmark.SetOpacity(0);
+                            break;
+                        }
+
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                this.isBookmarkDirty = false;
+            }
+
+            if (base.arrangeDirty)
+            {
+                this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
+
+                this.drawingBookmark.Arrange(0, this.OffsetY);
+
+                base.arrangeDirty = false;
             }
         }
 

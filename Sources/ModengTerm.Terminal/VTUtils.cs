@@ -14,6 +14,7 @@ using XTerminal.Base.Enumerations;
 using ModengTerm.Base;
 using System.IO;
 using System.Windows.Media.Imaging;
+using ModengTerm.Base.Enumerations;
 
 namespace ModengTerm.Terminal
 {
@@ -30,18 +31,9 @@ namespace ModengTerm.Terminal
         public string SessionName { get; set; }
 
         /// <summary>
-        /// 终端背景颜色
+        /// 字体样式
         /// </summary>
-        public string Background { get; set; }
-
-        /// <summary>
-        /// 终端前景色（文本默认颜色）
-        /// </summary>
-        public string Foreground { get; set; }
-
-        public string FontFamily { get; set; }
-
-        public double FontSize { get; set; }
+        public VTypeface Typeface { get; set; }
     }
 
     public delegate void CreateLineDelegate(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, LoggerFilter filter = null);
@@ -225,9 +217,10 @@ namespace ModengTerm.Terminal
 
             if (fileType == LogFileTypeEnum.HTML)
             {
-                string htmlBackground = VTColor.CreateFromRgbKey(parameter.Background).Html;
-                string htmlForeground = VTColor.CreateFromRgbKey(parameter.Foreground).Html;
-                return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground, parameter.FontSize, parameter.FontFamily, htmlForeground);
+                string htmlBackground = VTColor.CreateFromRgbKey(parameter.Typeface.BackgroundColor).Html;
+                string htmlForeground = VTColor.CreateFromRgbKey(parameter.Typeface.ForegroundColor).Html;
+                return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground, 
+                    parameter.Typeface.FontSize, parameter.Typeface.FontFamily, htmlForeground);
             }
 
             return builder.ToString();
@@ -606,20 +599,59 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 根据当前屏幕大小计算终端的自适应大小
         /// </summary>
-        /// <param name="contentArea">文档显示区域的大小</param>
+        /// <param name="contentSize">文档显示区域的大小</param>
         /// <param name="typeface">字体信息</param>
         /// <param name="rowSize">计算出来的终端行数</param>
         /// <param name="colSize">计算出来的终端列数</param>
-        public static void CalculateAutoFitSize(VTSize contentArea, VTypeface typeface, out int rowSize, out int colSize)
+        public static void CalculateAutoFitSize(VTSize contentSize, VTypeface typeface, out int rowSize, out int colSize)
         {
             // 自适应屏幕大小
             // 计算一共有多少行，和每行之间的间距是多少
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置
-            rowSize = (int)Math.Floor(contentArea.Height / typeface.Height);
-            colSize = (int)Math.Floor(contentArea.Width / typeface.SpaceWidth);
+            rowSize = (int)Math.Floor(contentSize.Height / typeface.Height);
+            colSize = (int)Math.Floor(contentSize.Width / typeface.SpaceWidth);
 
             //Console.WriteLine("height = {0}, characterHeight = {1}, rows = {2}", contentArea.Height, typeface.Height, rowSize);
         }
+
+
+        public static void GetSegement(string text, int characterIndex, out int startIndex, out int endIndex)
+        {
+            startIndex = 0;
+            endIndex = text.Length - 1;
+
+            if (!char.IsLetterOrDigit(text[characterIndex]))
+            {
+                startIndex = characterIndex;
+                endIndex = characterIndex;
+                return;
+            }
+
+            for (int i = characterIndex; i >= 0; i--)
+            {
+                char c = text[i];
+                if (char.IsLetterOrDigit(c))
+                {
+                    continue;
+                }
+
+                startIndex = i + 1;
+                break;
+            }
+
+            for (int i = characterIndex + 1; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (char.IsLetterOrDigit(c))
+                {
+                    continue;
+                }
+
+                endIndex = i - 1;
+                break;
+            }
+        }
+
     }
 }

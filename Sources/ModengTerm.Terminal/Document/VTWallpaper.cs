@@ -93,19 +93,17 @@ namespace ModengTerm.Terminal.Document
 
         #region VTElement
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             this.DrawingObject.Uri = this.Uri;
             this.DrawingObject.BackgroundColor = this.BackgroundColor;
             this.DrawingObject.PaperType = this.PaperType;
             this.DrawingObject.EffectType = this.Effect;
             this.DrawingObject.Rect = this.Rect;
-            this.DrawingObject.Initialize();
         }
 
-        public override void Release()
+        protected override void OnRelease()
         {
-            this.DrawingObject.Release();
         }
 
         public override void RequestInvalidate()

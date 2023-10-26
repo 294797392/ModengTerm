@@ -48,7 +48,7 @@ namespace ModengTerm.Rendering
 
         #endregion
 
-        #region IDrawingObjectText
+        #region IDrawingTextLine
 
         protected override void OnInitialize()
         {

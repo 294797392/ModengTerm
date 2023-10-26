@@ -73,10 +73,7 @@ namespace ModengTerm.Terminal.ViewModels
                 CharactersList = favorites.CharacterList,
                 ContentType = LogFileTypeEnum.PlainText,
                 SessionName = String.Empty,
-                FontSize = favorites.FontSize,
-                FontFamily = favorites.FontFamily,
-                Background = favorites.Background,
-                Foreground = favorites.Foreground
+                Typeface = favorites.Typeface,
             };
             this.Content = VTUtils.CreateContent(ccp);
             this.CreationTime = favorites.CreationTime;

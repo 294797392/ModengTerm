@@ -138,8 +138,6 @@ namespace ModengTerm.Terminal.ViewModels
         private VTColorTable colorTable;
         internal string foregroundColor;
         internal string backgroundColor;
-        internal double fontSize;
-        internal string fontFamily;
 
         private bool sendAll;
 
@@ -270,13 +268,9 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.outputEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
-            this.fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
-            this.fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
             this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
             this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
             this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
-            VTypeface typeface = this.drawingWindow.GetTypeface(new VTextStyle() { FontSize = this.fontSize, FontFamily = this.fontFamily });
-            double contentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
 
             #region 初始化键盘
 
@@ -298,8 +292,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化文档模型
 
-            int fontSize = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
-            string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
             VTEventHandler eventHandler = new VTEventHandler()
             {
                 OnScrollChanged = this.OnScrollChanged,
@@ -312,80 +304,42 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.mainDrawingDocument = this.drawingWindow.CreateCanvas();
             this.mainDrawingDocument.Name = "MainDocument";
-            this.mainDrawingDocument.ContentMargin = contentMargin;
-            this.mainDrawingDocument.ScrollbarVisible = true;
             this.mainDrawingDocument.AddEventHandler(eventHandler);
             this.alternateDrawingDocument = this.drawingWindow.CreateCanvas();
             this.alternateDrawingDocument.Name = "AlternateDocument";
-            this.alternateDrawingDocument.ContentMargin = contentMargin;
-            this.alternateDrawingDocument.ScrollbarVisible = false;
             this.alternateDrawingDocument.AddEventHandler(eventHandler);
             this.drawingWindow.InsertCanvas(0, this.mainDrawingDocument);
             this.drawingWindow.InsertCanvas(0, this.alternateDrawingDocument);
             this.drawingWindow.VisibleCanvas(this.mainDrawingDocument, true);
             this.drawingWindow.VisibleCanvas(this.alternateDrawingDocument, false);
 
-            #region 初始化终端大小
-
-            // 先获取文档显示区域的像素大小
-            VTSize windowSize = this.drawingWindow.GetSize();
-
-            // 真正的内容显示区域大小不包含边距
-            VTSize contentArea = windowSize.Offset(-contentMargin * 2);
-
-            // 然后根据显示区域的像素大小和每个字符的宽度和高度动态计算终端的行和列
-            this.sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
-            switch (this.sizeMode)
+            VTDocumentOptions mainOptions = this.CreateDocumentOptions(sessionInfo, false);
+            this.mainDocument = new VTDocument(mainOptions, this.mainDrawingDocument, false)
             {
-                case TerminalSizeModeEnum.AutoFit:
-                    {
-                        VTUtils.CalculateAutoFitSize(contentArea, typeface, out this.viewportRow, out this.viewportColumn);
-
-                        // 算完真正的终端大小之后重新设置一下参数，因为在SessionDriver里是直接使用SessionInfo里的参数的
-                        sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.viewportRow);
-                        sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, this.viewportColumn);
-                        break;
-                    }
-
-                case TerminalSizeModeEnum.Fixed:
-                    {
-                        this.viewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-                        this.viewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            #endregion
-
-            VTDocumentOptions documentOptions = new VTDocumentOptions()
-            {
-                ViewportColumn = this.viewportColumn,
-                ViewportRow = this.viewportRow,
-                DECPrivateAutoWrapMode = false,
-                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
-                CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
-                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
-                CursorSize = new VTSize(typeface.SpaceWidth, typeface.Height),
-                FontFamily = fontFamily,
-                FontSize = fontSize,
-                ForegroundColor = this.foregroundColor,
-                BackgroundColor = this.backgroundColor,
-                ColorTable = this.colorTable,
-                ScrollDelta = this.scrollDelta,
-                ScrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
-                Typeface = typeface,
-                SizeMode = this.sizeMode,
-                Session = this.Session,
-                Padding = contentMargin,
+                Name = "MainDocument",
+                ScrollbarVisible = true,
+                BookmarkVisible = true,
             };
-            this.mainDocument = new VTDocument(documentOptions, this.mainDrawingDocument, false) { Name = "MainDocument" };
             this.mainDocument.Initialize();
-            this.alternateDocument = new VTDocument(documentOptions, this.alternateDrawingDocument, true) { Name = "AlternateDocument" };
+
+            VTDocumentOptions alternateOptions = this.CreateDocumentOptions(sessionInfo, true);
+            this.alternateDocument = new VTDocument(alternateOptions, this.alternateDrawingDocument, true)
+            {
+                Name = "AlternateDocument",
+                ScrollbarVisible = false,
+                BookmarkVisible = false,
+            };
             this.alternateDocument.Initialize();
             this.activeDocument = this.mainDocument;
+
+            // 初始化完VTDocument之后，真正要使用的Column和Row已经被计算出来了
+            // 此时重新设置sessionInfo里的Row和Column，因为SessionTransport要使用
+            // 行和列以主缓冲区为准
+            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.mainDocument.ViewportRow);
+            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, this.mainDocument.ViewportColumn);
+
+            this.ViewportRow = this.mainDocument.ViewportRow;
+            this.ViewportColumn = this.mainDocument.ViewportColumn;
 
             #endregion
 
@@ -410,7 +364,7 @@ namespace ModengTerm.Terminal.ViewModels
                 Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
                 BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
                 Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT),
-                Rect = new VTRect(0, 0, windowSize)
+                Rect = new VTRect(0, 0, this.drawingWindow.GetSize())
             };
             this.wallpaper.Initialize();
             this.wallpaper.RequestInvalidate();
@@ -461,7 +415,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <returns></returns>
         public VTParagraph GetSelectedParagraph()
         {
-            return this.activeDocument.CreateParagraph(ParagraphTypeEnum.SaveSelected, LogFileTypeEnum.PlainText);
+            return this.activeDocument.CreateParagraph(ParagraphTypeEnum.Selected, LogFileTypeEnum.PlainText);
         }
 
         /// <summary>
@@ -542,9 +496,106 @@ namespace ModengTerm.Terminal.ViewModels
             this.activeDocument.RequestInvalidate();
         }
 
+        /// <summary>
+        /// 设置某一行的标签状态
+        /// 如果该行所在的文档是备用缓冲区，那么什么都不做
+        /// </summary>
+        /// <param name="textLine">要设置的行</param>
+        /// <param name="targetState">要设置的标签状态</param>
+        public void AddBookmark(VTextLine textLine, VTBookmarkStates targetState)
+        {
+            VTDocument document = textLine.OwnerDocument;
+
+            // 备用缓冲区不可以新建书签
+            if (document.IsAlternate)
+            {
+                return;
+            }
+
+            if (textLine.BookmarkState == targetState)
+            {
+                return;
+            }
+
+            textLine.BookmarkState = targetState;
+
+            // 重绘
+            textLine.RequestInvalidate();
+
+            // 更新历史行里的标签状态
+            document.Scrollbar.UpdateHistory(textLine);
+        }
+
+        /// <summary>
+        /// 设置书签的显示或隐藏状态
+        /// </summary>
+        /// <param name="visible"></param>
+        public void SetBookmarkVisible(bool visible)
+        {
+            this.mainDocument.BookmarkVisible = visible;
+        }
+
+        /// <summary>
+        /// 开始录制回放文件
+        /// </summary>
+        /// <param name="playbackFile">要录制的回放文件的名字</param>
+        public void StartRecord(string playbackFile)
+        {
+
+        }
+
+        /// <summary>
+        /// 停止录制回放文件
+        /// </summary>
+        public void StopRecord()
+        {
+
+        }
+
         #endregion
 
         #region 实例方法
+
+        private VTDocumentOptions CreateDocumentOptions(XTermSession sessionInfo, bool isAlternate)
+        {
+            string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
+            double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
+
+            VTypeface typeface = this.drawingWindow.GetTypeface(fontSize, fontFamily);
+            typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
+            typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
+
+            VTDocumentOptions documentOptions = new VTDocumentOptions()
+            {
+                DefaultViewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL),
+                DefaultViewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW),
+                WindowSize = this.drawingWindow.GetSize(),
+                DECPrivateAutoWrapMode = false,
+                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
+                CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
+                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
+                ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
+                ScrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
+                Typeface = typeface,
+                SizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE),
+                Session = sessionInfo,
+                ContentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN),
+                BookmarkColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_BOOKMARK_COLOR)
+            };
+
+            if (isAlternate)
+            {
+                documentOptions.ScrollbarVisible = false;
+                documentOptions.BookmarkVisible = false;
+            }
+            else 
+            {
+                documentOptions.ScrollbarVisible = true;
+                documentOptions.BookmarkVisible = true;
+            }
+
+            return documentOptions;
+        }
 
         private void PerformDeviceStatusReport(StatusType statusType)
         {
@@ -1307,7 +1358,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.uiSyncContext.Send((o) =>
             {
-                // 全部数据都处理完了之后，只渲染一次
+            // 全部数据都处理完了之后，只渲染一次
                 this.activeDocument.RequestInvalidate();
             }, null);
 

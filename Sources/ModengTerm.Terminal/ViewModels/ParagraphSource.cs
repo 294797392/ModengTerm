@@ -40,7 +40,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         public override List<ParagraphVM> GetParagraphs()
         {
-            return this.clipboard.HistoryList.Select(v=> new ParagraphVM(v)).ToList();
+            return this.clipboard.HistoryList.Select(v => new ParagraphVM(v)).ToList();
         }
     }
 
@@ -68,6 +68,21 @@ namespace ModengTerm.Terminal.ViewModels
             }
 
             return favoritesList.Select(v => new ParagraphVM(v)).ToList();
+        }
+    }
+
+    public class BookmarkParagraphSource : ParagraphSource
+    {
+        private VTBookmark bookmarkMgr;
+
+        public BookmarkParagraphSource(VTBookmark bookmarkMgr)
+        {
+            this.bookmarkMgr = bookmarkMgr;
+        }
+
+        public override List<ParagraphVM> GetParagraphs()
+        {
+            return this.bookmarkMgr.Bookmarks.Select(v => new ParagraphVM(v)).ToList();
         }
     }
 }

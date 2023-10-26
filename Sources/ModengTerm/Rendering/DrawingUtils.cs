@@ -58,14 +58,14 @@ namespace ModengTerm.Rendering
             }
         }
 
-        public static Typeface GetTypeface(VTextStyle textStyle)
+        public static Typeface GetTypeface(string fontFamily)
         {
             Typeface typeface;
-            if (!TypefaceMap.TryGetValue(textStyle.FontFamily, out typeface))
+            if (!TypefaceMap.TryGetValue(fontFamily, out typeface))
             {
-                FontFamily fontFamily = new FontFamily(textStyle.FontFamily);
-                typeface = new Typeface(fontFamily, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-                TypefaceMap[textStyle.FontFamily] = typeface;
+                FontFamily family = new FontFamily(fontFamily);
+                typeface = new Typeface(family, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+                TypefaceMap[fontFamily] = typeface;
             }
             return typeface;
         }
@@ -105,9 +105,9 @@ namespace ModengTerm.Rendering
         /// <returns></returns>
         public static FormattedText CreateFormattedText(VTFormattedText textData, DrawingContext dc = null)
         {
-            VTextStyle textStyle = textData.Style;
+            VTypeface textStyle = textData.Style;
             Brush foreground = DrawingUtils.GetBrush(textStyle.ForegroundColor);
-            Typeface typeface = DrawingUtils.GetTypeface(textStyle);
+            Typeface typeface = DrawingUtils.GetTypeface(textStyle.FontFamily);
 
             FormattedText formattedText = new FormattedText(textData.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
                 textStyle.FontSize, foreground, null, TextFormattingMode.Display, App.PixelsPerDip);

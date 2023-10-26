@@ -30,10 +30,42 @@ namespace ModengTerm.Terminal.Document
         private bool blinkAllowed;
         private VTDocument ownerDocument;
         private int characterIndex;
+        private VTCursorStyles style;
+        private string color;
 
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 光标样式
+        /// </summary>
+        public VTCursorStyles Style
+        {
+            get { return this.style; }
+            set
+            {
+                if (this.style != value)
+                {
+                    this.style = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 光标颜色
+        /// </summary>
+        public string Color
+        {
+            get { return this.color; }
+            set
+            {
+                if (this.color != value)
+                {
+                    this.color = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 是否显示光标
@@ -108,6 +140,11 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
+        /// <summary>
+        /// 字体样式信息，用来计算光标大小
+        /// </summary>
+        public VTypeface Typeface { get; set; }
+
         #endregion
 
         #region 构造方法
@@ -126,17 +163,44 @@ namespace ModengTerm.Terminal.Document
 
         #region 公开接口
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
-            this.DrawingObject.Color = ownerDocument.options.CursorColor;
-            this.DrawingObject.Size = ownerDocument.options.CursorSize;
-            this.DrawingObject.Style = ownerDocument.options.CursorStyle;
-            this.DrawingObject.Initialize();
+            switch (this.style)
+            {
+                case VTCursorStyles.Block:
+                    {
+                        this.DrawingObject.Size = new VTRect(0, 0, this.Typeface.SpaceWidth, this.Typeface.Height);
+                        break;
+                    }
+
+                case VTCursorStyles.Line:
+                    {
+                        this.DrawingObject.Size = new VTRect(0, 0, 2, this.Typeface.Height);
+                        break;
+                    }
+
+                case VTCursorStyles.Underscore:
+                    {
+                        this.DrawingObject.Size = new VTRect(0, this.Typeface.Height - 2, this.Typeface.SpaceWidth, 2);
+                        break;
+                    }
+
+                case VTCursorStyles.None:
+                    {
+                        this.DrawingObject.Size = new VTRect();
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            this.DrawingObject.Color = this.color;
+            this.DrawingObject.Style = this.style;
         }
 
-        public override void Release()
+        protected override void OnRelease()
         {
-            this.DrawingObject.Release();
         }
 
         /// <summary>

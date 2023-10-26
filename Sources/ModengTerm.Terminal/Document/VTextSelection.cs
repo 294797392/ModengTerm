@@ -283,7 +283,7 @@ namespace ModengTerm.Terminal.Document
 
         #region VTElement
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             this.Geometry = new List<VTRect>();
 
@@ -293,12 +293,10 @@ namespace ModengTerm.Terminal.Document
             this.LastRowCharacterIndex = -1;
 
             this.Geometry = new List<VTRect>();
-            this.DrawingObject.Initialize();
         }
 
-        public override void Release()
+        protected override void OnRelease()
         {
-            this.DrawingObject.Release();
         }
 
         public override void RequestInvalidate()

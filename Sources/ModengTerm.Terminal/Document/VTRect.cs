@@ -19,6 +19,11 @@ namespace ModengTerm.Terminal.Document
             this.Height = h;
         }
 
+        /// <summary>
+        /// 高度和宽度分别扩大offset长度
+        /// </summary>
+        /// <param name="offset">要扩大或者缩小的长度</param>
+        /// <returns></returns>
         public VTSize Offset(double offset)
         {
             return new VTSize(this.Width + offset, this.Height + offset);

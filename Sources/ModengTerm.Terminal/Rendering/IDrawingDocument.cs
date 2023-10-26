@@ -50,6 +50,11 @@ namespace ModengTerm.Terminal.Rendering
         bool ScrollbarVisible { get; set; }
 
         /// <summary>
+        /// 是否显示书签列
+        /// </summary>
+        bool BookmarkVisible { get; set; }
+
+        /// <summary>
         /// 创建一个渲染对象
         /// </summary>
         /// <returns>绘图对象</returns>
@@ -77,5 +82,12 @@ namespace ModengTerm.Terminal.Rendering
         /// </summary>
         /// <param name="eventHandler"></param>
         void AddEventHandler(VTEventHandler eventHandler);
+
+        /// <summary>
+        /// 获取鼠标相对于文档的坐标
+        /// </summary>
+        /// <param name="relativeTo">指定要获取鼠标相对于文档里哪部分区域的坐标</param>
+        /// <returns></returns>
+        VTPoint GetMousePosition(VTDocumentAreas relativeTo);
     }
 }

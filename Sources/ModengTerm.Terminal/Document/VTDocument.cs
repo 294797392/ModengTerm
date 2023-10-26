@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Definitions;
+using XTerminal.Base.Enumerations;
 using XTerminal.Parser;
 using static ModengTerm.Terminal.Document.VTextLine;
 
@@ -86,6 +87,11 @@ namespace ModengTerm.Terminal.Document
 
         private VTypeface typeface;
 
+        /// <summary>
+        /// 存放该文档的容器
+        /// </summary>
+        private IDrawingWindow ownerWindow;
+
         #endregion
 
         #region 属性
@@ -151,12 +157,7 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 渲染该文档的Canvas
         /// </summary>
-        public IDrawingDocument DrawingObject { get; private set; }
-
-        /// <summary>
-        /// 渲染Tag的Canvas
-        /// </summary>
-        public IDrawingDocument TagCanvas { get; private set; }
+        internal IDrawingDocument DrawingObject { get; set; }
 
         /// <summary>
         /// 是否是备用缓冲区
@@ -196,6 +197,56 @@ namespace ModengTerm.Terminal.Document
 
         public int ViewportColumn { get { return this.viewportColumn; } }
 
+        /// <summary>
+        /// 是否显示书签
+        /// </summary>
+        public bool BookmarkVisible
+        {
+            get { return this.DrawingObject.BookmarkVisible; }
+            set
+            {
+                if (this.DrawingObject.BookmarkVisible != value)
+                {
+                    this.DrawingObject.BookmarkVisible = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 是否显示滚动条
+        /// </summary>
+        public bool ScrollbarVisible
+        {
+            get { return this.DrawingObject.ScrollbarVisible; }
+            set
+            {
+                if (this.DrawingObject.ScrollbarVisible != value)
+                {
+                    this.DrawingObject.ScrollbarVisible = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 文档内容的边距
+        /// </summary>
+        public double ContentMargin
+        {
+            get { return this.DrawingObject.ContentMargin; }
+            set
+            {
+                if (this.DrawingObject.ContentMargin != value)
+                {
+                    this.DrawingObject.ContentMargin = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取该文档所使用的字体Typeface
+        /// </summary>
+        public VTypeface Typeface { get { return this.options.Typeface; } }
+
         #endregion
 
         #region 构造方法
@@ -211,11 +262,10 @@ namespace ModengTerm.Terminal.Document
             this.scrollDelta = options.ScrollDelta;
             this.sizeMode = options.SizeMode;
             this.typeface = options.Typeface;
-
-            this.viewportRow = this.options.ViewportRow;
-            this.viewportColumn = this.options.ViewportColumn;
-
             this.AttributeState = new VTextAttributeState();
+            this.ContentMargin = options.ContentMargin;
+            this.ScrollbarVisible = options.ScrollbarVisible;
+            this.BookmarkVisible = options.BookmarkVisible;
         }
 
         #endregion
@@ -235,14 +285,7 @@ namespace ModengTerm.Terminal.Document
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = this.DECPrivateAutoWrapMode,
                 PhysicsRow = physicsRow,
-                Style = new VTextStyle()
-                {
-                    FontSize = this.options.FontSize,
-                    FontFamily = this.options.FontFamily,
-                    ColorTable = this.options.ColorTable,
-                    ForegroundColor = this.options.ForegroundColor,
-                    BackgroundColor = this.options.BackgroundColor,
-                },
+                Style = this.options.Typeface
             };
 
             textLine.Initialize();
@@ -619,25 +662,57 @@ namespace ModengTerm.Terminal.Document
 
         public void Initialize()
         {
-            this.Cursor = new VTCursor(this)
+            #region 初始化终端大小
+
+            // 先获取文档显示区域的像素大小
+            VTSize windowSize = this.options.WindowSize;
+
+            // 真正的内容显示区域大小
+            // 该区域不包含边距，滚动条以及书签区域
+            VTSize contentSize = windowSize.Offset(-this.options.ContentMargin * 2);
+            //VTSize contentSize = this.options.ContentSize;
+
+            // 然后根据显示区域的像素大小和每个字符的宽度和高度动态计算终端的行和列
+            this.sizeMode = this.options.SizeMode;
+            switch (this.sizeMode)
             {
-                OffsetX = 0,
-                OffsetY = 0,
-                Row = 0,
-                Column = 0,
-                Delay = VTUtils.GetCursorInterval(options.CursorSpeed),
-                AllowBlink = true,
-                IsVisible = true,
-            };
+                case TerminalSizeModeEnum.AutoFit:
+                    {
+                        VTUtils.CalculateAutoFitSize(contentSize, typeface, out this.viewportRow, out this.viewportColumn);
+                        break;
+                    }
+
+                case TerminalSizeModeEnum.Fixed:
+                    {
+                        this.viewportRow = this.options.DefaultViewportRow;
+                        this.viewportColumn = this.options.DefaultViewportColumn;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            #endregion
+
+            this.Cursor = new VTCursor(this);
+            this.Cursor.OffsetX = 0;
+            this.Cursor.OffsetY = 0;
+            this.Cursor.Row = 0;
+            this.Cursor.Column = 0;
+            this.Cursor.Delay = VTUtils.GetCursorInterval(this.options.CursorSpeed);
+            this.Cursor.AllowBlink = true;
+            this.Cursor.IsVisible = true;
+            this.Cursor.Color = this.options.CursorColor;
+            this.Cursor.Style = this.options.CursorStyle;
+            this.Cursor.Typeface = this.options.Typeface;
             this.Cursor.Initialize();
 
-            this.Selection = new VTextSelection(this)
-            {
-            };
+            this.Selection = new VTextSelection(this);
             this.Selection.Initialize();
 
             this.Scrollbar = VTScrollInfo.Create(this.IsAlternate, this);
-            this.Scrollbar.ViewportRow = this.options.ViewportRow;
+            this.Scrollbar.ViewportRow = this.viewportRow; ;
             this.Scrollbar.ScrollbackMax = this.options.ScrollbackMax;
             this.Scrollbar.Initialize();
 
@@ -651,7 +726,7 @@ namespace ModengTerm.Terminal.Document
             #endregion
 
             // 默认创建80行，可见区域也是80行
-            for (int i = 1; i < options.ViewportRow; i++)
+            for (int i = 1; i < this.viewportRow; i++)
             {
                 VTextLine textLine = this.CreateTextLine(i);
                 this.LastLine.Append(textLine);
@@ -741,7 +816,8 @@ namespace ModengTerm.Terminal.Document
 
                 // 下移之后，删除整行数据，终端会重新打印该行数据的
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
-                this.ActiveLine.EraseAll();
+                //this.ActiveLine.EraseAll();
+                this.ActiveLine.Recycle();
 
                 // 物理行号和scrollMargin无关
                 if (!this.IsAlternate)
@@ -1506,7 +1582,7 @@ namespace ModengTerm.Terminal.Document
                 return VTParagraph.Empty;
             }
 
-            return this.CreateParagraph(ParagraphTypeEnum.SaveSelected, LogFileTypeEnum.PlainText);
+            return this.CreateParagraph(ParagraphTypeEnum.Selected, LogFileTypeEnum.PlainText);
         }
 
         /// <summary>
@@ -1523,7 +1599,7 @@ namespace ModengTerm.Terminal.Document
 
             switch (paragraphType)
             {
-                case ParagraphTypeEnum.SaveAll:
+                case ParagraphTypeEnum.AllDocument:
                     {
                         if (this.IsAlternate)
                         {
@@ -1558,7 +1634,7 @@ namespace ModengTerm.Terminal.Document
                         break;
                     }
 
-                case ParagraphTypeEnum.SaveDocument:
+                case ParagraphTypeEnum.Viewport:
                     {
                         VTextLine current = this.FirstLine;
                         while (current != null)
@@ -1574,7 +1650,7 @@ namespace ModengTerm.Terminal.Document
                         break;
                     }
 
-                case ParagraphTypeEnum.SaveSelected:
+                case ParagraphTypeEnum.Selected:
                     {
                         if (this.Selection.IsEmpty)
                         {
@@ -1626,10 +1702,7 @@ namespace ModengTerm.Terminal.Document
                 StartCharacterIndex = startCharacterIndex,
                 EndCharacterIndex = endCharacterIndex,
                 ContentType = fileType,
-                Background = this.options.BackgroundColor,
-                FontSize = this.options.FontSize,
-                FontFamily = this.options.FontFamily,
-                Foreground = this.options.ForegroundColor
+                Typeface = this.options.Typeface
             };
 
             string text = VTUtils.CreateContent(parameter);
@@ -1673,6 +1746,19 @@ namespace ModengTerm.Terminal.Document
             this.Selection.FirstRowCharacterIndex = 0;
             this.Selection.LastRowCharacterIndex = lastCharacterIndex;
             this.Selection.RequestInvalidate();
+        }
+
+        /// <summary>
+        /// 获取当前鼠标所在行
+        /// </summary>
+        /// <returns></returns>
+        public VTextLine GetCursorLine()
+        {
+            VTPoint mouseLocation = this.DrawingObject.GetMousePosition(VTDocumentAreas.ContentArea);
+
+            VTextLine cursorLine = HitTestHelper.HitTestVTextLine(this.FirstLine, mouseLocation.Y);
+
+            return cursorLine;
         }
 
         /// <summary>
@@ -1728,12 +1814,12 @@ namespace ModengTerm.Terminal.Document
 
         #region 事件处理器
 
-        public void OnMouseDown(VTPoint location, int clickCount)
+        public void OnMouseDown(VTPoint mouseLocation, int clickCount)
         {
             if (clickCount == 1)
             {
                 this.isMouseDown = true;
-                this.mouseDownPos = location;
+                this.mouseDownPos = mouseLocation;
 
                 // 点击的时候先清除选中区域
                 this.Selection.Reset();
@@ -1746,7 +1832,7 @@ namespace ModengTerm.Terminal.Document
 
                 int startIndex = 0, endIndex = 0;
 
-                VTextLine lineHit = HitTestHelper.HitTestVTextLine(this.FirstLine, location.Y);
+                VTextLine lineHit = HitTestHelper.HitTestVTextLine(this.FirstLine, mouseLocation.Y);
                 if (lineHit == null)
                 {
                     return;
@@ -1760,11 +1846,11 @@ namespace ModengTerm.Terminal.Document
                             string text = VTUtils.CreatePlainText(lineHit.Characters);
                             int characterIndex;
                             VTRect characterBounds;
-                            if (!HitTestHelper.HitTestVTCharacter(lineHit, location.X, out characterIndex, out characterBounds))
+                            if (!HitTestHelper.HitTestVTCharacter(lineHit, mouseLocation.X, out characterIndex, out characterBounds))
                             {
                                 return;
                             }
-                            VDocumentUtils.GetSegement(text, characterIndex, out startIndex, out endIndex);
+                            VTUtils.GetSegement(text, characterIndex, out startIndex, out endIndex);
                             break;
                         }
 
@@ -1791,7 +1877,7 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
-        public void OnMouseMove(VTPoint location)
+        public void OnMouseMove(VTPoint mouseLocation)
         {
             if (!this.isMouseDown)
             {
@@ -1817,7 +1903,7 @@ namespace ModengTerm.Terminal.Document
             // 如果还没有测量起始字符，那么测量起始字符
             if (startPointer.CharacterIndex == -1)
             {
-                if (!this.GetTextPointer(location, vtRect, startPointer))
+                if (!this.GetTextPointer(mouseLocation, vtRect, startPointer))
                 {
                     // 没有命中起始字符，那么直接返回啥都不做
                     //logger.DebugFormat("没命中起始字符");
@@ -1827,10 +1913,10 @@ namespace ModengTerm.Terminal.Document
 
             // 首先检测鼠标是否在Surface边界框的外面
             // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
-            this.ScrollIfCursorOutsideDocument(location, vtRect);
+            this.ScrollIfCursorOutsideDocument(mouseLocation, vtRect);
 
             // 更新当前鼠标的命中信息，保存在endPointer里
-            if (!this.GetTextPointer(location, vtRect, endPointer))
+            if (!this.GetTextPointer(mouseLocation, vtRect, endPointer))
             {
                 // 命中失败，不更新
                 return;
@@ -1869,7 +1955,7 @@ namespace ModengTerm.Terminal.Document
             this.RequestInvalidate();
         }
 
-        public void OnMouseUp(VTPoint location)
+        public void OnMouseUp(VTPoint mouseLocation)
         {
             this.isMouseDown = false;
             this.selectionState = false;

@@ -22,5 +22,25 @@ namespace ModengTerm.Terminal.Document
         /// 这个宽度是空白字符的宽度
         /// </summary>
         public double SpaceWidth { get; set; }
+
+        /// <summary>
+        /// 字体样式
+        /// </summary>
+        public string FontFamily { get; set; }
+
+        /// <summary>
+        /// 字体大小
+        /// </summary>
+        public double FontSize { get; set; }
+
+        /// <summary>
+        /// 文本的背景色
+        /// </summary>
+        public string BackgroundColor { get; set; }
+
+        /// <summary>
+        /// 文本的前景色
+        /// </summary>
+        public string ForegroundColor { get; set; }
     }
 }

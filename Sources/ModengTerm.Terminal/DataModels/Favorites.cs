@@ -35,23 +35,8 @@ namespace ModengTerm.Terminal.DataModels
         public int EndCharacterIndex { get; set; }
 
         /// <summary>
-        /// 前景色
+        /// 字体样式
         /// </summary>
-        public string Foreground { get; set; }
-
-        /// <summary>
-        /// 背景色
-        /// </summary>
-        public string Background { get; set; }
-
-        /// <summary>
-        /// 字体大小
-        /// </summary>
-        public double FontSize { get; set; }
-
-        /// <summary>
-        /// 字体
-        /// </summary>
-        public string FontFamily { get; set; }
+        public VTypeface Typeface { get; set; }
     }
 }

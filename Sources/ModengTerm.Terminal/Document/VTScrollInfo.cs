@@ -276,7 +276,7 @@ namespace ModengTerm.Terminal.Document
         {
         }
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             this.history = new VTMemoryHistory();
             this.history.Initialize();
@@ -284,7 +284,7 @@ namespace ModengTerm.Terminal.Document
             this.DrawingObject.SetOpacity(0);
         }
 
-        public override void Release()
+        protected override void OnRelease()
         {
         }
 
@@ -319,7 +319,7 @@ namespace ModengTerm.Terminal.Document
 
         #region VTScrollInfo
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             this.history = new VTMemoryHistory();
             this.history.Initialize();
@@ -329,14 +329,11 @@ namespace ModengTerm.Terminal.Document
             this.DrawingObject.ViewportRow = this.ViewportRow;
             this.display = false;
             this.DrawingObject.SetOpacity(0);
-            this.DrawingObject.Initialize();
         }
 
-        public override void Release()
+        protected override void OnRelease()
         {
             this.history.Release();
-
-            this.DrawingObject.Release();
         }
 
         public override void RequestInvalidate()

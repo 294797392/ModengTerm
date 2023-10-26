@@ -150,7 +150,6 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="Background" Value="#2E2E2E"/>
-        <Setter Property="Width" Value="18"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type mrendering:DrawingScrollbar}">
@@ -212,14 +211,18 @@
 
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
 
-                        <mrendering:ContentArea Grid.Column="0" x:Name="PART_ContentArea"
+                        <mrendering:ContentArea Grid.Column="0" x:Name="PART_BookmarkArea" Width="20" Background="#1E1E1E"
+                                                Visibility="{TemplateBinding BookmarkVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
+
+                        <mrendering:ContentArea Grid.Column="1" x:Name="PART_ContentArea" Background="Transparent"
                                                 Margin="{TemplateBinding ContentMargin, Converter={StaticResource ResourceKey=ContentPaddingConverter}}"/>
 
-                        <mrendering:DrawingScrollbar Grid.Column="1" x:Name="PART_Scrollbar" Style="{StaticResource ResourceKey=StyleDrawingScrollBar}"
+                        <mrendering:DrawingScrollbar Grid.Column="2" x:Name="PART_Scrollbar" Width="20" Style="{StaticResource ResourceKey=StyleDrawingScrollBar}"
                                                      Visibility="{TemplateBinding ScrollbarVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
 
                     </Grid>

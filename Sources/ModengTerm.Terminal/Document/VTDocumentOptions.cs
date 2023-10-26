@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Rendering;
@@ -16,6 +17,23 @@ namespace ModengTerm.Terminal.Document
 {
     public class VTDocumentOptions
     {
+        /// <summary>
+        /// 默认的可视区域行数
+        /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
+        /// 如果SizeMode等于AutoFit，那么在VTDocument.Initialize的时候会动态计算行和列
+        /// </summary>
+        public int DefaultViewportRow { get; set; }
+
+        /// <summary>
+        /// 默认的可视区域宽度
+        /// </summary>
+        public int DefaultViewportColumn { get; set; }
+
+        /// <summary>
+        /// 终端的缩放模式
+        /// </summary>
+        public TerminalSizeModeEnum SizeMode { get; set; }
+
         /// <summary>
         /// 文档所属会话
         /// </summary>
@@ -37,19 +55,19 @@ namespace ModengTerm.Terminal.Document
         public int ScrollbackMax { get; set; }
 
         /// <summary>
-        /// 文档内边距
+        /// 是否显示滚动条
         /// </summary>
-        public double Padding { get; set; }
+        public bool ScrollbarVisible { get; set; }
 
         /// <summary>
-        /// 文档所能显示的最大列数
+        /// 是否显示书签
         /// </summary>
-        public int ViewportColumn { get; set; }
+        public bool BookmarkVisible { get; set; }
 
         /// <summary>
-        /// 文档所能显示的最大行数
+        /// 书签颜色
         /// </summary>
-        public int ViewportRow { get; set; }
+        public string BookmarkColor { get; set; }
 
         /// <summary>
         /// DECPrivateAutoWrapMode是否启用
@@ -70,40 +88,21 @@ namespace ModengTerm.Terminal.Document
         /// 光标颜色
         /// </summary>
         public string CursorColor { get; set; }
-        
-        /// <summary>
-        /// 光标高度
-        /// </summary>
-        public VTSize CursorSize { get; set; }
 
         /// <summary>
-        /// 字体样式
+        /// 内容边距
         /// </summary>
-        public string FontFamily { get; set; }
+        public double ContentMargin { get; set; }
 
         /// <summary>
-        /// 字体大小
+        /// 窗口大小
         /// </summary>
-        public int FontSize { get; set; }
+        public VTSize WindowSize { get; set; }
 
         /// <summary>
-        /// 文本前景色
+        /// 内容大小
+        /// 该大小不包含边距，滚动条以及书签区域
         /// </summary>
-        public string ForegroundColor { get; set; }
-
-        /// <summary>
-        /// 背景色
-        /// </summary>
-        public string BackgroundColor { get; set; }
-
-        /// <summary>
-        /// 颜色表
-        /// </summary>
-        public VTColorTable ColorTable { get; set; }
-
-        /// <summary>
-        /// 终端的缩放模式
-        /// </summary>
-        public TerminalSizeModeEnum SizeMode { get; set; }
+        public VTSize ContentSize { get; set; }
     }
 }

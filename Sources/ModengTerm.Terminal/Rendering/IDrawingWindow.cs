@@ -35,7 +35,7 @@ namespace ModengTerm.Terminal.Rendering
         /// </summary>
         /// <param name="textStyle">字体样式</param>
         /// <returns></returns>
-        VTypeface GetTypeface(VTextStyle textStyle);
+        VTypeface GetTypeface(double fontSize, string fontFamily);
 
         /// <summary>
         /// 获取整个终端窗口的大小

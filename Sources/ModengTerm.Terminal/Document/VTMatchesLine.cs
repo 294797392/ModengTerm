@@ -100,16 +100,13 @@ namespace ModengTerm.Terminal.Document
 
         #region VTDocumentElement
 
-        public override void Initialize()
+        protected override void OnInitialize()
         {
             TextBlocks = new List<VTFormattedText>();
-            this.DrawingObject.Initialize();
         }
 
-        public override void Release()
+        protected override void OnRelease()
         {
-            this.drawingDocument.DeleteDrawingObject(this.DrawingObject);
-            this.DrawingObject.Release();
         }
 
         public override void RequestInvalidate()

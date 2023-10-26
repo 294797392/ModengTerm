@@ -21,7 +21,7 @@ namespace ModengTerm.Rendering
     {
         #region 类变量
 
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("DrawingDocument");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ContentArea");
 
         #endregion
 
@@ -32,6 +32,18 @@ namespace ModengTerm.Rendering
         #endregion
 
         #region 属性
+
+        public Brush Background
+        {
+            get { return (Brush)GetValue(BackgroundProperty); }
+            set { SetValue(BackgroundProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Background.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty BackgroundProperty =
+            DependencyProperty.Register("Background", typeof(Brush), typeof(ContentArea), new PropertyMetadata(Brushes.Transparent));
+
+
 
         // Provide a required override for the VisualChildrenCount property.
         protected override int VisualChildrenCount
@@ -62,14 +74,7 @@ namespace ModengTerm.Rendering
         {
             base.OnRender(drawingContext);
 
-            drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
-
-            //// 调试用，看这个Surface有多大
-            //if (this.VisualChildrenCount > 20)
-            //{
-            //    Console.WriteLine("渲染高度 = {0}", this.ActualHeight);
-            //    drawingContext.DrawRectangle(Brushes.Red, new Pen(Brushes.Black, 1), new Rect(0, 0, this.ActualWidth, this.ActualHeight));
-            //}
+            drawingContext.DrawRectangle(this.Background, null, new Rect(0, 0, this.ActualWidth, this.ActualHeight));
         }
 
         #endregion

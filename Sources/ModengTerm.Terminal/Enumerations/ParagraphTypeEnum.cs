@@ -11,16 +11,16 @@ namespace ModengTerm.Terminal.Enumerations
         /// <summary>
         /// 保存当前屏幕的内容
         /// </summary>
-        SaveDocument,
+        Viewport,
 
         /// <summary>
         /// 保存选中的内容
         /// </summary>
-        SaveSelected,
+        Selected,
 
         /// <summary>
         /// 保存全部内容
         /// </summary>
-        SaveAll
+        AllDocument
     }
 }
