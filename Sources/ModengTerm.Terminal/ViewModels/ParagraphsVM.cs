@@ -22,6 +22,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private ParagraphSource paragraphSource;
         protected IVideoTerminal videoTerminal;
+        protected ShellSessionVM shellSession;
 
         #endregion
 
@@ -35,13 +36,14 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 构造方法
 
-        public ParagraphsVM(ParagraphSource source, IVideoTerminal videoTerminal)
+        public ParagraphsVM(ParagraphSource source, ShellSessionVM shellSessionVM)
         {
             this.paragraphSource = source;
+            this.shellSession = shellSessionVM;
+            this.videoTerminal = shellSessionVM.VideoTerminal;
 
             this.ParagraphList = new BindableCollection<ParagraphVM>();
             this.ParagraphList.AddRange(this.paragraphSource.GetParagraphs());
-            this.videoTerminal = videoTerminal;
         }
 
         #endregion
@@ -76,7 +78,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             ParagraphVM paragraph = this.Sender2ParagraphVM(sender);
 
-            this.videoTerminal.SendInput(paragraph.Content);
+            this.shellSession.SendInput(paragraph.Content);
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using ModengTerm;
 using ModengTerm.Base;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Rendering;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
@@ -51,7 +52,8 @@ namespace XTerminal.UserControls
 
         #region 实例变量
 
-        private VideoTerminal videoTerminal;
+        private ShellSessionVM shellSession;
+        private IVideoTerminal videoTerminal;
 
         /// <summary>
         /// 提供剪贴板功能
@@ -67,11 +69,6 @@ namespace XTerminal.UserControls
         /// 记录当鼠标按下的时候的文本行
         /// </summary>
         private VTextLine mouseDownLine;
-
-        /// <summary>
-        /// 书签管理器
-        /// </summary>
-        private VTBookmark bookmarkMgr;
 
         #endregion
 
@@ -114,18 +111,18 @@ namespace XTerminal.UserControls
             }
         }
 
-        private void SaveToFile(ParagraphTypeEnum saveMode)
+        private void SaveToFile(ParagraphTypeEnum paragraphType)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
-            saveFileDialog.FileName = string.Format("{0}_{1}", this.videoTerminal.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            saveFileDialog.FileName = string.Format("{0}_{1}", this.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
             if ((bool)saveFileDialog.ShowDialog())
             {
                 LogFileTypeEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
 
                 try
                 {
-                    VTParagraph paragraph = this.videoTerminal.CreateParagraph(saveMode, fileType);
+                    VTParagraph paragraph = this.videoTerminal.CreateParagraph(paragraphType, fileType);
                     File.WriteAllText(saveFileDialog.FileName, paragraph.Content);
                 }
                 catch (Exception ex)
@@ -178,7 +175,7 @@ namespace XTerminal.UserControls
         private void MenuItemPaste_Click(object sender, RoutedEventArgs e)
         {
             string text = System.Windows.Clipboard.GetText();
-            this.videoTerminal.SendInput(text);
+            this.shellSession.SendInput(text);
         }
 
         private void MenuItemSelectAll_Click(object sender, RoutedEventArgs e)
@@ -264,7 +261,7 @@ namespace XTerminal.UserControls
             ClipboardParagraphSource clipboardParagraphSource = new ClipboardParagraphSource(this.clipboard);
             clipboardParagraphSource.Session = this.Session;
 
-            ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this.videoTerminal);
+            ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this.shellSession);
             clipboardVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
 
             ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
@@ -318,7 +315,7 @@ namespace XTerminal.UserControls
             FavoritesParagraphSource favoritesParagraphSource = new FavoritesParagraphSource(this.serviceAgent);
             favoritesParagraphSource.Session = this.Session;
 
-            FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this.videoTerminal);
+            FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this.shellSession);
             favoritesVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
 
             ParagraphsWindow paragraphsWindow = new ParagraphsWindow(favoritesVM);
@@ -338,9 +335,7 @@ namespace XTerminal.UserControls
                 return;
             }
 
-            this.bookmarkMgr.AddBookmark(this.mouseDownLine);
-
-            this.videoTerminal.AddBookmark(this.mouseDownLine, VTBookmarkStates.Enabled);
+            this.shellSession.SetBookmarkState(this.mouseDownLine, VTBookmarkStates.Enabled);
         }
 
         private void MeuItemRemoveBookmark_Click(object sender, RoutedEventArgs e)
@@ -350,18 +345,16 @@ namespace XTerminal.UserControls
                 return;
             }
 
-            this.bookmarkMgr.RemoveBookmark(this.mouseDownLine);
-
-            this.videoTerminal.AddBookmark(this.mouseDownLine, VTBookmarkStates.None);
+            this.shellSession.SetBookmarkState(this.mouseDownLine, VTBookmarkStates.None);
         }
 
         private void MenuItemBookmarkList_Click(object sender, RoutedEventArgs e)
         {
             MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
 
-            BookmarkParagraphSource bookmarkParagraphSource = new BookmarkParagraphSource(this.bookmarkMgr);
+            BookmarkParagraphSource bookmarkParagraphSource = new BookmarkParagraphSource(this.shellSession.BookmarkMgr);
 
-            BookmarksVM bookmarksVM = new BookmarksVM(bookmarkParagraphSource, this.videoTerminal);
+            BookmarksVM bookmarksVM = new BookmarksVM(bookmarkParagraphSource, this.shellSession);
             bookmarksVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
 
             ParagraphsWindow paragraphsWindow = new ParagraphsWindow(bookmarksVM);
@@ -449,10 +442,10 @@ namespace XTerminal.UserControls
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
 
-            this.bookmarkMgr = new VTBookmark(this.Session);
+            this.shellSession = viewModel as ShellSessionVM;
+            this.shellSession.Open();
 
-            this.videoTerminal = viewModel as VideoTerminal;
-            this.videoTerminal.Open();
+            this.videoTerminal = this.shellSession.VideoTerminal;
 
             return ResponseCode.SUCCESS;
         }
@@ -465,7 +458,8 @@ namespace XTerminal.UserControls
             // 释放剪贴板
             this.clipboard.Release();
 
-            this.videoTerminal.Close();
+            this.shellSession.Close();
+            this.videoTerminal = null;
         }
 
         #endregion

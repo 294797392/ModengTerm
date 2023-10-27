@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal.DataModels;
 using System;

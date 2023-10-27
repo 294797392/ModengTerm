@@ -33,19 +33,9 @@ namespace ModengTerm.Terminal
         event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
 
         /// <summary>
-        /// 终端对应的会话信息
+        /// 会话名字
         /// </summary>
-        XTermSession Session { get; }
-
-        /// <summary>
-        /// 终端行大小
-        /// </summary>
-        int ViewportRow { get; }
-
-        /// <summary>
-        /// 终端列大小
-        /// </summary>
-        int ViewportColumn { get; }
+        string Name { get; set; }
 
         /// <summary>
         /// 当前正在显示的Document
@@ -75,9 +65,28 @@ namespace ModengTerm.Terminal
         void ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop);
 
         /// <summary>
-        /// 向SSH主机发送一段文本
+        /// 创建指定的段落内容
         /// </summary>
-        /// <param name="text"></param>
-        void SendInput(string text);
+        /// <param name="paragraphType">段落类型</param>
+        /// <param name="fileType">要创建的内容格式</param>
+        /// <returns></returns>
+        VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, LogFileTypeEnum fileType);
+
+        /// <summary>
+        /// 获取当前使用鼠标选中的段落区域
+        /// </summary>
+        /// <returns></returns>
+        VTParagraph GetSelectedParagraph();
+
+        /// <summary>
+        /// 选中所有内容
+        /// </summary>
+        void SelectAll();
+
+        /// <summary>
+        /// 设置书签的显示或隐藏状态
+        /// </summary>
+        /// <param name="visible"></param>
+        void SetBookmarkVisible(bool visible);
     }
 }

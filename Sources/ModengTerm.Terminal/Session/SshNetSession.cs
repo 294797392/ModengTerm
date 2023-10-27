@@ -1,4 +1,6 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;

@@ -8,7 +8,7 @@ namespace ModengTerm.Terminal.ViewModels
 {
     public class BookmarksVM : ParagraphsVM
     {
-        public BookmarksVM(ParagraphSource source, IVideoTerminal videoTerminal) :
+        public BookmarksVM(ParagraphSource source, ShellSessionVM videoTerminal) :
             base(source, videoTerminal)
         {
         }

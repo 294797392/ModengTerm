@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit.DataModels;
+using ModengTerm.Base.Enumerations;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

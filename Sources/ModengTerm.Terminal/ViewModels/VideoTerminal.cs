@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
@@ -14,10 +15,28 @@ using XTerminal.Parser;
 
 namespace ModengTerm.Terminal.ViewModels
 {
+    public class VTOptions
+    {
+        /// <summary>
+        /// 承载该终端的窗口
+        /// </summary>
+        public IDrawingWindow WindowHost { get; set; }
+
+        /// <summary>
+        /// 该终端所对应的Session
+        /// </summary>
+        public XTermSession Session { get; set; }
+
+        /// <summary>
+        /// 发送数据给主机的回调
+        /// </summary>
+        public SessionTransport SessionTransport { get; set; }
+    }
+
     /// <summary>
     /// 处理虚拟终端的所有逻辑
     /// </summary>
-    public class VideoTerminal : OpenedSessionVM, IVideoTerminal
+    public class VideoTerminal : IVideoTerminal
     {
         #region 类变量
 
@@ -37,13 +56,15 @@ namespace ModengTerm.Terminal.ViewModels
 
         public event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
 
+        /// <summary>
+        /// 当可视区域的行或列改变的时候触发
+        /// </summary>
+        public event Action<IVideoTerminal, int, int> ViewportChanged;
+
         #endregion
 
         #region 实例变量
 
-        /// <summary>
-        /// 与终端进行通信的信道
-        /// </summary>
         private SessionTransport sessionTransport;
 
         /// <summary>
@@ -119,12 +140,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 输入编码方式
         /// </summary>
-        private Encoding outputEncoding;
+        private Encoding writeEncoding;
 
         /// <summary>
         /// 提供终端屏幕的功能
         /// </summary>
-        private IDrawingWindow drawingWindow;
+        private IDrawingWindow windowHost;
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -139,11 +160,16 @@ namespace ModengTerm.Terminal.ViewModels
         internal string foregroundColor;
         internal string backgroundColor;
 
-        private bool sendAll;
+        private VTOptions vtOptions;
 
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 会话名字
+        /// </summary>
+        public string Name { get; set; }
 
         /// <summary>
         /// 获取当前光标所在行
@@ -172,60 +198,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         public VTDocument ActiveDocument { get { return this.activeDocument; } }
 
-        /// <summary>
-        /// 可视区域内的行数
-        /// </summary>
-        public int ViewportRow
-        {
-            get
-            {
-                return this.viewportRow;
-            }
-            private set
-            {
-                if (this.viewportRow != value)
-                {
-                    this.viewportRow = value;
-                    this.NotifyPropertyChanged("ViewportRow");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 可视区域内的列数
-        /// </summary>
-        public int ViewportColumn
-        {
-            get
-            {
-                return this.viewportColumn;
-            }
-            private set
-            {
-                if (this.viewportColumn != value)
-                {
-                    this.viewportColumn = value;
-                    this.NotifyPropertyChanged("ViewportColumn");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 是否发送到所有终端
-        /// </summary>
-        public bool SendAll
-        {
-            get { return this.sendAll; }
-            set
-            {
-                if (this.sendAll != value)
-                {
-                    this.sendAll = value;
-                    this.NotifyPropertyChanged("SendAll");
-                }
-            }
-        }
-
         public VTWallpaper Background { get { return this.wallpaper; } }
 
         /// <summary>
@@ -235,12 +207,16 @@ namespace ModengTerm.Terminal.ViewModels
 
         public VTLogger Logger { get; set; }
 
+        /// <summary>
+        /// 电脑按键和发送的数据的映射关系
+        /// </summary>
+        public VTKeyboard Keyboard { get { return this.keyboard; } }
+
         #endregion
 
         #region 构造方法
 
-        public VideoTerminal(XTermSession session) :
-            base(session)
+        public VideoTerminal()
         {
         }
 
@@ -252,12 +228,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// 初始化终端模拟器
         /// </summary>
         /// <param name="sessionInfo"></param>
-        protected override int OnOpen()
+        public void Initialize(VTOptions options)
         {
-            XTermSession sessionInfo = this.Session;
+            this.vtOptions = options;
 
             this.uiSyncContext = SynchronizationContext.Current;
-            this.drawingWindow = this.Content as IDrawingWindow;
+            this.windowHost = this.vtOptions.WindowHost;
 
             // DECAWM
             this.autoWrapMode = false;
@@ -266,7 +242,13 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.isRunning = true;
 
-            this.outputEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
+            this.sessionTransport = options.SessionTransport;
+
+            XTermSession sessionInfo = options.Session;
+
+            this.Name = sessionInfo.Name;
+
+            this.writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
             this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
             this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE);
             this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
@@ -275,7 +257,7 @@ namespace ModengTerm.Terminal.ViewModels
             #region 初始化键盘
 
             this.keyboard = new VTKeyboard();
-            this.keyboard.Encoding = this.outputEncoding;
+            this.keyboard.Encoding = this.writeEncoding;
             this.keyboard.SetAnsiMode(true);
             this.keyboard.SetKeypadMode(false);
 
@@ -302,16 +284,16 @@ namespace ModengTerm.Terminal.ViewModels
                 OnMouseWheel = this.OnMouseWheel
             };
 
-            this.mainDrawingDocument = this.drawingWindow.CreateCanvas();
+            this.mainDrawingDocument = this.windowHost.CreateCanvas();
             this.mainDrawingDocument.Name = "MainDocument";
             this.mainDrawingDocument.AddEventHandler(eventHandler);
-            this.alternateDrawingDocument = this.drawingWindow.CreateCanvas();
+            this.alternateDrawingDocument = this.windowHost.CreateCanvas();
             this.alternateDrawingDocument.Name = "AlternateDocument";
             this.alternateDrawingDocument.AddEventHandler(eventHandler);
-            this.drawingWindow.InsertCanvas(0, this.mainDrawingDocument);
-            this.drawingWindow.InsertCanvas(0, this.alternateDrawingDocument);
-            this.drawingWindow.VisibleCanvas(this.mainDrawingDocument, true);
-            this.drawingWindow.VisibleCanvas(this.alternateDrawingDocument, false);
+            this.windowHost.InsertCanvas(0, this.mainDrawingDocument);
+            this.windowHost.InsertCanvas(0, this.alternateDrawingDocument);
+            this.windowHost.VisibleCanvas(this.mainDrawingDocument, true);
+            this.windowHost.VisibleCanvas(this.alternateDrawingDocument, false);
 
             VTDocumentOptions mainOptions = this.CreateDocumentOptions(sessionInfo, false);
             this.mainDocument = new VTDocument(mainOptions, this.mainDrawingDocument, false)
@@ -338,8 +320,7 @@ namespace ModengTerm.Terminal.ViewModels
             sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.mainDocument.ViewportRow);
             sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, this.mainDocument.ViewportColumn);
 
-            this.ViewportRow = this.mainDocument.ViewportRow;
-            this.ViewportColumn = this.mainDocument.ViewportColumn;
+            this.ViewportChanged?.Invoke(this, this.mainDocument.ViewportRow, this.mainDocument.ViewportColumn);
 
             #endregion
 
@@ -353,10 +334,10 @@ namespace ModengTerm.Terminal.ViewModels
             #region 初始化背景
 
             // 此时Inser(0)在Z顺序的最下面一层
-            this.backgroundDrawingDocument = this.drawingWindow.CreateCanvas();
+            this.backgroundDrawingDocument = this.windowHost.CreateCanvas();
             this.backgroundDrawingDocument.Name = "BackgroundDocument";
             this.backgroundDrawingDocument.ScrollbarVisible = false;
-            this.drawingWindow.InsertCanvas(0, this.backgroundDrawingDocument);
+            this.windowHost.InsertCanvas(0, this.backgroundDrawingDocument);
 
             this.wallpaper = new VTWallpaper(this.backgroundDrawingDocument)
             {
@@ -364,49 +345,66 @@ namespace ModengTerm.Terminal.ViewModels
                 Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
                 BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
                 Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT),
-                Rect = new VTRect(0, 0, this.drawingWindow.GetSize())
+                Rect = new VTRect(0, 0, this.windowHost.GetSize())
             };
             this.wallpaper.Initialize();
             this.wallpaper.RequestInvalidate();
 
             #endregion
-
-            #region 连接终端通道
-
-            SessionTransport transport = new SessionTransport();
-            transport.StatusChanged += this.SessionTransport_StatusChanged;
-            transport.DataReceived += this.SessionTransport_DataReceived;
-            transport.Initialize(sessionInfo);
-            transport.OpenAsync();
-            this.sessionTransport = transport;
-
-            #endregion
-
-            return ResponseCode.SUCCESS;
         }
 
         /// <summary>
         /// 释放资源
         /// </summary>
-        protected override void OnClose()
+        public void Release()
         {
             this.isRunning = false;
 
             this.vtParser.ActionEvent -= VtParser_ActionEvent;
             this.vtParser.Release();
 
-            this.sessionTransport.StatusChanged -= this.SessionTransport_StatusChanged;
-            this.sessionTransport.DataReceived -= this.SessionTransport_DataReceived;
-            this.sessionTransport.Close();
-            this.sessionTransport.Release();
-
             this.mainDocument.Release();
             this.alternateDocument.Release();
 
             this.backgroundDrawingDocument.DeleteDrawingObjects();
 
-            this.drawingWindow.RemoveDocument(this.mainDrawingDocument);
-            this.drawingWindow.RemoveDocument(this.alternateDrawingDocument);
+            this.windowHost.RemoveDocument(this.mainDrawingDocument);
+            this.windowHost.RemoveDocument(this.alternateDrawingDocument);
+        }
+
+        /// <summary>
+        /// 处理从远程主机收到的数据流
+        /// </summary>
+        /// <param name="bytes">收到的数据流缓冲区</param>
+        /// <param name="size">要处理的数据长度</param>
+        public void ProcessData(byte[] bytes, int size)
+        {
+            VTDebug.Context.WriteRawRead(bytes, size);
+
+            try
+            {
+                this.vtParser.ProcessCharacters(bytes, size);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ProcessCharacters异常", ex);
+            }
+
+            this.uiSyncContext.Send((o) =>
+            {
+                // 全部数据都处理完了之后，只渲染一次
+                this.activeDocument.RequestInvalidate();
+            }, null);
+
+            // 更新最新的历史行
+            // 解决当一次性打印多个字符的时候，不需要每打印一个字符就更新历史行，而是等所有字符都打印完了再更新
+            // 不要在Print事件里保存历史记录，因为可能会连续触发多次Print事件
+            // 触发完多次Print事件后，会最后触发一次PerformDrawing，在PerformDrawing完了再保存最后一行历史行
+            if (this.activeDocument == this.mainDocument)
+            {
+                VTScrollInfo scrollBar = this.mainDocument.Scrollbar;
+                scrollBar.UpdateHistory(this.ActiveLine);
+            }
         }
 
         /// <summary>
@@ -438,50 +436,6 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 向SSH主机发送用户输入
-        /// 用户每输入一个字符，就调用一次这个函数
-        /// </summary>
-        /// <param name="input">用户输入信息</param>
-        public void SendInput(UserInput input)
-        {
-            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
-            {
-                return;
-            }
-
-            byte[] bytes = this.keyboard.TranslateInput(input);
-            if (bytes == null)
-            {
-                return;
-            }
-
-            VTDebug.Context.WriteInteractive(VTSendTypeEnum.UserInput, bytes);
-
-            // 这里输入的都是键盘按键
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
-            }
-        }
-
-        public void SendInput(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return;
-            }
-
-            byte[] bytes = this.outputEncoding.GetBytes(text);
-
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("粘贴数据失败, {0}", code);
-            }
-        }
-
-        /// <summary>
         /// 滚动并重新渲染
         /// </summary>
         /// <param name="physicsRow">要滚动到的物理行数</param>
@@ -497,59 +451,12 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 设置某一行的标签状态
-        /// 如果该行所在的文档是备用缓冲区，那么什么都不做
-        /// </summary>
-        /// <param name="textLine">要设置的行</param>
-        /// <param name="targetState">要设置的标签状态</param>
-        public void AddBookmark(VTextLine textLine, VTBookmarkStates targetState)
-        {
-            VTDocument document = textLine.OwnerDocument;
-
-            // 备用缓冲区不可以新建书签
-            if (document.IsAlternate)
-            {
-                return;
-            }
-
-            if (textLine.BookmarkState == targetState)
-            {
-                return;
-            }
-
-            textLine.BookmarkState = targetState;
-
-            // 重绘
-            textLine.RequestInvalidate();
-
-            // 更新历史行里的标签状态
-            document.Scrollbar.UpdateHistory(textLine);
-        }
-
-        /// <summary>
         /// 设置书签的显示或隐藏状态
         /// </summary>
         /// <param name="visible"></param>
         public void SetBookmarkVisible(bool visible)
         {
             this.mainDocument.BookmarkVisible = visible;
-        }
-
-        /// <summary>
-        /// 开始录制回放文件
-        /// </summary>
-        /// <param name="playbackFile">要录制的回放文件的名字</param>
-        public void StartRecord(string playbackFile)
-        {
-
-        }
-
-        /// <summary>
-        /// 停止录制回放文件
-        /// </summary>
-        public void StopRecord()
-        {
-
         }
 
         #endregion
@@ -561,7 +468,7 @@ namespace ModengTerm.Terminal.ViewModels
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
             double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
 
-            VTypeface typeface = this.drawingWindow.GetTypeface(fontSize, fontFamily);
+            VTypeface typeface = this.windowHost.GetTypeface(fontSize, fontFamily);
             typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
 
@@ -569,7 +476,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 DefaultViewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL),
                 DefaultViewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW),
-                WindowSize = this.drawingWindow.GetSize(),
+                WindowSize = this.windowHost.GetSize(),
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
@@ -754,10 +661,7 @@ namespace ModengTerm.Terminal.ViewModels
                             #endregion
 
                             // 触发行被完全打印的事件
-                            if (this.LinePrinted != null)
-                            {
-                                this.LinePrinted(this, oldHistoryLine);
-                            }
+                            this.LinePrinted?.Invoke(this, oldHistoryLine);
                         }
 
                         break;
@@ -1227,8 +1131,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         IDrawingDocument remove = this.mainDocument.DrawingObject;
                         IDrawingDocument add = this.alternateDocument.DrawingObject;
-                        this.drawingWindow.VisibleCanvas(remove, false);
-                        this.drawingWindow.VisibleCanvas(add, true);
+                        this.windowHost.VisibleCanvas(remove, false);
+                        this.windowHost.VisibleCanvas(add, true);
 
                         // 这里只重置行数，在用户调整窗口大小的时候需要执行终端的Resize操作
                         this.alternateDocument.SetScrollMargin(0, 0);
@@ -1246,8 +1150,8 @@ namespace ModengTerm.Terminal.ViewModels
 
                         IDrawingDocument remove = this.alternateDocument.DrawingObject;
                         IDrawingDocument add = this.mainDocument.DrawingObject;
-                        this.drawingWindow.VisibleCanvas(remove, false);
-                        this.drawingWindow.VisibleCanvas(add, true);
+                        this.windowHost.VisibleCanvas(remove, false);
+                        this.windowHost.VisibleCanvas(add, true);
 
                         this.mainDocument.DirtyAll();
                         this.activeDocument = this.mainDocument;
@@ -1343,92 +1247,22 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)
-        {
-            VTDebug.Context.WriteRawRead(bytes, size);
-
-            try
-            {
-                this.vtParser.ProcessCharacters(bytes, size);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ProcessCharacters异常", ex);
-            }
-
-            this.uiSyncContext.Send((o) =>
-            {
-            // 全部数据都处理完了之后，只渲染一次
-                this.activeDocument.RequestInvalidate();
-            }, null);
-
-            // 更新最新的历史行
-            // 解决当一次性打印多个字符的时候，不需要每打印一个字符就更新历史行，而是等所有字符都打印完了再更新
-            // 不要在Print事件里保存历史记录，因为可能会连续触发多次Print事件
-            // 触发完多次Print事件后，会最后触发一次PerformDrawing，在PerformDrawing完了再保存最后一行历史行
-            if (this.activeDocument == this.mainDocument)
-            {
-                VTScrollInfo scrollBar = this.mainDocument.Scrollbar;
-                scrollBar.UpdateHistory(this.ActiveLine);
-            }
-        }
-
-        private void SessionTransport_StatusChanged(object client, SessionStatusEnum status)
-        {
-            logger.InfoFormat("会话状态发生改变, {0}", status);
-
-            try
-            {
-                switch (status)
-                {
-                    case SessionStatusEnum.Connected:
-                        {
-                            break;
-                        }
-
-                    case SessionStatusEnum.Connecting:
-                        {
-                            break;
-                        }
-
-                    case SessionStatusEnum.ConnectionError:
-                        {
-                            break;
-                        }
-
-                    case SessionStatusEnum.Disconnected:
-                        {
-                            break;
-                        }
-
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("SessionTransport_StatusChanged异常", ex);
-            }
-
-            base.NotifyStatusChanged(status);
-        }
-
-        public void OnMouseWheel(bool upper)
+        private void OnMouseWheel(bool upper)
         {
             this.activeDocument.OnMouseWheel(upper);
         }
 
-        public void OnMouseDown(VTPoint p, int clickCount)
+        private void OnMouseDown(VTPoint p, int clickCount)
         {
             this.activeDocument.OnMouseDown(p, clickCount);
         }
 
-        public void OnMouseMove(VTPoint p)
+        private void OnMouseMove(VTPoint p)
         {
             this.activeDocument.OnMouseMove(p);
         }
 
-        public void OnMouseUp(VTPoint p)
+        private void OnMouseUp(VTPoint p)
         {
             this.activeDocument.OnMouseUp(p);
         }
@@ -1438,10 +1272,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         /// <param name="vt"></param>
         /// <param name="contentSize">新的内存区域大小</param>
-        public void OnSizeChanged(VTSize contentSize)
+        private void OnSizeChanged(VTSize contentSize)
         {
-            // 有可能在大小改变的时候还没连接上终端
-            if (this.Status != SessionStatusEnum.Connected)
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
                 return;
             }
@@ -1451,16 +1284,14 @@ namespace ModengTerm.Terminal.ViewModels
             this.alternateDocument.Resize(contentSize);
 
             // 重绘背景
-            VTSize windowSize = this.drawingWindow.GetSize();
+            VTSize windowSize = this.windowHost.GetSize();
             this.wallpaper.Rect = new VTRect(0, 0, windowSize);
             this.wallpaper.RequestInvalidate();
 
             // 给SSH主机发个Resiz指令
             this.sessionTransport.Resize(this.activeDocument.ViewportRow, this.activeDocument.ViewportColumn);
 
-            // 更新界面
-            this.ViewportRow = this.activeDocument.ViewportRow;
-            this.ViewportColumn = this.activeDocument.ViewportColumn;
+            this.ViewportChanged?.Invoke(this, this.activeDocument.ViewportRow, this.activeDocument.ViewportColumn);
         }
 
         private void OnScrollChanged(int scrollValue)

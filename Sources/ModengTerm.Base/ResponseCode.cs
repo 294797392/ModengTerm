@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Base
+namespace ModengTerm.Base
 {
     public class ResponseCode
     {

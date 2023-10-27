@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.ViewModels;
 using System;

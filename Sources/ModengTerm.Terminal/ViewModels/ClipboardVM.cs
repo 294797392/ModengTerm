@@ -15,7 +15,7 @@ namespace ModengTerm.Terminal.ViewModels
     /// </summary>
     public class ClipboardVM : ParagraphsVM
     {
-        public ClipboardVM(ParagraphSource paragraphSource, IVideoTerminal videoTerminal) : 
+        public ClipboardVM(ParagraphSource paragraphSource, ShellSessionVM videoTerminal) : 
             base(paragraphSource, videoTerminal)
         {
 

@@ -174,7 +174,7 @@ namespace ModengTerm.ViewModels
         {
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
-            dialog.FileName = String.Format("{0}_{1}", this.vt.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            dialog.FileName = String.Format("{0}_{1}", this.vt.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
             if ((bool)(dialog.ShowDialog()))
             {
                 this.FilePath = dialog.FileName;

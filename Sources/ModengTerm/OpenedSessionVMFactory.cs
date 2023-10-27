@@ -28,7 +28,7 @@ namespace ModengTerm
                 case SessionTypeEnum.SSH:
                 case SessionTypeEnum.Win32CommandLine:
                     {
-                        return new VideoTerminal(session);
+                        return new ShellSessionVM(session);
                     }
 
                 default:

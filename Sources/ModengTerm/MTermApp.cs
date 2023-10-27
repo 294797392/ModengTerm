@@ -78,7 +78,7 @@ namespace ModengTerm
         /// </summary>
         public BindableCollection<OpenedSessionVM> OpenedSessionList { get; private set; }
 
-        public BindableCollection<VideoTerminal> OpenedTerminals { get; private set; }
+        public BindableCollection<ShellSessionVM> OpenedTerminals { get; private set; }
 
         /// <summary>
         /// 界面上当前选中的会话
@@ -103,7 +103,7 @@ namespace ModengTerm
         protected override int OnInitialize()
         {
             this.OpenedSessionList = new BindableCollection<OpenedSessionVM>();
-            this.OpenedTerminals = new BindableCollection<VideoTerminal>();
+            this.OpenedTerminals = new BindableCollection<ShellSessionVM>();
             this.ServiceAgent = new LocalServiceAgent();
             this.ServiceAgent.Initialize();
 
@@ -154,7 +154,7 @@ namespace ModengTerm
             SessionContent sessionContent = session.Content as SessionContent;
             if (MTermUtils.IsTerminal((SessionTypeEnum)sessionContent.Session.Type))
             {
-                this.OpenedTerminals.Remove(sessionContent.ViewModel as VideoTerminal);
+                this.OpenedTerminals.Remove(sessionContent.ViewModel as ShellSessionVM);
             }
             sessionContent.Close();
 
@@ -222,9 +222,9 @@ namespace ModengTerm
         /// <param name="e"></param>
         private void DrawFrameTimer_Tick(object sender, EventArgs e)
         {
-            IEnumerable<VideoTerminal> vtlist = this.OpenedTerminals;
+            IEnumerable<ShellSessionVM> vtlist = this.OpenedTerminals;
 
-            foreach (VideoTerminal vt in vtlist)
+            foreach (ShellSessionVM vt in vtlist)
             {
                 // 如果当前界面上没有显示终端，那么不处理帧
                 FrameworkElement frameworkElement = vt.Content as FrameworkElement;
@@ -233,33 +233,35 @@ namespace ModengTerm
                     continue;
                 }
 
+                VTDocument activeDocument = vt.VideoTerminal.ActiveDocument;
+
                 int elapsed = this.drawFrameTimer.Interval.Milliseconds;
 
-                this.ProcessFrame(elapsed, vt.Cursor);
+                this.ProcessFrame(elapsed, activeDocument.Cursor);
 
-                switch (vt.Background.PaperType)
-                {
-                    case WallpaperTypeEnum.Live:
-                        {
-                            this.ProcessFrame(elapsed, vt.Background);
-                            break;
-                        }
+                //switch (vt.Background.PaperType)
+                //{
+                //    case WallpaperTypeEnum.Live:
+                //        {
+                //            this.ProcessFrame(elapsed, vt.Background);
+                //            break;
+                //        }
 
-                    case WallpaperTypeEnum.Image:
-                    case WallpaperTypeEnum.Color:
-                        {
-                            if (vt.Background.Effect != EffectTypeEnum.None)
-                            {
-                                this.ProcessFrame(elapsed, vt.Background);
-                            }
-                            break;
-                        }
+                //    case WallpaperTypeEnum.Image:
+                //    case WallpaperTypeEnum.Color:
+                //        {
+                //            if (vt.Background.Effect != EffectTypeEnum.None)
+                //            {
+                //                this.ProcessFrame(elapsed, vt.Background);
+                //            }
+                //            break;
+                //        }
 
-                    default:
-                        {
-                            break;
-                        }
-                }
+                //    default:
+                //        {
+                //            break;
+                //        }
+                //}
             }
         }
 
@@ -281,7 +283,7 @@ namespace ModengTerm
             // 方便“发送到所有”功能
             if (MTermUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
             {
-                this.OpenedTerminals.Add(content.ViewModel as VideoTerminal);
+                this.OpenedTerminals.Add(content.ViewModel as ShellSessionVM);
             }
 
             OpenedSessionVM sessionVM = content.ViewModel;

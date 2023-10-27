@@ -9,7 +9,7 @@ namespace ModengTerm.Terminal.ViewModels
 {
     public class FavoritesVM : ParagraphsVM
     {
-        public FavoritesVM(ParagraphSource source, IVideoTerminal videoTerminal) : 
+        public FavoritesVM(ParagraphSource source, ShellSessionVM videoTerminal) : 
             base(source, videoTerminal)
         {
         }

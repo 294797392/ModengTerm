@@ -1,4 +1,5 @@
 ﻿using ModengTerm;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
@@ -77,18 +78,18 @@ namespace XTerminal
         /// 向SSH服务器发送输入
         /// </summary>
         /// <param name="userInput"></param>
-        private void SendUserInput(VideoTerminal videoTerminal, UserInput userInput)
+        private void SendUserInput(ShellSessionVM sendTo, UserInput userInput)
         {
-            if (videoTerminal.SendAll)
+            if (sendTo.SendAll)
             {
-                foreach (VideoTerminal vt in MTermApp.Context.OpenedTerminals)
+                foreach (ShellSessionVM shellSession in MTermApp.Context.OpenedTerminals)
                 {
-                    vt.SendInput(userInput);
+                    shellSession.SendInput(userInput);
                 }
             }
             else
             {
-                videoTerminal.SendInput(userInput);
+                sendTo.SendInput(userInput);
             }
         }
 
@@ -98,9 +99,9 @@ namespace XTerminal
 
         public void SendToAllTerminal(string text)
         {
-            foreach (VideoTerminal vt in MTermApp.Context.OpenedTerminals)
+            foreach (ShellSessionVM shellSession in MTermApp.Context.OpenedTerminals)
             {
-                vt.SendInput(text);
+                shellSession.SendInput(text);
             }
         }
 
@@ -141,7 +142,7 @@ namespace XTerminal
         private void PathClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             FrameworkElement element = sender as FrameworkElement;
-            VideoTerminal openedSession = element.Tag as VideoTerminal;
+            ShellSessionVM openedSession = element.Tag as ShellSessionVM;
             if (openedSession == null)
             {
                 return;
@@ -218,7 +219,7 @@ namespace XTerminal
         {
             base.OnPreviewTextInput(e);
 
-            VideoTerminal videoTerminal = MTermApp.Context.SelectedOpenedSession as VideoTerminal;
+            ShellSessionVM videoTerminal = MTermApp.Context.SelectedOpenedSession as ShellSessionVM;
             if (videoTerminal == null)
             {
                 return;
@@ -242,8 +243,8 @@ namespace XTerminal
         {
             base.OnPreviewKeyDown(e);
 
-            VideoTerminal videoTerminal = MTermApp.Context.SelectedOpenedSession as VideoTerminal;
-            if (videoTerminal == null)
+            ShellSessionVM shellSession = MTermApp.Context.SelectedOpenedSession as ShellSessionVM;
+            if (shellSession == null)
             {
                 return;
             }
@@ -279,7 +280,7 @@ namespace XTerminal
                 this.userInput.Key = vtKey;
                 this.userInput.Text = null;
                 this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-                this.SendUserInput(videoTerminal, this.userInput);
+                this.SendUserInput(shellSession, this.userInput);
             }
 
             e.Handled = true;
