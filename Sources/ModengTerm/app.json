@@ -158,5 +158,13 @@
                 "uri": "Live_1"
             }
         ]
-    }
+    },
+
+    "functionMenus": [
+        {
+            "name": "",
+            "entry": "",
+            "children": {}
+        }
+    ]
 }

@@ -4,17 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Windows"
-        xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
-        xmlns:converter="clr-namespace:ModengTerm"
+        xmlns:mcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+        xmlns:converter="clr-namespace:ModengTerm.Terminal"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText2000}" 
         Height="Auto" Width="400" ResizeMode="NoResize"
                        SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         Closed="Window_Closed">
-    
+
     <Window.Resources>
-        
+
         <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="Right"/>
@@ -105,7 +105,7 @@
             </StackPanel>
 
         </Grid>
-        
+
 
     </Grid>
 </mcontrols:MTermWindow>

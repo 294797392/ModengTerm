@@ -834,27 +834,27 @@ namespace ModengTerm.ViewModels
             int row, column;
             if (!int.TryParse(this.TerminalRows, out row))
             {
-                MessageBoxUtils.Info("请输入正确的终端行数");
+                MTMessageBox.Info("请输入正确的终端行数");
                 return false;
             }
 
             if (!int.TryParse(this.TerminalColumns, out column))
             {
-                MessageBoxUtils.Info("请输入正确的终端列数");
+                MTMessageBox.Info("请输入正确的终端列数");
                 return false;
             }
 
             int scrollback;
             if (!int.TryParse(this.MaxScrollback, out scrollback))
             {
-                MessageBoxUtils.Info("请输入正确的回滚行数");
+                MTMessageBox.Info("请输入正确的回滚行数");
                 return false;
             }
 
             int maxCliboardHistory;
             if(!int.TryParse(this.MaxClipboardHistory, out maxCliboardHistory))
             {
-                MMessageBox.Info("请输入正确的剪贴板历史记录数");
+                MTMessageBox.Info("请输入正确的剪贴板历史记录数");
                 return false;
             }
 

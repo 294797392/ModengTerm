@@ -1,21 +1,105 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit;
+using Microsoft.Win32;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Rendering;
 using ModengTerm.Terminal.Session;
 using ModengTerm.ViewModels;
+using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Base.Enumerations;
+using System.Windows;
+using WPFToolkit.MVVM;
+using WPFToolkit.Utility;
 
 namespace ModengTerm.Terminal.ViewModels
 {
+    /// <summary>
+    /// 定义Shell可以执行的动作
+    /// </summary>
+    public enum ShellFunctionEnum
+    {
+        None,
+
+        StartLogger,
+        StopLogger,
+        PauseLogger,
+        ResumeLogger,
+
+        Copy,
+        Paste,
+        SelectAll,
+        ClipboardHostory,
+
+        AddFavorites,
+        FaviritesList,
+
+        AddBookmark,
+        RemoveBookmark,
+        BookmarkList,
+        DisplayBookmark,
+        HidenBookmark,
+
+        StartRecord,
+        StopRecord,
+        PauseRecord,
+        ResumeRecord,
+
+        Find,
+
+        SaveDocument,
+        SaveSelection,
+        SaveAllDocument,
+
+        SendToAll
+    }
+
+    public class ShellFunctionMenu : ViewModelBase
+    {
+        private ShellFunctionEnum function;
+
+        public BindableCollection<ShellFunctionMenu> Children { get; set; }
+
+        public ShellFunctionEnum Function
+        {
+            get { return this.function; }
+            set
+            {
+                if (this.function != value)
+                {
+                    this.function = value;
+                    this.NotifyPropertyChanged("Function");
+                }
+            }
+        }
+
+        public ExecuteShellFunctionCallback Execute { get; private set; }
+
+        public ShellFunctionMenu(string name)
+        {
+            this.ID = Guid.NewGuid().ToString();
+            this.Name = name;
+        }
+
+        public ShellFunctionMenu(string name, ShellFunctionEnum function, ExecuteShellFunctionCallback execute)
+        {
+            this.ID = Guid.NewGuid().ToString();
+            this.Name = name;
+            this.Execute = execute;
+            this.Function = function;
+        }
+    }
+
     public class ShellSessionVM : OpenedSessionVM
     {
         #region 类变量
@@ -52,6 +136,25 @@ namespace ModengTerm.Terminal.ViewModels
         /// 存储当前的录制状态
         /// </summary>
         private RecordContext recordContext;
+
+        private bool isPlayback;
+
+        /// <summary>
+        /// 用来回放的线程
+        /// </summary>
+        private Task playbackTask;
+
+        private PlaybackFile playbackFile;
+
+        /// <summary>
+        /// 是否正在运行
+        /// </summary>
+        private bool isRunning;
+
+        /// <summary>
+        /// 提供剪贴板功能
+        /// </summary>
+        private VTClipboard clipboard;
 
         #endregion
 
@@ -111,9 +214,45 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 书签管理器
+        /// 是否是回放
         /// </summary>
-        public VTBookmark BookmarkMgr { get { return this.bookmarkMgr; } }
+        public bool IsPlayback
+        {
+            get { return this.isPlayback; }
+            set
+            {
+                if (this.isPlayback != value)
+                {
+                    this.isPlayback = value;
+                    this.NotifyPropertyChanged("IsPlayback");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 回放文件路径
+        /// </summary>
+        public string PlaybackFilePath { get; set; }
+
+        /// <summary>
+        /// 该终端的菜单状态
+        /// </summary>
+        public BindableCollection<ShellFunctionMenu> FunctionMenus { get; private set; }
+
+        /// <summary>
+        /// 发送到所有窗口的委托，由外部赋值
+        /// </summary>
+        public SendToAllTerminalCallback SendToAllCallback { get; set; }
+
+        /// <summary>
+        /// 访问Terminal服务的代理
+        /// </summary>
+        public ITerminalAgent TerminalAgent { get; set; }
+
+        /// <summary>
+        /// 日志记录器
+        /// </summary>
+        public LoggerManager LoggerManager { get; set; }
 
         #endregion
 
@@ -131,13 +270,72 @@ namespace ModengTerm.Terminal.ViewModels
         protected override int OnOpen()
         {
             this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
-
             this.bookmarkMgr = new VTBookmark(this.Session);
             this.recordContext = new RecordContext();
+            this.clipboard = new VTClipboard() 
+            {
+                MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
+            };
 
-            SessionTransport transport = new SessionTransport();
+            #region 初始化功能菜单
+
+            this.FunctionMenus = new BindableCollection<ShellFunctionMenu>()
+            {
+                new ShellFunctionMenu("查找...", ShellFunctionEnum.Find, this.Find),
+                new ShellFunctionMenu("日志")
+                {
+                    Children = new BindableCollection<ShellFunctionMenu>()
+                    {
+                        new ShellFunctionMenu("启动", ShellFunctionEnum.StartLogger, this.StartLogger),
+                        new ShellFunctionMenu("停止", ShellFunctionEnum.StopLogger, this.StopLogger),
+                        new ShellFunctionMenu("暂停", ShellFunctionEnum.PauseLogger, this.PauseLogger),
+                        new ShellFunctionMenu("继续", ShellFunctionEnum.ResumeLogger, this.ResumeLogger)
+                    }
+                },
+                new ShellFunctionMenu("复制", ShellFunctionEnum.Copy, this.Copy),
+                new ShellFunctionMenu("粘贴", ShellFunctionEnum.Paste, this.Paste),
+                new ShellFunctionMenu("全选", ShellFunctionEnum.SelectAll, this.SelectAll),
+                new ShellFunctionMenu("查看剪贴板历史", ShellFunctionEnum.ClipboardHostory, this.ClipboardHistory),
+                new ShellFunctionMenu("收藏夹")
+                {
+                    Children = new BindableCollection<ShellFunctionMenu>()
+                    {
+                        new ShellFunctionMenu("加入收藏夹", ShellFunctionEnum.AddFavorites, this.AddFavorites),
+                        new ShellFunctionMenu("查看收藏夹", ShellFunctionEnum.FaviritesList, this.FaviritesList),
+                    }
+                },
+                new ShellFunctionMenu("书签")
+                {
+                    Children = new BindableCollection<ShellFunctionMenu>()
+                    {
+                        new ShellFunctionMenu("新建书签", ShellFunctionEnum.AddBookmark, this.AddBookmark),
+                        new ShellFunctionMenu("删除书签", ShellFunctionEnum.RemoveBookmark, this.RemoveBookmark),
+                        new ShellFunctionMenu("查看书签列表", ShellFunctionEnum.BookmarkList, this.BookmarkList),
+                        new ShellFunctionMenu("显示书签栏", ShellFunctionEnum.DisplayBookmark, this.DisplayBookmark),
+                        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
+                    }
+                },
+                new ShellFunctionMenu("录屏")
+                {
+                    Children = new BindableCollection<ShellFunctionMenu>() 
+                    {
+                        new ShellFunctionMenu("启动录制", ShellFunctionEnum.StartRecord, this.StartRecord),
+                        new ShellFunctionMenu("停止录制", ShellFunctionEnum.StopRecord, this.StopRecord),
+                        new ShellFunctionMenu("暂停录制", ShellFunctionEnum.PauseRecord, this.PauseRecord),
+                        new ShellFunctionMenu("恢复录制", ShellFunctionEnum.ResumeRecord, this.ResumeRecord)
+                    }
+                },
+                new ShellFunctionMenu("保存当前屏幕内容", ShellFunctionEnum.SaveDocument, this.SaveDocument),
+                new ShellFunctionMenu("保存选中内容", ShellFunctionEnum.SaveSelection, this.SaveSelection),
+                new ShellFunctionMenu("保存所有内容", ShellFunctionEnum.SaveAllDocument, this.SaveAllDocument),
+                new ShellFunctionMenu("发送到所有会话", ShellFunctionEnum.SendToAll, this.SendToAll)
+            };
+
+            #endregion
 
             #region 初始化终端
+
+            SessionTransport transport = new SessionTransport();
 
             VTOptions options = new VTOptions()
             {
@@ -153,26 +351,104 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 连接终端通道
 
-            transport.StatusChanged += this.SessionTransport_StatusChanged;
-            transport.DataReceived += this.SessionTransport_DataReceived;
-            transport.Initialize(this.Session);
-            transport.OpenAsync();
+            if (this.isPlayback)
+            {
+                // 如果是回放那就启动回放线程
+
+                this.playbackFile = new PlaybackFile();
+                int code = this.playbackFile.OpenRead(this.PlaybackFilePath);
+                if (code != ResponseCode.SUCCESS)
+                {
+                    return code;
+                }
+
+                this.NotifyStatusChanged(SessionStatusEnum.Connected);
+                this.playbackTask = Task.Factory.StartNew(this.PlaybackThreadProc);
+            }
+            else
+            {
+                // 如果不是回放那就连接SSH服务器
+                transport.StatusChanged += this.SessionTransport_StatusChanged;
+                transport.DataReceived += this.SessionTransport_DataReceived;
+                transport.Initialize(this.Session);
+                transport.OpenAsync();
+            }
+
             this.sessionTransport = transport;
 
             #endregion
+
+            this.isRunning = true;
 
             return ResponseCode.SUCCESS;
         }
 
         protected override void OnClose()
         {
-            this.sessionTransport.StatusChanged -= this.SessionTransport_StatusChanged;
-            this.sessionTransport.DataReceived -= this.SessionTransport_DataReceived;
-            this.sessionTransport.Close();
-            this.sessionTransport.Release();
+            if (!this.isRunning)
+            {
+                return;
+            }
+
+            if (this.isPlayback)
+            {
+                this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
+                Task.WaitAll(this.playbackTask);
+                this.playbackFile.Close();
+            }
+            else
+            {
+                this.sessionTransport.StatusChanged -= this.SessionTransport_StatusChanged;
+                this.sessionTransport.DataReceived -= this.SessionTransport_DataReceived;
+                this.sessionTransport.Close();
+                this.sessionTransport.Release();
+            }
 
             this.videoTerminal.ViewportChanged -= this.VideoTerminal_ViewportChanged;
             this.videoTerminal.Release();
+
+            // 释放剪贴板
+            this.clipboard.Release();
+
+            this.isRunning = false;
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
+        {
+            switch (filterIndex)
+            {
+                case 1: return LogFileTypeEnum.PlainText;
+                case 2: return LogFileTypeEnum.HTML;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void SaveToFile(ParagraphTypeEnum paragraphType)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
+            saveFileDialog.FileName = string.Format("{0}_{1}", this.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            if ((bool)saveFileDialog.ShowDialog())
+            {
+                LogFileTypeEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
+
+                try
+                {
+                    VTParagraph paragraph = this.videoTerminal.CreateParagraph(paragraphType, fileType);
+                    File.WriteAllText(saveFileDialog.FileName, paragraph.Content);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("保存日志异常", ex);
+                    MessageBoxUtils.Error("保存失败");
+                }
+            }
         }
 
         #endregion
@@ -317,6 +593,42 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 事件处理器
 
+        /// <summary>
+        /// 回放
+        /// </summary>
+        private void PlaybackThreadProc()
+        {
+            while (this.Status == SessionStatusEnum.Connected)
+            {
+                if (this.playbackFile.EndOfFile)
+                {
+                    logger.InfoFormat("回放文件播放结束");
+                    return;
+                }
+
+                try
+                {
+                    PlaybackFrame nextFrame = this.playbackFile.GetNextFrame();
+
+                    if (nextFrame == null)
+                    {
+                        // 此时说明读取文件有异常
+                        logger.ErrorFormat("读取回放文件下一帧失败, 结束回放");
+                        return;
+                    }
+
+                    // 播放一帧
+                    this.videoTerminal.ProcessData(nextFrame.Data, nextFrame.Data.Length);
+
+                    Thread.Sleep(1000);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("回放异常", ex);
+                }
+            }
+        }
+
         private void VideoTerminal_ViewportChanged(IVideoTerminal vt, int newRow, int newColumn)
         {
             this.ViewportRow = newRow;
@@ -404,6 +716,206 @@ namespace ModengTerm.Terminal.ViewModels
             }
 
             base.NotifyStatusChanged(status);
+        }
+
+        private void StartLogger()
+        {
+            LoggerOptionsWindow window = new LoggerOptionsWindow(this.videoTerminal);
+            window.Owner = Window.GetWindow(this.Content);
+            if ((bool)window.ShowDialog())
+            {
+                this.LoggerManager.Start(this.videoTerminal, window.Options);
+            }
+        }
+
+        private void StopLogger()
+        {
+            this.LoggerManager.Stop(this.videoTerminal);
+        }
+
+        private void PauseLogger()
+        {
+            this.LoggerManager.Pause(this.videoTerminal);
+        }
+
+        private void ResumeLogger()
+        {
+            this.LoggerManager.Resume(this.videoTerminal);
+        }
+
+        public void Copy()
+        {
+            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
+            if (paragraph.IsEmpty)
+            {
+                return;
+            }
+
+            this.clipboard.SetData(paragraph);
+
+            // 把数据设置到Windows剪贴板里
+            System.Windows.Clipboard.SetText(paragraph.Content);
+        }
+
+        private void Paste()
+        {
+            string text = System.Windows.Clipboard.GetText();
+            this.SendInput(text);
+        }
+
+        private void SelectAll()
+        {
+            this.videoTerminal.SelectAll();
+        }
+
+        /// <summary>
+        /// 显示剪贴板历史记录
+        /// </summary>
+        private void ClipboardHistory()
+        {
+            ClipboardParagraphSource clipboardParagraphSource = new ClipboardParagraphSource(this.clipboard);
+            clipboardParagraphSource.Session = this.Session;
+
+            ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this);
+            clipboardVM.SendToAllTerminalDlg = this.SendToAllCallback;
+
+            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
+            paragraphsWindow.Title = "剪贴板历史";
+            paragraphsWindow.Owner = Window.GetWindow(this.Content);
+            paragraphsWindow.Show();
+        }
+
+        /// <summary>
+        /// 选中的内容添加到收藏夹
+        /// </summary>
+        private void AddFavorites()
+        {
+            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
+            if (paragraph.IsEmpty)
+            {
+                return;
+            }
+
+            Favorites favorites = new Favorites()
+            {
+                ID = Guid.NewGuid().ToString(),
+                Typeface = this.videoTerminal.ActiveDocument.Typeface,
+                SessionID = this.Session.ID,
+                StartCharacterIndex = paragraph.StartCharacterIndex,
+                EndCharacterIndex = paragraph.EndCharacterIndex,
+                CharacterList = paragraph.CharacterList,
+                CreationTime = paragraph.CreationTime,
+            };
+
+            int code = this.TerminalAgent.AddFavorites(favorites);
+            if (code != ResponseCode.SUCCESS)
+            {
+                MTMessageBox.Info("保存失败");
+            }
+        }
+
+        private void FaviritesList()
+        {
+            FavoritesParagraphSource favoritesParagraphSource = new FavoritesParagraphSource(this.TerminalAgent);
+            favoritesParagraphSource.Session = this.Session;
+
+            FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this);
+            favoritesVM.SendToAllTerminalDlg = this.SendToAllCallback;
+
+            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(favoritesVM);
+            paragraphsWindow.Title = "收藏夹列表";
+            paragraphsWindow.Owner = Window.GetWindow(this.Content);
+            paragraphsWindow.Show();
+        }
+
+        private void AddBookmark()
+        {
+            if (this.videoTerminal.MouseDownLine == null)
+            {
+                return;
+            }
+
+            this.SetBookmarkState(this.videoTerminal.MouseDownLine, VTBookmarkStates.Enabled);
+        }
+
+        private void RemoveBookmark()
+        {
+            if (this.videoTerminal.MouseDownLine == null)
+            {
+                return;
+            }
+
+            this.SetBookmarkState(this.videoTerminal.MouseDownLine, VTBookmarkStates.None);
+        }
+
+        private void BookmarkList()
+        {
+            BookmarkParagraphSource bookmarkParagraphSource = new BookmarkParagraphSource(this.bookmarkMgr);
+
+            BookmarksVM bookmarksVM = new BookmarksVM(bookmarkParagraphSource, this);
+            bookmarksVM.SendToAllTerminalDlg = this.SendToAllCallback;
+
+            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(bookmarksVM);
+            paragraphsWindow.Title = "书签列表";
+            paragraphsWindow.Owner = Window.GetWindow(this.Content);
+            paragraphsWindow.Show();
+        }
+
+        private void DisplayBookmark()
+        {
+            this.videoTerminal.SetBookmarkVisible(true);
+        }
+
+        private void HidenBookmark()
+        {
+            this.videoTerminal.SetBookmarkVisible(false);
+        }
+
+        private void StartRecord()
+        {
+        }
+
+        private void StopRecord()
+        {
+        }
+
+        private void PauseRecord()
+        {
+        }
+
+        private void ResumeRecord()
+        {
+        }
+
+        /// <summary>
+        /// 查找
+        /// </summary>
+        private void Find()
+        {
+            FindVM vtFind = new FindVM(this.videoTerminal);
+            FindWindow findWindow = new FindWindow(vtFind);
+            findWindow.Owner = Window.GetWindow(this.Content);
+            findWindow.Show();
+        }
+
+        private void SaveDocument()
+        {
+            this.SaveToFile(ParagraphTypeEnum.Viewport);
+        }
+
+        private void SaveSelection()
+        {
+            this.SaveToFile(ParagraphTypeEnum.Selected);
+        }
+
+        private void SaveAllDocument()
+        {
+            this.SaveToFile(ParagraphTypeEnum.AllDocument);
+        }
+
+        private void SendToAll()
+        {
+
         }
 
         #endregion

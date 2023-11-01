@@ -4,6 +4,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -26,6 +27,9 @@
     <None Remove="Wallpapers\img3.png" />
     <None Remove="Wallpapers\img4.jpg" />
     <None Remove="Wallpapers\Live_1.gif" />
+    <None Remove="Windows\FindWindow.xaml" />
+    <None Remove="Windows\LoggerOptionsWindow.xaml" />
+    <None Remove="Windows\ParagraphsWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +46,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
+    <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
     <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />
   </ItemGroup>
@@ -53,8 +58,14 @@
     <Reference Include="log4net">
       <HintPath>..\..\Dependence\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Expression.Interactions">
+      <HintPath>..\..\Dependence\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Interactivity">
+      <HintPath>..\..\Dependence\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="WPFToolkit">
       <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>

@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Terminal.Callbacks;
+using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -12,12 +13,6 @@ namespace ModengTerm.Terminal.ViewModels
 {
     public abstract class ParagraphsVM : ViewModelBase
     {
-        /// <summary>
-        /// 发送到所有窗口的委托
-        /// </summary>
-        /// <param name="text"></param>
-        public delegate void SendToAllTerminalDelegate(string text);
-
         #region 实例变量
 
         private ParagraphSource paragraphSource;
@@ -28,7 +23,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 属性
 
-        public SendToAllTerminalDelegate SendToAllTerminalDlg { get; set; }
+        public SendToAllTerminalCallback SendToAllTerminalDlg { get; set; }
 
         public BindableCollection<ParagraphVM> ParagraphList { get; private set; }
 

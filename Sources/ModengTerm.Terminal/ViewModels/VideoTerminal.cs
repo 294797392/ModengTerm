@@ -212,6 +212,11 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public VTKeyboard Keyboard { get { return this.keyboard; } }
 
+        /// <summary>
+        /// 鼠标按下的时候鼠标所在行
+        /// </summary>
+        public VTextLine MouseDownLine { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -1254,6 +1259,12 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void OnMouseDown(VTPoint p, int clickCount)
         {
+            VTPoint mouseLocation = this.activeDocument.DrawingObject.GetMousePosition(VTDocumentAreas.ContentArea);
+
+            VTextLine mouseDownLine = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseLocation.Y);
+
+            this.MouseDownLine = mouseDownLine;
+
             this.activeDocument.OnMouseDown(p, clickCount);
         }
 

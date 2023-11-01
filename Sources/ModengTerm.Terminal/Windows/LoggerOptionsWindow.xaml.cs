@@ -4,6 +4,7 @@ using ModengTerm.Base;
 using ModengTerm.Controls;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
+using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;

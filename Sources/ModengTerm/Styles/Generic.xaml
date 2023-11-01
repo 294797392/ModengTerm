@@ -14,46 +14,6 @@
 
     <!-- 通用控件 -->
 
-    <Style x:Key="StyleMTermButton" TargetType="{x:Type mcontrols:MTermButton}">
-        <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type mcontrols:MTermButton}">
-
-                    <Grid>
-                        <Border x:Name="BorderBackground" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                            <Border.Background>
-                                <DrawingBrush>
-                                    <DrawingBrush.Drawing>
-                                        <GeometryDrawing Brush="Black">
-                                            <GeometryDrawing.Geometry>
-                                                <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
-                                            </GeometryDrawing.Geometry>
-                                        </GeometryDrawing>
-                                    </DrawingBrush.Drawing>
-                                </DrawingBrush>
-                            </Border.Background>
-                        </Border>
-
-                        <ContentPresenter Margin="{TemplateBinding Padding}"/>
-
-                    </Grid>
-
-                    <ControlTemplate.Triggers>
-                        <!--<Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="0.7" TargetName="BorderBackground"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Opacity" Value="1" TargetName="BorderBackground"/>
-                        </Trigger>-->
-                    </ControlTemplate.Triggers>
-
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style x:Key="StyleDrawingScrollBar" TargetType="{x:Type mrendering:DrawingScrollbar}">
         <Style.Resources>
             <!-- 拖动标样式 -->

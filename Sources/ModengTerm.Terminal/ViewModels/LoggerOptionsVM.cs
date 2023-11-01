@@ -1,11 +1,12 @@
 ﻿using DotNEToolkit;
 using Microsoft.Win32;
+using ModengTerm.Base;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
 using System;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels
+namespace ModengTerm.Terminal.ViewModels
 {
     public class LoggerOptionsVM : ViewModelBase
     {
@@ -151,7 +152,7 @@ namespace ModengTerm.ViewModels
         {
             if (string.IsNullOrEmpty(this.FilePath))
             {
-                MMessageBox.Info("请选择日志保存路径");
+                MTMessageBox.Info("请选择日志保存路径");
                 return null;
             }
 

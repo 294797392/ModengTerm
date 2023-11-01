@@ -1749,19 +1749,6 @@ namespace ModengTerm.Terminal.Document
         }
 
         /// <summary>
-        /// 获取当前鼠标所在行
-        /// </summary>
-        /// <returns></returns>
-        public VTextLine GetCursorLine()
-        {
-            VTPoint mouseLocation = this.DrawingObject.GetMousePosition(VTDocumentAreas.ContentArea);
-
-            VTextLine cursorLine = HitTestHelper.HitTestVTextLine(this.FirstLine, mouseLocation.Y);
-
-            return cursorLine;
-        }
-
-        /// <summary>
         /// update anything about ui
         /// 如果需要布局则进行布局
         /// 如果不需要布局，那么就看是否需要重绘某些文本行

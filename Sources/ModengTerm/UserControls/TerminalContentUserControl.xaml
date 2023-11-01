@@ -36,41 +36,13 @@
         <Grid Grid.Row="0">
 
             <Grid Grid.Row="0" Background="Transparent">
-
                 <Grid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="日志">
-                            <MenuItem Header="启动" Click="MenuItemStartLogger_Click"/>
-                            <MenuItem Header="停止" Click="MenuItemStopLogger_Click"/>
-                            <MenuItem Header="暂停" Click="MenuItemPauseLogger_Click"/>
-                            <MenuItem Header="继续" Click="MenuItemResumeLogger_Click"/>
-                            <!--<MenuItem Header="打开日志文件夹" Click="MenuItemOpenLoggerDirectory_Click"/>-->
-                        </MenuItem>
-                        <Separator/>
-                        <MenuItem Header="复制" Click="MenuItemCopy_Click"/>
-                        <MenuItem Header="粘贴" Click="MenuItemPaste_Click"/>
-                        <MenuItem Header="全选" Click="MenuItemSelectAll_Click"/>
-                        <MenuItem Header="查看剪贴板历史" Click="MenuItemClipboardHistory_Click"/>
-                        <Separator/>
-                        <MenuItem Header="收藏夹">
-                            <MenuItem Header="加入收藏夹" Click="MenuItemAddToFavorites_Click"/>
-                            <MenuItem Header="查看收藏夹" Click="MenuItemFaviritesList_Click"/>
-                        </MenuItem>
-                        <MenuItem Header="书签">
-                            <MenuItem Header="新建书签" Click="MeuItemAddBookmark_Click"/>
-                            <MenuItem Header="删除书签" Click="MeuItemRemoveBookmark_Click"/>
-                            <MenuItem Header="查看书签列表" Click="MenuItemBookmarkList_Click"/>
-                            <MenuItem Header="显示书签栏" Click="MenuItemDisplayBookmark_Click"/>
-                            <MenuItem Header="隐藏书签栏" Click="MenuItemHidenBookmark_Click"/>
-                        </MenuItem>
-                        <Separator/>
-                        <MenuItem Header="查找..." Click="MenuItemFind_Click"/>
-                        <Separator/>
-                        <MenuItem Header="保存当前屏幕内容" Click="MenuItemSaveDocument_Click"/>
-                        <MenuItem Header="保存选中内容" Click="MenuItemSaveSelected_Click"/>
-                        <MenuItem Header="保存所有内容" Click="MenuItemSaveAll_Click"/>
-                        <Separator/>
-                        <MenuItem x:Name="MenuItemSendAll" Header="发送到所有会话" IsCheckable="True" IsChecked="{Binding Path=SendAll, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ContextMenu ItemsSource="{Binding Path=FunctionMenus}" MenuItem.Click="ContextMenu_Click">
+                        <ContextMenu.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </HierarchicalDataTemplate>
+                        </ContextMenu.ItemTemplate>
                     </ContextMenu>
                 </Grid.ContextMenu>
 

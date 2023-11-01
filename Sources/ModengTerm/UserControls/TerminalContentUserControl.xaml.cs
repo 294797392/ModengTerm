@@ -56,19 +56,9 @@ namespace XTerminal.UserControls
         private IVideoTerminal videoTerminal;
 
         /// <summary>
-        /// 提供剪贴板功能
-        /// </summary>
-        private VTClipboard clipboard;
-
-        /// <summary>
         /// 访问服务的代理
         /// </summary>
         private ServiceAgent serviceAgent;
-
-        /// <summary>
-        /// 记录当鼠标按下的时候的文本行
-        /// </summary>
-        private VTextLine mouseDownLine;
 
         #endregion
 
@@ -99,40 +89,6 @@ namespace XTerminal.UserControls
             this.Background = Brushes.Transparent;
         }
 
-        private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
-        {
-            switch (filterIndex)
-            {
-                case 1: return LogFileTypeEnum.PlainText;
-                case 2: return LogFileTypeEnum.HTML;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        private void SaveToFile(ParagraphTypeEnum paragraphType)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
-            saveFileDialog.FileName = string.Format("{0}_{1}", this.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
-            if ((bool)saveFileDialog.ShowDialog())
-            {
-                LogFileTypeEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
-
-                try
-                {
-                    VTParagraph paragraph = this.videoTerminal.CreateParagraph(paragraphType, fileType);
-                    File.WriteAllText(saveFileDialog.FileName, paragraph.Content);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("保存日志异常", ex);
-                    MessageBoxUtils.Error("保存失败");
-                }
-            }
-        }
-
         #endregion
 
         #region 事件处理器
@@ -142,9 +98,6 @@ namespace XTerminal.UserControls
             base.OnMouseDown(e);
 
             this.Focus();
-
-            // 记录鼠标所在行
-            this.mouseDownLine = this.videoTerminal.ActiveDocument.GetCursorLine();
         }
 
         /// <summary>
@@ -158,222 +111,22 @@ namespace XTerminal.UserControls
             return new PointHitTestResult(this, hitTestParameters.HitPoint);
         }
 
-        private void MenuItemCopy_Click(object sender, RoutedEventArgs e)
+        private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
-            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
-            if (paragraph.IsEmpty)
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            ShellFunctionMenu functionMenu = menuItem.DataContext as ShellFunctionMenu;
+            if (functionMenu == null) 
             {
                 return;
             }
 
-            this.clipboard.SetData(paragraph);
-
-            // 把数据设置到Windows剪贴板里
-            System.Windows.Clipboard.SetText(paragraph.Content);
-        }
-
-        private void MenuItemPaste_Click(object sender, RoutedEventArgs e)
-        {
-            string text = System.Windows.Clipboard.GetText();
-            this.shellSession.SendInput(text);
-        }
-
-        private void MenuItemSelectAll_Click(object sender, RoutedEventArgs e)
-        {
-            this.videoTerminal.SelectAll();
-        }
-
-        #region 保存日志
-
-        private void MenuItemSaveDocument_Click(object sender, RoutedEventArgs e)
-        {
-            this.SaveToFile(ParagraphTypeEnum.Viewport);
-        }
-
-        private void MenuItemSaveSelected_Click(object sender, RoutedEventArgs e)
-        {
-            this.SaveToFile(ParagraphTypeEnum.Selected);
-        }
-
-        private void MenuItemSaveAll_Click(object sender, RoutedEventArgs e)
-        {
-            this.SaveToFile(ParagraphTypeEnum.AllDocument);
-        }
-
-        #endregion
-
-        #region 日志记录
-
-        private void MenuItemStartLogger_Click(object sender, RoutedEventArgs e)
-        {
-            LoggerOptionsWindow window = new LoggerOptionsWindow(this.videoTerminal);
-            window.Owner = Window.GetWindow(this);
-            if ((bool)window.ShowDialog())
-            {
-                MTermApp.Context.LoggerManager.Start(this.videoTerminal, window.Options);
-            }
-        }
-
-        private void MenuItemStopLogger_Click(object sender, RoutedEventArgs e)
-        {
-            MTermApp.Context.LoggerManager.Stop(this.videoTerminal);
-        }
-
-        private void MenuItemPauseLogger_Click(object sender, RoutedEventArgs e)
-        {
-            MTermApp.Context.LoggerManager.Pause(this.videoTerminal);
-        }
-
-        private void MenuItemResumeLogger_Click(object sender, RoutedEventArgs e)
-        {
-            MTermApp.Context.LoggerManager.Resume(this.videoTerminal);
-        }
-
-        private void MenuItemOpenLoggerDirectory_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        #endregion
-
-        /// <summary>
-        /// 查找
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuItemFind_Click(object sender, RoutedEventArgs e)
-        {
-            FindVM vtFind = new FindVM(this.videoTerminal);
-            FindWindow findWindow = new FindWindow(vtFind);
-            findWindow.Owner = Window.GetWindow(this);
-            findWindow.Show();
-        }
-
-        /// <summary>
-        /// 剪贴板历史记录
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuItemClipboardHistory_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
-
-            ClipboardParagraphSource clipboardParagraphSource = new ClipboardParagraphSource(this.clipboard);
-            clipboardParagraphSource.Session = this.Session;
-
-            ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this.shellSession);
-            clipboardVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
-
-            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
-            paragraphsWindow.Title = "剪贴板历史";
-            paragraphsWindow.Owner = mainWindow;
-            paragraphsWindow.Show();
-        }
-
-        #region 收藏夹
-
-        /// <summary>
-        /// 添加到收藏夹
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuItemAddToFavorites_Click(object sender, RoutedEventArgs e)
-        {
-            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
-            if (paragraph.IsEmpty)
+            if (functionMenu.Execute == null)
             {
                 return;
             }
 
-            Favorites favorites = new Favorites()
-            {
-                ID = Guid.NewGuid().ToString(),
-                Typeface = this.videoTerminal.ActiveDocument.Typeface,
-                SessionID = this.Session.ID,
-                StartCharacterIndex = paragraph.StartCharacterIndex,
-                EndCharacterIndex = paragraph.EndCharacterIndex,
-                CharacterList = paragraph.CharacterList,
-                CreationTime = paragraph.CreationTime,
-            };
-
-            int code = this.serviceAgent.AddFavorites(favorites);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MMessageBox.Error("保存失败");
-            }
+            functionMenu.Execute();
         }
-
-        /// <summary>
-        /// 查看收藏夹列表
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void MenuItemFaviritesList_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
-
-            FavoritesParagraphSource favoritesParagraphSource = new FavoritesParagraphSource(this.serviceAgent);
-            favoritesParagraphSource.Session = this.Session;
-
-            FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this.shellSession);
-            favoritesVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
-
-            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(favoritesVM);
-            paragraphsWindow.Title = "收藏夹列表";
-            paragraphsWindow.Owner = mainWindow;
-            paragraphsWindow.Show();
-        }
-
-        #endregion
-
-        #region 书签
-
-        private void MeuItemAddBookmark_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.mouseDownLine == null)
-            {
-                return;
-            }
-
-            this.shellSession.SetBookmarkState(this.mouseDownLine, VTBookmarkStates.Enabled);
-        }
-
-        private void MeuItemRemoveBookmark_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.mouseDownLine == null)
-            {
-                return;
-            }
-
-            this.shellSession.SetBookmarkState(this.mouseDownLine, VTBookmarkStates.None);
-        }
-
-        private void MenuItemBookmarkList_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
-
-            BookmarkParagraphSource bookmarkParagraphSource = new BookmarkParagraphSource(this.shellSession.BookmarkMgr);
-
-            BookmarksVM bookmarksVM = new BookmarksVM(bookmarkParagraphSource, this.shellSession);
-            bookmarksVM.SendToAllTerminalDlg = mainWindow.SendToAllTerminal;
-
-            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(bookmarksVM);
-            paragraphsWindow.Title = "书签列表";
-            paragraphsWindow.Owner = mainWindow;
-            paragraphsWindow.Show();
-        }
-
-        private void MenuItemDisplayBookmark_Click(object sender, RoutedEventArgs e)
-        {
-            this.videoTerminal.SetBookmarkVisible(true);
-        }
-
-        private void MenuItemHidenBookmark_Click(object sender, RoutedEventArgs e)
-        {
-            this.videoTerminal.SetBookmarkVisible(false);
-        }
-
-        #endregion
 
         #endregion
 
@@ -437,12 +190,12 @@ namespace XTerminal.UserControls
 
         protected override int OnOpen(OpenedSessionVM viewModel)
         {
-            this.clipboard = new VTClipboard()
-            {
-                MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
-            };
-
             this.shellSession = viewModel as ShellSessionVM;
+
+            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
+            this.shellSession.SendToAllCallback = mainWindow.SendToAllTerminal;
+            this.shellSession.TerminalAgent = MTermApp.Context.ServiceAgent;
+            this.shellSession.LoggerManager = MTermApp.Context.LoggerManager;
             this.shellSession.Open();
 
             this.videoTerminal = this.shellSession.VideoTerminal;
@@ -454,9 +207,6 @@ namespace XTerminal.UserControls
         {
             // 停止对终端的日志记录
             MTermApp.Context.LoggerManager.Stop(this.videoTerminal);
-
-            // 释放剪贴板
-            this.clipboard.Release();
 
             this.shellSession.Close();
             this.videoTerminal = null;
