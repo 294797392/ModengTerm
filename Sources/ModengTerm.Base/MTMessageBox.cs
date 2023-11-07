@@ -13,5 +13,10 @@ namespace ModengTerm.Base
         {
             MessageBox.Show(string.Format(message, args), "信息", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        public static void Error(string message, params object[] args)
+        {
+            MessageBox.Show(string.Format(message, args), "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }

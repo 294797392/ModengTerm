@@ -3,8 +3,8 @@ using Microsoft.Win32;
 using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Controls;
 using ModengTerm.Rendering;
-using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Document;
@@ -32,12 +32,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WPFToolkit.Utility;
-using XTerminal.Base;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Enumerations;
-using XTerminal.Enumerations;
 
-namespace XTerminal.UserControls
+namespace ModengTerm.Terminal.UserControls
 {
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
@@ -54,11 +50,6 @@ namespace XTerminal.UserControls
 
         private ShellSessionVM shellSession;
         private IVideoTerminal videoTerminal;
-
-        /// <summary>
-        /// 访问服务的代理
-        /// </summary>
-        private ServiceAgent serviceAgent;
 
         #endregion
 
@@ -85,7 +76,6 @@ namespace XTerminal.UserControls
             ToggleButtonLoggerSetting.Visibility = Visibility.Collapsed;
 #endif
 
-            this.serviceAgent = MTermApp.Context.ServiceAgent;
             this.Background = Brushes.Transparent;
         }
 
@@ -168,7 +158,7 @@ namespace XTerminal.UserControls
         {
             Typeface typeface = DrawingUtils.GetTypeface(fontFamily);
             FormattedText formattedText = new FormattedText(" ", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                fontSize, Brushes.Black, null, TextFormattingMode.Display, App.PixelsPerDip);
+                fontSize, Brushes.Black, null, TextFormattingMode.Display, DrawingUtils.PixelPerDpi);
 
             return new VTypeface()
             {
@@ -191,11 +181,6 @@ namespace XTerminal.UserControls
         protected override int OnOpen(OpenedSessionVM viewModel)
         {
             this.shellSession = viewModel as ShellSessionVM;
-
-            MainWindow mainWindow = Window.GetWindow(this) as MainWindow;
-            this.shellSession.SendToAllCallback = mainWindow.SendToAllTerminal;
-            this.shellSession.TerminalAgent = MTermApp.Context.ServiceAgent;
-            this.shellSession.LoggerManager = MTermApp.Context.LoggerManager;
             this.shellSession.Open();
 
             this.videoTerminal = this.shellSession.VideoTerminal;
@@ -205,9 +190,6 @@ namespace XTerminal.UserControls
 
         protected override void OnClose()
         {
-            // 停止对终端的日志记录
-            MTermApp.Context.LoggerManager.Stop(this.videoTerminal);
-
             this.shellSession.Close();
             this.videoTerminal = null;
         }

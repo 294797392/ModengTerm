@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
+    <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="WPFToolkit">
       <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
     </Reference>

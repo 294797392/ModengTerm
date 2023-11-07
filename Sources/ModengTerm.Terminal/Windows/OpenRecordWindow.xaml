@@ -1,0 +1,58 @@
+﻿<Window x:Class="ModengTerm.Terminal.Windows.OpenRecordWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModengTerm.Terminal.Windows"
+        mc:Ignorable="d"
+        Title="OpenRecordWindow" Height="450" Width="700">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Right"/>
+            </Style>
+
+            <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}">
+                <Setter Property="Margin" Value="3"/>
+            </Style>
+
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="3"/>
+            </Style>
+            
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="80"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="录像文件：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+
+            <TextBox Grid.Column="1" x:Name="TextBoxPlaybackFile" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+            <Button Grid.Column="2" Content="浏览" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+
+        </Grid>
+
+        <Grid Grid.Row="2">
+            
+        </Grid>
+        
+    </Grid>
+</Window>

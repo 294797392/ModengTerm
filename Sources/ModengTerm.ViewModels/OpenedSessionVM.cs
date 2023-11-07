@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.ServiceAgents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,6 +69,11 @@ namespace ModengTerm.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// 访问服务的代理
+        /// </summary>
+        public ServiceAgent ServiceAgent { get; set; }
 
         #endregion
 

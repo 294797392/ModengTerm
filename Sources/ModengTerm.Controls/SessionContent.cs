@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using XTerminal.Base.DataModels;
 
-namespace XTerminal.UserControls
+namespace ModengTerm.Controls
 {
     public abstract class SessionContent : UserControl
     {
-        public OpenedSessionVM ViewModel { get; private set; }
+        public OpenedSessionVM ViewModel { get; set; }
 
         public XTermSession Session { get; set; }
 
@@ -24,13 +24,6 @@ namespace XTerminal.UserControls
         /// <returns></returns>
         public int Open()
         {
-            this.ViewModel = OpenedSessionVMFactory.Create(this.Session);
-            this.ViewModel.ID = Guid.NewGuid().ToString();
-            this.ViewModel.Name = this.Session.Name;
-            this.ViewModel.Description = this.Session.Description;
-            this.ViewModel.Content = this;
-            base.DataContext = this.ViewModel;
-
             return this.OnOpen(this.ViewModel);
         }
 

@@ -51,23 +51,24 @@ namespace ModengTerm.Terminal.ViewModels
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FavoritesParagraphSource");
 
-        private ITerminalAgent terminalAgent;
+        //private ITerminalAgent terminalAgent;
 
-        public FavoritesParagraphSource(ITerminalAgent terminalAgent)
-        {
-            this.terminalAgent = terminalAgent;
-        }
+        //public FavoritesParagraphSource(ITerminalAgent terminalAgent)
+        //{
+            //this.terminalAgent = terminalAgent;
+        //}
 
         public override List<ParagraphVM> GetParagraphs()
         {
-            List<Favorites> favoritesList = this.terminalAgent.GetFavorites(this.Session.ID);
-            if (favoritesList == null)
-            {
-                logger.ErrorFormat("获取收藏夹列表失败, sessionID = {0}", this.Session.ID);
-                return new List<ParagraphVM>();
-            }
+            //List<Favorites> favoritesList = this.terminalAgent.GetFavorites(this.Session.ID);
+            //if (favoritesList == null)
+            //{
+            //    logger.ErrorFormat("获取收藏夹列表失败, sessionID = {0}", this.Session.ID);
+            //    return new List<ParagraphVM>();
+            //}
 
-            return favoritesList.Select(v => new ParagraphVM(v)).ToList();
+            //return favoritesList.Select(v => new ParagraphVM(v)).ToList();
+            throw new NotImplementedException();
         }
     }
 

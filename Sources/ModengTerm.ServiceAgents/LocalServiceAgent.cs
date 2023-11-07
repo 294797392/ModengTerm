@@ -1,7 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,21 +18,6 @@ namespace ModengTerm.ServiceAgents
     public class LocalServiceAgent : ServiceAgent
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("LocalServiceAgent");
-
-        public override MTermManifest GetManifest()
-        {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.json");
-
-            try
-            {
-                return JSONHelper.ParseFile<MTermManifest>(path);
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("加载AppManifest异常, {0}, {1}", path, ex);
-                return default(MTermManifest);
-            }
-        }
 
         #region Session管理
 
@@ -95,49 +79,49 @@ namespace ModengTerm.ServiceAgents
 
         #endregion
 
-        public override List<Favorites> GetFavorites(string sessionId)
-        {
-            try
-            {
-                return JSONDatabase.SelectAll<Favorites>(this.GetFilePath<Favorites>(sessionId));
-            }
-            catch (Exception ex)
-            {
-                logger.Error("GetFavorites异常", ex);
-                return new List<Favorites>();
-            }
-        }
+        //public override List<Favorites> GetFavorites(string sessionId)
+        //{
+        //    try
+        //    {
+        //        return JSONDatabase.SelectAll<Favorites>(this.GetFilePath<Favorites>(sessionId));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("GetFavorites异常", ex);
+        //        return new List<Favorites>();
+        //    }
+        //}
 
-        public override int AddFavorites(Favorites favorites)
-        {
-            try
-            {
-                JSONDatabase.Insert<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), favorites);
+        //public override int AddFavorites(Favorites favorites)
+        //{
+        //    try
+        //    {
+        //        JSONDatabase.Insert<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), favorites);
 
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("AddFavorites异常", ex);
-                return ResponseCode.FAILED;
-            }
+        //        return ResponseCode.SUCCESS;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("AddFavorites异常", ex);
+        //        return ResponseCode.FAILED;
+        //    }
 
-        }
+        //}
 
-        public override int DeleteFavorites(Favorites favorites)
-        {
-            try
-            {
-                JSONDatabase.Delete<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), v => v.ID == favorites.ID);
+        //public override int DeleteFavorites(Favorites favorites)
+        //{
+        //    try
+        //    {
+        //        JSONDatabase.Delete<Favorites>(this.GetFilePath<Favorites>(favorites.SessionID), v => v.ID == favorites.ID);
 
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("DeleteFavorites异常", ex);
-                return ResponseCode.FAILED;
-            }
-        }
+        //        return ResponseCode.SUCCESS;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        logger.Error("DeleteFavorites异常", ex);
+        //        return ResponseCode.FAILED;
+        //    }
+        //}
 
         #region 实例方法
 

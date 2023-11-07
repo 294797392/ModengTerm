@@ -15,6 +15,7 @@ using ModengTerm.Base;
 using System.IO;
 using System.Windows.Media.Imaging;
 using ModengTerm.Base.Enumerations;
+using DotNEToolkit;
 
 namespace ModengTerm.Terminal
 {
@@ -595,7 +596,6 @@ namespace ModengTerm.Terminal
             return bitmapImage;
         }
 
-
         /// <summary>
         /// 根据当前屏幕大小计算终端的自适应大小
         /// </summary>
@@ -614,7 +614,6 @@ namespace ModengTerm.Terminal
 
             //Console.WriteLine("height = {0}, characterHeight = {1}, rows = {2}", contentArea.Height, typeface.Height, rowSize);
         }
-
 
         public static void GetSegement(string text, int characterIndex, out int startIndex, out int endIndex)
         {
@@ -653,5 +652,28 @@ namespace ModengTerm.Terminal
             }
         }
 
+        /// <summary>
+        /// 获取终端的清单文件
+        /// </summary>
+        /// <returns></returns>
+        public static TerminalManifest GetManifest()
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manifest.json");
+
+            if (!File.Exists(filePath))
+            {
+                return new TerminalManifest();
+            }
+
+            try
+            {
+                return JSONHelper.ParseFile<TerminalManifest>(filePath);
+            }
+            catch (Exception ex)
+            {
+                logger.ErrorFormat("加载终端清单文件异常, {0}, {1}", ex, filePath);
+                return new TerminalManifest();
+            }
+        }
     }
 }

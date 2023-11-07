@@ -21,8 +21,6 @@ namespace XTerminal
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("App");
 
-        public static double PixelsPerDip = 0;
-
         static App()
         {
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -43,7 +41,6 @@ namespace XTerminal
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
-            PixelsPerDip = VisualTreeHelper.GetDpi(new DrawingVisual()).PixelsPerDip;
 
             MTermApp.Context.Initialize("app.json");
         }

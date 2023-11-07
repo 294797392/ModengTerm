@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
-    <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +28,10 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataModels\" />
   </ItemGroup>
 
 </Project>

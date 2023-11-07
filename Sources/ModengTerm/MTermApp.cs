@@ -1,33 +1,22 @@
 ﻿using DotNEToolkit;
-using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Controls;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Document;
-using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using WPFToolkit.MVVM;
-using WPFToolkit.Utils;
-using XTerminal.Base;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Definitions;
-using XTerminal.Base.Enumerations;
-using XTerminal.UserControls;
 using XTerminal.UserControls.OptionsUserControl;
 
 namespace ModengTerm
@@ -143,9 +132,23 @@ namespace ModengTerm
         {
             // 先初始化UI，等UI显示出来在打开Session
             // 因为初始化终端需要知道当前的界面大小，从而计算行大小和列大小
+
             SessionContent sessionContent = SessionContentFactory.Create(session);
+            OpenedSessionVM viewModel = OpenedSessionVMFactory.Create(session);
+
+            // 给ViewModel赋值
+            viewModel.ID = Guid.NewGuid().ToString();
+            viewModel.Name = session.Name;
+            viewModel.Description = session.Description;
+            viewModel.Content = sessionContent;
+            viewModel.ServiceAgent = MTermApp.Context.ServiceAgent;
+
+            // 给SessionContent赋值
             sessionContent.Session = session;
+            sessionContent.ViewModel = viewModel;
+            sessionContent.DataContext = viewModel;
             sessionContent.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
+
             container.Content = sessionContent;
         }
 

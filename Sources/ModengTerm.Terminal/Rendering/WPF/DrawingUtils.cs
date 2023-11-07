@@ -25,6 +25,7 @@ namespace ModengTerm.Rendering
         public static readonly Point ZeroPoint = new Point();
         private static readonly string[] Splitter = new string[] { "," };
 
+        public static double PixelPerDpi = 0;
 
         /// <summary>
         /// RGB字符串 -> Brush
@@ -34,6 +35,7 @@ namespace ModengTerm.Rendering
 
         static DrawingUtils()
         {
+            PixelPerDpi = VisualTreeHelper.GetDpi(new System.Windows.Controls.Control()).PixelsPerDip;
         }
 
         public static void UpdateTextMetrics(VTextLine textLine, FormattedText formattedText)
@@ -110,7 +112,7 @@ namespace ModengTerm.Rendering
             Typeface typeface = DrawingUtils.GetTypeface(textStyle.FontFamily);
 
             FormattedText formattedText = new FormattedText(textData.Text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface,
-                textStyle.FontSize, foreground, null, TextFormattingMode.Display, App.PixelsPerDip);
+                textStyle.FontSize, foreground, null, TextFormattingMode.Display, PixelPerDpi);
 
             #region 画文本装饰
 

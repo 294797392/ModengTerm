@@ -64,6 +64,7 @@ namespace ModengTerm.ViewModels
         private Visibility paperVisible;
 
         private MTermManifest appManifest;
+        private TerminalManifest terminalManifest;
 
         private bool bookmarkVisible;
 
@@ -457,9 +458,11 @@ namespace ModengTerm.ViewModels
         {
             this.serviceAgent = serviceAgent;
 
-            MTermManifest appManifest = serviceAgent.GetManifest();
+            MTermManifest appManifest = MTermApp.Context.Manifest;
+            TerminalManifest terminalManifest = VTUtils.GetManifest();
 
             this.appManifest = appManifest;
+            this.terminalManifest = terminalManifest;
 
             this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
 
@@ -529,20 +532,20 @@ namespace ModengTerm.ViewModels
             #region Theme
 
             this.ThemeList = new BindableCollection<ThemePackage>();
-            this.ThemeList.AddRange(appManifest.ThemeManifest.ThemeList);
+            this.ThemeList.AddRange(terminalManifest.ThemeManifest.ThemeList);
             this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
             this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
             ThemePackage selectedTheme = this.ThemeList.SelectedItem;
 
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
-            this.FontFamilyList.AddRange(appManifest.FontFamilyList);
+            this.FontFamilyList.AddRange(terminalManifest.FontFamilyList);
             // 加载系统已安装的所有字体
             InstalledFontCollection installedFont = new InstalledFontCollection();
             this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
             this.FontFamilyList.SelectedItem = this.GetDefaultFontFamily();
 
             this.FontSizeList = new BindableCollection<FontSizeDefinition>();
-            this.FontSizeList.AddRange(appManifest.FontSizeList);
+            this.FontSizeList.AddRange(terminalManifest.FontSizeList);
             this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
 
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
@@ -554,7 +557,7 @@ namespace ModengTerm.ViewModels
             this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
 
             this.CursorColors = new BindableCollection<ColorDefinition>();
-            this.CursorColors.AddRange(appManifest.ThemeManifest.DefaultColors);
+            this.CursorColors.AddRange(terminalManifest.ThemeManifest.DefaultColors);
             this.CursorColors.SelectedItem = this.CursorColors.FirstOrDefault();
 
             this.WallpaperTypeEnumList = new BindableCollection<WallpaperTypeEnum>();
@@ -928,9 +931,9 @@ namespace ModengTerm.ViewModels
             this.BackgroundLivePapers.Clear();
             this.BackgroundPapers.Clear();
 
-            this.BackgroundPureColors.AddRange(this.appManifest.ThemeManifest.DefaultColors);
-            this.BackgroundLivePapers.AddRange(this.appManifest.ThemeManifest.DefaultLivePapers);
-            this.BackgroundPapers.AddRange(this.appManifest.ThemeManifest.DefaultPapers);
+            this.BackgroundPureColors.AddRange(this.terminalManifest.ThemeManifest.DefaultColors);
+            this.BackgroundLivePapers.AddRange(this.terminalManifest.ThemeManifest.DefaultLivePapers);
+            this.BackgroundPapers.AddRange(this.terminalManifest.ThemeManifest.DefaultPapers);
 
             // 先保证每种样式都有一个默认选项
             this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault();
@@ -986,7 +989,7 @@ namespace ModengTerm.ViewModels
             // 更新第一个原始文本颜色
             this.ForegroundColors.SelectedItem = null;
             this.ForegroundColors.Clear();
-            this.ForegroundColors.AddRange(this.appManifest.ThemeManifest.DefaultColors);
+            this.ForegroundColors.AddRange(this.terminalManifest.ThemeManifest.DefaultColors);
 
             ColorDefinition colorDefinition1 = this.ForegroundColors.FirstOrDefault(v => v.Value == theme.ForegroundColor);
             if (colorDefinition1 == null)

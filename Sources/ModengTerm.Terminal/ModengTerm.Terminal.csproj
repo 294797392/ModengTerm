@@ -18,6 +18,7 @@
   <ItemGroup>
     <Compile Remove="Document\VTextStyle.cs" />
     <Compile Remove="Document\VTPointCollection.cs" />
+    <Compile Remove="ITerminalAgent.cs" />
     <Compile Remove="ViewModels\VideoTerminal.Drawing.cs" />
   </ItemGroup>
 
@@ -47,6 +48,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
+    <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
     <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />
   </ItemGroup>
@@ -70,6 +72,19 @@
     <Reference Include="WPFToolkit">
       <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="manifest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UserControls\TerminalContentUserControl.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

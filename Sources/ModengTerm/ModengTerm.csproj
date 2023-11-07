@@ -21,7 +21,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Rendering\DrawingFrameworkObject.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
   </ItemGroup>

@@ -1,5 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Controls;
+using ModengTerm.Terminal.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +10,7 @@ using System.Threading.Tasks;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.UserControls
+namespace ModengTerm
 {
     public static class SessionContentFactory
     {

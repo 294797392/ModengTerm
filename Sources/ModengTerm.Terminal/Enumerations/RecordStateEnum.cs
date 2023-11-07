@@ -12,23 +12,18 @@ namespace ModengTerm.Terminal.Enumerations
     public enum RecordStateEnum
     {
         /// <summary>
-        /// 停止录制
+        /// 已经停止录制
         /// </summary>
         Stop,
 
         /// <summary>
-        /// 开始录制
+        /// 正在录制
         /// </summary>
-        Start,
+        Recording,
 
         /// <summary>
-        /// 暂停录制
+        /// 已经暂停录制
         /// </summary>
         Pause,
-
-        /// <summary>
-        /// 继续录制
-        /// </summary>
-        Resume
     }
 }

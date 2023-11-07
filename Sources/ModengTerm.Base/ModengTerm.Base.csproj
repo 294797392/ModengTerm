@@ -16,6 +16,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DataModels\SessionOptions\**" />
+    <EmbeddedResource Remove="DataModels\SessionOptions\**" />
+    <None Remove="DataModels\SessionOptions\**" />
+    <Page Remove="DataModels\SessionOptions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />
   </ItemGroup>
 

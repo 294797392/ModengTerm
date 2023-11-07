@@ -1,8 +1,4 @@
-﻿using DotNEToolkit;
-using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
-using ModengTerm.Terminal.DataModels;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Definitions;
 
-namespace ModengTerm.ServiceAgents
+namespace ModengTerm.Terminal.DataModels
 {
-    public class MTermManifest : AppManifest
+    public class TerminalManifest
     {
-        /// <summary>
-        /// 支持的会话列表
-        /// </summary>
-        [JsonProperty("sessions")]
-        public List<SessionDefinition> SessionList { get; private set; }
-
         /// <summary>
         /// XTerminal支持的文字大小列表
         /// </summary>
@@ -38,9 +28,8 @@ namespace ModengTerm.ServiceAgents
         [JsonProperty("themeManifest")]
         public ThemeManifest ThemeManifest { get; private set; }
 
-        public MTermManifest()
+        public TerminalManifest()
         {
-            this.SessionList = new List<SessionDefinition>();
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
         }

@@ -26,4 +26,7 @@
     <sys:String x:Key="UIText4001">段落列表</sys:String>
 
 
+    <!-- 录制窗口 4501 - 5000 -->
+    <sys:String x:Key="UIText4501">录制</sys:String>
+
 </ResourceDictionary>

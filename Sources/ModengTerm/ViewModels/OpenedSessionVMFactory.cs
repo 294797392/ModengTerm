@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Enumerations;
-using ModengTerm.ViewModels;
 using ModengTerm.Terminal.ViewModels;
 using XTerminal.Base.DataModels;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using XTerminal;
 
-namespace ModengTerm
+namespace ModengTerm.ViewModels
 {
     public static class OpenedSessionVMFactory
     {
@@ -28,7 +28,13 @@ namespace ModengTerm
                 case SessionTypeEnum.SSH:
                 case SessionTypeEnum.Win32CommandLine:
                     {
-                        return new ShellSessionVM(session);
+                        MainWindow mainWindow = App.Current.MainWindow as MainWindow;
+
+                        return new ShellSessionVM(session)
+                        {
+                            SendToAllCallback = mainWindow.SendToAllTerminal,
+                            LoggerManager = MTermApp.Context.LoggerManager,
+                        };
                     }
 
                 default:

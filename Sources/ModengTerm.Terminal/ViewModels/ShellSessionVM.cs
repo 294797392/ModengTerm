@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Document;
@@ -10,6 +11,7 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Rendering;
 using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
 using ModengTerm.Windows;
 using System;
@@ -245,11 +247,6 @@ namespace ModengTerm.Terminal.ViewModels
         public SendToAllTerminalCallback SendToAllCallback { get; set; }
 
         /// <summary>
-        /// 访问Terminal服务的代理
-        /// </summary>
-        public ITerminalAgent TerminalAgent { get; set; }
-
-        /// <summary>
         /// 日志记录器
         /// </summary>
         public LoggerManager LoggerManager { get; set; }
@@ -317,12 +314,13 @@ namespace ModengTerm.Terminal.ViewModels
                 },
                 new ShellFunctionMenu("录屏")
                 {
-                    Children = new BindableCollection<ShellFunctionMenu>() 
+                    Children = new BindableCollection<ShellFunctionMenu>()
                     {
                         new ShellFunctionMenu("启动录制", ShellFunctionEnum.StartRecord, this.StartRecord),
                         new ShellFunctionMenu("停止录制", ShellFunctionEnum.StopRecord, this.StopRecord),
                         new ShellFunctionMenu("暂停录制", ShellFunctionEnum.PauseRecord, this.PauseRecord),
-                        new ShellFunctionMenu("恢复录制", ShellFunctionEnum.ResumeRecord, this.ResumeRecord)
+                        new ShellFunctionMenu("恢复录制", ShellFunctionEnum.ResumeRecord, this.ResumeRecord),
+                        new ShellFunctionMenu("打开回放", ShellFunctionEnum.ResumeRecord, this.OpenRecord)
                     }
                 },
                 new ShellFunctionMenu("保存当前屏幕内容", ShellFunctionEnum.SaveDocument, this.SaveDocument),
@@ -398,6 +396,12 @@ namespace ModengTerm.Terminal.ViewModels
             }
             else
             {
+                // 停止对终端的日志记录
+                this.StopLogger();
+
+                // 停止录制
+                this.StopRecord();
+
                 this.sessionTransport.StatusChanged -= this.SessionTransport_StatusChanged;
                 this.sessionTransport.DataReceived -= this.SessionTransport_DataReceived;
                 this.sessionTransport.Close();
@@ -549,46 +553,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        /// <summary>
-        /// 设置录像状态
-        /// </summary>
-        /// <param name="targetState">要设置的状态</param>
-        public void SetRecordState(RecordStateEnum targetState)
-        {
-            if (this.recordContext.State == targetState)
-            {
-                return;
-            }
-
-            switch (targetState)
-            {
-                case RecordStateEnum.Stop:
-                    {
-                        PlaybackFile playbackFile = this.recordContext.PlaybackFile;
-                        playbackFile.Close();
-                        break;
-                    }
-
-                case RecordStateEnum.Start:
-                    {
-                        PlaybackFile playbackFile = this.recordContext.PlaybackFile;
-                        //playbackFile.OpenWrite();
-                        break;
-                    }
-
-                case RecordStateEnum.Resume:
-                case RecordStateEnum.Pause:
-                    {
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            this.recordContext.State = targetState;
-        }
-
         #endregion
 
         #region 事件处理器
@@ -651,8 +615,7 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
-                case RecordStateEnum.Resume:
-                case RecordStateEnum.Start:
+                case RecordStateEnum.Recording:
                     {
                         byte[] frameData = new byte[size];
                         if (size != bytes.Length)
@@ -743,7 +706,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.LoggerManager.Resume(this.videoTerminal);
         }
 
-        public void Copy()
+        private void Copy()
         {
             VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
             if (paragraph.IsEmpty)
@@ -807,25 +770,32 @@ namespace ModengTerm.Terminal.ViewModels
                 CreationTime = paragraph.CreationTime,
             };
 
-            int code = this.TerminalAgent.AddFavorites(favorites);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MTMessageBox.Info("保存失败");
-            }
+            throw new NotImplementedException();
+
+            //int code = this.TerminalAgent.AddFavorites(favorites);
+            //if (code != ResponseCode.SUCCESS)
+            //{
+            //    MTMessageBox.Info("保存失败");
+            //}
         }
 
+        /// <summary>
+        /// 显示收藏夹列表
+        /// </summary>
         private void FaviritesList()
         {
-            FavoritesParagraphSource favoritesParagraphSource = new FavoritesParagraphSource(this.TerminalAgent);
-            favoritesParagraphSource.Session = this.Session;
+            throw new NotImplementedException();
 
-            FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this);
-            favoritesVM.SendToAllTerminalDlg = this.SendToAllCallback;
+            //FavoritesParagraphSource favoritesParagraphSource = new FavoritesParagraphSource(this.TerminalAgent);
+            //favoritesParagraphSource.Session = this.Session;
 
-            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(favoritesVM);
-            paragraphsWindow.Title = "收藏夹列表";
-            paragraphsWindow.Owner = Window.GetWindow(this.Content);
-            paragraphsWindow.Show();
+            //FavoritesVM favoritesVM = new FavoritesVM(favoritesParagraphSource, this);
+            //favoritesVM.SendToAllTerminalDlg = this.SendToAllCallback;
+
+            //ParagraphsWindow paragraphsWindow = new ParagraphsWindow(favoritesVM);
+            //paragraphsWindow.Title = "收藏夹列表";
+            //paragraphsWindow.Owner = Window.GetWindow(this.Content);
+            //paragraphsWindow.Show();
         }
 
         private void AddBookmark()
@@ -861,30 +831,123 @@ namespace ModengTerm.Terminal.ViewModels
             paragraphsWindow.Show();
         }
 
+        /// <summary>
+        /// 显示书签栏
+        /// </summary>
         private void DisplayBookmark()
         {
             this.videoTerminal.SetBookmarkVisible(true);
         }
 
+        /// <summary>
+        /// 隐藏书签栏
+        /// </summary>
         private void HidenBookmark()
         {
             this.videoTerminal.SetBookmarkVisible(false);
         }
 
+        /// <summary>
+        /// 开始录像
+        /// </summary>
         private void StartRecord()
         {
+            if (this.recordContext.State == RecordStateEnum.Recording)
+            {
+                return;
+            }
+
+            RecordOptionsVM recordOptionsVM = new RecordOptionsVM();
+            recordOptionsVM.FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("video_{0}_{1}", this.Session.Name, DateTimeFormat.yyyyMMddhhmmss));
+
+            RecordOptionsWindow recordOptionsWindow = new RecordOptionsWindow();
+            recordOptionsWindow.Owner = Window.GetWindow(this.Content);
+            recordOptionsWindow.DataContext = recordOptionsVM;
+            if ((bool)recordOptionsWindow.ShowDialog())
+            {
+                int code = this.recordContext.PlaybackFile.OpenWrite(recordOptionsVM.FilePath);
+                if (code != ResponseCode.SUCCESS)
+                {
+                    MTMessageBox.Error("录制失败, {0}", ResponseCode.GetMessage(code));
+                    return;
+                }
+
+                this.recordContext.State = RecordStateEnum.Recording;
+            }
         }
 
+        /// <summary>
+        /// 停止录像
+        /// </summary>
         private void StopRecord()
         {
+            if (this.recordContext.State == RecordStateEnum.Stop)
+            {
+                return;
+            }
+
+            // TODO：此时文件可能正在被写入，PlaybackFile里做了异常处理，所以直接这么写
+            // 需要优化
+            this.recordContext.PlaybackFile.Close();
+
+            this.recordContext.State = RecordStateEnum.Stop;
         }
 
+        /// <summary>
+        /// 暂停录像
+        /// </summary>
         private void PauseRecord()
         {
+            if (this.recordContext.State == RecordStateEnum.Pause)
+            {
+                return;
+            }
+
+            this.recordContext.State = RecordStateEnum.Pause;
         }
 
+        /// <summary>
+        /// 继续录像
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
         private void ResumeRecord()
         {
+            if (this.recordContext.State == RecordStateEnum.Recording)
+            {
+                return;
+            }
+
+            switch (this.recordContext.State)
+            {
+                case RecordStateEnum.Stop:
+                    {
+                        break;
+                    }
+
+                case RecordStateEnum.Recording:
+                    {
+                        break;
+                    }
+
+                case RecordStateEnum.Pause:
+                    {
+                        this.recordContext.State = RecordStateEnum.Recording;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 打开录像
+        /// </summary>
+        private void OpenRecord() 
+        {
+            OpenRecordWindow openRecordWindow = new OpenRecordWindow();
+            openRecordWindow.Owner = Window.GetWindow(this.Content);
+            openRecordWindow.Show();
         }
 
         /// <summary>
