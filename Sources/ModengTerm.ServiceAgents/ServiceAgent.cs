@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit.Modular;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.ServiceAgents.Crypto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,13 +21,19 @@ namespace ModengTerm.ServiceAgents
     /// </summary>
     public abstract class ServiceAgent //: ITerminalAgent
     {
+        private Cryptor cryptor;
+
         public int Initialize()
         {
+            this.cryptor = Cryptor.Create(SecretKeyTypeEnum.AES256_Local);
+            this.cryptor.Initialize();
+
             return ResponseCode.SUCCESS;
         }
 
         public void Release()
         {
+            this.cryptor.Release();
         }
 
         #region Session管理
@@ -59,6 +66,16 @@ namespace ModengTerm.ServiceAgents
         public abstract int UpdateSession(XTermSession session);
 
         #endregion
+
+        protected string EncryptObject(object toEncrypt)
+        {
+            return this.cryptor.Encrypt(toEncrypt);
+        }
+
+        protected T DecryptObject<T>(string toDecrypt)
+        {
+            return this.cryptor.Decrypt<T>(toDecrypt);
+        }
 
         //public abstract List<Favorites> GetFavorites(string sessionId);
         //public abstract int AddFavorites(Favorites favorites);
