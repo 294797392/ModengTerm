@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,23 +13,34 @@ namespace ModengTerm.Terminal.ViewModels
     /// </summary>
     public class RecordOptionsVM : ViewModelBase
     {
-        private string filePath;
+        private string fileName;
 
-        public string FilePath
+        public string FileName
         {
-            get { return this.filePath; }
+            get { return this.fileName; }
             set
             {
-                if (this.filePath != value)
+                if (this.fileName != value)
                 {
-                    this.filePath = value;
-                    this.NotifyPropertyChanged("FilePath");
+                    this.fileName = value;
+                    this.NotifyPropertyChanged("FileName");
                 }
             }
         }
 
         public RecordOptionsVM() 
         {
+        }
+
+        public bool ParameterVerfication()
+        {
+            if (string.IsNullOrEmpty(FileName))
+            {
+                MTMessageBox.Info("请输入文件名");
+                return false;
+            }
+
+            return true;
         }
     }
 }

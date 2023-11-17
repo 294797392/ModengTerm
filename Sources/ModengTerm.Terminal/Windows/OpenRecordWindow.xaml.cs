@@ -1,4 +1,9 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
+using ModengTerm.ServiceAgents;
+using ModengTerm.ServiceAgents.DataModels;
+using ModengTerm.Terminal.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +24,77 @@ namespace ModengTerm.Terminal.Windows
     /// </summary>
     public partial class OpenRecordWindow : Window
     {
+        private ShellSessionVM shellSessionVM;
+
+        /// <summary>
+        /// 访问服务的代理
+        /// </summary>
+        public ServiceAgent ServiceAgent { get; set; }
+
+        /// <summary>
+        /// 要显示的录像列表所属的Session
+        /// </summary>
+        public XTermSession Session { get; set; }
+
+        /// <summary>
+        /// 是否显示所有回放列表
+        /// 如果是，则显示所有Session的回放列表
+        /// 如果否，则只显示传进来的Session的回放列表
+        /// </summary>
+        public bool DisplayAllPlaybackList { get; set; }
+
         public OpenRecordWindow()
         {
             InitializeComponent();
+        }
+
+        public void InitializeWindow()
+        {
+            List<PlaybackFile> playbackList = this.ServiceAgent.GetPlaybackFiles(this.Session.ID);
+
+            ComboBoxPlaybackList.ItemsSource = playbackList;
+        }
+
+        private void ButtonPlay_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.shellSessionVM != null)
+            {
+                // 如果打开了先关闭
+                this.shellSessionVM.Close();
+                this.shellSessionVM = null;
+            }
+
+            PlaybackFile playbackFile = ComboBoxPlaybackList.SelectedItem as PlaybackFile;
+            if (playbackFile == null)
+            {
+                MTMessageBox.Info("请选择要回放的文件");
+                return;
+            }
+
+            string playbackFilePath = VTUtils.GetPlaybackFilePath(this.Session.ID, playbackFile);
+            if (!System.IO.File.Exists(playbackFilePath))
+            {
+                MTMessageBox.Info("回放文件不存在");
+                return;
+            }
+
+            ShellSessionVM shellSessionVM = new ShellSessionVM(playbackFile.Session);
+            shellSessionVM.IsPlayback = true;
+            shellSessionVM.PlaybackFilePath = playbackFilePath;
+            shellSessionVM.Content = TerminalContentUserControl;
+            shellSessionVM.ServiceAgent = this.ServiceAgent;
+            shellSessionVM.Open();
+
+            this.shellSessionVM = shellSessionVM;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (this.shellSessionVM != null)
+            {
+                this.shellSessionVM.Close();
+                this.shellSessionVM = null;
+            }
         }
     }
 }

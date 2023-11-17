@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.DataModels
+namespace ModengTerm.ServiceAgents.DataModels
 {
     /// <summary>
     /// 存储回放文件里的一帧信息

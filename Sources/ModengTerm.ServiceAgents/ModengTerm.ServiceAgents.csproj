@@ -30,8 +30,4 @@
     </Reference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DataModels\" />
-  </ItemGroup>
-
 </Project>

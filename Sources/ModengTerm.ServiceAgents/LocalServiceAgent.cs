@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.ServiceAgents.DataModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,49 @@ namespace ModengTerm.ServiceAgents
     public class LocalServiceAgent : ServiceAgent
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("LocalServiceAgent");
+
+        public override int DeletePlaybackFile(string fileId)
+        {
+            try
+            {
+                JSONDatabase.Delete<PlaybackFile>(v => v.ID == fileId);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("DeletePlaybackFile异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        public override List<PlaybackFile> GetPlaybackFiles(string sessionId)
+        {
+            try
+            {
+                return JSONDatabase.SelectAll<PlaybackFile>();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetPlaybackFiles异常", ex);
+                return new List<PlaybackFile>();
+            }
+        }
+
+        public override int AddPlaybackFile(PlaybackFile file)
+        {
+            try
+            {
+                JSONDatabase.Insert<PlaybackFile>(file);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AddPlaybackFile异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
 
         #region Session管理
 
@@ -124,12 +168,6 @@ namespace ModengTerm.ServiceAgents
         //}
 
         #region 实例方法
-
-        private string GetFilePath<T>(string sessionId)
-        {
-            string appDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            return Path.Combine(appDataDirectory, string.Format("{0}_{1}", sessionId, typeof(T).ToString()));
-        }
 
         #endregion
     }

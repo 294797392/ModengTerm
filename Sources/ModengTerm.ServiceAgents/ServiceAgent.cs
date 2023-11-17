@@ -2,6 +2,7 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.ServiceAgents.Crypto;
+using ModengTerm.ServiceAgents.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,6 +65,14 @@ namespace ModengTerm.ServiceAgents
         /// <param name="session"></param>
         /// <returns></returns>
         public abstract int UpdateSession(XTermSession session);
+
+        #endregion
+
+        #region 回放文件管理
+
+        public abstract List<PlaybackFile> GetPlaybackFiles(string sessionId);
+        public abstract int AddPlaybackFile(PlaybackFile file);
+        public abstract int DeletePlaybackFile(string fileId);
 
         #endregion
 

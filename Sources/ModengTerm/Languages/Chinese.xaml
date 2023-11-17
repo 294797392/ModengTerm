@@ -29,4 +29,7 @@
     <!-- 录制窗口 4501 - 5000 -->
     <sys:String x:Key="UIText4501">录制</sys:String>
 
+    <!-- 回放窗口 5001 - 5500 -->
+    <sys:String x:Key="UIText5001">回放</sys:String>
+
 </ResourceDictionary>

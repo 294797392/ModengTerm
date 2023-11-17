@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,18 @@ namespace ModengTerm.Terminal.Windows
         public RecordOptionsWindow()
         {
             InitializeComponent();
+        }
+
+        private void ButtonOK_Click(object sender, RoutedEventArgs e)
+        {
+            RecordOptionsVM recordOptionsVM = base.DataContext as RecordOptionsVM;
+
+            if (!recordOptionsVM.ParameterVerfication())
+            {
+                return;
+            }
+
+            base.DialogResult = true;
         }
     }
 }

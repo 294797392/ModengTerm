@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Terminal.Windows"
+        xmlns:termusercontrols="clr-namespace:ModengTerm.Terminal.UserControls"
         mc:Ignorable="d"
-        Title="OpenRecordWindow" Height="450" Width="700">
+        Title="{DynamicResource ResourceKey=UIText5001}" 
+        Height="450" Width="700"
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Closing="Window_Closing">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -24,35 +28,51 @@
 
             <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
                 <Setter Property="Margin" Value="3"/>
+                <Setter Property="Height" Value="30"/>
             </Style>
-            
+
+            <Style x:Key="StyleComboBoxPlaybackList" TargetType="{x:Type ComboBox}">
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
         </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="70"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="80"/>
-            </Grid.ColumnDefinitions>
+        <GroupBox Grid.Row="0" Header="回放列表">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="70"/>
+                </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0" Text="录像文件：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                <TextBlock Grid.Column="0" Text="回放列表：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
 
-            <TextBox Grid.Column="1" x:Name="TextBoxPlaybackFile" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+                <ComboBox Grid.Column="1" x:Name="ComboBoxPlaybackList" SelectedIndex="0" Style="{StaticResource ResourceKey=StyleComboBoxPlaybackList}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
-            <Button Grid.Column="2" Content="浏览" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Grid.Column="2" Content="播放" Click="ButtonPlay_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
+            </Grid>
+        </GroupBox>
+
+        <Grid Grid.Row="1">
+            <GroupBox Header="播放器">
+                <termusercontrols:TerminalContentUserControl x:Name="TerminalContentUserControl"/>
+            </GroupBox>
         </Grid>
 
-        <Grid Grid.Row="2">
-            
-        </Grid>
-        
     </Grid>
 </Window>
