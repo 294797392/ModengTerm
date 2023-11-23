@@ -90,7 +90,7 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 存放该文档的容器
         /// </summary>
-        private IDrawingWindow ownerWindow;
+        private IDrawingTerminal ownerWindow;
 
         #endregion
 
@@ -664,13 +664,9 @@ namespace ModengTerm.Terminal.Document
         {
             #region 初始化终端大小
 
-            // 先获取文档显示区域的像素大小
-            VTSize windowSize = this.options.WindowSize;
-
             // 真正的内容显示区域大小
             // 该区域不包含边距，滚动条以及书签区域
-            VTSize contentSize = windowSize.Offset(-this.options.ContentMargin * 2);
-            //VTSize contentSize = this.options.ContentSize;
+            VTSize contentSize = this.options.ContentSize;
 
             // 然后根据显示区域的像素大小和每个字符的宽度和高度动态计算终端的行和列
             this.sizeMode = this.options.SizeMode;

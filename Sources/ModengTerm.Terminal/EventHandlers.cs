@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal
 {
-    public delegate void MouseDownHandler(IDrawingWindow vt, VTPoint location, int clickCount);
-    public delegate void MouseMoveHandler(IDrawingWindow vt, VTPoint location);
-    public delegate void MouseUpHandler(IDrawingWindow vt, VTPoint location);
-    public delegate void MouseWheelHandler(IDrawingWindow vt, bool upper);
-    public delegate void SizeChangedHandler(IDrawingWindow vt, VTRect vtRect);
+    public delegate void MouseDownHandler(IDrawingTerminal vt, VTPoint location, int clickCount);
+    public delegate void MouseMoveHandler(IDrawingTerminal vt, VTPoint location);
+    public delegate void MouseUpHandler(IDrawingTerminal vt, VTPoint location);
+    public delegate void MouseWheelHandler(IDrawingTerminal vt, bool upper);
+    public delegate void SizeChangedHandler(IDrawingTerminal vt, VTRect vtRect);
 }

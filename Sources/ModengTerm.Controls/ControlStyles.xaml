@@ -19,7 +19,7 @@
                     <Grid>
                         <Border x:Name="BorderBackground" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                             <Border.Background>
-                                <DrawingBrush>
+                                <DrawingBrush Stretch="Uniform">
                                     <DrawingBrush.Drawing>
                                         <GeometryDrawing Brush="Black">
                                             <GeometryDrawing.Geometry>

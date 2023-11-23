@@ -12,7 +12,7 @@ namespace ModengTerm.Terminal.Rendering
     /// 终端显示屏
     /// 显示屏里包含多个Surface，Surface用来真正渲染终端输出
     /// </summary>
-    public interface IDrawingWindow
+    public interface IDrawingTerminal
     {
         /// <summary>
         /// 创建一个画板用来渲染文档

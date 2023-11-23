@@ -20,7 +20,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 承载该终端的窗口
         /// </summary>
-        public IDrawingWindow WindowHost { get; set; }
+        public IDrawingTerminal WindowHost { get; set; }
 
         /// <summary>
         /// 该终端所对应的Session
@@ -145,7 +145,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 提供终端屏幕的功能
         /// </summary>
-        private IDrawingWindow windowHost;
+        private IDrawingTerminal windowHost;
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -477,11 +477,16 @@ namespace ModengTerm.Terminal.ViewModels
             typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
 
+            VTSize terminalSize = this.windowHost.GetSize();
+            double contentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
+            VTSize contentSize = new VTSize(terminalSize.Width - 35, terminalSize.Height).Offset(-contentMargin * 2);
+
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
                 DefaultViewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL),
                 DefaultViewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW),
-                WindowSize = this.windowHost.GetSize(),
+                WindowSize = terminalSize,
+                ContentSize = contentSize,
                 DECPrivateAutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
@@ -491,20 +496,11 @@ namespace ModengTerm.Terminal.ViewModels
                 Typeface = typeface,
                 SizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE),
                 Session = sessionInfo,
-                ContentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN),
-                BookmarkColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_BOOKMARK_COLOR)
+                ContentMargin = contentMargin,
+                BookmarkColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_BOOKMARK_COLOR),
+                ScrollbarVisible = true,
+                BookmarkVisible = true,
             };
-
-            if (isAlternate)
-            {
-                documentOptions.ScrollbarVisible = false;
-                documentOptions.BookmarkVisible = false;
-            }
-            else 
-            {
-                documentOptions.ScrollbarVisible = true;
-                documentOptions.BookmarkVisible = true;
-            }
 
             return documentOptions;
         }
@@ -1281,7 +1277,6 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 当窗口大小改变的时候触发
         /// </summary>
-        /// <param name="vt"></param>
         /// <param name="contentSize">新的内存区域大小</param>
         private void OnSizeChanged(VTSize contentSize)
         {

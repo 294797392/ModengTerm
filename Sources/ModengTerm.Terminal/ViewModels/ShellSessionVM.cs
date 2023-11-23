@@ -336,7 +336,7 @@ namespace ModengTerm.Terminal.ViewModels
             VTOptions options = new VTOptions()
             {
                 Session = this.Session,
-                WindowHost = this.Content as IDrawingWindow,
+                WindowHost = this.Content as IDrawingTerminal,
                 SessionTransport = transport
             };
             this.videoTerminal = new VideoTerminal();

@@ -38,7 +38,7 @@ namespace ModengTerm.Terminal.UserControls
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalContentUserControl : SessionContent, IDrawingWindow
+    public partial class TerminalContentUserControl : SessionContent, IDrawingTerminal
     {
         #region 类变量
 
