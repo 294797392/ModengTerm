@@ -21,6 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />

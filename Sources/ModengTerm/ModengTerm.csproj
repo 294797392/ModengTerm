@@ -40,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
   </ItemGroup>
 
@@ -54,9 +55,6 @@
   <ItemGroup>
     <Reference Include="DotNEToolkit">
       <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="log4net">
-      <HintPath>..\..\Dependence\log4net.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions">
       <HintPath>..\..\Dependence\Microsoft.Expression.Interactions.dll</HintPath>
@@ -82,5 +80,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy $(SolutionDir)..\Dependence\log4net.xml $(TargetDir) /y" />
+  </Target>
 
 </Project>
