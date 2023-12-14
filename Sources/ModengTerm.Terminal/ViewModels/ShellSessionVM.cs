@@ -135,16 +135,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private VTBookmark bookmarkMgr;
 
-        private bool isPlayback;
-
-        /// <summary>
-        /// 用来回放的线程
-        /// </summary>
-        private Task playbackTask;
-
-        private RecordStateEnum recordState;
-        private PlaybackFile playbackFile;
-        private AutoResetEvent playbackEvent;
+        private RecordStatusEnum recordState;
 
         /// <summary>
         /// 是否正在运行
@@ -155,6 +146,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// 提供剪贴板功能
         /// </summary>
         private VTClipboard clipboard;
+
+        private PlaybackStatusEnum playbackStatus;
+        private PlaybackStream playbackStream;
 
         #endregion
 
@@ -214,27 +208,6 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 是否是回放
-        /// </summary>
-        public bool IsPlayback
-        {
-            get { return this.isPlayback; }
-            set
-            {
-                if (this.isPlayback != value)
-                {
-                    this.isPlayback = value;
-                    this.NotifyPropertyChanged("IsPlayback");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 回放文件路径
-        /// </summary>
-        public string PlaybackFilePath { get; set; }
-
-        /// <summary>
         /// 该终端的菜单状态
         /// </summary>
         public BindableCollection<ShellFunctionMenu> FunctionMenus { get; private set; }
@@ -264,10 +237,10 @@ namespace ModengTerm.Terminal.ViewModels
 
         protected override int OnOpen()
         {
-            this.recordState = RecordStateEnum.Stop;
+            this.recordState = RecordStatusEnum.Stop;
             this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
             this.bookmarkMgr = new VTBookmark(this.Session);
-            this.clipboard = new VTClipboard() 
+            this.clipboard = new VTClipboard()
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
@@ -299,17 +272,17 @@ namespace ModengTerm.Terminal.ViewModels
                         new ShellFunctionMenu("查看收藏夹", ShellFunctionEnum.FaviritesList, this.FaviritesList),
                     }
                 },
-                new ShellFunctionMenu("书签")
-                {
-                    Children = new BindableCollection<ShellFunctionMenu>()
-                    {
-                        new ShellFunctionMenu("新建书签", ShellFunctionEnum.AddBookmark, this.AddBookmark),
-                        new ShellFunctionMenu("删除书签", ShellFunctionEnum.RemoveBookmark, this.RemoveBookmark),
-                        new ShellFunctionMenu("查看书签列表", ShellFunctionEnum.BookmarkList, this.BookmarkList),
-                        new ShellFunctionMenu("显示书签栏", ShellFunctionEnum.DisplayBookmark, this.DisplayBookmark),
-                        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
-                    }
-                },
+                //new ShellFunctionMenu("书签")
+                //{
+                //    Children = new BindableCollection<ShellFunctionMenu>()
+                //    {
+                //        new ShellFunctionMenu("新建书签", ShellFunctionEnum.AddBookmark, this.AddBookmark),
+                //        new ShellFunctionMenu("删除书签", ShellFunctionEnum.RemoveBookmark, this.RemoveBookmark),
+                //        new ShellFunctionMenu("查看书签列表", ShellFunctionEnum.BookmarkList, this.BookmarkList),
+                //        new ShellFunctionMenu("显示书签栏", ShellFunctionEnum.DisplayBookmark, this.DisplayBookmark),
+                //        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
+                //    }
+                //},
                 new ShellFunctionMenu("录屏")
                 {
                     Children = new BindableCollection<ShellFunctionMenu>()
@@ -347,29 +320,11 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 连接终端通道
 
-            if (this.isPlayback)
-            {
-                // 如果是回放那就启动回放线程
-
-                this.playbackFile = new PlaybackFile();
-                int code = this.playbackFile.OpenRead(this.PlaybackFilePath);
-                if (code != ResponseCode.SUCCESS)
-                {
-                    return code;
-                }
-
-                this.NotifyStatusChanged(SessionStatusEnum.Connected);
-                this.playbackEvent = new AutoResetEvent(false);
-                this.playbackTask = Task.Factory.StartNew(this.PlaybackThreadProc);
-            }
-            else
-            {
-                // 如果不是回放那就连接SSH服务器
-                transport.StatusChanged += this.SessionTransport_StatusChanged;
-                transport.DataReceived += this.SessionTransport_DataReceived;
-                transport.Initialize(this.Session);
-                transport.OpenAsync();
-            }
+            // 连接SSH服务器
+            transport.StatusChanged += this.SessionTransport_StatusChanged;
+            transport.DataReceived += this.SessionTransport_DataReceived;
+            transport.Initialize(this.Session);
+            transport.OpenAsync();
 
             this.sessionTransport = transport;
 
@@ -387,27 +342,16 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            if (this.isPlayback)
-            {
-                this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
-                this.playbackEvent.Set();
-                Task.WaitAll(this.playbackTask);
-                this.playbackFile.Close();
-                this.playbackEvent.Close();
-            }
-            else
-            {
-                // 停止对终端的日志记录
-                this.StopLogger();
+            // 停止对终端的日志记录
+            this.StopLogger();
 
-                // 停止录制
-                this.StopRecord();
+            // 停止录制
+            this.StopRecord();
 
-                this.sessionTransport.StatusChanged -= this.SessionTransport_StatusChanged;
-                this.sessionTransport.DataReceived -= this.SessionTransport_DataReceived;
-                this.sessionTransport.Close();
-                this.sessionTransport.Release();
-            }
+            this.sessionTransport.StatusChanged -= this.SessionTransport_StatusChanged;
+            this.sessionTransport.DataReceived -= this.SessionTransport_DataReceived;
+            this.sessionTransport.Close();
+            this.sessionTransport.Release();
 
             this.videoTerminal.ViewportChanged -= this.VideoTerminal_ViewportChanged;
             this.videoTerminal.Release();
@@ -558,50 +502,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 事件处理器
 
-        /// <summary>
-        /// 回放
-        /// </summary>
-        private void PlaybackThreadProc()
-        {
-            long prevTimestamp = 0;
-
-            while (this.Status == SessionStatusEnum.Connected)
-            {
-                if (this.playbackFile.EndOfFile)
-                {
-                    logger.InfoFormat("回放文件播放结束");
-                    return;
-                }
-
-                try
-                {
-                    PlaybackFrame nextFrame = this.playbackFile.GetNextFrame();
-
-                    if (nextFrame == null)
-                    {
-                        // 此时说明读取文件有异常
-                        logger.ErrorFormat("读取回放文件下一帧失败, 结束回放");
-                        return;
-                    }
-
-                    // 播放一帧
-                    this.videoTerminal.ProcessData(nextFrame.Data, nextFrame.Data.Length);
-
-                    if (prevTimestamp > 0)
-                    {
-                        long interval = nextFrame.Timestamp - prevTimestamp;
-                        this.playbackEvent.WaitOne((int)interval / 1000);
-                    }
-
-                    prevTimestamp = nextFrame.Timestamp;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("回放异常", ex);
-                }
-            }
-        }
-
         private void VideoTerminal_ViewportChanged(IVideoTerminal vt, int newRow, int newColumn)
         {
             this.ViewportRow = newRow;
@@ -614,31 +514,29 @@ namespace ModengTerm.Terminal.ViewModels
 
             switch (this.recordState)
             {
-                case RecordStateEnum.Pause:
+                case RecordStatusEnum.Pause:
                     {
                         break;
                     }
 
-                case RecordStateEnum.Stop:
+                case RecordStatusEnum.Stop:
                     {
                         break;
                     }
 
-                case RecordStateEnum.Recording:
+                case RecordStatusEnum.Recording:
                     {
+                        // 拷贝回放数据
                         byte[] frameData = new byte[size];
-                        if (size != bytes.Length)
-                        {
-                            Buffer.BlockCopy(bytes, 0, frameData, 0, frameData.Length);
-                        }
+                        Buffer.BlockCopy(bytes, 0, frameData, 0, frameData.Length);
 
+                        // 写入回放帧
                         PlaybackFrame frame = new PlaybackFrame()
                         {
                             Timestamp = DateTime.Now.ToFileTime(),
                             Data = frameData
                         };
-
-                        this.playbackFile.WriteFrame(frame);
+                        this.playbackStream.WriteFrame(frame);
 
                         break;
                     }
@@ -859,7 +757,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void StartRecord()
         {
-            if (this.recordState == RecordStateEnum.Recording)
+            if (this.recordState == RecordStatusEnum.Recording)
             {
                 return;
             }
@@ -871,12 +769,7 @@ namespace ModengTerm.Terminal.ViewModels
             recordOptionsWindow.DataContext = recordOptionsVM;
             if ((bool)recordOptionsWindow.ShowDialog())
             {
-                // 获取该会话的回放文件存储目录
-                string saveDirectory = VTUtils.GetPlaybackFileDirectory(this.Session.ID);
-
-                string playbackFilePath = Path.Combine(saveDirectory, recordOptionsVM.FileName);
-
-                this.playbackFile = new PlaybackFile()
+                PlaybackFile playbackFile = new PlaybackFile()
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = recordOptionsVM.FileName,
@@ -884,7 +777,8 @@ namespace ModengTerm.Terminal.ViewModels
                 };
 
                 // 先打开录像文件
-                int code = this.playbackFile.OpenWrite(playbackFilePath);
+                this.playbackStream = new PlaybackStream();
+                int code = this.playbackStream.OpenWrite(playbackFile);
                 if (code != ResponseCode.SUCCESS)
                 {
                     MTMessageBox.Error("打开录像文件失败, {0}", ResponseCode.GetMessage(code));
@@ -892,15 +786,15 @@ namespace ModengTerm.Terminal.ViewModels
                 }
 
                 // 然后保存录像记录
-                code = this.ServiceAgent.AddPlaybackFile(this.playbackFile);
+                code = this.ServiceAgent.AddPlaybackFile(playbackFile);
                 if (code != ResponseCode.SUCCESS)
                 {
                     MTMessageBox.Error("录制失败, 保存录制记录失败, {0}", ResponseCode.GetMessage(code));
-                    this.playbackFile.Close();
+                    this.playbackStream.Close();
                     return;
                 }
 
-                this.recordState = RecordStateEnum.Recording;
+                this.recordState = RecordStatusEnum.Recording;
             }
         }
 
@@ -909,16 +803,16 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void StopRecord()
         {
-            if (this.recordState == RecordStateEnum.Stop)
+            if (this.recordState == RecordStatusEnum.Stop)
             {
                 return;
             }
 
             // TODO：此时文件可能正在被写入，PlaybackFile里做了异常处理，所以直接这么写
             // 需要优化
-            this.playbackFile.Close();
+            this.playbackStream.Close();
 
-            this.recordState = RecordStateEnum.Stop;
+            this.recordState = RecordStatusEnum.Stop;
         }
 
         /// <summary>
@@ -926,12 +820,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void PauseRecord()
         {
-            if (this.recordState == RecordStateEnum.Pause)
+            if (this.recordState == RecordStatusEnum.Pause)
             {
                 return;
             }
 
-            this.recordState = RecordStateEnum.Pause;
+            this.recordState = RecordStatusEnum.Pause;
         }
 
         /// <summary>
@@ -940,26 +834,26 @@ namespace ModengTerm.Terminal.ViewModels
         /// <exception cref="NotImplementedException"></exception>
         private void ResumeRecord()
         {
-            if (this.recordState == RecordStateEnum.Recording)
+            if (this.recordState == RecordStatusEnum.Recording)
             {
                 return;
             }
 
             switch (this.recordState)
             {
-                case RecordStateEnum.Stop:
+                case RecordStatusEnum.Stop:
                     {
                         break;
                     }
 
-                case RecordStateEnum.Recording:
+                case RecordStatusEnum.Recording:
                     {
                         break;
                     }
 
-                case RecordStateEnum.Pause:
+                case RecordStatusEnum.Pause:
                     {
-                        this.recordState = RecordStateEnum.Recording;
+                        this.recordState = RecordStatusEnum.Recording;
                         break;
                     }
 
@@ -971,7 +865,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 打开录像
         /// </summary>
-        private void OpenRecord() 
+        private void OpenRecord()
         {
             OpenRecordWindow openRecordWindow = new OpenRecordWindow();
             openRecordWindow.ServiceAgent = this.ServiceAgent;

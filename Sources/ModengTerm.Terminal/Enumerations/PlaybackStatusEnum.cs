@@ -7,23 +7,18 @@ using System.Threading.Tasks;
 namespace ModengTerm.Terminal.Enumerations
 {
     /// <summary>
-    /// 定义录制状态
+    /// 定义回放状态
     /// </summary>
-    public enum RecordStateEnum
+    public enum PlaybackStatusEnum
     {
         /// <summary>
-        /// 已经停止录制
+        /// 空闲，还没播放
         /// </summary>
-        Stop,
+        Idle,
 
         /// <summary>
-        /// 正在录制
+        /// 正在播放中
         /// </summary>
-        Recording,
-
-        /// <summary>
-        /// 已经暂停录制
-        /// </summary>
-        Pause,
+        Playing,
     }
 }

@@ -95,12 +95,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 当前终端行数
         /// </summary>
-        private int viewportRow;
+        private int viewportRow { get { return this.activeDocument.ViewportRow; } }
 
         /// <summary>
         /// 当前终端列数
         /// </summary>
-        private int viewportColumn;
+        private int viewportColumn { get { return this.activeDocument.ViewportColumn; } }
 
         #region Mouse
 

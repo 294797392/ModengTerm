@@ -45,6 +45,9 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public bool IsEmpty { get { return this.firstRowCharacterIndex < 0 || this.lastRowCharacterIndex < 0; } }
 
+        /// <summary>
+        /// 选中区域的第一行的物理行号
+        /// </summary>
         public int FirstRow
         {
             get { return this.firstRow; }
@@ -58,6 +61,9 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
+        /// <summary>
+        /// 选中区域的最后一行的物理行号
+        /// </summary>
         public int LastRow
         {
             get { return this.lastRow; }

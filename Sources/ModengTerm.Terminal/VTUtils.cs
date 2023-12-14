@@ -224,7 +224,7 @@ namespace ModengTerm.Terminal
             {
                 string htmlBackground = VTColor.CreateFromRgbKey(parameter.Typeface.BackgroundColor).Html;
                 string htmlForeground = VTColor.CreateFromRgbKey(parameter.Typeface.ForegroundColor).Html;
-                return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground, 
+                return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground,
                     parameter.Typeface.FontSize, parameter.Typeface.FontFamily, htmlForeground);
             }
 
@@ -686,9 +686,9 @@ namespace ModengTerm.Terminal
         /// <param name="sessionId">回放文件所属的会话Id</param>
         /// <param name="playbackFile">回放文件</param>
         /// <returns></returns>
-        public static string GetPlaybackFilePath(string sessionId, PlaybackFile playbackFile)
+        public static string GetPlaybackFilePath(PlaybackFile playbackFile)
         {
-            string directory = GetPlaybackFileDirectory(sessionId);
+            string directory = GetPlaybackFileDirectory(playbackFile.Session.ID);
 
             return Path.Combine(directory, playbackFile.Name);
         }
