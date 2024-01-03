@@ -35,6 +35,8 @@ namespace ModengTerm.Terminal.ViewModels
 
     /// <summary>
     /// 处理虚拟终端的所有逻辑
+    /// 主缓冲区：文档物理行数是不固定的，可以大于终端行数
+    /// 备用缓冲区：文档的物理行数是固定的，等于终端的行数
     /// </summary>
     public class VideoTerminal : IVideoTerminal
     {
@@ -321,7 +323,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 初始化完VTDocument之后，真正要使用的Column和Row已经被计算出来了
             // 此时重新设置sessionInfo里的Row和Column，因为SessionTransport要使用
-            // 行和列以主缓冲区为准
+            // 主缓冲区和备用缓冲区的行和列是一样的，这里使用主缓冲区的行和列
             sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, this.mainDocument.ViewportRow);
             sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, this.mainDocument.ViewportColumn);
 
@@ -479,7 +481,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             VTSize terminalSize = this.windowHost.GetSize();
             double contentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
-            VTSize contentSize = new VTSize(terminalSize.Width - 35, terminalSize.Height).Offset(-contentMargin * 2);
+            VTSize contentSize = new VTSize(terminalSize.Width - 15, terminalSize.Height).Offset(-contentMargin * 2);
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
@@ -1277,13 +1279,15 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 当窗口大小改变的时候触发
         /// </summary>
-        /// <param name="contentSize">新的内存区域大小</param>
+        /// <param name="contentSize">新的内容区域大小</param>
         private void OnSizeChanged(VTSize contentSize)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
                 return;
             }
+
+            logger.InfoFormat("Resize, {0}", contentSize);
 
             // 重新设置文档大小
             this.mainDocument.Resize(contentSize);

@@ -808,25 +808,25 @@ namespace ModengTerm.Terminal.Document
                     this.LastLine = node1;
                 }
 
+                // 更新光标所在行
                 this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
 
                 // 下移之后，删除整行数据，终端会重新打印该行数据的
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
-                //this.ActiveLine.EraseAll();
-                this.ActiveLine.Recycle();
+                this.ActiveLine.EraseAll();
 
-                // 物理行号和scrollMargin无关
                 if (!this.IsAlternate)
                 {
                     // this.FirstLine.PhysicsRow > 0表示滚动了一行
-
                     if (this.ScrollMarginTop != 0 || this.ScrollMarginBottom != 0)
                     {
+                        // 物理行号和scrollMargin无关
                         // 有margin需要全部重新设置
                         this.ResetPhysicsRow(oldFirstLine.PhysicsRow + 1);
                     }
                     else
                     {
+                        // 没有scrollMargin
                         this.LastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
                     }
                 }

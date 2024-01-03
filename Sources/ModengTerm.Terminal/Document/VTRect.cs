@@ -28,6 +28,11 @@ namespace ModengTerm.Terminal.Document
         {
             return new VTSize(this.Width + offset, this.Height + offset);
         }
+
+        public override string ToString()
+        {
+            return string.Format("Width = {0}, Height = {1}", this.Width, this.Height);
+        }
     }
 
     public struct VTRect

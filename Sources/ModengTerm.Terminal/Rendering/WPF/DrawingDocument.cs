@@ -245,6 +245,11 @@ namespace ModengTerm.Rendering
                 return;
             }
 
+            if (!e.WidthChanged && !e.HeightChanged)
+            {
+                return;
+            }
+
             FrameworkElement frameworkElement = sender as FrameworkElement;
             this.eventHandler.OnSizeChanged(new VTSize(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
         }

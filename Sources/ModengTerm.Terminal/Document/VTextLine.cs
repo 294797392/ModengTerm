@@ -619,17 +619,6 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
-        /// <summary>
-        /// 复用该行对象
-        /// 该方法会重置该行的数据为默认值
-        /// </summary>
-        internal void Recycle()
-        {
-            this.EraseAll();
-
-            this.BookmarkState = VTBookmarkStates.None;
-        }
-
         #endregion
 
         #region VTDocumentElement

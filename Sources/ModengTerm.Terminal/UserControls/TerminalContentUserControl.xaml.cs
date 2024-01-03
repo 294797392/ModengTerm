@@ -120,7 +120,7 @@ namespace ModengTerm.Terminal.UserControls
 
         #endregion
 
-        #region IDrawingWindow
+        #region IDrawingTerminal
 
         public IDrawingDocument CreateCanvas()
         {

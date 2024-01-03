@@ -264,14 +264,14 @@ namespace ModengTerm.Terminal.ViewModels
                 new ShellFunctionMenu("粘贴", ShellFunctionEnum.Paste, this.Paste),
                 new ShellFunctionMenu("全选", ShellFunctionEnum.SelectAll, this.SelectAll),
                 new ShellFunctionMenu("查看剪贴板历史", ShellFunctionEnum.ClipboardHostory, this.ClipboardHistory),
-                new ShellFunctionMenu("收藏夹")
-                {
-                    Children = new BindableCollection<ShellFunctionMenu>()
-                    {
-                        new ShellFunctionMenu("加入收藏夹", ShellFunctionEnum.AddFavorites, this.AddFavorites),
-                        new ShellFunctionMenu("查看收藏夹", ShellFunctionEnum.FaviritesList, this.FaviritesList),
-                    }
-                },
+                //new ShellFunctionMenu("收藏夹")
+                //{
+                //    Children = new BindableCollection<ShellFunctionMenu>()
+                //    {
+                //        new ShellFunctionMenu("加入收藏夹", ShellFunctionEnum.AddFavorites, this.AddFavorites),
+                //        new ShellFunctionMenu("查看收藏夹", ShellFunctionEnum.FaviritesList, this.FaviritesList),
+                //    }
+                //},
                 //new ShellFunctionMenu("书签")
                 //{
                 //    Children = new BindableCollection<ShellFunctionMenu>()

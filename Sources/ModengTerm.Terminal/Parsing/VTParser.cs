@@ -1075,7 +1075,14 @@ namespace XTerminal.Parser
             {
                 VTDebug.Context.Writevttest(vtAction, this.sequenceBytes);
 
-                this.ActionEvent(this, vtAction, param);
+                try
+                {
+                    this.ActionEvent(this, vtAction, param);
+                }
+                catch (Exception ex) 
+                {
+                    logger.Error(ex);
+                }
 
                 this.sequenceBytes.Clear();
             }
