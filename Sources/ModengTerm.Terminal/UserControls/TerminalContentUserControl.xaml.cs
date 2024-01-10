@@ -122,35 +122,33 @@ namespace ModengTerm.Terminal.UserControls
 
         #region IDrawingTerminal
 
-        public IDrawingDocument CreateCanvas()
+        public IDrawingCanvas CreateCanvas(int canvasIndex)
         {
-            DrawingDocument drawingDocument = new DrawingDocument();
-            return drawingDocument;
-        }
+            DrawingCanvas canvas = null;
 
-        public void InsertCanvas(int index, IDrawingDocument document)
-        {
-            this.Dispatcher.Invoke(() =>
+            this.Dispatcher.Invoke(() => 
             {
-                FrameworkElement element = document as FrameworkElement;
-                GridDocumentList.Children.Insert(0, element);
+                canvas = new DrawingCanvas();
+                GridCanvasList.Children.Insert(0, canvas);
 
                 // 添加到子节点里之后马上加载模板，不然后面新建DrawingObject的时候模板还没加载，找不到drawArea
-                element.ApplyTemplate();
+                canvas.ApplyTemplate();
             });
+
+            return canvas;
         }
 
-        public void RemoveDocument(IDrawingDocument document)
+        public void DeleteCanvas(IDrawingCanvas canvas)
         {
-            DrawingDocument drawingDocument = document as DrawingDocument;
-            GridDocumentList.Children.Remove(drawingDocument);
+            DrawingCanvas drawingDocument = canvas as DrawingCanvas;
+            GridCanvasList.Children.Remove(drawingDocument);
         }
 
-        public void VisibleCanvas(IDrawingDocument document, bool visible)
+        public void VisibleCanvas(IDrawingCanvas canvas, bool visible)
         {
             base.Dispatcher.Invoke(() =>
             {
-                (document as FrameworkElement).Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+                (canvas as FrameworkElement).Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
             });
         }
 
@@ -171,7 +169,7 @@ namespace ModengTerm.Terminal.UserControls
 
         public VTSize GetSize()
         {
-            return new VTSize(GridDocumentList.ActualWidth, GridDocumentList.ActualHeight);
+            return new VTSize(GridCanvasList.ActualWidth, GridCanvasList.ActualHeight);
         }
 
         #endregion

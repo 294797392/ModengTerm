@@ -28,7 +28,6 @@ namespace ModengTerm.Terminal.Document
         private int row;
         private bool blinkState;
         private bool blinkAllowed;
-        private VTDocument ownerDocument;
         private int characterIndex;
         private VTCursorStyles style;
         private string color;
@@ -67,11 +66,6 @@ namespace ModengTerm.Terminal.Document
             }
         }
 
-        /// <summary>
-        /// 是否显示光标
-        /// </summary>
-        public bool IsVisible { get; set; }
-
         public override VTDocumentElements Type => VTDocumentElements.Cursor;
 
         /// <summary>
@@ -86,7 +80,7 @@ namespace ModengTerm.Terminal.Document
                 if (this.column != value)
                 {
                     this.column = value;
-                    this.SetArrangeDirty(true);
+                    this.SetDirtyFlags(VTDirtyFlags.PositionDirty, true);
                 }
             }
         }
@@ -103,7 +97,7 @@ namespace ModengTerm.Terminal.Document
                 if (this.row != value)
                 {
                     this.row = value;
-                    this.SetArrangeDirty(true);
+                    this.SetDirtyFlags(VTDirtyFlags.PositionDirty, true);
                 }
             }
         }
@@ -209,6 +203,18 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public void RequestInvalidatePosition()
         {
+            if (this.GetDirtyFlags(VTDirtyFlags.VisibleDirty))
+            {
+                this.DrawingObject.SetOpacity(this.IsVisible ? 1 : 0);
+
+                this.ResetDirtyFlags();
+            }
+
+            if (!this.IsVisible)
+            {
+                return;
+            }
+
             VTextLine cursorLine = this.ownerDocument.ActiveLine;
             if (cursorLine == null)
             {

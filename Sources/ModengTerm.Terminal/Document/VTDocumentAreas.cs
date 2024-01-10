@@ -17,11 +17,6 @@ namespace ModengTerm.Terminal.Document
         AllDocument,
 
         /// <summary>
-        /// 相对于书签的坐标
-        /// </summary>
-        BookmarkArea,
-
-        /// <summary>
         /// 相对于文档内容区域的坐标
         /// </summary>
         ContentArea,

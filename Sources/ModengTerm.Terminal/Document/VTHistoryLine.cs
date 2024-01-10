@@ -27,11 +27,6 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public List<VTCharacter> Characters { get; private set; }
 
-        /// <summary>
-        /// 该行的书签状态
-        /// </summary>
-        public VTBookmarkStates BookmarkState { get; set; }
-
         public VTHistoryLine()
         {
             this.Characters = new List<VTCharacter>();

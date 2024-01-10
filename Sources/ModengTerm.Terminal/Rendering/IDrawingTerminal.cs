@@ -10,25 +10,28 @@ namespace ModengTerm.Terminal.Rendering
 {
     /// <summary>
     /// 终端显示屏
-    /// 显示屏里包含多个Surface，Surface用来真正渲染终端输出
+    /// 显示屏里包含多个Canvas，Canvas用来真正渲染终端输出
     /// </summary>
     public interface IDrawingTerminal
     {
         /// <summary>
         /// 创建一个画板用来渲染文档
         /// </summary>
-        /// <returns></returns>
-        IDrawingDocument CreateCanvas();
+        /// <param name="canvasIndex">要新建的Canvas在界面上的索引</param>
+        /// <returns>画板实例</returns>
+        IDrawingCanvas CreateCanvas(int canvasIndex);
 
-        void InsertCanvas(int index, IDrawingDocument canvas);
-
-        void RemoveDocument(IDrawingDocument document);
+        /// <summary>
+        /// 删除一个画板
+        /// </summary>
+        /// <param name="canvas"></param>
+        void DeleteCanvas(IDrawingCanvas canvas);
 
         /// <summary>
         /// 显示或者隐藏文档
         /// </summary>
         /// <param name="canvas"></param>
-        void VisibleCanvas(IDrawingDocument canvas, bool visible);
+        void VisibleCanvas(IDrawingCanvas canvas, bool visible);
 
         /// <summary>
         /// 获取字形信息

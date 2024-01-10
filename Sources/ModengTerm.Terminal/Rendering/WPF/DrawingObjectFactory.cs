@@ -25,7 +25,6 @@ namespace ModengTerm.Rendering
                 case VTDocumentElements.MatchesLine: return new DrawingMatchesLine();
                 case VTDocumentElements.Wallpaper: return new DrawingWallpaper();
                 case VTDocumentElements.Scrollbar: return new DrawingScrollbar();
-                case VTDocumentElements.Bookmark: return new DrawingBookmark();
 
                 default:
                     throw new NotImplementedException(string.Format("{0}", type));

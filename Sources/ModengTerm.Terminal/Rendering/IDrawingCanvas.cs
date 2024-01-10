@@ -9,12 +9,12 @@ namespace ModengTerm.Terminal.Rendering
 {
     public class VTEventHandler
     {
-        public delegate void MouseWheelDelegate(bool upper);
-        public delegate void MouseDownDelegate(VTPoint location, int clickCount);
-        public delegate void MouseMoveDelegate(VTPoint location);
-        public delegate void MouseUpDelegate(VTPoint location);
-        public delegate void SizeChangedDelegate(VTSize contentSize);
-        public delegate void ScrollChangedDelegate(int scrollValue);
+        public delegate void MouseWheelDelegate(IDrawingCanvas sender, bool upper);
+        public delegate void MouseDownDelegate(IDrawingCanvas sender, VTPoint location, int clickCount);
+        public delegate void MouseMoveDelegate(IDrawingCanvas sender, VTPoint location);
+        public delegate void MouseUpDelegate(IDrawingCanvas sender, VTPoint location);
+        public delegate void SizeChangedDelegate(IDrawingCanvas sender, VTSize contentSize);
+        public delegate void ScrollChangedDelegate(IDrawingCanvas sender, int scrollValue);
 
         public MouseWheelDelegate OnMouseWheel;
         public MouseDownDelegate OnMouseDown;
@@ -27,7 +27,7 @@ namespace ModengTerm.Terminal.Rendering
     /// <summary>
     /// 表示一个用来渲染终端输出的表面
     /// </summary>
-    public interface IDrawingDocument
+    public interface IDrawingCanvas
     {
         /// <summary>
         /// 该文档的名字，调试用
@@ -48,11 +48,6 @@ namespace ModengTerm.Terminal.Rendering
         /// 设置滚动条的可见性
         /// </summary>
         bool ScrollbarVisible { get; set; }
-
-        /// <summary>
-        /// 是否显示书签列
-        /// </summary>
-        bool BookmarkVisible { get; set; }
 
         /// <summary>
         /// 创建一个渲染对象

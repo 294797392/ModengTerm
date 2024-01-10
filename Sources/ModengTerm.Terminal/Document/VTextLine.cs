@@ -36,18 +36,6 @@ namespace ModengTerm.Terminal.Document
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTextLine");
 
-        /// <summary>
-        /// 元素是否需要重新渲染
-        /// 对于VTextLine来说，Render分两步，第一步是对文字进行排版，第二部是画，排版操作是很耗时的
-        /// Render的同时也会进行Measure操作
-        /// </summary>
-        private bool renderDirty;
-
-        /// <summary>
-        /// 元素是否需要重新测量
-        /// </summary>
-        private bool isMeasureDirty;
-
         #endregion
 
         #region 实例变量
@@ -64,12 +52,6 @@ namespace ModengTerm.Terminal.Document
         private int columns;
 
         private int physicsRow;
-
-        private VTBookmarkStates bookmarkState;
-
-        private IDrawingBookmark drawingBookmark;
-
-        private bool isBookmarkDirty;
 
         #endregion
 
@@ -91,7 +73,7 @@ namespace ModengTerm.Terminal.Document
 #if DEBUG
                     // TODO：正式出版本的时候要删除这里，不然会影响运行速度
                     // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
-                    this.SetRenderDirty(true);
+                    this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
 #endif
                 }
             }
@@ -150,22 +132,6 @@ namespace ModengTerm.Terminal.Document
         /// 文本样式
         /// </summary>
         public VTypeface Style { get; set; }
-
-        /// <summary>
-        /// 该行书签状态
-        /// </summary>
-        public VTBookmarkStates BookmarkState
-        {
-            get { return this.bookmarkState; }
-            set
-            {
-                if (this.bookmarkState != value)
-                {
-                    this.bookmarkState = value;
-                    this.SetBookmarkDirty(true);
-                }
-            }
-        }
 
         #endregion
 
@@ -304,15 +270,7 @@ namespace ModengTerm.Terminal.Document
                 character.Flags = VTCharacterFlags.None;
             }
 
-            this.SetRenderDirty(true);
-        }
-
-        private void SetBookmarkDirty(bool dirty)
-        {
-            if (this.isBookmarkDirty != dirty)
-            {
-                this.isBookmarkDirty = dirty;
-            }
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         #endregion
@@ -377,7 +335,7 @@ namespace ModengTerm.Terminal.Document
             this.characters.Insert(characterIndex, character);
             this.columns += character.ColumnSize;
 
-            this.SetRenderDirty(true);
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -523,9 +481,8 @@ namespace ModengTerm.Terminal.Document
             VTUtils.CopyCharacter(historyLine.Characters, this.characters);
             this.PhysicsRow = historyLine.PhysicsRow;
             this.columns = VTUtils.GetColumns(this.characters);
-            this.BookmarkState = historyLine.BookmarkState;
 
-            this.SetRenderDirty(true);
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -597,26 +554,7 @@ namespace ModengTerm.Terminal.Document
                 this.columns -= toDelete.ColumnSize;
             }
 
-            this.SetRenderDirty(true);
-        }
-
-        public void SetMeasureDirty(bool isDirty)
-        {
-            if (this.isMeasureDirty != isDirty)
-            {
-                this.isMeasureDirty = isDirty;
-            }
-        }
-
-        public void SetRenderDirty(bool isDirty)
-        {
-            if (this.renderDirty != isDirty)
-            {
-                this.renderDirty = isDirty;
-
-                // 需要render的时候也说明需要measure
-                this.isMeasureDirty = isDirty;
-            }
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         #endregion
@@ -625,88 +563,58 @@ namespace ModengTerm.Terminal.Document
 
         protected override void OnInitialize()
         {
-            this.drawingBookmark = this.ownerDocument.DrawingObject.CreateDrawingObject<IDrawingBookmark>(VTDocumentElements.Bookmark);
-            this.drawingBookmark.Color = this.ownerDocument.options.BookmarkColor;
-            this.drawingBookmark.Height = this.ownerDocument.options.Typeface.Height * 0.8;
-            this.drawingBookmark.Width = Math.Min(10, this.ownerDocument.options.Typeface.Height * 0.7);
-            this.drawingBookmark.OffsetX = 5;
-            this.drawingBookmark.OffsetY = this.ownerDocument.options.Typeface.Height * 0.1;
-            this.drawingBookmark.Initialize();
-            this.drawingBookmark.SetOpacity(0); // 先画出来，但是隐藏掉，后续添加或者删除书签只改变显隐即可
-            this.drawingBookmark.Draw();
         }
 
         protected override void OnRelease()
         {
-            this.drawingBookmark.Release();
             this.drawingDocument.DeleteDrawingObject(this.DrawingObject);
         }
 
         public override void RequestInvalidate()
         {
-            if (this.renderDirty)
+            if (this.GetDirtyFlags(VTDirtyFlags.VisibleDirty))
+            {
+                this.DrawingObject.SetOpacity(this.IsVisible ? 1 : 0);
+                this.SetDirtyFlags(VTDirtyFlags.VisibleDirty, false);
+            }
+
+            if (!this.IsVisible)
+            {
+                // 如果不显示的话直接隐藏，剩下的事情就不做了
+                return;
+            }
+
+            if (this.GetDirtyFlags(VTDirtyFlags.RenderDirty))
             {
                 VTFormattedText formattedText = VTUtils.CreateFormattedText(this.characters);
                 formattedText.Style = this.Style;
 
                 // 如果文本是空的那么无法测量出来高度
                 // 空白字符可以测量出来高度
-                if (formattedText.Text == null)
+                if (string.IsNullOrWhiteSpace(formattedText.Text))
                 {
                     formattedText.Text = " ";
                 }
 
                 // 把物理行号打印出来，调试用
-                //textData.Text = string.Format("{0} - {1}", textLine.PhysicsRow, textData.Text);
+                formattedText.Text = string.Format("{0} - {1}", this.PhysicsRow, formattedText.Text);
 
                 this.DrawingObject.FormattedText = formattedText;
 
                 this.DrawingObject.Draw();
 
-                this.renderDirty = false;
-            }
-
-            if (this.isMeasureDirty)
-            {
                 IDrawingTextLine objectText = this.DrawingObject as IDrawingTextLine;
 
                 VTextMetrics textMetrics = objectText.Measure();
                 this.Metrics = textMetrics;
-
-                this.isMeasureDirty = false;
             }
 
-            if (this.isBookmarkDirty)
-            {
-                switch (this.bookmarkState)
-                {
-                    case VTBookmarkStates.Enabled:
-                        {
-                            this.drawingBookmark.SetOpacity(1);
-                            break;
-                        }
-
-                    case VTBookmarkStates.None:
-                        {
-                            this.drawingBookmark.SetOpacity(0);
-                            break;
-                        }
-
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                this.isBookmarkDirty = false;
-            }
-
-            if (base.arrangeDirty)
+            if (this.GetDirtyFlags(VTDirtyFlags.PositionDirty))
             {
                 this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
-
-                this.drawingBookmark.Arrange(0, this.OffsetY);
-
-                base.arrangeDirty = false;
             }
+
+            this.ResetDirtyFlags();
         }
 
         /// <summary>

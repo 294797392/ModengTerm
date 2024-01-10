@@ -84,7 +84,7 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTWallpaper(IDrawingDocument drawingDocument)
+        public VTWallpaper(IDrawingCanvas drawingDocument)
             : base(drawingDocument)
         {
         }

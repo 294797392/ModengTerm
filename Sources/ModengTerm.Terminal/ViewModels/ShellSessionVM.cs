@@ -450,54 +450,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        /// <summary>
-        /// 设置某一行的标签状态
-        /// 如果该行所在的文档是备用缓冲区，那么什么都不做
-        /// </summary>
-        /// <param name="textLine">要设置的行</param>
-        /// <param name="targetState">要设置的标签状态</param>
-        public void SetBookmarkState(VTextLine textLine, VTBookmarkStates targetState)
-        {
-            VTDocument document = textLine.OwnerDocument;
-
-            // 备用缓冲区不可以新建书签
-            if (document.IsAlternate)
-            {
-                return;
-            }
-
-            if (textLine.BookmarkState == targetState)
-            {
-                return;
-            }
-
-            textLine.BookmarkState = targetState;
-
-            // 重绘
-            textLine.RequestInvalidate();
-
-            // 更新历史行里的标签状态
-            document.Scrollbar.UpdateHistory(textLine);
-
-            switch (targetState)
-            {
-                case VTBookmarkStates.Enabled:
-                    {
-                        this.bookmarkMgr.AddBookmark(textLine);
-                        break;
-                    }
-
-                case VTBookmarkStates.None:
-                    {
-                        this.bookmarkMgr.RemoveBookmark(textLine);
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         #endregion
 
         #region 事件处理器
@@ -701,55 +653,6 @@ namespace ModengTerm.Terminal.ViewModels
             //paragraphsWindow.Title = "收藏夹列表";
             //paragraphsWindow.Owner = Window.GetWindow(this.Content);
             //paragraphsWindow.Show();
-        }
-
-        private void AddBookmark()
-        {
-            if (this.videoTerminal.MouseDownLine == null)
-            {
-                return;
-            }
-
-            this.SetBookmarkState(this.videoTerminal.MouseDownLine, VTBookmarkStates.Enabled);
-        }
-
-        private void RemoveBookmark()
-        {
-            if (this.videoTerminal.MouseDownLine == null)
-            {
-                return;
-            }
-
-            this.SetBookmarkState(this.videoTerminal.MouseDownLine, VTBookmarkStates.None);
-        }
-
-        private void BookmarkList()
-        {
-            BookmarkParagraphSource bookmarkParagraphSource = new BookmarkParagraphSource(this.bookmarkMgr);
-
-            BookmarksVM bookmarksVM = new BookmarksVM(bookmarkParagraphSource, this);
-            bookmarksVM.SendToAllTerminalDlg = this.SendToAllCallback;
-
-            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(bookmarksVM);
-            paragraphsWindow.Title = "书签列表";
-            paragraphsWindow.Owner = Window.GetWindow(this.Content);
-            paragraphsWindow.Show();
-        }
-
-        /// <summary>
-        /// 显示书签栏
-        /// </summary>
-        private void DisplayBookmark()
-        {
-            this.videoTerminal.SetBookmarkVisible(true);
-        }
-
-        /// <summary>
-        /// 隐藏书签栏
-        /// </summary>
-        private void HidenBookmark()
-        {
-            this.videoTerminal.SetBookmarkVisible(false);
         }
 
         /// <summary>

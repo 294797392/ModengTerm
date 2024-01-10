@@ -14,14 +14,12 @@ using System.Windows.Media;
 namespace ModengTerm.Rendering
 {
     [TemplatePart(Name = "PART_ContentArea", Type = typeof(ContentArea))]
-    [TemplatePart(Name = "PART_BookmarkArea", Type = typeof(ContentArea))]
     [TemplatePart(Name = "PART_Scrollbar", Type = typeof(DrawingScrollbar))]
-    public class DrawingDocument : Control, IDrawingDocument
+    public class DrawingCanvas : Control, IDrawingCanvas
     {
         #region 实例变量
 
         private ContentArea contentArea;
-        private ContentArea bookmarkArea;
         private DrawingScrollbar scrollbar;
         private VTEventHandler eventHandler;
 
@@ -44,7 +42,7 @@ namespace ModengTerm.Rendering
 
         // Using a DependencyProperty as the backing store for DocumentPadding.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ContentMarginProperty =
-            DependencyProperty.Register("ContentMargin", typeof(double), typeof(DrawingDocument), new PropertyMetadata(0.0D));
+            DependencyProperty.Register("ContentMargin", typeof(double), typeof(DrawingCanvas), new PropertyMetadata(0.0D));
 
         public bool ScrollbarVisible
         {
@@ -54,61 +52,20 @@ namespace ModengTerm.Rendering
 
         // Using a DependencyProperty as the backing store for ScrollbarVisible.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ScrollbarVisibleProperty =
-            DependencyProperty.Register("ScrollbarVisible", typeof(bool), typeof(DrawingDocument), new PropertyMetadata(false));
-
-
-
-        public string BookmarkColor
-        {
-            get { return (string)GetValue(BookmarkColorProperty); }
-            set { SetValue(BookmarkColorProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for BookmarkColor.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty BookmarkColorProperty =
-            DependencyProperty.Register("BookmarkColor", typeof(string), typeof(DrawingDocument), new PropertyMetadata(string.Empty));
-
-
-
-        public string BookmarkBackground
-        {
-            get { return (string)GetValue(BookmarkBackgroundProperty); }
-            set { SetValue(BookmarkBackgroundProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for BookmarkBackground.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty BookmarkBackgroundProperty =
-            DependencyProperty.Register("BookmarkBackground", typeof(string), typeof(DrawingDocument), new PropertyMetadata(string.Empty));
-
-
-
-
-        public bool BookmarkVisible
-        {
-            get { return (bool)GetValue(BookmarkVisibleProperty); }
-            set { SetValue(BookmarkVisibleProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for BookmarkVisible.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty BookmarkVisibleProperty =
-            DependencyProperty.Register("BookmarkVisible", typeof(bool), typeof(DrawingDocument), new PropertyMetadata(false));
-
-
-
-
+            DependencyProperty.Register("ScrollbarVisible", typeof(bool), typeof(DrawingCanvas), new PropertyMetadata(false));
 
         #endregion
 
         #region 构造方法
 
-        public DrawingDocument()
+        public DrawingCanvas()
         {
-            this.Style = Application.Current.FindResource("StyleDrawingDocument") as Style;
+            this.Style = Application.Current.FindResource("StyleDrawingCanvas") as Style;
         }
 
         #endregion
 
-        #region IDrawingDocument
+        #region IDrawingCanvas
 
         public TDrawingObject CreateDrawingObject<TDrawingObject>(VTDocumentElements type) where TDrawingObject : IDrawingObject
         {
@@ -116,12 +73,6 @@ namespace ModengTerm.Rendering
 
             switch (type)
             {
-                case VTDocumentElements.Bookmark:
-                    {
-                        this.bookmarkArea.AddVisual(drawingObject as DrawingObject);
-                        break;
-                    }
-
                 default:
                     {
                         this.contentArea.AddVisual(drawingObject as DrawingObject);
@@ -177,12 +128,6 @@ namespace ModengTerm.Rendering
                         break;
                     }
 
-                case VTDocumentAreas.BookmarkArea:
-                    {
-                        relativeElement = this.bookmarkArea;
-                        break;
-                    }
-
                 default:
                     throw new NotImplementedException();
             }
@@ -205,7 +150,7 @@ namespace ModengTerm.Rendering
             FrameworkElement frameworkElement = sender as FrameworkElement;
             Point p = e.GetPosition(frameworkElement);
             frameworkElement.CaptureMouse();
-            this.eventHandler.OnMouseDown(new VTPoint(p.X, p.Y), e.ClickCount);
+            this.eventHandler.OnMouseDown(this, new VTPoint(p.X, p.Y), e.ClickCount);
         }
 
         private void ContentArea_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -217,7 +162,7 @@ namespace ModengTerm.Rendering
 
             FrameworkElement frameworkElement = sender as FrameworkElement;
             Point p = e.GetPosition(frameworkElement);
-            this.eventHandler.OnMouseUp(new VTPoint(p.X, p.Y));
+            this.eventHandler.OnMouseUp(this, new VTPoint(p.X, p.Y));
             frameworkElement.ReleaseMouseCapture();
         }
 
@@ -235,7 +180,7 @@ namespace ModengTerm.Rendering
             }
 
             Point p = e.GetPosition(frameworkElement);
-            this.eventHandler.OnMouseMove(new VTPoint(p.X, p.Y));
+            this.eventHandler.OnMouseMove(this, new VTPoint(p.X, p.Y));
         }
 
         private void ContentArea_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -251,7 +196,7 @@ namespace ModengTerm.Rendering
             }
 
             FrameworkElement frameworkElement = sender as FrameworkElement;
-            this.eventHandler.OnSizeChanged(new VTSize(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
+            this.eventHandler.OnSizeChanged(this, new VTSize(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
         }
 
         private void ContentArea_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -261,7 +206,7 @@ namespace ModengTerm.Rendering
                 return;
             }
 
-            this.eventHandler.OnMouseWheel(e.Delta > 0);
+            this.eventHandler.OnMouseWheel(this, e.Delta > 0);
         }
 
         private void Scrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -271,7 +216,7 @@ namespace ModengTerm.Rendering
                 return;
             }
 
-            this.eventHandler.OnScrollChanged((int)e.NewValue);
+            this.eventHandler.OnScrollChanged(this, (int)e.NewValue);
         }
 
         #endregion
@@ -291,8 +236,6 @@ namespace ModengTerm.Rendering
 
             this.scrollbar = base.Template.FindName("PART_Scrollbar", this) as DrawingScrollbar;
             this.scrollbar.ValueChanged += Scrollbar_ValueChanged;
-
-            this.bookmarkArea = base.Template.FindName("PART_BookmarkArea", this) as ContentArea;
         }
 
         #endregion

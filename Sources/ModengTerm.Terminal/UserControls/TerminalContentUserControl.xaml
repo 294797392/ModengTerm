@@ -44,7 +44,7 @@
                     </ContextMenu>
                 </Grid.ContextMenu>
 
-                <Grid x:Name="GridDocumentList"/>
+                <Grid x:Name="GridCanvasList"/>
 
             </Grid>
         </Grid>

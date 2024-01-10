@@ -41,11 +41,6 @@ namespace ModengTerm.Terminal.Document
         /// 背景
         /// </summary>
         Wallpaper,
-
-        /// <summary>
-        /// 书签
-        /// </summary>
-        Bookmark
     }
 
     /// <summary>

@@ -159,26 +159,22 @@
         </Setter>
     </Style>
 
-    <Style x:Key="StyleDrawingDocument" TargetType="{x:Type mrendering:DrawingDocument}">
+    <Style x:Key="StyleDrawingCanvas" TargetType="{x:Type mrendering:DrawingCanvas}">
         <Setter Property="Template">
             <Setter.Value>
 
-                <ControlTemplate TargetType="{x:Type mrendering:DrawingDocument}">
+                <ControlTemplate TargetType="{x:Type mrendering:DrawingCanvas}">
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="15"/>
                         </Grid.ColumnDefinitions>
 
-                        <mrendering:ContentArea Grid.Column="0" x:Name="PART_BookmarkArea" Background="#1E1E1E"
-                                                Visibility="{TemplateBinding BookmarkVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
-
-                        <mrendering:ContentArea Grid.Column="1" x:Name="PART_ContentArea" Background="Transparent"
+                        <mrendering:ContentArea Grid.Column="0" x:Name="PART_ContentArea" Background="Transparent"
                                                 Margin="{TemplateBinding ContentMargin, Converter={StaticResource ResourceKey=ContentPaddingConverter}}"/>
 
-                        <mrendering:DrawingScrollbar Grid.Column="2" x:Name="PART_Scrollbar" Style="{StaticResource ResourceKey=StyleDrawingScrollBar}"
+                        <mrendering:DrawingScrollbar Grid.Column="1" x:Name="PART_Scrollbar" Style="{StaticResource ResourceKey=StyleDrawingScrollBar}"
                                                      Visibility="{TemplateBinding ScrollbarVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
 
                     </Grid>

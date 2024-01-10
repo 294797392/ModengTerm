@@ -80,18 +80,6 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         private int scrollDelta;
 
-        /// <summary>
-        /// 终端的大小模式
-        /// </summary>
-        private TerminalSizeModeEnum sizeMode;
-
-        private VTypeface typeface;
-
-        /// <summary>
-        /// 存放该文档的容器
-        /// </summary>
-        private IDrawingTerminal ownerWindow;
-
         #endregion
 
         #region 属性
@@ -157,7 +145,7 @@ namespace ModengTerm.Terminal.Document
         /// <summary>
         /// 渲染该文档的Canvas
         /// </summary>
-        internal IDrawingDocument DrawingObject { get; set; }
+        internal IDrawingCanvas DrawingObject { get; set; }
 
         /// <summary>
         /// 是否是备用缓冲区
@@ -198,51 +186,6 @@ namespace ModengTerm.Terminal.Document
         public int ViewportColumn { get { return this.viewportColumn; } }
 
         /// <summary>
-        /// 是否显示书签
-        /// </summary>
-        public bool BookmarkVisible
-        {
-            get { return this.DrawingObject.BookmarkVisible; }
-            set
-            {
-                if (this.DrawingObject.BookmarkVisible != value)
-                {
-                    this.DrawingObject.BookmarkVisible = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 是否显示滚动条
-        /// </summary>
-        public bool ScrollbarVisible
-        {
-            get { return this.DrawingObject.ScrollbarVisible; }
-            set
-            {
-                if (this.DrawingObject.ScrollbarVisible != value)
-                {
-                    this.DrawingObject.ScrollbarVisible = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// 文档内容的边距
-        /// </summary>
-        public double ContentMargin
-        {
-            get { return this.DrawingObject.ContentMargin; }
-            set
-            {
-                if (this.DrawingObject.ContentMargin != value)
-                {
-                    this.DrawingObject.ContentMargin = value;
-                }
-            }
-        }
-
-        /// <summary>
         /// 获取该文档所使用的字体Typeface
         /// </summary>
         public VTypeface Typeface { get { return this.options.Typeface; } }
@@ -251,21 +194,18 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTDocument(VTDocumentOptions options, IDrawingDocument drawingObject, bool isAlternate)
+        public VTDocument(VTDocumentOptions options, IDrawingCanvas canvas, bool isAlternate)
         {
             this.options = options;
             this.IsAlternate = isAlternate;
-            this.DrawingObject = drawingObject;
+            this.DrawingObject = canvas;
             this.cursorState = new VTCursorState();
             this.startPointer = new VTextPointer();
             this.endPointer = new VTextPointer();
             this.scrollDelta = options.ScrollDelta;
-            this.sizeMode = options.SizeMode;
-            this.typeface = options.Typeface;
             this.AttributeState = new VTextAttributeState();
-            this.ContentMargin = options.ContentMargin;
-            this.ScrollbarVisible = options.ScrollbarVisible;
-            this.BookmarkVisible = options.BookmarkVisible;
+            this.viewportRow = options.ViewportRow;
+            this.viewportColumn = options.ViewportColumn;
         }
 
         #endregion
@@ -662,35 +602,6 @@ namespace ModengTerm.Terminal.Document
 
         public void Initialize()
         {
-            #region 初始化终端大小
-
-            // 真正的内容显示区域大小
-            // 该区域不包含边距，滚动条以及书签区域
-            VTSize contentSize = this.options.ContentSize;
-
-            // 然后根据显示区域的像素大小和每个字符的宽度和高度动态计算终端的行和列
-            this.sizeMode = this.options.SizeMode;
-            switch (this.sizeMode)
-            {
-                case TerminalSizeModeEnum.AutoFit:
-                    {
-                        VTUtils.CalculateAutoFitSize(contentSize, typeface, out this.viewportRow, out this.viewportColumn);
-                        break;
-                    }
-
-                case TerminalSizeModeEnum.Fixed:
-                    {
-                        this.viewportRow = this.options.DefaultViewportRow;
-                        this.viewportColumn = this.options.DefaultViewportColumn;
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            #endregion
-
             this.Cursor = new VTCursor(this);
             this.Cursor.OffsetX = 0;
             this.Cursor.OffsetY = 0;
@@ -708,7 +619,7 @@ namespace ModengTerm.Terminal.Document
             this.Selection.Initialize();
 
             this.Scrollbar = VTScrollInfo.Create(this.IsAlternate, this);
-            this.Scrollbar.ViewportRow = this.viewportRow; ;
+            this.Scrollbar.ViewportRow = this.viewportRow;
             this.Scrollbar.ScrollbackMax = this.options.ScrollbackMax;
             this.Scrollbar.Initialize();
 
@@ -838,7 +749,6 @@ namespace ModengTerm.Terminal.Document
                 // 光标不在可滚动区域的最后一行，说明可以直接移动光标
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 this.SetCursor(this.Cursor.Row + 1, this.Cursor.Column);
-                this.ActiveLine.SetRenderDirty(true);
             }
         }
 
@@ -917,7 +827,6 @@ namespace ModengTerm.Terminal.Document
                 // 光标位置在可视区域里面
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
                 this.SetCursor(this.Cursor.Row - 1, this.Cursor.Column);
-                this.ActiveLine.SetRenderDirty(true);
             }
         }
 
@@ -1057,22 +966,6 @@ namespace ModengTerm.Terminal.Document
         public void DeleteCharacter(VTextLine textLine, int column, int count)
         {
             textLine.DeleteCharacter(column, count);
-        }
-
-        /// <summary>
-        /// 把当前可视区域的所有TextLine标记为需要重新渲染的状态
-        /// </summary>
-        public void DirtyAll()
-        {
-            VTextLine current = this.FirstLine;
-            VTextLine last = this.LastLine;
-
-            while (current != null)
-            {
-                current.SetRenderDirty(true);
-
-                current = current.NextLine;
-            }
         }
 
         /// <summary>
@@ -1273,7 +1166,6 @@ namespace ModengTerm.Terminal.Document
             if (this.Cursor.Column != column)
             {
                 this.Cursor.Column = column;
-
             }
 
             // 要判断下光标所在行是否为空
@@ -1367,27 +1259,19 @@ namespace ModengTerm.Terminal.Document
         }
 
         /// <summary>
-        /// 重新设置终端的行和列
+        /// 重新设置文档可视区域的行和列
         /// </summary>
-        /// <param name="newSize">文档渲染区域的大小</param>
-        public void Resize(VTSize newSize)
+        /// <param name="viewportRow">文档新的可视区域行数</param>
+        /// <param name="viewportColumn">文档新的可视区域的列数</param>
+        public void Resize(int viewportRow, int viewportColumn)
         {
-            // 如果是固定大小的终端，那么什么都不做
-            if (this.sizeMode == TerminalSizeModeEnum.Fixed)
-            {
-                return;
-            }
-
-            int newRows, newCols;
-            VTUtils.CalculateAutoFitSize(newSize, this.typeface, out newRows, out newCols);
-
             // 如果行和列都没变化，那么就什么都不做
-            if (this.viewportRow == newRows && this.viewportColumn == newCols)
+            if (this.viewportRow == viewportRow && this.viewportColumn == viewportColumn)
             {
                 return;
             }
 
-            VTDebug.Context.WriteInteractive("ResizeTerminal", "{0},{1},{2},{3}", this.viewportRow, this.viewportColumn, newRows, newCols);
+            VTDebug.Context.WriteInteractive("ResizeTerminal", "{0},{1},{2},{3}", this.viewportRow, this.viewportColumn, viewportRow, viewportColumn);
 
             // 缩放前先滚动到底，不然会有问题
             this.ScrollToBottom();
@@ -1398,10 +1282,10 @@ namespace ModengTerm.Terminal.Document
             // 目前的实现思路是：如果是减少行，那么从第一行开始删除；如果是增加行，那么从最后一行开始新建行。不考虑ScrollMargin
             int scrollMin = this.Scrollbar.ScrollMin;
             int scrollMax = this.Scrollbar.ScrollMax;
-            this.Resize(newRows, newCols, scrollMin, scrollMax);
+            this.Resize(viewportRow, viewportColumn, scrollMin, scrollMax);
 
             // 更新滚动条
-            this.Scrollbar.ViewportRow = newRows;
+            this.Scrollbar.ViewportRow = viewportRow;
 
             if (this.IsAlternate)
             {
@@ -1452,8 +1336,8 @@ namespace ModengTerm.Terminal.Document
             this.RequestInvalidate();
 
             // 更新界面上的行和列
-            this.viewportColumn = newCols;
-            this.viewportRow = newRows;
+            this.viewportColumn = viewportRow;
+            this.viewportRow = viewportColumn;
         }
 
         /// <summary>
@@ -1791,6 +1675,21 @@ namespace ModengTerm.Terminal.Document
             this.Selection.RequestInvalidate();
 
             #endregion
+        }
+
+        public void SetVisible(bool visible)
+        {
+            VTextLine next = this.FirstLine;
+
+            while (next != null)
+            {
+                next.IsVisible = visible;
+
+                next = next.NextLine;
+            }
+
+            this.Cursor.IsVisible = visible;
+            this.Selection.IsVisible = visible;
         }
 
         #endregion

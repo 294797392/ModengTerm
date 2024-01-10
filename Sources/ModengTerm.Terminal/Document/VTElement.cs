@@ -16,11 +16,11 @@ namespace ModengTerm.Terminal.Document
     {
         #region 实例变量
 
-        protected bool arrangeDirty;
-
+        private int dirtyFlags;
         private double offsetX;
         private double offsetY;
-        protected IDrawingDocument drawingDocument;
+        private bool visible;
+        protected IDrawingCanvas drawingDocument;
 
         #endregion
 
@@ -42,7 +42,7 @@ namespace ModengTerm.Terminal.Document
                 if (this.offsetX != value)
                 {
                     this.offsetX = value;
-                    this.SetArrangeDirty(true);
+                    this.SetDirtyFlags(VTDirtyFlags.PositionDirty, true);
                 }
             }
         }
@@ -58,7 +58,23 @@ namespace ModengTerm.Terminal.Document
                 if (this.offsetY != value)
                 {
                     this.offsetY = value;
-                    this.SetArrangeDirty(true);
+                    this.SetDirtyFlags(VTDirtyFlags.PositionDirty, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置该元素是否可见
+        /// </summary>
+        public bool IsVisible
+        {
+            get { return this.visible; }
+            set
+            {
+                if (this.visible != value)
+                {
+                    this.visible = value;
+                    this.SetDirtyFlags(VTDirtyFlags.VisibleDirty, true);
                 }
             }
         }
@@ -72,7 +88,7 @@ namespace ModengTerm.Terminal.Document
 
         #region 构造方法
 
-        public VTElement(IDrawingDocument drawingDocument)
+        public VTElement(IDrawingCanvas drawingDocument)
         {
             this.drawingDocument = drawingDocument;
         }
@@ -86,6 +102,9 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public void Initialize()
         {
+            // 默认所有图形都是显示的
+            this.IsVisible = true;
+
             if (this.Type == VTDocumentElements.Scrollbar)
             {
                 // Scrollbar就不用创建了，因为Scrollbar默认就是存在的
@@ -129,14 +148,73 @@ namespace ModengTerm.Terminal.Document
 
         #endregion
 
-        #region 实例方法
+        #region 受保护方法
 
-        protected void SetArrangeDirty(bool dirty)
+        protected void SetDirtyFlags(VTDirtyFlags flag, bool dirty)
         {
-            if (this.arrangeDirty != dirty)
+            switch (flag)
             {
-                this.arrangeDirty = dirty;
+                case VTDirtyFlags.VisibleDirty:
+                    {
+                        this.dirtyFlags = dirty ? this.dirtyFlags |= 2 : this.dirtyFlags &= (~2);
+                        break;
+                    }
+
+                case VTDirtyFlags.SizeDirty:
+                    {
+                        this.dirtyFlags = dirty ? this.dirtyFlags |= 4 : this.dirtyFlags &= (~4);
+                        break;
+                    }
+
+                case VTDirtyFlags.PositionDirty:
+                    {
+                        this.dirtyFlags = dirty ? this.dirtyFlags |= 8 : this.dirtyFlags &= (~8);
+                        break;
+                    }
+
+                case VTDirtyFlags.RenderDirty:
+                    {
+                        this.dirtyFlags = dirty ? this.dirtyFlags |= 16 : this.dirtyFlags &= (~16);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
             }
+        }
+
+        protected bool GetDirtyFlags(VTDirtyFlags flag)
+        {
+            switch (flag)
+            {
+                case VTDirtyFlags.VisibleDirty:
+                    {
+                        return (this.dirtyFlags >> 1 & 1) == 1;
+                    }
+
+                case VTDirtyFlags.SizeDirty:
+                    {
+                        return (this.dirtyFlags >> 2 & 1) == 1;
+                    }
+
+                case VTDirtyFlags.PositionDirty:
+                    {
+                        return (this.dirtyFlags >> 3 & 1) == 1;
+                    }
+
+                case VTDirtyFlags.RenderDirty:
+                    {
+                        return (this.dirtyFlags >> 4 & 1) == 1;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        protected void ResetDirtyFlags()
+        {
+            this.dirtyFlags = 0;
         }
 
         #endregion

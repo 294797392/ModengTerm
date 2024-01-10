@@ -111,11 +111,9 @@ namespace ModengTerm.Terminal.Document
 
         public override void RequestInvalidate()
         {
-            if (this.arrangeDirty)
+            if (this.GetDirtyFlags(VTDirtyFlags.PositionDirty))
             {
                 this.DrawingObject.Arrange(this.OffsetX, this.OffsetY);
-
-                this.arrangeDirty = false;
             }
 
             if (dirty)
@@ -159,6 +157,8 @@ namespace ModengTerm.Terminal.Document
 
                 dirty = false;
             }
+
+            this.ResetDirtyFlags();
         }
 
         #endregion

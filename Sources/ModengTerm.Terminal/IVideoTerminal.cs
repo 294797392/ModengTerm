@@ -82,11 +82,5 @@ namespace ModengTerm.Terminal
         /// 选中所有内容
         /// </summary>
         void SelectAll();
-
-        /// <summary>
-        /// 设置书签的显示或隐藏状态
-        /// </summary>
-        /// <param name="visible"></param>
-        void SetBookmarkVisible(bool visible);
     }
 }

@@ -55,7 +55,7 @@ namespace ModengTerm.Terminal.Document
         /// </summary>
         public double Elapsed { get; set; }
 
-        public VTFramedElement(IDrawingDocument drawingDocument) :
+        public VTFramedElement(IDrawingCanvas drawingDocument) :
             base(drawingDocument)
         {
 
