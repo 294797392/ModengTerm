@@ -249,8 +249,6 @@ namespace ModengTerm.Terminal
                 case VTActions.BackgroundUnset: enabled = false; return VTextAttributes.Background;
                 case VTActions.Foreground: return VTextAttributes.Foreground;
                 case VTActions.ForegroundUnset: enabled = false; return VTextAttributes.Foreground;
-                case VTActions.ReverseVideo: return VTextAttributes.Background;
-                case VTActions.ReverseVideoUnset: enabled = false; return VTextAttributes.Background;
 
                 default:
                     throw new NotImplementedException();

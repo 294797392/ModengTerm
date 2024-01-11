@@ -928,19 +928,33 @@ namespace ModengTerm.Terminal.ViewModels
                         // 所以这里要记录下如果当前有文本特效被设置了，那么在行改变的时候也需要设置文本特效
                         // 缓存下来，每次打印字符的时候都要对ActiveLine Apply一下
 
-                        if (action == VTActions.ReverseVideo)
+                        switch (action)
                         {
-                            VTColor foreColor = VTColor.CreateFromRgbKey(this.backgroundColor);
-                            VTColor backColor = VTColor.CreateFromRgbKey(this.foregroundColor);
-                            this.activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
-                            this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
+                            case VTActions.ReverseVideo:
+                                {
+                                    VTColor foreColor = VTColor.CreateFromRgbKey(this.backgroundColor);
+                                    VTColor backColor = VTColor.CreateFromRgbKey(this.foregroundColor);
+                                    this.activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
+                                    this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
+                                    break;
+                                }
+
+                            case VTActions.ReverseVideoUnset:
+                                {
+                                    this.activeDocument.SetAttribute(VTextAttributes.Background, false, null);
+                                    this.activeDocument.SetAttribute(VTextAttributes.Foreground, false, null);
+                                    break;
+                                }
+
+                            default:
+                                {
+                                    bool enabled;
+                                    VTextAttributes attribute = VTUtils.VTAction2TextAttribute(action, out enabled);
+                                    this.activeDocument.SetAttribute(attribute, enabled, parameter);
+                                    break;
+                                }
                         }
-                        else
-                        {
-                            bool enabled;
-                            VTextAttributes attribute = VTUtils.VTAction2TextAttribute(action, out enabled);
-                            this.activeDocument.SetAttribute(attribute, enabled, parameter);
-                        }
+
                         break;
                     }
 

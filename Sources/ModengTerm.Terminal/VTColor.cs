@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal
 {
+    /// <summary>
+    /// 使用R,G,B或者RgbKey表示一个颜色
+    /// </summary>
     public class VTColor
     {
         /// <summary>
