@@ -597,7 +597,7 @@ namespace ModengTerm.Terminal.Document
                 }
 
                 // 把物理行号打印出来，调试用
-                formattedText.Text = string.Format("{0} - {1}", this.PhysicsRow, formattedText.Text);
+                //formattedText.Text = string.Format("{0} - {1}", this.PhysicsRow, formattedText.Text);
 
                 this.DrawingObject.FormattedText = formattedText;
 

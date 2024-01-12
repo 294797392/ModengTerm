@@ -73,9 +73,9 @@ namespace ModengTerm.Terminal.Session
         /// <summary>
         /// 往会话里写入数据
         /// </summary>
-        /// <param name="bytes"></param>
+        /// <param name="buffer"></param>
         /// <returns></returns>
-        public abstract int Write(byte[] bytes);
+        public abstract int Write(byte[] buffer);
 
         /// <summary>
         /// 从会话里同步读取数据
