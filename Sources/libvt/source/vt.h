@@ -1,29 +1,20 @@
-#ifndef __LIBVT_EXPORT_H__
-#define __LIBVT_EXPORT_H__
+#ifndef __LIBVT_H__
+#define __LIBVT_H__
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#ifdef VTWIN32
-#include <winsock2.h>
-#include <windows.h>
-#include <ws2tcpip.h>
+// 定义导出和导入符号
+// 注意，如果是链接静态库，那么不需要__declspec(dllimport)
+#if (defined(LIBVT_WIN32))
+#ifdef LIBVT_EXPORT
+#define LIBVTAPI __declspec(dllexport)
 #else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/time.h>
+#define LIBVTAPI __declspec(dllimport)
 #endif
-
-#define VTAPI
-
-#ifdef VTWIN32
-typedef SOCKET VTSOCK;
-#define sleep_ms(ms) Sleep(ms)
 #else
-typedef int VTSOCK;
-#define sleep_ms(ms) sleep(ms / 1000)
+#define LIBVTAPI
 #endif
 
 #endif

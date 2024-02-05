@@ -6,7 +6,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
-#ifdef VTWIN32
+#ifdef VT_WIN32
 #include <winsock2.h>
 #include <windows.h>
 #include <ws2tcpip.h>
@@ -17,7 +17,6 @@
 #include <sys/time.h>
 #endif
 
-#include "libY.h"
 #include "libssh2.h"
 
 #include "vtssh.h"
@@ -38,7 +37,6 @@ struct vtssh
 	int notify;
 	LIBSSH2_SESSION *session;
 	LIBSSH2_CHANNEL *channel;
-	Ythread *ssh_thread;
 };
 
 static void ssh_thread_proc(void *userdata)
@@ -48,21 +46,21 @@ static void ssh_thread_proc(void *userdata)
 	LIBSSH2_CHANNEL *channel = ssh->channel;
 	char buffer[8192] = { '\0' };
 
-	while(ssh->status == VTSSH_STATUS_CONNECTED)
+	while (ssh->status == VTSSH_STATUS_CONNECTED)
 	{
 		int rc = libssh2_channel_read(channel, buffer, sizeof(buffer));
-		if(rc < 0)
+		if (rc < 0)
 		{
 			// 读取失败，断开连接
 			ssh->status = VTSSH_STATUS_DISCONNECTED;
-			YLOGE("libssh2_channel_read failed, %d", rc);
-			if(ssh->notify)
+			printf("libssh2_channel_read failed, %d\n", rc);
+			if (ssh->notify)
 			{
 				options->on_status_changed(ssh, ssh->status);
 			}
 			break;
 		}
-		else if(rc == 0)
+		else if (rc == 0)
 		{
 			// 继续读
 			continue;
@@ -95,7 +93,7 @@ static int connect_ssh_server(vtssh *ssh)
 	int err;
 
 	err = WSAStartup(MAKEWORD(2, 0), &wsadata);
-	if(err != 0) {
+	if (err != 0) {
 		YLOGE("WSAStartup failed with error: %s", strerror(err));
 		return VTSSH_ERR_SYSERR;
 	}
@@ -106,28 +104,28 @@ static int connect_ssh_server(vtssh *ssh)
 
 	/* Connect to SSH server */
 	sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if(sock == -1)
+	if (sock == -1)
 	{
-		YLOGE("failed to open socket, %s", strerror(errno));
+		printf("failed to open socket, %s\n", strerror(errno));
 		return VTSSH_ERR_SYSERR;
 	}
 
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = inet_addr(options->serverip);
-	if(INADDR_NONE == sin.sin_addr.s_addr) {
-		YLOGE("inet_addr failed, %s", strerror(errno));
+	if (INADDR_NONE == sin.sin_addr.s_addr) {
+		printf("inet_addr failed, %s\n", strerror(errno));
 		return VTSSH_ERR_SYSERR;
 	}
 	sin.sin_port = htons(options->serverport);
 
-	if(connect(sock, (struct sockaddr *)(&sin), sizeof(struct sockaddr_in)) != 0) {
-		YLOGE("failed to connect, %s", strerror(errno));
+	if (connect(sock, (struct sockaddr *)(&sin), sizeof(struct sockaddr_in)) != 0) {
+		printf("failed to connect, %s\n", strerror(errno));
 		return VTSSH_ERR_SYSERR;
 	}
 
 	ssh->sock = sock;
-	
-	YLOGI("connect ssh server success");
+
+	printf("connect ssh server success\n");
 
 	return VTSSH_ERR_OK;
 }
@@ -151,8 +149,8 @@ static int initialize_ssh_channel(vtssh *ssh)
 
 	/* Create a session instance */
 	session = libssh2_session_init();
-	if(!session) {
-		YLOGE("Could not initialize SSH session!");
+	if (!session) {
+		printf("Could not initialize SSH session!");
 		return VTSSH_ERR_SYSERR;
 	}
 
@@ -160,8 +158,8 @@ static int initialize_ssh_channel(vtssh *ssh)
 	 * and setup crypto, compression, and MAC layers
 	 */
 	rc = libssh2_session_handshake(session, sock);
-	if(rc) {
-		YLOGE("Error when starting up SSH session: %d", rc);
+	if (rc) {
+		printf("Error when starting up SSH session: %d", rc);
 		return VTSSH_ERR_SYSERR;
 	}
 
@@ -172,68 +170,68 @@ static int initialize_ssh_channel(vtssh *ssh)
 	 */
 	fingerprint = libssh2_hostkey_hash(session, LIBSSH2_HOSTKEY_HASH_SHA1);
 	fprintf(stderr, "Fingerprint: ");
-	for(int i = 0; i < 20; i++)
+	for (int i = 0; i < 20; i++)
 		fprintf(stderr, "%02X ", (unsigned char)fingerprint[i]);
 	fprintf(stderr, "\n");
 
 	/* check what authentication methods are available */
 	userauthlist = libssh2_userauth_list(session, options->username, strlen(options->username));
-	YLOGI("Authentication methods: %s", userauthlist);
-	if(strstr(userauthlist, "password"))
+	printf("Authentication methods: %s", userauthlist);
+	if (strstr(userauthlist, "password"))
 	{
 		supported_auth |= VTSSH_AUTH_PASSWORD;
 	}
-	if(strstr(userauthlist, "publickey"))
+	if (strstr(userauthlist, "publickey"))
 	{
 		supported_auth |= VTSSH_AUTH_PUBLICKEY;
 	}
 
 #pragma region 登录逻辑
-	switch(auth)
+	switch (auth)
 	{
-	case VTSSH_AUTH_NONE:
-	{
-		YLOGI("ssh_auth_none");
-		break;
-	}
-
-	case VTSSH_AUTH_PASSWORD:
-	{
-		// 使用密码登录
-		if(libssh2_userauth_password(session, options->username, options->password)) {
-			YLOGE("Authentication by password failed");
-			return VTSSH_ERR_AUTH_FAILED;
-		}
-		else {
-			YLOGI("Authentication by password succeeded");
+		case VTSSH_AUTH_NONE:
+		{
+			printf("ssh_auth_none");
 			break;
 		}
-	}
 
-	case VTSSH_AUTH_PUBLICKEY:
-	{
-		if(libssh2_userauth_publickey_fromfile(session, options->username, options->keyfile1, options->keyfile2, options->password)) {
-			YLOGE("Authentication by public key failed!");
-			return VTSSH_ERR_AUTH_FAILED;
+		case VTSSH_AUTH_PASSWORD:
+		{
+			// 使用密码登录
+			if (libssh2_userauth_password(session, options->username, options->password)) {
+				printf("Authentication by password failed");
+				return VTSSH_ERR_AUTH_FAILED;
+			}
+			else {
+				printf("Authentication by password succeeded");
+				break;
+			}
 		}
-		else {
-			YLOGI("Authentication by public key succeeded.");
+
+		case VTSSH_AUTH_PUBLICKEY:
+		{
+			if (libssh2_userauth_publickey_fromfile(session, options->username, options->keyfile1, options->keyfile2, options->password)) {
+				printf("Authentication by public key failed!");
+				return VTSSH_ERR_AUTH_FAILED;
+			}
+			else {
+				printf("Authentication by public key succeeded.");
+				break;
+			}
+		}
+
+		default:
+			printf("No supported authentication methods found!");
 			break;
-		}
-	}
-
-	default:
-		YLOGE("No supported authentication methods found!");
-		break;
 	}
 #pragma endregion
 
 #pragma region 创建SSH Shell通道
 	/* Request a shell */
 	LIBSSH2_CHANNEL *channel = libssh2_channel_open_session(session);
-	if(channel == NULL)
+	if (channel == NULL)
 	{
-		YLOGE("libssh2_channel_open_session failed");
+		printf("libssh2_channel_open_session failed");
 		return VTSSH_ERR_SYSERR;
 	}
 
@@ -241,15 +239,15 @@ static int initialize_ssh_channel(vtssh *ssh)
 	 * See /etc/termcap for more options
 	 */
 	rc = libssh2_channel_request_pty_ex(channel, options->term, strlen(options->term), NULL, 0, options->term_columns, options->term_rows, 0, 0);
-	if(rc != 0)
+	if (rc != 0)
 	{
-		YLOGE("libssh2_channel_request_pty_ex failed, %d", rc);
+		printf("libssh2_channel_request_pty_ex failed, %d", rc);
 		return VTSSH_ERR_SYSERR;
 	}
 
 	/* Open a SHELL on that pty */
-	if(libssh2_channel_shell(channel)) {
-		YLOGE("Unable to request shell on allocated pty");
+	if (libssh2_channel_shell(channel)) {
+		printf("Unable to request shell on allocated pty");
 		return VTSSH_ERR_SYSERR;
 	}
 #pragma endregion
@@ -279,7 +277,7 @@ static int initialize_ssh_channel(vtssh *ssh)
 int vtssh_create(vtssh **_ssh, vtssh_options *ssh_options)
 {
 	vtssh *ssh = (vtssh *)calloc(1, sizeof(vtssh));
-	if(ssh == NULL)
+	if (ssh == NULL)
 	{
 		return VTSSH_ERR_NO_MEM;
 	}
@@ -297,27 +295,24 @@ int vtssh_connect(vtssh *ssh)
 	int rc = 0;
 
 	// 1. 连接ssh服务器
-	if((rc = connect_ssh_server(ssh)) != VTSSH_ERR_OK)
+	if ((rc = connect_ssh_server(ssh)) != VTSSH_ERR_OK)
 	{
 		return rc;
 	}
 
 	// 2. 初始化ssh通道
-	if((rc = initialize_ssh_channel(ssh)) != VTSSH_ERR_OK)
+	if ((rc = initialize_ssh_channel(ssh)) != VTSSH_ERR_OK)
 	{
 		return rc;
 	}
 
 	ssh->notify = 1;
-
-	Ythread *thread = Y_create_thread(ssh_thread_proc, ssh);
-	ssh->ssh_thread = thread;
 	return VTSSH_ERR_OK;
 }
 
 int vtssh_send(vtssh *ssh, char *bytes, uint32_t bytesize)
 {
-	if(ssh->channel == NULL)
+	if (ssh->channel == NULL)
 	{
 		return VTSSH_ERR_OK;
 	}
@@ -330,14 +325,14 @@ void vtssh_disconnect(vtssh *ssh)
 	ssh->status = VTSSH_STATUS_DISCONNECTED;
 	ssh->notify = 0;
 
-	if(ssh->channel)
+	if (ssh->channel)
 	{
 		libssh2_channel_close(ssh->channel);
 		libssh2_channel_free(ssh->channel);
 		ssh->channel = NULL;
 	}
 
-	if(ssh->session)
+	if (ssh->session)
 	{
 		libssh2_session_disconnect(ssh->session, "Normal Shutdown, Thank you for playing");
 		libssh2_session_free(ssh->session);
@@ -349,7 +344,6 @@ void vtssh_disconnect(vtssh *ssh)
 #else
 	close(ssh->sock);
 #endif
-	Y_delete_thread(ssh->ssh_thread);
 }
 
 void vtssh_delete(vtssh *ssh)

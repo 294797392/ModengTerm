@@ -49,4 +49,28 @@
         </Setter>
     </Style>
 
+    <Style x:Key="StyleMTermWindow" TargetType="{x:Type mcontrols:MTermWindow}">
+        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=Brush1501}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="1"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="WindowStyle" Value="None"/>
+        <Setter Property="ResizeMode" Value="NoResize"/>
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type Window}">
+
+                    <Grid>
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+
+                        <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                    </Grid>
+
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>
