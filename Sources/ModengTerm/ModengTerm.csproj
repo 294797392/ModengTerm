@@ -21,6 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controls\SessionContent.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
   </ItemGroup>
@@ -46,7 +47,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
-    <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
     <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
     <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
@@ -79,6 +79,13 @@
     <None Update="app.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Styles\ControlStyles.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

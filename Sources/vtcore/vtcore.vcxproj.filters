@@ -2,5 +2,25 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.c" />
+    <ClCompile Include="vtparser.c">
+      <Filter>vtparser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="vtcore.h" />
+    <ClInclude Include="vtparser.h">
+      <Filter>vtparser</Filter>
+    </ClInclude>
+    <ClInclude Include="vtdoc.h">
+      <Filter>vtdoc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="vtdoc">
+      <UniqueIdentifier>{4a33dab5-af90-45e9-a262-ab41c4de17e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vtparser">
+      <UniqueIdentifier>{50f84751-0197-4690-8438-33ae94806b6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

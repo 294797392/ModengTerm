@@ -195,18 +195,18 @@ namespace XTerminal
 
         private void MenuItemDebugWindow_Click(object sender, RoutedEventArgs e)
         {
-            SessionContent sessionContent = ContentControlSession.Content as SessionContent;
-            VideoTerminal terminalSession = sessionContent.DataContext as VideoTerminal;
-            if (terminalSession == null)
-            {
-                return;
-            }
+            //ISessionContent sessionContent = ContentControlSession.Content as ISessionContent;
+            //VideoTerminal terminalSession = sessionContent.DataContext as VideoTerminal;
+            //if (terminalSession == null)
+            //{
+            //    return;
+            //}
 
-            DebugWindow debugWindow = new DebugWindow();
-            debugWindow.VideoTerminal = terminalSession;
-            debugWindow.Owner = this;
-            debugWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            debugWindow.ShowDialog();
+            //DebugWindow debugWindow = new DebugWindow();
+            //debugWindow.VideoTerminal = terminalSession;
+            //debugWindow.Owner = this;
+            //debugWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            //debugWindow.ShowDialog();
         }
 
 

@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Terminal.UserControls;
@@ -14,7 +15,7 @@ namespace ModengTerm
 {
     public static class SessionContentFactory
     {
-        public static SessionContent Create(XTermSession session)
+        public static ISessionContent Create(XTermSession session)
         {
             switch ((SessionTypeEnum)session.Type)
             {

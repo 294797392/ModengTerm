@@ -1252,6 +1252,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void OnMouseDown(IDrawingCanvas sender, VTPoint p, int clickCount)
         {
+            logger.InfoFormat("OnMouseDown");
+
             VTPoint mouseLocation = this.activeDocument.DrawingObject.GetMousePosition(VTDocumentAreas.ContentArea);
 
             VTextLine mouseDownLine = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseLocation.Y);
@@ -1263,6 +1265,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void OnMouseMove(IDrawingCanvas sender, VTPoint p)
         {
+            logger.InfoFormat("OnMouseMove");
+
             this.activeDocument.OnMouseMove(p);
         }
 

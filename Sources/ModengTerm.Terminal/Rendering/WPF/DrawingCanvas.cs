@@ -149,7 +149,10 @@ namespace ModengTerm.Rendering
 
             FrameworkElement frameworkElement = sender as FrameworkElement;
             Point p = e.GetPosition(frameworkElement);
-            frameworkElement.CaptureMouse();
+            if (!frameworkElement.CaptureMouse())
+            {
+                Console.WriteLine("Capture失败");
+            }
             this.eventHandler.OnMouseDown(this, new VTPoint(p.X, p.Y), e.ClickCount);
         }
 

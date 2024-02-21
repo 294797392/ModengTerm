@@ -48,7 +48,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
-    <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
     <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
     <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />

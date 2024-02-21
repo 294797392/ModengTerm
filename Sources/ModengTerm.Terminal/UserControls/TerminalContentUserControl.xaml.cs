@@ -2,8 +2,8 @@
 using Microsoft.Win32;
 using ModengTerm;
 using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Controls;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
@@ -38,7 +38,7 @@ namespace ModengTerm.Terminal.UserControls
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalContentUserControl : SessionContent, IDrawingTerminal
+    public partial class TerminalContentUserControl : UserControl, IDrawingTerminal, ISessionContent
     {
         #region 类变量
 
@@ -54,6 +54,8 @@ namespace ModengTerm.Terminal.UserControls
         #endregion
 
         #region 属性
+
+        public XTermSession Session { get; set; }
 
         #endregion
 
@@ -105,7 +107,7 @@ namespace ModengTerm.Terminal.UserControls
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ShellFunctionMenu functionMenu = menuItem.DataContext as ShellFunctionMenu;
-            if (functionMenu == null) 
+            if (functionMenu == null)
             {
                 return;
             }
@@ -126,7 +128,7 @@ namespace ModengTerm.Terminal.UserControls
         {
             DrawingCanvas canvas = null;
 
-            this.Dispatcher.Invoke(() => 
+            this.Dispatcher.Invoke(() =>
             {
                 canvas = new DrawingCanvas();
                 GridCanvasList.Children.Insert(0, canvas);
@@ -174,11 +176,11 @@ namespace ModengTerm.Terminal.UserControls
 
         #endregion
 
-        #region SessionContent
+        #region ISessionContent
 
-        protected override int OnOpen(OpenedSessionVM viewModel)
+        public int Open()
         {
-            this.shellSession = viewModel as ShellSessionVM;
+            this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.Open();
 
             this.videoTerminal = this.shellSession.VideoTerminal;
@@ -186,7 +188,7 @@ namespace ModengTerm.Terminal.UserControls
             return ResponseCode.SUCCESS;
         }
 
-        protected override void OnClose()
+        public void Close()
         {
             this.shellSession.Close();
             this.videoTerminal = null;

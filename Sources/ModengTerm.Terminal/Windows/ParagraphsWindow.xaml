@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Windows"
-        xmlns:mcontrol="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+        xmlns:mcontrol="clr-namespace:ModengTerm.Controls"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         mc:Ignorable="d"
@@ -17,9 +17,6 @@
     <Window.Resources>
 
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModengTerm.Controls;component/ControlStyles.xaml"/>
-            </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="StyleMTermButtonLocal" TargetType="{x:Type mcontrol:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
                 <Setter Property="Width" Value="16"/>
