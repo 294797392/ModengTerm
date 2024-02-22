@@ -149,11 +149,11 @@ namespace ModengTerm.Rendering
 
             FrameworkElement frameworkElement = sender as FrameworkElement;
             Point p = e.GetPosition(frameworkElement);
-            if (!frameworkElement.CaptureMouse())
-            {
-                Console.WriteLine("Capture失败");
-            }
+            frameworkElement.CaptureMouse();
             this.eventHandler.OnMouseDown(this, new VTPoint(p.X, p.Y), e.ClickCount);
+
+            // 不设置为true的话会立即出发MosueLeftButtonUp事件，不知道为什么
+            e.Handled = true;
         }
 
         private void ContentArea_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

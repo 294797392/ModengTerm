@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Windows"
-        xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
+        xmlns:mcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
         xmlns:converter="clr-namespace:ModengTerm.Terminal"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText2000}" 

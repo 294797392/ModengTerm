@@ -21,4 +21,11 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Page Update="Template.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
 </Project>

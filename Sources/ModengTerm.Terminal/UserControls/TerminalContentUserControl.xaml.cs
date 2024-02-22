@@ -4,6 +4,7 @@ using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Controls;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;

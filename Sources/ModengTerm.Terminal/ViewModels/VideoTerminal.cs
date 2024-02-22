@@ -1272,6 +1272,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void OnMouseUp(IDrawingCanvas sender, VTPoint p)
         {
+            logger.InfoFormat("OnMouseUp");
+
             this.activeDocument.OnMouseUp(p);
         }
 

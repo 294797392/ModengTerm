@@ -133,33 +133,35 @@ namespace ModengTerm
             // 先初始化UI，等UI显示出来在打开Session
             // 因为初始化终端需要知道当前的界面大小，从而计算行大小和列大小
 
-            SessionContent sessionContent = SessionContentFactory.Create(session);
+            ISessionContent content = SessionContentFactory.Create(session);
             OpenedSessionVM viewModel = OpenedSessionVMFactory.Create(session);
 
             // 给ViewModel赋值
             viewModel.ID = Guid.NewGuid().ToString();
             viewModel.Name = session.Name;
             viewModel.Description = session.Description;
-            viewModel.Content = sessionContent;
+            viewModel.Content = content as DependencyObject;
             viewModel.ServiceAgent = MTermApp.Context.ServiceAgent;
 
             // 给SessionContent赋值
-            sessionContent.Session = session;
-            sessionContent.ViewModel = viewModel;
-            sessionContent.DataContext = viewModel;
-            sessionContent.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
+            content.Session = session;
 
-            container.Content = sessionContent;
+            UserControl userControl = content as UserControl;
+            userControl.DataContext = viewModel;
+            userControl.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
+
+            container.Content = content;
         }
 
         public void CloseSession(OpenedSessionVM session)
         {
-            SessionContent sessionContent = session.Content as SessionContent;
-            if (MTermUtils.IsTerminal((SessionTypeEnum)sessionContent.Session.Type))
+            ISessionContent content = session.Content as ISessionContent;
+            if (MTermUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
             {
-                this.OpenedTerminals.Remove(sessionContent.ViewModel as ShellSessionVM);
+                UserControl userControl = content as UserControl;
+                this.OpenedTerminals.Remove(userControl.DataContext as ShellSessionVM);
             }
-            sessionContent.Close();
+            content.Close();
 
             this.OpenedSessionList.Remove(session);
             OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
@@ -271,10 +273,11 @@ namespace ModengTerm
         private void SessionContent_Loaded(object sender, RoutedEventArgs e)
         {
             // 此时所有的界面都加载完了，可以真正打开Session了
-            SessionContent content = sender as SessionContent;
+            ISessionContent content = sender as ISessionContent;
 
             // 要反注册事件，不然每次显示界面就会多打开一个VideoTerminal
-            content.Loaded -= this.SessionContent_Loaded;
+            UserControl userControl = content as UserControl;
+            userControl.Loaded -= this.SessionContent_Loaded;
 
             int code = content.Open();
             if (code != ResponseCode.SUCCESS)
@@ -286,10 +289,10 @@ namespace ModengTerm
             // 方便“发送到所有”功能
             if (MTermUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
             {
-                this.OpenedTerminals.Add(content.ViewModel as ShellSessionVM);
+                this.OpenedTerminals.Add(userControl.DataContext as ShellSessionVM);
             }
 
-            OpenedSessionVM sessionVM = content.ViewModel;
+            OpenedSessionVM sessionVM = userControl.DataContext as OpenedSessionVM;
 
             // 添加到界面上，因为最后一个元素是打开Session的TabItem，所以要添加到倒数第二个元素的位置
             this.OpenedSessionList.Insert(this.OpenedSessionList.Count - 1, sessionVM);
