@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Drawing\Wallpaper\**" />
+    <EmbeddedResource Remove="Drawing\Wallpaper\**" />
+    <None Remove="Drawing\Wallpaper\**" />
+    <Page Remove="Drawing\Wallpaper\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Drawing\ContentArea.cs" />
+    <Compile Remove="Drawing\DrawingBookmark.cs" />
+    <Compile Remove="Drawing\DrawingCanvas.cs" />
+    <Compile Remove="Drawing\DrawingCursor.cs" />
+    <Compile Remove="Drawing\DrawingLine.cs" />
+    <Compile Remove="Drawing\DrawingMatchesLine.cs" />
+    <Compile Remove="Drawing\DrawingObject.cs" />
+    <Compile Remove="Drawing\DrawingObjectFactory.cs" />
+    <Compile Remove="Drawing\DrawingScrollbar.cs" />
+    <Compile Remove="Drawing\DrawingSelection.cs" />
+    <Compile Remove="Drawing\DrawingUtils.cs" />
+    <Compile Remove="Drawing\IDrawingBookmark.cs" />
+    <Compile Remove="VTBookmarkStates.cs" />
+    <Compile Remove="VTFramedElement.cs" />
+    <Compile Remove="VTWallpaper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Drawing\Template.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
