@@ -54,15 +54,9 @@ namespace ModengTerm.Document.Utility
 
         private static readonly List<VTextAttributes> AllTextAttributes = Enum.GetValues(typeof(VTextAttributes)).Cast<VTextAttributes>().ToList();
         private static readonly Dictionary<string, GifMetadata> GifMetadataMap = new Dictionary<string, GifMetadata>();
-        private static readonly BitmapImage ErrorBitmapImage = null;
 
         static VTUtils()
         {
-            ErrorBitmapImage = new BitmapImage();
-            ErrorBitmapImage.BeginInit();
-            ErrorBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            ErrorBitmapImage.UriSource = new Uri("pack://application:,,,/ModengTerm;component/Images/error.png");
-            ErrorBitmapImage.EndInit();
         }
 
         internal static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count)
@@ -511,7 +505,7 @@ namespace ModengTerm.Document.Utility
                         Stream stream = VTUtils.GetWallpaperStream(uri);
                         if (stream == null)
                         {
-                            return ErrorBitmapImage;
+                            throw new NotImplementedException();
                         }
 
                         return GifParser.GetThumbnail(stream);
@@ -534,7 +528,7 @@ namespace ModengTerm.Document.Utility
             Stream stream = VTUtils.GetWallpaperStream(uri);
             if (stream == null)
             {
-                return ErrorBitmapImage;
+                throw new NotImplementedException();
             }
 
             BitmapImage bitmapImage = new BitmapImage();

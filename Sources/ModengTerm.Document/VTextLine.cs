@@ -104,6 +104,12 @@ namespace ModengTerm.Document
         public List<VTCharacter> Characters { get { return characters; } }
 
         /// <summary>
+        /// 获取该行一共占用了多少列
+        /// 一个中文字符占用2列，其他的占用1列
+        /// </summary>
+        public int Columns { get { return this.columns; } }
+
+        /// <summary>
         /// 文本的测量信息
         /// </summary>
         public VTextMetrics Metrics { get; private set; }
@@ -119,7 +125,7 @@ namespace ModengTerm.Document
         /// DECAWM SET：超出后要在新的一行上从头开始显示字符
         /// DECAWM RESET：超出后在该行的第一个字符处开始显示字符
         /// </summary>
-        public double Height { get { return Metrics.Height; } }
+        public double Height { get { return this.Style.Height; return Metrics.Height; } }
 
         /// <summary>
         /// 获取该文本的边界框信息
@@ -252,25 +258,6 @@ namespace ModengTerm.Document
             }
         }
 
-        private void EraseCharacter(int characterIndex, int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                int index = characterIndex + i;
-                VTCharacter character = characters[index];
-                if (character.ColumnSize > 1)
-                {
-                    columns -= character.ColumnSize - 1;
-                }
-
-                character.Character = ' ';
-                character.ColumnSize = 1;
-                character.Attribute = 0;
-                character.Flags = VTCharacterFlags.None;
-            }
-
-            SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-        }
 
         #endregion
 
@@ -343,9 +330,6 @@ namespace ModengTerm.Document
         /// <param name="column">从哪一列开始填充</param>
         public void EraseToEnd(int column)
         {
-            // TODO：所有被新加的字符都要沿用最后一个字符的Attribute?
-            // htop第5行的背景不会显示到最后面
-
             int startIndex = FindCharacterIndex(column);
             if (startIndex == -1)
             {
@@ -356,20 +340,20 @@ namespace ModengTerm.Document
 
             int count = characters.Count - startIndex;
 
-            EraseCharacter(startIndex, count);
+            EraseRange(startIndex, count);
         }
 
         /// <summary>
-        /// 清除该行所有字符
-        /// 做法是用空白符填充该行所有字符
+        /// 用空白字符填充该行所有字符
         /// </summary>
         public void EraseAll()
         {
-            EraseCharacter(0, characters.Count);
+            EraseRange(0, characters.Count);
         }
 
         /// <summary>
-        /// 删除从行首到光标处的内容
+        /// 使用空白字符填充从行首到指定列处的内容
+        /// 如果指定列不存在则什么都不做
         /// </summary>
         /// <param name="column">光标位置</param>
         public void EraseFromBeginning(int column)
@@ -377,31 +361,55 @@ namespace ModengTerm.Document
             int characterIndex = FindCharacterIndex(column);
             if (characterIndex == -1)
             {
-                // 按理说应该不会出现
-                logger.FatalFormat("EraseFromBeginning失败, startIndex == -1, column = {0}", column);
+                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
+                logger.WarnFormat("EraseFromBeginning失败, startIndex == -1, column = {0}", column);
                 return;
             }
 
-            EraseCharacter(0, characterIndex);
+            EraseRange(0, characterIndex + 1);
         }
 
         /// <summary>
-        /// 从光标处用空格填充n个字符
+        /// 用空白字符填充指定区域内的字符
         /// </summary>
-        /// <param name="column">光标位置</param>
-        /// <param name="characterCount">要填充的字符个数</param>
-        public void EraseRange(int column, int characterCount)
+        /// <param name="column">要从第几列开始擦除字符</param>
+        /// <param name="count">要擦除的字符个数</param>
+        public void EraseRange(int column, int count)
         {
-            int characterIndex = FindCharacterIndex(column);
-            if (characterIndex == -1)
+            if (count == 0)
             {
-                // 按理说应该不会出现
-                logger.FatalFormat("EraseRange失败, startIndex == -1, column = {0}", column);
                 return;
             }
 
-            PadColumns(characterIndex + characterCount);
-            EraseCharacter(characterIndex, characterCount);
+            if (column >= columns)
+            {
+                logger.WarnFormat("EraseRange失败，删除的索引位置在字符之外");
+                return;
+            }
+
+            int startIndex = FindCharacterIndex(column);
+            if (startIndex == -1)
+            {
+                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
+                logger.WarnFormat("DeleteText失败, startIndex == -1, column = {0}, count = {1}", column, count);
+                return;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                VTCharacter character = characters[startIndex + i];
+                if (character.ColumnSize > 1)
+                {
+                    columns -= character.ColumnSize - 1;
+                }
+
+                character.Character = ' ';
+                character.ColumnSize = 1;
+                character.Attribute = 0;
+                character.Flags = VTCharacterFlags.None;
+            }
+
+            SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -528,8 +536,13 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="column">从此处开始删除字符</param>
         /// <param name="count">要删除的字符个数</param>
-        public void DeleteCharacter(int column, int count)
+        public void DeleteRange(int column, int count)
         {
+            if (count == 0)
+            {
+                return;
+            }
+
             if (column >= columns)
             {
                 logger.WarnFormat("DeleteText失败，删除的索引位置在字符之外");
@@ -556,6 +569,14 @@ namespace ModengTerm.Document
             SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
+        /// <summary>
+        /// 删除该行所有字符
+        /// </summary>
+        public void DeleteAll()
+        {
+            this.DeleteRange(0, this.characters.Count);
+        }
+
         #endregion
 
         #region VTElement
@@ -573,14 +594,7 @@ namespace ModengTerm.Document
             IDrawingTextLine drawingTextLine = this.DrawingObject as IDrawingTextLine;
 
             VTFormattedText formattedText = VTUtils.CreateFormattedText(characters);
-            formattedText.Style = Style;
-
-            // 如果文本是空的那么无法测量出来高度
-            // 空白字符可以测量出来高度
-            if (string.IsNullOrWhiteSpace(formattedText.Text))
-            {
-                formattedText.Text = " ";
-            }
+            formattedText.Style = this.Style;
 
             // 把物理行号打印出来，调试用
             //formattedText.Text = string.Format("{0} - {1}", this.PhysicsRow, formattedText.Text);
@@ -594,16 +608,16 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 测量指定文本里的子文本的矩形框
+        /// 测量该行里指定的子文本矩形框
         /// </summary>
         /// <param name="startIndex">要测量的起始字符索引</param>
         /// <param name="count">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        public VTRect MeasureTextBlock(int startIndex, int count)
+        public VTRect MeasureTextRange(int startIndex, int count)
         {
             IDrawingTextLine objectText = DrawingObject as IDrawingTextLine;
 
-            return objectText.MeasureTextBlock(startIndex, count);
+            return objectText.MeasureTextRange(startIndex, count);
         }
 
         /// <summary>

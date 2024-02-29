@@ -7,24 +7,24 @@ using System.Threading.Tasks;
 namespace ModengTerm.Document.Enumerations
 {
     /// <summary>
-    /// 定义光标闪烁速度等级
-    /// 每种速度对应的间隔时间请参考XTermDefaultValues.XXXXBlinkInterval
+    /// 定义光标闪烁速度
+    /// 枚举的值就是闪烁间隔时间，单位毫秒
     /// </summary>
     public enum VTCursorSpeeds
     {
         /// <summary>
         /// 高速闪烁
         /// </summary>
-        HighSpeed,
+        HighSpeed = 300,
 
         /// <summary>
         /// 中速
         /// </summary>
-        NormalSpeed,
+        NormalSpeed = 600,
 
         /// <summary>
         /// 低速
         /// </summary>
-        LowSpeed,
+        LowSpeed = 900,
     }
 }

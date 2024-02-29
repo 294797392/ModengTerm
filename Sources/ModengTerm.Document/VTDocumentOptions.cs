@@ -48,9 +48,9 @@ namespace ModengTerm.Document
         public int ScrollbackMax { get; set; }
 
         /// <summary>
-        /// DECPrivateAutoWrapMode是否启用
+        /// 当一行数据超出了ViewportColumn的时候，是否自动换行
         /// </summary>
-        public bool DECPrivateAutoWrapMode { get; set; }
+        public bool AutoWrapMode { get; set; }
 
         /// <summary>
         /// 光标样式
@@ -66,5 +66,16 @@ namespace ModengTerm.Document
         /// 光标颜色
         /// </summary>
         public string CursorColor { get; set; }
+
+        /// <summary>
+        /// TextSelection的颜色
+        /// </summary>
+        public string SelectionColor { get; set; }
+
+        public VTDocumentOptions()
+        {
+            this.ScrollDelta = 1;
+            this.ScrollbackMax = 100;
+        }
     }
 }

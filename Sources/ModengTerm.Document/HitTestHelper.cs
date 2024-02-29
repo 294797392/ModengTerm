@@ -19,7 +19,7 @@ namespace ModengTerm.Document
         /// 根据Y坐标找到包含该Y坐标的历史行
         /// </summary>
         /// <param name="firstLine">要从第几行开始往下找</param>
-        /// <param name="cursorY">Y坐标偏移量</param>
+        /// <param name="cursorY">鼠标坐标Y轴数值</param>
         /// <returns>找到了就返回找到的历史行，没找到返回null</returns>
         public static VTextLine HitTestVTextLine(VTextLine firstLine, double cursorY)
         {
@@ -67,7 +67,10 @@ namespace ModengTerm.Document
             {
                 VTRect characterBounds = textLine.MeasureCharacter(i);
 
-                if (characterBounds.Left <= cursorX && characterBounds.Right >= cursorX)
+                double left = characterBounds.Left + characterBounds.Width / 2;
+                double right = characterBounds.Right;
+
+                if (cursorX > left && cursorX < right)
                 {
                     // 鼠标命中了字符，使用命中的字符的边界框
                     characterHitIndex = i;

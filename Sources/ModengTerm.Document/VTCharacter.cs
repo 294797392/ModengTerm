@@ -57,11 +57,14 @@ namespace ModengTerm.Document
         /// <summary>
         /// 创建一个新的字符
         /// </summary>
+        /// <param name="ch">要新建的字符</param>
+        /// <param name="columnSize">该字符占几列</param>
+        /// <param name="attributeState"></param>
         /// <remarks>
         /// 该方法会首先从缓存里取字符，如果缓存里没有空闲字符，那么创建一个新的
         /// </remarks>
         /// <returns></returns>
-        public static VTCharacter Create(char ch, int columnSize, VTextAttributeState attributeState)
+        public static VTCharacter Create(char ch, int columnSize, VTextAttributeState attributeState = null)
         {
             VTCharacter character = new VTCharacter();
             if (attributeState != null)

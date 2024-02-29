@@ -15,21 +15,26 @@ namespace ModengTerm.Document
         /// <summary>
         /// 获取或者设置是否显示滚动条
         /// </summary>
-        public virtual bool Visible { get; set; }
+        public abstract bool Visible { get; set; }
 
         /// <summary>
         /// 最多可以滚动到的值
         /// </summary>
-        public double Maximum { get; set; }
+        public abstract double Maximum { get; set; }
 
         /// <summary>
         /// 当前滚动到的值
         /// </summary>
-        public double Value { get; set; }
+        public abstract double Value { get; set; }
 
         /// <summary>
         /// 可视区域的行数
         /// </summary>
-        public int ViewportRow { get; set; }
+        public abstract int ViewportRow { get; set; }
+
+        /// <summary>
+        /// 滚动条所属文档
+        /// </summary>
+        public VTDocument Document { get; set; }
     }
 }

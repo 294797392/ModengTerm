@@ -105,7 +105,7 @@ namespace ModengTerm.Document
 
             #endregion
 
-            VTRect rect = textLine.MeasureTextBlock(matches.Index, matches.Length);
+            VTRect rect = textLine.MeasureTextRange(matches.Index, matches.Length);
 
             VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
             formattedText.OffsetX = rect.Left;

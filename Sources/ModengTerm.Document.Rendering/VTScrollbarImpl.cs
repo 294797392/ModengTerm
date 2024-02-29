@@ -13,44 +13,82 @@ namespace ModengTerm.Document.Rendering
     {
         #region 实例变量
 
-        private ScrollBar scorllbar;
+        private ScrollBar scrollbar;
 
         #endregion
+
+        public override double Maximum
+        {
+            get { return this.scrollbar.Maximum; }
+            set
+            {
+                if (this.scrollbar.Maximum != value)
+                {
+                    this.scrollbar.Maximum = value;
+                }
+            }
+        }
+
+        public override double Value
+        {
+            get { return this.scrollbar.Value; }
+            set
+            {
+                if (this.scrollbar.Value != value)
+                {
+                    this.scrollbar.Value = value;
+                }
+            }
+        }
+
+        public override int ViewportRow
+        {
+            get { return (int)this.scrollbar.ViewportSize; }
+            set
+            {
+                if (this.scrollbar.ViewportSize != value)
+                {
+                    this.scrollbar.ViewportSize = value;
+                }
+            }
+        }
 
         public override bool Visible
         {
             get
             {
-                return base.Visible;
+                return this.scrollbar.Visibility == Visibility.Visible;
             }
             set
             {
-                if (base.Visible != value) 
+                bool visible = this.scrollbar.Visibility == Visibility.Visible;
+
+                if (visible != value)
                 {
                     if (value)
                     {
-                        this.scorllbar.Visibility = Visibility.Visible;
+                        this.scrollbar.Visibility = Visibility.Visible;
                     }
                     else
                     {
-                        this.scorllbar.Visibility = Visibility.Collapsed;
+                        this.scrollbar.Visibility = Visibility.Collapsed;
                     }
-
-                    base.Visible = value;
                 }
             }
         }
 
-        public VTScrollbarImpl(ScrollBar scrollBar) 
+        public VTScrollbarImpl(ScrollBar scrollbar) 
         {
-            this.scorllbar = scorllbar;
-            this.scorllbar.LargeChange = 1;
-            this.scorllbar.SmallChange = 1;
-            //this.scorllbar.ValueChanged += Scorllbar_ValueChanged;
+            this.scrollbar = scrollbar;
+            this.scrollbar.LargeChange = 1;
+            this.scrollbar.SmallChange = 1;
+            this.scrollbar.ValueChanged += Scorllbar_ValueChanged;
         }
 
         private void Scorllbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            this.Document.EventInput.OnScrollChanged((int)e.NewValue);
+
             //double newvalue = Math.Round(newValue, 0);
             //if (newvalue > this.Maximum)
             //{

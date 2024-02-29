@@ -171,9 +171,9 @@
                         </Grid.ColumnDefinitions>
 
                         <mrendering:DrawingSurface Grid.Column="0" x:Name="PART_DrawingSurface" Background="Transparent"
-                                                Margin="{TemplateBinding Padding}"/>
+                                                   Margin="{TemplateBinding Padding}" Cursor="IBeam"/>
 
-                        <ScrollBar Grid.Column="1" x:Name="PART_Scrollbar" Style="{StaticResource ResourceKey=StyleScrollBar}"/>
+                        <ScrollBar Grid.Column="1" x:Name="PART_Scrollbar" Visibility="Collapsed" Style="{StaticResource ResourceKey=StyleScrollBar}"/>
 
                     </Grid>
 

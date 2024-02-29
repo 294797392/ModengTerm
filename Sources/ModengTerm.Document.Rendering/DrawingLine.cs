@@ -69,7 +69,7 @@ namespace ModengTerm.Document.Rendering
         public VTextMetrics Measure()
         {
             FormattedText formattedText = DrawingUtils.CreateFormattedText(this.FormattedText);
-            return new VTextMetrics() 
+            return new VTextMetrics()
             {
                 Width = formattedText.WidthIncludingTrailingWhitespace,
                 Height = formattedText.Height
@@ -83,7 +83,7 @@ namespace ModengTerm.Document.Rendering
         /// <param name="startIndex">要测量的起始字符索引</param>
         /// <param name="count">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        public VTRect MeasureTextBlock(int startIndex, int count)
+        public VTRect MeasureTextRange(int startIndex, int count)
         {
             return CommonMeasureLine(this.FormattedText, startIndex, count);
         }

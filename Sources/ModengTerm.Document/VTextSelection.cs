@@ -14,15 +14,11 @@ namespace ModengTerm.Document
     {
         #region 类变量
 
-        private static readonly VTRect NullRect = new VTRect(-1, -1, -1, -1);
-
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTextSelection");
 
         #endregion
 
         #region 实例变量
-
-        private bool dirty;
 
         private int firstRow;
         private int lastRow;
@@ -73,6 +69,9 @@ namespace ModengTerm.Document
             }
         }
 
+        /// <summary>
+        /// 选中区域的第一行的第一个字符
+        /// </summary>
         public int FirstRowCharacterIndex
         {
             get { return firstRowCharacterIndex; }
@@ -86,6 +85,9 @@ namespace ModengTerm.Document
             }
         }
 
+        /// <summary>
+        /// 选中区域的最后一行的最后一个字符
+        /// </summary>
         public int LastRowCharacterIndex
         {
             get { return lastRowCharacterIndex; }
@@ -98,6 +100,11 @@ namespace ModengTerm.Document
                 }
             }
         }
+
+        /// <summary>
+        /// 选中区域的颜色
+        /// </summary>
+        public string Color { get; set; }
 
         #endregion
 
@@ -120,6 +127,8 @@ namespace ModengTerm.Document
         /// <param name="container"></param>
         private void UpdateGeometry()
         {
+            this.geometries.Clear();
+
             VTextPointer Start = new VTextPointer(firstRow, firstRowCharacterIndex);
             VTextPointer End = new VTextPointer(lastRow, lastRowCharacterIndex);
 
@@ -137,18 +146,19 @@ namespace ModengTerm.Document
                     return;
                 }
 
+                // 单独处理选中的是一个字符的情况
+                if (Start.CharacterIndex == End.CharacterIndex)
+                {
+                    // 选中的是一个字符
+                    VTRect bounds1 = textLine.MeasureCharacter(Start.CharacterIndex);
+                    geometries.Add(bounds1);
+                    return;
+                }
+
                 VTextPointer leftPointer = Start.CharacterIndex < End.CharacterIndex ? Start : End;
                 VTextPointer rightPointer = Start.CharacterIndex < End.CharacterIndex ? End : Start;
 
-                VTRect leftBounds = textLine.MeasureCharacter(leftPointer.CharacterIndex);
-                VTRect rightBounds = textLine.MeasureCharacter(rightPointer.CharacterIndex);
-
-                double x = leftBounds.Left;
-                double y = textLine.OffsetY;
-                double width = rightBounds.Right - leftBounds.Left;
-                double height = textLine.Height;
-
-                VTRect bounds = new VTRect(x, y, width, height);
+                VTRect bounds = textLine.MeasureTextRange(leftPointer.CharacterIndex, rightPointer.CharacterIndex - leftPointer.CharacterIndex + 1);
                 geometries.Add(bounds);
                 return;
             }
@@ -223,17 +233,17 @@ namespace ModengTerm.Document
         /// <summary>
         /// 清除选中的区域
         /// </summary>
-        public void Reset()
+        public void Clear()
         {
             OffsetY = 0;
             OffsetX = 0;
-
-            this.geometries.Clear();
 
             FirstRow = -1;
             LastRow = -1;
             FirstRowCharacterIndex = -1;
             LastRowCharacterIndex = -1;
+
+            this.geometries.Clear();
         }
 
         public void Normalize(out int topRow, out int bottomRow, out int startIndex, out int endIndex)
@@ -284,6 +294,10 @@ namespace ModengTerm.Document
             LastRow = -1;
             FirstRowCharacterIndex = -1;
             LastRowCharacterIndex = -1;
+
+            IDrawingSelection drawingSelection = drawingObject as IDrawingSelection;
+            drawingSelection.Color = this.Color;
+            drawingSelection.Geometry = this.geometries;
         }
 
         protected override void OnRelease()

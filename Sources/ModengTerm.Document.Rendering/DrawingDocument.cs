@@ -20,7 +20,6 @@ namespace ModengTerm.Document.Rendering
 
         private DrawingSurface surface;
         private ScrollBar scrollbar;
-        private VTDocumentHandler eventHandler;
 
         #endregion
 
@@ -36,7 +35,7 @@ namespace ModengTerm.Document.Rendering
         public double PaddingSize
         {
             get { return this.Padding.Left; }
-            set 
+            set
             {
                 this.Padding = new Thickness(value);
             }
@@ -88,17 +87,6 @@ namespace ModengTerm.Document.Rendering
             }
         }
 
-        public VTRect GetContentRect()
-        {
-            Point leftTop = surface.TranslatePoint(new Point(), this);
-            return new VTRect(leftTop.X, leftTop.Y, surface.ActualWidth, surface.ActualHeight);
-        }
-
-        public void AddHandler(VTDocumentHandler eventHandler)
-        {
-            this.eventHandler = eventHandler;
-        }
-
         public VTypeface GetTypeface(double fontSize, string fontFamily)
         {
             Typeface typeface = DrawingUtils.GetTypeface(fontFamily);
@@ -116,92 +104,6 @@ namespace ModengTerm.Document.Rendering
 
         #endregion
 
-        #region 事件处理器
-
-        private void Surface_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (this.eventHandler == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            Point p = e.GetPosition(frameworkElement);
-            frameworkElement.CaptureMouse();
-            this.eventHandler.OnMouseDown(this, new VTPoint(p.X, p.Y), e.ClickCount);
-
-            // 不设置为true的话会立即出发MosueLeftButtonUp事件，不知道为什么
-            e.Handled = true;
-        }
-
-        private void Surface_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (this.eventHandler == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            Point p = e.GetPosition(frameworkElement);
-            this.eventHandler.OnMouseUp(this, new VTPoint(p.X, p.Y));
-            frameworkElement.ReleaseMouseCapture();
-        }
-
-        private void Surface_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (this.eventHandler == null)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            if (!frameworkElement.IsMouseCaptured)
-            {
-                return;
-            }
-
-            Point p = e.GetPosition(frameworkElement);
-            this.eventHandler.OnMouseMove(this, new VTPoint(p.X, p.Y));
-        }
-
-        private void Surface_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (this.eventHandler == null)
-            {
-                return;
-            }
-
-            if (!e.WidthChanged && !e.HeightChanged)
-            {
-                return;
-            }
-
-            FrameworkElement frameworkElement = sender as FrameworkElement;
-            this.eventHandler.OnSizeChanged(this, new VTSize(frameworkElement.ActualWidth, frameworkElement.ActualHeight));
-        }
-
-        private void Surface_MouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (this.eventHandler == null)
-            {
-                return;
-            }
-
-            this.eventHandler.OnMouseWheel(this, e.Delta > 0);
-        }
-
-        private void Scrollbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (this.eventHandler == null)
-            {
-                return;
-            }
-
-            this.eventHandler.OnScrollChanged(this, (int)e.NewValue);
-        }
-
-        #endregion
-
         #region 重写方法
 
         public override void OnApplyTemplate()
@@ -209,15 +111,7 @@ namespace ModengTerm.Document.Rendering
             base.OnApplyTemplate();
 
             this.surface = base.Template.FindName("PART_DrawingSurface", this) as DrawingSurface;
-            surface.MouseLeftButtonDown += Surface_MouseLeftButtonDown;
-            surface.MouseLeftButtonUp += Surface_MouseLeftButtonUp;
-            surface.MouseMove += Surface_MouseMove;
-            surface.SizeChanged += Surface_SizeChanged;
-            surface.MouseWheel += Surface_MouseWheel;
-
             this.scrollbar = base.Template.FindName("PART_Scrollbar", this) as ScrollBar;
-            this.scrollbar.ValueChanged += Scrollbar_ValueChanged;
-
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
         }
 

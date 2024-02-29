@@ -13,5 +13,10 @@ namespace ModengTerm.Document.Drawing
         /// 选项区域
         /// </summary>
         List<VTRect> Geometry { get; set; }
+
+        /// <summary>
+        /// 选中区域的颜色
+        /// </summary>
+        string Color { get; set; }
     }
 }

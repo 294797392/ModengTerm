@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +15,13 @@ namespace ModengTerm.Document.Rendering
     /// </summary>
     public class DrawingSelection : DrawingObject, IDrawingSelection
     {
-        private static readonly Brush DefaultSelectionBrush = Application.Current.FindResource("BrushSelectionBackground") as Brush;
-
         private StreamGeometry selectionGeometry;
         private Pen pen;
         private Brush brush;
 
         public List<VTRect> Geometry { get; set; }
+
+        public string Color { get; set; }
 
         public DrawingSelection()
         {
@@ -30,7 +31,7 @@ namespace ModengTerm.Document.Rendering
         {
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
-            this.brush = DefaultSelectionBrush;
+            this.brush = DrawingUtils.GetBrush(this.Color);
         }
 
         protected override void OnRelease()

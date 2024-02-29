@@ -6,23 +6,6 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Document.Drawing
 {
-    public class VTDocumentHandler
-    {
-        public delegate void MouseWheelDelegate(IDrawingDocument sender, bool upper);
-        public delegate void MouseDownDelegate(IDrawingDocument sender, VTPoint location, int clickCount);
-        public delegate void MouseMoveDelegate(IDrawingDocument sender, VTPoint location);
-        public delegate void MouseUpDelegate(IDrawingDocument sender, VTPoint location);
-        public delegate void SizeChangedDelegate(IDrawingDocument sender, VTSize contentSize);
-        public delegate void ScrollChangedDelegate(IDrawingDocument sender, int scrollValue);
-
-        public MouseWheelDelegate OnMouseWheel;
-        public MouseDownDelegate OnMouseDown;
-        public MouseMoveDelegate OnMouseMove;
-        public MouseUpDelegate OnMouseUp;
-        public SizeChangedDelegate OnSizeChanged;
-        public ScrollChangedDelegate OnScrollChanged;
-    }
-
     /// <summary>
     /// 文档渲染对象
     /// 一个文档里包文本，光标等元素
@@ -73,11 +56,5 @@ namespace ModengTerm.Document.Drawing
         /// <param name="textStyle">字体样式</param>
         /// <returns></returns>
         VTypeface GetTypeface(double fontSize, string fontFamily);
-
-        /// <summary>
-        /// 为文档增加事件处理器
-        /// </summary>
-        /// <param name="handler">要增加的事件处理器</param>
-        void AddHandler(VTDocumentHandler handler);
     }
 }

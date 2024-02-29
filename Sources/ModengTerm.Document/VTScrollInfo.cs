@@ -273,6 +273,7 @@ namespace ModengTerm.Document
             this.scrollbar.Value = 0;
             this.scrollbar.ViewportRow = ViewportRow;
             this.scrollbar.Visible = false; // 默认不显示滚动条
+            this.scrollbar.Document = this.ownerDocument;
         }
 
         public void Release()

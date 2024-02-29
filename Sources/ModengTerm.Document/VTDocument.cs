@@ -1,18 +1,16 @@
-﻿using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Drawing;
+﻿using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ModengTerm.Document.VTextLine;
 
 namespace ModengTerm.Document
 {
     /// <summary>
-    /// 终端显示的字符的文档模型
+    /// 文档数据模型
+    /// 负责维护文档的所有状态，用户输入
     /// </summary>
     public class VTDocument
     {
@@ -182,6 +180,11 @@ namespace ModengTerm.Document
         /// </summary>
         public VTypeface Typeface { get { return options.Typeface; } }
 
+        /// <summary>
+        /// 获取该文档的事件输入
+        /// </summary>
+        public VTEventInput EventInput { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -191,6 +194,16 @@ namespace ModengTerm.Document
             this.options = options;
             IsAlternate = options.IsAlternate;
             DrawingObject = options.DrawingObject;
+            this.EventInput = new VTEventInput()
+            {
+                OnMouseDown = this.OnMouseDown,
+                OnMouseMove = this.OnMouseMove,
+                OnMouseUp = this.OnMouseUp,
+                OnMouseWheel = this.OnMouseWheel,
+                OnScrollChanged = this.OnScrollChanged,
+                OnSizeChanged = this.OnSizeChanged,
+                OnInput = this.OnInput
+            };
             cursorState = new VTCursorState();
             startPointer = new VTextPointer();
             endPointer = new VTextPointer();
@@ -588,6 +601,42 @@ namespace ModengTerm.Document
             }
         }
 
+        private void HandleTextInput(VTInput input)
+        {
+            foreach (char ch in input.Text)
+            {
+                VTCharacter character = VTCharacter.Create(ch, 1);
+                this.PrintCharacter(character, this.Cursor.Column);
+                this.SetCursor(this.Cursor.Row, this.Cursor.Column + 1);
+            }
+        }
+
+        private void HandleKeyInput(VTInput input)
+        {
+            VTKeys key = input.Key;
+
+            if (key >= VTKeys.A && key <= VTKeys.Z)
+            {
+                input.Type = VTInputTypes.TextInput;
+                input.Text = key.ToString();
+                this.HandleTextInput(input);
+                return;
+            }
+
+            switch (key)
+            {
+                case VTKeys.Enter:
+                    {
+                        this.LineFeed();
+                        this.SetCursor(this.Cursor.Row, 0);
+                        break;
+                    }
+
+                default:
+                    break;
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -599,7 +648,7 @@ namespace ModengTerm.Document
             Cursor.OffsetY = 0;
             Cursor.Row = 0;
             Cursor.Column = 0;
-            Cursor.Interval = 100;// VTUtils.GetCursorInterval(options.CursorSpeed);
+            Cursor.Interval = (int)options.CursorSpeed;
             Cursor.AllowBlink = true;
             Cursor.IsVisible = true;
             Cursor.Color = options.CursorColor;
@@ -608,6 +657,7 @@ namespace ModengTerm.Document
             Cursor.Initialize();
 
             Selection = new VTextSelection(this);
+            Selection.Color = options.SelectionColor;
             Selection.Initialize();
 
             Scrollbar = new VTScrollInfo(this);
@@ -716,7 +766,7 @@ namespace ModengTerm.Document
 
                 // 下移之后，删除整行数据，终端会重新打印该行数据的
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
-                ActiveLine.EraseAll();
+                ActiveLine.DeleteAll();
 
                 if (!IsAlternate)
                 {
@@ -742,6 +792,33 @@ namespace ModengTerm.Document
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 SetCursor(Cursor.Row + 1, Cursor.Column);
             }
+
+            #region 记录历史行
+
+            // 1. 更新旧的最后一行的历史行数据
+            // 2. 创建新的历史行
+
+            // 更新旧的最后一行和新的最后一行的历史记录
+            this.Scrollbar.UpdateHistory(this.ActiveLine.PreviousLine);
+            this.Scrollbar.UpdateHistory(this.ActiveLine);
+
+            #endregion
+
+            #region 更新滚动条的值
+
+            // 滚动条滚动到底
+            // 计算滚动条可以滚动的最大值
+            int scrollMax = this.FirstLine.PhysicsRow;
+            if (scrollMax > 0)
+            {
+                this.Scrollbar.ScrollMax = scrollMax;
+                this.Scrollbar.ScrollValue = scrollMax;
+            }
+
+            #endregion
+
+            // 触发行被完全打印的事件
+            //this.LinePrinted?.Invoke(this, oldHistoryLine);
         }
 
         /// <summary>
@@ -801,7 +878,7 @@ namespace ModengTerm.Document
                 // 上移之后，删除整行数据，终端会重新打印该行数据的
                 // 如果不删除的话，在man程序下有可能会显示重叠的信息
                 // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
-                ActiveLine.EraseAll();
+                ActiveLine.DeleteAll();
 
                 // 物理行号和scrollMargin无关
                 if (!IsAlternate)
@@ -829,9 +906,9 @@ namespace ModengTerm.Document
         /// <param name="ch"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
-        public void PrintCharacter(VTextLine textLine, VTCharacter character, int column)
+        public void PrintCharacter(VTCharacter character, int column)
         {
-            textLine.PrintCharacter(character, column);
+            this.ActiveLine.PrintCharacter(character, column);
         }
 
         /// <summary>
@@ -840,8 +917,10 @@ namespace ModengTerm.Document
         /// <param name="textLine">要执行删除操作的行</param>
         /// <param name="column">光标所在列</param>
         /// <param name="eraseType">删除类型</param>
-        public void EraseLine(VTextLine textLine, int column, EraseType eraseType)
+        public void EraseLine(int column, EraseType eraseType)
         {
+            VTextLine textLine = this.ActiveLine;
+
             switch (eraseType)
             {
                 case EraseType.ToEnd:
@@ -877,8 +956,10 @@ namespace ModengTerm.Document
         /// <param name="textLine">当前光标所在行</param>
         /// <param name="column">当前的光标位置</param>
         /// <param name="eraseType"></param>
-        public void EraseDisplay(VTextLine textLine, int column, EraseType eraseType)
+        public void EraseDisplay(int column, EraseType eraseType)
         {
+            VTextLine textLine = this.ActiveLine;
+
             switch (eraseType)
             {
                 case EraseType.ToEnd:
@@ -955,19 +1036,22 @@ namespace ModengTerm.Document
         /// <param name="textLine">要删除的字符所在行</param>
         /// <param name="column">要删除的字符起始列</param>
         /// <param name="count">要删除的字符个数</param>
-        public void DeleteCharacter(VTextLine textLine, int column, int count)
+        public void DeleteCharacter(int column, int count)
         {
-            textLine.DeleteCharacter(column, count);
+            VTextLine textLine = this.ActiveLine;
+
+            textLine.DeleteRange(column, count);
         }
 
         /// <summary>
-        /// 在可视区域的指定的行位置插入多个新行，并把指定的行和指定行后面的所有行往后移动
+        /// 在光标所在行的位置插入多个新行，并把光标所在行和后面的所有行往后移动
         /// 要考虑到TopMargin和BottomMargin
         /// </summary>
-        /// <param name="activeLine">光标所在行</param>
         /// <param name="lines">要插入的行数</param>
-        public void InsertLines(VTextLine activeLine, int lines)
+        public void InsertLines(int lines)
         {
+            VTextLine activeLine = this.ActiveLine;
+
             VTextLine head = FirstLine.FindNext(ScrollMarginTop);
             VTextLine last = LastLine.FindPrevious(ScrollMarginBottom);
 
@@ -1033,10 +1117,11 @@ namespace ModengTerm.Document
         /// <summary>
         /// 从activeLine开始删除lines行，并把后面的行往前移动
         /// </summary>
-        /// <param name="activeLine"></param>
         /// <param name="lines"></param>
-        public void DeleteLines(VTextLine activeLine, int lines)
+        public void DeleteLines(int lines)
         {
+            VTextLine activeLine = this.ActiveLine;
+
             VTextLine current = activeLine;
 
             VTextLine head = FirstLine.FindNext(ScrollMarginTop);
@@ -1100,11 +1185,12 @@ namespace ModengTerm.Document
         /// <summary>
         /// 在指定行的指定位置处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
         /// </summary>
-        /// <param name="textLine">要插入空白字符的行</param>
         /// <param name="column">要插入的字符的列</param>
         /// <param name="characters">要插入的空白字符的个数</param>
-        public void InsertCharacters(VTextLine textLine, int column, int characters)
+        public void InsertCharacters(int column, int characters)
         {
+            VTextLine textLine = this.ActiveLine;
+
             for (int i = 0; i < characters; i++)
             {
                 // 先找到当前光标处的字符索引
@@ -1142,7 +1228,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 设置光标位置和activeLine
         /// row和column从0开始计数，0表示第一行或者第一列
-        /// /// </summary>
+        /// </summary>
         /// <param name="row">要设置的行</param>
         /// <param name="column">要设置的列</param>
         public void SetCursor(int row, int column)
@@ -1158,14 +1244,6 @@ namespace ModengTerm.Document
             if (Cursor.Column != column)
             {
                 Cursor.Column = column;
-            }
-
-            // 要判断下光标所在行是否为空
-            // 如果光标所在行被滚动到可视区域外了，然后执行CR指令，那么ActiveLine就是空的
-            if (ActiveLine != null)
-            {
-                ActiveLine.PadColumns(column + 1);
-                Cursor.CharacterIndex = ActiveLine.FindCharacterIndex(column) - 1;
             }
         }
 
@@ -1650,6 +1728,7 @@ namespace ModengTerm.Document
             #region 重绘光标
 
             // 光标闪烁在单独线程处理，这里只改变光标位置
+            Cursor.MakeInvalidate();
             Cursor.RequestInvalidate();
 
             #endregion
@@ -1671,16 +1750,19 @@ namespace ModengTerm.Document
 
         #region 事件处理器
 
-        public void OnMouseDown(VTPoint mouseLocation, int clickCount)
+        private void OnMouseDown(VTPoint mouseLocation, int clickCount)
         {
             if (clickCount == 1)
             {
                 isMouseDown = true;
                 mouseDownPos = mouseLocation;
 
-                // 点击的时候先清除选中区域
-                Selection.Reset();
-                Selection.RequestInvalidate();
+                if (!Selection.IsEmpty)
+                {
+                    // 点击的时候先清除选中区域
+                    Selection.Clear();
+                    Selection.RequestInvalidate();
+                }
             }
             else
             {
@@ -1734,7 +1816,7 @@ namespace ModengTerm.Document
             }
         }
 
-        public void OnMouseMove(VTPoint mouseLocation)
+        private void OnMouseMove(VTPoint mouseLocation)
         {
             if (!isMouseDown)
             {
@@ -1745,7 +1827,7 @@ namespace ModengTerm.Document
             {
                 // 此时说明开始选中操作
                 selectionState = true;
-                Selection.Reset();
+                Selection.Clear();
                 startPointer.CharacterIndex = -1;
                 startPointer.PhysicsRow = -1;
                 endPointer.CharacterIndex = -1;
@@ -1789,16 +1871,6 @@ namespace ModengTerm.Document
 
             #endregion
 
-            #region 起始字符和结束字符是同一个字符，啥都不做
-
-            if (startPointer.CharacterIndex == endPointer.CharacterIndex)
-            {
-                //logger.WarnFormat("鼠标命中的起始字符和结束字符是相同字符");
-                return;
-            }
-
-            #endregion
-
             // 重新渲染
             // PerformDrawing会更新TextSelection的形状
 
@@ -1808,25 +1880,18 @@ namespace ModengTerm.Document
             Selection.LastRowCharacterIndex = endPointer.CharacterIndex;
 
             // 此处要全部刷新，因为有可能会触发ScrollIfCursorOutsideDocument
-            // ScrollIfCursorOutsideDocument的情况下，是滚动后的数据，所以需要刷新
+            // ScrollIfCursorOutsideDocument的情况下，要显示滚动后的数据
             RequestInvalidate();
         }
 
-        public void OnMouseUp(VTPoint mouseLocation)
+        private void OnMouseUp(VTPoint mouseLocation)
         {
             isMouseDown = false;
             selectionState = false;
         }
 
-        public void OnMouseWheel(bool upper)
+        private void OnMouseWheel(bool upper)
         {
-            // 只有主缓冲区才可以用鼠标滚轮进行滚动
-            // 备用缓冲区不可以滚动
-            if (IsAlternate)
-            {
-                return;
-            }
-
             int scrollValue = Scrollbar.ScrollValue;
             int scrollMax = Scrollbar.ScrollMax;
 
@@ -1877,6 +1942,44 @@ namespace ModengTerm.Document
 
             // 重新渲染
             RequestInvalidate();
+        }
+
+        private void OnSizeChanged(VTSize newSize)
+        {
+
+        }
+
+        private void OnScrollChanged(int scrollValue)
+        {
+            this.ScrollTo(scrollValue);
+            this.RequestInvalidate();
+        }
+
+        /// <summary>
+        /// 当有输入的时候触发
+        /// </summary>
+        /// <param name="text"></param>
+        private void OnInput(VTInput input)
+        {
+            switch (input.Type)
+            {
+                case VTInputTypes.TextInput:
+                    {
+                        this.HandleTextInput(input);
+                        break;
+                    }
+
+                case VTInputTypes.KeyInput:
+                    {
+                        this.HandleKeyInput(input);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            this.RequestInvalidate();
         }
 
         #endregion

@@ -9,6 +9,32 @@ using System.Threading.Tasks;
 namespace ModengTerm.Document
 {
     /// <summary>
+    /// 定义光标类型
+    /// </summary>
+    public enum VTCursorStyles
+    {
+        /// <summary>
+        /// 不显示光标
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// 光标是一条竖线
+        /// </summary>
+        Line,
+
+        /// <summary>
+        /// 光标是一个矩形块
+        /// </summary>
+        Block,
+
+        /// <summary>
+        /// 光标是半个下划线
+        /// </summary>
+        Underscore
+    }
+
+    /// <summary>
     /// 光标的数据模型
     /// </summary>
     public class VTCursor : VTElement
@@ -25,7 +51,6 @@ namespace ModengTerm.Document
         private int row;
         private bool blinkState;
         private bool blinkAllowed;
-        private int characterIndex;
         private VTCursorStyles style;
         private string color;
         private int interval;
@@ -69,6 +94,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 光标所在列
         /// 从0开始，最大值是终端的ColumnSize - 1
+        /// 表示下一个要打印的字符的位置
         /// </summary>
         public int Column
         {
@@ -78,7 +104,7 @@ namespace ModengTerm.Document
                 if (column != value)
                 {
                     column = value;
-                    SetDirtyFlags(VTDirtyFlags.PositionDirty, true);
+                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
                 }
             }
         }
@@ -95,24 +121,7 @@ namespace ModengTerm.Document
                 if (row != value)
                 {
                     row = value;
-                    SetDirtyFlags(VTDirtyFlags.PositionDirty, true);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 光标所在位置的前一个字符索引（光标永远都是在下一个要打印的字符位置上）
-        /// 注意该字符索引不等于Column，因为有可能一个字符占多列
-        /// 在VTDocument.SetCurosr时候设置
-        /// </summary>
-        public int CharacterIndex
-        {
-            get { return characterIndex; }
-            set
-            {
-                if (characterIndex != value)
-                {
-                    characterIndex = value;
+                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
                 }
             }
         }
@@ -140,7 +149,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 光标闪烁的间隔时间
         /// </summary>
-        public int Interval 
+        public int Interval
         {
             get { return this.interval; }
             set
@@ -217,20 +226,40 @@ namespace ModengTerm.Document
         /// </summary>
         protected override void OnRender()
         {
-            VTextLine cursorLine = this.OwnerDocument.ActiveLine;
-            if (cursorLine == null)
+            VTextLine activeLine = this.OwnerDocument.ActiveLine;
+            if (activeLine == null)
             {
+                // 光标不存在
+                DrawingObject.Arrange(-9999, -9999);
                 return;
             }
 
             // 设置光标位置
-            // 有可能有中文字符，一个中文字符占用2列
-            // 先通过光标所在列找到真正的字符所在列
-            int characterIndex = this.characterIndex;
-            // 字符大于0才去测量
-            VTRect rect = cursorLine.MeasureTextBlock(characterIndex, 1);
+
+            // 光标在这个索引位置的字符后面
+            int characterIndex = 0;
+
+            if (this.column == activeLine.Columns)
+            {
+                // 此时说明光标在最后一个字符的后面
+                characterIndex = activeLine.Characters.Count - 1;
+            }
+            else if (this.column < activeLine.Columns)
+            {
+                // 此时说明光标在某个字符后面
+                characterIndex = activeLine.FindCharacterIndex(this.column);
+            }
+            else
+            {
+                // 此时说明光标位置已经超出了最后一个字符的位置
+                // 不做处理
+                logger.WarnFormat("光标超出了最后一个字符的位置, 渲染光标失败");
+                return;
+            }
+
+            VTRect rect = activeLine.MeasureCharacter(characterIndex);
             double offsetX = rect.Right;
-            double offsetY = cursorLine.OffsetY;
+            double offsetY = activeLine.OffsetY;
             DrawingObject.Arrange(offsetX, offsetY);
         }
 
@@ -256,9 +285,6 @@ namespace ModengTerm.Document
             else
             {
                 // 说明光标所在行可见
-
-                // 设置光标是否可以显示
-                DrawingObject.SetOpacity(IsVisible ? 1 : 0);
 
                 // 可以显示的话再执行下面的
                 if (IsVisible)

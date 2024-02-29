@@ -1,0 +1,22 @@
+﻿<Window x:Class="ModengTerm.DocumentApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModengTerm.DocumentApp"
+        xmlns:rendering="clr-namespace:ModengTerm.Document.Rendering;assembly=ModengTerm.Document.Rendering"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+    </Window.Resources>
+    
+    <Grid>
+
+        <Border BorderBrush="Blue" BorderThickness="2" Margin="30">
+            <rendering:DrawingDocument x:Name="Document"/>
+        </Border>
+
+    </Grid>
+</Window>
