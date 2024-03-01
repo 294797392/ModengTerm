@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using Microsoft.Win32;
 using ModengTerm.Base;
+using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
 using System;

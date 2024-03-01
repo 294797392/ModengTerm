@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit.Modular;
 using ModengTerm.Base;
-using ModengTerm.Terminal.Document;
+using ModengTerm.Document;
+using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -156,7 +157,9 @@ namespace ModengTerm.Terminal.Loggering
 
             lock (logger.Builder)
             {
-                logger.CreateLine(historyLine.Characters, logger.Builder, 0, historyLine.Characters.Count, logger.Filter);
+                // TODO：
+                throw new NotImplementedException();
+                //logger.CreateLine(historyLine.Characters, logger.Builder, 0, historyLine.Characters.Count, logger.Filter);
             }
         }
 

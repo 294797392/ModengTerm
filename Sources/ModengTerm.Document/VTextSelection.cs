@@ -150,16 +150,16 @@ namespace ModengTerm.Document
                 if (Start.CharacterIndex == End.CharacterIndex)
                 {
                     // 选中的是一个字符
-                    VTRect bounds1 = textLine.MeasureCharacter(Start.CharacterIndex);
-                    geometries.Add(bounds1);
+                    VTextRange bounds1 = textLine.MeasureCharacter(Start.CharacterIndex);
+                    geometries.Add(VTRect.CreateFromTextRange(bounds1, textLine.OffsetY));
                     return;
                 }
 
                 VTextPointer leftPointer = Start.CharacterIndex < End.CharacterIndex ? Start : End;
                 VTextPointer rightPointer = Start.CharacterIndex < End.CharacterIndex ? End : Start;
 
-                VTRect bounds = textLine.MeasureTextRange(leftPointer.CharacterIndex, rightPointer.CharacterIndex - leftPointer.CharacterIndex + 1);
-                geometries.Add(bounds);
+                VTextRange bounds = textLine.MeasureTextRange(leftPointer.CharacterIndex, rightPointer.CharacterIndex - leftPointer.CharacterIndex + 1);
+                geometries.Add(VTRect.CreateFromTextRange(bounds, textLine.OffsetY));
                 return;
             }
 
@@ -174,11 +174,11 @@ namespace ModengTerm.Document
             {
                 // 此时说明选中的内容都在屏幕里
                 // 构建上边和下边的矩形
-                VTRect topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
-                VTRect bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
+                VTextRange topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
+                VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
 
                 // 第一行的矩形
-                geometries.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
+                geometries.Add(new VTRect(topBounds.OffsetX, topLine.OffsetY, container.Width - topBounds.OffsetX, topLine.Height));
 
                 // 中间的矩形
                 double y = topLine.OffsetY + topBounds.Height;
@@ -186,17 +186,17 @@ namespace ModengTerm.Document
                 geometries.Add(new VTRect(0, y, container.Width, height));
 
                 // 最后一行的矩形
-                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
+                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Width, bottomLine.Height));
                 return;
             }
 
             if (topLine != null && bottomLine == null)
             {
                 // 选中的内容有一部分被移到屏幕外了，滚动条往上移动
-                VTRect topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
+                VTextRange topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
 
                 // 第一行的矩形
-                geometries.Add(new VTRect(topBounds.X, topLine.OffsetY, container.Width - topBounds.X, topLine.Height));
+                geometries.Add(new VTRect(topBounds.OffsetX, topLine.OffsetY, container.Width - topBounds.OffsetX, topLine.Height));
 
                 // 剩下的矩形
                 double height = document.LastLine.Bounds.Bottom - topLine.Bounds.Bottom;
@@ -207,10 +207,10 @@ namespace ModengTerm.Document
             if (topLine == null && bottomLine != null)
             {
                 // 选中的内容有一部分被移到屏幕外了，滚动条往下移动
-                VTRect bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
+                VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
 
                 // 最后一行的矩形
-                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Right, bottomLine.Height));
+                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Width, bottomLine.Height));
 
                 // 剩下的矩形
                 geometries.Add(new VTRect(0, 0, container.Width, bottomLine.OffsetY));

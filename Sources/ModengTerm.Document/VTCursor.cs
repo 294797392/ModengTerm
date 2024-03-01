@@ -230,6 +230,7 @@ namespace ModengTerm.Document
             if (activeLine == null)
             {
                 // 光标不存在
+                // 不要使用SetOpticty隐藏光标，只有闪烁线程才可以调用SetOpacty显隐光标，其他地方如果调用的话会导致光标闪烁不流畅
                 DrawingObject.Arrange(-9999, -9999);
                 return;
             }
@@ -253,12 +254,12 @@ namespace ModengTerm.Document
             {
                 // 此时说明光标位置已经超出了最后一个字符的位置
                 // 不做处理
-                logger.WarnFormat("光标超出了最后一个字符的位置, 渲染光标失败");
+                logger.DebugFormat("光标超出了最后一个字符的位置, 渲染光标失败");
                 return;
             }
 
-            VTRect rect = activeLine.MeasureCharacter(characterIndex);
-            double offsetX = rect.Right;
+            VTextRange textRange = activeLine.MeasureCharacter(characterIndex);
+            double offsetX = textRange.OffsetX + textRange.Width;
             double offsetY = activeLine.OffsetY;
             DrawingObject.Arrange(offsetX, offsetY);
         }

@@ -1,5 +1,5 @@
-﻿using ModengTerm.Terminal.Callbacks;
-using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Document.Enumerations;
+using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;

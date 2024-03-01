@@ -27,6 +27,7 @@
     <Compile Remove="Drawing\DrawingUtils.cs" />
     <Compile Remove="Drawing\IDrawingBookmark.cs" />
     <Compile Remove="VTBookmarkStates.cs" />
+    <Compile Remove="VTColorTable.cs" />
     <Compile Remove="VTFramedElement.cs" />
     <Compile Remove="VTWallpaper.cs" />
   </ItemGroup>

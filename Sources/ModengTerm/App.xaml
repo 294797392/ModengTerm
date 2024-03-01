@@ -12,7 +12,7 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Themes/Themes.Default.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm.Controls;component/Template.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/ModengTerm.Terminal;component/Rendering/WPF/Template.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm.Document.Rendering;component/Template.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 

@@ -1,5 +1,7 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Terminal.Document;
+using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
@@ -69,7 +71,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private List<MatchResult> matchResult;
 
-        private VTMatchesLine matchesLine;
+        //private VTMatchesLine matchesLine;
 
         /// <summary>
         /// 是否停止查找
@@ -186,8 +188,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.FindStartupList.AddRange(MTermUtils.GetEnumValues<FindStartups>());
             this.matchResult = new List<MatchResult>();
 
-            this.matchesLine = new VTMatchesLine(this.videoTerminal.ActiveDocument);
-            this.matchesLine.Initialize();
+            //this.matchesLine = new VTMatchesLine(this.videoTerminal.ActiveDocument);
+            //this.matchesLine.Initialize();
         }
 
         #endregion
@@ -319,11 +321,11 @@ namespace ModengTerm.Terminal.ViewModels
         {
             VTextLine textLine = this.videoTerminal.ActiveDocument.FindLine(matches.PhysicsRow);
 
-            this.matchesLine.MatchesList = matches.Matches;
-            this.matchesLine.TextLine = textLine;
-            this.matchesLine.OffsetY = textLine.OffsetY;
+            //this.matchesLine.MatchesList = matches.Matches;
+            //this.matchesLine.TextLine = textLine;
+            //this.matchesLine.OffsetY = textLine.OffsetY;
 
-            this.matchesLine.RequestInvalidate();
+            //this.matchesLine.RequestInvalidate();
         }
 
         #endregion
@@ -332,10 +334,10 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void VideoTerminal_DocumentChanged(IVideoTerminal vt, VTDocument oldDocument, VTDocument newDocument)
         {
-            this.matchesLine.Release();
+            //this.matchesLine.Release();
 
-            this.matchesLine = new VTMatchesLine(newDocument);
-            this.matchesLine.Initialize();
+            //this.matchesLine = new VTMatchesLine(newDocument);
+            //this.matchesLine.Initialize();
         }
 
         #endregion
@@ -463,12 +465,12 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.stopFind = true;
             this.dirty = true;
-            this.matchesLine.MatchesList = null;
-            this.matchesLine.OffsetX = 0;
-            this.matchesLine.OffsetY = 0;
-            this.matchesLine.TextBlocks.Clear();
-            this.matchesLine.RequestInvalidate();
-            this.matchesLine.Release();
+            //this.matchesLine.MatchesList = null;
+            //this.matchesLine.OffsetX = 0;
+            //this.matchesLine.OffsetY = 0;
+            //this.matchesLine.TextBlocks.Clear();
+            //this.matchesLine.RequestInvalidate();
+            //this.matchesLine.Release();
             this.Message = string.Empty;
 
             this.videoTerminal.DocumentChanged -= this.VideoTerminal_DocumentChanged;

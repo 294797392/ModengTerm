@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Controls;
-using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using System;

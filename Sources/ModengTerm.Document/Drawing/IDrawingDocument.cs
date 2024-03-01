@@ -34,6 +34,11 @@ namespace ModengTerm.Document.Drawing
         VTScrollbar Scrollbar { get; }
 
         /// <summary>
+        /// 设置文档的可见性
+        /// </summary>
+        bool Visible { get; set; }
+
+        /// <summary>
         /// 创建一个绘图对象
         /// </summary>
         /// <param name="type">要创建的绘图对象的类型</param>

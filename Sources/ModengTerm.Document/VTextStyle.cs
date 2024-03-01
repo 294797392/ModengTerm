@@ -28,11 +28,6 @@ namespace ModengTerm.Document
         /// </summary>
         public string BackgroundColor { get; set; }
 
-        /// <summary>
-        /// 颜色表
-        /// </summary>
-        public VTColorTable ColorTable { get; set; }
-
         public VTextStyle()
         {
         }

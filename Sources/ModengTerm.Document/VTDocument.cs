@@ -70,6 +70,11 @@ namespace ModengTerm.Document
         /// </summary>
         private int scrollDelta;
 
+        /// <summary>
+        /// 该文档是否可见
+        /// </summary>
+        private bool visible = true;
+
         #endregion
 
         #region 属性
@@ -77,7 +82,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 文档的名字，方便调试
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         /// <summary>
         /// 记录光标信息
@@ -192,6 +197,7 @@ namespace ModengTerm.Document
         public VTDocument(VTDocumentOptions options)
         {
             this.options = options;
+            Name = options.Name;
             IsAlternate = options.IsAlternate;
             DrawingObject = options.DrawingObject;
             this.EventInput = new VTEventInput()
@@ -487,6 +493,7 @@ namespace ModengTerm.Document
                 // 鼠标在画布左边，那么悬浮的就是第一个字符
                 characterIndex = 0;
             }
+
             if (mouseX > documentSize.Width)
             {
                 // 鼠标在画布右边，那么悬浮的就是最后一个字符
@@ -495,8 +502,8 @@ namespace ModengTerm.Document
             else
             {
                 // 鼠标的水平方向在画布中间，那么做字符命中测试
-                VTRect characterBounds;
-                if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out characterBounds))
+                VTextRange characterRange;
+                if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out characterRange))
                 {
                     // 没有命中字符
                     return false;
@@ -768,20 +775,17 @@ namespace ModengTerm.Document
                 // 如果不删除的话，会和ReverseLineFeed一样有可能会显示重叠的信息
                 ActiveLine.DeleteAll();
 
-                if (!IsAlternate)
+                // this.FirstLine.PhysicsRow > 0表示滚动了一行
+                if (ScrollMarginTop != 0 || ScrollMarginBottom != 0)
                 {
-                    // this.FirstLine.PhysicsRow > 0表示滚动了一行
-                    if (ScrollMarginTop != 0 || ScrollMarginBottom != 0)
-                    {
-                        // 物理行号和scrollMargin无关
-                        // 有margin需要全部重新设置
-                        ResetPhysicsRow(oldFirstLine.PhysicsRow + 1);
-                    }
-                    else
-                    {
-                        // 没有scrollMargin
-                        LastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
-                    }
+                    // 物理行号和scrollMargin无关
+                    // 有margin需要全部重新设置
+                    ResetPhysicsRow(oldFirstLine.PhysicsRow + 1);
+                }
+                else
+                {
+                    // 没有scrollMargin
+                    LastLine.PhysicsRow = oldLastLine.PhysicsRow + 1;
                 }
 
                 cursorPhysicsRow = ActiveLine.PhysicsRow;
@@ -792,33 +796,6 @@ namespace ModengTerm.Document
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 SetCursor(Cursor.Row + 1, Cursor.Column);
             }
-
-            #region 记录历史行
-
-            // 1. 更新旧的最后一行的历史行数据
-            // 2. 创建新的历史行
-
-            // 更新旧的最后一行和新的最后一行的历史记录
-            this.Scrollbar.UpdateHistory(this.ActiveLine.PreviousLine);
-            this.Scrollbar.UpdateHistory(this.ActiveLine);
-
-            #endregion
-
-            #region 更新滚动条的值
-
-            // 滚动条滚动到底
-            // 计算滚动条可以滚动的最大值
-            int scrollMax = this.FirstLine.PhysicsRow;
-            if (scrollMax > 0)
-            {
-                this.Scrollbar.ScrollMax = scrollMax;
-                this.Scrollbar.ScrollValue = scrollMax;
-            }
-
-            #endregion
-
-            // 触发行被完全打印的事件
-            //this.LinePrinted?.Invoke(this, oldHistoryLine);
         }
 
         /// <summary>
@@ -1245,6 +1222,11 @@ namespace ModengTerm.Document
             {
                 Cursor.Column = column;
             }
+
+            if (ActiveLine == null)
+            {
+                Console.WriteLine("SetCursor ActiveLine == NULL");
+            }
         }
 
         /// <summary>
@@ -1263,6 +1245,11 @@ namespace ModengTerm.Document
             {
                 // 如果光标所在物理行被滚动到了文档外，那么ActiveLine就是空的
                 ActiveLine = FindLine(physicsRow);
+            }
+
+            if (ActiveLine == null)
+            {
+                Console.WriteLine("SetCursorPhysicsRow ActiveLine == NULL");
             }
         }
 
@@ -1507,11 +1494,6 @@ namespace ModengTerm.Document
         /// </summary>
         public void ScrollToBottom()
         {
-            if (IsAlternate)
-            {
-                return;
-            }
-
             if (!ScrollAtBottom)
             {
                 ScrollToHistory(Scrollbar.ScrollMax);
@@ -1746,6 +1728,22 @@ namespace ModengTerm.Document
             #endregion
         }
 
+        /// <summary>
+        /// 设置文档的可见性
+        /// </summary>
+        /// <param name="visible"></param>
+        public void SetVisible(bool visible)
+        {
+            if (this.visible == visible)
+            {
+                return;
+            }
+
+            this.visible = visible;
+
+            this.DrawingObject.Visible = visible;
+        }
+
         #endregion
 
         #region 事件处理器
@@ -1784,8 +1782,8 @@ namespace ModengTerm.Document
                             // 选中单词
                             string text = VTUtils.CreatePlainText(lineHit.Characters);
                             int characterIndex;
-                            VTRect characterBounds;
-                            if (!HitTestHelper.HitTestVTCharacter(lineHit, mouseLocation.X, out characterIndex, out characterBounds))
+                            VTextRange characterRange;
+                            if (!HitTestHelper.HitTestVTCharacter(lineHit, mouseLocation.X, out characterIndex, out characterRange))
                             {
                                 return;
                             }

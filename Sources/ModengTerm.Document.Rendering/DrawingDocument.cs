@@ -49,6 +49,26 @@ namespace ModengTerm.Document.Rendering
             }
         }
 
+        public bool Visible
+        {
+            get { return this.Visibility == Visibility.Visible;}
+            set
+            {
+                bool visible = this.Visibility == Visibility.Visible;
+                if (visible != value)
+                {
+                    if (value)
+                    {
+                        this.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        this.Visibility = Visibility.Collapsed;
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法

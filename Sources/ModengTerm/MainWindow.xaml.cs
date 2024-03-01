@@ -276,7 +276,7 @@ namespace XTerminal
                     e.Handled = true;
                 }
 
-                VTKeys vtKey = DrawingUtils.ConvertToVTKey(e.Key);
+                VTKeys vtKey = TermUtils.ConvertToVTKey(e.Key);
                 this.userInput.CapsLock = Console.CapsLock;
                 this.userInput.Key = vtKey;
                 this.userInput.Text = null;

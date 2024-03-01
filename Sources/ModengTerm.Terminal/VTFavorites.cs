@@ -1,4 +1,4 @@
-﻿using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Document;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +21,5 @@ namespace ModengTerm.Terminal
         {
             this.paragraphs = new List<VTParagraph>();
         }
-
-
     }
 }

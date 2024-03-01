@@ -1,5 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Terminal.Document;
+using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +48,7 @@ namespace ModengTerm.Terminal
                 CreationTime = DateTime.Now,
                 EndCharacterIndex = createContentParameter.EndCharacterIndex,
                 FirstPhysicsRow = textLine.PhysicsRow,
-                IsAlternate = textLine.OwnerDocument.IsAlternate,
+                IsAlternate = false,
                 LastPhysicsRow = textLine.PhysicsRow,
             };
 

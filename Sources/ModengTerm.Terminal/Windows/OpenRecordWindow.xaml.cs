@@ -85,7 +85,7 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            string playbackFilePath = VTUtils.GetPlaybackFilePath(playbackFile);
+            string playbackFilePath = TermUtils.GetPlaybackFilePath(playbackFile);
             if (!System.IO.File.Exists(playbackFilePath))
             {
                 MTMessageBox.Info("回放文件不存在");

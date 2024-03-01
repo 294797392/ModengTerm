@@ -13,8 +13,6 @@ namespace ModengTerm.Document
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("HitTestHelper");
 
-        private static readonly VTRect EmptyRect = new VTRect();
-
         /// <summary>
         /// 根据Y坐标找到包含该Y坐标的历史行
         /// </summary>
@@ -51,9 +49,9 @@ namespace ModengTerm.Document
         /// <param name="textLine">要做字符命中测试的行</param>
         /// <param name="cursorX">要做命中测试的X偏移量</param>
         /// <param name="characterHitIndex">被命中的字符的索引</param>
-        /// <param name="characterHitBounds">被命中的字符的边界框信息</param>
+        /// <param name="characterHitRange">被命中的字符的边界框信息</param>
         /// <returns>命中成功返回true，失败返回false</returns>
-        public static bool HitTestVTCharacter(VTextLine textLine, double cursorX, out int characterHitIndex, out VTRect characterHitBounds)
+        public static bool HitTestVTCharacter(VTextLine textLine, double cursorX, out int characterHitIndex, out VTextRange characterHitRange)
         {
             // 命中测试流程是一个一个字符做边界框的判断
             // 先测量第一个字符的边界框，然后判断xPos是否在该边界框里
@@ -61,20 +59,20 @@ namespace ModengTerm.Document
             // ...以此类推，直到命中为止
 
             characterHitIndex = -1;
-            characterHitBounds = EmptyRect;
+            characterHitRange = VTextRange.Empty;
 
             for (int i = 0; i < textLine.Characters.Count; i++)
             {
-                VTRect characterBounds = textLine.MeasureCharacter(i);
+                VTextRange characterRange = textLine.MeasureCharacter(i);
 
-                double left = characterBounds.Left + characterBounds.Width / 2;
-                double right = characterBounds.Right;
+                double left = characterRange.OffsetX + characterRange.Width / 2;
+                double right = characterRange.OffsetX + characterRange.Width;
 
                 if (cursorX > left && cursorX < right)
                 {
                     // 鼠标命中了字符，使用命中的字符的边界框
                     characterHitIndex = i;
-                    characterHitBounds = characterBounds;
+                    characterHitRange = characterRange;
                     return true;
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Document.Utility;
 using ModengTerm.ServiceAgents.DataModels;
 using System;
 using System.Collections.Generic;
@@ -103,7 +104,7 @@ namespace ModengTerm.Terminal
                 return ResponseCode.SUCCESS;
             }
 
-            string filePath = VTUtils.GetPlaybackFilePath(file);
+            string filePath = TermUtils.GetPlaybackFilePath(file);
 
             try
             {
@@ -140,7 +141,7 @@ namespace ModengTerm.Terminal
                 return ResponseCode.FAILED;
             }
 
-            string filePath = VTUtils.GetPlaybackFilePath(file);
+            string filePath = TermUtils.GetPlaybackFilePath(file);
 
             if (!File.Exists(filePath))
             {

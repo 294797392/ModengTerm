@@ -3,23 +3,23 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="vtparser.c">
-      <Filter>vtparser</Filter>
+      <Filter>parser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vtcore.h" />
     <ClInclude Include="vtparser.h">
-      <Filter>vtparser</Filter>
+      <Filter>parser</Filter>
     </ClInclude>
-    <ClInclude Include="vtdoc.h">
-      <Filter>vtdoc</Filter>
+    <ClInclude Include="VTDocument.h">
+      <Filter>document</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="vtdoc">
+    <Filter Include="document">
       <UniqueIdentifier>{4a33dab5-af90-45e9-a262-ab41c4de17e1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="vtparser">
+    <Filter Include="parser">
       <UniqueIdentifier>{50f84751-0197-4690-8438-33ae94806b6e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

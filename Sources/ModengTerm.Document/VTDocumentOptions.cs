@@ -11,6 +11,11 @@ namespace ModengTerm.Document
     public class VTDocumentOptions
     {
         /// <summary>
+        /// 文档名字
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// 是备用缓冲区还是主缓冲区
         /// </summary>
         public bool IsAlternate { get; set; }

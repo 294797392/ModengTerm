@@ -1,8 +1,10 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Rendering;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
-using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
@@ -213,25 +215,26 @@ namespace ModengTerm
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            ColorDefinition colorDefinition = value as ColorDefinition;
-            if (colorDefinition == null)
-            {
-                return Brushes.Transparent;
-            }
+            //ColorDefinition colorDefinition = value as ColorDefinition;
+            //if (colorDefinition == null)
+            //{
+            //    return Brushes.Transparent;
+            //}
 
-            string uri = colorDefinition.Uri;
+            //string uri = colorDefinition.Uri;
 
-            Brush brush;
-            if (!BrushCache.TryGetValue(uri, out brush))
-            {
-                WallpaperTypeEnum paperType = (WallpaperTypeEnum)parameter;
+            //Brush brush;
+            //if (!BrushCache.TryGetValue(uri, out brush))
+            //{
+            //    WallpaperTypeEnum paperType = (WallpaperTypeEnum)parameter;
 
-                ImageSource imageSource = VTUtils.GetWallpaperThumbnail(paperType, uri);
-                ImageBrush imageBrush = new ImageBrush(imageSource);
-                BrushCache[uri] = imageBrush;
-                brush = imageBrush;
-            }
-            return brush;
+            //    ImageSource imageSource = .GetWallpaperThumbnail(paperType, uri);
+            //    ImageBrush imageBrush = new ImageBrush(imageSource);
+            //    BrushCache[uri] = imageBrush;
+            //    brush = imageBrush;
+            //}
+            //return brush;
+            return Brushes.Black;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

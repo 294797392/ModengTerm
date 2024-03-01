@@ -1,5 +1,5 @@
 ﻿using DotNEToolkit.DataModels;
-using ModengTerm.Terminal.Document;
+using ModengTerm.Document;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -3,11 +3,12 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -459,7 +460,7 @@ namespace ModengTerm.ViewModels
             this.serviceAgent = serviceAgent;
 
             MTermManifest appManifest = MTermApp.Context.Manifest;
-            TerminalManifest terminalManifest = VTUtils.GetManifest();
+            TerminalManifest terminalManifest = TermUtils.GetManifest();
 
             this.appManifest = appManifest;
             this.terminalManifest = terminalManifest;
@@ -873,6 +874,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
             session.SetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN, MTermConsts.DefaultContentMargin);
             session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, this.BookmarkVisible);
+            session.SetOption<string>(OptionKeyEnum.TERM_SELECTION_COLOR, "255,255,255");
 
             return true;
         }

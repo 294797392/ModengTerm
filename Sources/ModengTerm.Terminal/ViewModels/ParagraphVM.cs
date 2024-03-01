@@ -1,5 +1,7 @@
-﻿using ModengTerm.Terminal.DataModels;
-using ModengTerm.Terminal.Document;
+﻿using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Utility;
+using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

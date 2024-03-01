@@ -1,6 +1,8 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.IO;

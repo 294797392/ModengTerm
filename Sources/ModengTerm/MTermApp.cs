@@ -4,8 +4,8 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
+using ModengTerm.Document;
 using ModengTerm.ServiceAgents;
-using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
@@ -195,25 +195,25 @@ namespace ModengTerm
 
         #region 实例方法
 
-        private void ProcessFrame(int elapsed, IFramedElement element)
-        {
-            element.Elapsed -= elapsed;
+        //private void ProcessFrame(int elapsed, IFramedElement element)
+        //{
+        //    element.Elapsed -= elapsed;
 
-            if (element.Elapsed <= 0)
-            {
-                // 渲染
-                try
-                {
-                    element.RequestInvalidate();
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("RequestInvalidate运行异常", ex);
-                }
+        //    if (element.Elapsed <= 0)
+        //    {
+        //        // 渲染
+        //        try
+        //        {
+        //            element.RequestInvalidate();
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            logger.Error("RequestInvalidate运行异常", ex);
+        //        }
 
-                element.Elapsed = element.Delay;
-            }
-        }
+        //        element.Elapsed = element.Delay;
+        //    }
+        //}
 
         #endregion
 
@@ -242,7 +242,7 @@ namespace ModengTerm
 
                 int elapsed = this.drawFrameTimer.Interval.Milliseconds;
 
-                this.ProcessFrame(elapsed, activeDocument.Cursor);
+                //this.ProcessFrame(elapsed, activeDocument.Cursor);
 
                 //switch (vt.Background.PaperType)
                 //{

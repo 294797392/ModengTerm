@@ -1,8 +1,8 @@
 ﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Terminal.Document;
+using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
-using ModengTerm.Terminal.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;

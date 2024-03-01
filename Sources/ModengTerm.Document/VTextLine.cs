@@ -613,7 +613,7 @@ namespace ModengTerm.Document
         /// <param name="startIndex">要测量的起始字符索引</param>
         /// <param name="count">要测量的最大字符数，0为全部测量</param>
         /// <returns></returns>
-        public VTRect MeasureTextRange(int startIndex, int count)
+        public VTextRange MeasureTextRange(int startIndex, int count)
         {
             IDrawingTextLine objectText = DrawingObject as IDrawingTextLine;
 
@@ -626,11 +626,9 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="characterIndex">要测量的字符</param>
         /// <returns>文本坐标，X=文本左边的X偏移量，Y永远是0，因为边界框是相对于该行的</returns>
-        public VTRect MeasureCharacter(int characterIndex)
+        public VTextRange MeasureCharacter(int characterIndex)
         {
-            IDrawingTextLine objectText = DrawingObject as IDrawingTextLine;
-
-            return objectText.MeasureCharacter(characterIndex);
+            return this.MeasureTextRange(characterIndex, 1);
         }
 
         #endregion

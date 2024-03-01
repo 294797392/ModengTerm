@@ -128,7 +128,7 @@ namespace ModengTerm.Document.Utility
             builder.AppendLine("</br>");
         }
 
-        internal static CreateLineDelegate GetCreateLineDelegate(LogFileTypeEnum fileType)
+        public static CreateLineDelegate GetCreateLineDelegate(LogFileTypeEnum fileType)
         {
             switch (fileType)
             {

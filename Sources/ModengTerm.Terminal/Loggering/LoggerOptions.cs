@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Document.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

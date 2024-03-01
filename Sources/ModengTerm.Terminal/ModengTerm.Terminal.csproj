@@ -16,10 +16,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Document\VTextStyle.cs" />
-    <Compile Remove="Document\VTPointCollection.cs" />
+    <Compile Remove="Document\**" />
+    <Compile Remove="Rendering\**" />
+    <EmbeddedResource Remove="Document\**" />
+    <EmbeddedResource Remove="Rendering\**" />
+    <None Remove="Document\**" />
+    <None Remove="Rendering\**" />
+    <Page Remove="Document\**" />
+    <Page Remove="Rendering\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="ITerminalAgent.cs" />
     <Compile Remove="ViewModels\VideoTerminal.Drawing.cs" />
+    <Compile Remove="VTColor.cs" />
+    <Compile Remove="VTUtils.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,6 +60,8 @@
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
+    <ProjectReference Include="..\ModengTerm.Document.Rendering\ModengTerm.Document.Rendering.csproj" />
+    <ProjectReference Include="..\ModengTerm.Document\ModengTerm.Document.csproj" />
     <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
     <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />

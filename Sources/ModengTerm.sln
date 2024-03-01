@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Document", "Mode
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.Document.Rendering", "ModengTerm.Document.Rendering\ModengTerm.Document.Rendering.csproj", "{C68DFE62-A0E8-43CF-82DB-C01445EC936C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.DocumentApp", "ModengTerm.DocumentApp\ModengTerm.DocumentApp.csproj", "{5D65FE64-D4E1-4BC8-AA4A-7D4274682C50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.Document.Demo", "ModengTerm.DocumentApp\ModengTerm.Document.Demo.csproj", "{5D65FE64-D4E1-4BC8-AA4A-7D4274682C50}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Document", "Document", "{25813942-B527-42C0-BE53-B77DC073B289}"
 EndProject

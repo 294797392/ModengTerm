@@ -1,10 +1,12 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.Document;
+using ModengTerm.Document;
+using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
-using ModengTerm.Terminal.Rendering;
 using ModengTerm.Terminal.Session;
 using ModengTerm.ViewModels;
 using System.Text;
@@ -17,10 +19,9 @@ namespace ModengTerm.Terminal.ViewModels
 {
     public class VTOptions
     {
-        /// <summary>
-        /// 承载该终端的窗口
-        /// </summary>
-        public IDrawingTerminal WindowHost { get; set; }
+        public IDrawingDocument AlternateDocument { get; set; }
+
+        public IDrawingDocument MainDocument { get; set; }
 
         /// <summary>
         /// 该终端所对应的Session
@@ -56,6 +57,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
 
+        /// <summary>
+        /// 当切换显示文档之后触发
+        /// IVideoTerminal：事件触发者
+        /// VTDocument：oldDocument，切换之前显示的文档
+        /// VTDocument：newDocument，切换之后显示的文档
+        /// </summary>
         public event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
 
         /// <summary>
@@ -120,9 +127,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool xtermBracketedPasteMode;
 
-        private IDrawingCanvas documentCanvas;
-        private IDrawingCanvas backgroundCanvas;
-        private VTWallpaper wallpaper;
+        private IDrawingDocument documentCanvas;
 
         /// <summary>
         /// 是否正在运行
@@ -133,11 +138,6 @@ namespace ModengTerm.Terminal.ViewModels
         /// 输入编码方式
         /// </summary>
         private Encoding writeEncoding;
-
-        /// <summary>
-        /// 提供终端屏幕的功能
-        /// </summary>
-        private IDrawingTerminal drawingTerminal;
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -190,8 +190,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         public VTDocument ActiveDocument { get { return this.activeDocument; } }
 
-        public VTWallpaper Background { get { return this.wallpaper; } }
-
         /// <summary>
         /// UI线程上下文对象
         /// </summary>
@@ -230,7 +228,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.vtOptions = options;
 
             this.uiSyncContext = SynchronizationContext.Current;
-            this.drawingTerminal = this.vtOptions.WindowHost;
 
             // DECAWM
             this.autoWrapMode = false;
@@ -271,73 +268,44 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化文档模型
 
-            VTEventHandler eventHandler = new VTEventHandler()
-            {
-                OnScrollChanged = this.OnScrollChanged,
-                OnSizeChanged = this.OnSizeChanged,
-                OnMouseDown = this.OnMouseDown,
-                OnMouseMove = this.OnMouseMove,
-                OnMouseUp = this.OnMouseUp,
-                OnMouseWheel = this.OnMouseWheel
-            };
-
-            this.documentCanvas = this.drawingTerminal.CreateCanvas(0);
-            this.documentCanvas.Name = "Document";
-            this.documentCanvas.ContentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
-            this.documentCanvas.ScrollbarVisible = true;
-            this.documentCanvas.AddEventHandler(eventHandler);
-            this.drawingTerminal.VisibleCanvas(this.documentCanvas, true);
-
-            VTDocumentOptions documentOptions = this.CreateDocumentOptions(sessionInfo);
-            this.mainDocument = new VTDocument(documentOptions, this.documentCanvas, false)
-            {
-                Name = "MainDocument",
-            };
+            VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
+            this.mainDocument = new VTDocument(mainOptions);
             this.mainDocument.Initialize();
-            this.mainDocument.Cursor.IsVisible = true;
 
-            this.alternateDocument = new VTDocument(documentOptions, this.documentCanvas, true)
-            {
-                Name = "AlternateDocument",
-            };
+            VTDocumentOptions alternateOptions = this.CreateDocumentOptions("AlternateDocument", sessionInfo, options.AlternateDocument);
+            alternateOptions.ScrollbackMax = 0;
+            this.alternateDocument = new VTDocument(alternateOptions);
             this.alternateDocument.Initialize();
-            this.alternateDocument.Cursor.IsVisible = false;
+            this.alternateDocument.SetVisible(false);
 
             this.activeDocument = this.mainDocument;
 
             // 初始化完VTDocument之后，真正要使用的Column和Row已经被计算出来并保存到了VTDocumentOptions里
             // 此时重新设置sessionInfo里的Row和Column，因为SessionTransport要使用
-            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, documentOptions.ViewportRow);
-            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, documentOptions.ViewportColumn);
+            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, mainOptions.ViewportRow);
+            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, mainOptions.ViewportColumn);
 
             this.ViewportChanged?.Invoke(this, this.mainDocument.ViewportRow, this.mainDocument.ViewportColumn);
-
-            #endregion
-
-            #region 初始化光标
-
-            this.activeDocument.Cursor.RequestInvalidate();
-            this.alternateDocument.Cursor.RequestInvalidate();
 
             #endregion
 
             #region 初始化背景
 
             // 此时Inser(0)在Z顺序的最下面一层
-            this.backgroundCanvas = this.drawingTerminal.CreateCanvas(0);
-            this.backgroundCanvas.Name = "BackgroundDocument";
-            this.backgroundCanvas.ScrollbarVisible = false;
+            //this.backgroundCanvas = this.drawingTerminal.CreateCanvas(0);
+            //this.backgroundCanvas.Name = "BackgroundDocument";
+            //this.backgroundCanvas.ScrollbarVisible = false;
 
-            this.wallpaper = new VTWallpaper(this.backgroundCanvas)
-            {
-                PaperType = sessionInfo.GetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE),
-                Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
-                BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
-                Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT),
-                Rect = new VTRect(0, 0, this.drawingTerminal.GetSize())
-            };
-            this.wallpaper.Initialize();
-            this.wallpaper.RequestInvalidate();
+            //this.wallpaper = new VTWallpaper(this.backgroundCanvas)
+            //{
+            //    PaperType = sessionInfo.GetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE),
+            //    Uri = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI),
+            //    BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR),
+            //    Effect = sessionInfo.GetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT),
+            //    Rect = new VTRect(0, 0, this.drawingTerminal.GetSize())
+            //};
+            //this.wallpaper.Initialize();
+            //this.wallpaper.RequestInvalidate();
 
             #endregion
         }
@@ -354,10 +322,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.mainDocument.Release();
             this.alternateDocument.Release();
-
-            this.backgroundCanvas.DeleteDrawingObjects();
-
-            this.drawingTerminal.DeleteCanvas(this.documentCanvas);
         }
 
         /// <summary>
@@ -443,16 +407,16 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 实例方法
 
-        private VTDocumentOptions CreateDocumentOptions(XTermSession sessionInfo)
+        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, IDrawingDocument drawingDocument)
         {
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY);
             double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_FONT_SIZE);
 
-            VTypeface typeface = this.drawingTerminal.GetTypeface(fontSize, fontFamily);
+            VTypeface typeface = drawingDocument.GetTypeface(fontSize, fontFamily);
             typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR);
             typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR);
 
-            VTSize terminalSize = this.drawingTerminal.GetSize();
+            VTSize terminalSize = drawingDocument.Size;
             double contentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
             VTSize contentSize = new VTSize(terminalSize.Width - 15, terminalSize.Height).Offset(-contentMargin * 2);
             TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
@@ -468,16 +432,18 @@ namespace ModengTerm.Terminal.ViewModels
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
             {
+                Name = name,
                 ViewportRow = viewportRow,
                 ViewportColumn = viewportColumn,
-                DECPrivateAutoWrapMode = false,
+                AutoWrapMode = false,
                 CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE),
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR),
                 CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED),
                 ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
                 ScrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
                 Typeface = typeface,
-                Session = sessionInfo,
+                DrawingObject = drawingDocument,
+                SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.TERM_SELECTION_COLOR),
             };
 
             return documentOptions;
@@ -576,7 +542,7 @@ namespace ModengTerm.Terminal.ViewModels
                         char ch = Convert.ToChar(parameter);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, ch);
                         VTCharacter character = this.CreateCharacter(parameter, this.activeDocument.AttributeState);
-                        this.activeDocument.PrintCharacter(this.ActiveLine, character, this.CursorCol);
+                        this.activeDocument.PrintCharacter(character, this.CursorCol);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + character.ColumnSize);
 
                         break;
@@ -611,7 +577,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
                         // MainScrrenBuffer和AlternateScrrenBuffer里的行分别记录
                         // AlternateScreenBuffer是用来给man，vim等程序使用的
-                        // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
+                        // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
                         if (this.activeDocument == this.mainDocument)
                         {
                             // 1. 更新旧的最后一行的历史行数据
@@ -620,7 +586,7 @@ namespace ModengTerm.Terminal.ViewModels
                             VTextLine oldLastLine = this.ActiveLine.PreviousLine;
                             VTextLine newLastLine = this.ActiveLine;
 
-                            VTScrollInfo scrollBar = this.mainDocument.Scrollbar;
+                            VTScrollInfo scrollBar = this.activeDocument.Scrollbar;
 
                             // 更新旧的最后一行和新的最后一行的历史记录
                             VTHistoryLine oldHistoryLine = scrollBar.UpdateHistory(oldLastLine);
@@ -630,7 +596,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             // 滚动条滚动到底
                             // 计算滚动条可以滚动的最大值
-                            int scrollMax = this.mainDocument.FirstLine.PhysicsRow;
+                            int scrollMax = this.activeDocument.FirstLine.PhysicsRow;
                             if (scrollMax > 0)
                             {
                                 scrollBar.ScrollMax = scrollMax;
@@ -681,16 +647,16 @@ namespace ModengTerm.Terminal.ViewModels
                 case VTActions.EL_EraseLine:
                     {
                         List<int> parameters = parameter as List<int>;
-                        EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
+                        XTerminal.Parser.EraseType eraseType = (XTerminal.Parser.EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, eraseType);
-                        this.activeDocument.EraseLine(this.ActiveLine, this.CursorCol, eraseType);
+                        this.activeDocument.EraseLine(this.CursorCol, (Document.Enumerations.EraseType)eraseType);
                         break;
                     }
 
                 case VTActions.ED_EraseDisplay:
                     {
                         List<int> parameters = parameter as List<int>;
-                        EraseType eraseType = (EraseType)VTParameter.GetParameter(parameters, 0, 0);
+                        XTerminal.Parser.EraseType eraseType = (XTerminal.Parser.EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, eraseType);
 
                         switch (eraseType)
@@ -698,8 +664,8 @@ namespace ModengTerm.Terminal.ViewModels
                             // In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
                             // top和clear指令会执行EraseType.All，在其他的终端软件里top指令不会清空已经存在的行，而是把已经存在的行往上移动
                             // 所以EraseType.All的动作和Scrollback一样执行
-                            case EraseType.All:
-                            case EraseType.Scrollback:
+                            case XTerminal.Parser.EraseType.All:
+                            case XTerminal.Parser.EraseType.Scrollback:
                                 {
                                     if (this.activeDocument.IsAlternate)
                                     {
@@ -752,7 +718,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                             default:
                                 {
-                                    this.activeDocument.EraseDisplay(this.ActiveLine, this.CursorCol, eraseType);
+                                    this.activeDocument.EraseDisplay(this.CursorCol, (Document.Enumerations.EraseType)eraseType);
                                     break;
                                 }
                         }
@@ -949,7 +915,7 @@ namespace ModengTerm.Terminal.ViewModels
                             default:
                                 {
                                     bool enabled;
-                                    VTextAttributes attribute = VTUtils.VTAction2TextAttribute(action, out enabled);
+                                    VTextAttributes attribute = TermUtils.VTAction2TextAttribute(action, out enabled);
                                     this.activeDocument.SetAttribute(attribute, enabled, parameter);
                                     break;
                                 }
@@ -1043,7 +1009,7 @@ namespace ModengTerm.Terminal.ViewModels
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, count);
-                        this.activeDocument.DeleteCharacter(this.ActiveLine, this.CursorCol, count);
+                        this.activeDocument.DeleteCharacter(this.CursorCol, count);
                         break;
                     }
 
@@ -1058,7 +1024,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
                         List<int> parameters = parameter as List<int>;
                         int count = VTParameter.GetParameter(parameters, 0, 1);
-                        this.activeDocument.InsertCharacters(this.ActiveLine, this.CursorCol, count);
+                        this.activeDocument.InsertCharacters(this.CursorCol, count);
                         break;
                     }
 
@@ -1080,7 +1046,7 @@ namespace ModengTerm.Terminal.ViewModels
                         VTDebug.Context.WriteInteractive(action, "{0}", lines);
                         if (lines > 0)
                         {
-                            this.activeDocument.InsertLines(this.ActiveLine, lines);
+                            this.activeDocument.InsertLines(lines);
                         }
                         break;
                     }
@@ -1093,7 +1059,7 @@ namespace ModengTerm.Terminal.ViewModels
                         VTDebug.Context.WriteInteractive(action, "{0}", lines);
                         if (lines > 0)
                         {
-                            this.activeDocument.DeleteLines(this.ActiveLine, lines);
+                            this.activeDocument.DeleteLines(lines);
                         }
                         break;
                     }
@@ -1120,15 +1086,13 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
-                        this.mainDocument.SetVisible(false);
-                        this.alternateDocument.SetVisible(true);
+                        this.uiSyncContext.Send(new SendOrPostCallback((o) =>
+                        {
+                            this.mainDocument.SetVisible(false);
+                            this.alternateDocument.SetVisible(true);
+                        }), null);
 
                         this.activeDocument = this.alternateDocument;
-
-                        this.uiSyncContext.Send(new SendOrPostCallback((v) =>
-                        {
-                            this.mainDocument.RequestInvalidate();
-                        }), null);
 
                         this.DocumentChanged?.Invoke(this, this.mainDocument, this.alternateDocument);
                         break;
@@ -1138,22 +1102,21 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
+                        this.uiSyncContext.Send(new SendOrPostCallback((o) =>
+                        {
+                            this.mainDocument.SetVisible(true);
+                            this.alternateDocument.SetVisible(false);
+                        }), null);
+
                         this.alternateDocument.SetScrollMargin(0, 0);
                         this.alternateDocument.EraseAll();
                         this.alternateDocument.SetCursor(0, 0);
                         this.alternateDocument.ClearAttribute();
-                        this.alternateDocument.Selection.Reset();
-                        this.alternateDocument.SetVisible(false);
+                        this.alternateDocument.Selection.Clear();
 
-                        this.mainDocument.Selection.Reset();
-                        this.mainDocument.SetVisible(true);
+                        this.mainDocument.Selection.Clear();
 
                         this.activeDocument = this.mainDocument;
-
-                        this.uiSyncContext.Send(new SendOrPostCallback((v) =>
-                        {
-                            this.alternateDocument.RequestInvalidate();
-                        }), null);
 
                         this.DocumentChanged?.Invoke(this, this.alternateDocument, this.mainDocument);
                         break;
@@ -1243,87 +1206,6 @@ namespace ModengTerm.Terminal.ViewModels
                         throw new NotImplementedException(string.Format("未执行的VTAction, {0}", action));
                     }
             }
-        }
-
-        private void OnMouseWheel(IDrawingCanvas sender, bool upper)
-        {
-            this.activeDocument.OnMouseWheel(upper);
-        }
-
-        private void OnMouseDown(IDrawingCanvas sender, VTPoint p, int clickCount)
-        {
-            logger.InfoFormat("OnMouseDown");
-
-            VTPoint mouseLocation = this.activeDocument.DrawingObject.GetMousePosition(VTDocumentAreas.ContentArea);
-
-            VTextLine mouseDownLine = HitTestHelper.HitTestVTextLine(this.activeDocument.FirstLine, mouseLocation.Y);
-
-            this.MouseDownLine = mouseDownLine;
-
-            this.activeDocument.OnMouseDown(p, clickCount);
-        }
-
-        private void OnMouseMove(IDrawingCanvas sender, VTPoint p)
-        {
-            logger.InfoFormat("OnMouseMove");
-
-            this.activeDocument.OnMouseMove(p);
-        }
-
-        private void OnMouseUp(IDrawingCanvas sender, VTPoint p)
-        {
-            logger.InfoFormat("OnMouseUp");
-
-            this.activeDocument.OnMouseUp(p);
-        }
-
-        /// <summary>
-        /// 当窗口大小改变的时候触发
-        /// </summary>
-        /// <param name="contentSize">新的内容区域大小</param>
-        private void OnSizeChanged(IDrawingCanvas sender, VTSize contentSize)
-        {
-            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
-            {
-                return;
-            }
-
-            // 如果是固定大小的终端，那么什么都不做
-            TerminalSizeModeEnum sizeMode = this.vtOptions.Session.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
-            if (sizeMode == TerminalSizeModeEnum.Fixed)
-            {
-                return;
-            }
-
-            logger.InfoFormat("Resize, {0}", contentSize);
-
-            // 计算新的文档大小
-            int newRow, newColumn;
-            VTUtils.CalculateAutoFitSize(contentSize, this.mainDocument.options.Typeface, out newRow, out newColumn);
-
-            // 重新设置文档大小
-            this.mainDocument.Resize(newRow, newColumn);
-            this.alternateDocument.Resize(newRow, newColumn);
-
-            // 重绘背景
-            VTSize windowSize = this.drawingTerminal.GetSize();
-            this.wallpaper.Rect = new VTRect(0, 0, windowSize);
-            this.wallpaper.RequestInvalidate();
-
-            // 给SSH主机发个Resiz指令
-            this.sessionTransport.Resize(this.activeDocument.ViewportRow, this.activeDocument.ViewportColumn);
-
-            this.ViewportChanged?.Invoke(this, this.activeDocument.ViewportRow, this.activeDocument.ViewportColumn);
-        }
-
-        private void OnScrollChanged(IDrawingCanvas sender, int scrollValue)
-        {
-            if (this.activeDocument.IsAlternate)
-            {
-                return;
-            }
-
-            this.ScrollTo(scrollValue);
         }
 
         #endregion

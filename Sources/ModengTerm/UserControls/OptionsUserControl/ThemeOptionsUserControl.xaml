@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:XTerminal.UserControls.OptionsUserControl"
              xmlns:converter="clr-namespace:ModengTerm"
              xmlns:enums="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
+             xmlns:documentenums="clr-namespace:ModengTerm.Document.Enumerations;assembly=ModengTerm.Document"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="UserControl1">
@@ -181,7 +182,7 @@
                          Style="{StaticResource ResourceKey=StyleListBoxColors}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemColor}">
-                                <Setter Property="Background" Value="{Binding Converter={StaticResource ResourceKey=LivePaperBrushConverter}, ConverterParameter={x:Static enums:WallpaperTypeEnum.Live}}"/>
+                                <Setter Property="Background" Value="{Binding Converter={StaticResource ResourceKey=LivePaperBrushConverter}, ConverterParameter={x:Static documentenums:WallpaperTypeEnum.Live}}"/>
                             </Style>
                         </ListBox.ItemContainerStyle>
                     </ListBox>
@@ -191,7 +192,7 @@
                          Style="{StaticResource ResourceKey=StyleListBoxColors}">
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemColor}">
-                                <Setter Property="Background" Value="{Binding Converter={StaticResource ResourceKey=LivePaperBrushConverter}, ConverterParameter={x:Static enums:WallpaperTypeEnum.Image}}"/>
+                                <Setter Property="Background" Value="{Binding Converter={StaticResource ResourceKey=LivePaperBrushConverter}, ConverterParameter={x:Static documentenums:WallpaperTypeEnum.Image}}"/>
                             </Style>
                         </ListBox.ItemContainerStyle>
                     </ListBox>

@@ -150,5 +150,10 @@ namespace ModengTerm.Document
         {
             return new VTRect(X - value, Y - value, Width + value * 2, Height + value * 2);
         }
+
+        public static VTRect CreateFromTextRange(VTextRange textRange, double offsetY)
+        {
+            return new VTRect(textRange.OffsetX, offsetY, textRange.Width, textRange.Height);
+        }
     }
 }

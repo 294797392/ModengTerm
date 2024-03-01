@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.Enumerations;
+﻿using ModengTerm.Document.Enumerations;
+using ModengTerm.Terminal.Enumerations;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 

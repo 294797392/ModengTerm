@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-                                  xmlns:terminal="clr-namespace:ModengTerm.Terminal"
-                                  xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
-             xmlns:modentermcontrols="clr-namespace:ModengTerm.Controls"
+             xmlns:terminal="clr-namespace:ModengTerm.Terminal"
+             xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
+             xmlns:modentermdocumentrendering="clr-namespace:ModengTerm.Document.Rendering;assembly=ModengTerm.Document.Rendering"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -31,22 +31,20 @@
             <RowDefinition Height="0"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent">
+            <Grid.ContextMenu>
+                <ContextMenu ItemsSource="{Binding Path=FunctionMenus}" MenuItem.Click="ContextMenu_Click">
+                    <ContextMenu.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </HierarchicalDataTemplate>
+                    </ContextMenu.ItemTemplate>
+                </ContextMenu>
+            </Grid.ContextMenu>
 
-            <Grid Grid.Row="0" Background="Transparent">
-                <Grid.ContextMenu>
-                    <ContextMenu ItemsSource="{Binding Path=FunctionMenus}" MenuItem.Click="ContextMenu_Click">
-                        <ContextMenu.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                <TextBlock Text="{Binding Path=Name}"/>
-                            </HierarchicalDataTemplate>
-                        </ContextMenu.ItemTemplate>
-                    </ContextMenu>
-                </Grid.ContextMenu>
+            <modentermdocumentrendering:DrawingDocument x:Name="DocumentAlternate"/>
+            <modentermdocumentrendering:DrawingDocument x:Name="DocumentMain"/>
 
-                <Grid x:Name="GridCanvasList"/>
-
-            </Grid>
         </Grid>
 
         <!-- 状态栏 -->
@@ -98,4 +96,3 @@
 
     </Grid>
 </UserControl>
-

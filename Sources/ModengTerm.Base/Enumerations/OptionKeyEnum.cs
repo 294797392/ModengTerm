@@ -73,7 +73,7 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
-        #region 终端通用 1001 - 1500
+        #region 终端 1001 - 1500
 
         /// <summary>
         /// 最多可以回滚的行数
@@ -84,16 +84,22 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         TERM_MAX_CLIPBOARD_HISTORY = 1002,
 
+        TERM_SELECTION_COLOR = 1003,
+
+        MOUSE_SCROLL_DELTA = 1004,
+
         #endregion
+
+        #region 通用 1501 - 5000
 
         /// <summary>
         /// 输出编码格式
         /// </summary>
-        WRITE_ENCODING,
-        WRITE_BUFFER_SIZE,
-        READ_BUFFER_SIZE,
+        WRITE_ENCODING = 1501,
+        WRITE_BUFFER_SIZE = 1502,
+        READ_BUFFER_SIZE = 1503,
 
-        MOUSE_SCROLL_DELTA,
+        #endregion
 
         #region SFTP 10000 - 11000
 

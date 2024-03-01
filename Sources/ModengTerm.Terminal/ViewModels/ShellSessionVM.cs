@@ -3,14 +3,15 @@ using Microsoft.Win32;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
+using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Enumerations;
 using ModengTerm.ServiceAgents;
 using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
-using ModengTerm.Terminal.Document;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
-using ModengTerm.Terminal.Rendering;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
@@ -222,6 +223,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public LoggerManager LoggerManager { get; set; }
 
+        public IDrawingDocument MainDocument { get; set; }
+        public IDrawingDocument AlternateDocument { get; set; }
+
         #endregion
 
         #region 构造方法
@@ -304,13 +308,12 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化终端
 
-            SessionTransport transport = new SessionTransport();
-
             VTOptions options = new VTOptions()
             {
                 Session = this.Session,
-                WindowHost = this.Content as IDrawingTerminal,
-                SessionTransport = transport
+                SessionTransport = new SessionTransport(),
+                AlternateDocument = this.AlternateDocument,
+                MainDocument = this.MainDocument
             };
             this.videoTerminal = new VideoTerminal();
             this.videoTerminal.ViewportChanged += this.VideoTerminal_ViewportChanged;
@@ -321,6 +324,7 @@ namespace ModengTerm.Terminal.ViewModels
             #region 连接终端通道
 
             // 连接SSH服务器
+            SessionTransport transport = options.SessionTransport;
             transport.StatusChanged += this.SessionTransport_StatusChanged;
             transport.DataReceived += this.SessionTransport_DataReceived;
             transport.Initialize(this.Session);

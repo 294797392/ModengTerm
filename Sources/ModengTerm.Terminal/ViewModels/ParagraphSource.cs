@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal.DataModels;
-using ModengTerm.Terminal.Document;
 using System;
 using System.Collections.Generic;
 using System.Linq;

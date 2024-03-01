@@ -132,7 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vtcore.h" />
-    <ClInclude Include="vtdoc.h" />
+    <ClInclude Include="VTDocument.h" />
     <ClInclude Include="vtparser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,7 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.Rendering;
 using ModengTerm.Terminal.Session;
 using System;
 using System.Collections.Generic;
@@ -63,7 +62,6 @@ namespace ModengTerm.Terminal.ViewModels
             VTOptions options = new VTOptions()
             {
                 Session = this.playbackFile.Session,
-                WindowHost = this.Content as IDrawingTerminal,
                 SessionTransport = transport
             };
             this.videoTerminal = new VideoTerminal();
