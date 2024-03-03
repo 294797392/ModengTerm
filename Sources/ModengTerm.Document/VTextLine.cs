@@ -532,6 +532,34 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
+        /// 从指定列开始删除字符，删到结尾
+        /// </summary>
+        /// <param name="column">要从第几列开始删除</param>
+        public void Delete(int column) 
+        {
+            int startIndex = FindCharacterIndex(column);
+            if (startIndex == -1)
+            {
+                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
+                logger.FatalFormat("Delete失败, startIndex == -1, column = {0}", column);
+                return;
+            }
+
+            int count = this.characters.Count - startIndex;
+
+            for (int i = 0; i < count; i++)
+            {
+                VTCharacter toDelete = characters[startIndex];
+                characters.Remove(toDelete);
+
+                // 更新总列数
+                columns -= toDelete.ColumnSize;
+            }
+
+            SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+        }
+
+        /// <summary>
         /// 删除指定列处的字符
         /// </summary>
         /// <param name="column">从此处开始删除字符</param>
@@ -562,7 +590,7 @@ namespace ModengTerm.Document
                 VTCharacter toDelete = characters[startIndex];
                 characters.Remove(toDelete);
 
-                // 更新显示的列数
+                // 更新总列数
                 columns -= toDelete.ColumnSize;
             }
 

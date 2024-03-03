@@ -356,7 +356,10 @@ namespace ModengTerm.Terminal.ViewModels
             if (this.activeDocument == this.mainDocument)
             {
                 VTScrollInfo scrollBar = this.mainDocument.Scrollbar;
-                scrollBar.UpdateHistory(this.ActiveLine);
+                if (this.ActiveLine != null)
+                {
+                    scrollBar.UpdateHistory(this.ActiveLine);
+                }
             }
         }
 
@@ -649,7 +652,22 @@ namespace ModengTerm.Terminal.ViewModels
                         List<int> parameters = parameter as List<int>;
                         XTerminal.Parser.EraseType eraseType = (XTerminal.Parser.EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, eraseType);
-                        this.activeDocument.EraseLine(this.CursorCol, (Document.Enumerations.EraseType)eraseType);
+
+                        switch (eraseType)
+                        {
+                            case XTerminal.Parser.EraseType.ToEnd:
+                                {
+                                    this.activeDocument.DeleteCharacter(this.CursorCol);
+                                    break;
+                                }
+
+                            default:
+                                {
+                                    this.activeDocument.EraseLine(this.CursorCol, (Document.Enumerations.EraseType)eraseType);
+                                    break;
+                                }
+                        }
+
                         break;
                     }
 

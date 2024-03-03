@@ -140,6 +140,17 @@ namespace ModengTerm.Terminal.UserControls
             e.Handled = true;
         }
 
+        protected override void OnMouseWheel(MouseWheelEventArgs e)
+        {
+            base.OnMouseWheel(e);
+
+            VTEventInput eventInput = this.GetActiveEventInput();
+            eventInput.OnMouseWheel(e.Delta > 0);
+
+            e.Handled = true;
+        }
+
+
         /// <summary>
         /// 重写了这个事件后，就会触发鼠标相关的事件
         /// </summary>

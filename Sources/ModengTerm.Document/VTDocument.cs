@@ -75,6 +75,8 @@ namespace ModengTerm.Document
         /// </summary>
         private bool visible = true;
 
+        private VTextLine activeLine;
+
         #endregion
 
         #region 属性
@@ -120,7 +122,17 @@ namespace ModengTerm.Document
         /// 当前光标所在行
         /// 通过SetCursor函数设置
         /// </summary>
-        public VTextLine ActiveLine { get; private set; }
+        public VTextLine ActiveLine 
+        {
+            get { return this.activeLine; }
+            private set
+            {
+                if (this.activeLine != value)
+                {
+                    this.activeLine = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 文档里的第一行
@@ -889,9 +901,8 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 在当前光标所在行开始删除字符操作
+        /// 在当前光标所在行使用填充字符的方式操作行
         /// </summary>
-        /// <param name="textLine">要执行删除操作的行</param>
         /// <param name="column">光标所在列</param>
         /// <param name="eraseType">删除类型</param>
         public void EraseLine(int column, EraseType eraseType)
@@ -1008,9 +1019,8 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 从指定行的指定列处开始删除字符，要删除的字符数由count指定
+        /// 删除光标所在行里的字符
         /// </summary>
-        /// <param name="textLine">要删除的字符所在行</param>
         /// <param name="column">要删除的字符起始列</param>
         /// <param name="count">要删除的字符个数</param>
         public void DeleteCharacter(int column, int count)
@@ -1018,6 +1028,85 @@ namespace ModengTerm.Document
             VTextLine textLine = this.ActiveLine;
 
             textLine.DeleteRange(column, count);
+        }
+
+        /// <summary>
+        /// 从指定列开始删除光标所在行的字符
+        /// </summary>
+        /// <param name="column">要从第几列开始删除</param>
+        public void DeleteCharacter(int column) 
+        {
+            VTextLine textLine = this.ActiveLine;
+
+            textLine.Delete(column);
+        }
+
+        /// <summary>
+        /// 从光标所在行开始删除行，并把后面的行往前移动
+        /// </summary>
+        /// <param name="lines">要删除的行数</param>
+        public void DeleteLines(int lines)
+        {
+            VTextLine activeLine = this.ActiveLine;
+
+            VTextLine current = activeLine;
+
+            VTextLine head = FirstLine.FindNext(ScrollMarginTop);
+            VTextLine last = LastLine.FindPrevious(ScrollMarginBottom);
+
+            VTextLine node1 = activeLine;
+            VTextLine node1Prev = node1.PreviousLine;
+            VTextLine node1Next = node1.NextLine;
+
+            VTextLine node2 = last;
+            VTextLine node2Prev = node2.PreviousLine;
+            VTextLine node2Next = node2.NextLine;
+
+            for (int i = 0; i < lines; i++)
+            {
+                // node1就是要删除的节点
+                // 把node1插到node2下面
+
+                // 更新上半部分
+                node1Next.PreviousLine = node1Prev;
+                if (node1Prev != null)
+                {
+                    node1Prev.NextLine = node1Next;
+                }
+
+                // 更新下半部分
+                node2.NextLine = node1;
+                node1.PreviousLine = node2;
+                node1.NextLine = node2Next;
+                if (node2Next != null)
+                {
+                    node2Next.PreviousLine = node1;
+                }
+                node1.EraseAll();
+
+                // 更新FirstLine
+                if (ScrollMarginTop == 0)
+                {
+                    FirstLine = node1Next;
+                }
+
+                // 更新LastLine
+                if (ScrollMarginBottom == 0)
+                {
+                    LastLine = node1;
+                }
+
+                node2 = node1;
+                node1Prev = node2.PreviousLine;
+                node2Next = node2.NextLine;
+
+                node1 = node1Next;
+                node1Prev = node1.PreviousLine;
+                node1Next = node1.NextLine;
+            }
+
+            // 更新ActiveLine
+            ActiveLine = FirstLine.FindNext(Cursor.Row);
         }
 
         /// <summary>
@@ -1085,74 +1174,6 @@ namespace ModengTerm.Document
                 {
                     LastLine = node2Prev;
                 }
-            }
-
-            // 更新ActiveLine
-            ActiveLine = FirstLine.FindNext(Cursor.Row);
-        }
-
-        /// <summary>
-        /// 从activeLine开始删除lines行，并把后面的行往前移动
-        /// </summary>
-        /// <param name="lines"></param>
-        public void DeleteLines(int lines)
-        {
-            VTextLine activeLine = this.ActiveLine;
-
-            VTextLine current = activeLine;
-
-            VTextLine head = FirstLine.FindNext(ScrollMarginTop);
-            VTextLine last = LastLine.FindPrevious(ScrollMarginBottom);
-
-            VTextLine node1 = activeLine;
-            VTextLine node1Prev = node1.PreviousLine;
-            VTextLine node1Next = node1.NextLine;
-
-            VTextLine node2 = last;
-            VTextLine node2Prev = node2.PreviousLine;
-            VTextLine node2Next = node2.NextLine;
-
-            for (int i = 0; i < lines; i++)
-            {
-                // node1就是要删除的节点
-                // 把node1插到node2下面
-
-                // 更新上半部分
-                node1Next.PreviousLine = node1Prev;
-                if (node1Prev != null)
-                {
-                    node1Prev.NextLine = node1Next;
-                }
-
-                // 更新下半部分
-                node2.NextLine = node1;
-                node1.PreviousLine = node2;
-                node1.NextLine = node2Next;
-                if (node2Next != null)
-                {
-                    node2Next.PreviousLine = node1;
-                }
-                node1.EraseAll();
-
-                // 更新FirstLine
-                if (ScrollMarginTop == 0)
-                {
-                    FirstLine = node1Next;
-                }
-
-                // 更新LastLine
-                if (ScrollMarginBottom == 0)
-                {
-                    LastLine = node1;
-                }
-
-                node2 = node1;
-                node1Prev = node2.PreviousLine;
-                node2Next = node2.NextLine;
-
-                node1 = node1Next;
-                node1Prev = node1.PreviousLine;
-                node1Next = node1.NextLine;
             }
 
             // 更新ActiveLine
@@ -1244,12 +1265,8 @@ namespace ModengTerm.Document
                 ActiveLine.PhysicsRow != physicsRow)
             {
                 // 如果光标所在物理行被滚动到了文档外，那么ActiveLine就是空的
+                // 比如通过滚动滚动条把光标所在行移动到了可视区域外
                 ActiveLine = FindLine(physicsRow);
-            }
-
-            if (ActiveLine == null)
-            {
-                Console.WriteLine("SetCursorPhysicsRow ActiveLine == NULL");
             }
         }
 

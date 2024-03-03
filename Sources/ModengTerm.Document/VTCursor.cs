@@ -235,33 +235,36 @@ namespace ModengTerm.Document
                 return;
             }
 
-            // 设置光标位置
+            // Column表示要输入的下一个字符的位置，从0开始计算
 
-            // 光标在这个索引位置的字符后面
-            int characterIndex = 0;
+            // 分三种情况去确定光标位置
 
-            if (this.column == activeLine.Columns)
+            // 1. 光标在开头
+            if (this.column == 0)
             {
-                // 此时说明光标在最后一个字符的后面
-                characterIndex = activeLine.Characters.Count - 1;
+                // 光标所在行没有字符，那么光标在位置0处显示
+                DrawingObject.Arrange(0, activeLine.OffsetY);
             }
-            else if (this.column < activeLine.Columns)
+
+            // 2. 光标在结尾
+            else if (this.column == activeLine.Columns)
             {
-                // 此时说明光标在某个字符后面
-                characterIndex = activeLine.FindCharacterIndex(this.column);
+                DrawingObject.Arrange(activeLine.Width, activeLine.OffsetY);
+            }
+
+            // 3. 光标在中间
+            else if (this.column > 0 && this.column < activeLine.Columns)
+            {
+                int characterIndex = activeLine.FindCharacterIndex(this.column);
+                VTextRange textRange = activeLine.MeasureCharacter(characterIndex);
+                double offsetX = textRange.OffsetX;
+                double offsetY = activeLine.OffsetY;
+                DrawingObject.Arrange(offsetX, offsetY);
             }
             else
             {
-                // 此时说明光标位置已经超出了最后一个字符的位置
-                // 不做处理
-                logger.DebugFormat("光标超出了最后一个字符的位置, 渲染光标失败");
-                return;
+                logger.ErrorFormat("渲染光标失败, 没有考虑到的光标所在位置");
             }
-
-            VTextRange textRange = activeLine.MeasureCharacter(characterIndex);
-            double offsetX = textRange.OffsetX + textRange.Width;
-            double offsetY = activeLine.OffsetY;
-            DrawingObject.Arrange(offsetX, offsetY);
         }
 
         #endregion
