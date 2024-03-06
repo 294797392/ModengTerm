@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "string.h": "c",
+        "vtcommon.h": "c",
+        "vtextselection.h": "c"
+    }
+}
