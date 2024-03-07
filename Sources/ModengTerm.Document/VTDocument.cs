@@ -248,7 +248,7 @@ namespace ModengTerm.Document
                 OffsetY = 0,
                 DECPrivateAutoWrapMode = DECPrivateAutoWrapMode,
                 PhysicsRow = physicsRow,
-                Style = options.Typeface
+                Typeface = options.Typeface
             };
 
             textLine.Initialize();

@@ -125,7 +125,7 @@ namespace ModengTerm.Document
         /// DECAWM SET：超出后要在新的一行上从头开始显示字符
         /// DECAWM RESET：超出后在该行的第一个字符处开始显示字符
         /// </summary>
-        public double Height { get { return this.Style.Height; return Metrics.Height; } }
+        public double Height { get { return this.Typeface.Height; return Metrics.Height; } }
 
         /// <summary>
         /// 获取该文本的边界框信息
@@ -136,7 +136,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 文本样式
         /// </summary>
-        public VTypeface Style { get; set; }
+        public VTypeface Typeface { get; set; }
 
         #endregion
 
@@ -622,7 +622,7 @@ namespace ModengTerm.Document
             IDrawingTextLine drawingTextLine = this.DrawingObject as IDrawingTextLine;
 
             VTFormattedText formattedText = VTUtils.CreateFormattedText(characters);
-            formattedText.Style = this.Style;
+            formattedText.Style = this.Typeface;
 
             // 把物理行号打印出来，调试用
             //formattedText.Text = string.Format("{0} - {1}", this.PhysicsRow, formattedText.Text);

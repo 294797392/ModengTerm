@@ -244,6 +244,8 @@ namespace ModengTerm.Document
             LastRowCharacterIndex = -1;
 
             this.geometries.Clear();
+
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty);
         }
 
         public void Normalize(out int topRow, out int bottomRow, out int startIndex, out int endIndex)

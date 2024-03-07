@@ -99,8 +99,8 @@ namespace ModengTerm.Document
 
                 VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
                 VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
-                character.Foreground = VTColor.CreateFromRgbKey(textLine.Style.BackgroundColor);
-                character.Background = VTColor.CreateFromRgbKey(textLine.Style.ForegroundColor);
+                character.Foreground = VTColor.CreateFromRgbKey(textLine.Typeface.BackgroundColor);
+                character.Background = VTColor.CreateFromRgbKey(textLine.Typeface.ForegroundColor);
             }
 
             #endregion
@@ -110,7 +110,7 @@ namespace ModengTerm.Document
             VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
             formattedText.OffsetX = textRange.OffsetX;
             formattedText.OffsetY = textLine.OffsetY;
-            formattedText.Style = textLine.Style;
+            formattedText.Style = textLine.Typeface;
 
             drawingTextBlock.FormattedText = formattedText;
         }

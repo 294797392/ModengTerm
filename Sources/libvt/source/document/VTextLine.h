@@ -4,17 +4,36 @@
 #include "VTCommon.h"
 #include "VTCharacter.h"
 #include "VTextMetrics.h"
+#include "VTypeface.h"
 
-typedef struct VTextLine VTextLine;
+#ifdef __cplusplus 
+extern "C" {
+#endif
 
-struct VTextLine
-{
-    int physicsRow;
-    VTextLine *previous;
-    VTextLine *next;
-    VTCharacter *character;
-    int columns;
-    VTextMetrics *metrics;
-};
+    typedef struct VTextLine VTextLine;
+
+    struct VTextLine
+    {
+        int physicsRow;
+        VTextLine *previous;
+        VTextLine *next;
+        VTCharacter *character;
+        int columns;
+        VTextMetrics *metrics;
+        double offsetX;
+        double offsetY;
+        VTypeface *typeface;
+    };
+
+    VTAPI VTextLine *VTextLine_new();
+    VTAPI void VTextLine_free(VTextLine *textLine);
+    VTAPI void VTextLine_initialize(VTextLine *textLine);
+    VTAPI void VTextLine_release(VTextLine *textLine);
+
+    VTAPI void VTextLine_append(VTextLine *textLine, VTextLine *toAppend);
+
+#ifdef __cplusplus 
+}
+#endif
 
 #endif

@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
-// ¶¨Òåµ¼³öºÍµ¼Èë·ûºÅ
-// ×¢Òâ£¬Èç¹ûÊÇÁ´½Ó¾²Ì¬¿â£¬ÄÇÃ´²»ÐèÒª__declspec(dllimport)
+// ï¿½ï¿½ï¿½åµ¼ï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ×¢ï¿½â£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¾ï¿½Ì¬ï¿½â£¬ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½Òª__declspec(dllimport)
 #if (defined(LIBVT_WIN32))
 #ifdef LIBVT_EXPORT
 #define VTAPI __declspec(dllexport)
@@ -16,5 +16,7 @@
 #else
 #define VTAPI
 #endif
+
+#define VTCOLOR_SIZE                32
 
 #endif
