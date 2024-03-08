@@ -1,14 +1,15 @@
 #ifndef __VTCURSOR_H__
 #define __VTCURSOR_H__
 
-#include "VTDocument.h"
+//#include "VTDocument.h"
+#include "VTCommon.h"
 #include "VTypeface.h"
 
 #ifdef __cplusplus 
 extern "C" {
 #endif
 
-    typedef enum VTCursorStyles
+    typedef enum 
     {
         VTCURSOR_STYLES_NONE,
         VTCURSOR_STYLES_LINE,
@@ -16,7 +17,7 @@ extern "C" {
         VTCURSOR_STYLES_UNDERSCORE
     }VTCursorStyles;
 
-    typedef enum VTCursorSpeeds
+    typedef enum 
     {
         VTCURSOR_SPEEDS_HIGH = 300,
         VTCURSOR_SPEEDS_NORMAL = 600,
@@ -32,7 +33,7 @@ extern "C" {
         VTCursorStyles style;
         char color[VTCOLOR_SIZE];
         int interval;
-        VTDocument *ownerDocument;
+        //VTDocument *ownerDocument;
         double offsetX;
         double offsetY;
         int isVisible;

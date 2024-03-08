@@ -65,10 +65,10 @@ namespace ModengTerm.Document
             {
                 VTextRange characterRange = textLine.MeasureCharacter(i);
 
-                double left = characterRange.OffsetX + characterRange.Width / 2;
+                double left = characterRange.OffsetX;
                 double right = characterRange.OffsetX + characterRange.Width;
 
-                if (cursorX > left && cursorX < right)
+                if (cursorX >= left && cursorX <= right)
                 {
                     // 鼠标命中了字符，使用命中的字符的边界框
                     characterHitIndex = i;

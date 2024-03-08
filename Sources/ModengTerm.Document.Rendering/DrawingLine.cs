@@ -85,14 +85,14 @@ namespace ModengTerm.Document.Rendering
         /// <returns></returns>
         public VTextRange MeasureTextRange(int startIndex, int count)
         {
-            return CommonMeasureLine(this.FormattedText, startIndex, count);
+            return CommonMeasureLine(this.FormattedText, this.Offset.Y, startIndex, count);
         }
 
         #endregion
 
         #region 实例方法
 
-        private static VTextRange CommonMeasureLine(VTFormattedText textData, int startIndex, int count)
+        private static VTextRange CommonMeasureLine(VTFormattedText textData, double offsetY, int startIndex, int count)
         {
             if (textData == null)
             {
@@ -118,7 +118,7 @@ namespace ModengTerm.Document.Rendering
 
             FormattedText formattedText = DrawingUtils.CreateFormattedText(textData);
             Geometry geometry = formattedText.BuildHighlightGeometry(DrawingUtils.ZeroPoint, startIndex, count);
-            return new VTextRange(geometry.Bounds.Left, geometry.Bounds.Width, geometry.Bounds.Height);
+            return new VTextRange(geometry.Bounds.Left, offsetY, geometry.Bounds.Width, geometry.Bounds.Height);
         }
 
         #endregion

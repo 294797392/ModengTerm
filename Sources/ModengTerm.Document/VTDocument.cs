@@ -101,7 +101,10 @@ namespace ModengTerm.Document
         /// </summary>
         public VTScrollInfo Scrollbar { get; private set; }
 
-        public bool DECPrivateAutoWrapMode { get; set; }
+        /// <summary>
+        /// 当一行字符超出了最大列数之后是否自动换行
+        /// </summary>
+        public bool AutoWrapMode { get; set; }
 
         /// <summary>
         /// 当光标在该范围内就得滚动
@@ -246,7 +249,6 @@ namespace ModengTerm.Document
             {
                 OffsetX = 0,
                 OffsetY = 0,
-                DECPrivateAutoWrapMode = DECPrivateAutoWrapMode,
                 PhysicsRow = physicsRow,
                 Typeface = options.Typeface
             };
@@ -489,7 +491,7 @@ namespace ModengTerm.Document
                 if (cursorLine == null)
                 {
                     // 这里说明鼠标没有在任何一行上
-                    logger.DebugFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
+                    logger.WarnFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
                     return false;
                 }
             }
@@ -498,7 +500,8 @@ namespace ModengTerm.Document
 
             #region 再计算鼠标悬浮于哪个字符上
 
-            int characterIndex = 0;
+            int characterIndex;
+            VTextRange textRange = VTextRange.Empty;
 
             if (mouseX < 0)
             {
@@ -514,10 +517,10 @@ namespace ModengTerm.Document
             else
             {
                 // 鼠标的水平方向在画布中间，那么做字符命中测试
-                VTextRange characterRange;
-                if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out characterRange))
+                if (!HitTestHelper.HitTestVTCharacter(cursorLine, mouseX, out characterIndex, out textRange))
                 {
                     // 没有命中字符
+                    logger.WarnFormat("没有找到鼠标对应的字符, cursorY = {0}", mouseY);
                     return false;
                 }
             }
@@ -625,7 +628,7 @@ namespace ModengTerm.Document
             foreach (char ch in input.Text)
             {
                 VTCharacter character = VTCharacter.Create(ch, 1);
-                this.PrintCharacter(character, this.Cursor.Column);
+                this.PrintCharacter(character);
                 this.SetCursor(this.Cursor.Row, this.Cursor.Column + 1);
             }
         }
@@ -889,15 +892,15 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 在指定的光标位置打印一个字符
+        /// 在当前光标位置打印一个字符
         /// TODO：该函数里的VTCharacter没有复用，需要改进
         /// </summary>
         /// <param name="ch"></param>
         /// <param name="row"></param>
         /// <param name="col"></param>
-        public void PrintCharacter(VTCharacter character, int column)
+        public void PrintCharacter(VTCharacter character)
         {
-            this.ActiveLine.PrintCharacter(character, column);
+            this.ActiveLine.PrintCharacter(character, this.Cursor.Column);
         }
 
         /// <summary>

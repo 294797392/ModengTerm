@@ -18,6 +18,26 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\document\VTCharacter.h" />
+    <ClInclude Include="..\source\document\VTColor.h" />
+    <ClInclude Include="..\source\document\VTCursor.h" />
+    <ClInclude Include="..\source\document\VTDocument.h" />
+    <ClInclude Include="..\source\document\VTextLine.h" />
+    <ClInclude Include="..\source\document\VTextMetrics.h" />
+    <ClInclude Include="..\source\document\VTextSelection.h" />
+    <ClInclude Include="..\source\document\VTScrollInfo.h" />
+    <ClInclude Include="..\source\document\VTypeface.h" />
+    <ClInclude Include="..\source\VTCommon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\document\VTCursor.c" />
+    <ClCompile Include="..\source\document\VTDocument.c" />
+    <ClCompile Include="..\source\document\VTextLine.c" />
+    <ClCompile Include="..\source\document\VTextSelection.c" />
+    <ClCompile Include="..\source\document\VTScrollInfo.c" />
+    <ClCompile Include="..\source\main.c" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -118,9 +138,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;VT_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;VT_WIN32;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\oheiheiheiheihei\terminal\Dependence\libssh2\include;E:\oheiheiheiheihei\terminal\Sources\libvt\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\oheiheiheiheihei\terminal\Dependence\libssh2\include;E:\oheiheiheiheihei\terminal\Sources\libvt\source\document;E:\oheiheiheiheihei\terminal\Sources\libvt\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -143,13 +163,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\source\vt.h" />
-    <ClInclude Include="libvt.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="libvt.c" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

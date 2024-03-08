@@ -89,16 +89,6 @@ namespace ModengTerm.Document
         public VTextLine NextLine { get; set; }
 
         /// <summary>
-        /// 是否开启了DECAWM模式
-        /// </summary>
-        public bool DECPrivateAutoWrapMode { get; set; }
-
-        /// <summary>
-        /// 当前光标是否在最右边
-        /// </summary>
-        public bool CursorAtRightMargin { get; private set; }
-
-        /// <summary>
         /// 获取该行字符的只读集合
         /// </summary>
         public List<VTCharacter> Characters { get { return characters; } }
@@ -116,6 +106,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 获取该文本块的宽度
+        /// 包含空白字符
         /// </summary>
         public double Width { get { return Metrics.Width; } }
 
@@ -477,6 +468,8 @@ namespace ModengTerm.Document
             }
 
             this.columns += count;
+
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -518,6 +511,8 @@ namespace ModengTerm.Document
 
                 characters.Remove(character);
             }
+
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -529,6 +524,7 @@ namespace ModengTerm.Document
         {
             characters.Insert(characterIndex, character);
             columns += character.ColumnSize;
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -541,7 +537,7 @@ namespace ModengTerm.Document
             if (startIndex == -1)
             {
                 // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
-                logger.FatalFormat("Delete失败, startIndex == -1, column = {0}", column);
+                logger.WarnFormat("Delete失败, startIndex == -1, column = {0}", column);
                 return;
             }
 

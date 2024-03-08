@@ -178,7 +178,7 @@ namespace ModengTerm.Document
                 VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
 
                 // 第一行的矩形
-                geometries.Add(new VTRect(topBounds.OffsetX, topLine.OffsetY, container.Width - topBounds.OffsetX, topLine.Height));
+                geometries.Add(new VTRect(topBounds.OffsetX, topBounds.OffsetY, container.Width - topBounds.OffsetX, topLine.Height));
 
                 // 中间的矩形
                 double y = topLine.OffsetY + topBounds.Height;
@@ -186,7 +186,7 @@ namespace ModengTerm.Document
                 geometries.Add(new VTRect(0, y, container.Width, height));
 
                 // 最后一行的矩形
-                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Width, bottomLine.Height));
+                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.OffsetX + bottomBounds.Width, bottomLine.Height));
                 return;
             }
 
@@ -210,7 +210,7 @@ namespace ModengTerm.Document
                 VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
 
                 // 最后一行的矩形
-                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.Width, bottomLine.Height));
+                geometries.Add(new VTRect(0, bottomBounds.OffsetY, bottomBounds.OffsetX + bottomBounds.Width, bottomLine.Height));
 
                 // 剩下的矩形
                 geometries.Add(new VTRect(0, 0, container.Width, bottomLine.OffsetY));
@@ -245,7 +245,7 @@ namespace ModengTerm.Document
 
             this.geometries.Clear();
 
-            this.SetDirtyFlags(VTDirtyFlags.RenderDirty);
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         public void Normalize(out int topRow, out int bottomRow, out int startIndex, out int endIndex)
@@ -308,11 +308,6 @@ namespace ModengTerm.Document
 
         protected override void OnRender()
         {
-            if (this.IsEmpty)
-            {
-                return;
-            }
-
             UpdateGeometry();
             DrawingObject.Draw();
         }

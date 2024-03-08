@@ -31,13 +31,14 @@ static VTextLine *createTextLine(int physicsRow, VTDocumentOptions *options)
     textLine->physicsRow = physicsRow;
     textLine->typeface = options->typeface;
     VTextLine_initialize(textLine);
+    return textLine;
 }
 
 
 
 
 
-VTDocument *VTDocument_create()
+VTDocument *VTDocument_new()
 {
     VTDocument *document = (VTDocument*)calloc(1, sizeof(VTDocument));
     return document;
@@ -89,4 +90,9 @@ void VTDocument_initialize(VTDocument *document, VTDocumentOptions *options)
 void VTDocument_release(VTDocument *document)
 {
 
+}
+
+void VTDocument_printCharacter(VTDocument *document, VTCharacter *character)
+{
+    VTextLine *activeLine = document->activeLine;
 }

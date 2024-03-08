@@ -13,7 +13,7 @@ namespace ModengTerm.Document
     {
         /// <summary>
         /// 渲染后该文本块的宽度
-        /// 忽略空白宽度
+        /// 如果该文本块后面有空白，那么计算空白宽度
         /// </summary>
         public double Width { get; set; }
 

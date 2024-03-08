@@ -4,6 +4,7 @@
 #include "VTCommon.h"
 #include "VTypeface.h"
 #include "VTCursor.h"
+#include "VTCharacter.h"
 
 #ifdef __cplusplus 
 extern "C" {
@@ -30,7 +31,7 @@ extern "C" {
     VTAPI void VTDocument_initialize(VTDocument *document, VTDocumentOptions *options);
     VTAPI void VTDocument_release(VTDocument *document);
 
-    VTAPI void VTDocument_printCharacter(VTCharacter *character, int column);
+    VTAPI void VTDocument_printCharacter(VTCharacter *character);
 
 #ifdef __cplusplus 
 }

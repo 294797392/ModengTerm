@@ -1,10 +1,56 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="..\source\vt.h" />
-    <ClInclude Include="libvt.h" />
+    <Filter Include="document">
+      <UniqueIdentifier>{0e57eaaf-1cd8-4514-ad2f-31fa6dd25fd5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="libvt.c" />
+    <ClInclude Include="..\source\document\VTCharacter.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTColor.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTCursor.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTDocument.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTextLine.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTextMetrics.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTextSelection.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTScrollInfo.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\document\VTypeface.h">
+      <Filter>document</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\VTCommon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\document\VTCursor.c">
+      <Filter>document</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\document\VTDocument.c">
+      <Filter>document</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\document\VTextLine.c">
+      <Filter>document</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\document\VTextSelection.c">
+      <Filter>document</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\main.c" />
+    <ClCompile Include="..\source\document\VTScrollInfo.c">
+      <Filter>document</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

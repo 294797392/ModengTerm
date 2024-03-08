@@ -545,7 +545,7 @@ namespace ModengTerm.Terminal.ViewModels
                         char ch = Convert.ToChar(parameter);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, ch);
                         VTCharacter character = this.CreateCharacter(parameter, this.activeDocument.AttributeState);
-                        this.activeDocument.PrintCharacter(character, this.CursorCol);
+                        this.activeDocument.PrintCharacter(character);
                         this.activeDocument.SetCursor(this.CursorRow, this.CursorCol + character.ColumnSize);
 
                         break;
@@ -857,7 +857,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", this.CursorRow, this.CursorCol, n);
 
-                        this.ActiveLine.PadColumns(n);
+                        this.ActiveLine.PadColumns(n - 1);
                         this.activeDocument.SetCursor(this.CursorRow, n - 1);
                         break;
                     }
@@ -990,7 +990,7 @@ namespace ModengTerm.Terminal.ViewModels
                         bool enable = Convert.ToBoolean(parameter);
                         VTDebug.Context.WriteInteractive(action, "{0}", enable);
                         this.autoWrapMode = enable;
-                        this.activeDocument.DECPrivateAutoWrapMode = enable;
+                        this.activeDocument.AutoWrapMode = enable;
                         break;
                     }
 

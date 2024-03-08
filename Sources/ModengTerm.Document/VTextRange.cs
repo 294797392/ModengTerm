@@ -19,6 +19,11 @@ namespace ModengTerm.Document
         public double OffsetX { get; set; }
 
         /// <summary>
+        /// 距离文档的Y偏移量
+        /// </summary>
+        public double OffsetY { get; set; }
+
+        /// <summary>
         /// 该文本段宽度
         /// </summary>
         public double Width { get; set; }
@@ -28,9 +33,10 @@ namespace ModengTerm.Document
         /// </summary>
         public double Height { get; set; }
 
-        public VTextRange(double offsetX, double width, double height)
+        public VTextRange(double offsetX, double offsetY, double width, double height)
         {
             this.OffsetX = offsetX;
+            this.OffsetY = offsetY;
             this.Width = width;
             this.Height = height;
         }

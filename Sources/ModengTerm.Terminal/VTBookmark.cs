@@ -36,7 +36,7 @@ namespace ModengTerm.Terminal
                 StartCharacterIndex = 0,
                 EndCharacterIndex = textLine.Characters.Count - 1,
                 ContentType = LogFileTypeEnum.PlainText,
-                Typeface = textLine.Style,
+                Typeface = textLine.Typeface,
                 CharactersList = new List<List<VTCharacter>>() { textLine.Characters.ToList() }
             };
 

@@ -96,17 +96,11 @@ namespace ModengTerm.Terminal.UserControls
 
         #region 事件处理器
 
-        protected override void OnMouseDown(MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            base.OnMouseDown(e);
+            base.OnMouseLeftButtonDown(e);
 
             this.Focus();
-
-            // 右击如果设置了e.Handled = true的话会阻止右键菜单的弹出
-            if (e.ChangedButton == MouseButton.Right)
-            {
-                return;
-            }
 
             VTEventInput eventInput = this.GetActiveEventInput();
             eventInput.OnMouseDown(e.GetPosition(GridDocument).ToVTPoint(), e.ClickCount);
@@ -125,14 +119,9 @@ namespace ModengTerm.Terminal.UserControls
             e.Handled = true;
         }
 
-        protected override void OnMouseUp(MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            base.OnMouseUp(e);
-
-            if (e.ChangedButton == MouseButton.Right)
-            {
-                return;
-            }
+            base.OnMouseLeftButtonUp(e);
 
             VTEventInput eventInput = this.GetActiveEventInput();
             eventInput.OnMouseUp(e.GetPosition(GridDocument).ToVTPoint());
