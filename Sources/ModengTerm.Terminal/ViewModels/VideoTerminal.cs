@@ -1,18 +1,13 @@
-﻿using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
-using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Session;
-using ModengTerm.ViewModels;
 using System.Text;
-using XTerminal.Base;
 using XTerminal.Base.Definitions;
-using XTerminal.Base.Enumerations;
 using XTerminal.Parser;
 
 namespace ModengTerm.Terminal.ViewModels
