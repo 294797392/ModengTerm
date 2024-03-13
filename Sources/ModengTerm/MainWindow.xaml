@@ -103,6 +103,7 @@
             </ListBox>
 
             <!-- 终端展示页面 -->
+            <Border Grid.Row="1" Background="Black"/>
             <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
 
         </Grid>

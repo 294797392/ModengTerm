@@ -155,6 +155,14 @@ namespace XTerminal
             }
 
             MTermApp.Context.CloseSession(openedSession);
+
+            MTermApp.Context.SelectedOpenedSession = MTermApp.Context.OpenedTerminals.FirstOrDefault();
+
+            if (MTermApp.Context.SelectedOpenedSession == null)
+            {
+                ContentControlSession.Content = null;
+                ListBoxOpenedSessionTab.SelectedItem = null;
+            }
         }
 
         private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)

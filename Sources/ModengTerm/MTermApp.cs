@@ -164,14 +164,6 @@ namespace ModengTerm
             content.Close();
 
             this.OpenedSessionList.Remove(session);
-            OpenedSessionVM firstOpenedSession = this.GetOpenedSessions().FirstOrDefault();
-            if (firstOpenedSession == null)
-            {
-            }
-            else
-            {
-                this.SelectedOpenedSession = firstOpenedSession;
-            }
 
             if (session is VideoTerminal)
             {
