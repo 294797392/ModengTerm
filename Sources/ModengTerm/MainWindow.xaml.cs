@@ -31,7 +31,7 @@ namespace XTerminal
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : MTermWindow
+    public partial class MainWindow : Window
     {
         #region 实例变量
 
@@ -129,6 +129,11 @@ namespace XTerminal
                 if (e.RemovedItems.Count > 0)
                 {
                     ListBoxOpenedSessionTab.SelectedItem = e.RemovedItems[0];
+                }
+                else
+                {
+                    // 如果当前没有任何一个打开的Session，那么重置选中状态，以便于下次可以继续触发SelectionChanged事件
+                    ListBoxOpenedSessionTab.SelectedItem = null;
                 }
 
                 this.CreateSession();

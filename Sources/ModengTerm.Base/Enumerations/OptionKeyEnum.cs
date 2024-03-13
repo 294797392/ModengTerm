@@ -17,28 +17,28 @@ namespace ModengTerm.Base.Enumerations
         SSH_TERM_SIZE_MODE = 3,
 
         // Theme 100 - 200
-        SSH_THEME_FONT_FAMILY = 100,
-        SSH_THEME_FONT_SIZE = 101,
-        SSH_THEME_FORE_COLOR = 102,
+        THEME_FONT_FAMILY = 100,
+        THEME_FONT_SIZE = 101,
+        THEME_FONT_COLOR = 102,
         /// <summary>
         /// 光标闪烁速度
         /// </summary>
-        SSH_THEME_CURSOR_SPEED = 103,
+        THEME_CURSOR_SPEED = 103,
         /// <summary>
         /// 光标样式
         /// </summary>
-        SSH_THEME_CURSOR_STYLE = 104,
-        SSH_THEME_CURSOR_COLOR = 106,
+        THEME_CURSOR_STYLE = 104,
+        THEME_CURSOR_COLOR = 106,
         /// <summary>
         /// 选择的主题ID
         /// </summary>
-        SSH_THEME_ID = 107,
-        SSH_TEHEM_COLOR_TABLE = 108,
+        THEME_ID = 107,
+        TEHEM_COLOR_TABLE = 108,
 
-        SSH_THEME_BACKGROUND_TYPE = 110,
+        THEME_BACKGROUND_TYPE = 110,
         SSH_THEME_BACKGROUND_URI = 111,
-        SSH_THEME_BACK_COLOR = 112,
-        SSH_THEME_BACKGROUND_EFFECT = 113,
+        THEME_BACKGROUND_COLOR = 112,
+        THEME_BACKGROUND_EFFECT = 113,
 
         /// <summary>
         /// 文档边距
@@ -49,7 +49,7 @@ namespace ModengTerm.Base.Enumerations
         /// 是否显示书签
         /// </summary>
         SSH_BOOKMARK_VISIBLE = 115,
-        SSH_BOOKMARK_COLOR = 116,
+        THEME_BOOKMARK_COLOR = 116,
 
         // Server 201 - 300
         SSH_SERVER_ADDR = 201,

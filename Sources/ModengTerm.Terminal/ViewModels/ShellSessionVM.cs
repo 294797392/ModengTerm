@@ -28,51 +28,8 @@ using WPFToolkit.Utility;
 
 namespace ModengTerm.Terminal.ViewModels
 {
-    /// <summary>
-    /// 定义Shell可以执行的动作
-    /// </summary>
-    public enum ShellFunctionEnum
-    {
-        None,
-
-        StartLogger,
-        StopLogger,
-        PauseLogger,
-        ResumeLogger,
-
-        Copy,
-        Paste,
-        SelectAll,
-        ClipboardHostory,
-
-        AddFavorites,
-        FaviritesList,
-
-        AddBookmark,
-        RemoveBookmark,
-        BookmarkList,
-        DisplayBookmark,
-        HidenBookmark,
-
-        StartRecord,
-        StopRecord,
-        PauseRecord,
-        ResumeRecord,
-
-        Find,
-
-        SaveDocument,
-        SaveSelection,
-        SaveAllDocument,
-
-        SendToAll,
-
-        SaveInteractve,
-    }
-
     public class ShellFunctionMenu : ViewModelBase
     {
-        private ShellFunctionEnum function;
         private bool canChecked;
         private bool isChecked;
 
@@ -103,19 +60,6 @@ namespace ModengTerm.Terminal.ViewModels
                 }
             }
         }
-        
-        public ShellFunctionEnum Function
-        {
-            get { return this.function; }
-            set
-            {
-                if (this.function != value)
-                {
-                    this.function = value;
-                    this.NotifyPropertyChanged("Function");
-                }
-            }
-        }
 
         public ExecuteShellFunctionCallback Execute { get; private set; }
 
@@ -125,16 +69,15 @@ namespace ModengTerm.Terminal.ViewModels
             this.Name = name;
         }
 
-        public ShellFunctionMenu(string name, ShellFunctionEnum function, ExecuteShellFunctionCallback execute)
+        public ShellFunctionMenu(string name, ExecuteShellFunctionCallback execute)
         {
             this.ID = Guid.NewGuid().ToString();
             this.Name = name;
             this.Execute = execute;
-            this.Function = function;
         }
 
-        public ShellFunctionMenu(string name, ShellFunctionEnum function, ExecuteShellFunctionCallback execute, bool canChecked) :
-            this(name, function, execute)
+        public ShellFunctionMenu(string name, ExecuteShellFunctionCallback execute, bool canChecked) :
+            this(name, execute)
         {
             this.canChecked = canChecked;
         }
@@ -289,21 +232,21 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.FunctionMenus = new BindableCollection<ShellFunctionMenu>()
             {
-                new ShellFunctionMenu("查找...", ShellFunctionEnum.Find, this.Find),
+                new ShellFunctionMenu("查找...",  this.Find),
                 new ShellFunctionMenu("日志")
                 {
                     Children = new BindableCollection<ShellFunctionMenu>()
                     {
-                        new ShellFunctionMenu("启动", ShellFunctionEnum.StartLogger, this.StartLogger),
-                        new ShellFunctionMenu("停止", ShellFunctionEnum.StopLogger, this.StopLogger),
-                        new ShellFunctionMenu("暂停", ShellFunctionEnum.PauseLogger, this.PauseLogger),
-                        new ShellFunctionMenu("继续", ShellFunctionEnum.ResumeLogger, this.ResumeLogger)
+                        new ShellFunctionMenu("启动",  this.StartLogger),
+                        new ShellFunctionMenu("停止",  this.StopLogger),
+                        new ShellFunctionMenu("暂停",  this.PauseLogger),
+                        new ShellFunctionMenu("继续",  this.ResumeLogger)
                     }
                 },
-                new ShellFunctionMenu("复制", ShellFunctionEnum.Copy, this.Copy),
-                new ShellFunctionMenu("粘贴", ShellFunctionEnum.Paste, this.Paste),
-                new ShellFunctionMenu("全选", ShellFunctionEnum.SelectAll, this.SelectAll),
-                new ShellFunctionMenu("查看剪贴板历史", ShellFunctionEnum.ClipboardHostory, this.ClipboardHistory),
+                new ShellFunctionMenu("复制", this.Copy),
+                new ShellFunctionMenu("粘贴", this.Paste),
+                new ShellFunctionMenu("全选", this.SelectAll),
+                new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
                 //new ShellFunctionMenu("收藏夹")
                 //{
                 //    Children = new BindableCollection<ShellFunctionMenu>()
@@ -327,33 +270,40 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     Children = new BindableCollection<ShellFunctionMenu>()
                     {
-                        new ShellFunctionMenu("启动录制", ShellFunctionEnum.StartRecord, this.StartRecord),
-                        new ShellFunctionMenu("停止录制", ShellFunctionEnum.StopRecord, this.StopRecord),
-                        new ShellFunctionMenu("暂停录制", ShellFunctionEnum.PauseRecord, this.PauseRecord),
-                        new ShellFunctionMenu("恢复录制", ShellFunctionEnum.ResumeRecord, this.ResumeRecord),
-                        new ShellFunctionMenu("打开回放", ShellFunctionEnum.ResumeRecord, this.OpenRecord)
+                        new ShellFunctionMenu("启动录制", this.StartRecord),
+                        new ShellFunctionMenu("停止录制", this.StopRecord),
+                        new ShellFunctionMenu("暂停录制", this.PauseRecord),
+                        new ShellFunctionMenu("恢复录制", this.ResumeRecord),
+                        new ShellFunctionMenu("打开回放", this.OpenRecord)
                     }
                 },
-                new ShellFunctionMenu("保存当前屏幕内容", ShellFunctionEnum.SaveDocument, this.SaveDocument),
-                new ShellFunctionMenu("保存选中内容", ShellFunctionEnum.SaveSelection, this.SaveSelection),
-                new ShellFunctionMenu("保存所有内容", ShellFunctionEnum.SaveAllDocument, this.SaveAllDocument),
-                new ShellFunctionMenu("发送到所有会话", ShellFunctionEnum.SendToAll, this.SendToAll, true),
-                new ShellFunctionMenu("交互测试用例")
+                new ShellFunctionMenu("保存")
                 {
                     Children = new BindableCollection<ShellFunctionMenu>()
                     {
-                        new ShellFunctionMenu("记录", ShellFunctionEnum.SaveInteractve, this.SaveInteractive),
+                        new ShellFunctionMenu("当前屏幕内容", this.SaveDocument),
+                        new ShellFunctionMenu("选中内容", this.SaveSelection),
+                        new ShellFunctionMenu("所有内容", this.SaveAllDocument),
                     }
                 },
-                new ShellFunctionMenu("记录调试日志")
-                {
-                    Children = new BindableCollection<ShellFunctionMenu>()
-                    {
-                        new ShellFunctionMenu("Interactive"),
-                        new ShellFunctionMenu("vttestCode"),
-                        new ShellFunctionMenu("RawRead")
-                    }
-                }
+                new ShellFunctionMenu("发送到所有会话", this.SendToAll, true),
+                //new ShellFunctionMenu("交互测试用例")
+                //{
+                //    Children = new BindableCollection<ShellFunctionMenu>()
+                //    {
+                //        new ShellFunctionMenu("记录", ShellFunctionEnum.SaveInteractve, this.SaveInteractive),
+                //    }
+                //},
+                //new ShellFunctionMenu("记录调试日志")
+                //{
+                //    Children = new BindableCollection<ShellFunctionMenu>()
+                //    {
+                //        new ShellFunctionMenu("Interactive"),
+                //        new ShellFunctionMenu("vttestCode"),
+                //        new ShellFunctionMenu("RawRead")
+                //    }
+                //}
+                new ShellFunctionMenu("关于", this.About)
             };
 
             #endregion
@@ -868,6 +818,13 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void SaveInteractive()
         {
+        }
+
+        private void About() 
+        {
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.Owner = Application.Current.MainWindow;
+            aboutWindow.ShowDialog();
         }
 
         #endregion

@@ -5,6 +5,7 @@ using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Rendering;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
@@ -17,6 +18,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Base.Definitions;
@@ -60,14 +62,14 @@ namespace ModengTerm.ViewModels
 
         private ServiceAgent serviceAgent;
 
-        private Visibility pureColorVisible;
-        private Visibility livePaperVisible;
-        private Visibility paperVisible;
-
         private MTermManifest appManifest;
         private TerminalManifest terminalManifest;
 
         private bool bookmarkVisible;
+
+        private Color backgroundColor;
+        private Color fontColor;
+        private Color cursorColor;
 
         #endregion
 
@@ -353,56 +355,47 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 光标颜色
         /// </summary>
-        public BindableCollection<ColorDefinition> CursorColors { get; private set; }
-
-        public BindableCollection<EffectTypeEnum> EffectTypeEnumList { get; private set; }
-        public BindableCollection<WallpaperTypeEnum> WallpaperTypeEnumList { get; private set; }
-        /// <summary>
-        /// 纯色背景缩略图
-        /// </summary>
-        public BindableCollection<ColorDefinition> BackgroundPureColors { get; private set; }
-        /// <summary>
-        /// 动态壁纸缩略图
-        /// </summary>
-        public BindableCollection<ColorDefinition> BackgroundLivePapers { get; private set; }
-        public BindableCollection<ColorDefinition> BackgroundPapers { get; private set; }
-        public BindableCollection<ColorDefinition> ForegroundColors { get; private set; }
-
-        public Visibility PureColorVisible
+        public Color CursorColor 
         {
-            get { return this.pureColorVisible; }
+            get { return this.cursorColor; }
             set
             {
-                if (this.pureColorVisible != value)
+                if (this.cursorColor != value)
                 {
-                    this.pureColorVisible = value;
-                    this.NotifyPropertyChanged("PureColorVisible");
+                    this.cursorColor = value;
+                    this.NotifyPropertyChanged("CursorColor");
                 }
             }
         }
 
-        public Visibility LivePaperVisible
+        /// <summary>
+        /// 前景色
+        /// </summary>
+        public Color FontColor
         {
-            get { return this.livePaperVisible; }
+            get { return this.fontColor; }
             set
             {
-                if (this.livePaperVisible != value)
+                if (this.fontColor != value)
                 {
-                    this.livePaperVisible = value;
-                    this.NotifyPropertyChanged("LivePaperVisible");
+                    this.fontColor = value;
+                    this.NotifyPropertyChanged("FontColor");
                 }
             }
         }
 
-        public Visibility PaperVisible
+        /// <summary>
+        /// 背景色
+        /// </summary>
+        public Color BackgroundColor 
         {
-            get { return this.paperVisible; }
+            get { return this.backgroundColor; }
             set
             {
-                if (this.paperVisible != value)
+                if(this.backgroundColor != value) 
                 {
-                    this.paperVisible = value;
-                    this.NotifyPropertyChanged("PaperVisible");
+                    this.backgroundColor = value;
+                    this.NotifyPropertyChanged("BackgroundColor");
                 }
             }
         }
@@ -533,7 +526,7 @@ namespace ModengTerm.ViewModels
             #region Theme
 
             this.ThemeList = new BindableCollection<ThemePackage>();
-            this.ThemeList.AddRange(terminalManifest.ThemeManifest.ThemeList);
+            this.ThemeList.AddRange(terminalManifest.DefaultThemes);
             this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
             this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
             ThemePackage selectedTheme = this.ThemeList.SelectedItem;
@@ -557,25 +550,9 @@ namespace ModengTerm.ViewModels
             this.CursorStyles.AddRange(MTermUtils.GetEnumValues<VTCursorStyles>());
             this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
 
-            this.CursorColors = new BindableCollection<ColorDefinition>();
-            this.CursorColors.AddRange(terminalManifest.ThemeManifest.DefaultColors);
-            this.CursorColors.SelectedItem = this.CursorColors.FirstOrDefault();
-
-            this.WallpaperTypeEnumList = new BindableCollection<WallpaperTypeEnum>();
-            this.WallpaperTypeEnumList.AddRange(MTermUtils.GetEnumValues<WallpaperTypeEnum>(WallpaperTypeEnum.Live));
-            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)selectedTheme.BackgroundType;
-            this.WallpaperTypeEnumList.SelectionChanged += WallpaperTypeEnumList_SelectionChanged;
-            this.WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum.Live, this.WallpaperTypeEnumList.SelectedItem);
-
-            this.EffectTypeEnumList = new BindableCollection<EffectTypeEnum>();
-            this.EffectTypeEnumList.AddRange(MTermUtils.GetEnumValues<EffectTypeEnum>(EffectTypeEnum.Snow));
-            this.EffectTypeEnumList.SelectedItem = EffectTypeEnum.None;
-
-            this.ForegroundColors = new BindableCollection<ColorDefinition>();
-            this.BackgroundPureColors = new BindableCollection<ColorDefinition>();
-            this.BackgroundLivePapers = new BindableCollection<ColorDefinition>();
-            this.BackgroundPapers = new BindableCollection<ColorDefinition>();
-            this.SwitchTheme(selectedTheme);
+            this.CursorColor = DrawingUtils.GetColor(selectedTheme.CursorColor);
+            this.FontColor = DrawingUtils.GetColor(selectedTheme.FontColor);
+            this.backgroundColor = DrawingUtils.GetColor(selectedTheme.BackgroundColor);
 
             #endregion
 
@@ -787,48 +764,22 @@ namespace ModengTerm.ViewModels
                 return false;
             }
 
-            ColorDefinition background = null;
+            session.SetOption<string>(OptionKeyEnum.THEME_ID, this.ThemeList.SelectedItem.ID);
+            session.SetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
+            session.SetOption<int>(OptionKeyEnum.THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
 
-            switch (this.WallpaperTypeEnumList.SelectedItem)
-            {
-                case WallpaperTypeEnum.Color:
-                    {
-                        background = this.BackgroundPureColors.SelectedItem;
-                        break;
-                    }
+            session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_TYPE, WallpaperTypeEnum.Color);
+            //session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI, background.Uri);
+            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackgroundColor));
+            session.SetOption<EffectTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_EFFECT, EffectTypeEnum.None);
 
-                case WallpaperTypeEnum.Live:
-                    {
-                        background = this.BackgroundLivePapers.SelectedItem;
-                        break;
-                    }
+            session.SetOption<string>(OptionKeyEnum.THEME_FONT_COLOR, DrawingUtils.GetRgbKey(this.FontColor));
+            session.SetOption<int>(OptionKeyEnum.THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
+            session.SetOption<int>(OptionKeyEnum.THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
+            session.SetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR, DrawingUtils.GetRgbKey(this.CursorColor));
+            session.SetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
 
-                case WallpaperTypeEnum.Image:
-                    {
-                        background = this.BackgroundPapers.SelectedItem;
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_ID, this.ThemeList.SelectedItem.ID);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
-            session.SetOption<int>(OptionKeyEnum.SSH_THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
-
-            session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_TYPE, this.WallpaperTypeEnumList.SelectedItem);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI, background.Uri);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACK_COLOR, background.Value);
-            session.SetOption<EffectTypeEnum>(OptionKeyEnum.SSH_THEME_BACKGROUND_EFFECT, this.EffectTypeEnumList.SelectedItem);
-
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_FORE_COLOR, this.ForegroundColors.SelectedItem.Value);
-            session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
-            session.SetOption<int>(OptionKeyEnum.SSH_THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
-            session.SetOption<string>(OptionKeyEnum.SSH_THEME_CURSOR_COLOR, this.CursorColors.SelectedItem.Value);
-            session.SetOption<VTColorTable>(OptionKeyEnum.SSH_TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
-
-            session.SetOption<string>(OptionKeyEnum.SSH_BOOKMARK_COLOR, this.ThemeList.SelectedItem.BookmarkColor);
+            session.SetOption<string>(OptionKeyEnum.THEME_BOOKMARK_COLOR, this.ThemeList.SelectedItem.BookmarkColor);
 
             return true;
         }
@@ -915,107 +866,10 @@ namespace ModengTerm.ViewModels
 
         private void SwitchTheme(ThemePackage theme)
         {
-            #region 更新背景色选项
-
-            // 实现逻辑是把主题对应的颜色放到第一个位置
-            // 其他位置显示默认颜色列表
-
-            // 如果背景类型没有被选择，那么直接显示该类型下的所有默认背景
-
-            // 更新背景类型
-            this.WallpaperTypeEnumList.SelectedItem = (WallpaperTypeEnum)theme.BackgroundType;
-
-            this.BackgroundPureColors.SelectedItem = null;
-            this.BackgroundLivePapers.SelectedItem = null;
-            this.BackgroundPapers.SelectedItem = null;
-
-            this.BackgroundPureColors.Clear();
-            this.BackgroundLivePapers.Clear();
-            this.BackgroundPapers.Clear();
-
-            this.BackgroundPureColors.AddRange(this.terminalManifest.ThemeManifest.DefaultColors);
-            this.BackgroundLivePapers.AddRange(this.terminalManifest.ThemeManifest.DefaultLivePapers);
-            this.BackgroundPapers.AddRange(this.terminalManifest.ThemeManifest.DefaultPapers);
-
-            // 先保证每种样式都有一个默认选项
-            this.BackgroundPureColors.SelectedItem = this.BackgroundPureColors.FirstOrDefault();
-            this.BackgroundLivePapers.SelectedItem = this.BackgroundLivePapers.FirstOrDefault();
-            this.BackgroundPapers.SelectedItem = this.BackgroundPapers.FirstOrDefault();
-
-            ColorDefinition originalColor = new ColorDefinition("原始背景", theme.BackgroundColor, theme.BackgroundUri); // 如果默认背景列表里不存在背景实例，那么把这个加进去
-            ColorDefinition colorDefinition = null; // 存在于默认背景列表里的背景实例
-            BindableCollection<ColorDefinition> collection = null; // 默认背景列表
-
-            switch ((WallpaperTypeEnum)theme.BackgroundType)
-            {
-                case WallpaperTypeEnum.Color:
-                    {
-                        colorDefinition = this.BackgroundPureColors.FirstOrDefault(v => v.Value == theme.BackgroundColor);
-                        collection = this.BackgroundPureColors;
-                        break;
-                    }
-
-                case WallpaperTypeEnum.Live:
-                    {
-                        colorDefinition = this.BackgroundLivePapers.FirstOrDefault(v => v.Uri == theme.BackgroundUri);
-                        collection = this.BackgroundLivePapers;
-                        break;
-                    }
-
-                case WallpaperTypeEnum.Image:
-                    {
-                        colorDefinition = this.BackgroundPapers.FirstOrDefault(v => v.Uri == theme.BackgroundUri);
-                        collection = this.BackgroundPapers;
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            if (colorDefinition == null)
-            {
-                collection.Insert(0, originalColor);
-            }
-            else
-            {
-                int index = collection.IndexOf(colorDefinition);
-                collection.Move(index, 0);
-            }
-            collection.SelectedItem = collection.FirstOrDefault();
-
-            #endregion
-
-            #region 更新文本颜色选项
-
-            // 更新第一个原始文本颜色
-            this.ForegroundColors.SelectedItem = null;
-            this.ForegroundColors.Clear();
-            this.ForegroundColors.AddRange(this.terminalManifest.ThemeManifest.DefaultColors);
-
-            ColorDefinition colorDefinition1 = this.ForegroundColors.FirstOrDefault(v => v.Value == theme.ForegroundColor);
-            if (colorDefinition1 == null)
-            {
-                this.ForegroundColors.Insert(0, new ColorDefinition("原始颜色", theme.ForegroundColor, theme.ForegroundColor));
-            }
-            else
-            {
-                int index = this.ForegroundColors.IndexOf(colorDefinition1);
-                this.ForegroundColors.Move(index, 0);
-            }
-            this.ForegroundColors.SelectedItem = this.ForegroundColors.FirstOrDefault();
-
-            #endregion
-
-            #region 更新滚动条选项
-
-            this.ScrollbarButtonColor = theme.ScrollbarButtonColor;
-            this.ScrollbarThumbColor = theme.ScrollbarThumbColor;
-            this.ScrollbarTrackColor = theme.ScrollbarTrackColor;
-
-            #endregion
+            this.FontColor = DrawingUtils.GetColor(theme.FontColor);
+            this.BackgroundColor = DrawingUtils.GetColor(theme.BackgroundColor);
+            this.CursorColor = DrawingUtils.GetColor(theme.CursorColor);
         }
-
 
         private bool CollectOptions(XTermSession session)
         {
@@ -1087,38 +941,6 @@ namespace ModengTerm.ViewModels
             }
 
             this.SwitchTheme(newTheme);
-        }
-
-        private void WallpaperTypeEnumList_SelectionChanged(WallpaperTypeEnum oldValue, WallpaperTypeEnum newValue)
-        {
-            this.LivePaperVisible = Visibility.Collapsed;
-            this.PureColorVisible = Visibility.Collapsed;
-            this.PaperVisible = Visibility.Collapsed;
-
-            switch (newValue)
-            {
-                case WallpaperTypeEnum.Live:
-                    {
-                        this.LivePaperVisible = Visibility.Visible;
-                        break;
-                    }
-
-                case WallpaperTypeEnum.Color:
-                    {
-                        this.PureColorVisible = Visibility.Visible;
-                        break;
-                    }
-
-                case WallpaperTypeEnum.Image:
-                    {
-                        this.PaperVisible = Visibility.Visible;
-                        break;
-                    }
-
-
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         #endregion

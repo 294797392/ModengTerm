@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="DataModels\ThemeManifest.cs" />
     <Compile Remove="ITerminalAgent.cs" />
     <Compile Remove="ViewModels\VideoTerminal.Drawing.cs" />
     <Compile Remove="VTColor.cs" />

@@ -77,6 +77,17 @@ namespace ModengTerm.Document.Rendering
             return brush;
         }
 
+        public static Color GetColor(string rgbKey) 
+        {
+            SolidColorBrush brush = GetBrush(rgbKey) as SolidColorBrush;
+            return brush.Color;
+        }
+
+        public static string GetRgbKey(Color color) 
+        {
+            return string.Format("{0},{1},{2}", color.R, color.G, color.B);
+        }
+
         /// <summary>
         /// 根据VTextLine生成一个FormattedText
         /// </summary>

@@ -115,8 +115,8 @@ namespace ModengTerm.Terminal.Session
                 return;
             }
 
-            this.backgroundTask.Wait();
             this.CloseDriver();
+            this.backgroundTask.Wait();
         }
 
         public int Write(byte[] bytes)

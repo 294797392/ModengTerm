@@ -25,6 +25,7 @@ namespace XTerminal.UserControls.OptionsUserControl
         {
             InitializeComponent();
 
+
             this.InitializeUserControl();
         }
 

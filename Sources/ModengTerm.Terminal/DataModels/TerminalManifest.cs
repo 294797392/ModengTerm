@@ -23,15 +23,16 @@ namespace ModengTerm.Terminal.DataModels
         public List<FontFamilyDefinition> FontFamilyList { get; private set; }
 
         /// <summary>
-        /// 和主题相关的数据清单
+        /// 主题列表
         /// </summary>
-        [JsonProperty("themeManifest")]
-        public ThemeManifest ThemeManifest { get; private set; }
+        [JsonProperty("defaultThemes")]
+        public List<ThemePackage> DefaultThemes { get; private set; }
 
         public TerminalManifest()
         {
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
+            this.DefaultThemes = new List<ThemePackage>();
         }
     }
 }

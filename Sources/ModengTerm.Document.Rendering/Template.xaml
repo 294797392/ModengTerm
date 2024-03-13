@@ -13,12 +13,12 @@
         <Style.Resources>
             <!-- 拖动标样式 -->
             <Style x:Key="StyleThumbLocal" TargetType="{x:Type Thumb}">
-                <Style.Triggers>
+                <!--<Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
                         <Setter Property="Background" Value="#999999"/>
                     </Trigger>
                 </Style.Triggers>
-                <Setter Property="Background" Value="#4D4D4D"/>
+                <Setter Property="Background" Value="#4D4D4D"/>-->
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Thumb}">
@@ -60,14 +60,14 @@
             </Style>
 
             <Style x:Key="StyleRepeatButtonBase" TargetType="{x:Type RepeatButton}">
-                <Style.Triggers>
+                <!--<Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
                         <Setter Property="Background" Value="#999999"/>
                     </Trigger>
-                </Style.Triggers>
+                </Style.Triggers>-->
                 <Setter Property="BorderBrush" Value="{x:Null}"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Background" Value="#4D4D4D"/>
+                <!--<Setter Property="Background" Value="#4D4D4D"/>-->
             </Style>
             <Style x:Key="StyleRepeatButtonDecrease" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource ResourceKey=StyleRepeatButtonBase}">
                 <Setter Property="Template">
@@ -104,7 +104,7 @@
         </Style.Resources>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="Background" Value="#2E2E2E"/>
+        <!--<Setter Property="Background" Value="#2E2E2E"/>-->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ScrollBar}">

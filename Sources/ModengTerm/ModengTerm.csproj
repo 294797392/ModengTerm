@@ -68,6 +68,9 @@
     <Reference Include="WPFToolkit">
       <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
     </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit">
+      <HintPath>..\..\Dependence\Xceed.Wpf.Toolkit.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

@@ -7,6 +7,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Rendering;
 using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
@@ -174,6 +175,9 @@ namespace ModengTerm.Terminal.UserControls
 
         public int Open()
         {
+            string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            BorderBackground.Background = DrawingUtils.GetBrush(background);
+
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
             this.shellSession.AlternateDocument = DocumentAlternate;

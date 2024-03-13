@@ -16,23 +16,5 @@ namespace ModengTerm.Terminal.DataModels
         /// </summary>
         [JsonProperty("themes")]
         public List<ThemePackage> ThemeList { get; private set; }
-
-        /// <summary>
-        /// 定义ModengTerm支持的默认颜色
-        /// </summary>
-        [JsonProperty("defaultColors")]
-        public List<ColorDefinition> DefaultColors { get; private set; }
-
-        /// <summary>
-        /// 默认的动态背景列表
-        /// </summary>
-        [JsonProperty("defaultLivePapers")]
-        public List<ColorDefinition> DefaultLivePapers { get; private set; }
-
-        /// <summary>
-        /// 默认的静态背景图片
-        /// </summary>
-        [JsonProperty("defaultPapers")]
-        public List<ColorDefinition> DefaultPapers { get; private set; }
     }
 }

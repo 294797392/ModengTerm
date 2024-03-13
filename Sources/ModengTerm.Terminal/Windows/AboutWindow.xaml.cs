@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace XTerminal.Windows
+namespace ModengTerm.Terminal
 {
     /// <summary>
     /// AboutWindow.xaml 的交互逻辑

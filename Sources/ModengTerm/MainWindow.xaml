@@ -1,4 +1,4 @@
-﻿<mtermcontrols:MTermWindow x:Class="XTerminal.MainWindow"
+﻿<Window x:Class="XTerminal.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,8 +9,7 @@
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="800" Height="600" WindowStartupLocation="CenterScreen"
-        MinWidth="800" MinHeight="600" Loaded="Window_Loaded"
-                           Style="{DynamicResource ResourceKey=StyleMTermWindow}">
+        MinWidth="800" MinHeight="600" Loaded="Window_Loaded">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -95,8 +94,7 @@
             <!-- 打开的终端列表Tab页 -->
             <ListBox Grid.Row="0" x:Name="ListBoxOpenedSessionTab" DataContext="{Binding Source={x:Static local:MTermApp.Context}}" 
                      ItemsSource="{Binding Path=OpenedSessionList}" SelectedItem="{Binding Path=SelectedOpenedSession}" 
-                     SelectionChanged="ListBoxOpenedSessionTab_SelectionChanged"
-                     Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
+                     SelectionChanged="ListBoxOpenedSessionTab_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
@@ -111,4 +109,4 @@
 
     </Grid>
 
-</mtermcontrols:MTermWindow>
+</Window>

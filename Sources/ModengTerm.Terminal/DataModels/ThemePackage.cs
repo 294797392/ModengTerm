@@ -54,7 +54,13 @@ namespace ModengTerm.Terminal.DataModels
         /// 格式是r,g,b
         /// </summary>
         [JsonProperty("foregroundColor")]
-        public string ForegroundColor { get; set; }
+        public string FontColor { get; set; }
+
+        /// <summary>
+        /// 光标颜色
+        /// </summary>
+        [JsonProperty("cursorColor")]
+        public string CursorColor { get; set; }
 
         [JsonProperty("scrollbarThumbColor")]
         public string ScrollbarThumbColor { get; set; }
