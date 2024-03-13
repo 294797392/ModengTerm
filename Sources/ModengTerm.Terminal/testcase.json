@@ -2,7 +2,7 @@
     "testCases": {
         "name": "",
         "osver": "ubuntu-16.0",
-        "caseList": [
+        "steps": [
             {
                 "input": [],
                 "output": []

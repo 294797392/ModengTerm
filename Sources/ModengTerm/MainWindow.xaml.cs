@@ -220,7 +220,7 @@ namespace XTerminal
         {
             base.OnPreviewTextInput(e);
 
-            ShellSessionVM videoTerminal = MTermApp.Context.SelectedOpenedSession as ShellSessionVM;
+            ShellSessionVM videoTerminal = ListBoxOpenedSessionTab.SelectedItem as ShellSessionVM;
             if (videoTerminal == null)
             {
                 return;
@@ -244,7 +244,7 @@ namespace XTerminal
         {
             base.OnPreviewKeyDown(e);
 
-            ShellSessionVM shellSession = MTermApp.Context.SelectedOpenedSession as ShellSessionVM;
+            ShellSessionVM shellSession = ListBoxOpenedSessionTab.SelectedItem as ShellSessionVM;
             if (shellSession == null)
             {
                 return;
