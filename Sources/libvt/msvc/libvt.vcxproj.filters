@@ -4,6 +4,9 @@
     <Filter Include="document">
       <UniqueIdentifier>{0e57eaaf-1cd8-4514-ad2f-31fa6dd25fd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="parser">
+      <UniqueIdentifier>{62272227-8a1a-461f-acff-4c4fe954c22a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\document\VTCharacter.h">
@@ -34,6 +37,12 @@
       <Filter>document</Filter>
     </ClInclude>
     <ClInclude Include="..\source\VTCommon.h" />
+    <ClInclude Include="..\source\parser\VTParser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\parser\VTParserStatements.h">
+      <Filter>parser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\document\VTCursor.c">
@@ -51,6 +60,9 @@
     <ClCompile Include="..\source\main.c" />
     <ClCompile Include="..\source\document\VTScrollInfo.c">
       <Filter>document</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\parser\VTParser.c">
+      <Filter>parser</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -28,6 +28,8 @@
     <ClInclude Include="..\source\document\VTextSelection.h" />
     <ClInclude Include="..\source\document\VTScrollInfo.h" />
     <ClInclude Include="..\source\document\VTypeface.h" />
+    <ClInclude Include="..\source\parser\VTParser.h" />
+    <ClInclude Include="..\source\parser\VTParserStatements.h" />
     <ClInclude Include="..\source\VTCommon.h" />
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +39,7 @@
     <ClCompile Include="..\source\document\VTextSelection.c" />
     <ClCompile Include="..\source\document\VTScrollInfo.c" />
     <ClCompile Include="..\source\main.c" />
+    <ClCompile Include="..\source\parser\VTParser.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
