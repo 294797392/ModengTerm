@@ -65,15 +65,45 @@ namespace ModengTerm.Terminal.ViewModels
         SaveSelection,
         SaveAllDocument,
 
-        SendToAll
+        SendToAll,
+
+        SaveInteractve,
     }
 
     public class ShellFunctionMenu : ViewModelBase
     {
         private ShellFunctionEnum function;
+        private bool canChecked;
+        private bool isChecked;
 
         public BindableCollection<ShellFunctionMenu> Children { get; set; }
 
+        public bool CanChecked
+        {
+            get { return this.canChecked; }
+            set
+            {
+                if (this.canChecked != value)
+                {
+                    this.canChecked = value;
+                    this.NotifyPropertyChanged("CanChecked");
+                }
+            }
+        }
+
+        public bool IsChecked
+        {
+            get { return this.isChecked; }
+            set
+            {
+                if (this.isChecked != value)
+                {
+                    this.isChecked = value;
+                    this.NotifyPropertyChanged("IsChecked");
+                }
+            }
+        }
+        
         public ShellFunctionEnum Function
         {
             get { return this.function; }
@@ -101,6 +131,12 @@ namespace ModengTerm.Terminal.ViewModels
             this.Name = name;
             this.Execute = execute;
             this.Function = function;
+        }
+
+        public ShellFunctionMenu(string name, ShellFunctionEnum function, ExecuteShellFunctionCallback execute, bool canChecked) :
+            this(name, function, execute)
+        {
+            this.canChecked = canChecked;
         }
     }
 
@@ -301,7 +337,23 @@ namespace ModengTerm.Terminal.ViewModels
                 new ShellFunctionMenu("保存当前屏幕内容", ShellFunctionEnum.SaveDocument, this.SaveDocument),
                 new ShellFunctionMenu("保存选中内容", ShellFunctionEnum.SaveSelection, this.SaveSelection),
                 new ShellFunctionMenu("保存所有内容", ShellFunctionEnum.SaveAllDocument, this.SaveAllDocument),
-                new ShellFunctionMenu("发送到所有会话", ShellFunctionEnum.SendToAll, this.SendToAll)
+                new ShellFunctionMenu("发送到所有会话", ShellFunctionEnum.SendToAll, this.SendToAll, true),
+                new ShellFunctionMenu("交互测试用例")
+                {
+                    Children = new BindableCollection<ShellFunctionMenu>()
+                    {
+                        new ShellFunctionMenu("记录", ShellFunctionEnum.SaveInteractve, this.SaveInteractive),
+                    }
+                },
+                new ShellFunctionMenu("记录调试日志")
+                {
+                    Children = new BindableCollection<ShellFunctionMenu>()
+                    {
+                        new ShellFunctionMenu("Interactive"),
+                        new ShellFunctionMenu("vttestCode"),
+                        new ShellFunctionMenu("RawRead")
+                    }
+                }
             };
 
             #endregion
@@ -812,7 +864,10 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void SendToAll()
         {
+        }
 
+        private void SaveInteractive()
+        {
         }
 
         #endregion

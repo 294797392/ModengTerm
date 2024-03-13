@@ -34,6 +34,12 @@
         <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent">
             <Grid.ContextMenu>
                 <ContextMenu ItemsSource="{Binding Path=FunctionMenus}" MenuItem.Click="ContextMenu_Click">
+                    <ContextMenu.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="IsCheckable" Value="{Binding Path=CanChecked}"/>
+                            <Setter Property="IsChecked" Value="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Style>
+                    </ContextMenu.ItemContainerStyle>
                     <ContextMenu.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
                             <TextBlock Text="{Binding Path=Name}"/>
