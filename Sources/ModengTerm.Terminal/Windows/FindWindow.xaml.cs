@@ -47,25 +47,25 @@ namespace ModengTerm.Windows
                 return;
             }
 
-            this.viewModel.FindOnce = findOnce;
+            this.viewModel.FindAll = findOnce;
 
-            Task.Factory.StartNew(() =>
-            {
-                this.finding = true;
+            //Task.Factory.StartNew(() =>
+            //{
+            //    this.finding = true;
 
-                try
-                {
-                    this.viewModel.Find();
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("查找异常", ex);
-                }
-                finally
-                {
-                    this.finding = false;
-                }
-            });
+            //    try
+            //    {
+            //        this.viewModel.Find();
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        logger.Error("查找异常", ex);
+            //    }
+            //    finally
+            //    {
+            //        this.finding = false;
+            //    }
+            //});
         }
 
         private void ButtonFind_Click(object sender, RoutedEventArgs e)
@@ -81,6 +81,11 @@ namespace ModengTerm.Windows
         private void Window_Closed(object sender, EventArgs e)
         {
             this.viewModel.Release();
+        }
+
+        private void ButtonNextMatches_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

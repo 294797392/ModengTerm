@@ -38,23 +38,29 @@ namespace ModengTerm.Terminal.DataModels
         public string BackgroundUri { get; set; }
 
         /// <summary>
-        /// 背景主颜色
-        /// </summary>
-        [JsonProperty("backgroundColor")]
-        public string BackgroundColor { get; set; }
-
-        /// <summary>
         /// 背景特效
         /// </summary>
         [JsonProperty("backgroundEffect")]
         public int BackgroundEffect { get; set; }
 
         /// <summary>
+        /// 背景主颜色
+        /// </summary>
+        [JsonProperty("backColor")]
+        public string BackColor { get; set; }
+
+        /// <summary>
         /// 默认前景色
         /// 格式是r,g,b
         /// </summary>
-        [JsonProperty("foregroundColor")]
+        [JsonProperty("fontColor")]
         public string FontColor { get; set; }
+
+        [JsonProperty("highlightFontColor")]
+        public string HighlightFontColor { get; set; }
+
+        [JsonProperty("highlightBackColor")]
+        public string HighlightBackColor { get; set; }
 
         /// <summary>
         /// 光标颜色

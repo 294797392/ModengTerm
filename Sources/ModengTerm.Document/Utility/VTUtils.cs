@@ -19,7 +19,7 @@ namespace ModengTerm.Document.Utility
 
         public int EndCharacterIndex { get; set; }
 
-        public LogFileTypeEnum ContentType { get; set; }
+        public ParagraphFormatEnum ContentType { get; set; }
 
         public string SessionName { get; set; }
 
@@ -128,12 +128,12 @@ namespace ModengTerm.Document.Utility
             builder.AppendLine("</br>");
         }
 
-        public static CreateLineDelegate GetCreateLineDelegate(LogFileTypeEnum fileType)
+        public static CreateLineDelegate GetCreateLineDelegate(ParagraphFormatEnum fileType)
         {
             switch (fileType)
             {
-                case LogFileTypeEnum.HTML: return CreateHtml;
-                case LogFileTypeEnum.PlainText: return CreatePlainText;
+                case ParagraphFormatEnum.HTML: return CreateHtml;
+                case ParagraphFormatEnum.PlainText: return CreatePlainText;
                 default:
                     throw new NotImplementedException();
             }
@@ -175,7 +175,7 @@ namespace ModengTerm.Document.Utility
         public static string CreateContent(CreateContentParameter parameter)
         {
             List<List<VTCharacter>> charactersList = parameter.CharactersList;
-            LogFileTypeEnum fileType = parameter.ContentType;
+            ParagraphFormatEnum fileType = parameter.ContentType;
             int startCharIndex = parameter.StartCharacterIndex;
             int endCharIndex = parameter.EndCharacterIndex;
 
@@ -205,7 +205,7 @@ namespace ModengTerm.Document.Utility
                 createLine(last, builder, 0, endCharIndex + 1);
             }
 
-            if (fileType == LogFileTypeEnum.HTML)
+            if (fileType == ParagraphFormatEnum.HTML)
             {
                 string htmlBackground = VTColor.CreateFromRgbKey(parameter.Typeface.BackgroundColor).Html;
                 string htmlForeground = VTColor.CreateFromRgbKey(parameter.Typeface.ForegroundColor).Html;

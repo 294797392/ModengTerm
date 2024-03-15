@@ -21,8 +21,14 @@ namespace ModengTerm.Document
         /// </summary>
         public int Index { get; set; }
 
-        public VTMatches(int length, int index)
+        /// <summary>
+        /// 匹配到的关键字所在的行
+        /// </summary>
+        public VTextLine TextLine { get; set; }
+
+        public VTMatches(VTextLine textLine, int length, int index)
         {
+            this.TextLine = textLine;
             Length = length;
             Index = index;
         }

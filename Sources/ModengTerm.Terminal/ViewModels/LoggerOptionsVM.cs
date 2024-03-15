@@ -17,7 +17,7 @@ namespace ModengTerm.Terminal.ViewModels
         private bool ignoreCase;
         private bool regexp;
         private string filePath;
-        private LogFileTypeEnum fileType;
+        private ParagraphFormatEnum fileType;
         private IVideoTerminal vt;
 
         #endregion
@@ -88,7 +88,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public LogFileTypeEnum FileType
+        public ParagraphFormatEnum FileType
         {
             get { return this.fileType; }
             set
@@ -114,12 +114,12 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 实例方法
 
-        private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
+        private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
         {
             switch (filterIndex)
             {
-                case 1: return LogFileTypeEnum.PlainText;
-                case 2: return LogFileTypeEnum.HTML;
+                case 1: return ParagraphFormatEnum.PlainText;
+                case 2: return ParagraphFormatEnum.HTML;
 
                 default:
                     throw new NotImplementedException();

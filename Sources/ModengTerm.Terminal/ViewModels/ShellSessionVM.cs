@@ -6,6 +6,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Utility;
 using ModengTerm.ServiceAgents;
 using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Callbacks;
@@ -372,12 +373,12 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 实例方法
 
-        private LogFileTypeEnum FilterIndex2FileType(int filterIndex)
+        private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
         {
             switch (filterIndex)
             {
-                case 1: return LogFileTypeEnum.PlainText;
-                case 2: return LogFileTypeEnum.HTML;
+                case 1: return ParagraphFormatEnum.PlainText;
+                case 2: return ParagraphFormatEnum.HTML;
 
                 default:
                     throw new NotImplementedException();
@@ -391,7 +392,7 @@ namespace ModengTerm.Terminal.ViewModels
             saveFileDialog.FileName = string.Format("{0}_{1}", this.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
             if ((bool)saveFileDialog.ShowDialog())
             {
-                LogFileTypeEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
+                ParagraphFormatEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
 
                 try
                 {
@@ -625,7 +626,7 @@ namespace ModengTerm.Terminal.ViewModels
             Favorites favorites = new Favorites()
             {
                 ID = Guid.NewGuid().ToString(),
-                Typeface = this.videoTerminal.ActiveDocument.Typeface,
+                Typeface = this.videoTerminal.ActiveScreen.Typeface,
                 SessionID = this.Session.ID,
                 StartCharacterIndex = paragraph.StartCharacterIndex,
                 EndCharacterIndex = paragraph.EndCharacterIndex,
@@ -791,7 +792,14 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void Find()
         {
-            FindVM vtFind = new FindVM(this.videoTerminal);
+            string highlightBackground = this.Session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            string highlightForeground = this.Session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR);
+
+            FindVM vtFind = new FindVM(this.videoTerminal)
+            {
+                HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
+                HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
+            };
             FindWindow findWindow = new FindWindow(vtFind);
             findWindow.Owner = Window.GetWindow(this.Content);
             findWindow.Show();
@@ -814,10 +822,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void SendToAll()
         {
-        }
-
-        private void SaveInteractive()
-        {
+            this.SendAll = !this.SendAll;
         }
 
         private void About() 

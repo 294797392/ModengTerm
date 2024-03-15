@@ -67,8 +67,10 @@ namespace ModengTerm.ViewModels
 
         private bool bookmarkVisible;
 
-        private Color backgroundColor;
+        private Color backColor;
         private Color fontColor;
+        private Color highlightFontColor;
+        private Color highlightBackColor;
         private Color cursorColor;
 
         #endregion
@@ -387,18 +389,45 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 背景色
         /// </summary>
-        public Color BackgroundColor 
+        public Color BackColor 
         {
-            get { return this.backgroundColor; }
+            get { return this.backColor; }
             set
             {
-                if(this.backgroundColor != value) 
+                if(this.backColor != value) 
                 {
-                    this.backgroundColor = value;
-                    this.NotifyPropertyChanged("BackgroundColor");
+                    this.backColor = value;
+                    this.NotifyPropertyChanged("BackColor");
                 }
             }
         }
+
+        public Color HighlightBackColor
+        {
+            get { return this.highlightBackColor; }
+            set
+            {
+                if (this.highlightBackColor != value) 
+                {
+                    this.highlightBackColor = value;
+                    this.NotifyPropertyChanged("HighlightBackColor");
+                }
+            }
+        }
+
+        public Color HighlightFontColor
+        {
+            get { return this.highlightFontColor; }
+            set
+            {
+                if (this.highlightFontColor != value)
+                {
+                    this.highlightFontColor = value;
+                    this.NotifyPropertyChanged("HighlightFontColor");
+                }
+            }
+        }
+
 
         public string ScrollbarThumbColor { get; set; }
         public string ScrollbarButtonColor { get; set; }
@@ -533,26 +562,17 @@ namespace ModengTerm.ViewModels
 
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
             this.FontFamilyList.AddRange(terminalManifest.FontFamilyList);
-            // 加载系统已安装的所有字体
-            InstalledFontCollection installedFont = new InstalledFontCollection();
-            this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
-            this.FontFamilyList.SelectedItem = this.GetDefaultFontFamily();
 
             this.FontSizeList = new BindableCollection<FontSizeDefinition>();
             this.FontSizeList.AddRange(terminalManifest.FontSizeList);
-            this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
 
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
             this.CursorSpeeds.AddRange(MTermUtils.GetEnumValues<VTCursorSpeeds>());
-            this.CursorSpeeds.SelectedItem = MTermConsts.DefaultCursorBlinkSpeed;
 
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
             this.CursorStyles.AddRange(MTermUtils.GetEnumValues<VTCursorStyles>());
-            this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
 
-            this.CursorColor = DrawingUtils.GetColor(selectedTheme.CursorColor);
-            this.FontColor = DrawingUtils.GetColor(selectedTheme.FontColor);
-            this.backgroundColor = DrawingUtils.GetColor(selectedTheme.BackgroundColor);
+            this.SwitchTheme(selectedTheme);
 
             #endregion
 
@@ -770,7 +790,7 @@ namespace ModengTerm.ViewModels
 
             session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_TYPE, WallpaperTypeEnum.Color);
             //session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI, background.Uri);
-            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackgroundColor));
+            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackColor));
             session.SetOption<EffectTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_EFFECT, EffectTypeEnum.None);
 
             session.SetOption<string>(OptionKeyEnum.THEME_FONT_COLOR, DrawingUtils.GetRgbKey(this.FontColor));
@@ -778,6 +798,8 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.THEME_CURSOR_SPEED, (int)this.CursorSpeeds.SelectedItem);
             session.SetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR, DrawingUtils.GetRgbKey(this.CursorColor));
             session.SetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE, this.ThemeList.SelectedItem.ColorTable);
+            session.SetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, DrawingUtils.GetRgbKey(this.HighlightBackColor));
+            session.SetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR, DrawingUtils.GetRgbKey(this.highlightFontColor));
 
             session.SetOption<string>(OptionKeyEnum.THEME_BOOKMARK_COLOR, this.ThemeList.SelectedItem.BookmarkColor);
 
@@ -866,9 +888,29 @@ namespace ModengTerm.ViewModels
 
         private void SwitchTheme(ThemePackage theme)
         {
+            // 加载系统已安装的所有字体
+            InstalledFontCollection installedFont = new InstalledFontCollection();
+            this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
+            this.FontFamilyList.SelectedItem = this.GetDefaultFontFamily();
+
+            this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
+
+            this.CursorSpeeds.SelectedItem = MTermConsts.DefaultCursorBlinkSpeed;
+
+            this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
+
             this.FontColor = DrawingUtils.GetColor(theme.FontColor);
-            this.BackgroundColor = DrawingUtils.GetColor(theme.BackgroundColor);
+            this.BackColor = DrawingUtils.GetColor(theme.BackColor);
             this.CursorColor = DrawingUtils.GetColor(theme.CursorColor);
+            this.HighlightBackColor = DrawingUtils.GetColor(theme.BackColor);
+            this.HighlightFontColor = DrawingUtils.GetColor(theme.FontColor);
+
+            this.CursorColor = DrawingUtils.GetColor(theme.CursorColor);
+            this.FontColor = DrawingUtils.GetColor(theme.FontColor);
+            this.BackColor = DrawingUtils.GetColor(theme.BackColor);
+
+            this.HighlightBackColor = DrawingUtils.GetColor(theme.HighlightBackColor);
+            this.HighlightFontColor = DrawingUtils.GetColor(theme.HighlightFontColor);
         }
 
         private bool CollectOptions(XTermSession session)

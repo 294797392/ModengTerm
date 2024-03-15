@@ -39,9 +39,6 @@
             <Setter Property="Height" Value="30"/>
         </Style>
 
-        <converter:FindScopes2StringConverter x:Key="FindScopes2StringConverter"/>
-        <converter:FindStartups2StringConverter x:Key="FindStartups2StringConverter"/>
-
     </Window.Resources>
 
     <Grid>

@@ -88,19 +88,6 @@ namespace ModengTerm.Document.Rendering
         private void Scorllbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             this.Document.EventInput.OnScrollChanged((int)e.NewValue);
-
-            //double newvalue = Math.Round(newValue, 0);
-            //if (newvalue > this.Maximum)
-            //{
-            //    newvalue = this.Maximum;
-            //}
-
-            //// feel free to add code to test against the min, too. 
-            //this.Value = newvalue;
-
-            //// base.OnValueChanged会触发ValueChanged事件
-            //// base.OnValueChanged使用传入的newValue作为ValueChanged事件的参数
-            //base.OnValueChanged(oldValue, newvalue);
         }
     }
 }

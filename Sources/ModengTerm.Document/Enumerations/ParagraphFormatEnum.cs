@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Document.Enumerations
 {
-    public enum LogFileTypeEnum
+    /// <summary>
+    /// 定义段落格式
+    /// </summary>
+    public enum ParagraphFormatEnum
     {
         /// <summary>
         /// 文本文件日志

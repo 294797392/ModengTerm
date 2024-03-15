@@ -20,6 +20,17 @@ namespace ModengTerm.Document
 
         #endregion
 
+        #region 事件处理器
+
+        /// <summary>
+        /// 当滚动结束触发
+        /// int:oldScrollValue
+        /// int:newScrollValue
+        /// </summary>
+        public event Action<VTDocument, int, int> ScrollChanged;
+
+        #endregion
+
         #region 实例变量
 
         #region SelectionRange
@@ -125,7 +136,7 @@ namespace ModengTerm.Document
         /// 当前光标所在行
         /// 通过SetCursor函数设置
         /// </summary>
-        public VTextLine ActiveLine 
+        public VTextLine ActiveLine
         {
             get { return this.activeLine; }
             private set
@@ -191,8 +202,14 @@ namespace ModengTerm.Document
             }
         }
 
+        /// <summary>
+        /// 可视区域的行数
+        /// </summary>
         public int ViewportRow { get { return viewportRow; } }
 
+        /// <summary>
+        /// 可视区域的列数
+        /// </summary>
         public int ViewportColumn { get { return viewportColumn; } }
 
         /// <summary>
@@ -410,6 +427,12 @@ namespace ModengTerm.Document
             if (!Selection.IsEmpty)
             {
                 Selection.MakeInvalidate();
+            }
+
+            // 触发滚动事件
+            if (this.ScrollChanged != null)
+            {
+                this.ScrollChanged(this, oldScroll, newScroll);
             }
 
             return true;
@@ -1037,7 +1060,7 @@ namespace ModengTerm.Document
         /// 从指定列开始删除光标所在行的字符
         /// </summary>
         /// <param name="column">要从第几列开始删除</param>
-        public void DeleteCharacter(int column) 
+        public void DeleteCharacter(int column)
         {
             VTextLine textLine = this.ActiveLine;
 
@@ -1468,7 +1491,8 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="physicsRow">要滚动到的物理行数</param>
         /// <param name="options">滚动选项</param>
-        public void ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop)
+        /// <returns>如果进行了滚动，那么返回true，否则返回false</returns>
+        public bool ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop)
         {
             int scrollTo = -1;
 
@@ -1506,7 +1530,7 @@ namespace ModengTerm.Document
                 scrollTo = Scrollbar.ScrollMax;
             }
 
-            ScrollToHistory(scrollTo);
+            return ScrollToHistory(scrollTo);
         }
 
         /// <summary>
@@ -1532,7 +1556,7 @@ namespace ModengTerm.Document
                 return VTParagraph.Empty;
             }
 
-            return this.CreateParagraph(ParagraphTypeEnum.Selected, LogFileTypeEnum.PlainText);
+            return this.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
         }
 
         /// <summary>
@@ -1541,7 +1565,7 @@ namespace ModengTerm.Document
         /// <param name="paragraphType">段落类型</param>
         /// <param name="fileType">要创建的内容格式</param>
         /// <returns></returns>
-        public VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, LogFileTypeEnum fileType)
+        public VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, ParagraphFormatEnum fileType)
         {
             List<List<VTCharacter>> characters = new List<List<VTCharacter>>();
             int startCharacterIndex = 0, endCharacterIndex = 0;
@@ -1969,7 +1993,11 @@ namespace ModengTerm.Document
 
         private void OnScrollChanged(int scrollValue)
         {
-            this.ScrollTo(scrollValue);
+            if (!this.ScrollTo(scrollValue))
+            {
+                return;
+            }
+
             this.RequestInvalidate();
         }
 

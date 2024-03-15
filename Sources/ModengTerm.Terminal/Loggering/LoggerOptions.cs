@@ -17,7 +17,7 @@ namespace ModengTerm.Terminal.Loggering
         /// <summary>
         /// 要保存的日志格式
         /// </summary>
-        public LogFileTypeEnum FileType { get; set; }
+        public ParagraphFormatEnum FileType { get; set; }
 
         /// <summary>
         /// 日志过滤器类型

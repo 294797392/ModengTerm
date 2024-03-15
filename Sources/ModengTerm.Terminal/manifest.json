@@ -43,10 +43,12 @@
             },
             "backgroundType": 0,
             "backgroundUri": "54,52,46",
-            "backgroundColor": "54,52,46",
-            "foregroundColor": "236,238,238",
+            "backColor": "54,52,46",
+            "fontColor": "236,238,238",
             "cursorColor": "255,255,255",
-            "bookmarkColor": "236,238,238"
+            "bookmarkColor": "236,238,238",
+            "highlightFontColor": "54,52,46",
+            "highlightBackColor": "236,238,238"
         },
 
         {
@@ -57,10 +59,12 @@
             },
             "backgroundType": 0,
             "backgroundUri": "0,0,0",
-            "backgroundColor": "0,0,0",
-            "foregroundColor": "255,255,255",
+            "backColor": "0,0,0",
+            "fontColor": "255,255,255",
             "cursorColor": "255,255,255",
-            "bookmarkColor": "255,255,255"
+            "bookmarkColor": "255,255,255",
+            "highlightFontColor": "0,0,0",
+            "highlightBackColor": "255,255,255"
         }
     ]
 }

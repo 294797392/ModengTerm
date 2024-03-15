@@ -6,6 +6,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.ServiceAgents;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;

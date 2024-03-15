@@ -1,4 +1,4 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;

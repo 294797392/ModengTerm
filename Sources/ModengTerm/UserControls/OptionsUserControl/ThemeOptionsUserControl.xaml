@@ -112,9 +112,11 @@
                     <RowDefinition Height="35"/>
                     <RowDefinition Height="35"/>
                     <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="90"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -155,7 +157,7 @@
                 <xceedtoolkit:ColorPicker Grid.Row="3" Grid.Column="1" Height="30" SelectedColor="{Binding Path=FontColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="背景颜色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="1" Height="30" SelectedColor="{Binding Path=BackgroundColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="1" Height="30" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
 
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="背景特效：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                 <ComboBox Grid.Row="5" Grid.Column="1" DataContext="{Binding Path=EffectTypeEnumList}"
@@ -193,6 +195,12 @@
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>
+
+                <TextBlock Grid.Row="9" Grid.Column="0" Text="高亮字体色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <xceedtoolkit:ColorPicker Grid.Row="9" Grid.Column="1" Height="30" SelectedColor="{Binding Path=HighlightFontColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+
+                <TextBlock Grid.Row="10" Grid.Column="0" Text="高亮背景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <xceedtoolkit:ColorPicker Grid.Row="10" Grid.Column="1" Height="30" SelectedColor="{Binding Path=HighlightBackgroundColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
 
             </Grid>
 

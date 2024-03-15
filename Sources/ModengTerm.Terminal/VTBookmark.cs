@@ -35,7 +35,7 @@ namespace ModengTerm.Terminal
                 SessionName = this.session.Name,
                 StartCharacterIndex = 0,
                 EndCharacterIndex = textLine.Characters.Count - 1,
-                ContentType = LogFileTypeEnum.PlainText,
+                ContentType = ParagraphFormatEnum.PlainText,
                 Typeface = textLine.Typeface,
                 CharactersList = new List<List<VTCharacter>>() { textLine.Characters.ToList() }
             };

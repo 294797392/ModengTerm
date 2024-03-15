@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
@@ -14,76 +15,43 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.Terminal.ViewModels
 {
+    /// <summary>
+    /// 搜索ViewModel
+    /// 模仿XShell和VS2022的搜索功能
+    /// </summary>
     public class FindVM : ViewModelBase
     {
-        /// <summary>
-        /// 存储匹配到的结果
-        /// </summary>
-        private class MatchResult
-        {
-            public List<VTMatches> Matches { get; private set; }
-
-            public int PhysicsRow { get; set; }
-
-            public MatchResult(int physicsRow)
-            {
-                this.PhysicsRow = physicsRow;
-                this.Matches = new List<VTMatches>();
-            }
-        }
+        #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FindVM");
 
+        #endregion
+
         #region 实例变量
 
-        private bool ignoreCase;
+        private bool caseSensitive;
         private bool regexp;
         private string keyword;
         private IVideoTerminal videoTerminal;
-
-        /// <summary>
-        /// 存储当前要搜索的第一行物理行号
-        /// </summary>
-        private int startRow;
-
-        /// <summary>
-        /// 存储当前要搜索的最后一行物理行号
-        /// </summary>
-        private int endRow;
-
-        /// <summary>
-        /// 存储当前搜索到的行索引
-        /// </summary>
-        private int findIndex;
-
-        /// <summary>
-        /// 是否需要重置查找参数
-        /// </summary>
-        private bool dirty;
-
-        private StringComparison stringComparison;
-        private RegexOptions regexOptions;
 
         private bool findOnce;
 
         /// <summary>
         /// 存储当前命中匹配到的行
         /// </summary>
-        private List<MatchResult> matchResult;
-
-        //private VTMatchesLine matchesLine;
-
-        /// <summary>
-        /// 是否停止查找
-        /// 当窗口关闭的时候会设置该值为true
-        /// 再次查找的时候会设置该值为false
-        /// </summary>
-        private bool stopFind;
+        private List<VTMatches> matchResult;
 
         /// <summary>
         /// 查找提示
         /// </summary>
         private string message;
+
+        /// <summary>
+        /// 当前查找下一个的索引
+        /// 可以从下往上找
+        /// 也可以从上往下找
+        /// </summary>
+        private int findIndex;
 
         #endregion
 
@@ -105,25 +73,26 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public BindableCollection<FindScopes> FindScopeList { get; private set; }
-
-        public BindableCollection<FindStartups> FindStartupList { get; private set; }
-
-        public bool IgnoreCase
+        /// <summary>
+        /// 查找的时候是否区分大小写
+        /// </summary>
+        public bool CaseSensitive
         {
-            get { return this.ignoreCase; }
+            get { return this.caseSensitive; }
             set
             {
-                if (this.ignoreCase != value)
+                if (this.caseSensitive != value)
                 {
-                    this.ignoreCase = value;
-                    this.NotifyPropertyChanged("IgnoreCase");
-
-                    this.dirty = true;
+                    this.caseSensitive = value;
+                    this.NotifyPropertyChanged("CaseSensitive");
+                    this.OnCaseSensitiveChanged();
                 }
             }
         }
 
+        /// <summary>
+        /// 是否使用正则表达式进行查找
+        /// </summary>
         public bool Regexp
         {
             get { return this.regexp; }
@@ -133,12 +102,13 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     this.regexp = value;
                     this.NotifyPropertyChanged("Regexp");
-
-                    this.dirty = true;
                 }
             }
         }
 
+        /// <summary>
+        /// 要查找的关键字或者正则表达式
+        /// </summary>
         public string Keyword
         {
             get { return this.keyword; }
@@ -148,16 +118,15 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     this.keyword = value;
                     this.NotifyPropertyChanged("Keyword");
-
-                    this.dirty = true;
+                    this.OnKeywordChanged(value);
                 }
             }
         }
 
         /// <summary>
-        /// 当前是否是只查找一次就返回
+        /// 是否查找所有
         /// </summary>
-        public bool FindOnce
+        public bool FindAll
         {
             get { return this.findOnce; }
             set
@@ -165,11 +134,20 @@ namespace ModengTerm.Terminal.ViewModels
                 if (this.findOnce != value)
                 {
                     this.findOnce = value;
-                    this.NotifyPropertyChanged("FindOnce");
-                    this.dirty = true;
+                    this.NotifyPropertyChanged("FindAll");
                 }
             }
         }
+
+        /// <summary>
+        /// 高亮区域的前景色
+        /// </summary>
+        public VTColor HighlightForeground { get; set; }
+
+        /// <summary>
+        /// 高亮区域的背景色
+        /// </summary>
+        public VTColor HighlightBackground { get; set; }
 
         #endregion
 
@@ -178,62 +156,65 @@ namespace ModengTerm.Terminal.ViewModels
         public FindVM(IVideoTerminal vt)
         {
             this.videoTerminal = vt;
-
-            this.videoTerminal.DocumentChanged += VideoTerminal_DocumentChanged;
-
-            this.FindScopeList = new BindableCollection<FindScopes>();
-            this.FindScopeList.AddRange(MTermUtils.GetEnumValues<FindScopes>());
-
-            this.FindStartupList = new BindableCollection<FindStartups>();
-            this.FindStartupList.AddRange(MTermUtils.GetEnumValues<FindStartups>());
-            this.matchResult = new List<MatchResult>();
-
-            //this.matchesLine = new VTMatchesLine(this.videoTerminal.ActiveDocument);
-            //this.matchesLine.Initialize();
+            this.videoTerminal.ScrollChanged += VideoTerminal_ScrollChanged;
         }
 
         #endregion
 
         #region 实例方法
 
+        private void PerformFind(string keyword)
+        {
+            // 先恢复文本行的状态
+            this.ResetTextLineState();
+
+            if (string.IsNullOrEmpty(keyword))
+            {
+                this.matchResult = null;
+                return;
+            }
+
+            List<VTMatches> matches = this.FindMatches(keyword);
+            this.HighlightMatches(matches);
+
+            this.matchResult = matches;
+        }
+
         /// <summary>
         /// 匹配一行，如果有匹配成功则返回匹配后的数据
         /// </summary>
-        /// <param name="matchIndex">物理行号</param>
+        /// <param name="textLine">要搜索的行</param>
         /// <returns></returns>
-        private MatchResult MatchLine(int matchIndex)
+        private List<VTMatches> FindMatches(string keyword, VTextLine textLine)
         {
-            VTHistoryLine historyLine;
-            if (!this.videoTerminal.ScrollInfo.TryGetHistory(matchIndex, out historyLine))
-            {
-                logger.ErrorFormat("查找失败, 没找到对应的行, {0}", matchIndex);
-                return null;
-            }
-
-            string text = VTUtils.CreatePlainText(historyLine.Characters);
+            string text = VTUtils.CreatePlainText(textLine.Characters);
 
             if (this.Regexp)
             {
+                RegexOptions regexOptions = this.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+
                 // 用正则表达式搜索
-                Match match = Regex.Match(text, this.Keyword, this.regexOptions);
+                Match match = Regex.Match(text, keyword, regexOptions);
                 if (!match.Success)
                 {
                     // 没有找到搜索结果
                     return null;
                 }
 
-                MatchResult matchedLine = new MatchResult(matchIndex);
+                List<VTMatches> vtMatches = new List<VTMatches>();
 
                 do
                 {
-                    matchedLine.Matches.Add(new VTMatches(match.Length, match.Index));
+                    vtMatches.Add(new VTMatches(textLine, match.Length, match.Index));
                 }
                 while ((match = match.NextMatch()) != null);
 
-                return matchedLine;
+                return vtMatches;
             }
             else
             {
+                StringComparison stringComparison = this.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
                 // 直接文本匹配
                 // 注意一行文本里可能会有多个地方匹配，要把所有匹配的地方都找到
 
@@ -242,238 +223,150 @@ namespace ModengTerm.Terminal.ViewModels
                 // 存储匹配的字符索引
                 int matchedIndex = 0;
 
-                if ((matchedIndex = text.IndexOf(this.Keyword, 0, this.stringComparison)) == -1)
+                if ((matchedIndex = text.IndexOf(keyword, 0, stringComparison)) == -1)
                 {
                     // 没找到
                     return null;
                 }
 
-                MatchResult matchedLine = new MatchResult(matchIndex);
-                matchedLine.Matches.Add(new VTMatches(this.keyword.Length, matchedIndex));
+                List<VTMatches> vtMatches = new List<VTMatches>();
+
+                vtMatches.Add(new VTMatches(textLine, this.keyword.Length, matchedIndex));
 
                 startIndex = matchedIndex + this.keyword.Length;
 
                 // 找到了继续找
                 while ((matchedIndex = text.IndexOf(this.keyword, startIndex, stringComparison)) >= 0)
                 {
-                    matchedLine.Matches.Add(new VTMatches(this.keyword.Length, matchedIndex));
+                    vtMatches.Add(new VTMatches(textLine, this.keyword.Length, matchedIndex));
 
                     startIndex = matchedIndex + this.keyword.Length;
                 }
 
-                return matchedLine;
+                return vtMatches;
             }
         }
 
         /// <summary>
-        /// 获取下一个要匹配的行的物理行号
+        /// 查找当前文档的所有匹配项
         /// </summary>
-        /// <returns>返回-1则表示查找到底了</returns>
-        private int GetNextMatchIndex()
+        /// <param name="keyword">要匹配的关键字</param>
+        /// <returns></returns>
+        private List<VTMatches> FindMatches(string keyword)
         {
-            int nextIndex = 0;
+            List<VTMatches> result = new List<VTMatches>();
 
-            if (this.endRow >= this.startRow)
-            {
-                // 说明从上往下找
-                nextIndex = this.findIndex + this.startRow;
-            }
-            else
-            {
-                // 说明从下往上找
-                nextIndex = this.endRow - this.findIndex;
-            }
+            VTScreen activeScreen = this.videoTerminal.ActiveScreen;
 
-            if (nextIndex == this.endRow)
+            VTextLine current = activeScreen.FirstLine;
+
+            while (current != null)
             {
-                // 从上往下找找到底了
-                this.dirty = true;
-                return -1;
+                List<VTMatches> matches = this.FindMatches(keyword, current);
+                if (matches != null)
+                {
+                    result.AddRange(matches);
+                }
+
+                current = current.NextLine;
             }
 
-            if (nextIndex < 0)
-            {
-                // 从下往上找找到底了
-                this.dirty = true;
-                return -1;
-            }
-
-            this.findIndex++;
-
-            return nextIndex;
-        }
-
-        /// <summary>
-        /// 让滚动条滚动到一行处
-        /// </summary>
-        /// <param name="matches"></param>
-        private void ScrollToMatches(MatchResult matches)
-        {
-            // 让matches行显示到最中间
-            this.videoTerminal.ScrollTo(matches.PhysicsRow, ScrollOptions.ScrollToMiddle);
+            return result;
         }
 
         /// <summary>
         /// 高亮显示匹配的项
         /// </summary>
         /// <param name="matches"></param>
-        private void HighlightMatches(MatchResult matches)
+        private void HighlightMatches(List<VTMatches> matchResult)
         {
-            VTextLine textLine = this.videoTerminal.ActiveDocument.FindLine(matches.PhysicsRow);
+            foreach (VTMatches matches in matchResult)
+            {
+                VTextLine textLine = matches.TextLine;
 
-            //this.matchesLine.MatchesList = matches.Matches;
-            //this.matchesLine.TextLine = textLine;
-            //this.matchesLine.OffsetY = textLine.OffsetY;
+                for (int i = 0; i < matches.Length; i++)
+                {
+                    VTCharacter character = textLine.Characters[i + matches.Index];
 
-            //this.matchesLine.RequestInvalidate();
+                    character.Background = this.HighlightBackground;
+                    character.Foreground = this.HighlightForeground;
+
+                    VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
+                    VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
+                }
+
+                textLine.MakeInvalidate();
+                textLine.RequestInvalidate();
+            }
+        }
+
+        /// <summary>
+        /// 把高亮显示的匹配项重置为默认颜色
+        /// </summary>
+        private void ResetTextLineState()
+        {
+            if (this.matchResult == null)
+            {
+                return;
+            }
+
+            IEnumerable<VTextLine> textLines = this.matchResult.GroupBy(v => v.TextLine).Select(v => v.Key);
+            foreach (VTextLine textLine in textLines)
+            {
+                VTHistoryLine historyLine;
+                if (!this.videoTerminal.TryGetHistoryLine(textLine.PhysicsRow, out historyLine))
+                {
+                    logger.ErrorFormat("KeywordChanged失败, 没找到文本行对应的历史记录, physicsRow = {0}", textLine.PhysicsRow);
+                    continue;
+                }
+
+                textLine.SetHistory(historyLine);
+                textLine.RequestInvalidate();
+            }
+        }
+
+        /// <summary>
+        /// 当关键字改变的时候触发
+        /// </summary>
+        private void OnKeywordChanged(string keyword)
+        {
+            this.PerformFind(keyword);
+        }
+
+        /// <summary>
+        /// 当区分大小写选项改变的时候触发
+        /// </summary>
+        private void OnCaseSensitiveChanged()
+        {
+            this.PerformFind(this.Keyword);
         }
 
         #endregion
 
         #region 事件处理器
 
-        private void VideoTerminal_DocumentChanged(IVideoTerminal vt, VTDocument oldDocument, VTDocument newDocument)
+        private void VideoTerminal_ScrollChanged(IVideoTerminal vt, int oldScrollValue, int newScrollValue)
         {
-            //this.matchesLine.Release();
-
-            //this.matchesLine = new VTMatchesLine(newDocument);
-            //this.matchesLine.Initialize();
+            this.PerformFind(this.keyword);
         }
 
         #endregion
 
         #region 公开接口
 
-        public void Find()
+        /// <summary>
+        /// 查找下一个
+        /// </summary>
+        public void FindNext()
         {
-            this.Message = string.Empty;
 
-            if (string.IsNullOrEmpty(this.Keyword))
-            {
-                return;
-            }
-
-            if (this.dirty)
-            {
-                VTScrollInfo scrollback = this.videoTerminal.ScrollInfo;
-                int firstRow = 0, lastRow = 0, totalRows = 0; // 要搜索的起始行和结束行和要搜索的总行数
-
-                switch (this.FindScopeList.SelectedItem)
-                {
-                    case FindScopes.All:
-                        {
-                            // 计算一共要搜索的行数
-                            firstRow = scrollback.FirstLine.PhysicsRow;
-                            lastRow = scrollback.LastLine.PhysicsRow;
-                            totalRows = lastRow - firstRow + 1;
-                            break;
-                        }
-
-                    case FindScopes.Document:
-                        {
-                            firstRow = this.videoTerminal.ActiveDocument.FirstLine.PhysicsRow;
-                            lastRow = this.videoTerminal.ActiveDocument.LastLine.PhysicsRow;
-                            totalRows = lastRow - firstRow + 1;
-                            break;
-                        }
-
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                switch (this.FindStartupList.SelectedItem)
-                {
-                    case FindStartups.FromBegin:
-                        {
-                            // 从头开始查找
-                            this.findIndex = 0;
-                            this.startRow = firstRow;
-                            this.endRow = lastRow;
-                            break;
-                        }
-
-                    case FindStartups.FromEnd:
-                        {
-                            this.findIndex = 0;
-                            this.startRow = lastRow;
-                            this.endRow = firstRow;
-                            break;
-                        }
-
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                this.stringComparison = this.IgnoreCase ? StringComparison.CurrentCultureIgnoreCase : StringComparison.CurrentCulture;
-                this.regexOptions = this.IgnoreCase ? RegexOptions.IgnoreCase : RegexOptions.None;
-
-                this.dirty = false;
-            }
-
-            this.stopFind = false;
-            this.matchResult.Clear();
-
-            while (true)
-            {
-                if (this.stopFind)
-                {
-                    // 停止查找
-                    break;
-                }
-
-                int matchIndex = this.GetNextMatchIndex();
-                if (matchIndex < 0)
-                {
-                    // 到底了
-                    if (this.FindOnce)
-                    {
-                        this.Message = "已经找到最后一行了";
-                    }
-                    else
-                    {
-                        // 显示查找结果窗口
-                    }
-                    return;
-                }
-
-                MatchResult matches = this.MatchLine(matchIndex);
-                if (matches == null)
-                {
-                    // 没找到，继续找
-                    continue;
-                }
-                else
-                {
-                    if (FindOnce)
-                    {
-                        this.videoTerminal.UISyncContext.Send((state) =>
-                        {
-                            this.ScrollToMatches(matches);
-                            this.HighlightMatches(matches);
-                        }, null);
-                        break;
-                    }
-                    else
-                    {
-                        this.matchResult.Add(matches);
-                    }
-                }
-            }
         }
 
         public void Release()
         {
-            this.stopFind = true;
-            this.dirty = true;
-            //this.matchesLine.MatchesList = null;
-            //this.matchesLine.OffsetX = 0;
-            //this.matchesLine.OffsetY = 0;
-            //this.matchesLine.TextBlocks.Clear();
-            //this.matchesLine.RequestInvalidate();
-            //this.matchesLine.Release();
+            this.ResetTextLineState();
+            this.matchResult = null;
             this.Message = string.Empty;
-
-            this.videoTerminal.DocumentChanged -= this.VideoTerminal_DocumentChanged;
         }
 
         #endregion

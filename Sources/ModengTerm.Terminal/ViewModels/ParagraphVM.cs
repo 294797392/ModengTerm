@@ -73,7 +73,7 @@ namespace ModengTerm.Terminal.ViewModels
                 StartCharacterIndex = favorites.StartCharacterIndex,
                 EndCharacterIndex = favorites.EndCharacterIndex,
                 CharactersList = favorites.CharacterList,
-                ContentType = LogFileTypeEnum.PlainText,
+                ContentType = ParagraphFormatEnum.PlainText,
                 SessionName = String.Empty,
                 Typeface = favorites.Typeface,
             };

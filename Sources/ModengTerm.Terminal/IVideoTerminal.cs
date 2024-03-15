@@ -33,6 +33,13 @@ namespace ModengTerm.Terminal
         event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
 
         /// <summary>
+        /// 当文档被滚动的时候触发
+        /// int:oldValue
+        /// int:newValue
+        /// </summary>
+        event Action<IVideoTerminal, int, int> ScrollChanged;
+
+        /// <summary>
         /// 会话名字
         /// </summary>
         string Name { get; set; }
@@ -40,12 +47,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 当前正在显示的Document
         /// </summary>
-        VTDocument ActiveDocument { get; }
-
-        /// <summary>
-        /// 获取终端的滚动信息
-        /// </summary>
-        VTScrollInfo ScrollInfo { get; }
+        VTScreen ActiveScreen { get; }
 
         /// <summary>
         /// 获取UI线程上下文
@@ -68,9 +70,9 @@ namespace ModengTerm.Terminal
         /// 创建指定的段落内容
         /// </summary>
         /// <param name="paragraphType">段落类型</param>
-        /// <param name="fileType">要创建的内容格式</param>
+        /// <param name="formatType">要创建的段落格式</param>
         /// <returns></returns>
-        VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, LogFileTypeEnum fileType);
+        VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, ParagraphFormatEnum formatType);
 
         /// <summary>
         /// 获取当前使用鼠标选中的段落区域
@@ -82,5 +84,13 @@ namespace ModengTerm.Terminal
         /// 选中所有内容
         /// </summary>
         void SelectAll();
+
+        /// <summary>
+        /// 找到历史行
+        /// </summary>
+        /// <param name="physicsRow">要找的历史行的物理行号</param>
+        /// <param name="historyLine">找到了的历史行</param>
+        /// <returns>成功返回true，失败返回false</returns>
+        bool TryGetHistoryLine(int physicsRow, out VTHistoryLine historyLine);
     }
 }

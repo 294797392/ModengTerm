@@ -21,6 +21,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 该字符所占用的列数
         /// 一个中文字符占用2列
+        /// 每列的宽度是一个英文字符宽度
         /// 如果显示其他国家的语言，需要测试得出一个字符占用几列
         /// </summary>
         public int ColumnSize { get; set; }
@@ -37,12 +38,12 @@ namespace ModengTerm.Document
         public int Attribute;
 
         /// <summary>
-        /// 按位存储RGB颜色
+        /// 该字符的背景色
         /// </summary>
         public VTColor Background { get; set; }
 
         /// <summary>
-        /// 按位存储RGB颜色
+        /// 该字符的前景色
         /// </summary>
         public VTColor Foreground { get; set; }
 

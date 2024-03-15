@@ -16,6 +16,10 @@ namespace ModengTerm.Base.Enumerations
         SSH_TERM_TYPE = 2,
         SSH_TERM_SIZE_MODE = 3,
 
+        #endregion
+
+        #region Theme 100 - 500
+
         // Theme 100 - 200
         THEME_FONT_FAMILY = 100,
         THEME_FONT_SIZE = 101,
@@ -36,23 +40,36 @@ namespace ModengTerm.Base.Enumerations
         TEHEM_COLOR_TABLE = 108,
 
         THEME_BACKGROUND_TYPE = 110,
-        SSH_THEME_BACKGROUND_URI = 111,
+        THEME_BACKGROUND_URI = 111,
         THEME_BACKGROUND_COLOR = 112,
         THEME_BACKGROUND_EFFECT = 113,
 
         /// <summary>
+        /// 查找高亮前景色
+        /// </summary>
+        THEME_FIND_HIGHLIGHT_FONTCOLOR = 114,
+        /// <summary>
+        /// 查找高亮背景色
+        /// </summary>
+        THEME_FIND_HIGHLIGHT_BACKCOLOR = 115,
+
+        #endregion
+
+        #region 
+
+        /// <summary>
         /// 文档边距
         /// </summary>
-        SSH_THEME_CONTENT_MARGIN = 114,
+        SSH_THEME_CONTENT_MARGIN = 501,
 
         /// <summary>
         /// 是否显示书签
         /// </summary>
-        SSH_BOOKMARK_VISIBLE = 115,
-        THEME_BOOKMARK_COLOR = 116,
+        SSH_BOOKMARK_VISIBLE = 502,
+        THEME_BOOKMARK_COLOR = 503,
 
         // Server 201 - 300
-        SSH_SERVER_ADDR = 201,
+        SSH_SERVER_ADDR = 504,
         SSH_SERVER_PORT,
         SSH_SERVER_USER_NAME,
         SSH_SERVER_PASSWORD,

@@ -23,7 +23,7 @@ namespace ModengTerm.Terminal.Loggering
         /// <summary>
         /// 文件格式
         /// </summary>
-        public LogFileTypeEnum FileType { get; set; }
+        public ParagraphFormatEnum FileType { get; set; }
 
         /// <summary>
         /// 日志文件路径

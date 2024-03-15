@@ -40,15 +40,10 @@
             <Setter Property="Height" Value="30"/>
         </Style>
 
-        <converter:FindScopes2StringConverter x:Key="FindScopes2StringConverter"/>
-        <converter:FindStartups2StringConverter x:Key="FindStartups2StringConverter"/>
-
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
@@ -63,34 +58,12 @@
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Keyword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="区分大小写：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=IgnoreCase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=CaseSensitive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="正则表达式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Path=Regexp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="查找范围：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="3" Grid.Column="1" DataContext="{Binding Path=FindScopeList}" ItemsSource="{Binding}"
-                  SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=FindScopes2StringConverter}}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-
-        <TextBlock Grid.Row="4" Grid.Column="0" Text="查找方向：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <ComboBox Grid.Row="4" Grid.Column="1" DataContext="{Binding Path=FindStartupList}" ItemsSource="{Binding}"
-                  SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=FindStartups2StringConverter}}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-
-        <Grid Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -100,7 +73,7 @@
                        Foreground="Red" FontWeight="Bold"/>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="查找" Click="ButtonFind_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Content="查找下一个" Click="ButtonNextMatches_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
                 <Button Visibility="Collapsed" Content="查找全部" Click="ButtonFindAll_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
             </StackPanel>
 
