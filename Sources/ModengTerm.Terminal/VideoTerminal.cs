@@ -65,8 +65,6 @@ namespace ModengTerm.Terminal
         /// </summary>
         public event Action<IVideoTerminal, int, int> ViewportChanged;
 
-        public event Action<IVideoTerminal, int, int> ScrollChanged;
-
         #endregion
 
         #region 实例变量
@@ -81,32 +79,22 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 主缓冲区文档模型
         /// </summary>
-        private PrimaryScreen primaryScreen;
+        private VTDocument mainDocument;
 
         /// <summary>
         /// 备用缓冲区文档模型
         /// </summary>
-        private AlternateScreen alternateScreen;
+        private VTDocument alternateDocument;
 
         /// <summary>
         /// 当前正在使用的文档模型
         /// </summary>
-        private VTScreen activeScreen;
-        
+        private VTDocument activeDocument;
+
         /// <summary>
         /// UI线程上下文
         /// </summary>
         internal SynchronizationContext uiSyncContext;
-
-        /// <summary>
-        /// 当前终端行数
-        /// </summary>
-        private int viewportRow { get { return activeScreen.ViewportRow; } }
-
-        /// <summary>
-        /// 当前终端列数
-        /// </summary>
-        private int viewportColumn { get { return activeScreen.ViewportColumn; } }
 
         #region Mouse
 
@@ -163,7 +151,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 获取当前光标所在行
         /// </summary>
-        private VTextLine ActiveLine { get { return activeScreen.ActiveLine; } }
+        private VTextLine ActiveLine { get { return this.activeDocument.ActiveLine; } }
 
         /// <summary>
         /// 获取当前光标所在行
@@ -181,11 +169,24 @@ namespace ModengTerm.Terminal
         /// 该坐标是基于ViewableDocument的坐标
         /// Cursor的位置是下一个要打印的字符的位置
         /// </summary>
-        public VTCursor Cursor { get { return activeScreen.Cursor; } }
+        public VTCursor Cursor { get { return this.activeDocument.Cursor; } }
 
-        public VTScrollInfo ScrollInfo { get { return activeScreen.ScrollInfo; } }
+        public VTScrollInfo ScrollInfo { get { return this.activeDocument.Scrollbar; } }
 
-        public VTScreen ActiveScreen { get { return activeScreen; } }
+        /// <summary>
+        /// 当前正在使用的缓冲区
+        /// </summary>
+        public VTDocument ActiveDocument { get { return this.activeDocument; } }
+
+        /// <summary>
+        /// 备用缓冲区
+        /// </summary>
+        public VTDocument AlternateDocument { get { return this.alternateDocument; } }
+
+        /// <summary>
+        /// 主缓冲区
+        /// </summary>
+        public VTDocument MainDocument { get { return this.mainDocument; } }
 
         /// <summary>
         /// UI线程上下文对象
@@ -200,9 +201,9 @@ namespace ModengTerm.Terminal
         public VTKeyboard Keyboard { get { return keyboard; } }
 
         /// <summary>
-        /// 鼠标按下的时候鼠标所在行
+        /// 当前显示的是否是备用缓冲区
         /// </summary>
-        public VTextLine MouseDownLine { get; private set; }
+        public bool IsAlternate { get { return this.activeDocument == this.alternateDocument; } }
 
         #endregion
 
@@ -222,6 +223,9 @@ namespace ModengTerm.Terminal
         /// <param name="sessionInfo"></param>
         public void Initialize(VTOptions options)
         {
+            // 开启日志记录
+            //VTDebug.Context.Categories.FirstOrDefault(v => v.Category == VTDebugCategoryEnum.Interactive).Enabled = true;
+
             vtOptions = options;
 
             uiSyncContext = SynchronizationContext.Current;
@@ -265,22 +269,24 @@ namespace ModengTerm.Terminal
 
             #region 初始化文档模型
 
-            this.primaryScreen = new PrimaryScreen(this.vtOptions);
-            this.primaryScreen.Initialize();
+            VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
+            this.mainDocument = new VTDocument(mainOptions);
+            this.mainDocument.Initialize();
 
-            this.alternateScreen = new AlternateScreen(this.vtOptions);
-            this.alternateScreen.Initialize();
-            this.alternateScreen.ScrollbackMax = 0; // 不可以滚动
-            this.alternateScreen.SetVisible(false);
+            VTDocumentOptions alternateOptions = this.CreateDocumentOptions("AlternateDocument", sessionInfo, options.AlternateDocument);
+            alternateOptions.ScrollbackMax = 0;
+            this.alternateDocument = new VTDocument(alternateOptions);
+            this.alternateDocument.Initialize();
+            this.alternateDocument.SetVisible(false);
 
-            this.activeScreen = this.primaryScreen;
+            this.activeDocument = this.mainDocument;
 
             // 初始化完VTDocument之后，真正要使用的Column和Row已经被计算出来并保存到了VTDocumentOptions里
             // 此时重新设置sessionInfo里的Row和Column，因为SessionTransport要使用
-            sessionInfo.SetOption(OptionKeyEnum.SSH_TERM_ROW, this.primaryScreen.ViewportRow);
-            sessionInfo.SetOption(OptionKeyEnum.SSH_TERM_COL, this.primaryScreen.ViewportColumn);
+            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, mainOptions.ViewportRow);
+            sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, mainOptions.ViewportColumn);
 
-            ViewportChanged?.Invoke(this, this.primaryScreen.ViewportRow, this.primaryScreen.ViewportColumn);
+            this.ViewportChanged?.Invoke(this, this.mainDocument.ViewportRow, this.mainDocument.ViewportColumn);
 
             #endregion
 
@@ -315,8 +321,8 @@ namespace ModengTerm.Terminal
             vtParser.ActionEvent -= VtParser_ActionEvent;
             vtParser.Release();
 
-            primaryScreen.Release();
-            alternateScreen.Release();
+            this.mainDocument.Release();
+            this.alternateDocument.Release();
         }
 
         /// <summary>
@@ -327,6 +333,8 @@ namespace ModengTerm.Terminal
         public void ProcessData(byte[] bytes, int size)
         {
             VTDebug.Context.WriteRawRead(bytes, size);
+
+            int oldScroll = this.activeDocument.Scrollbar.ScrollValue;
 
             try
             {
@@ -340,21 +348,31 @@ namespace ModengTerm.Terminal
             uiSyncContext.Send((o) =>
             {
                 // 全部数据都处理完了之后，只渲染一次
-                activeScreen.Render();
+                this.activeDocument.RequestInvalidate();
+
+                int newScroll = this.activeDocument.Scrollbar.ScrollValue;
+                if (newScroll != oldScroll)
+                {
+                    // 计算ScrollData
+                    VTScrollData scrollData = this.GetScrollData(this.activeDocument, oldScroll, newScroll);
+                    this.activeDocument.InvokeScrollChanged(scrollData);
+                }
 
             }, null);
+        }
 
-            // 更新最新的历史行
-            // 解决当一次性打印多个字符的时候，不需要每打印一个字符就更新历史行，而是等所有字符都打印完了再更新
-            // 不要在Print事件里保存历史记录，因为可能会连续触发多次Print事件
-            // 触发完多次Print事件后，会最后触发一次PerformDrawing，在PerformDrawing完了再保存最后一行历史行
-            if (activeScreen == primaryScreen)
+        /// <summary>
+        /// 选中全部的文本
+        /// </summary>
+        public void SelectAll()
+        {
+            if (this.IsAlternate)
             {
-                VTScrollInfo scrollBar = primaryScreen.ScrollInfo;
-                if (ActiveLine != null)
-                {
-                    scrollBar.UpdateHistory(ActiveLine);
-                }
+                activeDocument.SelectViewport();
+            }
+            else
+            {
+                activeDocument.SelectAll();
             }
         }
 
@@ -364,15 +382,13 @@ namespace ModengTerm.Terminal
         /// <returns></returns>
         public VTParagraph GetSelectedParagraph()
         {
-            return activeDocument.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
-        }
+            VTextSelection selection = this.activeDocument.Selection;
+            if (selection.IsEmpty)
+            {
+                return VTParagraph.Empty;
+            }
 
-        /// <summary>
-        /// 选中全部的文本
-        /// </summary>
-        public void SelectAll()
-        {
-            activeDocument.SelectAll();
+            return this.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
         }
 
         /// <summary>
@@ -383,7 +399,114 @@ namespace ModengTerm.Terminal
         /// <returns></returns>
         public VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, ParagraphFormatEnum fileType)
         {
-            return activeDocument.CreateParagraph(paragraphType, fileType);
+            // 所有要保存的行存储在这里
+            List<VTHistoryLine> historyLines = new List<VTHistoryLine>();
+            int startCharacterIndex = 0, endCharacterIndex = 0;
+
+            switch (paragraphType)
+            {
+                case ParagraphTypeEnum.AllDocument:
+                    {
+                        if (IsAlternate)
+                        {
+                            // 备用缓冲区直接保存VTextLine
+                            VTextLine current = this.activeDocument.FirstLine;
+                            while (current != null)
+                            {
+                                historyLines.Add(current.History);
+                                current = current.NextLine;
+                            }
+                        }
+                        else
+                        {
+                            historyLines.AddRange(this.activeDocument.History.GetAllHistoryLines());
+                        }
+
+                        startCharacterIndex = 0;
+                        endCharacterIndex = historyLines.LastOrDefault().Characters.Count - 1;
+
+                        break;
+                    }
+
+                case ParagraphTypeEnum.Viewport:
+                    {
+                        VTextLine current = this.activeDocument.FirstLine;
+                        while (current != null)
+                        {
+                            historyLines.Add(current.History);
+                            current = current.NextLine;
+                        }
+
+                        startCharacterIndex = 0;
+                        endCharacterIndex = historyLines.LastOrDefault().Characters.Count - 1;
+
+                        break;
+                    }
+
+                case ParagraphTypeEnum.Selected:
+                    {
+                        VTextSelection selection = this.activeDocument.Selection;
+
+                        if (selection.IsEmpty)
+                        {
+                            return VTParagraph.Empty;
+                        }
+
+                        int topRow, bottomRow;
+                        selection.Normalize(out topRow, out bottomRow, out startCharacterIndex, out endCharacterIndex);
+
+                        if (IsAlternate)
+                        {
+                            // 备用缓冲区没有滚动内容，只能选中当前显示出来的文档
+                            int rows = bottomRow - topRow + 1;
+                            VTextLine firstLine = this.activeDocument.FindLine(topRow);
+                            while (rows >= 0)
+                            {
+                                historyLines.Add(firstLine.History);
+
+                                firstLine = firstLine.NextLine;
+
+                                rows--;
+                            }
+                        }
+                        else
+                        {
+                            IEnumerable<VTHistoryLine> histories;
+                            if (!this.activeDocument.History.TryGetHistories(topRow, bottomRow, out histories))
+                            {
+                                logger.ErrorFormat("SaveSelected失败, 有的历史记录为空");
+                                return VTParagraph.Empty;
+                            }
+                            historyLines.AddRange(histories);
+                        }
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            CreateContentParameter parameter = new CreateContentParameter()
+            {
+                SessionName = String.Empty,
+                HistoryLines = historyLines,
+                StartCharacterIndex = startCharacterIndex,
+                EndCharacterIndex = endCharacterIndex,
+                ContentType = fileType,
+                Typeface = this.activeDocument.Typeface
+            };
+
+            string text = VTUtils.CreateContent(parameter);
+
+            return new VTParagraph()
+            {
+                Content = text,
+                CreationTime = DateTime.Now,
+                StartCharacterIndex = startCharacterIndex,
+                EndCharacterIndex = endCharacterIndex,
+                CharacterList = historyLines,
+                IsAlternate = IsAlternate
+            };
         }
 
         /// <summary>
@@ -392,8 +515,9 @@ namespace ModengTerm.Terminal
         /// <param name="physicsRow">要滚动到的物理行数</param>
         public void ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop)
         {
-            if (activeDocument.IsAlternate)
+            if (this.IsAlternate)
             {
+                // 备用缓冲区不可以滚动
                 return;
             }
 
@@ -401,9 +525,43 @@ namespace ModengTerm.Terminal
             activeDocument.RequestInvalidate();
         }
 
-        public bool TryGetHistoryLine(int physicsRow, out VTHistoryLine historyLine)
+        public void OnSizeChanged(VTSize oldSize, VTSize newSize)
         {
-            return ScrollInfo.TryGetHistory(physicsRow, out historyLine);
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
+            VTDocument document = this.activeDocument;
+
+            int oldRow = document.ViewportRow, oldCol = document.ViewportColumn;
+            int newRow = 0, newCol = 0;
+            VTUtils.CalculateAutoFitSize(newSize, document.Typeface, out newRow, out newCol);
+
+            if (newRow == document.ViewportRow && newCol == document.ViewportColumn)
+            {
+                // 变化之后的行和列和现在的行和列一样，什么都不做
+                return;
+            }
+
+            // 对Document执行Resize
+            // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样
+            // 遇到过一种情况：如果终端名称不正确，比如XTerm，那么当行数增加的时候，光标会移动到该行的最右边，终端名称改成xterm就没问题了
+            // 目前的实现思路是：如果是减少行，那么从第一行开始删除；如果是增加行，那么从最后一行开始新建行。不考虑ScrollMargin
+
+            this.MainDocumentResize(this.mainDocument, oldRow, newRow, oldCol, newCol);
+            this.AlternateDocumentResize(this.alternateDocument, oldRow, newRow, oldCol, newCol);
+
+            // 重绘当前显示的文档
+            this.activeDocument.RequestInvalidate();
+
+            // 给HOST发送修改行列的请求
+            this.sessionTransport.Resize(newRow, newCol);
+
+            if (this.ViewportChanged != null)
+            {
+                this.ViewportChanged(this, newRow, newCol);
+            }
         }
 
         #endregion
@@ -463,7 +621,7 @@ namespace ModengTerm.Terminal
                     // https://symbl.cc/en/unicode/blocks/box-drawing/
                     // https://unicodeplus.com/U+2500#:~:text=The%20unicode%20character%20U%2B2500%20%28%E2%94%80%29%20is%20named%20%22Box,Horizontal%22%20and%20belongs%20to%20the%20Box%20Drawing%20block.
                     // gotop命令会用到Box Drawing字符，BoxDrawing字符不能用宋体，不然渲染的时候界面会乱掉。BoxDrawing字符的范围是0x2500 - 0x257F
-                    // 经过测试发现WindwosTerminal如果用宋体渲染top的话，界面也是乱的...
+                    // 经过测试发现WindowsTerminal如果用宋体渲染top的话，界面也是乱的...
 
                     column = 1;
                 }
@@ -475,6 +633,253 @@ namespace ModengTerm.Terminal
                 // 说明是ASCII码可见字符
                 return VTCharacter.Create(Convert.ToChar(ch), 1, attributeState);
             }
+        }
+
+        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, IDrawingDocument drawingDocument)
+        {
+            string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY);
+            double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);
+
+            VTypeface typeface = drawingDocument.GetTypeface(fontSize, fontFamily);
+            typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
+
+            VTSize terminalSize = drawingDocument.Size;
+            double contentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
+            VTSize contentSize = new VTSize(terminalSize.Width - 15, terminalSize.Height).Offset(-contentMargin * 2);
+            TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
+
+            int viewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
+            int viewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
+            if (sizeMode == TerminalSizeModeEnum.AutoFit)
+            {
+                /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
+                /// 如果SizeMode等于AutoFit，那么动态计算行和列
+                VTUtils.CalculateAutoFitSize(contentSize, typeface, out viewportRow, out viewportColumn);
+            }
+
+            VTDocumentOptions documentOptions = new VTDocumentOptions()
+            {
+                Name = name,
+                ViewportRow = viewportRow,
+                ViewportColumn = viewportColumn,
+                AutoWrapMode = false,
+                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.THEME_CURSOR_STYLE),
+                CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR),
+                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.THEME_CURSOR_SPEED),
+                ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
+                ScrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
+                Typeface = typeface,
+                DrawingObject = drawingDocument,
+                SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR),
+            };
+
+            return documentOptions;
+        }
+
+        /// <summary>
+        /// 换行
+        /// 换行逻辑是把第一行拿到最后一行，要考虑到scrollMargin
+        /// </summary>
+        /// <param name="document">要执行换行的文档</param>
+        private void LineFeed(VTDocument document)
+        {
+            // 可滚动区域的第一行和最后一行
+            VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
+            VTextLine last = document.LastLine.FindPrevious(document.ScrollMarginBottom);
+
+            // 光标所在行是可滚动区域的最后一行
+            // 也表示即将滚动
+            if (last == ActiveLine)
+            {
+                // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
+                logger.DebugFormat("LineFeed，光标在可滚动区域最后一行，向下滚动一行");
+
+                document.SwapLine(head, last);
+
+                if (this.IsAlternate)
+                {
+                    // 备用缓冲区重置被移动的行
+                    head.DeleteAll();
+                }
+                else
+                {
+                    // 换行之后记录历史行
+                    // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
+                    // MainScrrenBuffer和AlternateScrrenBuffer里的行分别记录
+                    // AlternateScreenBuffer是用来给man，vim等程序使用的
+                    // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
+
+                    // 主缓冲区要创建一个新的VTHistoryLine
+                    VTHistoryLine historyLine = new VTHistoryLine();
+                    head.SetHistory(historyLine);
+                    document.History.AddHistory(historyLine);
+
+                    #region 更新滚动条的值
+
+                    // 滚动条滚动到底
+                    // 计算滚动条可以滚动的最大值
+
+                    int scrollMax = document.History.Lines - document.ViewportRow;
+                    if (scrollMax > 0)
+                    {
+                        this.ScrollInfo.ScrollMax = Math.Min(scrollMax, document.ScrollMax);
+                        this.ScrollInfo.ScrollValue = this.ScrollInfo.ScrollMax;
+                    }
+
+                    #endregion
+
+                    // 触发行被完全打印的事件
+                    LinePrinted?.Invoke(this, last.History);
+                }
+            }
+            else
+            {
+                // 光标不在可滚动区域的最后一行，说明可以直接移动光标
+                logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
+                document.SetCursor(Cursor.Row + 1, Cursor.Column);
+            }
+        }
+
+        /// <summary>
+        /// 反向换行
+        /// 反向换行不增加新行，也不减少新行，保持总行数不变
+        /// </summary>
+        /// <param name="document"></param>
+        private void ReverseLineFeed(VTDocument document)
+        {
+            // 可滚动区域的第一行和最后一行
+            VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
+            VTextLine last = document.LastLine.FindPrevious(document.ScrollMarginBottom);
+
+            if (head == ActiveLine)
+            {
+                // 此时光标位置在可视区域的第一行
+                logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
+
+                // 上移之后，删除整行数据，终端会重新打印该行数据的
+                // 如果不删除的话，在man程序下有可能会显示重叠的信息
+                // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
+                document.SwapLineReverse(last, head);
+
+                last.DeleteAll();
+
+                if (this.IsAlternate)
+                {
+                }
+                else
+                {
+                    // 物理行号和scrollMargin无关，保持物理行号不变
+                }
+            }
+            else
+            {
+                // 这里假设光标在可视区域里面
+                // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
+
+                // 光标位置在可视区域里面
+                logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
+                document.SetCursor(Cursor.Row - 1, Cursor.Column);
+            }
+        }
+
+        /// <summary>
+        /// 重置终端大小
+        /// 模仿Xshell的做法：
+        /// 1. 扩大行的时候，如果有滚动内容，那么显示滚动内容。如果没有滚动内容，则直接在后面扩大。
+        /// 2. 减少行的时候，如果有滚动内容，那么减少滚动内容。
+        /// 3. ActiveLine保持不变
+        /// 调用这个函数的时候保证此时文档已经滚动到底
+        /// 是否需要考虑scrollMargin?目前没考虑
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="oldRow"></param>
+        /// <param name="newRow"></param>
+        /// <param name="oldCol"></param>
+        /// <param name="newCol"></param>
+        private void MainDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
+        {
+            // 调整大小前前先滚动到底，不然会有问题
+            this.activeDocument.ScrollToBottom();
+
+            document.Resize(oldRow, newRow, oldCol, newCol);
+        }
+
+        private void AlternateDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
+        {
+            document.Resize(oldRow, newRow, oldCol, newCol);
+
+            // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
+            document.EraseAll();
+        }
+
+        /// <summary>
+        /// 根据滚动前的值和滚动后的值计算滚动数据
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="oldScroll"></param>
+        /// <param name="newScroll"></param>
+        /// <returns></returns>
+        private VTScrollData GetScrollData(VTDocument document, int oldScroll, int newScroll)
+        {
+            int scrolledRows = Math.Abs(newScroll - oldScroll);
+
+            int scrollValue = newScroll;
+            int viewportRow = document.ViewportRow;
+            VTHistory history = document.History;
+            VTScrollInfo scrollbar = document.Scrollbar;
+
+            List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
+            List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
+
+            if (scrolledRows >= viewportRow)
+            {
+                // 此时说明把所有行都滚动到屏幕外了
+
+                // 遍历显示
+                VTextLine current = document.FirstLine;
+                for (int i = 0; i < viewportRow; i++)
+                {
+                    addedLines.Add(current.History);
+                }
+
+                // 我打赌不会报异常
+                IEnumerable<VTHistoryLine> historyLines;
+                history.TryGetHistories(oldScroll, oldScroll + viewportRow, out historyLines);
+                removedLines.AddRange(historyLines);
+            }
+            else
+            {
+                // 此时说明有部分行被移动出去了
+                if (newScroll > oldScroll)
+                {
+                    // 往下滚动
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll, oldScroll + scrolledRows, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(oldScroll + viewportRow, oldScroll + viewportRow + scrolledRows - 1, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+                else
+                {
+                    // 往上滚动,2
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll + viewportRow - scrolledRows, oldScroll + viewportRow - 1, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(newScroll, newScroll + scrolledRows, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+            }
+
+            return new VTScrollData()
+            {
+                NewScroll = newScroll,
+                OldScroll = oldScroll,
+                AddedLines = addedLines,
+                RemovedLines = removedLines
+            };
         }
 
         #endregion
@@ -532,44 +937,7 @@ namespace ModengTerm.Terminal
 
                         // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
                         // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
-                        activeDocument.LineFeed();
-
-                        // 换行之后记录历史行
-                        // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
-                        // MainScrrenBuffer和AlternateScrrenBuffer里的行分别记录
-                        // AlternateScreenBuffer是用来给man，vim等程序使用的
-                        // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
-                        if (activeDocument == mainDocument)
-                        {
-                            // 1. 更新旧的最后一行的历史行数据
-                            // 2. 创建新的历史行
-
-                            VTextLine oldLastLine = ActiveLine.PreviousLine;
-                            VTextLine newLastLine = ActiveLine;
-
-                            VTScrollInfo scrollBar = activeDocument.Scrollbar;
-
-                            // 更新旧的最后一行和新的最后一行的历史记录
-                            VTHistoryLine oldHistoryLine = scrollBar.UpdateHistory(oldLastLine);
-                            scrollBar.UpdateHistory(newLastLine);
-
-                            #region 更新滚动条的值
-
-                            // 滚动条滚动到底
-                            // 计算滚动条可以滚动的最大值
-                            int scrollMax = activeDocument.FirstLine.PhysicsRow;
-                            if (scrollMax > 0)
-                            {
-                                scrollBar.ScrollMax = scrollMax;
-                                scrollBar.ScrollValue = scrollMax;
-                            }
-
-                            #endregion
-
-                            // 触发行被完全打印的事件
-                            LinePrinted?.Invoke(this, oldHistoryLine);
-                        }
-
+                        this.LineFeed(this.activeDocument);
                         break;
                     }
 
@@ -578,9 +946,9 @@ namespace ModengTerm.Terminal
                         VTDebug.Context.WriteInteractive(action, string.Empty);
 
                         // 和LineFeed相反，也就是把光标往上移一个位置
-                        // 在用man命令的时候会触发这个指令
+                        // 在用man命令的时候往上滚动会触发这个指令
                         // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
-                        activeDocument.ReverseLineFeed();
+                        this.ReverseLineFeed(this.ActiveDocument);
                         break;
                     }
 
@@ -610,22 +978,7 @@ namespace ModengTerm.Terminal
                         List<int> parameters = parameter as List<int>;
                         XTerminal.Parser.EraseType eraseType = (XTerminal.Parser.EraseType)VTParameter.GetParameter(parameters, 0, 0);
                         VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, eraseType);
-
-                        switch (eraseType)
-                        {
-                            case XTerminal.Parser.EraseType.ToEnd:
-                                {
-                                    activeDocument.DeleteCharacter(CursorCol);
-                                    break;
-                                }
-
-                            default:
-                                {
-                                    activeDocument.EraseLine(CursorCol, (Document.Enumerations.EraseType)eraseType);
-                                    break;
-                                }
-                        }
-
+                        activeDocument.EraseLine(CursorCol, (Document.Enumerations.EraseType)eraseType);
                         break;
                     }
 
@@ -641,11 +994,24 @@ namespace ModengTerm.Terminal
                             // top和clear指令会执行EraseType.All，在其他的终端软件里top指令不会清空已经存在的行，而是把已经存在的行往上移动
                             // 所以EraseType.All的动作和Scrollback一样执行
                             case XTerminal.Parser.EraseType.All:
+                                {
+                                    VTextLine next = activeDocument.FirstLine;
+                                    while (next != null)
+                                    {
+                                        next.EraseAll();
+
+                                        next = next.NextLine;
+                                    }
+
+                                    break;
+                                }
+
                             case XTerminal.Parser.EraseType.Scrollback:
                                 {
-                                    if (activeDocument.IsAlternate)
+                                    if (this.IsAlternate)
                                     {
                                         // xterm-256color类型的终端VIM程序的PageDown和PageUp会执行EraseType.All
+                                        // 备用缓冲区是没有滚动数据的，只能清空当前显示的所有内容
                                         // 所以这里把备用缓冲区和主缓冲区分开处理
                                         VTextLine next = activeDocument.FirstLine;
                                         while (next != null)
@@ -657,37 +1023,45 @@ namespace ModengTerm.Terminal
                                     }
                                     else
                                     {
+                                        // 把当前鼠标所在行之前的所有行移动到可视区域外，注意当前行不移动
+
                                         // 相关命令：
-                                        // MainDocument：clear
+                                        // MainDocument：xterm-256color类型的终端clear程序
                                         // AlternateDocument：暂无
 
                                         // Erase Saved Lines
-                                        // 模拟xshell的操作，把当前行移动到可视区域的第一行
+                                        // 模拟xshell的操作，把当前行（光标所在行，就是最后一行）移动到可视区域的第一行
 
-                                        VTScrollInfo scrollBar = mainDocument.Scrollbar;
+                                        // 一共要移动这么多行
+                                        int rows = this.activeDocument.Cursor.Row;
 
-                                        VTextLine firstLine = activeDocument.FirstLine;
-                                        VTextLine lastLine = activeDocument.LastLine;
-
-                                        // 当前终端里显示的行数
-                                        int lines = scrollBar.LastLine.PhysicsRow - firstLine.PhysicsRow;
-
-                                        // 把当前终端里显示的行数全部放到滚动区域上面
-                                        // 先做换行动作，换行完光标在往下的lines行
-                                        for (int i = 0; i < lines; i++)
+                                        for (int i = 0; i < rows; i++)
                                         {
-                                            firstLine.EraseAll();
-                                            activeDocument.MoveLine(firstLine, VTextLine.MoveOptions.MoveToLast);
-                                            firstLine = activeDocument.FirstLine;
+                                            VTextLine firstLine = this.activeDocument.FirstLine;
+                                            VTextLine lastLine = this.activeDocument.LastLine;
+
+                                            this.activeDocument.SwapLine(firstLine, lastLine);
+
+                                            VTHistoryLine historyLine = new VTHistoryLine();
+                                            firstLine.SetHistory(historyLine);
+                                            this.activeDocument.History.AddHistory(historyLine);
                                         }
 
-                                        int scrollMax = activeDocument.FirstLine.PhysicsRow;
-                                        scrollBar.ScrollMax = scrollMax;
-                                        scrollBar.ScrollValue = scrollMax;
+                                        #region 更新滚动条的值
 
-                                        // 重新设置光标所在行的数据
-                                        VTextLine cursorLine = activeDocument.FirstLine.FindNext(activeDocument.Cursor.Row);
-                                        activeDocument.SetCursorPhysicsRow(cursorLine.PhysicsRow);
+                                        // 滚动条滚动到底
+                                        // 计算滚动条可以滚动的最大值
+
+                                        int scrollMax = this.activeDocument.History.Lines - this.activeDocument.ViewportRow;
+                                        if (scrollMax > 0)
+                                        {
+                                            this.ScrollInfo.ScrollMax = Math.Min(scrollMax, this.activeDocument.ScrollMax);
+                                            this.ScrollInfo.ScrollValue = this.ScrollInfo.ScrollMax;
+                                        }
+
+                                        #endregion
+
+                                        //this.activeDocument.SetCursor(0, this.Cursor.Column);
                                     }
                                     break;
                                 }
@@ -781,6 +1155,9 @@ namespace ModengTerm.Terminal
                             row = newrow == 0 ? 0 : newrow - 1;
                             col = newcol == 0 ? 0 : newcol - 1;
 
+                            int viewportRow = this.activeDocument.ViewportRow;
+                            int viewportColumn = this.activeDocument.ViewportColumn;
+
                             // 对行和列做限制
                             if (row >= viewportRow)
                             {
@@ -797,7 +1174,13 @@ namespace ModengTerm.Terminal
                             // 如果没有参数，那么说明就是定位到原点(0,0)
                         }
 
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2},{3}", CursorRow, CursorCol, row, col);
+                        // 打开vim，输入i，然后按tab，虽然第一行的字符列数小于要移动到的col，但是vim还是会移动，所以这里把不足的列数使用空格补齐
+                        if (this.ActiveLine.Columns < col)
+                        {
+                            this.ActiveLine.PadColumns(col);
+                        }
+
+                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2},{3},{4}", CursorRow, CursorCol, row, col, this.ActiveLine.Characters.Count);
                         activeDocument.SetCursor(row, col);
                         break;
                     }
@@ -1090,8 +1473,6 @@ namespace ModengTerm.Terminal
                         alternateDocument.ClearAttribute();
                         alternateDocument.Selection.Clear();
 
-                        mainDocument.Selection.Clear();
-
                         activeDocument = mainDocument;
 
                         DocumentChanged?.Invoke(this, alternateDocument, mainDocument);
@@ -1135,7 +1516,7 @@ namespace ModengTerm.Terminal
                         // * https://github.com/microsoft/terminal/issues/1849
 
                         // 当前终端屏幕可显示的行数量
-                        int lines = viewportRow;
+                        int lines = this.activeDocument.ViewportRow;
 
                         List<int> parameters = parameter as List<int>;
                         int topMargin = VTParameter.GetParameter(parameters, 0, 1);

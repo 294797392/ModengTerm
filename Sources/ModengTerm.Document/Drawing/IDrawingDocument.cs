@@ -18,12 +18,6 @@ namespace ModengTerm.Document.Drawing
         string Name { get; set; }
 
         /// <summary>
-        /// 文档内边距
-        /// 内容和边框之间的距离
-        /// </summary>
-        double PaddingSize { get; set; }
-
-        /// <summary>
         /// 获取文档大小
         /// </summary>
         VTSize Size { get; }

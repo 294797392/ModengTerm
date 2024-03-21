@@ -17,6 +17,6 @@ namespace ModengTerm.Document.Drawing
         /// <summary>
         /// 选中区域的颜色
         /// </summary>
-        string Color { get; set; }
+        VTColor Color { get; set; }
     }
 }

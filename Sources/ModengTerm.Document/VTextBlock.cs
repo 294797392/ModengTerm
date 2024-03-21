@@ -84,35 +84,37 @@ namespace ModengTerm.Document
 
         protected override void OnRender()
         {
-            IDrawingTextBlock drawingTextBlock = this.DrawingObject as IDrawingTextBlock;
+            throw new NotImplementedException();
 
-            // 先拷贝要显示的字符
-            List<VTCharacter> characters = new List<VTCharacter>();
-            VTUtils.CopyCharacter(textLine.Characters, characters);
+            //IDrawingTextBlock drawingTextBlock = this.DrawingObject as IDrawingTextBlock;
 
-            #region 更新前景色和背景色
+            //// 先拷贝要显示的字符
+            //List<VTCharacter> characters = new List<VTCharacter>();
+            //VTUtils.CopyCharacter(textLine.Characters, characters);
 
-            // 设置字符的高亮颜色，这里直接把前景色和背景色做反色
-            for (int i = 0; i < matches.Length; i++)
-            {
-                VTCharacter character = characters[matches.Index + i];
+            //#region 更新前景色和背景色
 
-                VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
-                VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
-                character.Foreground = VTColor.CreateFromRgbKey(textLine.Typeface.BackgroundColor);
-                character.Background = VTColor.CreateFromRgbKey(textLine.Typeface.ForegroundColor);
-            }
+            //// 设置字符的高亮颜色，这里直接把前景色和背景色做反色
+            //for (int i = 0; i < matches.Length; i++)
+            //{
+            //    VTCharacter character = characters[matches.Index + i];
 
-            #endregion
+            //    VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
+            //    VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
+            //    character.Foreground = VTColor.CreateFromRgbKey(textLine.Typeface.BackgroundColor);
+            //    character.Background = VTColor.CreateFromRgbKey(textLine.Typeface.ForegroundColor);
+            //}
 
-            VTextRange textRange = textLine.MeasureTextRange(matches.Index, matches.Length);
+            //#endregion
 
-            VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
-            formattedText.OffsetX = textRange.OffsetX;
-            formattedText.OffsetY = textLine.OffsetY;
-            formattedText.Style = textLine.Typeface;
+            //VTextRange textRange = textLine.MeasureTextRange(matches.Index, matches.Length);
 
-            drawingTextBlock.FormattedText = formattedText;
+            //VTFormattedText formattedText = VTUtils.CreateFormattedText(characters, matches.Index, matches.Length);
+            //formattedText.OffsetX = textRange.OffsetX;
+            //formattedText.OffsetY = textLine.OffsetY;
+            //formattedText.Style = textLine.Typeface;
+
+            //drawingTextBlock.FormattedText = formattedText;
         }
 
         #endregion

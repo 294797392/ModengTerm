@@ -25,18 +25,12 @@ namespace ModengTerm.Document
         private int scrollMax;
         private int scrollValue;
         private int viewportRow;
-        protected VTHistory history;
         private VTScrollbar scrollbar;
         private VTDocument ownerDocument;
 
         #endregion
 
         #region 属性
-
-        /// <summary>
-        /// 最多可以有多少滚动的行数
-        /// </summary>
-        public int ScrollbackMax { get; set; }
 
         /// <summary>
         /// 可以滚动到的最大值
@@ -51,28 +45,6 @@ namespace ModengTerm.Document
                 if (scrollMax != value)
                 {
                     scrollMax = value;
-
-                    if (scrollMax > ScrollbackMax)
-                    {
-                        // 算出来当前一共有多少行可以滚动
-                        int scrolls = scrollMax - FirstLine.PhysicsRow;
-
-                        // 滚动的行数大于可以滚动的最大行数
-                        if (scrolls > ScrollbackMax)
-                        {
-                            // 多了多少行，要把这些行删除
-                            int count = scrolls - ScrollbackMax;
-                            if (count > 0)
-                            {
-                                for (int i = 0; i < count; i++)
-                                {
-                                    RemoveFirst();
-                                }
-
-                                ScrollMin += count;
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -149,16 +121,6 @@ namespace ModengTerm.Document
             }
         }
 
-        /// <summary>
-        /// 可滚动内容的第一行记录
-        /// </summary>
-        public VTHistoryLine FirstLine { get; protected set; }
-
-        /// <summary>
-        /// 可滚动内容的最后一行记录
-        /// </summary>
-        public VTHistoryLine LastLine { get; protected set; }
-
         #endregion
 
         #region 构造方法
@@ -170,104 +132,8 @@ namespace ModengTerm.Document
 
         #endregion
 
-        #region 实例方法
-
-        /// <summary>
-        /// 移除第一行并更新第一行的指针
-        /// </summary>
-        private void RemoveFirst()
-        {
-            history.RemoveHistory(FirstLine);
-
-            VTHistoryLine firstLine;
-            if (!history.TryGetHistory(FirstLine.PhysicsRow + 1, out firstLine))
-            {
-                // 不可能发生
-                throw new NotImplementedException();
-            }
-
-            FirstLine = firstLine;
-        }
-
-        #endregion
-
-        #region 公开接口
-
-        /// <summary>
-        /// 更新文本行对应的历史记录
-        /// 如果不存在历史记录，那么创建历史记录
-        /// </summary>
-        /// <param name="textLine"></param>
-        /// <returns>返回被更新后的历史行数据</returns>
-        public VTHistoryLine UpdateHistory(VTextLine textLine)
-        {
-            VTHistoryLine historyLine;
-            if (!history.TryGetHistory(textLine.PhysicsRow, out historyLine))
-            {
-                historyLine = new VTHistoryLine();
-
-                if (textLine.PhysicsRow == 0)
-                {
-                    FirstLine = historyLine;
-                    LastLine = historyLine;
-                }
-                else if (textLine.PhysicsRow > LastLine.PhysicsRow)
-                {
-                    LastLine = historyLine;
-                }
-
-                history.UpdateHistory(textLine, historyLine);
-                history.AddHistory(historyLine);
-            }
-            else
-            {
-                history.UpdateHistory(textLine, historyLine);
-            }
-
-            return historyLine;
-        }
-
-        /// <summary>
-        /// 从指定行开始获取指定的行数
-        /// </summary>
-        /// <param name="startRow"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        public bool TryGetHistories(int startRow, int count, out List<VTHistoryLine> historyLines)
-        {
-            historyLines = new List<VTHistoryLine>();
-
-            for (int i = 0; i < count; i++)
-            {
-                VTHistoryLine historyLine;
-                if (!history.TryGetHistory(startRow + i, out historyLine))
-                {
-                    return false;
-                }
-
-                historyLines.Add(historyLine);
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// 获取指定的历史记录行
-        /// </summary>
-        /// <param name="physicsRow">要获取的历史记录行</param>
-        /// <returns></returns>
-        public bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine)
-        {
-            return history.TryGetHistory(physicsRow, out historyLine);
-        }
-
-        #endregion
-
         public void Initialize()
         {
-            history = new VTMemoryHistory();
-            history.Initialize();
-
             this.scrollbar = ownerDocument.DrawingObject.Scrollbar;
             this.scrollbar.Maximum = 0;
             this.scrollbar.Value = 0;
@@ -278,10 +144,9 @@ namespace ModengTerm.Document
 
         public void Release()
         {
-            history.Release();
         }
 
-        public void RequestInvalidate() 
+        public void RequestInvalidate()
         {
             if (!HasScroll)
             {

@@ -61,7 +61,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.ID = Guid.NewGuid().ToString();
             this.Content = paragraph.Content;
             this.CreationTime = paragraph.CreationTime;
-            this.FirstRow = paragraph.FirstPhysicsRow;
+            //this.FirstRow = paragraph.FirstPhysicsRow;
         }
 
         public ParagraphVM(Favorites favorites)
@@ -72,7 +72,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 StartCharacterIndex = favorites.StartCharacterIndex,
                 EndCharacterIndex = favorites.EndCharacterIndex,
-                CharactersList = favorites.CharacterList,
+                HistoryLines = favorites.CharacterList,
                 ContentType = ParagraphFormatEnum.PlainText,
                 SessionName = String.Empty,
                 Typeface = favorites.Typeface,

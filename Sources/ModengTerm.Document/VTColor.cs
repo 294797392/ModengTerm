@@ -22,9 +22,11 @@ namespace ModengTerm.Document
         private static readonly string[] Splitter = new string[] { "," };
 
         /// <summary>
-        /// r,g,b
+        /// r,g,b,a
         /// </summary>
         public string Key { get; protected set; }
+
+        public byte A { get; private set; }
 
         public byte R { get; private set; }
 
@@ -37,18 +39,19 @@ namespace ModengTerm.Document
         /// </summary>
         public string Html { get; set; }
 
-        public VTColor(byte r, byte g, byte b)
+        public VTColor(byte r, byte g, byte b, byte a)
         {
-            this.Key = string.Format("{0},{1},{2}", r, g, b);
+            this.Key = string.Format("{0},{1},{2},{3}", r, g, b, a);
+            this.A = a;
             this.R = r;
             this.G = g;
             this.B = b;
             this.Html = ColorTranslator.ToHtml(Color.FromArgb(r, g, b));
         }
 
-        public static VTColor CreateFromRgb(byte r, byte g, byte b)
+        public static VTColor CreateFromRgb(byte r, byte g, byte b, byte a)
         {
-            string rgbKey = string.Format("{0},{1},{2}", r, g, b);
+            string rgbKey = string.Format("{0},{1},{2},{3}", r, g, b, a);
             return VTColor.CreateFromRgbKey(rgbKey);
         }
 
@@ -67,7 +70,8 @@ namespace ModengTerm.Document
                 byte r = byte.Parse(values[0]);
                 byte g = byte.Parse(values[1]);
                 byte b = byte.Parse(values[2]);
-                vtc = new VTColor(r, g, b);
+                byte a = byte.Parse(values[3]);
+                vtc = new VTColor(r, g, b, a);
                 colorMap[rgbKey] = vtc;
             }
             return vtc;

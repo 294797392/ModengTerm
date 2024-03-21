@@ -37,13 +37,13 @@ namespace ModengTerm.Terminal
                 EndCharacterIndex = textLine.Characters.Count - 1,
                 ContentType = ParagraphFormatEnum.PlainText,
                 Typeface = textLine.Typeface,
-                CharactersList = new List<List<VTCharacter>>() { textLine.Characters.ToList() }
+                HistoryLines = new List<List<VTCharacter>>() { textLine.Characters.ToList() }
             };
 
             VTParagraph paragraph = new VTParagraph()
             {
                 StartCharacterIndex = createContentParameter.StartCharacterIndex,
-                CharacterList = createContentParameter.CharactersList,
+                CharacterList = createContentParameter.HistoryLines,
                 Content = VTUtils.CreateContent(createContentParameter),
                 CreationTime = DateTime.Now,
                 EndCharacterIndex = createContentParameter.EndCharacterIndex,

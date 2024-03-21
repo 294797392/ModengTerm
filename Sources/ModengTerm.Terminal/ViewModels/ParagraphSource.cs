@@ -73,16 +73,13 @@ namespace ModengTerm.Terminal.ViewModels
 
     public class BookmarkParagraphSource : ParagraphSource
     {
-        private VTBookmark bookmarkMgr;
-
-        public BookmarkParagraphSource(VTBookmark bookmarkMgr)
+        public BookmarkParagraphSource()
         {
-            this.bookmarkMgr = bookmarkMgr;
         }
 
         public override List<ParagraphVM> GetParagraphs()
         {
-            return this.bookmarkMgr.Bookmarks.Select(v => new ParagraphVM(v)).ToList();
+            throw new NotImplementedException();
         }
     }
 }

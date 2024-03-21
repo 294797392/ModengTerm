@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace ModengTerm.Terminal
 {
@@ -33,13 +34,6 @@ namespace ModengTerm.Terminal
         event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
 
         /// <summary>
-        /// 当文档被滚动的时候触发
-        /// int:oldValue
-        /// int:newValue
-        /// </summary>
-        event Action<IVideoTerminal, int, int> ScrollChanged;
-
-        /// <summary>
         /// 会话名字
         /// </summary>
         string Name { get; set; }
@@ -47,7 +41,23 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 当前正在显示的Document
         /// </summary>
-        VTScreen ActiveScreen { get; }
+        VTDocument ActiveDocument { get; }
+
+        /// <summary>
+        /// 备用缓冲区
+        /// </summary>
+        VTDocument AlternateDocument { get; }
+
+        /// <summary>
+        /// 主缓冲区
+        /// </summary>
+        VTDocument MainDocument { get; }
+
+        /// <summary>
+        /// 获取当前显示的是否是备用缓冲区
+        /// 备用缓冲区没有历史记录
+        /// </summary>
+        bool IsAlternate { get; }
 
         /// <summary>
         /// 获取UI线程上下文
@@ -86,11 +96,10 @@ namespace ModengTerm.Terminal
         void SelectAll();
 
         /// <summary>
-        /// 找到历史行
+        /// 当大小改变的时候触发
         /// </summary>
-        /// <param name="physicsRow">要找的历史行的物理行号</param>
-        /// <param name="historyLine">找到了的历史行</param>
-        /// <returns>成功返回true，失败返回false</returns>
-        bool TryGetHistoryLine(int physicsRow, out VTHistoryLine historyLine);
+        /// <param name="oldSize"></param>
+        /// <param name="newSize"></param>
+        void OnSizeChanged(VTSize oldSize, VTSize newSize);
     }
 }

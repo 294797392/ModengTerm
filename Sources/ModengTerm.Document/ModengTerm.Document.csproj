@@ -50,4 +50,8 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EventArgs\" />
+  </ItemGroup>
+
 </Project>

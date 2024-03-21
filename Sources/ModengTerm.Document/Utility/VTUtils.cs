@@ -13,7 +13,7 @@ namespace ModengTerm.Document.Utility
 {
     public class CreateContentParameter
     {
-        public List<List<VTCharacter>> CharactersList { get; set; }
+        public List<VTHistoryLine> HistoryLines { get; set; }
 
         public int StartCharacterIndex { get; set; }
 
@@ -174,7 +174,7 @@ namespace ModengTerm.Document.Utility
 
         public static string CreateContent(CreateContentParameter parameter)
         {
-            List<List<VTCharacter>> charactersList = parameter.CharactersList;
+            List<VTHistoryLine> charactersList = parameter.HistoryLines;
             ParagraphFormatEnum fileType = parameter.ContentType;
             int startCharIndex = parameter.StartCharacterIndex;
             int endCharIndex = parameter.EndCharacterIndex;
@@ -185,23 +185,23 @@ namespace ModengTerm.Document.Utility
             if (charactersList.Count == 1)
             {
                 // 只有一行
-                createLine(charactersList[0], builder, startCharIndex, endCharIndex - startCharIndex + 1);
+                createLine(charactersList[0].Characters, builder, startCharIndex, endCharIndex - startCharIndex + 1);
             }
             else
             {
                 // 第一行
-                List<VTCharacter> first = charactersList.FirstOrDefault();
+                List<VTCharacter> first = charactersList[0].Characters;
                 createLine(first, builder, startCharIndex, first.Count - startCharIndex);
 
                 // 中间的行
                 for (int i = 1; i < charactersList.Count - 1; i++)
                 {
-                    List<VTCharacter> characters = charactersList[i];
+                    List<VTCharacter> characters = charactersList[i].Characters;
                     createLine(characters, builder, 0, characters.Count);
                 }
 
                 // 最后一行
-                List<VTCharacter> last = charactersList.LastOrDefault();
+                List<VTCharacter> last = charactersList.LastOrDefault().Characters;
                 createLine(last, builder, 0, endCharIndex + 1);
             }
 
@@ -231,25 +231,6 @@ namespace ModengTerm.Document.Utility
             }
 
             return columns;
-        }
-
-        public static void CopyCharacter(List<VTCharacter> copyFroms, List<VTCharacter> copyTos)
-        {
-            copyTos.Clear();
-            for (int i = 0; i < copyFroms.Count; i++)
-            {
-                VTCharacter copyFrom = copyFroms[i];
-                VTCharacter character = VTCharacter.CreateNull();
-
-                character.Attribute = copyFrom.Attribute;
-                character.Background = copyFrom.Background;
-                character.Foreground = copyFrom.Foreground;
-                character.Character = copyFrom.Character;
-                character.ColumnSize = copyFrom.ColumnSize;
-                character.Flags = copyFrom.Flags;
-
-                copyTos.Add(character);
-            }
         }
 
         /// <summary>

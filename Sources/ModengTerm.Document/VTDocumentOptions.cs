@@ -16,11 +16,6 @@ namespace ModengTerm.Document
         public string Name { get; set; }
 
         /// <summary>
-        /// 是备用缓冲区还是主缓冲区
-        /// </summary>
-        public bool IsAlternate { get; set; }
-
-        /// <summary>
         /// 文档数据模型对应的绘图模型
         /// </summary>
         public IDrawingDocument DrawingObject { get; set; }

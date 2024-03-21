@@ -1,4 +1,5 @@
 using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,14 +120,22 @@ namespace ModengTerm.Document
 
         #region 实例方法
 
+        #endregion
+
+        #region 公开接口
+
         /// <summary>
         /// 根据当前的TextPointer信息更新选中区域的形状
-        /// 虽然TextPointer的数值是一样的，但是当移动了滚动条之后，选中区域的显示就不一样了
+        /// 选中区域需要在下面几个时机更新：
+        /// 1. 在当前页面选中部分区域要更新
+        /// 2. 当前页面存在选中区域并且滚动了滚动条之后也需要更新
         /// </summary>
         /// <param name="document"></param>
         /// <param name="container"></param>
-        private void UpdateGeometry()
+        public void UpdateGeometry()
         {
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+
             this.geometries.Clear();
 
             VTextPointer Start = new VTextPointer(firstRow, firstRowCharacterIndex);
@@ -209,26 +218,26 @@ namespace ModengTerm.Document
                 // 选中的内容有一部分被移到屏幕外了，滚动条往下移动
                 VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
 
+                // 
+                geometries.Add(new VTRect(0, 0, container.Width, bottomBounds.OffsetY));
+
                 // 最后一行的矩形
                 geometries.Add(new VTRect(0, bottomBounds.OffsetY, bottomBounds.OffsetX + bottomBounds.Width, bottomLine.Height));
-
-                // 剩下的矩形
-                geometries.Add(new VTRect(0, 0, container.Width, bottomLine.OffsetY));
                 return;
             }
 
-            if (topPointer.PhysicsRow < document.FirstLine.PhysicsRow &&
-                bottomPointer.PhysicsRow > document.LastLine.PhysicsRow)
+            if (topPointer.PhysicsRow < document.Scrollbar.ScrollValue &&
+                bottomPointer.PhysicsRow >= document.Scrollbar.ScrollValue + document.ViewportRow - 1)
             {
-                // 这种情况下说明当前显示的内容被全部选择了
-                geometries.Add(new VTRect(0, 0, container.Width, document.LastLine.Bounds.Bottom));
+                // 选中区域的第一行在当前显示的第一行之前
+                // 选中区域的最后一行在当前显示的最后一行之后
+                this.geometries.Add(new VTRect(0, 0, container.Width, document.LastLine.Bounds.Bottom));
                 return;
             }
+
+            // 有选中区域后，并且选中区域不存在当前页面里
+            // 什么都不做
         }
-
-        #endregion
-
-        #region 公开接口
 
         /// <summary>
         /// 清除选中的区域
@@ -298,7 +307,7 @@ namespace ModengTerm.Document
             LastRowCharacterIndex = -1;
 
             IDrawingSelection drawingSelection = drawingObject as IDrawingSelection;
-            drawingSelection.Color = this.Color;
+            drawingSelection.Color = VTColor.CreateFromRgbKey(this.Color);
             drawingSelection.Geometry = this.geometries;
         }
 
@@ -308,7 +317,6 @@ namespace ModengTerm.Document
 
         protected override void OnRender()
         {
-            UpdateGeometry();
             DrawingObject.Draw();
         }
 

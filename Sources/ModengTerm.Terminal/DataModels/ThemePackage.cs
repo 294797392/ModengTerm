@@ -83,6 +83,12 @@ namespace ModengTerm.Terminal.DataModels
         [JsonProperty("bookmarkColor")]
         public string BookmarkColor { get; set; }
 
+        /// <summary>
+        /// 文本选中的颜色
+        /// </summary>
+        [JsonProperty("selectionColor")]
+        public string SelectionColor { get; set; }
+
         public ThemePackage()
         {
         }

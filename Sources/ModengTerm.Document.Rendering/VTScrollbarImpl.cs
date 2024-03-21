@@ -77,7 +77,7 @@ namespace ModengTerm.Document.Rendering
             }
         }
 
-        public VTScrollbarImpl(ScrollBar scrollbar) 
+        public VTScrollbarImpl(ScrollBar scrollbar)
         {
             this.scrollbar = scrollbar;
             this.scrollbar.LargeChange = 1;
@@ -87,7 +87,13 @@ namespace ModengTerm.Document.Rendering
 
         private void Scorllbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            this.Document.EventInput.OnScrollChanged((int)e.NewValue);
+            var newvalue = Math.Round(e.NewValue, 0);
+            if (newvalue > this.scrollbar.Maximum)
+            {
+                newvalue = this.scrollbar.Maximum;
+            }
+
+            this.Document.EventInput.OnScrollChanged((int)newvalue);
         }
     }
 }

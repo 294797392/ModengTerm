@@ -47,7 +47,8 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="0"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
@@ -63,7 +64,11 @@
         <TextBlock Grid.Row="2" Grid.Column="0" Text="正则表达式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Path=Regexp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
 
-        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="方向：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <RadioButton Grid.Row="3" Grid.Column="1" Content="向上" VerticalAlignment="Center" GroupName="FindDirection" IsChecked="{Binding Path=UpFind,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+        <RadioButton Grid.Row="3" Grid.Column="1" Content="向下" Margin="80,0,0,0" VerticalAlignment="Center" GroupName="FindDirection" IsChecked="{Binding Path=DownFind, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

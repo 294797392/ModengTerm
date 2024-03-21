@@ -27,10 +27,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="AlternateScreen.cs" />
     <Compile Remove="DataModels\ThemeManifest.cs" />
     <Compile Remove="ITerminalAgent.cs" />
+    <Compile Remove="PrimaryScreen.cs" />
     <Compile Remove="ViewModels\VideoTerminal.Drawing.cs" />
+    <Compile Remove="VTBookmark.cs" />
     <Compile Remove="VTColor.cs" />
+    <Compile Remove="VTScreen.cs" />
     <Compile Remove="VTUtils.cs" />
   </ItemGroup>
 

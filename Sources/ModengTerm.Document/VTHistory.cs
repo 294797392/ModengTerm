@@ -13,6 +13,26 @@ namespace ModengTerm.Document
     public abstract class VTHistory
     {
         /// <summary>
+        /// 历史记录的第一行
+        /// </summary>
+        public VTHistoryLine FirstLine { get; protected set; }
+
+        /// <summary>
+        /// 历史记录的最后一行
+        /// </summary>
+        public VTHistoryLine LastLine { get; protected set; }
+
+        /// <summary>
+        /// 一共多少航
+        /// </summary>
+        public int Lines { get; protected set; }
+
+        /// <summary>
+        /// 最多可以存储多少历史记录
+        /// </summary>
+        public int MaxHistory { get; set; }
+
+        /// <summary>
         /// 初始化
         /// </summary>
         /// <returns></returns>
@@ -42,9 +62,17 @@ namespace ModengTerm.Document
         /// <summary>
         /// 获取指定的历史记录行
         /// </summary>
-        /// <param name="physicsRow">要获取的历史记录行</param>
+        /// <param name="rowIndex">要获取的行索引</param>
         /// <returns></returns>
-        public abstract bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine);
+        public abstract bool TryGetHistory(int rowIndex, out VTHistoryLine historyLine);
+
+        public abstract bool TryGetHistories(int startRowIndex, int endRowIndex, out IEnumerable<VTHistoryLine> historyLines);
+
+        /// <summary>
+        /// 获取所有的历史记录
+        /// </summary>
+        /// <returns></returns>
+        public abstract IEnumerable<VTHistoryLine> GetAllHistoryLines();
     }
 
     /// <summary>
@@ -52,16 +80,36 @@ namespace ModengTerm.Document
     /// </summary>
     public class VTMemoryHistory : VTHistory
     {
-        private Dictionary<int, VTHistoryLine> historyLines;
+        private List<VTHistoryLine> historyLines;
 
-        public override bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine)
+        public override bool TryGetHistory(int rowIndex, out VTHistoryLine historyLine)
         {
-            return historyLines.TryGetValue(physicsRow, out historyLine);
+            historyLine = null;
+
+            if (rowIndex >= this.historyLines.Count)
+            {
+                return false;
+            }
+
+            historyLine = this.historyLines[rowIndex];
+
+            return true;
+        }
+
+        public override bool TryGetHistories(int startRowIndex, int endRowIndex, out IEnumerable<VTHistoryLine> historyLines)
+        {
+            historyLines = null;
+
+            int count = endRowIndex - startRowIndex + 1;
+
+            historyLines = this.historyLines.Skip(startRowIndex + 1).Take(count);
+
+            return true;
         }
 
         public override int Initialize()
         {
-            historyLines = new Dictionary<int, VTHistoryLine>();
+            historyLines = new List<VTHistoryLine>();
 
             return 0;
         }
@@ -73,18 +121,42 @@ namespace ModengTerm.Document
 
         public override void AddHistory(VTHistoryLine historyLine)
         {
-            historyLines[historyLine.PhysicsRow] = historyLine;
+            // 最多可以保存0行历史记录，什么都不做
+            if (this.MaxHistory == 0)
+            {
+                return;
+            }
+
+            if (this.FirstLine == null)
+            {
+                this.FirstLine = historyLine;
+            }
+
+            if (this.historyLines.Count == this.MaxHistory)
+            {
+                this.historyLines.RemoveAt(0);
+                this.FirstLine = this.historyLines[0];
+            }
+
+            this.historyLines.Add(historyLine);
+
+            this.LastLine = historyLine;
+
+            this.Lines = this.historyLines.Count;
         }
 
         public override void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine)
         {
-            historyLine.PhysicsRow = textLine.PhysicsRow;
-            VTUtils.CopyCharacter(textLine.Characters, historyLine.Characters);
         }
 
         public override void RemoveHistory(VTHistoryLine historyLine)
         {
-            historyLines.Remove(historyLine.PhysicsRow);
+            historyLines.Remove(historyLine);
+        }
+
+        public override IEnumerable<VTHistoryLine> GetAllHistoryLines()
+        {
+            return this.historyLines;
         }
     }
 
@@ -108,6 +180,11 @@ namespace ModengTerm.Document
             throw new NotImplementedException();
         }
 
+        public override bool TryGetHistories(int startRowIndex, int endRowIndex, out IEnumerable<VTHistoryLine> historyLines)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void RemoveHistory(VTHistoryLine historyLine)
         {
             throw new NotImplementedException();
@@ -119,6 +196,11 @@ namespace ModengTerm.Document
         }
 
         public override void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<VTHistoryLine> GetAllHistoryLines()
         {
             throw new NotImplementedException();
         }

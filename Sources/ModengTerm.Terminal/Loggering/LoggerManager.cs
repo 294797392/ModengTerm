@@ -158,8 +158,7 @@ namespace ModengTerm.Terminal.Loggering
             lock (logger.Builder)
             {
                 // TODO：
-                throw new NotImplementedException();
-                //logger.CreateLine(historyLine.Characters, logger.Builder, 0, historyLine.Characters.Count, logger.Filter);
+                logger.CreateLine(historyLine.Characters, logger.Builder, 0, historyLine.Characters.Count);
             }
         }
 

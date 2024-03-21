@@ -68,13 +68,21 @@ namespace ModengTerm.Document.Rendering
                 byte r = byte.Parse(values[0]);
                 byte g = byte.Parse(values[1]);
                 byte b = byte.Parse(values[2]);
+                byte a = byte.Parse(values[3]);
 
-                Color color = Color.FromRgb(r, g, b);
+                Color color = Color.FromArgb(a, r, g, b);
                 brush = new SolidColorBrush(color);
+                brush.Freeze(); // 冻结对象可以提升性能，冻结之后该对象的属性不可以修改
                 BrushMap[rgbKey] = brush;
             }
 
             return brush;
+        }
+
+        public static Brush GetBrush(VTColor vtColor)
+        {
+            string rgbKey = vtColor.Key;
+            return DrawingUtils.GetBrush(rgbKey);
         }
 
         public static Color GetColor(string rgbKey) 
@@ -85,7 +93,7 @@ namespace ModengTerm.Document.Rendering
 
         public static string GetRgbKey(Color color) 
         {
-            return string.Format("{0},{1},{2}", color.R, color.G, color.B);
+            return string.Format("{0},{1},{2},{3}", color.R, color.G, color.B, color.A);
         }
 
         /// <summary>
@@ -161,7 +169,7 @@ namespace ModengTerm.Document.Rendering
 
                     VTColor color = textAttribute.Parameter as VTColor;
                     Brush brush = DrawingUtils.GetBrush(color.Key);
-                    Geometry geometry = formattedText.BuildHighlightGeometry(new Point(textData.OffsetX, textData.OffsetY), textAttribute.StartIndex, textAttribute.Count);
+                    System.Windows.Media.Geometry geometry = formattedText.BuildHighlightGeometry(new Point(textData.OffsetX, textData.OffsetY), textAttribute.StartIndex, textAttribute.Count);
                     dc.DrawRectangle(brush, null, geometry.Bounds);
                 }
             }

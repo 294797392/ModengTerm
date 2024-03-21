@@ -117,7 +117,7 @@ namespace ModengTerm.Document.Rendering
             }
 
             FormattedText formattedText = DrawingUtils.CreateFormattedText(textData);
-            Geometry geometry = formattedText.BuildHighlightGeometry(DrawingUtils.ZeroPoint, startIndex, count);
+            System.Windows.Media.Geometry geometry = formattedText.BuildHighlightGeometry(DrawingUtils.ZeroPoint, startIndex, count);
             return new VTextRange(geometry.Bounds.Left, offsetY, geometry.Bounds.Width, geometry.Bounds.Height);
         }
 

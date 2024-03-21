@@ -34,17 +34,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 该段落的字符列表
         /// </summary>
-        public List<List<VTCharacter>> CharacterList { get; set; }
-
-        /// <summary>
-        /// 该段落的起始行
-        /// </summary>
-        public int FirstPhysicsRow { get; set; }
-
-        /// <summary>
-        /// 该段落的结束行
-        /// </summary>
-        public int LastPhysicsRow { get; set; }
+        public List<VTHistoryLine> CharacterList { get; set; }
 
         /// <summary>
         /// 段落的起始行的第一个字符索引

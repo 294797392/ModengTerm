@@ -93,7 +93,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 光标所在列
-        /// 从0开始，最大值是终端的ColumnSize - 1
+        /// 从0开始，最大值是终端的ViewportColumn - 1
         /// 表示下一个要打印的字符的位置
         /// </summary>
         public int Column
@@ -111,7 +111,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 光标所在行
-        /// 从0开始，最大值是终端的RowSize - 1
+        /// 从0开始，最大值是终端的ViewportRow - 1
         /// </summary>
         public int Row
         {

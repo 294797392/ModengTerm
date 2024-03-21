@@ -614,7 +614,7 @@ namespace XTerminal.Parser
             {
                 // 这里使用RGB颜色
                 optionsConsumed = 4;
-                rgbColor = VTColor.CreateFromRgb((byte)parameters[paramIndex + 1], (byte)parameters[paramIndex + 2], (byte)parameters[paramIndex + 3]);
+                rgbColor = VTColor.CreateFromRgb((byte)parameters[paramIndex + 1], (byte)parameters[paramIndex + 2], (byte)parameters[paramIndex + 3], 255);
             }
             else if (options == GraphicsOptions.BlinkOrXterm256Index)
             {
@@ -626,7 +626,7 @@ namespace XTerminal.Parser
                     byte r, g, b;
                     byte index = (byte)tableIndex;
                     Xterm256Color.ConvertRGB(index, out r, out g, out b);
-                    rgbColor = VTColor.CreateFromRgb(r, g, b);
+                    rgbColor = VTColor.CreateFromRgb(r, g, b, 255);
                 }
             }
             return optionsConsumed;

@@ -111,11 +111,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool sendAll;
 
-        /// <summary>
-        /// 书签管理器
-        /// </summary>
-        private VTBookmark bookmarkMgr;
-
         private RecordStatusEnum recordState;
 
         /// <summary>
@@ -223,7 +218,6 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.recordState = RecordStatusEnum.Stop;
             this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
-            this.bookmarkMgr = new VTBookmark(this.Session);
             this.clipboard = new VTClipboard()
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
@@ -247,7 +241,7 @@ namespace ModengTerm.Terminal.ViewModels
                 new ShellFunctionMenu("复制", this.Copy),
                 new ShellFunctionMenu("粘贴", this.Paste),
                 new ShellFunctionMenu("全选", this.SelectAll),
-                new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
+                //new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
                 //new ShellFunctionMenu("收藏夹")
                 //{
                 //    Children = new BindableCollection<ShellFunctionMenu>()
@@ -626,7 +620,7 @@ namespace ModengTerm.Terminal.ViewModels
             Favorites favorites = new Favorites()
             {
                 ID = Guid.NewGuid().ToString(),
-                Typeface = this.videoTerminal.ActiveScreen.Typeface,
+                Typeface = this.videoTerminal.ActiveDocument.Typeface,
                 SessionID = this.Session.ID,
                 StartCharacterIndex = paragraph.StartCharacterIndex,
                 EndCharacterIndex = paragraph.EndCharacterIndex,

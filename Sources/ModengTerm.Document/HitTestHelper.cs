@@ -18,9 +18,12 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="firstLine">要从第几行开始往下找</param>
         /// <param name="cursorY">鼠标坐标Y轴数值</param>
+        /// <param name="logicalRow">所命中的行是第几行</param>
         /// <returns>找到了就返回找到的历史行，没找到返回null</returns>
-        public static VTextLine HitTestVTextLine(VTextLine firstLine, double cursorY)
+        public static VTextLine HitTestVTextLine(VTextLine firstLine, double cursorY, out int logicalRow)
         {
+            logicalRow = 0;
+
             // 当前行的Y偏移量
             VTextLine current = firstLine;
 
@@ -36,6 +39,7 @@ namespace ModengTerm.Document
                     return current;
                 }
 
+                logicalRow++;
                 current = current.NextLine;
             }
 

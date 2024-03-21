@@ -126,5 +126,10 @@ namespace ModengTerm.Terminal
         {
             return new VTPoint(wpfPoint.X, wpfPoint.Y);
         }
+
+        public static VTSize ToVTSize(this Size wpfSize)
+        {
+            return new VTSize(wpfSize.Width, wpfSize.Height);
+        }
     }
 }

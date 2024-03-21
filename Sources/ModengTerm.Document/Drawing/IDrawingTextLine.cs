@@ -26,6 +26,7 @@ namespace ModengTerm.Document.Drawing
 
         /// <summary>
         /// 测量指定文本里的子文本的矩形框
+        /// 测量出来的Y偏移量就是该文本相对于文档左上角的偏移量
         /// </summary>
         /// <param name="startIndex">要测量的起始字符索引</param>
         /// <param name="count">要测量的最大字符数，0为全部测量</param>

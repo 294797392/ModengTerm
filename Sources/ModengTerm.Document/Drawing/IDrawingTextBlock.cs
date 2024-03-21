@@ -9,6 +9,9 @@ namespace ModengTerm.Document.Drawing
 {
     public interface IDrawingTextBlock : IDrawingObject
     {
+        /// <summary>
+        /// 要显示的文本内容
+        /// </summary>
         VTFormattedText FormattedText { get; set; }
     }
 }

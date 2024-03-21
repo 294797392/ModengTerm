@@ -53,6 +53,8 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         THEME_FIND_HIGHLIGHT_BACKCOLOR = 115,
 
+        THEME_SELECTION_COLOR = 116,
+
         #endregion
 
         #region 
@@ -100,8 +102,6 @@ namespace ModengTerm.Base.Enumerations
         /// 最多可以保存的剪贴板历史记录数据
         /// </summary>
         TERM_MAX_CLIPBOARD_HISTORY = 1002,
-
-        TERM_SELECTION_COLOR = 1003,
 
         MOUSE_SCROLL_DELTA = 1004,
 

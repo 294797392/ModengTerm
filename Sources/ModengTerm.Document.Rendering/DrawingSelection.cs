@@ -21,7 +21,7 @@ namespace ModengTerm.Document.Rendering
 
         public List<VTRect> Geometry { get; set; }
 
-        public string Color { get; set; }
+        public VTColor Color { get; set; }
 
         public DrawingSelection()
         {
@@ -31,6 +31,7 @@ namespace ModengTerm.Document.Rendering
         {
             this.selectionGeometry = new StreamGeometry();
             this.pen = new Pen(Brushes.Transparent, 1);
+            this.pen.Freeze();
             this.brush = DrawingUtils.GetBrush(this.Color);
         }
 

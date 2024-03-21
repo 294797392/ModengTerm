@@ -32,15 +32,6 @@ namespace ModengTerm.Document.Rendering
 
         public VTScrollbar Scrollbar { get; private set; }
 
-        public double PaddingSize
-        {
-            get { return this.Padding.Left; }
-            set
-            {
-                this.Padding = new Thickness(value);
-            }
-        }
-
         public VTSize Size
         {
             get

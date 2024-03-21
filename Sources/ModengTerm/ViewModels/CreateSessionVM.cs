@@ -72,6 +72,7 @@ namespace ModengTerm.ViewModels
         private Color highlightFontColor;
         private Color highlightBackColor;
         private Color cursorColor;
+        private Color selectionColor;
 
         #endregion
 
@@ -424,6 +425,19 @@ namespace ModengTerm.ViewModels
                 {
                     this.highlightFontColor = value;
                     this.NotifyPropertyChanged("HighlightFontColor");
+                }
+            }
+        }
+
+        public Color SelectionColor
+        {
+            get { return this.selectionColor; }
+            set
+            {
+                if (this.selectionColor != value) 
+                {
+                    this.selectionColor = value;
+                    this.NotifyPropertyChanged("SelectionColor");
                 }
             }
         }
@@ -803,6 +817,8 @@ namespace ModengTerm.ViewModels
 
             session.SetOption<string>(OptionKeyEnum.THEME_BOOKMARK_COLOR, this.ThemeList.SelectedItem.BookmarkColor);
 
+            session.SetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR, DrawingUtils.GetRgbKey(this.SelectionColor));
+
             return true;
         }
 
@@ -847,7 +863,6 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
             session.SetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN, MTermConsts.DefaultContentMargin);
             session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, this.BookmarkVisible);
-            session.SetOption<string>(OptionKeyEnum.TERM_SELECTION_COLOR, "255,255,255");
 
             return true;
         }
@@ -902,8 +917,6 @@ namespace ModengTerm.ViewModels
             this.FontColor = DrawingUtils.GetColor(theme.FontColor);
             this.BackColor = DrawingUtils.GetColor(theme.BackColor);
             this.CursorColor = DrawingUtils.GetColor(theme.CursorColor);
-            this.HighlightBackColor = DrawingUtils.GetColor(theme.BackColor);
-            this.HighlightFontColor = DrawingUtils.GetColor(theme.FontColor);
 
             this.CursorColor = DrawingUtils.GetColor(theme.CursorColor);
             this.FontColor = DrawingUtils.GetColor(theme.FontColor);
@@ -911,6 +924,8 @@ namespace ModengTerm.ViewModels
 
             this.HighlightBackColor = DrawingUtils.GetColor(theme.HighlightBackColor);
             this.HighlightFontColor = DrawingUtils.GetColor(theme.HighlightFontColor);
+
+            this.SelectionColor = DrawingUtils.GetColor(theme.SelectionColor);
         }
 
         private bool CollectOptions(XTermSession session)

@@ -22,7 +22,7 @@ namespace ModengTerm.Terminal.DataModels
         /// <summary>
         /// 该段落的字符列表
         /// </summary>
-        public List<List<VTCharacter>> CharacterList { get; set; }
+        public List<VTHistoryLine> CharacterList { get; set; }
 
         /// <summary>
         /// 第一行第一个的字符索引

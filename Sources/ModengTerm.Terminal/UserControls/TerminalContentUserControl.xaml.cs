@@ -89,8 +89,53 @@ namespace ModengTerm.Terminal.UserControls
         /// <returns></returns>
         private VTEventInput GetActiveEventInput()
         {
-            VTDocument activeDocument = this.videoTerminal.ActiveDocument;
-            return activeDocument.EventInput;
+            return this.videoTerminal.ActiveDocument.EventInput;
+        }
+
+        private DrawingDocument GetActiveDocument()
+        {
+            return this.videoTerminal.IsAlternate ?
+                DocumentAlternate : DocumentMain;
+        }
+
+        private MouseData GetMouseData(MouseButtonEventArgs e) 
+        {
+            DrawingDocument document = this.GetActiveDocument();
+            Point mousePosition = e.GetPosition(document);
+            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, e.ClickCount);
+
+            return mouseData;
+        }
+
+        private MouseData GetMouseData(MouseEventArgs e)
+        {
+            DrawingDocument document = this.GetActiveDocument();
+            Point mousePosition = e.GetPosition(document);
+            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0);
+
+            return mouseData;
+        }
+
+        private void HandleMouseCapture(MouseData mouseData)
+        {
+            if (mouseData.CaptureMouse)
+            {
+                if (this.IsMouseCaptured)
+                {
+                    return;
+                }
+
+                this.CaptureMouse();
+            }
+            else
+            {
+                if (!this.IsMouseCaptured)
+                {
+                    return;
+                }
+
+                this.ReleaseMouseCapture();
+            }
         }
 
         #endregion
@@ -103,8 +148,10 @@ namespace ModengTerm.Terminal.UserControls
 
             this.Focus();
 
+            MouseData mouseData = this.GetMouseData(e);
             VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseDown(e.GetPosition(GridDocument).ToVTPoint(), e.ClickCount);
+            eventInput.OnMouseDown(mouseData);
+            this.HandleMouseCapture(mouseData);
 
             // 阻止事件继续传播
             e.Handled = true;
@@ -114,8 +161,10 @@ namespace ModengTerm.Terminal.UserControls
         {
             base.OnMouseMove(e);
 
+            MouseData mouseData = this.GetMouseData(e);
             VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseMove(e.GetPosition(GridDocument).ToVTPoint());
+            eventInput.OnMouseMove(mouseData);
+            this.HandleMouseCapture(mouseData);
 
             e.Handled = true;
         }
@@ -124,8 +173,10 @@ namespace ModengTerm.Terminal.UserControls
         {
             base.OnMouseLeftButtonUp(e);
 
+            MouseData mouseData = this.GetMouseData(e);
             VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseUp(e.GetPosition(GridDocument).ToVTPoint());
+            eventInput.OnMouseUp(mouseData);
+            this.HandleMouseCapture(mouseData);
 
             e.Handled = true;
         }
@@ -138,6 +189,11 @@ namespace ModengTerm.Terminal.UserControls
             eventInput.OnMouseWheel(e.Delta > 0);
 
             e.Handled = true;
+        }
+
+        private void TerminalContentUserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            this.videoTerminal.OnSizeChanged(e.PreviousSize.ToVTSize(), e.NewSize.ToVTSize());
         }
 
 
@@ -185,11 +241,15 @@ namespace ModengTerm.Terminal.UserControls
 
             this.videoTerminal = this.shellSession.VideoTerminal;
 
+            this.SizeChanged += TerminalContentUserControl_SizeChanged;
+
             return ResponseCode.SUCCESS;
         }
 
         public void Close()
         {
+            this.SizeChanged -= TerminalContentUserControl_SizeChanged;
+
             this.shellSession.Close();
             this.videoTerminal = null;
         }

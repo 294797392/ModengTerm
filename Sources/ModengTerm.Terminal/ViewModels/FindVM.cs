@@ -1,7 +1,10 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
+using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Geometry;
+using ModengTerm.Document.Rendering;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
@@ -15,6 +18,14 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.Terminal.ViewModels
 {
+    /// <summary>
+    /// 定义查找范围
+    /// </summary>
+    public enum FindScopes
+    {
+        AllDocument,
+    }
+
     /// <summary>
     /// 搜索ViewModel
     /// 模仿XShell和VS2022的搜索功能
@@ -34,8 +45,6 @@ namespace ModengTerm.Terminal.ViewModels
         private string keyword;
         private IVideoTerminal videoTerminal;
 
-        private bool findOnce;
-
         /// <summary>
         /// 存储当前命中匹配到的行
         /// </summary>
@@ -47,11 +56,28 @@ namespace ModengTerm.Terminal.ViewModels
         private string message;
 
         /// <summary>
-        /// 当前查找下一个的索引
+        /// 要高亮显示的在matchResult里的元素索引
         /// 可以从下往上找
         /// 也可以从上往下找
         /// </summary>
         private int findIndex;
+
+        /// <summary>
+        /// 是否至少执行了一次查找
+        /// </summary>
+        private bool findOnce;
+
+        private bool upFind;
+        private bool downFind;
+
+        private bool findAll;
+
+        /// <summary>
+        /// 用来高亮显示匹配结果的矩形
+        /// </summary>
+        private VTRectangle mainRectElement;
+        private VTRectangle alternateRectElement;
+        private VTRectangle activeRectElement;
 
         #endregion
 
@@ -128,12 +154,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public bool FindAll
         {
-            get { return this.findOnce; }
+            get { return this.findAll; }
             set
             {
-                if (this.findOnce != value)
+                if (this.findAll != value)
                 {
-                    this.findOnce = value;
+                    this.findAll = value;
                     this.NotifyPropertyChanged("FindAll");
                 }
             }
@@ -141,6 +167,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         /// <summary>
         /// 高亮区域的前景色
+        /// 暂时没用
         /// </summary>
         public VTColor HighlightForeground { get; set; }
 
@@ -149,6 +176,38 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public VTColor HighlightBackground { get; set; }
 
+        /// <summary>
+        /// 向上查找
+        /// </summary>
+        public bool UpFind
+        {
+            get { return this.upFind; }
+            set
+            {
+                if (this.upFind != value)
+                {
+                    this.upFind = value;
+                    this.NotifyPropertyChanged("UpFind");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 向下查找
+        /// </summary>
+        public bool DownFind
+        {
+            get { return this.downFind; }
+            set
+            {
+                if (this.downFind != value)
+                {
+                    this.downFind = value;
+                    this.NotifyPropertyChanged("DownFind");
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -156,28 +215,56 @@ namespace ModengTerm.Terminal.ViewModels
         public FindVM(IVideoTerminal vt)
         {
             this.videoTerminal = vt;
-            this.videoTerminal.ScrollChanged += VideoTerminal_ScrollChanged;
+
+            this.videoTerminal.MainDocument.ScrollChanged += MainDocument_ScrollChanged;
+            this.videoTerminal.MainDocument.DiscardLine += MainDocument_DiscardLine;
+            this.mainRectElement = new VTRectangle(this.videoTerminal.MainDocument);
+            this.mainRectElement.Initialize();
+            this.alternateRectElement = new VTRectangle(this.videoTerminal.AlternateDocument);
+            this.alternateRectElement.Initialize();
+
+            if (this.videoTerminal.IsAlternate)
+            {
+                this.activeRectElement = this.alternateRectElement;
+            }
+            else
+            {
+                this.activeRectElement = this.mainRectElement;
+            }
         }
 
         #endregion
 
         #region 实例方法
 
-        private void PerformFind(string keyword)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keyword"></param>
+        /// <returns>是否找到了至少一个匹配项</returns>
+        private bool PerformFind(string keyword)
         {
-            // 先恢复文本行的状态
-            this.ResetTextLineState();
-
             if (string.IsNullOrEmpty(keyword))
             {
                 this.matchResult = null;
-                return;
+                this.activeRectElement.Clear();
+                this.activeRectElement.RequestInvalidate();
+                return false;
             }
 
             List<VTMatches> matches = this.FindMatches(keyword);
+            if (matches.Count == 0)
+            {
+                this.activeRectElement.Clear();
+                this.activeRectElement.RequestInvalidate();
+                return false;
+            }
+
             this.HighlightMatches(matches);
 
             this.matchResult = matches;
+
+            return true;
         }
 
         /// <summary>
@@ -256,9 +343,9 @@ namespace ModengTerm.Terminal.ViewModels
         {
             List<VTMatches> result = new List<VTMatches>();
 
-            VTScreen activeScreen = this.videoTerminal.ActiveScreen;
+            VTDocument activeDocument = this.videoTerminal.ActiveDocument;
 
-            VTextLine current = activeScreen.FirstLine;
+            VTextLine current = activeDocument.FirstLine;
 
             while (current != null)
             {
@@ -280,49 +367,27 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="matches"></param>
         private void HighlightMatches(List<VTMatches> matchResult)
         {
+            this.activeRectElement.Clear();
+
             foreach (VTMatches matches in matchResult)
             {
                 VTextLine textLine = matches.TextLine;
 
-                for (int i = 0; i < matches.Length; i++)
+                VTextRange textRange = textLine.MeasureTextRange(matches.Index, matches.Length);
+
+                VTRectangleGeometry rectangleGeometry = new VTRectangleGeometry()
                 {
-                    VTCharacter character = textLine.Characters[i + matches.Index];
+                    BackColor = this.HighlightBackground,
+                    Height = textRange.Height,
+                    Width = textRange.Width,
+                    X = textRange.OffsetX,
+                    Y = textRange.OffsetY
+                };
 
-                    character.Background = this.HighlightBackground;
-                    character.Foreground = this.HighlightForeground;
-
-                    VTUtils.SetTextAttribute(VTextAttributes.Foreground, true, ref character.Attribute);
-                    VTUtils.SetTextAttribute(VTextAttributes.Background, true, ref character.Attribute);
-                }
-
-                textLine.MakeInvalidate();
-                textLine.RequestInvalidate();
-            }
-        }
-
-        /// <summary>
-        /// 把高亮显示的匹配项重置为默认颜色
-        /// </summary>
-        private void ResetTextLineState()
-        {
-            if (this.matchResult == null)
-            {
-                return;
+                this.activeRectElement.AddGeometry(rectangleGeometry);
             }
 
-            IEnumerable<VTextLine> textLines = this.matchResult.GroupBy(v => v.TextLine).Select(v => v.Key);
-            foreach (VTextLine textLine in textLines)
-            {
-                VTHistoryLine historyLine;
-                if (!this.videoTerminal.TryGetHistoryLine(textLine.PhysicsRow, out historyLine))
-                {
-                    logger.ErrorFormat("KeywordChanged失败, 没找到文本行对应的历史记录, physicsRow = {0}", textLine.PhysicsRow);
-                    continue;
-                }
-
-                textLine.SetHistory(historyLine);
-                textLine.RequestInvalidate();
-            }
+            this.activeRectElement.RequestInvalidate();
         }
 
         /// <summary>
@@ -345,7 +410,22 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 事件处理器
 
-        private void VideoTerminal_ScrollChanged(IVideoTerminal vt, int oldScrollValue, int newScrollValue)
+        /// <summary>
+        /// 当滚动结束并渲染结束之后触发
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        private void MainDocument_ScrollChanged(VTDocument arg1, VTScrollData arg2)
+        {
+            this.PerformFind(this.keyword);
+        }
+
+        /// <summary>
+        /// 当丢弃行的时候触发
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void MainDocument_DiscardLine(VTDocument obj)
         {
             this.PerformFind(this.keyword);
         }
@@ -359,12 +439,19 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void FindNext()
         {
-
+            // 不存在匹配的结果，什么都不做
+            if (this.matchResult == null)
+            {
+                return;
+            }
         }
 
         public void Release()
         {
-            this.ResetTextLineState();
+            this.mainRectElement.Release();
+            this.alternateRectElement.Release();
+
+            this.videoTerminal.MainDocument.ScrollChanged -= this.MainDocument_ScrollChanged;
             this.matchResult = null;
             this.Message = string.Empty;
         }

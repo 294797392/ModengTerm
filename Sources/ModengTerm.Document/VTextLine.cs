@@ -15,22 +15,6 @@ namespace ModengTerm.Document
     /// </summary>
     public class VTextLine : VTElement
     {
-        /// <summary>
-        /// 指定要把行移动到的位置
-        /// </summary>
-        public enum MoveOptions
-        {
-            /// <summary>
-            /// 移动到最后一行
-            /// </summary>
-            MoveToLast,
-
-            /// <summary>
-            /// 移动到第一行
-            /// </summary>
-            MoveToFirst
-        }
-
         #region 实例变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTextLine");
@@ -38,11 +22,6 @@ namespace ModengTerm.Document
         #endregion
 
         #region 实例变量
-
-        /// <summary>
-        /// 存储该行的字符列表
-        /// </summary>
-        private List<VTCharacter> characters;
 
         /// <summary>
         /// 已经显示了的列数
@@ -59,24 +38,34 @@ namespace ModengTerm.Document
         public override DrawingObjectTypes Type => DrawingObjectTypes.TextLine;
 
         /// <summary>
-        /// 行索引，从0开始
+        /// 物理行号，从0开始
+        /// TODO：考虑删掉，如果在编辑文档的时候，删除了一行，那么所有的HistoryLine都要更新，这会是一个灾难
+        /// 解决方法是在VTDocument里保存当前显示的第一行的索引
         /// </summary>
-        public int PhysicsRow
-        {
-            get { return physicsRow; }
-            set
-            {
-                if (physicsRow != value)
-                {
-                    physicsRow = value;
-#if DEBUG
-                    // TODO：正式出版本的时候要删除这里，不然会影响运行速度
-                    // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
-                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-#endif
-                }
-            }
-        }
+//        public int PhysicsRow
+//        {
+//            get { return physicsRow; }
+//            set
+//            {
+//                if (physicsRow != value)
+//                {
+//                    physicsRow = value;
+//#if DEBUG
+//                    // TODO：正式出版本的时候要删除这里，不然会影响运行速度
+//                    // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
+//                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+//#endif
+//                }
+//            }
+//        }
+
+        /// <summary>
+        /// 该行对应的历史记录
+        /// 每一个VTextLine都和一个VTHistoryLine对应
+        /// 当修改Characters的时候，直接对History里的Characters进行修改，这样就不需要每次都去手动更新VTHistoryLine了
+        /// VTHistoryLine保存显示该行所需要的最基本的数据，不包含运行时数据
+        /// </summary>
+        public VTHistoryLine History { get; private set; }
 
         /// <summary>
         /// 上一个文本行
@@ -89,9 +78,9 @@ namespace ModengTerm.Document
         public VTextLine NextLine { get; set; }
 
         /// <summary>
-        /// 获取该行字符的只读集合
+        /// 获取该行字符的集合
         /// </summary>
-        public List<VTCharacter> Characters { get { return characters; } }
+        public List<VTCharacter> Characters { get { return this.History.Characters; } }
 
         /// <summary>
         /// 获取该行一共占用了多少列
@@ -140,8 +129,8 @@ namespace ModengTerm.Document
         public VTextLine(VTDocument owner) :
             base(owner)
         {
-            characters = new List<VTCharacter>();
-            Metrics = new VTextMetrics();
+            this.Metrics = new VTextMetrics();
+            this.History = new VTHistoryLine();
         }
 
         #endregion
@@ -162,38 +151,7 @@ namespace ModengTerm.Document
                 return null;
             }
 
-            return characters[characterIndex];
-        }
-
-        /// <summary>
-        /// 将该节点从VTDocument里移除
-        /// </summary>
-        internal void Remove()
-        {
-            VTextLine previous = PreviousLine;
-            VTextLine next = NextLine;
-
-            if (previous == null)
-            {
-                // 说明是第一行
-                next.PreviousLine = null;
-                this.OwnerDocument.FirstLine = next;
-            }
-            else if (next == null)
-            {
-                // 说明是最后一行
-                previous.NextLine = null;
-                this.OwnerDocument.LastLine = previous;
-            }
-            else
-            {
-                // 说明是中间的行
-                previous.NextLine = next;
-                next.PreviousLine = previous;
-            }
-
-            PreviousLine = null;
-            NextLine = null;
+            return this.Characters[characterIndex];
         }
 
         /// <summary>
@@ -221,35 +179,6 @@ namespace ModengTerm.Document
             textLine.NextLine = next;
         }
 
-        /// <summary>
-        /// 把一行挂载到该行前面
-        /// </summary>
-        /// <param name="textLine"></param>
-        internal void Prepend(VTextLine textLine)
-        {
-            // 分两种情况去处理：
-            // 1. 该行是第一行，那么需要更新FirstLine指针
-            // 2. 该行不是第一行
-
-            if (this == this.OwnerDocument.FirstLine)
-            {
-                // 该行是第一行
-                this.OwnerDocument.FirstLine = textLine;
-                textLine.NextLine = this;
-                PreviousLine = textLine;
-            }
-            else
-            {
-                // 该行不是第一行
-                VTextLine previous = PreviousLine;
-                previous.NextLine = textLine;
-                textLine.PreviousLine = previous;
-                textLine.NextLine = this;
-                PreviousLine = textLine;
-            }
-        }
-
-
         #endregion
 
         #region 公开接口
@@ -267,7 +196,7 @@ namespace ModengTerm.Document
             int startColumn = 0;
             int endColumn = 0;
 
-            foreach (VTCharacter character in characters)
+            foreach (VTCharacter character in this.Characters)
             {
                 endColumn = startColumn + character.ColumnSize;
 
@@ -304,12 +233,12 @@ namespace ModengTerm.Document
                 return;
             }
 
-            VTCharacter oldCharacter = characters[characterIndex];
+            VTCharacter oldCharacter = this.Characters[characterIndex];
 
-            characters.RemoveAt(characterIndex);
+            this.Characters.RemoveAt(characterIndex);
             columns -= oldCharacter.ColumnSize;
 
-            characters.Insert(characterIndex, character);
+            this.Characters.Insert(characterIndex, character);
             columns += character.ColumnSize;
 
             SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
@@ -329,7 +258,7 @@ namespace ModengTerm.Document
                 return;
             }
 
-            int count = characters.Count - startIndex;
+            int count = this.Characters.Count - startIndex;
 
             EraseRange(startIndex, count);
         }
@@ -339,7 +268,7 @@ namespace ModengTerm.Document
         /// </summary>
         public void EraseAll()
         {
-            EraseRange(0, characters.Count);
+            EraseRange(0, this.Characters.Count);
         }
 
         /// <summary>
@@ -388,7 +317,7 @@ namespace ModengTerm.Document
 
             for (int i = 0; i < count; i++)
             {
-                VTCharacter character = characters[startIndex + i];
+                VTCharacter character = this.Characters[startIndex + i];
                 if (character.ColumnSize > 1)
                 {
                     columns -= character.ColumnSize - 1;
@@ -464,7 +393,7 @@ namespace ModengTerm.Document
             // 补齐字符
             for (int i = 0; i < count; i++)
             {
-                characters.Add(VTCharacter.CreateNull());
+                this.Characters.Add(VTCharacter.CreateNull());
             }
 
             this.columns += count;
@@ -478,11 +407,9 @@ namespace ModengTerm.Document
         /// <param name="historyLine">要应用的历史行数据</param>
         public void SetHistory(VTHistoryLine historyLine)
         {
-            VTUtils.CopyCharacter(historyLine.Characters, characters);
-            PhysicsRow = historyLine.PhysicsRow;
-            columns = VTUtils.GetColumns(characters);
-
-            SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+            this.History = historyLine;
+            this.columns = VTUtils.GetColumns(this.Characters);
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -500,7 +427,7 @@ namespace ModengTerm.Document
             int cols = this.columns - columns;
             while (cols > 0)
             {
-                VTCharacter character = characters.LastOrDefault();
+                VTCharacter character = this.Characters.LastOrDefault();
                 if (character == null)
                 {
                     break;
@@ -509,7 +436,7 @@ namespace ModengTerm.Document
                 cols -= character.ColumnSize;
                 this.columns -= character.ColumnSize;
 
-                characters.Remove(character);
+                this.Characters.Remove(character);
             }
 
             this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
@@ -522,7 +449,7 @@ namespace ModengTerm.Document
         /// <param name="character">要插入的字符</param>
         public void InsertCharacter(int characterIndex, VTCharacter character)
         {
-            characters.Insert(characterIndex, character);
+            this.Characters.Insert(characterIndex, character);
             columns += character.ColumnSize;
             this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
@@ -537,16 +464,16 @@ namespace ModengTerm.Document
             if (startIndex == -1)
             {
                 // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
-                logger.WarnFormat("Delete失败, startIndex == -1, column = {0}", column);
+                //logger.WarnFormat("Delete失败, startIndex == -1, column = {0}", column);
                 return;
             }
 
-            int count = this.characters.Count - startIndex;
+            int count = this.Characters.Count - startIndex;
 
             for (int i = 0; i < count; i++)
             {
-                VTCharacter toDelete = characters[startIndex];
-                characters.Remove(toDelete);
+                VTCharacter toDelete = this.Characters[startIndex];
+                this.Characters.Remove(toDelete);
 
                 // 更新总列数
                 columns -= toDelete.ColumnSize;
@@ -583,8 +510,8 @@ namespace ModengTerm.Document
 
             for (int i = 0; i < count; i++)
             {
-                VTCharacter toDelete = characters[startIndex];
-                characters.Remove(toDelete);
+                VTCharacter toDelete = this.Characters[startIndex];
+                this.Characters.Remove(toDelete);
 
                 // 更新总列数
                 columns -= toDelete.ColumnSize;
@@ -598,7 +525,7 @@ namespace ModengTerm.Document
         /// </summary>
         public void DeleteAll()
         {
-            this.DeleteRange(0, this.characters.Count);
+            this.DeleteRange(0, this.Characters.Count);
         }
 
         #endregion
@@ -617,7 +544,7 @@ namespace ModengTerm.Document
         {
             IDrawingTextLine drawingTextLine = this.DrawingObject as IDrawingTextLine;
 
-            VTFormattedText formattedText = VTUtils.CreateFormattedText(characters);
+            VTFormattedText formattedText = VTUtils.CreateFormattedText(Characters);
             formattedText.Style = this.Typeface;
 
             // 把物理行号打印出来，调试用
@@ -633,6 +560,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 测量该行里指定的子文本矩形框
+        /// 测量出来的Y偏移量就是该文本相对于文档左上角的偏移量
         /// </summary>
         /// <param name="startIndex">要测量的起始字符索引</param>
         /// <param name="count">要测量的最大字符数，0为全部测量</param>
@@ -646,10 +574,10 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 测量一行里某个字符的测量信息
-        /// 注意该接口只能测量出来X偏移量，Y偏移量需要外部根据高度自己计算
+        /// 测量出来的Y偏移量就是该文本相对于文档左上角的偏移量
         /// </summary>
         /// <param name="characterIndex">要测量的字符</param>
-        /// <returns>文本坐标，X=文本左边的X偏移量，Y永远是0，因为边界框是相对于该行的</returns>
+        /// <returns></returns>
         public VTextRange MeasureCharacter(int characterIndex)
         {
             return this.MeasureTextRange(characterIndex, 1);

@@ -108,18 +108,6 @@ namespace ModengTerm.Terminal.TestCase
             VTextLine firstLine = activeDocument.FirstLine;
             VTextLine lastLine = activeDocument.LastLine;
 
-            if (firstLine.PhysicsRow != caseStep.FirstLinePhysicsRow)
-            {
-                logger.ErrorFormat("");
-                return false;
-            }
-
-            if (lastLine.PhysicsRow != caseStep.LastLinePhysicsRow)
-            {
-                logger.ErrorFormat("");
-                return false;
-            }
-
             foreach (CaseLine caseLine in caseStep.OutputLines)
             {
                 VTextLine textLine = activeDocument.FindLine(caseLine.PhysicsRow);
@@ -143,12 +131,6 @@ namespace ModengTerm.Terminal.TestCase
 
         private bool CompareLine(VTextLine textLine, CaseLine caseLine)
         {
-            if (textLine.PhysicsRow != caseLine.PhysicsRow)
-            {
-                logger.ErrorFormat("");
-                return false;
-            }
-
             if (textLine.Characters.Count != caseLine.Characters.Count)
             {
                 logger.ErrorFormat("");

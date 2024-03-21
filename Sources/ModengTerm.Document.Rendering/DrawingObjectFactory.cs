@@ -22,6 +22,7 @@ namespace ModengTerm.Document.Rendering
                 case DrawingObjectTypes.TextLine: return new DrawingLine();
                 case DrawingObjectTypes.TextBlock: return new DrawingTextBlock();
                 case DrawingObjectTypes.Wallpaper: return new DrawingWallpaper();
+                case DrawingObjectTypes.Rectangle: return new DrawingRectangle();
 
                 default:
                     throw new NotImplementedException(string.Format("{0}", type));
