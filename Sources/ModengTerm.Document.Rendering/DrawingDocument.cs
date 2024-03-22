@@ -28,7 +28,7 @@ namespace ModengTerm.Document.Rendering
         /// <summary>
         /// 用来渲染内容的区域
         /// </summary>
-        public DrawingSurface ContentArea { get { return this.surface; } }
+        public DrawingSurface Surface { get { return this.surface; } }
 
         public VTScrollbar Scrollbar { get; private set; }
 

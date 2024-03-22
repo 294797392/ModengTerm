@@ -98,43 +98,47 @@ namespace ModengTerm.Terminal.UserControls
                 DocumentAlternate : DocumentMain;
         }
 
-        private MouseData GetMouseData(MouseButtonEventArgs e) 
+        private MouseData GetMouseData(object sender, MouseButtonEventArgs e)
         {
             DrawingDocument document = this.GetActiveDocument();
             Point mousePosition = e.GetPosition(document);
-            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, e.ClickCount);
+            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, e.ClickCount, (sender as FrameworkElement).IsMouseCaptured);
 
             return mouseData;
         }
 
-        private MouseData GetMouseData(MouseEventArgs e)
+        private MouseData GetMouseData(object sender, MouseEventArgs e)
         {
             DrawingDocument document = this.GetActiveDocument();
             Point mousePosition = e.GetPosition(document);
-            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0);
+            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0, (sender as FrameworkElement).IsMouseCaptured);
 
             return mouseData;
         }
 
-        private void HandleMouseCapture(MouseData mouseData)
+        private void HandleCaptureAction(object sender, MouseData mouseData)
         {
-            if (mouseData.CaptureMouse)
+            switch (mouseData.CaptureAction)
             {
-                if (this.IsMouseCaptured)
-                {
-                    return;
-                }
+                case MouseData.CaptureActions.None:
+                    {
+                        break;
+                    }
 
-                this.CaptureMouse();
-            }
-            else
-            {
-                if (!this.IsMouseCaptured)
-                {
-                    return;
-                }
+                case MouseData.CaptureActions.Capture:
+                    {
+                        (sender as FrameworkElement).CaptureMouse();
+                        break;
+                    }
 
-                this.ReleaseMouseCapture();
+                case MouseData.CaptureActions.ReleaseCapture:
+                    {
+                        (sender as FrameworkElement).ReleaseMouseCapture();
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
             }
         }
 
@@ -142,44 +146,32 @@ namespace ModengTerm.Terminal.UserControls
 
         #region 事件处理器
 
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        private void Surface_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            base.OnMouseLeftButtonDown(e);
-
             this.Focus();
 
-            MouseData mouseData = this.GetMouseData(e);
-            VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseDown(mouseData);
-            this.HandleMouseCapture(mouseData);
-
-            // 阻止事件继续传播
-            e.Handled = true;
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-
-            MouseData mouseData = this.GetMouseData(e);
+            MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
             eventInput.OnMouseMove(mouseData);
-            this.HandleMouseCapture(mouseData);
-
-            e.Handled = true;
+            this.HandleCaptureAction(sender, mouseData);
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        private void Surface_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            base.OnMouseLeftButtonUp(e);
-
-            MouseData mouseData = this.GetMouseData(e);
+            MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
             eventInput.OnMouseUp(mouseData);
-            this.HandleMouseCapture(mouseData);
-
-            e.Handled = true;
+            this.HandleCaptureAction(sender, mouseData);
         }
+
+        private void Surface_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MouseData mouseData = this.GetMouseData(sender, e);
+            VTEventInput eventInput = this.GetActiveEventInput();
+            eventInput.OnMouseDown(mouseData);
+            this.HandleCaptureAction(sender, mouseData);
+        }
+
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
@@ -236,7 +228,13 @@ namespace ModengTerm.Terminal.UserControls
 
             double margin = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
             DocumentAlternate.Margin = new Thickness(margin);
+            DocumentAlternate.Surface.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
+            DocumentAlternate.Surface.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
+            DocumentAlternate.Surface.PreviewMouseMove += Surface_PreviewMouseMove;
             DocumentMain.Margin = new Thickness(margin);
+            DocumentMain.Surface.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
+            DocumentMain.Surface.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
+            DocumentMain.Surface.PreviewMouseMove += Surface_PreviewMouseMove;
 
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
@@ -253,6 +251,13 @@ namespace ModengTerm.Terminal.UserControls
         public void Close()
         {
             this.SizeChanged -= TerminalContentUserControl_SizeChanged;
+
+            DocumentAlternate.Surface.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
+            DocumentAlternate.Surface.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
+            DocumentAlternate.Surface.PreviewMouseMove -= Surface_PreviewMouseMove;
+            DocumentMain.Surface.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
+            DocumentMain.Surface.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
+            DocumentMain.Surface.PreviewMouseMove -= Surface_PreviewMouseMove;
 
             this.shellSession.Close();
             this.videoTerminal = null;

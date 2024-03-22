@@ -8,6 +8,24 @@ namespace ModengTerm.Document
 {
     public class MouseData
     {
+        public enum CaptureActions
+        {
+            /// <summary>
+            /// 指定不做任何操作
+            /// </summary>
+            None,
+
+            /// <summary>
+            /// 指定捕获鼠标
+            /// </summary>
+            Capture,
+
+            /// <summary>
+            /// 指定释放捕获的鼠标
+            /// </summary>
+            ReleaseCapture
+        }
+
         /// <summary>
         /// 鼠标的X坐标
         /// </summary>
@@ -24,16 +42,23 @@ namespace ModengTerm.Document
         public int ClickCount { get; set; }
 
         /// <summary>
-        /// 指示是否要捕获鼠标
+        /// 设置是否需要捕获鼠标
         /// 捕获鼠标之后，即使鼠标移出了触发鼠标事件的元素所在区域，也会继续触发该元素的鼠标事件（比如鼠标移动事件）
         /// </summary>
-        public bool CaptureMouse { get; set; }
+        public CaptureActions CaptureAction { get; set; }
 
-        public MouseData(double x, double y, int clickCount)
+        /// <summary>
+        /// 获取当前鼠标是否是捕获状态
+        /// </summary>
+        public bool IsMouseCaptured { get; private set; }
+
+        public MouseData(double x, double y, int clickCount, bool isMouseCaptured)
         {
             X = x;
             Y = y;
             ClickCount = clickCount;
+            this.IsMouseCaptured = isMouseCaptured;
+            this.CaptureAction = CaptureActions.None;
         }
     }
 

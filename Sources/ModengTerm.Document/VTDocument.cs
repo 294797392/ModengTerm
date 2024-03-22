@@ -49,11 +49,6 @@ namespace ModengTerm.Document
         VTextPointer endPointer;
 
         /// <summary>
-        /// 鼠标是否按下
-        /// </summary>
-        private bool isMouseDown;
-
-        /// <summary>
         /// 当前鼠标是否处于Selection状态
         /// </summary>
         private bool selectionState;
@@ -1529,8 +1524,6 @@ namespace ModengTerm.Document
         {
             if (mouseData.ClickCount == 1)
             {
-                isMouseDown = true;
-
                 if (!Selection.IsEmpty)
                 {
                     // 点击的时候先清除选中区域
@@ -1538,6 +1531,8 @@ namespace ModengTerm.Document
                     Selection.RequestInvalidate();
                     selectionState = false;
                 }
+
+                mouseData.CaptureAction = MouseData.CaptureActions.Capture;
             }
             else
             {
@@ -1593,12 +1588,10 @@ namespace ModengTerm.Document
 
         private void OnMouseMove(MouseData mouseData)
         {
-            if (!isMouseDown)
+            if (!mouseData.IsMouseCaptured)
             {
                 return;
             }
-
-            mouseData.CaptureMouse = true;
 
             if (!selectionState)
             {
@@ -1669,9 +1662,8 @@ namespace ModengTerm.Document
 
         private void OnMouseUp(MouseData mouseData)
         {
-            isMouseDown = false;
             selectionState = false;
-            mouseData.CaptureMouse = false;
+            mouseData.CaptureAction = MouseData.CaptureActions.ReleaseCapture;
         }
 
         private void OnMouseWheel(bool upper)
