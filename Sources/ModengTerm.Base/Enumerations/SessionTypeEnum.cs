@@ -33,6 +33,11 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// SFTP会话
         /// </summary>
-        SFTP = 4
+        SFTP = 4,
+
+        /// <summary>
+        /// SSH回放
+        /// </summary>
+        Playback
     }
 }

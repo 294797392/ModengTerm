@@ -16,6 +16,11 @@ namespace ModengTerm.Base.Enumerations
         SSH_TERM_TYPE = 2,
         SSH_TERM_SIZE_MODE = 3,
 
+        /// <summary>
+        /// 回放文件路径
+        /// </summary>
+        SSH_PLAYBACK_FILE_PATH = 4,
+
         #endregion
 
         #region Theme 100 - 500

@@ -101,5 +101,12 @@ namespace ModengTerm.Terminal
         /// <param name="oldSize"></param>
         /// <param name="newSize"></param>
         void OnSizeChanged(VTSize oldSize, VTSize newSize);
+
+        /// <summary>
+        /// 处理SSH数据
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="size"></param>
+        void ProcessData(byte[] bytes, int size);
     }
 }

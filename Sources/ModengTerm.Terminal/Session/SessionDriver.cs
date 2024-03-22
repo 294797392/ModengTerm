@@ -84,6 +84,7 @@ namespace ModengTerm.Terminal.Session
         /// <param name="buffer"></param>
         /// <returns>
         /// 返回读取到的字节数，如果读取失败则返回-1
+        /// 如果返回0表示所有数据读取结束，没有更多的数据可读了
         /// </returns>
         internal abstract int Read(byte[] buffer);
 

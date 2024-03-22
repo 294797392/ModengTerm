@@ -221,7 +221,7 @@ namespace ModengTerm.Terminal
             {
                 this.stream.Write(frameBytes);
 
-                logger.InfoFormat("写入数据包, 数据大小 = {0}, 总大小 = {1}, timestamp = {2}", frame.Data.Length, frameBytes.Length, frame.Timestamp);
+                //logger.InfoFormat("写入数据包, 数据大小 = {0}, 总大小 = {1}, timestamp = {2}", frame.Data.Length, frameBytes.Length, frame.Timestamp);
 
                 return ResponseCode.SUCCESS;
             }
@@ -260,7 +260,7 @@ namespace ModengTerm.Terminal
                     Timestamp = timestamp
                 };
 
-                logger.InfoFormat("读取数据包, 数据大小 = {0}, timestamp = {1}", frame.Data.Length, timestamp);
+                //logger.InfoFormat("读取数据包, 数据大小 = {0}, timestamp = {1}", frame.Data.Length, timestamp);
 
                 return frame;
             }

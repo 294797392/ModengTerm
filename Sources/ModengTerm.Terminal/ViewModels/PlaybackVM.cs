@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Document.Drawing;
 using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Session;
@@ -27,17 +28,17 @@ namespace ModengTerm.Terminal.ViewModels
         private PlaybackStatusEnum playbackStatus;
         private PlaybackFile playbackFile;
         private PlaybackStream playbackStream;
-        private VideoTerminal videoTerminal;
 
         #endregion
 
         #region 属性
 
-        /// <summary>
-        /// 终端渲染控件
-        /// </summary>
-        public DependencyObject Content { get; set; }
-        
+        public IVideoTerminal VideoTerminal { get; set; }
+
+        public IDrawingDocument MainDocument { get; set; }
+
+        public IDrawingDocument AlternateDocument { get; set; }
+
         #endregion
 
         #region 公开接口
@@ -57,16 +58,6 @@ namespace ModengTerm.Terminal.ViewModels
                 return code;
             }
 
-            SessionTransport transport = new SessionTransport();
-
-            VTOptions options = new VTOptions()
-            {
-                Session = this.playbackFile.Session,
-                SessionTransport = transport
-            };
-            this.videoTerminal = new VideoTerminal();
-            this.videoTerminal.Initialize(options);
-
             this.playbackStatus = PlaybackStatusEnum.Playing;
             this.playbackEvent = new AutoResetEvent(false);
             this.playbackTask = Task.Factory.StartNew(this.PlaybackThreadProc);
@@ -85,8 +76,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.playbackStream.Close();
             this.playbackEvent.Close();
             this.playbackEvent.Dispose();
-
-            this.videoTerminal.Release();
         }
 
         #endregion
@@ -126,7 +115,7 @@ namespace ModengTerm.Terminal.ViewModels
                     }
 
                     // 播放一帧
-                    this.videoTerminal.ProcessData(nextFrame.Data, nextFrame.Data.Length);
+                    this.VideoTerminal.ProcessData(nextFrame.Data, nextFrame.Data.Length);
 
                     prevTimestamp = nextFrame.Timestamp;
                 }

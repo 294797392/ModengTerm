@@ -92,9 +92,8 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            PlaybackVM playbackVM = new PlaybackVM();
-            playbackVM.Content = TerminalContentUserControl;
-            playbackVM.Open(playbackFile);
+            TerminalContentUserControl.Session = playbackFile.Session;
+            TerminalContentUserControl.Open();
 
             this.playbackVM = playbackVM;
         }

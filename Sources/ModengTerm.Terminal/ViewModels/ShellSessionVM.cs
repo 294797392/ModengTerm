@@ -261,17 +261,17 @@ namespace ModengTerm.Terminal.ViewModels
                 //        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
                 //    }
                 //},
-                new ShellFunctionMenu("录屏")
-                {
-                    Children = new BindableCollection<ShellFunctionMenu>()
-                    {
-                        new ShellFunctionMenu("启动录制", this.StartRecord),
-                        new ShellFunctionMenu("停止录制", this.StopRecord),
-                        new ShellFunctionMenu("暂停录制", this.PauseRecord),
-                        new ShellFunctionMenu("恢复录制", this.ResumeRecord),
-                        new ShellFunctionMenu("打开回放", this.OpenRecord)
-                    }
-                },
+                //new ShellFunctionMenu("录屏")
+                //{
+                //    Children = new BindableCollection<ShellFunctionMenu>()
+                //    {
+                //        new ShellFunctionMenu("启动录制", this.StartRecord),
+                //        new ShellFunctionMenu("停止录制", this.StopRecord),
+                //        new ShellFunctionMenu("暂停录制", this.PauseRecord),
+                //        new ShellFunctionMenu("恢复录制", this.ResumeRecord),
+                //        new ShellFunctionMenu("打开回放", this.OpenRecord)
+                //    }
+                //},
                 new ShellFunctionMenu("保存")
                 {
                     Children = new BindableCollection<ShellFunctionMenu>()
@@ -673,14 +673,18 @@ namespace ModengTerm.Terminal.ViewModels
             recordOptionsWindow.DataContext = recordOptionsVM;
             if ((bool)recordOptionsWindow.ShowDialog())
             {
+                XTermSession playbackSession = JSONHelper.CloneObject<XTermSession, XTermSession>(this.Session);
+                playbackSession.Type = (int)SessionTypeEnum.Playback;
+
                 PlaybackFile playbackFile = new PlaybackFile()
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = recordOptionsVM.FileName,
-                    Session = this.Session,
+                    Session = playbackSession
                 };
 
                 // 先打开录像文件
+                string filePath = TermUtils.GetPlaybackFilePath(playbackFile);
                 this.playbackStream = new PlaybackStream();
                 int code = this.playbackStream.OpenWrite(playbackFile);
                 if (code != ResponseCode.SUCCESS)

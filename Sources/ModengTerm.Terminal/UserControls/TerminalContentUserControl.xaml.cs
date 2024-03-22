@@ -59,6 +59,8 @@ namespace ModengTerm.Terminal.UserControls
 
         public XTermSession Session { get; set; }
 
+        public IVideoTerminal VideoTerminal { get; set; }
+
         #endregion
 
         #region 构造方法
