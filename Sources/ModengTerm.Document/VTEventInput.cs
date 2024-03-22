@@ -37,6 +37,13 @@ namespace ModengTerm.Document
         }
     }
 
+    public class ScrollChangedData
+    {
+        public int OldScroll { get; set; }
+
+        public int NewScroll { get; set; }
+    }
+
     public class VTEventInput
     {
         public delegate void MouseWheelDelegate(bool upper);
@@ -48,7 +55,7 @@ namespace ModengTerm.Document
         /// <param name="location">以文档左上角的位置为原点，相对于文档左上角的位置的鼠标坐标</param>
         public delegate void MouseMoveDelegate(MouseData mouseData);
         public delegate void MouseUpDelegate(MouseData mouseData);
-        public delegate void ScrollChangedDelegate(int scrollValue);
+        public delegate void ScrollChangedDelegate(ScrollChangedData scrollData);
 
         public MouseWheelDelegate OnMouseWheel;
         public MouseDownDelegate OnMouseDown;

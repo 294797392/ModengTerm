@@ -25,7 +25,8 @@ namespace ModengTerm.DocumentApp
     public partial class MainWindow : Window
     {
         private VTDocument document;
-        private VTInput input = new VTInput();
+        private VTInputData input = new VTInputData();
+        private InputEventImpl inputEventImpl;
 
         public MainWindow()
         {
@@ -45,7 +46,7 @@ namespace ModengTerm.DocumentApp
                 Height = formattedText.Height,
                 SpaceWidth = formattedText.WidthIncludingTrailingWhitespace,
                 BackgroundColor = String.Empty,
-                ForegroundColor = "0,0,0"
+                ForegroundColor = "0,0,0,255"
             };
 
             VTDocumentOptions options = new VTDocumentOptions()
@@ -53,14 +54,38 @@ namespace ModengTerm.DocumentApp
                 DrawingObject = Document,
                 ViewportRow = 10,
                 ViewportColumn = 100,
-                CursorColor = "0,0,0",
+                CursorColor = "0,0,0,255",
                 CursorStyle = VTCursorStyles.Line,
                 ScrollbackMax = 100,
                 Typeface = typeface1,
-                SelectionColor = "114,213,252"
+                SelectionColor = "114,213,252,180"
             };
             this.document = new VTDocument(options);
             this.document.Initialize();
+
+            this.inputEventImpl = new InputEventImpl(this.document);
+        }
+
+        private void HandleMouseCapture(MouseData mouseData)
+        {
+            if (mouseData.CaptureMouse)
+            {
+                if (this.IsMouseCaptured)
+                {
+                    return;
+                }
+
+                this.CaptureMouse();
+            }
+            else
+            {
+                if (!this.IsMouseCaptured)
+                {
+                    return;
+                }
+
+                this.ReleaseMouseCapture();
+            }
         }
 
         protected override void OnPreviewTextInput(TextCompositionEventArgs e)
@@ -68,18 +93,15 @@ namespace ModengTerm.DocumentApp
             base.OnPreviewTextInput(e);
 
             this.input.Text = e.Text;
-            this.input.Type = VTInputTypes.TextInput;
-
-            this.document.EventInput.OnInput(this.input);
+            this.inputEventImpl.HandleInput(this.input);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
 
-            this.input.Type = VTInputTypes.KeyInput;
-            this.input.Key = (VTKeys)e.Key;
-            this.document.EventInput.OnInput(this.input);
+            this.input.Text = e.Key.ToString();
+            this.inputEventImpl.HandleInput(this.input);
 
             e.Handled = true;
 
@@ -114,7 +136,11 @@ namespace ModengTerm.DocumentApp
 
             Point position = e.GetPosition(Document);
 
-            this.document.EventInput.OnMouseDown(new VTPoint(position.X, position.Y), e.ClickCount);
+            MouseData mouseData = new MouseData(position.X, position.Y, e.ClickCount);
+
+            this.document.EventInput.OnMouseDown(mouseData);
+
+            this.HandleMouseCapture(mouseData);
         }
 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
@@ -123,7 +149,11 @@ namespace ModengTerm.DocumentApp
 
             Point position = e.GetPosition(Document);
 
-            this.document.EventInput.OnMouseUp(new VTPoint(position.X, position.Y));
+            MouseData mouseData = new MouseData(position.X, position.Y, e.ClickCount);
+
+            this.document.EventInput.OnMouseUp(mouseData);
+
+            this.HandleMouseCapture(mouseData);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -132,7 +162,11 @@ namespace ModengTerm.DocumentApp
 
             Point position = e.GetPosition(Document);
 
-            this.document.EventInput.OnMouseMove(new VTPoint(position.X, position.Y));
+            MouseData mouseData = new MouseData(position.X, position.Y, 0);
+
+            this.document.EventInput.OnMouseMove(mouseData);
+
+            this.HandleMouseCapture(mouseData);
         }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)

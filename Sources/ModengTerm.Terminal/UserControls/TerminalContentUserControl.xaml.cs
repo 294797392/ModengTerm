@@ -234,6 +234,10 @@ namespace ModengTerm.Terminal.UserControls
             string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
 
+            double margin = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
+            DocumentAlternate.Margin = new Thickness(margin);
+            DocumentMain.Margin = new Thickness(margin);
+
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
             this.shellSession.AlternateDocument = DocumentAlternate;

@@ -14,6 +14,10 @@ namespace ModengTerm.Document.Rendering
         #region 实例变量
 
         private ScrollBar scrollbar;
+        private bool mouseDown;
+        private int oldValue;
+        private int newValue;
+        private ScrollChangedData scrollData;
 
         #endregion
 
@@ -79,21 +83,47 @@ namespace ModengTerm.Document.Rendering
 
         public VTScrollbarImpl(ScrollBar scrollbar)
         {
+            this.scrollData = new ScrollChangedData();
+
             this.scrollbar = scrollbar;
             this.scrollbar.LargeChange = 1;
             this.scrollbar.SmallChange = 1;
-            this.scrollbar.ValueChanged += Scorllbar_ValueChanged;
+            this.scrollbar.PreviewMouseLeftButtonDown += Scrollbar_PreviewMouseLeftButtonDown;
+            this.scrollbar.PreviewMouseLeftButtonUp += Scrollbar_PreviewMouseLeftButtonUp;
+            this.scrollbar.MouseMove += Scrollbar_MouseMove;
         }
 
-        private void Scorllbar_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private int GetScrollValue() 
         {
-            var newvalue = Math.Round(e.NewValue, 0);
+            var newvalue = (int)Math.Round(this.scrollbar.Value, 0);
             if (newvalue > this.scrollbar.Maximum)
             {
-                newvalue = this.scrollbar.Maximum;
+                newvalue = (int)Math.Round(this.scrollbar.Maximum, 0);
+            }
+            return newvalue;
+        }
+
+        private void Scrollbar_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (!this.mouseDown)
+            {
+                return;
             }
 
-            this.Document.EventInput.OnScrollChanged((int)newvalue);
+            this.scrollData.NewScroll = this.GetScrollValue();
+            this.Document.EventInput.OnScrollChanged(this.scrollData);
+        }
+
+        private void Scrollbar_PreviewMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            this.mouseDown = false;
+        }
+
+        private void Scrollbar_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            this.scrollData.OldScroll = this.GetScrollValue();
+
+            this.mouseDown = true;
         }
     }
 }

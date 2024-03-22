@@ -231,7 +231,7 @@ namespace ModengTerm.Document
             {
                 // 光标不存在
                 // 不要使用SetOpticty隐藏光标，只有闪烁线程才可以调用SetOpacty显隐光标，其他地方如果调用的话会导致光标闪烁不流畅
-                DrawingObject.Arrange(-9999, -9999);
+                DrawingObject.Arrange(99999, 99999); // 不能使用负数，负数会导致鼠标事件出问题
                 return;
             }
 

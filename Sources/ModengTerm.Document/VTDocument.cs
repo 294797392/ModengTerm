@@ -309,20 +309,20 @@ namespace ModengTerm.Document
         /// 注意该方法不会重新渲染界面，只修改文档模型
         /// </summary>
         /// <param name="scrollValue">要显示的第一行历史记录</param>
-        /// <returns>如果进行了滚动，那么返回true，如果因为某种原因没进行滚动，那么返回false</returns>
-        private bool ScrollToHistory(int scrollValue, VTScrollData scrollData = null)
+        /// <returns>如果进行了滚动，那么返回滚动数据，如果因为某种原因没进行滚动，那么返回空</returns>
+        private VTScrollData ScrollToHistory(int scrollValue)
         {
             // 要滚动的值和当前值是一样的，也不滚动
             if (Scrollbar.ScrollValue == scrollValue)
             {
-                return false;
+                return null;
             }
 
             // 判断要滚动的目标值合法性
             if (scrollValue > Scrollbar.ScrollMax ||
                 scrollValue < Scrollbar.ScrollMin)
             {
-                return false;
+                return null;
             }
 
             // 滚动前光标所在行
@@ -459,15 +459,13 @@ namespace ModengTerm.Document
             this.SetCursor(newCursorRow, this.Cursor.Column);
 
             // 填充滚动数据
-            if (scrollData != null)
+            return new VTScrollData()
             {
-                scrollData.NewScroll = newScroll;
-                scrollData.OldScroll = oldScroll;
-                scrollData.AddedLines = addedLines;
-                scrollData.RemovedLines = removedLines;
-            }
-
-            return true;
+                NewScroll = newScroll,
+                OldScroll = oldScroll,
+                AddedLines = addedLines,
+                RemovedLines = removedLines
+            };
         }
 
         /// <summary>
@@ -476,11 +474,9 @@ namespace ModengTerm.Document
         /// <param name="mousePosition">当前鼠标的坐标</param>
         /// <param name="documentSize">文档的大小</param>
         /// <param name="scrollData">保存滚动数据</param>
-        /// <returns>是否执行了滚动动作</returns>
-        private bool ScrollIfCursorOutsideDocument(VTPoint mousePosition, VTSize documentSize, out VTScrollData scrollData)
+        /// <returns>如果进行了滚动，那么返回滚动数据，如果因为某种原因没进行滚动，那么返回空</returns>
+        private VTScrollData ScrollIfCursorOutsideDocument(VTPoint mousePosition, VTSize documentSize)
         {
-            scrollData = null;
-
             // 要滚动到的目标行
             int scrollTarget = -1;
 
@@ -505,11 +501,10 @@ namespace ModengTerm.Document
 
             if (scrollTarget != -1)
             {
-                scrollData = new VTScrollData();
-                return ScrollToHistory(scrollTarget, scrollData);
+                return ScrollToHistory(scrollTarget);
             }
 
-            return false;
+            return null;
         }
 
         /// <summary>
@@ -1277,9 +1272,9 @@ namespace ModengTerm.Document
             SetCursor(cursorState.Row, cursorState.Column);
         }
 
-        public bool ScrollTo(int physicsRow, VTScrollData scrollData)
+        public VTScrollData ScrollTo(int physicsRow)
         {
-            return this.ScrollTo(physicsRow, ScrollOptions.ScrollToTop, scrollData);
+            return this.ScrollTo(physicsRow, ScrollOptions.ScrollToTop);
         }
 
         /// <summary>
@@ -1289,7 +1284,7 @@ namespace ModengTerm.Document
         /// <param name="options">滚动选项</param>
         /// <param name="scrollData">用来保存本次滚动相关的数据</param>
         /// <returns>如果进行了滚动，那么返回true，否则返回false</returns>
-        public bool ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop, VTScrollData scrollData = null)
+        public VTScrollData ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop)
         {
             int scrollTo = -1;
 
@@ -1635,8 +1630,7 @@ namespace ModengTerm.Document
 
             // 首先检测鼠标是否在Surface边界框的外面
             // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
-            VTScrollData scrollData;
-            bool scrolled = ScrollIfCursorOutsideDocument(mouseLocation, size, out scrollData);
+            VTScrollData scrollData = ScrollIfCursorOutsideDocument(mouseLocation, size);
 
             // 更新当前鼠标的命中信息，保存在endPointer里
             if (!GetTextPointer(mouseLocation, size, endPointer))
@@ -1667,7 +1661,7 @@ namespace ModengTerm.Document
             // ScrollIfCursorOutsideDocument的情况下，要显示滚动后的数据
             RequestInvalidate();
 
-            if (scrolled)
+            if (scrollData != null)
             {
                 this.InvokeScrollChanged(scrollData);
             }
@@ -1682,9 +1676,9 @@ namespace ModengTerm.Document
 
         private void OnMouseWheel(bool upper)
         {
-            int scrollValue = Scrollbar.ScrollValue;
+            int oldScroll = Scrollbar.ScrollValue;
             int scrollMax = Scrollbar.ScrollMax;
-            VTScrollData scrollData = null;
+            int newScroll = 0; // 最终要滚动到的值
 
             if (upper)
             {
@@ -1697,16 +1691,14 @@ namespace ModengTerm.Document
                     return;
                 }
 
-                scrollData = new VTScrollData();
-
-                if (scrollValue < scrollDelta)
+                if (oldScroll < scrollDelta)
                 {
                     // 一次可以全部滚完并且还有剩余
-                    ScrollToHistory(Scrollbar.ScrollMin, scrollData);
+                    newScroll = Scrollbar.ScrollMin;
                 }
                 else
                 {
-                    ScrollToHistory(scrollValue - scrollDelta, scrollData);
+                    newScroll = oldScroll - scrollDelta;
                 }
             }
             else
@@ -1719,20 +1711,24 @@ namespace ModengTerm.Document
                     return;
                 }
 
-                scrollData = new VTScrollData();
-
                 // 剩余可以往下滚动的行数
-                int remainScroll = scrollMax - scrollValue;
+                int remainScroll = scrollMax - oldScroll;
 
                 if (remainScroll >= scrollDelta)
                 {
-                    ScrollToHistory(scrollValue + scrollDelta, scrollData);
+                    newScroll = oldScroll + scrollDelta;
                 }
                 else
                 {
                     // 直接滚动到底
-                    ScrollToHistory(scrollMax, scrollData);
+                    newScroll = scrollMax;
                 }
+            }
+
+            VTScrollData scrollData = this.ScrollToHistory(newScroll);
+            if (scrollData == null)
+            {
+                return;
             }
 
             // 重新渲染
@@ -1741,11 +1737,10 @@ namespace ModengTerm.Document
             this.InvokeScrollChanged(scrollData);
         }
 
-        private void OnScrollChanged(int scrollValue)
+        private void OnScrollChanged(ScrollChangedData changed)
         {
-            VTScrollData scrollData = new VTScrollData();
-
-            if (!this.ScrollTo(scrollValue, scrollData))
+            VTScrollData scrollData = this.ScrollTo(changed.NewScroll);
+            if (scrollData == null) 
             {
                 return;
             }
