@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{59478dff-866c-4f7c-9a13-fdcd5d199158}</ProjectGuid>
+    <RootNamespace>winpty</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;COMPILING_WINPTY_DLL;NOMINMAX;WINPTY_AGENT_ASSERT;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\oheiheiheiheihei\terminal\Sources\winpty\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\agent\Agent.cc" />
+    <ClCompile Include="..\source\agent\AgentCreateDesktop.cc" />
+    <ClCompile Include="..\source\agent\ConsoleFont.cc" />
+    <ClCompile Include="..\source\agent\ConsoleInput.cc" />
+    <ClCompile Include="..\source\agent\ConsoleInputReencoding.cc" />
+    <ClCompile Include="..\source\agent\ConsoleLine.cc" />
+    <ClCompile Include="..\source\agent\DebugShowInput.cc" />
+    <ClCompile Include="..\source\agent\DefaultInputMap.cc" />
+    <ClCompile Include="..\source\agent\EventLoop.cc" />
+    <ClCompile Include="..\source\agent\InputMap.cc" />
+    <ClCompile Include="..\source\agent\LargeConsoleRead.cc" />
+    <ClCompile Include="..\source\agent\main.cc" />
+    <ClCompile Include="..\source\agent\NamedPipe.cc" />
+    <ClCompile Include="..\source\agent\Scraper.cc" />
+    <ClCompile Include="..\source\agent\Terminal.cc" />
+    <ClCompile Include="..\source\agent\UnicodeEncodingTest.cc" />
+    <ClCompile Include="..\source\agent\Win32Console.cc" />
+    <ClCompile Include="..\source\agent\Win32ConsoleBuffer.cc" />
+    <ClCompile Include="..\source\libwinpty\AgentLocation.cc" />
+    <ClCompile Include="..\source\libwinpty\winpty.cc" />
+    <ClCompile Include="..\source\shared\BackgroundDesktop.cc" />
+    <ClCompile Include="..\source\shared\Buffer.cc" />
+    <ClCompile Include="..\source\shared\DebugClient.cc" />
+    <ClCompile Include="..\source\shared\GenRandom.cc" />
+    <ClCompile Include="..\source\shared\OwnedHandle.cc" />
+    <ClCompile Include="..\source\shared\StringBuilderTest.cc" />
+    <ClCompile Include="..\source\shared\StringUtil.cc" />
+    <ClCompile Include="..\source\shared\WindowsSecurity.cc" />
+    <ClCompile Include="..\source\shared\WindowsVersion.cc" />
+    <ClCompile Include="..\source\shared\WinptyAssert.cc" />
+    <ClCompile Include="..\source\shared\WinptyException.cc" />
+    <ClCompile Include="..\source\shared\WinptyVersion.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\agent\Agent.h" />
+    <ClInclude Include="..\source\agent\AgentCreateDesktop.h" />
+    <ClInclude Include="..\source\agent\ConsoleFont.h" />
+    <ClInclude Include="..\source\agent\ConsoleInput.h" />
+    <ClInclude Include="..\source\agent\ConsoleInputReencoding.h" />
+    <ClInclude Include="..\source\agent\ConsoleLine.h" />
+    <ClInclude Include="..\source\agent\Coord.h" />
+    <ClInclude Include="..\source\agent\DebugShowInput.h" />
+    <ClInclude Include="..\source\agent\DefaultInputMap.h" />
+    <ClInclude Include="..\source\agent\DsrSender.h" />
+    <ClInclude Include="..\source\agent\EventLoop.h" />
+    <ClInclude Include="..\source\agent\InputMap.h" />
+    <ClInclude Include="..\source\agent\LargeConsoleRead.h" />
+    <ClInclude Include="..\source\agent\NamedPipe.h" />
+    <ClInclude Include="..\source\agent\Scraper.h" />
+    <ClInclude Include="..\source\agent\SimplePool.h" />
+    <ClInclude Include="..\source\agent\SmallRect.h" />
+    <ClInclude Include="..\source\agent\Terminal.h" />
+    <ClInclude Include="..\source\agent\UnicodeEncoding.h" />
+    <ClInclude Include="..\source\agent\Win32Console.h" />
+    <ClInclude Include="..\source\agent\Win32ConsoleBuffer.h" />
+    <ClInclude Include="..\source\include\winpty.h" />
+    <ClInclude Include="..\source\include\winpty_constants.h" />
+    <ClInclude Include="..\source\libwinpty\AgentLocation.h" />
+    <ClInclude Include="..\source\libwinpty\LibWinptyException.h" />
+    <ClInclude Include="..\source\libwinpty\WinptyInternal.h" />
+    <ClInclude Include="..\source\shared\AgentMsg.h" />
+    <ClInclude Include="..\source\shared\BackgroundDesktop.h" />
+    <ClInclude Include="..\source\shared\Buffer.h" />
+    <ClInclude Include="..\source\shared\DebugClient.h" />
+    <ClInclude Include="..\source\shared\GenRandom.h" />
+    <ClInclude Include="..\source\shared\Mutex.h" />
+    <ClInclude Include="..\source\shared\OsModule.h" />
+    <ClInclude Include="..\source\shared\OwnedHandle.h" />
+    <ClInclude Include="..\source\shared\PrecompiledHeader.h" />
+    <ClInclude Include="..\source\shared\StringBuilder.h" />
+    <ClInclude Include="..\source\shared\StringUtil.h" />
+    <ClInclude Include="..\source\shared\TimeMeasurement.h" />
+    <ClInclude Include="..\source\shared\UnixCtrlChars.h" />
+    <ClInclude Include="..\source\shared\WindowsSecurity.h" />
+    <ClInclude Include="..\source\shared\WindowsVersion.h" />
+    <ClInclude Include="..\source\shared\WinptyAssert.h" />
+    <ClInclude Include="..\source\shared\WinptyException.h" />
+    <ClInclude Include="..\source\shared\WinptyVersion.h" />
+    <ClInclude Include="..\source\shared\winpty_snprintf.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

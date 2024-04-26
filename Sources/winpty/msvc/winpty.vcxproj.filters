@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{2dc41e0c-de2c-4b16-8fbf-14b1da3492d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared">
+      <UniqueIdentifier>{3809df20-4ac7-4dcc-8486-0162cd2fc417}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="libwinpty">
+      <UniqueIdentifier>{e6fb18e4-bc5d-47a7-9de2-fb9af422aa20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="agent">
+      <UniqueIdentifier>{fbfbe455-b943-4126-9e2d-9c7027187890}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\libwinpty\AgentLocation.cc">
+      <Filter>libwinpty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\libwinpty\winpty.cc">
+      <Filter>libwinpty</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\BackgroundDesktop.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\Buffer.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\DebugClient.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\GenRandom.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\OwnedHandle.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\StringBuilderTest.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\StringUtil.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\WindowsSecurity.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\WindowsVersion.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\WinptyAssert.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\WinptyException.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\shared\WinptyVersion.cc">
+      <Filter>shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\Agent.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\AgentCreateDesktop.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\ConsoleFont.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\ConsoleInput.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\ConsoleInputReencoding.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\ConsoleLine.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\DebugShowInput.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\DefaultInputMap.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\EventLoop.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\InputMap.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\LargeConsoleRead.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\main.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\NamedPipe.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\Scraper.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\Terminal.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\UnicodeEncodingTest.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\Win32Console.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\agent\Win32ConsoleBuffer.cc">
+      <Filter>agent</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\include\winpty.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\include\winpty_constants.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\libwinpty\AgentLocation.h">
+      <Filter>libwinpty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\libwinpty\LibWinptyException.h">
+      <Filter>libwinpty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\libwinpty\WinptyInternal.h">
+      <Filter>libwinpty</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\AgentMsg.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\BackgroundDesktop.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\Buffer.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\DebugClient.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\GenRandom.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\Mutex.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\OsModule.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\OwnedHandle.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\PrecompiledHeader.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\StringBuilder.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\StringUtil.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\TimeMeasurement.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\UnixCtrlChars.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\WindowsSecurity.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\WindowsVersion.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\winpty_snprintf.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\WinptyAssert.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\WinptyException.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\shared\WinptyVersion.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\Agent.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\AgentCreateDesktop.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\ConsoleFont.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\ConsoleInput.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\ConsoleInputReencoding.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\ConsoleLine.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\Coord.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\DebugShowInput.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\DefaultInputMap.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\DsrSender.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\EventLoop.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\InputMap.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\LargeConsoleRead.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\NamedPipe.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\Scraper.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\SimplePool.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\SmallRect.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\Terminal.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\UnicodeEncoding.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\Win32Console.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\agent\Win32ConsoleBuffer.h">
+      <Filter>agent</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

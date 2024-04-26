@@ -693,7 +693,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 把src挂载到dest后面
-        /// 并更新光标所在行
+        /// 保持CursorY不变，更新光标所在行
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest"></param>
@@ -763,7 +763,8 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 把src挂载到dest前面 并更新光标所在行
+        /// 把src挂载到dest前面
+        /// 保持CursorY不变，并更新光标所在行
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest"></param>
