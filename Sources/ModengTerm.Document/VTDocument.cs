@@ -290,10 +290,7 @@ namespace ModengTerm.Document
 
             textLine.Initialize();
 
-            VTHistoryLine historyLine = new VTHistoryLine();
-            textLine.SetHistory(historyLine);
-
-            this.history.AddHistory(historyLine);
+            this.history.AddHistory(textLine.History);
 
             return textLine;
         }
@@ -1349,10 +1346,10 @@ namespace ModengTerm.Document
             int lastRow = this.history.Lines - 1;
             int lastCharacterIndex = Math.Max(0, lastHistoryLine.Characters.Count - 1);
 
-            Selection.FirstRow = firstRow;
-            Selection.LastRow = lastRow;
-            Selection.FirstRowCharacterIndex = 0;
-            Selection.LastRowCharacterIndex = lastCharacterIndex;
+            Selection.StartRow = firstRow;
+            Selection.EndRow = lastRow;
+            Selection.StartColumn = 0;
+            Selection.EndColumn = lastCharacterIndex;
 
             // 立即显示选中区域
             Selection.UpdateGeometry();
@@ -1364,10 +1361,10 @@ namespace ModengTerm.Document
         /// </summary>
         public void SelectViewport()
         {
-            Selection.FirstRow = this.ViewportFirst;
-            Selection.LastRow = this.ViewportLast;
-            Selection.FirstRowCharacterIndex = 0;
-            Selection.LastRowCharacterIndex = Math.Max(0, this.LastLine.Characters.Count - 1);
+            Selection.StartRow = this.ViewportFirst;
+            Selection.EndRow = this.ViewportLast;
+            Selection.StartColumn = 0;
+            Selection.EndColumn = Math.Max(0, this.LastLine.Characters.Count - 1);
 
             // 立即显示选中区域
             Selection.UpdateGeometry();
@@ -1579,10 +1576,10 @@ namespace ModengTerm.Document
                         }
                 }
 
-                Selection.FirstRow = this.Scrollbar.ScrollValue + logicalRow;
-                Selection.FirstRowCharacterIndex = startIndex;
-                Selection.LastRow = this.Scrollbar.ScrollValue + logicalRow;
-                Selection.LastRowCharacterIndex = endIndex;
+                Selection.StartRow = this.Scrollbar.ScrollValue + logicalRow;
+                Selection.StartColumn = startIndex;
+                Selection.EndRow = this.Scrollbar.ScrollValue + logicalRow;
+                Selection.EndColumn = endIndex;
                 Selection.RequestInvalidate();
             }
         }
@@ -1646,10 +1643,10 @@ namespace ModengTerm.Document
             // 重新渲染
             // PerformDrawing会更新TextSelection的形状
 
-            Selection.FirstRow = startPointer.PhysicsRow;
-            Selection.FirstRowCharacterIndex = startPointer.CharacterIndex;
-            Selection.LastRow = endPointer.PhysicsRow;
-            Selection.LastRowCharacterIndex = endPointer.CharacterIndex;
+            Selection.StartRow = startPointer.PhysicsRow;
+            Selection.StartColumn = startPointer.CharacterIndex;
+            Selection.EndRow = endPointer.PhysicsRow;
+            Selection.EndColumn = endPointer.CharacterIndex;
 
             // 此处要全部刷新，因为有可能会触发ScrollIfCursorOutsideDocument
             // ScrollIfCursorOutsideDocument的情况下，要显示滚动后的数据

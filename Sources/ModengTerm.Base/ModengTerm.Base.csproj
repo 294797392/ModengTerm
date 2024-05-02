@@ -17,9 +17,13 @@
 
   <ItemGroup>
     <Compile Remove="DataModels\SessionOptions\**" />
+    <Compile Remove="TestCase\**" />
     <EmbeddedResource Remove="DataModels\SessionOptions\**" />
+    <EmbeddedResource Remove="TestCase\**" />
     <None Remove="DataModels\SessionOptions\**" />
+    <None Remove="TestCase\**" />
     <Page Remove="DataModels\SessionOptions\**" />
+    <Page Remove="TestCase\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,10 +45,6 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="TestCase\" />
   </ItemGroup>
 
 </Project>

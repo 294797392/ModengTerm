@@ -161,7 +161,7 @@ namespace XTerminal.Parser
                 this.sequenceBytes.Add(ch);
 
                 // 在OSCString的状态下，ESC转义字符可以用作OSC状态的结束符，所以在这里不进入ESC状态
-                if (ASCIITable.IsEscape(ch) && this.state != VTStates.OSCString)
+                if (ASCIITable.IsEscape(ch) && this.state != VTStates.OSCString && this.state != VTStates.OSCParam)
                 {
                     this.EnterEscape();
                 }

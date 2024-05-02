@@ -224,7 +224,7 @@ namespace ModengTerm.Terminal
         public void Initialize(VTOptions options)
         {
             // 开启日志记录
-            //VTDebug.Context.Categories.FirstOrDefault(v => v.Category == VTDebugCategoryEnum.Interactive).Enabled = true;
+            VTDebug.Context.Categories.FirstOrDefault(v => v.Category == VTDebugCategoryEnum.vttestCode).Enabled = true;
 
             vtOptions = options;
 

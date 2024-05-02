@@ -263,7 +263,7 @@ namespace ModengTerm.Document
             }
             else
             {
-                logger.ErrorFormat("渲染光标失败, 没有考虑到的光标所在位置");
+                logger.ErrorFormat("渲染光标失败, 没有考虑到的光标所在位置, cursorColumn = {0}, activeLine.Columns = {1}", this.column, activeLine.Columns);
             }
         }
 

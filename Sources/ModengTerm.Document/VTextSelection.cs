@@ -21,10 +21,10 @@ namespace ModengTerm.Document
 
         #region 实例变量
 
-        private int firstRow;
-        private int lastRow;
-        private int firstRowCharacterIndex;
-        private int lastRowCharacterIndex;
+        private int startRow;
+        private int endRow;
+        private int startColumn;
+        private int endColumn;
         private List<VTRect> geometries;
 
         #endregion
@@ -36,35 +36,19 @@ namespace ModengTerm.Document
         /// <summary>
         /// 指示当前选中的内容是否为空
         /// </summary>
-        public bool IsEmpty { get { return firstRowCharacterIndex < 0 || lastRowCharacterIndex < 0; } }
+        public bool IsEmpty { get { return startColumn < 0 || endColumn < 0; } }
 
         /// <summary>
         /// 选中区域的第一行的物理行号
         /// </summary>
-        public int FirstRow
+        public int StartRow
         {
-            get { return firstRow; }
+            get { return startRow; }
             set
             {
-                if (firstRow != value)
+                if (startRow != value)
                 {
-                    firstRow = value;
-                    this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 选中区域的最后一行的物理行号
-        /// </summary>
-        public int LastRow
-        {
-            get { return lastRow; }
-            set
-            {
-                if (lastRow != value)
-                {
-                    lastRow = value;
+                    startRow = value;
                     this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
                 }
             }
@@ -73,14 +57,30 @@ namespace ModengTerm.Document
         /// <summary>
         /// 选中区域的第一行的第一个字符
         /// </summary>
-        public int FirstRowCharacterIndex
+        public int StartColumn
         {
-            get { return firstRowCharacterIndex; }
+            get { return startColumn; }
             set
             {
-                if (firstRowCharacterIndex != value)
+                if (startColumn != value)
                 {
-                    firstRowCharacterIndex = value;
+                    startColumn = value;
+                    this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 选中区域的最后一行的物理行号
+        /// </summary>
+        public int EndRow
+        {
+            get { return endRow; }
+            set
+            {
+                if (endRow != value)
+                {
+                    endRow = value;
                     this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
                 }
             }
@@ -89,14 +89,14 @@ namespace ModengTerm.Document
         /// <summary>
         /// 选中区域的最后一行的最后一个字符
         /// </summary>
-        public int LastRowCharacterIndex
+        public int EndColumn
         {
-            get { return lastRowCharacterIndex; }
+            get { return endColumn; }
             set
             {
-                if (lastRowCharacterIndex != value)
+                if (endColumn != value)
                 {
-                    lastRowCharacterIndex = value;
+                    endColumn = value;
                     this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
                 }
             }
@@ -138,8 +138,8 @@ namespace ModengTerm.Document
 
             this.geometries.Clear();
 
-            VTextPointer Start = new VTextPointer(firstRow, firstRowCharacterIndex);
-            VTextPointer End = new VTextPointer(lastRow, lastRowCharacterIndex);
+            VTextPointer Start = new VTextPointer(startRow, startColumn);
+            VTextPointer End = new VTextPointer(endRow, endColumn);
 
             VTDocument document = this.OwnerDocument;
             VTSize container = document.DrawingObject.Size;
@@ -247,10 +247,10 @@ namespace ModengTerm.Document
             OffsetY = 0;
             OffsetX = 0;
 
-            FirstRow = -1;
-            LastRow = -1;
-            FirstRowCharacterIndex = -1;
-            LastRowCharacterIndex = -1;
+            StartRow = -1;
+            EndRow = -1;
+            StartColumn = -1;
+            EndColumn = -1;
 
             this.geometries.Clear();
 
@@ -259,8 +259,8 @@ namespace ModengTerm.Document
 
         public void Normalize(out int topRow, out int bottomRow, out int startIndex, out int endIndex)
         {
-            VTextPointer Start = new VTextPointer(firstRow, firstRowCharacterIndex);
-            VTextPointer End = new VTextPointer(lastRow, lastRowCharacterIndex);
+            VTextPointer Start = new VTextPointer(startRow, startColumn);
+            VTextPointer End = new VTextPointer(endRow, endColumn);
 
             if (Start.PhysicsRow == End.PhysicsRow)
             {
@@ -301,10 +301,10 @@ namespace ModengTerm.Document
         {
             this.geometries = new List<VTRect>();
 
-            FirstRow = -1;
-            LastRow = -1;
-            FirstRowCharacterIndex = -1;
-            LastRowCharacterIndex = -1;
+            StartRow = -1;
+            EndRow = -1;
+            StartColumn = -1;
+            EndColumn = -1;
 
             IDrawingSelection drawingSelection = drawingObject as IDrawingSelection;
             drawingSelection.Color = VTColor.CreateFromRgbKey(this.Color);

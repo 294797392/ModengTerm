@@ -66,6 +66,13 @@ namespace ModengTerm.Document
         /// <returns></returns>
         public abstract bool TryGetHistory(int rowIndex, out VTHistoryLine historyLine);
 
+        /// <summary>
+        /// 获取指定的历史记录行
+        /// </summary>
+        /// <param name="startRowIndex">要获取的起始行（返回的行列表里包含该行）</param>
+        /// <param name="endRowIndex">要获取的结束行（返回的行列表里包含该行）</param>
+        /// <param name="historyLines">获取的行列表</param>
+        /// <returns>是否获取成功</returns>
         public abstract bool TryGetHistories(int startRowIndex, int endRowIndex, out IEnumerable<VTHistoryLine> historyLines);
 
         /// <summary>
@@ -102,7 +109,7 @@ namespace ModengTerm.Document
 
             int count = endRowIndex - startRowIndex + 1;
 
-            historyLines = this.historyLines.Skip(startRowIndex + 1).Take(count);
+            historyLines = this.historyLines.Skip(startRowIndex).Take(count);
 
             return true;
         }

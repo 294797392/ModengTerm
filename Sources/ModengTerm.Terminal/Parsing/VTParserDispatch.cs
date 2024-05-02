@@ -388,6 +388,29 @@ namespace XTerminal.Parser
         }
 
         /// <summary>
+        /// 指定要使用的字符集
+        /// https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
+        /// 
+        /// 参考：
+        /// terminal: OutputStateMachineEngine.cpp - OutputStateMachineEngine::ActionEscDispatch - default
+        /// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html: ESC ( C
+        /// </summary>
+        /// <param name="commandChar"></param>
+        /// <param name="commandParameter">finalByte</param>
+        private void DesignateCharset(int commandChar, byte commandParameter)
+        {
+            //switch (commandChar)
+            //{
+            //    case '(':
+            //        {
+
+            //            break;
+            //        }
+
+            //}
+        }
+
+        /// <summary>
         ///  - Triggers the EscDispatch action to indicate that the listener should handle a simple escape sequence.
         ///   These sequences traditionally start with ESC and a simple letter. No complicated parameters.
         /// </summary>
@@ -430,15 +453,47 @@ namespace XTerminal.Parser
                         break;
                     }
 
-                case (EscActionCodes)66:
-                case (EscActionCodes)230:
+                case EscActionCodes.SS2_SingleShift:
                     {
-                        //logger.FatalFormat("terminal没实现的EscActionCodes - {0}", (char)code);
+                        break;
+                    }
+                case EscActionCodes.SS3_SingleShift:
+                    {
                         break;
                     }
 
+                //case (EscActionCodes)'0': // make menuconfig触发
+                //    {
+                //        // https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
+                //        // 指定字符集
+                //        // Sequence	说明	行为
+                //        // ESC(0 指定字符集 - DEC 线条绘制    启用 DEC 线条绘制模式
+
+                //        // terminal:
+                //        // OutputStateMachineEngine.cpp - OutputStateMachineEngine::ActionEscDispatch - default
+
+
+                //        break;
+                //    }
+
+                //case (EscActionCodes)66:
+                //case (EscActionCodes)230:
+                //    {
+                //        logger.FatalFormat("terminal没实现的EscActionCodes - {0}", (char)code);
+                //        break;
+                //    }
+
                 default:
-                    throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
+                    {
+                        if (this.parameters.Count == 0)
+                        {
+                            throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
+                        }
+
+                        this.DesignateCharset(this.parameters[0], ch);
+
+                        break;
+                    }
             }
         }
 

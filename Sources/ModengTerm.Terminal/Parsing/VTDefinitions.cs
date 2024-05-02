@@ -306,15 +306,52 @@ namespace XTerminal.Parser
         NEL_NextLine = 'E',
         HTS_HorizontalTabSet = 'H',
         RI_ReverseLineFeed = 'M',
+
+        /// <summary>
+        /// Single Shift G2
+        /// 把G2字符集临时填充到GL部分，只用一次
+        /// G2字符集里的数据使用SCS指令指定
+        /// 
+        /// Temporarily invokes G2 character set into GL for the next graphic character. G2 is designated by a select-character-set (SCS) sequence.
+        /// </summary>
         SS2_SingleShift = 'N',
+
+        /// <summary>
+        /// Single Shift G3
+        /// 把G3字符集临时填充到GL部分，只用一次
+        /// G3字符集里的数据使用SCS指令指定
+        /// 
+        /// Temporarily invokes G3 character set into GL for the next graphic character. G3 is designated by a select-character-set (SCS) sequence.
+        /// </summary>
         SS3_SingleShift = 'O',
         DECID_IdentifyDevice = 'Z',
         ST_StringTerminator = '\\',
         RIS_ResetToInitialState = 'c',
+        
+        /// <summary>
+        /// Lock Shift G2
+        /// GL使用G2字符集
+        /// </summary>
         LS2_LockingShift = 'n',
+        /// <summary>
+        /// Lock Shift G3
+        /// GL使用G3字符集
+        /// </summary>
         LS3_LockingShift = 'o',
+        /// <summary>
+        /// Lock Shift G1 GR
+        /// GR使用G1字符集
+        /// </summary>
         LS1R_LockingShift = '~',
+        /// <summary>
+        /// Lock Shift G2 GR
+        /// GR使用G2字符集
+        /// </summary>
         LS2R_LockingShift = '}',
+        /// <summary>
+        /// Lock Shift G3 GR
+        /// GR使用G3字符集
+        /// </summary>
         LS3R_LockingShift = '|',
         //DECAC1_AcceptC1Controls = ' 7',
         //DECDHL_DoubleHeightLineTop = '#3',
