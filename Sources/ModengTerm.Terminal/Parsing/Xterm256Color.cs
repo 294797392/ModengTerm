@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Parser
+namespace ModengTerm.Terminal.Parsing
 {
     /// <summary>
     /// 提供Xterm颜色索引值到RGB值的转换

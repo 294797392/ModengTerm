@@ -1,12 +1,15 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Terminal;
+using ModengTerm.Terminal.Parsing;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using XTerminal.Base;
 
-namespace XTerminal.Parser
+namespace ModengTerm.Terminal.Parsing
 {
     /// <summary>
     /// 负责分发VTParser的事件
@@ -29,11 +32,9 @@ namespace XTerminal.Parser
         #region 属性
 
         /// <summary>
-        /// 颜色表
-        /// ColorIndex -> RgbKey
-        /// 当执行SGR指令的时候直接把ColorIndex映射成VTColor对象
+        /// 处理终端命令的处理器
         /// </summary>
-        public VTColorTable ColorTable { get; set; }
+        public VTDispatchHandler DispatchHandler { get; set; }
 
         #endregion
 
@@ -49,12 +50,12 @@ namespace XTerminal.Parser
 
         private void ActionPrint(byte ch)
         {
-            this.NotifyActionEvent(VTActions.Print, ch);
+            this.DispatchHandler.PrintCharacter(Convert.ToChar(ch));
         }
 
         private void ActionPrint(char ch)
         {
-            this.NotifyActionEvent(VTActions.Print, ch);
+            this.DispatchHandler.PrintCharacter(ch);
         }
 
         /// <summary>
@@ -79,48 +80,36 @@ namespace XTerminal.Parser
                 case ASCIITable.BEL:
                     {
                         // 响铃
-                        this.NotifyActionEvent(VTActions.PlayBell);
+                        this.DispatchHandler.PlayBell();
                         break;
                     }
 
                 case ASCIITable.BS:
                     {
                         // Backspace，退格，光标向前移动一位
-                        this.NotifyActionEvent(VTActions.BS);
+                        this.DispatchHandler.Backspace();
                         break;
                     }
 
                 case ASCIITable.TAB:
                     {
                         // tab键
-                        this.NotifyActionEvent(VTActions.ForwardTab);
+                        this.DispatchHandler.ForwardTab();
                         break;
                     }
 
                 case ASCIITable.CR:
                     {
-                        this.NotifyActionEvent(VTActions.CarriageReturn);
+                        this.DispatchHandler.CarriageReturn();
                         break;
                     }
 
                 case ASCIITable.LF:
-                    {
-                        this.NotifyActionEvent(VTActions.LF);
-                        break;
-                    }
-
                 case ASCIITable.FF:
-                    {
-                        //logger.DebugFormat("Action - LF");
-                        this.NotifyActionEvent(VTActions.FF);
-                        break;
-                    }
-
                 case ASCIITable.VT:
                     {
                         // 这三个都是LF
-                        //logger.DebugFormat("Action - VT");
-                        this.NotifyActionEvent(VTActions.VT);
+                        this.DispatchHandler.LineFeed();
                         break;
                     }
 
@@ -128,13 +117,13 @@ namespace XTerminal.Parser
                 case ASCIITable.SO:
                     {
                         // 这两个不知道是什么意思
-                        logger.FatalFormat("未处理的SI和SI");
+                        logger.FatalFormat("未处理的SI和SO");
                         break;
                     }
 
                 default:
                     {
-                        this.NotifyActionEvent(VTActions.Print, ch);
+                        this.DispatchHandler.PrintCharacter(Convert.ToChar(ch));
                         break;
                         //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
                     }
@@ -182,37 +171,43 @@ namespace XTerminal.Parser
                         /// 触发场景：VIM
                         /// </summary>
 
-                        this.NotifyActionEvent(VTActions.ED_EraseDisplay, parameters);
+                        VTEraseType eraseType = (VTEraseType)VTParameter.GetParameter(parameters, 0, 0);
+
+                        this.DispatchHandler.EraseDisplay(eraseType);
                         break;
                     }
 
                 case CsiActionCodes.HVP_HorizontalVerticalPosition:
                     {
-                        this.NotifyActionEvent(VTActions.HVP_HorizontalVerticalPosition, parameters);
+                        this.DispatchHandler.HVP_HorizontalVerticalPosition(parameters);
                         break;
                     }
 
                 case CsiActionCodes.CUP_CursorPosition:
                     {
-                        this.NotifyActionEvent(VTActions.CUP_CursorPosition, parameters);
+                        this.DispatchHandler.CUP_CursorPosition(parameters);
                         break;
                     }
 
                 case CsiActionCodes.CUF_CursorForward:
                     {
-                        this.NotifyActionEvent(VTActions.CUF_CursorForward, parameters);
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
+
+                        this.DispatchHandler.CUF_CursorForward(n);
                         break;
                     }
 
                 case CsiActionCodes.CUU_CursorUp:
                     {
-                        this.NotifyActionEvent(VTActions.CUU_CursorUp, parameters);
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
+
+                        this.DispatchHandler.CUU_CursorUp(n);
                         break;
                     }
 
                 case CsiActionCodes.CUD_CursorDown:
                     {
-                        this.NotifyActionEvent(VTActions.CUD_CursorDown, parameters);
+                        this.DispatchHandler.CUD_CursorDown(parameters);
                         break;
                     }
 
@@ -242,7 +237,7 @@ namespace XTerminal.Parser
                         // Default: Pt = 1
                         // bottomMargin：is the line number for the bottom margin.
                         // Default: Pb = current number of lines per screen
-                        this.NotifyActionEvent(VTActions.DECSTBM_SetScrollingRegion, parameters);
+                        this.DispatchHandler.DECSTBM_SetScrollingRegion(parameters);
                         break;
                     }
 
@@ -256,31 +251,33 @@ namespace XTerminal.Parser
                         // 当DECLRMM启用的时候，执行设置左右边距的动作
                         // 当DECLRMM没启用的时候，执行CursorSaveState动作
 
-                        this.NotifyActionEvent(VTActions.DECSLRM_SetLeftRightMargins, parameters);
+                        this.DispatchHandler.DECSLRM_SetLeftRightMargins(parameters);
                         break;
                     }
 
                 case CsiActionCodes.EL_EraseLine:
                     {
-                        this.NotifyActionEvent(VTActions.EL_EraseLine, parameters);
+                        VTEraseType eraseType = (VTEraseType)VTParameter.GetParameter(this.parameters, 0, 0);
+
+                        this.DispatchHandler.EL_EraseLine(eraseType);
                         break;
                     }
 
                 case CsiActionCodes.DCH_DeleteCharacter:
                     {
-                        this.NotifyActionEvent(VTActions.DCH_DeleteCharacter, parameters);
+                        this.DispatchHandler.DCH_DeleteCharacter(parameters);
                         break;
                     }
 
                 case CsiActionCodes.ICH_InsertCharacter:
                     {
-                        this.NotifyActionEvent(VTActions.ICH_InsertCharacter, parameters);
+                        this.DispatchHandler.ICH_InsertCharacter(parameters);
                         break;
                     }
 
                 case CsiActionCodes.DSR_DeviceStatusReport:
                     {
-                        this.NotifyActionEvent(VTActions.DSR_DeviceStatusReport, parameters);
+                        this.DispatchHandler.DSR_DeviceStatusReport(parameters);
                         break;
                     }
 
@@ -325,49 +322,49 @@ namespace XTerminal.Parser
                               DECPCCM, DECVCCM) are ignored.
                         ********************************************************************/
 
-                        this.NotifyActionEvent(VTActions.DA_DeviceAttributes);
+                        this.DispatchHandler.DA_DeviceAttributes(parameters);
                         break;
                     }
 
                 case CsiActionCodes.IL_InsertLine:
                     {
-                        this.NotifyActionEvent(VTActions.IL_InsertLine, parameters);
+                        this.DispatchHandler.IL_InsertLine(parameters);
                         break;
                     }
 
                 case CsiActionCodes.DL_DeleteLine:
                     {
-                        this.NotifyActionEvent(VTActions.DL_DeleteLine, parameters);
+                        this.DispatchHandler.DL_DeleteLine(parameters);
                         break;
                     }
 
                 case CsiActionCodes.CHA_CursorHorizontalAbsolute:
                     {
-                        this.NotifyActionEvent(VTActions.CHA_CursorHorizontalAbsolute, parameters);
+                        this.DispatchHandler.CHA_CursorHorizontalAbsolute(parameters);
                         break;
                     }
 
                 case CsiActionCodes.VPA_VerticalLinePositionAbsolute:
                     {
-                        this.NotifyActionEvent(VTActions.VPA_VerticalLinePositionAbsolute, parameters);
+                        this.DispatchHandler.VPA_VerticalLinePositionAbsolute(parameters);
                         break;
                     }
 
                 case CsiActionCodes.SD_ScrollDown:
                     {
-                        this.NotifyActionEvent(VTActions.SD_ScrollDown, parameters);
+                        this.DispatchHandler.SD_ScrollDown(parameters);
                         break;
                     }
 
                 case CsiActionCodes.SU_ScrollUp:
                     {
-                        this.NotifyActionEvent(VTActions.SU_ScrollUp, parameters);
+                        this.DispatchHandler.SU_ScrollUp(parameters);
                         break;
                     }
 
                 case CsiActionCodes.ECH_EraseCharacters:
                     {
-                        this.NotifyActionEvent(VTActions.ECH_EraseCharacters, parameters);
+                        this.DispatchHandler.ECH_EraseCharacters(parameters);
                         break;
                     }
 
@@ -423,25 +420,25 @@ namespace XTerminal.Parser
             {
                 case EscActionCodes.DECSC_CursorSave:
                     {
-                        this.NotifyActionEvent(VTActions.DECSC_CursorSave);
+                        this.DispatchHandler.DECSC_CursorSave();
                         break;
                     }
 
                 case EscActionCodes.DECRC_CursorRestore:
                     {
-                        this.NotifyActionEvent(VTActions.DECRC_CursorRestore);
+                        this.DispatchHandler.DECRC_CursorRestore();
                         break;
                     }
 
                 case EscActionCodes.DECKPAM_KeypadApplicationMode:
                     {
-                        this.NotifyActionEvent(VTActions.DECKPAM_KeypadApplicationMode);
+                        this.DispatchHandler.DECKPAM_KeypadApplicationMode();
                         break;
                     }
 
                 case EscActionCodes.DECKPNM_KeypadNumericMode:
                     {
-                        this.NotifyActionEvent(VTActions.DECKPNM_KeypadNumericMode);
+                        this.DispatchHandler.DECKPNM_KeypadNumericMode();
                         break;
                     }
 
@@ -449,7 +446,7 @@ namespace XTerminal.Parser
                     {
                         // Performs a "Reverse line feed", essentially, the opposite of '\n'.
                         //    Moves the cursor up one line, and tries to keep its position in the line
-                        this.NotifyActionEvent(VTActions.RI_ReverseLineFeed);
+                        this.DispatchHandler.RI_ReverseLineFeed();
                         break;
                     }
 
@@ -485,12 +482,14 @@ namespace XTerminal.Parser
 
                 default:
                     {
-                        if (this.parameters.Count == 0)
-                        {
-                            throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
-                        }
+                        throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
 
-                        this.DesignateCharset(this.parameters[0], ch);
+                        //if (this.parameters.Count == 0)
+                        //{
+                        //    throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
+                        //}
+
+                        //this.DesignateCharset(this.parameters[0], ch);
 
                         break;
                     }
@@ -545,107 +544,7 @@ namespace XTerminal.Parser
             {
                 byte option = (byte)parameters[i];
 
-                switch ((GraphicsOptions)option)
-                {
-                    // 将所有属性返回到修改前的默认状态
-                    case GraphicsOptions.Off:
-                        {
-                            this.NotifyActionEvent(VTActions.UnsetAll);
-                            break;
-                        }
-
-                    case GraphicsOptions.ForegroundDefault: this.NotifyActionEvent(VTActions.ForegroundUnset); break;
-                    case GraphicsOptions.BackgroundDefault: this.NotifyActionEvent(VTActions.BackgroundUnset); break;
-                    case GraphicsOptions.BoldBright: this.NotifyActionEvent(VTActions.Bold); break;
-                    case GraphicsOptions.RGBColorOrFaint: this.NotifyActionEvent(VTActions.Faint); break;// 降低颜色强度
-                    case GraphicsOptions.NotBoldOrFaint:
-                        {
-                            // 还原颜色强度和粗细
-                            this.NotifyActionEvent(VTActions.BoldUnset);
-                            this.NotifyActionEvent(VTActions.FaintUnset);
-                            break;
-                        }
-
-                    case GraphicsOptions.Italics: this.NotifyActionEvent(VTActions.Italics); break;
-                    case GraphicsOptions.NotItalics: this.NotifyActionEvent(VTActions.ItalicsUnset); break;
-                    case GraphicsOptions.BlinkOrXterm256Index:
-                    case GraphicsOptions.RapidBlink: this.NotifyActionEvent(VTActions.Blink); break;
-                    case GraphicsOptions.Steady: this.NotifyActionEvent(VTActions.BlinkUnset); break;
-                    case GraphicsOptions.Invisible: this.NotifyActionEvent(VTActions.Invisible); break;
-                    case GraphicsOptions.Visible: this.NotifyActionEvent(VTActions.InvisibleUnset); break;
-                    case GraphicsOptions.CrossedOut: this.NotifyActionEvent(VTActions.CrossedOut); break;
-                    case GraphicsOptions.NotCrossedOut: this.NotifyActionEvent(VTActions.CrossedOutUnset); break;
-                    case GraphicsOptions.Negative: this.NotifyActionEvent(VTActions.ReverseVideo); break;
-                    case GraphicsOptions.Positive: this.NotifyActionEvent(VTActions.ReverseVideoUnset); break;
-                    case GraphicsOptions.Underline: this.NotifyActionEvent(VTActions.Underline); break;
-                    case GraphicsOptions.DoublyUnderlined: this.NotifyActionEvent(VTActions.DoublyUnderlined); break;
-                    case GraphicsOptions.NoUnderline:
-                        {
-                            this.NotifyActionEvent(VTActions.UnderlineUnset);
-                            this.NotifyActionEvent(VTActions.DoublyUnderlinedUnset);
-                            break;
-                        }
-
-                    case GraphicsOptions.Overline: this.NotifyActionEvent(VTActions.Overlined); break;
-                    case GraphicsOptions.NoOverline: this.NotifyActionEvent(VTActions.OverlinedUnset); break;
-
-                    case GraphicsOptions.ForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.DarkBlack)); break;
-                    case GraphicsOptions.ForegroundBlue: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.DarkBlue)); break;
-                    case GraphicsOptions.ForegroundGreen: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkGreen)); break;
-                    case GraphicsOptions.ForegroundCyan: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkCyan)); break;
-                    case GraphicsOptions.ForegroundRed: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkRed)); break;
-                    case GraphicsOptions.ForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkMagenta)); break;
-                    case GraphicsOptions.ForegroundYellow: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkYellow)); break;
-                    case GraphicsOptions.ForegroundWhite: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.DarkWhite)); break;
-
-                    case GraphicsOptions.BackgroundBlack: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkBlack)); break;
-                    case GraphicsOptions.BackgroundBlue: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkBlue)); break;
-                    case GraphicsOptions.BackgroundGreen: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkGreen)); break;
-                    case GraphicsOptions.BackgroundCyan: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkCyan)); break;
-                    case GraphicsOptions.BackgroundRed: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkRed)); break;
-                    case GraphicsOptions.BackgroundMagenta: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkMagenta)); break;
-                    case GraphicsOptions.BackgroundYellow: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkYellow)); break;
-                    case GraphicsOptions.BackgroundWhite: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.DarkWhite)); break;
-
-                    case GraphicsOptions.BrightForegroundBlack: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
-                    case GraphicsOptions.BrightForegroundBlue: this.NotifyActionEvent(VTActions.Foreground,  this.ColorTable.GetColor(VTColorIndex.BrightBlue)); break;
-                    case GraphicsOptions.BrightForegroundGreen: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightGreen)); break;
-                    case GraphicsOptions.BrightForegroundCyan: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightCyan)); break;
-                    case GraphicsOptions.BrightForegroundRed: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightRed)); break;
-                    case GraphicsOptions.BrightForegroundMagenta: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightMagenta)); break;
-                    case GraphicsOptions.BrightForegroundYellow: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightYellow)); break;
-                    case GraphicsOptions.BrightForegroundWhite: this.NotifyActionEvent(VTActions.Foreground, this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
-
-                    case GraphicsOptions.BrightBackgroundBlack: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightBlack)); break;
-                    case GraphicsOptions.BrightBackgroundBlue: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightBlue)); break;
-                    case GraphicsOptions.BrightBackgroundGreen: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightGreen)); break;
-                    case GraphicsOptions.BrightBackgroundCyan: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightCyan)); break;
-                    case GraphicsOptions.BrightBackgroundRed: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightRed)); break;
-                    case GraphicsOptions.BrightBackgroundMagenta: this.NotifyActionEvent(VTActions.Background, this.ColorTable.GetColor(VTColorIndex.BrightMagenta)); break;
-                    case GraphicsOptions.BrightBackgroundYellow: this.NotifyActionEvent(VTActions.Background,this.ColorTable.GetColor(VTColorIndex.BrightYellow)); break;
-                    case GraphicsOptions.BrightBackgroundWhite: this.NotifyActionEvent(VTActions.Background,  this.ColorTable.GetColor(VTColorIndex.BrightWhite)); break;
-
-                    case GraphicsOptions.ForegroundExtended:
-                        {
-                            VTColor rgbColor;
-                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            this.NotifyActionEvent(VTActions.Foreground, rgbColor);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundExtended:
-                        {
-                            VTColor rgbColor;
-                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            this.NotifyActionEvent(VTActions.Background, rgbColor);
-                            break;
-                        }
-
-                    default:
-                        {
-                            throw new NotImplementedException(string.Format("未实现的SGRCode = {0}", option));
-                        }
-                }
+                this.DispatchHandler.PerformSGR((GraphicsOptions)option, this.parameters);
             }
         }
 
@@ -707,48 +606,49 @@ namespace XTerminal.Parser
                             // true表示ApplicationMode
                             // false表示NormalMode
                             this.isApplicationMode = enable;
-                            this.NotifyActionEvent(VTActions.DECCKM_CursorKeysMode, enable);
+                            this.DispatchHandler.DECCKM_CursorKeysMode(enable);
                             break;
                         }
 
                     case DECPrivateMode.DECANM_AnsiMode:
                         {
                             this.isAnsiMode = enable;
-                            this.NotifyActionEvent(VTActions.DECANM_AnsiMode, enable);
+                            this.DispatchHandler.DECANM_AnsiMode(enable);
                             break;
                         }
 
                     case DECPrivateMode.DECAWM_AutoWrapMode:
                         {
-                            this.NotifyActionEvent(VTActions.DECAWM_AutoWrapMode, enable);
+                            this.DispatchHandler.DECAWM_AutoWrapMode(enable);
                             break;
                         }
 
                     case DECPrivateMode.ASB_AlternateScreenBuffer:
                         {
+                            // 是否使用备用缓冲区
                             // 打开VIM等编辑器的时候会触发
-                            this.NotifyActionEvent(enable ? VTActions.UseAlternateScreenBuffer : VTActions.UseMainScreenBuffer);
+                            this.DispatchHandler.ASB_AlternateScreenBuffer(enable):
                             break;
                         }
 
                     case DECPrivateMode.XTERM_BracketedPasteMode:
                         {
                             // Sets the XTerm bracketed paste mode. This controls whether pasted content is bracketed with control sequences to differentiate it from typed text.
-                            this.NotifyActionEvent(VTActions.XTERM_BracketedPasteMode, enable);
+                            this.DispatchHandler.XTERM_BracketedPasteMode(enable);
                             break;
                         }
 
                     case DECPrivateMode.ATT610_StartCursorBlink:
                         {
                             // 控制是否要闪烁光标
-                            this.NotifyActionEvent(VTActions.ATT610_StartCursorBlink, enable);
+                            this.DispatchHandler.ATT610_StartCursorBlink(enable);
                             break;
                         }
 
                     case DECPrivateMode.DECTCEM_TextCursorEnableMode:
                         {
                             // 控制是否要显示光标
-                            this.NotifyActionEvent(VTActions.DECTCEM_TextCursorEnableMode, enable);
+                            this.DispatchHandler.DECTCEM_TextCursorEnableMode(enable);
                             break;
                         }
 

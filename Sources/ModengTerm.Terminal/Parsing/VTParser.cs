@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using XTerminal.Base;
 
-namespace XTerminal.Parser
+namespace ModengTerm.Terminal.Parsing
 {
     /// <summary>
     /// 模块名称：终端数据流解析器
@@ -79,8 +79,6 @@ namespace XTerminal.Parser
         #endregion
 
         #region 公开事件
-
-        public event VTParserEventDlg ActionEvent;
 
         #endregion
 
@@ -1069,24 +1067,24 @@ namespace XTerminal.Parser
 
         #endregion
 
-        private void NotifyActionEvent(VTActions vtAction, object param = null)
-        {
-            if (this.ActionEvent != null)
-            {
-                VTDebug.Context.Writevttest(vtAction, this.sequenceBytes);
+        //private void NotifyActionEvent(VTActions vtAction, object param = null)
+        //{
+        //    if (this.ActionEvent != null)
+        //    {
+        //        VTDebug.Context.Writevttest(vtAction, this.sequenceBytes);
 
-                try
-                {
-                    this.ActionEvent(this, vtAction, param);
-                }
-                catch (Exception ex) 
-                {
-                    logger.Error(ex);
-                }
+        //        try
+        //        {
+        //            this.ActionEvent(this, vtAction, param);
+        //        }
+        //        catch (Exception ex) 
+        //        {
+        //            logger.Error(ex);
+        //        }
 
-                this.sequenceBytes.Clear();
-            }
-        }
+        //        this.sequenceBytes.Clear();
+        //    }
+        //}
 
         #endregion
 

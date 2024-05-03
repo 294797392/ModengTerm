@@ -164,11 +164,6 @@ namespace ModengTerm.Terminal
             return true;
         }
 
-        public void WriteInteractive(VTActions action, string format, params object[] param)
-        {
-            this.WriteInteractive(action.ToString(), format, param);
-        }
-
         public void WriteInteractive(VTSendTypeEnum type, byte[] bytes)
         {
             if (!this.CanWrite(this.interactiveCategory))

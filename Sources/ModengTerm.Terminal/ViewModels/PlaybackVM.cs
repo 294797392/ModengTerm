@@ -2,6 +2,7 @@
 using ModengTerm.Document.Drawing;
 using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using System;
 using System.Collections.Generic;
@@ -29,15 +30,13 @@ namespace ModengTerm.Terminal.ViewModels
         private PlaybackFile playbackFile;
         private PlaybackStream playbackStream;
 
+        private VTParser vtParser;
+
         #endregion
 
         #region 属性
 
-        public IVideoTerminal VideoTerminal { get; set; }
-
-        public IDrawingDocument MainDocument { get; set; }
-
-        public IDrawingDocument AlternateDocument { get; set; }
+        public VideoTerminal VideoTerminal { get; set; }
 
         #endregion
 
@@ -58,6 +57,10 @@ namespace ModengTerm.Terminal.ViewModels
                 return code;
             }
 
+            this.vtParser = new VTParser();
+            this.vtParser.DispatchHandler = this.VideoTerminal;
+            this.vtParser.Initialize();
+
             this.playbackStatus = PlaybackStatusEnum.Playing;
             this.playbackEvent = new AutoResetEvent(false);
             this.playbackTask = Task.Factory.StartNew(this.PlaybackThreadProc);
@@ -76,6 +79,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.playbackStream.Close();
             this.playbackEvent.Close();
             this.playbackEvent.Dispose();
+            this.vtParser.Release();
         }
 
         #endregion
@@ -115,7 +119,7 @@ namespace ModengTerm.Terminal.ViewModels
                     }
 
                     // 播放一帧
-                    this.VideoTerminal.ProcessData(nextFrame.Data, nextFrame.Data.Length);
+                    //this.VideoTerminal.ProcessData(nextFrame.Data, nextFrame.Data.Length);
 
                     prevTimestamp = nextFrame.Timestamp;
                 }

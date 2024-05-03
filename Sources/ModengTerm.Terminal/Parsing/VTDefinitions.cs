@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace XTerminal.Parser
+namespace ModengTerm.Terminal.Parsing
 {
     public enum GraphicsOptions
     {
@@ -11,6 +11,10 @@ namespace XTerminal.Parser
         BoldBright = 1,
         // The 2 and 5 entries here are for BOTH the extended graphics options,
         // as well as the Faint/Blink options.
+
+        /// <summary>
+        /// 降低颜色强度
+        /// </summary>
         RGBColorOrFaint = 2, // 2 is also Faint, decreased intensity (ISO 6429).
         Italics = 3,
         Underline = 4,
@@ -28,6 +32,10 @@ namespace XTerminal.Parser
         Invisible = 8,
         CrossedOut = 9,
         DoublyUnderlined = 21,
+
+        /// <summary>
+        /// 还原颜色强度和粗细
+        /// </summary>
         NotBoldOrFaint = 22,
         NotItalics = 23,
         NoUnderline = 24,
@@ -85,7 +93,7 @@ namespace XTerminal.Parser
     /// <summary>
     /// EraseLine的类型
     /// </summary>
-    public enum EraseType
+    public enum VTEraseType
     {
         /// <summary>
         /// 删除从当前光标处到该行结尾的所有字符

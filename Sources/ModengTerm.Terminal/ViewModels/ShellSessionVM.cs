@@ -13,6 +13,7 @@ using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
+using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
@@ -125,6 +126,11 @@ namespace ModengTerm.Terminal.ViewModels
 
         private PlaybackStatusEnum playbackStatus;
         private PlaybackStream playbackStream;
+
+        /// <summary>
+        /// 数据流解析器
+        /// </summary>
+        private VTParser vtParser;
 
         #endregion
 
@@ -312,9 +318,14 @@ namespace ModengTerm.Terminal.ViewModels
                 AlternateDocument = this.AlternateDocument,
                 MainDocument = this.MainDocument
             };
-            this.videoTerminal = new VideoTerminal();
-            this.videoTerminal.ViewportChanged += this.VideoTerminal_ViewportChanged;
-            this.videoTerminal.Initialize(options);
+            VideoTerminal videoTerminal = new VideoTerminal();
+            videoTerminal.ViewportChanged += this.VideoTerminal_ViewportChanged;
+            videoTerminal.Initialize(options);
+            this.videoTerminal = videoTerminal;
+
+            this.vtParser = new VTParser();
+            this.vtParser.DispatchHandler = this.videoTerminal;
+            this.vtParser.Initialize();
 
             #endregion
 
@@ -360,6 +371,8 @@ namespace ModengTerm.Terminal.ViewModels
             // 释放剪贴板
             this.clipboard.Release();
 
+            this.vtParser.Release();
+
             this.isRunning = false;
         }
 
@@ -399,6 +412,75 @@ namespace ModengTerm.Terminal.ViewModels
                     MessageBoxUtils.Error("保存失败");
                 }
             }
+        }
+
+        /// <summary>
+        /// 根据滚动前的值和滚动后的值计算滚动数据
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="oldScroll"></param>
+        /// <param name="newScroll"></param>
+        /// <returns></returns>
+        private VTScrollData GetScrollData(VTDocument document, int oldScroll, int newScroll)
+        {
+            int scrolledRows = Math.Abs(newScroll - oldScroll);
+
+            int scrollValue = newScroll;
+            int viewportRow = document.ViewportRow;
+            VTHistory history = document.History;
+            VTScrollInfo scrollbar = document.Scrollbar;
+
+            List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
+            List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
+
+            if (scrolledRows >= viewportRow)
+            {
+                // 此时说明把所有行都滚动到屏幕外了
+
+                // 遍历显示
+                VTextLine current = document.FirstLine;
+                for (int i = 0; i < viewportRow; i++)
+                {
+                    addedLines.Add(current.History);
+                }
+
+                // 我打赌不会报异常
+                IEnumerable<VTHistoryLine> historyLines;
+                history.TryGetHistories(oldScroll, oldScroll + viewportRow, out historyLines);
+                removedLines.AddRange(historyLines);
+            }
+            else
+            {
+                // 此时说明有部分行被移动出去了
+                if (newScroll > oldScroll)
+                {
+                    // 往下滚动
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll, oldScroll + scrolledRows, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(oldScroll + viewportRow, oldScroll + viewportRow + scrolledRows - 1, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+                else
+                {
+                    // 往上滚动,2
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll + viewportRow - scrolledRows, oldScroll + viewportRow - 1, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(newScroll, newScroll + scrolledRows, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+            }
+
+            return new VTScrollData()
+            {
+                NewScroll = newScroll,
+                OldScroll = oldScroll,
+                AddedLines = addedLines,
+                RemovedLines = removedLines
+            };
         }
 
         #endregion
@@ -463,7 +545,33 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
-            this.videoTerminal.ProcessData(bytes, size);
+            VTDebug.Context.WriteRawRead(bytes, size);
+
+            VTDocument activeDocument = this.VideoTerminal.ActiveDocument;
+            int oldScroll = activeDocument.Scrollbar.ScrollValue;
+
+            try
+            {
+                vtParser.ProcessCharacters(bytes, size);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("ProcessCharacters异常", ex);
+            }
+
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                // 全部数据都处理完了之后，只渲染一次
+                activeDocument.RequestInvalidate();
+
+                int newScroll = activeDocument.Scrollbar.ScrollValue;
+                if (newScroll != oldScroll)
+                {
+                    // 计算ScrollData
+                    VTScrollData scrollData = this.GetScrollData(activeDocument, oldScroll, newScroll);
+                    activeDocument.InvokeScrollChanged(scrollData);
+                }
+            });
 
             switch (this.recordState)
             {

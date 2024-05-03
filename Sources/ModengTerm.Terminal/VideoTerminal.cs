@@ -5,8 +5,13 @@ using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Loggering;
+using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
+using System;
+using System.Data.Common;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Xml.Linq;
 using XTerminal.Base.Definitions;
 using XTerminal.Parser;
 
@@ -34,7 +39,7 @@ namespace ModengTerm.Terminal
     /// 主缓冲区：文档物理行数是不固定的，可以大于终端行数
     /// 备用缓冲区：文档的物理行数是固定的，等于终端的行数
     /// </summary>
-    public class VideoTerminal : IVideoTerminal
+    public class VideoTerminal : IVideoTerminal, VTDispatchHandler
     {
         #region 类变量
 
@@ -70,11 +75,6 @@ namespace ModengTerm.Terminal
         #region 实例变量
 
         private SessionTransport sessionTransport;
-
-        /// <summary>
-        /// 终端字符解析器
-        /// </summary>
-        private VTParser vtParser;
 
         /// <summary>
         /// 主缓冲区文档模型
@@ -258,15 +258,6 @@ namespace ModengTerm.Terminal
 
             #endregion
 
-            #region 初始化终端解析器
-
-            vtParser = new VTParser();
-            vtParser.ColorTable = colorTable;
-            vtParser.ActionEvent += VtParser_ActionEvent;
-            vtParser.Initialize();
-
-            #endregion
-
             #region 初始化文档模型
 
             VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
@@ -318,47 +309,8 @@ namespace ModengTerm.Terminal
         {
             isRunning = false;
 
-            vtParser.ActionEvent -= VtParser_ActionEvent;
-            vtParser.Release();
-
             this.mainDocument.Release();
             this.alternateDocument.Release();
-        }
-
-        /// <summary>
-        /// 处理从远程主机收到的数据流
-        /// </summary>
-        /// <param name="bytes">收到的数据流缓冲区</param>
-        /// <param name="size">要处理的数据长度</param>
-        public void ProcessData(byte[] bytes, int size)
-        {
-            VTDebug.Context.WriteRawRead(bytes, size);
-
-            int oldScroll = this.activeDocument.Scrollbar.ScrollValue;
-
-            try
-            {
-                vtParser.ProcessCharacters(bytes, size);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ProcessCharacters异常", ex);
-            }
-
-            uiSyncContext.Send((o) =>
-            {
-                // 全部数据都处理完了之后，只渲染一次
-                this.activeDocument.RequestInvalidate();
-
-                int newScroll = this.activeDocument.Scrollbar.ScrollValue;
-                if (newScroll != oldScroll)
-                {
-                    // 计算ScrollData
-                    VTScrollData scrollData = this.GetScrollData(this.activeDocument, oldScroll, newScroll);
-                    this.activeDocument.InvokeScrollChanged(scrollData);
-                }
-
-            }, null);
         }
 
         /// <summary>
@@ -607,9 +559,9 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <param name="ch">多字节或者单字节的字符</param>
         /// <returns></returns>
-        private VTCharacter CreateCharacter(object ch, VTextAttributeState attributeState)
+        private VTCharacter CreateCharacter(char ch, VTextAttributeState attributeState)
         {
-            if (ch is char)
+            if (ch > byte.MaxValue)
             {
                 // 说明是unicode字符
                 // 如果无法确定unicode字符的类别，那么占1列，否则占2列
@@ -678,12 +630,79 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 换行
-        /// 换行逻辑是把第一行拿到最后一行，要考虑到scrollMargin
+        /// 重置终端大小
+        /// 模仿Xshell的做法：
+        /// 1. 扩大行的时候，如果有滚动内容，那么显示滚动内容。如果没有滚动内容，则直接在后面扩大。
+        /// 2. 减少行的时候，如果有滚动内容，那么减少滚动内容。
+        /// 3. ActiveLine保持不变
+        /// 调用这个函数的时候保证此时文档已经滚动到底
+        /// 是否需要考虑scrollMargin?目前没考虑
         /// </summary>
-        /// <param name="document">要执行换行的文档</param>
-        private void LineFeed(VTDocument document)
+        /// <param name="document"></param>
+        /// <param name="oldRow"></param>
+        /// <param name="newRow"></param>
+        /// <param name="oldCol"></param>
+        /// <param name="newCol"></param>
+        private void MainDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
         {
+            // 调整大小前前先滚动到底，不然会有问题
+            this.activeDocument.ScrollToBottom();
+
+            document.Resize(oldRow, newRow, oldCol, newCol);
+        }
+
+        private void AlternateDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
+        {
+            document.Resize(oldRow, newRow, oldCol, newCol);
+
+            // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
+            document.EraseAll();
+        }
+
+        #endregion
+
+        #region VTDispatchHandler
+
+        public void PlayBell()
+        { }
+
+        public void ForwardTab() 
+        {
+            // 执行TAB键的动作（在当前光标位置处打印4个空格）
+            // 微软的terminal项目里说，如果光标在该行的最右边，那么再次执行TAB的时候光标会自动移动到下一行，目前先不这么做
+
+            VTDebug.Context.WriteInteractive("ForwardTab", string.Empty);
+
+            int tabSize = 4;
+            activeDocument.SetCursor(CursorRow, CursorCol + tabSize);
+        }
+
+        public void CarriageReturn() 
+        {
+            // CR
+            // 把光标移动到行开头
+            VTDebug.Context.WriteInteractive("CarriageReturn", "{0},{1}", CursorRow, CursorCol);
+            activeDocument.SetCursor(CursorRow, 0);
+        }
+
+        // 换行和反向换行
+        public void LineFeed()
+        {
+            // LF
+            // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
+
+            VTDebug.Context.WriteInteractive("LineFeed", "{0},{1}", CursorRow, CursorCol);
+
+            // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
+            // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
+            // 换行逻辑是把第一行拿到最后一行，要考虑到scrollMargin
+            
+            // 要换行的文档
+            VTDocument document = this.activeDocument;
+
+            // 如果滚动条不在最底部，那么先把滚动条滚动到底
+            document.ScrollToBottom();
+
             // 可滚动区域的第一行和最后一行
             VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
             VTextLine last = document.LastLine.FindPrevious(document.ScrollMarginBottom);
@@ -741,13 +760,18 @@ namespace ModengTerm.Terminal
             }
         }
 
-        /// <summary>
-        /// 反向换行
-        /// 反向换行不增加新行，也不减少新行，保持总行数不变
-        /// </summary>
-        /// <param name="document"></param>
-        private void ReverseLineFeed(VTDocument document)
+        public void RI_ReverseLineFeed() 
         {
+            VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", string.Empty);
+
+            // 和LineFeed相反，也就是把光标往上移一个位置
+            // 在用man命令的时候往上滚动会触发这个指令
+            // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
+
+            // 反向换行不增加新行，也不减少新行，保持总行数不变
+
+            VTDocument document = this.activeDocument;
+
             // 可滚动区域的第一行和最后一行
             VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
             VTextLine last = document.LastLine.FindPrevious(document.ScrollMarginBottom);
@@ -783,104 +807,195 @@ namespace ModengTerm.Terminal
             }
         }
 
-        /// <summary>
-        /// 重置终端大小
-        /// 模仿Xshell的做法：
-        /// 1. 扩大行的时候，如果有滚动内容，那么显示滚动内容。如果没有滚动内容，则直接在后面扩大。
-        /// 2. 减少行的时候，如果有滚动内容，那么减少滚动内容。
-        /// 3. ActiveLine保持不变
-        /// 调用这个函数的时候保证此时文档已经滚动到底
-        /// 是否需要考虑scrollMargin?目前没考虑
-        /// </summary>
-        /// <param name="document"></param>
-        /// <param name="oldRow"></param>
-        /// <param name="newRow"></param>
-        /// <param name="oldCol"></param>
-        /// <param name="newCol"></param>
-        private void MainDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
+        public void PrintCharacter(char ch) 
         {
-            // 调整大小前前先滚动到底，不然会有问题
-            this.activeDocument.ScrollToBottom();
+            // 根据测试得出结论：
+            // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
+            // 在正常模式下，如果遇到中文字符，也使用2列来显示
+            // 也就是说，如果终端列数一共是80，那么可以显示40个中文字符，显示完40个中文字符后就要换行
 
-            document.Resize(oldRow, newRow, oldCol, newCol);
+            // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
+            // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
+
+            // 用户输入的时候，如果滚动条没滚动到底，那么先把滚动条滚动到底
+            // 不然会出现在VTDocument当前的最后一行打印字符的问题
+            activeDocument.ScrollToBottom();
+
+            // 创建并打印新的字符
+            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, ch);
+            VTCharacter character = this.CreateCharacter(ch, activeDocument.AttributeState);
+            activeDocument.PrintCharacter(character);
+            activeDocument.SetCursor(CursorRow, CursorCol + character.ColumnSize);
         }
 
-        private void AlternateDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
+        public void EraseDisplay(VTEraseType eraseType) 
         {
-            document.Resize(oldRow, newRow, oldCol, newCol);
+            VTDebug.Context.WriteInteractive("EraseDisplay", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
 
-            // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
-            document.EraseAll();
-        }
-
-        /// <summary>
-        /// 根据滚动前的值和滚动后的值计算滚动数据
-        /// </summary>
-        /// <param name="document"></param>
-        /// <param name="oldScroll"></param>
-        /// <param name="newScroll"></param>
-        /// <returns></returns>
-        private VTScrollData GetScrollData(VTDocument document, int oldScroll, int newScroll)
-        {
-            int scrolledRows = Math.Abs(newScroll - oldScroll);
-
-            int scrollValue = newScroll;
-            int viewportRow = document.ViewportRow;
-            VTHistory history = document.History;
-            VTScrollInfo scrollbar = document.Scrollbar;
-
-            List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
-            List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
-
-            if (scrolledRows >= viewportRow)
+            switch (eraseType)
             {
-                // 此时说明把所有行都滚动到屏幕外了
+                // In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
+                // top和clear指令会执行EraseType.All，在其他的终端软件里top指令不会清空已经存在的行，而是把已经存在的行往上移动
+                // 所以EraseType.All的动作和Scrollback一样执行
+                case VTEraseType.All:
+                    {
+                        VTextLine next = activeDocument.FirstLine;
+                        while (next != null)
+                        {
+                            next.EraseAll();
 
-                // 遍历显示
-                VTextLine current = document.FirstLine;
-                for (int i = 0; i < viewportRow; i++)
-                {
-                    addedLines.Add(current.History);
-                }
+                            next = next.NextLine;
+                        }
 
-                // 我打赌不会报异常
-                IEnumerable<VTHistoryLine> historyLines;
-                history.TryGetHistories(oldScroll, oldScroll + viewportRow, out historyLines);
-                removedLines.AddRange(historyLines);
+                        break;
+                    }
+
+                case VTEraseType.Scrollback:
+                    {
+                        if (this.IsAlternate)
+                        {
+                            // xterm-256color类型的终端VIM程序的PageDown和PageUp会执行EraseType.All
+                            // 备用缓冲区是没有滚动数据的，只能清空当前显示的所有内容
+                            // 所以这里把备用缓冲区和主缓冲区分开处理
+                            VTextLine next = activeDocument.FirstLine;
+                            while (next != null)
+                            {
+                                next.EraseAll();
+
+                                next = next.NextLine;
+                            }
+                        }
+                        else
+                        {
+                            // 把当前鼠标所在行之前的所有行移动到可视区域外，注意当前行不移动
+
+                            // 相关命令：
+                            // MainDocument：xterm-256color类型的终端clear程序
+                            // AlternateDocument：暂无
+
+                            // Erase Saved Lines
+                            // 模拟xshell的操作，把当前行（光标所在行，就是最后一行）移动到可视区域的第一行
+
+                            // 一共要移动这么多行
+                            int rows = this.activeDocument.Cursor.Row;
+
+                            for (int i = 0; i < rows; i++)
+                            {
+                                VTextLine firstLine = this.activeDocument.FirstLine;
+                                VTextLine lastLine = this.activeDocument.LastLine;
+
+                                this.activeDocument.SwapLine(firstLine, lastLine);
+
+                                VTHistoryLine historyLine = new VTHistoryLine();
+                                firstLine.SetHistory(historyLine);
+                                this.activeDocument.History.AddHistory(historyLine);
+                            }
+
+                            #region 更新滚动条的值
+
+                            // 滚动条滚动到底
+                            // 计算滚动条可以滚动的最大值
+
+                            int scrollMax = this.activeDocument.History.Lines - this.activeDocument.ViewportRow;
+                            if (scrollMax > 0)
+                            {
+                                this.ScrollInfo.ScrollMax = Math.Min(scrollMax, this.activeDocument.ScrollMax);
+                                this.ScrollInfo.ScrollValue = this.ScrollInfo.ScrollMax;
+                            }
+
+                            #endregion
+
+                            //this.activeDocument.SetCursor(0, this.Cursor.Column);
+                        }
+                        break;
+                    }
+
+                default:
+                    {
+                        activeDocument.EraseDisplay(CursorCol, (EraseType)eraseType);
+                        break;
+                    }
             }
-            else
-            {
-                // 此时说明有部分行被移动出去了
-                if (newScroll > oldScroll)
-                {
-                    // 往下滚动
-                    IEnumerable<VTHistoryLine> historyLines;
-                    history.TryGetHistories(oldScroll, oldScroll + scrolledRows, out historyLines);
-                    removedLines.AddRange(historyLines);
-
-                    history.TryGetHistories(oldScroll + viewportRow, oldScroll + viewportRow + scrolledRows - 1, out historyLines);
-                    addedLines.AddRange(historyLines);
-                }
-                else
-                {
-                    // 往上滚动,2
-                    IEnumerable<VTHistoryLine> historyLines;
-                    history.TryGetHistories(oldScroll + viewportRow - scrolledRows, oldScroll + viewportRow - 1, out historyLines);
-                    removedLines.AddRange(historyLines);
-
-                    history.TryGetHistories(newScroll, newScroll + scrolledRows, out historyLines);
-                    addedLines.AddRange(historyLines);
-                }
-            }
-
-            return new VTScrollData()
-            {
-                NewScroll = newScroll,
-                OldScroll = oldScroll,
-                AddedLines = addedLines,
-                RemovedLines = removedLines
-            };
         }
+
+        public void EL_EraseLine(VTEraseType eraseType) 
+        {
+            VTDebug.Context.WriteInteractive("EraseLine", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
+
+            this.activeDocument.EraseLine(CursorCol, (EraseType)eraseType);
+        }
+
+        // 字符操作
+        public void DCH_DeleteCharacter(List<int> parameters) { }
+        public void ICH_InsertCharacter(List<int> parameters) { }
+        public void ECH_EraseCharacters(List<int> parameters) { }
+
+        // 行操作
+        public void IL_InsertLine(List<int> parameters) { }
+        public void DL_DeleteLine(List<int> parameters) { }
+
+        // 设备状态
+        public void DSR_DeviceStatusReport(List<int> parameters) { }
+        public void DA_DeviceAttributes(List<int> parameters) { }
+
+        #region 光标控制
+
+        // 下面的光标移动指令不能进行VTDocument的滚动
+        // 光标的移动坐标是相对于可视区域内的坐标
+        // 服务器发送过来的光标原点是从(1,1)开始的，我们程序里的是(0,0)开始的，所以要减1
+
+        public void HVP_HorizontalVerticalPosition(List<int> parameters) { }
+        public void CUP_CursorPosition(List<int> parameters) { }
+        
+        public void CUF_CursorForward(int n) 
+        {
+            VTDebug.Context.WriteInteractive("CursorForward", "{0},{1},{2}", CursorRow, CursorCol, n);
+            activeDocument.SetCursor(CursorRow, CursorCol + n);
+        }
+
+        public void CUU_CursorUp(int n) 
+        {
+            VTDebug.Context.WriteInteractive("CursorUp", "{0},{1},{2}", CursorRow, CursorCol, n);
+            activeDocument.SetCursor(CursorRow - n, CursorCol);
+        }
+
+        public void CUD_CursorDown(List<int> parameters) { }
+        public void CHA_CursorHorizontalAbsolute(List<int> parameters) { }
+        public void VPA_VerticalLinePositionAbsolute(List<int> parameters) { }
+
+        public void Backspace()
+        {
+            VTDebug.Context.WriteInteractive("Backspace", "{0},{1}", CursorRow, CursorCol);
+            activeDocument.SetCursor(CursorRow, CursorCol - 1);
+        }
+
+        #endregion
+
+        // 滚动控制
+        public void SD_ScrollDown(List<int> parameters) { }
+        public void SU_ScrollUp(List<int> parameters) { }
+
+        // Margin
+        public void DECSTBM_SetScrollingRegion(List<int> parameters) { }
+        public void DECSLRM_SetLeftRightMargins(List<int> parameters) { }
+
+
+        public void DECSC_CursorSave() { }
+        public void DECRC_CursorRestore() { }
+        public void DECKPAM_KeypadApplicationMode() { }
+        public void DECKPNM_KeypadNumericMode() { }
+
+
+        // SGR
+        public void PerformSGR(GraphicsOptions options, List<int> parameters) { }
+
+        public void DECCKM_CursorKeysMode(bool isApplicationMode) { }
+        public void DECANM_AnsiMode(bool isAnsiMode) { }
+        public void DECAWM_AutoWrapMode(bool isAutoWrapMode) { }
+        public void ASB_AlternateScreenBuffer(bool enable) { }
+        public void XTERM_BracketedPasteMode(bool enable) { }
+        public void ATT610_StartCursorBlink(bool enable) { }
+        public void DECTCEM_TextCursorEnableMode(bool enable) { }
 
         #endregion
 
@@ -890,206 +1005,7 @@ namespace ModengTerm.Terminal
         {
             switch (action)
             {
-                case VTActions.Print:
-                    {
-                        // 根据测试得出结论：
-                        // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
-                        // 在正常模式下，如果遇到中文字符，也使用2列来显示
-                        // 也就是说，如果终端列数一共是80，那么可以显示40个中文字符，显示完40个中文字符后就要换行
-
-                        // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
-                        // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
-
-                        // 用户输入的时候，如果滚动条没滚动到底，那么先把滚动条滚动到底
-                        // 不然会出现在VTDocument当前的最后一行打印字符的问题
-                        activeDocument.ScrollToBottom();
-
-                        // 创建并打印新的字符
-                        char ch = Convert.ToChar(parameter);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, ch);
-                        VTCharacter character = CreateCharacter(parameter, activeDocument.AttributeState);
-                        activeDocument.PrintCharacter(character);
-                        activeDocument.SetCursor(CursorRow, CursorCol + character.ColumnSize);
-
-                        break;
-                    }
-
-                case VTActions.CarriageReturn:
-                    {
-                        // CR
-                        // 把光标移动到行开头
-                        VTDebug.Context.WriteInteractive(action, "{0},{1}", CursorRow, CursorCol);
-                        activeDocument.SetCursor(CursorRow, 0);
-                        break;
-                    }
-
-                case VTActions.FF:
-                case VTActions.VT:
-                case VTActions.LF:
-                    {
-                        // LF
-                        // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
-
-                        VTDebug.Context.WriteInteractive(action, "{0},{1}", CursorRow, CursorCol);
-
-                        // 如果滚动条不在最底部，那么先把滚动条滚动到底
-                        activeDocument.ScrollToBottom();
-
-                        // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
-                        // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
-                        this.LineFeed(this.activeDocument);
-                        break;
-                    }
-
-                case VTActions.RI_ReverseLineFeed:
-                    {
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-
-                        // 和LineFeed相反，也就是把光标往上移一个位置
-                        // 在用man命令的时候往上滚动会触发这个指令
-                        // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
-                        this.ReverseLineFeed(this.ActiveDocument);
-                        break;
-                    }
-
-                case VTActions.PlayBell:
-                    {
-                        // 响铃
-                        break;
-                    }
-
-                case VTActions.ForwardTab:
-                    {
-                        // 执行TAB键的动作（在当前光标位置处打印4个空格）
-                        // 微软的terminal项目里说，如果光标在该行的最右边，那么再次执行TAB的时候光标会自动移动到下一行，目前先不这么做
-
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-
-                        int tabSize = 4;
-                        activeDocument.SetCursor(CursorRow, CursorCol + tabSize);
-
-                        break;
-                    }
-
-                #region Erase
-
-                case VTActions.EL_EraseLine:
-                    {
-                        List<int> parameters = parameter as List<int>;
-                        XTerminal.Parser.EraseType eraseType = (XTerminal.Parser.EraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, eraseType);
-                        activeDocument.EraseLine(CursorCol, (Document.Enumerations.EraseType)eraseType);
-                        break;
-                    }
-
-                case VTActions.ED_EraseDisplay:
-                    {
-                        List<int> parameters = parameter as List<int>;
-                        XTerminal.Parser.EraseType eraseType = (XTerminal.Parser.EraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, eraseType);
-
-                        switch (eraseType)
-                        {
-                            // In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
-                            // top和clear指令会执行EraseType.All，在其他的终端软件里top指令不会清空已经存在的行，而是把已经存在的行往上移动
-                            // 所以EraseType.All的动作和Scrollback一样执行
-                            case XTerminal.Parser.EraseType.All:
-                                {
-                                    VTextLine next = activeDocument.FirstLine;
-                                    while (next != null)
-                                    {
-                                        next.EraseAll();
-
-                                        next = next.NextLine;
-                                    }
-
-                                    break;
-                                }
-
-                            case XTerminal.Parser.EraseType.Scrollback:
-                                {
-                                    if (this.IsAlternate)
-                                    {
-                                        // xterm-256color类型的终端VIM程序的PageDown和PageUp会执行EraseType.All
-                                        // 备用缓冲区是没有滚动数据的，只能清空当前显示的所有内容
-                                        // 所以这里把备用缓冲区和主缓冲区分开处理
-                                        VTextLine next = activeDocument.FirstLine;
-                                        while (next != null)
-                                        {
-                                            next.EraseAll();
-
-                                            next = next.NextLine;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // 把当前鼠标所在行之前的所有行移动到可视区域外，注意当前行不移动
-
-                                        // 相关命令：
-                                        // MainDocument：xterm-256color类型的终端clear程序
-                                        // AlternateDocument：暂无
-
-                                        // Erase Saved Lines
-                                        // 模拟xshell的操作，把当前行（光标所在行，就是最后一行）移动到可视区域的第一行
-
-                                        // 一共要移动这么多行
-                                        int rows = this.activeDocument.Cursor.Row;
-
-                                        for (int i = 0; i < rows; i++)
-                                        {
-                                            VTextLine firstLine = this.activeDocument.FirstLine;
-                                            VTextLine lastLine = this.activeDocument.LastLine;
-
-                                            this.activeDocument.SwapLine(firstLine, lastLine);
-
-                                            VTHistoryLine historyLine = new VTHistoryLine();
-                                            firstLine.SetHistory(historyLine);
-                                            this.activeDocument.History.AddHistory(historyLine);
-                                        }
-
-                                        #region 更新滚动条的值
-
-                                        // 滚动条滚动到底
-                                        // 计算滚动条可以滚动的最大值
-
-                                        int scrollMax = this.activeDocument.History.Lines - this.activeDocument.ViewportRow;
-                                        if (scrollMax > 0)
-                                        {
-                                            this.ScrollInfo.ScrollMax = Math.Min(scrollMax, this.activeDocument.ScrollMax);
-                                            this.ScrollInfo.ScrollValue = this.ScrollInfo.ScrollMax;
-                                        }
-
-                                        #endregion
-
-                                        //this.activeDocument.SetCursor(0, this.Cursor.Column);
-                                    }
-                                    break;
-                                }
-
-                            default:
-                                {
-                                    activeDocument.EraseDisplay(CursorCol, (Document.Enumerations.EraseType)eraseType);
-                                    break;
-                                }
-                        }
-
-                        break;
-                    }
-
-                #endregion
-
                 #region 光标操作
-
-                // 下面的光标移动指令不能进行VTDocument的滚动
-                // 光标的移动坐标是相对于可视区域内的坐标
-                // 服务器发送过来的光标原点是从(1,1)开始的，我们程序里的是(0,0)开始的，所以要减1
-
-                case VTActions.BS:
-                    {
-                        VTDebug.Context.WriteInteractive(action, "{0},{1}", CursorRow, CursorCol);
-                        activeDocument.SetCursor(CursorRow, CursorCol - 1);
-                        break;
-                    }
 
                 case VTActions.CursorBackward:
                     {
@@ -1100,21 +1016,11 @@ namespace ModengTerm.Terminal
                         break;
                     }
 
-                case VTActions.CUF_CursorForward:
-                    {
-                        List<int> parameters = parameter as List<int>;
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, n);
-                        activeDocument.SetCursor(CursorRow, CursorCol + n);
-                        break;
-                    }
 
                 case VTActions.CUU_CursorUp:
                     {
                         List<int> parameters = parameter as List<int>;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, n);
-                        activeDocument.SetCursor(CursorRow - n, CursorCol);
                         break;
                     }
 
