@@ -394,6 +394,12 @@ namespace ModengTerm.Document.Utility
                         break;
                     }
 
+                case VTextAttributes.Faint:
+                    {
+                        attribute = enable ? attribute |= 64 : attribute &= (~64);
+                        break;
+                    }
+
                 default:
                     throw new NotImplementedException();
             }
@@ -437,6 +443,11 @@ namespace ModengTerm.Document.Utility
                 case VTextAttributes.Underline:
                     {
                         return (attribute >> 4 & 1) == 1;
+                    }
+
+                case VTextAttributes.Faint:
+                    {
+                        return (attribute >> 6 & 1) == 1;
                     }
 
                 default:

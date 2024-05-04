@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Terminal.Parsing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Parser;
 
 namespace ModengTerm.Terminal
 {
@@ -205,45 +205,45 @@ namespace ModengTerm.Terminal
         }
 
 
-        public void Writevttest(VTActions actions, List<byte> sequence)
-        {
-            if (!this.CanWrite(this.vttestCodeCategory))
-            {
-                return;
-            }
+        //public void Writevttest(VTActions actions, List<byte> sequence)
+        //{
+        //    if (!this.CanWrite(this.vttestCodeCategory))
+        //    {
+        //        return;
+        //    }
 
-            if (sequence.Count == 0)
-            {
-                // TODO：因为SGR序列会执行多次VTAction，执行第一次VTAction的时候sequence就被清空了
-                // 暂时先不处理这种情况，需要优化，SGR指令只调用一次VTAction
-                return;
-            }
+        //    if (sequence.Count == 0)
+        //    {
+        //        // TODO：因为SGR序列会执行多次VTAction，执行第一次VTAction的时候sequence就被清空了
+        //        // 暂时先不处理这种情况，需要优化，SGR指令只调用一次VTAction
+        //        return;
+        //    }
 
-            StringBuilder builder = new StringBuilder();
-            foreach (byte b in sequence)
-            {
-                if (actions == VTActions.CarriageReturn)
-                {
-                    builder.AppendFormat("'\\r',");
-                }
-                else if (actions == VTActions.LF)
-                {
-                    builder.AppendFormat("'\\n',");
-                }
-                else
-                {
-                    builder.AppendFormat("'{0}',", Convert.ToChar(b));
-                }
-            }
-            builder.Append("'\\0'");
+        //    StringBuilder builder = new StringBuilder();
+        //    foreach (byte b in sequence)
+        //    {
+        //        if (actions == VTActions.CarriageReturn)
+        //        {
+        //            builder.AppendFormat("'\\r',");
+        //        }
+        //        else if (actions == VTActions.LF)
+        //        {
+        //            builder.AppendFormat("'\\n',");
+        //        }
+        //        else
+        //        {
+        //            builder.AppendFormat("'{0}',", Convert.ToChar(b));
+        //        }
+        //    }
+        //    builder.Append("'\\0'");
 
-            string varName = string.Format("{0}{1}", actions, this.vttestCodeIndex++);
-            string annotation = actions.ToString();
+        //    string varName = string.Format("{0}{1}", actions, this.vttestCodeIndex++);
+        //    string annotation = actions.ToString();
 
-            string log = string.Format("char {0}[] = {{{1}}};printf({2}); // {3}", varName, builder.ToString(), varName, actions);
+        //    string log = string.Format("char {0}[] = {{{1}}};printf({2}); // {3}", varName, builder.ToString(), varName, actions);
 
-            File.AppendAllText(this.vttestCodeCategory.FilePath, log + Environment.NewLine);
-        }
+        //    File.AppendAllText(this.vttestCodeCategory.FilePath, log + Environment.NewLine);
+        //}
 
 
         public void WriteRawRead(byte[] bytes, int size)

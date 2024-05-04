@@ -1,11 +1,11 @@
 ﻿using ModengTerm.Document;
+using ModengTerm.Terminal.Parsing;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XTerminal.Parser;
 
 namespace ModengTerm.Terminal
 {

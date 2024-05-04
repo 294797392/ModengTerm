@@ -1223,7 +1223,7 @@ namespace ModengTerm.Document
         /// <param name="attribute">要应用的装饰类型</param>
         /// <param name="unset">是否应用该装饰</param>
         /// <param name="parameter">该状态对应的参数</param>
-        public void SetAttribute(VTextAttributes attribute, bool enabled, object parameter)
+        public void SetAttribute(VTextAttributes attribute, bool enabled, object color)
         {
             VTUtils.SetTextAttribute(attribute, enabled, ref AttributeState.Value);
 
@@ -1231,13 +1231,13 @@ namespace ModengTerm.Document
             {
                 case VTextAttributes.Background:
                     {
-                        AttributeState.Background = parameter as VTColor;
+                        AttributeState.Background = color as VTColor;
                         break;
                     }
 
                 case VTextAttributes.Foreground:
                     {
-                        AttributeState.Foreground = parameter as VTColor;
+                        AttributeState.Foreground = color as VTColor;
                         break;
                     }
 

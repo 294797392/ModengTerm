@@ -26,16 +26,16 @@ namespace ModengTerm.Terminal.Parsing
         void EL_EraseLine(VTEraseType eraseType);
 
         // 字符操作
-        void DCH_DeleteCharacter(List<int> parameters);
-        void ICH_InsertCharacter(List<int> parameters);
-        void ECH_EraseCharacters(List<int> parameters);
+        void DCH_DeleteCharacter(int count);
+        void ICH_InsertCharacter(int count);
+        void ECH_EraseCharacters(int count);
 
         // 行操作
-        void IL_InsertLine(List<int> parameters);
-        void DL_DeleteLine(List<int> parameters);
+        void IL_InsertLine(int count);
+        void DL_DeleteLine(int count);
 
         // 设备状态
-        void DSR_DeviceStatusReport(List<int> parameters);
+        void DSR_DeviceStatusReport(StatusType statusType);
         void DA_DeviceAttributes(List<int> parameters);
 
         // 光标控制
@@ -43,9 +43,9 @@ namespace ModengTerm.Terminal.Parsing
         void CUP_CursorPosition(List<int> parameters);
         void CUF_CursorForward(int n);
         void CUU_CursorUp(int n);
-        void CUD_CursorDown(List<int> parameters);
-        void CHA_CursorHorizontalAbsolute(List<int> parameters);
-        void VPA_VerticalLinePositionAbsolute(List<int> parameters);
+        void CUD_CursorDown(int n);
+        void CHA_CursorHorizontalAbsolute(int col);
+        void VPA_VerticalLinePositionAbsolute(int row);
 
         // 滚动控制
         void SD_ScrollDown(List<int> parameters);
@@ -53,7 +53,7 @@ namespace ModengTerm.Terminal.Parsing
 
         // Margin
         void DECSTBM_SetScrollingRegion(List<int> parameters);
-        void DECSLRM_SetLeftRightMargins(List<int> parameters);
+        void DECSLRM_SetLeftRightMargins(int leftMargin, int rightMargin);
 
 
         void DECSC_CursorSave();
@@ -63,7 +63,7 @@ namespace ModengTerm.Terminal.Parsing
 
 
         // SGR
-        void PerformSGR(GraphicsOptions options, List<int> parameters);
+        void PerformSGR(GraphicsOptions options, VTColor extColor);
 
         void DECCKM_CursorKeysMode(bool isApplicationMode);
         void DECANM_AnsiMode(bool isAnsiMode);
@@ -72,5 +72,20 @@ namespace ModengTerm.Terminal.Parsing
         void XTERM_BracketedPasteMode(bool enable);
         void ATT610_StartCursorBlink(bool enable);
         void DECTCEM_TextCursorEnableMode(bool enable);
+
+        #region 字符集
+
+        void SS2_SingleShift();
+        void SS3_SingleShift();
+
+        /// <summary>
+        /// 对指定的字符集应用指定的字符集映射
+        /// </summary>
+        /// <param name="gsetIndex">要应用到的字符集</param>
+        /// <param name="charset">要使用的字符集映射</param>
+        void Designate94Charset(int gsetIndex, int charset);
+        void Designate96Charset(int gsetIndex, int charset);
+
+        #endregion
     }
 }

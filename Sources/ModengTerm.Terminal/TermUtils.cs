@@ -4,6 +4,7 @@ using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Rendering;
 using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.DataModels;
+using ModengTerm.Terminal.Parsing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,7 +14,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using XTerminal.Parser;
 
 namespace ModengTerm.Terminal
 {
@@ -21,24 +21,45 @@ namespace ModengTerm.Terminal
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("TermUtils");
 
-        public static VTextAttributes VTAction2TextAttribute(VTActions actions, out bool enabled)
+        public static VTColorIndex GraphicsOptions2VTColorIndex(GraphicsOptions options)
         {
-            enabled = true;
-
-            switch (actions)
+            switch (options)
             {
-                case VTActions.Bold: return VTextAttributes.Bold;
-                case VTActions.BoldUnset: enabled = false; return VTextAttributes.Bold;
-                case VTActions.Underline: return VTextAttributes.Underline;
-                case VTActions.UnderlineUnset: enabled = false; return VTextAttributes.Underline;
-                case VTActions.Italics: return VTextAttributes.Italics;
-                case VTActions.ItalicsUnset: enabled = false; return VTextAttributes.Italics;
-                case VTActions.DoublyUnderlined: return VTextAttributes.DoublyUnderlined;
-                case VTActions.DoublyUnderlinedUnset: enabled = false; return VTextAttributes.DoublyUnderlined;
-                case VTActions.Background: return VTextAttributes.Background;
-                case VTActions.BackgroundUnset: enabled = false; return VTextAttributes.Background;
-                case VTActions.Foreground: return VTextAttributes.Foreground;
-                case VTActions.ForegroundUnset: enabled = false; return VTextAttributes.Foreground;
+                case GraphicsOptions.ForegroundBlack: return VTColorIndex.DarkBlack;
+                case GraphicsOptions.ForegroundBlue: return VTColorIndex.DarkBlue;
+                case GraphicsOptions.ForegroundGreen: return VTColorIndex.DarkGreen;
+                case GraphicsOptions.ForegroundCyan: return VTColorIndex.DarkCyan;
+                case GraphicsOptions.ForegroundRed: return VTColorIndex.DarkRed;
+                case GraphicsOptions.ForegroundMagenta: return VTColorIndex.DarkMagenta;
+                case GraphicsOptions.ForegroundYellow: return VTColorIndex.DarkYellow;
+                case GraphicsOptions.ForegroundWhite: return VTColorIndex.DarkBlack;
+
+                case GraphicsOptions.BackgroundBlack: return VTColorIndex.DarkBlack;
+                case GraphicsOptions.BackgroundBlue: return VTColorIndex.DarkBlue;
+                case GraphicsOptions.BackgroundGreen: return VTColorIndex.DarkGreen;
+                case GraphicsOptions.BackgroundCyan: return VTColorIndex.DarkCyan;
+                case GraphicsOptions.BackgroundRed: return VTColorIndex.DarkRed;
+                case GraphicsOptions.BackgroundMagenta: return VTColorIndex.DarkMagenta;
+                case GraphicsOptions.BackgroundYellow: return VTColorIndex.DarkYellow;
+                case GraphicsOptions.BackgroundWhite: return VTColorIndex.DarkWhite;
+
+                case GraphicsOptions.BrightForegroundBlack: return VTColorIndex.BrightBlack;
+                case GraphicsOptions.BrightForegroundBlue: return VTColorIndex.BrightBlue;
+                case GraphicsOptions.BrightForegroundGreen: return VTColorIndex.BrightGreen;
+                case GraphicsOptions.BrightForegroundCyan: return VTColorIndex.BrightCyan;
+                case GraphicsOptions.BrightForegroundRed: return VTColorIndex.BrightRed;
+                case GraphicsOptions.BrightForegroundMagenta: return VTColorIndex.BrightMagenta;
+                case GraphicsOptions.BrightForegroundYellow: return VTColorIndex.BrightYellow;
+                case GraphicsOptions.BrightForegroundWhite: return VTColorIndex.BrightWhite;
+
+                case GraphicsOptions.BrightBackgroundBlack: return VTColorIndex.BrightBlack;
+                case GraphicsOptions.BrightBackgroundBlue: return VTColorIndex.BrightBlue;
+                case GraphicsOptions.BrightBackgroundGreen: return VTColorIndex.BrightGreen;
+                case GraphicsOptions.BrightBackgroundCyan: return VTColorIndex.BrightCyan;
+                case GraphicsOptions.BrightBackgroundRed: return VTColorIndex.BrightRed;
+                case GraphicsOptions.BrightBackgroundMagenta: return VTColorIndex.BrightMagenta;
+                case GraphicsOptions.BrightBackgroundYellow: return VTColorIndex.BrightYellow;
+                case GraphicsOptions.BrightBackgroundWhite: return VTColorIndex.BrightWhite;
 
                 default:
                     throw new NotImplementedException();

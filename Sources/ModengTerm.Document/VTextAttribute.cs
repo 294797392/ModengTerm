@@ -40,7 +40,12 @@ namespace ModengTerm.Document
         /// <summary>
         /// 字体颜色
         /// </summary>
-        Foreground = 5
+        Foreground = 5,
+
+        /// <summary>
+        /// 降低颜色强度
+        /// </summary>
+        Faint = 6
     }
 
     /// <summary>

@@ -178,14 +178,9 @@ namespace ModengTerm.Terminal.Parsing
                     }
 
                 case CsiActionCodes.HVP_HorizontalVerticalPosition:
-                    {
-                        this.DispatchHandler.HVP_HorizontalVerticalPosition(parameters);
-                        break;
-                    }
-
                 case CsiActionCodes.CUP_CursorPosition:
                     {
-                        this.DispatchHandler.CUP_CursorPosition(parameters);
+                        this.DispatchHandler.CUP_CursorPosition(this.parameters);
                         break;
                     }
 
@@ -207,7 +202,9 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.CUD_CursorDown:
                     {
-                        this.DispatchHandler.CUD_CursorDown(parameters);
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
+
+                        this.DispatchHandler.CUD_CursorDown(n);
                         break;
                     }
 
@@ -237,6 +234,8 @@ namespace ModengTerm.Terminal.Parsing
                         // Default: Pt = 1
                         // bottomMargin：is the line number for the bottom margin.
                         // Default: Pb = current number of lines per screen
+
+
                         this.DispatchHandler.DECSTBM_SetScrollingRegion(parameters);
                         break;
                     }
@@ -251,7 +250,10 @@ namespace ModengTerm.Terminal.Parsing
                         // 当DECLRMM启用的时候，执行设置左右边距的动作
                         // 当DECLRMM没启用的时候，执行CursorSaveState动作
 
-                        this.DispatchHandler.DECSLRM_SetLeftRightMargins(parameters);
+                        int leftMargin = VTParameter.GetParameter(parameters, 0, 0);
+                        int rightMargin = VTParameter.GetParameter(parameters, 1, 0);
+
+                        this.DispatchHandler.DECSLRM_SetLeftRightMargins(leftMargin, rightMargin);
                         break;
                     }
 
@@ -265,19 +267,32 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.DCH_DeleteCharacter:
                     {
-                        this.DispatchHandler.DCH_DeleteCharacter(parameters);
+                        // 从指定位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
+                        int count = VTParameter.GetParameter(parameters, 0, 1);
+                        this.DispatchHandler.DCH_DeleteCharacter(count);
                         break;
                     }
 
                 case CsiActionCodes.ICH_InsertCharacter:
                     {
-                        this.DispatchHandler.ICH_InsertCharacter(parameters);
+                        // 相关命令：
+                        // MainDocument：sudo apt install pstat，然后回车，最后按方向键上回到历史命令
+                        // AlternateDocument：暂无
+
+                        // Insert Ps (Blank) Character(s) (default = 1) (ICH).
+                        // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
+                        // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
+                        int count = VTParameter.GetParameter(parameters, 0, 1);
+                        this.DispatchHandler.ICH_InsertCharacter(count);
                         break;
                     }
 
                 case CsiActionCodes.DSR_DeviceStatusReport:
                     {
-                        this.DispatchHandler.DSR_DeviceStatusReport(parameters);
+                        // DSR，参考https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
+
+                        StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
+                        this.DispatchHandler.DSR_DeviceStatusReport(statusType);
                         break;
                     }
 
@@ -328,30 +343,47 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.IL_InsertLine:
                     {
-                        this.DispatchHandler.IL_InsertLine(parameters);
+                        // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
+                        int lines = VTParameter.GetParameter(parameters, 0, 1);
+                        this.DispatchHandler.IL_InsertLine(lines);
                         break;
                     }
 
                 case CsiActionCodes.DL_DeleteLine:
                     {
-                        this.DispatchHandler.DL_DeleteLine(parameters);
+                        // 从缓冲区中删除<n> 行，从光标所在的行开始。
+                        int lines = VTParameter.GetParameter(parameters, 0, 1);
+                        this.DispatchHandler.DL_DeleteLine(lines);
                         break;
                     }
 
                 case CsiActionCodes.CHA_CursorHorizontalAbsolute:
                     {
-                        this.DispatchHandler.CHA_CursorHorizontalAbsolute(parameters);
+                        // 将光标移动到当前行中的第n列
+                        int n = VTParameter.GetParameter(parameters, 0, -1);
+                        if (n == -1)
+                        {
+                            break;
+                        }
+
+                        this.DispatchHandler.CHA_CursorHorizontalAbsolute(n - 1);
                         break;
                     }
 
                 case CsiActionCodes.VPA_VerticalLinePositionAbsolute:
                     {
-                        this.DispatchHandler.VPA_VerticalLinePositionAbsolute(parameters);
+                        // 绝对垂直行位置 光标在当前列中垂直移动到第 <n> 个位置
+                        // 保持列不变，把光标移动到指定的行处
+                        int row = VTParameter.GetParameter(parameters, 0, 1);
+                        row = Math.Max(0, row - 1);
+
+                        this.DispatchHandler.VPA_VerticalLinePositionAbsolute(row);
                         break;
                     }
 
                 case CsiActionCodes.SD_ScrollDown:
                     {
+                        // Scroll down Ps lines (default = 1) (SD), VT420.
                         this.DispatchHandler.SD_ScrollDown(parameters);
                         break;
                     }
@@ -364,7 +396,11 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.ECH_EraseCharacters:
                     {
-                        this.DispatchHandler.ECH_EraseCharacters(parameters);
+                        // 从当前光标处用空格填充n个字符
+                        // Erase Characters from the current cursor position, by replacing them with a space
+
+                        int count = VTParameter.GetParameter(parameters, 0, 1);
+                        this.DispatchHandler.ECH_EraseCharacters(count);
                         break;
                     }
 
@@ -382,29 +418,6 @@ namespace ModengTerm.Terminal.Parsing
         private DCSStringHandlerDlg ActionDCSDispatch(int id, List<int> parameters)
         {
             throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 指定要使用的字符集
-        /// https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
-        /// 
-        /// 参考：
-        /// terminal: OutputStateMachineEngine.cpp - OutputStateMachineEngine::ActionEscDispatch - default
-        /// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html: ESC ( C
-        /// </summary>
-        /// <param name="commandChar"></param>
-        /// <param name="commandParameter">finalByte</param>
-        private void DesignateCharset(int commandChar, byte commandParameter)
-        {
-            //switch (commandChar)
-            //{
-            //    case '(':
-            //        {
-
-            //            break;
-            //        }
-
-            //}
         }
 
         /// <summary>
@@ -452,46 +465,86 @@ namespace ModengTerm.Terminal.Parsing
 
                 case EscActionCodes.SS2_SingleShift:
                     {
+                        this.DispatchHandler.SS2_SingleShift();
                         break;
                     }
+
                 case EscActionCodes.SS3_SingleShift:
                     {
+                        this.DispatchHandler.SS3_SingleShift();
                         break;
                     }
-
-                //case (EscActionCodes)'0': // make menuconfig触发
-                //    {
-                //        // https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
-                //        // 指定字符集
-                //        // Sequence	说明	行为
-                //        // ESC(0 指定字符集 - DEC 线条绘制    启用 DEC 线条绘制模式
-
-                //        // terminal:
-                //        // OutputStateMachineEngine.cpp - OutputStateMachineEngine::ActionEscDispatch - default
-
-
-                //        break;
-                //    }
-
-                //case (EscActionCodes)66:
-                //case (EscActionCodes)230:
-                //    {
-                //        logger.FatalFormat("terminal没实现的EscActionCodes - {0}", (char)code);
-                //        break;
-                //    }
 
                 default:
                     {
+                        if (this.parameters.Count > 0) 
+                        {
+                            /// <summary>
+                            /// 指定要使用的字符集
+                            /// https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
+                            /// 
+                            /// 参考：
+                            /// terminal: OutputStateMachineEngine.cpp - OutputStateMachineEngine::ActionEscDispatch - default
+                            /// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html: ESC ( C
+                            /// </summary>
+                            /// <param name="commandChar"></param>
+                            /// <param name="commandParameter">finalByte</param>
+
+                            int commandChar = this.parameters[0];
+                            int commandParameter = ch;
+
+                            switch (commandChar)
+                            {
+                                case '(':
+                                    {
+                                        this.DispatchHandler.Designate94Charset(0, commandParameter);
+                                        break;
+                                    }
+
+                                case ')':
+                                    {
+                                        this.DispatchHandler.Designate94Charset(1, commandParameter);
+                                        break;
+                                    }
+
+                                case '*':
+                                    {
+                                        this.DispatchHandler.Designate94Charset(2, commandParameter);
+                                        break;
+                                    }
+
+                                case '+':
+                                    {
+                                        this.DispatchHandler.Designate94Charset(3, commandParameter);
+                                        break;
+                                    }
+
+                                case '-':
+                                    {
+                                        this.DispatchHandler.Designate96Charset(1, commandParameter);
+                                        break;
+                                    }
+
+                                case '.':
+                                    {
+                                        this.DispatchHandler.Designate96Charset(2, commandParameter);
+                                        break;
+                                    }
+
+                                case '/':
+                                    {
+                                        this.DispatchHandler.Designate96Charset(3, commandParameter);
+                                        break;
+                                    }
+
+                                default:
+                                    {
+                                        throw new NotImplementedException(string.Format("未实现EscAction, finalByte = {0}", ch));
+                                    }
+                            }
+                        }
+
                         throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
-
-                        //if (this.parameters.Count == 0)
-                        //{
-                        //    throw new NotImplementedException(string.Format("未实现EscAction, {0}", code));
-                        //}
-
-                        //this.DesignateCharset(this.parameters[0], ch);
-
-                        break;
                     }
             }
         }
@@ -544,7 +597,27 @@ namespace ModengTerm.Terminal.Parsing
             {
                 byte option = (byte)parameters[i];
 
-                this.DispatchHandler.PerformSGR((GraphicsOptions)option, this.parameters);
+                VTColor rgbColor = null;
+
+                switch ((GraphicsOptions)option)
+                {
+                    case GraphicsOptions.ForegroundExtended:
+                        {
+                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
+                            break;
+                        }
+
+                    case GraphicsOptions.BackgroundExtended:
+                        {
+                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
+
+                this.DispatchHandler.PerformSGR((GraphicsOptions)option, rgbColor);
             }
         }
 
@@ -627,7 +700,7 @@ namespace ModengTerm.Terminal.Parsing
                         {
                             // 是否使用备用缓冲区
                             // 打开VIM等编辑器的时候会触发
-                            this.DispatchHandler.ASB_AlternateScreenBuffer(enable):
+                            this.DispatchHandler.ASB_AlternateScreenBuffer(enable);
                             break;
                         }
 

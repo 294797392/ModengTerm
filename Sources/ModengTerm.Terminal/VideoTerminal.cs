@@ -7,13 +7,8 @@ using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
-using System;
-using System.Data.Common;
-using System.Reflection.Metadata;
 using System.Text;
-using System.Xml.Linq;
 using XTerminal.Base.Definitions;
-using XTerminal.Parser;
 
 namespace ModengTerm.Terminal
 {
@@ -139,6 +134,15 @@ namespace ModengTerm.Terminal
 
         private VTOptions vtOptions;
 
+
+        /// <summary>
+        /// G0,G1,G2,G3字符集
+        /// </summary>
+        private List<VTCharsetMap> gsetList;
+
+        private VTCharsetMap glMap;
+        private VTCharsetMap grMap;
+
         #endregion
 
         #region 属性
@@ -227,7 +231,7 @@ namespace ModengTerm.Terminal
             VTDebug.Context.Categories.FirstOrDefault(v => v.Category == VTDebugCategoryEnum.vttestCode).Enabled = true;
 
             vtOptions = options;
-
+            this.gsetList = new List<VTCharsetMap>();
             uiSyncContext = SynchronizationContext.Current;
 
             // DECAWM
@@ -520,40 +524,6 @@ namespace ModengTerm.Terminal
 
         #region 实例方法
 
-        private void PerformDeviceStatusReport(StatusType statusType)
-        {
-            switch (statusType)
-            {
-                case StatusType.OS_OperatingStatus:
-                    {
-                        // Result ("OK") is CSI 0 n
-                        VTDebug.Context.WriteInteractive(VTActions.DSR_DeviceStatusReport, "{0}", statusType);
-                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DSR_DeviceStatusReport, statusType, OS_OperatingStatusData);
-                        sessionTransport.Write(OS_OperatingStatusData);
-                        break;
-                    }
-
-                case StatusType.CPR_CursorPositionReport:
-                    {
-                        // 打开VIM后会收到这个请求
-
-                        // 1,1 is the top - left corner of the viewport in VT - speak, so add 1
-                        // Result is CSI ? r ; c R
-                        int cursorRow = CursorRow + 1;
-                        int cursorCol = CursorCol + 1;
-                        VTDebug.Context.WriteInteractive(VTActions.DSR_DeviceStatusReport, "{0},{1},{2}", statusType, CursorRow, CursorCol);
-                        string cprData = string.Format("\x1b[{0};{1}R", cursorRow, cursorCol);
-                        byte[] cprBytes = Encoding.ASCII.GetBytes(cprData);
-                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DSR_DeviceStatusReport, statusType, cprBytes);
-                        sessionTransport.Write(cprBytes);
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         /// <summary>
         /// 自动判断ch是多字节字符还是单字节字符，创建一个VTCharacter
         /// </summary>
@@ -666,7 +636,7 @@ namespace ModengTerm.Terminal
         public void PlayBell()
         { }
 
-        public void ForwardTab() 
+        public void ForwardTab()
         {
             // 执行TAB键的动作（在当前光标位置处打印4个空格）
             // 微软的terminal项目里说，如果光标在该行的最右边，那么再次执行TAB的时候光标会自动移动到下一行，目前先不这么做
@@ -677,7 +647,7 @@ namespace ModengTerm.Terminal
             activeDocument.SetCursor(CursorRow, CursorCol + tabSize);
         }
 
-        public void CarriageReturn() 
+        public void CarriageReturn()
         {
             // CR
             // 把光标移动到行开头
@@ -696,7 +666,7 @@ namespace ModengTerm.Terminal
             // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
             // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
             // 换行逻辑是把第一行拿到最后一行，要考虑到scrollMargin
-            
+
             // 要换行的文档
             VTDocument document = this.activeDocument;
 
@@ -760,7 +730,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        public void RI_ReverseLineFeed() 
+        public void RI_ReverseLineFeed()
         {
             VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", string.Empty);
 
@@ -807,7 +777,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        public void PrintCharacter(char ch) 
+        public void PrintCharacter(char ch)
         {
             // 根据测试得出结论：
             // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
@@ -828,7 +798,7 @@ namespace ModengTerm.Terminal
             activeDocument.SetCursor(CursorRow, CursorCol + character.ColumnSize);
         }
 
-        public void EraseDisplay(VTEraseType eraseType) 
+        public void EraseDisplay(VTEraseType eraseType)
         {
             VTDebug.Context.WriteInteractive("EraseDisplay", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
 
@@ -918,7 +888,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        public void EL_EraseLine(VTEraseType eraseType) 
+        public void EL_EraseLine(VTEraseType eraseType)
         {
             VTDebug.Context.WriteInteractive("EraseLine", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
 
@@ -926,17 +896,82 @@ namespace ModengTerm.Terminal
         }
 
         // 字符操作
-        public void DCH_DeleteCharacter(List<int> parameters) { }
-        public void ICH_InsertCharacter(List<int> parameters) { }
-        public void ECH_EraseCharacters(List<int> parameters) { }
+        public void DCH_DeleteCharacter(int count)
+        {
+            VTDebug.Context.WriteInteractive("DCH_DeleteCharacter", "{0},{1},{2}", CursorRow, CursorCol, count);
+            activeDocument.DeleteCharacter(CursorCol, count);
+        }
+
+        public void ICH_InsertCharacter(int count)
+        {
+            activeDocument.InsertCharacters(CursorCol, count);
+        }
+
+        public void ECH_EraseCharacters(int count)
+        {
+            ActiveLine.EraseRange(CursorCol, count);
+        }
 
         // 行操作
-        public void IL_InsertLine(List<int> parameters) { }
-        public void DL_DeleteLine(List<int> parameters) { }
+        public void IL_InsertLine(int count)
+        {
+            VTDebug.Context.WriteInteractive("IL_InsertLine", "{0}", count);
+            if (count > 0)
+            {
+                activeDocument.InsertLines(count);
+            }
+        }
+
+        public void DL_DeleteLine(int count)
+        {
+            VTDebug.Context.WriteInteractive("DL_DeleteLine", "{0}", count);
+            if (count > 0)
+            {
+                activeDocument.DeleteLines(count);
+            }
+        }
 
         // 设备状态
-        public void DSR_DeviceStatusReport(List<int> parameters) { }
-        public void DA_DeviceAttributes(List<int> parameters) { }
+        public void DSR_DeviceStatusReport(StatusType statusType)
+        {
+            switch (statusType)
+            {
+                case StatusType.OS_OperatingStatus:
+                    {
+                        // Result ("OK") is CSI 0 n
+                        VTDebug.Context.WriteInteractive("DSR_DeviceStatusReport", "{0}", statusType);
+                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DSR_DeviceStatusReport, statusType, OS_OperatingStatusData);
+                        sessionTransport.Write(OS_OperatingStatusData);
+                        break;
+                    }
+
+                case StatusType.CPR_CursorPositionReport:
+                    {
+                        // 打开VIM后会收到这个请求
+
+                        // 1,1 is the top - left corner of the viewport in VT - speak, so add 1
+                        // Result is CSI ? r ; c R
+                        int cursorRow = CursorRow + 1;
+                        int cursorCol = CursorCol + 1;
+                        VTDebug.Context.WriteInteractive("DSR_DeviceStatusReport", "{0},{1},{2}", statusType, CursorRow, CursorCol);
+                        string cprData = string.Format("\x1b[{0};{1}R", cursorRow, cursorCol);
+                        byte[] cprBytes = Encoding.ASCII.GetBytes(cprData);
+                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DSR_DeviceStatusReport, statusType, cprBytes);
+                        sessionTransport.Write(cprBytes);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public void DA_DeviceAttributes(List<int> parameters)
+        {
+            VTDebug.Context.WriteInteractive("DA_DeviceAttributes", string.Empty);
+            VTDebug.Context.WriteInteractive(VTSendTypeEnum.DA_DeviceAttributes, DA_DeviceAttributesData);
+            sessionTransport.Write(DA_DeviceAttributesData);
+        }
 
         #region 光标控制
 
@@ -945,23 +980,80 @@ namespace ModengTerm.Terminal
         // 服务器发送过来的光标原点是从(1,1)开始的，我们程序里的是(0,0)开始的，所以要减1
 
         public void HVP_HorizontalVerticalPosition(List<int> parameters) { }
-        public void CUP_CursorPosition(List<int> parameters) { }
-        
-        public void CUF_CursorForward(int n) 
+
+        public void CUP_CursorPosition(List<int> parameters)
+        {
+            int row = 0, col = 0;
+            if (parameters.Count == 2)
+            {
+                // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
+                int newrow = parameters[0];
+                int newcol = parameters[1];
+
+                // 测试中发现在ubuntu系统上执行apt install或者apt remove命令，HVP会发送0列过来，这里处理一下，如果遇到参数是0，那么就直接变成0
+                row = newrow == 0 ? 0 : newrow - 1;
+                col = newcol == 0 ? 0 : newcol - 1;
+
+                int viewportRow = this.activeDocument.ViewportRow;
+                int viewportColumn = this.activeDocument.ViewportColumn;
+
+                // 对行和列做限制
+                if (row >= viewportRow)
+                {
+                    row = viewportRow - 1;
+                }
+
+                if (col >= viewportColumn)
+                {
+                    col = viewportColumn - 1;
+                }
+            }
+            else
+            {
+                // 如果没有参数，那么说明就是定位到原点(0,0)
+            }
+
+            // 打开vim，输入i，然后按tab，虽然第一行的字符列数小于要移动到的col，但是vim还是会移动，所以这里把不足的列数使用空格补齐
+            if (this.ActiveLine.Columns < col)
+            {
+                this.ActiveLine.PadColumns(col);
+            }
+
+            VTDebug.Context.WriteInteractive("CursorPosition", "{0},{1},{2},{3},{4}", CursorRow, CursorCol, row, col, this.ActiveLine.Characters.Count);
+            activeDocument.SetCursor(row, col);
+        }
+
+        public void CUF_CursorForward(int n)
         {
             VTDebug.Context.WriteInteractive("CursorForward", "{0},{1},{2}", CursorRow, CursorCol, n);
             activeDocument.SetCursor(CursorRow, CursorCol + n);
         }
 
-        public void CUU_CursorUp(int n) 
+        public void CUU_CursorUp(int n)
         {
             VTDebug.Context.WriteInteractive("CursorUp", "{0},{1},{2}", CursorRow, CursorCol, n);
             activeDocument.SetCursor(CursorRow - n, CursorCol);
         }
 
-        public void CUD_CursorDown(List<int> parameters) { }
-        public void CHA_CursorHorizontalAbsolute(List<int> parameters) { }
-        public void VPA_VerticalLinePositionAbsolute(List<int> parameters) { }
+        public void CUD_CursorDown(int n)
+        {
+            VTDebug.Context.WriteInteractive("CursorDown", "{0},{1},{2}", CursorRow, CursorCol, n);
+            activeDocument.SetCursor(CursorRow + n, CursorCol);
+        }
+
+        public void CHA_CursorHorizontalAbsolute(int col)
+        {
+            VTDebug.Context.WriteInteractive("CursorHorizontalAbsolute", "{0},{1},{2}", CursorRow, CursorCol, col);
+
+            ActiveLine.PadColumns(col);
+            activeDocument.SetCursor(CursorRow, col);
+        }
+
+        public void VPA_VerticalLinePositionAbsolute(int row)
+        {
+            VTDebug.Context.WriteInteractive("VerticalLinePositionAbsolute", "{0},{1},{2}", CursorRow, CursorCol, row);
+            activeDocument.SetCursor(row, CursorCol);
+        }
 
         public void Backspace()
         {
@@ -976,500 +1068,383 @@ namespace ModengTerm.Terminal
         public void SU_ScrollUp(List<int> parameters) { }
 
         // Margin
-        public void DECSTBM_SetScrollingRegion(List<int> parameters) { }
-        public void DECSLRM_SetLeftRightMargins(List<int> parameters) { }
-
-
-        public void DECSC_CursorSave() { }
-        public void DECRC_CursorRestore() { }
-        public void DECKPAM_KeypadApplicationMode() { }
-        public void DECKPNM_KeypadNumericMode() { }
-
-
-        // SGR
-        public void PerformSGR(GraphicsOptions options, List<int> parameters) { }
-
-        public void DECCKM_CursorKeysMode(bool isApplicationMode) { }
-        public void DECANM_AnsiMode(bool isAnsiMode) { }
-        public void DECAWM_AutoWrapMode(bool isAutoWrapMode) { }
-        public void ASB_AlternateScreenBuffer(bool enable) { }
-        public void XTERM_BracketedPasteMode(bool enable) { }
-        public void ATT610_StartCursorBlink(bool enable) { }
-        public void DECTCEM_TextCursorEnableMode(bool enable) { }
-
-        #endregion
-
-        #region 事件处理器
-
-        private void VtParser_ActionEvent(VTParser parser, VTActions action, object parameter)
+        public void DECSTBM_SetScrollingRegion(List<int> parameters)
         {
-            switch (action)
+            // 设置可滚动区域
+            // 不可以操作滚动区域以外的行，只能对滚动区域内的行进行操作
+            // 对于滚动区域的作用的解释，举个例子说明
+            // 比方说marginTop是1，marginBottom也是1
+            // 那么在执行LineFeed动作的时候，默认情况下，是把第一行挂到最后一行的后面，有了margin之后，就要把第二行挂到倒数第二行的后面
+            // ScrollMargin会对很多动作产生影响：LF，RI_ReverseLineFeed，DeleteLine，InsertLine
+
+            // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
+            // 边距还会影响插入行 (IL) 和删除行 (DL)、向上滚动 (SU) 和向下滚动 (SD) 修改的行。
+
+            // Notes on DECSTBM
+            // * The value of the top margin (Pt) must be less than the bottom margin (Pb).
+            // * The maximum size of the scrolling region is the page size
+            // * DECSTBM moves the cursor to column 1, line 1 of the page
+            // * https://github.com/microsoft/terminal/issues/1849
+
+            // 当前终端屏幕可显示的行数量
+            int lines = this.activeDocument.ViewportRow;
+
+            int topMargin = VTParameter.GetParameter(parameters, 0, 1);
+            int bottomMargin = VTParameter.GetParameter(parameters, 1, lines);
+
+            if (bottomMargin < 0 || topMargin < 0)
             {
-                #region 光标操作
+                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                return;
+            }
+            if (topMargin >= bottomMargin)
+            {
+                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                return;
+            }
+            if (bottomMargin > lines)
+            {
+                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
+                return;
+            }
 
-                case VTActions.CursorBackward:
+            // 如果topMargin等于1，那么就表示使用默认值，也就是没有marginTop，所以当topMargin == 1的时候，marginTop改为0
+            int marginTop = topMargin == 1 ? 0 : topMargin;
+            // 如果bottomMargin等于控制台高度，那么就表示使用默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
+            int marginBottom = lines - bottomMargin;
+
+            VTDebug.Context.WriteInteractive("DECSTBM_SetScrollingRegion", "topMargin1 = {0}, bottomMargin1 = {1}, topMargin2 = {2}, bottomMargin2 = {3}", topMargin, bottomMargin, marginTop, marginBottom);
+            activeDocument.SetScrollMargin(marginTop, marginBottom);
+        }
+
+        public void DECSLRM_SetLeftRightMargins(int leftMargin, int rightMargin)
+        {
+            VTDebug.Context.WriteInteractive("DECSLRM_SetLeftRightMargins", "leftMargin = {0}, rightMargin = {1}", leftMargin, rightMargin);
+            logger.ErrorFormat("未实现DECSLRM_SetLeftRightMargins");
+        }
+
+
+        public void DECSC_CursorSave()
+        {
+            VTDebug.Context.WriteInteractive("CursorSave", "{0},{1}", CursorRow, CursorCol);
+
+            // 收到这个指令的时候把光标状态保存一下，等下次收到DECRC_CursorRestore再还原保存了的光标状态
+            activeDocument.CursorSave();
+        }
+
+        public void DECRC_CursorRestore()
+        {
+            VTDebug.Context.WriteInteractive("CursorRestore", "{0},{1},{2},{3}", CursorRow, CursorCol, activeDocument.CursorState.Row, activeDocument.CursorState.Column);
+            activeDocument.CursorRestore();
+        }
+
+
+        /// <summary>
+        /// SGR
+        /// 打开VIM的时候，VIM会在打印第一行的~号的时候设置验色，然后把剩余的行全部打印，也就是说设置一次颜色可以对多行都生效
+        /// 所以这里要记录下如果当前有文本特效被设置了，那么在行改变的时候也需要设置文本特效
+        /// 缓存下来，每次打印字符的时候都要对ActiveLine Apply一下
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="parameters"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        public void PerformSGR(GraphicsOptions options, VTColor extColor)
+        {
+            VTDebug.Context.WriteInteractive(string.Format("SGR - {0}", options), string.Empty);
+
+            switch (options)
+            {
+                case GraphicsOptions.Off:
                     {
-                        List<int> parameters = parameter as List<int>;
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, n);
-                        activeDocument.SetCursor(CursorRow, CursorCol - n);
-                        break;
-                    }
-
-
-                case VTActions.CUU_CursorUp:
-                    {
-                        List<int> parameters = parameter as List<int>;
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        break;
-                    }
-
-                case VTActions.CUD_CursorDown:
-                    {
-                        List<int> parameters = parameter as List<int>;
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, n);
-                        activeDocument.SetCursor(CursorRow + n, CursorCol);
-                        break;
-                    }
-
-                case VTActions.VPA_VerticalLinePositionAbsolute:
-                    {
-                        // 绝对垂直行位置 光标在当前列中垂直移动到第 <n> 个位置
-                        // 保持列不变，把光标移动到指定的行处
-                        List<int> parameters = parameter as List<int>;
-                        int row = VTParameter.GetParameter(parameters, 0, 1);
-                        row = Math.Max(0, row - 1);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, row);
-                        activeDocument.SetCursor(row, CursorCol);
-                        break;
-                    }
-
-                case VTActions.HVP_HorizontalVerticalPosition:
-                case VTActions.CUP_CursorPosition:
-                    {
-                        List<int> parameters = parameter as List<int>;
-
-                        int row = 0, col = 0;
-                        if (parameters.Count == 2)
-                        {
-                            // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
-                            int newrow = parameters[0];
-                            int newcol = parameters[1];
-
-                            // 测试中发现在ubuntu系统上执行apt install或者apt remove命令，HVP会发送0列过来，这里处理一下，如果遇到参数是0，那么就直接变成0
-                            row = newrow == 0 ? 0 : newrow - 1;
-                            col = newcol == 0 ? 0 : newcol - 1;
-
-                            int viewportRow = this.activeDocument.ViewportRow;
-                            int viewportColumn = this.activeDocument.ViewportColumn;
-
-                            // 对行和列做限制
-                            if (row >= viewportRow)
-                            {
-                                row = viewportRow - 1;
-                            }
-
-                            if (col >= viewportColumn)
-                            {
-                                col = viewportColumn - 1;
-                            }
-                        }
-                        else
-                        {
-                            // 如果没有参数，那么说明就是定位到原点(0,0)
-                        }
-
-                        // 打开vim，输入i，然后按tab，虽然第一行的字符列数小于要移动到的col，但是vim还是会移动，所以这里把不足的列数使用空格补齐
-                        if (this.ActiveLine.Columns < col)
-                        {
-                            this.ActiveLine.PadColumns(col);
-                        }
-
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2},{3},{4}", CursorRow, CursorCol, row, col, this.ActiveLine.Characters.Count);
-                        activeDocument.SetCursor(row, col);
-                        break;
-                    }
-
-                case VTActions.CHA_CursorHorizontalAbsolute:
-                    {
-                        List<int> parameters = parameter as List<int>;
-
-                        // 将光标移动到当前行中的第n列
-                        int n = VTParameter.GetParameter(parameters, 0, -1);
-                        if (n == -1)
-                        {
-                            break;
-                        }
-
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, n);
-
-                        ActiveLine.PadColumns(n - 1);
-                        activeDocument.SetCursor(CursorRow, n - 1);
-                        break;
-                    }
-
-                case VTActions.DECSC_CursorSave:
-                    {
-                        VTDebug.Context.WriteInteractive(action, "{0},{1}", CursorRow, CursorCol);
-
-                        // 收到这个指令的时候把光标状态保存一下，等下次收到DECRC_CursorRestore再还原保存了的光标状态
-                        activeDocument.CursorSave();
-                        break;
-                    }
-
-                case VTActions.DECRC_CursorRestore:
-                    {
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2},{3}", CursorRow, CursorCol, activeDocument.CursorState.Row, activeDocument.CursorState.Column);
-                        activeDocument.CursorRestore();
-                        break;
-                    }
-
-                #endregion
-
-                #region 文本特效
-
-                case VTActions.UnsetAll:
-                    {
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-
                         // 重置所有文本装饰
                         activeDocument.ClearAttribute();
                         break;
                     }
 
-                case VTActions.Bold:
-                case VTActions.BoldUnset:
-                case VTActions.Underline:
-                case VTActions.UnderlineUnset:
-                case VTActions.Italics:
-                case VTActions.ItalicsUnset:
-                case VTActions.DoublyUnderlined:
-                case VTActions.DoublyUnderlinedUnset:
-                case VTActions.Foreground:
-                case VTActions.ForegroundUnset:
-                case VTActions.Background:
-                case VTActions.BackgroundUnset:
-                case VTActions.ReverseVideo:
-                case VTActions.ReverseVideoUnset:
+                case GraphicsOptions.ForegroundDefault:
                     {
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, parameter == null ? string.Empty : parameter.ToString());
-
-                        // 打开VIM的时候，VIM会在打印第一行的~号的时候设置验色，然后把剩余的行全部打印，也就是说设置一次颜色可以对多行都生效
-                        // 所以这里要记录下如果当前有文本特效被设置了，那么在行改变的时候也需要设置文本特效
-                        // 缓存下来，每次打印字符的时候都要对ActiveLine Apply一下
-
-                        switch (action)
-                        {
-                            case VTActions.ReverseVideo:
-                                {
-                                    VTColor foreColor = VTColor.CreateFromRgbKey(backgroundColor);
-                                    VTColor backColor = VTColor.CreateFromRgbKey(foregroundColor);
-                                    activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
-                                    activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
-                                    break;
-                                }
-
-                            case VTActions.ReverseVideoUnset:
-                                {
-                                    activeDocument.SetAttribute(VTextAttributes.Background, false, null);
-                                    activeDocument.SetAttribute(VTextAttributes.Foreground, false, null);
-                                    break;
-                                }
-
-                            default:
-                                {
-                                    bool enabled;
-                                    VTextAttributes attribute = TermUtils.VTAction2TextAttribute(action, out enabled);
-                                    activeDocument.SetAttribute(attribute, enabled, parameter);
-                                    break;
-                                }
-                        }
-
+                        this.activeDocument.SetAttribute(VTextAttributes.Foreground, false, null);
                         break;
                     }
 
-                case VTActions.Faint:
-                case VTActions.FaintUnset:
-                case VTActions.CrossedOut:
-                case VTActions.CrossedOutUnset:
+                case GraphicsOptions.BackgroundDefault:
                     {
-                        logger.ErrorFormat(string.Format("未执行的VTAction, {0}", action));
+                        this.activeDocument.SetAttribute(VTextAttributes.Background, false, null);
                         break;
                     }
 
-                #endregion
-
-                #region DECPrivateMode
-
-                case VTActions.DECANM_AnsiMode:
+                case GraphicsOptions.NotBoldOrFaint:
                     {
-                        bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.Context.WriteInteractive(action, "{0}", enable);
-                        keyboard.SetAnsiMode(enable);
+                        this.activeDocument.SetAttribute(VTextAttributes.Bold, false, null);
+                        this.activeDocument.SetAttribute(VTextAttributes.Faint, false, null);
                         break;
                     }
 
-                case VTActions.DECCKM_CursorKeysMode:
+                case GraphicsOptions.RGBColorOrFaint:
                     {
-                        bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.Context.WriteInteractive(action, "{0}", enable);
-                        keyboard.SetCursorKeyMode(enable);
+                        logger.ErrorFormat("Faint");
+                        this.activeDocument.SetAttribute(VTextAttributes.Faint, true, null);
                         break;
                     }
 
-                case VTActions.DECKPAM_KeypadApplicationMode:
+                case GraphicsOptions.Negative:
                     {
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-                        keyboard.SetKeypadMode(true);
+                        // ReverseVideo
+                        VTColor foreColor = VTColor.CreateFromRgbKey(backgroundColor);
+                        VTColor backColor = VTColor.CreateFromRgbKey(foregroundColor);
+                        activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
+                        activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
                         break;
                     }
 
-                case VTActions.DECKPNM_KeypadNumericMode:
+                case GraphicsOptions.Positive:
                     {
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-                        keyboard.SetKeypadMode(false);
+                        // ReverseVideoUnset
+                        activeDocument.SetAttribute(VTextAttributes.Background, false, null);
+                        activeDocument.SetAttribute(VTextAttributes.Foreground, false, null);
                         break;
                     }
 
-                case VTActions.DECAWM_AutoWrapMode:
+                case GraphicsOptions.BoldBright:
                     {
-                        bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.Context.WriteInteractive(action, "{0}", enable);
-                        autoWrapMode = enable;
-                        activeDocument.AutoWrapMode = enable;
+                        this.activeDocument.SetAttribute(VTextAttributes.Bold, true, null);
                         break;
                     }
 
-                case VTActions.XTERM_BracketedPasteMode:
+                case GraphicsOptions.Italics:
                     {
-                        xtermBracketedPasteMode = Convert.ToBoolean(parameter);
-                        VTDebug.Context.WriteInteractive(action, "{0}", xtermBracketedPasteMode);
+                        this.activeDocument.SetAttribute(VTextAttributes.Italics, true, null);
                         break;
                     }
 
-                case VTActions.ATT610_StartCursorBlink:
+                case GraphicsOptions.NotItalics:
                     {
-                        bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.Context.WriteInteractive(action, "{0}", enable);
-                        Cursor.AllowBlink = enable;
+                        this.activeDocument.SetAttribute(VTextAttributes.Italics, false, null);
                         break;
                     }
 
-                case VTActions.DECTCEM_TextCursorEnableMode:
+                case GraphicsOptions.Underline:
                     {
-                        bool enable = Convert.ToBoolean(parameter);
-                        VTDebug.Context.WriteInteractive(action, "{0}", enable);
-                        Cursor.IsVisible = enable;
+                        this.activeDocument.SetAttribute(VTextAttributes.Underline, true, null);
                         break;
                     }
 
-                #endregion
-
-                #region 文本操作
-
-                case VTActions.DCH_DeleteCharacter:
+                case GraphicsOptions.DoublyUnderlined:
                     {
-                        // 从指定位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
-                        List<int> parameters = parameter as List<int>;
-                        int count = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0},{1},{2}", CursorRow, CursorCol, count);
-                        activeDocument.DeleteCharacter(CursorCol, count);
+                        this.activeDocument.SetAttribute(VTextAttributes.DoublyUnderlined, true, null);
                         break;
                     }
 
-                case VTActions.ICH_InsertCharacter:
+                case GraphicsOptions.NoUnderline:
                     {
-                        // 相关命令：
-                        // MainDocument：sudo apt install pstat，然后回车，最后按方向键上回到历史命令
-                        // AlternateDocument：暂无
+                        // UnderlineUnset
+                        activeDocument.SetAttribute(VTextAttributes.Underline, false, null);
 
-                        // Insert Ps (Blank) Character(s) (default = 1) (ICH).
-                        // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
-                        // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
-                        List<int> parameters = parameter as List<int>;
-                        int count = VTParameter.GetParameter(parameters, 0, 1);
-                        activeDocument.InsertCharacters(CursorCol, count);
+                        // DoublyUnderlineUnset
+                        activeDocument.SetAttribute(VTextAttributes.DoublyUnderlined, false, null);
                         break;
                     }
 
-                case VTActions.ECH_EraseCharacters:
+                case GraphicsOptions.ForegroundBlack:
+                case GraphicsOptions.ForegroundBlue:
+                case GraphicsOptions.ForegroundGreen:
+                case GraphicsOptions.ForegroundCyan:
+                case GraphicsOptions.ForegroundRed:
+                case GraphicsOptions.ForegroundMagenta:
+                case GraphicsOptions.ForegroundYellow:
+                case GraphicsOptions.ForegroundWhite:
+                case GraphicsOptions.BrightForegroundBlack:
+                case GraphicsOptions.BrightForegroundBlue:
+                case GraphicsOptions.BrightForegroundGreen:
+                case GraphicsOptions.BrightForegroundCyan:
+                case GraphicsOptions.BrightForegroundRed:
+                case GraphicsOptions.BrightForegroundMagenta:
+                case GraphicsOptions.BrightForegroundYellow:
+                case GraphicsOptions.BrightForegroundWhite:
                     {
-                        // 从当前光标处用空格填充n个字符
-                        // Erase Characters from the current cursor position, by replacing them with a space
-                        List<int> parameters = parameter as List<int>;
-                        int count = VTParameter.GetParameter(parameters, 0, 1);
-                        ActiveLine.EraseRange(CursorCol, count);
+                        VTColorIndex colorIndex = TermUtils.GraphicsOptions2VTColorIndex(options);
+                        this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, this.colorTable.GetColor(colorIndex));
                         break;
                     }
 
-                case VTActions.IL_InsertLine:
+                case GraphicsOptions.BackgroundBlack:
+                case GraphicsOptions.BackgroundBlue:
+                case GraphicsOptions.BackgroundGreen:
+                case GraphicsOptions.BackgroundCyan:
+                case GraphicsOptions.BackgroundRed:
+                case GraphicsOptions.BackgroundMagenta:
+                case GraphicsOptions.BackgroundYellow:
+                case GraphicsOptions.BackgroundWhite:
+                case GraphicsOptions.BrightBackgroundBlack:
+                case GraphicsOptions.BrightBackgroundBlue:
+                case GraphicsOptions.BrightBackgroundGreen:
+                case GraphicsOptions.BrightBackgroundCyan:
+                case GraphicsOptions.BrightBackgroundRed:
+                case GraphicsOptions.BrightBackgroundMagenta:
+                case GraphicsOptions.BrightBackgroundYellow:
+                case GraphicsOptions.BrightBackgroundWhite:
                     {
-                        // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
-                        List<int> parameters = parameter as List<int>;
-                        int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0}", lines);
-                        if (lines > 0)
-                        {
-                            activeDocument.InsertLines(lines);
-                        }
+                        VTColorIndex colorIndex = TermUtils.GraphicsOptions2VTColorIndex(options);
+                        this.activeDocument.SetAttribute(VTextAttributes.Background, true, this.colorTable.GetColor(colorIndex));
                         break;
                     }
 
-                case VTActions.DL_DeleteLine:
+                case GraphicsOptions.ForegroundExtended:
                     {
-                        // 从缓冲区中删除<n> 行，从光标所在的行开始。
-                        List<int> parameters = parameter as List<int>;
-                        int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        VTDebug.Context.WriteInteractive(action, "{0}", lines);
-                        if (lines > 0)
-                        {
-                            activeDocument.DeleteLines(lines);
-                        }
+                        this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, extColor);
                         break;
                     }
 
-                #endregion
-
-                #region 上下滚动
-
-                case VTActions.SD_ScrollDown:
+                case GraphicsOptions.BackgroundExtended:
                     {
-                        // Scroll down Ps lines (default = 1) (SD), VT420.
-
+                        this.activeDocument.SetAttribute(VTextAttributes.Background, true, extColor);
                         break;
                     }
 
-                case VTActions.SU_ScrollUp:
+                case GraphicsOptions.NotCrossedOut:
+                case GraphicsOptions.CrossedOut:
                     {
-                        break;
-                    }
-
-                #endregion
-
-                case VTActions.UseAlternateScreenBuffer:
-                    {
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-
-                        uiSyncContext.Send(new SendOrPostCallback((o) =>
-                        {
-                            mainDocument.SetVisible(false);
-                            alternateDocument.SetVisible(true);
-                        }), null);
-
-                        activeDocument = alternateDocument;
-
-                        DocumentChanged?.Invoke(this, mainDocument, alternateDocument);
-                        break;
-                    }
-
-                case VTActions.UseMainScreenBuffer:
-                    {
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-
-                        uiSyncContext.Send(new SendOrPostCallback((o) =>
-                        {
-                            mainDocument.SetVisible(true);
-                            alternateDocument.SetVisible(false);
-                        }), null);
-
-                        alternateDocument.SetScrollMargin(0, 0);
-                        alternateDocument.EraseAll();
-                        alternateDocument.SetCursor(0, 0);
-                        alternateDocument.ClearAttribute();
-                        alternateDocument.Selection.Clear();
-
-                        activeDocument = mainDocument;
-
-                        DocumentChanged?.Invoke(this, alternateDocument, mainDocument);
-                        break;
-                    }
-
-                case VTActions.DSR_DeviceStatusReport:
-                    {
-                        // DSR，参考https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
-
-                        List<int> parameters = parameter as List<int>;
-                        StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
-                        PerformDeviceStatusReport(statusType);
-                        break;
-                    }
-
-                case VTActions.DA_DeviceAttributes:
-                    {
-                        VTDebug.Context.WriteInteractive(action, string.Empty);
-                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DA_DeviceAttributes, DA_DeviceAttributesData);
-                        sessionTransport.Write(DA_DeviceAttributesData);
-                        break;
-                    }
-
-                case VTActions.DECSTBM_SetScrollingRegion:
-                    {
-                        // 设置可滚动区域
-                        // 不可以操作滚动区域以外的行，只能对滚动区域内的行进行操作
-                        // 对于滚动区域的作用的解释，举个例子说明
-                        // 比方说marginTop是1，marginBottom也是1
-                        // 那么在执行LineFeed动作的时候，默认情况下，是把第一行挂到最后一行的后面，有了margin之后，就要把第二行挂到倒数第二行的后面
-                        // ScrollMargin会对很多动作产生影响：LF，RI_ReverseLineFeed，DeleteLine，InsertLine
-
-                        // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
-                        // 边距还会影响插入行 (IL) 和删除行 (DL)、向上滚动 (SU) 和向下滚动 (SD) 修改的行。
-
-                        // Notes on DECSTBM
-                        // * The value of the top margin (Pt) must be less than the bottom margin (Pb).
-                        // * The maximum size of the scrolling region is the page size
-                        // * DECSTBM moves the cursor to column 1, line 1 of the page
-                        // * https://github.com/microsoft/terminal/issues/1849
-
-                        // 当前终端屏幕可显示的行数量
-                        int lines = this.activeDocument.ViewportRow;
-
-                        List<int> parameters = parameter as List<int>;
-                        int topMargin = VTParameter.GetParameter(parameters, 0, 1);
-                        int bottomMargin = VTParameter.GetParameter(parameters, 1, lines);
-
-                        if (bottomMargin < 0 || topMargin < 0)
-                        {
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                            return;
-                        }
-                        if (topMargin >= bottomMargin)
-                        {
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                            return;
-                        }
-                        if (bottomMargin > lines)
-                        {
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
-                            return;
-                        }
-
-                        // 如果topMargin等于1，那么就表示使用默认值，也就是没有marginTop，所以当topMargin == 1的时候，marginTop改为0
-                        int marginTop = topMargin == 1 ? 0 : topMargin;
-                        // 如果bottomMargin等于控制台高度，那么就表示使用默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
-                        int marginBottom = lines - bottomMargin;
-                        VTDebug.Context.WriteInteractive(action, "topMargin1 = {0}, bottomMargin1 = {1}, topMargin2 = {2}, bottomMargin2 = {3}", topMargin, bottomMargin, marginTop, marginBottom);
-                        activeDocument.SetScrollMargin(marginTop, marginBottom);
-                        break;
-                    }
-
-                case VTActions.DECSLRM_SetLeftRightMargins:
-                    {
-                        List<int> parameters = parameter as List<int>;
-                        int leftMargin = VTParameter.GetParameter(parameters, 0, 0);
-                        int rightMargin = VTParameter.GetParameter(parameters, 1, 0);
-
-                        VTDebug.Context.WriteInteractive(action, "leftMargin = {0}, rightMargin = {1}", leftMargin, rightMargin);
-                        logger.ErrorFormat("未实现DECSLRM_SetLeftRightMargins");
+                        logger.ErrorFormat("未实现SGR, {0}", options.ToString());
                         break;
                     }
 
                 default:
                     {
-                        throw new NotImplementedException(string.Format("未执行的VTAction, {0}", action));
+                        // TODO：
+                        logger.ErrorFormat("未实现的SGR, {0}", options.ToString());
+                        throw new NotImplementedException();
                     }
             }
         }
+
+        #region DECPrivateMode
+
+        public void DECCKM_CursorKeysMode(bool isApplicationMode)
+        {
+            VTDebug.Context.WriteInteractive("DECCKM_CursorKeysMode", "{0}", isApplicationMode);
+            keyboard.SetCursorKeyMode(isApplicationMode);
+        }
+
+        public void DECANM_AnsiMode(bool isAnsiMode)
+        {
+            VTDebug.Context.WriteInteractive("DECANM_AnsiMode", "{0}", isAnsiMode);
+            keyboard.SetAnsiMode(isAnsiMode);
+        }
+
+        public void DECKPAM_KeypadApplicationMode()
+        {
+            VTDebug.Context.WriteInteractive("DECKPAM_KeypadApplicationMode", string.Empty);
+            keyboard.SetKeypadMode(true);
+        }
+
+        public void DECKPNM_KeypadNumericMode()
+        {
+            VTDebug.Context.WriteInteractive("DECKPNM_KeypadNumericMode", string.Empty);
+            keyboard.SetKeypadMode(false);
+        }
+
+        public void DECAWM_AutoWrapMode(bool isAutoWrapMode)
+        {
+            VTDebug.Context.WriteInteractive("DECAWM_AutoWrapMode", "{0}", isAutoWrapMode);
+            autoWrapMode = isAutoWrapMode;
+            activeDocument.AutoWrapMode = isAutoWrapMode;
+        }
+
+        public void XTERM_BracketedPasteMode(bool enable)
+        {
+            VTDebug.Context.WriteInteractive("XTERM_BracketedPasteMode", "{0}", enable);
+            xtermBracketedPasteMode = enable;
+        }
+
+
+        public void ATT610_StartCursorBlink(bool enable)
+        {
+            VTDebug.Context.WriteInteractive("ATT610_StartCursorBlink", "{0}", enable);
+            Cursor.AllowBlink = enable;
+        }
+
+        public void DECTCEM_TextCursorEnableMode(bool enable)
+        {
+            VTDebug.Context.WriteInteractive("DECTCEM_TextCursorEnableMode", "{0}", enable);
+            Cursor.IsVisible = enable;
+        }
+
+        #endregion
+
+        public void ASB_AlternateScreenBuffer(bool enable)
+        {
+            if (enable)
+            {
+                // 使用备用缓冲区
+                VTDebug.Context.WriteInteractive("UseAlternateScreenBuffer", string.Empty);
+
+                uiSyncContext.Send(new SendOrPostCallback((o) =>
+                {
+                    mainDocument.SetVisible(false);
+                    alternateDocument.SetVisible(true);
+                }), null);
+
+                activeDocument = alternateDocument;
+
+                DocumentChanged?.Invoke(this, mainDocument, alternateDocument);
+            }
+            else
+            {
+                // 使用主缓冲区
+
+                VTDebug.Context.WriteInteractive("UseMainScreenBuffer", string.Empty);
+
+                uiSyncContext.Send(new SendOrPostCallback((o) =>
+                {
+                    mainDocument.SetVisible(true);
+                    alternateDocument.SetVisible(false);
+                }), null);
+
+                alternateDocument.SetScrollMargin(0, 0);
+                alternateDocument.EraseAll();
+                alternateDocument.SetCursor(0, 0);
+                alternateDocument.ClearAttribute();
+                alternateDocument.Selection.Clear();
+
+                activeDocument = mainDocument;
+
+                DocumentChanged?.Invoke(this, alternateDocument, mainDocument);
+            }
+        }
+
+        public void SS2_SingleShift()
+        {
+            if (this.gsetList.Count == 0) 
+            {
+                return;
+            }
+
+            this.glMap = this.gsetList[1];
+        }
+
+        public void SS3_SingleShift()
+        {
+            if (this.gsetList.Count == 0)
+            {
+                return;
+            }
+
+            this.glMap = this.gsetList[2];
+        }
+
+        public void Designate94Charset(int gsetIndex, int charset)
+        {
+            
+        }
+
+        public void Designate96Charset(int gsetIndex, int charset)
+        {
+            
+        }
+
+        #endregion
+
+        #region 事件处理器
 
         #endregion
     }
