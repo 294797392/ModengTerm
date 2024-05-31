@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Automation;
 
 namespace ModengTerm.Terminal.Parsing
 {
@@ -12,6 +13,16 @@ namespace ModengTerm.Terminal.Parsing
     /// </summary>
     public interface VTDispatchHandler
     {
+        /// <summary>
+        /// 可视区域的行数
+        /// </summary>
+        int ViewportRow { get; }
+
+        /// <summary>
+        /// 可视区域的列数
+        /// </summary>
+        int ViewportColumn { get; }
+
         void PlayBell();
         void Backspace();
         void ForwardTab();
@@ -38,9 +49,14 @@ namespace ModengTerm.Terminal.Parsing
         void DSR_DeviceStatusReport(StatusType statusType);
         void DA_DeviceAttributes(List<int> parameters);
 
-        // 光标控制
-        void HVP_HorizontalVerticalPosition(List<int> parameters);
-        void CUP_CursorPosition(List<int> parameters);
+
+        /// <summary>
+        /// 设置光标在终端里的位置
+        /// 左上角是0，0
+        /// </summary>
+        /// <param name="row">光标所在行</param>
+        /// <param name="col">光标所在列</param>
+        void CUP_CursorPosition(int row, int col);
         void CUF_CursorForward(int n);
         void CUU_CursorUp(int n);
         void CUD_CursorDown(int n);
@@ -51,9 +67,18 @@ namespace ModengTerm.Terminal.Parsing
         void SD_ScrollDown(List<int> parameters);
         void SU_ScrollUp(List<int> parameters);
 
-        // Margin
-        void DECSTBM_SetScrollingRegion(List<int> parameters);
+        #region Margin
+
+        /// <summary>
+        /// 不可以操作滚动区域以外的行，只能对滚动区域内的行进行操作
+        /// 滚动区域不包含topMargin和bottomMargin
+        /// </summary>
+        /// <param name="topMargin"></param>
+        /// <param name="bottomMargin"></param>
+        void DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin);
         void DECSLRM_SetLeftRightMargins(int leftMargin, int rightMargin);
+
+        #endregion
 
 
         void DECSC_CursorSave();
@@ -78,13 +103,19 @@ namespace ModengTerm.Terminal.Parsing
         void SS2_SingleShift();
         void SS3_SingleShift();
 
+        void LS2_LockingShift();
+        void LS3_LockingShift();
+        void LS1R_LockingShift();
+        void LS2R_LockingShift();
+        void LS3R_LockingShift();
+
         /// <summary>
-        /// 对指定的字符集应用指定的字符集映射
+        /// 对指定的集合应用指定的字符集映射
         /// </summary>
-        /// <param name="gsetIndex">要应用到的字符集</param>
+        /// <param name="gsetIndex">要映射到的字符集合</param>
         /// <param name="charset">要使用的字符集映射</param>
-        void Designate94Charset(int gsetIndex, int charset);
-        void Designate96Charset(int gsetIndex, int charset);
+        void Designate94Charset(int gsetIndex, ulong charset);
+        void Designate96Charset(int gsetIndex, ulong charset);
 
         #endregion
     }

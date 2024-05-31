@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
-using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

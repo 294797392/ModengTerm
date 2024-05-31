@@ -818,7 +818,7 @@ namespace ModengTerm.Document
                  5.-----          5.-----
                  ***************************/
 
-                VTextLine node1 = dest.NextLine;
+                VTextLine node1 = dest.PreviousLine;
 
                 node1.NextLine = src;
                 src.PreviousLine = node1;
@@ -842,42 +842,9 @@ namespace ModengTerm.Document
             this.ActiveLine.PrintCharacter(character, this.Cursor.Column);
         }
 
-        /// <summary>
-        /// 在当前光标所在行使用填充字符的方式操作行
-        /// </summary>
-        /// <param name="column">光标所在列</param>
-        /// <param name="eraseType">删除类型</param>
-        public void EraseLine(int column, EraseType eraseType)
+        public void PrintCharacter(VTCharacter character, int column) 
         {
-            VTextLine textLine = this.ActiveLine;
-
-            switch (eraseType)
-            {
-                case EraseType.ToEnd:
-                    {
-                        // 删除从当前光标处到该行结尾的所有字符
-                        textLine.EraseToEnd(column);
-                        break;
-                    }
-
-                case EraseType.FromBeginning:
-                    {
-                        // 删除从行首到当前光标处的内容
-                        textLine.EraseFromBeginning(column);
-                        break;
-                    }
-
-                case EraseType.All:
-                    {
-                        // 删除光标所在整行
-                        textLine.EraseAll();
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
+            this.ActiveLine.PrintCharacter(character, column);
         }
 
         /// <summary>

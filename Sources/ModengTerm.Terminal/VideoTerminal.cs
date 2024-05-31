@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
@@ -7,6 +8,7 @@ using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
+using System.Printing;
 using System.Text;
 using XTerminal.Base.Definitions;
 
@@ -134,18 +136,23 @@ namespace ModengTerm.Terminal
 
         private VTOptions vtOptions;
 
-
         /// <summary>
         /// G0,G1,G2,G3字符集
         /// </summary>
-        private List<VTCharsetMap> gsetList;
-
-        private VTCharsetMap glMap;
-        private VTCharsetMap grMap;
+        private VTCharsetMap[] gsetList;
+        private int glSetNumber;
+        private int glSetNumberSingleShift = -1; // 只映射下一次使用的gsetNumber
+        private VTCharsetMap glTranslationTable;
+        private int grSetNumber;
+        private VTCharsetMap grTranslationTable;
 
         #endregion
 
         #region 属性
+
+        public int ViewportRow { get { return this.activeDocument.ViewportRow; } }
+
+        public int ViewportColumn { get { return this.activeDocument.ViewportColumn; } }
 
         /// <summary>
         /// 会话名字
@@ -227,12 +234,21 @@ namespace ModengTerm.Terminal
         /// <param name="sessionInfo"></param>
         public void Initialize(VTOptions options)
         {
-            // 开启日志记录
-            VTDebug.Context.Categories.FirstOrDefault(v => v.Category == VTDebugCategoryEnum.vttestCode).Enabled = true;
+            uiSyncContext = SynchronizationContext.Current;
 
             vtOptions = options;
-            this.gsetList = new List<VTCharsetMap>();
-            uiSyncContext = SynchronizationContext.Current;
+            // 设置默认的字符集映射
+            // 参考:
+            // terminal项目 - TerminalOutput构造函数
+            // https://vt100.net/docs/vt220-rm/chapter4.html#F4-1
+            // Character sets remain designated until the terminal receives another SCS sequence. All locking shifts remain active until the terminal receives another locking shift. Single shifts SS2 and SS3 are active for only the next single graphic character.
+            this.gsetList = new VTCharsetMap[4]
+            {
+                VTCharsetMap.Ascii, VTCharsetMap.Ascii,
+                VTCharsetMap.Latin1, VTCharsetMap.Latin1,
+            };
+            this.glTranslationTable = VTCharsetMap.Ascii;
+            this.grTranslationTable = VTCharsetMap.Latin1;
 
             // DECAWM
             autoWrapMode = false;
@@ -629,6 +645,88 @@ namespace ModengTerm.Terminal
             document.EraseAll();
         }
 
+        private VTCharsetMap Select94CharsetMap(ulong charset)
+        {
+            switch (charset)
+            {
+                case 'B':
+                case '1': return VTCharsetMap.Ascii;
+                case '0':
+                case '2': return VTCharsetMap.DecSpecialGraphics;
+                case 'A': return VTCharsetMap.BritishNrcs;
+                case '4': return VTCharsetMap.DutchNrcs;
+                case '5':
+                case 'C': return VTCharsetMap.FinnishNrcs;
+                case 'R': return VTCharsetMap.FrenchNrcs;
+                case 'f': return VTCharsetMap.FrenchNrcsIso;
+                case '9':
+                case 'Q': return VTCharsetMap.FrenchCanadianNrcs;
+                case 'K': return VTCharsetMap.GermanNrcs;
+                case 'Y': return VTCharsetMap.ItalianNrcs;
+                case '6':
+                case 'E': return VTCharsetMap.NorwegianDanishNrcs;
+                case '`': return VTCharsetMap.NorwegianDanishNrcsIso;
+                case 'Z': return VTCharsetMap.SpanishNrcs;
+                case '7':
+                case 'H': return VTCharsetMap.SwedishNrcs;
+                case '=': return VTCharsetMap.SwissNrcs;
+
+                default:
+                    {
+                        throw new NotImplementedException(string.Format("未处理的94 charset, {0}", charset));
+                    }
+            }
+        }
+
+        private VTCharsetMap Select96CharsetMap(ulong charset)
+        {
+            switch (charset)
+            {
+                case 'A': return VTCharsetMap.Latin1;
+                case 'B': return VTCharsetMap.Latin2;
+                case 'L': return VTCharsetMap.LatinCyrillic;
+                case 'F': return VTCharsetMap.LatinGreek;
+                case 'H': return VTCharsetMap.LatinHebrew;
+                case 'M': return VTCharsetMap.Latin5;
+
+                default:
+                    {
+                        throw new NotImplementedException(string.Format("未处理的96 charset, {0}", charset));
+                    }
+            }
+        }
+
+        private char TranslateCharacter(char ch) 
+        {
+            // 最终要打印的字符
+            char chPrint = ch;
+
+            // 首先根据GL和GR的映射状态转换要显示的字符
+            if (ch >= 0x20 && ch <= 0x7F)
+            {
+                // 此时显示的是GL区域的字符
+                if (this.glSetNumberSingleShift == 2 || this.glSetNumberSingleShift == 3)
+                {
+                    VTCharsetMap translationTable = this.gsetList[this.glSetNumberSingleShift];
+
+                    chPrint = translationTable.TranslateCharacter(ch);
+
+                    this.glSetNumberSingleShift = -1;
+                }
+                else
+                {
+                    chPrint = this.glTranslationTable.TranslateCharacter(ch);
+                }
+            }
+            else if (ch >= 0xA0 && ch <= 0xFF)
+            {
+                // 此时显示的是GR区域的字符
+                chPrint = this.grTranslationTable.TranslateCharacter(ch);
+            }
+
+            return chPrint;
+        }
+
         #endregion
 
         #region VTDispatchHandler
@@ -791,9 +889,11 @@ namespace ModengTerm.Terminal
             // 不然会出现在VTDocument当前的最后一行打印字符的问题
             activeDocument.ScrollToBottom();
 
+            char chPrint = this.TranslateCharacter(ch);
+
             // 创建并打印新的字符
-            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, ch);
-            VTCharacter character = this.CreateCharacter(ch, activeDocument.AttributeState);
+            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
+            VTCharacter character = this.CreateCharacter(chPrint, activeDocument.AttributeState);
             activeDocument.PrintCharacter(character);
             activeDocument.SetCursor(CursorRow, CursorCol + character.ColumnSize);
         }
@@ -890,9 +990,48 @@ namespace ModengTerm.Terminal
 
         public void EL_EraseLine(VTEraseType eraseType)
         {
+            // TODO：优化填充算法
+
             VTDebug.Context.WriteInteractive("EraseLine", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
 
-            this.activeDocument.EraseLine(CursorCol, (EraseType)eraseType);
+            switch (eraseType)
+            {
+                case VTEraseType.All:
+                    {
+                        for (int i = 0; i < this.ViewportColumn; i++)
+                        {
+                            VTCharacter character = this.CreateCharacter(' ', activeDocument.AttributeState);
+                            this.activeDocument.PrintCharacter(character, i);
+                        }
+
+                        break;
+                    }
+
+                case VTEraseType.FromBeginning:
+                    {
+                        for (int i = 0; i <= this.CursorCol; i++)
+                        {
+                            VTCharacter character = this.CreateCharacter(' ', activeDocument.AttributeState);
+                            this.activeDocument.PrintCharacter(character, i);
+                        }
+
+                        break;
+                    }
+
+                case VTEraseType.ToEnd:
+                    {
+                        for (int i = this.CursorCol; i < this.ViewportColumn; i++)
+                        {
+                            VTCharacter character = this.CreateCharacter(' ', activeDocument.AttributeState);
+                            this.activeDocument.PrintCharacter(character, i);
+                        }
+
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         // 字符操作
@@ -909,7 +1048,17 @@ namespace ModengTerm.Terminal
 
         public void ECH_EraseCharacters(int count)
         {
-            ActiveLine.EraseRange(CursorCol, count);
+            // TODO：优化算法
+            VTextAttributeState attributeState = this.activeDocument.AttributeState;
+
+            for (int i = 0; i < count; i++)
+            {
+                int column = this.CursorCol + i;
+
+                VTCharacter character = this.CreateCharacter(' ', attributeState);
+
+                this.activeDocument.PrintCharacter(character, column);
+            }
         }
 
         // 行操作
@@ -979,47 +1128,14 @@ namespace ModengTerm.Terminal
         // 光标的移动坐标是相对于可视区域内的坐标
         // 服务器发送过来的光标原点是从(1,1)开始的，我们程序里的是(0,0)开始的，所以要减1
 
-        public void HVP_HorizontalVerticalPosition(List<int> parameters) { }
-
-        public void CUP_CursorPosition(List<int> parameters)
+        public void CUP_CursorPosition(int row, int col)
         {
-            int row = 0, col = 0;
-            if (parameters.Count == 2)
-            {
-                // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
-                int newrow = parameters[0];
-                int newcol = parameters[1];
-
-                // 测试中发现在ubuntu系统上执行apt install或者apt remove命令，HVP会发送0列过来，这里处理一下，如果遇到参数是0，那么就直接变成0
-                row = newrow == 0 ? 0 : newrow - 1;
-                col = newcol == 0 ? 0 : newcol - 1;
-
-                int viewportRow = this.activeDocument.ViewportRow;
-                int viewportColumn = this.activeDocument.ViewportColumn;
-
-                // 对行和列做限制
-                if (row >= viewportRow)
-                {
-                    row = viewportRow - 1;
-                }
-
-                if (col >= viewportColumn)
-                {
-                    col = viewportColumn - 1;
-                }
-            }
-            else
-            {
-                // 如果没有参数，那么说明就是定位到原点(0,0)
-            }
-
             // 打开vim，输入i，然后按tab，虽然第一行的字符列数小于要移动到的col，但是vim还是会移动，所以这里把不足的列数使用空格补齐
             if (this.ActiveLine.Columns < col)
             {
                 this.ActiveLine.PadColumns(col);
             }
 
-            VTDebug.Context.WriteInteractive("CursorPosition", "{0},{1},{2},{3},{4}", CursorRow, CursorCol, row, col, this.ActiveLine.Characters.Count);
             activeDocument.SetCursor(row, col);
         }
 
@@ -1068,59 +1184,13 @@ namespace ModengTerm.Terminal
         public void SU_ScrollUp(List<int> parameters) { }
 
         // Margin
-        public void DECSTBM_SetScrollingRegion(List<int> parameters)
+        public void DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin)
         {
-            // 设置可滚动区域
-            // 不可以操作滚动区域以外的行，只能对滚动区域内的行进行操作
-            // 对于滚动区域的作用的解释，举个例子说明
-            // 比方说marginTop是1，marginBottom也是1
-            // 那么在执行LineFeed动作的时候，默认情况下，是把第一行挂到最后一行的后面，有了margin之后，就要把第二行挂到倒数第二行的后面
-            // ScrollMargin会对很多动作产生影响：LF，RI_ReverseLineFeed，DeleteLine，InsertLine
-
-            // 视频终端的规范里说，如果topMargin等于bottomMargin，或者bottomMargin大于屏幕高度，那么忽略这个指令
-            // 边距还会影响插入行 (IL) 和删除行 (DL)、向上滚动 (SU) 和向下滚动 (SD) 修改的行。
-
-            // Notes on DECSTBM
-            // * The value of the top margin (Pt) must be less than the bottom margin (Pb).
-            // * The maximum size of the scrolling region is the page size
-            // * DECSTBM moves the cursor to column 1, line 1 of the page
-            // * https://github.com/microsoft/terminal/issues/1849
-
-            // 当前终端屏幕可显示的行数量
-            int lines = this.activeDocument.ViewportRow;
-
-            int topMargin = VTParameter.GetParameter(parameters, 0, 1);
-            int bottomMargin = VTParameter.GetParameter(parameters, 1, lines);
-
-            if (bottomMargin < 0 || topMargin < 0)
-            {
-                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                return;
-            }
-            if (topMargin >= bottomMargin)
-            {
-                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                return;
-            }
-            if (bottomMargin > lines)
-            {
-                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
-                return;
-            }
-
-            // 如果topMargin等于1，那么就表示使用默认值，也就是没有marginTop，所以当topMargin == 1的时候，marginTop改为0
-            int marginTop = topMargin == 1 ? 0 : topMargin;
-            // 如果bottomMargin等于控制台高度，那么就表示使用默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
-            int marginBottom = lines - bottomMargin;
-
-            VTDebug.Context.WriteInteractive("DECSTBM_SetScrollingRegion", "topMargin1 = {0}, bottomMargin1 = {1}, topMargin2 = {2}, bottomMargin2 = {3}", topMargin, bottomMargin, marginTop, marginBottom);
-            activeDocument.SetScrollMargin(marginTop, marginBottom);
+            activeDocument.SetScrollMargin(topMargin, bottomMargin);
         }
 
         public void DECSLRM_SetLeftRightMargins(int leftMargin, int rightMargin)
         {
-            VTDebug.Context.WriteInteractive("DECSLRM_SetLeftRightMargins", "leftMargin = {0}, rightMargin = {1}", leftMargin, rightMargin);
-            logger.ErrorFormat("未实现DECSLRM_SetLeftRightMargins");
         }
 
 
@@ -1412,35 +1482,70 @@ namespace ModengTerm.Terminal
             }
         }
 
+        #region 切换字符集
+
         public void SS2_SingleShift()
         {
-            if (this.gsetList.Count == 0) 
-            {
-                return;
-            }
-
-            this.glMap = this.gsetList[1];
+            this.glSetNumberSingleShift = 2;
         }
 
         public void SS3_SingleShift()
         {
-            if (this.gsetList.Count == 0)
-            {
-                return;
-            }
-
-            this.glMap = this.gsetList[2];
+            this.glSetNumberSingleShift = 3;
         }
 
-        public void Designate94Charset(int gsetIndex, int charset)
+        public void LS2_LockingShift()
         {
-            
+            this.glSetNumber = 2;
+            this.glTranslationTable = this.gsetList[this.glSetNumber];
         }
 
-        public void Designate96Charset(int gsetIndex, int charset)
+        public void LS3_LockingShift()
         {
-            
+            this.glSetNumber = 3;
+            this.glTranslationTable = this.gsetList[this.glSetNumber];
         }
+
+        public void LS1R_LockingShift()
+        {
+            this.grSetNumber = 1;
+            this.grTranslationTable = this.gsetList[this.grSetNumber];
+        }
+
+        public void LS2R_LockingShift()
+        {
+            this.grSetNumber = 2;
+            this.grTranslationTable = this.gsetList[this.grSetNumber];
+        }
+
+        public void LS3R_LockingShift()
+        {
+            this.grSetNumber = 3;
+            this.grTranslationTable = this.gsetList[this.grSetNumber];
+        }
+
+
+        public void Designate94Charset(int gsetIndex, ulong charset)
+        {
+            VTCharsetMap charsetMap = this.Select94CharsetMap(charset);
+
+            this.gsetList[gsetIndex] = charsetMap;
+
+            this.glTranslationTable = this.gsetList[this.glSetNumber];
+            this.grTranslationTable = this.gsetList[this.grSetNumber];
+        }
+
+        public void Designate96Charset(int gsetIndex, ulong charset)
+        {
+            VTCharsetMap charsetMap = this.Select96CharsetMap(charset);
+
+            this.gsetList[gsetIndex] = charsetMap;
+
+            this.glTranslationTable = this.gsetList[this.glSetNumber];
+            this.grTranslationTable = this.gsetList[this.grSetNumber];
+        }
+
+        #endregion
 
         #endregion
 

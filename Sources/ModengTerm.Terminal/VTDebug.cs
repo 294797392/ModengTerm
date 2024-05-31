@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using log4net.Util;
 using ModengTerm.Terminal.Parsing;
 using System;
 using System.Collections.Generic;
@@ -121,9 +122,9 @@ namespace ModengTerm.Terminal
         }
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDebug");
+        private log4net.ILog vttestLogger = log4net.LogManager.GetLogger("vttest");
 
         private LogCategory interactiveCategory;
-        private LogCategory vttestCodeCategory;
         private LogCategory rawReadCategory;
         private Dictionary<VTDebugCategoryEnum, LogCategory> categoryMap;
         public List<LogCategory> Categories { get; private set; }
@@ -135,7 +136,6 @@ namespace ModengTerm.Terminal
             this.categoryMap = new Dictionary<VTDebugCategoryEnum, LogCategory>();
 
             this.interactiveCategory = this.CreateCategory(VTDebugCategoryEnum.Interactive);
-            this.vttestCodeCategory = this.CreateCategory(VTDebugCategoryEnum.vttestCode);
             this.rawReadCategory = this.CreateCategory(VTDebugCategoryEnum.RawRead);
         }
 
@@ -205,45 +205,30 @@ namespace ModengTerm.Terminal
         }
 
 
-        //public void Writevttest(VTActions actions, List<byte> sequence)
-        //{
-        //    if (!this.CanWrite(this.vttestCodeCategory))
-        //    {
-        //        return;
-        //    }
+        public void Writevttest(string action, List<byte> sequence)
+        {
+            string varName = string.Format("{0}{1}", action, this.vttestCodeIndex++);
+            string codeSequence = string.Empty;
 
-        //    if (sequence.Count == 0)
-        //    {
-        //        // TODO：因为SGR序列会执行多次VTAction，执行第一次VTAction的时候sequence就被清空了
-        //        // 暂时先不处理这种情况，需要优化，SGR指令只调用一次VTAction
-        //        return;
-        //    }
+            if (action == "LF")
+            {
+                codeSequence = "'\\n'";
+            }
+            else if (action == "CR")
+            {
+                codeSequence = "'\\r'";
+            }
+            else
+            {
+                codeSequence = string.Join(',', sequence.Select(v => string.Format("'{0}'", Convert.ToChar(v))));
+            }
 
-        //    StringBuilder builder = new StringBuilder();
-        //    foreach (byte b in sequence)
-        //    {
-        //        if (actions == VTActions.CarriageReturn)
-        //        {
-        //            builder.AppendFormat("'\\r',");
-        //        }
-        //        else if (actions == VTActions.LF)
-        //        {
-        //            builder.AppendFormat("'\\n',");
-        //        }
-        //        else
-        //        {
-        //            builder.AppendFormat("'{0}',", Convert.ToChar(b));
-        //        }
-        //    }
-        //    builder.Append("'\\0'");
+            codeSequence += ",'\\0'";
 
-        //    string varName = string.Format("{0}{1}", actions, this.vttestCodeIndex++);
-        //    string annotation = actions.ToString();
+            string log = string.Format("char {0}[] = {{{1}}};printf({2}); // {3}", varName, codeSequence, varName, action);
 
-        //    string log = string.Format("char {0}[] = {{{1}}};printf({2}); // {3}", varName, builder.ToString(), varName, actions);
-
-        //    File.AppendAllText(this.vttestCodeCategory.FilePath, log + Environment.NewLine);
-        //}
+            this.vttestLogger.Info(log);
+        }
 
 
         public void WriteRawRead(byte[] bytes, int size)

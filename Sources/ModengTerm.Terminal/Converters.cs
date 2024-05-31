@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

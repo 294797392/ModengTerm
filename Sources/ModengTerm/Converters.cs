@@ -45,20 +45,6 @@ namespace ModengTerm
         }
     }
 
-    public class CloseSessionButtonColorConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            bool selected = (bool)value;
-            return selected ? Brushes.White : Brushes.Black;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class SessionTypeStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

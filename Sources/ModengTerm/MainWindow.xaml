@@ -1,50 +1,59 @@
-﻿<Window x:Class="XTerminal.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
-        xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
-        xmlns:local="clr-namespace:ModengTerm"
-        mc:Ignorable="d"
-        Title="{DynamicResource ResourceKey=UIText1}"
-        Width="800" Height="600" WindowStartupLocation="CenterScreen"
-        MinWidth="800" MinHeight="600" Loaded="Window_Loaded">
+﻿<mtermcontrols:MTermWindow x:Class="XTerminal.MainWindow"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
+                           xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+                           xmlns:local="clr-namespace:ModengTerm"
+                           mc:Ignorable="d"
+                           Title="{DynamicResource ResourceKey=UIText1}"
+                           Style="{StaticResource ResourceKey=StyleMTermWindow}"
+                           Width="800" Height="600" WindowStartupLocation="CenterScreen"
+                           MinWidth="800" MinHeight="600" Loaded="Window_Loaded">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
             </ResourceDictionary.MergedDictionaries>
 
-            <local:CloseSessionButtonColorConverter x:Key="CloseSessionButtonColorConverter"/>
-
             <DataTemplate x:Key="DataTemplateOpenedSession">
-                <Grid>
+
+                <DataTemplate.Resources>
+                    <SolidColorBrush x:Key="BrushMouseOver" Color="White" Opacity="0.2"/>
+                </DataTemplate.Resources>
+
+                <Grid Background="Transparent">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" MinWidth="80"/>
-                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="30"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
-                    <Path Grid.Column="1" x:Name="PathClose" Data="M30,15 L15,30 M15,15 30,30" Stretch="Fill" Stroke="{Binding Path=IsSelected, Converter={StaticResource ResourceKey=CloseSessionButtonColorConverter}}" 
-                          StrokeThickness="2" Cursor="Hand" Width="8" Height="8" Fill="Transparent" Tag="{Binding}"
-                          MouseLeftButtonDown="PathClose_MouseLeftButtonDown"/>
+                    <mtermcontrols:MTermButton Grid.Column="2" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2"
+                                               SVGColor="White" MouseOverBrush="{StaticResource ResourceKey=BrushMouseOver}" MouseDownBrush="{StaticResource ResourceKey=BrushMouseOver}"
+                                               Tag="{Binding}" Visibility="Collapsed" Width="20" Height="20"
+                                               SVGPath="M512 466.944l233.472-233.472a31.744 31.744 0 0 1 45.056 45.056L557.056 512l233.472 233.472a31.744 31.744 0 0 1-45.056 45.056L512 557.056l-233.472 233.472a31.744 31.744 0 0 1-45.056-45.056L466.944 512 233.472 278.528a31.744 31.744 0 0 1 45.056-45.056z"
+                                               Click="ButtonCloseSession_Click"
+                                               Style="{StaticResource ResourceKey=StyleMTermButton}"/>
 
                 </Grid>
 
                 <DataTemplate.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Stroke" Value="Red" TargetName="PathClose"/>
+                        <Setter Property="Visibility" Value="Visible" TargetName="ButtonClose"/>
                     </Trigger>
                 </DataTemplate.Triggers>
 
             </DataTemplate>
 
             <DataTemplate x:Key="DataTemplateOpenSession">
-                <Grid Width="20">
-                    <TextBlock Text="+" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="16"/>
-                </Grid>
+                <mtermcontrols:MTermButton Content="+" FontWeight="Bold" FontSize="16" Width="25" Height="25" CornerRadius="0,0,0,0"
+                                           VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Foreground="White"
+                                           VerticalAlignment="Bottom" BorderBrush="{DynamicResource ResourceKey=Brush4003}" BorderThickness="1,1,1,0"
+                                           MouseOverBrush="{DynamicResource ResourceKey=Brush4005}" MouseDownBrush="{DynamicResource ResourceKey=Brush4004}"
+                                           Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMTermButton}"/>
             </DataTemplate>
 
             <Style x:Key="StyleMenuItemLocal" TargetType="{x:Type MenuItem}">
@@ -52,8 +61,62 @@
                 <Setter Property="Width" Value="50"/>
             </Style>
 
-            <Style x:Key="StyleCanvasUnfixed" TargetType="{x:Type Canvas}">
-                <Setter Property="VerticalAlignment" Value="Top"/>
+            <Style x:Key="StyleListBoxItemSession" TargetType="{x:Type ListBoxItem}">
+                <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="{x:Null}"/>
+                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Margin" Value="2,0,0,0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                            <Grid>
+                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" 
+                                        BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0,0,0,0"/>
+                                <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="StyleListBoxItemOpenedSession" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemSession}">
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=Brush4004}"/>
+                    </Trigger>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=Brush4005}"/>
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="Padding" Value="10,0,0,0"/>
+            </Style>
+
+            <Style x:Key="StyleListBoxItemOpenSession" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemSession}">
+            </Style>
+
+            <Style x:Key="StyleListBoxSessionList" TargetType="{x:Type ListBox}">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderBrush" Value="{x:Null}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBox}">
+                            <Grid>
+
+                                <Border BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        Background="{TemplateBinding Background}"/>
+
+                                <ItemsPresenter Grid.Column="0" Margin="{TemplateBinding Padding}"/>
+
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
         </ResourceDictionary>
@@ -73,7 +136,7 @@
 
                 <MenuItem Header="文件" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
-                    <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
+                    <!--<MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>-->
                 </MenuItem>
 
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
@@ -87,27 +150,32 @@
         <!-- 终端显示区域 -->
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
             <!-- 打开的终端列表Tab页 -->
-            <ListBox Grid.Row="0" x:Name="ListBoxOpenedSessionTab" DataContext="{Binding Source={x:Static local:MTermApp.Context}}" 
-                     ItemsSource="{Binding Path=OpenedSessionList}" SelectedItem="{Binding Path=SelectedOpenedSession}" 
-                     SelectionChanged="ListBoxOpenedSessionTab_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-            </ListBox>
+            <Grid Grid.Row="0">
+
+                <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                    <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
+                         SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </ScrollViewer>
+
+            </Grid>
 
             <!-- 终端展示页面 -->
-            <Border Grid.Row="1" Background="Black"/>
+            <Border Grid.Row="1" Background="{DynamicResource ResourceKey=Brush4003}"/>
             <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
 
         </Grid>
 
     </Grid>
 
-</Window>
+</mtermcontrols:MTermWindow>

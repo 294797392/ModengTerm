@@ -13,7 +13,7 @@ using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.ViewModels
 {
-    public abstract class OpenedSessionVM : ItemViewModel
+    public abstract class OpenedSessionVM : SessionItemVM
     {
         #region 公开事件
 

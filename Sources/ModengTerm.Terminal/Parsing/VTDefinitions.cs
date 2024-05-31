@@ -97,11 +97,13 @@ namespace ModengTerm.Terminal.Parsing
     {
         /// <summary>
         /// 删除从当前光标处到该行结尾的所有字符
+        /// 包含当前光标处的字符
         /// </summary>
         ToEnd = 0,
 
         /// <summary>
         /// 删除从行首到当前光标处的字符
+        /// 包含当前光标处的字符
         /// </summary>
         FromBeginning = 1,
 
@@ -321,6 +323,7 @@ namespace ModengTerm.Terminal.Parsing
         /// G2字符集里的数据使用SCS指令指定
         /// 
         /// Temporarily invokes G2 character set into GL for the next graphic character. G2 is designated by a select-character-set (SCS) sequence.
+        /// Single Shift Select of G2 Character Set (SS2  is 0x8e), VT220.This affects next character only.
         /// </summary>
         SS2_SingleShift = 'N',
 
@@ -420,5 +423,11 @@ namespace ModengTerm.Terminal.Parsing
         DarkMagenta,
         DarkCyan,
         DarkWhite
+    }
+
+    public enum CodingSystem
+    {
+        ISO2022 = '@',
+        UTF8 = 'G'
     }
 }

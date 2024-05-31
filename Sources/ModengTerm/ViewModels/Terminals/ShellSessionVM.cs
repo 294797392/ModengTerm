@@ -931,7 +931,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.SendAll = !this.SendAll;
         }
 
-        private void About() 
+        private void About()
         {
             AboutWindow aboutWindow = new AboutWindow();
             aboutWindow.Owner = Application.Current.MainWindow;

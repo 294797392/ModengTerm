@@ -19,12 +19,16 @@
   <ItemGroup>
     <Compile Remove="Document\**" />
     <Compile Remove="Rendering\**" />
+    <Compile Remove="TestCase\**" />
     <EmbeddedResource Remove="Document\**" />
     <EmbeddedResource Remove="Rendering\**" />
+    <EmbeddedResource Remove="TestCase\**" />
     <None Remove="Document\**" />
     <None Remove="Rendering\**" />
+    <None Remove="TestCase\**" />
     <Page Remove="Document\**" />
     <Page Remove="Rendering\**" />
+    <Page Remove="TestCase\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,7 +38,6 @@
     <Compile Remove="Parsing\VTActions.cs" />
     <Compile Remove="Parsing\VTParserEventDlg.cs" />
     <Compile Remove="PrimaryScreen.cs" />
-    <Compile Remove="ViewModels\VideoTerminal.Drawing.cs" />
     <Compile Remove="VTBookmark.cs" />
     <Compile Remove="VTColor.cs" />
     <Compile Remove="VTScreen.cs" />
@@ -47,9 +50,6 @@
     <None Remove="Wallpapers\img3.png" />
     <None Remove="Wallpapers\img4.jpg" />
     <None Remove="Wallpapers\Live_1.gif" />
-    <None Remove="Windows\FindWindow.xaml" />
-    <None Remove="Windows\LoggerOptionsWindow.xaml" />
-    <None Remove="Windows\ParagraphsWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,7 +71,6 @@
     <ProjectReference Include="..\ModengTerm.Document.Rendering\ModengTerm.Document.Rendering.csproj" />
     <ProjectReference Include="..\ModengTerm.Document\ModengTerm.Document.csproj" />
     <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
-    <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />
   </ItemGroup>
 
@@ -100,13 +99,6 @@
     <None Update="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="UserControls\TerminalContentUserControl.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
 
 </Project>

@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
-    <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>

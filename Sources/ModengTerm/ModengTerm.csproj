@@ -50,7 +50,6 @@
     <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
     <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
-    <ProjectReference Include="..\ModengTerm.ViewModels\ModengTerm.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -83,6 +82,12 @@
     <None Update="app.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="UserControls\Terminals\TerminalContentUserControl.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -21,12 +21,12 @@ namespace ModengTerm.Controls
             base.OnApplyTemplate();
 
             Button closeButton = this.Template.FindName("PART_CloseButton", this) as Button;
+            Grid grid = this.Template.FindName("PART_Title", this) as Grid;
+            grid.MouseLeftButtonDown += Grid_MouseLeftButtonDown;
         }
 
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            base.OnMouseLeftButtonDown(e);
-
             this.DragMove();
         }
     }

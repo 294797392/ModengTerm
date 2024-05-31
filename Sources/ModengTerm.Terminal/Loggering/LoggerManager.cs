@@ -2,7 +2,6 @@
 using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
-using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;

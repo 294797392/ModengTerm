@@ -33,6 +33,18 @@
     <SolidColorBrush x:Key="Brush1007" Color="#666666"/>
 
     <!-- MTerm控件 1501 - 4000 -->
-    <SolidColorBrush x:Key="Brush1501" Color="Silver"/>
+
+    
+    <!-- Window颜色 4001 - 5000 -->
+    
+    <!-- 打开的会话列表Tab背景色 -->
+    <SolidColorBrush x:Key="Brush4001" Color="#232633"/>
+    <SolidColorBrush x:Key="Brush4002" Color="#414457"/>
+    
+    <!-- 主窗口背景色 -->
+    <SolidColorBrush x:Key="Brush4003" Color="#edf1f2"/>
+
+    <SolidColorBrush x:Key="Brush4004" Color="#36384C"/>
+    <SolidColorBrush x:Key="Brush4005" Color="#333A44"/>
 
 </ResourceDictionary>

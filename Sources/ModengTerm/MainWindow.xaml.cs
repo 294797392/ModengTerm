@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WPFToolkit.Utility;
+using WPFToolkit.Utils;
 using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
@@ -31,12 +32,14 @@ namespace XTerminal
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : MTermWindow
     {
         #region 实例变量
 
         private OpenedSessionDataTemplateSelector templateSelector;
+        private OpenedSessionItemContainerStyleSelector itemContainerStyleSelector;
         private UserInput userInput;
+        private OpenedSessionListVM sessionListVM;
 
         #endregion
 
@@ -59,7 +62,16 @@ namespace XTerminal
             this.templateSelector = new OpenedSessionDataTemplateSelector();
             this.templateSelector.DataTemplateOpenedSession = this.FindResource("DataTemplateOpenedSession") as DataTemplate;
             this.templateSelector.DataTemplateOpenSession = this.FindResource("DataTemplateOpenSession") as DataTemplate;
-            ListBoxOpenedSessionTab.ItemTemplateSelector = this.templateSelector;
+            ListBoxOpenedSession.ItemTemplateSelector = this.templateSelector;
+
+            this.itemContainerStyleSelector = new OpenedSessionItemContainerStyleSelector();
+            this.itemContainerStyleSelector.StyleOpenedSession = this.FindResource("StyleListBoxItemOpenedSession") as Style;
+            this.itemContainerStyleSelector.StyleOpenSession = this.FindResource("StyleListBoxItemOpenSession") as Style;
+            ListBoxOpenedSession.ItemContainerStyleSelector = this.itemContainerStyleSelector;
+
+            this.sessionListVM = new OpenedSessionListVM();
+            ListBoxOpenedSession.DataContext = this.sessionListVM;
+            ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
         private void CreateSession()
@@ -71,7 +83,9 @@ namespace XTerminal
             {
                 XTermSession session = sessionListWindow.SelectedSession;
 
-                MTermApp.Context.OpenSession(session, ContentControlSession);
+                ISessionContent content = this.sessionListVM.OpenSession(session);
+                ContentControlSession.Content = content;
+                ScrollViewerOpenedSession.ScrollToRightEnd();
             }
         }
 
@@ -83,7 +97,7 @@ namespace XTerminal
         {
             if (sendTo.SendAll)
             {
-                foreach (ShellSessionVM shellSession in MTermApp.Context.OpenedTerminals)
+                foreach (ShellSessionVM shellSession in this.sessionListVM.ShellSessions)
                 {
                     shellSession.SendInput(userInput);
                 }
@@ -100,7 +114,7 @@ namespace XTerminal
 
         public void SendToAllTerminal(string text)
         {
-            foreach (ShellSessionVM shellSession in MTermApp.Context.OpenedTerminals)
+            foreach (ShellSessionVM shellSession in this.sessionListVM.ShellSessions)
             {
                 shellSession.SendInput(text);
             }
@@ -115,9 +129,9 @@ namespace XTerminal
             this.CreateSession();
         }
 
-        private void ListBoxOpenedSessionTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ListBoxOpenedSession_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            OpenedSessionVM selectedTabItem = ListBoxOpenedSessionTab.SelectedItem as OpenedSessionVM;
+            OpenedSessionVM selectedTabItem = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
             if (selectedTabItem == null)
             {
                 return;
@@ -128,12 +142,12 @@ namespace XTerminal
                 // 点击的是打开Session按钮，返回到上一个选中的SessionTabItem
                 if (e.RemovedItems.Count > 0)
                 {
-                    ListBoxOpenedSessionTab.SelectedItem = e.RemovedItems[0];
+                    ListBoxOpenedSession.SelectedItem = e.RemovedItems[0];
                 }
                 else
                 {
                     // 如果当前没有任何一个打开的Session，那么重置选中状态，以便于下次可以继续触发SelectionChanged事件
-                    ListBoxOpenedSessionTab.SelectedItem = null;
+                    ListBoxOpenedSession.SelectedItem = null;
                 }
 
                 this.CreateSession();
@@ -144,31 +158,43 @@ namespace XTerminal
             }
         }
 
-        // 关闭会话
-        private void PathClose_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e) 
         {
-            FrameworkElement element = sender as FrameworkElement;
-            ShellSessionVM openedSession = element.Tag as ShellSessionVM;
-            if (openedSession == null)
+            double offset = ScrollViewerOpenedSession.HorizontalOffset;
+
+            if (e.Delta > 0) 
             {
-                return;
+                ScrollViewerOpenedSession.ScrollToHorizontalOffset(offset - 50);
             }
-
-            MTermApp.Context.CloseSession(openedSession);
-
-            MTermApp.Context.SelectedOpenedSession = MTermApp.Context.OpenedTerminals.FirstOrDefault();
-
-            if (MTermApp.Context.SelectedOpenedSession == null)
+            else
             {
-                ContentControlSession.Content = null;
-                ListBoxOpenedSessionTab.SelectedItem = null;
+                ScrollViewerOpenedSession.ScrollToHorizontalOffset(offset + 50);
             }
         }
 
-        private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)
+        private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)
         {
             this.CreateSession();
         }
+
+        private void ButtonCloseSession_Click(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            OpenedSessionVM openedSessionVM = frameworkElement.DataContext as OpenedSessionVM;
+
+            this.sessionListVM.CloseSession(openedSessionVM);
+
+            this.sessionListVM.SelectedSession = this.sessionListVM.SessionList.OfType<OpenedSessionVM>().FirstOrDefault();
+
+            if (this.sessionListVM.SelectedSession == null)
+            {
+                ContentControlSession.Content = null;
+                ListBoxOpenedSession.SelectedItem = null;
+            }
+        }
+
+
+
 
         private void MenuItemCreateSession_Click(object sender, RoutedEventArgs e)
         {
@@ -233,7 +259,7 @@ namespace XTerminal
         {
             base.OnPreviewTextInput(e);
 
-            ShellSessionVM videoTerminal = ListBoxOpenedSessionTab.SelectedItem as ShellSessionVM;
+            ShellSessionVM videoTerminal = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
             if (videoTerminal == null)
             {
                 return;
@@ -257,7 +283,7 @@ namespace XTerminal
         {
             base.OnPreviewKeyDown(e);
 
-            ShellSessionVM shellSession = ListBoxOpenedSessionTab.SelectedItem as ShellSessionVM;
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
             if (shellSession == null)
             {
                 return;
@@ -317,6 +343,24 @@ namespace XTerminal
             else
             {
                 return this.DataTemplateOpenedSession;
+            }
+        }
+    }
+
+    public class OpenedSessionItemContainerStyleSelector : StyleSelector
+    {
+        public Style StyleOpenedSession { get; set; }
+        public Style StyleOpenSession { get; set; }
+
+        public override Style SelectStyle(object item, DependencyObject container)
+        {
+            if (item is OpenSessionVM)
+            {
+                return this.StyleOpenSession;
+            }
+            else
+            {
+                return this.StyleOpenedSession;
             }
         }
     }

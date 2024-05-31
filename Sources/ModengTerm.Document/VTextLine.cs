@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using System.Xml;
 
 namespace ModengTerm.Document
@@ -247,20 +248,40 @@ namespace ModengTerm.Document
         /// <summary>
         /// 从指定位置用空白符填充该行所有字符（包括指定位置处的字符）
         /// </summary>
-        /// <param name="column">从哪一列开始填充</param>
+        /// <param name="column">从哪一列开始填充, 该行也会被擦除</param>
         public void EraseToEnd(int column)
         {
-            int startIndex = FindCharacterIndex(column);
-            if (startIndex == -1)
+            int characterIndex = FindCharacterIndex(column);
+
+            // 先把该列和后面的所有字符删除
+            int characters = this.Characters.Count - characterIndex;
+            for (int i = 0; i < characters; i++)
             {
-                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
-                logger.FatalFormat("EraseToEnd失败, startIndex == -1");
-                return;
+                VTCharacter toRemove = this.Characters[characterIndex];
+
+                this.Characters.RemoveAt(characterIndex);
+
+                this.columns -= toRemove.ColumnSize;
             }
 
-            int count = this.Characters.Count - startIndex;
+            // 再新建空字符
 
-            EraseRange(startIndex, count);
+            // 总列数
+            int totalCols = this.OwnerDocument.ViewportColumn;
+
+            // 要擦除的列数
+            int eraseCols = totalCols - this.columns;
+
+            for (int i = 0; i < eraseCols; i++)
+            {
+                VTCharacter character = VTCharacter.CreateNull();
+
+                this.Characters.Add(character);
+            }
+
+            this.columns = totalCols;
+
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
@@ -268,25 +289,20 @@ namespace ModengTerm.Document
         /// </summary>
         public void EraseAll()
         {
-            EraseRange(0, this.Characters.Count);
-        }
+            this.Characters.Clear();
 
-        /// <summary>
-        /// 使用空白字符填充从行首到指定列处的内容
-        /// 如果指定列不存在则什么都不做
-        /// </summary>
-        /// <param name="column">光标位置</param>
-        public void EraseFromBeginning(int column)
-        {
-            int characterIndex = FindCharacterIndex(column);
-            if (characterIndex == -1)
+            int totalColumns = this.OwnerDocument.ViewportColumn;
+
+            for (int i = 0; i < totalColumns; i++)
             {
-                // 按理说应该不会出现，因为在上面已经判断过列是否超出范围了
-                logger.WarnFormat("EraseFromBeginning失败, startIndex == -1, column = {0}", column);
-                return;
+                VTCharacter character = VTCharacter.CreateNull();
+
+                this.Characters.Add(character);
             }
 
-            EraseRange(0, characterIndex + 1);
+            this.columns = totalColumns;
+
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>

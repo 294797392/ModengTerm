@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using XTerminal.Base;
@@ -89,15 +90,23 @@ namespace ModengTerm.Terminal.Parsing
         private int oscParam;
         private StringBuilder oscString;
 
-        private List<byte> intermediate;
+        /// <summary>
+        /// 用来存储csi或者esc intermediate参数的类
+        /// </summary>
+        private VTID vtid;
         private List<int> parameters;
 
         private List<byte> unicodeText;
 
         /// <summary>
-        /// 当前解析器的数据流是否是ANSI模式的数据流
+        /// Designate VT52 mode (DECANM)
         /// </summary>
         private bool isAnsiMode;
+
+        /// <summary>
+        /// 是否处理C1区域的转义字符序列
+        /// </summary>
+        private bool acceptC1Control;
 
         /// <summary>
         /// 当前Keypad的模式是否是Application模式
@@ -130,7 +139,7 @@ namespace ModengTerm.Terminal.Parsing
             this.oscString = new StringBuilder();
             this.oscParam = 0;
 
-            this.intermediate = new List<byte>();
+            this.vtid = new VTID();
             this.parameters = new List<int>();
 
             this.state = VTStates.Ground;   // 状态机默认设置为基态
@@ -159,7 +168,15 @@ namespace ModengTerm.Terminal.Parsing
                 this.sequenceBytes.Add(ch);
 
                 // 在OSCString的状态下，ESC转义字符可以用作OSC状态的结束符，所以在这里不进入ESC状态
-                if (ASCIITable.IsEscape(ch) && this.state != VTStates.OSCString && this.state != VTStates.OSCParam)
+                //if (VTParserUtils.IsC1ControlCharacter(ch))
+                //{
+                //    if (this.acceptC1Control)
+                //    {
+                //        byte[] c1To7Bit = new byte[2] { 0x1B, (byte)(ch - 0x40) };
+                //        this.ProcessCharacters(c1To7Bit, 2);
+                //    }
+                //}
+                if (VTParserUtils.IsEscape(ch) && this.state != VTStates.OSCString && this.state != VTStates.OSCParam)
                 {
                     this.EnterEscape();
                 }
@@ -305,7 +322,7 @@ namespace ModengTerm.Terminal.Parsing
             this.oscParam = 0;
             this.oscString.Clear();
 
-            this.intermediate.Clear();
+            this.vtid.Clear();
             this.parameters.Clear();
 
             this.unicodeText.Clear();
@@ -431,12 +448,12 @@ namespace ModengTerm.Terminal.Parsing
         }
 
         /// <summary>
-        /// 收集CSI或者EscapeIntermediate状态下的Intermediate字符
+        /// 收集CSI或者Escape状态下的Intermediate字符
         /// </summary>
         /// <param name="ch"></param>
         private void ActionCollect(byte ch)
         {
-            this.intermediate.Add(ch);
+            this.vtid.AddIntermediate(ch);
         }
 
         /// <summary>
@@ -452,7 +469,7 @@ namespace ModengTerm.Terminal.Parsing
                 this.parameters.Add(0);
             }
 
-            if (ASCIITable.IsParameterDelimiter(ch))
+            if (VTParserUtils.IsParameterDelimiter(ch))
             {
                 this.parameters.Add(0);
             }
@@ -506,15 +523,15 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventGround(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch) || ASCIITable.IsDelete(ch))
+            if (VTParserUtils.IsC0Code(ch) || VTParserUtils.IsDelete(ch))
             {
                 // 如果是C0控制字符和Delete字符，说明要执行动作
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsPrintable(ch))
+            else if (VTParserUtils.IsPrintable(ch))
             {
                 // 其他字符直接打印
-                this.ActionPrint(ch);
+                this.ActionPrint(Convert.ToChar(ch));
             }
             else
             {
@@ -542,32 +559,32 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventEscape(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterEscapeIntermediate();
             }
             else if (this.isAnsiMode)
             {
-                if (ASCIITable.IsCSIIndicator(ch))
+                if (VTParserUtils.IsCSIIndicator(ch))
                 {
                     // 0x5B，进入到了csi entry状态
                     this.EnterCSIEntry();
                 }
-                else if (ASCIITable.IsOSCIndicator(ch))
+                else if (VTParserUtils.IsOSCIndicator(ch))
                 {
                     // 0x5D，进入到了osc状态
                     this.EnterOSCParam();
                 }
-                else if (ASCIITable.IsDCSIndicator(ch))
+                else if (VTParserUtils.IsDCSIndicator(ch))
                 {
                     // 0x50，进入到了dcs状态
                     this.EnterDCSEntry();
@@ -578,7 +595,7 @@ namespace ModengTerm.Terminal.Parsing
                     this.EnterGround();
                 }
             }
-            else if (ASCIITable.IsVt52CursorAddress(ch))
+            else if (VTParserUtils.IsVt52CursorAddress(ch))
             {
                 // 判断是否是VT52模式下的移动光标指令, 当进入了VT52模式下才会触发
                 // 在VT52模式下只有移动光标的指令有参数，所以这里把移动光标的指令单独做处理
@@ -603,15 +620,15 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventEscapeIntermediate(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
@@ -620,7 +637,7 @@ namespace ModengTerm.Terminal.Parsing
                 this.ActionEscDispatch(ch);
                 this.EnterGround();
             }
-            else if (ASCIITable.IsVt52CursorAddress(ch))
+            else if (VTParserUtils.IsVt52CursorAddress(ch))
             {
                 this.EnterVt52Param();
             }
@@ -637,18 +654,18 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventOSCParam(byte ch)
         {
-            if (ASCIITable.IsOSCTerminator(ch))
+            if (VTParserUtils.IsOSCTerminator(ch))
             {
                 // OSC状态下出现了BEL结束符
                 // 参考terminal的做法，进入Ground状态
                 this.EnterGround();
             }
-            else if (ASCIITable.IsNumericParamValue(ch))
+            else if (VTParserUtils.IsNumericParamValue(ch))
             {
                 // OSC状态下的数字，收集起来
                 this.ActionOSCParam(ch);
             }
-            else if (ASCIITable.IsOSCDelimiter(ch))
+            else if (VTParserUtils.IsOSCDelimiter(ch))
             {
                 // OSC状态下出现了分隔符，说明要开始收集字符串了
                 this.EnterOSCString();
@@ -672,13 +689,13 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventOSCString(byte ch)
         {
-            if (ASCIITable.IsOSCTerminator(ch))
+            if (VTParserUtils.IsOSCTerminator(ch))
             {
                 // 出现了OSC结束符，那么进入Ground状态
                 this.ActionOSCDispatch(ch);
                 this.EnterGround();
             }
-            else if (ASCIITable.IsEscape(ch))
+            else if (VTParserUtils.IsEscape(ch))
             {
                 // OSC状态下出现了ESC字符，那么有两种情况会出现：
                 // 1. ESC后面有ST字符，说明是OSC状态结束了
@@ -686,7 +703,7 @@ namespace ModengTerm.Terminal.Parsing
                 // 所以这里定义一个OSCTermination状态来处理这两种状态
                 this.EnterOSCTermination();
             }
-            else if (ASCIITable.IsOSCIndicator(ch))
+            else if (VTParserUtils.IsOSCIndicator(ch))
             {
                 // OSC非法字符，忽略
                 this.ActionIgnore(ch);
@@ -707,7 +724,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventOSCTermination(byte ch)
         {
-            if (ASCIITable.IsStringTermination(ch))
+            if (VTParserUtils.IsStringTermination(ch))
             {
                 // OSC状态下出现了ESC后，后面紧跟着ST字符，说明是OSC状态结束了
                 this.ActionOSCDispatch(ch);
@@ -735,29 +752,29 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventCSIEntry(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterCSIIntermediate();
             }
-            else if (ASCIITable.IsCSIInvalid(ch))
+            else if (VTParserUtils.IsCSIInvalid(ch))
             {
                 this.EnterCSIIgnore();
             }
-            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
+            else if (VTParserUtils.IsNumericParamValue(ch) || VTParserUtils.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
                 this.EnterCSIParam();
             }
-            else if (ASCIITable.IsCSIPrivateMarker(ch))
+            else if (VTParserUtils.IsCSIPrivateMarker(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterCSIParam();
@@ -781,19 +798,19 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventCSIIntermediate(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsIntermediateInvalid(ch))
+            else if (VTParserUtils.IsIntermediateInvalid(ch))
             {
                 this.EnterCSIIgnore();
             }
@@ -816,19 +833,19 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventCSIIgnore(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsIntermediateInvalid(ch))
+            else if (VTParserUtils.IsIntermediateInvalid(ch))
             {
                 this.ActionIgnore(ch);
             }
@@ -851,24 +868,24 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventCSIParam(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
+            else if (VTParserUtils.IsNumericParamValue(ch) || VTParserUtils.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterCSIIntermediate();
             }
-            else if (ASCIITable.IsParameterInvalid(ch))
+            else if (VTParserUtils.IsParameterInvalid(ch))
             {
                 this.EnterCSIIgnore();
             }
@@ -895,24 +912,24 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventDCSEntry(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsCSIInvalid(ch))
+            else if (VTParserUtils.IsCSIInvalid(ch))
             {
                 this.EnterDCSIgnore();
             }
-            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
+            else if (VTParserUtils.IsNumericParamValue(ch) || VTParserUtils.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
                 this.EnterDCSParam();
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterDCSIntermediate();
@@ -946,19 +963,19 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventDCSIntermediate(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
             }
-            else if (ASCIITable.IsIntermediateInvalid(ch))
+            else if (VTParserUtils.IsIntermediateInvalid(ch))
             {
                 this.EnterDCSIgnore();
             }
@@ -981,24 +998,24 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventDCSParam(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }
-            else if (ASCIITable.IsNumericParamValue(ch) || ASCIITable.IsParameterDelimiter(ch))
+            else if (VTParserUtils.IsNumericParamValue(ch) || VTParserUtils.IsParameterDelimiter(ch))
             {
                 this.ActionParam(ch);
             }
-            else if (ASCIITable.IsIntermediate(ch))
+            else if (VTParserUtils.IsIntermediate(ch))
             {
                 this.ActionCollect(ch);
                 this.EnterDCSIntermediate();
             }
-            else if (ASCIITable.IsParameterInvalid(ch))
+            else if (VTParserUtils.IsParameterInvalid(ch))
             {
                 this.EnterDCSIgnore();
             }
@@ -1018,7 +1035,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventDCSPassThrough(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch) || ASCIITable.IsDCSPassThroughValid(ch))
+            if (VTParserUtils.IsC0Code(ch) || VTParserUtils.IsDCSPassThroughValid(ch))
             {
                 if (!this.dcsStringHandler(ch))
                 {
@@ -1042,11 +1059,11 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void EventVt52Param(byte ch)
         {
-            if (ASCIITable.IsC0Code(ch))
+            if (VTParserUtils.IsC0Code(ch))
             {
                 this.ActionExecute(ch);
             }
-            else if (ASCIITable.IsDelete(ch))
+            else if (VTParserUtils.IsDelete(ch))
             {
                 this.ActionIgnore(ch);
             }

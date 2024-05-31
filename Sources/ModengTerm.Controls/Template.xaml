@@ -11,17 +11,21 @@
 
     <Style x:Key="StyleMTermButton" TargetType="{x:Type mcontrols:MTermButton}">
         <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type mcontrols:MTermButton}">
 
                     <Grid>
-                        <Border x:Name="BorderBackground" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+
+                        <Border x:Name="BorderBackground" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}"/>
+                        <Border x:Name="BorderMouseOver" Background="{TemplateBinding MouseOverBrush}" Visibility="Collapsed" CornerRadius="{TemplateBinding CornerRadius}"/>
+                        <Border x:Name="BorderMouseDown" Background="{TemplateBinding MouseDownBrush}" Visibility="Collapsed" CornerRadius="{TemplateBinding CornerRadius}"/>
+
+                        <Border Margin="{TemplateBinding SVGMargin}">
                             <Border.Background>
                                 <DrawingBrush Stretch="Uniform">
                                     <DrawingBrush.Drawing>
-                                        <GeometryDrawing Brush="Black">
+                                        <GeometryDrawing Brush="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGColor}">
                                             <GeometryDrawing.Geometry>
                                                 <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
                                             </GeometryDrawing.Geometry>
@@ -31,17 +35,20 @@
                             </Border.Background>
                         </Border>
 
-                        <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+
+                        <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
 
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        <!--<Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Opacity" Value="0.7" TargetName="BorderBackground"/>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Visibility" Value="Visible" TargetName="BorderMouseOver"/>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Opacity" Value="1" TargetName="BorderBackground"/>
-                        </Trigger>-->
+                            <Setter Property="Visibility" Value="Visible" TargetName="BorderMouseDown"/>
+                        </Trigger>
                     </ControlTemplate.Triggers>
 
                 </ControlTemplate>
@@ -50,10 +57,9 @@
     </Style>
 
     <Style x:Key="StyleMTermWindow" TargetType="{x:Type mcontrols:MTermWindow}">
-        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=Brush1501}"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="1"/>
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=Brush4001}"/>
         <Setter Property="WindowStyle" Value="None"/>
         <Setter Property="ResizeMode" Value="NoResize"/>
         <Setter Property="Template">
@@ -62,9 +68,18 @@
                 <ControlTemplate TargetType="{x:Type Window}">
 
                     <Grid>
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <Border Grid.Row="0" Grid.RowSpan="2" BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}"/>
 
-                        <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                        <Grid Grid.Row="0" x:Name="PART_Title" Background="Transparent"></Grid>
+                        
+                        <ContentPresenter Grid.Row="1" Margin="{TemplateBinding Padding}"/>
                     </Grid>
 
                 </ControlTemplate>
