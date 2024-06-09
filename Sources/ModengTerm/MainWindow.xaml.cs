@@ -6,6 +6,7 @@ using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,14 +33,15 @@ namespace XTerminal
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : MTermWindow
+    public partial class MainWindow : Window
+
     {
         #region 实例变量
 
         private OpenedSessionDataTemplateSelector templateSelector;
         private OpenedSessionItemContainerStyleSelector itemContainerStyleSelector;
         private UserInput userInput;
-        private OpenedSessionListVM sessionListVM;
+        private OpenedSessionsVM sessionListVM;
 
         #endregion
 
@@ -69,7 +71,7 @@ namespace XTerminal
             this.itemContainerStyleSelector.StyleOpenSession = this.FindResource("StyleListBoxItemOpenSession") as Style;
             ListBoxOpenedSession.ItemContainerStyleSelector = this.itemContainerStyleSelector;
 
-            this.sessionListVM = new OpenedSessionListVM();
+            this.sessionListVM = new OpenedSessionsVM();
             ListBoxOpenedSession.DataContext = this.sessionListVM;
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
@@ -93,13 +95,13 @@ namespace XTerminal
         /// 向SSH服务器发送输入
         /// </summary>
         /// <param name="userInput"></param>
-        private void SendUserInput(ShellSessionVM sendTo, UserInput userInput)
+        private void SendUserInput(InputSessionVM sendTo, UserInput userInput)
         {
             if (sendTo.SendAll)
             {
-                foreach (ShellSessionVM shellSession in this.sessionListVM.ShellSessions)
+                foreach (InputSessionVM inputSession in this.sessionListVM.SessionList.OfType<InputSessionVM>())
                 {
-                    shellSession.SendInput(userInput);
+                    inputSession.SendInput(userInput);
                 }
             }
             else
@@ -158,11 +160,11 @@ namespace XTerminal
             }
         }
 
-        private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e) 
+        private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             double offset = ScrollViewerOpenedSession.HorizontalOffset;
 
-            if (e.Delta > 0) 
+            if (e.Delta > 0)
             {
                 ScrollViewerOpenedSession.ScrollToHorizontalOffset(offset - 50);
             }
@@ -259,8 +261,8 @@ namespace XTerminal
         {
             base.OnPreviewTextInput(e);
 
-            ShellSessionVM videoTerminal = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (videoTerminal == null)
+            InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
+            if (selectedSession == null)
             {
                 return;
             }
@@ -270,7 +272,7 @@ namespace XTerminal
             this.userInput.Text = e.Text;
             this.userInput.Modifiers = VTModifierKeys.None;
 
-            this.SendUserInput(videoTerminal, this.userInput);
+            this.SendUserInput(selectedSession, this.userInput);
 
             e.Handled = true;
         }
@@ -283,8 +285,8 @@ namespace XTerminal
         {
             base.OnPreviewKeyDown(e);
 
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
+            InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
+            if (selectedSession == null)
             {
                 return;
             }
@@ -320,7 +322,7 @@ namespace XTerminal
                 this.userInput.Key = vtKey;
                 this.userInput.Text = null;
                 this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-                this.SendUserInput(shellSession, this.userInput);
+                this.SendUserInput(selectedSession, this.userInput);
             }
 
             e.Handled = true;

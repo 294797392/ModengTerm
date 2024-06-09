@@ -17,6 +17,7 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
@@ -85,7 +87,7 @@ namespace ModengTerm.Terminal.ViewModels
         }
     }
 
-    public class ShellSessionVM : OpenedSessionVM
+    public class ShellSessionVM : InputSessionVM
     {
         #region 类变量
 
@@ -318,6 +320,7 @@ namespace ModengTerm.Terminal.ViewModels
                 AlternateDocument = this.AlternateDocument,
                 MainDocument = this.MainDocument
             };
+
             VideoTerminal videoTerminal = new VideoTerminal();
             videoTerminal.ViewportChanged += this.VideoTerminal_ViewportChanged;
             videoTerminal.Initialize(options);
@@ -491,8 +494,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// 向SSH主机发送用户输入
         /// 用户每输入一个字符，就调用一次这个函数
         /// </summary>
-        /// <param name="input">用户输入信息</param>
-        public void SendInput(UserInput input)
+        /// <param name="userInput">用户输入信息</param>
+        public override void SendInput(UserInput userInput)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
@@ -501,7 +504,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             VTKeyboard keyboard = this.videoTerminal.Keyboard;
 
-            byte[] bytes = keyboard.TranslateInput(input);
+            byte[] bytes = keyboard.TranslateInput(userInput);
             if (bytes == null)
             {
                 return;
@@ -514,22 +517,6 @@ namespace ModengTerm.Terminal.ViewModels
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
-            }
-        }
-
-        public void SendInput(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-            {
-                return;
-            }
-
-            byte[] bytes = this.writeEncoding.GetBytes(text);
-
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("发送数据失败, {0}", code);
             }
         }
 

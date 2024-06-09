@@ -17,16 +17,28 @@ using ModengTerm.Terminal;
 
 namespace ModengTerm.ViewModels
 {
-    public class OpenedSessionListVM : ViewModelBase
+    public class OpenedSessionsVM : ViewModelBase
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("OpenedSessionListVM");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("OpenedSessionsVM");
 
+        /// <summary>
+        /// 最后一个打开会话的按钮
+        /// </summary>
         public static readonly OpenSessionVM OpenSessionVM = new OpenSessionVM();
 
+        /// <summary>
+        /// 打开的所有会话列表
+        /// </summary>
         public BindableCollection<SessionItemVM> SessionList { get; private set; }
 
+        /// <summary>
+        /// 打开的所有类型是Shell的会话列表
+        /// </summary>
         public IEnumerable<ShellSessionVM> ShellSessions { get { return this.SessionList.OfType<ShellSessionVM>(); } }
 
+        /// <summary>
+        /// 选中的会话
+        /// </summary>
         public SessionItemVM SelectedSession
         {
             get { return this.SessionList.SelectedItem; }
@@ -37,11 +49,13 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public OpenedSessionListVM()
+        public OpenedSessionsVM()
         {
             this.SessionList = new BindableCollection<SessionItemVM>();
             this.SessionList.Add(OpenSessionVM);
         }
+
+        #region 公开接口
 
         public ISessionContent OpenSession(XTermSession session)
         {
@@ -61,9 +75,9 @@ namespace ModengTerm.ViewModels
             // 给SessionContent赋值
             content.Session = session;
 
-            UserControl userControl = content as UserControl;
-            userControl.DataContext = viewModel;
-            userControl.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
+            FrameworkElement frameworkElement = content as UserControl;
+            frameworkElement.DataContext = viewModel;
+            frameworkElement.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
 
             // 加到打开按钮前面
             int index = this.SessionList.IndexOf(OpenSessionVM);
@@ -85,6 +99,8 @@ namespace ModengTerm.ViewModels
             this.SessionList.Remove(session);
         }
 
+        #endregion
+
         #region 事件处理器
 
         private void SessionContent_Loaded(object sender, RoutedEventArgs e)
@@ -93,8 +109,8 @@ namespace ModengTerm.ViewModels
             ISessionContent content = sender as ISessionContent;
 
             // 要反注册事件，不然每次显示界面就会多打开一个VideoTerminal
-            UserControl userControl = content as UserControl;
-            userControl.Loaded -= this.SessionContent_Loaded;
+            FrameworkElement frameworkElement = content as FrameworkElement;
+            frameworkElement.Loaded -= this.SessionContent_Loaded;
 
             int code = content.Open();
             if (code != ResponseCode.SUCCESS)
@@ -102,7 +118,7 @@ namespace ModengTerm.ViewModels
                 logger.ErrorFormat("打开会话失败, {0}", code);
             }
 
-            OpenedSessionVM sessionVM = userControl.DataContext as OpenedSessionVM;
+            OpenedSessionVM sessionVM = frameworkElement.DataContext as OpenedSessionVM;
         }
 
         #endregion

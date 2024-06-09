@@ -57,7 +57,7 @@
 
         <Grid Grid.Row="1">
             <GroupBox Header="会话列表">
-                <DataGrid x:Name="DataGridSessionList" IsReadOnly="True" AutoGenerateColumns="False"
+                <DataGrid x:Name="DataGridSessionList" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column"
                           ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                           MouseDoubleClick="DataGridSessionList_MouseDoubleClick">
                     <DataGrid.Columns>
@@ -88,7 +88,7 @@
                         <DataGridTemplateColumn Header="创建时间" Width="1*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Path=CreationTime}"/>
+                                    <TextBlock Text="{Binding Path=CreationTime, StringFormat='yyyy-MM-dd HH:mm:ss'}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
