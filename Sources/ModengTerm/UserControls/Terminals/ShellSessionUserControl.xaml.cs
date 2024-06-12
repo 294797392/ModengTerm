@@ -8,7 +8,6 @@ using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Rendering;
-using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
@@ -94,7 +93,7 @@ namespace ModengTerm.Terminal.UserControls
             return this.videoTerminal.ActiveDocument.EventInput;
         }
 
-        private DrawingDocument GetActiveDocument()
+        private WPFDocument GetActiveDocument()
         {
             return this.videoTerminal.IsAlternate ?
                 DocumentAlternate : DocumentMain;
@@ -102,7 +101,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private MouseData GetMouseData(object sender, MouseButtonEventArgs e)
         {
-            DrawingDocument document = this.GetActiveDocument();
+            WPFDocument document = this.GetActiveDocument();
             Point mousePosition = e.GetPosition(document);
             MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, e.ClickCount, (sender as FrameworkElement).IsMouseCaptured);
 
@@ -111,7 +110,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private MouseData GetMouseData(object sender, MouseEventArgs e)
         {
-            DrawingDocument document = this.GetActiveDocument();
+            WPFDocument document = this.GetActiveDocument();
             Point mousePosition = e.GetPosition(document);
             MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0, (sender as FrameworkElement).IsMouseCaptured);
 

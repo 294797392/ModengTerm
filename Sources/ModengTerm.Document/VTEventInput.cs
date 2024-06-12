@@ -60,6 +60,15 @@ namespace ModengTerm.Document
             this.IsMouseCaptured = isMouseCaptured;
             this.CaptureAction = CaptureActions.None;
         }
+
+        public MouseData(double x, double y, int clickCount)
+        {
+            X = x;
+            Y = y;
+            ClickCount = clickCount;
+            this.IsMouseCaptured = false;
+            this.CaptureAction = CaptureActions.None;
+        }
     }
 
     public class ScrollChangedData

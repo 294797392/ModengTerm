@@ -2,7 +2,6 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Controls;
-using ModengTerm.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;

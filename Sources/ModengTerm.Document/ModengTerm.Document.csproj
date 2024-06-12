@@ -8,9 +8,13 @@
 
   <ItemGroup>
     <Compile Remove="Drawing\Wallpaper\**" />
+    <Compile Remove="Geometry\**" />
     <EmbeddedResource Remove="Drawing\Wallpaper\**" />
+    <EmbeddedResource Remove="Geometry\**" />
     <None Remove="Drawing\Wallpaper\**" />
+    <None Remove="Geometry\**" />
     <Page Remove="Drawing\Wallpaper\**" />
+    <Page Remove="Geometry\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,8 +30,16 @@
     <Compile Remove="Drawing\DrawingSelection.cs" />
     <Compile Remove="Drawing\DrawingUtils.cs" />
     <Compile Remove="Drawing\IDrawingBookmark.cs" />
+    <Compile Remove="Drawing\IDrawingCursor.cs" />
+    <Compile Remove="Drawing\IDrawingRectangle.cs" />
+    <Compile Remove="Drawing\IDrawingSelection.cs" />
+    <Compile Remove="Drawing\IDrawingTextBlock.cs" />
+    <Compile Remove="Drawing\IDrawingTextLine.cs" />
+    <Compile Remove="Drawing\IDrawingWallpaper.cs" />
+    <Compile Remove="Drawing\RenderingOptions.cs" />
     <Compile Remove="VTBookmarkStates.cs" />
     <Compile Remove="VTColorTable.cs" />
+    <Compile Remove="VTextBlock.cs" />
     <Compile Remove="VTFramedElement.cs" />
     <Compile Remove="VTWallpaper.cs" />
   </ItemGroup>

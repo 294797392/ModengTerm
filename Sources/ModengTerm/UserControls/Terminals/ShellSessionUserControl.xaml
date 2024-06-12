@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:terminal="clr-namespace:ModengTerm.Terminal"
              xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
-             xmlns:modentermdocumentrendering="clr-namespace:ModengTerm.Document.Rendering;assembly=ModengTerm.Document.Rendering"
+             xmlns:renderer="clr-namespace:ModengTerm.Document.Rendering;assembly=ModengTerm.Document.Rendering"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -50,8 +50,8 @@
 
             <Border x:Name="BorderBackground"/>
 
-            <modentermdocumentrendering:DrawingDocument x:Name="DocumentAlternate"/>
-            <modentermdocumentrendering:DrawingDocument x:Name="DocumentMain"/>
+            <renderer:WPFDocument x:Name="DocumentAlternate"/>
+            <renderer:WPFDocument x:Name="DocumentMain"/>
 
         </Grid>
 

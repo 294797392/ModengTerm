@@ -1,4 +1,4 @@
-﻿<Window x:Class="ModengTerm.DocumentApp.MainWindow"
+﻿<Window x:Class="ModengTerm.Document.Demo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,7 +15,7 @@
     <Grid>
 
         <Border BorderBrush="Blue" BorderThickness="2" Margin="30">
-            <rendering:DrawingDocument x:Name="Document"/>
+            <rendering:WPFDocument x:Name="WPFDocument"/>
         </Border>
 
     </Grid>

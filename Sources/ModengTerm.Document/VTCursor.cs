@@ -178,42 +178,43 @@ namespace ModengTerm.Document
 
         #region VTElement
 
-        protected override void OnInitialize(IDrawingObject drawingObject)
+        protected override void OnInitialize()
         {
-            IDrawingCursor drawingCursor = drawingObject as IDrawingCursor;
+            VTColor backColor = VTColor.CreateFromRgbKey(this.color);
 
             switch (style)
             {
                 case VTCursorStyles.Block:
                     {
-                        drawingCursor.Size = new VTRect(0, 0, Typeface.SpaceWidth, Typeface.Height);
+                        VTRect cursorRect = new VTRect(0, 0, Typeface.SpaceWidth, Typeface.Height);
+                        this.DrawingObject.DrawRectangle(cursorRect, null, backColor);
                         break;
                     }
 
                 case VTCursorStyles.Line:
                     {
-                        drawingCursor.Size = new VTRect(0, 0, 2, Typeface.Height);
+                        VTRect cursorRect = new VTRect(0, 0, 2, Typeface.Height);
+                        this.DrawingObject.DrawRectangle(cursorRect, null, backColor);
                         break;
                     }
 
                 case VTCursorStyles.Underscore:
                     {
-                        drawingCursor.Size = new VTRect(0, Typeface.Height - 2, Typeface.SpaceWidth, 2);
+                        VTRect cursorRect = new VTRect(0, Typeface.Height - 2, Typeface.SpaceWidth, 2);
+                        this.DrawingObject.DrawRectangle(cursorRect, null, backColor);
                         break;
                     }
 
                 case VTCursorStyles.None:
                     {
-                        drawingCursor.Size = new VTRect();
+                        VTRect cursorRect = new VTRect();
+                        this.DrawingObject.DrawRectangle(cursorRect, null, backColor);
                         break;
                     }
 
                 default:
                     throw new NotImplementedException();
             }
-
-            drawingCursor.Color = color;
-            drawingCursor.Style = style;
         }
 
         protected override void OnRelease()

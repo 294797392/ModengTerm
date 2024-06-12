@@ -15,7 +15,7 @@ namespace ModengTerm.ViewModels.Terminals
     {
         private VTDocument document;
 
-        public IDrawingDocument DrawingDocument { get; set; }
+        public IDocumentRenderer DrawingDocument { get; set; }
 
         public MTermSessionVM() : 
             base(null)
@@ -26,7 +26,7 @@ namespace ModengTerm.ViewModels.Terminals
         {
             VTDocumentOptions options = new VTDocumentOptions() 
             {
-                DrawingObject = this.DrawingDocument
+                Controller = this.DrawingDocument
             };
 
             this.document = new VTDocument(options);

@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ModengTerm.DocumentApp
+namespace ModengTerm.Document.Demo
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -51,7 +51,7 @@ namespace ModengTerm.DocumentApp
 
             VTDocumentOptions options = new VTDocumentOptions()
             {
-                DrawingObject = Document,
+                Controller = WPFDocument,
                 ViewportRow = 10,
                 ViewportColumn = 100,
                 CursorColor = "0,0,0,255",
@@ -68,7 +68,7 @@ namespace ModengTerm.DocumentApp
 
         private void HandleMouseCapture(MouseData mouseData)
         {
-            if (mouseData.CaptureMouse)
+            if (mouseData.IsMouseCaptured)
             {
                 if (this.IsMouseCaptured)
                 {
@@ -92,49 +92,65 @@ namespace ModengTerm.DocumentApp
         {
             base.OnPreviewTextInput(e);
 
-            this.input.Text = e.Text;
-            this.inputEventImpl.HandleInput(this.input);
+            //foreach (char c in e.Text)
+            //{
+            //    VTCharacter character = VTCharacter.Create(c, 2);
+
+            //    this.document.PrintCharacter(character);
+            //}
+
+            //this.document.RequestInvalidate();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
 
-            this.input.Text = e.Key.ToString();
-            this.inputEventImpl.HandleInput(this.input);
+            if (e.Key == Key.ImeProcessed)
+            {
+                // 这些字符交给输入法处理了
+            }
+            else
+            {
+                switch (e.Key)
+                {
+                    case Key.Tab:
+                    case Key.Up:
+                    case Key.Down:
+                    case Key.Left:
+                    case Key.Right:
+                    case Key.Space:
+                    case Key.LeftShift:
+                        {
+                            // 防止焦点移动到其他控件上了
+                            e.Handled = true;
+                            return;
+                        }
 
-            e.Handled = true;
+                    case Key.Enter: 
+                        {
+                            this.document.SetCursor(this.document.Cursor.Row + 1, 0);
+                            break;
+                        }
 
-            //if (e.Key == Key.ImeProcessed)
-            //{
-            //    // 这些字符交给输入法处理了
-            //}
-            //else
-            //{
-            //    switch (e.Key)
-            //    {
-            //        case Key.Tab:
-            //        case Key.Up:
-            //        case Key.Down:
-            //        case Key.Left:
-            //        case Key.Right:
-            //        case Key.Space:
-            //            {
-            //                // 防止焦点移动到其他控件上了
-            //                e.Handled = true;
-            //                break;
-            //            }
-            //    }
+                    default:
+                        {
+                            VTCharacter character = VTCharacter.Create(char.Parse(e.Key.ToString()), 1);
+                            this.document.PrintCharacter(character);
+                            this.document.SetCursor(this.document.Cursor.Row, this.document.Cursor.Column + 1);
+                            break;
+                        }
+                }
 
-            //    this.document.EventInput.OnTextInput(e.Key.ToString());
-            //}
+                this.document.RequestInvalidate();
+            }
         }
 
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
 
-            Point position = e.GetPosition(Document);
+            Point position = e.GetPosition(WPFDocument);
 
             MouseData mouseData = new MouseData(position.X, position.Y, e.ClickCount);
 
@@ -147,7 +163,7 @@ namespace ModengTerm.DocumentApp
         {
             base.OnMouseLeftButtonUp(e);
 
-            Point position = e.GetPosition(Document);
+            Point position = e.GetPosition(WPFDocument);
 
             MouseData mouseData = new MouseData(position.X, position.Y, e.ClickCount);
 
@@ -160,7 +176,7 @@ namespace ModengTerm.DocumentApp
         {
             base.OnMouseMove(e);
 
-            Point position = e.GetPosition(Document);
+            Point position = e.GetPosition(WPFDocument);
 
             MouseData mouseData = new MouseData(position.X, position.Y, 0);
 

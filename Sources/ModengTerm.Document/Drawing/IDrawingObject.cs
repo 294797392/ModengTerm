@@ -16,21 +16,6 @@ namespace ModengTerm.Document.Drawing
     public interface IDrawingObject
     {
         /// <summary>
-        /// 初始化画图对象
-        /// </summary>
-        void Initialize();
-
-        /// <summary>
-        /// 释放画图对象
-        /// </summary>
-        void Release();
-
-        /// <summary>
-        /// 重绘
-        /// </summary>
-        void Draw();
-
-        /// <summary>
         /// 设置透明度
         /// 从0 - 1
         /// </summary>
@@ -42,5 +27,42 @@ namespace ModengTerm.Document.Drawing
         /// <param name="x"></param>
         /// <param name="y"></param>
         void Arrange(double x, double y);
+
+        /// <summary>
+        /// 画一个矩形
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="pen"></param>
+        /// <param name="backColor"></param>
+        void DrawRectangle(VTRect vtRec, VTPen vtPen, VTColor vtColor);
+
+        /// <summary>
+        /// 一次性画多个矩形
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <param name="pen"></param>
+        /// <param name="backColor"></param>
+        void DrawRectangles(List<VTRect> vtRects, VTPen vtPen, VTColor vtColor);
+
+        /// <summary>
+        /// 渲染指定的文本并返回文本的测量信息
+        /// </summary>
+        /// <param name="formattedText"></param>
+        /// <returns>文本的测量信息</returns>
+        VTextMetrics DrawText(VTFormattedText vtFormattedText);
+
+        /// <summary>
+        /// 测量指定的文本
+        /// </summary>
+        /// <param name="vtFormattedText"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        VTextRange MeasureText(VTFormattedText vtFormattedText, int startIndex, int count);
+
+        /// <summary>
+        /// 清空绘制的图形
+        /// </summary>
+        void Clear();
     }
 }

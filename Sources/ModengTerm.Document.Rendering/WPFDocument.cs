@@ -12,13 +12,16 @@ using System.Windows.Media;
 
 namespace ModengTerm.Document.Rendering
 {
-    [TemplatePart(Name = "PART_DrawingSurface", Type = typeof(DrawingSurface))]
+    /// <summary>
+    /// WPF实现的文档渲染器
+    /// </summary>
+    [TemplatePart(Name = "PART_DocumentCanvas", Type = typeof(WPFDocumentCanvas))]
     [TemplatePart(Name = "PART_Scrollbar", Type = typeof(ScrollBar))]
-    public class DrawingDocument : Control, IDrawingDocument
+    public class WPFDocument : Control, IDocumentRenderer
     {
         #region 实例变量
 
-        private DrawingSurface surface;
+        private WPFDocumentCanvas canvas;
         private ScrollBar scrollbar;
 
         #endregion
@@ -28,7 +31,7 @@ namespace ModengTerm.Document.Rendering
         /// <summary>
         /// 用来渲染内容的区域
         /// </summary>
-        public DrawingSurface Surface { get { return this.surface; } }
+        public WPFDocumentCanvas Surface { get { return this.canvas; } }
 
         public VTScrollbar Scrollbar { get; private set; }
 
@@ -64,33 +67,32 @@ namespace ModengTerm.Document.Rendering
 
         #region 构造方法
 
-        public DrawingDocument()
+        public WPFDocument()
         {
-            this.Style = Application.Current.FindResource("StyleDrawingDocument") as Style;
+            this.Style = Application.Current.FindResource("StyleWPFDocument") as Style;
         }
 
         #endregion
 
-        #region IDrawingDocument
+        #region IDocumentRenderer
 
-        public IDrawingObject CreateDrawingObject(DrawingObjectTypes types)
+        public IDrawingObject CreateDrawingObject()
         {
-            IDrawingObject drawingObject = DrawingObjectFactory.CreateDrawingObject(types);
+            DrawingObject drawingObject = new DrawingObject();
 
-            this.surface.AddVisual(drawingObject as DrawingObject);
+            this.canvas.AddVisual(drawingObject);
 
             return drawingObject;
         }
 
         public void DeleteDrawingObject(IDrawingObject drawingObject)
         {
-            drawingObject.Release();
-            surface.RemoveVisual(drawingObject as DrawingObject);
+            canvas.RemoveVisual(drawingObject as DrawingObject);
         }
 
         public void DeleteDrawingObjects()
         {
-            List<IDrawingObject> drawingObjects = surface.GetAllVisual().Cast<IDrawingObject>().ToList();
+            List<IDrawingObject> drawingObjects = canvas.GetAllVisual().Cast<IDrawingObject>().ToList();
 
             foreach (IDrawingObject drawingObject in drawingObjects)
             {
@@ -121,7 +123,7 @@ namespace ModengTerm.Document.Rendering
         {
             base.OnApplyTemplate();
 
-            this.surface = base.Template.FindName("PART_DrawingSurface", this) as DrawingSurface;
+            this.canvas = base.Template.FindName("PART_DocumentCanvas", this) as WPFDocumentCanvas;
             this.scrollbar = base.Template.FindName("PART_Scrollbar", this) as ScrollBar;
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
         }

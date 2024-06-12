@@ -85,6 +85,14 @@ namespace ModengTerm.Document.Rendering
             return DrawingUtils.GetBrush(rgbKey);
         }
 
+        public static Pen GetPen(VTPen vtPen)
+        {
+            Pen pen = new Pen(DrawingUtils.GetBrush(vtPen.Color), vtPen.Width);
+            pen.Freeze();
+            return pen;
+        }
+
+
         public static Color GetColor(string rgbKey) 
         {
             SolidColorBrush brush = GetBrush(rgbKey) as SolidColorBrush;

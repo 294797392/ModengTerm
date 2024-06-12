@@ -160,9 +160,9 @@ namespace ModengTerm.Document
         public bool IsEmpty { get { return FirstLine == null && LastLine == null; } }
 
         /// <summary>
-        /// 渲染该文档的Canvas
+        /// 该文档的渲染器
         /// </summary>
-        internal IDrawingDocument DrawingObject { get; set; }
+        public IDocumentRenderer Renderer { get; internal set; }
 
         /// <summary>
         /// 当前应用的文本属性
@@ -252,7 +252,7 @@ namespace ModengTerm.Document
         {
             this.options = options;
             Name = options.Name;
-            DrawingObject = options.DrawingObject;
+            Renderer = options.Controller;
             this.EventInput = new VTEventInput()
             {
                 OnMouseDown = this.OnMouseDown,
@@ -682,7 +682,7 @@ namespace ModengTerm.Document
 
             this.history.Release();
 
-            DrawingObject.DeleteDrawingObjects();
+            Renderer.DeleteDrawingObjects();
             FirstLine = null;
             LastLine = null;
             ActiveLine = null;
@@ -1409,7 +1409,7 @@ namespace ModengTerm.Document
 
             this.visible = visible;
 
-            this.DrawingObject.Visible = visible;
+            this.Renderer.Visible = visible;
         }
 
         public void Resize(int oldRow, int newRow, int oldCol, int newCol)
@@ -1573,7 +1573,7 @@ namespace ModengTerm.Document
 
             // 整体思路是算出来StartTextPointer和EndTextPointer之间的几何图形
             // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
-            VTSize size = DrawingObject.Size;
+            VTSize size = Renderer.Size;
 
             // 如果还没有测量起始字符，那么测量起始字符
             if (startPointer.CharacterIndex == -1)

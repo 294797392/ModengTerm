@@ -12,11 +12,13 @@ namespace ModengTerm.Document.Rendering
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public abstract class DrawingObject : DrawingVisual, IDrawingObject
+    public class DrawingObject : DrawingVisual, IDrawingObject
     {
         #region 实例变量
 
         private Visibility visible = Visibility.Visible;
+
+        private StreamGeometry streamGeometry;
 
         #endregion
 
@@ -34,50 +36,7 @@ namespace ModengTerm.Document.Rendering
 
         #endregion
 
-        #region 抽象方法
-
-        /// <summary>
-        /// DrawingObject初始化完成之后调用
-        /// </summary>
-        protected abstract void OnInitialize();
-
-        /// <summary>
-        /// DrawingObjectRelease完之后调用
-        /// </summary>
-        protected abstract void OnRelease();
-
-        /// <summary>
-        /// 由DrawingObject.Draw方法调用
-        /// </summary>
-        /// <param name="dc"></param>
-        protected abstract void OnDraw(DrawingContext dc);
-
-        #endregion
-
         #region 公开接口
-
-        public void Initialize()
-        {
-            this.OnInitialize();
-        }
-
-        /// <summary>
-        /// 绘制图像
-        /// </summary>
-        public virtual void Draw()
-        {
-            DrawingContext dc = this.RenderOpen();
-
-            this.OnDraw(dc);
-
-            dc.Close();
-        }
-
-        public void Release()
-        {
-            this.OnRelease();
-        }
-
 
         public void SetOpacity(double opacity)
         {
@@ -92,6 +51,111 @@ namespace ModengTerm.Document.Rendering
         public void Arrange(double x, double y)
         {
             this.Offset = new Vector(x, y);
+        }
+
+        public void DrawRectangle(VTRect vtRec, VTPen vtPen, VTColor vtColor)
+        {
+            Brush brush = DrawingUtils.GetBrush(vtColor);
+
+            Pen pen = null;
+            if (vtPen != null)
+            {
+                pen = DrawingUtils.GetPen(vtPen);
+            }
+
+            Rect rectangle = vtRec.GetRect();
+
+            DrawingContext dc = this.RenderOpen();
+
+            dc.DrawRectangle(brush, pen, rectangle);
+
+            dc.Close();
+        }
+
+        public void DrawRectangles(List<VTRect> vtRects, VTPen vtPen, VTColor vtColor)
+        {
+            if (this.streamGeometry == null)
+            {
+                this.streamGeometry = new StreamGeometry();
+            }
+
+            StreamGeometryContext sgc = this.streamGeometry.Open();
+
+            foreach (VTRect bounds in vtRects)
+            {
+                sgc.BeginFigure(new Point(bounds.LeftTop.X, bounds.LeftTop.Y), true, true);
+                sgc.LineTo(new Point(bounds.RightTop.X, bounds.RightTop.Y), true, true);
+                sgc.LineTo(new Point(bounds.RightBottom.X, bounds.RightBottom.Y), true, true);
+                sgc.LineTo(new Point(bounds.LeftBottom.X, bounds.LeftBottom.Y), true, true);
+            }
+
+            sgc.Close();
+
+            Brush brush = DrawingUtils.GetBrush(vtColor);
+
+            Pen pen = null;
+            if (vtPen != null)
+            {
+                pen = DrawingUtils.GetPen(vtPen);
+            }
+
+            DrawingContext dc = this.RenderOpen();
+
+            dc.DrawGeometry(brush, pen, this.streamGeometry);
+
+            dc.Close();
+        }
+
+        public VTextMetrics DrawText(VTFormattedText vtFormattedText)
+        {
+            DrawingContext dc = this.RenderOpen();
+
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(vtFormattedText, dc);
+            dc.DrawText(formattedText, DrawingUtils.ZeroPoint);
+
+            dc.Close();
+
+            return new VTextMetrics()
+            {
+                Width = formattedText.WidthIncludingTrailingWhitespace,
+                Height = formattedText.Height
+            };
+        }
+
+        public VTextRange MeasureText(VTFormattedText vtFormattedText, int startIndex, int count)
+        {
+            if (vtFormattedText == null)
+            {
+                return new VTextRange();
+            }
+
+            if (startIndex < 0)
+            {
+                startIndex = 0;
+            }
+
+            int totalChars = vtFormattedText.Text.Length;
+            if (startIndex + count > totalChars)
+            {
+                startIndex = 0;
+                count = totalChars;
+            }
+
+            if (startIndex == 0 && count == 0)
+            {
+                return new VTextRange();
+            }
+
+            FormattedText formattedText = DrawingUtils.CreateFormattedText(vtFormattedText);
+            System.Windows.Media.Geometry geometry = formattedText.BuildHighlightGeometry(DrawingUtils.ZeroPoint, startIndex, count);
+            return new VTextRange(geometry.Bounds.Left, this.Offset.Y, geometry.Bounds.Width, geometry.Bounds.Height);
+        }
+
+        public void Clear()
+        {
+            DrawingContext dc = this.RenderOpen();
+
+            dc.Close();
         }
 
         #endregion

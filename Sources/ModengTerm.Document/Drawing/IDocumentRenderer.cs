@@ -10,7 +10,7 @@ namespace ModengTerm.Document.Drawing
     /// 文档渲染对象
     /// 一个文档里包文本，光标等元素
     /// </summary>
-    public interface IDrawingDocument
+    public interface IDocumentRenderer
     {
         /// <summary>
         /// 该文档的名字，调试用
@@ -37,7 +37,7 @@ namespace ModengTerm.Document.Drawing
         /// </summary>
         /// <param name="type">要创建的绘图对象的类型</param>
         /// <returns>绘图对象</returns>
-        IDrawingObject CreateDrawingObject(DrawingObjectTypes type);
+        IDrawingObject CreateDrawingObject();
 
         /// <summary>
         /// 删除并释放绘图对象

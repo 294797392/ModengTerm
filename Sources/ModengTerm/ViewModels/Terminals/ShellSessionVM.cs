@@ -206,8 +206,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public LoggerManager LoggerManager { get; set; }
 
-        public IDrawingDocument MainDocument { get; set; }
-        public IDrawingDocument AlternateDocument { get; set; }
+        public IDocumentRenderer MainDocument { get; set; }
+        public IDocumentRenderer AlternateDocument { get; set; }
 
         #endregion
 

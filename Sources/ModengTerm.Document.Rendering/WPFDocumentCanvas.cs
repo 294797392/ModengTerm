@@ -15,7 +15,7 @@ namespace ModengTerm.Document.Rendering
     /// <summary>
     /// 用来渲染终端输出的表面
     /// </summary>
-    public class DrawingSurface : FrameworkElement
+    public class WPFDocumentCanvas : FrameworkElement
     {
         #region 类变量
 
@@ -39,7 +39,7 @@ namespace ModengTerm.Document.Rendering
 
         // Using a DependencyProperty as the backing store for Background.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(Brush), typeof(DrawingSurface), new PropertyMetadata(Brushes.Transparent));
+            DependencyProperty.Register("Background", typeof(Brush), typeof(WPFDocumentCanvas), new PropertyMetadata(Brushes.Transparent));
 
 
 
@@ -53,7 +53,7 @@ namespace ModengTerm.Document.Rendering
 
         #region 构造方法
 
-        public DrawingSurface()
+        public WPFDocumentCanvas()
         {
             this.visuals = new VisualCollection(this);
         }

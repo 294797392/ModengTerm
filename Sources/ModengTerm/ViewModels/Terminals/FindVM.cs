@@ -3,7 +3,6 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Geometry;
 using ModengTerm.Document.Rendering;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Enumerations;
@@ -75,9 +74,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 用来高亮显示匹配结果的矩形
         /// </summary>
-        private VTRectangle mainRectElement;
-        private VTRectangle alternateRectElement;
-        private VTRectangle activeRectElement;
+        private IDrawingObject mainRectElement;
+        private IDrawingObject alternateRectElement;
+        private IDrawingObject activeRectElement;
 
         #endregion
 
@@ -218,10 +217,8 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.videoTerminal.MainDocument.ScrollChanged += MainDocument_ScrollChanged;
             this.videoTerminal.MainDocument.DiscardLine += MainDocument_DiscardLine;
-            this.mainRectElement = new VTRectangle(this.videoTerminal.MainDocument);
-            this.mainRectElement.Initialize();
-            this.alternateRectElement = new VTRectangle(this.videoTerminal.AlternateDocument);
-            this.alternateRectElement.Initialize();
+            this.mainRectElement = this.videoTerminal.MainDocument.Renderer.CreateDrawingObject();
+            this.alternateRectElement = this.videoTerminal.AlternateDocument.Renderer.CreateDrawingObject();
 
             if (this.videoTerminal.IsAlternate)
             {
@@ -248,7 +245,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.matchResult = null;
                 this.activeRectElement.Clear();
-                this.activeRectElement.RequestInvalidate();
                 return false;
             }
 
@@ -256,7 +252,6 @@ namespace ModengTerm.Terminal.ViewModels
             if (matches.Count == 0)
             {
                 this.activeRectElement.Clear();
-                this.activeRectElement.RequestInvalidate();
                 return false;
             }
 
@@ -367,7 +362,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="matches"></param>
         private void HighlightMatches(List<VTMatches> matchResult)
         {
-            this.activeRectElement.Clear();
+            List<VTRect> rectangles = new List<VTRect>();
 
             foreach (VTMatches matches in matchResult)
             {
@@ -375,19 +370,10 @@ namespace ModengTerm.Terminal.ViewModels
 
                 VTextRange textRange = textLine.MeasureTextRange(matches.Index, matches.Length);
 
-                VTRectangleGeometry rectangleGeometry = new VTRectangleGeometry()
-                {
-                    BackColor = this.HighlightBackground,
-                    Height = textRange.Height,
-                    Width = textRange.Width,
-                    X = textRange.OffsetX,
-                    Y = textRange.OffsetY
-                };
-
-                this.activeRectElement.AddGeometry(rectangleGeometry);
+                rectangles.Add(new VTRect(textRange.OffsetX, textRange.OffsetY, textRange.Width, textRange.Height));
             }
 
-            this.activeRectElement.RequestInvalidate();
+            this.activeRectElement.DrawRectangles(rectangles, null, this.HighlightBackground);
         }
 
         /// <summary>
@@ -434,23 +420,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 公开接口
 
-        /// <summary>
-        /// 查找下一个
-        /// </summary>
-        public void FindNext()
-        {
-            // 不存在匹配的结果，什么都不做
-            if (this.matchResult == null)
-            {
-                return;
-            }
-        }
-
         public void Release()
         {
-            this.mainRectElement.Release();
-            this.alternateRectElement.Release();
-
             this.videoTerminal.MainDocument.ScrollChanged -= this.MainDocument_ScrollChanged;
             this.matchResult = null;
             this.Message = string.Empty;

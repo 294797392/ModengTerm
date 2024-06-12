@@ -20,7 +20,7 @@ namespace ModengTerm.Windows
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindWindow : MTermWindow
+    public partial class FindWindow : Window
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FindWindow");
 
@@ -55,7 +55,7 @@ namespace ModengTerm.Windows
 
             //    try
             //    {
-            //        this.viewModel.Find();
+            //        this.viewModel.FindNext();
             //    }
             //    catch (Exception ex)
             //    {

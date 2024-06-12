@@ -7,7 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Wallpaper\**" />
+    <EmbeddedResource Remove="Wallpaper\**" />
+    <None Remove="Wallpaper\**" />
+    <Page Remove="Wallpaper\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="DrawingBookmark.cs" />
+    <Compile Remove="DrawingCursor.cs" />
+    <Compile Remove="DrawingLine.cs" />
+    <Compile Remove="DrawingObjectFactory.cs" />
+    <Compile Remove="DrawingRectangle.cs" />
+    <Compile Remove="DrawingSelection.cs" />
+    <Compile Remove="DrawingTextBlock.cs" />
   </ItemGroup>
 
   <ItemGroup>

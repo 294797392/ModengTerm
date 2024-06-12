@@ -16,9 +16,9 @@ namespace ModengTerm.Terminal
 {
     public class VTOptions
     {
-        public IDrawingDocument AlternateDocument { get; set; }
+        public IDocumentRenderer AlternateDocument { get; set; }
 
-        public IDrawingDocument MainDocument { get; set; }
+        public IDocumentRenderer MainDocument { get; set; }
 
         /// <summary>
         /// 该终端所对应的Session
@@ -109,7 +109,7 @@ namespace ModengTerm.Terminal
 
         private bool xtermBracketedPasteMode;
 
-        private IDrawingDocument documentCanvas;
+        private IDocumentRenderer documentCanvas;
 
         /// <summary>
         /// 是否正在运行
@@ -573,7 +573,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, IDrawingDocument drawingDocument)
+        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, IDocumentRenderer drawingDocument)
         {
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY);
             double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);
@@ -608,7 +608,7 @@ namespace ModengTerm.Terminal
                 ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
                 ScrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
                 Typeface = typeface,
-                DrawingObject = drawingDocument,
+                Controller = drawingDocument,
                 SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR),
             };
 

@@ -87,7 +87,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 对应的绘图对象
         /// </summary>
-        protected IDrawingObject DrawingObject { get; set; }
+        protected IDrawingObject DrawingObject { get; private set; }
 
         #endregion
 
@@ -111,13 +111,11 @@ namespace ModengTerm.Document
         /// </summary>
         public void Initialize()
         {
-            IDrawingDocument drawingDocument = this.ownerDocument.DrawingObject;
+            IDocumentRenderer documentController = this.ownerDocument.Renderer;
 
-            this.DrawingObject = drawingDocument.CreateDrawingObject(this.Type);
+            this.DrawingObject = documentController.CreateDrawingObject();
 
-            this.OnInitialize(this.DrawingObject);
-
-            this.DrawingObject.Initialize();
+            this.OnInitialize();
         }
 
         /// <summary>
@@ -127,11 +125,9 @@ namespace ModengTerm.Document
         {
             this.OnRelease();
 
-            this.DrawingObject.Release();
+            IDocumentRenderer documentController = this.ownerDocument.Renderer;
 
-            IDrawingDocument drawingDocument = this.ownerDocument.DrawingObject;
-
-            drawingDocument.DeleteDrawingObject(this.DrawingObject);
+            documentController.DeleteDrawingObject(this.DrawingObject);
         }
 
         /// <summary>
@@ -181,8 +177,7 @@ namespace ModengTerm.Document
         /// 子类需要做的事情就是对DrawingObject里的一些属性和字段进行初始化赋值
         /// 子类不需要调用DrawingObject的Initialize方法，OnInitialize完之后会自动调用DrawingObject.Initialize
         /// </summary>
-        /// <param name="drawingObject">该UI元素所对应的绘图对象</param>
-        protected abstract void OnInitialize(IDrawingObject drawingObject);
+        protected abstract void OnInitialize();
 
         /// <summary>
         /// 释放该绘图元素

@@ -51,7 +51,6 @@ namespace ModengTerm.Document
         /// <param name="vtInput"></param>
         public void HandleInput(VTInputData vtInput)
         {
-
         }
     }
 }

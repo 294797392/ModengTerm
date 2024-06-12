@@ -26,6 +26,7 @@ namespace ModengTerm.Document
         private int startColumn;
         private int endColumn;
         private List<VTRect> geometries;
+        private VTColor backColor;
 
         #endregion
 
@@ -142,7 +143,7 @@ namespace ModengTerm.Document
             VTextPointer End = new VTextPointer(endRow, endColumn);
 
             VTDocument document = this.OwnerDocument;
-            VTSize container = document.DrawingObject.Size;
+            VTSize container = document.Renderer.Size;
 
             // 单独处理选中的是同一行的情况
             if (Start.PhysicsRow == End.PhysicsRow)
@@ -297,7 +298,7 @@ namespace ModengTerm.Document
 
         #region VTElement
 
-        protected override void OnInitialize(IDrawingObject drawingObject)
+        protected override void OnInitialize()
         {
             this.geometries = new List<VTRect>();
 
@@ -306,9 +307,7 @@ namespace ModengTerm.Document
             StartColumn = -1;
             EndColumn = -1;
 
-            IDrawingSelection drawingSelection = drawingObject as IDrawingSelection;
-            drawingSelection.Color = VTColor.CreateFromRgbKey(this.Color);
-            drawingSelection.Geometry = this.geometries;
+            this.backColor = VTColor.CreateFromRgbKey(this.Color);
         }
 
         protected override void OnRelease()
@@ -317,7 +316,7 @@ namespace ModengTerm.Document
 
         protected override void OnRender()
         {
-            DrawingObject.Draw();
+            this.DrawingObject.DrawRectangles(this.geometries, null, this.backColor);
         }
 
         #endregion

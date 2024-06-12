@@ -32,6 +32,8 @@ namespace ModengTerm.Document
 
         private int physicsRow;
 
+        private VTFormattedText formattedText;
+
         #endregion
 
         #region 属性
@@ -548,7 +550,7 @@ namespace ModengTerm.Document
 
         #region VTElement
 
-        protected override void OnInitialize(IDrawingObject drawingObject)
+        protected override void OnInitialize()
         {
         }
 
@@ -558,20 +560,15 @@ namespace ModengTerm.Document
 
         protected override void OnRender()
         {
-            IDrawingTextLine drawingTextLine = this.DrawingObject as IDrawingTextLine;
-
             VTFormattedText formattedText = VTUtils.CreateFormattedText(Characters);
             formattedText.Style = this.Typeface;
+
+            this.formattedText = formattedText;
 
             // 把物理行号打印出来，调试用
             //formattedText.Text = string.Format("{0} - {1}", this.PhysicsRow, formattedText.Text);
 
-            drawingTextLine.FormattedText = formattedText;
-
-            drawingTextLine.Draw();
-
-            VTextMetrics textMetrics = drawingTextLine.Measure();
-            Metrics = textMetrics;
+            this.Metrics = this.DrawingObject.DrawText(formattedText);
         }
 
         /// <summary>
@@ -583,9 +580,7 @@ namespace ModengTerm.Document
         /// <returns></returns>
         public VTextRange MeasureTextRange(int startIndex, int count)
         {
-            IDrawingTextLine objectText = DrawingObject as IDrawingTextLine;
-
-            return objectText.MeasureTextRange(startIndex, count);
+            return this.DrawingObject.MeasureText(this.formattedText, startIndex, count);
         }
 
         /// <summary>

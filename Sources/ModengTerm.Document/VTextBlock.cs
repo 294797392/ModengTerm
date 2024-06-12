@@ -74,7 +74,7 @@ namespace ModengTerm.Document
 
         #region VTElement
 
-        protected override void OnInitialize(IDrawingObject drawingObject)
+        protected override void OnInitialize()
         {
         }
 

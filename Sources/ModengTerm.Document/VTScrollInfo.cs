@@ -134,7 +134,7 @@ namespace ModengTerm.Document
 
         public void Initialize()
         {
-            this.scrollbar = ownerDocument.DrawingObject.Scrollbar;
+            this.scrollbar = ownerDocument.Renderer.Scrollbar;
             this.scrollbar.Maximum = 0;
             this.scrollbar.Value = 0;
             this.scrollbar.ViewportRow = ViewportRow;
