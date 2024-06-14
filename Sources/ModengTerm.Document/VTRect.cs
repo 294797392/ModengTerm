@@ -42,22 +42,22 @@ namespace ModengTerm.Document
         /// <summary>
         /// 左上角X坐标
         /// </summary>
-        public double X { get; set; }
+        public double X { get; private set; }
 
         /// <summary>
         /// 左上角Y坐标
         /// </summary>
-        public double Y { get; set; }
+        public double Y { get; private set; }
 
         /// <summary>
         /// 宽度
         /// </summary>
-        public double Width { get; set; }
+        public double Width { get; private set; }
 
         /// <summary>
         /// 高度
         /// </summary>
-        public double Height { get; set; }
+        public double Height { get; private set; }
 
         public VTPoint LeftTop { get { return new VTPoint(X, Y); } }
 
@@ -100,60 +100,14 @@ namespace ModengTerm.Document
             Height = height;
         }
 
-        public VTRect(double x, double y, VTSize size)
-        {
-            X = x;
-            Y = y;
-            Width = size.Width;
-            Height = size.Height;
-        }
-
-        /// <summary>
-        /// 测试是否在水平位置包含X
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="tolerance"></param>
-        /// <returns></returns>
-        public bool ContainsX(double x, int tolerance = 0)
-        {
-            if (tolerance > 0)
-            {
-                return x >= Left - tolerance && x <= Right + tolerance;
-            }
-            else
-            {
-                return x >= Left && x <= Right;
-            }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("x = {0}, y = {1}, width = {2}, height = {3}", LeftTop.X, LeftTop.Y, Width, Height);
-        }
-
         public Rect GetRect()
         {
             return new Rect(X, Y, Width, Height);
         }
 
-        public VTSize GetSize()
+        public override string ToString()
         {
-            return new VTSize(Width, Height);
-        }
-
-        /// <summary>
-        /// 保持中心点不变，向四周扩大相同的距离
-        /// </summary>
-        /// <param name="value">要扩大的距离</param>
-        /// <returns></returns>
-        public VTRect Extend(double value)
-        {
-            return new VTRect(X - value, Y - value, Width + value * 2, Height + value * 2);
-        }
-
-        public static VTRect CreateFromTextRange(VTextRange textRange, double offsetY)
-        {
-            return new VTRect(textRange.OffsetX, offsetY, textRange.Width, textRange.Height);
+            return string.Format("x = {0}, y = {1}, width = {2}, height = {3}", LeftTop.X, LeftTop.Y, Width, Height);
         }
     }
 }

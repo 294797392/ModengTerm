@@ -141,9 +141,17 @@ namespace ModengTerm.Terminal
         /// </summary>
         private VTCharsetMap[] gsetList;
         private int glSetNumber;
-        private int glSetNumberSingleShift = -1; // 只映射下一次使用的gsetNumber
+        private int glSetNumberSingleShift = -1; // 只映射下一次使用的gsetNumber。如果为-1表示不映射。
+
+        /// <summary>
+        /// GL部分要使用的字符映射关系
+        /// </summary>
         private VTCharsetMap glTranslationTable;
         private int grSetNumber;
+
+        /// <summary>
+        /// GR部分要使用的字符映射关系
+        /// </summary>
         private VTCharsetMap grTranslationTable;
 
         #endregion
@@ -373,7 +381,7 @@ namespace ModengTerm.Terminal
         {
             // 所有要保存的行存储在这里
             List<VTHistoryLine> historyLines = new List<VTHistoryLine>();
-            int startCharacterIndex = 0, endCharacterIndex = 0;
+            int startCharacterIndex = -1, endCharacterIndex = -1;
 
             switch (paragraphType)
             {
@@ -424,8 +432,21 @@ namespace ModengTerm.Terminal
                             return VTParagraph.Empty;
                         }
 
-                        int topRow, bottomRow;
-                        selection.Normalize(out topRow, out bottomRow, out startCharacterIndex, out endCharacterIndex);
+                        VTextPointer topPointer = null, bottomPointer = null;
+
+                        if (selection.StartPointer.PhysicsRow < selection.EndPointer.PhysicsRow)
+                        {
+                            topPointer = selection.StartPointer;
+                            bottomPointer = selection.EndPointer;
+                        }
+                        else
+                        {
+                            topPointer = selection.EndPointer;
+                            bottomPointer = selection.StartPointer;
+                        }
+
+                        int topRow = topPointer.PhysicsRow;
+                        int bottomRow = bottomPointer.PhysicsRow;
 
                         if (IsAlternate)
                         {
@@ -451,11 +472,95 @@ namespace ModengTerm.Terminal
                             }
                             historyLines.AddRange(histories);
                         }
+
+                        VTHistoryLine topLine = historyLines.FirstOrDefault();
+                        VTHistoryLine bottomLine = historyLines.LastOrDefault();
+
+                        #region 处理当选中的第一行没有文本的情况
+
+                        if (topPointer.CharacterIndex == -1)
+                        {
+                            // 第一行没有选中字符
+                            int columns = 0;
+
+                            for (int i = 0; i < topLine.Characters.Count; i++)
+                            {
+                                VTCharacter character = topLine.Characters[i];
+
+                                if (columns >= topPointer.ColumnIndex)
+                                {
+                                    startCharacterIndex = i;
+                                    break;
+                                }
+
+                                columns += character.ColumnSize;
+                            }
+
+                            // 如果选中的第一行没有选中的字符，那么就用下一行的第一个字符作为选中起始点
+                            if (startCharacterIndex == -1)
+                            {
+                                startCharacterIndex = 0;
+                                historyLines.Remove(topLine);
+                            }
+                        }
+                        else
+                        {
+                            startCharacterIndex = topPointer.CharacterIndex;
+                        }
+
+                        #endregion
+
+                        #region 处理当选中的最后一行没有文本的情况
+
+                        if (bottomPointer.CharacterIndex == -1)
+                        {
+                            // 最后一行没有选中字符
+
+                            int columns = bottomLine.Characters.Sum(v => v.ColumnSize);
+
+                            for (int i = bottomLine.Characters.Count - 1; i >= 0; i--)
+                            {
+                                VTCharacter character = bottomLine.Characters[i];
+
+                                if (columns <= bottomPointer.ColumnIndex)
+                                {
+                                    endCharacterIndex = i;
+                                    break;
+                                }
+
+                                columns -= character.ColumnSize;
+                            }
+
+                            // 如果选中的最后一行没有选中的字符，那么就用上一行的最后一个字符作为终点
+                            if (endCharacterIndex == -1)
+                            {
+                                historyLines.Remove(bottomLine);
+
+                                if (historyLines.Count > 0)
+                                {
+                                    VTHistoryLine historyLine = historyLines.LastOrDefault();
+                                    endCharacterIndex = historyLine.Characters.Count - 1;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            endCharacterIndex = bottomPointer.CharacterIndex;
+                        }
+
+                        #endregion
+
                         break;
                     }
 
                 default:
                     throw new NotImplementedException();
+            }
+
+            // 当选中的内容为空的时候会出现
+            if (historyLines.Count == 0)
+            {
+                return VTParagraph.Empty;
             }
 
             CreateContentParameter parameter = new CreateContentParameter()
@@ -521,8 +626,8 @@ namespace ModengTerm.Terminal
             // 遇到过一种情况：如果终端名称不正确，比如XTerm，那么当行数增加的时候，光标会移动到该行的最右边，终端名称改成xterm就没问题了
             // 目前的实现思路是：如果是减少行，那么从第一行开始删除；如果是增加行，那么从最后一行开始新建行。不考虑ScrollMargin
 
-            this.MainDocumentResize(this.mainDocument, oldRow, newRow, oldCol, newCol);
-            this.AlternateDocumentResize(this.alternateDocument, oldRow, newRow, oldCol, newCol);
+            this.MainDocumentResize(this.mainDocument, newRow, newCol);
+            this.AlternateDocumentResize(this.alternateDocument, newRow, newCol);
 
             // 重绘当前显示的文档
             this.activeDocument.RequestInvalidate();
@@ -625,21 +730,19 @@ namespace ModengTerm.Terminal
         /// 是否需要考虑scrollMargin?目前没考虑
         /// </summary>
         /// <param name="document"></param>
-        /// <param name="oldRow"></param>
         /// <param name="newRow"></param>
-        /// <param name="oldCol"></param>
         /// <param name="newCol"></param>
-        private void MainDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
+        private void MainDocumentResize(VTDocument document, int newRow, int newCol)
         {
             // 调整大小前前先滚动到底，不然会有问题
             this.activeDocument.ScrollToBottom();
 
-            document.Resize(oldRow, newRow, oldCol, newCol);
+            document.Resize(newRow, newCol);
         }
 
-        private void AlternateDocumentResize(VTDocument document, int oldRow, int newRow, int oldCol, int newCol)
+        private void AlternateDocumentResize(VTDocument document, int newRow, int newCol)
         {
-            document.Resize(oldRow, newRow, oldCol, newCol);
+            document.Resize(newRow, newCol);
 
             // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
             document.EraseAll();
@@ -696,7 +799,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        private char TranslateCharacter(char ch) 
+        private char TranslateCharacter(char ch)
         {
             // 最终要打印的字符
             char chPrint = ch;

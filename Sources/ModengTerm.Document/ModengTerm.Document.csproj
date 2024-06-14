@@ -41,6 +41,7 @@
     <Compile Remove="VTColorTable.cs" />
     <Compile Remove="VTextBlock.cs" />
     <Compile Remove="VTFramedElement.cs" />
+    <Compile Remove="VTPointCollection.cs" />
     <Compile Remove="VTWallpaper.cs" />
   </ItemGroup>
 

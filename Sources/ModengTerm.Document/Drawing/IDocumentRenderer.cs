@@ -18,7 +18,7 @@ namespace ModengTerm.Document.Drawing
         string Name { get; set; }
 
         /// <summary>
-        /// 获取文档大小
+        /// 获取文档像素大小
         /// </summary>
         VTSize Size { get; }
 

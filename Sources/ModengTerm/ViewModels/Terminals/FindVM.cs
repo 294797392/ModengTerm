@@ -370,7 +370,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 VTextRange textRange = textLine.MeasureTextRange(matches.Index, matches.Length);
 
-                rectangles.Add(new VTRect(textRange.OffsetX, textRange.OffsetY, textRange.Width, textRange.Height));
+                rectangles.Add(new VTRect(textRange.Left, textRange.Top, textRange.Width, textRange.Height));
             }
 
             this.activeRectElement.DrawRectangles(rectangles, null, this.HighlightBackground);

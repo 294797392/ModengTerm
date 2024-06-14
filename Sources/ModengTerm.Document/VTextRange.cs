@@ -14,14 +14,24 @@ namespace ModengTerm.Document
         public static readonly VTextRange Empty = new VTextRange();
 
         /// <summary>
-        /// 距离该行的X偏移量
+        /// 距离文档左边的X偏移量
         /// </summary>
-        public double OffsetX { get; set; }
+        public double Left { get; set; }
 
         /// <summary>
-        /// 距离文档的Y偏移量
+        /// 距离文档上边的Y偏移量
         /// </summary>
-        public double OffsetY { get; set; }
+        public double Top { get; set; }
+
+        public double Right
+        {
+            get { return this.Left + Width; }
+        }
+
+        public double Bottom 
+        {
+            get { return this.Top + this.Height; }
+        }
 
         /// <summary>
         /// 该文本段宽度
@@ -35,8 +45,8 @@ namespace ModengTerm.Document
 
         public VTextRange(double offsetX, double offsetY, double width, double height)
         {
-            this.OffsetX = offsetX;
-            this.OffsetY = offsetY;
+            this.Left = offsetX;
+            this.Top = offsetY;
             this.Width = width;
             this.Height = height;
         }

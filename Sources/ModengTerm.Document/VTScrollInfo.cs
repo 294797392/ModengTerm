@@ -33,6 +33,16 @@ namespace ModengTerm.Document
         #region 属性
 
         /// <summary>
+        /// 获取当前显示的第一行的物理行号
+        /// </summary>
+        public int FirstPhysicsRow { get { return this.ScrollValue; } }
+
+        /// <summary>
+        /// 获取当前显示的最后一行的物理行号
+        /// </summary>
+        public int LastPhysicsRow { get { return this.ScrollValue + this.ownerDocument.ViewportRow - 1; } }
+
+        /// <summary>
         /// 可以滚动到的最大值
         /// 也就是滚动条滚动到底的时候，滚动条的值
         /// 也就是滚动条滚动到底的时候，文档里的第一行的PhysicsRow
@@ -106,21 +116,6 @@ namespace ModengTerm.Document
             }
         }
 
-        /// <summary>
-        /// 可视区域的行数
-        /// </summary>
-        public int ViewportRow
-        {
-            get { return viewportRow; }
-            set
-            {
-                if (viewportRow != value)
-                {
-                    viewportRow = value;
-                }
-            }
-        }
-
         #endregion
 
         #region 构造方法
@@ -137,7 +132,6 @@ namespace ModengTerm.Document
             this.scrollbar = ownerDocument.Renderer.Scrollbar;
             this.scrollbar.Maximum = 0;
             this.scrollbar.Value = 0;
-            this.scrollbar.ViewportRow = ViewportRow;
             this.scrollbar.Visible = false; // 默认不显示滚动条
             this.scrollbar.Document = this.ownerDocument;
         }
@@ -162,7 +156,7 @@ namespace ModengTerm.Document
                     display = true;
                 }
 
-                this.scrollbar.ViewportRow = this.ViewportRow;
+                this.scrollbar.ViewportRow = this.ownerDocument.ViewportRow;
                 this.scrollbar.Maximum = this.ScrollMax;
                 this.scrollbar.Value = this.ScrollValue;
             }

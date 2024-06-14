@@ -152,7 +152,7 @@
             </Grid.RowDefinitions>
 
             <!-- 打开的终端列表Tab页 -->
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="0" Margin="0,5,0,0">
 
                 <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
                     <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"

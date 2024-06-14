@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.Terminal
 {
     /// <summary>
-    /// 存储字符集信息
-    /// 字符集有四组，分别是G1,G2,G3,G4字符集
+    /// 存储字符映射信息
     /// </summary>
     public class VTCharsetMap
     {

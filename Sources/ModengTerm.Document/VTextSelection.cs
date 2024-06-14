@@ -21,10 +21,6 @@ namespace ModengTerm.Document
 
         #region 实例变量
 
-        private int startRow;
-        private int endRow;
-        private int startColumn;
-        private int endColumn;
         private List<VTRect> geometries;
         private VTColor backColor;
 
@@ -37,71 +33,11 @@ namespace ModengTerm.Document
         /// <summary>
         /// 指示当前选中的内容是否为空
         /// </summary>
-        public bool IsEmpty { get { return startColumn < 0 || endColumn < 0; } }
+        public bool IsEmpty { get { return this.StartPointer.ColumnIndex < 0 || this.EndPointer.ColumnIndex < 0; } }
 
-        /// <summary>
-        /// 选中区域的第一行的物理行号
-        /// </summary>
-        public int StartRow
-        {
-            get { return startRow; }
-            set
-            {
-                if (startRow != value)
-                {
-                    startRow = value;
-                    this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-                }
-            }
-        }
+        public VTextPointer StartPointer { get; set; }
 
-        /// <summary>
-        /// 选中区域的第一行的第一个字符
-        /// </summary>
-        public int StartColumn
-        {
-            get { return startColumn; }
-            set
-            {
-                if (startColumn != value)
-                {
-                    startColumn = value;
-                    this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 选中区域的最后一行的物理行号
-        /// </summary>
-        public int EndRow
-        {
-            get { return endRow; }
-            set
-            {
-                if (endRow != value)
-                {
-                    endRow = value;
-                    this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 选中区域的最后一行的最后一个字符
-        /// </summary>
-        public int EndColumn
-        {
-            get { return endColumn; }
-            set
-            {
-                if (endColumn != value)
-                {
-                    endColumn = value;
-                    this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-                }
-            }
-        }
+        public VTextPointer EndPointer { get; set; }
 
         /// <summary>
         /// 选中区域的颜色
@@ -126,6 +62,101 @@ namespace ModengTerm.Document
         #region 公开接口
 
         /// <summary>
+        /// 选中某一行
+        /// </summary>
+        /// <param name="textLine"></param>
+        /// <param name="logicalRow"></param>
+        public void SelectRow(VTextLine textLine, int logicalRow)
+        {
+            VTDocument document = this.OwnerDocument;
+            VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
+
+            this.StartPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.StartPointer.CharacterIndex = 0;
+            this.StartPointer.ColumnIndex = 0;
+
+            this.EndPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.EndPointer.CharacterIndex = textLine.Characters.Count - 1;
+            this.EndPointer.ColumnIndex = document.ViewportColumn - 1;
+
+            this.UpdateGeometry();
+            this.RequestInvalidate();
+        }
+
+        /// <summary>
+        /// 选中一行里的某个区域
+        /// </summary>
+        /// <param name="textLine"></param>
+        /// <param name="logicalRow"></param>
+        /// <param name="startCharacterIndex"></param>
+        /// <param name="characterCount"></param>
+        public void SelectRange(VTextLine textLine, int logicalRow, int startCharacterIndex, int characterCount)
+        {
+            VTDocument document = this.OwnerDocument;
+            VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
+
+            this.StartPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.StartPointer.CharacterIndex = startCharacterIndex;
+            this.StartPointer.ColumnIndex = textLine.FindCharacterColumn(this.StartPointer.CharacterIndex);
+
+            this.EndPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.EndPointer.CharacterIndex = startCharacterIndex + characterCount - 1;
+            this.EndPointer.ColumnIndex = textLine.FindCharacterColumn(this.EndPointer.CharacterIndex);
+
+            this.UpdateGeometry();
+            this.RequestInvalidate();
+        }
+
+        /// <summary>
+        /// 选中全部的文本（包含滚动的文本）
+        /// </summary>
+        public void SelectAll()
+        {
+            VTDocument document = this.OwnerDocument;
+            VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
+            VTHistory history = document.History;
+
+            VTHistoryLine startHistoryLine = history.FirstLine;
+            VTHistoryLine lastHistoryLine = history.LastLine;
+            int firstRow = 0;
+            int lastRow = history.Lines - 1;
+            int lastCharacterIndex = Math.Max(0, lastHistoryLine.Characters.Count - 1);
+
+            this.StartPointer.PhysicsRow = firstRow;
+            this.StartPointer.CharacterIndex = 0;
+            this.StartPointer.ColumnIndex = 0;
+
+            this.EndPointer.PhysicsRow = lastRow;
+            this.EndPointer.CharacterIndex = lastCharacterIndex;
+            this.EndPointer.ColumnIndex = document.ViewportColumn - 1;
+
+            this.UpdateGeometry();
+            this.RequestInvalidate();
+        }
+
+        /// <summary>
+        /// 选中当前显示区域的所有文本
+        /// </summary>
+        public void SelectViewport()
+        {
+            VTDocument document = this.OwnerDocument;
+            VTScrollInfo scrollInfo = document.Scrollbar;
+
+            this.StartPointer.PhysicsRow = scrollInfo.FirstPhysicsRow;
+            this.StartPointer.CharacterIndex = 0;
+            this.StartPointer.ColumnIndex = 0;
+
+            this.EndPointer.PhysicsRow = scrollInfo.LastPhysicsRow;
+            this.EndPointer.CharacterIndex = scrollInfo.LastPhysicsRow;
+            this.EndPointer.ColumnIndex = document.ViewportColumn - 1;
+
+            // 立即显示选中区域
+            this.UpdateGeometry();
+            this.RequestInvalidate();
+        }
+
+
+        /// <summary>
         /// 根据当前的TextPointer信息更新选中区域的形状
         /// 选中区域需要在下面几个时机更新：
         /// 1. 在当前页面选中部分区域要更新
@@ -139,43 +170,96 @@ namespace ModengTerm.Document
 
             this.geometries.Clear();
 
-            VTextPointer Start = new VTextPointer(startRow, startColumn);
-            VTextPointer End = new VTextPointer(endRow, endColumn);
+            VTextPointer startPointer = this.StartPointer;
+            int startRow = startPointer.PhysicsRow;
+            int startColumn = startPointer.ColumnIndex;
+            int startCharacterIndex = startPointer.CharacterIndex;
+            VTextPointer endPointer = this.EndPointer;
+            int endRow = endPointer.PhysicsRow;
+            int endColumn = endPointer.ColumnIndex;
+            int endCharacterIndex = endPointer.CharacterIndex;
 
             VTDocument document = this.OwnerDocument;
-            VTSize container = document.Renderer.Size;
+            double charWidth = document.Typeface.SpaceWidth;
+            VTSize displaySize = document.Renderer.Size;
 
             // 单独处理选中的是同一行的情况
-            if (Start.PhysicsRow == End.PhysicsRow)
+            if (startRow == endRow)
             {
+                //logger.InfoFormat("startColumn:{0}, startCharIndex:{1},endColumn:{2},endCharIndex:{3}", this.startColumn, this.startCharacterIndex, this.endColumn, this.endCharacterIndex);
+
                 // 找到对应的文本行
-                VTextLine textLine = document.FindLine(Start.PhysicsRow);
+                VTextLine textLine = document.FindLine(startPointer.PhysicsRow);
                 if (textLine == null)
                 {
                     // 当选中了一行之后，然后该行被移动到屏幕外了，会出现这种情况
                     return;
                 }
 
-                // 单独处理选中的是一个字符的情况
-                if (Start.CharacterIndex == End.CharacterIndex)
+                // 处理选中的是同一个字符的情况
+                if (startColumn == endColumn)
                 {
-                    // 选中的是一个字符
-                    VTextRange bounds1 = textLine.MeasureCharacter(Start.CharacterIndex);
-                    geometries.Add(VTRect.CreateFromTextRange(bounds1, textLine.OffsetY));
+                    if (startCharacterIndex > -1 && endCharacterIndex > -1)
+                    {
+                        VTextRange textRange = textLine.MeasureCharacter(startCharacterIndex);
+                        geometries.Add(new VTRect(textRange.Left, textRange.Top, textRange.Width, textRange.Height));
+                    }
+                    else
+                    {
+                        geometries.Add(new VTRect(startColumn * charWidth, textLine.OffsetY, charWidth, textLine.Height));
+                    }
                     return;
                 }
 
-                VTextPointer leftPointer = Start.CharacterIndex < End.CharacterIndex ? Start : End;
-                VTextPointer rightPointer = Start.CharacterIndex < End.CharacterIndex ? End : Start;
+                VTextPointer leftPointer, rightPointer;
+                if (startColumn > endColumn)
+                {
+                    leftPointer = endPointer;
+                    rightPointer = startPointer;
+                }
+                else
+                {
+                    leftPointer = startPointer;
+                    rightPointer = endPointer;
+                }
 
-                VTextRange bounds = textLine.MeasureTextRange(leftPointer.CharacterIndex, rightPointer.CharacterIndex - leftPointer.CharacterIndex + 1);
-                geometries.Add(VTRect.CreateFromTextRange(bounds, textLine.OffsetY));
+                double left = 0;
+                double top = textLine.OffsetY;
+                double width = 0;
+                double height = textLine.Height;
+
+                if (leftPointer.CharacterIndex == -1)
+                {
+                    // 左边没字符
+                    int leftColumn = leftPointer.ColumnIndex;
+                    left = leftColumn * charWidth;
+                }
+                else
+                {
+                    // 左边有字符
+                    left = textLine.MeasureCharacter(leftPointer.CharacterIndex).Left;
+                }
+
+                if (rightPointer.CharacterIndex == -1)
+                {
+                    int leftColumn = leftPointer.ColumnIndex;
+                    int rightColumn = rightPointer.ColumnIndex;
+                    width = ((rightColumn - leftColumn) + 1) * charWidth;
+                }
+                else
+                {
+                    width = textLine.MeasureCharacter(rightPointer.CharacterIndex).Right - left;
+                }
+
+                //logger.InfoFormat("{0},{1},{2}", leftPointer.CharacterIndex, rightPointer.CharacterIndex, width);
+
+                geometries.Add(new VTRect(left, top, width, height));
                 return;
             }
 
             // 下面处理选中了多行的状态
-            VTextPointer topPointer = Start.PhysicsRow > End.PhysicsRow ? End : Start;
-            VTextPointer bottomPointer = Start.PhysicsRow > End.PhysicsRow ? Start : End;
+            VTextPointer topPointer = startPointer.PhysicsRow > endPointer.PhysicsRow ? endPointer : startPointer;
+            VTextPointer bottomPointer = startPointer.PhysicsRow > endPointer.PhysicsRow ? startPointer : endPointer;
 
             VTextLine topLine = document.FindLine(topPointer.PhysicsRow);
             VTextLine bottomLine = document.FindLine(bottomPointer.PhysicsRow);
@@ -184,46 +268,101 @@ namespace ModengTerm.Document
             {
                 // 此时说明选中的内容都在屏幕里
                 // 构建上边和下边的矩形
-                VTextRange topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
-                VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
 
-                // 第一行的矩形
-                geometries.Add(new VTRect(topBounds.OffsetX, topBounds.OffsetY, container.Width - topBounds.OffsetX, topLine.Height));
+                VTRect topRect = new VTRect();
+                VTRect bottomRect = new VTRect();
 
-                // 中间的矩形
-                double y = topLine.OffsetY + topBounds.Height;
-                double height = bottomLine.OffsetY - (topLine.OffsetY + topBounds.Height);
-                geometries.Add(new VTRect(0, y, container.Width, height));
+                if (topPointer.CharacterIndex == -1)
+                {
+                    // 第一行的矩形
+                    double left = topPointer.ColumnIndex * charWidth;
+                    double width = displaySize.Width - left;
+                    topRect = new VTRect(left, topLine.OffsetY, width, topLine.Height);
+                }
+                else
+                {
+                    VTextRange topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
 
-                // 最后一行的矩形
-                geometries.Add(new VTRect(0, bottomLine.OffsetY, bottomBounds.OffsetX + bottomBounds.Width, bottomLine.Height));
+                    // 第一行的矩形
+                    topRect = new VTRect(topBounds.Left, topBounds.Top, displaySize.Width - topBounds.Left, topLine.Height);
+                }
+
+                if (bottomPointer.CharacterIndex == -1)
+                {
+                    // 最后一行的矩形
+                    double width = (bottomPointer.ColumnIndex + 1) * charWidth;
+                    bottomRect = new VTRect(0, bottomLine.OffsetY, width, bottomLine.Height);
+                }
+                else
+                {
+                    // 最后一行的矩形
+                    VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
+                    bottomRect = new VTRect(0, bottomLine.OffsetY, bottomBounds.Left + bottomBounds.Width, bottomLine.Height);
+                }
+
+                VTRect middleRect = new VTRect(0, topRect.Bottom, displaySize.Width, bottomRect.Top - topRect.Bottom);
+
+                this.geometries.Add(topRect);
+                this.geometries.Add(middleRect);
+                this.geometries.Add(bottomRect);
+
                 return;
             }
 
             if (topLine != null && bottomLine == null)
             {
-                // 选中的内容有一部分被移到屏幕外了，滚动条往上移动
-                VTextRange topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
+                // 选中的内容有一部分被移到下面了
+                VTRect topRect = new VTRect();
+                VTRect bottomRect = new VTRect();
 
-                // 第一行的矩形
-                geometries.Add(new VTRect(topBounds.OffsetX, topLine.OffsetY, container.Width - topBounds.OffsetX, topLine.Height));
+                if (topPointer.CharacterIndex == -1)
+                {
+                    // 第一行的矩形
+                    double left = topPointer.ColumnIndex * charWidth;
+                    double width = displaySize.Width - left;
+                    topRect = new VTRect(left, topLine.OffsetY, width, topLine.Height);
+                }
+                else
+                {
+                    VTextRange topBounds = topLine.MeasureCharacter(topPointer.CharacterIndex);
 
-                // 剩下的矩形
-                double height = document.LastLine.Bounds.Bottom - topLine.Bounds.Bottom;
-                geometries.Add(new VTRect(0, topLine.Bounds.Bottom, container.Width, height));
+                    // 第一行的矩形
+                    topRect = new VTRect(topBounds.Left, topBounds.Top, displaySize.Width - topBounds.Left, topLine.Height);
+                }
+
+                bottomRect = new VTRect(0, topRect.Bottom, displaySize.Width, displaySize.Height - topRect.Bottom);
+
+                this.geometries.Add(topRect);
+                this.geometries.Add(bottomRect);
+
                 return;
             }
 
             if (topLine == null && bottomLine != null)
             {
-                // 选中的内容有一部分被移到屏幕外了，滚动条往下移动
-                VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
+                // 选中的内容有一部分被移到屏幕上面了
 
-                // 
-                geometries.Add(new VTRect(0, 0, container.Width, bottomBounds.OffsetY));
+                VTRect topRect = new VTRect();
+                VTRect bottomRect = new VTRect();
 
-                // 最后一行的矩形
-                geometries.Add(new VTRect(0, bottomBounds.OffsetY, bottomBounds.OffsetX + bottomBounds.Width, bottomLine.Height));
+                if (bottomPointer.CharacterIndex == -1)
+                {
+                    // 最后一行的矩形
+                    double width = (bottomPointer.ColumnIndex + 1) * charWidth;
+                    bottomRect = new VTRect(0, bottomLine.OffsetY, width, bottomLine.Height);
+                }
+                else
+                {
+                    // 最后一行的矩形
+                    VTextRange bottomBounds = bottomLine.MeasureCharacter(bottomPointer.CharacterIndex);
+                    bottomRect = new VTRect(0, bottomLine.OffsetY, bottomBounds.Left + bottomBounds.Width, bottomLine.Height);
+                }
+
+                topRect = new VTRect(0, 0, displaySize.Width, bottomRect.Top);
+
+                this.geometries.Add(topRect);
+                this.geometries.Add(bottomRect);
+
                 return;
             }
 
@@ -232,7 +371,7 @@ namespace ModengTerm.Document
             {
                 // 选中区域的第一行在当前显示的第一行之前
                 // 选中区域的最后一行在当前显示的最后一行之后
-                this.geometries.Add(new VTRect(0, 0, container.Width, document.LastLine.Bounds.Bottom));
+                this.geometries.Add(new VTRect(0, 0, displaySize.Width, document.LastLine.Bounds.Bottom));
                 return;
             }
 
@@ -245,53 +384,20 @@ namespace ModengTerm.Document
         /// </summary>
         public void Clear()
         {
-            OffsetY = 0;
-            OffsetX = 0;
+            this.OffsetY = 0;
+            this.OffsetX = 0;
 
-            StartRow = -1;
-            EndRow = -1;
-            StartColumn = -1;
-            EndColumn = -1;
+            this.StartPointer.CharacterIndex = -1;
+            this.StartPointer.ColumnIndex = -1;
+            this.StartPointer.PhysicsRow = -1;
+
+            this.EndPointer.CharacterIndex = -1;
+            this.EndPointer.ColumnIndex = -1;
+            this.EndPointer.PhysicsRow = -1;
 
             this.geometries.Clear();
 
             this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-        }
-
-        public void Normalize(out int topRow, out int bottomRow, out int startIndex, out int endIndex)
-        {
-            VTextPointer Start = new VTextPointer(startRow, startColumn);
-            VTextPointer End = new VTextPointer(endRow, endColumn);
-
-            if (Start.PhysicsRow == End.PhysicsRow)
-            {
-                topRow = Start.PhysicsRow;
-                bottomRow = End.PhysicsRow;
-
-                // 注意要处理鼠标从右向左选中的情况
-                // 如果鼠标是从右向左进行选中，那么Start就是Selection的右边，End就是Selection的左边
-                startIndex = Math.Min(Start.CharacterIndex, End.CharacterIndex);
-                endIndex = Math.Max(Start.CharacterIndex, End.CharacterIndex);
-            }
-            else
-            {
-                // 要考虑鼠标从下往上选中的情况
-                // 如果鼠标从下往上选中，那么此时下面的VTextPointer是起始，上面的VTextPointer是结束
-                if (Start.PhysicsRow > End.PhysicsRow)
-                {
-                    topRow = End.PhysicsRow;
-                    bottomRow = Start.PhysicsRow;
-                    startIndex = End.CharacterIndex;
-                    endIndex = Start.CharacterIndex;
-                }
-                else
-                {
-                    topRow = Start.PhysicsRow;
-                    bottomRow = End.PhysicsRow;
-                    startIndex = Start.CharacterIndex;
-                    endIndex = End.CharacterIndex;
-                }
-            }
         }
 
         #endregion
@@ -301,11 +407,6 @@ namespace ModengTerm.Document
         protected override void OnInitialize()
         {
             this.geometries = new List<VTRect>();
-
-            StartRow = -1;
-            EndRow = -1;
-            StartColumn = -1;
-            EndColumn = -1;
 
             this.backColor = VTColor.CreateFromRgbKey(this.Color);
         }

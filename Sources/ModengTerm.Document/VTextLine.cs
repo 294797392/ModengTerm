@@ -45,22 +45,22 @@ namespace ModengTerm.Document
         /// TODO：考虑删掉，如果在编辑文档的时候，删除了一行，那么所有的HistoryLine都要更新，这会是一个灾难
         /// 解决方法是在VTDocument里保存当前显示的第一行的索引
         /// </summary>
-//        public int PhysicsRow
-//        {
-//            get { return physicsRow; }
-//            set
-//            {
-//                if (physicsRow != value)
-//                {
-//                    physicsRow = value;
-//#if DEBUG
-//                    // TODO：正式出版本的时候要删除这里，不然会影响运行速度
-//                    // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
-//                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-//#endif
-//                }
-//            }
-//        }
+        //        public int PhysicsRow
+        //        {
+        //            get { return physicsRow; }
+        //            set
+        //            {
+        //                if (physicsRow != value)
+        //                {
+        //                    physicsRow = value;
+        //#if DEBUG
+        //                    // TODO：正式出版本的时候要删除这里，不然会影响运行速度
+        //                    // 这里只是为了可以在渲染的时候看到最新的PhysicsRow，方便调试
+        //                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+        //#endif
+        //                }
+        //            }
+        //        }
 
         /// <summary>
         /// 该行对应的历史记录
@@ -214,6 +214,31 @@ namespace ModengTerm.Document
 
             return -1;
         }
+
+        /// <summary>
+        /// 根据字符索引查找该字符所在的列索引
+        /// </summary>
+        /// <param name="characterIndex"></param>
+        /// <returns></returns>
+        public int FindCharacterColumn(int characterIndex)
+        {
+            int column = 0;
+
+            for (int i = 0; i < this.Characters.Count; i++)
+            {
+                VTCharacter character = this.Characters[i];
+
+                if (i == characterIndex)
+                {
+                    return column;
+                }
+
+                column += character.ColumnSize;
+            }
+
+            return column;
+        }
+
 
         /// <summary>
         /// 设置指定位置处的字符
@@ -476,7 +501,7 @@ namespace ModengTerm.Document
         /// 从指定列开始删除字符，删到结尾
         /// </summary>
         /// <param name="column">要从第几列开始删除</param>
-        public void Delete(int column) 
+        public void Delete(int column)
         {
             int startIndex = FindCharacterIndex(column);
             if (startIndex == -1)

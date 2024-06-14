@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ModengTerm.Document.Utility;
 
 namespace ModengTerm.Document
 {
@@ -258,7 +259,7 @@ namespace ModengTerm.Document
             {
                 int characterIndex = activeLine.FindCharacterIndex(this.column);
                 VTextRange textRange = activeLine.MeasureCharacter(characterIndex);
-                double offsetX = textRange.OffsetX;
+                double offsetX = textRange.Left;
                 double offsetY = activeLine.OffsetY;
                 DrawingObject.Arrange(offsetX, offsetY);
             }

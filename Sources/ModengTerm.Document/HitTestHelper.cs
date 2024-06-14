@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Document.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -52,36 +53,29 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="textLine">要做字符命中测试的行</param>
         /// <param name="cursorX">要做命中测试的X偏移量</param>
-        /// <param name="characterHitIndex">被命中的字符的索引</param>
+        /// <param name="charIndexHit">被命中的字符的索引</param>
         /// <param name="characterHitRange">被命中的字符的边界框信息</param>
+        /// <param name="columnIndexHit">命中的列索引</param>
         /// <returns>命中成功返回true，失败返回false</returns>
-        public static bool HitTestVTCharacter(VTextLine textLine, double cursorX, out int characterHitIndex, out VTextRange characterHitRange)
+        public static void HitTestVTCharacter(VTextLine textLine, double cursorX, out int charIndexHit, out VTextRange characterHitRange, out int columnIndexHit)
         {
             // 命中测试流程是一个一个字符做边界框的判断
             // 先测量第一个字符的边界框，然后判断xPos是否在该边界框里
             // 然后测量第一个和第二个字符的边界框，然后再判断
             // ...以此类推，直到命中为止
 
-            characterHitIndex = -1;
             characterHitRange = VTextRange.Empty;
 
-            for (int i = 0; i < textLine.Characters.Count; i++)
+            // 这种计算方式只适用于等宽字体
+            columnIndexHit = (int)Math.Min(Math.Floor(cursorX / textLine.Typeface.SpaceWidth), textLine.OwnerDocument.ViewportColumn - 1);
+
+            charIndexHit = textLine.FindCharacterIndex(columnIndexHit);
+            if (charIndexHit >= 0)
             {
-                VTextRange characterRange = textLine.MeasureCharacter(i);
-
-                double left = characterRange.OffsetX;
-                double right = characterRange.OffsetX + characterRange.Width;
-
-                if (cursorX >= left && cursorX <= right)
-                {
-                    // 鼠标命中了字符，使用命中的字符的边界框
-                    characterHitIndex = i;
-                    characterHitRange = characterRange;
-                    return true;
-                }
+                characterHitRange = textLine.MeasureCharacter(charIndexHit);
             }
-
-            return false;
         }
     }
 }
+
+
