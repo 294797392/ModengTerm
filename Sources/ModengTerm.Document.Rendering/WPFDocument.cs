@@ -21,27 +21,20 @@ namespace ModengTerm.Document.Rendering
     {
         #region 实例变量
 
-        private WPFDocumentCanvas canvas;
+        /// <summary>
+        /// 用来渲染内容的区域
+        /// </summary>
+        private WPFDocumentCanvas content;
         private ScrollBar scrollbar;
+        private double contentMargin;
 
         #endregion
 
         #region 属性
 
-        /// <summary>
-        /// 用来渲染内容的区域
-        /// </summary>
-        public WPFDocumentCanvas Surface { get { return this.canvas; } }
+        public WPFDocumentCanvas Content { get { return this.content; } }
 
         public VTScrollbar Scrollbar { get; private set; }
-
-        public VTSize Size
-        {
-            get
-            {
-                return new VTSize(this.ActualWidth, this.ActualHeight);
-            }
-        }
 
         public bool Visible
         {
@@ -63,6 +56,27 @@ namespace ModengTerm.Document.Rendering
             }
         }
 
+        public VTSize ContentSize
+        {
+            get
+            {
+                return new VTSize(this.content.ActualWidth, this.content.ActualHeight);
+            }
+        }
+
+        public double ContentMargin
+        {
+            get { return this.contentMargin; }
+            set
+            {
+                if (this.contentMargin != value)
+                {
+                    this.contentMargin = value;
+                    this.content.Margin = new Thickness(value);
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -80,19 +94,19 @@ namespace ModengTerm.Document.Rendering
         {
             DrawingObject drawingObject = new DrawingObject();
 
-            this.canvas.AddVisual(drawingObject);
+            this.content.AddVisual(drawingObject);
 
             return drawingObject;
         }
 
         public void DeleteDrawingObject(IDrawingObject drawingObject)
         {
-            canvas.RemoveVisual(drawingObject as DrawingObject);
+            content.RemoveVisual(drawingObject as DrawingObject);
         }
 
         public void DeleteDrawingObjects()
         {
-            List<IDrawingObject> drawingObjects = canvas.GetAllVisual().Cast<IDrawingObject>().ToList();
+            List<IDrawingObject> drawingObjects = content.GetAllVisual().Cast<IDrawingObject>().ToList();
 
             foreach (IDrawingObject drawingObject in drawingObjects)
             {
@@ -111,7 +125,7 @@ namespace ModengTerm.Document.Rendering
                 FontSize = fontSize,
                 FontFamily = fontFamily,
                 Height = formattedText.Height,
-                SpaceWidth = formattedText.WidthIncludingTrailingWhitespace
+                Width = formattedText.WidthIncludingTrailingWhitespace
             };
         }
 
@@ -123,7 +137,7 @@ namespace ModengTerm.Document.Rendering
         {
             base.OnApplyTemplate();
 
-            this.canvas = base.Template.FindName("PART_DocumentCanvas", this) as WPFDocumentCanvas;
+            this.content = base.Template.FindName("PART_DocumentCanvas", this) as WPFDocumentCanvas;
             this.scrollbar = base.Template.FindName("PART_Scrollbar", this) as ScrollBar;
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
         }

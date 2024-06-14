@@ -602,7 +602,7 @@ namespace ModengTerm.Terminal
             activeDocument.RequestInvalidate();
         }
 
-        public void OnSizeChanged(VTSize oldSize, VTSize newSize)
+        public void OnSizeChanged(VTSize newSize)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
@@ -687,9 +687,7 @@ namespace ModengTerm.Terminal
             typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
 
-            VTSize terminalSize = drawingDocument.Size;
-            double contentMargin = sessionInfo.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
-            VTSize contentSize = new VTSize(terminalSize.Width - 15, terminalSize.Height).Offset(-contentMargin * 2);
+            VTSize displaySize = drawingDocument.ContentSize;
             TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
 
             int viewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
@@ -698,7 +696,7 @@ namespace ModengTerm.Terminal
             {
                 /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
                 /// 如果SizeMode等于AutoFit，那么动态计算行和列
-                VTUtils.CalculateAutoFitSize(contentSize, typeface, out viewportRow, out viewportColumn);
+                VTUtils.CalculateAutoFitSize(displaySize, typeface, out viewportRow, out viewportColumn);
             }
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
@@ -745,7 +743,7 @@ namespace ModengTerm.Terminal
             document.Resize(newRow, newCol);
 
             // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
-            document.EraseAll();
+            document.DeleteAll();
         }
 
         private VTCharsetMap Select94CharsetMap(ulong charset)
@@ -928,6 +926,12 @@ namespace ModengTerm.Terminal
                 // 光标不在可滚动区域的最后一行，说明可以直接移动光标
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 document.SetCursor(Cursor.Row + 1, Cursor.Column);
+
+                // 光标移动到该行的时候再加入历史记录
+                if (!this.IsAlternate)
+                {
+                    document.History.AddHistory(document.ActiveLine.History);
+                }
             }
         }
 
@@ -1040,7 +1044,7 @@ namespace ModengTerm.Terminal
                         }
                         else
                         {
-                            // 把当前鼠标所在行之前的所有行移动到可视区域外，注意当前行不移动
+                            // 把当前鼠标所在行之前的所有行移动到可视区域外，当前鼠标所在行作为第一行，注意当前行不移动
 
                             // 相关命令：
                             // MainDocument：xterm-256color类型的终端clear程序
@@ -1049,36 +1053,33 @@ namespace ModengTerm.Terminal
                             // Erase Saved Lines
                             // 模拟xshell的操作，把当前行（光标所在行，就是最后一行）移动到可视区域的第一行
 
-                            // 一共要移动这么多行
-                            int rows = this.activeDocument.Cursor.Row;
+                            VTDocument document = this.activeDocument;
+                            VTScrollInfo scrollInfo = document.Scrollbar;
+                            VTCursor cursor = document.Cursor;
 
-                            for (int i = 0; i < rows; i++)
+                            int newScrollMax = scrollInfo.ScrollValue + cursor.Row;
+                            newScrollMax = Math.Min(newScrollMax, document.ScrollMax);
+
+                            scrollInfo.ScrollMax = newScrollMax;
+                            scrollInfo.ScrollValue = newScrollMax;
+
+                            // 从ScrollMax开始显示
+                            VTextLine textLine = document.FirstLine;
+                            for (int i = 0; i < document.ViewportRow; i++)
                             {
-                                VTextLine firstLine = this.activeDocument.FirstLine;
-                                VTextLine lastLine = this.activeDocument.LastLine;
+                                VTHistoryLine historyLine;
+                                if (document.History.TryGetHistory(scrollInfo.ScrollValue + i, out historyLine))
+                                {
+                                    textLine.SetHistory(historyLine);
+                                }
+                                else
+                                {
+                                    historyLine = new VTHistoryLine();
+                                    textLine.SetHistory(historyLine);
+                                }
 
-                                this.activeDocument.SwapLine(firstLine, lastLine);
-
-                                VTHistoryLine historyLine = new VTHistoryLine();
-                                firstLine.SetHistory(historyLine);
-                                this.activeDocument.History.AddHistory(historyLine);
+                                textLine = textLine.NextLine;
                             }
-
-                            #region 更新滚动条的值
-
-                            // 滚动条滚动到底
-                            // 计算滚动条可以滚动的最大值
-
-                            int scrollMax = this.activeDocument.History.Lines - this.activeDocument.ViewportRow;
-                            if (scrollMax > 0)
-                            {
-                                this.ScrollInfo.ScrollMax = Math.Min(scrollMax, this.activeDocument.ScrollMax);
-                                this.ScrollInfo.ScrollValue = this.ScrollInfo.ScrollMax;
-                            }
-
-                            #endregion
-
-                            //this.activeDocument.SetCursor(0, this.Cursor.Column);
                         }
                         break;
                     }

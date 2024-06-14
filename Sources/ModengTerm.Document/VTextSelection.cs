@@ -180,8 +180,8 @@ namespace ModengTerm.Document
             int endCharacterIndex = endPointer.CharacterIndex;
 
             VTDocument document = this.OwnerDocument;
-            double charWidth = document.Typeface.SpaceWidth;
-            VTSize displaySize = document.Renderer.Size;
+            double charWidth = document.Typeface.Width;
+            VTSize displaySize = document.Renderer.ContentSize;
 
             // 单独处理选中的是同一行的情况
             if (startRow == endRow)

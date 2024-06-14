@@ -98,8 +98,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 当大小改变的时候触发
         /// </summary>
-        /// <param name="oldSize"></param>
-        /// <param name="newSize"></param>
-        void OnSizeChanged(VTSize oldSize, VTSize newSize);
+        /// <param name="newSize">新的终端显示区域的大小</param>
+        void OnSizeChanged(VTSize newSize);
     }
 }

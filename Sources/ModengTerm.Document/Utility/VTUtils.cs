@@ -548,9 +548,9 @@ namespace ModengTerm.Document.Utility
 
             // 终端控件的初始宽度和高度，在打开Session的时候动态设置
             rowSize = (int)Math.Floor(displaySize.Height / typeface.Height);
-            colSize = (int)Math.Floor(displaySize.Width / typeface.SpaceWidth);
+            colSize = (int)Math.Floor(displaySize.Width / typeface.Width);
 
-            //Console.WriteLine("height = {0}, characterHeight = {1}, rows = {2}", contentArea.Height, typeface.Height, rowSize);
+            //logger.InfoFormat("计算行数, {0}, {1}, {2}", displaySize.Height, typeface.Height, rowSize);
         }
 
         public static void GetSegement(string text, int characterIndex, out int startIndex, out int endIndex)

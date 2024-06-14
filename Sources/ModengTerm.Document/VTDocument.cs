@@ -169,6 +169,9 @@ namespace ModengTerm.Document
         /// </summary>
         public VTextAttributeState AttributeState { get; private set; }
 
+        /// <summary>
+        /// 获取当前保存的光标状态
+        /// </summary>
         public VTCursorState CursorState { get { return cursorState; } }
 
         /// <summary>
@@ -213,11 +216,14 @@ namespace ModengTerm.Document
         /// </summary>
         public VTEventInput EventInput { get; private set; }
 
+        /// <summary>
+        /// 获取该文档的历史记录信息
+        /// </summary>
         public VTHistory History { get { return this.history; } }
 
         /// <summary>
         /// 获取滚动条可以滚动到的最大值
-        /// 该值和可以保存的最多历史记录条数有关
+        /// 滚动条的最大值不可以超出该值
         /// </summary>
         public int ScrollMax
         {
@@ -267,7 +273,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 创建一个新行，该行不挂在链表上
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="addToHistory">是否在历史行里新加一行</param>
         /// <returns></returns>
         private VTextLine CreateTextLine()
         {
@@ -280,8 +286,6 @@ namespace ModengTerm.Document
 
             textLine.Initialize();
 
-            this.history.AddHistory(textLine.History);
-
             return textLine;
         }
 
@@ -290,19 +294,19 @@ namespace ModengTerm.Document
         /// 并更新UI上的滚动条位置
         /// 注意该方法不会重新渲染界面，只修改文档模型
         /// </summary>
-        /// <param name="scrollValue">要显示的第一行历史记录</param>
+        /// <param name="physicsRow">要显示的第一行历史记录</param>
         /// <returns>如果进行了滚动，那么返回滚动数据，如果因为某种原因没进行滚动，那么返回空</returns>
-        private VTScrollData ScrollToHistory(int scrollValue)
+        private VTScrollData ScrollToHistory(int physicsRow)
         {
             // 要滚动的值和当前值是一样的，也不滚动
-            if (Scrollbar.ScrollValue == scrollValue)
+            if (Scrollbar.ScrollValue == physicsRow)
             {
                 return null;
             }
 
             // 判断要滚动的目标值合法性
-            if (scrollValue > Scrollbar.ScrollMax ||
-                scrollValue < Scrollbar.ScrollMin)
+            if (physicsRow > Scrollbar.ScrollMax ||
+                physicsRow < Scrollbar.ScrollMin)
             {
                 return null;
             }
@@ -313,7 +317,7 @@ namespace ModengTerm.Document
             int newCursorRow = 0;
 
             // 要滚动到的值
-            int newScroll = scrollValue;
+            int newScroll = physicsRow;
             // 滚动之前的值
             int oldScroll = Scrollbar.ScrollValue;
 
@@ -352,7 +356,7 @@ namespace ModengTerm.Document
                 {
                     removedLines.Add(current.History);
 
-                    int rowIndex = scrollValue + i;
+                    int rowIndex = physicsRow + i;
                     VTHistoryLine historyLine;
                     if (this.history.TryGetHistory(rowIndex, out historyLine))
                     {
@@ -396,9 +400,10 @@ namespace ModengTerm.Document
                         }
                         else
                         {
-                            // 有可能会找不到该行对应的历史记录，找不到就清空
+                            // 有可能会找不到该行对应的历史记录，此时说明该行还没有被打印过，新建一个空的历史行
                             // 打开终端 -> clear -> 滚到最上面 -> 再往下滚，就会复现
-                            firstLine.EraseAll();
+                            historyLine = new VTHistoryLine();
+                            firstLine.SetHistory(historyLine);
                         }
 
                         addedLines.Add(firstLine.History);
@@ -435,7 +440,7 @@ namespace ModengTerm.Document
             #endregion
 
             // 更新当前滚动条的值
-            Scrollbar.ScrollValue = scrollValue;
+            Scrollbar.ScrollValue = physicsRow;
 
             // 有可能光标所在行被滚动到了文档外，此时要更新ActiveLine，ActiveLine就是空的
             this.SetCursor(newCursorRow, this.Cursor.Column);
@@ -457,8 +462,10 @@ namespace ModengTerm.Document
         /// <param name="documentSize">文档的大小</param>
         /// <param name="scrollData">保存滚动数据</param>
         /// <returns>如果进行了滚动，那么返回滚动数据，如果因为某种原因没进行滚动，那么返回空</returns>
-        private VTScrollData ScrollIfCursorOutsideDocument(VTPoint mousePosition, VTSize documentSize)
+        private VTScrollData ScrollIfCursorOutsideDocument(VTPoint mousePosition)
         {
+            VTSize displaySize = this.Renderer.ContentSize;
+
             // 要滚动到的目标行
             int scrollTarget = -1;
 
@@ -471,7 +478,7 @@ namespace ModengTerm.Document
                     scrollTarget = Scrollbar.ScrollValue - 1;
                 }
             }
-            else if (mousePosition.Y > documentSize.Height)
+            else if (mousePosition.Y > displaySize.Height)
             {
                 // 光标在容器下面
                 if (!ScrollAtBottom)
@@ -506,7 +513,7 @@ namespace ModengTerm.Document
             double mouseY = mousePosition.Y;
 
             VTDocument document = this;
-            VTSize displaySize = this.Renderer.Size;
+            VTSize displaySize = this.Renderer.ContentSize;
 
             #region 先计算鼠标位于哪一行上
 
@@ -632,11 +639,13 @@ namespace ModengTerm.Document
             Selection.Initialize();
 
             Scrollbar = new VTScrollInfo(this);
+            Scrollbar.ViewportRow = this.options.ViewportRow;
             Scrollbar.Initialize();
 
             #region 初始化第一行，并设置链表首尾指针
 
             VTextLine firstLine = CreateTextLine();
+            this.history.AddHistory(firstLine.History);
             FirstLine = firstLine;
             LastLine = firstLine;
             ActiveLine = firstLine;
@@ -837,7 +846,7 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="character"></param>
         /// <param name="column"></param>
-        public void PrintCharacter(VTCharacter character, int column) 
+        public void PrintCharacter(VTCharacter character, int column)
         {
             this.ActiveLine.PrintCharacter(character, column);
         }
@@ -1019,6 +1028,21 @@ namespace ModengTerm.Document
 
             // 更新ActiveLine
             ActiveLine = FirstLine.FindNext(Cursor.Row);
+        }
+
+        /// <summary>
+        /// 删除所有文本数据
+        /// </summary>
+        public void DeleteAll()
+        {
+            VTextLine current = this.FirstLine;
+
+            while (current != null)
+            {
+                current.DeleteAll();
+
+                current = current.NextLine;
+            }
         }
 
         /// <summary>
@@ -1394,49 +1418,92 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="newRow"></param>
         /// <param name="newCol"></param>
-        public void Resize( int newRow,  int newCol)
+        public void Resize(int newRow, int newCol)
         {
             int oldRow = this.viewportRow;
             int oldCol = this.viewportColumn;
 
             if (newRow != oldRow)
             {
-                int rows = Math.Abs(newRow - oldRow);
+                VTScrollInfo scrollInfo = this.Scrollbar;
+
+                // 计算减了或者增加了多少行
+                int rows = Math.Abs(oldRow - newRow);
+
+                // 新的光标所在行
+                int newCursorRow = this.Cursor.Row;
+                // 第一行要显示的内容
+                int newScrollMax = scrollInfo.ScrollMax;
+
+                // 当前总行数
+                int allRows = this.history.Lines;
 
                 if (newRow > oldRow)
                 {
                     // 增加了行数
+
                     for (int i = 0; i < rows; i++)
                     {
                         VTextLine textLine = this.CreateTextLine();
                         this.LastLine.Append(textLine);
                     }
+
+                    // 总行数比显示区域的行数多的话更新显示区域的数据
+                    if (allRows > newRow)
+                    {
+                        newCursorRow += rows;
+                        newScrollMax = scrollInfo.ScrollValue - rows;
+                    }
                 }
                 else
                 {
-                    // 删除了行数
+                    // 减少了行数
+
+                    // 从文档上面删除减少了的行数
                     for (int i = 0; i < rows; i++)
                     {
-                        this.RemoveLine(this.LastLine);
                         this.LastLine.Release();
+
+                        this.RemoveLine(this.LastLine);
+                    }
+
+                    if (allRows > newRow)
+                    {
+                        newCursorRow -= rows;
+                        newScrollMax = scrollInfo.ScrollValue + rows;
+                    }
+                }
+
+                // 更新文档显示内容，第一行显示scrollMax
+                if (allRows > newRow)
+                {
+                    scrollInfo.ScrollMax = newScrollMax;
+                    scrollInfo.ScrollValue = newScrollMax;
+
+                    VTextLine textLine = this.FirstLine;
+                    for (int i = 0; i < newRow; i++)
+                    {
+                        VTHistoryLine historyLine;
+                        if (this.History.TryGetHistory(newScrollMax + i, out historyLine))
+                        {
+                            textLine.SetHistory(historyLine);
+                        }
+                        else
+                        {
+                            historyLine = new VTHistoryLine();
+                            textLine.SetHistory(historyLine);
+                        }
+
+                        textLine = textLine.NextLine;
                     }
                 }
 
                 // 更新滚动条信息
-
-                if (this.options.ScrollbackMax > 0)
-                {
-                    int scrollMax = this.History.Lines - newRow;
-                    if (scrollMax > 0)
-                    {
-                        this.Scrollbar.ScrollMax = Math.Min(scrollMax, this.ScrollMax);
-                        this.Scrollbar.ScrollValue = this.Scrollbar.ScrollMax;
-                    }
-                }
+                scrollInfo.ViewportRow = newRow;
 
                 #region 更新光标所在行
 
-                // 思路是保持光标所在行不变
+                this.SetCursor(newCursorRow, this.Cursor.Column);
 
                 #endregion
             }
@@ -1534,6 +1601,9 @@ namespace ModengTerm.Document
                 return;
             }
 
+            // 整体思路是算出来StartTextPointer和EndTextPointer之间的几何图形
+            // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
+
             if (!selectionState)
             {
                 // 此时说明开始选中操作
@@ -1542,10 +1612,6 @@ namespace ModengTerm.Document
             }
 
             VTPoint mouseLocation = new VTPoint(mouseData.X, mouseData.Y);
-
-            // 整体思路是算出来StartTextPointer和EndTextPointer之间的几何图形
-            // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
-            VTSize size = Renderer.Size;
 
             // 如果还没有测量起始字符，那么测量起始字符
             if (startPointer.ColumnIndex == -1)
@@ -1560,7 +1626,7 @@ namespace ModengTerm.Document
 
             // 首先检测鼠标是否在Surface边界框的外面
             // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
-            VTScrollData scrollData = ScrollIfCursorOutsideDocument(mouseLocation, size);
+            VTScrollData scrollData = ScrollIfCursorOutsideDocument(mouseLocation);
 
             // 更新当前鼠标的命中信息，保存在endPointer里
             if (!GetTextPointer(mouseLocation, endPointer))
@@ -1570,8 +1636,6 @@ namespace ModengTerm.Document
             }
 
             // 重新渲染
-            // PerformDrawing会更新TextSelection的形状
-
             this.Selection.MakeInvalidate();
 
             // 此处要全部刷新，因为有可能会触发ScrollIfCursorOutsideDocument
@@ -1656,7 +1720,7 @@ namespace ModengTerm.Document
         private void OnScrollChanged(ScrollChangedData changed)
         {
             VTScrollData scrollData = this.ScrollTo(changed.NewScroll);
-            if (scrollData == null) 
+            if (scrollData == null)
             {
                 return;
             }

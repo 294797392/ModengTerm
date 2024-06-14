@@ -28,7 +28,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="0"/>
+            <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent">
@@ -66,9 +66,6 @@
                     Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
                     BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
                     BorderThickness="0,1,0,0"/>
-
-            <ToggleButton Grid.Column="0" x:Name="ToggleButtonLoggerSetting" Content="日志设置" 
-                          Width="60" Height="25" HorizontalAlignment="Left" Margin="5,0,0,0"/>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
 

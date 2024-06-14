@@ -44,7 +44,7 @@ namespace ModengTerm.Document.Demo
                 FontSize = 12,
                 FontFamily = "宋体",
                 Height = formattedText.Height,
-                SpaceWidth = formattedText.WidthIncludingTrailingWhitespace,
+                Width = formattedText.WidthIncludingTrailingWhitespace,
                 BackgroundColor = String.Empty,
                 ForegroundColor = "0,0,0,255"
             };

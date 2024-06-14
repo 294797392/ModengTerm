@@ -18,11 +18,6 @@ namespace ModengTerm.Document.Drawing
         string Name { get; set; }
 
         /// <summary>
-        /// 获取文档像素大小
-        /// </summary>
-        VTSize Size { get; }
-
-        /// <summary>
         /// 获取文档里的滚动条接口
         /// </summary>
         VTScrollbar Scrollbar { get; }
@@ -31,6 +26,16 @@ namespace ModengTerm.Document.Drawing
         /// 设置文档的可见性
         /// </summary>
         bool Visible { get; set; }
+
+        /// <summary>
+        /// 获取显示内容区域的像素大小
+        /// </summary>
+        VTSize ContentSize { get; }
+
+        /// <summary>
+        /// 设置文档内容距离文档的边距
+        /// </summary>
+        double ContentMargin { get; set; }
 
         /// <summary>
         /// 创建一个绘图对象

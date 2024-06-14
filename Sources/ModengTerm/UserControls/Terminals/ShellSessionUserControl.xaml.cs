@@ -186,7 +186,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private void TerminalContentUserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.videoTerminal.OnSizeChanged(e.PreviousSize.ToVTSize(), e.NewSize.ToVTSize());
+            this.videoTerminal.OnSizeChanged(DocumentMain.ContentSize);
         }
 
 
@@ -228,14 +228,20 @@ namespace ModengTerm.Terminal.UserControls
             BorderBackground.Background = DrawingUtils.GetBrush(background);
 
             double margin = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
-            DocumentAlternate.Margin = new Thickness(margin);
-            DocumentAlternate.Surface.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
-            DocumentAlternate.Surface.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
-            DocumentAlternate.Surface.PreviewMouseMove += Surface_PreviewMouseMove;
-            DocumentMain.Margin = new Thickness(margin);
-            DocumentMain.Surface.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
-            DocumentMain.Surface.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
-            DocumentMain.Surface.PreviewMouseMove += Surface_PreviewMouseMove;
+            DocumentAlternate.ContentMargin = margin;
+            DocumentAlternate.Content.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
+            DocumentAlternate.Content.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
+            DocumentAlternate.Content.PreviewMouseMove += Surface_PreviewMouseMove;
+            DocumentMain.ContentMargin = margin;
+            DocumentMain.Content.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
+            DocumentMain.Content.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
+            DocumentMain.Content.PreviewMouseMove += Surface_PreviewMouseMove;
+
+            // 设置了ContentMargin，等待界面加载完毕
+            // TODO：
+            // 设置了ContentMargin之后，不会立即更新ActualWidth和ActualHeight，要等Loaded之后才能获取到
+            // 暂时没找到更好的办法去获取到设置了Margin之后的ContentSize
+            base.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Loaded); 
 
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
@@ -253,12 +259,12 @@ namespace ModengTerm.Terminal.UserControls
         {
             this.SizeChanged -= TerminalContentUserControl_SizeChanged;
 
-            DocumentAlternate.Surface.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
-            DocumentAlternate.Surface.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
-            DocumentAlternate.Surface.PreviewMouseMove -= Surface_PreviewMouseMove;
-            DocumentMain.Surface.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
-            DocumentMain.Surface.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
-            DocumentMain.Surface.PreviewMouseMove -= Surface_PreviewMouseMove;
+            DocumentAlternate.Content.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
+            DocumentAlternate.Content.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
+            DocumentAlternate.Content.PreviewMouseMove -= Surface_PreviewMouseMove;
+            DocumentMain.Content.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
+            DocumentMain.Content.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
+            DocumentMain.Content.PreviewMouseMove -= Surface_PreviewMouseMove;
 
             this.shellSession.Close();
             this.videoTerminal = null;

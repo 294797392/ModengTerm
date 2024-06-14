@@ -61,8 +61,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 可以滚动到的最小值
-        /// 也就是滚动条滚动到顶的时候，文档里的第一行的PhysicsRow
-        /// 这个值在ScrollMax改变的时候更新（在ScrollMax的属性set访问器里更新）
+        /// 该值永远是0
         /// </summary>
         public int ScrollMin { get; private set; }
 
@@ -116,6 +115,21 @@ namespace ModengTerm.Document
             }
         }
 
+        /// <summary>
+        /// 文档可视区域的行数
+        /// </summary>
+        public int ViewportRow
+        {
+            get { return this.viewportRow; }
+            set
+            {
+                if (this.viewportRow != value)
+                {
+                    this.viewportRow = value;
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -156,7 +170,7 @@ namespace ModengTerm.Document
                     display = true;
                 }
 
-                this.scrollbar.ViewportRow = this.ownerDocument.ViewportRow;
+                this.scrollbar.ViewportRow = this.viewportRow;
                 this.scrollbar.Maximum = this.ScrollMax;
                 this.scrollbar.Value = this.ScrollValue;
             }

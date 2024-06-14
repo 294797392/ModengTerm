@@ -187,7 +187,7 @@ namespace ModengTerm.Document
             {
                 case VTCursorStyles.Block:
                     {
-                        VTRect cursorRect = new VTRect(0, 0, Typeface.SpaceWidth, Typeface.Height);
+                        VTRect cursorRect = new VTRect(0, 0, Typeface.Width, Typeface.Height);
                         this.DrawingObject.DrawRectangle(cursorRect, null, backColor);
                         break;
                     }
@@ -201,7 +201,7 @@ namespace ModengTerm.Document
 
                 case VTCursorStyles.Underscore:
                     {
-                        VTRect cursorRect = new VTRect(0, Typeface.Height - 2, Typeface.SpaceWidth, 2);
+                        VTRect cursorRect = new VTRect(0, Typeface.Height - 2, Typeface.Width, 2);
                         this.DrawingObject.DrawRectangle(cursorRect, null, backColor);
                         break;
                     }

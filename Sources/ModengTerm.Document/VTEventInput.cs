@@ -95,6 +95,10 @@ namespace ModengTerm.Document
         public MouseDownDelegate OnMouseDown;
         public MouseMoveDelegate OnMouseMove;
         public MouseUpDelegate OnMouseUp;
+
+        /// <summary>
+        /// 滚动条滚动事件不触发，手动滚动滚动条的时候触发
+        /// </summary>
         public ScrollChangedDelegate OnScrollChanged;
     }
 }

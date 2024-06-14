@@ -21,7 +21,7 @@ namespace ModengTerm.Document
         /// 注意每个字符的宽度可能都不是一样的
         /// 这个宽度是空白字符的宽度
         /// </summary>
-        public double SpaceWidth { get; set; }
+        public double Width { get; set; }
 
         /// <summary>
         /// 字体样式

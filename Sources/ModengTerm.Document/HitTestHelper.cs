@@ -67,7 +67,7 @@ namespace ModengTerm.Document
             characterHitRange = VTextRange.Empty;
 
             // 这种计算方式只适用于等宽字体
-            columnIndexHit = (int)Math.Min(Math.Floor(cursorX / textLine.Typeface.SpaceWidth), textLine.OwnerDocument.ViewportColumn - 1);
+            columnIndexHit = (int)Math.Min(Math.Floor(cursorX / textLine.Typeface.Width), textLine.OwnerDocument.ViewportColumn - 1);
 
             charIndexHit = textLine.FindCharacterIndex(columnIndexHit);
             if (charIndexHit >= 0)

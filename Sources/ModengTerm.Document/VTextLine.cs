@@ -581,6 +581,7 @@ namespace ModengTerm.Document
 
         protected override void OnRelease()
         {
+            this.History = null;
         }
 
         protected override void OnRender()
