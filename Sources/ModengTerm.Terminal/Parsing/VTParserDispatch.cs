@@ -109,7 +109,17 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // 这三个都是LF
                         this.TraceAction("LF");
+
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
+
                         this.DispatchHandler.LineFeed();
+
+                        int newRow = this.DispatchHandler.CursorRow;
+                        int newCol = this.DispatchHandler.CursorCol;
+                        
+                        VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
+
                         break;
                     }
 
@@ -178,13 +188,25 @@ namespace ModengTerm.Terminal.Parsing
 
                         VTEraseType eraseType = (VTEraseType)VTParameter.GetParameter(parameters, 0, 0);
 
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
+
                         this.DispatchHandler.EraseDisplay(eraseType);
+
+                        int newRow = this.DispatchHandler.CursorRow;
+                        int newCol = this.DispatchHandler.CursorCol;
+
+                        VTDebug.Context.WriteInteractive("EraseDisplay", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, eraseType);
+
                         break;
                     }
 
                 case CsiActionCodes.HVP_HorizontalVerticalPosition:
                 case CsiActionCodes.CUP_CursorPosition:
                     {
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
+
                         int row = 0, col = 0;
                         if (parameters.Count == 2)
                         {
@@ -209,8 +231,6 @@ namespace ModengTerm.Terminal.Parsing
                             {
                                 col = viewportColumn - 1;
                             }
-
-                            VTDebug.Context.WriteInteractive("CUP_CursorPosition", "{0},{1},{2},{3}", newrow, newcol, row, col);
                         }
                         else
                         {
@@ -218,6 +238,12 @@ namespace ModengTerm.Terminal.Parsing
                         }
 
                         this.DispatchHandler.CUP_CursorPosition(row, col);
+
+                        int newRow = this.DispatchHandler.CursorRow;
+                        int newCol = this.DispatchHandler.CursorCol;
+
+                        VTDebug.Context.WriteInteractive("CUP_CursorPosition", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
+
                         break;
                     }
 
@@ -557,9 +583,18 @@ namespace ModengTerm.Terminal.Parsing
 
                 case EscActionCodes.RI_ReverseLineFeed:
                     {
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
+
                         // Performs a "Reverse line feed", essentially, the opposite of '\n'.
                         //    Moves the cursor up one line, and tries to keep its position in the line
                         this.DispatchHandler.RI_ReverseLineFeed();
+
+                        int newRow = this.DispatchHandler.CursorRow;
+                        int newCol = this.DispatchHandler.CursorCol;
+
+                        VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
+
                         break;
                     }
 
@@ -758,7 +793,7 @@ namespace ModengTerm.Terminal.Parsing
 
         private void TraceAction(string action)
         {
-            VTDebug.Context.Writevttest(action, this.sequenceBytes);
+            VTDebug.Context.WriteCode(action, this.sequenceBytes);
             this.sequenceBytes.Clear();
         }
 

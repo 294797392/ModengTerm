@@ -10,7 +10,7 @@ namespace XTerminal.Base.Definitions
     public class FontFamilyDefinition
     {
         /// <summary>
-        /// 字体名字
+        /// 显示给用户选择的名字
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }

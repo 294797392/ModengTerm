@@ -347,8 +347,8 @@ namespace ModengTerm.Terminal.Session
         private void Stream_ErrorOccurred(object sender, Renci.SshNet.Common.ExceptionEventArgs e)
         {
             logger.Error("SshNet Stream_ErrorOccurred", e.Exception);
+            this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
             this.CloseDriver();
-            this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
         }
 
         private void Stream_DataReceived(object sender, Renci.SshNet.Common.ShellDataEventArgs e)

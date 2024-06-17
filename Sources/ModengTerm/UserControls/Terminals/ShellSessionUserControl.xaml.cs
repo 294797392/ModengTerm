@@ -186,7 +186,9 @@ namespace ModengTerm.Terminal.UserControls
 
         private void TerminalContentUserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.videoTerminal.OnSizeChanged(DocumentMain.ContentSize);
+            WPFDocument document = this.GetActiveDocument();
+
+            this.videoTerminal.OnSizeChanged(document.ContentSize);
         }
 
 

@@ -31,7 +31,7 @@
                     <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
                     <mtermcontrols:MTermButton Grid.Column="2" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2"
-                                               SVGColor="Black" Tag="{Binding}" MouseOverBrush="Silver" MouseDownBrush="Silver"
+                                               SVGColor="Black" Tag="{Binding}" MouseOverBrush="Silver" MouseDownBrush="#9E9E9E"
                                                Visibility="Collapsed" Width="20" Height="20"
                                                SVGPath="M512 466.944l233.472-233.472a31.744 31.744 0 0 1 45.056 45.056L557.056 512l233.472 233.472a31.744 31.744 0 0 1-45.056 45.056L512 557.056l-233.472 233.472a31.744 31.744 0 0 1-45.056-45.056L466.944 512 233.472 278.528a31.744 31.744 0 0 1 45.056-45.056z"
                                                Click="ButtonCloseSession_Click" Style="{StaticResource ResourceKey=StyleMTermButton}"/>
@@ -47,10 +47,9 @@
             </DataTemplate>
 
             <DataTemplate x:Key="DataTemplateOpenSession">
-                <mtermcontrols:MTermButton Content="+" FontWeight="Bold" FontSize="16" Width="25" Height="25" CornerRadius="0,0,0,0"
+                <mtermcontrols:MTermButton Content="+" FontWeight="Bold" FontSize="16" Width="25" Height="25" CornerRadius="2"
                                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                                           VerticalAlignment="Bottom"
-                                           MouseOverBrush="Silver" MouseDownBrush="Silver"
+                                           MouseOverBrush="Silver" MouseDownBrush="#9E9E9E"
                                            Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMTermButton}"/>
             </DataTemplate>
 

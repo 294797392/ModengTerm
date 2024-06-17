@@ -163,6 +163,17 @@ namespace ModengTerm.Terminal
         public int ViewportColumn { get { return this.activeDocument.ViewportColumn; } }
 
         /// <summary>
+        /// 获取当前光标所在行
+        /// </summary>
+        public int CursorRow { get { return Cursor.Row; } }
+
+        /// <summary>
+        /// 获取当前光标所在列
+        /// 下一个字符要显示的位置
+        /// </summary>
+        public int CursorCol { get { return Cursor.Column; } }
+
+        /// <summary>
         /// 会话名字
         /// </summary>
         public string Name { get; set; }
@@ -171,17 +182,6 @@ namespace ModengTerm.Terminal
         /// 获取当前光标所在行
         /// </summary>
         private VTextLine ActiveLine { get { return this.activeDocument.ActiveLine; } }
-
-        /// <summary>
-        /// 获取当前光标所在行
-        /// </summary>
-        private int CursorRow { get { return Cursor.Row; } }
-
-        /// <summary>
-        /// 获取当前光标所在列
-        /// 下一个字符要显示的位置
-        /// </summary>
-        private int CursorCol { get { return Cursor.Column; } }
 
         /// <summary>
         /// activeDocument的光标信息
@@ -622,7 +622,7 @@ namespace ModengTerm.Terminal
             }
 
             // 对Document执行Resize
-            // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的，暂时先这样
+            // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的？暂时先这样
             // 遇到过一种情况：如果终端名称不正确，比如XTerm，那么当行数增加的时候，光标会移动到该行的最右边，终端名称改成xterm就没问题了
             // 目前的实现思路是：如果是减少行，那么从第一行开始删除；如果是增加行，那么从最后一行开始新建行。不考虑ScrollMargin
 
@@ -850,8 +850,15 @@ namespace ModengTerm.Terminal
         {
             // CR
             // 把光标移动到行开头
-            VTDebug.Context.WriteInteractive("CarriageReturn", "{0},{1}", CursorRow, CursorCol);
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+            
             activeDocument.SetCursor(CursorRow, 0);
+
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol;
+
+            VTDebug.Context.WriteInteractive("CarriageReturn", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }
 
         // 换行和反向换行
@@ -859,8 +866,6 @@ namespace ModengTerm.Terminal
         {
             // LF
             // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
-
-            VTDebug.Context.WriteInteractive("LineFeed", "{0},{1}", CursorRow, CursorCol);
 
             // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
             // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
@@ -937,8 +942,6 @@ namespace ModengTerm.Terminal
 
         public void RI_ReverseLineFeed()
         {
-            VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", string.Empty);
-
             // 和LineFeed相反，也就是把光标往上移一个位置
             // 在用man命令的时候往上滚动会触发这个指令
             // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
@@ -1007,8 +1010,6 @@ namespace ModengTerm.Terminal
 
         public void EraseDisplay(VTEraseType eraseType)
         {
-            VTDebug.Context.WriteInteractive("EraseDisplay", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
-
             switch (eraseType)
             {
                 // In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.

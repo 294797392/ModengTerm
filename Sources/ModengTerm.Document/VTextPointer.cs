@@ -28,7 +28,8 @@ namespace ModengTerm.Document
         public int ColumnIndex { get; set; }
 
         public VTextPointer()
-        { }
+        {
+        }
 
         public VTextPointer(int physicsRow, int characterIndex, int columnIndex)
         {

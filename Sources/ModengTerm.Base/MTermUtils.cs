@@ -34,10 +34,9 @@ namespace ModengTerm.Base
         {
             switch (sessionType)
             {
-                case SessionTypeEnum.libvtssh:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.SSH:
-                case SessionTypeEnum.Win32CommandLine:
+                case SessionTypeEnum.HostCommandLine:
                     {
                         return true;
                     }

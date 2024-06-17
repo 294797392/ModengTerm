@@ -23,10 +23,9 @@ namespace ModengTerm.ViewModels
         {
             switch ((SessionTypeEnum)session.Type)
             {
-                case SessionTypeEnum.libvtssh:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.SSH:
-                case SessionTypeEnum.Win32CommandLine:
+                case SessionTypeEnum.HostCommandLine:
                     {
                         MainWindow mainWindow = App.Current.MainWindow as MainWindow;
 

@@ -45,8 +45,8 @@ namespace ModengTerm.Document
 
         #region SelectionRange
 
-        VTextPointer startPointer;
-        VTextPointer endPointer;
+        private VTextPointer startPointer;
+        private VTextPointer endPointer;
 
         /// <summary>
         /// 当前鼠标是否处于Selection状态
@@ -259,7 +259,9 @@ namespace ModengTerm.Document
             };
             cursorState = new VTCursorState();
             startPointer = new VTextPointer();
+            startPointer.ColumnIndex = -1;
             endPointer = new VTextPointer();
+            endPointer.ColumnIndex = -1;
             scrollDelta = options.ScrollDelta;
             AttributeState = new VTextAttributeState();
             viewportRow = options.ViewportRow;

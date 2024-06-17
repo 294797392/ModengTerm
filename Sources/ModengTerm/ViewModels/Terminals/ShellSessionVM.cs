@@ -133,6 +133,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// 数据流解析器
         /// </summary>
         private VTParser vtParser;
+        private string uri;
 
         #endregion
 
@@ -187,6 +188,22 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     this.sendAll = value;
                     this.NotifyPropertyChanged("SendAll");
+                }
+            }
+        }
+
+        /// <summary>
+        /// SSH主机的Uri
+        /// </summary>
+        public string Uri
+        {
+            get { return this.uri; }
+            private set
+            {
+                if (this.uri != value)
+                {
+                    this.uri = value;
+                    this.NotifyPropertyChanged("Uri");
                 }
             }
         }
@@ -345,6 +362,8 @@ namespace ModengTerm.Terminal.ViewModels
 
             #endregion
 
+            this.Uri = this.InitializeURI();
+
             this.isRunning = true;
 
             return ResponseCode.SUCCESS;
@@ -484,6 +503,41 @@ namespace ModengTerm.Terminal.ViewModels
                 AddedLines = addedLines,
                 RemovedLines = removedLines
             };
+        }
+
+        private string InitializeURI()
+        {
+            string uri = string.Empty;
+
+            switch ((SessionTypeEnum)this.Session.Type)
+            {
+                case SessionTypeEnum.HostCommandLine:
+                    {
+                        break;
+                    }
+
+                case SessionTypeEnum.SSH:
+                    {
+                        string userName = this.Session.GetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME);
+                        string hostName = this.Session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
+                        int port = this.Session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
+                        uri = string.Format("ssh://{0}@{1}:{2}", userName, hostName, port);
+                        break;
+                    }
+
+                case SessionTypeEnum.SerialPort:
+                    {
+                        string portName = this.Session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
+                        int baudRate = this.Session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
+                        uri = string.Format("serialPort://{0} {1}", portName, baudRate);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return uri;
         }
 
         #endregion
@@ -769,7 +823,7 @@ namespace ModengTerm.Terminal.ViewModels
             if ((bool)recordOptionsWindow.ShowDialog())
             {
                 XTermSession playbackSession = JSONHelper.CloneObject<XTermSession, XTermSession>(this.Session);
-                playbackSession.Type = (int)SessionTypeEnum.Playback;
+                playbackSession.Type = (int)SessionTypeEnum.SSHPlayback;
 
                 PlaybackFile playbackFile = new PlaybackFile()
                 {

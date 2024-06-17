@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using XTerminal.Base.Definitions;
@@ -58,9 +59,8 @@ namespace ModengTerm
             switch (type)
             {
                 case SessionTypeEnum.SerialPort: return "串口";
-                case SessionTypeEnum.libvtssh:
                 case SessionTypeEnum.SSH: return "SSH";
-                case SessionTypeEnum.Win32CommandLine: return "命令行";
+                case SessionTypeEnum.HostCommandLine: return "命令行";
                 case SessionTypeEnum.SFTP: return "SFTP";
 
                 default:
@@ -220,6 +220,21 @@ namespace ModengTerm
             //}
             //return brush;
             return Brushes.Black;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SessionStatus2VisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            SessionStatusEnum visibleStatus = (SessionStatusEnum)parameter;
+            SessionStatusEnum currentStatus = (SessionStatusEnum)value;
+            return visibleStatus == currentStatus ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

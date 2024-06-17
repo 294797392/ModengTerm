@@ -23,6 +23,9 @@ namespace ModengTerm.Terminal.Parsing
         /// </summary>
         int ViewportColumn { get; }
 
+        int CursorRow { get; }
+        int CursorCol { get; }
+
         void PlayBell();
         void Backspace();
         void ForwardTab();

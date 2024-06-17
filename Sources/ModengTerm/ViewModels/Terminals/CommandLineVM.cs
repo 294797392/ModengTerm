@@ -11,13 +11,13 @@ using System.Windows;
 
 namespace ModengTerm.ViewModels.Terminals
 {
-    public class MTermSessionVM : InputSessionVM
+    public class CommandLineVM : InputSessionVM
     {
         private VTDocument document;
 
         public IDocumentRenderer DrawingDocument { get; set; }
 
-        public MTermSessionVM() : 
+        public CommandLineVM() : 
             base(null)
         { 
         }

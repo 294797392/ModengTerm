@@ -14,14 +14,20 @@
       <appender-ref ref="ColoredConsoleAppender"/>
     </root>
 	    
-	<logger name="vttest">
+	<logger name="code">
       <level value="OFF" />
-      <appender-ref ref="vttestFileAppender" />
+      <appender-ref ref="codeFileAppender" />
     </logger>
 	
-	<appender name="vttestFileAppender" type="log4net.Appender.RollingFileAppender">
+	<logger name="interactive">
+      <level value="ALL" />
+      <appender-ref ref="interactiveFileAppender" />
+    </logger>
+
+	
+	<appender name="codeFileAppender" type="log4net.Appender.RollingFileAppender">
       <param name="Encoding" value="utf-8" />
-      <param name="File" value="vttest.log" />
+      <param name="File" value="code.log" />
       <param name="AppendToFile" value="true" />
       <param name="MaxSizeRollBackups" value="1" />
       <param name="MaximumFileSize" value="30MB" />
@@ -32,6 +38,21 @@
 		</layout>
 	  <lockingModel type="log4net.Appender.FileAppender+MinimalLock"/>
     </appender>
+	
+	<appender name="interactiveFileAppender" type="log4net.Appender.RollingFileAppender">
+      <param name="Encoding" value="utf-8" />
+      <param name="File" value="interactive.log" />
+      <param name="AppendToFile" value="true" />
+      <param name="MaxSizeRollBackups" value="1" />
+      <param name="MaximumFileSize" value="30MB" />
+      <param name="RollingStyle" value="Size" />
+      <param name="StaticLogFileName" value="true" />
+	  	<layout type="log4net.Layout.PatternLayout">
+			<conversionPattern value="%message%newline" />
+		</layout>
+	  <lockingModel type="log4net.Appender.FileAppender+MinimalLock"/>
+    </appender>
+
 
 
     <appender name="RollingFileAppender" type="log4net.Appender.RollingFileAppender">

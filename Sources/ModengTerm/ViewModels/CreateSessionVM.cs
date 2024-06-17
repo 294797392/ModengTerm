@@ -30,14 +30,6 @@ namespace ModengTerm.ViewModels
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionVM");
 
-        /// <summary>
-        /// 优先选择这些字体
-        /// </summary>
-        public static readonly List<string> DefaultFontFamilies = new List<string>()
-        {
-            "Consolas", "宋体", "微软雅黑", "Yahei"
-        };
-
         #region 实例变量
 
         private string sshPort;
@@ -94,10 +86,9 @@ namespace ModengTerm.ViewModels
                     // 根据不同的会话类型，切换不同的配置选项树形列表
                     switch (value.Type)
                     {
-                        case SessionTypeEnum.libvtssh:
                         case SessionTypeEnum.SerialPort:
                         case SessionTypeEnum.SSH:
-                        case SessionTypeEnum.Win32CommandLine:
+                        case SessionTypeEnum.HostCommandLine:
                             {
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 break;
@@ -358,7 +349,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 光标颜色
         /// </summary>
-        public Color CursorColor 
+        public Color CursorColor
         {
             get { return this.cursorColor; }
             set
@@ -390,12 +381,12 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 背景色
         /// </summary>
-        public Color BackColor 
+        public Color BackColor
         {
             get { return this.backColor; }
             set
             {
-                if(this.backColor != value) 
+                if (this.backColor != value)
                 {
                     this.backColor = value;
                     this.NotifyPropertyChanged("BackColor");
@@ -408,7 +399,7 @@ namespace ModengTerm.ViewModels
             get { return this.highlightBackColor; }
             set
             {
-                if (this.highlightBackColor != value) 
+                if (this.highlightBackColor != value)
                 {
                     this.highlightBackColor = value;
                     this.NotifyPropertyChanged("HighlightBackColor");
@@ -434,7 +425,7 @@ namespace ModengTerm.ViewModels
             get { return this.selectionColor; }
             set
             {
-                if (this.selectionColor != value) 
+                if (this.selectionColor != value)
                 {
                     this.selectionColor = value;
                     this.NotifyPropertyChanged("SelectionColor");
@@ -599,20 +590,6 @@ namespace ModengTerm.ViewModels
         #endregion
 
         #region 实例方法
-
-        private FontFamilyDefinition GetDefaultFontFamily()
-        {
-            foreach (string fontFamily in DefaultFontFamilies)
-            {
-                FontFamilyDefinition defaultFont = this.FontFamilyList.FirstOrDefault(v => v.Value == fontFamily);
-                if (defaultFont != null)
-                {
-                    return defaultFont;
-                }
-            }
-
-            return null;
-        }
 
         private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
         {
@@ -845,7 +822,7 @@ namespace ModengTerm.ViewModels
             }
 
             int maxCliboardHistory;
-            if(!int.TryParse(this.MaxClipboardHistory, out maxCliboardHistory))
+            if (!int.TryParse(this.MaxClipboardHistory, out maxCliboardHistory))
             {
                 MTMessageBox.Info("请输入正确的剪贴板历史记录数");
                 return false;
@@ -904,9 +881,21 @@ namespace ModengTerm.ViewModels
         private void SwitchTheme(ThemePackage theme)
         {
             // 加载系统已安装的所有字体
+            this.FontFamilyList.Clear();
             InstalledFontCollection installedFont = new InstalledFontCollection();
-            this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
-            this.FontFamilyList.SelectedItem = this.GetDefaultFontFamily();
+            foreach (FontFamilyDefinition ffd in this.terminalManifest.FontFamilyList)
+            {
+                if (installedFont.Families.FirstOrDefault(v => v.Name == ffd.Value) != null)
+                {
+                    this.FontFamilyList.Add(ffd);
+                }
+            }
+            // 如果所有的预定义字体都不存在于当前系统里安装的字体，那么把当前系统里的所有字体加进去
+            if (this.FontFamilyList.Count == 0)
+            {
+                this.FontFamilyList.AddRange(installedFont.Families.Select(v => new FontFamilyDefinition() { Name = v.Name, Value = v.Name }));
+            }
+            this.FontFamilyList.SelectedItem = this.FontFamilyList.FirstOrDefault();
 
             this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault();
 
@@ -939,7 +928,6 @@ namespace ModengTerm.ViewModels
 
             switch (sessionType.Type)
             {
-                case SessionTypeEnum.libvtssh:
                 case SessionTypeEnum.SSH:
                     {
                         if (!this.GetSSHSessionOptions(session))
@@ -949,7 +937,7 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.Win32CommandLine:
+                case SessionTypeEnum.HostCommandLine:
                     {
                         break;
                     }

@@ -32,16 +32,7 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.ForegroundRed: return VTColorIndex.DarkRed;
                 case GraphicsOptions.ForegroundMagenta: return VTColorIndex.DarkMagenta;
                 case GraphicsOptions.ForegroundYellow: return VTColorIndex.DarkYellow;
-                case GraphicsOptions.ForegroundWhite: return VTColorIndex.DarkBlack;
-
-                case GraphicsOptions.BackgroundBlack: return VTColorIndex.DarkBlack;
-                case GraphicsOptions.BackgroundBlue: return VTColorIndex.DarkBlue;
-                case GraphicsOptions.BackgroundGreen: return VTColorIndex.DarkGreen;
-                case GraphicsOptions.BackgroundCyan: return VTColorIndex.DarkCyan;
-                case GraphicsOptions.BackgroundRed: return VTColorIndex.DarkRed;
-                case GraphicsOptions.BackgroundMagenta: return VTColorIndex.DarkMagenta;
-                case GraphicsOptions.BackgroundYellow: return VTColorIndex.DarkYellow;
-                case GraphicsOptions.BackgroundWhite: return VTColorIndex.DarkWhite;
+                case GraphicsOptions.ForegroundWhite: return VTColorIndex.DarkWhite;
 
                 case GraphicsOptions.BrightForegroundBlack: return VTColorIndex.BrightBlack;
                 case GraphicsOptions.BrightForegroundBlue: return VTColorIndex.BrightBlue;
@@ -51,6 +42,15 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.BrightForegroundMagenta: return VTColorIndex.BrightMagenta;
                 case GraphicsOptions.BrightForegroundYellow: return VTColorIndex.BrightYellow;
                 case GraphicsOptions.BrightForegroundWhite: return VTColorIndex.BrightWhite;
+
+                case GraphicsOptions.BackgroundBlack: return VTColorIndex.DarkBlack;
+                case GraphicsOptions.BackgroundBlue: return VTColorIndex.DarkBlue;
+                case GraphicsOptions.BackgroundGreen: return VTColorIndex.DarkGreen;
+                case GraphicsOptions.BackgroundCyan: return VTColorIndex.DarkCyan;
+                case GraphicsOptions.BackgroundRed: return VTColorIndex.DarkRed;
+                case GraphicsOptions.BackgroundMagenta: return VTColorIndex.DarkMagenta;
+                case GraphicsOptions.BackgroundYellow: return VTColorIndex.DarkYellow;
+                case GraphicsOptions.BackgroundWhite: return VTColorIndex.DarkWhite;
 
                 case GraphicsOptions.BrightBackgroundBlack: return VTColorIndex.BrightBlack;
                 case GraphicsOptions.BrightBackgroundBlue: return VTColorIndex.BrightBlue;

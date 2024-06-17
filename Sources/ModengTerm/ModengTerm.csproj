@@ -28,7 +28,10 @@
 
   <ItemGroup>
     <None Remove="Images\close.png" />
+    <None Remove="Images\connect.png" />
     <None Remove="Images\error.png" />
+    <None Remove="Images\fail.png" />
+    <None Remove="Images\ok.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,7 +78,10 @@
 
   <ItemGroup>
     <Resource Include="Images\close.png" />
+    <Resource Include="Images\connect.png" />
     <Resource Include="Images\error.png" />
+    <Resource Include="Images\fail.png" />
+    <Resource Include="Images\ok.png" />
   </ItemGroup>
 
   <ItemGroup>

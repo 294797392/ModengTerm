@@ -122,9 +122,9 @@ namespace ModengTerm.Terminal
         }
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDebug");
-        private log4net.ILog vttestLogger = log4net.LogManager.GetLogger("vttest");
+        private log4net.ILog codeLogger = log4net.LogManager.GetLogger("code");
+        private log4net.ILog interactiveLogger = log4net.LogManager.GetLogger("interactive");
 
-        private LogCategory interactiveCategory;
         private LogCategory rawReadCategory;
         private Dictionary<VTDebugCategoryEnum, LogCategory> categoryMap;
         public List<LogCategory> Categories { get; private set; }
@@ -135,7 +135,6 @@ namespace ModengTerm.Terminal
             this.Categories = new List<LogCategory>();
             this.categoryMap = new Dictionary<VTDebugCategoryEnum, LogCategory>();
 
-            this.interactiveCategory = this.CreateCategory(VTDebugCategoryEnum.Interactive);
             this.rawReadCategory = this.CreateCategory(VTDebugCategoryEnum.RawRead);
         }
 
@@ -166,7 +165,7 @@ namespace ModengTerm.Terminal
 
         public void WriteInteractive(VTSendTypeEnum type, byte[] bytes)
         {
-            if (!this.CanWrite(this.interactiveCategory))
+            if (!interactiveLogger.IsDebugEnabled)
             {
                 return;
             }
@@ -177,36 +176,41 @@ namespace ModengTerm.Terminal
 
             string log = string.Format("-> [{0},{1}]", type, message);
 
-            File.AppendAllText(this.interactiveCategory.FilePath, log + Environment.NewLine);
+            interactiveLogger.Info(log);
         }
 
         public void WriteInteractive(VTSendTypeEnum type, StatusType statusType, byte[] bytes)
         {
-            if (!this.CanWrite(this.interactiveCategory))
+            if (!interactiveLogger.IsDebugEnabled)
             {
                 return;
             }
 
             string message = bytes.Select(v => ((int)v).ToString()).Join(",");
             string log = string.Format("-> [{0},{1},{2}]", type, statusType, message);
-            File.AppendAllText(this.interactiveCategory.FilePath, log + Environment.NewLine);
+            interactiveLogger.Info(log);
         }
 
         public void WriteInteractive(string action, string format, params object[] param)
         {
-            if (!this.CanWrite(this.interactiveCategory))
+            if (!interactiveLogger.IsDebugEnabled)
             {
                 return;
             }
 
             string message = string.Format(format, param);
             string log = string.Format("<- [{0},{1}]", action, message);
-            File.AppendAllText(this.interactiveCategory.FilePath, log + Environment.NewLine);
+            interactiveLogger.Info(log);
         }
 
 
-        public void Writevttest(string action, List<byte> sequence)
+        public void WriteCode(string action, List<byte> sequence)
         {
+            if (!codeLogger.IsDebugEnabled)
+            {
+                return;
+            }
+
             string varName = string.Format("{0}{1}", action, this.vttestCodeIndex++);
             string codeSequence = string.Empty;
 
@@ -227,7 +231,7 @@ namespace ModengTerm.Terminal
 
             string log = string.Format("char {0}[] = {{{1}}};printf({2}); // {3}", varName, codeSequence, varName, action);
 
-            this.vttestLogger.Info(log);
+            this.codeLogger.Info(log);
         }
 
 

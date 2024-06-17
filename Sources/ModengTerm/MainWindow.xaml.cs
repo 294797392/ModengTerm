@@ -33,7 +33,6 @@ namespace XTerminal
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window
-
     {
         #region 实例变量
 

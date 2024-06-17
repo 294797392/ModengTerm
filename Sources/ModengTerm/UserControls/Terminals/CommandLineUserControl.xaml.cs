@@ -20,22 +20,20 @@ using System.Windows.Shapes;
 namespace ModengTerm.UserControls.Terminals
 {
     /// <summary>
-    /// MTermSessionUserControl.xaml 的交互逻辑
+    /// CommandLineUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class MTermSessionUserControl : UserControl, ISessionContent
+    public partial class CommandLineUserControl : UserControl
     {
-        private MTermSessionVM sessionVM;
+        private CommandLineVM sessionVM;
 
-        public MTermSessionUserControl()
+        public CommandLineUserControl()
         {
             InitializeComponent();
         }
 
-        public XTermSession Session { get; set; }
-
         public int Open()
         {
-            this.sessionVM = base.DataContext as MTermSessionVM;
+            this.sessionVM = base.DataContext as CommandLineVM;
             this.sessionVM.Open();
 
             return ResponseCode.SUCCESS;
