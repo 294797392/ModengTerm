@@ -249,15 +249,24 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.CUF_CursorForward:
                     {
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
 
+                        VTDebug.Context.WriteInteractive("CUF_CursorForward", "{0},{1},{2}", oldRow, oldCol, n);
+
                         this.DispatchHandler.CUF_CursorForward(n);
+
                         break;
                     }
 
                 case CsiActionCodes.CUU_CursorUp:
                     {
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
+
+                        VTDebug.Context.WriteInteractive("CUU_CursorUp", "{0},{1},{2}", oldRow, oldCol, n);
 
                         this.DispatchHandler.CUU_CursorUp(n);
                         break;
@@ -265,7 +274,11 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.CUD_CursorDown:
                     {
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
+
+                        VTDebug.Context.WriteInteractive("CUD_CursorDown", "{0},{1},{2}", oldRow, oldCol, n);
 
                         this.DispatchHandler.CUD_CursorDown(n);
                         break;
@@ -473,14 +486,22 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.CHA_CursorHorizontalAbsolute:
                     {
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
                         // 将光标移动到当前行中的第n列
                         int n = VTParameter.GetParameter(parameters, 0, -1);
+
                         if (n == -1)
                         {
-                            break;
+                            VTDebug.Context.WriteInteractive("CHA_CursorHorizontalAbsolute", "{0},{1},{2}, n是-1, 不执行操作", oldRow, oldCol, n);
+                        }
+                        else
+                        {
+                            VTDebug.Context.WriteInteractive("CHA_CursorHorizontalAbsolute", "{0},{1},{2}", oldRow, oldCol, n);
+
+                            this.DispatchHandler.CHA_CursorHorizontalAbsolute(n - 1);
                         }
 
-                        this.DispatchHandler.CHA_CursorHorizontalAbsolute(n - 1);
                         break;
                     }
 

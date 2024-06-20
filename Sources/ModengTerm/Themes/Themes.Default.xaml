@@ -10,9 +10,6 @@
         </SolidColorBrush.Color>
     </SolidColorBrush>
 
-    <SolidColorBrush x:Key="BrushStatusBarBackground" Color="#E0E0E0"/>
-    <SolidColorBrush x:Key="BrushStatsuBarBorder" Color="Silver"/>
-
     <SolidColorBrush x:Key="BrushBackground1" Color="#938E8E" Opacity="0.7"/>
 
     <!-- 剪贴板历史记录 500 - 1000 -->
@@ -46,5 +43,14 @@
 
     <SolidColorBrush x:Key="Brush4004" Color="#36384C"/>
     <SolidColorBrush x:Key="Brush4005" Color="#333A44"/>
+
+
+    <SolidColorBrush x:Key="BrushStatusBarBackground" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="BrushStatsuBarBorder" Color="Silver"/>
+    <SolidColorBrush x:Key="BrushSessionSelected" Color="#6699CC"/>
+    <SolidColorBrush x:Key="BrushCloseSessionHover" Color="#99CCFF" Opacity="0.5"/>
+    <SolidColorBrush x:Key="BrushCloseSessionDown" Color="#99CCFF"/>
+    <SolidColorBrush x:Key="BrushOpenSessonHover" Color="Silver"/>
+    <SolidColorBrush x:Key="BrushOpenSessionDown" Color="#9E9E9E"/>
 
 </ResourceDictionary>

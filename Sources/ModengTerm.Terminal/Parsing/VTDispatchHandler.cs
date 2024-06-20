@@ -101,7 +101,7 @@ namespace ModengTerm.Terminal.Parsing
         void ATT610_StartCursorBlink(bool enable);
         void DECTCEM_TextCursorEnableMode(bool enable);
 
-        #region 字符集
+        #region 切换字符集
 
         void SS2_SingleShift();
         void SS3_SingleShift();

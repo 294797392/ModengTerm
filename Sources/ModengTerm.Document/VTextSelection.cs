@@ -186,28 +186,13 @@ namespace ModengTerm.Document
             // 单独处理选中的是同一行的情况
             if (startRow == endRow)
             {
-                //logger.InfoFormat("startColumn:{0}, startCharIndex:{1},endColumn:{2},endCharIndex:{3}", this.startColumn, this.startCharacterIndex, this.endColumn, this.endCharacterIndex);
+                //logger.InfoFormat("startColumn:{0}, startCharIndex:{1},endColumn:{2},endCharIndex:{3}", startColumn, startCharacterIndex, endColumn, endCharacterIndex);
 
                 // 找到对应的文本行
                 VTextLine textLine = document.FindLine(startPointer.PhysicsRow);
                 if (textLine == null)
                 {
                     // 当选中了一行之后，然后该行被移动到屏幕外了，会出现这种情况
-                    return;
-                }
-
-                // 处理选中的是同一个字符的情况
-                if (startColumn == endColumn)
-                {
-                    if (startCharacterIndex > -1 && endCharacterIndex > -1)
-                    {
-                        VTextRange textRange = textLine.MeasureCharacter(startCharacterIndex);
-                        geometries.Add(new VTRect(textRange.Left, textRange.Top, textRange.Width, textRange.Height));
-                    }
-                    else
-                    {
-                        geometries.Add(new VTRect(startColumn * charWidth, textLine.OffsetY, charWidth, textLine.Height));
-                    }
                     return;
                 }
 

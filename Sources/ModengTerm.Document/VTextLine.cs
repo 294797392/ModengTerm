@@ -571,6 +571,44 @@ namespace ModengTerm.Document
             this.DeleteRange(0, this.Characters.Count);
         }
 
+        /// <summary>
+        /// 获取该行的物理行号
+        /// </summary>
+        /// <returns></returns>
+        public int GetPhysicsRow()
+        {
+            // 先找到逻辑行号
+
+            int logicalRow = 0;
+
+            VTDocument document = this.OwnerDocument;
+            VTScrollInfo scrollInfo = document.Scrollbar;
+
+            VTextLine textLine = document.FirstLine;
+
+            while (textLine != null)
+            {
+                if (textLine == this) 
+                {
+                    break;
+                    //return scrollInfo.ScrollValue + logicalRow;
+                }
+
+                logicalRow++;
+
+                textLine = textLine.NextLine;
+            }
+
+            if (scrollInfo.ScrollMax == 0)
+            {
+                return logicalRow;
+            }
+            else
+            {
+                return scrollInfo.ScrollValue + logicalRow;
+            }
+        }
+
         #endregion
 
         #region VTElement

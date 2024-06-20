@@ -17,16 +17,16 @@ namespace ModengTerm.Document
         /// <summary>
         /// 根据Y坐标找到包含该Y坐标的历史行
         /// </summary>
-        /// <param name="firstLine">要从第几行开始往下找</param>
+        /// <param name="document">要做命中测试的文档</param>
         /// <param name="cursorY">鼠标坐标Y轴数值</param>
         /// <param name="logicalRow">所命中的行是第几行</param>
         /// <returns>找到了就返回找到的历史行，没找到返回null</returns>
-        public static VTextLine HitTestVTextLine(VTextLine firstLine, double cursorY, out int logicalRow)
+        public static VTextLine HitTestVTextLine(VTDocument document, double cursorY, out int logicalRow)
         {
             logicalRow = 0;
 
             // 当前行的Y偏移量
-            VTextLine current = firstLine;
+            VTextLine current = document.FirstLine;
 
             while (current != null)
             {
@@ -68,6 +68,8 @@ namespace ModengTerm.Document
 
             // 这种计算方式只适用于等宽字体
             columnIndexHit = (int)Math.Min(Math.Floor(cursorX / textLine.Typeface.Width), textLine.OwnerDocument.ViewportColumn - 1);
+
+            //logger.InfoFormat("columnIndexHit = {0}, cursorX = {1}, charWidth = {2}", columnIndexHit, cursorX, textLine.Typeface.Width);
 
             charIndexHit = textLine.FindCharacterIndex(columnIndexHit);
             if (charIndexHit >= 0)

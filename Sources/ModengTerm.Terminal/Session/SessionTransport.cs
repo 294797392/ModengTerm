@@ -327,7 +327,6 @@ namespace ModengTerm.Terminal.Session
                 SshNetSession sshNetSession = this.driver as SshNetSession;
                 sshNetSession.DataReceived = Stream_DataReceived;
                 sshNetSession.ErrorOccurred = Stream_ErrorOccurred;
-                logger.InfoFormat("退出Session线程");
                 return;
             }
 

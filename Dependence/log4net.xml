@@ -20,7 +20,7 @@
     </logger>
 	
 	<logger name="interactive">
-      <level value="ALL" />
+      <level value="OFF" />
       <appender-ref ref="interactiveFileAppender" />
     </logger>
 

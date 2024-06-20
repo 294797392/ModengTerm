@@ -51,6 +51,8 @@ namespace ModengTerm.Terminal
 
         /// <summary>
         /// 当某一行被完整打印之后触发
+        /// 如果同一行被多次打印（top命令），那么只会在第一次打印的时候触发
+        /// 只有在主缓冲区的时候才会触发
         /// </summary>
         public event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
 
@@ -291,6 +293,7 @@ namespace ModengTerm.Terminal
             VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
             this.mainDocument = new VTDocument(mainOptions);
             this.mainDocument.Initialize();
+            this.mainDocument.History.AddHistory(this.mainDocument.FirstLine.History);
 
             VTDocumentOptions alternateOptions = this.CreateDocumentOptions("AlternateDocument", sessionInfo, options.AlternateDocument);
             alternateOptions.ScrollbackMax = 0;
@@ -852,7 +855,7 @@ namespace ModengTerm.Terminal
             // 把光标移动到行开头
             int oldRow = this.CursorRow;
             int oldCol = this.CursorCol;
-            
+
             activeDocument.SetCursor(CursorRow, 0);
 
             int newRow = this.CursorRow;
@@ -874,12 +877,11 @@ namespace ModengTerm.Terminal
             // 要换行的文档
             VTDocument document = this.activeDocument;
 
-            // 如果滚动条不在最底部，那么先把滚动条滚动到底
-            document.ScrollToBottom();
-
             // 可滚动区域的第一行和最后一行
             VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
             VTextLine last = document.LastLine.FindPrevious(document.ScrollMarginBottom);
+
+            VTHistory history = document.History;
 
             // 光标所在行是可滚动区域的最后一行
             // 也表示即将滚动
@@ -904,23 +906,25 @@ namespace ModengTerm.Terminal
                     // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
 
                     // 主缓冲区要创建一个新的VTHistoryLine
-                    VTHistoryLine historyLine = new VTHistoryLine();
-                    head.SetHistory(historyLine);
-                    document.History.AddHistory(historyLine);
-
                     #region 更新滚动条的值
+
+                    VTScrollInfo scrollInfo = document.Scrollbar;
 
                     // 滚动条滚动到底
                     // 计算滚动条可以滚动的最大值
 
-                    int scrollMax = document.History.Lines - document.ViewportRow;
-                    if (scrollMax > 0)
-                    {
-                        this.ScrollInfo.ScrollMax = Math.Min(scrollMax, document.ScrollMax);
-                        this.ScrollInfo.ScrollValue = this.ScrollInfo.ScrollMax;
-                    }
+                    int scrollMax = scrollInfo.ScrollMax + 1;
+                    scrollMax = Math.Min(scrollMax, document.ScrollMax);
+                    scrollInfo.ScrollMax = scrollMax;
+                    scrollInfo.ScrollValue = scrollMax;
 
                     #endregion
+
+                    VTextLine activeLine = this.ActiveLine;
+
+                    VTHistoryLine historyLine = new VTHistoryLine();
+                    activeLine.SetHistory(historyLine);
+                    history.AddHistory(historyLine);
 
                     // 触发行被完全打印的事件
                     LinePrinted?.Invoke(this, last.History);
@@ -932,10 +936,20 @@ namespace ModengTerm.Terminal
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 document.SetCursor(Cursor.Row + 1, Cursor.Column);
 
+                VTextLine activeLine = this.ActiveLine;
+
                 // 光标移动到该行的时候再加入历史记录
                 if (!this.IsAlternate)
                 {
-                    document.History.AddHistory(document.ActiveLine.History);
+                    // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
+                    // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
+                    int physicsRow = activeLine.GetPhysicsRow();
+                    if (!history.ContainHistory(physicsRow))
+                    {
+                        history.AddHistory(activeLine.History);
+
+                        this.LinePrinted?.Invoke(this, activeLine.History);
+                    }
                 }
             }
         }
@@ -1012,22 +1026,11 @@ namespace ModengTerm.Terminal
         {
             switch (eraseType)
             {
-                // In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
+                // terminal项目里是All和Scrollback执行的是一样的操作：In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
                 // top和clear指令会执行EraseType.All，在其他的终端软件里top指令不会清空已经存在的行，而是把已经存在的行往上移动
                 // 所以EraseType.All的动作和Scrollback一样执行
+
                 case VTEraseType.All:
-                    {
-                        VTextLine next = activeDocument.FirstLine;
-                        while (next != null)
-                        {
-                            next.EraseAll();
-
-                            next = next.NextLine;
-                        }
-
-                        break;
-                    }
-
                 case VTEraseType.Scrollback:
                     {
                         if (this.IsAlternate)
@@ -1045,7 +1048,7 @@ namespace ModengTerm.Terminal
                         }
                         else
                         {
-                            // 把当前鼠标所在行之前的所有行移动到可视区域外，当前鼠标所在行作为第一行，注意当前行不移动
+                            // 把当前所有行移动到可视区域外，并更新当前光标所在行
 
                             // 相关命令：
                             // MainDocument：xterm-256color类型的终端clear程序
@@ -1056,10 +1059,19 @@ namespace ModengTerm.Terminal
 
                             VTDocument document = this.activeDocument;
                             VTScrollInfo scrollInfo = document.Scrollbar;
-                            VTCursor cursor = document.Cursor;
+                            VTHistory history = document.History;
 
-                            int newScrollMax = scrollInfo.ScrollValue + cursor.Row;
+                            // 获取当前屏幕一共显示了多少行
+                            int displayRows = document.GetDisplayRows(scrollInfo.ScrollMax);
+
+                            // 计算滚动条的最大值
+                            int newScrollMax = scrollInfo.ScrollValue + displayRows;
                             newScrollMax = Math.Min(newScrollMax, document.ScrollMax);
+
+                            if (newScrollMax == scrollInfo.ScrollMax)
+                            {
+                                return;
+                            }
 
                             scrollInfo.ScrollMax = newScrollMax;
                             scrollInfo.ScrollValue = newScrollMax;
@@ -1236,6 +1248,14 @@ namespace ModengTerm.Terminal
         public void CUP_CursorPosition(int row, int col)
         {
             // 打开vim，输入i，然后按tab，虽然第一行的字符列数小于要移动到的col，但是vim还是会移动，所以这里把不足的列数使用空格补齐
+
+            //if (this.ActiveLine == null)
+            //{
+            //    // top指令会导致ActiveLine为空
+            //    // top在主缓冲区更新内容，更新内容的时候用户滚动滚动条，此时有可能ActiveLine为空
+            //    return;
+            //}
+
             if (this.ActiveLine.Columns < col)
             {
                 this.ActiveLine.PadColumns(col);
@@ -1246,26 +1266,21 @@ namespace ModengTerm.Terminal
 
         public void CUF_CursorForward(int n)
         {
-            VTDebug.Context.WriteInteractive("CursorForward", "{0},{1},{2}", CursorRow, CursorCol, n);
             activeDocument.SetCursor(CursorRow, CursorCol + n);
         }
 
         public void CUU_CursorUp(int n)
         {
-            VTDebug.Context.WriteInteractive("CursorUp", "{0},{1},{2}", CursorRow, CursorCol, n);
             activeDocument.SetCursor(CursorRow - n, CursorCol);
         }
 
         public void CUD_CursorDown(int n)
         {
-            VTDebug.Context.WriteInteractive("CursorDown", "{0},{1},{2}", CursorRow, CursorCol, n);
             activeDocument.SetCursor(CursorRow + n, CursorCol);
         }
 
         public void CHA_CursorHorizontalAbsolute(int col)
         {
-            VTDebug.Context.WriteInteractive("CursorHorizontalAbsolute", "{0},{1},{2}", CursorRow, CursorCol, col);
-
             ActiveLine.PadColumns(col);
             activeDocument.SetCursor(CursorRow, col);
         }

@@ -29,7 +29,7 @@ namespace ModengTerm.Document
 
         public VTHistoryLine()
         {
-            Characters = new List<VTCharacter>();
+            this.Characters = new List<VTCharacter>();
         }
     }
 }

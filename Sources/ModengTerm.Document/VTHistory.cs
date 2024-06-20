@@ -45,6 +45,13 @@ namespace ModengTerm.Document
         public abstract void Release();
 
         /// <summary>
+        /// 是否存在某个历史记录
+        /// </summary>
+        /// <param name="physicsRow">要查询的物理行号</param>
+        /// <returns></returns>
+        public abstract bool ContainHistory(int physicsRow);
+
+        /// <summary>
         /// 增加一个历史行
         /// </summary>
         /// <param name="historyLine">要增加的历史行</param>
@@ -127,6 +134,16 @@ namespace ModengTerm.Document
             historyLines.Clear();
         }
 
+        public override bool ContainHistory(int physicsRow)
+        {
+            if (physicsRow <= 0 || physicsRow >= this.historyLines.Count)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public override void AddHistory(VTHistoryLine historyLine)
         {
             // 最多可以保存0行历史记录，什么都不做
@@ -179,6 +196,11 @@ namespace ModengTerm.Document
         }
 
         public override void Release()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool ContainHistory(int physicsRow)
         {
             throw new NotImplementedException();
         }

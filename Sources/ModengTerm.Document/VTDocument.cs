@@ -313,11 +313,6 @@ namespace ModengTerm.Document
                 return null;
             }
 
-            // 滚动前光标所在行
-            int oldCursorRow = this.Cursor.Row;
-            // 滚动后光标所在行
-            int newCursorRow = 0;
-
             // 要滚动到的值
             int newScroll = physicsRow;
             // 滚动之前的值
@@ -325,6 +320,11 @@ namespace ModengTerm.Document
 
             // 需要进行滚动的行数
             int scrolledRows = Math.Abs(newScroll - oldScroll);
+
+            // 滚动前光标所在行
+            int oldCursorRow = this.Cursor.Row;
+            // 滚动后光标所在行
+            int newCursorRow = 0;
 
             List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
             List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
@@ -539,7 +539,7 @@ namespace ModengTerm.Document
             {
                 // 光标在画布中，那么做命中测试
                 // 找到鼠标所在行
-                textLine = HitTestHelper.HitTestVTextLine(document.FirstLine, mouseY, out logicalRow);
+                textLine = HitTestHelper.HitTestVTextLine(document, mouseY, out logicalRow);
                 if (textLine == null)
                 {
                     // 这里说明鼠标没有在任何一行上
@@ -647,7 +647,6 @@ namespace ModengTerm.Document
             #region 初始化第一行，并设置链表首尾指针
 
             VTextLine firstLine = CreateTextLine();
-            this.history.AddHistory(firstLine.History);
             FirstLine = firstLine;
             LastLine = firstLine;
             ActiveLine = firstLine;
@@ -1531,6 +1530,16 @@ namespace ModengTerm.Document
             }
         }
 
+        /// <summary>
+        /// 获取当前视野中显示的行数
+        /// </summary>
+        /// <param name="scrollValue">滚动条的值</param>
+        /// <returns></returns>
+        public int GetDisplayRows(int scrollValue)
+        {
+            return Math.Max(0, history.Lines - scrollValue);
+        }
+
         #endregion
 
         #region 事件处理器
@@ -1556,7 +1565,7 @@ namespace ModengTerm.Document
 
                 int startIndex = 0, endIndex = 0, logicalRow = 0;
 
-                VTextLine textLine = HitTestHelper.HitTestVTextLine(FirstLine, mouseData.Y, out logicalRow);
+                VTextLine textLine = HitTestHelper.HitTestVTextLine(this, mouseData.Y, out logicalRow);
                 if (textLine == null)
                 {
                     return;

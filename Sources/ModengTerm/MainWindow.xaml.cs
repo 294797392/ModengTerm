@@ -131,7 +131,7 @@ namespace XTerminal
 
         private void ListBoxOpenedSession_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            OpenedSessionVM selectedTabItem = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
+            SessionItemVM selectedTabItem = ListBoxOpenedSession.SelectedItem as SessionItemVM;
             if (selectedTabItem == null)
             {
                 return;
@@ -139,9 +139,9 @@ namespace XTerminal
 
             if (selectedTabItem is OpenSessionVM)
             {
-                // 点击的是打开Session按钮，返回到上一个选中的SessionTabItem
                 if (e.RemovedItems.Count > 0)
                 {
+                    // 点击的是打开Session按钮，返回到上一个选中的SessionTabItem
                     ListBoxOpenedSession.SelectedItem = e.RemovedItems[0];
                 }
                 else
@@ -149,12 +149,11 @@ namespace XTerminal
                     // 如果当前没有任何一个打开的Session，那么重置选中状态，以便于下次可以继续触发SelectionChanged事件
                     ListBoxOpenedSession.SelectedItem = null;
                 }
-
-                this.CreateSession();
             }
             else
             {
-                ContentControlSession.Content = selectedTabItem.Content;
+                OpenedSessionVM openedSessionVM = selectedTabItem as OpenedSessionVM;
+                ContentControlSession.Content = openedSessionVM.Content;
             }
         }
 

@@ -15,18 +15,20 @@
             <Style x:Key="StyleThumbLocal" TargetType="{x:Type Thumb}">
                 <!--<Style.Triggers>
                     <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#999999"/>
+                        <Setter Property="Background" Value="#6699CC"/>
                     </Trigger>
                 </Style.Triggers>
-                <Setter Property="Background" Value="#4D4D4D"/>-->
+                <Setter Property="Background" Value="#99CCFF"/>-->
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Thumb}">
                             <Grid x:Name="Grid">
-                                <Rectangle HorizontalAlignment="Stretch" x:Name="HoverRectangle" 
+                                <Border Background="{TemplateBinding Background}" Width="{TemplateBinding Width}"
+                                        CornerRadius="3" Opacity="{TemplateBinding Opacity}"/>
+                                <!--<Rectangle HorizontalAlignment="Stretch" x:Name="HoverRectangle" 
                                            VerticalAlignment="Stretch" Width="{TemplateBinding Width}" 
                                            Stroke="{x:Null}" Fill="{TemplateBinding Background}"
-                                           Opacity="{TemplateBinding Opacity}"/>
+                                           Opacity="{TemplateBinding Opacity}"/>-->
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsFocused" Value="True" />
@@ -128,10 +130,10 @@
                                     <Thumb x:Name="Thumb" Style="{StaticResource ResourceKey=StyleThumbLocal}"/>
                                 </Track.Thumb>
                                 <Track.IncreaseRepeatButton>
-                                    <RepeatButton x:Name="PageUp" Style="{DynamicResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageDownCommand" />
+                                    <RepeatButton x:Name="PageUp" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageDownCommand" />
                                 </Track.IncreaseRepeatButton>
                                 <Track.DecreaseRepeatButton>
-                                    <RepeatButton x:Name="PageDown" Style="{DynamicResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageUpCommand" />
+                                    <RepeatButton x:Name="PageDown" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageUpCommand" />
                                 </Track.DecreaseRepeatButton>
                             </Track>
                         </Grid>

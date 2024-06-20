@@ -111,7 +111,8 @@ namespace ModengTerm.Terminal.UserControls
         private MouseData GetMouseData(object sender, MouseEventArgs e)
         {
             WPFDocument document = this.GetActiveDocument();
-            Point mousePosition = e.GetPosition(document);
+            WPFDocumentCanvas canvas = document.Content;
+            Point mousePosition = e.GetPosition(canvas);
             MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0, (sender as FrameworkElement).IsMouseCaptured);
 
             return mouseData;

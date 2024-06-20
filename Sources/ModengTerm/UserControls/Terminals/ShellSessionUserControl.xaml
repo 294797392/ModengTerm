@@ -99,6 +99,9 @@
 
                 <Border Style="{StaticResource ResourceKey=StyleBorderSplitter}"/>
 
+                <TextBlock Text="总行数：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=TotalRows}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="0,0,20,0"/>
+
                 <TextBlock Text="{Binding Path=ViewportRow}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 <TextBlock Text=" x " Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 <TextBlock Text="{Binding Path=ViewportColumn}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>

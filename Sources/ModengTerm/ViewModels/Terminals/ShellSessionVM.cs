@@ -135,6 +135,8 @@ namespace ModengTerm.Terminal.ViewModels
         private VTParser vtParser;
         private string uri;
 
+        private int totalRows;
+
         #endregion
 
         #region 属性
@@ -225,6 +227,22 @@ namespace ModengTerm.Terminal.ViewModels
 
         public IDocumentRenderer MainDocument { get; set; }
         public IDocumentRenderer AlternateDocument { get; set; }
+
+        /// <summary>
+        /// 总行数
+        /// </summary>
+        public int TotalRows
+        {
+            get { return this.totalRows; }
+            set
+            {
+                if (this.totalRows != value) 
+                {
+                    this.totalRows = value;
+                    this.NotifyPropertyChanged("TotalRows");
+                }
+            }
+        }
 
         #endregion
 
@@ -340,6 +358,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             VideoTerminal videoTerminal = new VideoTerminal();
             videoTerminal.ViewportChanged += this.VideoTerminal_ViewportChanged;
+            videoTerminal.LinePrinted += VideoTerminal_LinePrinted;
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
 
@@ -513,6 +532,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 case SessionTypeEnum.HostCommandLine:
                     {
+                        uri = string.Format("cmdline://cmd.exe");
                         break;
                     }
 
@@ -584,12 +604,26 @@ namespace ModengTerm.Terminal.ViewModels
             this.ViewportColumn = newColumn;
         }
 
+        private void VideoTerminal_LinePrinted(IVideoTerminal vt, VTHistoryLine historyLine)
+        {
+            VTHistory history = vt.MainDocument.History;
+
+            this.TotalRows = history.Lines;
+        }
+
         private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)
         {
             VTDebug.Context.WriteRawRead(bytes, size);
 
             VTDocument activeDocument = this.VideoTerminal.ActiveDocument;
             int oldScroll = activeDocument.Scrollbar.ScrollValue;
+
+            // 有些命令（top）会动态更新主缓冲区
+            // 执行动作之前先把主缓冲区滚动到底
+            if (!this.videoTerminal.IsAlternate)
+            {
+                activeDocument.ScrollToBottom();
+            }
 
             try
             {

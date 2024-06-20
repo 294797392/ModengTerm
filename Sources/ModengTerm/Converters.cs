@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
@@ -235,6 +236,44 @@ namespace ModengTerm
             SessionStatusEnum visibleStatus = (SessionStatusEnum)parameter;
             SessionStatusEnum currentStatus = (SessionStatusEnum)value;
             return visibleStatus == currentStatus ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SessionImageConverter : IValueConverter
+    {
+        public static ImageSource SSHImage = WPFToolkit.Utility.ImageUtility.FromURI("pack://application:,,,/ModengTerm;component/Images/ssh.png");
+        public static ImageSource HostCommandLineImage = WPFToolkit.Utility.ImageUtility.FromURI("pack://application:,,,/ModengTerm;component/Images/cmdline.png");
+        public static ImageSource SerialPortImage = WPFToolkit.Utility.ImageUtility.FromURI("pack://application:,,,/ModengTerm;component/Images/serialport.png");
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            SessionTypeEnum sessionType = (SessionTypeEnum)value;
+
+            switch (sessionType)
+            {
+                case SessionTypeEnum.SerialPort:
+                    {
+                        return SerialPortImage;
+                    }
+
+                case SessionTypeEnum.SSH:
+                    {
+                        return SSHImage;
+                    }
+
+                case SessionTypeEnum.HostCommandLine:
+                    {
+                        return HostCommandLineImage;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
