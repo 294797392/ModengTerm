@@ -474,6 +474,12 @@ namespace ModengTerm.Terminal
                                 return VTParagraph.Empty;
                             }
                             historyLines.AddRange(histories);
+
+                            if (historyLines.Count == 0)
+                            {
+                                logger.WarnFormat("选中区域为空");
+                                return VTParagraph.Empty;
+                            }
                         }
 
                         VTHistoryLine topLine = historyLines.FirstOrDefault();

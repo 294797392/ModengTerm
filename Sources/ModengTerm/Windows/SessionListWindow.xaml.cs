@@ -94,7 +94,7 @@ namespace XTerminal
             int code = MTermApp.Context.ServiceAgent.AddSession(session);
             if (code != ResponseCode.SUCCESS)
             {
-                MessageBoxUtils.Error("新建会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
+                MTMessageBox.Error("新建会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
                 return;
             }
 
@@ -108,10 +108,11 @@ namespace XTerminal
             XTermSessionVM selectedSession = DataGridSessionList.SelectedItem as XTermSessionVM;
             if (selectedSession == null)
             {
+                MTMessageBox.Info("请选择要删除的会话");
                 return;
             }
 
-            if (!MessageBoxUtils.Confirm("确定要删除{0}吗", selectedSession.Name))
+            if (!MTMessageBox.Confirm("确定要删除{0}吗", selectedSession.Name))
             {
                 return;
             }
@@ -119,7 +120,7 @@ namespace XTerminal
             int code = MTermApp.Context.ServiceAgent.DeleteSession(selectedSession.ID.ToString());
             if (code != ResponseCode.SUCCESS)
             {
-                MessageBoxUtils.Error("删除会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
+                MTMessageBox.Error("删除会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
                 return;
             }
 

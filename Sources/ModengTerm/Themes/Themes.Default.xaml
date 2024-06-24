@@ -53,4 +53,8 @@
     <SolidColorBrush x:Key="BrushOpenSessonHover" Color="Silver"/>
     <SolidColorBrush x:Key="BrushOpenSessionDown" Color="#9E9E9E"/>
 
+    <SolidColorBrush x:Key="BrushButtonNormal" Color="White"/>
+    <SolidColorBrush x:Key="BrushButtonHover" Color="White"/>
+    <SolidColorBrush x:Key="BrushButtonBorder" Color="#6699CC"/>
+
 </ResourceDictionary>

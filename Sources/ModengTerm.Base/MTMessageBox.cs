@@ -18,5 +18,10 @@ namespace ModengTerm.Base
         {
             MessageBox.Show(string.Format(message, args), "错误", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+
+        public static bool Confirm(string message, params object[] args)
+        {
+            return MessageBox.Show(string.Format(message, args), "确认", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes;
+        }
     }
 }
