@@ -31,10 +31,6 @@ ModengTerm（读作“摩登Term”，意思是现代化的，时尚的终端）
 目前ModengTerm只能运行在Windows环境下，未来准备开发Mac版本。  
 
 
-# 软件下载
-
-[点击下载软件](https://gitee.com/zyfalreadyexsit/ModengTerm/repository/archive/ModengTerm_x64_1.0.1.zip)
-
 ## 问题/功能交流QQ群：
 **群号：862861851**  
 ![Image](images/QQGroup.png)  
