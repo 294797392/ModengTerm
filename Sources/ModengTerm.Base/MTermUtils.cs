@@ -51,5 +51,19 @@ namespace ModengTerm.Base
                     throw new NotImplementedException();
             }
         }
+
+        public static int Clamp(int val, int minval, int maxval) 
+        {
+            if (val < minval)
+            {
+                return minval;
+            }
+            else if(val > maxval)
+            {
+                return maxval;
+            }
+
+            return val;
+        }
     }
 }

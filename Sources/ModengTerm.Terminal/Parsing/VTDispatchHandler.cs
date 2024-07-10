@@ -61,6 +61,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="col">光标所在列</param>
         void CUP_CursorPosition(int row, int col);
         void CUF_CursorForward(int n);
+        void CUB_CursorBackward(int n);
         void CUU_CursorUp(int n);
         void CUD_CursorDown(int n);
         void CHA_CursorHorizontalAbsolute(int col);

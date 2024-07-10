@@ -201,6 +201,21 @@ namespace ModengTerm.Terminal.Parsing
                         break;
                     }
 
+                case CsiActionCodes.CUB_CursorBackward:
+                    {
+                        // 	光标向后（左）<n> 行
+
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
+
+                        VTDebug.Context.WriteInteractive("CUB_CursorBackward", "{0},{1},{2}", oldRow, oldCol, n);
+
+                        this.DispatchHandler.CUF_CursorForward(n);
+
+                        break;
+                    }
+
                 case CsiActionCodes.HVP_HorizontalVerticalPosition:
                 case CsiActionCodes.CUP_CursorPosition:
                     {
@@ -507,12 +522,21 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.VPA_VerticalLinePositionAbsolute:
                     {
+                        int oldRow = this.DispatchHandler.CursorRow;
+                        int oldCol = this.DispatchHandler.CursorCol;
+
                         // 绝对垂直行位置 光标在当前列中垂直移动到第 <n> 个位置
                         // 保持列不变，把光标移动到指定的行处
                         int row = VTParameter.GetParameter(parameters, 0, 1);
                         row = Math.Max(0, row - 1);
 
                         this.DispatchHandler.VPA_VerticalLinePositionAbsolute(row);
+
+                        int newRow = this.DispatchHandler.CursorRow;
+                        int newCol = this.DispatchHandler.CursorCol;
+
+                        VTDebug.Context.WriteInteractive("VPA_VerticalLinePositionAbsolute", "{0},{1},{2}", oldRow, oldCol, newRow, newCol);
+
                         break;
                     }
 

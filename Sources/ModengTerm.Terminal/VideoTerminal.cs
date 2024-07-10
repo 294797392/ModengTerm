@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
@@ -1251,16 +1252,17 @@ namespace ModengTerm.Terminal
         // 光标的移动坐标是相对于可视区域内的坐标
         // 服务器发送过来的光标原点是从(1,1)开始的，我们程序里的是(0,0)开始的，所以要减1
 
+        private void CursorMovePosition(int row, int col)
+        {
+            row = MTermUtils.Clamp(row, 0, this.ViewportRow - 1);
+            col = MTermUtils.Clamp(col, 0, this.ViewportColumn - 1);
+
+            this.activeDocument.SetCursor(row, col);
+        }
+
         public void CUP_CursorPosition(int row, int col)
         {
             // 打开vim，输入i，然后按tab，虽然第一行的字符列数小于要移动到的col，但是vim还是会移动，所以这里把不足的列数使用空格补齐
-
-            //if (this.ActiveLine == null)
-            //{
-            //    // top指令会导致ActiveLine为空
-            //    // top在主缓冲区更新内容，更新内容的时候用户滚动滚动条，此时有可能ActiveLine为空
-            //    return;
-            //}
 
             if (this.ActiveLine.Columns < col)
             {
@@ -1272,17 +1274,34 @@ namespace ModengTerm.Terminal
 
         public void CUF_CursorForward(int n)
         {
-            activeDocument.SetCursor(CursorRow, CursorCol + n);
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol + n;
+
+            this.CursorMovePosition(newRow, newCol);
+        }
+
+        public void CUB_CursorBackward(int n)
+        {
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol - n;
+
+            this.CursorMovePosition(newRow, newCol);
         }
 
         public void CUU_CursorUp(int n)
         {
-            activeDocument.SetCursor(CursorRow - n, CursorCol);
+            int newRow = this.CursorRow - n;
+            int newCol = this.CursorCol;
+
+            this.CursorMovePosition(newRow, newCol);
         }
 
         public void CUD_CursorDown(int n)
         {
-            activeDocument.SetCursor(CursorRow + n, CursorCol);
+            int newRow = this.CursorRow + n;
+            int newCol = this.CursorCol;
+
+            this.CursorMovePosition(newRow, newCol);
         }
 
         public void CHA_CursorHorizontalAbsolute(int col)
@@ -1293,7 +1312,6 @@ namespace ModengTerm.Terminal
 
         public void VPA_VerticalLinePositionAbsolute(int row)
         {
-            VTDebug.Context.WriteInteractive("VerticalLinePositionAbsolute", "{0},{1},{2}", CursorRow, CursorCol, row);
             activeDocument.SetCursor(row, CursorCol);
         }
 
@@ -1676,6 +1694,10 @@ namespace ModengTerm.Terminal
         #endregion
 
         #region 事件处理器
+
+        private void SshMonitorThreadProc()
+        {
+        }
 
         #endregion
     }

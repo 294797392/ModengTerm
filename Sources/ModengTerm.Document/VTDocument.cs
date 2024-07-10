@@ -1417,8 +1417,8 @@ namespace ModengTerm.Document
         /// <summary>
         /// 重置文档的行和列大小
         /// </summary>
-        /// <param name="newRow"></param>
-        /// <param name="newCol"></param>
+        /// <param name="newRow">新的行数</param>
+        /// <param name="newCol">新的列数</param>
         public void Resize(int newRow, int newCol)
         {
             int oldRow = this.viewportRow;
@@ -1431,6 +1431,7 @@ namespace ModengTerm.Document
                 // 计算减了或者增加了多少行
                 int rows = Math.Abs(oldRow - newRow);
 
+                int oldCursorRow = this.Cursor.Row;
                 // 新的光标所在行
                 int newCursorRow = this.Cursor.Row;
                 // 第一行要显示的内容
@@ -1472,6 +1473,10 @@ namespace ModengTerm.Document
                     {
                         newCursorRow -= rows;
                         newScrollMax = scrollInfo.ScrollValue + rows;
+                    }
+                    else if (oldCursorRow > newRow)
+                    {
+                        newCursorRow = newRow - 1;
                     }
                 }
 
