@@ -13,7 +13,7 @@ namespace ModengTerm.Terminal.Parsing
 {
     /// <summary>
     /// 负责分发VTParser的事件
-    /// 把指令透传给外部模块，外部模块去解析每个指令的参数
+    /// 把指令和参数通过VTDispatchHandler透传给外部模块，外部模块去解析每个指令的参数
     /// </summary>
     public partial class VTParser
     {

@@ -12,24 +12,6 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal
 {
-    public enum VTDebugCategoryEnum
-    {
-        /// <summary>
-        /// ModengTerm和SSH主机交互的日志
-        /// </summary>
-        Interactive,
-
-        /// <summary>
-        /// 自动生成vttest源码的日志
-        /// </summary>
-        vttestCode,
-
-        /// <summary>
-        /// 记录从SSH主机收到的原始数据
-        /// </summary>
-        RawRead,
-    }
-
     public enum VTSendTypeEnum
     {
         /// <summary>
@@ -53,114 +35,16 @@ namespace ModengTerm.Terminal
     /// </summary>
     public class VTDebug : SingletonObject<VTDebug>
     {
-        /// <summary>
-        /// 存储日志分类的上下文信息
-        /// </summary>
-        public class LogCategory
-        {
-            private bool enabled;
-
-            public string Name { get; set; }
-
-            /// <summary>
-            /// 日志分类
-            /// </summary>
-            public VTDebugCategoryEnum Category { get; private set; }
-
-            /// <summary>
-            /// 日志文件的完整路径
-            /// </summary>
-            public string FilePath { get; set; }
-
-            /// <summary>
-            /// 是否记录该类型的日志
-            /// </summary>
-            public bool Enabled
-            {
-                get { return this.enabled; }
-                set
-                {
-                    if (this.enabled != value)
-                    {
-                        this.enabled = value;
-
-                        if (value)
-                        {
-                            this.OnStart();
-                        }
-                        else
-                        {
-                            this.OnStop();
-                        }
-                    }
-                }
-            }
-
-            public LogCategory(VTDebugCategoryEnum category)
-            {
-                this.Category = category;
-                this.Name = this.Category.ToString();
-            }
-
-            public void OnStart()
-            {
-                if (File.Exists(this.FilePath))
-                {
-                    try
-                    {
-                        File.Delete(this.FilePath);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("删除日志文件异常", ex);
-                    }
-                }
-            }
-
-            public void OnStop()
-            { }
-        }
-
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTDebug");
         private log4net.ILog codeLogger = log4net.LogManager.GetLogger("code");
         private log4net.ILog interactiveLogger = log4net.LogManager.GetLogger("interactive");
+        private log4net.ILog receivedLogger = log4net.LogManager.GetLogger("received");
+        private log4net.ILog rawReadLogger = log4net.LogManager.GetLogger("rawread");
 
-        private LogCategory rawReadCategory;
-        private Dictionary<VTDebugCategoryEnum, LogCategory> categoryMap;
-        public List<LogCategory> Categories { get; private set; }
         private int vttestCodeIndex;
 
         public VTDebug()
         {
-            this.Categories = new List<LogCategory>();
-            this.categoryMap = new Dictionary<VTDebugCategoryEnum, LogCategory>();
-
-            this.rawReadCategory = this.CreateCategory(VTDebugCategoryEnum.RawRead);
-        }
-
-        private LogCategory CreateCategory(VTDebugCategoryEnum categoryEnum)
-        {
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, string.Format("log_{0}.txt", categoryEnum.ToString()));
-
-            LogCategory category = new LogCategory(categoryEnum)
-            {
-                FilePath = filePath
-            };
-
-            this.categoryMap[categoryEnum] = category;
-            this.Categories.Add(category);
-
-            return category;
-        }
-
-        private bool CanWrite(LogCategory logCategory)
-        {
-            if (!logCategory.Enabled)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         public void WriteInteractive(VTSendTypeEnum type, byte[] bytes)
@@ -203,7 +87,6 @@ namespace ModengTerm.Terminal
             interactiveLogger.Info(log);
         }
 
-
         public void WriteCode(string action, List<byte> sequence)
         {
             if (!codeLogger.IsDebugEnabled)
@@ -234,16 +117,33 @@ namespace ModengTerm.Terminal
             this.codeLogger.Info(log);
         }
 
-
         public void WriteRawRead(byte[] bytes, int size)
         {
-            if (!this.CanWrite(this.rawReadCategory))
+            if (!this.rawReadLogger.IsDebugEnabled)
             {
                 return;
             }
 
             string message = bytes.Take(size).Select(v => ((int)v).ToString()).Join(",");
-            File.AppendAllText(this.rawReadCategory.FilePath, message + ",");
+            this.rawReadLogger.Info(message);
+        }
+
+        /// <summary>
+        /// 记录从服务器接收到的原始指令和指令对应的参数
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="format"></param>
+        /// <param name="param"></param>
+        public void WriteReceived(string action, string format, params object[] param)
+        {
+            if (!this.receivedLogger.IsDebugEnabled)
+            {
+                return;
+            }
+
+            string message = string.Format(format, param);
+            string log = string.Format("<- [{0},{1}]", action, message);
+            this.receivedLogger.Info(log);
         }
     }
 }

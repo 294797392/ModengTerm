@@ -14,7 +14,6 @@ extern "C" {
 
     struct VTextLine
     {
-        int physicsRow;
         VTextLine *previous;
         VTextLine *next;
         VTCharacter *character;

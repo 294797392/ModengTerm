@@ -34,8 +34,8 @@ namespace ModengTerm.Terminal
 
     /// <summary>
     /// 处理虚拟终端的所有逻辑
-    /// 主缓冲区：文档物理行数是不固定的，可以大于终端行数
-    /// 备用缓冲区：文档的物理行数是固定的，等于终端的行数
+    /// 主缓冲区：可以滚动，保存历史记录
+    /// 备用缓冲区：行和列是固定的
     /// </summary>
     public class VideoTerminal : IVideoTerminal, VTDispatchHandler
     {
@@ -843,7 +843,9 @@ namespace ModengTerm.Terminal
         #region VTDispatchHandler
 
         public void PlayBell()
-        { }
+        {
+            Console.Beep();
+        }
 
         public void ForwardTab()
         {

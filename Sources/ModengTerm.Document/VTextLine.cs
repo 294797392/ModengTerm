@@ -279,6 +279,11 @@ namespace ModengTerm.Document
         public void EraseToEnd(int column)
         {
             int characterIndex = FindCharacterIndex(column);
+            if (characterIndex == -1)
+            {
+                logger.WarnFormat("EraseToEnd失败, 没有找到对应列的字符, column = {0}", column);
+                return;
+            }
 
             // 先把该列和后面的所有字符删除
             int characters = this.Characters.Count - characterIndex;
