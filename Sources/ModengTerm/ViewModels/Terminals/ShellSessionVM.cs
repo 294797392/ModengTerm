@@ -225,8 +225,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public LoggerManager LoggerManager { get; set; }
 
-        public IDocumentRenderer MainDocument { get; set; }
-        public IDocumentRenderer AlternateDocument { get; set; }
+        public IDocument MainDocument { get; set; }
+        public IDocument AlternateDocument { get; set; }
 
         /// <summary>
         /// 总行数
@@ -260,7 +260,7 @@ namespace ModengTerm.Terminal.ViewModels
         protected override int OnOpen()
         {
             this.recordState = RecordStatusEnum.Stop;
-            this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
+            this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING));
             this.clipboard = new VTClipboard()
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)

@@ -18,7 +18,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 文档数据模型对应的绘图模型
         /// </summary>
-        public IDocumentRenderer Controller { get; set; }
+        public IDocument Controller { get; set; }
 
         /// <summary>
         /// 默认的可视区域行数

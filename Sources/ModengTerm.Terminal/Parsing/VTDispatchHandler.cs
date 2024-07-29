@@ -13,18 +13,18 @@ namespace ModengTerm.Terminal.Parsing
     /// </summary>
     public interface VTDispatchHandler
     {
-        /// <summary>
-        /// 可视区域的行数
-        /// </summary>
-        int ViewportRow { get; }
+        ///// <summary>
+        ///// 可视区域的行数
+        ///// </summary>
+        //int ViewportRow { get; }
 
-        /// <summary>
-        /// 可视区域的列数
-        /// </summary>
-        int ViewportColumn { get; }
+        ///// <summary>
+        ///// 可视区域的列数
+        ///// </summary>
+        //int ViewportColumn { get; }
 
-        int CursorRow { get; }
-        int CursorCol { get; }
+        //int CursorRow { get; }
+        //int CursorCol { get; }
 
         void PlayBell();
         void Backspace();
@@ -59,13 +59,13 @@ namespace ModengTerm.Terminal.Parsing
         /// </summary>
         /// <param name="row">光标所在行</param>
         /// <param name="col">光标所在列</param>
-        void CUP_CursorPosition(int row, int col);
+        void CUP_CursorPosition(List<int> parameters);
         void CUF_CursorForward(int n);
         void CUB_CursorBackward(int n);
         void CUU_CursorUp(int n);
         void CUD_CursorDown(int n);
-        void CHA_CursorHorizontalAbsolute(int col);
-        void VPA_VerticalLinePositionAbsolute(int row);
+        void CHA_CursorHorizontalAbsolute(List<int> parameters);
+        void VPA_VerticalLinePositionAbsolute(List<int> parameters);
 
         // 滚动控制
         void SD_ScrollDown(List<int> parameters);
@@ -79,7 +79,7 @@ namespace ModengTerm.Terminal.Parsing
         /// </summary>
         /// <param name="topMargin"></param>
         /// <param name="bottomMargin"></param>
-        void DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin);
+        void DECSTBM_SetScrollingRegion(List<int> parameters);
         void DECSLRM_SetLeftRightMargins(int leftMargin, int rightMargin);
 
         #endregion

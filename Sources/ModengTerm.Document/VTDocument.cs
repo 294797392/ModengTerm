@@ -162,7 +162,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 该文档的渲染器
         /// </summary>
-        public IDocumentRenderer Renderer { get; internal set; }
+        public IDocument Renderer { get; internal set; }
 
         /// <summary>
         /// 当前应用的文本属性

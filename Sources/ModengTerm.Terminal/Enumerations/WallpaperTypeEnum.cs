@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Document.Enumerations
+namespace ModengTerm.Terminal.Enumerations
 {
     /// <summary>
     /// 指定终端背景类型
@@ -16,10 +16,10 @@ namespace ModengTerm.Document.Enumerations
         /// </summary>
         Color = 0,
 
-        /// <summary>
-        /// 动态背景,gif动画
-        /// </summary>
-        Live = 1,
+        ///// <summary>
+        ///// 动态背景,gif动画
+        ///// </summary>
+        //Live = 1,
 
         /// <summary>
         /// 静态图

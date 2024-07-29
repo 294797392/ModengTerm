@@ -15,7 +15,7 @@ namespace ModengTerm.ViewModels.Terminals
     {
         private VTDocument document;
 
-        public IDocumentRenderer DrawingDocument { get; set; }
+        public IDocument DrawingDocument { get; set; }
 
         public CommandLineVM() : 
             base(null)

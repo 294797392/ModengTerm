@@ -28,7 +28,7 @@ namespace ModengTerm.Document
 
         #region 属性
 
-        public override DrawingObjectTypes Type => DrawingObjectTypes.Selection;
+        public override DocumentObjectTypes Type => DocumentObjectTypes.Selection;
 
         /// <summary>
         /// 指示当前选中的内容是否为空

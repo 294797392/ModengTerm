@@ -21,7 +21,7 @@ namespace ModengTerm.Terminal.DataModels
         /// </summary>
         [JsonProperty("uri")]
         public string Uri { get; set; }
-        
+
         /// <summary>
         /// 特效
         /// </summary>

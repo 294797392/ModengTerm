@@ -62,7 +62,7 @@ namespace ModengTerm.Terminal.Session
 
         public int Initialize(XTermSession session)
         {
-            int bufferSize = session.GetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE);
+            int bufferSize = session.GetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE);
             this.row = session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 

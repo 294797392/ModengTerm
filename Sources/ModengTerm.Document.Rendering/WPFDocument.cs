@@ -17,7 +17,7 @@ namespace ModengTerm.Document.Rendering
     /// </summary>
     [TemplatePart(Name = "PART_DocumentCanvas", Type = typeof(WPFDocumentCanvas))]
     [TemplatePart(Name = "PART_Scrollbar", Type = typeof(ScrollBar))]
-    public class WPFDocument : Control, IDocumentRenderer
+    public class WPFDocument : Control, IDocument
     {
         #region 实例变量
 
@@ -90,7 +90,7 @@ namespace ModengTerm.Document.Rendering
 
         #region IDocumentRenderer
 
-        public IDrawingObject CreateDrawingObject()
+        public IDocumentObject CreateDrawingObject()
         {
             DrawingObject drawingObject = new DrawingObject();
 
@@ -99,16 +99,16 @@ namespace ModengTerm.Document.Rendering
             return drawingObject;
         }
 
-        public void DeleteDrawingObject(IDrawingObject drawingObject)
+        public void DeleteDrawingObject(IDocumentObject drawingObject)
         {
             content.RemoveVisual(drawingObject as DrawingObject);
         }
 
         public void DeleteDrawingObjects()
         {
-            List<IDrawingObject> drawingObjects = content.GetAllVisual().Cast<IDrawingObject>().ToList();
+            List<IDocumentObject> drawingObjects = content.GetAllVisual().Cast<IDocumentObject>().ToList();
 
-            foreach (IDrawingObject drawingObject in drawingObjects)
+            foreach (IDocumentObject drawingObject in drawingObjects)
             {
                 DeleteDrawingObject(drawingObject);
             }

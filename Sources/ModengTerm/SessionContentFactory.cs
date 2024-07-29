@@ -3,7 +3,6 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Terminal.UserControls;
-using ModengTerm.UserControls.Terminals;
 using System;
 using System.Collections.Generic;
 using System.Linq;

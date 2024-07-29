@@ -137,7 +137,7 @@ namespace ModengTerm
 
             switch ((WallpaperTypeEnum)value)
             {
-                case WallpaperTypeEnum.Live: return "动态背景";
+                //case WallpaperTypeEnum.Live: return "动态背景";
                 case WallpaperTypeEnum.Color: return "纯色";
                 case WallpaperTypeEnum.Image: return "图片";
                 default:
@@ -160,14 +160,15 @@ namespace ModengTerm
                 return "未知";
             }
 
-            switch ((EffectTypeEnum)value)
-            {
-                case EffectTypeEnum.None: return "无";
-                case EffectTypeEnum.Snow: return "飘雪";
-                case EffectTypeEnum.Star: return "星空";
-                default:
-                    throw new NotImplementedException();
-            }
+            //switch ((EffectTypeEnum)value)
+            //{
+            //    case EffectTypeEnum.None: return "无";
+            //    case EffectTypeEnum.Snow: return "飘雪";
+            //    case EffectTypeEnum.Star: return "星空";
+            //    default:
+            //        throw new NotImplementedException();
+            //}
+            return string.Empty;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

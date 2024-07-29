@@ -455,84 +455,84 @@ namespace ModengTerm.Document.Utility
             }
         }
 
-        /// <summary>
-        /// 当Wallpaper是动态图的时候，获取动态图的元数据，用来实时渲染
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <returns></returns>
-        public static GifMetadata GetWallpaperMetadata(string uri)
-        {
-            GifMetadata gifMetadata;
-            if (!GifMetadataMap.TryGetValue(uri, out gifMetadata))
-            {
-                Stream stream = GetWallpaperStream(uri);
-                if (stream == null)
-                {
-                    return new GifMetadata();
-                }
+        ///// <summary>
+        ///// 当Wallpaper是动态图的时候，获取动态图的元数据，用来实时渲染
+        ///// </summary>
+        ///// <param name="uri"></param>
+        ///// <returns></returns>
+        //public static GifMetadata GetWallpaperMetadata(string uri)
+        //{
+        //    GifMetadata gifMetadata;
+        //    if (!GifMetadataMap.TryGetValue(uri, out gifMetadata))
+        //    {
+        //        Stream stream = GetWallpaperStream(uri);
+        //        if (stream == null)
+        //        {
+        //            return new GifMetadata();
+        //        }
 
-                gifMetadata = GifParser.GetFrames(uri, stream);
-                GifMetadataMap[uri] = gifMetadata;
-            }
-            return gifMetadata;
-        }
+        //        gifMetadata = GifParser.GetFrames(uri, stream);
+        //        GifMetadataMap[uri] = gifMetadata;
+        //    }
+        //    return gifMetadata;
+        //}
 
-        /// <summary>
-        /// 获取动态背景或静态背景的预览图
-        /// </summary>
-        /// <param name="paperType">标识是静态图还是动态图</param>
-        /// <param name="uri">背景图的路径</param>
-        /// <returns></returns>
-        public static BitmapSource GetWallpaperThumbnail(WallpaperTypeEnum paperType, string uri)
-        {
-            switch (paperType)
-            {
-                case WallpaperTypeEnum.Image:
-                    {
-                        return GetWallpaperBitmap(uri, 200, 200);
-                    }
+        ///// <summary>
+        ///// 获取动态背景或静态背景的预览图
+        ///// </summary>
+        ///// <param name="paperType">标识是静态图还是动态图</param>
+        ///// <param name="uri">背景图的路径</param>
+        ///// <returns></returns>
+        //public static BitmapSource GetWallpaperThumbnail(WallpaperTypeEnum paperType, string uri)
+        //{
+        //    switch (paperType)
+        //    {
+        //        case WallpaperTypeEnum.Image:
+        //            {
+        //                return GetWallpaperBitmap(uri, 200, 200);
+        //            }
 
-                case WallpaperTypeEnum.Live:
-                    {
-                        Stream stream = VTUtils.GetWallpaperStream(uri);
-                        if (stream == null)
-                        {
-                            throw new NotImplementedException();
-                        }
+        //        case WallpaperTypeEnum.Live:
+        //            {
+        //                Stream stream = VTUtils.GetWallpaperStream(uri);
+        //                if (stream == null)
+        //                {
+        //                    throw new NotImplementedException();
+        //                }
 
-                        return GifParser.GetThumbnail(stream);
-                    }
+        //                return GifParser.GetThumbnail(stream);
+        //            }
 
-                default:
-                    throw new NotImplementedException();
-            }
-        }
+        //        default:
+        //            throw new NotImplementedException();
+        //    }
+        //}
 
-        /// <summary>
-        /// 当Wallpaper是静态图的时候，获取静态图
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="pixelWidth">设置解码后的图像宽度，减少这个值可以减少内存占用</param>
-        /// <param name="pixelHeight">设置解码后的图像高度，减少这个值可以减少内存占用</param>
-        /// <returns></returns>
-        public static BitmapSource GetWallpaperBitmap(string uri, int pixelWidth = 0, int pixelHeight = 0)
-        {
-            Stream stream = VTUtils.GetWallpaperStream(uri);
-            if (stream == null)
-            {
-                throw new NotImplementedException();
-            }
+        ///// <summary>
+        ///// 当Wallpaper是静态图的时候，获取静态图
+        ///// </summary>
+        ///// <param name="uri"></param>
+        ///// <param name="pixelWidth">设置解码后的图像宽度，减少这个值可以减少内存占用</param>
+        ///// <param name="pixelHeight">设置解码后的图像高度，减少这个值可以减少内存占用</param>
+        ///// <returns></returns>
+        //public static BitmapSource GetWallpaperBitmap(string uri, int pixelWidth = 0, int pixelHeight = 0)
+        //{
+        //    Stream stream = VTUtils.GetWallpaperStream(uri);
+        //    if (stream == null)
+        //    {
+        //        throw new NotImplementedException();
+        //    }
 
-            BitmapImage bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.DecodePixelHeight = pixelHeight;
-            bitmapImage.DecodePixelWidth = pixelWidth;
-            bitmapImage.StreamSource = stream;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
+        //    BitmapImage bitmapImage = new BitmapImage();
+        //    bitmapImage.BeginInit();
+        //    bitmapImage.DecodePixelHeight = pixelHeight;
+        //    bitmapImage.DecodePixelWidth = pixelWidth;
+        //    bitmapImage.StreamSource = stream;
+        //    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+        //    bitmapImage.EndInit();
 
-            return bitmapImage;
-        }
+        //    return bitmapImage;
+        //}
 
         /// <summary>
         /// 根据当前屏幕大小计算终端的自适应大小

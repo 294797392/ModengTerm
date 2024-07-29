@@ -37,6 +37,8 @@
     <Compile Remove="Drawing\IDrawingTextLine.cs" />
     <Compile Remove="Drawing\IDrawingWallpaper.cs" />
     <Compile Remove="Drawing\RenderingOptions.cs" />
+    <Compile Remove="Enumerations\EffectTypeEnum.cs" />
+    <Compile Remove="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Remove="VTBookmarkStates.cs" />
     <Compile Remove="VTColorTable.cs" />
     <Compile Remove="VTextBlock.cs" />

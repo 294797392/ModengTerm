@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Document.Drawing
 {
-    public enum DrawingObjectTypes
+    public enum DocumentObjectTypes
     {
         /// <summary>
         /// 光标
@@ -26,16 +26,6 @@ namespace ModengTerm.Document.Drawing
         /// <summary>
         /// 文本行
         /// </summary>
-        TextLine,
-
-        /// <summary>
-        /// 壁纸
-        /// </summary>
-        Wallpaper,
-
-        /// <summary>
-        /// 矩形区域
-        /// </summary>
-        Rectangle
+        TextLine
     }
 }

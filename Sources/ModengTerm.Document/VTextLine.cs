@@ -38,7 +38,7 @@ namespace ModengTerm.Document
 
         #region 属性
 
-        public override DrawingObjectTypes Type => DrawingObjectTypes.TextLine;
+        public override DocumentObjectTypes Type => DocumentObjectTypes.TextLine;
 
         /// <summary>
         /// 物理行号，从0开始

@@ -110,7 +110,7 @@ namespace ModengTerm.Terminal.Session
             string terminalType = this.session.GetOption<string>(OptionKeyEnum.SSH_TERM_TYPE);
             int columns = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
             int rows = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            int readBufferSize = this.session.GetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE);
+            int readBufferSize = this.session.GetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE);
             this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, readBufferSize, null);
             this.stream.DataReceived += this.DataReceived;
             this.stream.ErrorOccurred += this.ErrorOccurred;

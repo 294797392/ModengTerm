@@ -12,7 +12,7 @@ namespace ModengTerm.Document.Rendering
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
     /// </summary>
-    public class DrawingObject : DrawingVisual, IDrawingObject
+    public class DrawingObject : DrawingVisual, IDocumentObject
     {
         #region 实例变量
 

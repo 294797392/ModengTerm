@@ -17,9 +17,9 @@ namespace ModengTerm.Terminal
 {
     public class VTOptions
     {
-        public IDocumentRenderer AlternateDocument { get; set; }
+        public IDocument AlternateDocument { get; set; }
 
-        public IDocumentRenderer MainDocument { get; set; }
+        public IDocument MainDocument { get; set; }
 
         /// <summary>
         /// 该终端所对应的Session
@@ -112,7 +112,7 @@ namespace ModengTerm.Terminal
 
         private bool xtermBracketedPasteMode;
 
-        private IDocumentRenderer documentCanvas;
+        private IDocument documentCanvas;
 
         /// <summary>
         /// 是否正在运行
@@ -274,7 +274,7 @@ namespace ModengTerm.Terminal
 
             Name = sessionInfo.Name;
 
-            writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.WRITE_ENCODING));
+            writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING));
             scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
             colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE);
             foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
@@ -688,7 +688,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, IDocumentRenderer drawingDocument)
+        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, IDocument drawingDocument)
         {
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY);
             double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);
@@ -876,6 +876,9 @@ namespace ModengTerm.Terminal
         // 换行和反向换行
         public void LineFeed()
         {
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+
             // LF
             // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
 
@@ -961,10 +964,18 @@ namespace ModengTerm.Terminal
                     }
                 }
             }
+
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol;
+
+            VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }
 
         public void RI_ReverseLineFeed()
         {
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+
             // 和LineFeed相反，也就是把光标往上移一个位置
             // 在用man命令的时候往上滚动会触发这个指令
             // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
@@ -1006,6 +1017,11 @@ namespace ModengTerm.Terminal
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
                 document.SetCursor(Cursor.Row - 1, Cursor.Column);
             }
+
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol;
+
+            VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }
 
         public void PrintCharacter(char ch)
@@ -1033,6 +1049,9 @@ namespace ModengTerm.Terminal
 
         public void EraseDisplay(VTEraseType eraseType)
         {
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+
             switch (eraseType)
             {
                 // terminal项目里是All和Scrollback执行的是一样的操作：In most terminals, this is done by moving the viewport into the scrollback, clearing out the current screen.
@@ -1112,6 +1131,11 @@ namespace ModengTerm.Terminal
                         break;
                     }
             }
+
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol;
+
+            VTDebug.Context.WriteInteractive("EraseDisplay", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, eraseType);
         }
 
         public void EL_EraseLine(VTEraseType eraseType)
@@ -1262,9 +1286,42 @@ namespace ModengTerm.Terminal
             this.activeDocument.SetCursor(row, col);
         }
 
-        public void CUP_CursorPosition(int row, int col)
+        public void CUP_CursorPosition(List<int> parameters)
         {
             // 打开vim，输入i，然后按tab，虽然第一行的字符列数小于要移动到的col，但是vim还是会移动，所以这里把不足的列数使用空格补齐
+
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+
+            int row = 0, col = 0;
+            if (parameters.Count == 2)
+            {
+                // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
+                int newrow = parameters[0];
+                int newcol = parameters[1];
+
+                // 测试中发现在ubuntu系统上执行apt install或者apt remove命令，HVP会发送0列过来，这里处理一下，如果遇到参数是0，那么就直接变成0
+                row = newrow == 0 ? 0 : newrow - 1;
+                col = newcol == 0 ? 0 : newcol - 1;
+
+                int viewportRow = this.ViewportRow;
+                int viewportColumn = this.ViewportColumn;
+
+                // 对行和列做限制
+                if (row >= viewportRow)
+                {
+                    row = viewportRow - 1;
+                }
+
+                if (col >= viewportColumn)
+                {
+                    col = viewportColumn - 1;
+                }
+            }
+            else
+            {
+                // 如果没有参数，那么说明就是定位到原点(0,0)
+            }
 
             if (this.ActiveLine.Columns < col)
             {
@@ -1272,14 +1329,24 @@ namespace ModengTerm.Terminal
             }
 
             activeDocument.SetCursor(row, col);
+
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol;
+
+            VTDebug.Context.WriteInteractive("CUP_CursorPosition", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }
 
         public void CUF_CursorForward(int n)
         {
-            int newRow = this.CursorRow;
-            int newCol = this.CursorCol + n;
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
 
-            this.CursorMovePosition(newRow, newCol);
+            this.CursorMovePosition(oldRow, oldCol + n);
+
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol;
+
+            VTDebug.Context.WriteInteractive("CUB_CursorBackward", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, n);
         }
 
         public void CUB_CursorBackward(int n)
@@ -1292,29 +1359,70 @@ namespace ModengTerm.Terminal
 
         public void CUU_CursorUp(int n)
         {
-            int newRow = this.CursorRow - n;
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+
+            this.CursorMovePosition(oldRow - n, oldCol);
+
+            int newRow = this.CursorRow;
             int newCol = this.CursorCol;
 
-            this.CursorMovePosition(newRow, newCol);
+            VTDebug.Context.WriteInteractive("CUU_CursorUp", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, n);
         }
 
         public void CUD_CursorDown(int n)
         {
-            int newRow = this.CursorRow + n;
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+
+            this.CursorMovePosition(oldRow + n, oldCol);
+
+            int newRow = this.CursorRow;
             int newCol = this.CursorCol;
 
-            this.CursorMovePosition(newRow, newCol);
+            VTDebug.Context.WriteInteractive("CUD_CursorDown", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, n);
         }
 
-        public void CHA_CursorHorizontalAbsolute(int col)
+        public void CHA_CursorHorizontalAbsolute(List<int> parameters)
         {
-            ActiveLine.PadColumns(col);
-            activeDocument.SetCursor(CursorRow, col);
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+            // 将光标移动到当前行中的第n列
+            int n = VTParameter.GetParameter(parameters, 0, -1);
+
+            if (n == -1)
+            {
+                VTDebug.Context.WriteInteractive("CHA_CursorHorizontalAbsolute", "{0},{1},{2}, n是-1, 不执行操作", oldRow, oldCol, n);
+            }
+            else
+            {
+                int col = n - 1;
+                ActiveLine.PadColumns(col);
+                activeDocument.SetCursor(CursorRow, col);
+
+                int newRow = this.CursorRow;
+                int newCol = this.CursorCol;
+
+                VTDebug.Context.WriteInteractive("CHA_CursorHorizontalAbsolute", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, n);
+            }
         }
 
-        public void VPA_VerticalLinePositionAbsolute(int row)
+        public void VPA_VerticalLinePositionAbsolute(List<int> parameters)
         {
-            activeDocument.SetCursor(row, CursorCol);
+            int oldRow = this.CursorRow;
+            int oldCol = this.CursorCol;
+
+            // 绝对垂直行位置 光标在当前列中垂直移动到第 <n> 个位置
+            // 保持列不变，把光标移动到指定的行处
+            int row = VTParameter.GetParameter(parameters, 0, 1);
+            row = Math.Max(0, row - 1);
+
+            activeDocument.SetCursor(row, oldCol);
+
+            int newRow = this.CursorRow;
+            int newCol = this.CursorCol;
+
+            VTDebug.Context.WriteInteractive("VPA_VerticalLinePositionAbsolute", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, row);
         }
 
         public void Backspace()
@@ -1330,13 +1438,43 @@ namespace ModengTerm.Terminal
         public void SU_ScrollUp(List<int> parameters) { }
 
         // Margin
-        public void DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin)
+        public void DECSTBM_SetScrollingRegion(List<int> parameters)
         {
-            activeDocument.SetScrollMargin(topMargin, bottomMargin);
+            // 当前终端屏幕可显示的行数量
+            int lines = this.ViewportRow;
+
+            int topMargin = VTParameter.GetParameter(parameters, 0, 1);
+            int bottomMargin = VTParameter.GetParameter(parameters, 1, lines);
+
+            if (bottomMargin < 0 || topMargin < 0)
+            {
+                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                return;
+            }
+            if (topMargin >= bottomMargin)
+            {
+                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
+                return;
+            }
+            if (bottomMargin > lines)
+            {
+                logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
+                return;
+            }
+
+            // 如果topMargin等于1，那么就表示使用默认值，也就是没有marginTop，所以当topMargin == 1的时候，marginTop改为0
+            int marginTop = topMargin == 1 ? 0 : topMargin - 1;
+            // 如果bottomMargin等于控制台高度，那么就表示使用默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
+            int marginBottom = lines - bottomMargin;
+
+            VTDebug.Context.WriteInteractive("DECSTBM_SetScrollingRegion", "topMargin1 = {0}, bottomMargin1 = {1}, topMargin2 = {2}, bottomMargin2 = {3}", topMargin, bottomMargin, marginTop, marginBottom);
+
+            activeDocument.SetScrollMargin(marginTop, marginBottom);
         }
 
         public void DECSLRM_SetLeftRightMargins(int leftMargin, int rightMargin)
         {
+            throw new NotImplementedException();
         }
 
 

@@ -8,12 +8,12 @@ using System.Windows;
 namespace ModengTerm.Document.Drawing
 {
     /// <summary>
-    /// 封装画图对象
+    /// 文档里的一个对象实例
     /// 一个实例对应界面上的一个元素
     /// 该接口保存UI对象的渲染数据，渲染数据由Document模型来生成
     /// 该接口只负责拿到数据后渲染并显示。这样可以最小化移植不同渲染引擎的工作量
     /// </summary>
-    public interface IDrawingObject
+    public interface IDocumentObject
     {
         /// <summary>
         /// 设置透明度
@@ -31,10 +31,10 @@ namespace ModengTerm.Document.Drawing
         /// <summary>
         /// 画一个矩形
         /// </summary>
-        /// <param name="rect"></param>
-        /// <param name="pen"></param>
-        /// <param name="backColor"></param>
-        void DrawRectangle(VTRect vtRec, VTPen vtPen, VTColor vtColor);
+        /// <param name="vtRect">矩形的大小和位置</param>
+        /// <param name="vtPen">矩形的边框画笔</param>
+        /// <param name="backColor">矩形背景色</param>
+        void DrawRectangle(VTRect vtRect, VTPen vtPen, VTColor backColor);
 
         /// <summary>
         /// 一次性画多个矩形

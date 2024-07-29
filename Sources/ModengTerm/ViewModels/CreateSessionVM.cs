@@ -779,10 +779,11 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY, this.FontFamilyList.SelectedItem.Value);
             session.SetOption<int>(OptionKeyEnum.THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
 
+            // 壁纸配置
             session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_TYPE, WallpaperTypeEnum.Color);
-            //session.SetOption<string>(OptionKeyEnum.SSH_THEME_BACKGROUND_URI, background.Uri);
-            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackColor));
-            session.SetOption<EffectTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_EFFECT, EffectTypeEnum.None);
+            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_URI, DrawingUtils.GetRgbKey(this.BackColor));
+            //session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackColor));
+            //session.SetOption<EffectTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_EFFECT, EffectTypeEnum.None);
 
             session.SetOption<string>(OptionKeyEnum.THEME_FONT_COLOR, DrawingUtils.GetRgbKey(this.FontColor));
             session.SetOption<int>(OptionKeyEnum.THEME_CURSOR_STYLE, (int)this.CursorStyles.SelectedItem);
@@ -834,8 +835,8 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
             session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
             session.SetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.AutoFit);
-            session.SetOption<string>(OptionKeyEnum.WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
-            session.SetOption<int>(OptionKeyEnum.READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
+            session.SetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
+            session.SetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
             session.SetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN, MTermConsts.DefaultContentMargin);

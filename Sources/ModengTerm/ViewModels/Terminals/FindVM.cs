@@ -74,9 +74,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 用来高亮显示匹配结果的矩形
         /// </summary>
-        private IDrawingObject mainRectElement;
-        private IDrawingObject alternateRectElement;
-        private IDrawingObject activeRectElement;
+        private IDocumentObject mainRectElement;
+        private IDocumentObject alternateRectElement;
+        private IDocumentObject activeRectElement;
 
         #endregion
 

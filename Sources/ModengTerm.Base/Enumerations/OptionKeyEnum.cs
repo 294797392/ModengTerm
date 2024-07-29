@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Base.Enumerations
 {
+    /// <summary>
+    /// 配置类型
+    /// </summary>
     public enum OptionKeyEnum
     {
-        #region SSH 0 - 500
+        #region SSH 0 - 5000
 
         // Terminal 0 - 99
         SSH_TERM_ROW = 0,
@@ -21,9 +24,12 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         SSH_PLAYBACK_FILE_PATH = 4,
 
-        #endregion
-
-        #region Theme 100 - 500
+        /// <summary>
+        /// 输出编码格式
+        /// </summary>
+        SSH_WRITE_ENCODING = 5,
+        SSH_WRITE_BUFFER_SIZE = 6,
+        SSH_READ_BUFFER_SIZE = 7,
 
         // Theme 100 - 200
         THEME_FONT_FAMILY = 100,
@@ -60,9 +66,6 @@ namespace ModengTerm.Base.Enumerations
 
         THEME_SELECTION_COLOR = 116,
 
-        #endregion
-
-        #region 
 
         /// <summary>
         /// 文档边距
@@ -86,7 +89,7 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
-        #region 串口 501 - 1000
+        #region 串口 5000 - 1000
 
         SERIAL_PORT_NAME = 501,
         SERIAL_PORT_BAUD_RATE = 502,
@@ -109,17 +112,6 @@ namespace ModengTerm.Base.Enumerations
         TERM_MAX_CLIPBOARD_HISTORY = 1002,
 
         MOUSE_SCROLL_DELTA = 1004,
-
-        #endregion
-
-        #region 通用 1501 - 5000
-
-        /// <summary>
-        /// 输出编码格式
-        /// </summary>
-        WRITE_ENCODING = 1501,
-        WRITE_BUFFER_SIZE = 1502,
-        READ_BUFFER_SIZE = 1503,
 
         #endregion
 

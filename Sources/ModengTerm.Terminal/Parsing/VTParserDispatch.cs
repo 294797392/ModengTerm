@@ -14,6 +14,7 @@ namespace ModengTerm.Terminal.Parsing
     /// <summary>
     /// 负责分发VTParser的事件
     /// 把指令和参数通过VTDispatchHandler透传给外部模块，外部模块去解析每个指令的参数
+    /// 所有的指令注释都写在VTParser里
     /// </summary>
     public partial class VTParser
     {
@@ -50,7 +51,7 @@ namespace ModengTerm.Terminal.Parsing
 
         private void ActionPrint(char ch)
         {
-            this.TraceAction("Print");
+            this.WriteCode("Print");
             this.DispatchHandler.PrintCharacter(ch);
         }
 
@@ -68,14 +69,14 @@ namespace ModengTerm.Terminal.Parsing
                         // VT applications expect to be able to write NUL
                         // and have _nothing_ happen. Filter the NULs here, so they don't fill the
                         // buffer with empty spaces.
-                        this.TraceAction("NUL");
+                        this.WriteCode("NUL");
                         break;
                     }
 
                 case ASCIITable.BEL:
                     {
                         // 响铃
-                        this.TraceAction("BEL");
+                        this.WriteCode("BEL");
                         this.DispatchHandler.PlayBell();
                         break;
                     }
@@ -83,7 +84,7 @@ namespace ModengTerm.Terminal.Parsing
                 case ASCIITable.BS:
                     {
                         // Backspace，退格，光标向前移动一位
-                        this.TraceAction("BS");
+                        this.WriteCode("BS");
                         this.DispatchHandler.Backspace();
                         break;
                     }
@@ -91,14 +92,14 @@ namespace ModengTerm.Terminal.Parsing
                 case ASCIITable.TAB:
                     {
                         // tab键
-                        this.TraceAction("TAB");
+                        this.WriteCode("TAB");
                         this.DispatchHandler.ForwardTab();
                         break;
                     }
 
                 case ASCIITable.CR:
                     {
-                        this.TraceAction("CR");
+                        this.WriteCode("CR");
                         this.DispatchHandler.CarriageReturn();
                         break;
                     }
@@ -108,18 +109,8 @@ namespace ModengTerm.Terminal.Parsing
                 case ASCIITable.VT:
                     {
                         // 这三个都是LF
-                        this.TraceAction("LF");
-
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
-
+                        this.WriteCode("LF");
                         this.DispatchHandler.LineFeed();
-
-                        int newRow = this.DispatchHandler.CursorRow;
-                        int newCol = this.DispatchHandler.CursorCol;
-                        
-                        VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
-
                         break;
                     }
 
@@ -127,7 +118,7 @@ namespace ModengTerm.Terminal.Parsing
                 case ASCIITable.SO:
                     {
                         // 这两个不知道是什么意思
-                        this.TraceAction("SO");
+                        this.WriteCode("SO");
                         logger.FatalFormat("未处理的SI和SO");
                         break;
                     }
@@ -150,7 +141,7 @@ namespace ModengTerm.Terminal.Parsing
             CsiActionCodes code = (CsiActionCodes)finalByte;
             if (Enum.IsDefined<CsiActionCodes>(code))
             {
-                this.TraceAction(code.ToString());
+                this.WriteCode(code.ToString());
             }
 
             switch (code)
@@ -187,17 +178,7 @@ namespace ModengTerm.Terminal.Parsing
                         /// </summary>
 
                         VTEraseType eraseType = (VTEraseType)VTParameter.GetParameter(parameters, 0, 0);
-
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
-
                         this.DispatchHandler.EraseDisplay(eraseType);
-
-                        int newRow = this.DispatchHandler.CursorRow;
-                        int newCol = this.DispatchHandler.CursorCol;
-
-                        VTDebug.Context.WriteInteractive("EraseDisplay", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, eraseType);
-
                         break;
                     }
 
@@ -205,96 +186,35 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // 	光标向后（左）<n> 行
 
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-
-                        VTDebug.Context.WriteInteractive("CUB_CursorBackward", "{0},{1},{2}", oldRow, oldCol, n);
-
                         this.DispatchHandler.CUF_CursorForward(n);
-
                         break;
                     }
 
                 case CsiActionCodes.HVP_HorizontalVerticalPosition:
                 case CsiActionCodes.CUP_CursorPosition:
                     {
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
-
-                        int row = 0, col = 0;
-                        if (parameters.Count == 2)
-                        {
-                            // VT的光标原点是(1,1)，我们程序里的是(0,0)，所以要减1
-                            int newrow = parameters[0];
-                            int newcol = parameters[1];
-
-                            // 测试中发现在ubuntu系统上执行apt install或者apt remove命令，HVP会发送0列过来，这里处理一下，如果遇到参数是0，那么就直接变成0
-                            row = newrow == 0 ? 0 : newrow - 1;
-                            col = newcol == 0 ? 0 : newcol - 1;
-
-                            int viewportRow = this.DispatchHandler.ViewportRow;
-                            int viewportColumn = this.DispatchHandler.ViewportColumn;
-
-                            // 对行和列做限制
-                            if (row >= viewportRow)
-                            {
-                                row = viewportRow - 1;
-                            }
-
-                            if (col >= viewportColumn)
-                            {
-                                col = viewportColumn - 1;
-                            }
-                        }
-                        else
-                        {
-                            // 如果没有参数，那么说明就是定位到原点(0,0)
-                        }
-
-                        this.DispatchHandler.CUP_CursorPosition(row, col);
-
-                        int newRow = this.DispatchHandler.CursorRow;
-                        int newCol = this.DispatchHandler.CursorCol;
-
-                        VTDebug.Context.WriteInteractive("CUP_CursorPosition", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
-
+                        this.DispatchHandler.CUP_CursorPosition(this.parameters);
                         break;
                     }
 
                 case CsiActionCodes.CUF_CursorForward:
                     {
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-
-                        VTDebug.Context.WriteInteractive("CUF_CursorForward", "{0},{1},{2}", oldRow, oldCol, n);
-
                         this.DispatchHandler.CUF_CursorForward(n);
-
                         break;
                     }
 
                 case CsiActionCodes.CUU_CursorUp:
                     {
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-
-                        VTDebug.Context.WriteInteractive("CUU_CursorUp", "{0},{1},{2}", oldRow, oldCol, n);
-
                         this.DispatchHandler.CUU_CursorUp(n);
                         break;
                     }
 
                 case CsiActionCodes.CUD_CursorDown:
                     {
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-
-                        VTDebug.Context.WriteInteractive("CUD_CursorDown", "{0},{1},{2}", oldRow, oldCol, n);
-
                         this.DispatchHandler.CUD_CursorDown(n);
                         break;
                     }
@@ -326,7 +246,6 @@ namespace ModengTerm.Terminal.Parsing
                         // bottomMargin：is the line number for the bottom margin.
                         // Default: Pb = current number of lines per screen
 
-
                         // 设置可滚动区域
                         // 不可以操作滚动区域以外的行，只能对滚动区域内的行进行操作
                         // 对于滚动区域的作用的解释，举个例子说明
@@ -343,36 +262,7 @@ namespace ModengTerm.Terminal.Parsing
                         // * DECSTBM moves the cursor to column 1, line 1 of the page
                         // * https://github.com/microsoft/terminal/issues/1849
 
-                        // 当前终端屏幕可显示的行数量
-                        int lines = this.DispatchHandler.ViewportRow;
-
-                        int topMargin = VTParameter.GetParameter(parameters, 0, 1);
-                        int bottomMargin = VTParameter.GetParameter(parameters, 1, lines);
-
-                        if (bottomMargin < 0 || topMargin < 0)
-                        {
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                            return;
-                        }
-                        if (topMargin >= bottomMargin)
-                        {
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，topMargin大于等bottomMargin，忽略本次设置, topMargin = {0}, bottomMargin = {1}", topMargin, bottomMargin);
-                            return;
-                        }
-                        if (bottomMargin > lines)
-                        {
-                            logger.ErrorFormat("DECSTBM_SetScrollingRegion参数不正确，bottomMargin大于当前屏幕总行数, bottomMargin = {0}, lines = {1}", bottomMargin, lines);
-                            return;
-                        }
-
-                        // 如果topMargin等于1，那么就表示使用默认值，也就是没有marginTop，所以当topMargin == 1的时候，marginTop改为0
-                        int marginTop = topMargin == 1 ? 0 : topMargin - 1;
-                        // 如果bottomMargin等于控制台高度，那么就表示使用默认值，也就是没有marginBottom，所以当bottomMargin == 控制台高度的时候，marginBottom改为0
-                        int marginBottom = lines - bottomMargin;
-
-                        VTDebug.Context.WriteInteractive("DECSTBM_SetScrollingRegion", "topMargin1 = {0}, bottomMargin1 = {1}, topMargin2 = {2}, bottomMargin2 = {3}", topMargin, bottomMargin, marginTop, marginBottom);
-
-                        this.DispatchHandler.DECSTBM_SetScrollingRegion(marginTop, marginBottom);
+                        this.DispatchHandler.DECSTBM_SetScrollingRegion(this.parameters);
                         break;
                     }
 
@@ -501,42 +391,14 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.CHA_CursorHorizontalAbsolute:
                     {
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
                         // 将光标移动到当前行中的第n列
-                        int n = VTParameter.GetParameter(parameters, 0, -1);
-
-                        if (n == -1)
-                        {
-                            VTDebug.Context.WriteInteractive("CHA_CursorHorizontalAbsolute", "{0},{1},{2}, n是-1, 不执行操作", oldRow, oldCol, n);
-                        }
-                        else
-                        {
-                            VTDebug.Context.WriteInteractive("CHA_CursorHorizontalAbsolute", "{0},{1},{2}", oldRow, oldCol, n);
-
-                            this.DispatchHandler.CHA_CursorHorizontalAbsolute(n - 1);
-                        }
-
+                        this.DispatchHandler.CHA_CursorHorizontalAbsolute(this.parameters);
                         break;
                     }
 
                 case CsiActionCodes.VPA_VerticalLinePositionAbsolute:
                     {
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
-
-                        // 绝对垂直行位置 光标在当前列中垂直移动到第 <n> 个位置
-                        // 保持列不变，把光标移动到指定的行处
-                        int row = VTParameter.GetParameter(parameters, 0, 1);
-                        row = Math.Max(0, row - 1);
-
-                        this.DispatchHandler.VPA_VerticalLinePositionAbsolute(row);
-
-                        int newRow = this.DispatchHandler.CursorRow;
-                        int newCol = this.DispatchHandler.CursorCol;
-
-                        VTDebug.Context.WriteInteractive("VPA_VerticalLinePositionAbsolute", "{0},{1},{2}", oldRow, oldCol, newRow, newCol);
-
+                        this.DispatchHandler.VPA_VerticalLinePositionAbsolute(this.parameters);
                         break;
                     }
 
@@ -566,14 +428,14 @@ namespace ModengTerm.Terminal.Parsing
 
                 case (CsiActionCodes)'~':
                     {
-                        this.TraceAction("UnPerformed_CSI126_");
+                        this.WriteCode("UnPerformed_CSI126_");
                         logger.ErrorFormat("不需要实现的CSIAction, ~");
                         break;
                     }
 
                 default:
                     {
-                        this.TraceAction("UnkownCSIAction");
+                        this.WriteCode("UnkownCSIAction");
                         logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                         break;
                     }
@@ -597,7 +459,7 @@ namespace ModengTerm.Terminal.Parsing
             EscActionCodes code = (EscActionCodes)ch;
             if (Enum.IsDefined<EscActionCodes>(code))
             {
-                this.TraceAction(code.ToString());
+                this.WriteCode(code.ToString());
             }
 
             switch (code)
@@ -628,18 +490,9 @@ namespace ModengTerm.Terminal.Parsing
 
                 case EscActionCodes.RI_ReverseLineFeed:
                     {
-                        int oldRow = this.DispatchHandler.CursorRow;
-                        int oldCol = this.DispatchHandler.CursorCol;
-
                         // Performs a "Reverse line feed", essentially, the opposite of '\n'.
                         //    Moves the cursor up one line, and tries to keep its position in the line
                         this.DispatchHandler.RI_ReverseLineFeed();
-
-                        int newRow = this.DispatchHandler.CursorRow;
-                        int newCol = this.DispatchHandler.CursorCol;
-
-                        VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
-
                         break;
                     }
 
@@ -691,12 +544,12 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         if (!this.HandleDesignateCharset(this.vtid))
                         {
-                            this.TraceAction("UnkownESCAction");
+                            this.WriteCode("UnkownESCAction");
                             logger.ErrorFormat("未实现EscAction, {0}", code);
                         }
                         else
                         {
-                            this.TraceAction("DesignateCharset");
+                            this.WriteCode("DesignateCharset");
                         }
 
                         break;
@@ -716,14 +569,14 @@ namespace ModengTerm.Terminal.Parsing
             VT52ActionCodes code = (VT52ActionCodes)ch;
             if (Enum.IsDefined<VT52ActionCodes>(code))
             {
-                this.TraceAction(code.ToString());
+                this.WriteCode(code.ToString());
             }
 
             switch (code)
             {
                 default:
                     {
-                        this.TraceAction("UnkownVt52EscAction");
+                        this.WriteCode("UnkownVt52EscAction");
                         logger.ErrorFormat("未实现VT52ActionCodes:{0}", code);
                         break;
                     }
@@ -836,7 +689,7 @@ namespace ModengTerm.Terminal.Parsing
 
         #region 实例方法
 
-        private void TraceAction(string action)
+        private void WriteCode(string action)
         {
             VTDebug.Context.WriteCode(action, this.sequenceBytes);
             this.sequenceBytes.Clear();
@@ -996,16 +849,29 @@ namespace ModengTerm.Terminal.Parsing
                             break;
                         }
 
-
                     case DECPrivateMode.VT200_MOUSE_MODE:
                         {
                             logger.FatalFormat("VT200_MOUSE_MODE有待实现");
                             break;
                         }
 
+                    case DECPrivateMode.SGR_EXTENDED_MODE:
+                        {
+                            logger.FatalFormat("SGR_EXTENDED_MODE有待实现");
+                            break;
+                        }
+
+                    case DECPrivateMode.BUTTON_EVENT_MOUSE_MODE:
+                        {
+                            logger.FatalFormat("BUTTON_EVENT_MOUSE_MODE有待实现");
+                            break;
+                        }
+
+                    // 这些都是terminal项目没实现的
+                    case (DECPrivateMode)1015:
                     case (DECPrivateMode)4:
                         {
-                            logger.FatalFormat("terminal没实现DECPrivateMode - 4");
+                            logger.FatalFormat("terminal没实现DECPrivateMode - {0}", mode);
                             break;
                         }
 
