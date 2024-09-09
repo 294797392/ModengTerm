@@ -24,7 +24,7 @@ namespace ModengTerm.Document
         public VTHistoryLine LastLine { get; protected set; }
 
         /// <summary>
-        /// 一共多少航
+        /// 一共多少行
         /// </summary>
         public int Lines { get; protected set; }
 

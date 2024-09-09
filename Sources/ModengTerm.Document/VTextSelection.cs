@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.Document
 {
     /// <summary>
-    /// 存储鼠标选中的文本信息
+    /// 存储鼠标选中的区域信息
     /// </summary>
     public class VTextSelection : VTElement
     {
@@ -35,9 +35,25 @@ namespace ModengTerm.Document
         /// </summary>
         public bool IsEmpty { get { return this.StartPointer.ColumnIndex < 0 || this.EndPointer.ColumnIndex < 0; } }
 
+        /// <summary>
+        /// 选中区域的起始位置
+        /// </summary>
         public VTextPointer StartPointer { get; set; }
 
+        /// <summary>
+        /// 选中区域的结束位置
+        /// </summary>
         public VTextPointer EndPointer { get; set; }
+
+        public VTextPointer TopPointer
+        {
+            get { return this.StartPointer.PhysicsRow > this.EndPointer.PhysicsRow ? this.EndPointer : this.StartPointer; }
+        }
+
+        public VTextPointer BottomPointer
+        {
+            get { return this.StartPointer.PhysicsRow > this.EndPointer.PhysicsRow ? this.StartPointer : this.EndPointer; }
+        }
 
         /// <summary>
         /// 选中区域的颜色
@@ -71,11 +87,11 @@ namespace ModengTerm.Document
             VTDocument document = this.OwnerDocument;
             VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
 
-            this.StartPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.StartPointer.PhysicsRow = scrollInfo.Value + logicalRow;
             this.StartPointer.CharacterIndex = 0;
             this.StartPointer.ColumnIndex = 0;
 
-            this.EndPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.EndPointer.PhysicsRow = scrollInfo.Value + logicalRow;
             this.EndPointer.CharacterIndex = textLine.Characters.Count - 1;
             this.EndPointer.ColumnIndex = document.ViewportColumn - 1;
 
@@ -95,11 +111,11 @@ namespace ModengTerm.Document
             VTDocument document = this.OwnerDocument;
             VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
 
-            this.StartPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.StartPointer.PhysicsRow = scrollInfo.Value + logicalRow;
             this.StartPointer.CharacterIndex = startCharacterIndex;
             this.StartPointer.ColumnIndex = textLine.FindCharacterColumn(this.StartPointer.CharacterIndex);
 
-            this.EndPointer.PhysicsRow = scrollInfo.ScrollValue + logicalRow;
+            this.EndPointer.PhysicsRow = scrollInfo.Value + logicalRow;
             this.EndPointer.CharacterIndex = startCharacterIndex + characterCount - 1;
             this.EndPointer.ColumnIndex = textLine.FindCharacterColumn(this.EndPointer.CharacterIndex);
 
@@ -351,8 +367,8 @@ namespace ModengTerm.Document
                 return;
             }
 
-            if (topPointer.PhysicsRow < document.Scrollbar.ScrollValue &&
-                bottomPointer.PhysicsRow >= document.Scrollbar.ScrollValue + document.ViewportRow - 1)
+            if (topPointer.PhysicsRow < document.Scrollbar.Value &&
+                bottomPointer.PhysicsRow >= document.Scrollbar.Value + document.ViewportRow - 1)
             {
                 // 选中区域的第一行在当前显示的第一行之前
                 // 选中区域的最后一行在当前显示的最后一行之后

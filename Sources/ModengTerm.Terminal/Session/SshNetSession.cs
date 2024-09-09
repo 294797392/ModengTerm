@@ -129,11 +129,10 @@ namespace ModengTerm.Terminal.Session
             this.sshClient.Disconnect();
         }
 
-        public override int Write(byte[] bytes)
+        public override void Write(byte[] bytes)
         {
             this.stream.Write(bytes, 0, bytes.Length);
             this.stream.Flush();
-            return ResponseCode.SUCCESS;
         }
 
         internal override int Read(byte[] buffer)

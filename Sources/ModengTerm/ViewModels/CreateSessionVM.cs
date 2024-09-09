@@ -26,6 +26,9 @@ using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.ViewModels
 {
+    /// <summary>
+    /// 新建Session窗口的ViewModel
+    /// </summary>
     public class CreateSessionVM : ViewModelBase
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionVM");
@@ -782,7 +785,7 @@ namespace ModengTerm.ViewModels
             // 壁纸配置
             session.SetOption<WallpaperTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_TYPE, WallpaperTypeEnum.Color);
             session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_URI, DrawingUtils.GetRgbKey(this.BackColor));
-            //session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackColor));
+            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackColor));
             //session.SetOption<EffectTypeEnum>(OptionKeyEnum.THEME_BACKGROUND_EFFECT, EffectTypeEnum.None);
 
             session.SetOption<string>(OptionKeyEnum.THEME_FONT_COLOR, DrawingUtils.GetRgbKey(this.FontColor));

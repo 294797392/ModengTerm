@@ -75,13 +75,13 @@ void VTDocument_initialize(VTDocument *document, VTDocumentOptions *options)
 	VTScrollInfo_initialize(scrollInfo);
 	document->scrollInfo = scrollInfo;
 
-	VTextLine *firstLine = createTextLine(0, options);
+	VTextLine *firstLine = createTextLine(options);
 	document->firstLine = firstLine;
 	document->lastLine = firstLine;
 	document->activeLine = firstLine;
 	for (int i = 1; i < options->viewportRow; i++)
 	{
-		VTextLine *textLine = createTextLine(i, options);
+		VTextLine *textLine = createTextLine(options);
 		VTextLine_append(document->lastLine, textLine);
 	}
 }

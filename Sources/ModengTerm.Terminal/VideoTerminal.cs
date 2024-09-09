@@ -11,6 +11,7 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using System.Printing;
 using System.Text;
+using System.Windows.Navigation;
 using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Terminal
@@ -361,68 +362,53 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 获取当前使用鼠标选中的段落区域
-        /// </summary>
-        /// <returns></returns>
-        public VTParagraph GetSelectedParagraph()
-        {
-            VTextSelection selection = this.activeDocument.Selection;
-            if (selection.IsEmpty)
-            {
-                return VTParagraph.Empty;
-            }
-
-            return this.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
-        }
-
-        /// <summary>
         /// 创建指定的段落内容
         /// </summary>
         /// <param name="paragraphType">段落类型</param>
         /// <param name="fileType">要创建的内容格式</param>
         /// <returns></returns>
-        public VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, ParagraphFormatEnum fileType)
+        public VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, ParagraphFormatEnum formatType)
         {
             // 所有要保存的行存储在这里
-            List<VTHistoryLine> historyLines = new List<VTHistoryLine>();
-            int startCharacterIndex = -1, endCharacterIndex = -1;
+            int startColumn = -1, endColumn = -1;
+            int firstPhysicsRow = -1, lastPhysicsRow = -1;
 
             switch (paragraphType)
             {
                 case ParagraphTypeEnum.AllDocument:
                     {
+                        startColumn = 0;
+                        endColumn = this.ViewportColumn;
+
                         if (IsAlternate)
                         {
-                            // 备用缓冲区直接保存VTextLine
-                            VTextLine current = this.activeDocument.FirstLine;
-                            while (current != null)
-                            {
-                                historyLines.Add(current.History);
-                                current = current.NextLine;
-                            }
+                            firstPhysicsRow = 0;
+                            lastPhysicsRow = this.ViewportRow;
                         }
                         else
                         {
-                            historyLines.AddRange(this.activeDocument.History.GetAllHistoryLines());
+                            firstPhysicsRow = 0;
+                            lastPhysicsRow = this.mainDocument.History.Lines;
                         }
-
-                        startCharacterIndex = 0;
-                        endCharacterIndex = historyLines.LastOrDefault().Characters.Count - 1;
 
                         break;
                     }
 
                 case ParagraphTypeEnum.Viewport:
                     {
-                        VTextLine current = this.activeDocument.FirstLine;
-                        while (current != null)
-                        {
-                            historyLines.Add(current.History);
-                            current = current.NextLine;
-                        }
+                        startColumn = 0;
+                        endColumn = this.ViewportColumn;
 
-                        startCharacterIndex = 0;
-                        endCharacterIndex = historyLines.LastOrDefault().Characters.Count - 1;
+                        if (this.IsAlternate)
+                        {
+                            firstPhysicsRow = 0;
+                            lastPhysicsRow = this.ViewportRow;
+                        }
+                        else
+                        {
+                            firstPhysicsRow = this.mainDocument.Scrollbar.FirstPhysicsRow;
+                            lastPhysicsRow = this.mainDocument.Scrollbar.LastPhysicsRow;
+                        }
 
                         break;
                     }
@@ -430,135 +416,29 @@ namespace ModengTerm.Terminal
                 case ParagraphTypeEnum.Selected:
                     {
                         VTextSelection selection = this.activeDocument.Selection;
-
                         if (selection.IsEmpty)
                         {
                             return VTParagraph.Empty;
                         }
 
-                        VTextPointer topPointer = null, bottomPointer = null;
+                        VTextPointer top = selection.TopPointer;
+                        VTextPointer bottom = selection.BottomPointer;
 
-                        if (selection.StartPointer.PhysicsRow < selection.EndPointer.PhysicsRow)
+                        if (top.PhysicsRow == bottom.PhysicsRow)
                         {
-                            topPointer = selection.StartPointer;
-                            bottomPointer = selection.EndPointer;
+                            // 处理是同一行的情况
+                            firstPhysicsRow = top.PhysicsRow;
+                            lastPhysicsRow = top.PhysicsRow;
+                            startColumn = top.ColumnIndex > bottom.ColumnIndex ? bottom.ColumnIndex : top.ColumnIndex;
+                            endColumn = top.ColumnIndex > bottom.ColumnIndex ? top.ColumnIndex : bottom.ColumnIndex;
                         }
                         else
                         {
-                            topPointer = selection.EndPointer;
-                            bottomPointer = selection.StartPointer;
+                            firstPhysicsRow = top.PhysicsRow;
+                            lastPhysicsRow = bottom.PhysicsRow;
+                            startColumn = top.ColumnIndex;
+                            endColumn = bottom.ColumnIndex;
                         }
-
-                        int topRow = topPointer.PhysicsRow;
-                        int bottomRow = bottomPointer.PhysicsRow;
-
-                        if (IsAlternate)
-                        {
-                            // 备用缓冲区没有滚动内容，只能选中当前显示出来的文档
-                            int rows = bottomRow - topRow + 1;
-                            VTextLine firstLine = this.activeDocument.FindLine(topRow);
-                            while (rows >= 0)
-                            {
-                                historyLines.Add(firstLine.History);
-
-                                firstLine = firstLine.NextLine;
-
-                                rows--;
-                            }
-                        }
-                        else
-                        {
-                            IEnumerable<VTHistoryLine> histories;
-                            if (!this.activeDocument.History.TryGetHistories(topRow, bottomRow, out histories))
-                            {
-                                logger.ErrorFormat("SaveSelected失败, 有的历史记录为空");
-                                return VTParagraph.Empty;
-                            }
-                            historyLines.AddRange(histories);
-
-                            if (historyLines.Count == 0)
-                            {
-                                logger.WarnFormat("选中区域为空");
-                                return VTParagraph.Empty;
-                            }
-                        }
-
-                        VTHistoryLine topLine = historyLines.FirstOrDefault();
-                        VTHistoryLine bottomLine = historyLines.LastOrDefault();
-
-                        #region 处理当选中的第一行没有文本的情况
-
-                        if (topPointer.CharacterIndex == -1)
-                        {
-                            // 第一行没有选中字符
-                            int columns = 0;
-
-                            for (int i = 0; i < topLine.Characters.Count; i++)
-                            {
-                                VTCharacter character = topLine.Characters[i];
-
-                                if (columns >= topPointer.ColumnIndex)
-                                {
-                                    startCharacterIndex = i;
-                                    break;
-                                }
-
-                                columns += character.ColumnSize;
-                            }
-
-                            // 如果选中的第一行没有选中的字符，那么就用下一行的第一个字符作为选中起始点
-                            if (startCharacterIndex == -1)
-                            {
-                                startCharacterIndex = 0;
-                                historyLines.Remove(topLine);
-                            }
-                        }
-                        else
-                        {
-                            startCharacterIndex = topPointer.CharacterIndex;
-                        }
-
-                        #endregion
-
-                        #region 处理当选中的最后一行没有文本的情况
-
-                        if (bottomPointer.CharacterIndex == -1)
-                        {
-                            // 最后一行没有选中字符
-
-                            int columns = bottomLine.Characters.Sum(v => v.ColumnSize);
-
-                            for (int i = bottomLine.Characters.Count - 1; i >= 0; i--)
-                            {
-                                VTCharacter character = bottomLine.Characters[i];
-
-                                if (columns <= bottomPointer.ColumnIndex)
-                                {
-                                    endCharacterIndex = i;
-                                    break;
-                                }
-
-                                columns -= character.ColumnSize;
-                            }
-
-                            // 如果选中的最后一行没有选中的字符，那么就用上一行的最后一个字符作为终点
-                            if (endCharacterIndex == -1)
-                            {
-                                historyLines.Remove(bottomLine);
-
-                                if (historyLines.Count > 0)
-                                {
-                                    VTHistoryLine historyLine = historyLines.LastOrDefault();
-                                    endCharacterIndex = historyLine.Characters.Count - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            endCharacterIndex = bottomPointer.CharacterIndex;
-                        }
-
-                        #endregion
 
                         break;
                     }
@@ -567,33 +447,16 @@ namespace ModengTerm.Terminal
                     throw new NotImplementedException();
             }
 
-            // 当选中的内容为空的时候会出现
-            if (historyLines.Count == 0)
+            VTParagraphOptions paragraphOptions = new VTParagraphOptions()
             {
-                return VTParagraph.Empty;
-            }
-
-            CreateContentParameter parameter = new CreateContentParameter()
-            {
-                SessionName = String.Empty,
-                HistoryLines = historyLines,
-                StartCharacterIndex = startCharacterIndex,
-                EndCharacterIndex = endCharacterIndex,
-                ContentType = fileType,
-                Typeface = this.activeDocument.Typeface
+                StartColumn = startColumn,
+                EndColumn = endColumn,
+                FirstPhysicsRow = firstPhysicsRow,
+                LastPhysicsRow = lastPhysicsRow,
+                FormatType = formatType
             };
 
-            string text = VTUtils.CreateContent(parameter);
-
-            return new VTParagraph()
-            {
-                Content = text,
-                CreationTime = DateTime.Now,
-                StartCharacterIndex = startCharacterIndex,
-                EndCharacterIndex = endCharacterIndex,
-                CharacterList = historyLines,
-                IsAlternate = IsAlternate
-            };
+            return this.activeDocument.GetParagraph(paragraphOptions);
         }
 
         /// <summary>
@@ -925,10 +788,10 @@ namespace ModengTerm.Terminal
                     // 滚动条滚动到底
                     // 计算滚动条可以滚动的最大值
 
-                    int scrollMax = scrollInfo.ScrollMax + 1;
+                    int scrollMax = scrollInfo.Maximum + 1;
                     scrollMax = Math.Min(scrollMax, document.ScrollMax);
-                    scrollInfo.ScrollMax = scrollMax;
-                    scrollInfo.ScrollValue = scrollMax;
+                    scrollInfo.Maximum = scrollMax;
+                    scrollInfo.Value = scrollMax;
 
                     #endregion
 
@@ -1090,26 +953,26 @@ namespace ModengTerm.Terminal
                             VTHistory history = document.History;
 
                             // 获取当前屏幕一共显示了多少行
-                            int displayRows = document.GetDisplayRows(scrollInfo.ScrollMax);
+                            int displayRows = document.GetDisplayRows(scrollInfo.Maximum);
 
                             // 计算滚动条的最大值
-                            int newScrollMax = scrollInfo.ScrollValue + displayRows;
+                            int newScrollMax = scrollInfo.Value + displayRows;
                             newScrollMax = Math.Min(newScrollMax, document.ScrollMax);
 
-                            if (newScrollMax == scrollInfo.ScrollMax)
+                            if (newScrollMax == scrollInfo.Maximum)
                             {
                                 return;
                             }
 
-                            scrollInfo.ScrollMax = newScrollMax;
-                            scrollInfo.ScrollValue = newScrollMax;
+                            scrollInfo.Maximum = newScrollMax;
+                            scrollInfo.Value = newScrollMax;
 
                             // 从ScrollMax开始显示
                             VTextLine textLine = document.FirstLine;
                             for (int i = 0; i < document.ViewportRow; i++)
                             {
                                 VTHistoryLine historyLine;
-                                if (document.History.TryGetHistory(scrollInfo.ScrollValue + i, out historyLine))
+                                if (document.History.TryGetHistory(scrollInfo.Value + i, out historyLine))
                                 {
                                     textLine.SetHistory(historyLine);
                                 }

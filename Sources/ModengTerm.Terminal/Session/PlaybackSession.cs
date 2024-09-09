@@ -49,7 +49,7 @@ namespace ModengTerm.Terminal.Session
         {
         }
 
-        public override int Write(byte[] buffer)
+        public override void Write(byte[] buffer)
         {
             throw new NotImplementedException();
         }

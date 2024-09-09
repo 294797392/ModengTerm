@@ -266,7 +266,7 @@ namespace ModengTerm.Terminal.ViewModels
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
 
-            #region 初始化功能菜单
+            #region 初始化右键菜单
 
             this.FunctionMenus = new BindableCollection<ShellFunctionMenu>()
             {
@@ -616,7 +616,7 @@ namespace ModengTerm.Terminal.ViewModels
             VTDebug.Context.WriteRawRead(bytes, size);
 
             VTDocument activeDocument = this.VideoTerminal.ActiveDocument;
-            int oldScroll = activeDocument.Scrollbar.ScrollValue;
+            int oldScroll = activeDocument.Scrollbar.Value;
 
             // 有些命令（top）会动态更新主缓冲区
             // 执行动作之前先把主缓冲区滚动到底
@@ -639,7 +639,7 @@ namespace ModengTerm.Terminal.ViewModels
                 // 全部数据都处理完了之后，只渲染一次
                 activeDocument.RequestInvalidate();
 
-                int newScroll = activeDocument.Scrollbar.ScrollValue;
+                int newScroll = activeDocument.Scrollbar.Value;
                 if (newScroll != oldScroll)
                 {
                     // 计算ScrollData
@@ -749,7 +749,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void Copy()
         {
-            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
+            VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
             if (paragraph.IsEmpty)
             {
                 return;
@@ -794,7 +794,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void AddFavorites()
         {
-            VTParagraph paragraph = this.videoTerminal.GetSelectedParagraph();
+            VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
             if (paragraph.IsEmpty)
             {
                 return;
@@ -805,10 +805,6 @@ namespace ModengTerm.Terminal.ViewModels
                 ID = Guid.NewGuid().ToString(),
                 Typeface = this.videoTerminal.ActiveDocument.Typeface,
                 SessionID = this.Session.ID,
-                StartCharacterIndex = paragraph.StartCharacterIndex,
-                EndCharacterIndex = paragraph.EndCharacterIndex,
-                CharacterList = paragraph.CharacterList,
-                CreationTime = paragraph.CreationTime,
             };
 
             throw new NotImplementedException();

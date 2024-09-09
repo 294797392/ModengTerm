@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using System;
@@ -281,14 +282,14 @@ namespace ModengTerm.Terminal.Session
                 return ResponseCode.FAILED;
             }
 
-            string cmdexePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            string exePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             string envPath = Environment.GetEnvironmentVariable("PATH");
             string env = string.Empty;
             if (!string.IsNullOrEmpty(envPath))
             {
                 env = string.Format("PATH={0}", envPath);
             }
-            this.spawn_config = winpty.winpty_spawn_config_new(winpty.WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN, cmdexePath, string.Empty, string.Empty, env, out winpty_error);
+            this.spawn_config = winpty.winpty_spawn_config_new(winpty.WINPTY_SPAWN_FLAG_AUTO_SHUTDOWN, exePath, string.Empty, string.Empty, env, out winpty_error);
             if (winpty_error != IntPtr.Zero)
             {
                 this.HandleWinptyError("winpty_spawn_config_new", winpty_error);
@@ -337,10 +338,9 @@ namespace ModengTerm.Terminal.Session
             }
         }
 
-        public override int Write(byte[] bytes)
+        public override void Write(byte[] bytes)
         {
             this.inputStream.Write(bytes, 0, bytes.Length);
-            return ResponseCode.SUCCESS;
         }
 
         internal override int Read(byte[] buffer)

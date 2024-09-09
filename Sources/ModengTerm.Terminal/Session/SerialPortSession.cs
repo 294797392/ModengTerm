@@ -72,10 +72,9 @@ namespace ModengTerm.Terminal.Session
             this.serialPort.Dispose();
         }
 
-        public override int Write(byte[] bytes)
+        public override void Write(byte[] bytes)
         {
             this.serialPort.Write(bytes, 0, bytes.Length);
-            return ResponseCode.SUCCESS;
         }
 
         internal override int Read(byte[] buffer)

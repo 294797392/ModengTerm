@@ -35,19 +35,19 @@ namespace ModengTerm.Document
         /// <summary>
         /// 获取当前显示的第一行的物理行号
         /// </summary>
-        public int FirstPhysicsRow { get { return this.ScrollValue; } }
+        public int FirstPhysicsRow { get { return this.Value; } }
 
         /// <summary>
         /// 获取当前显示的最后一行的物理行号
         /// </summary>
-        public int LastPhysicsRow { get { return this.ScrollValue + this.ownerDocument.ViewportRow - 1; } }
+        public int LastPhysicsRow { get { return this.Value + this.ownerDocument.ViewportRow - 1; } }
 
         /// <summary>
         /// 可以滚动到的最大值
         /// 也就是滚动条滚动到底的时候，滚动条的值
         /// 也就是滚动条滚动到底的时候，文档里的第一行的PhysicsRow
         /// </summary>
-        public int ScrollMax
+        public int Maximum
         {
             get { return scrollMax; }
             set
@@ -63,14 +63,14 @@ namespace ModengTerm.Document
         /// 可以滚动到的最小值
         /// 该值永远是0
         /// </summary>
-        public int ScrollMin { get; private set; }
+        public int Minimum { get; private set; }
 
         /// <summary>
         /// 滚动条的值
         /// 也就是当前Document上渲染的第一行的PhysicsRow
         /// 默认值是0
         /// </summary>
-        public int ScrollValue
+        public int Value
         {
             get { return scrollValue; }
             set
@@ -89,7 +89,7 @@ namespace ModengTerm.Document
         {
             get
             {
-                return ScrollMax > 0;
+                return Maximum > 0;
             }
         }
 
@@ -100,7 +100,7 @@ namespace ModengTerm.Document
         {
             get
             {
-                return ScrollValue == ScrollMax;
+                return Value == Maximum;
             }
         }
 
@@ -111,7 +111,7 @@ namespace ModengTerm.Document
         {
             get
             {
-                return ScrollValue == ScrollMin;
+                return Value == Minimum;
             }
         }
 
@@ -171,8 +171,8 @@ namespace ModengTerm.Document
                 }
 
                 this.scrollbar.ViewportRow = this.viewportRow;
-                this.scrollbar.Maximum = this.ScrollMax;
-                this.scrollbar.Value = this.ScrollValue;
+                this.scrollbar.Maximum = this.Maximum;
+                this.scrollbar.Value = this.Value;
             }
         }
     }

@@ -43,6 +43,7 @@
     <ClInclude Include="..\source\parser\VTParserStatements.h">
       <Filter>parser</Filter>
     </ClInclude>
+    <ClInclude Include="..\source\libvt.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\document\VTCursor.c">
@@ -64,5 +65,6 @@
     <ClCompile Include="..\source\parser\VTParser.c">
       <Filter>parser</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\libvt.c" />
   </ItemGroup>
 </Project>

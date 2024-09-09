@@ -314,7 +314,7 @@ namespace ModengTerm.Terminal.Session
             }
             catch (Exception ex)
             {
-                logger.ErrorFormat("连接失败", ex);
+                logger.Error("连接失败", ex);
                 this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
                 return;
             }

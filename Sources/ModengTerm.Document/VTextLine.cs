@@ -604,13 +604,13 @@ namespace ModengTerm.Document
                 textLine = textLine.NextLine;
             }
 
-            if (scrollInfo.ScrollMax == 0)
+            if (scrollInfo.Maximum == 0)
             {
                 return logicalRow;
             }
             else
             {
-                return scrollInfo.ScrollValue + logicalRow;
+                return scrollInfo.Value + logicalRow;
             }
         }
 

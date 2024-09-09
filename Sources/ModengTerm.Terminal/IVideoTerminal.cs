@@ -85,12 +85,6 @@ namespace ModengTerm.Terminal
         VTParagraph CreateParagraph(ParagraphTypeEnum paragraphType, ParagraphFormatEnum formatType);
 
         /// <summary>
-        /// 获取当前使用鼠标选中的段落区域
-        /// </summary>
-        /// <returns></returns>
-        VTParagraph GetSelectedParagraph();
-
-        /// <summary>
         /// 选中所有内容
         /// </summary>
         void SelectAll();

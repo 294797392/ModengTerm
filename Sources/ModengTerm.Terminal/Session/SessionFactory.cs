@@ -16,7 +16,8 @@ namespace ModengTerm.Terminal.Session
             switch ((SessionTypeEnum)options.Type)
             {
                 case SessionTypeEnum.SSH: return new SshNetSession(options);
-                case SessionTypeEnum.HostCommandLine: return new WinptySession(options);
+                //case SessionTypeEnum.HostCommandLine: return new WinptySession(options);
+                case SessionTypeEnum.HostCommandLine: return new PseudoConsoleSession(options);
                 case SessionTypeEnum.SerialPort: return new SerialPortSession(options);
                 case SessionTypeEnum.SSHPlayback: return new PlaybackSession(options);
                 default:

@@ -87,17 +87,15 @@ namespace ModengTerm.Terminal.Session
             this.ssh = IntPtr.Zero;
         }
 
-        public override int Write(byte[] data)
+        public override void Write(byte[] data)
         {
             IntPtr bytesPtr = Marshal.UnsafeAddrOfPinnedArrayElement(data, 0);
             int code = libvt.vtssh_send(this.ssh, bytesPtr, data.Length);
             if (code != libvt.VTSSH_ERR.VTSSH_ERR_OK)
             {
                 logger.ErrorFormat("vtssh_send失败, code = {0}", code);
-                return ResponseCode.FAILED;
+                throw new Exception();
             }
-
-            return ResponseCode.SUCCESS;
         }
 
         internal override int Read(byte[] buffer)

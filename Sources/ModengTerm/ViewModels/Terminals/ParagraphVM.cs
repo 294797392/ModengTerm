@@ -60,26 +60,27 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.ID = Guid.NewGuid().ToString();
             this.Content = paragraph.Content;
-            this.CreationTime = paragraph.CreationTime;
             //this.FirstRow = paragraph.FirstPhysicsRow;
         }
 
         public ParagraphVM(Favorites favorites)
         {
+            throw new NotImplementedException();
+
             this.ID = Guid.NewGuid().ToString();
 
-            CreateContentParameter ccp = new CreateContentParameter()
-            {
-                StartCharacterIndex = favorites.StartCharacterIndex,
-                EndCharacterIndex = favorites.EndCharacterIndex,
-                HistoryLines = favorites.CharacterList,
-                ContentType = ParagraphFormatEnum.PlainText,
-                SessionName = String.Empty,
-                Typeface = favorites.Typeface,
-            };
-            this.Content = VTUtils.CreateContent(ccp);
-            this.CreationTime = favorites.CreationTime;
-            this.FirstRow = -1;
+            //CreateContentParameter ccp = new CreateContentParameter()
+            //{
+            //    StartCharacterIndex = favorites.StartCharacterIndex,
+            //    EndCharacterIndex = favorites.EndCharacterIndex,
+            //    HistoryLines = favorites.CharacterList,
+            //    ContentType = ParagraphFormatEnum.PlainText,
+            //    SessionName = String.Empty,
+            //    Typeface = favorites.Typeface,
+            //};
+            //this.Content = VTUtils.CreateContent(ccp);
+            //this.CreationTime = favorites.CreationTime;
+            //this.FirstRow = -1;
         }
     }
 }

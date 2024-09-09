@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Document.Enumerations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,34 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Document
 {
+    public class VTParagraphOptions
+    {
+        /// <summary>
+        /// 第一行的物理行号
+        /// </summary>
+        public int FirstPhysicsRow { get; set; }
+
+        /// <summary>
+        /// 最后一行的物理行号
+        /// </summary>
+        public int LastPhysicsRow { get; set; }
+
+        /// <summary>
+        /// 第一行的起始列数
+        /// </summary>
+        public int StartColumn { get; set; }
+
+        /// <summary>
+        /// 最后一行的结束列
+        /// </summary>
+        public int EndColumn { get; set; }
+
+        /// <summary>
+        /// 段落格式
+        /// </summary>
+        public ParagraphFormatEnum FormatType { get; set; }
+    }
+
     /// <summary>
     /// 存储文档里的一个段落信息
     /// </summary>
@@ -22,34 +51,9 @@ namespace ModengTerm.Document
         public bool IsEmpty { get { return string.IsNullOrEmpty(Content); } }
 
         /// <summary>
-        /// 该段落的创建时间
-        /// </summary>
-        public DateTime CreationTime { get; set; }
-
-        /// <summary>
         /// 该段落的纯文件数据，包含换行符
         /// </summary>
         public string Content { get; set; }
-
-        /// <summary>
-        /// 该段落的字符列表
-        /// </summary>
-        public List<VTHistoryLine> CharacterList { get; set; }
-
-        /// <summary>
-        /// 段落的起始行的第一个字符索引
-        /// </summary>
-        public int StartCharacterIndex { get; set; }
-
-        /// <summary>
-        /// 段落的结束行的最后一个字符索引
-        /// </summary>
-        public int EndCharacterIndex { get; set; }
-
-        /// <summary>
-        /// 是否是备用缓冲区里的内容
-        /// </summary>
-        public bool IsAlternate { get; set; }
 
         public VTParagraph()
         {

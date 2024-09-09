@@ -1,9 +1,13 @@
-﻿using ModengTerm.Document.Drawing;
+﻿using Microsoft.VisualBasic.FileIO;
+using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Text;
 using static ModengTerm.Document.VTextLine;
 
 namespace ModengTerm.Document
@@ -301,14 +305,14 @@ namespace ModengTerm.Document
         private VTScrollData ScrollToHistory(int physicsRow)
         {
             // 要滚动的值和当前值是一样的，也不滚动
-            if (Scrollbar.ScrollValue == physicsRow)
+            if (Scrollbar.Value == physicsRow)
             {
                 return null;
             }
 
             // 判断要滚动的目标值合法性
-            if (physicsRow > Scrollbar.ScrollMax ||
-                physicsRow < Scrollbar.ScrollMin)
+            if (physicsRow > Scrollbar.Maximum ||
+                physicsRow < Scrollbar.Minimum)
             {
                 return null;
             }
@@ -316,7 +320,7 @@ namespace ModengTerm.Document
             // 要滚动到的值
             int newScroll = physicsRow;
             // 滚动之前的值
-            int oldScroll = Scrollbar.ScrollValue;
+            int oldScroll = Scrollbar.Value;
 
             // 需要进行滚动的行数
             int scrolledRows = Math.Abs(newScroll - oldScroll);
@@ -442,7 +446,7 @@ namespace ModengTerm.Document
             #endregion
 
             // 更新当前滚动条的值
-            Scrollbar.ScrollValue = physicsRow;
+            Scrollbar.Value = physicsRow;
 
             // 有可能光标所在行被滚动到了文档外，此时要更新ActiveLine，ActiveLine就是空的
             this.SetCursor(newCursorRow, this.Cursor.Column);
@@ -477,7 +481,7 @@ namespace ModengTerm.Document
                 if (!ScrollAtTop)
                 {
                     // 不在最上面，往上滚动一行
-                    scrollTarget = Scrollbar.ScrollValue - 1;
+                    scrollTarget = Scrollbar.Value - 1;
                 }
             }
             else if (mousePosition.Y > displaySize.Height)
@@ -486,7 +490,7 @@ namespace ModengTerm.Document
                 if (!ScrollAtBottom)
                 {
                     // 往下滚动一行
-                    scrollTarget = Scrollbar.ScrollValue + 1;
+                    scrollTarget = Scrollbar.Value + 1;
                 }
             }
 
@@ -578,7 +582,7 @@ namespace ModengTerm.Document
             #endregion
 
             // 命中成功再更新TextPointer，保证pointer不为空
-            pointer.PhysicsRow = logicalRow + this.Scrollbar.ScrollValue;
+            pointer.PhysicsRow = logicalRow + this.Scrollbar.Value;
             pointer.CharacterIndex = charIndexHit;
             pointer.ColumnIndex = columnIndexHit;
 
@@ -1172,6 +1176,7 @@ namespace ModengTerm.Document
             {
                 Cursor.Row = row;
 
+                // 当光标所在行被滚动到了可视区域外，ActiveLine就是空的
                 ActiveLine = FirstLine.FindNext(row);
             }
 
@@ -1293,13 +1298,13 @@ namespace ModengTerm.Document
             }
 
             // 判断要滚动到的行是否超出了滚动最大值或者最小值
-            if (scrollTo < Scrollbar.ScrollMin)
+            if (scrollTo < Scrollbar.Minimum)
             {
-                scrollTo = Scrollbar.ScrollMin;
+                scrollTo = Scrollbar.Minimum;
             }
-            else if (scrollTo > Scrollbar.ScrollMax)
+            else if (scrollTo > Scrollbar.Maximum)
             {
-                scrollTo = Scrollbar.ScrollMax;
+                scrollTo = Scrollbar.Maximum;
             }
 
             return ScrollToHistory(scrollTo);
@@ -1312,7 +1317,7 @@ namespace ModengTerm.Document
         {
             if (!ScrollAtBottom)
             {
-                ScrollToHistory(Scrollbar.ScrollMax);
+                ScrollToHistory(Scrollbar.Maximum);
             }
         }
 
@@ -1435,7 +1440,7 @@ namespace ModengTerm.Document
                 // 新的光标所在行
                 int newCursorRow = this.Cursor.Row;
                 // 第一行要显示的内容
-                int newScrollMax = scrollInfo.ScrollMax;
+                int newScrollMax = scrollInfo.Maximum;
 
                 // 当前总行数
                 int allRows = this.history.Lines;
@@ -1454,7 +1459,7 @@ namespace ModengTerm.Document
                     if (allRows > newRow)
                     {
                         newCursorRow += rows;
-                        newScrollMax = scrollInfo.ScrollValue - rows;
+                        newScrollMax = scrollInfo.Value - rows;
                     }
                 }
                 else
@@ -1472,7 +1477,7 @@ namespace ModengTerm.Document
                     if (allRows > newRow)
                     {
                         newCursorRow -= rows;
-                        newScrollMax = scrollInfo.ScrollValue + rows;
+                        newScrollMax = scrollInfo.Value + rows;
                     }
                     else if (oldCursorRow > newRow)
                     {
@@ -1483,8 +1488,8 @@ namespace ModengTerm.Document
                 // 更新文档显示内容，第一行显示scrollMax
                 if (allRows > newRow)
                 {
-                    scrollInfo.ScrollMax = newScrollMax;
-                    scrollInfo.ScrollValue = newScrollMax;
+                    scrollInfo.Maximum = newScrollMax;
+                    scrollInfo.Value = newScrollMax;
 
                     VTextLine textLine = this.FirstLine;
                     for (int i = 0; i < newRow; i++)
@@ -1543,6 +1548,73 @@ namespace ModengTerm.Document
         public int GetDisplayRows(int scrollValue)
         {
             return Math.Max(0, history.Lines - scrollValue);
+        }
+
+        public VTParagraph GetParagraph(VTParagraphOptions options)
+        {
+            ParagraphFormatEnum formatType = options.FormatType;
+            int firstPhysicsRow = options.FirstPhysicsRow;
+            int lastPhysicsRow = options.LastPhysicsRow;
+            int startColumn = options.StartColumn;
+            int endColumn = options.EndColumn;
+
+            CreateLineDelegate createLine = VTUtils.GetCreateLineDelegate(formatType);
+            StringBuilder builder = new StringBuilder();
+
+            for (int i = firstPhysicsRow; i <= lastPhysicsRow; i++)
+            {
+                VTHistoryLine historyLine;
+                if (!this.history.TryGetHistory(i, out historyLine))
+                {
+                    // 不存在该行，说明当前行还没有用到
+                }
+                else
+                {
+                    // 第一个字符的索引
+                    int startIndex = 0;
+                    // 字符数量
+                    int count = 0;
+
+                    if (i == firstPhysicsRow && i == lastPhysicsRow)
+                    {
+                        // 优先处理只选中了一行的情况
+                        startIndex = VTUtils.GetCharacterIndex(historyLine.Characters, startColumn);
+                        int endIndex = VTUtils.GetCharacterIndex(historyLine.Characters, endColumn);
+                        count = endIndex - startIndex + 1;
+                    }
+                    else if (i == firstPhysicsRow)
+                    {
+                        startIndex = VTUtils.GetCharacterIndex(historyLine.Characters, startColumn);
+                        count = historyLine.Characters.Count - startIndex + 1;
+                    }
+                    else if (i == lastPhysicsRow)
+                    {
+                        startIndex = 0;
+                        count = VTUtils.GetCharacterIndex(historyLine.Characters, endColumn) + 1;
+                    }
+                    else
+                    {
+                        startIndex = 0;
+                        count = historyLine.Characters.Count;
+                    }
+
+                    createLine(historyLine.Characters, builder, startIndex, count, i == lastPhysicsRow);
+                }
+            }
+
+
+            //if (fileType == ParagraphFormatEnum.HTML)
+            //{
+            //    string htmlBackground = VTColor.CreateFromRgbKey(parameter.Typeface.BackgroundColor).Html;
+            //    string htmlForeground = VTColor.CreateFromRgbKey(parameter.Typeface.ForegroundColor).Html;
+            //    return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground,
+            //    parameter.Typeface.FontSize, parameter.Typeface.FontFamily, htmlForeground);
+            //}
+
+            return new VTParagraph()
+            {
+                Content = builder.ToString()
+            };
         }
 
         #endregion
@@ -1672,8 +1744,8 @@ namespace ModengTerm.Document
 
         private void OnMouseWheel(bool upper)
         {
-            int oldScroll = Scrollbar.ScrollValue;
-            int scrollMax = Scrollbar.ScrollMax;
+            int oldScroll = Scrollbar.Value;
+            int scrollMax = Scrollbar.Maximum;
             int newScroll = 0; // 最终要滚动到的值
 
             if (upper)
@@ -1690,7 +1762,7 @@ namespace ModengTerm.Document
                 if (oldScroll < scrollDelta)
                 {
                     // 一次可以全部滚完并且还有剩余
-                    newScroll = Scrollbar.ScrollMin;
+                    newScroll = Scrollbar.Minimum;
                 }
                 else
                 {

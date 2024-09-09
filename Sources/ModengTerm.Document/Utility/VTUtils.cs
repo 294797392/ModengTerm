@@ -11,25 +11,7 @@ using ModengTerm.Document.Enumerations;
 
 namespace ModengTerm.Document.Utility
 {
-    public class CreateContentParameter
-    {
-        public List<VTHistoryLine> HistoryLines { get; set; }
-
-        public int StartCharacterIndex { get; set; }
-
-        public int EndCharacterIndex { get; set; }
-
-        public ParagraphFormatEnum ContentType { get; set; }
-
-        public string SessionName { get; set; }
-
-        /// <summary>
-        /// 字体样式
-        /// </summary>
-        public VTypeface Typeface { get; set; }
-    }
-
-    public delegate void CreateLineDelegate(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count);
+    public delegate void CreateLineDelegate(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, bool lastLine);
 
     /// <summary>
     /// 提供终端的工具函数
@@ -59,7 +41,7 @@ namespace ModengTerm.Document.Utility
         {
         }
 
-        internal static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count)
+        internal static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, bool lastLine)
         {
             string text = VTUtils.CreatePlainText(characters, startIndex, count);
             //if (filter != null)
@@ -70,9 +52,9 @@ namespace ModengTerm.Document.Utility
             //    }
             //}
 
-            if (string.IsNullOrEmpty(text))
+            if (lastLine)
             {
-                builder.AppendLine();
+                builder.Append(text);
             }
             else
             {
@@ -80,7 +62,7 @@ namespace ModengTerm.Document.Utility
             }
         }
 
-        internal static void CreateHtml(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count)
+        internal static void CreateHtml(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, bool lastLine)
         {
             if (characters.Count == 0)
             {
@@ -170,52 +152,6 @@ namespace ModengTerm.Document.Utility
         }
 
 
-
-
-        public static string CreateContent(CreateContentParameter parameter)
-        {
-            List<VTHistoryLine> charactersList = parameter.HistoryLines;
-            ParagraphFormatEnum fileType = parameter.ContentType;
-            int startCharIndex = parameter.StartCharacterIndex;
-            int endCharIndex = parameter.EndCharacterIndex;
-
-            CreateLineDelegate createLine = VTUtils.GetCreateLineDelegate(fileType);
-            StringBuilder builder = new StringBuilder();
-
-            if (charactersList.Count == 1)
-            {
-                // 只有一行
-                createLine(charactersList[0].Characters, builder, startCharIndex, endCharIndex - startCharIndex + 1);
-            }
-            else
-            {
-                // 第一行
-                List<VTCharacter> first = charactersList[0].Characters;
-                createLine(first, builder, startCharIndex, first.Count - startCharIndex);
-
-                // 中间的行
-                for (int i = 1; i < charactersList.Count - 1; i++)
-                {
-                    List<VTCharacter> characters = charactersList[i].Characters;
-                    createLine(characters, builder, 0, characters.Count);
-                }
-
-                // 最后一行
-                List<VTCharacter> last = charactersList.LastOrDefault().Characters;
-                createLine(last, builder, 0, endCharIndex + 1);
-            }
-
-            if (fileType == ParagraphFormatEnum.HTML)
-            {
-                string htmlBackground = VTColor.CreateFromRgbKey(parameter.Typeface.BackgroundColor).Html;
-                string htmlForeground = VTColor.CreateFromRgbKey(parameter.Typeface.ForegroundColor).Html;
-                return string.Format(HtmlTemplate, parameter.SessionName, builder.ToString(), htmlBackground,
-                    parameter.Typeface.FontSize, parameter.Typeface.FontFamily, htmlForeground);
-            }
-
-            return builder.ToString();
-        }
-
         /// <summary>
         /// 获取字符列表一共占多少列
         /// </summary>
@@ -231,6 +167,32 @@ namespace ModengTerm.Document.Utility
             }
 
             return columns;
+        }
+
+        /// <summary>
+        /// 根据列索引获取该列对应的字符的索引
+        /// </summary>
+        /// <param name="characters"></param>
+        /// <param name="column"></param>
+        /// <returns>如果不存在则返回-1</returns>
+        public static int GetCharacterIndex(IEnumerable<VTCharacter> characters, int column)
+        {
+            int characterIndex = 0;
+            int columns = 0;
+
+            foreach (VTCharacter character in characters)
+            {
+                if (columns >= column)
+                {
+                    return characterIndex;
+                }
+
+                columns += character.ColumnSize;
+
+                characterIndex++;
+            }
+
+            return -1;
         }
 
         /// <summary>
