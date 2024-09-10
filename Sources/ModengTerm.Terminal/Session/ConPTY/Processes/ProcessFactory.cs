@@ -83,7 +83,7 @@ namespace ModengTerm.Terminal.Session.ConPTY.Processes
                 lpProcessAttributes: ref pSec,
                 lpThreadAttributes: ref tSec,
                 bInheritHandles: false,
-                dwCreationFlags: EXTENDED_STARTUPINFO_PRESENT,
+                dwCreationFlags: EXTENDED_STARTUPINFO_PRESENT | CREATE_UNICODE_ENVIRONMENT,
                 lpEnvironment: IntPtr.Zero,
                 lpCurrentDirectory: null,
                 lpStartupInfo: ref sInfoEx,

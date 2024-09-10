@@ -45,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="testcase.json" />
     <None Remove="Wallpapers\img1.jpg" />
     <None Remove="Wallpapers\img2.png" />
     <None Remove="Wallpapers\img3.png" />

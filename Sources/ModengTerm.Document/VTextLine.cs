@@ -629,7 +629,7 @@ namespace ModengTerm.Document
 
         protected override void OnRender()
         {
-            VTFormattedText formattedText = VTUtils.CreateFormattedText(Characters);
+            VTFormattedText formattedText = VTUtils.CreateFormattedText(this.Characters);
             formattedText.Style = this.Typeface;
 
             this.formattedText = formattedText;

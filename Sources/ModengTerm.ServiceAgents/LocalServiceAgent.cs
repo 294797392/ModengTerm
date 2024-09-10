@@ -2,6 +2,7 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.ServiceAgents.DataModels;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,8 @@ namespace ModengTerm.ServiceAgents
     public class LocalServiceAgent : ServiceAgent
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("LocalServiceAgent");
+
+        private static readonly string DefaultSessionFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "defaultSession.json");
 
         public override int DeletePlaybackFile(string fileId)
         {

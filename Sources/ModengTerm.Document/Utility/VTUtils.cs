@@ -199,6 +199,8 @@ namespace ModengTerm.Document.Utility
         /// 创建带有样式的文本
         /// </summary>
         /// <param name="characters"></param>
+        /// <param name="startIndex"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
         public static VTFormattedText CreateFormattedText(List<VTCharacter> characters, int startIndex, int count)
         {
@@ -551,10 +553,5 @@ namespace ModengTerm.Document.Utility
                 break;
             }
         }
-
-
-
-
-
     }
 }

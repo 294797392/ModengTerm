@@ -8,6 +8,7 @@ using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,7 +75,7 @@ namespace XTerminal
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
-        private void CreateSession()
+        private void ShowCreateSessionWindow()
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
             sessionListWindow.Owner = this;
@@ -82,11 +83,26 @@ namespace XTerminal
             if ((bool)sessionListWindow.ShowDialog())
             {
                 XTermSession session = sessionListWindow.SelectedSession;
-
-                ISessionContent content = this.sessionListVM.OpenSession(session);
-                ContentControlSession.Content = content;
-                ScrollViewerOpenedSession.ScrollToRightEnd();
+                this.OpenSession(session);
             }
+        }
+
+        private void OpenSession(XTermSession session) 
+        {
+            ISessionContent content = this.sessionListVM.OpenSession(session);
+            ContentControlSession.Content = content;
+            ScrollViewerOpenedSession.ScrollToRightEnd();
+        }
+
+        private void OpenDefaultSession()
+        {
+            XTermSession defaultSession = MTermApp.Context.Manifest.DefaultSession;
+            if (defaultSession == null)
+            {
+                return;
+            }
+
+            this.OpenSession(defaultSession);
         }
 
         /// <summary>
@@ -126,7 +142,12 @@ namespace XTerminal
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.CreateSession();
+            //this.CreateSession();
+
+            // 直接打开Windows命令行，可以更快速的进入工作状态
+            // TODO：做成可选项，可以直接打开命令行，也能打开会话列表
+
+            this.OpenDefaultSession();
         }
 
         private void ListBoxOpenedSession_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -173,7 +194,7 @@ namespace XTerminal
 
         private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)
         {
-            this.CreateSession();
+            this.ShowCreateSessionWindow();
         }
 
         private void ButtonCloseSession_Click(object sender, RoutedEventArgs e)
@@ -189,6 +210,12 @@ namespace XTerminal
             {
                 ContentControlSession.Content = null;
                 ListBoxOpenedSession.SelectedItem = null;
+            }
+
+            if (this.sessionListVM.SessionList.Count == 1 &&
+                this.sessionListVM.SessionList[0] is OpenSessionVM) 
+            {
+                this.ShowCreateSessionWindow();
             }
         }
 
@@ -216,7 +243,7 @@ namespace XTerminal
             }
 
             // 打开会话
-            this.CreateSession();
+            this.ShowCreateSessionWindow();
         }
 
         private void MenuItemAbout_Click(object sender, RoutedEventArgs e)

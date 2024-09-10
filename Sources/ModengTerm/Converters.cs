@@ -282,4 +282,43 @@ namespace ModengTerm
             throw new NotImplementedException();
         }
     }
+
+    public class BehaviorRightClicksConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return "未知方式";
+            }
+
+            BehaviorRightClicks brc = (BehaviorRightClicks)value;
+
+            switch (brc)
+            {
+                case BehaviorRightClicks.ContextMenu:
+                    {
+                        return "显示上下文菜单";
+                    }
+
+                case BehaviorRightClicks.Copy:
+                    {
+                        return "复制选中内容";
+                    }
+
+                case BehaviorRightClicks.None:
+                    {
+                        return "什么都不做";
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

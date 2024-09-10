@@ -1345,6 +1345,15 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
+        /// 清空选中的区域
+        /// </summary>
+        public void ClearSelection()
+        {
+            this.Selection.Clear();
+            this.Selection.RequestInvalidate();
+        }
+
+        /// <summary>
         /// update anything about ui
         /// 如果需要布局则进行布局
         /// 如果不需要布局，那么就看是否需要重绘某些文本行
@@ -1566,7 +1575,7 @@ namespace ModengTerm.Document
                 VTHistoryLine historyLine;
                 if (!this.history.TryGetHistory(i, out historyLine))
                 {
-                    // 不存在该行，说明当前行还没有用到
+                    // 不存在该行，说明当前行没有被渲染过
                 }
                 else
                 {
@@ -1584,11 +1593,13 @@ namespace ModengTerm.Document
                     }
                     else if (i == firstPhysicsRow)
                     {
+                        // 第一行
                         startIndex = VTUtils.GetCharacterIndex(historyLine.Characters, startColumn);
-                        count = historyLine.Characters.Count - startIndex + 1;
+                        count = historyLine.Characters.Count - startIndex;
                     }
                     else if (i == lastPhysicsRow)
                     {
+                        // 最后一行
                         startIndex = 0;
                         count = VTUtils.GetCharacterIndex(historyLine.Characters, endColumn) + 1;
                     }

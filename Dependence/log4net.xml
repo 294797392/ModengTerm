@@ -10,7 +10,7 @@
     <root>
     	<!-- ALL/DEBUG/INFO/WARN/ERROR/FATAL/OFF -->
       <level value="INFO"/>
-	  <appender-ref ref="RollingFileAppender"/>
+<appender-ref ref="RollingFileAppender"/>
       <appender-ref ref="ColoredConsoleAppender"/>
     </root>
 	    

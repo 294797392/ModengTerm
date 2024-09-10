@@ -337,8 +337,12 @@ namespace ModengTerm.Terminal.Session
             // 此时连接失败
             this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
 
-            this.driver.Close();
-            this.isRunning = false;
+            // 主动关闭isRunning == false
+            if (this.isRunning)
+            {
+                this.driver.Close();
+                this.isRunning = false;
+            }
 
             logger.InfoFormat("退出Session线程");
         }

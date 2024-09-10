@@ -19,6 +19,12 @@ namespace ModengTerm
         [JsonProperty("sessions")]
         public List<SessionDefinition> SessionList { get; private set; }
 
+        /// <summary>
+        /// 默认要打开的会话
+        /// </summary>
+        [JsonProperty("defaultSession")]
+        public XTermSession DefaultSession { get; set; }
+
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();

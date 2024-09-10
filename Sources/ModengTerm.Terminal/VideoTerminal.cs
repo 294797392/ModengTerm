@@ -502,10 +502,7 @@ namespace ModengTerm.Terminal
             this.MainDocumentResize(this.mainDocument, newRow, newCol);
             this.AlternateDocumentResize(this.alternateDocument, newRow, newCol);
 
-            // 重绘当前显示的文档
-            this.activeDocument.RequestInvalidate();
-
-            // 给HOST发送修改行列的请求
+            // 给HOST发送修改行列的请求，HOST会重绘终端
             this.sessionTransport.Resize(newRow, newCol);
 
             if (this.ViewportChanged != null)
@@ -922,6 +919,12 @@ namespace ModengTerm.Terminal
                 // 所以EraseType.All的动作和Scrollback一样执行
 
                 case VTEraseType.All:
+                    {
+                        this.activeDocument.EraseAll();
+
+                        break;
+                    }
+
                 case VTEraseType.Scrollback:
                     {
                         if (this.IsAlternate)

@@ -335,6 +335,12 @@ namespace ModengTerm.ViewModels
             }
         }
 
+        #region 终端行为相关
+
+        public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
+
+        #endregion
+
         #region 主题相关
 
         /// <summary>
@@ -524,6 +530,14 @@ namespace ModengTerm.ViewModels
             this.TerminalTypeList.SelectedItem = MTermConsts.DefaultTerminalType;
             this.MaxScrollback = MTermConsts.DefaultTerminalScrollback.ToString();
             this.MaxClipboardHistory = MTermConsts.DefaultMaxClipboardHistory.ToString();
+
+            #endregion
+
+            #region 终端行为
+
+            this.BehaviorRightClicks = new BindableCollection<BehaviorRightClicks>();
+            this.BehaviorRightClicks.AddRange(Enum.GetValues(typeof(BehaviorRightClicks)).Cast<BehaviorRightClicks>());
+            this.BehaviorRightClicks.SelectedItem = Base.Enumerations.BehaviorRightClicks.ContextMenu;
 
             #endregion
 
@@ -882,6 +896,13 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
+        private bool GetTerminalBehaviorOptions(XTermSession session)
+        {
+            session.SetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, this.BehaviorRightClicks.SelectedItem);
+
+            return true;
+        }
+
         private void SwitchTheme(ThemePackage theme)
         {
             // 加载系统已安装的所有字体
@@ -932,6 +953,15 @@ namespace ModengTerm.ViewModels
 
             switch (sessionType.Type)
             {
+                case SessionTypeEnum.SFTP:
+                    {
+                        if (!this.GetSFTPOptions(session))
+                        {
+                            return false;
+                        }
+                        return true;
+                    }
+
                 case SessionTypeEnum.SSH:
                     {
                         if (!this.GetSSHSessionOptions(session))
@@ -955,22 +985,14 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.SFTP:
-                    {
-                        if (!this.GetSFTPOptions(session))
-                        {
-                            return false;
-                        }
-                        return true;
-                    }
-
                 default:
                     throw new NotImplementedException();
             }
 
             if (!this.GetThemeOptions(session) ||
                 !this.GetTerminalOptions(session) ||
-                !this.GetMouseOptions(session))
+                !this.GetMouseOptions(session) ||
+                !this.GetTerminalBehaviorOptions(session))
             {
                 return false;
             }

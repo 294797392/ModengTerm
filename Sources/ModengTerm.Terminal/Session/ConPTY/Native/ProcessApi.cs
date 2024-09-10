@@ -9,6 +9,7 @@ namespace ModengTerm.Terminal.Session.ConPTY.Native
     static class ProcessApi
     {
         internal const uint EXTENDED_STARTUPINFO_PRESENT = 0x00080000;
+        internal const uint CREATE_UNICODE_ENVIRONMENT = 0x00000400;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         internal struct STARTUPINFOEX

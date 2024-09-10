@@ -6,8 +6,6 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Utility;
-using ModengTerm.ServiceAgents;
 using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
@@ -16,17 +14,13 @@ using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.Windows;
-using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
@@ -137,6 +131,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private int totalRows;
 
+        private Visibility contextMenuVisibility;
+
         #endregion
 
         #region 属性
@@ -236,10 +232,26 @@ namespace ModengTerm.Terminal.ViewModels
             get { return this.totalRows; }
             set
             {
-                if (this.totalRows != value) 
+                if (this.totalRows != value)
                 {
                     this.totalRows = value;
                     this.NotifyPropertyChanged("TotalRows");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 控制右键菜单的显示和隐藏
+        /// </summary>
+        public Visibility ContextMenuVisibility
+        {
+            get { return this.contextMenuVisibility; }
+            set
+            {
+                if (this.contextMenuVisibility != value)
+                {
+                    this.contextMenuVisibility = value;
+                    this.NotifyPropertyChanged("ContextMenuVisibility");
                 }
             }
         }
@@ -268,81 +280,16 @@ namespace ModengTerm.Terminal.ViewModels
 
             #region 初始化右键菜单
 
-            this.FunctionMenus = new BindableCollection<ShellFunctionMenu>()
+            BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
+            if (brc == BehaviorRightClicks.ContextMenu)
             {
-                new ShellFunctionMenu("查找...",  this.Find),
-                new ShellFunctionMenu("日志")
-                {
-                    Children = new BindableCollection<ShellFunctionMenu>()
-                    {
-                        new ShellFunctionMenu("启动",  this.StartLogger),
-                        new ShellFunctionMenu("停止",  this.StopLogger),
-                        new ShellFunctionMenu("暂停",  this.PauseLogger),
-                        new ShellFunctionMenu("继续",  this.ResumeLogger)
-                    }
-                },
-                new ShellFunctionMenu("复制", this.Copy),
-                new ShellFunctionMenu("粘贴", this.Paste),
-                new ShellFunctionMenu("全选", this.SelectAll),
-                //new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
-                //new ShellFunctionMenu("收藏夹")
-                //{
-                //    Children = new BindableCollection<ShellFunctionMenu>()
-                //    {
-                //        new ShellFunctionMenu("加入收藏夹", ShellFunctionEnum.AddFavorites, this.AddFavorites),
-                //        new ShellFunctionMenu("查看收藏夹", ShellFunctionEnum.FaviritesList, this.FaviritesList),
-                //    }
-                //},
-                //new ShellFunctionMenu("书签")
-                //{
-                //    Children = new BindableCollection<ShellFunctionMenu>()
-                //    {
-                //        new ShellFunctionMenu("新建书签", ShellFunctionEnum.AddBookmark, this.AddBookmark),
-                //        new ShellFunctionMenu("删除书签", ShellFunctionEnum.RemoveBookmark, this.RemoveBookmark),
-                //        new ShellFunctionMenu("查看书签列表", ShellFunctionEnum.BookmarkList, this.BookmarkList),
-                //        new ShellFunctionMenu("显示书签栏", ShellFunctionEnum.DisplayBookmark, this.DisplayBookmark),
-                //        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
-                //    }
-                //},
-                //new ShellFunctionMenu("录屏")
-                //{
-                //    Children = new BindableCollection<ShellFunctionMenu>()
-                //    {
-                //        new ShellFunctionMenu("启动录制", this.StartRecord),
-                //        new ShellFunctionMenu("停止录制", this.StopRecord),
-                //        new ShellFunctionMenu("暂停录制", this.PauseRecord),
-                //        new ShellFunctionMenu("恢复录制", this.ResumeRecord),
-                //        new ShellFunctionMenu("打开回放", this.OpenRecord)
-                //    }
-                //},
-                new ShellFunctionMenu("保存")
-                {
-                    Children = new BindableCollection<ShellFunctionMenu>()
-                    {
-                        new ShellFunctionMenu("当前屏幕内容", this.SaveDocument),
-                        new ShellFunctionMenu("选中内容", this.SaveSelection),
-                        new ShellFunctionMenu("所有内容", this.SaveAllDocument),
-                    }
-                },
-                new ShellFunctionMenu("发送到所有会话", this.SendToAll, true),
-                //new ShellFunctionMenu("交互测试用例")
-                //{
-                //    Children = new BindableCollection<ShellFunctionMenu>()
-                //    {
-                //        new ShellFunctionMenu("记录", ShellFunctionEnum.SaveInteractve, this.SaveInteractive),
-                //    }
-                //},
-                //new ShellFunctionMenu("记录调试日志")
-                //{
-                //    Children = new BindableCollection<ShellFunctionMenu>()
-                //    {
-                //        new ShellFunctionMenu("Interactive"),
-                //        new ShellFunctionMenu("vttestCode"),
-                //        new ShellFunctionMenu("RawRead")
-                //    }
-                //}
-                new ShellFunctionMenu("关于", this.About)
-            };
+                this.InitializeContextMenu();
+                this.ContextMenuVisibility = Visibility.Visible;
+            }
+            else
+            {
+                this.ContextMenuVisibility = Visibility.Collapsed;
+            }
 
             #endregion
 
@@ -420,6 +367,85 @@ namespace ModengTerm.Terminal.ViewModels
         #endregion
 
         #region 实例方法
+
+        private void InitializeContextMenu()
+        {
+            this.FunctionMenus = new BindableCollection<ShellFunctionMenu>()
+                {
+                    new ShellFunctionMenu("查找...",  this.Find),
+                    new ShellFunctionMenu("日志")
+                    {
+                        Children = new BindableCollection<ShellFunctionMenu>()
+                        {
+                            new ShellFunctionMenu("启动",  this.StartLogger),
+                            new ShellFunctionMenu("停止",  this.StopLogger),
+                            new ShellFunctionMenu("暂停",  this.PauseLogger),
+                            new ShellFunctionMenu("继续",  this.ResumeLogger)
+                        }
+                    },
+                    new ShellFunctionMenu("复制", this.CopySelection),
+                    new ShellFunctionMenu("粘贴", this.Paste),
+                    new ShellFunctionMenu("全选", this.SelectAll),
+                    //new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
+                    //new ShellFunctionMenu("收藏夹")
+                    //{
+                    //    Children = new BindableCollection<ShellFunctionMenu>()
+                    //    {
+                    //        new ShellFunctionMenu("加入收藏夹", ShellFunctionEnum.AddFavorites, this.AddFavorites),
+                    //        new ShellFunctionMenu("查看收藏夹", ShellFunctionEnum.FaviritesList, this.FaviritesList),
+                    //    }
+                    //},
+                    //new ShellFunctionMenu("书签")
+                    //{
+                    //    Children = new BindableCollection<ShellFunctionMenu>()
+                    //    {
+                    //        new ShellFunctionMenu("新建书签", ShellFunctionEnum.AddBookmark, this.AddBookmark),
+                    //        new ShellFunctionMenu("删除书签", ShellFunctionEnum.RemoveBookmark, this.RemoveBookmark),
+                    //        new ShellFunctionMenu("查看书签列表", ShellFunctionEnum.BookmarkList, this.BookmarkList),
+                    //        new ShellFunctionMenu("显示书签栏", ShellFunctionEnum.DisplayBookmark, this.DisplayBookmark),
+                    //        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
+                    //    }
+                    //},
+                    //new ShellFunctionMenu("录屏")
+                    //{
+                    //    Children = new BindableCollection<ShellFunctionMenu>()
+                    //    {
+                    //        new ShellFunctionMenu("启动录制", this.StartRecord),
+                    //        new ShellFunctionMenu("停止录制", this.StopRecord),
+                    //        new ShellFunctionMenu("暂停录制", this.PauseRecord),
+                    //        new ShellFunctionMenu("恢复录制", this.ResumeRecord),
+                    //        new ShellFunctionMenu("打开回放", this.OpenRecord)
+                    //    }
+                    //},
+                    new ShellFunctionMenu("保存")
+                    {
+                        Children = new BindableCollection<ShellFunctionMenu>()
+                        {
+                            new ShellFunctionMenu("当前屏幕内容", this.SaveDocument),
+                            new ShellFunctionMenu("选中内容", this.SaveSelection),
+                            new ShellFunctionMenu("所有内容", this.SaveAllDocument),
+                        }
+                    },
+                    new ShellFunctionMenu("发送到所有会话", this.SendToAll, true),
+                    //new ShellFunctionMenu("交互测试用例")
+                    //{
+                    //    Children = new BindableCollection<ShellFunctionMenu>()
+                    //    {
+                    //        new ShellFunctionMenu("记录", ShellFunctionEnum.SaveInteractve, this.SaveInteractive),
+                    //    }
+                    //},
+                    //new ShellFunctionMenu("记录调试日志")
+                    //{
+                    //    Children = new BindableCollection<ShellFunctionMenu>()
+                    //    {
+                    //        new ShellFunctionMenu("Interactive"),
+                    //        new ShellFunctionMenu("vttestCode"),
+                    //        new ShellFunctionMenu("RawRead")
+                    //    }
+                    //}
+                    new ShellFunctionMenu("关于", this.About)
+                };
+        }
 
         private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
         {
@@ -747,7 +773,10 @@ namespace ModengTerm.Terminal.ViewModels
             this.LoggerManager.Resume(this.videoTerminal);
         }
 
-        private void Copy()
+        /// <summary>
+        /// 拷贝当前选中的内容到剪切板
+        /// </summary>
+        public void CopySelection()
         {
             VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
             if (paragraph.IsEmpty)

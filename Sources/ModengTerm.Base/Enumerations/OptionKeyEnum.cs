@@ -1,11 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ModengTerm.Base.Enumerations
 {
+    public enum BehaviorRightClicks
+    {
+        /// <summary>
+        /// 右键点击的时候什么都不做
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// 右键点击的时候复制选中内容到剪切板
+        /// </summary>
+        Copy,
+
+        /// <summary>
+        /// 右键点击的时候弹出上下文菜单
+        /// </summary>
+        ContextMenu
+    }
+
     /// <summary>
     /// 配置类型
     /// </summary>
@@ -112,6 +131,12 @@ namespace ModengTerm.Base.Enumerations
         TERM_MAX_CLIPBOARD_HISTORY = 1002,
 
         MOUSE_SCROLL_DELTA = 1004,
+
+        /// <summary>
+        /// 当鼠标右键点击的时候的行为
+        /// </summary>
+        [EnumDataType(typeof(BehaviorRightClicks))]
+        BEHAVIOR_RIGHT_CLICK = 1005,
 
         #endregion
 

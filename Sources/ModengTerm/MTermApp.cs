@@ -1,24 +1,13 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
-using ModengTerm.Base.Enumerations;
-using ModengTerm.Controls;
-using ModengTerm.Document;
 using ModengTerm.ServiceAgents;
-using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
-using ModengTerm.Terminal.ViewModels;
+using ModengTerm.UserControls.OptionsUserControl;
 using ModengTerm.ViewModels;
-using Renci.SshNet;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Threading;
-using WPFToolkit.MVVM;
 using XTerminal.UserControls.OptionsUserControl;
 
 namespace ModengTerm
@@ -39,7 +28,13 @@ namespace ModengTerm
                 }
             },
 
-            new OptionDefinition("终端", typeof(TerminalOptionsUserControl)),
+            new OptionDefinition("终端", typeof(TerminalOptionsUserControl))
+            {
+                Children = new List<OptionDefinition>()
+                {
+                    new OptionDefinition("行为", typeof(TerminalBehaviorOptionsUserControl))
+                }
+            },
 
             new OptionDefinition("外观主题", typeof(ThemeOptionsUserControl))
         };

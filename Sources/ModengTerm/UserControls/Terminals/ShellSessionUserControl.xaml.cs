@@ -148,7 +148,7 @@ namespace ModengTerm.Terminal.UserControls
 
         #region 事件处理器
 
-        private void Surface_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void ContentCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             this.Focus();
 
@@ -158,7 +158,7 @@ namespace ModengTerm.Terminal.UserControls
             this.HandleCaptureAction(sender, mouseData);
         }
 
-        private void Surface_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void ContentCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
@@ -166,7 +166,7 @@ namespace ModengTerm.Terminal.UserControls
             this.HandleCaptureAction(sender, mouseData);
         }
 
-        private void Surface_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void ContentCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
@@ -174,6 +174,18 @@ namespace ModengTerm.Terminal.UserControls
             this.HandleCaptureAction(sender, mouseData);
         }
 
+        private void ContentCanvas_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
+            if (brc == BehaviorRightClicks.Copy)
+            {
+                ShellSessionVM shellSessionVM = base.DataContext as ShellSessionVM;
+                shellSessionVM.CopySelection();
+
+                VTDocument activeDocument = this.videoTerminal.ActiveDocument;
+                activeDocument.ClearSelection();
+            }
+        }
 
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
@@ -232,13 +244,15 @@ namespace ModengTerm.Terminal.UserControls
 
             double margin = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
             DocumentAlternate.ContentMargin = margin;
-            DocumentAlternate.Content.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
-            DocumentAlternate.Content.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
-            DocumentAlternate.Content.PreviewMouseMove += Surface_PreviewMouseMove;
+            DocumentAlternate.Content.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentAlternate.Content.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentAlternate.Content.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
+            DocumentAlternate.Content.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
             DocumentMain.ContentMargin = margin;
-            DocumentMain.Content.PreviewMouseLeftButtonDown += Surface_PreviewMouseLeftButtonDown;
-            DocumentMain.Content.PreviewMouseLeftButtonUp += Surface_PreviewMouseLeftButtonUp;
-            DocumentMain.Content.PreviewMouseMove += Surface_PreviewMouseMove;
+            DocumentMain.Content.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentMain.Content.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentMain.Content.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
+            DocumentMain.Content.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
 
             // 设置了ContentMargin，等待界面加载完毕
             // TODO：
@@ -262,12 +276,12 @@ namespace ModengTerm.Terminal.UserControls
         {
             this.SizeChanged -= TerminalContentUserControl_SizeChanged;
 
-            DocumentAlternate.Content.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
-            DocumentAlternate.Content.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
-            DocumentAlternate.Content.PreviewMouseMove -= Surface_PreviewMouseMove;
-            DocumentMain.Content.PreviewMouseLeftButtonDown -= Surface_PreviewMouseLeftButtonDown;
-            DocumentMain.Content.PreviewMouseLeftButtonUp -= Surface_PreviewMouseLeftButtonUp;
-            DocumentMain.Content.PreviewMouseMove -= Surface_PreviewMouseMove;
+            DocumentAlternate.Content.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentAlternate.Content.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentAlternate.Content.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
+            DocumentMain.Content.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentMain.Content.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentMain.Content.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
 
             this.shellSession.Close();
             this.videoTerminal = null;
