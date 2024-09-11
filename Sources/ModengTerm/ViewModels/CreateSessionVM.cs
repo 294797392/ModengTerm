@@ -69,6 +69,8 @@ namespace ModengTerm.ViewModels
         private Color cursorColor;
         private Color selectionColor;
 
+        private string commandLinePath;
+
         #endregion
 
         #region 属性
@@ -91,7 +93,7 @@ namespace ModengTerm.ViewModels
                     {
                         case SessionTypeEnum.SerialPort:
                         case SessionTypeEnum.SSH:
-                        case SessionTypeEnum.HostCommandLine:
+                        case SessionTypeEnum.CommandLine:
                             {
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 break;
@@ -335,6 +337,23 @@ namespace ModengTerm.ViewModels
             }
         }
 
+        #region 命令行
+
+        public string CommandLinePath
+        {
+            get { return this.commandLinePath; }
+            set
+            {
+                if (this.commandLinePath != value)
+                {
+                    this.commandLinePath = value;
+                    this.NotifyPropertyChanged("CommandLinePath");
+                }
+            }
+        }
+
+        #endregion
+
         #region 终端行为相关
 
         public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
@@ -520,6 +539,12 @@ namespace ModengTerm.ViewModels
             //this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
             this.LoadOptionsTree(this.TerminalOptionsTreeVM, MTermApp.TerminalOptionList);
             this.OptionTreeVM = this.TerminalOptionsTreeVM;
+
+            #region 命令行
+
+            this.CommandLinePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+
+            #endregion
 
             #region 终端
 
@@ -903,6 +928,25 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
+        private bool GetCommandlineOptions(XTermSession session)
+        {
+            if (string.IsNullOrEmpty(this.CommandLinePath))
+            {
+                MessageBoxUtils.Info("请选择命令行程序");
+                return false;
+            }
+
+            if (!File.Exists(this.CommandLinePath))
+            {
+                MessageBoxUtils.Info("命令行程序不存在, 请重新选择");
+                return false;
+            }
+
+            session.SetOption<string>(OptionKeyEnum.CMD_FILE_PATH, this.CommandLinePath);
+
+            return true;
+        }
+
         private void SwitchTheme(ThemePackage theme)
         {
             // 加载系统已安装的所有字体
@@ -971,8 +1015,12 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.HostCommandLine:
+                case SessionTypeEnum.CommandLine:
                     {
+                        if (!this.GetCommandlineOptions(session))
+                        {
+                            return false;
+                        }
                         break;
                     }
 

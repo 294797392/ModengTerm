@@ -13,7 +13,7 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// 主机命令行
         /// </summary>
-        HostCommandLine,
+        CommandLine,
 
         /// <summary>
         /// 是一个SSH远程主机

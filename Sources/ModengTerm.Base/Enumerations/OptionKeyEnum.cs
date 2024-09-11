@@ -17,7 +17,7 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// 右键点击的时候复制选中内容到剪切板
         /// </summary>
-        Copy,
+        FastCopyPaste,
 
         /// <summary>
         /// 右键点击的时候弹出上下文菜单
@@ -132,11 +132,24 @@ namespace ModengTerm.Base.Enumerations
 
         MOUSE_SCROLL_DELTA = 1004,
 
+        #endregion
+
+        #region 终端行为 1501 - 2000
+
         /// <summary>
         /// 当鼠标右键点击的时候的行为
         /// </summary>
         [EnumDataType(typeof(BehaviorRightClicks))]
         BEHAVIOR_RIGHT_CLICK = 1005,
+
+        #endregion
+
+        #region 命令行 2001 - 2500
+
+        /// <summary>
+        /// 命令行可执行程序路径
+        /// </summary>
+        CMD_FILE_PATH = 2001,
 
         #endregion
 

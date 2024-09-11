@@ -177,13 +177,26 @@ namespace ModengTerm.Terminal.UserControls
         private void ContentCanvas_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
-            if (brc == BehaviorRightClicks.Copy)
+            if (brc == BehaviorRightClicks.FastCopyPaste)
             {
-                ShellSessionVM shellSessionVM = base.DataContext as ShellSessionVM;
-                shellSessionVM.CopySelection();
-
                 VTDocument activeDocument = this.videoTerminal.ActiveDocument;
-                activeDocument.ClearSelection();
+
+                if (activeDocument.Selection.IsEmpty)
+                {
+                    // 粘贴剪贴板里的内容
+                    string text = Clipboard.GetText();
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        return;
+                    }
+
+                    this.shellSession.Send(text);
+                }
+                else
+                {
+                    this.shellSession.CopySelection();
+                    activeDocument.ClearSelection();
+                }
             }
         }
 

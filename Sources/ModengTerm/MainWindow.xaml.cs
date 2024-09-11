@@ -1,6 +1,7 @@
 ﻿using ModengTerm;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
@@ -87,7 +88,7 @@ namespace XTerminal
             }
         }
 
-        private void OpenSession(XTermSession session) 
+        private void OpenSession(XTermSession session)
         {
             ISessionContent content = this.sessionListVM.OpenSession(session);
             ContentControlSession.Content = content;
@@ -101,6 +102,9 @@ namespace XTerminal
             {
                 return;
             }
+
+            string cmdPath = System.IO.Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            defaultSession.SetOption<string>(OptionKeyEnum.CMD_FILE_PATH, cmdPath);
 
             this.OpenSession(defaultSession);
         }
@@ -213,7 +217,7 @@ namespace XTerminal
             }
 
             if (this.sessionListVM.SessionList.Count == 1 &&
-                this.sessionListVM.SessionList[0] is OpenSessionVM) 
+                this.sessionListVM.SessionList[0] is OpenSessionVM)
             {
                 this.ShowCreateSessionWindow();
             }

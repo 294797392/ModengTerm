@@ -61,7 +61,7 @@ namespace ModengTerm
             {
                 case SessionTypeEnum.SerialPort: return "串口";
                 case SessionTypeEnum.SSH: return "SSH";
-                case SessionTypeEnum.HostCommandLine: return "命令行";
+                case SessionTypeEnum.CommandLine: return "命令行";
                 case SessionTypeEnum.SFTP: return "SFTP";
 
                 default:
@@ -267,7 +267,7 @@ namespace ModengTerm
                         return SSHImage;
                     }
 
-                case SessionTypeEnum.HostCommandLine:
+                case SessionTypeEnum.CommandLine:
                     {
                         return HostCommandLineImage;
                     }
@@ -301,9 +301,9 @@ namespace ModengTerm
                         return "显示上下文菜单";
                     }
 
-                case BehaviorRightClicks.Copy:
+                case BehaviorRightClicks.FastCopyPaste:
                     {
-                        return "复制选中内容";
+                        return "快速复制粘贴";
                     }
 
                 case BehaviorRightClicks.None:

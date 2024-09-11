@@ -87,7 +87,7 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.HostCommandLine:
+                case SessionTypeEnum.CommandLine:
                     {
                         break;
                     }

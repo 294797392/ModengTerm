@@ -556,9 +556,10 @@ namespace ModengTerm.Terminal.ViewModels
 
             switch ((SessionTypeEnum)this.Session.Type)
             {
-                case SessionTypeEnum.HostCommandLine:
+                case SessionTypeEnum.CommandLine:
                     {
-                        uri = string.Format("cmdline://cmd.exe");
+                        string cmdPath = this.Session.GetOption<string>(OptionKeyEnum.CMD_FILE_PATH);
+                        uri = string.Format("{0}", cmdPath);
                         break;
                     }
 
@@ -617,6 +618,16 @@ namespace ModengTerm.Terminal.ViewModels
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
+            }
+        }
+
+        public void Send(string text)
+        {
+            byte[] bytes = this.writeEncoding.GetBytes(text);
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("向终端发送数据失败, {0}", ResponseCode.GetMessage(code));
             }
         }
 

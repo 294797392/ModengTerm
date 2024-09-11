@@ -36,7 +36,7 @@ namespace ModengTerm.Terminal.Session
             int row = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             int col = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
 
-            string exePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            string exePath = this.session.GetOption<string>(OptionKeyEnum.CMD_FILE_PATH);
 
             this.terminal = new ConPTYTerminal();
             this.terminal.Start(exePath, col, row);

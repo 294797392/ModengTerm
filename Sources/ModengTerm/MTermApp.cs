@@ -23,6 +23,7 @@ namespace ModengTerm
             {
                 Children = new List<OptionDefinition>()
                 {
+                    new OptionDefinition("命令行", typeof(CommandLineOptionsUserControl)),
                     new OptionDefinition("SSH", typeof(SSHOptionsUserControl)),
                     new OptionDefinition("串口", typeof(SerialPortOptionsUserControl))
                 }
