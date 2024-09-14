@@ -87,7 +87,7 @@
                     <TextBlock Text="连接中..." Foreground="Orange" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.ConnectionError}}">
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.ConnectError}}">
                     <Image Source="pack://application:,,,/ModengTerm;component/Images/fail.png" Width="16" Height="16"/>
                     <TextBlock Text="连接失败" Foreground="DarkRed" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 </StackPanel>

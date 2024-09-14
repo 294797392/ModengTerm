@@ -21,13 +21,13 @@ namespace ModengTerm.Base.Enumerations
         Connected,
 
         /// <summary>
+        /// 连接失败
+        /// </summary>
+        ConnectError,
+
+        /// <summary>
         /// 连接已断开
         /// </summary>
         Disconnected,
-
-        /// <summary>
-        /// 连接失败
-        /// </summary>
-        ConnectionError
     }
 }

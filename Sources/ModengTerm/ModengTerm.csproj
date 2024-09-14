@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Images\app.png" />
     <None Remove="Images\close.png" />
     <None Remove="Images\cmdline.png" />
     <None Remove="Images\connect.png" />
@@ -80,6 +81,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\app.png" />
     <Resource Include="Images\cmdline.png" />
     <Resource Include="Images\connect.png" />
     <Resource Include="Images\fail.png" />

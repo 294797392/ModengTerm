@@ -57,4 +57,10 @@
     <SolidColorBrush x:Key="BrushButtonHover" Color="White"/>
     <SolidColorBrush x:Key="BrushButtonBorder" Color="#6699CC"/>
 
+    <SolidColorBrush x:Key="BrushTitleBorder" Color="Silver"/>
+    <SolidColorBrush x:Key="BrushTitleBackground" Color="Transparent"/>
+
+    <SolidColorBrush x:Key="BrushMainWindowButtonHoverBackground" Color="#D0D0D0"/>
+    <SolidColorBrush x:Key="BrushMainWindowButtonDownBackground" Color="#A4A4A4"/>
+    
 </ResourceDictionary>

@@ -134,7 +134,7 @@ namespace ModengTerm.Terminal.Session
             catch (Exception ex)
             {
                 this.Close();
-                this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+                this.NotifyStatusChanged(SessionStatusEnum.ConnectError);
                 logger.Error("发送数据异常", ex);
                 return ResponseCode.FAILED;
             }
@@ -164,7 +164,7 @@ namespace ModengTerm.Terminal.Session
             catch (Exception ex)
             {
                 this.Close();
-                this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+                this.NotifyStatusChanged(SessionStatusEnum.ConnectError);
                 logger.Error("Resize异常", ex);
                 return ResponseCode.FAILED;
             }
@@ -308,14 +308,14 @@ namespace ModengTerm.Terminal.Session
             {
                 if ((code = this.driver.Open()) != ResponseCode.SUCCESS)
                 {
-                    this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+                    this.NotifyStatusChanged(SessionStatusEnum.ConnectError);
                     return;
                 }
             }
             catch (Exception ex)
             {
                 logger.Error("连接失败", ex);
-                this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+                this.NotifyStatusChanged(SessionStatusEnum.ConnectError);
                 return;
             }
 
@@ -335,7 +335,7 @@ namespace ModengTerm.Terminal.Session
             this.SessionLoop();
 
             // 此时连接失败
-            this.NotifyStatusChanged(SessionStatusEnum.ConnectionError);
+            this.NotifyStatusChanged(SessionStatusEnum.Disconnected);
 
             // 主动关闭isRunning == false
             if (this.isRunning)

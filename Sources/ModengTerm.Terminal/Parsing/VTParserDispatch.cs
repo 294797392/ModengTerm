@@ -867,6 +867,18 @@ namespace ModengTerm.Terminal.Parsing
                             break;
                         }
 
+                    case DECPrivateMode.DECSCNM_ScreenMode:
+                        {
+                            logger.FatalFormat("DECSCNM_ScreenMode有待实现, {0}", enable);
+                            break;
+                        }
+
+                    case DECPrivateMode.FOCUS_EVENT_MODE:
+                        {
+                            logger.FatalFormat("FOCUS_EVENT_MODE有待实现, {0}", enable);
+                            break;
+                        }
+
                     // 这些都是terminal项目没实现的
                     case (DECPrivateMode)1015:
                     case (DECPrivateMode)4:

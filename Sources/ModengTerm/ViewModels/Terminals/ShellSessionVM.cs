@@ -652,27 +652,29 @@ namespace ModengTerm.Terminal.ViewModels
         {
             VTDebug.Context.WriteRawRead(bytes, size);
 
-            VTDocument activeDocument = this.VideoTerminal.ActiveDocument;
-            int oldScroll = activeDocument.Scrollbar.Value;
-
-            // 有些命令（top）会动态更新主缓冲区
-            // 执行动作之前先把主缓冲区滚动到底
-            if (!this.videoTerminal.IsAlternate)
-            {
-                activeDocument.ScrollToBottom();
-            }
-
-            try
-            {
-                vtParser.ProcessCharacters(bytes, size);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("ProcessCharacters异常", ex);
-            }
-
+            // 窗口持续改变大小的时候可能导致ProcessCharacters和SizeChanged事件一起运行，产生多线程修改VTDocument的bug
+            // 所以这里把ProcessCharacters放在UI线程处理
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
+                VTDocument activeDocument = this.VideoTerminal.ActiveDocument;
+                int oldScroll = activeDocument.Scrollbar.Value;
+
+                // 有些命令（top）会动态更新主缓冲区
+                // 执行动作之前先把主缓冲区滚动到底
+                if (!this.videoTerminal.IsAlternate)
+                {
+                    activeDocument.ScrollToBottom();
+                }
+
+                try
+                {
+                    this.vtParser.ProcessCharacters(bytes, size);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("ProcessCharacters异常", ex);
+                }
+
                 // 全部数据都处理完了之后，只渲染一次
                 activeDocument.RequestInvalidate();
 
@@ -737,7 +739,7 @@ namespace ModengTerm.Terminal.ViewModels
                             break;
                         }
 
-                    case SessionStatusEnum.ConnectionError:
+                    case SessionStatusEnum.ConnectError:
                         {
                             break;
                         }

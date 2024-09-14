@@ -57,7 +57,7 @@ namespace ModengTerm.Terminal.Session.ConPTY
             // free resources in case the console is ungracefully closed (e.g. by the 'x' in the window titlebar)
             //OnClose(() => DisposeResources(process, pseudoConsole, outputPipe, inputPipe, _consoleInputWriter));
 
-            //WaitForExit(process).WaitOne(Timeout.Infinite);
+            Task.Factory.StartNew(this.WaitProcessExit);
         }
 
         public void Stop()
@@ -89,12 +89,16 @@ namespace ModengTerm.Terminal.Session.ConPTY
             }, true);
         }
 
-        private void DisposeResources(params IDisposable[] disposables)
+        private void WaitProcessExit()
         {
-            foreach (var disposable in disposables)
+            AutoResetEvent autoResetEvent = new AutoResetEvent(false)
             {
-                disposable.Dispose();
-            }
+                SafeWaitHandle = new SafeWaitHandle(this.process.ProcessInfo.hProcess, false)
+            };
+            autoResetEvent.WaitOne(Timeout.Infinite);
+            autoResetEvent.Dispose();
+
+            this.Stop();
         }
     }
 }

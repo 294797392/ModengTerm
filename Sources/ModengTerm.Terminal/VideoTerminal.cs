@@ -503,6 +503,8 @@ namespace ModengTerm.Terminal
             this.AlternateDocumentResize(this.alternateDocument, newRow, newCol);
 
             // 给HOST发送修改行列的请求，HOST会重绘终端
+            // TODO：Resize之后在异步线程里修改VTDocument的时候，还没修改完，可能会再次触发Resize
+            // 在数据处理线程和UI线程同时在修改VTDocument，导致多线程访问冲突
             this.sessionTransport.Resize(newRow, newCol);
 
             if (this.ViewportChanged != null)
@@ -722,13 +724,14 @@ namespace ModengTerm.Terminal
         {
             // CR
             // 把光标移动到行开头
-            int oldRow = this.CursorRow;
-            int oldCol = this.CursorCol;
 
-            activeDocument.SetCursor(CursorRow, 0);
+            int oldRow = this.activeDocument.Cursor.Row;
+            int oldCol = this.activeDocument.Cursor.Column;
 
-            int newRow = this.CursorRow;
-            int newCol = this.CursorCol;
+            this.activeDocument.SetCursor(CursorRow, 0);
+
+            int newRow = this.activeDocument.Cursor.Row;
+            int newCol = this.activeDocument.Cursor.Column;
 
             VTDebug.Context.WriteInteractive("CarriageReturn", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }

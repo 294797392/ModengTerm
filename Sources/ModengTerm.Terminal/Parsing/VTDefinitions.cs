@@ -262,6 +262,7 @@ namespace ModengTerm.Terminal.Parsing
         XTERM_EnableDECCOLMSupport = 40,
         VT200_MOUSE_MODE = 1000,
         BUTTON_EVENT_MOUSE_MODE = 1002,
+        FOCUS_EVENT_MODE = 1004,
         ANY_EVENT_MOUSE_MODE = 1003,
 
         /// <summary>

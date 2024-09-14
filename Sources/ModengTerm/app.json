@@ -1,7 +1,7 @@
 ﻿{
     "sessions": [
         {
-            "id": "2",
+            "id": "0",
             "name": "命令行",
             "description": "",
             "icon": "",
@@ -17,11 +17,11 @@
         },
 
         {
-            "id": "3",
+            "id": "2",
             "name": "串口",
             "description": "",
             "icon": "",
-            "type": 3
+            "type": 2
         }
     ],
 

@@ -76,7 +76,7 @@ namespace XTerminal
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
-        private void ShowCreateSessionWindow()
+        private void ShowSessionListWindow()
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
             sessionListWindow.Owner = this;
@@ -198,7 +198,7 @@ namespace XTerminal
 
         private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)
         {
-            this.ShowCreateSessionWindow();
+            this.ShowSessionListWindow();
         }
 
         private void ButtonCloseSession_Click(object sender, RoutedEventArgs e)
@@ -219,7 +219,7 @@ namespace XTerminal
             if (this.sessionListVM.SessionList.Count == 1 &&
                 this.sessionListVM.SessionList[0] is OpenSessionVM)
             {
-                this.ShowCreateSessionWindow();
+                this.ShowSessionListWindow();
             }
         }
 
@@ -247,7 +247,7 @@ namespace XTerminal
             }
 
             // 打开会话
-            this.ShowCreateSessionWindow();
+            this.ShowSessionListWindow();
         }
 
         private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
@@ -278,7 +278,35 @@ namespace XTerminal
             //debugWindow.ShowDialog();
         }
 
+        private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)
+        {
+            this.ShowSessionListWindow();
+        }
 
+        
+        
+        
+        private void ButtonMinmizedWindow_Click(object sender, RoutedEventArgs e)
+        {
+            base.WindowState = WindowState.Minimized;
+        }
+
+        private void ButtonMaxmizedWindow_Click(object sender, RoutedEventArgs e)
+        {
+            if (base.WindowState == WindowState.Normal)
+            {
+                base.WindowState = WindowState.Maximized;
+            }
+            else
+            {
+                base.WindowState = WindowState.Normal;
+            }
+        }
+
+        private void ButtonCloseWindow_Click(object sender, RoutedEventArgs e)
+        {
+            base.Close();
+        }
 
 
         /// <summary>
@@ -355,6 +383,26 @@ namespace XTerminal
 
             e.Handled = true;
         }
+
+        private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 1)
+            {
+                base.DragMove();
+            }
+            else if (e.ClickCount == 2)
+            {
+                if (base.WindowState == WindowState.Normal)
+                {
+                    base.WindowState = WindowState.Maximized;
+                }
+                else
+                {
+                    base.WindowState = WindowState.Normal;
+                }
+            }
+        }
+
 
         #endregion
     }
