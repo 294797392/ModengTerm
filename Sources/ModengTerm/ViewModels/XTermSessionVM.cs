@@ -89,7 +89,7 @@ namespace ModengTerm.ViewModels
 
                 case SessionTypeEnum.CommandLine:
                     {
-                        this.HostName = session.GetOption<string>(OptionKeyEnum.CMD_FILE_PATH);
+                        this.HostName = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         break;
                     }
 

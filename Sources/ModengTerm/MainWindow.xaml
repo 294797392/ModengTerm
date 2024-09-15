@@ -147,7 +147,7 @@
             <Menu Grid.Column="1" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0"
                   VerticalContentAlignment="Center" VerticalAlignment="Center">
 
-                <MenuItem Header="文件" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                <MenuItem Header="会话" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
                 </MenuItem>

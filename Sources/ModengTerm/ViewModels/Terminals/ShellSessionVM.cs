@@ -558,7 +558,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 case SessionTypeEnum.CommandLine:
                     {
-                        string cmdPath = this.Session.GetOption<string>(OptionKeyEnum.CMD_FILE_PATH);
+                        string cmdPath = this.Session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         uri = string.Format("{0}", cmdPath);
                         break;
                     }

@@ -49,6 +49,9 @@ namespace ModengTerm.ViewModels
 
         private SessionTypeVM selectedSessionType;
         private OptionTreeVM optionTreeVM;
+        private TreeNodeViewModel commandLineNode;
+        private TreeNodeViewModel sshNode;
+        private TreeNodeViewModel serialPortNode;
 
         private string mouseScrollDelta;
 
@@ -69,7 +72,9 @@ namespace ModengTerm.ViewModels
         private Color cursorColor;
         private Color selectionColor;
 
-        private string commandLinePath;
+        private string startupPath;
+        private string startupArgument;
+        private string startupDir;
 
         #endregion
 
@@ -92,10 +97,32 @@ namespace ModengTerm.ViewModels
                     switch (value.Type)
                     {
                         case SessionTypeEnum.SerialPort:
+                            {
+                                this.serialPortNode.IsVisible = true;
+                                this.commandLineNode.IsVisible = false;
+                                this.sshNode.IsVisible = false;
+                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
+                                this.serialPortNode.IsSelected = true;
+                                break;
+                            }
+
                         case SessionTypeEnum.SSH:
+                            {
+                                this.serialPortNode.IsVisible = false;
+                                this.commandLineNode.IsVisible = false;
+                                this.sshNode.IsVisible = true;
+                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
+                                this.sshNode.IsSelected = true;
+                                break;
+                            }
+
                         case SessionTypeEnum.CommandLine:
                             {
+                                this.serialPortNode.IsVisible = false;
+                                this.commandLineNode.IsVisible = true;
+                                this.sshNode.IsVisible = false;
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
+                                this.commandLineNode.IsSelected = true;
                                 break;
                             }
 
@@ -268,7 +295,7 @@ namespace ModengTerm.ViewModels
         }
 
         /// <summary>
-        /// 当前要显示的选项配置树形列表ViewModel
+        /// 当前显示的配置树形列表ViewModel
         /// </summary>
         public OptionTreeVM OptionTreeVM
         {
@@ -283,9 +310,9 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public OptionTreeVM TerminalOptionsTreeVM { get; set; }
+        public OptionTreeVM TerminalOptionsTreeVM { get; private set; }
 
-        public OptionTreeVM SFTPOptionsTreeVM { get; set; }
+        public OptionTreeVM SFTPOptionsTreeVM { get; private set; }
 
         /// <summary>
         /// 终端类型列表
@@ -339,15 +366,41 @@ namespace ModengTerm.ViewModels
 
         #region 命令行
 
-        public string CommandLinePath
+        public string StartupPath
         {
-            get { return this.commandLinePath; }
+            get { return this.startupPath; }
             set
             {
-                if (this.commandLinePath != value)
+                if (this.startupPath != value)
                 {
-                    this.commandLinePath = value;
-                    this.NotifyPropertyChanged("CommandLinePath");
+                    this.startupPath = value;
+                    this.NotifyPropertyChanged("StartupPath");
+                }
+            }
+        }
+
+        public string StartupArgument
+        {
+            get { return this.startupArgument; }
+            set
+            {
+                if (this.startupArgument != value)
+                {
+                    this.startupArgument = value;
+                    this.NotifyPropertyChanged("StartupArgument");
+                }
+            }
+        }
+
+        public string StartupDirectory
+        {
+            get { return this.startupDir; }
+            set
+            {
+                if (this.startupDir != value)
+                {
+                    this.startupDir = value;
+                    this.NotifyPropertyChanged("StartupDirectory");
                 }
             }
         }
@@ -522,6 +575,20 @@ namespace ModengTerm.ViewModels
 
             this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
 
+            #region 加载参数树形列表
+
+            // 加载参数树形列表
+            this.SFTPOptionsTreeVM = new OptionTreeVM();
+            this.TerminalOptionsTreeVM = new OptionTreeVM();
+            //this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
+            this.LoadOptionsTree(this.TerminalOptionsTreeVM, MTermApp.TerminalOptionList);
+            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.CommandLineID, out this.commandLineNode);
+            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SshID, out this.sshNode);
+            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SerialPortID, out this.serialPortNode);
+            this.OptionTreeVM = this.TerminalOptionsTreeVM;
+
+            #endregion
+
             #region 会话类型
 
             this.SessionTypeList = new BindableCollection<SessionTypeVM>();
@@ -533,16 +600,10 @@ namespace ModengTerm.ViewModels
 
             #endregion
 
-            // 加载参数树形列表
-            this.SFTPOptionsTreeVM = new OptionTreeVM();
-            this.TerminalOptionsTreeVM = new OptionTreeVM();
-            //this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
-            this.LoadOptionsTree(this.TerminalOptionsTreeVM, MTermApp.TerminalOptionList);
-            this.OptionTreeVM = this.TerminalOptionsTreeVM;
-
             #region 命令行
 
-            this.CommandLinePath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            this.StartupPath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+            this.StartupDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
             #endregion
 
@@ -566,10 +627,14 @@ namespace ModengTerm.ViewModels
 
             #endregion
 
+            #region SSH
+
             this.SSHAuthTypeList = new BindableCollection<SSHAuthTypeEnum>();
             this.SSHAuthTypeList.AddRange(MTermUtils.GetEnumValues<SSHAuthTypeEnum>());
             this.SSHAuthTypeList.SelectedItem = this.SSHAuthTypeList.FirstOrDefault();
             this.SSHServerPort = MTermConsts.DefaultSSHPort.ToString();
+
+            #endregion
 
             #region 串口
 
@@ -930,19 +995,21 @@ namespace ModengTerm.ViewModels
 
         private bool GetCommandlineOptions(XTermSession session)
         {
-            if (string.IsNullOrEmpty(this.CommandLinePath))
+            if (string.IsNullOrEmpty(this.StartupPath))
             {
                 MessageBoxUtils.Info("请选择命令行程序");
                 return false;
             }
 
-            if (!File.Exists(this.CommandLinePath))
+            if (!File.Exists(this.StartupPath))
             {
                 MessageBoxUtils.Info("命令行程序不存在, 请重新选择");
                 return false;
             }
 
-            session.SetOption<string>(OptionKeyEnum.CMD_FILE_PATH, this.CommandLinePath);
+            session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, this.StartupPath);
+            session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_ARGUMENT, this.StartupArgument);
+            session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_DIR, this.StartupDirectory);
 
             return true;
         }

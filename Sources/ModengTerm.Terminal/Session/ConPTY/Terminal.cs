@@ -20,6 +20,8 @@ namespace ModengTerm.Terminal.Session.ConPTY
         private PseudoConsolePipe outputPipe;
         private PseudoConsole pseudoConsole;
         private Process process;
+        private bool isStop;
+
 
         /// <summary>
         /// A stream of VT-100-enabled output from the console.
@@ -40,12 +42,12 @@ namespace ModengTerm.Terminal.Session.ConPTY
         /// <param name="command">the command to run, e.g. cmd.exe</param>
         /// <param name="consoleHeight">The height (in characters) to start the pseudoconsole with. Defaults to 80.</param>
         /// <param name="consoleWidth">The width (in characters) to start the pseudoconsole with. Defaults to 30.</param>
-        public void Start(string command, int consoleWidth = 80, int consoleHeight = 30)
+        public void Start(string command, string startupDiretcory, int row, int column)
         {
             this.inputPipe = new PseudoConsolePipe();
             this.outputPipe = new PseudoConsolePipe();
-            this.pseudoConsole = PseudoConsole.Create(inputPipe.ReadSide, outputPipe.WriteSide, consoleWidth, consoleHeight);
-            this.process = ProcessFactory.Start(command, PseudoConsole.PseudoConsoleThreadAttribute, pseudoConsole.Handle);
+            this.pseudoConsole = PseudoConsole.Create(inputPipe.ReadSide, outputPipe.WriteSide, column, row);
+            this.process = ProcessFactory.Start(command, startupDiretcory, PseudoConsole.PseudoConsoleThreadAttribute, pseudoConsole.Handle);
 
             // copy all pseudoconsole output to a FileStream and expose it to the rest of the app
             this.ConsoleOutStream = new FileStream(outputPipe.ReadSide, FileAccess.Read);
@@ -62,13 +64,20 @@ namespace ModengTerm.Terminal.Session.ConPTY
 
         public void Stop()
         {
-            this.process.Dispose();
-            this.pseudoConsole.Dispose();
+            if (this.isStop)
+            {
+                return;
+            }
+
+            this.isStop = true;
+
             this.outputPipe.Dispose();
             this.inputPipe.Dispose();
+            this.pseudoConsole.Dispose();
+            this.process.Dispose();
         }
 
-        public void Resize(int row, int col) 
+        public void Resize(int row, int col)
         {
             this.pseudoConsole.Resize(row, col);
         }
@@ -98,6 +107,7 @@ namespace ModengTerm.Terminal.Session.ConPTY
             autoResetEvent.WaitOne(Timeout.Infinite);
             autoResetEvent.Dispose();
 
+            // 导致SessionTransport读取失败，然后关闭Session
             this.Stop();
         }
     }

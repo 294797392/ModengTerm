@@ -104,7 +104,7 @@ namespace XTerminal
             }
 
             string cmdPath = System.IO.Path.Combine(Environment.SystemDirectory, "cmd.exe");
-            defaultSession.SetOption<string>(OptionKeyEnum.CMD_FILE_PATH, cmdPath);
+            defaultSession.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, cmdPath);
 
             this.OpenSession(defaultSession);
         }

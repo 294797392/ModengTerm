@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:XTerminal.Windows"
         xmlns:xtermconverter="clr-namespace:XTerminal"
+        xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText100}" 
-        Height="600" Width="700" ResizeMode="NoResize"
+        Height="600" Width="600" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
@@ -15,6 +16,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
 
             <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions"
                                       ItemsSource="{Binding Path=Children}">
@@ -26,6 +29,7 @@
             <Style x:Key="StyleTreeViewItemOption" TargetType="{x:Type TreeViewItem}">
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Setter Property="Visibility" Value="{Binding Path=IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
             </Style>
 
         </ResourceDictionary>

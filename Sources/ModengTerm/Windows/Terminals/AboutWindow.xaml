@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText6}" 
-        Height="200" Width="500" WindowStartupLocation="CenterScreen"
+        Height="170" Width="380" WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                
+
             </ResourceDictionary.MergedDictionaries>
 
             <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
@@ -28,29 +28,30 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid>
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Margin="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="30"/>
-                <RowDefinition Height="30"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="联系作者：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="294797392（微信）" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="作者微信/QQ：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <TextBlock Grid.Row="0" Grid.Column="1" Text="294797392" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="gitee：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="https://gitee.com/zyfalreadyexsit/terminal.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Gitee：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Text="https://gitee.com/zyfalreadyexsit/ModengTerm-Release.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="github：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Text="https://github.com/294797392/terminal.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="软件版本号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="TextBlockSoftwareVersion" Text="" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
-
-        </Grid>
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="版本号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TextBlockSoftwareVersion" Text="" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
     </Grid>
+
 </Window>

@@ -9,6 +9,10 @@ namespace ModengTerm.Base.Definitions
 {
     public class OptionDefinition
     {
+        public static readonly string CommandLineID = Guid.NewGuid().ToString();
+        public static readonly string SshID = Guid.NewGuid().ToString();
+        public static readonly string SerialPortID = Guid.NewGuid().ToString();
+
         /// <summary>
         /// 唯一标志符
         /// </summary>
@@ -19,6 +23,9 @@ namespace ModengTerm.Base.Definitions
         /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// 控件类型
+        /// </summary>
         public Type EntryType { get; set; }
 
         /// <summary>
@@ -26,9 +33,22 @@ namespace ModengTerm.Base.Definitions
         /// </summary>
         public List<OptionDefinition> Children { get; set; }
 
+        public OptionDefinition(string name)
+        {
+            this.ID = Guid.NewGuid().ToString();
+            this.Name = name;
+        }
+
         public OptionDefinition(string name, Type entryType)
         {
             this.ID = Guid.NewGuid().ToString();
+            this.Name = name;
+            this.EntryType = entryType;
+        }
+
+        public OptionDefinition(string id, string name, Type entryType)
+        {
+            this.ID = id;
             this.Name = name;
             this.EntryType = entryType;
         }

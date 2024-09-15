@@ -19,13 +19,13 @@ namespace ModengTerm
         /// </summary>
         public static readonly List<OptionDefinition> TerminalOptionList = new List<OptionDefinition>()
         {
-            new OptionDefinition("连接设置", typeof(SSHOptionsUserControl))
+            new OptionDefinition("连接设置")
             {
                 Children = new List<OptionDefinition>()
                 {
-                    new OptionDefinition("命令行", typeof(CommandLineOptionsUserControl)),
-                    new OptionDefinition("SSH", typeof(SSHOptionsUserControl)),
-                    new OptionDefinition("串口", typeof(SerialPortOptionsUserControl))
+                    new OptionDefinition(OptionDefinition.CommandLineID, "命令行", typeof(CommandLineOptionsUserControl)),
+                    new OptionDefinition(OptionDefinition.SshID, "SSH", typeof(SSHOptionsUserControl)),
+                    new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl))
                 }
             },
 

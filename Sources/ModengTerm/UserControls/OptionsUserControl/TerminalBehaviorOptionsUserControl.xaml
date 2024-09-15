@@ -30,11 +30,11 @@
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="点击鼠标右键时：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="右键点击：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxBehaviorRightClicks" IsEditable="False"
                   DataContext="{Binding Path=BehaviorRightClicks}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   Style="{StaticResource ResourceKey=StyleComboBoxValue}">

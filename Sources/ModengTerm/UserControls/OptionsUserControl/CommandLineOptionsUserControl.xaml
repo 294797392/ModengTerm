@@ -29,16 +29,26 @@
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="命令行路径：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="启动路径：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <Grid Grid.Row="0" Grid.Column="1">
-            <TextBox x:Name="TextBoxCommandLinePath" IsEnabled="False" Text="{Binding Path=CommandLinePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+            <TextBox x:Name="StartupPath" Text="{Binding Path=StartupPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
             <Button x:Name="ButtonBrowser" Content="浏览" HorizontalAlignment="Right" Width="80" Click="ButtonBrowserCommandLinePath_Click"
                     Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
         </Grid>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="初始目录：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <TextBox x:Name="StartupDirectory" Text="{Binding Path=StartupDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+            <Button x:Name="ButtonBrowserStartupDirectory" Content="浏览" HorizontalAlignment="Right" Width="80" Click="ButtonBrowserStartupDirectory_Click"
+                    Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        </Grid>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="启动参数：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=StartupArgument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
     </Grid>
 </UserControl>

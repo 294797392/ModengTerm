@@ -149,7 +149,17 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// 命令行可执行程序路径
         /// </summary>
-        CMD_FILE_PATH = 2001,
+        CMD_STARTUP_PATH = 2001,
+
+        /// <summary>
+        /// 命令行参数
+        /// </summary>
+        CMD_STARTUP_ARGUMENT = 2002,
+
+        /// <summary>
+        /// 初始目录
+        /// </summary>
+        CMD_STARTUP_DIR = 2003,
 
         #endregion
 

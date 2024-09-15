@@ -9,10 +9,18 @@ namespace ModengTerm.Terminal.Session.ConPTY.Processes
     /// </summary>
     internal sealed class Process : IDisposable
     {
+        private IntPtr lpAttributeList;
+        private IntPtr hProcess;
+        private IntPtr hThread;
+
         public Process(STARTUPINFOEX startupInfo, PROCESS_INFORMATION processInfo)
         {
             StartupInfo = startupInfo;
             ProcessInfo = processInfo;
+
+            this.lpAttributeList = startupInfo.lpAttributeList;
+            this.hProcess = processInfo.hProcess;
+            this.hThread = processInfo.hThread;
         }
 
         public STARTUPINFOEX StartupInfo { get; }
@@ -34,20 +42,23 @@ namespace ModengTerm.Terminal.Session.ConPTY.Processes
                 // dispose unmanaged state
 
                 // Free the attribute list
-                if (StartupInfo.lpAttributeList != IntPtr.Zero)
+                if (this.lpAttributeList != IntPtr.Zero)
                 {
-                    DeleteProcThreadAttributeList(StartupInfo.lpAttributeList);
-                    Marshal.FreeHGlobal(StartupInfo.lpAttributeList);
+                    DeleteProcThreadAttributeList(this.lpAttributeList);
+                    Marshal.FreeHGlobal(this.lpAttributeList);
+                    this.lpAttributeList = IntPtr.Zero;
                 }
 
                 // Close process and thread handles
-                if (ProcessInfo.hProcess != IntPtr.Zero)
+                if (this.hProcess != IntPtr.Zero)
                 {
-                    CloseHandle(ProcessInfo.hProcess);
+                    CloseHandle(this.hProcess);
+                    this.hProcess = IntPtr.Zero;
                 }
-                if (ProcessInfo.hThread != IntPtr.Zero)
+                if (this.hThread != IntPtr.Zero)
                 {
-                    CloseHandle(ProcessInfo.hThread);
+                    CloseHandle(this.hThread);
+                    this.hThread = IntPtr.Zero;
                 }
 
                 disposedValue = true;

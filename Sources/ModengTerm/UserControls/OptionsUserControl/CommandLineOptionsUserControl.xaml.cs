@@ -34,7 +34,16 @@ namespace ModengTerm.UserControls.OptionsUserControl
             dialog.Multiselect = false;
             if ((bool)(dialog.ShowDialog()))
             {
-                TextBoxCommandLinePath.Text = dialog.FileName;
+                StartupPath.Text = dialog.FileName;
+            }
+        }
+
+        private void ButtonBrowserStartupDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            if (folderBrowserDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                StartupDirectory.Text = folderBrowserDialog.SelectedPath;
             }
         }
 
