@@ -26,12 +26,12 @@ using WPFToolkit.Utility;
 
 namespace ModengTerm.Terminal.ViewModels
 {
-    public class ShellFunctionMenu : ViewModelBase
+    public class ShellContextMenu : ViewModelBase
     {
         private bool canChecked;
         private bool isChecked;
 
-        public BindableCollection<ShellFunctionMenu> Children { get; set; }
+        public BindableCollection<ShellContextMenu> Children { get; set; }
 
         public bool CanChecked
         {
@@ -61,20 +61,20 @@ namespace ModengTerm.Terminal.ViewModels
 
         public ExecuteShellFunctionCallback Execute { get; private set; }
 
-        public ShellFunctionMenu(string name)
+        public ShellContextMenu(string name)
         {
             this.ID = Guid.NewGuid().ToString();
             this.Name = name;
         }
 
-        public ShellFunctionMenu(string name, ExecuteShellFunctionCallback execute)
+        public ShellContextMenu(string name, ExecuteShellFunctionCallback execute)
         {
             this.ID = Guid.NewGuid().ToString();
             this.Name = name;
             this.Execute = execute;
         }
 
-        public ShellFunctionMenu(string name, ExecuteShellFunctionCallback execute, bool canChecked) :
+        public ShellContextMenu(string name, ExecuteShellFunctionCallback execute, bool canChecked) :
             this(name, execute)
         {
             this.canChecked = canChecked;
@@ -132,6 +132,11 @@ namespace ModengTerm.Terminal.ViewModels
         private int totalRows;
 
         private Visibility contextMenuVisibility;
+
+        /// <summary>
+        /// 输出为十六进制数据（类似于hexdump输出）
+        /// </summary>
+        private bool hexdump;
 
         #endregion
 
@@ -209,7 +214,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 该终端的菜单状态
         /// </summary>
-        public BindableCollection<ShellFunctionMenu> FunctionMenus { get; private set; }
+        public BindableCollection<ShellContextMenu> FunctionMenus { get; private set; }
 
         /// <summary>
         /// 发送到所有窗口的委托，由外部赋值
@@ -256,6 +261,11 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 保存该会话输入的历史记录
+        /// </summary>
+        public BindableCollection<string> HistoryCommands { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -263,6 +273,7 @@ namespace ModengTerm.Terminal.ViewModels
         public ShellSessionVM(XTermSession session) :
             base(session)
         {
+            this.HistoryCommands = new BindableCollection<string>();
         }
 
         #endregion
@@ -277,6 +288,8 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
+
+            this.hexdump = this.Session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_HEX_DUMP);
 
             #region 初始化右键菜单
 
@@ -370,22 +383,22 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void InitializeContextMenu()
         {
-            this.FunctionMenus = new BindableCollection<ShellFunctionMenu>()
+            this.FunctionMenus = new BindableCollection<ShellContextMenu>()
                 {
-                    new ShellFunctionMenu("查找...",  this.Find),
-                    new ShellFunctionMenu("日志")
+                    new ShellContextMenu("查找...",  this.Find),
+                    new ShellContextMenu("日志")
                     {
-                        Children = new BindableCollection<ShellFunctionMenu>()
+                        Children = new BindableCollection<ShellContextMenu>()
                         {
-                            new ShellFunctionMenu("启动",  this.StartLogger),
-                            new ShellFunctionMenu("停止",  this.StopLogger),
-                            new ShellFunctionMenu("暂停",  this.PauseLogger),
-                            new ShellFunctionMenu("继续",  this.ResumeLogger)
+                            new ShellContextMenu("启动",  this.StartLogger),
+                            new ShellContextMenu("停止",  this.StopLogger),
+                            new ShellContextMenu("暂停",  this.PauseLogger),
+                            new ShellContextMenu("继续",  this.ResumeLogger)
                         }
                     },
-                    new ShellFunctionMenu("复制", this.CopySelection),
-                    new ShellFunctionMenu("粘贴", this.Paste),
-                    new ShellFunctionMenu("全选", this.SelectAll),
+                    new ShellContextMenu("复制", this.CopySelection),
+                    new ShellContextMenu("粘贴", this.Paste),
+                    new ShellContextMenu("全选", this.SelectAll),
                     //new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
                     //new ShellFunctionMenu("收藏夹")
                     //{
@@ -417,16 +430,16 @@ namespace ModengTerm.Terminal.ViewModels
                     //        new ShellFunctionMenu("打开回放", this.OpenRecord)
                     //    }
                     //},
-                    new ShellFunctionMenu("保存")
+                    new ShellContextMenu("保存")
                     {
-                        Children = new BindableCollection<ShellFunctionMenu>()
+                        Children = new BindableCollection<ShellContextMenu>()
                         {
-                            new ShellFunctionMenu("当前屏幕内容", this.SaveDocument),
-                            new ShellFunctionMenu("选中内容", this.SaveSelection),
-                            new ShellFunctionMenu("所有内容", this.SaveAllDocument),
+                            new ShellContextMenu("当前屏幕内容", this.SaveDocument),
+                            new ShellContextMenu("选中内容", this.SaveSelection),
+                            new ShellContextMenu("所有内容", this.SaveAllDocument),
                         }
                     },
-                    new ShellFunctionMenu("发送到所有会话", this.SendToAll, true),
+                    new ShellContextMenu("发送到所有会话", this.SendToAll, true),
                     //new ShellFunctionMenu("交互测试用例")
                     //{
                     //    Children = new BindableCollection<ShellFunctionMenu>()
@@ -443,7 +456,7 @@ namespace ModengTerm.Terminal.ViewModels
                     //        new ShellFunctionMenu("RawRead")
                     //    }
                     //}
-                    new ShellFunctionMenu("关于", this.About)
+                    new ShellContextMenu("关于", this.About)
                 };
         }
 
@@ -587,16 +600,75 @@ namespace ModengTerm.Terminal.ViewModels
             return uri;
         }
 
+        /// <summary>
+        /// 输出类似于hexdump命令的格式
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="size"></param>
+        private void ProcessHexDump(byte[] bytes, int size)
+        {
+            VideoTerminal videoTerminal = this.videoTerminal;
+            VTDocument document = videoTerminal.ActiveDocument;
+            int viewportColumn = document.ViewportColumn;
+            int viewportRow = document.ViewportRow;
+
+            for (int i = 0; i < size; i++)
+            {
+                byte value = bytes[i];
+
+                int cursorRow = document.Cursor.Row;
+                int cursorCol = document.Cursor.Column;
+
+                // 要在第几列显示
+                int printColumn = 0;
+
+                // 要在第几行显示
+                int printRow = 0;
+
+                // 计算剩余可以显示多少列
+                VTextLine activeLine = document.ActiveLine;
+                int leftCols = viewportColumn - activeLine.Columns;
+
+                // 光标所在行的剩余列数至少得有3个字符的位置才能显示一个十六进制数（包含一个空字符)
+                if (leftCols <= 3)
+                {
+                    printRow = cursorRow == viewportRow - 1 ? cursorRow : cursorRow + 1;
+                    printColumn = 0;
+                    videoTerminal.LineFeed();
+                }
+                else
+                {
+                    printRow = cursorRow;
+                    printColumn = cursorCol;
+                }
+
+                string hexstr = value.ToString("X2");
+
+                document.SetCursor(printRow, printColumn);
+                VTCharacter character1 = VTCharacter.CreateNull();
+                document.PrintCharacter(character1);
+
+                document.SetCursor(printRow, printColumn + 1);
+                VTCharacter character2 = VTCharacter.Create(hexstr[0], 1);
+                document.PrintCharacter(character2);
+
+                document.SetCursor(printRow, printColumn + 2);
+                VTCharacter character3 = VTCharacter.Create(hexstr[1], 1);
+                document.PrintCharacter(character3);
+
+                document.SetCursor(printRow, printColumn + 3);
+            }
+        }
+
         #endregion
 
         #region 公开接口
 
         /// <summary>
-        /// 向SSH主机发送用户输入
-        /// 用户每输入一个字符，就调用一次这个函数
+        /// 模拟用户输入发送数据
         /// </summary>
-        /// <param name="userInput">用户输入信息</param>
-        public override void SendInput(UserInput userInput)
+        /// <param name="keyInput">用户输入信息</param>
+        public override void SendInput(VTKeyInput keyInput)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
@@ -605,7 +677,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             VTKeyboard keyboard = this.videoTerminal.Keyboard;
 
-            byte[] bytes = keyboard.TranslateInput(userInput);
+            byte[] bytes = keyboard.TranslateInput(keyInput);
             if (bytes == null)
             {
                 return;
@@ -617,17 +689,34 @@ namespace ModengTerm.Terminal.ViewModels
             int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
-                logger.ErrorFormat("处理输入异常, {0}", ResponseCode.GetMessage(code));
+                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
             }
         }
 
-        public void Send(string text)
+        /// <summary>
+        /// 发送原始字节数据
+        /// </summary>
+        /// <param name="rawData"></param>
+        public override void SendRawData(byte[] rawData)
+        {
+            int code = this.sessionTransport.Write(rawData);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
+            }
+        }
+
+        /// <summary>
+        /// 发送纯文本数据
+        /// </summary>
+        /// <param name="text"></param>
+        public override void SendText(string text)
         {
             byte[] bytes = this.writeEncoding.GetBytes(text);
             int code = this.sessionTransport.Write(bytes);
             if (code != ResponseCode.SUCCESS)
             {
-                logger.ErrorFormat("向终端发送数据失败, {0}", ResponseCode.GetMessage(code));
+                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
             }
         }
 
@@ -666,13 +755,20 @@ namespace ModengTerm.Terminal.ViewModels
                     activeDocument.ScrollToBottom();
                 }
 
-                try
+                if (this.hexdump)
                 {
-                    this.vtParser.ProcessCharacters(bytes, size);
+                    this.ProcessHexDump(bytes, size);
                 }
-                catch (Exception ex)
+                else
                 {
-                    logger.Error("ProcessCharacters异常", ex);
+                    try
+                    {
+                        this.vtParser.ProcessCharacters(bytes, size);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("ProcessCharacters异常", ex);
+                    }
                 }
 
                 // 全部数据都处理完了之后，只渲染一次
@@ -806,7 +902,7 @@ namespace ModengTerm.Terminal.ViewModels
         private void Paste()
         {
             string text = System.Windows.Clipboard.GetText();
-            this.SendInput(text);
+            this.SendText(text);
         }
 
         private void SelectAll()

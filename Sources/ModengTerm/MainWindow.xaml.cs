@@ -7,6 +7,7 @@ using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
+using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,18 +30,20 @@ using XTerminal.Base.Enumerations;
 using XTerminal.UserControls;
 using XTerminal.Windows;
 
-namespace XTerminal
+namespace ModengTerm
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly string[] Splitter = new string[] { " " };
+
         #region 实例变量
 
         private OpenedSessionDataTemplateSelector templateSelector;
         private OpenedSessionItemContainerStyleSelector itemContainerStyleSelector;
-        private UserInput userInput;
+        private VTKeyInput userInput;
         private OpenedSessionsVM sessionListVM;
 
         #endregion
@@ -60,7 +63,7 @@ namespace XTerminal
 
         private void InitializeWindow()
         {
-            this.userInput = new UserInput();
+            this.userInput = new VTKeyInput();
             this.templateSelector = new OpenedSessionDataTemplateSelector();
             this.templateSelector.DataTemplateOpenedSession = this.FindResource("DataTemplateOpenedSession") as DataTemplate;
             this.templateSelector.DataTemplateOpenSession = this.FindResource("DataTemplateOpenSession") as DataTemplate;
@@ -113,7 +116,7 @@ namespace XTerminal
         /// 向SSH服务器发送输入
         /// </summary>
         /// <param name="userInput"></param>
-        private void SendUserInput(InputSessionVM sendTo, UserInput userInput)
+        private void SendUserInput(InputSessionVM sendTo, VTKeyInput userInput)
         {
             if (sendTo.SendAll)
             {
@@ -136,7 +139,7 @@ namespace XTerminal
         {
             foreach (ShellSessionVM shellSession in this.sessionListVM.ShellSessions)
             {
-                shellSession.SendInput(text);
+                shellSession.SendText(text);
             }
         }
 
@@ -309,80 +312,80 @@ namespace XTerminal
         }
 
 
-        /// <summary>
-        /// 输入中文的时候会触发该事件
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnPreviewTextInput(TextCompositionEventArgs e)
-        {
-            base.OnPreviewTextInput(e);
+        ///// <summary>
+        ///// 输入中文的时候会触发该事件
+        ///// </summary>
+        ///// <param name="e"></param>
+        //protected override void OnPreviewTextInput(TextCompositionEventArgs e)
+        //{
+        //    base.OnPreviewTextInput(e);
 
-            InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
-            if (selectedSession == null)
-            {
-                return;
-            }
+        //    InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
+        //    if (selectedSession == null)
+        //    {
+        //        return;
+        //    }
 
-            this.userInput.CapsLock = Console.CapsLock;
-            this.userInput.Key = VTKeys.GenericText;
-            this.userInput.Text = e.Text;
-            this.userInput.Modifiers = VTModifierKeys.None;
+        //    this.userInput.CapsLock = Console.CapsLock;
+        //    this.userInput.Key = VTKeys.GenericText;
+        //    this.userInput.Text = e.Text;
+        //    this.userInput.Modifiers = VTModifierKeys.None;
 
-            this.SendUserInput(selectedSession, this.userInput);
+        //    this.SendUserInput(selectedSession, this.userInput);
 
-            e.Handled = true;
-        }
+        //    e.Handled = true;
+        //}
 
-        /// <summary>
-        /// 从键盘上按下按键的时候会触发
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
-        {
-            base.OnPreviewKeyDown(e);
+        ///// <summary>
+        ///// 从键盘上按下按键的时候会触发
+        ///// </summary>
+        ///// <param name="e"></param>
+        //protected override void OnPreviewKeyDown(KeyEventArgs e)
+        //{
+        //    base.OnPreviewKeyDown(e);
 
-            InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
-            if (selectedSession == null)
-            {
-                return;
-            }
+        //    InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
+        //    if (selectedSession == null)
+        //    {
+        //        return;
+        //    }
 
-            if (e.Key == Key.ImeProcessed)
-            {
-                // 这些字符交给输入法处理了
-            }
-            else
-            {
-                switch (e.Key)
-                {
-                    case Key.Tab:
-                    case Key.Up:
-                    case Key.Down:
-                    case Key.Left:
-                    case Key.Right:
-                    case Key.Space:
-                        {
-                            // 防止焦点移动到其他控件上了
-                            e.Handled = true;
-                            break;
-                        }
-                }
+        //    if (e.Key == Key.ImeProcessed)
+        //    {
+        //        // 这些字符交给输入法处理了
+        //    }
+        //    else
+        //    {
+        //        switch (e.Key)
+        //        {
+        //            case Key.Tab:
+        //            case Key.Up:
+        //            case Key.Down:
+        //            case Key.Left:
+        //            case Key.Right:
+        //            case Key.Space:
+        //                {
+        //                    // 防止焦点移动到其他控件上了
+        //                    e.Handled = true;
+        //                    break;
+        //                }
+        //        }
 
-                if (e.Key != Key.ImeProcessed)
-                {
-                    e.Handled = true;
-                }
+        //        if (e.Key != Key.ImeProcessed)
+        //        {
+        //            e.Handled = true;
+        //        }
 
-                VTKeys vtKey = TermUtils.ConvertToVTKey(e.Key);
-                this.userInput.CapsLock = Console.CapsLock;
-                this.userInput.Key = vtKey;
-                this.userInput.Text = null;
-                this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-                this.SendUserInput(selectedSession, this.userInput);
-            }
+        //        VTKeys vtKey = TermUtils.ConvertToVTKey(e.Key);
+        //        this.userInput.CapsLock = Console.CapsLock;
+        //        this.userInput.Key = vtKey;
+        //        this.userInput.Text = null;
+        //        this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+        //        this.SendUserInput(selectedSession, this.userInput);
+        //    }
 
-            e.Handled = true;
-        }
+        //    e.Handled = true;
+        //}
 
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -403,6 +406,55 @@ namespace XTerminal
             }
         }
 
+
+        #endregion
+
+        #region 命令响应
+
+        private void SendCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ShellCommandVM shellCommand = e.Parameter as ShellCommandVM;
+            if (shellCommand == null)
+            {
+                return;
+            }
+
+            InputSessionVM inputSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
+            if (inputSession == null)
+            {
+                return;
+            }
+
+            switch (shellCommand.Type)
+            {
+                case ShellCommandTypeEnum.PureText:
+                    {
+                        inputSession.SendText(shellCommand.Command);
+                        break;
+                    }
+
+                case ShellCommandTypeEnum.Hexadecimal:
+                    {
+                        byte[] bytes;
+                        if (!MTermUtils.TryParseHexString(shellCommand.Command, out bytes))
+                        {
+                            MTMessageBox.Info("发送失败, 十六进制数据格式错误");
+                            return;
+                        }
+
+                        inputSession.SendRawData(bytes);
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            if (shellCommand.AutoCRLF)
+            {
+                inputSession.SendText("\r\n");
+            }
+        }
 
         #endregion
     }

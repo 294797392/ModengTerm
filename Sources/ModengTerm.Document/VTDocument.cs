@@ -835,7 +835,7 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 在当前光标位置打印一个字符
+        /// 在当前光标位置打印一个字符，不移动光标位置
         /// TODO：该函数里的VTCharacter没有复用，需要改进
         /// </summary>
         /// <param name="ch"></param>

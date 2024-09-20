@@ -287,9 +287,9 @@ namespace ModengTerm
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null || !(value is BehaviorRightClicks))
+            if (!(value is BehaviorRightClicks))
             {
-                return "未知方式";
+                return string.Empty;
             }
 
             BehaviorRightClicks brc = (BehaviorRightClicks)value;
@@ -313,6 +313,31 @@ namespace ModengTerm
 
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ShellCommandTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is ShellCommandTypeEnum))
+            {
+                return string.Empty;
+            }
+
+            ShellCommandTypeEnum commandType = (ShellCommandTypeEnum)value;
+
+            switch (commandType)
+            {
+                case ShellCommandTypeEnum.PureText: return "纯文本";
+                case ShellCommandTypeEnum.Hexadecimal: return "十六进制数据（如有多个数值，请使用空格分开）";
+                default: throw new NotImplementedException();
             }
         }
 

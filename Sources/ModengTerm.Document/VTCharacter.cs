@@ -82,6 +82,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 从缓冲池里创建一个空的字符
+        /// TODO：考虑重命名为CreateSpace或者CreateBlank
         /// </summary>
         /// <returns></returns>
         public static VTCharacter CreateNull()

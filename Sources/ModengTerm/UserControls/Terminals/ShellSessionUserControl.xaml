@@ -26,15 +26,26 @@
             <Setter Property="Width" Value="2"/>
         </Style>
 
+        <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+
+        <Style x:Key="StyleToggleButtonLocal" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent">
+        <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent"
+              MouseDown="GridDocument_MouseDown" Loaded="GridDocument_Loaded"
+              TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
             <Grid.ContextMenu>
                 <ContextMenu ItemsSource="{Binding Path=FunctionMenus}" MenuItem.Click="ContextMenu_Click"
                              Visibility="{Binding Path=ContextMenuVisibility}">
@@ -59,8 +70,36 @@
 
         </Grid>
 
+        <!-- 输入栏 -->
+        <Grid Grid.Row="1" Height="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="60"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Grid.ColumnSpan="99" Background="White" BorderThickness="0,1,0,0" BorderBrush="Silver"/>
+
+            <TextBlock Grid.Column="0" Text="输入：" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <ComboBox Grid.Column="1" x:Name="ComboBoxHistoryCommands" VerticalContentAlignment="Center" Height="25" Margin="3,0,3,0" IsEditable="True"/>
+
+            <Button Grid.Column="2" Content="发送" Click="ButtonSend_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Grid.Column="3" x:Name="ButtonOptions" Content="选项" Click="ButtonOptions_Checked" Style="{StaticResource ResourceKey=StyleButtonLocal}">
+                <Button.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem x:Name="MenuItemHexInput" Header="16进制输入" IsCheckable="True"/>
+                        <MenuItem x:Name="MenuItemSendCRLF" Header="自动换行" IsCheckable="True"/>
+                    </ContextMenu>
+                </Button.ContextMenu>
+            </Button>
+            <Button Grid.Column="4" Content="清空" Click="ButtonClear_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+
+        </Grid>
+
         <!-- 状态栏 -->
-        <Grid Grid.Row="1" x:Name="GridStatusbar">
+        <Grid Grid.Row="2" x:Name="GridStatusbar">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>

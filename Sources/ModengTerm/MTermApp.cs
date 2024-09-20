@@ -1,10 +1,13 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.UserControls.OptionsUserControl;
+using ModengTerm.UserControls.OptionsUserControl.Terminal;
 using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.Terminals;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Threading;
@@ -19,13 +22,13 @@ namespace ModengTerm
         /// </summary>
         public static readonly List<OptionDefinition> TerminalOptionList = new List<OptionDefinition>()
         {
-            new OptionDefinition("连接设置")
+            new OptionDefinition("会话")
             {
                 Children = new List<OptionDefinition>()
                 {
                     new OptionDefinition(OptionDefinition.CommandLineID, "命令行", typeof(CommandLineOptionsUserControl)),
                     new OptionDefinition(OptionDefinition.SshID, "SSH", typeof(SSHOptionsUserControl)),
-                    new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl))
+                    new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl)),
                 }
             },
 
@@ -33,11 +36,11 @@ namespace ModengTerm
             {
                 Children = new List<OptionDefinition>()
                 {
-                    new OptionDefinition("行为", typeof(TerminalBehaviorOptionsUserControl))
+                    new OptionDefinition("外观", typeof(ThemeOptionsUserControl)),
+                    new OptionDefinition("行为", typeof(TerminalBehaviorOptionsUserControl)),
+                    new OptionDefinition("高级", typeof(AdvanceOptionsUserControl))
                 }
             },
-
-            new OptionDefinition("外观主题", typeof(ThemeOptionsUserControl))
         };
 
         #region 实例变量
@@ -60,6 +63,8 @@ namespace ModengTerm
         /// </summary>
         public LoggerManager LoggerManager { get; private set; }
 
+        public ShellGlobalVM ShellGlobalVM { get; private set; }
+
         #endregion
 
         #region ModularApp
@@ -71,6 +76,17 @@ namespace ModengTerm
 
             this.LoggerManager = new LoggerManager();
             this.LoggerManager.Initialize();
+
+            #region 初始化ShellGlobalVM
+
+            this.ShellGlobalVM = new ShellGlobalVM();
+            List<ShellCommand> commands = this.ServiceAgent.GetShellCommands();
+            foreach (ShellCommand shellCommand in commands)
+            {
+                this.ShellGlobalVM.Commands.Add(new ShellCommandVM(shellCommand));
+            }
+
+            #endregion
 
             #region 启动后台工作线程
 

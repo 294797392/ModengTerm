@@ -30,7 +30,7 @@ namespace ModengTerm.Base.Enumerations
     /// </summary>
     public enum OptionKeyEnum
     {
-        #region SSH 0 - 5000
+        #region SSH 0 - 1000
 
         // Terminal 0 - 99
         SSH_TERM_ROW = 0,
@@ -108,17 +108,6 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
-        #region 串口 5000 - 1000
-
-        SERIAL_PORT_NAME = 501,
-        SERIAL_PORT_BAUD_RATE = 502,
-        SERIAL_PORT_DATA_BITS = 503,
-        SERIAL_PORT_STOP_BITS = 504,
-        SERIAL_PORT_PARITY = 505,
-        SERIAL_PORT_HANDSHAKE = 506,
-
-        #endregion
-
         #region 终端 1001 - 1500
 
         /// <summary>
@@ -163,6 +152,26 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
+        #region 串口 2501 - 3000
+
+        SERIAL_PORT_NAME = 2501,
+        SERIAL_PORT_BAUD_RATE = 2502,
+        SERIAL_PORT_DATA_BITS = 2503,
+        SERIAL_PORT_STOP_BITS = 2504,
+        SERIAL_PORT_PARITY = 2505,
+        SERIAL_PORT_HANDSHAKE = 2506,
+
+        #endregion
+
+        #region 终端高级选项 3001 - 4000
+
+        /// <summary>
+        /// 显示为十六进制数据
+        /// </summary>
+        TERM_ADVANCE_HEX_DUMP = 3001,
+
+        #endregion
+
         #region SFTP 10000 - 11000
 
         SFTP_SERVER_ADDRESS = 10000,
@@ -174,5 +183,6 @@ namespace ModengTerm.Base.Enumerations
         SFTP_CLIENT_INITIAL_DIRECTORY = 10006,
 
         #endregion
+
     }
 }

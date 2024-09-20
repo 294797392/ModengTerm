@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,18 +53,62 @@ namespace ModengTerm.Base
             }
         }
 
-        public static int Clamp(int val, int minval, int maxval) 
+        public static int Clamp(int val, int minval, int maxval)
         {
             if (val < minval)
             {
                 return minval;
             }
-            else if(val > maxval)
+            else if (val > maxval)
             {
                 return maxval;
             }
 
             return val;
+        }
+
+        /// <summary>
+        /// 把一个16进制字符串转换成字节数组
+        /// </summary>
+        /// <param name="hex"></param>
+        /// <param name="parsed"></param>
+        /// <returns></returns>
+        public static bool TryParseHexString(string hex, out byte[] parsed)
+        {
+            parsed = null;
+
+            if (string.IsNullOrEmpty(hex))
+            {
+                parsed = new byte[0];
+                return true;
+            }
+
+            // 先删除所有的0x（如果有的话）
+            string lowerHex = hex.ToLower().Replace("0x", string.Empty).Replace(" ", string.Empty);
+
+            // 十六进制字符串的长度必须是2的倍数，2个字符等于1个字节
+            if (lowerHex.Length % 2 != 0)
+            {
+                return false;
+            }
+
+            List<byte> values = new List<byte>();
+
+            // 再一个一个字节拆分16进制字符串
+            for (int i = 0; i < lowerHex.Length; i += 2)
+            {
+                byte v;
+                if (!byte.TryParse(lowerHex.Substring(i, 2), NumberStyles.HexNumber, null, out v))
+                {
+                    return false;
+                }
+
+                values.Add(v);
+            }
+
+            parsed = values.ToArray();
+
+            return true;
         }
     }
 }

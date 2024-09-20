@@ -78,6 +78,9 @@ namespace ModengTerm.Document
         public int NewScroll { get; set; }
     }
 
+    /// <summary>
+    /// 由VTDocument处理外部模块触发的输入事件
+    /// </summary>
     public class VTEventInput
     {
         public delegate void MouseWheelDelegate(bool upper);

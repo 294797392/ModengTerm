@@ -73,7 +73,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             ParagraphVM paragraph = this.Sender2ParagraphVM(sender);
 
-            this.shellSession.SendInput(paragraph.Content);
+            this.shellSession.SendText(paragraph.Content);
         }
 
         /// <summary>

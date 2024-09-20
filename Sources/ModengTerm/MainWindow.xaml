@@ -1,21 +1,30 @@
-﻿<Window x:Class="XTerminal.MainWindow"
-                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                           xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
-                           xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
-                           xmlns:local="clr-namespace:ModengTerm"
-                           mc:Ignorable="d"
-                           Title="{DynamicResource ResourceKey=UIText1}"
-                           Width="800" Height="600" WindowStartupLocation="CenterScreen"
-                           MinWidth="800" MinHeight="600" Loaded="Window_Loaded"
+﻿<Window x:Class="ModengTerm.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
+        xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+        xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
+        xmlns:mcmd="clr-namespace:ModengTerm"
+        xmlns:local="clr-namespace:ModengTerm"
+        mc:Ignorable="d"
+        Title="{DynamicResource ResourceKey=UIText1}"
+        Width="900" Height="700" WindowStartupLocation="CenterScreen"
+        MinWidth="900" MinHeight="700" Loaded="Window_Loaded"
+        xmlns:terminaluc="clr-namespace:ModengTerm.UserControls.Terminals"
         WindowStyle="None" ResizeMode="NoResize">
 
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static mcmd:MCommands.SendCommand}" Executed="SendCommand_Executed"/>
+    </Window.CommandBindings>
+    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
             </ResourceDictionary.MergedDictionaries>
+
+            <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
 
             <local:SessionImageConverter x:Key="SessionImageConverter"/>
 
@@ -118,6 +127,17 @@
                 </Setter>
             </Style>
 
+
+            <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mtermcontrols:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
+                <Setter Property="SVGColor" Value="Black"/>
+                <Setter Property="SVGMargin" Value="7"/>
+                <Setter Property="Margin" Value="3"/>
+                <Setter Property="MouseOverBrush" Value="{DynamicResource ResourceKey=BrushMainWindowButtonHoverBackground}"/>
+                <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=BrushMainWindowButtonDownBackground}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Focusable" Value="False"/>
+            </Style>
+            
         </ResourceDictionary>
     </Window.Resources>
 
@@ -152,6 +172,10 @@
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
                 </MenuItem>
 
+                <!--<MenuItem Header="视图" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem x:Name="MenuItemShellCommand" Header="快捷命令"/>
+                </MenuItem>-->
+
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
                     <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->
@@ -159,52 +183,63 @@
 
             </Menu>
 
+            <mtermcontrols:MTermButton Grid.Column="2" SVGPath="M797.291117 486.21473 224.18848 486.21473c-14.078647 0-25.469068 11.342326-25.469068 25.472138 0 14.028505 11.390421 25.471115 25.469068 25.471115l573.101613 0c14.07967 0 25.470091-11.441587 25.470091-25.471115C822.760185 497.557056 811.370787 486.21473 797.291117 486.21473z" 
+                                       Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mtermcontrols:MTermButton Grid.Column="2" Margin="3" SVGMargin="7" MouseOverBrush="{DynamicResource ResourceKey=BrushMainWindowButtonHoverBackground}"
-                                       MouseDownBrush="{DynamicResource ResourceKey=BrushMainWindowButtonDownBackground}"
-                                       SVGColor="Black" SVGPath="M797.291117 486.21473 224.18848 486.21473c-14.078647 0-25.469068 11.342326-25.469068 25.472138 0 14.028505 11.390421 25.471115 25.469068 25.471115l573.101613 0c14.07967 0 25.470091-11.441587 25.470091-25.471115C822.760185 497.557056 811.370787 486.21473 797.291117 486.21473z" Style="{StaticResource ResourceKey=StyleMTermButton}"
-                                       Click="ButtonMinmizedWindow_Click"/>
+            <mtermcontrols:MTermButton Grid.Column="3" SVGPath="M819.61718723 863.56250027H204.38281277a43.9947507 43.9947507 0 0 1-43.94531304-43.94531304V204.38281277a43.9947507 43.9947507 0 0 1 43.94531304-43.94531304h615.23437446a43.9947507 43.9947507 0 0 1 43.94531304 43.94531304v615.23437446a43.9947507 43.9947507 0 0 1-43.94531304 43.94531304zM204.38281277 195.59375a8.78906277 8.78906277 0 0 0-8.78906277 8.78906277v615.23437446a8.78906277 8.78906277 0 0 0 8.78906277 8.78906277h615.23437446a8.78906277 8.78906277 0 0 0 8.78906277-8.78906277V204.38281277a8.78906277 8.78906277 0 0 0-8.78906277-8.78906277z"
+                                       Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mtermcontrols:MTermButton Grid.Column="3" Margin="3" SVGMargin="7" MouseOverBrush="{DynamicResource ResourceKey=BrushMainWindowButtonHoverBackground}"
-                                       MouseDownBrush="{DynamicResource ResourceKey=BrushMainWindowButtonDownBackground}"
-                                       SVGColor="Black" SVGPath="M819.61718723 863.56250027H204.38281277a43.9947507 43.9947507 0 0 1-43.94531304-43.94531304V204.38281277a43.9947507 43.9947507 0 0 1 43.94531304-43.94531304h615.23437446a43.9947507 43.9947507 0 0 1 43.94531304 43.94531304v615.23437446a43.9947507 43.9947507 0 0 1-43.94531304 43.94531304zM204.38281277 195.59375a8.78906277 8.78906277 0 0 0-8.78906277 8.78906277v615.23437446a8.78906277 8.78906277 0 0 0 8.78906277 8.78906277h615.23437446a8.78906277 8.78906277 0 0 0 8.78906277-8.78906277V204.38281277a8.78906277 8.78906277 0 0 0-8.78906277-8.78906277z" Style="{StaticResource ResourceKey=StyleMTermButton}"
-                                       Click="ButtonMaxmizedWindow_Click"/>
-
-            <mtermcontrols:MTermButton Grid.Column="4" Margin="3" SVGMargin="7" MouseOverBrush="{DynamicResource ResourceKey=BrushMainWindowButtonHoverBackground}"
-                                       MouseDownBrush="{DynamicResource ResourceKey=BrushMainWindowButtonDownBackground}"
-                                       SVGColor="Black" SVGPath="M558.933333 529.066667l285.866667 285.866666-29.866667 29.866667-285.866666-285.866667-285.866667 285.866667-29.866667-29.866667 285.866667-285.866666L213.333333 243.2l29.866667-29.866667 285.866667 285.866667L814.933333 213.333333l29.866667 29.866667-285.866667 285.866667z" Style="{StaticResource ResourceKey=StyleMTermButton}"
-                                       Click="ButtonCloseWindow_Click"/>
+            <mtermcontrols:MTermButton Grid.Column="4" SVGPath="M558.933333 529.066667l285.866667 285.866666-29.866667 29.866667-285.866666-285.866667-285.866667 285.866667-29.866667-29.866667 285.866667-285.866666L213.333333 243.2l29.866667-29.866667 285.866667 285.866667L814.933333 213.333333l29.866667 29.866667-285.866667 285.866667z"
+                                       Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
         </Grid>
 
-        <!-- 终端显示区域 -->
         <Grid Grid.Row="1" Margin="0,5,0,0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- 打开的终端列表Tab页 -->
-            <Grid Grid.Row="0">
+            <!-- 终端显示区域 -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
-                    <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
+                <!-- 打开的终端列表Tab页 -->
+                <Grid Grid.Row="0">
+
+                    <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                        <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
                              SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                    </ListBox>
-                </ScrollViewer>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                    </ScrollViewer>
+
+                </Grid>
+
+                <!-- 终端展示页面 -->
+                <Border Grid.Row="1" Background="{DynamicResource ResourceKey=Brush4003}"/>
+                <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
 
             </Grid>
 
-            <!-- 终端展示页面 -->
-            <Border Grid.Row="1" Background="{DynamicResource ResourceKey=Brush4003}"/>
-            <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
+            <Grid Grid.Column="1" Margin="3,0,0,0">
+                <TabControl Width="250">
+                    <TabItem Header="快捷命令">
+                        <terminaluc:ShellCommandUserControl/>
+                    </TabItem>
+                </TabControl>
+            </Grid>
 
         </Grid>
+
+        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="Silver"/>
 
     </Grid>
 

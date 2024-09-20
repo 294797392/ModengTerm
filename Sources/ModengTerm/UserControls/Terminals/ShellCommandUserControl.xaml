@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="ModengTerm.UserControls.Terminals.ShellCommandUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ModengTerm.UserControls.Terminals"
+             xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="200" d:DesignWidth="200">
+
+    <UserControl.Resources>
+        <Style x:Key="StyleMTermButtonLocal" TargetType="{x:Type mtermcontrols:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
+            <Setter Property="Width" Value="20"/>
+            <Setter Property="Height" Value="20"/>
+            <Setter Property="BorderBrush" Value="Silver"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Margin" Value="0,0,5,0"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid>
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
+                <mtermcontrols:MTermButton ToolTip="新建命令" Content="+" Style="{StaticResource ResourceKey=StyleMTermButtonLocal}" Click="ButtonCreate_Click"/>
+                <CheckBox x:Name="CheckBoxAutoCRLF" VerticalAlignment="Center" Content="自动输入回车键" Margin="0,0,5,0"/>
+            </StackPanel>
+
+            <Border BorderBrush="Silver" BorderThickness="0,0,0,1"/>
+        </Grid>
+
+        <ListBox x:Name="ListBoxCommands" Grid.Row="1" ItemsSource="{Binding}" 
+                 SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 SelectionChanged="ListBoxCommands_SelectionChanged">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.Style>
+                <Style TargetType="{x:Type ListBox}">
+                    <Setter Property="BorderBrush" Value="{x:Null}"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+            </ListBox.Style>
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="Margin" Value="3"/>
+                    <Setter Property="Padding" Value="5,0,5,0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    <Setter Property="BorderBrush" Value="Silver"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            
+        </ListBox>
+
+    </Grid>
+</UserControl>

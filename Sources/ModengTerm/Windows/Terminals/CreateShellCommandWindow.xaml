@@ -1,0 +1,67 @@
+﻿<Window x:Class="ModengTerm.Windows.Terminals.CreateShellCommandWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModengTerm.Windows.Terminals"
+        xmlns:converter="clr-namespace:ModengTerm"
+        mc:Ignorable="d"
+        Title="新建命令" Height="250" Width="400"
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+
+        <converter:ShellCommandTypeConverter x:Key="ShellCommandTypeConverter"/>
+
+        <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Width" Value="70"/>
+            <Setter Property="Height" Value="30"/>
+        </Style>
+
+        <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+
+        <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}">
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="名称：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+        <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxName" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="类型：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+        <ComboBox Grid.Row="1" Grid.Column="2" x:Name="ComboBoxCommandTypes" Height="25" Margin="3,0,3,0">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=ShellCommandTypeConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="命令：" VerticalAlignment="Top" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+        <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextBoxCommand" VerticalContentAlignment="Top" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="999" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button Content="保存" Click="ButtonSave_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Content="关闭" Click="ButtonClose_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        </StackPanel>
+        
+    </Grid>
+</Window>

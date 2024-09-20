@@ -6,17 +6,11 @@ using System.Text;
 namespace ModengTerm.Terminal
 {
     /// <summary>
-    /// 存储输入事件
+    /// 存储按键输入事件
     /// 你需要把你使用的GUI框架（WPF,Winform...etc）的键盘事件转换成VTInputEventArgs
     /// </summary>
-    public class UserInput
+    public class VTKeyInput
     {
-        /// <summary>
-        /// 经过输入法处理后的字符串（用户输入的中文字符），如果没有则填null
-        /// 在WPF里这个值使用TextInput事件参数的Text属性获取到
-        /// </summary>
-        public string Text { get; set; }
-
         /// <summary>
         /// 用户按下的按键
         /// </summary>

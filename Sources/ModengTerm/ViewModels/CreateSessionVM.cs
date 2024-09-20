@@ -76,6 +76,13 @@ namespace ModengTerm.ViewModels
         private string startupArgument;
         private string startupDir;
 
+
+        #region 终端高级选项
+
+        private bool displayAsHex;
+
+        #endregion
+
         #endregion
 
         #region 属性
@@ -407,7 +414,7 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
-        #region 终端行为相关
+        #region 终端行为选项
 
         public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
 
@@ -559,6 +566,20 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        #region 终端高级选项
+
+        public bool DisplayAsHex
+        {
+            get { return this.displayAsHex; }
+            set
+            {
+                this.displayAsHex = value;
+                this.NotifyPropertyChanged("DisplayAsHex");
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region 构造方法
@@ -612,7 +633,7 @@ namespace ModengTerm.ViewModels
             this.TerminalRows = MTermConsts.TerminalRows.ToString();
             this.TerminalColumns = MTermConsts.TerminalColumns.ToString();
             this.TerminalTypeList = new BindableCollection<TerminalTypeEnum>();
-            this.TerminalTypeList.AddRange(Enum.GetValues(typeof(TerminalTypeEnum)).Cast<TerminalTypeEnum>());
+            this.TerminalTypeList.AddRange(MTermUtils.GetEnumValues<TerminalTypeEnum>());
             this.TerminalTypeList.SelectedItem = MTermConsts.DefaultTerminalType;
             this.MaxScrollback = MTermConsts.DefaultTerminalScrollback.ToString();
             this.MaxClipboardHistory = MTermConsts.DefaultMaxClipboardHistory.ToString();
@@ -622,7 +643,7 @@ namespace ModengTerm.ViewModels
             #region 终端行为
 
             this.BehaviorRightClicks = new BindableCollection<BehaviorRightClicks>();
-            this.BehaviorRightClicks.AddRange(Enum.GetValues(typeof(BehaviorRightClicks)).Cast<BehaviorRightClicks>());
+            this.BehaviorRightClicks.AddRange(MTermUtils.GetEnumValues<BehaviorRightClicks>());
             this.BehaviorRightClicks.SelectedItem = Base.Enumerations.BehaviorRightClicks.ContextMenu;
 
             #endregion
@@ -862,7 +883,7 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
-        private bool GetThemeOptions(XTermSession session)
+        private bool GetTerminalThemeOptions(XTermSession session)
         {
             if (this.FontFamilyList.SelectedItem == null)
             {
@@ -993,6 +1014,13 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
+        private bool GetTerminalAdvancedOptions(XTermSession session)
+        {
+            session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_HEX_DUMP, this.DisplayAsHex);
+
+            return true;
+        }
+
         private bool GetCommandlineOptions(XTermSession session)
         {
             if (string.IsNullOrEmpty(this.StartupPath))
@@ -1104,10 +1132,11 @@ namespace ModengTerm.ViewModels
                     throw new NotImplementedException();
             }
 
-            if (!this.GetThemeOptions(session) ||
+            if (!this.GetTerminalThemeOptions(session) ||
                 !this.GetTerminalOptions(session) ||
                 !this.GetMouseOptions(session) ||
-                !this.GetTerminalBehaviorOptions(session))
+                !this.GetTerminalBehaviorOptions(session) ||
+                !this.GetTerminalAdvancedOptions(session))
             {
                 return false;
             }

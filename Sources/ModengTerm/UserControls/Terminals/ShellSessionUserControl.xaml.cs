@@ -1,38 +1,15 @@
-﻿using DotNEToolkit;
-using Microsoft.Win32;
-using ModengTerm;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Document;
-using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Rendering;
-using ModengTerm.Terminal;
-using ModengTerm.Terminal.DataModels;
-using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.ViewModels;
-using ModengTerm.ViewModels;
-using ModengTerm.Windows;
 using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WPFToolkit.Utility;
 
 namespace ModengTerm.Terminal.UserControls
 {
@@ -51,6 +28,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private ShellSessionVM shellSession;
         private IVideoTerminal videoTerminal;
+        private VTKeyInput userInput;
 
         #endregion
 
@@ -77,11 +55,10 @@ namespace ModengTerm.Terminal.UserControls
 
         private void InitializeUserControl()
         {
-#if !DEBUG
-            ToggleButtonLoggerSetting.Visibility = Visibility.Collapsed;
-#endif
-
+            // 必须设置Focusable=true，调用Focus才生效
+            GridDocument.Focusable = true;
             this.Background = Brushes.Transparent;
+            this.userInput = new VTKeyInput();
         }
 
         /// <summary>
@@ -150,8 +127,6 @@ namespace ModengTerm.Terminal.UserControls
 
         private void ContentCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            this.Focus();
-
             MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
             eventInput.OnMouseMove(mouseData);
@@ -190,7 +165,7 @@ namespace ModengTerm.Terminal.UserControls
                         return;
                     }
 
-                    this.shellSession.Send(text);
+                    this.shellSession.SendText(text);
                 }
                 else
                 {
@@ -232,7 +207,7 @@ namespace ModengTerm.Terminal.UserControls
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            ShellFunctionMenu functionMenu = menuItem.DataContext as ShellFunctionMenu;
+            ShellContextMenu functionMenu = menuItem.DataContext as ShellContextMenu;
             if (functionMenu == null)
             {
                 return;
@@ -245,6 +220,95 @@ namespace ModengTerm.Terminal.UserControls
 
             functionMenu.Execute();
         }
+
+        private void ButtonOptions_Checked(object sender, RoutedEventArgs e)
+        {
+            ButtonOptions.ContextMenu.IsOpen = true;
+        }
+
+        private void ButtonSend_Click(object sender, RoutedEventArgs e)
+        {
+            string text = ComboBoxHistoryCommands.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            if (MenuItemHexInput.IsChecked)
+            {
+                byte[] bytes;
+                if (!MTermUtils.TryParseHexString(text, out bytes))
+                {
+                    MTMessageBox.Info("请输入正确的十六进制数据");
+                    return;
+                }
+
+                this.shellSession.SendRawData(bytes);
+            }
+            else
+            {
+                this.shellSession.SendText(text);
+            }
+
+            if (MenuItemSendCRLF.IsChecked)
+            {
+                this.shellSession.SendText("\r\n");
+            }
+
+            this.shellSession.HistoryCommands.Add(text);
+        }
+
+        private void ButtonClear_Click(object sender, RoutedEventArgs e)
+        {
+            ComboBoxHistoryCommands.Text = string.Empty;
+        }
+
+
+
+        private void GridDocument_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Tab:
+                case Key.Up:
+                case Key.Down:
+                case Key.Left:
+                case Key.Right:
+                    {
+                        this.userInput.CapsLock = Console.CapsLock;
+                        this.userInput.Key = TermUtils.ConvertToVTKey(e.Key);
+                        this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+                        this.shellSession.SendInput(this.userInput);
+
+                        // 防止焦点移动到其他控件上
+                        e.Handled = true;
+                        break;
+                    }
+
+                default:
+                    {
+                        break;
+                    }
+            }
+        }
+
+        private void GridDocument_TextInput(object sender, TextCompositionEventArgs e)
+        {
+            this.shellSession.SendText(e.Text);
+        }
+
+        private void GridDocument_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Loaded事件里让控件获取焦点，这样才能触发OnKeyDown和OnTextInput事件
+            GridDocument.Focus();
+        }
+
+        private void GridDocument_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // 获取焦点，才能收到OnKeyDown和OnTextInput回调
+            GridDocument.Focus();
+        }
+
 
         #endregion
 
@@ -271,7 +335,7 @@ namespace ModengTerm.Terminal.UserControls
             // TODO：
             // 设置了ContentMargin之后，不会立即更新ActualWidth和ActualHeight，要等Loaded之后才能获取到
             // 暂时没找到更好的办法去获取到设置了Margin之后的ContentSize
-            base.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Loaded); 
+            base.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Loaded);
 
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;

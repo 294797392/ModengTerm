@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using DotNEToolkit.DataAccess;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
 using System;
@@ -20,27 +21,22 @@ namespace ModengTerm.ViewModels.Terminals
         public bool SendAll { get; set; }
 
         /// <summary>
-        /// 处理用户输入数据
+        /// 处理用户按键输入数据
         /// </summary>
-        /// <param name="userInput"></param>
-        public abstract void SendInput(UserInput userInput);
+        /// <param name="keyInput">按键输入信息</param>
+        public abstract void SendInput(VTKeyInput keyInput);
+
+        /// <summary>
+        /// 输入原始数据
+        /// </summary>
+        /// <param name="rawData"></param>
+        public abstract void SendRawData(byte[] rawData);
 
         /// <summary>
         /// 输入纯文本数据
         /// </summary>
         /// <param name="text"></param>
-        public void SendInput(string text)
-        {
-            UserInput userInput = new UserInput()
-            {
-                CapsLock = false,
-                Text = text,
-                Key = ModengTerm.Terminal.VTKeys.GenericText,
-                Modifiers = VTModifierKeys.None
-            };
-
-            this.SendInput(userInput);
-        }
+        public abstract void SendText(string text);
 
         protected InputSessionVM(XTermSession session) :
             base(session)

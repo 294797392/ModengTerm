@@ -40,8 +40,19 @@ namespace ModengTerm.ViewModels.Terminals
             this.document.Release();
         }
 
+        public override void SendRawInput(byte[] rawData)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SendRawInput(string text)
+        {
+            throw new NotImplementedException();
+        }
+
         public override void SendInput(UserInput userInput)
         {
+            throw new NotImplementedException();
         }
     }
 }

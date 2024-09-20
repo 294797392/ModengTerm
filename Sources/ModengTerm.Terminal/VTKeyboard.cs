@@ -321,14 +321,8 @@ namespace ModengTerm.Terminal
         /// 代码参考terminal - terminalInput.cpp
         /// </summary>
         /// <returns></returns>
-        public byte[] TranslateInput(UserInput userInput)
+        public byte[] TranslateInput(VTKeyInput userInput)
         {
-            if (userInput.Key == VTKeys.GenericText)
-            {
-                // 这里说明是中文
-                return this.Encoding.GetBytes(userInput.Text);
-            }
-
             byte[] bytes = null;
 
             if (this.isVt52Mode)

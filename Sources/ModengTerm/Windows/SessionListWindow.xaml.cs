@@ -13,7 +13,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Windows;
 
-namespace XTerminal
+namespace ModengTerm.Windows
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑

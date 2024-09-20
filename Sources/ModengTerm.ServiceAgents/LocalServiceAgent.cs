@@ -3,6 +3,7 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.ServiceAgents.DataModels;
 using Newtonsoft.Json;
+using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -120,6 +121,38 @@ namespace ModengTerm.ServiceAgents
             catch (Exception ex)
             {
                 logger.Error("UpdateSession异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        #endregion
+
+        #region ShellCommand管理
+
+        public override List<ShellCommand> GetShellCommands()
+        {
+            try
+            {
+                return JSONDatabase.SelectAll<ShellCommand>();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetShellCommands异常", ex);
+                return new List<ShellCommand>();
+            }
+        }
+
+        public override int AddShellCommand(ShellCommand shcmd)
+        {
+            try
+            {
+                JSONDatabase.Insert<ShellCommand>(shcmd);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AddShellCommand异常", ex);
                 return ResponseCode.FAILED;
             }
         }

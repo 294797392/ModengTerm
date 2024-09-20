@@ -81,7 +81,7 @@
                           ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemOption}"/>
             </GroupBox>
 
-            <ContentControl Grid.Column="1" x:Name="ContentControlContent" Margin="0,10,10,0"/>
+            <ContentControl Grid.Column="1" x:Name="ContentControlContent" Margin="10"/>
 
         </Grid>
 
