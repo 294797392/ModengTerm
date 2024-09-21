@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.ServiceAgents;
 using System;
 using System.Collections.Generic;
@@ -50,7 +50,7 @@ namespace ModengTerm.Windows.Terminals
         {
             this.serviceAgent = MTermApp.Context.ServiceAgent;
 
-            ComboBoxCommandTypes.ItemsSource = Enum.GetValues(typeof(ShellCommandTypeEnum));
+            ComboBoxCommandTypes.ItemsSource = Enum.GetValues(typeof(CommandTypeEnum));
             ComboBoxCommandTypes.SelectedIndex = 0;
         }
 
@@ -75,10 +75,10 @@ namespace ModengTerm.Windows.Terminals
                 return;
             }
 
-            ShellCommandTypeEnum commandType = (ShellCommandTypeEnum)ComboBoxCommandTypes.SelectedItem;
+            CommandTypeEnum commandType = (CommandTypeEnum)ComboBoxCommandTypes.SelectedItem;
             switch (commandType)
             {
-                case ShellCommandTypeEnum.Hexadecimal:
+                case CommandTypeEnum.HexData:
                     {
                         byte[] bytes;
                         if (!MTermUtils.TryParseHexString(command, out bytes))

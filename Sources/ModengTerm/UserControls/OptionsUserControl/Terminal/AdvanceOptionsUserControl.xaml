@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.OptionsUserControl.Terminal"
+             xmlns:converter="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
@@ -12,25 +13,39 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <converter:RenderModeTextConverter x:Key="RenderModeTextConverter"/>
+
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
         <!-- 串口配置 -->
         <Grid.RowDefinitions>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="显示16进制输出（类似于hexdump输出）" IsChecked="{Binding Path=DisplayAsHex}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="渲染方式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" DataContext="{Binding Path=RenderModes}" ItemsSource="{Binding}" 
+                  SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=RenderModeTextConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="十六进制渲染选项" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
+            <Grid>
+                <CheckBox Content="在单独一行显示收到的数据" IsChecked="{Binding Path=DisplayAtNewLine}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
+            </Grid>
+        </GroupBox>
 
     </Grid>
 

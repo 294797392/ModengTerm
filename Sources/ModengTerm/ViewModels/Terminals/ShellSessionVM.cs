@@ -133,11 +133,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         private Visibility contextMenuVisibility;
 
-        /// <summary>
-        /// 输出为十六进制数据（类似于hexdump输出）
-        /// </summary>
-        private bool hexdump;
-
         #endregion
 
         #region 属性
@@ -289,8 +284,6 @@ namespace ModengTerm.Terminal.ViewModels
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
 
-            this.hexdump = this.Session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_HEX_DUMP);
-
             #region 初始化右键菜单
 
             BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
@@ -385,6 +378,9 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.FunctionMenus = new BindableCollection<ShellContextMenu>()
                 {
+                    new ShellContextMenu("复制", this.CopySelection),
+                    new ShellContextMenu("粘贴", this.Paste),
+                    new ShellContextMenu("全选", this.SelectAll),
                     new ShellContextMenu("查找...",  this.Find),
                     new ShellContextMenu("日志")
                     {
@@ -396,9 +392,6 @@ namespace ModengTerm.Terminal.ViewModels
                             new ShellContextMenu("继续",  this.ResumeLogger)
                         }
                     },
-                    new ShellContextMenu("复制", this.CopySelection),
-                    new ShellContextMenu("粘贴", this.Paste),
-                    new ShellContextMenu("全选", this.SelectAll),
                     //new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
                     //new ShellFunctionMenu("收藏夹")
                     //{
@@ -494,75 +487,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        /// <summary>
-        /// 根据滚动前的值和滚动后的值计算滚动数据
-        /// </summary>
-        /// <param name="document"></param>
-        /// <param name="oldScroll"></param>
-        /// <param name="newScroll"></param>
-        /// <returns></returns>
-        private VTScrollData GetScrollData(VTDocument document, int oldScroll, int newScroll)
-        {
-            int scrolledRows = Math.Abs(newScroll - oldScroll);
-
-            int scrollValue = newScroll;
-            int viewportRow = document.ViewportRow;
-            VTHistory history = document.History;
-            VTScrollInfo scrollbar = document.Scrollbar;
-
-            List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
-            List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
-
-            if (scrolledRows >= viewportRow)
-            {
-                // 此时说明把所有行都滚动到屏幕外了
-
-                // 遍历显示
-                VTextLine current = document.FirstLine;
-                for (int i = 0; i < viewportRow; i++)
-                {
-                    addedLines.Add(current.History);
-                }
-
-                // 我打赌不会报异常
-                IEnumerable<VTHistoryLine> historyLines;
-                history.TryGetHistories(oldScroll, oldScroll + viewportRow, out historyLines);
-                removedLines.AddRange(historyLines);
-            }
-            else
-            {
-                // 此时说明有部分行被移动出去了
-                if (newScroll > oldScroll)
-                {
-                    // 往下滚动
-                    IEnumerable<VTHistoryLine> historyLines;
-                    history.TryGetHistories(oldScroll, oldScroll + scrolledRows, out historyLines);
-                    removedLines.AddRange(historyLines);
-
-                    history.TryGetHistories(oldScroll + viewportRow, oldScroll + viewportRow + scrolledRows - 1, out historyLines);
-                    addedLines.AddRange(historyLines);
-                }
-                else
-                {
-                    // 往上滚动,2
-                    IEnumerable<VTHistoryLine> historyLines;
-                    history.TryGetHistories(oldScroll + viewportRow - scrolledRows, oldScroll + viewportRow - 1, out historyLines);
-                    removedLines.AddRange(historyLines);
-
-                    history.TryGetHistories(newScroll, newScroll + scrolledRows, out historyLines);
-                    addedLines.AddRange(historyLines);
-                }
-            }
-
-            return new VTScrollData()
-            {
-                NewScroll = newScroll,
-                OldScroll = oldScroll,
-                AddedLines = addedLines,
-                RemovedLines = removedLines
-            };
-        }
-
         private string InitializeURI()
         {
             string uri = string.Empty;
@@ -600,66 +524,6 @@ namespace ModengTerm.Terminal.ViewModels
             return uri;
         }
 
-        /// <summary>
-        /// 输出类似于hexdump命令的格式
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="size"></param>
-        private void ProcessHexDump(byte[] bytes, int size)
-        {
-            VideoTerminal videoTerminal = this.videoTerminal;
-            VTDocument document = videoTerminal.ActiveDocument;
-            int viewportColumn = document.ViewportColumn;
-            int viewportRow = document.ViewportRow;
-
-            for (int i = 0; i < size; i++)
-            {
-                byte value = bytes[i];
-
-                int cursorRow = document.Cursor.Row;
-                int cursorCol = document.Cursor.Column;
-
-                // 要在第几列显示
-                int printColumn = 0;
-
-                // 要在第几行显示
-                int printRow = 0;
-
-                // 计算剩余可以显示多少列
-                VTextLine activeLine = document.ActiveLine;
-                int leftCols = viewportColumn - activeLine.Columns;
-
-                // 光标所在行的剩余列数至少得有3个字符的位置才能显示一个十六进制数（包含一个空字符)
-                if (leftCols <= 3)
-                {
-                    printRow = cursorRow == viewportRow - 1 ? cursorRow : cursorRow + 1;
-                    printColumn = 0;
-                    videoTerminal.LineFeed();
-                }
-                else
-                {
-                    printRow = cursorRow;
-                    printColumn = cursorCol;
-                }
-
-                string hexstr = value.ToString("X2");
-
-                document.SetCursor(printRow, printColumn);
-                VTCharacter character1 = VTCharacter.CreateNull();
-                document.PrintCharacter(character1);
-
-                document.SetCursor(printRow, printColumn + 1);
-                VTCharacter character2 = VTCharacter.Create(hexstr[0], 1);
-                document.PrintCharacter(character2);
-
-                document.SetCursor(printRow, printColumn + 2);
-                VTCharacter character3 = VTCharacter.Create(hexstr[1], 1);
-                document.PrintCharacter(character3);
-
-                document.SetCursor(printRow, printColumn + 3);
-            }
-        }
-
         #endregion
 
         #region 公开接口
@@ -690,7 +554,10 @@ namespace ModengTerm.Terminal.ViewModels
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
+                return;
             }
+
+            this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.UserInput);
         }
 
         /// <summary>
@@ -703,7 +570,10 @@ namespace ModengTerm.Terminal.ViewModels
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
+                return;
             }
+
+            this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.UserInput);
         }
 
         /// <summary>
@@ -717,7 +587,10 @@ namespace ModengTerm.Terminal.ViewModels
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
+                return;
             }
+
+            this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.UserInput);
         }
 
         #endregion
@@ -741,45 +614,19 @@ namespace ModengTerm.Terminal.ViewModels
         {
             VTDebug.Context.WriteRawRead(bytes, size);
 
-            // 窗口持续改变大小的时候可能导致ProcessCharacters和SizeChanged事件一起运行，产生多线程修改VTDocument的bug
-            // 所以这里把ProcessCharacters放在UI线程处理
+            // 窗口持续改变大小的时候可能导致Render和SizeChanged事件一起运行，产生多线程修改VTDocument的bug
+            // 所以这里把Render放在UI线程处理
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                VTDocument activeDocument = this.VideoTerminal.ActiveDocument;
-                int oldScroll = activeDocument.Scrollbar.Value;
+                this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.Receive);
 
-                // 有些命令（top）会动态更新主缓冲区
-                // 执行动作之前先把主缓冲区滚动到底
-                if (!this.videoTerminal.IsAlternate)
+                try
                 {
-                    activeDocument.ScrollToBottom();
+                    this.videoTerminal.Render(bytes, size);
                 }
-
-                if (this.hexdump)
+                catch (Exception ex)
                 {
-                    this.ProcessHexDump(bytes, size);
-                }
-                else
-                {
-                    try
-                    {
-                        this.vtParser.ProcessCharacters(bytes, size);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("ProcessCharacters异常", ex);
-                    }
-                }
-
-                // 全部数据都处理完了之后，只渲染一次
-                activeDocument.RequestInvalidate();
-
-                int newScroll = activeDocument.Scrollbar.Value;
-                if (newScroll != oldScroll)
-                {
-                    // 计算ScrollData
-                    VTScrollData scrollData = this.GetScrollData(activeDocument, oldScroll, newScroll);
-                    activeDocument.InvokeScrollChanged(scrollData);
+                    logger.Error("Render异常", ex);
                 }
             });
 

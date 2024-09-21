@@ -4,18 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.Terminals"
-             xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+             xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="200">
 
     <UserControl.Resources>
-        <Style x:Key="StyleMTermButtonLocal" TargetType="{x:Type mtermcontrols:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="BorderBrush" Value="Silver"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Margin" Value="0,0,5,0"/>
-        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -25,12 +18,14 @@
         </Grid.RowDefinitions>
 
         <Grid>
+            <Border BorderBrush="Silver" BorderThickness="0,0,0,1" Background="White"/>
+
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
-                <mtermcontrols:MTermButton ToolTip="新建命令" Content="+" Style="{StaticResource ResourceKey=StyleMTermButtonLocal}" Click="ButtonCreate_Click"/>
+                <mcontrols:MTermButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
+                                       Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
                 <CheckBox x:Name="CheckBoxAutoCRLF" VerticalAlignment="Center" Content="自动输入回车键" Margin="0,0,5,0"/>
             </StackPanel>
 
-            <Border BorderBrush="Silver" BorderThickness="0,0,0,1"/>
         </Grid>
 
         <ListBox x:Name="ListBoxCommands" Grid.Row="1" ItemsSource="{Binding}" 

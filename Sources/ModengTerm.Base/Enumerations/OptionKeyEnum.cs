@@ -1,9 +1,11 @@
-﻿using System;
+﻿using ModengTerm.Base.Enumerations.Terminal;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Interop;
 
 namespace ModengTerm.Base.Enumerations
 {
@@ -166,9 +168,14 @@ namespace ModengTerm.Base.Enumerations
         #region 终端高级选项 3001 - 4000
 
         /// <summary>
-        /// 显示为十六进制数据
+        /// 终端渲染模式
         /// </summary>
-        TERM_ADVANCE_HEX_DUMP = 3001,
+        [EnumDataType(typeof(RenderModeEnum))]
+        TERM_ADVANCE_RENDER_MODE = 3001,
+        /// <summary>
+        /// 每次16进制输出在新行显示
+        /// </summary>
+        TERM_ADVANCE_RENDER_AT_NEWLINE = 3002,
 
         #endregion
 

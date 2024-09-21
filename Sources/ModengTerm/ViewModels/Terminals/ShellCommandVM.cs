@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ namespace ModengTerm.ViewModels.Terminals
     public class ShellCommandVM : ItemViewModel
     {
         private string command;
-        private ShellCommandTypeEnum type;
+        private CommandTypeEnum type;
 
         /// <summary>
         /// 要执行的命令
@@ -36,7 +36,7 @@ namespace ModengTerm.ViewModels.Terminals
             }
         }
 
-        public ShellCommandTypeEnum Type
+        public CommandTypeEnum Type
         {
             get
             {
@@ -63,7 +63,7 @@ namespace ModengTerm.ViewModels.Terminals
             this.Name = command.Name;
             this.Description = command.Description;
             this.Command = command.Command;
-            this.Type = (ShellCommandTypeEnum)command.Type;
+            this.Type = (CommandTypeEnum)command.Type;
         }
     }
 }

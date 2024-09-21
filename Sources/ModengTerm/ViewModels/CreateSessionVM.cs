@@ -3,6 +3,7 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Rendering;
@@ -76,10 +77,9 @@ namespace ModengTerm.ViewModels
         private string startupArgument;
         private string startupDir;
 
-
         #region 终端高级选项
 
-        private bool displayAsHex;
+        private bool displayAtNewLine;
 
         #endregion
 
@@ -568,13 +568,18 @@ namespace ModengTerm.ViewModels
 
         #region 终端高级选项
 
-        public bool DisplayAsHex
+        public BindableCollection<RenderModeEnum> RenderModes { get; private set; }
+
+        public bool DisplayAtNewLine
         {
-            get { return this.displayAsHex; }
+            get { return this.displayAtNewLine; }
             set
             {
-                this.displayAsHex = value;
-                this.NotifyPropertyChanged("DisplayAsHex");
+                if (this.displayAtNewLine != value) 
+                {
+                    this.displayAtNewLine = value;
+                    this.NotifyPropertyChanged("DisplayAtNewLine");
+                }
             }
         }
 
@@ -630,6 +635,8 @@ namespace ModengTerm.ViewModels
 
             #region 终端
 
+            #region 终端
+
             this.TerminalRows = MTermConsts.TerminalRows.ToString();
             this.TerminalColumns = MTermConsts.TerminalColumns.ToString();
             this.TerminalTypeList = new BindableCollection<TerminalTypeEnum>();
@@ -640,11 +647,21 @@ namespace ModengTerm.ViewModels
 
             #endregion
 
-            #region 终端行为
+            #region 行为
 
             this.BehaviorRightClicks = new BindableCollection<BehaviorRightClicks>();
             this.BehaviorRightClicks.AddRange(MTermUtils.GetEnumValues<BehaviorRightClicks>());
             this.BehaviorRightClicks.SelectedItem = Base.Enumerations.BehaviorRightClicks.ContextMenu;
+
+            #endregion
+
+            #region 高级
+
+            this.RenderModes = new BindableCollection<RenderModeEnum>();
+            this.RenderModes.AddRange(MTermUtils.GetEnumValues<RenderModeEnum>());
+            this.RenderModes.SelectedItem = RenderModeEnum.Default;
+
+            #endregion
 
             #endregion
 
@@ -1016,7 +1033,8 @@ namespace ModengTerm.ViewModels
 
         private bool GetTerminalAdvancedOptions(XTermSession session)
         {
-            session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_HEX_DUMP, this.DisplayAsHex);
+            session.SetOption<RenderModeEnum>(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, this.RenderModes.SelectedItem);
+            session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_AT_NEWLINE, this.DisplayAtNewLine);
 
             return true;
         }

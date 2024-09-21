@@ -8,6 +8,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Xml.Linq;
 using static ModengTerm.Document.VTextLine;
 
 namespace ModengTerm.Document
@@ -1625,6 +1626,74 @@ namespace ModengTerm.Document
             return new VTParagraph()
             {
                 Content = builder.ToString()
+            };
+        }
+
+        /// <summary>
+        /// 根据滚动之前的值和滚动之后的值生成VTScrollData数据
+        /// </summary>
+        /// <param name="oldScroll">滚动之前滚动条的值</param>
+        /// <param name="newScroll">滚动之后滚动条的值</param>
+        /// <returns></returns>
+        public VTScrollData GetScrollData(int oldScroll, int newScroll) 
+        {
+            int scrolledRows = Math.Abs(newScroll - oldScroll);
+
+            int scrollValue = newScroll;
+            int viewportRow = this.viewportRow;
+            VTHistory history = this.history;
+            VTScrollInfo scrollbar = this.Scrollbar;
+
+            List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
+            List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
+
+            if (scrolledRows >= viewportRow)
+            {
+                // 此时说明把所有行都滚动到屏幕外了
+
+                // 遍历显示
+                VTextLine current = this.FirstLine;
+                for (int i = 0; i < viewportRow; i++)
+                {
+                    addedLines.Add(current.History);
+                }
+
+                // 我打赌不会报异常
+                IEnumerable<VTHistoryLine> historyLines;
+                history.TryGetHistories(oldScroll, oldScroll + viewportRow, out historyLines);
+                removedLines.AddRange(historyLines);
+            }
+            else
+            {
+                // 此时说明有部分行被移动出去了
+                if (newScroll > oldScroll)
+                {
+                    // 往下滚动
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll, oldScroll + scrolledRows, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(oldScroll + viewportRow, oldScroll + viewportRow + scrolledRows - 1, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+                else
+                {
+                    // 往上滚动,2
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll + viewportRow - scrolledRows, oldScroll + viewportRow - 1, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(newScroll, newScroll + scrolledRows, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+            }
+
+            return new VTScrollData()
+            {
+                NewScroll = newScroll,
+                OldScroll = oldScroll,
+                AddedLines = addedLines,
+                RemovedLines = removedLines
             };
         }
 

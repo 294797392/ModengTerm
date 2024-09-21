@@ -14,6 +14,20 @@ namespace ModengTerm.Controls
     /// </summary>
     public class MTermButton : Button
     {
+
+
+        public Brush MouseOverBorder
+        {
+            get { return (Brush)GetValue(MouseOverBorderProperty); }
+            set { SetValue(MouseOverBorderProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MouseOverBorder.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MouseOverBorderProperty =
+            DependencyProperty.Register("MouseOverBorder", typeof(Brush), typeof(MTermButton), new PropertyMetadata(Brushes.Transparent));
+
+
+
         public Brush MouseOverBrush
         {
             get { return (Brush)GetValue(MouseOverBrushProperty); }

@@ -189,7 +189,7 @@ namespace ModengTerm.Terminal.UserControls
         {
             WPFDocument document = this.GetActiveDocument();
 
-            this.videoTerminal.OnSizeChanged(document.ContentSize);
+            this.videoTerminal.Resize(document.ContentSize);
         }
 
 
@@ -247,12 +247,12 @@ namespace ModengTerm.Terminal.UserControls
             }
             else
             {
-                this.shellSession.SendText(text);
-            }
+                if (MenuItemSendCRLF.IsChecked)
+                {
+                    text = string.Format("{0}\r\n", text);
+                }
 
-            if (MenuItemSendCRLF.IsChecked)
-            {
-                this.shellSession.SendText("\r\n");
+                this.shellSession.SendText(text);
             }
 
             this.shellSession.HistoryCommands.Add(text);

@@ -1,5 +1,5 @@
 ﻿using DotNEToolkit.DataModels;
-using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +19,7 @@ namespace ModengTerm.Base.DataModels
         /// <summary>
         /// 命令类型
         /// </summary>
-        [EnumDataType(typeof(ShellCommandTypeEnum))]
+        [EnumDataType(typeof(CommandTypeEnum))]
         public int Type { get; set; }
     }
 }

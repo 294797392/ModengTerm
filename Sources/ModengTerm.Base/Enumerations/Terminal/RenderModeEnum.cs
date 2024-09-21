@@ -4,21 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Base.Enumerations
+namespace ModengTerm.Base.Enumerations.Terminal
 {
     /// <summary>
-    /// 定义Shell命令类型
+    /// 指定终端数据的渲染方式
     /// </summary>
-    public enum ShellCommandTypeEnum
+    public enum RenderModeEnum
     {
         /// <summary>
-        /// 纯文本类型
+        /// 默认渲染为终端数据
         /// </summary>
-        PureText,
+        Default,
 
         /// <summary>
-        /// 十六进制数据
+        /// 渲染为类似于hexdump的16进制数据
         /// </summary>
-        Hexadecimal
+        Hexdump
     }
 }

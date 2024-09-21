@@ -2,6 +2,7 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Controls;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
@@ -427,13 +428,19 @@ namespace ModengTerm
 
             switch (shellCommand.Type)
             {
-                case ShellCommandTypeEnum.PureText:
+                case CommandTypeEnum.PureText:
                     {
-                        inputSession.SendText(shellCommand.Command);
+                        string command = shellCommand.Command;
+                        if (shellCommand.AutoCRLF)
+                        {
+                            command = string.Format("{0}\r\n", command);
+                        }
+
+                        inputSession.SendText(command);
                         break;
                     }
 
-                case ShellCommandTypeEnum.Hexadecimal:
+                case CommandTypeEnum.HexData:
                     {
                         byte[] bytes;
                         if (!MTermUtils.TryParseHexString(shellCommand.Command, out bytes))
@@ -448,11 +455,6 @@ namespace ModengTerm
 
                 default:
                     throw new NotImplementedException();
-            }
-
-            if (shellCommand.AutoCRLF)
-            {
-                inputSession.SendText("\r\n");
             }
         }
 

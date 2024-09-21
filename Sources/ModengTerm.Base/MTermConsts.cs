@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using System;
@@ -12,7 +13,6 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Base
 {

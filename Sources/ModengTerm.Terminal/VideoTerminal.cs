@@ -2,12 +2,15 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
+using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
+using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Printing;
 using System.Text;
@@ -158,6 +161,11 @@ namespace ModengTerm.Terminal
         /// </summary>
         private VTCharsetMap grTranslationTable;
 
+        /// <summary>
+        /// 数据渲染器
+        /// </summary>
+        private VTRenderer renderer;
+
         #endregion
 
         #region 属性
@@ -228,6 +236,8 @@ namespace ModengTerm.Terminal
         /// </summary>
         public bool IsAlternate { get { return this.activeDocument == this.alternateDocument; } }
 
+        public VTRenderer Renderer { get { return this.renderer; } }
+
         #endregion
 
         #region 构造方法
@@ -249,6 +259,9 @@ namespace ModengTerm.Terminal
             uiSyncContext = SynchronizationContext.Current;
 
             vtOptions = options;
+
+            #region 字符集映射设置
+
             // 设置默认的字符集映射
             // 参考:
             // terminal项目 - TerminalOutput构造函数
@@ -261,6 +274,8 @@ namespace ModengTerm.Terminal
             };
             this.glTranslationTable = VTCharsetMap.Ascii;
             this.grTranslationTable = VTCharsetMap.Latin1;
+
+            #endregion
 
             // DECAWM
             autoWrapMode = false;
@@ -333,6 +348,13 @@ namespace ModengTerm.Terminal
             //this.wallpaper.RequestInvalidate();
 
             #endregion
+
+            #region 初始化渲染器
+
+            this.renderer = this.CreateRenderer();
+            this.renderer.Initialize();
+
+            #endregion
         }
 
         /// <summary>
@@ -341,6 +363,8 @@ namespace ModengTerm.Terminal
         public void Release()
         {
             isRunning = false;
+
+            this.renderer.Release();
 
             this.mainDocument.Release();
             this.alternateDocument.Release();
@@ -460,7 +484,7 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 滚动并重新渲染
+        /// 滚动到指定位置并重新渲染
         /// </summary>
         /// <param name="physicsRow">要滚动到的物理行数</param>
         public void ScrollTo(int physicsRow, ScrollOptions options = ScrollOptions.ScrollToTop)
@@ -475,7 +499,11 @@ namespace ModengTerm.Terminal
             activeDocument.RequestInvalidate();
         }
 
-        public void OnSizeChanged(VTSize newSize)
+        /// <summary>
+        /// 重置终端大小
+        /// </summary>
+        /// <param name="newSize"></param>
+        public void Resize(VTSize newSize)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
@@ -510,6 +538,37 @@ namespace ModengTerm.Terminal
             if (this.ViewportChanged != null)
             {
                 this.ViewportChanged(this, newRow, newCol);
+            }
+        }
+
+        /// <summary>
+        /// 渲染数据
+        /// </summary>
+        /// <param name="bytes">要渲染的数据</param>
+        /// <param name="size">要渲染的数据长度</param>
+        public void Render(byte[] bytes, int size)
+        {
+            VTDocument document = this.activeDocument;
+            int oldScroll = document.Scrollbar.Value;
+
+            // 有些命令（top）会动态更新主缓冲区
+            // 执行动作之前先把主缓冲区滚动到底
+            if (!this.IsAlternate)
+            {
+                document.ScrollToBottom();
+            }
+
+            this.renderer.Render(bytes, size);
+
+            // 全部数据都处理完了之后，只渲染一次
+            document.RequestInvalidate();
+
+            int newScroll = document.Scrollbar.Value;
+            if (newScroll != oldScroll)
+            {
+                // 计算ScrollData
+                VTScrollData scrollData = document.GetScrollData(oldScroll, newScroll);
+                document.InvokeScrollChanged(scrollData);
             }
         }
 
@@ -700,6 +759,26 @@ namespace ModengTerm.Terminal
             return chPrint;
         }
 
+        /// <summary>
+        /// 根据配置创建一个渲染器
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private VTRenderer CreateRenderer()
+        {
+            XTermSession session = this.vtOptions.Session;
+
+            RenderModeEnum renderMode = session.GetOption<RenderModeEnum>(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE);
+
+            switch (renderMode)
+            {
+                case RenderModeEnum.Default: return new DefaultRenderer(this, this.vtOptions.Session);
+                case RenderModeEnum.Hexdump: return new HexdumpRenderer(this, this.vtOptions.Session);
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region VTDispatchHandler
@@ -802,7 +881,7 @@ namespace ModengTerm.Terminal
                     history.AddHistory(historyLine);
 
                     // 触发行被完全打印的事件
-                    LinePrinted?.Invoke(this, last.History);
+                    this.LinePrinted?.Invoke(this, last.History);
                 }
             }
             else

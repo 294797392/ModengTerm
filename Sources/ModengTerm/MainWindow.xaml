@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
-        xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+        xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls"
         xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
         xmlns:mcmd="clr-namespace:ModengTerm"
         xmlns:local="clr-namespace:ModengTerm"
@@ -189,8 +189,7 @@
             <mtermcontrols:MTermButton Grid.Column="3" SVGPath="M819.61718723 863.56250027H204.38281277a43.9947507 43.9947507 0 0 1-43.94531304-43.94531304V204.38281277a43.9947507 43.9947507 0 0 1 43.94531304-43.94531304h615.23437446a43.9947507 43.9947507 0 0 1 43.94531304 43.94531304v615.23437446a43.9947507 43.9947507 0 0 1-43.94531304 43.94531304zM204.38281277 195.59375a8.78906277 8.78906277 0 0 0-8.78906277 8.78906277v615.23437446a8.78906277 8.78906277 0 0 0 8.78906277 8.78906277h615.23437446a8.78906277 8.78906277 0 0 0 8.78906277-8.78906277V204.38281277a8.78906277 8.78906277 0 0 0-8.78906277-8.78906277z"
                                        Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mtermcontrols:MTermButton Grid.Column="4" SVGPath="M558.933333 529.066667l285.866667 285.866666-29.866667 29.866667-285.866666-285.866667-285.866667 285.866667-29.866667-29.866667 285.866667-285.866666L213.333333 243.2l29.866667-29.866667 285.866667 285.866667L814.933333 213.333333l29.866667 29.866667-285.866667 285.866667z"
-                                       Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mtermcontrols:MTermButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
         </Grid>
 
@@ -229,8 +228,8 @@
 
             </Grid>
 
-            <Grid Grid.Column="1" Margin="3,0,0,0">
-                <TabControl Width="250">
+            <Grid Grid.Column="1">
+                <TabControl Width="250" Margin="3,0,0,0">
                     <TabItem Header="快捷命令">
                         <terminaluc:ShellCommandUserControl/>
                     </TabItem>
