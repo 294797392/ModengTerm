@@ -65,12 +65,19 @@ namespace ModengTerm
 
         public ShellGlobalVM ShellGlobalVM { get; private set; }
 
+        /// <summary>
+        /// 主窗口ViewModel
+        /// </summary>
+        public MainWindowVM MainWindowVM { get; private set; }
+
         #endregion
 
         #region ModularApp
 
         protected override int OnInitialize()
         {
+            this.MainWindowVM = new MainWindowVM();
+
             this.ServiceAgent = new LocalServiceAgent();
             this.ServiceAgent.Initialize();
 

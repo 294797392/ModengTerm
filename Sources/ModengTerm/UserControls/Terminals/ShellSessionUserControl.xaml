@@ -16,16 +16,6 @@
         <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
         <modengterm:SessionStatus2VisibleConverter x:Key="SessionStatus2VisibleConverter"/>
 
-        <Style x:Key="StyleTextBlockStatusBar" TargetType="{x:Type TextBlock}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-
-        <Style x:Key="StyleBorderSplitter" TargetType="{x:Type Border}">
-            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=BrushBackground1}"/>
-            <Setter Property="Margin" Value="3,6,3,6"/>
-            <Setter Property="Width" Value="2"/>
-        </Style>
-
         <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="3"/>
         </Style>
@@ -40,10 +30,9 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent"
+        <Grid x:Name="GridDocument" Background="Transparent"
               MouseDown="GridDocument_MouseDown" Loaded="GridDocument_Loaded"
               TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
             <Grid.ContextMenu>
@@ -71,7 +60,7 @@
         </Grid>
 
         <!-- 输入栏 -->
-        <Grid Grid.Row="1" Height="30">
+        <Grid Grid.Row="1" Height="30" Visibility="{Binding Path=SendCommandPanelVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="*"/>
@@ -95,57 +84,6 @@
                 </Button.ContextMenu>
             </Button>
             <Button Grid.Column="4" Content="清空" Click="ButtonClear_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
-
-        </Grid>
-
-        <!-- 状态栏 -->
-        <Grid Grid.Row="2" x:Name="GridStatusbar">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Border Grid.Column="0" Grid.ColumnSpan="9999"
-                    Background="{DynamicResource ResourceKey=BrushStatusBarBackground}"
-                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
-                    BorderThickness="0,1,0,0"/>
-
-            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
-                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.Connected}}">
-                    <Image Source="pack://application:,,,/ModengTerm;component/Images/ok.png" Width="16" Height="16"/>
-                    <TextBlock Text="已连接" Foreground="Green" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.Disconnected}}">
-                    <Image Source="pack://application:,,,/ModengTerm;component/Images/fail.png" Width="16" Height="16"/>
-                    <TextBlock Text="连接断开" Foreground="Red" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.Connecting}}">
-                    <Image Source="pack://application:,,,/ModengTerm;component/Images/connect.png" Width="16" Height="16"/>
-                    <TextBlock Text="连接中..." Foreground="Orange" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                </StackPanel>
-
-                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.ConnectError}}">
-                    <Image Source="pack://application:,,,/ModengTerm;component/Images/fail.png" Width="16" Height="16"/>
-                    <TextBlock Text="连接失败" Foreground="DarkRed" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                </StackPanel>
-
-                <TextBlock Text="{Binding Path=Uri}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="10,0,0,0"/>
-
-            </StackPanel>
-
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-
-                <Border Style="{StaticResource ResourceKey=StyleBorderSplitter}"/>
-
-                <TextBlock Text="总行数：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text="{Binding Path=TotalRows}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="0,0,20,0"/>
-
-                <TextBlock Text="{Binding Path=ViewportRow}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text=" x " Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text="{Binding Path=ViewportColumn}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-            </StackPanel>
 
         </Grid>
 

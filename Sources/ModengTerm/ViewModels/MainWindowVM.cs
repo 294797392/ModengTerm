@@ -1,43 +1,49 @@
-﻿using System;
+﻿using ModengTerm.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media.Animation;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
 {
-    /// <summary>
-    /// 控制主界面视图的显示/隐藏
-    /// </summary>
-    public class ViewControlVM : ViewModelBase
+    public class MainWindowVM : ViewModelBase
     {
-        private bool shellCommandView;
+        private bool shellCommandPanelVisibility;
 
-        public bool ShellCommandView
+        public bool ShellCommandPanelVisiblity
         {
-            get { return shellCommandView; }
+            get { return this.shellCommandPanelVisibility; }
             set
             {
-                if (this.shellCommandView != value)
+                if (this.shellCommandPanelVisibility != value)
                 {
-                    this.shellCommandView = value;
-                    this.NotifyPropertyChanged("ShellCommandView");
+                    this.shellCommandPanelVisibility = value;
+                    this.NotifyPropertyChanged("ShellCommandPanelVisiblity");
                 }
             }
         }
-    }
 
-    public class MainWindowVM : ViewModelBase
-    {
-        public ViewControlVM ViewControl { get; private set; }
+        /// <summary>
+        /// 右侧窗格列表
+        /// </summary>
+        public MenuVM RightPanelMenu { get; private set; }
 
         public MainWindowVM()
         {
-            this.ViewControl = new ViewControlVM();
+            this.RightPanelMenu = new MenuVM();
+            this.RightPanelMenu.Initialize(new List<MenuDefinition>()
+            {
+                new MenuDefinition()
+                {
+                    Name = "快捷命令",
+                    ClassName = "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm",
+                }
+            });
+            this.RightPanelMenu.SelectedMenu = this.RightPanelMenu.MenuItems.FirstOrDefault();
         }
     }
 }
-
-

@@ -221,49 +221,6 @@ namespace ModengTerm.Terminal.UserControls
             functionMenu.Execute();
         }
 
-        private void ButtonOptions_Checked(object sender, RoutedEventArgs e)
-        {
-            ButtonOptions.ContextMenu.IsOpen = true;
-        }
-
-        private void ButtonSend_Click(object sender, RoutedEventArgs e)
-        {
-            string text = ComboBoxHistoryCommands.Text;
-            if (string.IsNullOrEmpty(text))
-            {
-                return;
-            }
-
-            if (MenuItemHexInput.IsChecked)
-            {
-                byte[] bytes;
-                if (!MTermUtils.TryParseHexString(text, out bytes))
-                {
-                    MTMessageBox.Info("请输入正确的十六进制数据");
-                    return;
-                }
-
-                this.shellSession.SendRawData(bytes);
-            }
-            else
-            {
-                if (MenuItemSendCRLF.IsChecked)
-                {
-                    text = string.Format("{0}\r\n", text);
-                }
-
-                this.shellSession.SendText(text);
-            }
-
-            this.shellSession.HistoryCommands.Add(text);
-        }
-
-        private void ButtonClear_Click(object sender, RoutedEventArgs e)
-        {
-            ComboBoxHistoryCommands.Text = string.Empty;
-        }
-
-
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)
         {
@@ -307,6 +264,56 @@ namespace ModengTerm.Terminal.UserControls
         {
             // 获取焦点，才能收到OnKeyDown和OnTextInput回调
             GridDocument.Focus();
+        }
+
+
+
+        private void ButtonOptions_Checked(object sender, RoutedEventArgs e)
+        {
+            ButtonOptions.ContextMenu.IsOpen = true;
+        }
+
+        private void ButtonSend_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = this.shellSession;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            string text = ComboBoxHistoryCommands.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            if (MenuItemHexInput.IsChecked)
+            {
+                byte[] bytes;
+                if (!MTermUtils.TryParseHexString(text, out bytes))
+                {
+                    MTMessageBox.Info("请输入正确的十六进制数据");
+                    return;
+                }
+
+                shellSession.SendRawData(bytes);
+            }
+            else
+            {
+                if (MenuItemSendCRLF.IsChecked)
+                {
+                    text = string.Format("{0}\r\n", text);
+                }
+
+                shellSession.SendText(text);
+            }
+
+            shellSession.HistoryCommands.Add(text);
+        }
+
+        private void ButtonClear_Click(object sender, RoutedEventArgs e)
+        {
+            ComboBoxHistoryCommands.Text = string.Empty;
         }
 
 

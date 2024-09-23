@@ -64,6 +64,8 @@ namespace ModengTerm
 
         private void InitializeWindow()
         {
+            base.DataContext = MTermApp.Context.MainWindowVM;
+
             this.userInput = new VTKeyInput();
             this.templateSelector = new OpenedSessionDataTemplateSelector();
             this.templateSelector.DataTemplateOpenedSession = this.FindResource("DataTemplateOpenedSession") as DataTemplate;
@@ -406,6 +408,9 @@ namespace ModengTerm
                 }
             }
         }
+
+
+
 
 
         #endregion

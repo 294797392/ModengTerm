@@ -6,6 +6,8 @@
         xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
         xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls"
         xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
+        xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
+        xmlns:converters="clr-namespace:ModengTerm"
         xmlns:mcmd="clr-namespace:ModengTerm"
         xmlns:local="clr-namespace:ModengTerm"
         mc:Ignorable="d"
@@ -25,8 +27,8 @@
             </ResourceDictionary.MergedDictionaries>
 
             <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
-
             <local:SessionImageConverter x:Key="SessionImageConverter"/>
+            <converters:SessionStatus2VisibleConverter x:Key="SessionStatus2VisibleConverter"/>
 
             <DataTemplate x:Key="DataTemplateOpenedSession">
 
@@ -127,7 +129,6 @@
                 </Setter>
             </Style>
 
-
             <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mtermcontrols:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
                 <Setter Property="SVGColor" Value="Black"/>
                 <Setter Property="SVGMargin" Value="7"/>
@@ -137,7 +138,21 @@
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Focusable" Value="False"/>
             </Style>
-            
+
+            <Style x:Key="StyleTextBlockStatusBar" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StyleBorderSplitter" TargetType="{x:Type Border}">
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=BrushBackground1}"/>
+                <Setter Property="Margin" Value="3,6,3,6"/>
+                <Setter Property="Width" Value="2"/>
+            </Style>
+
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="3"/>
+            </Style>
+
         </ResourceDictionary>
     </Window.Resources>
 
@@ -145,6 +160,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <!-- 菜单 -->
@@ -172,9 +189,10 @@
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
                 </MenuItem>
 
-                <!--<MenuItem Header="视图" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem x:Name="MenuItemShellCommand" Header="快捷命令"/>
-                </MenuItem>-->
+                <MenuItem Header="视图" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem x:Name="MenuItemShellCommand" Header="快捷命令" IsCheckable="True" IsChecked="{Binding Path=ShellCommandPanelVisiblity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <MenuItem x:Name="MenuItemInputPanel" Header="输入窗口" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendCommandPanelVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </MenuItem>
 
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
@@ -193,14 +211,14 @@
 
         </Grid>
 
-        <Grid Grid.Row="1" Margin="0,5,0,0">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- 终端显示区域 -->
-            <Grid Grid.Column="0">
+            <Grid Grid.Column="0" Margin="0,5,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -211,7 +229,7 @@
 
                     <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
                         <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
-                             SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
+                                 SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
                             <ListBox.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
@@ -228,17 +246,66 @@
 
             </Grid>
 
+            <!-- 右侧窗格 -->
             <Grid Grid.Column="1">
-                <TabControl Width="250" Margin="3,0,0,0">
-                    <TabItem Header="快捷命令">
-                        <terminaluc:ShellCommandUserControl/>
-                    </TabItem>
-                </TabControl>
+                <mtermcontrols:MToolPanel Menu="{Binding Path=RightPanelMenu}" Visibility="{Binding Path=ShellCommandPanelVisiblity, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                          BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMToolPanel}"/>
             </Grid>
 
         </Grid>
 
-        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="Silver"/>
+        <!-- 状态栏 -->
+        <Grid Grid.Row="3" x:Name="GridStatusbar" DataContext="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Grid.ColumnSpan="9999"
+                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
+                    BorderThickness="0,1,0,0"/>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.Connected}}">
+                    <Image Source="pack://application:,,,/ModengTerm;component/Images/ok.png" Width="16" Height="16"/>
+                    <TextBlock Text="已连接" Foreground="Green" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.Disconnected}}">
+                    <Image Source="pack://application:,,,/ModengTerm;component/Images/fail.png" Width="16" Height="16"/>
+                    <TextBlock Text="连接断开" Foreground="Red" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.Connecting}}">
+                    <Image Source="pack://application:,,,/ModengTerm;component/Images/connect.png" Width="16" Height="16"/>
+                    <TextBlock Text="连接中..." Foreground="Orange" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2VisibleConverter}, ConverterParameter={x:Static modengtermbase:SessionStatusEnum.ConnectError}}">
+                    <Image Source="pack://application:,,,/ModengTerm;component/Images/fail.png" Width="16" Height="16"/>
+                    <TextBlock Text="连接失败" Foreground="DarkRed" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding Path=Uri}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="10,0,0,0"/>
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                <Border Style="{StaticResource ResourceKey=StyleBorderSplitter}"/>
+
+                <TextBlock Text="总行数：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=TotalRows}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="0,0,20,0"/>
+
+                <TextBlock Text="{Binding Path=ViewportRow}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text=" x " Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=ViewportColumn}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+            </StackPanel>
+
+        </Grid>
+
+        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="Silver"
+                IsHitTestVisible="False"/>
 
     </Grid>
 

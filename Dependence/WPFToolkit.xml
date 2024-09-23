@@ -19,15 +19,11 @@
             列标题
             </summary>
         </member>
-        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.DataType">
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.DataTemplateKey">
             <summary>
-            列数据类型
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.DataTemplateURI">
-            <summary>
-            该列使用的数据模板URI
-            如果没指定，那么会根据DataType类型去自动生成（这个功能暂时没实现）
+            该列使用的数据模板Key
+            如果没指定，那么会根据DataType类型去自动生成
+            如果指定了，那么会在被绑定的DataGrid里去寻找对应的DataTemplate
             </summary>
         </member>
         <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.Width">
@@ -43,6 +39,11 @@
         <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.HorizontalContentAlignment">
             <summary>
             该列里的水平对齐方式
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Attributes.DataGridColumnAttribute.CanSort">
+            <summary>
+            是否可以排序
             </summary>
         </member>
         <member name="F:WPFToolkit.Attributes.ItemsSourceType.JSONFile">
@@ -2063,187 +2064,38 @@
             Raise UndoManagerOperation event.
             </summary>
         </member>
-        <member name="T:WPFToolkit.Panels.AVGPanel">
+        <member name="T:WPFToolkit.MVVM.MenuContentVM">
             <summary>
-            一个可以根据内容平分高度的面板
+            菜单内容控件ViewModel的基类
+            继承该类后，可以获取到在配置文件里设置的参数
             </summary>
         </member>
-        <member name="M:WPFToolkit.Panels.CircularPanel.MeasureOverride(System.Windows.Size)">
+        <member name="F:WPFToolkit.MVVM.MenuContentVM.parameters">
             <summary>
-            
-            </summary>
-            <param name="availableSize">FrameworkElement所测量到的可供Panel使用的空间大小</param>
-            <returns></returns>
-        </member>
-        <member name="T:WPFToolkit.Utils.SelectionArea">
-            <summary>
-            专门用来绘制选框的控件
+            该菜单在配置文件里的parameters数据
             </summary>
         </member>
-        <member name="T:WPFToolkit.Utils.ItemsControlUtils">
+        <member name="P:WPFToolkit.MVVM.MenuContentVM.Content">
             <summary>
-            对ItemsControl进行扩展
-            在实现SelectionArea属性的时候，意外的解决了一个困扰我多年的问题。。。如何实现在框选的时候滚动条自动往下滚动？
-            原来这个功能根本不用我们自己去实现，WPF已经帮我们实现好了，只要在鼠标按下的时候，调用控件的CaptureMouse即可。。。。
-            
-            注意，如果ItemsControl开启了虚拟化支持，那么请设置：VirtualizingPanel.ScrollUnit="Pixel"，不然获取不到ScrollViewer所滚动的距离
+            获取该菜单对应的内容控件
             </summary>
         </member>
-        <member name="F:WPFToolkit.Utils.ItemsControlUtils.AutoBringIntoViewProperty">
+        <member name="M:WPFToolkit.MVVM.MenuContentVM.GetParameter``1(System.String)">
             <summary>
-            当列表项被选中的时候，是否自动让滚动条滚动到列表项可见区域
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Utils.VisualTreeUtils">
-            <summary>
-            提供对VisualTree的扩展函数
-            </summary>
-        </member>
-        <member name="M:WPFToolkit.Utils.VisualTreeUtils.FindAllVisualChild``1(System.Windows.DependencyObject)">
-            <summary>
-            找到一个节点下的指定类型的所有子元素
+            读取该模块的输入参数，如果参数不存在则报异常
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="parent"></param>
+            <param name="key"></param>
             <returns></returns>
         </member>
-        <member name="M:WPFToolkit.Utils.VisualTreeUtils.FindAllChildVisualChild``1(System.Windows.DependencyObject,System.Collections.Generic.List{``0})">
+        <member name="M:WPFToolkit.MVVM.MenuContentVM.GetParameter``1(System.String,``0)">
             <summary>
-            找到一个节点下的指定类型的所有子元素
+            读取该模块的输入参数，如果参数不存在则返回defaultValue
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="parent"></param>
+            <param name="key"></param>
+            <param name="defaultValue"></param>
             <returns></returns>
-        </member>
-        <member name="M:WPFToolkit.Utils.VisualTreeUtils.CopyFrom(System.Windows.FrameworkElement,System.Windows.FrameworkElement,System.Collections.Generic.Dictionary{System.Type,System.Windows.DependencyProperty})">
-            <summary>
-            把一个控件里的所有子控件的值拷贝到另外一个相同的控件里
-            </summary>
-            <param name="srcElement"></param>
-            <param name="targetElement"></param>
-            <param name="copyWhat"></param>
-        </member>
-        <member name="T:WPFToolkit.Utility.DataGridUtils">
-            <summary>
-            为DataGrid附加功能
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Utility.FontUtility">
-            <summary>
-            对字体的帮助类
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Utility.ImageUtility">
-            <summary>
-            提供对ImageSource的帮助函数
-            
-            位图和调色板：https://blog.csdn.net/kingbyang1/article/details/5564704
-            </summary>
-        </member>
-        <member name="M:WPFToolkit.Utility.ImageUtility.FromURI(System.String)">
-            <summary>
-            使用imageURI创建一个ImageSource
-            </summary>
-            <param name="imageURI"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WPFToolkit.Utility.ImageUtility.FromBitmap(System.Drawing.Bitmap)">
-            <summary>
-            使用Winform的Bitmap创建一个ImageSource
-            注意，该函数不会释放Bitmap
-            </summary>
-            <param name="source"></param>
-            <returns></returns>
-        </member>
-        <member name="T:WPFToolkit.YControls.YDivider">
-            <summary>
-            分割线控件
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YDivider.Color">
-            <summary>
-            分割线的颜色
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YDivider.Orientation">
-            <summary>
-            分割线的方向
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YDivider.Thickness">
-            <summary>
-            分割线的粗细
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.YControls.YPressedEffects">
-            <summary>
-            定义当按钮被按下的时候的效果
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.YControls.YPressedEffects.BackgroundEffect">
-            <summary>
-            当鼠标移动到按钮上的时候显示一个浅颜色的背景
-            当鼠标按下的时候显示一个深颜色的背景
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundHover">
-            <summary>
-            指定当鼠标移动到按钮上显示的背景颜色
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundPressed">
-            <summary>
-            指定当鼠标按下的时候显示的背景颜色
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.ColorTextConverter">
-            <summary>
-            颜色结构体转文本
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.NullableVisiblityConverter">
-            <summary>
-            布尔值到空值的转换
-            如果传进来的值为空，那么返回Collapsed，否则返回Visible
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter">
-            <summary>
-            True转成Visible
-            False转成Collapsed
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter2">
-            <summary>
-            True转成Collapsed
-            False转成Visible
-            </summary>
-        </member>
-        <member name="M:WPFToolkit.DragDrop.IDragSource.StartDrag(WPFToolkit.DragDrop.DragInfo)">
-            <summary>
-            开始处理拖拽：
-            1. 判断元素是否可以拖拽
-            2. 如果可以，则根据DragInfo的信息解析数据，填充DragInfo.Data，设置DragDropEffects
-            
-            </summary>
-            <param name="dragInfo"></param>
-        </member>
-        <member name="T:WPFToolkit.DragDrop.IDropHandler">
-            <summary>
-            处理Drop事件
-            </summary>
-        </member>
-        <member name="M:WPFToolkit.DragDrop.IDropHandler.OnDragOver(WPFToolkit.DragDrop.DropInfo)">
-            <summary>
-            处理Drop Over消息。判断当前是否能够接受拖拽的数据源，同时根据需求修改鼠标拖拽效果
-            </summary>
-            <param name="dropInfo"></param>
-        </member>
-        <member name="M:WPFToolkit.DragDrop.IDropHandler.OnDrop(WPFToolkit.DragDrop.DropInfo)">
-            <summary>
-            处理Drop事件
-            </summary>
-            <param name="dropInfo"></param>
         </member>
         <member name="T:WPFToolkit.MVVM.BindableCollection`1">
             <summary>
@@ -2530,6 +2382,11 @@
             子菜单
             </summary>
         </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.Parameters">
+            <summary>
+            输入参数
+            </summary>
+        </member>
         <member name="T:WPFToolkit.MVVM.MenuDefinition">
             <summary>
             定义配置文件里的菜单模型
@@ -2563,6 +2420,11 @@
         <member name="P:WPFToolkit.MVVM.MenuDefinition.Children">
             <summary>
             子菜单
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuDefinition.Parameters">
+            <summary>
+            输入参数
             </summary>
         </member>
         <member name="T:WPFToolkit.MVVM.IContentHook">
@@ -2852,6 +2714,215 @@
             唯一标识符
             </summary>
         </member>
+        <member name="T:WPFToolkit.Panels.AVGPanel">
+            <summary>
+            一个可以根据内容平分高度的面板
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Panels.CirclePanel">
+            <summary>
+            圆形布局
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Panels.CirclePanel.CircleMargin">
+            <summary>
+            边框距离每个元素的距离
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Panels.CirclePanel.CircleWidth">
+            <summary>
+            边框宽度
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Panels.CirclePanel.Diameter">
+            <summary>
+            指定圆形的直径
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Panels.CirclePanel.AngleOffset">
+            <summary>
+            指定每个元素的角度偏移
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utils.SelectionArea">
+            <summary>
+            专门用来绘制选框的控件
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utils.ItemsControlUtils">
+            <summary>
+            对ItemsControl进行扩展
+            在实现SelectionArea属性的时候，意外的解决了一个困扰我多年的问题。。。如何实现在框选的时候滚动条自动往下滚动？
+            原来这个功能根本不用我们自己去实现，WPF已经帮我们实现好了，只要在鼠标按下的时候，调用控件的CaptureMouse即可。。。。
+            
+            注意，如果ItemsControl开启了虚拟化支持，那么请设置：VirtualizingPanel.ScrollUnit="Pixel"，不然获取不到ScrollViewer所滚动的距离
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.Utils.ItemsControlUtils.AutoBringIntoViewProperty">
+            <summary>
+            当列表项被选中的时候，是否自动让滚动条滚动到列表项可见区域
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Utils.ItemsControlUtils.GetItemPosition(System.Windows.Controls.ItemsControl,System.Object,WPFToolkit.Utils.ItemsControlUtils.ItemPositions)">
+            <summary>
+            获取ItemsControl里的某个Item的位置
+            </summary>
+            <param name="itemsControl">要获取的ItemControl</param>
+            <param name="item">要获取的Item的DataContext</param>
+            <param name="itemPosition">要获取Item的哪个位置</param>
+            <returns>如果获取失败则会返回NAN</returns>
+        </member>
+        <member name="T:WPFToolkit.Utils.VisualTreeUtils">
+            <summary>
+            提供对VisualTree的扩展函数
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Utils.VisualTreeUtils.FindAllVisualChild``1(System.Windows.DependencyObject)">
+            <summary>
+            找到一个节点下的指定类型的所有子元素
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Utils.VisualTreeUtils.FindAllChildVisualChild``1(System.Windows.DependencyObject,System.Collections.Generic.List{``0})">
+            <summary>
+            找到一个节点下的指定类型的所有子元素
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="parent"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Utils.VisualTreeUtils.CopyFrom(System.Windows.FrameworkElement,System.Windows.FrameworkElement,System.Collections.Generic.Dictionary{System.Type,System.Windows.DependencyProperty})">
+            <summary>
+            把一个控件里的所有子控件的值拷贝到另外一个相同的控件里
+            </summary>
+            <param name="srcElement"></param>
+            <param name="targetElement"></param>
+            <param name="copyWhat"></param>
+        </member>
+        <member name="T:WPFToolkit.Utility.DataGridUtils">
+            <summary>
+            为DataGrid附加功能
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utility.FontUtility">
+            <summary>
+            对字体的帮助类
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Utility.ImageUtility">
+            <summary>
+            提供对ImageSource的帮助函数
+            
+            位图和调色板：https://blog.csdn.net/kingbyang1/article/details/5564704
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.Utility.ImageUtility.FromURI(System.String)">
+            <summary>
+            使用imageURI创建一个ImageSource
+            </summary>
+            <param name="imageURI"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.Utility.ImageUtility.FromBitmap(System.Drawing.Bitmap)">
+            <summary>
+            使用Winform的Bitmap创建一个ImageSource
+            注意，该函数不会释放Bitmap
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="T:WPFToolkit.YControls.YDivider">
+            <summary>
+            分割线控件
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YDivider.Color">
+            <summary>
+            分割线的颜色
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YDivider.Orientation">
+            <summary>
+            分割线的方向
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YDivider.Thickness">
+            <summary>
+            分割线的粗细
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.YControls.YPressedEffects">
+            <summary>
+            定义当按钮被按下的时候的效果
+            </summary>
+        </member>
+        <member name="F:WPFToolkit.YControls.YPressedEffects.BackgroundEffect">
+            <summary>
+            当鼠标移动到按钮上的时候显示一个浅颜色的背景
+            当鼠标按下的时候显示一个深颜色的背景
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundHover">
+            <summary>
+            指定当鼠标移动到按钮上显示的背景颜色
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundPressed">
+            <summary>
+            指定当鼠标按下的时候显示的背景颜色
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.ColorTextConverter">
+            <summary>
+            颜色结构体转文本
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.NullableVisiblityConverter">
+            <summary>
+            布尔值到空值的转换
+            如果传进来的值为空，那么返回Collapsed，否则返回Visible
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter">
+            <summary>
+            True转成Visible
+            False转成Collapsed
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter2">
+            <summary>
+            True转成Collapsed
+            False转成Visible
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.DragDrop.IDragSource.StartDrag(WPFToolkit.DragDrop.DragInfo)">
+            <summary>
+            开始处理拖拽：
+            1. 判断元素是否可以拖拽
+            2. 如果可以，则根据DragInfo的信息解析数据，填充DragInfo.Data，设置DragDropEffects
+            
+            </summary>
+            <param name="dragInfo"></param>
+        </member>
+        <member name="T:WPFToolkit.DragDrop.IDropHandler">
+            <summary>
+            处理Drop事件
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.DragDrop.IDropHandler.OnDragOver(WPFToolkit.DragDrop.DropInfo)">
+            <summary>
+            处理Drop Over消息。判断当前是否能够接受拖拽的数据源，同时根据需求修改鼠标拖拽效果
+            </summary>
+            <param name="dropInfo"></param>
+        </member>
+        <member name="M:WPFToolkit.DragDrop.IDropHandler.OnDrop(WPFToolkit.DragDrop.DropInfo)">
+            <summary>
+            处理Drop事件
+            </summary>
+            <param name="dropInfo"></param>
+        </member>
         <member name="T:WPFToolkit.MarkupExtensions.EnumItemsSource">
             <summary>
             把一个枚举类型转换成可以直接绑定到ItemsControl上的类型
@@ -2962,6 +3033,36 @@
         <member name="M:WPFToolkit.Windows.SplashScreenWindow.InitializeComponent">
             <summary>
             InitializeComponent
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

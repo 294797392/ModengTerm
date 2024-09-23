@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
 
         <Grid>
-            <Border BorderBrush="Silver" BorderThickness="0,0,0,1" Background="White"/>
+            <Border BorderBrush="#ededed" BorderThickness="0,0,0,1" Background="White"/>
 
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
                 <mcontrols:MTermButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"

@@ -133,6 +133,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private Visibility contextMenuVisibility;
 
+        private bool sendCommandPanelVisible;
+
         #endregion
 
         #region 属性
@@ -260,6 +262,22 @@ namespace ModengTerm.Terminal.ViewModels
         /// 保存该会话输入的历史记录
         /// </summary>
         public BindableCollection<string> HistoryCommands { get; private set; }
+
+        /// <summary>
+        /// 是否显示发送命令窗口
+        /// </summary>
+        public bool SendCommandPanelVisible
+        {
+            get { return this.sendCommandPanelVisible;}
+            set
+            {
+                if (this.sendCommandPanelVisible != value)
+                {
+                    this.sendCommandPanelVisible = value;
+                    this.NotifyPropertyChanged("SendCommandPanelVisible");
+                }
+            }
+        }
 
         #endregion
 
