@@ -23,7 +23,6 @@
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
                 <mcontrols:MTermButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
                                        Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
-                <CheckBox x:Name="CheckBoxAutoCRLF" VerticalAlignment="Center" Content="自动输入回车键" Margin="0,0,5,0"/>
             </StackPanel>
 
         </Grid>

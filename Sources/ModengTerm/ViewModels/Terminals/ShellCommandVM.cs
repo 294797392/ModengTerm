@@ -20,7 +20,7 @@ namespace ModengTerm.ViewModels.Terminals
         /// <summary>
         /// 要执行的命令
         /// </summary>
-        public string Command 
+        public string Command
         {
             get
             {
@@ -57,6 +57,10 @@ namespace ModengTerm.ViewModels.Terminals
         /// </summary>
         public bool AutoCRLF { get; set; }
 
+        public ShellCommandVM()
+        {
+        }
+
         public ShellCommandVM(ShellCommand command)
         {
             this.ID = command.ID;
@@ -64,6 +68,19 @@ namespace ModengTerm.ViewModels.Terminals
             this.Description = command.Description;
             this.Command = command.Command;
             this.Type = (CommandTypeEnum)command.Type;
+            this.AutoCRLF = command.AutoCRLF;
+        }
+
+        public ShellCommand GetShellCommand()
+        {
+            return new ShellCommand()
+            {
+                ID = this.ID.ToString(),
+                Command = this.command,
+                Name = this.Name,
+                Type = (int)this.Type,
+                AutoCRLF = this.AutoCRLF
+            };
         }
     }
 }

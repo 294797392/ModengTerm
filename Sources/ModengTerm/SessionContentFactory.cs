@@ -1,15 +1,8 @@
-﻿using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Terminal.UserControls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm
 {

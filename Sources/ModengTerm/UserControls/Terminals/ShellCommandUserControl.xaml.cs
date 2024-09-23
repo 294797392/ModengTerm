@@ -1,22 +1,11 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.ServiceAgents;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows.Terminals;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using XTerminal;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls.Terminals
 {
@@ -25,7 +14,8 @@ namespace ModengTerm.UserControls.Terminals
     /// </summary>
     public partial class ShellCommandUserControl : UserControl
     {
-        private ShellGlobalVM shellGlobalVM;
+        private BindableCollection<ShellCommandVM> shellCommands;
+        private ServiceAgent serviceAgent;
 
         public ShellCommandUserControl()
         {
@@ -41,8 +31,11 @@ namespace ModengTerm.UserControls.Terminals
                 return;
             }
 
-            this.shellGlobalVM = MTermApp.Context.ShellGlobalVM;
-            ListBoxCommands.DataContext = this.shellGlobalVM.Commands;
+            this.serviceAgent = MTermApp.Context.ServiceAgent;
+
+            this.shellCommands = new BindableCollection<ShellCommandVM>();
+            this.shellCommands.AddRange(this.serviceAgent.GetShellCommands().Select(v => new ShellCommandVM(v)));
+            ListBoxCommands.DataContext = this.shellCommands;
         }
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
@@ -51,9 +44,8 @@ namespace ModengTerm.UserControls.Terminals
             window.Owner = MainWindow.GetWindow(this);
             if ((bool)window.ShowDialog())
             {
-                ShellCommand shellCommand = window.Command;
-
-                this.shellGlobalVM.Commands.Add(new ShellCommandVM(shellCommand));
+                this.shellCommands.Clear();
+                this.shellCommands.AddRange(this.serviceAgent.GetShellCommands().Select(v => new ShellCommandVM(v)));
             }
         }
 
@@ -64,8 +56,6 @@ namespace ModengTerm.UserControls.Terminals
             {
                 return;
             }
-
-            selectedCommand.AutoCRLF = CheckBoxAutoCRLF.IsChecked.Value;
 
             MCommands.SendCommand.Execute(selectedCommand, this);
 

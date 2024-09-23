@@ -157,6 +157,36 @@ namespace ModengTerm.ServiceAgents
             }
         }
 
+        public override int DeleteShellCommand(string id)
+        {
+            try
+            {
+                JSONDatabase.Delete<ShellCommand>(v => v.ID == id);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex) 
+            {
+                logger.Error("DeleteShellCommand异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        public override int UpdateShellCommand(ShellCommand shcmd)
+        {
+            try
+            {
+                JSONDatabase.Update<ShellCommand>(v => v.ID == shcmd.ID, shcmd);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("UpdateShellCommand异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
         #endregion
 
         //public override List<Favorites> GetFavorites(string sessionId)

@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Windows.Terminals"
         xmlns:converter="clr-namespace:ModengTerm"
+        xmlns:mcontrol="clr-namespace:ModengTerm.Controls"
         mc:Ignorable="d"
-        Title="新建命令" Height="250" Width="400"
+        Title="新建命令" Height="400" Width="600"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
@@ -29,39 +30,103 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
+        <Style x:Key="StyleGroupBoxLocal" TargetType="{x:Type GroupBox}">
+            <Setter Property="Margin" Value="3"/>
+        </Style>
+
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="名称：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-        <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxName" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+        <GroupBox Grid.Row="0" Grid.Column="0" Header="命令列表" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="类型：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-        <ComboBox Grid.Row="1" Grid.Column="2" x:Name="ComboBoxCommandTypes" Height="25" Margin="3,0,3,0">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=ShellCommandTypeConverter}}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="命令：" VerticalAlignment="Top" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextBoxCommand" VerticalContentAlignment="Top" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+                <ListBox Grid.Row="0" x:Name="ListBoxShellCommands" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         SelectedIndex="0" SelectionChanged="ListBoxShellCommands_SelectionChanged">
+                    <ListBox.Style>
+                        <Style TargetType="{x:Type ListBox}">
+                            <Setter Property="BorderBrush" Value="{x:Null}"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </ListBox.Style>
 
-        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="999" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                </ListBox>
+
+                <Border Grid.Row="1" BorderBrush="Silver" BorderThickness="0,1,0,0"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <mcontrol:MTermButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
+                                          Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
+                    <mcontrol:MTermButton ToolTip="删除" SVGPath="{StaticResource ResourceKey=SVGIcon7}"
+                                          Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
+                    <mcontrol:MTermButton ToolTip="上移" SVGPath="{StaticResource ResourceKey=SVGIcon8}"
+                                          Click="ButtonMoveUp_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
+                    <mcontrol:MTermButton ToolTip="下移" SVGPath="{StaticResource ResourceKey=SVGIcon9}"
+                                          Click="ButtonMoveDown_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
+                </StackPanel>
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="0" Grid.Column="1" Header="编辑命令" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
+            <Grid DataContext="{Binding ElementName=ListBoxShellCommands, Path=SelectedItem}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="名称：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxName" Text="{Binding Path=Name,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="类型：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                <ComboBox Grid.Row="1" Grid.Column="2" x:Name="ComboBoxCommandTypes" Height="25" Margin="3,0,3,0"
+                          SelectedItem="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=ShellCommandTypeConverter}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="命令：" VerticalAlignment="Top" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextBoxCommand" VerticalContentAlignment="Top" 
+                         Text="{Binding Path=Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+                <CheckBox Grid.Row="3" Grid.Column="1" Content="自动换行" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                          IsChecked="{Binding Path=AutoCRLF, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            </Grid>
+        </GroupBox>
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
             <Button Content="保存" Click="ButtonSave_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
             <Button Content="关闭" Click="ButtonClose_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
         </StackPanel>
-        
+
     </Grid>
+
 </Window>
