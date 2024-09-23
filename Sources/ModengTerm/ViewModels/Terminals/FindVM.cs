@@ -211,23 +211,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 构造方法
 
-        public FindVM(IVideoTerminal vt)
+        public FindVM()
         {
-            this.videoTerminal = vt;
-
-            this.videoTerminal.MainDocument.ScrollChanged += MainDocument_ScrollChanged;
-            this.videoTerminal.MainDocument.DiscardLine += MainDocument_DiscardLine;
-            this.mainRectElement = this.videoTerminal.MainDocument.Renderer.CreateDrawingObject();
-            this.alternateRectElement = this.videoTerminal.AlternateDocument.Renderer.CreateDrawingObject();
-
-            if (this.videoTerminal.IsAlternate)
-            {
-                this.activeRectElement = this.alternateRectElement;
-            }
-            else
-            {
-                this.activeRectElement = this.mainRectElement;
-            }
         }
 
         #endregion
@@ -420,9 +405,52 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 公开接口
 
+        /// <summary>
+        /// 设置要搜索的终端
+        /// </summary>
+        /// <param name="vt"></param>
+        public void SetVideoTerminal(IVideoTerminal vt)
+        {
+            if (this.videoTerminal == vt)
+            {
+                return;
+            }
+
+            IVideoTerminal oldTerminal = this.videoTerminal;
+            if (oldTerminal != null)
+            {
+                // 先释放之前搜索的终端资源
+                oldTerminal.MainDocument.ScrollChanged -= this.MainDocument_ScrollChanged;
+                oldTerminal.MainDocument.Renderer.DeleteDrawingObject(this.mainRectElement);
+                oldTerminal.AlternateDocument.Renderer.DeleteDrawingObject(this.alternateRectElement);
+            }
+
+            IVideoTerminal newTerminal = vt;
+            newTerminal.MainDocument.ScrollChanged += this.MainDocument_ScrollChanged;
+            this.mainRectElement = newTerminal.MainDocument.Renderer.CreateDrawingObject();
+            this.alternateRectElement = newTerminal.AlternateDocument.Renderer.CreateDrawingObject();
+            if (newTerminal.IsAlternate)
+            {
+                this.activeRectElement = this.alternateRectElement;
+            }
+            else
+            {
+                this.activeRectElement = this.mainRectElement;
+            }
+
+            this.videoTerminal = vt;
+
+            if (!string.IsNullOrEmpty(this.keyword))
+            {
+                this.PerformFind(this.keyword);
+            }
+        }
+
         public void Release()
         {
             this.videoTerminal.MainDocument.ScrollChanged -= this.MainDocument_ScrollChanged;
+            this.videoTerminal.MainDocument.Renderer.DeleteDrawingObject(this.mainRectElement);
+            this.videoTerminal.AlternateDocument.Renderer.DeleteDrawingObject(this.alternateRectElement);
             this.matchResult = null;
             this.Message = string.Empty;
         }

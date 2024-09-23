@@ -48,23 +48,25 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="0"/>
             <RowDefinition Height="0"/>
             <RowDefinition Height="0"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="70"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="关键字：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="查找：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Keyword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="区分大小写：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=CaseSensitive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="99" Orientation="Horizontal">
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="正则表达式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Path=Regexp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+            <CheckBox Content="区分大小写" Margin="20,0,0,0" IsChecked="{Binding Path=CaseSensitive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+
+            <CheckBox Content="使用正则表达式查找" Margin="20,0,0,0" IsChecked="{Binding Path=Regexp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+
+        </StackPanel>
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="方向：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <RadioButton Grid.Row="3" Grid.Column="1" Content="向上" VerticalAlignment="Center" GroupName="FindDirection" IsChecked="{Binding Path=UpFind,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>

@@ -1,4 +1,8 @@
-﻿using ModengTerm.Controls;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
+using ModengTerm.Controls;
+using ModengTerm.Document;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using System;
@@ -14,9 +18,70 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using XTerminal;
 
 namespace ModengTerm.Windows
 {
+    /// <summary>
+    /// 搜索窗口只能显示一个，用这个类来管理搜索窗口的生命周期
+    /// </summary>
+    public static class FindWindowMgr
+    {
+        private static FindWindow findWindow;
+
+        /// <summary>
+        /// 获取查找窗口是否显示
+        /// </summary>
+        public static bool WindowShown { get { return findWindow != null; } }
+
+        /// <summary>
+        /// 显示搜索窗口
+        /// </summary>
+        /// <param name="shellSession">要搜索的会话ViewModel</param>
+        public static void Show(ShellSessionVM shellSession)
+        {
+            XTermSession session = shellSession.Session;
+            IVideoTerminal vt = shellSession.VideoTerminal;
+
+            string highlightBackground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            string highlightForeground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR);
+
+            FindVM findVM = null;
+
+            if (findWindow == null)
+            {
+                findVM = new FindVM()
+                {
+                    HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
+                    HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
+                };
+
+                findWindow = new FindWindow(findVM);
+                findWindow.Owner = App.Current.MainWindow;
+                findWindow.Closed += FindWindow_Closed;
+                findWindow.Show();
+            }
+            else
+            {
+                // 已经显示了搜索窗口
+                findVM = findWindow.DataContext as FindVM;
+            }
+
+            findVM.SetVideoTerminal(vt);
+        }
+
+        private static void FindWindow_Closed(object? sender, EventArgs e)
+        {
+            FindWindow findWindow = sender as FindWindow;
+            findWindow.Closed -= FindWindow_Closed;
+
+            FindVM findVM = findWindow.DataContext as FindVM;
+            findVM.Release();
+
+            findWindow = null;
+        }
+    }
+
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>

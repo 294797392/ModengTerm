@@ -4,6 +4,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Controls;
+using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
@@ -186,6 +187,15 @@ namespace ModengTerm
                 OpenedSessionVM openedSessionVM = selectedTabItem as OpenedSessionVM;
                 ContentControlSession.Content = openedSessionVM.Content;
             }
+
+            // 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话
+            if (selectedTabItem is ShellSessionVM)
+            {
+                if (FindWindowMgr.WindowShown)
+                {
+                    FindWindowMgr.Show(selectedTabItem as ShellSessionVM);
+                }
+            }
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -289,9 +299,66 @@ namespace ModengTerm
             this.ShowSessionListWindow();
         }
 
-        
-        
-        
+        private void MenuItemFind_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                MTMessageBox.Info("请选中要搜索的终端");
+                return;
+            }
+
+            FindWindowMgr.Show(shellSession);
+        }
+
+        private void MenuItemCopySelected_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.CopySelection();
+        }
+
+        private void MenuItemSaveSelection_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.SaveSelection();
+        }
+
+        private void MenuItemSaveViewport_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.SaveViewport();
+        }
+
+        private void MenuItemSaveAllDocument_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.SaveAllDocument();
+        }
+
+
+
+
+
         private void ButtonMinmizedWindow_Click(object sender, RoutedEventArgs e)
         {
             base.WindowState = WindowState.Minimized;

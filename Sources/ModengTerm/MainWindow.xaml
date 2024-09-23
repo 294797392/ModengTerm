@@ -189,10 +189,24 @@
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
                 </MenuItem>
 
-                <MenuItem Header="视图" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem x:Name="MenuItemShellCommand" Header="快捷命令" IsCheckable="True" IsChecked="{Binding Path=ShellCommandPanelVisiblity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <MenuItem x:Name="MenuItemInputPanel" Header="输入窗口" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendCommandPanelVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <MenuItem Header="编辑" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem Header="查找" Click="MenuItemFind_Click"/>
+                    <MenuItem Header="复制" Click="MenuItemCopySelected_Click"/>
+                    <MenuItem Header="保存">
+                        <MenuItem Header="选中内容" Click="MenuItemSaveSelection_Click"/>
+                        <MenuItem Header="当前屏幕内容" Click="MenuItemSaveViewport_Click"/>
+                        <MenuItem Header="所有内容" Click="MenuItemSaveAllDocument_Click"/>
+                    </MenuItem>
                 </MenuItem>
+                
+                <MenuItem Header="查看" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem x:Name="MenuItemShellCommand" Header="快捷命令" IsCheckable="True" IsChecked="{Binding Path=ShellCommandPanelVisiblity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <MenuItem x:Name="MenuItemInputPanel" Header="输入栏" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendCommandPanelVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </MenuItem>
+
+                <!--<MenuItem Header="选项" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem x:Name="MenuItemSendAll" Header="向所有终端发送" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendAll, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </MenuItem>-->
 
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于" Click="MenuItemAbout_Click"/>

@@ -106,8 +106,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         private Encoding writeEncoding;
 
-        private bool sendAll;
-
         private RecordStatusEnum recordState;
 
         /// <summary>
@@ -175,22 +173,6 @@ namespace ModengTerm.Terminal.ViewModels
         /// 向外部公开终端模拟器的控制接口
         /// </summary>
         public IVideoTerminal VideoTerminal { get { return this.videoTerminal; } }
-
-        /// <summary>
-        /// 是否向所有终端发送数据
-        /// </summary>
-        public bool SendAll
-        {
-            get { return this.sendAll; }
-            set
-            {
-                if (this.sendAll != value)
-                {
-                    this.sendAll = value;
-                    this.NotifyPropertyChanged("SendAll");
-                }
-            }
-        }
 
         /// <summary>
         /// SSH主机的Uri
@@ -445,8 +427,8 @@ namespace ModengTerm.Terminal.ViewModels
                     {
                         Children = new BindableCollection<ShellContextMenu>()
                         {
-                            new ShellContextMenu("当前屏幕内容", this.SaveDocument),
                             new ShellContextMenu("选中内容", this.SaveSelection),
+                            new ShellContextMenu("当前屏幕内容", this.SaveViewport),
                             new ShellContextMenu("所有内容", this.SaveAllDocument),
                         }
                     },
@@ -970,32 +952,22 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 查找
         /// </summary>
-        private void Find()
+        public void Find()
         {
-            string highlightBackground = this.Session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR);
-            string highlightForeground = this.Session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR);
-
-            FindVM vtFind = new FindVM(this.videoTerminal)
-            {
-                HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
-                HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
-            };
-            FindWindow findWindow = new FindWindow(vtFind);
-            findWindow.Owner = Window.GetWindow(this.Content);
-            findWindow.Show();
+            FindWindowMgr.Show(this);
         }
 
-        private void SaveDocument()
+        public void SaveViewport()
         {
             this.SaveToFile(ParagraphTypeEnum.Viewport);
         }
 
-        private void SaveSelection()
+        public void SaveSelection()
         {
             this.SaveToFile(ParagraphTypeEnum.Selected);
         }
 
-        private void SaveAllDocument()
+        public void SaveAllDocument()
         {
             this.SaveToFile(ParagraphTypeEnum.AllDocument);
         }
