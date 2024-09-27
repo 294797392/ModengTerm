@@ -78,7 +78,7 @@ namespace ModengTerm.ServiceAgents
 
         #region ShellCommand管理
 
-        public abstract List<ShellCommand> GetShellCommands();
+        public abstract List<ShellCommand> GetShellCommands(string sessionId);
         public abstract int AddShellCommand(ShellCommand shcmd);
         public abstract int DeleteShellCommand(string id);
         public abstract int UpdateShellCommand(ShellCommand shcmd);

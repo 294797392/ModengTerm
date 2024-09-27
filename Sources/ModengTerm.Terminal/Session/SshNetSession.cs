@@ -5,10 +5,7 @@ using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using Renci.SshNet;
 using Renci.SshNet.Common;
-using System;
 using System.IO;
-using XTerminal.Base;
-using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session

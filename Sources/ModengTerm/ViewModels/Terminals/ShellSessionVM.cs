@@ -20,6 +20,7 @@ using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using WPFToolkit.MVVM;
@@ -133,6 +134,8 @@ namespace ModengTerm.Terminal.ViewModels
         private Visibility contextMenuVisibility;
 
         private bool sendCommandPanelVisible;
+
+        private BindableCollection<ShellCommandVM> shellCommands;
 
         #endregion
 
@@ -262,6 +265,22 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 该会话的所有快捷命令
+        /// </summary>
+        public BindableCollection<ShellCommandVM> ShellCommands 
+        {
+            get { return this.shellCommands; }
+            private set
+            {
+                if (this.shellCommands != value) 
+                {
+                    this.shellCommands = value;
+                    this.NotifyPropertyChanged("ShellCommands");
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -284,6 +303,9 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
+
+            this.ShellCommands = new BindableCollection<ShellCommandVM>();
+            this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new ShellCommandVM(v)));
 
             #region 初始化工具栏菜单
 

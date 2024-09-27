@@ -27,6 +27,14 @@ man
 * https://blog.csdn.net/ScilogyHunter/article/details/106874395
 
 
+
+# 对比产品
+https://github.com/Eugeny/tabby
+https://github.com/kingToolbox/WindTerm
+
+
+
+
 ### C0字符集
 ascii字符的前128（0-127）个字符属于C0字符集里的字符
 

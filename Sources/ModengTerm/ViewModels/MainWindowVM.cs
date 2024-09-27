@@ -46,6 +46,11 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<XTermSession> RecentlyOpenedSession { get; private set; }
 
+        /// <summary>
+        /// 打开的所有会话列表
+        /// </summary>
+        public OpenedSessionsVM OpenedSessionsVM { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -53,6 +58,8 @@ namespace ModengTerm.ViewModels
         public MainWindowVM()
         {
             this.serviceAgent = MTermApp.Context.ServiceAgent;
+
+            this.OpenedSessionsVM = new OpenedSessionsVM();
 
             this.RightPanelMenu = new MenuVM();
             this.RightPanelMenu.Initialize(new List<MenuDefinition>()

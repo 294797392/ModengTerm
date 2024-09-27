@@ -129,11 +129,11 @@ namespace ModengTerm.ServiceAgents
 
         #region ShellCommand管理
 
-        public override List<ShellCommand> GetShellCommands()
+        public override List<ShellCommand> GetShellCommands(string sessionId)
         {
             try
             {
-                return JSONDatabase.SelectAll<ShellCommand>();
+                return JSONDatabase.SelectAll<ShellCommand>(v => v.SessionId == sessionId);
             }
             catch (Exception ex)
             {

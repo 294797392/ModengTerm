@@ -30,5 +30,11 @@ namespace ModengTerm.Base.DataModels
         /// </summary>
         [JsonProperty("crlf")]
         public bool AutoCRLF { get; set; }
+
+        /// <summary>
+        /// 该命令关联的会话Id
+        /// </summary>
+        [JsonProperty("sessionId")]
+        public string SessionId { get; set; }
     }
 }

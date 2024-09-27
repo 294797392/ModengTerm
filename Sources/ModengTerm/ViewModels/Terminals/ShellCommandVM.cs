@@ -16,6 +16,7 @@ namespace ModengTerm.ViewModels.Terminals
     {
         private string command;
         private CommandTypeEnum type;
+        private string sessionId;
 
         /// <summary>
         /// 要执行的命令
@@ -57,6 +58,22 @@ namespace ModengTerm.ViewModels.Terminals
         /// </summary>
         public bool AutoCRLF { get; set; }
 
+        /// <summary>
+        /// 快捷命令所关联的会话
+        /// </summary>
+        public string SessionId 
+        {
+            get { return this.sessionId; }
+            set
+            {
+                if (this.sessionId != value)
+                {
+                    this.sessionId = value;
+                    this.NotifyPropertyChanged("SessionId");
+                }
+            }
+        }
+
         public ShellCommandVM()
         {
         }
@@ -69,6 +86,7 @@ namespace ModengTerm.ViewModels.Terminals
             this.Command = command.Command;
             this.Type = (CommandTypeEnum)command.Type;
             this.AutoCRLF = command.AutoCRLF;
+            this.SessionId = command.SessionId;
         }
 
         public ShellCommand GetShellCommand()
@@ -76,10 +94,11 @@ namespace ModengTerm.ViewModels.Terminals
             return new ShellCommand()
             {
                 ID = this.ID.ToString(),
-                Command = this.command,
+                Command = this.Command,
                 Name = this.Name,
                 Type = (int)this.Type,
-                AutoCRLF = this.AutoCRLF
+                AutoCRLF = this.AutoCRLF,
+                SessionId = this.SessionId
             };
         }
     }

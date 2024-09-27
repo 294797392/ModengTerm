@@ -26,6 +26,7 @@
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
     <Compile Remove="ViewModels\Terminals\CommandLineVM.cs" />
+    <Compile Remove="ViewModels\Terminals\ShellGlobalVM.cs" />
   </ItemGroup>
 
   <ItemGroup>

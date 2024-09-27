@@ -2,6 +2,7 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.ServiceAgents;
+using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace ModengTerm.Windows.Terminals
         private List<ShellCommandVM> deleteCommands; // 被删除的命令列表
         private BindableCollection<ShellCommandVM> shellCommands;
         private ServiceAgent serviceAgent;
+        private ShellSessionVM shellSession;
 
         #endregion
 
@@ -50,20 +52,21 @@ namespace ModengTerm.Windows.Terminals
 
         #region 构造方法
 
-        public CreateShellCommandWindow()
+        public CreateShellCommandWindow(ShellSessionVM shellSession)
         {
             InitializeComponent();
 
-            this.InitializeWindow();
+            this.InitializeWindow(shellSession);
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeWindow()
+        private void InitializeWindow(ShellSessionVM shellSession)
         {
             this.serviceAgent = MTermApp.Context.ServiceAgent;
+            this.shellSession = shellSession;
 
             this.updateCommands = new List<ShellCommandVM>();
             this.newCommands = new List<ShellCommandVM>();
@@ -72,7 +75,7 @@ namespace ModengTerm.Windows.Terminals
             ComboBoxCommandTypes.ItemsSource = Enum.GetValues(typeof(CommandTypeEnum));
             ComboBoxCommandTypes.SelectedIndex = 0;
 
-            List<ShellCommand> commands = this.serviceAgent.GetShellCommands();
+            List<ShellCommand> commands = this.serviceAgent.GetShellCommands(this.shellSession.ID.ToString());
             this.shellCommands = new BindableCollection<ShellCommandVM>();
             this.shellCommands.AddRange(commands.Select(v => new ShellCommandVM(v)));
             ListBoxShellCommands.DataContext = this.shellCommands;
@@ -150,7 +153,8 @@ namespace ModengTerm.Windows.Terminals
             {
                 ID = Guid.NewGuid().ToString(),
                 Name = "新建命令",
-                Type = (int)CommandTypeEnum.PureText
+                Type = (int)CommandTypeEnum.PureText,
+                SessionId = this.shellSession.ID.ToString()
             };
 
             this.shellCommands.Add(command);

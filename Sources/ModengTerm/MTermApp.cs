@@ -65,8 +65,6 @@ namespace ModengTerm
         /// </summary>
         public LoggerManager LoggerManager { get; private set; }
 
-        public ShellGlobalVM ShellGlobalVM { get; private set; }
-
         /// <summary>
         /// 主窗口ViewModel
         /// </summary>
@@ -85,17 +83,6 @@ namespace ModengTerm
 
             this.LoggerManager = new LoggerManager();
             this.LoggerManager.Initialize();
-
-            #region 初始化ShellGlobalVM
-
-            this.ShellGlobalVM = new ShellGlobalVM();
-            List<ShellCommand> commands = this.ServiceAgent.GetShellCommands();
-            foreach (ShellCommand shellCommand in commands)
-            {
-                this.ShellGlobalVM.Commands.Add(new ShellCommandVM(shellCommand));
-            }
-
-            #endregion
 
             #region 启动后台工作线程
 

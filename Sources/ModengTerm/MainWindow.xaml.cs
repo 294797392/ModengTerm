@@ -45,6 +45,7 @@ namespace ModengTerm
         private OpenedSessionDataTemplateSelector templateSelector;
         private OpenedSessionItemContainerStyleSelector itemContainerStyleSelector;
         private VTKeyInput userInput;
+        private MainWindowVM mainWindowVM;
         private OpenedSessionsVM sessionListVM;
 
         #endregion
@@ -64,7 +65,8 @@ namespace ModengTerm
 
         private void InitializeWindow()
         {
-            base.DataContext = MTermApp.Context.MainWindowVM;
+            this.mainWindowVM = MTermApp.Context.MainWindowVM;
+            base.DataContext = this.mainWindowVM;
 
             this.userInput = new VTKeyInput();
             this.templateSelector = new OpenedSessionDataTemplateSelector();
@@ -77,7 +79,7 @@ namespace ModengTerm
             this.itemContainerStyleSelector.StyleOpenSession = this.FindResource("StyleListBoxItemOpenSession") as Style;
             ListBoxOpenedSession.ItemContainerStyleSelector = this.itemContainerStyleSelector;
 
-            this.sessionListVM = new OpenedSessionsVM();
+            this.sessionListVM = this.mainWindowVM.OpenedSessionsVM;
             ListBoxOpenedSession.DataContext = this.sessionListVM;
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
@@ -273,7 +275,7 @@ namespace ModengTerm
             }
 
             // 打开会话
-            this.ShowSessionListWindow();
+            this.OpenSession(session, false);
         }
 
         private void MenuItemAbout_Click(object sender, RoutedEventArgs e)

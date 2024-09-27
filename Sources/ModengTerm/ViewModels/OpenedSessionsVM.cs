@@ -17,6 +17,9 @@ using ModengTerm.Terminal;
 
 namespace ModengTerm.ViewModels
 {
+    /// <summary>
+    /// 打开的所有会话列表ViewModel
+    /// </summary>
     public class OpenedSessionsVM : ViewModelBase
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("OpenedSessionsVM");
@@ -66,7 +69,7 @@ namespace ModengTerm.ViewModels
             OpenedSessionVM viewModel = OpenedSessionVMFactory.Create(session);
 
             // 给ViewModel赋值
-            viewModel.ID = Guid.NewGuid().ToString();
+            viewModel.ID = session.ID;
             viewModel.Name = session.Name;
             viewModel.Description = session.Description;
             viewModel.Content = content as DependencyObject;
