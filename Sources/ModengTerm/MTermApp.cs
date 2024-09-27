@@ -5,6 +5,7 @@ using ModengTerm.Base.Definitions;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.UserControls.OptionsUserControl;
+using ModengTerm.UserControls.OptionsUserControl.SSH;
 using ModengTerm.UserControls.OptionsUserControl.Terminal;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
@@ -29,6 +30,7 @@ namespace ModengTerm
                     new OptionDefinition(OptionDefinition.CommandLineID, "命令行", typeof(CommandLineOptionsUserControl)),
                     new OptionDefinition(OptionDefinition.SshID, "SSH", typeof(SSHOptionsUserControl)),
                     new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl)),
+                    new OptionDefinition("端口转发", typeof(PortForwardOptionsUserControl))
                 }
             },
 

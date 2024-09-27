@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,26 @@ namespace ModengTerm.Terminal.Session
             switch ((SessionTypeEnum)options.Type)
             {
                 case SessionTypeEnum.SSH: return new SshNetSession(options);
-                //case SessionTypeEnum.HostCommandLine: return new WinptySession(options);
-                case SessionTypeEnum.CommandLine: return new PseudoConsoleSession(options);
+                case SessionTypeEnum.CommandLine:
+                    {
+                        CmdDriverEnum driver = options.GetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER);
+
+                        switch (driver)
+                        {
+                            case CmdDriverEnum.Win10PseudoConsoleApi:
+                                {
+                                    return new PseudoConsoleSession(options);
+                                }
+
+                            case CmdDriverEnum.winpty:
+                                {
+                                    return new WinptySession(options);
+                                }
+
+                            default:
+                                throw new NotImplementedException();
+                        }
+                    }
                 case SessionTypeEnum.SerialPort: return new SerialPortSession(options);
                 case SessionTypeEnum.SSHPlayback: return new PlaybackSession(options);
                 default:

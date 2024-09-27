@@ -11,6 +11,7 @@
     </SolidColorBrush>
 
     <SolidColorBrush x:Key="BrushBackground1" Color="#938E8E" Opacity="0.7"/>
+    <SolidColorBrush x:Key="BrushSplitter" Color="#ededed"/>
 
     <!-- 剪贴板历史记录 500 - 1000 -->
     <!-- 窗口背景色 -->
@@ -62,5 +63,6 @@
 
     <SolidColorBrush x:Key="BrushMainWindowButtonHoverBackground" Color="#D0D0D0"/>
     <SolidColorBrush x:Key="BrushMainWindowButtonDownBackground" Color="#A4A4A4"/>
-    
+
+
 </ResourceDictionary>

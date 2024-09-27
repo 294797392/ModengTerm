@@ -85,6 +85,13 @@ namespace ModengTerm.ServiceAgents
 
         #endregion
 
+        #region RecentSession管理
+
+        public abstract List<string> GetRecentSessions();
+        public abstract int AddRecentSession(string sessionId);
+
+        #endregion
+
         protected string EncryptObject(object toEncrypt)
         {
             return this.cryptor.Encrypt(toEncrypt);

@@ -2,15 +2,7 @@
 using DotNEToolkit.DataModels;
 using ModengTerm.Base.Enumerations;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XTerminal.Base;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Base.DataModels
 {
@@ -32,6 +24,13 @@ namespace ModengTerm.Base.DataModels
         /// </summary>
         [JsonProperty("options")]
         public List<SessionOption> Options { get; private set; }
+
+        /// <summary>
+        /// 会话所属的分组Id
+        /// 如果为空，则表示没有分组
+        /// </summary>
+        [JsonProperty("groupId")]
+        public string GroupId { get; set; }
 
         public XTermSession()
         {

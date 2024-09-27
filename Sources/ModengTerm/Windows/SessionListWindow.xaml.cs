@@ -33,6 +33,11 @@ namespace ModengTerm.Windows
         /// </summary>
         public XTermSession SelectedSession { get; private set; }
 
+        /// <summary>
+        /// 当前选中的会话ViewModel
+        /// </summary>
+        public XTermSessionVM SelectedSessionVM { get; private set; }
+
         #endregion
 
         #region 实例变量
@@ -69,6 +74,7 @@ namespace ModengTerm.Windows
 
         private void OpenSession(XTermSessionVM sessionVM)
         {
+            this.SelectedSessionVM = sessionVM;
             this.SelectedSession = sessionVM.Session;
 
             base.DialogResult = true;

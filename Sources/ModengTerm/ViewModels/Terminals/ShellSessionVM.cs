@@ -14,6 +14,7 @@ using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.Windows;
+using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using System;
@@ -250,7 +251,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public bool SendCommandPanelVisible
         {
-            get { return this.sendCommandPanelVisible;}
+            get { return this.sendCommandPanelVisible; }
             set
             {
                 if (this.sendCommandPanelVisible != value)
@@ -283,6 +284,12 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
+
+            #region 初始化工具栏菜单
+
+            this.ToolbarMenus.Add(new SMenuItem("端口转发", "pack://application:,,,/ModengTerm;component/Images/portForward.png", this.OpenPortForwardWindow));
+
+            #endregion
 
             #region 初始化右键菜单
 
@@ -502,9 +509,9 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case SessionTypeEnum.SSH:
                     {
-                        string userName = this.Session.GetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME);
-                        string hostName = this.Session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
-                        int port = this.Session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
+                        string userName = this.Session.GetOption<string>(OptionKeyEnum.SSH_USER_NAME);
+                        string hostName = this.Session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
+                        int port = this.Session.GetOption<int>(OptionKeyEnum.SSH_PORT);
                         uri = string.Format("ssh://{0}@{1}:{2}", userName, hostName, port);
                         break;
                     }
@@ -591,6 +598,23 @@ namespace ModengTerm.Terminal.ViewModels
             }
 
             this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+        }
+
+        public int Control(int command, object parameter, out object result)
+        {
+            return this.sessionTransport.Control(command, parameter, out result);
+        }
+
+        public int Control(int code)
+        {
+            object result;
+            return this.Control(code, null, out result);
+        }
+
+        public int Control(int code, object parameter)
+        {
+            object result;
+            return this.Control(code, parameter, out result);
         }
 
         #endregion
@@ -982,6 +1006,10 @@ namespace ModengTerm.Terminal.ViewModels
             AboutWindow aboutWindow = new AboutWindow();
             aboutWindow.Owner = Application.Current.MainWindow;
             aboutWindow.ShowDialog();
+        }
+
+        private void OpenPortForwardWindow()
+        {
         }
 
         #endregion

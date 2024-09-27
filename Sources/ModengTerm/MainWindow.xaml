@@ -20,7 +20,7 @@
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static mcmd:MCommands.SendCommand}" Executed="SendCommand_Executed"/>
     </Window.CommandBindings>
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -34,13 +34,13 @@
 
                 <Grid Background="Transparent">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="30"/>
                         <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="*" MinWidth="80"/>
                         <ColumnDefinition Width="30"/>
                     </Grid.ColumnDefinitions>
 
-                    <Image Grid.Column="0" Source="{Binding Path=Session.Type, Converter={StaticResource ResourceKey=SessionImageConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Image Grid.Column="0" Width="24" Height="24" Source="{Binding Path=Session.Type, Converter={StaticResource ResourceKey=SessionImageConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
                     <TextBlock Grid.Column="2" Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
@@ -158,9 +158,9 @@
 
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
@@ -187,6 +187,18 @@
                 <MenuItem Header="会话" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
+                    <MenuItem Header="最新打开的会话" ItemsSource="{Binding Path=RecentlyOpenedSession}">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <EventSetter Event="Click" Handler="MenuItemRecentSessions_Click"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
                 </MenuItem>
 
                 <MenuItem Header="编辑" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
@@ -198,10 +210,14 @@
                         <MenuItem Header="所有内容" Click="MenuItemSaveAllDocument_Click"/>
                     </MenuItem>
                 </MenuItem>
-                
+
                 <MenuItem Header="查看" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem x:Name="MenuItemShellCommand" Header="快捷命令" IsCheckable="True" IsChecked="{Binding Path=ShellCommandPanelVisiblity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <MenuItem x:Name="MenuItemInputPanel" Header="输入栏" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendCommandPanelVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </MenuItem>
+
+                <MenuItem Header="工具" Style="{StaticResource ResourceKey=StyleMenuItemLocal}" Visibility="Collapsed">
+                    <MenuItem x:Name="MenuItemPortForward" Header="端口转发" Click="MenuItemPortForward_Click"/>
                 </MenuItem>
 
                 <!--<MenuItem Header="选项" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
@@ -225,7 +241,7 @@
 
         </Grid>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>

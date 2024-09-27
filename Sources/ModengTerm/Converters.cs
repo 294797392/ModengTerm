@@ -373,4 +373,36 @@ namespace ModengTerm
             throw new NotImplementedException();
         }
     }
+
+    public class PortForwardTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            if (!(value is PortForwardTypeEnum) && !(value is int))
+            {
+                return string.Empty;
+            }
+
+            PortForwardTypeEnum type = (PortForwardTypeEnum)value;
+
+            switch (type)
+            {
+                case PortForwardTypeEnum.Local: return "本地转发";
+                case PortForwardTypeEnum.Dynamic: return "动态转发";
+                case PortForwardTypeEnum.Remote: return "远程转发";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

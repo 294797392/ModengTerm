@@ -25,11 +25,6 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
-        <Setter Property="Margin" Value="5,3,0,3"/>
-        <Setter Property="Width" Value="70"/>
-    </Style>
-
     <Style x:Key="StyleCheckBoxLocal" TargetType="{x:Type CheckBox}">
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -39,6 +34,11 @@
     <Style x:Key="StyleGroupBoxLocal" TargetType="{x:Type GroupBox}">
         <Setter Property="Padding" Value="5"/>
         <Setter Property="Margin" Value="5"/>
+    </Style>
+
+    <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+        <Setter Property="Margin" Value="5,3,0,3"/>
+        <Setter Property="Width" Value="50"/>
     </Style>
 
 </ResourceDictionary>

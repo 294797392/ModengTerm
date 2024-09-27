@@ -14,7 +14,6 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -35,20 +34,25 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="启动路径：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <Grid Grid.Row="0" Grid.Column="1">
-            <TextBox x:Name="StartupPath" Text="{Binding Path=StartupPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
-            <Button x:Name="ButtonBrowser" Content="浏览" HorizontalAlignment="Right" Width="80" Click="ButtonBrowserCommandLinePath_Click"
+            <TextBox x:Name="StartupPath" Text="{Binding Path=StartupPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,70,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+            <Button x:Name="ButtonBrowser" Content="浏览" HorizontalAlignment="Right" Width="60" Click="ButtonBrowserCommandLinePath_Click"
                     Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
         </Grid>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="初始目录：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <Grid Grid.Row="1" Grid.Column="1">
-            <TextBox x:Name="StartupDirectory" Text="{Binding Path=StartupDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
-            <Button x:Name="ButtonBrowserStartupDirectory" Content="浏览" HorizontalAlignment="Right" Width="80" Click="ButtonBrowserStartupDirectory_Click"
+            <TextBox x:Name="StartupDirectory" Text="{Binding Path=StartupDirectory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,70,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+            <Button x:Name="ButtonBrowserStartupDirectory" Content="浏览" HorizontalAlignment="Right" Width="60" Click="ButtonBrowserStartupDirectory_Click"
                     Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
         </Grid>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="启动参数：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=StartupArgument, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="驱动程序：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="ComboBoxCommandlineDrivers"
+                  DataContext="{Binding Path=CmdDrivers}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
     </Grid>
 </UserControl>

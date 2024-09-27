@@ -1,5 +1,7 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,6 +96,13 @@ namespace ModengTerm.Terminal.Session
         /// <param name="row">新的行数</param>
         /// <param name="col">新的列数</param>
         public abstract void Resize(int row, int col);
+
+        public virtual int Control(int command, object parameter, out object result) 
+        {
+            result = null;
+
+            return ResponseCode.NOT_SUPPORTED;
+        }
 
         #endregion
 

@@ -37,6 +37,7 @@
     <None Remove="Images\error.png" />
     <None Remove="Images\fail.png" />
     <None Remove="Images\ok.png" />
+    <None Remove="Images\portForward.png" />
     <None Remove="Images\serialport.png" />
     <None Remove="Images\ssh.png" />
   </ItemGroup>
@@ -89,6 +90,7 @@
     <Resource Include="Images\create.png" />
     <Resource Include="Images\fail.png" />
     <Resource Include="Images\ok.png" />
+    <Resource Include="Images\portForward.png" />
     <Resource Include="Images\serialport.png" />
     <Resource Include="Images\ssh.png" />
   </ItemGroup>

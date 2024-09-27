@@ -1,4 +1,6 @@
-﻿using ModengTerm.Controls;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Controls;
+using ModengTerm.ServiceAgents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,14 @@ namespace ModengTerm.ViewModels
 {
     public class MainWindowVM : ViewModelBase
     {
+        #region 实例变量
+
         private bool shellCommandPanelVisibility;
+        private ServiceAgent serviceAgent;
+
+        #endregion
+
+        #region 属性
 
         public bool ShellCommandPanelVisiblity
         {
@@ -32,8 +41,19 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public MenuVM RightPanelMenu { get; private set; }
 
+        /// <summary>
+        /// 最近打开的会话列表
+        /// </summary>
+        public BindableCollection<XTermSession> RecentlyOpenedSession { get; private set; }
+
+        #endregion
+
+        #region 构造方法
+
         public MainWindowVM()
         {
+            this.serviceAgent = MTermApp.Context.ServiceAgent;
+
             this.RightPanelMenu = new MenuVM();
             this.RightPanelMenu.Initialize(new List<MenuDefinition>()
             {
@@ -44,6 +64,21 @@ namespace ModengTerm.ViewModels
                 }
             });
             this.RightPanelMenu.SelectedMenu = this.RightPanelMenu.MenuItems.FirstOrDefault();
+
+            this.RecentlyOpenedSession = new BindableCollection<XTermSession>();
         }
+
+        #endregion
+
+        #region 公开接口
+
+        public void AddToRecentSession(XTermSession session)
+        {
+            this.RecentlyOpenedSession.Add(session);
+
+            this.serviceAgent.AddRecentSession(session.ID);
+        }
+
+        #endregion
     }
 }

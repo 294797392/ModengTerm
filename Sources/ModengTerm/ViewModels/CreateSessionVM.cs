@@ -73,9 +73,13 @@ namespace ModengTerm.ViewModels
         private Color cursorColor;
         private Color selectionColor;
 
+        #region 命令行
+
         private string startupPath;
         private string startupArgument;
         private string startupDir;
+
+        #endregion
 
         #region 终端高级选项
 
@@ -412,6 +416,8 @@ namespace ModengTerm.ViewModels
             }
         }
 
+        public BindableCollection<CmdDriverEnum> CmdDrivers { get; private set; }
+
         #endregion
 
         #region 终端行为选项
@@ -575,13 +581,22 @@ namespace ModengTerm.ViewModels
             get { return this.displayAtNewLine; }
             set
             {
-                if (this.displayAtNewLine != value) 
+                if (this.displayAtNewLine != value)
                 {
                     this.displayAtNewLine = value;
                     this.NotifyPropertyChanged("DisplayAtNewLine");
                 }
             }
         }
+
+        #endregion
+
+        #region 端口转发
+
+        /// <summary>
+        /// 所有端口转发列表
+        /// </summary>
+        public BindableCollection<PortForward> PortForwards { get; private set; }
 
         #endregion
 
@@ -630,6 +645,17 @@ namespace ModengTerm.ViewModels
 
             this.StartupPath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             this.StartupDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            this.CmdDrivers = new BindableCollection<CmdDriverEnum>();
+            this.CmdDrivers.AddRange(MTermUtils.GetEnumValues<CmdDriverEnum>());
+            // 如果是Win10或更高版本那么默认选择PseudoConsoleApi
+            if (Environment.OSVersion.Version.Major >= 10)
+            {
+                this.CmdDrivers.SelectedItem = CmdDriverEnum.Win10PseudoConsoleApi;
+            }
+            else
+            {
+                this.CmdDrivers.SelectedItem = CmdDriverEnum.winpty;
+            }
 
             #endregion
 
@@ -662,6 +688,12 @@ namespace ModengTerm.ViewModels
             this.RenderModes.SelectedItem = RenderModeEnum.Default;
 
             #endregion
+
+            #endregion
+
+            #region 端口转发
+
+            this.PortForwards = new BindableCollection<PortForward>();
 
             #endregion
 
@@ -797,7 +829,7 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        private bool GetSSHSessionOptions(XTermSession session)
+        private bool GetSSHOptions(XTermSession session)
         {
             if (string.IsNullOrEmpty(this.SSHServerAddress))
             {
@@ -861,13 +893,14 @@ namespace ModengTerm.ViewModels
                     throw new NotImplementedException();
             }
 
-            session.SetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR, this.SSHServerAddress);
-            session.SetOption<int>(OptionKeyEnum.SSH_SERVER_PORT, port);
-            session.SetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME, this.SSHUserName);
-            session.SetOption<string>(OptionKeyEnum.SSH_SERVER_PASSWORD, this.SSHPassword);
-            session.SetOption<string>(OptionKeyEnum.SSH_SERVER_PRIVATE_KEY_FILE, this.SSHPrivateKeyFile);
-            session.SetOption<string>(OptionKeyEnum.SSH_SERVER_Passphrase, this.SSHPassphrase);
-            session.SetOption<int>(OptionKeyEnum.SSH_SERVER_AUTH_TYPE, (int)authType);
+            session.SetOption<string>(OptionKeyEnum.SSH_ADDR, this.SSHServerAddress);
+            session.SetOption<int>(OptionKeyEnum.SSH_PORT, port);
+            session.SetOption<string>(OptionKeyEnum.SSH_USER_NAME, this.SSHUserName);
+            session.SetOption<string>(OptionKeyEnum.SSH_PASSWORD, this.SSHPassword);
+            session.SetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE, this.SSHPrivateKeyFile);
+            session.SetOption<string>(OptionKeyEnum.SSH_Passphrase, this.SSHPassphrase);
+            session.SetOption<int>(OptionKeyEnum.SSH_AUTH_TYPE, (int)authType);
+            session.SetOption<List<PortForward>>(OptionKeyEnum.SSH_PORT_FORWARDS, this.PortForwards.ToList());
 
             return true;
         }
@@ -1056,6 +1089,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, this.StartupPath);
             session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_ARGUMENT, this.StartupArgument);
             session.SetOption<string>(OptionKeyEnum.CMD_STARTUP_DIR, this.StartupDirectory);
+            session.SetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER, this.CmdDrivers.SelectedItem);
 
             return true;
         }
@@ -1121,7 +1155,7 @@ namespace ModengTerm.ViewModels
 
                 case SessionTypeEnum.SSH:
                     {
-                        if (!this.GetSSHSessionOptions(session))
+                        if (!this.GetSSHOptions(session))
                         {
                             return false;
                         }

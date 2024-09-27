@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,9 @@ using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session
 {
+    /// <summary>
+    /// 封装SessionDriver
+    /// </summary>
     public class SessionTransport
     {
         #region 类变量
@@ -173,6 +177,18 @@ namespace ModengTerm.Terminal.Session
             this.col = col;
 
             return ResponseCode.SUCCESS;
+        }
+
+        /// <summary>
+        /// 控制会话执行指定的动作
+        /// </summary>
+        /// <param name="command">要执行的动作名字</param>
+        /// <param name="parameter">执行该动作的参数</param>
+        /// <param name="result">执行动作的返回值</param>
+        /// <returns>执行动作的返回值</returns>
+        public int Control(int command, object parameter, out object result)
+        {
+            return this.driver.Control(command, parameter, out result);
         }
 
         #endregion

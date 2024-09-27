@@ -10,6 +10,7 @@ using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
+using ModengTerm.Windows.SSH;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,8 +40,6 @@ namespace ModengTerm
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly string[] Splitter = new string[] { " " };
-
         #region 实例变量
 
         private OpenedSessionDataTemplateSelector templateSelector;
@@ -95,11 +94,22 @@ namespace ModengTerm
             }
         }
 
-        private void OpenSession(XTermSession session)
+        /// <summary>
+        /// 执行打开会话动作
+        /// </summary>
+        /// <param name="session">要打开的会话</param>
+        /// <param name="addToRecent">是否加入到最新打开的会话列表里</param>
+        private void OpenSession(XTermSession session, bool addToRecent = true)
         {
             ISessionContent content = this.sessionListVM.OpenSession(session);
             ContentControlSession.Content = content;
             ScrollViewerOpenedSession.ScrollToRightEnd();
+
+            // 增加到最近打开列表里
+            if (addToRecent)
+            {
+                MTermApp.Context.MainWindowVM.RecentlyOpenedSession.Add(session);
+            }
         }
 
         private void OpenDefaultSession()
@@ -113,7 +123,7 @@ namespace ModengTerm
             string cmdPath = System.IO.Path.Combine(Environment.SystemDirectory, "cmd.exe");
             defaultSession.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, cmdPath);
 
-            this.OpenSession(defaultSession);
+            this.OpenSession(defaultSession, false);
         }
 
         /// <summary>
@@ -355,7 +365,32 @@ namespace ModengTerm
             shellSession.SaveAllDocument();
         }
 
+        private void MenuItemRecentSessions_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+            XTermSession session = menuItem.DataContext as XTermSession;
+            this.OpenSession(session, false);
+        }
 
+        private void MenuItemPortForward_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                MTMessageBox.Info("请选择要查看的会话");
+                return;
+            }
+
+            if (shellSession.Session.Type != (int)SessionTypeEnum.SSH)
+            {
+                MTMessageBox.Info("该会话没有转发信息");
+                return;
+            }
+
+            PortForwardStatusWindow portForwardStatusWindow = new PortForwardStatusWindow(shellSession);
+            portForwardStatusWindow.Owner = this;
+            portForwardStatusWindow.Show();
+        }
 
 
 
@@ -476,6 +511,24 @@ namespace ModengTerm
             }
         }
 
+
+        /// <summary>
+        /// 点击顶部的工具栏菜单
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ListBoxToolbarMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //SMenuItem menuItem = ListBoxToolbarMenus.SelectedItem as SMenuItem;
+            //if (menuItem == null) 
+            //{
+            //    return;
+            //}
+
+            //menuItem.ClickDelegate();
+
+            //ListBoxToolbarMenus.SelectedItem = null; // 使下次可以继续点击
+        }
 
 
 

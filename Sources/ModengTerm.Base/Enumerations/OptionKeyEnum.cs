@@ -100,13 +100,14 @@ namespace ModengTerm.Base.Enumerations
         THEME_BOOKMARK_COLOR = 503,
 
         // Server 201 - 300
-        SSH_SERVER_ADDR = 504,
-        SSH_SERVER_PORT,
-        SSH_SERVER_USER_NAME,
-        SSH_SERVER_PASSWORD,
-        SSH_SERVER_PRIVATE_KEY_FILE,
-        SSH_SERVER_Passphrase,
-        SSH_SERVER_AUTH_TYPE,
+        SSH_ADDR = 504,
+        SSH_PORT,
+        SSH_USER_NAME,
+        SSH_PASSWORD,
+        SSH_PRIVATE_KEY_FILE,
+        SSH_Passphrase,
+        SSH_AUTH_TYPE,
+        SSH_PORT_FORWARDS,
 
         #endregion
 
@@ -151,6 +152,12 @@ namespace ModengTerm.Base.Enumerations
         /// 初始目录
         /// </summary>
         CMD_STARTUP_DIR = 2003,
+
+        /// <summary>
+        /// 命令行驱动程序
+        /// winpty/PesudoConsoleAPI
+        /// </summary>
+        CMD_DRIVER = 2004,
 
         #endregion
 

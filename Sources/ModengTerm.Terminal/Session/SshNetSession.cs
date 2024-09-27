@@ -1,6 +1,8 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Terminal.DataModels;
+using ModengTerm.Terminal.Enumerations;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
@@ -26,6 +28,7 @@ namespace ModengTerm.Terminal.Session
 
         private SshClient sshClient;
         private ShellStream stream;
+        private List<PortForwardState> portForwardStates;
 
         #endregion
 
@@ -56,11 +59,11 @@ namespace ModengTerm.Terminal.Session
         {
             #region 初始化身份验证方式
 
-            SSHAuthTypeEnum authType = this.session.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_SERVER_AUTH_TYPE);
-            string userName = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_USER_NAME);
-            string password = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_PASSWORD);
-            string privateKeyFile = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_PRIVATE_KEY_FILE);
-            string passphrase = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_Passphrase);
+            SSHAuthTypeEnum authType = this.session.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_AUTH_TYPE);
+            string userName = this.session.GetOption<string>(OptionKeyEnum.SSH_USER_NAME);
+            string password = this.session.GetOption<string>(OptionKeyEnum.SSH_PASSWORD);
+            string privateKeyFile = this.session.GetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE);
+            string passphrase = this.session.GetOption<string>(OptionKeyEnum.SSH_Passphrase);
 
             AuthenticationMethod authentication = null;
             switch (authType)
@@ -96,8 +99,8 @@ namespace ModengTerm.Terminal.Session
 
             #region 连接服务器
 
-            string serverAddress = this.session.GetOption<string>(OptionKeyEnum.SSH_SERVER_ADDR);
-            int serverPort = this.session.GetOption<int>(OptionKeyEnum.SSH_SERVER_PORT);
+            string serverAddress = this.session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
+            int serverPort = this.session.GetOption<int>(OptionKeyEnum.SSH_PORT);
             ConnectionInfo connectionInfo = new ConnectionInfo(serverAddress, serverPort, userName, authentication);
             this.sshClient = new SshClient(connectionInfo);
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
@@ -118,6 +121,34 @@ namespace ModengTerm.Terminal.Session
 
             #endregion
 
+            #region 初始化端口转发
+
+            this.portForwardStates = new List<PortForwardState>();
+            List<PortForward> portForwards = this.session.GetOption<List<PortForward>>(OptionKeyEnum.SSH_PORT_FORWARDS);
+            foreach (PortForward portForward in portForwards)
+            {
+                ForwardedPort forwardedPort = this.CreateForwardPort(portForward);
+                this.sshClient.AddForwardedPort(forwardedPort);
+
+                if (portForward.AutoOpen)
+                {
+                    forwardedPort.Start();
+                }
+
+                portForwardStates.Add(new PortForwardState()
+                {
+                    Status = portForward.AutoOpen ? PortForwardStatusEnum.Opened : PortForwardStatusEnum.Closed,
+                    DriverObject = forwardedPort,
+                    SourceAddress = portForward.SourceAddress,
+                    SourcePort = portForward.SourcePort,
+                    DestinationAddress = portForward.DestinationAddress,
+                    DestinationPort = portForward.DestinationPort,
+                    AutoOpen = portForward.AutoOpen
+                });
+            }
+
+            #endregion
+
             return ResponseCode.SUCCESS;
         }
 
@@ -127,6 +158,20 @@ namespace ModengTerm.Terminal.Session
             this.stream.ErrorOccurred -= this.ErrorOccurred;
             this.stream.Dispose();
             this.sshClient.Disconnect();
+
+            #region 关闭端口转发
+
+            foreach (PortForwardState forwardState in this.portForwardStates)
+            {
+                if (forwardState.Status == PortForwardStatusEnum.Opened) 
+                {
+                    ForwardedPort forwardedPort = forwardState.DriverObject as ForwardedPort;
+                    forwardedPort.Stop();
+                    forwardState.Status = PortForwardStatusEnum.Closed;
+                }
+            }
+
+            #endregion
         }
 
         public override void Write(byte[] bytes)
@@ -147,9 +192,52 @@ namespace ModengTerm.Terminal.Session
             this.stream.SendWindowChangeRequest((uint)col, (uint)row, 0, 0);
         }
 
+        public override int Control(int command, object parameter, out object result)
+        {
+            result = null;
+
+            switch (command)
+            {
+                case SSHControlCodes.GetForwardPortStates:
+                    {
+                        result = this.portForwardStates;
+                        return ResponseCode.SUCCESS;
+                    }
+
+                default:
+                    {
+                        return ResponseCode.NOT_SUPPORTED;
+                    }
+            }
+        }
+
         #endregion
 
         #region 实例方法
+
+        private ForwardedPort CreateForwardPort(PortForward portForward)
+        {
+            switch ((PortForwardTypeEnum)portForward.Type)
+            {
+                case PortForwardTypeEnum.Local:
+                    {
+                        return new ForwardedPortLocal(portForward.SourceAddress, (uint)portForward.SourcePort, portForward.DestinationAddress, (uint)portForward.DestinationPort);
+                    }
+
+                case PortForwardTypeEnum.Remote:
+                    {
+                        return new ForwardedPortRemote(portForward.SourceAddress, (uint)portForward.SourcePort, portForward.DestinationAddress, (uint)portForward.DestinationPort);
+                    }
+
+                case PortForwardTypeEnum.Dynamic:
+                    {
+                        return new ForwardedPortDynamic(portForward.SourceAddress, (uint)portForward.SourcePort);
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 
         #endregion
 

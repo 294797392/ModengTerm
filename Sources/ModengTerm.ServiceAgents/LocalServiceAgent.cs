@@ -189,6 +189,39 @@ namespace ModengTerm.ServiceAgents
 
         #endregion
 
+        #region RecentSession管理
+
+        public override List<string> GetRecentSessions()
+        {
+            try
+            {
+                return JSONDatabase.SelectAll<string>("recent.json");
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetRecentSessions异常", ex);
+                return new List<string>();
+            }
+        }
+
+        public override int AddRecentSession(string sessionId)
+        {
+            try
+            {
+                JSONDatabase.Insert<string>("recent.json", sessionId);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AddRecentSession异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        #endregion
+
+
         //public override List<Favorites> GetFavorites(string sessionId)
         //{
         //    try
