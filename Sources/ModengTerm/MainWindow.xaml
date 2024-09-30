@@ -195,7 +195,7 @@
                         </MenuItem.ItemTemplate>
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="{x:Type MenuItem}">
-                                <EventSetter Event="Click" Handler="MenuItemRecentSessions_Click"/>
+                                <EventSetter Event="Click" Handler="MenuItemOpenRecentSessions_Click"/>
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>

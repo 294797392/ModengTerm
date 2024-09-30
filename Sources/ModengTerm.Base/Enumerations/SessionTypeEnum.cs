@@ -31,8 +31,13 @@ namespace ModengTerm.Base.Enumerations
         SFTP,
 
         /// <summary>
+        /// Tcp会话
+        /// </summary>
+        RawTcp,
+
+        /// <summary>
         /// SSH回放
         /// </summary>
-        SSHPlayback
+        SSHPlayback,
     }
 }

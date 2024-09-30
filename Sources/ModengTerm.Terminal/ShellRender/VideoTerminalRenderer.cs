@@ -9,11 +9,14 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.ShellRender
 {
-    public class DefaultRenderer : ShellRenderer
+    /// <summary>
+    /// 渲染为终端界面
+    /// </summary>
+    public class VideoTerminalRenderer : ShellRenderer
     {
         public VTParser Parser { get; set; }
 
-        public DefaultRenderer(VideoTerminal vt) :
+        public VideoTerminalRenderer(VideoTerminal vt) :
             base(vt)
         {
         }

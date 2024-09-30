@@ -18,6 +18,8 @@ using System.Drawing.Text;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
+using System.Net;
+using System.Printing;
 using System.Windows;
 using System.Windows.Media;
 using WPFToolkit.MVVM;
@@ -53,6 +55,7 @@ namespace ModengTerm.ViewModels
         private TreeNodeViewModel commandLineNode;
         private TreeNodeViewModel sshNode;
         private TreeNodeViewModel serialPortNode;
+        private TreeNodeViewModel rawTcpNode;
 
         private string mouseScrollDelta;
 
@@ -87,6 +90,9 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        private string rawTcpAddress;
+        private int rawTcpPort;
+
         #endregion
 
         #region 属性
@@ -112,6 +118,7 @@ namespace ModengTerm.ViewModels
                                 this.serialPortNode.IsVisible = true;
                                 this.commandLineNode.IsVisible = false;
                                 this.sshNode.IsVisible = false;
+                                this.rawTcpNode.IsVisible = false;
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 this.serialPortNode.IsSelected = true;
                                 break;
@@ -122,6 +129,7 @@ namespace ModengTerm.ViewModels
                                 this.serialPortNode.IsVisible = false;
                                 this.commandLineNode.IsVisible = false;
                                 this.sshNode.IsVisible = true;
+                                this.rawTcpNode.IsVisible = false;
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 this.sshNode.IsSelected = true;
                                 break;
@@ -132,8 +140,21 @@ namespace ModengTerm.ViewModels
                                 this.serialPortNode.IsVisible = false;
                                 this.commandLineNode.IsVisible = true;
                                 this.sshNode.IsVisible = false;
+                                this.rawTcpNode.IsVisible = false;
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 this.commandLineNode.IsSelected = true;
+                                break;
+                            }
+
+                        case SessionTypeEnum.RawTcp:
+                            {
+                                this.serialPortNode.IsVisible = false;
+                                this.commandLineNode.IsVisible = false;
+                                this.sshNode.IsVisible = false;
+                                this.rawTcpNode.IsVisible = true;
+                                this.rawTcpNode.IsSelected = true;
+
+                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 break;
                             }
 
@@ -572,6 +593,38 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        #region RawTcp
+
+        public BindableCollection<RawTcpTypeEnum> RawTcpTypes { get; private set; }
+
+        public string RawTcpAddress 
+        {
+            get { return this.rawTcpAddress; }
+            set
+            {
+                if (this.rawTcpAddress != value)
+                {
+                    this.rawTcpAddress = value;
+                    this.NotifyPropertyChanged("RawTcpAddress");
+                }
+            }
+        }
+
+        public int RawTcpPort 
+        {
+            get { return this.rawTcpPort; }
+            set
+            {
+                if(this.rawTcpPort != value)
+                {
+                    this.rawTcpPort = value;
+                    this.NotifyPropertyChanged("RawTcpPort");
+                }
+            }
+        }
+
+        #endregion
+
         #region 终端高级选项
 
         public BindableCollection<RenderModeEnum> RenderModes { get; private set; }
@@ -626,6 +679,7 @@ namespace ModengTerm.ViewModels
             this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.CommandLineID, out this.commandLineNode);
             this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SshID, out this.sshNode);
             this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SerialPortID, out this.serialPortNode);
+            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.RawTcpID, out this.rawTcpNode);
             this.OptionTreeVM = this.TerminalOptionsTreeVM;
 
             #endregion
@@ -731,6 +785,13 @@ namespace ModengTerm.ViewModels
             this.HandshakeList = new BindableCollection<Handshake>();
             this.HandshakeList.AddRange(MTermUtils.GetEnumValues<Handshake>());
             this.HandshakeList.SelectedItem = Handshake.None;
+
+            #endregion
+
+            #region RawTcp
+
+            this.RawTcpTypes = new BindableCollection<RawTcpTypeEnum>();
+            this.RawTcpTypes.AddRange(MTermUtils.GetEnumValues<RawTcpTypeEnum>());
 
             #endregion
 
@@ -1093,6 +1154,32 @@ namespace ModengTerm.ViewModels
 
             return true;
         }
+
+        private bool GetRawTcpOptions(XTermSession session)
+        {
+            if (this.RawTcpTypes.SelectedItem == RawTcpTypeEnum.Client)
+            {
+                IPAddress ipaddr;
+                if (!IPAddress.TryParse(this.RawTcpAddress, out ipaddr))
+                {
+                    MTMessageBox.Info("请输入正确的IP地址");
+                    return false;
+                }
+            }
+
+            if (this.RawTcpPort <= 0 || this.RawTcpPort >= 65535)
+            {
+                MTMessageBox.Info("请输入正确的端口号");
+                return false;
+            }
+
+            session.SetOption<RawTcpTypeEnum>(OptionKeyEnum.RAW_TCP_TYPE, this.RawTcpTypes.SelectedItem);
+            session.SetOption<string>(OptionKeyEnum.RAW_TCP_ADDRESS, this.RawTcpAddress);
+            session.SetOption<int>(OptionKeyEnum.RAW_TCP_PORT, this.RawTcpPort);
+
+            return true;
+        }
+
 
         private void SwitchTheme(ThemePackage theme)
         {

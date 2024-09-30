@@ -12,6 +12,7 @@ namespace ModengTerm.Base.Definitions
         public static readonly string CommandLineID = Guid.NewGuid().ToString();
         public static readonly string SshID = Guid.NewGuid().ToString();
         public static readonly string SerialPortID = Guid.NewGuid().ToString();
+        public static readonly string RawTcpID = Guid.NewGuid().ToString();
 
         /// <summary>
         /// 唯一标志符

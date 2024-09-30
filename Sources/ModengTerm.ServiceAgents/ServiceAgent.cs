@@ -39,6 +39,8 @@ namespace ModengTerm.ServiceAgents
 
         #region Session管理
 
+        public abstract XTermSession GetSession(string sessionId);
+
         /// <summary>
         /// 获取所有的会话列表
         /// </summary>
@@ -87,8 +89,9 @@ namespace ModengTerm.ServiceAgents
 
         #region RecentSession管理
 
-        public abstract List<string> GetRecentSessions();
-        public abstract int AddRecentSession(string sessionId);
+        public abstract List<RecentlySession> GetRecentSessions();
+        public abstract int AddRecentSession(RecentlySession session);
+        public abstract int DeleteRecentSession(string sessionId);
 
         #endregion
 

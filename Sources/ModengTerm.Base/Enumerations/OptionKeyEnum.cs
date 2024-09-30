@@ -186,6 +186,14 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
+        #region RawTcp 4001 - 4500
+
+        RAW_TCP_TYPE = 4001,
+        RAW_TCP_ADDRESS = 4002,
+        RAW_TCP_PORT = 4003,
+
+        #endregion
+
         #region SFTP 10000 - 11000
 
         SFTP_SERVER_ADDRESS = 10000,

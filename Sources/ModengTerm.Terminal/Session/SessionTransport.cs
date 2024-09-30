@@ -285,7 +285,7 @@ namespace ModengTerm.Terminal.Session
                     zeros++;
                     if (zeros > 3)
                     {
-                        // 大于3次直接退出
+                        // 大于3次直接断线处理
                         break;
                     }
                     else

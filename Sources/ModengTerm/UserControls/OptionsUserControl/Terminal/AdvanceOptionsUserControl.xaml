@@ -23,7 +23,7 @@
         <!-- 串口配置 -->
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="80"/>
@@ -41,11 +41,8 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="十六进制渲染选项" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
-            <Grid>
-                <CheckBox Content="在单独一行显示收到的数据" IsChecked="{Binding Path=DisplayAtNewLine}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
-            </Grid>
-        </GroupBox>
+        <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="10,0,0,0"
+                  Content="在单独一行显示收到的数据" IsChecked="{Binding Path=DisplayAtNewLine}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
 
     </Grid>
 

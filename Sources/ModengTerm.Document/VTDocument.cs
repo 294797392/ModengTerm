@@ -16,6 +16,7 @@ namespace ModengTerm.Document
     /// <summary>
     /// 文档数据模型
     /// 负责维护文档的所有状态，用户输入
+    /// 为了提高性能，所有函数只修改文档的数据结构，不渲染。由调用者统一在外部调用RequestInvalidate进行渲染
     /// </summary>
     public class VTDocument
     {

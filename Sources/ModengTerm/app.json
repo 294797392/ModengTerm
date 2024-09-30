@@ -22,6 +22,14 @@
             "description": "",
             "icon": "",
             "type": 2
+        },
+
+        {
+            "id": "3",
+            "name": "RawTcp",
+            "description": "",
+            "icon": "",
+            "type": 4
         }
     ],
 

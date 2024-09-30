@@ -5,6 +5,7 @@ using ModengTerm.Base.Definitions;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.UserControls.OptionsUserControl;
+using ModengTerm.UserControls.OptionsUserControl.RawTcp;
 using ModengTerm.UserControls.OptionsUserControl.SSH;
 using ModengTerm.UserControls.OptionsUserControl.Terminal;
 using ModengTerm.ViewModels;
@@ -30,6 +31,7 @@ namespace ModengTerm
                     new OptionDefinition(OptionDefinition.CommandLineID, "命令行", typeof(CommandLineOptionsUserControl)),
                     new OptionDefinition(OptionDefinition.SshID, "SSH", typeof(SSHOptionsUserControl)),
                     new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl)),
+                    new OptionDefinition(OptionDefinition.RawTcpID, "RawTcp", typeof(RawTcpOptionsUserControl)),
                     new OptionDefinition("端口转发", typeof(PortForwardOptionsUserControl))
                 }
             },
@@ -76,13 +78,15 @@ namespace ModengTerm
 
         protected override int OnInitialize()
         {
-            this.MainWindowVM = new MainWindowVM();
-
             this.ServiceAgent = new LocalServiceAgent();
             this.ServiceAgent.Initialize();
 
             this.LoggerManager = new LoggerManager();
             this.LoggerManager.Initialize();
+
+            // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
+            this.MainWindowVM = new MainWindowVM();
+
 
             #region 启动后台工作线程
 

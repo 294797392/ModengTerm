@@ -44,7 +44,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 最近打开的会话列表
         /// </summary>
-        public BindableCollection<XTermSession> RecentlyOpenedSession { get; private set; }
+        public BindableCollection<RecentlySessionVM> RecentlyOpenedSession { get; private set; }
 
         /// <summary>
         /// 打开的所有会话列表
@@ -72,7 +72,14 @@ namespace ModengTerm.ViewModels
             });
             this.RightPanelMenu.SelectedMenu = this.RightPanelMenu.MenuItems.FirstOrDefault();
 
-            this.RecentlyOpenedSession = new BindableCollection<XTermSession>();
+            List<XTermSession> sessions = this.serviceAgent.GetSessions();
+            this.RecentlyOpenedSession = new BindableCollection<RecentlySessionVM>();
+            List<RecentlySession> recentSessions = this.serviceAgent.GetRecentSessions();
+            foreach (RecentlySession recentSession in recentSessions)
+            {
+                RecentlySessionVM recentlySessionVM = new RecentlySessionVM(recentSession);
+                this.RecentlyOpenedSession.Add(recentlySessionVM);
+            }
         }
 
         #endregion
@@ -81,9 +88,23 @@ namespace ModengTerm.ViewModels
 
         public void AddToRecentSession(XTermSession session)
         {
-            this.RecentlyOpenedSession.Add(session);
+            RecentlySession recentlySession = new RecentlySession()
+            {
+                ID = Guid.NewGuid().ToString(),
+                SessionId = session.ID,
+                SessionName = session.Name,
+            };
 
-            this.serviceAgent.AddRecentSession(session.ID);
+            this.RecentlyOpenedSession.Add(new RecentlySessionVM(recentlySession));
+
+            this.serviceAgent.AddRecentSession(recentlySession);
+        }
+
+        public void DeleteRecentSession(RecentlySessionVM recentlySession)
+        {
+            this.RecentlyOpenedSession.Remove(recentlySession);
+
+            this.serviceAgent.DeleteRecentSession(recentlySession.ID.ToString());
         }
 
         #endregion

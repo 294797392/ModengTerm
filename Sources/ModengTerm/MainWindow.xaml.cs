@@ -5,6 +5,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Controls;
 using ModengTerm.Document;
+using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
@@ -47,6 +48,7 @@ namespace ModengTerm
         private VTKeyInput userInput;
         private MainWindowVM mainWindowVM;
         private OpenedSessionsVM sessionListVM;
+        private ServiceAgent serviceAgent;
 
         #endregion
 
@@ -65,6 +67,8 @@ namespace ModengTerm
 
         private void InitializeWindow()
         {
+            this.serviceAgent = MTermApp.Context.ServiceAgent;
+
             this.mainWindowVM = MTermApp.Context.MainWindowVM;
             base.DataContext = this.mainWindowVM;
 
@@ -110,7 +114,7 @@ namespace ModengTerm
             // 增加到最近打开列表里
             if (addToRecent)
             {
-                MTermApp.Context.MainWindowVM.RecentlyOpenedSession.Add(session);
+                this.mainWindowVM.AddToRecentSession(session);
             }
         }
 
@@ -375,10 +379,21 @@ namespace ModengTerm
             shellSession.SaveAllDocument();
         }
 
-        private void MenuItemRecentSessions_Click(object sender, RoutedEventArgs e)
+        private void MenuItemOpenRecentSessions_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = sender as MenuItem;
-            XTermSession session = menuItem.DataContext as XTermSession;
+            RecentlySessionVM recentSession = menuItem.DataContext as RecentlySessionVM;
+
+            XTermSession session = this.serviceAgent.GetSession(recentSession.SessionId);
+            if (session == null) 
+            {
+                if (MTMessageBox.Confirm("会话不存在, 是否从列表里删除?")) 
+                {
+                    this.mainWindowVM.DeleteRecentSession(recentSession);
+                    return;
+                }
+            }
+
             this.OpenSession(session, false);
         }
 

@@ -69,6 +69,19 @@ namespace ModengTerm.ServiceAgents
 
         #region Session管理
 
+        public override XTermSession GetSession(string sessionId)
+        {
+            try
+            {
+                return JSONDatabase.Select<XTermSession>(v => v.ID == sessionId);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetSession异常", ex);
+                return null;
+            }
+        }
+
         public override int AddSession(XTermSession session)
         {
             try
@@ -191,30 +204,45 @@ namespace ModengTerm.ServiceAgents
 
         #region RecentSession管理
 
-        public override List<string> GetRecentSessions()
+        public override List<RecentlySession> GetRecentSessions()
         {
             try
             {
-                return JSONDatabase.SelectAll<string>("recent.json");
+                return JSONDatabase.SelectAll<RecentlySession>("recent.json");
             }
             catch (Exception ex)
             {
                 logger.Error("GetRecentSessions异常", ex);
-                return new List<string>();
+                return new List<RecentlySession>();
             }
         }
 
-        public override int AddRecentSession(string sessionId)
+        public override int AddRecentSession(RecentlySession sessionId)
         {
             try
             {
-                JSONDatabase.Insert<string>("recent.json", sessionId);
+                JSONDatabase.Insert<RecentlySession>("recent.json", sessionId);
 
                 return ResponseCode.SUCCESS;
             }
             catch (Exception ex)
             {
                 logger.Error("AddRecentSession异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        public override int DeleteRecentSession(string sessionId)
+        {
+            try
+            {
+                JSONDatabase.Delete<RecentlySession>("recent.json", v => v.ID == sessionId);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("DeleteRecentSession异常", ex);
                 return ResponseCode.FAILED;
             }
         }

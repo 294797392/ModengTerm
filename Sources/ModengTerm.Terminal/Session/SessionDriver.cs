@@ -83,9 +83,9 @@ namespace ModengTerm.Terminal.Session
         /// 从会话里同步读取数据
         /// 读取失败抛异常，由SessionTransport统一处理
         /// </summary>
-        /// <param name="buffer"></param>
+        /// <param name="buffer">保存读取到的数据的缓冲区</param>
         /// <returns>
-        /// 返回读取到的字节数，如果读取失败则返回-1
+        /// 返回读取到的字节数，如果读取失败则返回-1或者直接抛异常
         /// 如果返回0表示所有数据读取结束，没有更多的数据可读了
         /// </returns>
         internal abstract int Read(byte[] buffer);

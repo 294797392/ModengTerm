@@ -805,10 +805,32 @@ namespace ModengTerm.Terminal
 
             switch (renderMode)
             {
-                case RenderModeEnum.Default: return new DefaultRenderer(this) { Parser = this.vtParser };
-                case RenderModeEnum.Hexdump: return new HexdumpRenderer(this);
+                case RenderModeEnum.Default:
+                    {
+                        switch ((SessionTypeEnum)this.Session.Type)
+                        {
+                            case SessionTypeEnum.RawTcp:
+                                {
+                                    // RawTcp默认使用文本显示
+                                    return new TextRenderer(this);
+                                }
+
+                            default:
+                                {
+                                    return new VideoTerminalRenderer(this) { Parser = this.vtParser };
+                                }
+                        }
+                    }
+
+                case RenderModeEnum.Hexdump:
+                    {
+                        return new HexdumpRenderer(this);
+                    }
+
                 default:
-                    throw new NotImplementedException();
+                    {
+                        throw new NotImplementedException();
+                    }
             }
         }
 
