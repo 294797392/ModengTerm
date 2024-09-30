@@ -175,13 +175,13 @@ namespace ModengTerm
 
         private void ListBoxOpenedSession_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SessionItemVM selectedTabItem = ListBoxOpenedSession.SelectedItem as SessionItemVM;
-            if (selectedTabItem == null)
+            SessionItemVM selectedSession = ListBoxOpenedSession.SelectedItem as SessionItemVM;
+            if (selectedSession == null)
             {
                 return;
             }
 
-            if (selectedTabItem is OpenSessionVM)
+            if (selectedSession is OpenSessionVM)
             {
                 if (e.RemovedItems.Count > 0)
                 {
@@ -196,16 +196,24 @@ namespace ModengTerm
             }
             else
             {
-                OpenedSessionVM openedSessionVM = selectedTabItem as OpenedSessionVM;
+                OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
                 ContentControlSession.Content = openedSessionVM.Content;
             }
 
             // 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话
-            if (selectedTabItem is ShellSessionVM)
+            if (selectedSession is ShellSessionVM)
             {
+                ShellSessionVM shellSession = selectedSession as ShellSessionVM;
+
                 if (FindWindowMgr.WindowShown)
                 {
-                    FindWindowMgr.Show(selectedTabItem as ShellSessionVM);
+                    FindWindowMgr.Show(shellSession);
+                }
+
+                IVideoTerminal vt = shellSession.VideoTerminal;
+                if (vt != null)
+                {
+                    vt.ActiveDocument.EventInput.OnLoaded();
                 }
             }
         }

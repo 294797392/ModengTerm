@@ -9,3 +9,4 @@ ModengTerm - 2024.09.15
 5. 增加显示最近打开的终端列表功能
 6. 命令行会话增加"驱动程序"选项，可以选择winpty或者Win10PseudoConsoleAPI两种方式驱动命令行。（注：Win10PseudoConsoleAPI只能在Win10系统里才可以使用）
 7. 增加SSH端口转发功能，支持本地转发，远程转发和动态转发三种方式
+8. 增加光标闪烁功能

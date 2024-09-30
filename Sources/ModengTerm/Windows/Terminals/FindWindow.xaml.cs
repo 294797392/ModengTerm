@@ -36,6 +36,7 @@ namespace ModengTerm.Windows
 
         /// <summary>
         /// 显示搜索窗口
+        /// 如果已经显示了搜索窗口，那么使用传入的shellSession立即进行一次搜索
         /// </summary>
         /// <param name="shellSession">要搜索的会话ViewModel</param>
         public static void Show(ShellSessionVM shellSession)

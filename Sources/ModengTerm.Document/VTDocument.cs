@@ -261,6 +261,7 @@ namespace ModengTerm.Document
                 OnMouseUp = this.OnMouseUp,
                 OnMouseWheel = this.OnMouseWheel,
                 OnScrollChanged = this.OnScrollChanged,
+                OnLoaded = this.OnLoaded
             };
             cursorState = new VTCursorState();
             startPointer = new VTextPointer();
@@ -1896,6 +1897,12 @@ namespace ModengTerm.Document
             this.RequestInvalidate();
 
             this.InvokeScrollChanged(scrollData);
+        }
+
+        private void OnLoaded()
+        {
+            // 把光标加入到定时器里进行闪烁
+            VTCursorTimer.Context.SetCursor(this.Cursor);
         }
 
         #endregion

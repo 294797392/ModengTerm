@@ -149,6 +149,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 光标闪烁的间隔时间
+        /// 单位是毫秒
         /// </summary>
         public int Interval
         {
@@ -276,6 +277,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 重绘光标闪烁
         /// 在闪烁定时器里调用
+        /// 该方法会重新渲染光标
         /// </summary>
         public void Flash()
         {
@@ -308,6 +310,8 @@ namespace ModengTerm.Document
                     }
                 }
             }
+
+            this.RequestInvalidate();
         }
 
         #endregion

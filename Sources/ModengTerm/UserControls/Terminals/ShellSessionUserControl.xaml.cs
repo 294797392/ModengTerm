@@ -317,6 +317,12 @@ namespace ModengTerm.Terminal.UserControls
         }
 
 
+
+        private void VideoTerminal_DocumentChanged(IVideoTerminal arg1, VTDocument oldDocument, VTDocument newDocument)
+        {
+            newDocument.EventInput.OnLoaded();
+        }
+
         #endregion
 
         #region ISessionContent
@@ -350,6 +356,8 @@ namespace ModengTerm.Terminal.UserControls
             this.shellSession.Open();
 
             this.videoTerminal = this.shellSession.VideoTerminal;
+            this.videoTerminal.DocumentChanged += VideoTerminal_DocumentChanged;
+            this.videoTerminal.ActiveDocument.EventInput.OnLoaded();
 
             this.SizeChanged += TerminalContentUserControl_SizeChanged;
 
@@ -368,6 +376,8 @@ namespace ModengTerm.Terminal.UserControls
             DocumentMain.Content.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
 
             this.shellSession.Close();
+
+            this.videoTerminal.DocumentChanged -= VideoTerminal_DocumentChanged;
             this.videoTerminal = null;
         }
 

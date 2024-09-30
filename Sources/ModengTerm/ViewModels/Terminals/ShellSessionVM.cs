@@ -20,6 +20,7 @@ using ModengTerm.Windows;
 using System;
 using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Windows;
 using WPFToolkit.MVVM;
@@ -336,6 +337,7 @@ namespace ModengTerm.Terminal.ViewModels
             VideoTerminal videoTerminal = new VideoTerminal();
             videoTerminal.ViewportChanged += this.VideoTerminal_ViewportChanged;
             videoTerminal.LinePrinted += VideoTerminal_LinePrinted;
+            videoTerminal.DocumentChanged += VideoTerminal_DocumentChanged;
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
 
@@ -380,6 +382,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.sessionTransport.Release();
 
             this.videoTerminal.ViewportChanged -= this.VideoTerminal_ViewportChanged;
+            this.videoTerminal.LinePrinted -= this.VideoTerminal_LinePrinted;
+            this.videoTerminal.DocumentChanged -= this.VideoTerminal_DocumentChanged;
             this.videoTerminal.Release();
 
             // 释放剪贴板
@@ -643,6 +647,10 @@ namespace ModengTerm.Terminal.ViewModels
             VTHistory history = vt.MainDocument.History;
 
             this.TotalRows = history.Lines;
+        }
+
+        private void VideoTerminal_DocumentChanged(IVideoTerminal arg1, VTDocument oldDocument, VTDocument newDocument)
+        {
         }
 
         private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)

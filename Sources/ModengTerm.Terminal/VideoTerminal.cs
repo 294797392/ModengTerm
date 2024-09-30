@@ -106,9 +106,6 @@ namespace ModengTerm.Terminal
 
         #endregion
 
-
-        private IDocument documentCanvas;
-
         /// <summary>
         /// 是否正在运行
         /// </summary>
@@ -152,6 +149,9 @@ namespace ModengTerm.Terminal
         /// </summary>
         private VTCharsetMap grTranslationTable;
 
+        /// <summary>
+        /// 终端数据解析器
+        /// </summary>
         private VTParser vtParser;
 
         /// <summary>

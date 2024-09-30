@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,6 +94,9 @@ namespace ModengTerm.Document
         public delegate void MouseMoveDelegate(MouseData mouseData);
         public delegate void MouseUpDelegate(MouseData mouseData);
         public delegate void ScrollChangedDelegate(ScrollChangedData scrollData);
+        public delegate void LoadedDelegate();
+
+
 
         public MouseWheelDelegate OnMouseWheel;
         public MouseDownDelegate OnMouseDown;
@@ -103,5 +107,10 @@ namespace ModengTerm.Document
         /// 滚动条滚动事件不触发，手动滚动滚动条的时候触发
         /// </summary>
         public ScrollChangedDelegate OnScrollChanged;
+
+        /// <summary>
+        /// 当文档每次在UI里显示的时候触发
+        /// </summary>
+        public LoadedDelegate OnLoaded;
     }
 }
