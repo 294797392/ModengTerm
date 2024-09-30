@@ -59,7 +59,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
 
             this.vtParser = new VTParser();
-            this.vtParser.DispatchHandler = this.VideoTerminal;
             this.vtParser.Initialize();
 
             this.playbackStatus = PlaybackStatusEnum.Playing;

@@ -78,10 +78,10 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
-                        <DataGridTemplateColumn Header="主机名" Width="1*">
+                        <DataGridTemplateColumn Header="URI" Width="1*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Path=HostName}"/>
+                                    <TextBlock Text="{Binding Path=URI}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

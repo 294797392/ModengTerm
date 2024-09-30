@@ -18,7 +18,6 @@ using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -123,10 +122,6 @@ namespace ModengTerm.Terminal.ViewModels
         private PlaybackStatusEnum playbackStatus;
         private PlaybackStream playbackStream;
 
-        /// <summary>
-        /// 数据流解析器
-        /// </summary>
-        private VTParser vtParser;
         private string uri;
 
         private int totalRows;
@@ -344,10 +339,6 @@ namespace ModengTerm.Terminal.ViewModels
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
 
-            this.vtParser = new VTParser();
-            this.vtParser.DispatchHandler = this.videoTerminal;
-            this.vtParser.Initialize();
-
             #endregion
 
             #region 连接终端通道
@@ -393,8 +384,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 释放剪贴板
             this.clipboard.Release();
-
-            this.vtParser.Release();
 
             this.isRunning = false;
         }
@@ -586,7 +575,7 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
         }
 
         /// <summary>
@@ -602,7 +591,7 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
         }
 
         /// <summary>
@@ -619,7 +608,7 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
         }
 
         public int Control(int command, object parameter, out object result)
@@ -664,11 +653,11 @@ namespace ModengTerm.Terminal.ViewModels
             // 所以这里把Render放在UI线程处理
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                this.videoTerminal.Renderer.OnInteractionStateChanged(InteractionStateEnum.Receive);
+                this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.Receive);
 
                 try
                 {
-                    this.videoTerminal.Render(bytes, size);
+                    this.videoTerminal.ProcessHostData(bytes, size);
                 }
                 catch (Exception ex)
                 {

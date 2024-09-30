@@ -27,7 +27,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <returns></returns>
         public static bool IsControlCharacter(byte ch)
         {
-            if (ch <= ASCIITable.US)
+            if (ch <= (byte)ASCIITable.US)
             {
                 // 该字符是C0系列控制字符
                 return true;
@@ -37,7 +37,7 @@ namespace ModengTerm.Terminal.Parsing
                 // 该字符是C1系列控制字符
                 return true;
             }
-            else if (ch == ASCIITable.DEL)
+            else if (ch == (byte)ASCIITable.DEL)
             {
                 // 该字符是删除号，也是一个控制字符
                 return true;
@@ -55,9 +55,9 @@ namespace ModengTerm.Terminal.Parsing
         /// <returns></returns>
         public static bool IsC0Code(byte ch)
         {
-            return (ch >= ASCIITable.NUL && ch <= ASCIITable.ETB) ||
-                ch == ASCIITable.EM ||
-                (ch >= ASCIITable.FS && ch <= ASCIITable.US);
+            return (ch >= (int)ASCIITable.NUL && ch <= (int)ASCIITable.ETB) ||
+                ch == (int)ASCIITable.EM ||
+                (ch >= (int)ASCIITable.FS && ch <= (int)ASCIITable.US);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <returns></returns>
         public static bool IsDelete(byte ch)
         {
-            return ch == ASCIITable.DEL;
+            return ch == (int)ASCIITable.DEL;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <returns></returns>
         public static bool IsEscape(byte ch)
         {
-            return ch == ASCIITable.ESC;
+            return ch == (int)ASCIITable.ESC;
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <returns></returns>
         public static bool IsDCSPassThroughValid(byte ch)
         {
-            return ch >= ASCIITable.SPC && ch < ASCIITable.DEL;
+            return ch >= (byte)ASCIITable.SPC && ch < (byte)ASCIITable.DEL;
         }
 
         /// <summary>

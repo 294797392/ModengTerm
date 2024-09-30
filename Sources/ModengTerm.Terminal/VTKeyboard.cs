@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Terminal.Parsing;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -97,20 +98,20 @@ namespace ModengTerm.Terminal
 
         private static readonly Dictionary<VTKeys, byte[]> CursorKeyVT52 = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.Up, new byte[] { ASCIITable.ESC, (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC, (byte)'B' } },
-            { VTKeys.Right, new byte[] { ASCIITable.ESC, (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC, (byte)'D' } },
+            { VTKeys.Up, new byte[] { (byte)ASCIITable.ESC, (byte)'A' } }, { VTKeys.Down, new byte[] { (byte)ASCIITable.ESC, (byte)'B' } },
+            { VTKeys.Right, new byte[] { (byte)ASCIITable.ESC, (byte)'C' } }, { VTKeys.Left, new byte[] { (byte)ASCIITable.ESC, (byte)'D' } },
         };
 
         private static readonly Dictionary<VTKeys, byte[]> CursorKeyNormalMode = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.Up, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'B' } },
-            { VTKeys.Right, new byte[] { ASCIITable.ESC, (byte)'[', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'D' } },
+            { VTKeys.Up, new byte[] { (byte)ASCIITable.ESC, (byte)'[', (byte)'A' } }, { VTKeys.Down, new byte[] { (byte)ASCIITable.ESC,  (byte)'[', (byte)'B' } },
+            { VTKeys.Right, new byte[] { (byte)ASCIITable.ESC, (byte)'[', (byte)'C' } }, { VTKeys.Left, new byte[] { (byte)ASCIITable.ESC,  (byte)'[', (byte)'D' } },
         };
 
         private static readonly Dictionary<VTKeys, byte[]> CursorKeyApplicationMode = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.Up, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'B' } },
-            { VTKeys.Right, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'O', (byte)'D' } },
+            { VTKeys.Up, new byte[] { (byte)ASCIITable.ESC,  (byte)'O', (byte)'A' } }, { VTKeys.Down, new byte[] { (byte)ASCIITable.ESC,  (byte)'O', (byte)'B' } },
+            { VTKeys.Right, new byte[] { (byte)ASCIITable.ESC,  (byte)'O', (byte)'C' } }, { VTKeys.Left, new byte[] { (byte)ASCIITable.ESC,  (byte)'O', (byte)'D' } },
         };
 
         /// <summary>
@@ -118,8 +119,8 @@ namespace ModengTerm.Terminal
         /// </summary>
         private static readonly Dictionary<VTKeys, byte[]> CursorKeyControlPressed = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.Up, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'A' } }, { VTKeys.Down, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'B' } },
-            { VTKeys.Right, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'C' } }, { VTKeys.Left, new byte[] { ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'D' } },
+            { VTKeys.Up, new byte[] { (byte)ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'A' } }, { VTKeys.Down, new byte[] { (byte)ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'B' } },
+            { VTKeys.Right, new byte[] { (byte)ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'C' } }, { VTKeys.Left, new byte[] { (byte)ASCIITable.ESC,  (byte)'[', (byte)'1', (byte)'5', (byte)'D' } },
         };
 
         #endregion
@@ -128,16 +129,16 @@ namespace ModengTerm.Terminal
 
         private static readonly Dictionary<VTKeys, byte[]> VT52AuxiliaryKeyApplicationModeTable = new Dictionary<VTKeys, byte[]>()
         {
-            { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'1' } },
-            { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'s' } },
-            { VTKeys.NumPad4, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'u' } },
-            { VTKeys.NumPad6, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'w' } },
-            { VTKeys.NumPad8, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'x' } }, { VTKeys.NumPad9, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'y' } },
+            { VTKeys.NumPad0, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'1' } },
+            { VTKeys.NumPad2, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'s' } },
+            { VTKeys.NumPad4, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'u' } },
+            { VTKeys.NumPad6, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'w' } },
+            { VTKeys.NumPad8, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'x' } }, { VTKeys.NumPad9, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'y' } },
 
             // dash
-            { VTKeys.Subtract, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'m' } },
+            { VTKeys.Subtract, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'m' } },
             // period
-            { VTKeys.Decimal, new byte[] { ASCIITable.ESC, (byte)'?', (byte)'n' } }
+            { VTKeys.Decimal, new byte[] { (byte)ASCIITable.ESC, (byte)'?', (byte)'n' } }
         };
 
         private static readonly Dictionary<VTKeys, byte[]> VT52AuxiliaryKeyNumericModeTable = new Dictionary<VTKeys, byte[]>()
@@ -173,16 +174,16 @@ namespace ModengTerm.Terminal
         {
             { VTKeys.Space, new byte[] { (byte)' ' } }, { VTKeys.Tab, new byte[] { (byte)'\t' } }, { VTKeys.Enter, new byte[] { (byte)'\r' } },
 
-            { VTKeys.NumPad0, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'1' } },
-            { VTKeys.NumPad2, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'s' } },
-            { VTKeys.NumPad4, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'u' } },
-            { VTKeys.NumPad6, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'w' } },
-            { VTKeys.NumPad8, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'x' } }, { VTKeys.NumPad9, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'y' } },
+            { VTKeys.NumPad0, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'p' } }, { VTKeys.NumPad1, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'1' } },
+            { VTKeys.NumPad2, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'r' } }, { VTKeys.NumPad3, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'s' } },
+            { VTKeys.NumPad4, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'t' } }, { VTKeys.NumPad5, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'u' } },
+            { VTKeys.NumPad6, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'v' } }, { VTKeys.NumPad7, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'w' } },
+            { VTKeys.NumPad8, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'x' } }, { VTKeys.NumPad9, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'y' } },
 
             // dash
-            { VTKeys.Subtract, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'m' } },
+            { VTKeys.Subtract, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'m' } },
             // period
-            { VTKeys.Decimal, new byte[] { ASCIITable.ESC, (byte)'O', (byte)'n' } }
+            { VTKeys.Decimal, new byte[] { (byte)ASCIITable.ESC, (byte)'O', (byte)'n' } }
         };
 
         #endregion

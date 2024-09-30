@@ -133,7 +133,7 @@ namespace ModengTerm.Terminal.Parsing
     /// <summary>
     /// 定义CSI命令
     /// </summary>
-    internal enum CsiActionCodes
+    public enum CsiActionCodes
     {
         ICH_InsertCharacter = '@',
         CUU_CursorUp = 'A',
@@ -299,7 +299,7 @@ namespace ModengTerm.Terminal.Parsing
     /// <summary>
     /// 定义8位转义字符命令
     /// </summary>
-    internal enum EscActionCodes
+    public enum EscActionCodes
     {
         DECSC_CursorSave = '7',
         DECRC_CursorRestore = '8',

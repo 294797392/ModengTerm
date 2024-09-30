@@ -1,13 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WPFToolkit.MVVM;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.ViewModels
 {
@@ -15,7 +9,7 @@ namespace ModengTerm.ViewModels
     {
         private SessionTypeEnum type;
         private DateTime creationTime;
-        private string hostName;
+        private string uri;
 
         /// <summary>
         /// 会话类型
@@ -49,15 +43,15 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 主机名
         /// </summary>
-        public string HostName
+        public string URI
         {
-            get { return this.hostName; }
+            get { return this.uri; }
             set
             {
-                if (this.hostName != value)
+                if (this.uri != value)
                 {
-                    this.hostName = value;
-                    this.NotifyPropertyChanged("HostName");
+                    this.uri = value;
+                    this.NotifyPropertyChanged("URI");
                 }
             }
         }
@@ -77,19 +71,19 @@ namespace ModengTerm.ViewModels
             {
                 case SessionTypeEnum.SerialPort:
                     {
-                        this.HostName = session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
+                        this.URI = session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
                         break;
                     }
 
                 case SessionTypeEnum.SSH:
                     {
-                        this.HostName = session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
+                        this.URI = session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
                         break;
                     }
 
                 case SessionTypeEnum.CommandLine:
                     {
-                        this.HostName = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
+                        this.URI = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         break;
                     }
 

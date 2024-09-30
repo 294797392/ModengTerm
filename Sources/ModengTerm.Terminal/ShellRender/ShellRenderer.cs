@@ -7,20 +7,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Interactivity;
 
-namespace ModengTerm.Terminal.Renderer
+namespace ModengTerm.Terminal.ShellRender
 {
     /// <summary>
     /// 定义一个用来解析并渲染终端数据的渲染器
     /// </summary>
-    public abstract class VTRenderer
+    public abstract class ShellRenderer
     {
         protected VideoTerminal videoTerminal;
         protected XTermSession session;
 
-        public VTRenderer(VideoTerminal vt, XTermSession session)
+        public ShellRenderer(VideoTerminal vt)
         {
             this.videoTerminal = vt;
-            this.session = session;
+            this.session = vt.Session;
         }
 
         /// <summary>

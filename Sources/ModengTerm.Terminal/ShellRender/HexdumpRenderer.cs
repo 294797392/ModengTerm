@@ -8,12 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Renderer
+namespace ModengTerm.Terminal.ShellRender
 {
     /// <summary>
     /// 将收到的数据渲染为hexdump形式的格式
     /// </summary>
-    public class HexdumpRenderer : VTRenderer
+    public class HexdumpRenderer : ShellRenderer
     {
         #region 实例变量
 
@@ -36,15 +36,15 @@ namespace ModengTerm.Terminal.Renderer
 
         #region 构造方法
 
-        public HexdumpRenderer(VideoTerminal vt, XTermSession session) :
-            base(vt, session)
+        public HexdumpRenderer(VideoTerminal vt) :
+            base(vt)
         {
             this.document = vt.MainDocument;
         }
 
         #endregion
 
-        #region VTRenderer
+        #region ShellRenderer
 
         public override void Initialize()
         {

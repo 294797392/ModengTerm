@@ -36,6 +36,7 @@
     <Compile Remove="DataModels\ThemeManifest.cs" />
     <Compile Remove="ITerminalAgent.cs" />
     <Compile Remove="Parsing\VTActions.cs" />
+    <Compile Remove="Parsing\VTDispatchHandler.cs" />
     <Compile Remove="Parsing\VTParserEventDlg.cs" />
     <Compile Remove="PrimaryScreen.cs" />
     <Compile Remove="VTBookmark.cs" />

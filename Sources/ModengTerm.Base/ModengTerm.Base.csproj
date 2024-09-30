@@ -27,6 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="ASCIITable.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.15" />
   </ItemGroup>
 

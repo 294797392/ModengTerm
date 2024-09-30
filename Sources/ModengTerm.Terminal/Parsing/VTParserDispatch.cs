@@ -24,6 +24,11 @@ namespace ModengTerm.Terminal.Parsing
 
         #region 公开事件
 
+        public event Action<VTParser, ASCIITable> OnC0Actions;
+        public event Action<VTParser, EscActionCodes, VTID> OnESCActions;
+        public event Action<VTParser, char> OnPrint;
+        public event Action<VTParser, CsiActionCodes, List<int>> OnCSIActions;
+
         #endregion
 
         #region 实例变量
@@ -31,11 +36,6 @@ namespace ModengTerm.Terminal.Parsing
         #endregion
 
         #region 属性
-
-        /// <summary>
-        /// 处理终端命令的处理器
-        /// </summary>
-        public VTDispatchHandler DispatchHandler { get; set; }
 
         #endregion
 
@@ -51,8 +51,7 @@ namespace ModengTerm.Terminal.Parsing
 
         private void ActionPrint(char ch)
         {
-            this.WriteCode("Print");
-            this.DispatchHandler.PrintCharacter(ch);
+            this.OnPrint?.Invoke(this, ch);
         }
 
         /// <summary>
@@ -61,7 +60,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void ActionExecute(byte ch)
         {
-            switch (ch)
+            switch ((ASCIITable)ch)
             {
                 case ASCIITable.NUL:
                     {
@@ -77,7 +76,7 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // 响铃
                         this.WriteCode("BEL");
-                        this.DispatchHandler.PlayBell();
+                        this.OnC0Actions?.Invoke(this, ASCIITable.BEL);
                         break;
                     }
 
@@ -85,7 +84,7 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // Backspace，退格，光标向前移动一位
                         this.WriteCode("BS");
-                        this.DispatchHandler.Backspace();
+                        this.OnC0Actions?.Invoke(this, ASCIITable.BS);
                         break;
                     }
 
@@ -93,14 +92,14 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // tab键
                         this.WriteCode("TAB");
-                        this.DispatchHandler.ForwardTab();
+                        this.OnC0Actions?.Invoke(this, ASCIITable.TAB);
                         break;
                     }
 
                 case ASCIITable.CR:
                     {
                         this.WriteCode("CR");
-                        this.DispatchHandler.CarriageReturn();
+                        this.OnC0Actions?.Invoke(this, ASCIITable.CR);
                         break;
                     }
 
@@ -110,7 +109,7 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // 这三个都是LF
                         this.WriteCode("LF");
-                        this.DispatchHandler.LineFeed();
+                        this.OnC0Actions?.Invoke(this, ASCIITable.LF);
                         break;
                     }
 
@@ -125,6 +124,7 @@ namespace ModengTerm.Terminal.Parsing
 
                 default:
                     {
+                        this.WriteCode("Print");
                         this.ActionPrint(Convert.ToChar(ch));
                         break;
                         //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
@@ -139,10 +139,6 @@ namespace ModengTerm.Terminal.Parsing
         private void ActionCSIDispatch(int finalByte, List<int> parameters)
         {
             CsiActionCodes code = (CsiActionCodes)finalByte;
-            if (Enum.IsDefined<CsiActionCodes>(code))
-            {
-                this.WriteCode(code.ToString());
-            }
 
             switch (code)
             {
@@ -150,19 +146,22 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // Modifies the graphical rendering options applied to the next characters written into the buffer.
                         // Options include colors, invert, underlines, and other "font style" type options.
-                        this.PerformSetGraphicsRendition(parameters);
+                        this.WriteCode("SGR_SetGraphicsRendition");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.DECRST_PrivateModeReset:
                     {
-                        this.PerformDECPrivateMode(parameters, false);
+                        this.WriteCode("DECRST_PrivateModeReset");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.DECSET_PrivateModeSet:
                     {
-                        this.PerformDECPrivateMode(parameters, true);
+                        this.WriteCode("DECSET_PrivateModeSet");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -176,9 +175,9 @@ namespace ModengTerm.Terminal.Parsing
                         /// 
                         /// 触发场景：VIM
                         /// </summary>
+                        this.WriteCode("ED_EraseDisplay");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
 
-                        VTEraseType eraseType = (VTEraseType)VTParameter.GetParameter(parameters, 0, 0);
-                        this.DispatchHandler.EraseDisplay(eraseType);
                         break;
                     }
 
@@ -186,36 +185,37 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // 	光标向后（左）<n> 行
 
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.CUF_CursorForward(n);
+                        this.WriteCode("CUB_CursorBackward");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.HVP_HorizontalVerticalPosition:
                 case CsiActionCodes.CUP_CursorPosition:
                     {
-                        this.DispatchHandler.CUP_CursorPosition(this.parameters);
+                        this.WriteCode("HVP_HorizontalVerticalPosition__CUP_CursorPosition");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.CUF_CursorForward:
                     {
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.CUF_CursorForward(n);
+                        this.WriteCode("CUF_CursorForward");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.CUU_CursorUp:
                     {
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.CUU_CursorUp(n);
+                        this.WriteCode("CUU_CursorUp");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.CUD_CursorDown:
                     {
-                        int n = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.CUD_CursorDown(n);
+                        this.WriteCode("CUD_CursorDown");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -228,7 +228,8 @@ namespace ModengTerm.Terminal.Parsing
                         /// 触发场景：VIM
                         /// </summary>
 
-                        this.PerformWindowManipulation(parameters);
+                        this.WriteCode("DTTERM_WindowManipulation");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -262,12 +263,14 @@ namespace ModengTerm.Terminal.Parsing
                         // * DECSTBM moves the cursor to column 1, line 1 of the page
                         // * https://github.com/microsoft/terminal/issues/1849
 
-                        this.DispatchHandler.DECSTBM_SetScrollingRegion(this.parameters);
+                        this.WriteCode("DECSTBM_SetScrollingRegion");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.DECSLRM_SetLeftRightMargins:
                     {
+
                         /// Note that CSI s is dispatched as SetLeftRightScrollingMargins rather
                         // than CursorSaveState, so we don't test that here. The CursorSaveState
                         // will only be triggered by this sequence (in AdaptDispatch) when the
@@ -276,13 +279,8 @@ namespace ModengTerm.Terminal.Parsing
                         // 当DECLRMM启用的时候，执行设置左右边距的动作
                         // 当DECLRMM没启用的时候，执行CursorSaveState动作
 
-                        int leftMargin = VTParameter.GetParameter(parameters, 0, 0);
-                        int rightMargin = VTParameter.GetParameter(parameters, 1, 0);
-
-                        VTDebug.Context.WriteInteractive("DECSLRM_SetLeftRightMargins", "leftMargin = {0}, rightMargin = {1}", leftMargin, rightMargin);
-                        logger.ErrorFormat("未实现DECSLRM_SetLeftRightMargins");
-
-                        this.DispatchHandler.DECSLRM_SetLeftRightMargins(leftMargin, rightMargin);
+                        this.WriteCode("DECSLRM_SetLeftRightMargins");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -291,22 +289,23 @@ namespace ModengTerm.Terminal.Parsing
                         // 使用空白字符填充该行
                         // 注意空白字符需要应用当前样式
 
-                        VTEraseType eraseType = (VTEraseType)VTParameter.GetParameter(this.parameters, 0, 0);
-
-                        this.DispatchHandler.EL_EraseLine(eraseType);
+                        this.WriteCode("EL_EraseLine");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.DCH_DeleteCharacter:
                     {
                         // 从指定位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
-                        int count = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.DCH_DeleteCharacter(count);
+
+                        this.WriteCode("DCH_DeleteCharacter");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.ICH_InsertCharacter:
                     {
+
                         // 相关命令：
                         // MainDocument：sudo apt install pstat，然后回车，最后按方向键上回到历史命令
                         // AlternateDocument：暂无
@@ -314,8 +313,9 @@ namespace ModengTerm.Terminal.Parsing
                         // Insert Ps (Blank) Character(s) (default = 1) (ICH).
                         // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
                         // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
-                        int count = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.ICH_InsertCharacter(count);
+
+                        this.WriteCode("ICH_InsertCharacter");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -323,8 +323,8 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // DSR，参考https://invisible-island.net/xterm/ctlseqs/ctlseqs.html
 
-                        StatusType statusType = (StatusType)Convert.ToInt32(parameters[0]);
-                        this.DispatchHandler.DSR_DeviceStatusReport(statusType);
+                        this.WriteCode("DSR_DeviceStatusReport");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -369,49 +369,58 @@ namespace ModengTerm.Terminal.Parsing
                               DECPCCM, DECVCCM) are ignored.
                         ********************************************************************/
 
-                        this.DispatchHandler.DA_DeviceAttributes(parameters);
+                        this.WriteCode("DA_DeviceAttributes");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.IL_InsertLine:
                     {
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
-                        int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.IL_InsertLine(lines);
+
+                        this.WriteCode("IL_InsertLine");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.DL_DeleteLine:
                     {
                         // 从缓冲区中删除<n> 行，从光标所在的行开始。
-                        int lines = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.DL_DeleteLine(lines);
+
+                        this.WriteCode("DL_DeleteLine");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.CHA_CursorHorizontalAbsolute:
                     {
                         // 将光标移动到当前行中的第n列
-                        this.DispatchHandler.CHA_CursorHorizontalAbsolute(this.parameters);
+
+                        this.WriteCode("CHA_CursorHorizontalAbsolute");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.VPA_VerticalLinePositionAbsolute:
                     {
-                        this.DispatchHandler.VPA_VerticalLinePositionAbsolute(this.parameters);
+                        this.WriteCode("VPA_VerticalLinePositionAbsolute");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.SD_ScrollDown:
                     {
                         // Scroll down Ps lines (default = 1) (SD), VT420.
-                        this.DispatchHandler.SD_ScrollDown(parameters);
+
+                        this.WriteCode("SD_ScrollDown");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
                 case CsiActionCodes.SU_ScrollUp:
                     {
-                        this.DispatchHandler.SU_ScrollUp(parameters);
+                        this.WriteCode("SU_ScrollUp");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -421,8 +430,8 @@ namespace ModengTerm.Terminal.Parsing
                         // 擦除当前光标位置的 <n> 个字符，方法是使用空格字符覆盖它们。
                         // Erase Characters from the current cursor position, by replacing them with a space
 
-                        int count = VTParameter.GetParameter(parameters, 0, 1);
-                        this.DispatchHandler.ECH_EraseCharacters(count);
+                        this.WriteCode("ECH_EraseCharacters");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -435,7 +444,7 @@ namespace ModengTerm.Terminal.Parsing
 
                 default:
                     {
-                        this.WriteCode("UnkownCSIAction");
+                        this.WriteCode(string.Format("UnkownCSIAction_{0}", finalByte));
                         logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
                         break;
                     }
@@ -457,34 +466,34 @@ namespace ModengTerm.Terminal.Parsing
             this.vtid.Finalize(ch);
 
             EscActionCodes code = (EscActionCodes)ch;
-            if (Enum.IsDefined<EscActionCodes>(code))
-            {
-                this.WriteCode(code.ToString());
-            }
 
             switch (code)
             {
                 case EscActionCodes.DECSC_CursorSave:
                     {
-                        this.DispatchHandler.DECSC_CursorSave();
+                        this.WriteCode("DECSC_CursorSave");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.DECRC_CursorRestore:
                     {
-                        this.DispatchHandler.DECRC_CursorRestore();
+                        this.WriteCode("DECRC_CursorRestore");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.DECKPAM_KeypadApplicationMode:
                     {
-                        this.DispatchHandler.DECKPAM_KeypadApplicationMode();
+                        this.WriteCode("DECKPAM_KeypadApplicationMode");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.DECKPNM_KeypadNumericMode:
                     {
-                        this.DispatchHandler.DECKPNM_KeypadNumericMode();
+                        this.WriteCode("DECKPNM_KeypadNumericMode");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
@@ -492,66 +501,66 @@ namespace ModengTerm.Terminal.Parsing
                     {
                         // Performs a "Reverse line feed", essentially, the opposite of '\n'.
                         //    Moves the cursor up one line, and tries to keep its position in the line
-                        this.DispatchHandler.RI_ReverseLineFeed();
+                        this.WriteCode("RI_ReverseLineFeed");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.SS2_SingleShift:
                     {
-                        this.DispatchHandler.SS2_SingleShift();
+                        this.WriteCode("SS2_SingleShift");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.SS3_SingleShift:
                     {
-                        this.DispatchHandler.SS3_SingleShift();
+                        this.WriteCode("SS3_SingleShift");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.LS2_LockingShift:
                     {
                         // Invoke the G2 Character Set as GL (LS2).
-                        this.DispatchHandler.LS2_LockingShift();
+                        this.WriteCode("LS2_LockingShift");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.LS3_LockingShift:
                     {
                         // Invoke the G3 Character Set as GL
-                        this.DispatchHandler.LS3_LockingShift();
+                        this.WriteCode("LS3_LockingShift");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.LS1R_LockingShift:
                     {
-                        this.DispatchHandler.LS1R_LockingShift();
+                        this.WriteCode("LS1R_LockingShift");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.LS2R_LockingShift:
                     {
-                        this.DispatchHandler.LS2R_LockingShift();
+                        this.WriteCode("LS2R_LockingShift");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 case EscActionCodes.LS3R_LockingShift:
                     {
-                        this.DispatchHandler.LS3R_LockingShift();
+                        this.WriteCode("LS3R_LockingShift");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
 
                 default:
                     {
-                        if (!this.HandleDesignateCharset(this.vtid))
-                        {
-                            this.WriteCode("UnkownESCAction");
-                            logger.ErrorFormat("未实现EscAction, {0}", code);
-                        }
-                        else
-                        {
-                            this.WriteCode("DesignateCharset");
-                        }
-
+                        this.WriteCode("DesignateCharset");
+                        this.OnESCActions?.Invoke(this, code, this.vtid);
                         break;
                     }
             }
@@ -583,108 +592,6 @@ namespace ModengTerm.Terminal.Parsing
             }
         }
 
-        /// <summary>
-        /// 指定要使用的字符集
-        /// https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
-        /// 
-        /// 参考：
-        /// terminal: OutputStateMachineEngine.cpp - OutputStateMachineEngine::ActionEscDispatch - default
-        /// https://invisible-island.net/xterm/ctlseqs/ctlseqs.html: ESC ( C
-        /// </summary>
-        /// <param name="vtid">VTID里不包含ESC字符</param>
-        private bool HandleDesignateCharset(VTID vtid)
-        {
-            byte ch = vtid[0];
-            ulong finalBytes = vtid.SubSequence(1);
-
-            switch ((char)ch)
-            {
-                case '%':
-                    {
-                        //Routine Description:
-                        // DOCS - Selects the coding system through which character sets are activated.
-                        //     When ISO2022 is selected, the code page is set to ISO-8859-1, C1 control
-                        //     codes are accepted, and both GL and GR areas of the code table can be
-                        //     remapped. When UTF8 is selected, the code page is set to UTF-8, the C1
-                        //     control codes are disabled, and only the GL area can be remapped.
-                        //Arguments:
-                        // - codingSystem - The coding system that will be selected.
-
-                        CodingSystem codingSystem = (CodingSystem)vtid[1];
-
-                        switch (codingSystem)
-                        {
-                            case CodingSystem.UTF8:
-                                {
-                                    this.acceptC1Control = true;
-                                    break;
-                                }
-
-                            case CodingSystem.ISO2022:
-                                {
-                                    this.acceptC1Control = false;
-                                    break;
-                                }
-
-                            default:
-                                throw new NotImplementedException();
-                        }
-
-                        break;
-                    }
-
-                case '(':
-                    {
-                        this.DispatchHandler.Designate94Charset(0, finalBytes);
-                        break;
-                    }
-
-                case ')':
-                    {
-                        this.DispatchHandler.Designate94Charset(1, finalBytes);
-                        break;
-                    }
-
-                case '*':
-                    {
-                        this.DispatchHandler.Designate94Charset(2, finalBytes);
-                        break;
-                    }
-
-                case '+':
-                    {
-                        this.DispatchHandler.Designate94Charset(3, finalBytes);
-                        break;
-                    }
-
-                case '-':
-                    {
-                        this.DispatchHandler.Designate96Charset(1, finalBytes);
-                        break;
-                    }
-
-                case '.':
-                    {
-                        this.DispatchHandler.Designate96Charset(2, finalBytes);
-                        break;
-                    }
-
-                case '/':
-                    {
-                        this.DispatchHandler.Designate96Charset(3, finalBytes);
-                        break;
-                    }
-
-                default:
-                    {
-                        logger.ErrorFormat("HandleDesignateCharset失败, 可能是未处理的ESC指令??");
-                        return false;
-                    }
-            }
-
-            return true;
-        }
-
         #endregion
 
         #region 实例方法
@@ -693,223 +600,6 @@ namespace ModengTerm.Terminal.Parsing
         {
             VTDebug.Context.WriteCode(action, this.sequenceBytes);
             this.sequenceBytes.Clear();
-        }
-
-        /// <summary>
-        /// 代码参考自microsoft/terminal项目
-        /// AdaptDispatch::SetGraphicsRendition
-        /// 和terminal项目不同的地方是，这里会判断parameters里是否包含参数，如果不包含参数，那么它会被视为单个0参数
-        /// 参考自：https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences - 文本格式
-        /// 
-        /// SGR - Modifies the graphical rendering options applied to the next
-        ///   characters written into the buffer.
-        ///       - Options include colors, invert, underlines, and other "font style"
-        ///         type options.
-        /// </summary>
-        /// <param name="parameters"></param>
-        private void PerformSetGraphicsRendition(List<int> parameters)
-        {
-            if (parameters.Count == 0)
-            {
-                // 如果未指定任何参数，它会被视为单个 0 参数
-                parameters.Add(0);
-            }
-
-            int size = parameters.Count;
-
-            for (int i = 0; i < size; i++)
-            {
-                byte option = (byte)parameters[i];
-
-                VTColor rgbColor = null;
-
-                switch ((GraphicsOptions)option)
-                {
-                    case GraphicsOptions.ForegroundExtended:
-                        {
-                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundExtended:
-                        {
-                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
-
-                this.DispatchHandler.PerformSGR((GraphicsOptions)option, rgbColor);
-            }
-        }
-
-        /// <summary>
-        /// - Helper to parse extended graphics options, which start with 38 (FG) or 48 (BG)
-        ///     These options are followed by either a 2 (RGB) or 5 (xterm index)
-        ///      RGB sequences then take 3 MORE params to designate the R, G, B parts of the color
-        ///      Xterm index will use the param that follows to use a color from the preset 256 color xterm color table.
-        /// </summary>
-        /// <param name="parameters"></param>
-        /// <param name="paramIndex">从第几个参数开始使用</param>
-        /// <param name="rgbColor"></param>
-        /// <returns></returns>
-        private int SetRgbColorsHelper(List<int> parameters, int paramIndex, out VTColor rgbColor)
-        {
-            rgbColor = null;
-
-            int optionsConsumed = 1;
-            GraphicsOptions options = (GraphicsOptions)parameters[paramIndex];
-            if (options == GraphicsOptions.RGBColorOrFaint)
-            {
-                // 这里使用RGB颜色
-                optionsConsumed = 4;
-                rgbColor = VTColor.CreateFromRgb((byte)parameters[paramIndex + 1], (byte)parameters[paramIndex + 2], (byte)parameters[paramIndex + 3], 255);
-            }
-            else if (options == GraphicsOptions.BlinkOrXterm256Index)
-            {
-                // 这里使用xterm颜色表里的颜色
-                optionsConsumed = 2;
-                int tableIndex = parameters.Count > paramIndex ? parameters[paramIndex + 1] : 0;
-                if (tableIndex <= 255)
-                {
-                    byte r, g, b;
-                    byte index = (byte)tableIndex;
-                    Xterm256Color.ConvertRGB(index, out r, out g, out b);
-                    rgbColor = VTColor.CreateFromRgb(r, g, b, 255);
-                }
-            }
-            return optionsConsumed;
-        }
-
-        /// <summary>
-        /// 设置DECPrivateMode模式
-        /// </summary>
-        /// <param name="privateModes">要设置的模式列表</param>
-        /// <param name="enable">启用或者禁用</param>
-        private bool PerformDECPrivateMode(List<int> privateModes, bool enable)
-        {
-            bool success = false;
-
-            foreach (int mode in privateModes)
-            {
-                switch ((DECPrivateMode)mode)
-                {
-                    case DECPrivateMode.DECCKM_CursorKeysMode:
-                        {
-                            // set - Enable Application Mode, reset - Normal mode
-
-                            // true表示ApplicationMode
-                            // false表示NormalMode
-                            this.isApplicationMode = enable;
-                            this.DispatchHandler.DECCKM_CursorKeysMode(enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.DECANM_AnsiMode:
-                        {
-                            this.isAnsiMode = enable;
-                            this.DispatchHandler.DECANM_AnsiMode(enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.DECAWM_AutoWrapMode:
-                        {
-                            this.DispatchHandler.DECAWM_AutoWrapMode(enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.ASB_AlternateScreenBuffer:
-                        {
-                            // 是否使用备用缓冲区
-                            // 打开VIM等编辑器的时候会触发
-                            this.DispatchHandler.ASB_AlternateScreenBuffer(enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.XTERM_BracketedPasteMode:
-                        {
-                            // Sets the XTerm bracketed paste mode. This controls whether pasted content is bracketed with control sequences to differentiate it from typed text.
-                            this.DispatchHandler.XTERM_BracketedPasteMode(enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.ATT610_StartCursorBlink:
-                        {
-                            // 控制是否要闪烁光标
-                            this.DispatchHandler.ATT610_StartCursorBlink(enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.DECTCEM_TextCursorEnableMode:
-                        {
-                            // 控制是否要显示光标
-                            this.DispatchHandler.DECTCEM_TextCursorEnableMode(enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.VT200_MOUSE_MODE:
-                        {
-                            logger.FatalFormat("VT200_MOUSE_MODE有待实现");
-                            break;
-                        }
-
-                    case DECPrivateMode.SGR_EXTENDED_MODE:
-                        {
-                            logger.FatalFormat("SGR_EXTENDED_MODE有待实现");
-                            break;
-                        }
-
-                    case DECPrivateMode.BUTTON_EVENT_MOUSE_MODE:
-                        {
-                            logger.FatalFormat("BUTTON_EVENT_MOUSE_MODE有待实现");
-                            break;
-                        }
-
-                    case DECPrivateMode.DECSCNM_ScreenMode:
-                        {
-                            logger.FatalFormat("DECSCNM_ScreenMode有待实现, {0}", enable);
-                            break;
-                        }
-
-                    case DECPrivateMode.FOCUS_EVENT_MODE:
-                        {
-                            logger.FatalFormat("FOCUS_EVENT_MODE有待实现, {0}", enable);
-                            break;
-                        }
-
-                    // 这些都是terminal项目没实现的
-                    case (DECPrivateMode)1015:
-                    case (DECPrivateMode)4:
-                        {
-                            logger.FatalFormat("terminal没实现DECPrivateMode - {0}", mode);
-                            break;
-                        }
-
-                    default:
-                        throw new NotImplementedException(string.Format("未实现DECSETPrivateMode, {0}", mode));
-                }
-            }
-
-            return success;
-        }
-
-        /// <summary>
-        /// Window Manipulation - Performs a variety of actions relating to the window,
-        ///      such as moving the window position, resizing the window, querying
-        ///      window state, forcing the window to repaint, etc.
-        ///  This is kept separate from the input version, as there may be
-        ///      codes that are supported in one direction but not the other.
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="parameter1"></param>
-        /// <param name="parameter2"></param>
-        private void PerformWindowManipulation(List<int> parameters)
-        {
-            WindowManipulationType type = (WindowManipulationType)parameters[0];
-
-            logger.ErrorFormat("未处理的WindowManipulationType, {0}", type);
         }
 
         #endregion
