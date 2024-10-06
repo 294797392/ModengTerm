@@ -12,11 +12,12 @@
 * TELNET协议：https://www.rfc-editor.org/info/rfc318
 * https://blog.csdn.net/ScilogyHunter/article/details/106874395
 
-# 对比产品
+# 竞品
 https://github.com/Eugeny/tabby
 https://github.com/kingToolbox/WindTerm
+https://github.com/contour-terminal/
 https://www.hostbuf.com/
-contour
+
 
 # 压力测试命令
 

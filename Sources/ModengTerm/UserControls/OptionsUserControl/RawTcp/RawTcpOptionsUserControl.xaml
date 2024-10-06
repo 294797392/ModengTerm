@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.OptionsUserControl.RawTcp"
+             xmlns:converter="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -11,6 +12,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <converter:RawTcpTypeConverter x:Key="RawTcpTypeConverter"/>
+
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -28,7 +32,13 @@
         <TextBlock Grid.Row="0" Grid.Column="0" Text="类型：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxSerialPortNames" IsEditable="False"
                   DataContext="{Binding Path=RawTcpTypes}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
+                  Style="{StaticResource ResourceKey=StyleComboBoxValue}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource ResourceKey=RawTcpTypeConverter}}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="IP地址：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="1" Grid.Column="1" x:Name="TextBoxAddress" Text="{Binding Path=RawTcpAddress, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>

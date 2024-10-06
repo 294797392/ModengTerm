@@ -11,6 +11,9 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.Controls
 {
+    /// <summary>
+    /// 侧边工具栏控件
+    /// </summary>
     [TemplatePart(Name = "PART_ItemsHeader", Type = typeof(ListBox))]
     [TemplatePart(Name = "PART_Content", Type = typeof(ContentControl))]
     [TemplatePart(Name = "PART_CloseButton", Type = typeof(MTermButton))]

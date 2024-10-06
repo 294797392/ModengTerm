@@ -41,7 +41,7 @@ namespace ModengTerm
                 Children = new List<OptionDefinition>()
                 {
                     new OptionDefinition("外观", typeof(ThemeOptionsUserControl)),
-                    new OptionDefinition("行为", typeof(TerminalBehaviorOptionsUserControl)),
+                    new OptionDefinition("行为", typeof(BehaviorOptionsUserControl)),
                     new OptionDefinition("高级", typeof(AdvanceOptionsUserControl))
                 }
             },

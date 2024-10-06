@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ModengTerm.UserControls.OptionsUserControl
+namespace ModengTerm.UserControls.OptionsUserControl.Terminal
 {
     /// <summary>
     /// TerminalBehaviorOptionsUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalBehaviorOptionsUserControl : UserControl
+    public partial class BehaviorOptionsUserControl : UserControl
     {
-        public TerminalBehaviorOptionsUserControl()
+        public BehaviorOptionsUserControl()
         {
             InitializeComponent();
         }

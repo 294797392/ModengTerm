@@ -405,4 +405,35 @@ namespace ModengTerm
             throw new NotImplementedException();
         }
     }
+
+    public class RawTcpTypeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            if (!(value is RawTcpTypeEnum) && !(value is int))
+            {
+                return string.Empty;
+            }
+
+            RawTcpTypeEnum type = (RawTcpTypeEnum)value;
+
+            switch (type)
+            {
+                case RawTcpTypeEnum.Client: return "客户端";
+                case RawTcpTypeEnum.Server: return "服务器";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
