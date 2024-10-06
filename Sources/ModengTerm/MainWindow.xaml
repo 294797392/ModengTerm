@@ -222,9 +222,12 @@
                     <MenuItem x:Name="MenuItemCreateShellCommand" Header="快捷命令" Click="MenuItemShellCommand_Click"/>
                 </MenuItem>
 
-                <!--<MenuItem Header="选项" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem x:Name="MenuItemSendAll" Header="向所有终端发送" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendAll, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </MenuItem>-->
+                <MenuItem Header="记录日志" Width="70" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem x:Name="MenuItemStartLog" Header="开始" Click="MenuItemStartLog_Click"/>
+                    <MenuItem x:Name="MenuItemPauseLog" Header="暂停" Click="MenuItemPauseLog_Click"/>
+                    <MenuItem x:Name="MenuItemResumeLog" Header="继续" Click="MenuItemResumeLog_Click"/>
+                    <MenuItem x:Name="MenuItemStopLog" Header="停止" Click="MenuItemStopLog_Click"/>
+                </MenuItem>
 
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于" Click="MenuItemAbout_Click"/>

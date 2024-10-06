@@ -136,6 +136,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         private BindableCollection<ShellCommandVM> shellCommands;
 
+        private LoggerManager logMgr;
+
         #endregion
 
         #region 属性
@@ -197,16 +199,6 @@ namespace ModengTerm.Terminal.ViewModels
         /// 该终端的菜单状态
         /// </summary>
         public BindableCollection<ShellContextMenu> FunctionMenus { get; private set; }
-
-        /// <summary>
-        /// 发送到所有窗口的委托，由外部赋值
-        /// </summary>
-        public SendToAllTerminalCallback SendToAllCallback { get; set; }
-
-        /// <summary>
-        /// 日志记录器
-        /// </summary>
-        public LoggerManager LoggerManager { get; set; }
 
         public IDocument MainDocument { get; set; }
         public IDocument AlternateDocument { get; set; }
@@ -301,6 +293,8 @@ namespace ModengTerm.Terminal.ViewModels
 
         protected override int OnOpen()
         {
+            this.logMgr = MTermApp.Context.LoggerManager;
+
             this.recordState = RecordStatusEnum.Stop;
             this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING));
             this.clipboard = new VTClipboard()
@@ -814,29 +808,29 @@ namespace ModengTerm.Terminal.ViewModels
             base.NotifyStatusChanged(status);
         }
 
-        private void StartLogger()
+        public void StartLogger()
         {
-            LoggerOptionsWindow window = new LoggerOptionsWindow(this.videoTerminal);
+            LoggerOptionsWindow window = new LoggerOptionsWindow(this);
             window.Owner = Window.GetWindow(this.Content);
             if ((bool)window.ShowDialog())
             {
-                this.LoggerManager.Start(this.videoTerminal, window.Options);
+                this.logMgr.Start(this.videoTerminal, window.Options);
             }
         }
 
-        private void StopLogger()
+        public void StopLogger()
         {
-            this.LoggerManager.Stop(this.videoTerminal);
+            this.logMgr.Stop(this.videoTerminal);
         }
 
-        private void PauseLogger()
+        public void PauseLogger()
         {
-            this.LoggerManager.Pause(this.videoTerminal);
+            this.logMgr.Pause(this.videoTerminal);
         }
 
-        private void ResumeLogger()
+        public void ResumeLogger()
         {
-            this.LoggerManager.Resume(this.videoTerminal);
+            this.logMgr.Resume(this.videoTerminal);
         }
 
         /// <summary>
@@ -876,7 +870,6 @@ namespace ModengTerm.Terminal.ViewModels
             clipboardParagraphSource.Session = this.Session;
 
             ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this);
-            clipboardVM.SendToAllTerminalDlg = this.SendToAllCallback;
 
             ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
             paragraphsWindow.Title = "剪贴板历史";

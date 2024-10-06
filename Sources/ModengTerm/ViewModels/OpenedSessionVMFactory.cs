@@ -27,13 +27,7 @@ namespace ModengTerm.ViewModels
                 case SessionTypeEnum.SSH:
                 case SessionTypeEnum.CommandLine:
                     {
-                        MainWindow mainWindow = App.Current.MainWindow as MainWindow;
-
-                        return new ShellSessionVM(session)
-                        {
-                            SendToAllCallback = mainWindow.SendToAllTerminal,
-                            LoggerManager = MTermApp.Context.LoggerManager,
-                        };
+                        return new ShellSessionVM(session);
                     }
 
                 default:

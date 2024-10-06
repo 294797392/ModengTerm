@@ -23,8 +23,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 属性
 
-        public SendToAllTerminalCallback SendToAllTerminalDlg { get; set; }
-
         public BindableCollection<ParagraphVM> ParagraphList { get; private set; }
 
         #endregion
@@ -84,7 +82,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             ParagraphVM paragraph = this.Sender2ParagraphVM(sender);
 
-            this.SendToAllTerminalDlg(paragraph.Content);
+            //this.SendToAllTerminalDlg(paragraph.Content);
         }
 
         #endregion

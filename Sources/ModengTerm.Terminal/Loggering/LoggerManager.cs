@@ -1,18 +1,14 @@
-﻿using DotNEToolkit.Modular;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using XTerminal.Base;
 
 namespace ModengTerm.Terminal.Loggering
 {
+    /// <summary>
+    /// 管理所有的终端日志记录功能
+    /// </summary>
     public class LoggerManager
     {
         #region 类变量

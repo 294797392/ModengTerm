@@ -416,7 +416,7 @@ namespace ModengTerm
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
             if (shellSession == null)
             {
-                MTMessageBox.Info("请选择要查看的会话");
+                MTMessageBox.Info("请选择要设置的会话");
                 return;
             }
 
@@ -428,12 +428,62 @@ namespace ModengTerm
             ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
             if (shellSession == null)
             {
-                MTMessageBox.Info("请选择要查看的会话");
+                MTMessageBox.Info("请选择要设置的会话");
                 return;
             }
 
             shellSession.OpenCreateShellCommandWindow();
         }
+
+        private void MenuItemStartLog_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                MTMessageBox.Info("请选择要启动的会话");
+                return;
+            }
+
+            shellSession.StartLogger();
+        }
+
+        private void MenuItemStopLog_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.StopLogger();
+        }
+
+        private void MenuItemPauseLog_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.PauseLogger();
+        }
+
+        private void MenuItemResumeLog_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.ResumeLogger();
+        }
+
+
+
+
+
 
         private void ButtonMinmizedWindow_Click(object sender, RoutedEventArgs e)
         {

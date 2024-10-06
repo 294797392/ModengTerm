@@ -28,22 +28,26 @@ namespace ModengTerm.Windows
     public partial class LoggerOptionsWindow : MTermWindow
     {
         private LoggerOptionsVM viewModel;
-        private IVideoTerminal vt;
+        private ShellSessionVM shellSession;
 
         public LoggerOptions Options { get; private set; }
 
-        public LoggerOptionsWindow(IVideoTerminal vt)
+        public LoggerOptionsWindow(ShellSessionVM shellSession)
         {
             InitializeComponent();
 
-            this.InitializeWindow(vt);
+            this.InitializeWindow(shellSession);
         }
 
-        private void InitializeWindow(IVideoTerminal vt)
+        private void InitializeWindow(ShellSessionVM shellSession)
         {
-            this.vt = vt;
-            this.viewModel = new LoggerOptionsVM(vt);
+            this.shellSession = shellSession;
+            this.viewModel = new LoggerOptionsVM(this.shellSession.VideoTerminal);
             base.DataContext = this.viewModel;
+
+            string fileName = string.Format("{0}_{1}.log", this.shellSession.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            string fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            this.viewModel.FilePath = fullPath;
         }
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)

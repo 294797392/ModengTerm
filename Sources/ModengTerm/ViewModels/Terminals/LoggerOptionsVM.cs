@@ -181,8 +181,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.FilePath = dialog.FileName;
 
-                this.FileType =
-
                 this.FileType = this.FilterIndex2FileType(dialog.FilterIndex);
             }
         }
