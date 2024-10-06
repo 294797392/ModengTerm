@@ -1,18 +1,3 @@
-# 参考项目
-github:
-terminal
-contour
-
-# 重点测试命令
-clear
-gotop
-htop
-top
-vim
-git log
-man
-
-
 # 参考
 * https://github.com/microsoft/terminal.git  
 * https://devblogs.microsoft.com/commandline/windows-command-line-introducing-the-windows-pseudo-console-conpty/  
@@ -23,26 +8,20 @@ man
 * https://invisible-island.net/xterm/  
 * https://vt100.net/emu/dec_ansi_parser  
 * 虚拟终端/控制台/Shell介绍：https://cloud.tencent.com/developer/news/304629  
-* SSH协议：https://www.rfc-editor.org/rfc/rfc4254
+* SSH协议：https://www.rfc-editor.org/rfc/rfc4254 https://www.rfc-editor.org/info/rfc4251
+* TELNET协议：https://www.rfc-editor.org/info/rfc318
 * https://blog.csdn.net/ScilogyHunter/article/details/106874395
-
-
 
 # 对比产品
 https://github.com/Eugeny/tabby
 https://github.com/kingToolbox/WindTerm
 https://www.hostbuf.com/
-
-
-
-### C0字符集
-ascii字符的前128（0-127）个字符属于C0字符集里的字符
-
-### C1字符集
-ascii字符的后128（128-255）个字符属于C1字符集里的字符
-
-
+contour
 
 # 压力测试命令
 
 seq 99999  输出0-99999
+
+
+# 图标
+https://icons8.com/icons/color
