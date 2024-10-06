@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText6}" 
-        Height="170" Width="380" WindowStartupLocation="CenterScreen"
+        Height="500" Width="380" WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize">
 
     <Window.Resources>
@@ -34,23 +34,36 @@
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
             <RowDefinition Height="30"/>
+            <RowDefinition Height="300"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="70"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="联系作者：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="294797392（微信）" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="作者微信：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="294797392" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="gitee：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="https://gitee.com/zyfalreadyexsit/terminal.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource ResourceKey=StyleTextBlockValue}">
+                <Hyperlink NavigateUri="https://gitee.com/zyfalreadyexsit/terminal.git" RequestNavigate="Hyperlink_RequestNavigate">
+                    https://gitee.com/zyfalreadyexsit/terminal.git
+                </Hyperlink>
+        </TextBlock>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="github：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="https://github.com/294797392/terminal.git" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
+        <TextBlock Grid.Row="2" Grid.Column="1" Style="{StaticResource ResourceKey=StyleTextBlockValue}">
+                <Hyperlink NavigateUri="https://github.com/294797392/terminal.git" RequestNavigate="Hyperlink_RequestNavigate">
+                    https://github.com/294797392/terminal.git
+                </Hyperlink>
+        </TextBlock>
 
         <TextBlock Grid.Row="3" Grid.Column="0" Text="版本号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TextBlockSoftwareVersion" Text="" Style="{StaticResource ResourceKey=StyleTextBlockValue}"/>
+
+        <GroupBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Header="QQ群">
+            <Image Stretch="None" Source="pack://application:,,,/ModengTerm;component/Images/QQGroup.png"/>
+        </GroupBox>
 
     </Grid>
 

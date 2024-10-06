@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -30,6 +31,17 @@ namespace ModengTerm.Terminal
         private void InitializeWindow()
         {
             TextBlockSoftwareVersion.Text = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            ProcessStartInfo psi = new ProcessStartInfo() 
+            {
+                FileName = e.Uri.ToString(),
+                UseShellExecute = true
+            };
+
+            Process.Start(psi);
         }
     }
 }

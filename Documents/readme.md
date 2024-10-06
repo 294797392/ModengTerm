@@ -31,7 +31,7 @@ man
 # 对比产品
 https://github.com/Eugeny/tabby
 https://github.com/kingToolbox/WindTerm
-
+https://www.hostbuf.com/
 
 
 

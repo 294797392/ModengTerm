@@ -7,11 +7,13 @@ using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
+using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using ModengTerm.Windows.SSH;
+using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -129,26 +131,18 @@ namespace ModengTerm
             string cmdPath = System.IO.Path.Combine(Environment.SystemDirectory, "cmd.exe");
             defaultSession.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, cmdPath);
 
-            this.OpenSession(defaultSession, false);
-        }
-
-        /// <summary>
-        /// 向SSH服务器发送输入
-        /// </summary>
-        /// <param name="userInput"></param>
-        private void SendUserInput(InputSessionVM sendTo, VTKeyInput userInput)
-        {
-            if (sendTo.SendAll)
+            // 如果是Win10或者更高版本的操作系统，那么使用PseudoConsoleAPI
+            if (MTermUtils.IsWin10())
             {
-                foreach (InputSessionVM inputSession in this.sessionListVM.SessionList.OfType<InputSessionVM>())
-                {
-                    inputSession.SendInput(userInput);
-                }
+                defaultSession.SetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER, CmdDriverEnum.Win10PseudoConsoleApi);
             }
             else
             {
-                sendTo.SendInput(userInput);
+                // 如果是Win10以下的系统，使用winpty.dll
+                defaultSession.SetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER, CmdDriverEnum.winpty);
             }
+
+            this.OpenSession(defaultSession, false);
         }
 
         #endregion
@@ -385,9 +379,9 @@ namespace ModengTerm
             RecentlySessionVM recentSession = menuItem.DataContext as RecentlySessionVM;
 
             XTermSession session = this.serviceAgent.GetSession(recentSession.SessionId);
-            if (session == null) 
+            if (session == null)
             {
-                if (MTMessageBox.Confirm("会话不存在, 是否从列表里删除?")) 
+                if (MTMessageBox.Confirm("会话不存在, 是否从列表里删除?"))
                 {
                     this.mainWindowVM.DeleteRecentSession(recentSession);
                     return;
@@ -417,7 +411,29 @@ namespace ModengTerm
             portForwardStatusWindow.Show();
         }
 
+        private void MenuItemSendAll_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                MTMessageBox.Info("请选择要查看的会话");
+                return;
+            }
 
+            shellSession.OpenSyncInputConfigurationWindow();
+        }
+
+        private void MenuItemShellCommand_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                MTMessageBox.Info("请选择要查看的会话");
+                return;
+            }
+
+            shellSession.OpenCreateShellCommandWindow();
+        }
 
         private void ButtonMinmizedWindow_Click(object sender, RoutedEventArgs e)
         {

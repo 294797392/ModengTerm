@@ -216,8 +216,10 @@
                     <MenuItem x:Name="MenuItemInputPanel" Header="输入栏" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendCommandPanelVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </MenuItem>
 
-                <MenuItem Header="工具" Style="{StaticResource ResourceKey=StyleMenuItemLocal}" Visibility="Collapsed">
-                    <MenuItem x:Name="MenuItemPortForward" Header="端口转发" Click="MenuItemPortForward_Click"/>
+                <MenuItem Header="配置" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem x:Name="MenuItemPortForward" Header="端口转发" Click="MenuItemPortForward_Click" Visibility="Collapsed"/>
+                    <MenuItem x:Name="MenuItemSendAll" Header="同步输入" Click="MenuItemSendAll_Click"/>
+                    <MenuItem x:Name="MenuItemCreateShellCommand" Header="快捷命令" Click="MenuItemShellCommand_Click"/>
                 </MenuItem>
 
                 <!--<MenuItem Header="选项" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">

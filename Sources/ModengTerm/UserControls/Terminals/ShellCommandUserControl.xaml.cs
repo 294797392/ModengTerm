@@ -39,17 +39,7 @@ namespace ModengTerm.UserControls.Terminals
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
-            CreateShellCommandWindow window = new CreateShellCommandWindow(shellSession);
-            window.Owner = MainWindow.GetWindow(this);
-            if ((bool)window.ShowDialog())
-            {
-                // 重新读取所有快捷命令刷新界面
-
-                List<ShellCommand> shellCommands = this.serviceAgent.GetShellCommands(this.shellSession.ID.ToString());
-
-                this.shellSession.ShellCommands.Clear();
-                this.shellSession.ShellCommands.AddRange(shellCommands.Select(v => new ShellCommandVM(v)));
-            }
+            this.shellSession.OpenCreateShellCommandWindow();
         }
 
         private void ListBoxCommands_SelectionChanged(object sender, SelectionChangedEventArgs e)

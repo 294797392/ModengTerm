@@ -16,11 +16,6 @@ namespace ModengTerm.ViewModels.Terminals
     public abstract class InputSessionVM : OpenedSessionVM
     {
         /// <summary>
-        /// 是否发送到所有窗口
-        /// </summary>
-        public bool SendAll { get; set; }
-
-        /// <summary>
         /// 处理用户按键输入数据
         /// </summary>
         /// <param name="keyInput">按键输入信息</param>

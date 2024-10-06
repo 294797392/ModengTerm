@@ -17,7 +17,9 @@ using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
+using ModengTerm.Windows.Terminals;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -25,6 +27,7 @@ using System.Text;
 using System.Windows;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
+using XTerminal;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -264,18 +267,23 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 该会话的所有快捷命令
         /// </summary>
-        public BindableCollection<ShellCommandVM> ShellCommands 
+        public BindableCollection<ShellCommandVM> ShellCommands
         {
             get { return this.shellCommands; }
             private set
             {
-                if (this.shellCommands != value) 
+                if (this.shellCommands != value)
                 {
                     this.shellCommands = value;
                     this.NotifyPropertyChanged("ShellCommands");
                 }
             }
         }
+
+        /// <summary>
+        /// 要同步输入的会话列表
+        /// </summary>
+        public BindableCollection<SyncInputSessionVM> SyncInputSessions { get; private set; }
 
         #endregion
 
@@ -302,6 +310,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.ShellCommands = new BindableCollection<ShellCommandVM>();
             this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new ShellCommandVM(v)));
+            this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
             #region 初始化工具栏菜单
 
@@ -388,6 +397,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 释放剪贴板
             this.clipboard.Release();
+            this.SyncInputSessions.Clear();
 
             this.isRunning = false;
         }
@@ -546,6 +556,52 @@ namespace ModengTerm.Terminal.ViewModels
             return uri;
         }
 
+        /// <summary>
+        /// 执行最终的发送数据动作
+        /// </summary>
+        /// <param name="bytes"></param>
+        private void PerformSend(byte[] bytes)
+        {
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
+            VTDebug.Context.WriteInteractive(VTSendTypeEnum.UserInput, bytes);
+
+            // 这里输入的都是键盘按键
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
+                return;
+            }
+
+            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+        }
+
+        /// <summary>
+        /// 向同步输入的会话发送数据
+        /// </summary>
+        /// <param name="bytes">要发送的数据</param>
+        private void SendSyncInput(byte[] bytes)
+        {
+            foreach (SyncInputSessionVM syncInput in this.SyncInputSessions)
+            {
+                ShellSessionVM shellSession = syncInput.ShellSessionVM;
+                if (shellSession == null)
+                {
+                    shellSession = MTermApp.Context.MainWindowVM.OpenedSessionsVM.ShellSessions.FirstOrDefault(v => v.ID == syncInput.ID);
+                    syncInput.ShellSessionVM = shellSession;
+                }
+
+                if (shellSession != null && shellSession.Status == SessionStatusEnum.Connected)
+                {
+                    shellSession.PerformSend(bytes);
+                }
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -569,17 +625,9 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            VTDebug.Context.WriteInteractive(VTSendTypeEnum.UserInput, bytes);
+            this.PerformSend(bytes);
 
-            // 这里输入的都是键盘按键
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
-                return;
-            }
-
-            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+            this.SendSyncInput(bytes);
         }
 
         /// <summary>
@@ -588,14 +636,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="rawData"></param>
         public override void SendRawData(byte[] rawData)
         {
-            int code = this.sessionTransport.Write(rawData);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
-                return;
-            }
+            this.PerformSend(rawData);
 
-            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+            this.SendSyncInput(rawData);
         }
 
         /// <summary>
@@ -605,14 +648,10 @@ namespace ModengTerm.Terminal.ViewModels
         public override void SendText(string text)
         {
             byte[] bytes = this.writeEncoding.GetBytes(text);
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
-                return;
-            }
 
-            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
+            this.PerformSend(bytes);
+
+            this.SendSyncInput(bytes);
         }
 
         public int Control(int command, object parameter, out object result)
@@ -630,6 +669,34 @@ namespace ModengTerm.Terminal.ViewModels
         {
             object result;
             return this.Control(code, parameter, out result);
+        }
+
+        /// <summary>
+        /// 打开快捷命令编辑窗口
+        /// </summary>
+        public void OpenCreateShellCommandWindow()
+        {
+            CreateShellCommandWindow window = new CreateShellCommandWindow(this);
+            window.Owner = App.Current.MainWindow;
+            if ((bool)window.ShowDialog())
+            {
+                // 重新读取所有快捷命令刷新界面
+
+                List<ShellCommand> shellCommands = MTermApp.Context.ServiceAgent.GetShellCommands(this.ID.ToString());
+
+                this.ShellCommands.Clear();
+                this.ShellCommands.AddRange(shellCommands.Select(v => new ShellCommandVM(v)));
+            }
+        }
+
+        /// <summary>
+        /// 打开同步输入配置窗口
+        /// </summary>
+        public void OpenSyncInputConfigurationWindow()
+        {
+            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(this);
+            sendAllConfigurationWindow.Owner = App.Current.MainWindow;
+            sendAllConfigurationWindow.ShowDialog();
         }
 
         #endregion
@@ -1015,9 +1082,30 @@ namespace ModengTerm.Terminal.ViewModels
             this.SaveToFile(ParagraphTypeEnum.AllDocument);
         }
 
+        /// <summary>
+        /// 发送到所有窗口
+        /// </summary>
         private void SendToAll()
         {
-            this.SendAll = !this.SendAll;
+            foreach (ShellSessionVM shellSession in MTermApp.Context.MainWindowVM.OpenedSessionsVM.ShellSessions)
+            {
+                if (shellSession == this)
+                {
+                    continue;
+                }
+
+                SyncInputSessionVM syncInput = this.SyncInputSessions.FirstOrDefault(v => v.ID == shellSession.ID);
+                if (syncInput == null)
+                {
+                    syncInput = new SyncInputSessionVM()
+                    {
+                        ID = shellSession.ID,
+                        Name = shellSession.Name,
+                        Description = shellSession.Description
+                    };
+                    this.SyncInputSessions.Add(syncInput);
+                }
+            }
         }
 
         private void About()

@@ -110,5 +110,10 @@ namespace ModengTerm.Base
 
             return true;
         }
+
+        public static bool IsWin10()
+        {
+            return Environment.OSVersion.Version.Major >= 10;
+        }
     }
 }

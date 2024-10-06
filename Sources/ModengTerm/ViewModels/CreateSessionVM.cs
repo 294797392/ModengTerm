@@ -702,7 +702,7 @@ namespace ModengTerm.ViewModels
             this.CmdDrivers = new BindableCollection<CmdDriverEnum>();
             this.CmdDrivers.AddRange(MTermUtils.GetEnumValues<CmdDriverEnum>());
             // 如果是Win10或更高版本那么默认选择PseudoConsoleApi
-            if (Environment.OSVersion.Version.Major >= 10)
+            if (MTermUtils.IsWin10())
             {
                 this.CmdDrivers.SelectedItem = CmdDriverEnum.Win10PseudoConsoleApi;
             }
