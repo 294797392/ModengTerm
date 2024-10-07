@@ -72,7 +72,6 @@
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Document.Rendering\ModengTerm.Document.Rendering.csproj" />
     <ProjectReference Include="..\ModengTerm.Document\ModengTerm.Document.csproj" />
-    <ProjectReference Include="..\ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />
   </ItemGroup>
 

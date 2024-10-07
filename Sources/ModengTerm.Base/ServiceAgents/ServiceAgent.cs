@@ -1,8 +1,6 @@
 ﻿using DotNEToolkit.Modular;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.ServiceAgents.Crypto;
-using ModengTerm.ServiceAgents.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +10,7 @@ using XTerminal.Base;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 
-namespace ModengTerm.ServiceAgents
+namespace ModengTerm.Base.ServiceAgents
 {
     /// <summary>
     /// 远程服务器代理
@@ -22,19 +20,17 @@ namespace ModengTerm.ServiceAgents
     /// </summary>
     public abstract class ServiceAgent //: ITerminalAgent
     {
-        private Cryptor cryptor;
-
         public int Initialize()
         {
-            this.cryptor = Cryptor.Create(SecretKeyTypeEnum.AES256_Local);
-            this.cryptor.Initialize();
+            //this.cryptor = Cryptor.Create(SecretKeyTypeEnum.AES256_Local);
+            //this.cryptor.Initialize();
 
             return ResponseCode.SUCCESS;
         }
 
         public void Release()
         {
-            this.cryptor.Release();
+            //this.cryptor.Release();
         }
 
         #region Session管理
@@ -97,19 +93,22 @@ namespace ModengTerm.ServiceAgents
 
         #region PrivateKey管理
 
-        public abstract int AddPrivateKey();
+        public abstract int AddPrivateKey(PrivateKey privateKey);
+        public abstract int DeletePrivateKey(string id);
+        public abstract List<PrivateKey> GetAllPrivateKey();
+        public abstract PrivateKey GetPrivateKey(string id);
 
         #endregion
 
-        protected string EncryptObject(object toEncrypt)
-        {
-            return this.cryptor.Encrypt(toEncrypt);
-        }
+        //protected string EncryptObject(object toEncrypt)
+        //{
+        //    return this.cryptor.Encrypt(toEncrypt);
+        //}
 
-        protected T DecryptObject<T>(string toDecrypt)
-        {
-            return this.cryptor.Decrypt<T>(toDecrypt);
-        }
+        //protected T DecryptObject<T>(string toDecrypt)
+        //{
+        //    return this.cryptor.Decrypt<T>(toDecrypt);
+        //}
 
         //public abstract List<Favorites> GetFavorites(string sessionId);
         //public abstract int AddFavorites(Favorites favorites);

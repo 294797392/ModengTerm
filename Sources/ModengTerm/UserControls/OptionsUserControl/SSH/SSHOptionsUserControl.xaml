@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="XTerminal.UserControls.OptionsUserControl.SSHOptionsUserControl"
+﻿<UserControl x:Class="ModengTerm.UserControls.OptionsUserControl.SSH.SSHOptionsUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -25,9 +25,9 @@
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
+            <RowDefinition Height="35" x:Name="RowDefinitionPublicKey"/>
             <RowDefinition Height="35" x:Name="RowDefinitionUserName"/>
             <RowDefinition Height="35" x:Name="RowDefinitionPassword"/>
-            <RowDefinition Height="35" x:Name="RowDefinitionPublicKey"/>
             <RowDefinition Height="35" x:Name="RowDefinitionPassphrase"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -52,15 +52,15 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <TextBlock Grid.Row="3" Grid.Column="0" x:Name="TextBlockSSHUserName" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxSSHUserName" Text="{Binding Path=SSHUserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+        <TextBlock Grid.Row="3" Grid.Column="0" x:Name="TextBlockSSHPrivateKey" Text="密钥：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxSSHPrivateKey" Tag="{Binding Path=SSHPrivateKeyFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" Margin="3,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+        <Button Grid.Row="3" Grid.Column="1" Width="80" Content="浏览" HorizontalAlignment="Right" Margin="3" Click="ButtonBrowsePrivateKeyFile_Click"/>
 
-        <TextBlock Grid.Row="4" Grid.Column="0" x:Name="TextBlockSSHPassword" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <PasswordBox Grid.Row="4" Grid.Column="1" x:Name="PasswordBoxSSHPassword" Tag="{Binding Path=SSHPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChanged="PasswordBoxSSHPassword_PasswordChanged" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>
+        <TextBlock Grid.Row="4" Grid.Column="0" x:Name="TextBlockSSHUserName" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="4" Grid.Column="1" x:Name="TextBoxSSHUserName" Text="{Binding Path=SSHUserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
-        <TextBlock Grid.Row="5" Grid.Column="0" x:Name="TextBlockSSHPrivateKey" Text="PrivateKey：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBox Grid.Row="5" Grid.Column="1" x:Name="TextBoxSSHPrivateKey" Text="{Binding Path=SSHPrivateKeyFile, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" Margin="0,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
-        <Button Grid.Row="5" Grid.Column="1" Width="80" Content="浏览" HorizontalAlignment="Right" Margin="3" Click="ButtonBrowsePrivateKeyFile_Click"/>
+        <TextBlock Grid.Row="5" Grid.Column="0" x:Name="TextBlockSSHPassword" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <PasswordBox Grid.Row="5" Grid.Column="1" x:Name="PasswordBoxSSHPassword" Tag="{Binding Path=SSHPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChanged="PasswordBoxSSHPassword_PasswordChanged" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>
 
         <TextBlock Grid.Row="6" Grid.Column="0" x:Name="TextBlockSSHPassphrase" Text="密码：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <PasswordBox Grid.Row="6" Grid.Column="1" x:Name="PasswordBoxSSHPassphrase" Tag="{Binding Path=SSHPassphrase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PasswordChanged="PasswordBoxSSHPassword_PasswordChanged" Style="{StaticResource ResourceKey=StylePasswordBoxValue}"/>

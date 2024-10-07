@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ModengTerm.Windows.SSH;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ using System.Windows.Shapes;
 using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
-namespace XTerminal.UserControls.OptionsUserControl
+namespace ModengTerm.UserControls.OptionsUserControl.SSH
 {
     /// <summary>
     /// SSHOptionsUserControl.xaml 的交互逻辑
@@ -79,16 +80,14 @@ namespace XTerminal.UserControls.OptionsUserControl
 
         private void ButtonBrowsePrivateKeyFile_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if ((bool)openFileDialog.ShowDialog())
+            PrivateKeyManagerWindow window = new PrivateKeyManagerWindow();
+            window.Owner = Window.GetWindow(this);
+            if ((bool)window.ShowDialog())
             {
-                TextBoxSSHPrivateKey.Text = openFileDialog.FileName;
+                TextBoxSSHPrivateKey.Text = window.SelectedPrivateKey.Name;
+                TextBoxSSHPrivateKey.Tag = window.SelectedPrivateKey.ID;
             }
         }
-
-        #endregion
-
-        #region 事件处理器
 
         private void PasswordBoxSSHPassword_PasswordChanged(object sender, RoutedEventArgs e)
         {

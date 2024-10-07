@@ -43,15 +43,15 @@ namespace ModengTerm.Windows.SSH
             ComboBoxTypes.ItemsSource = portForwardTypes;
             ComboBoxTypes.SelectedIndex = 0;
 
-            this.PortForward = portForward;
-
-            if (this.PortForward == null) 
+            if (portForward == null) 
             {
-                this.PortForward = new PortForward()
+                portForward = new PortForward()
                 {
                     ID = Guid.NewGuid().ToString()
                 };
             }
+
+            this.PortForward = portForward;
 
             ComboBoxTypes.SelectedItem = (PortForwardTypeEnum)portForward.Type;
             TextBoxSourceAddress.Text = portForward.SourceAddress;

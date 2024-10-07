@@ -6,44 +6,29 @@
         xmlns:local="clr-namespace:ModengTerm.Windows.SSH"
         xmlns:converter="clr-namespace:ModengTerm"
         mc:Ignorable="d"
-        Title="新建端口转发规则" Height="300" Width="400"
+        Title="新建端口转发规则" Height="330" Width="500"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 
-
     <Window.Resources>
-        <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
 
-        <Style x:Key="StyleTextBoxValue" TargetType="{x:Type TextBox}">
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="3"/>
-        </Style>
-        
-        <Style x:Key="StyleComboBoxValue" TargetType="{x:Type ComboBox}">
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="3"/>
-        </Style>
+            <converter:PortForwardTypeConverter x:Key="PortForwardTypeConverter"/>
 
-        <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="Width" Value="70"/>
-        </Style>
-
-        <converter:PortForwardTypeConverter x:Key="PortForwardTypeConverter"/>
-
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -75,8 +60,8 @@
         <TextBlock Grid.Row="5" Grid.Column="0" Text="目标端口：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="5" Grid.Column="1" x:Name="TextBoxDestPort" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
-        <CheckBox Grid.Row="6" Grid.Column="1" x:Name="CheckBoxAutoOpen" HorizontalAlignment="Right"
-                  Content="在启动时自动打开" VerticalAlignment="Center" Margin="0,0,3,0"/>
+        <CheckBox Grid.Row="6" Grid.Column="1" x:Name="CheckBoxAutoOpen" HorizontalAlignment="Left"
+                  Content="在启动时自动打开" VerticalAlignment="Center" Margin="3,0,3,0"/>
 
         <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="保存" Click="ButtonSave_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>

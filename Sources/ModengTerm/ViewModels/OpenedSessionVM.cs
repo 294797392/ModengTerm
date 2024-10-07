@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.ServiceAgents;
+using ModengTerm.Base.ServiceAgents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.ViewModels
 {

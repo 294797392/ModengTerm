@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Document.Drawing;
-using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;

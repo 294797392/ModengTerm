@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm", "ModengTerm\Mo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Base", "ModengTerm.Base\ModengTerm.Base.csproj", "{4BFFF86C-6F63-4993-B8A6-D23D437C22D9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.ServiceAgents", "ModengTerm.ServiceAgents\ModengTerm.ServiceAgents.csproj", "{DD059E66-A949-464E-B249-A9FF12786B75}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Terminal", "ModengTerm.Terminal\ModengTerm.Terminal.csproj", "{688F4BCA-BD97-4B87-BD6A-539A2274B1E8}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Renci.SshNet", "Renci.SshNet\Renci.SshNet.csproj", "{A9EFB1A5-16CD-4509-8D3D-4B2F118B944A}"
@@ -61,18 +59,6 @@ Global
 		{4BFFF86C-6F63-4993-B8A6-D23D437C22D9}.Release|x64.Build.0 = Release|Any CPU
 		{4BFFF86C-6F63-4993-B8A6-D23D437C22D9}.Release|x86.ActiveCfg = Release|Any CPU
 		{4BFFF86C-6F63-4993-B8A6-D23D437C22D9}.Release|x86.Build.0 = Release|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Debug|x64.Build.0 = Debug|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Debug|x86.Build.0 = Debug|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Release|x64.ActiveCfg = Release|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Release|x64.Build.0 = Release|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Release|x86.ActiveCfg = Release|Any CPU
-		{DD059E66-A949-464E-B249-A9FF12786B75}.Release|x86.Build.0 = Release|Any CPU
 		{688F4BCA-BD97-4B87-BD6A-539A2274B1E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{688F4BCA-BD97-4B87-BD6A-539A2274B1E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{688F4BCA-BD97-4B87-BD6A-539A2274B1E8}.Debug|x64.ActiveCfg = Debug|Any CPU

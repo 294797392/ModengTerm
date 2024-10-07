@@ -1,0 +1,43 @@
+﻿<Window x:Class="ModengTerm.Windows.SSH.CreatePrivateKeyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ModengTerm.Windows.SSH"
+        mc:Ignorable="d"
+        Title="新建密钥" Height="150" Width="400"
+        ResizeMode="NoResize">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="名称：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxName" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="密钥：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="1" Grid.Column="1" x:Name="TextBoxPrivateKey" IsReadOnly="True" Margin="3,0,80,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+        <Button Grid.Row="1" Grid.Column="1" Content="浏览" HorizontalAlignment="Right" Click="ButtonBrowse_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="确定" Click="ButtonOK_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Content="取消" Click="ButtonCancel_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        </StackPanel>
+        
+    </Grid>
+</Window>

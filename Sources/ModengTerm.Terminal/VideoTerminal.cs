@@ -2187,7 +2187,7 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.BrightForegroundYellow:
                 case GraphicsOptions.BrightForegroundWhite:
                     {
-                        VTColorIndex colorIndex = TermUtils.GraphicsOptions2VTColorIndex(options);
+                        VTColorIndex colorIndex = VTermUtils.GraphicsOptions2VTColorIndex(options);
                         this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, this.colorTable.GetColor(colorIndex));
                         break;
                     }
@@ -2209,7 +2209,7 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.BrightBackgroundYellow:
                 case GraphicsOptions.BrightBackgroundWhite:
                     {
-                        VTColorIndex colorIndex = TermUtils.GraphicsOptions2VTColorIndex(options);
+                        VTColorIndex colorIndex = VTermUtils.GraphicsOptions2VTColorIndex(options);
                         this.activeDocument.SetAttribute(VTextAttributes.Background, true, this.colorTable.GetColor(colorIndex));
                         break;
                     }

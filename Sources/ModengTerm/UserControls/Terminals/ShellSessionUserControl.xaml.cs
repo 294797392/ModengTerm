@@ -233,7 +233,7 @@ namespace ModengTerm.Terminal.UserControls
                 case Key.Right:
                     {
                         this.userInput.CapsLock = Console.CapsLock;
-                        this.userInput.Key = TermUtils.ConvertToVTKey(e.Key);
+                        this.userInput.Key = VTermUtils.ConvertToVTKey(e.Key);
                         this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
                         this.shellSession.SendInput(this.userInput);
 

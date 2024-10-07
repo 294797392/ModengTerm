@@ -1,7 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.ServiceAgents;
-using ModengTerm.ServiceAgents.DataModels;
+using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
@@ -85,7 +84,7 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            string playbackFilePath = TermUtils.GetPlaybackFilePath(playbackFile);
+            string playbackFilePath = VTermUtils.GetPlaybackFilePath(playbackFile);
             if (!System.IO.File.Exists(playbackFilePath))
             {
                 MTMessageBox.Info("回放文件不存在");

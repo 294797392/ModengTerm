@@ -6,7 +6,6 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
@@ -951,7 +950,7 @@ namespace ModengTerm.Terminal.ViewModels
                 };
 
                 // 先打开录像文件
-                string filePath = TermUtils.GetPlaybackFilePath(playbackFile);
+                string filePath = VTermUtils.GetPlaybackFilePath(playbackFile);
                 this.playbackStream = new PlaybackStream();
                 int code = this.playbackStream.OpenWrite(playbackFile);
                 if (code != ResponseCode.SUCCESS)

@@ -4,10 +4,10 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
+using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Rendering;
-using ModengTerm.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
@@ -43,7 +43,7 @@ namespace ModengTerm.ViewModels
         private string sshUserName;
         private string sshPassword;
         private string sshPassphrase;
-        private string sshPrivateKeyFile;
+        private string sshPrivateKeyId;
 
         private string terminalRows;
         private string terminalColumns;
@@ -249,14 +249,14 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public string SSHPrivateKeyFile
+        public string SSHPrivateKeyId
         {
-            get { return this.sshPrivateKeyFile; }
+            get { return this.sshPrivateKeyId; }
             set
             {
-                if (this.sshPrivateKeyFile != value)
+                if (this.sshPrivateKeyId != value)
                 {
-                    this.sshPrivateKeyFile = value;
+                    this.sshPrivateKeyId = value;
                     this.NotifyPropertyChanged("SSHPrivateKeyFile");
                 }
             }
@@ -662,7 +662,7 @@ namespace ModengTerm.ViewModels
             this.serviceAgent = serviceAgent;
 
             MTermManifest appManifest = MTermApp.Context.Manifest;
-            TerminalManifest terminalManifest = TermUtils.GetManifest();
+            TerminalManifest terminalManifest = VTermUtils.GetManifest();
 
             this.appManifest = appManifest;
             this.terminalManifest = terminalManifest;
@@ -933,19 +933,13 @@ namespace ModengTerm.ViewModels
 
                 case SSHAuthTypeEnum.PrivateKey:
                     {
-                        if (string.IsNullOrEmpty(this.SSHPrivateKeyFile))
+                        if (string.IsNullOrEmpty(this.SSHPrivateKeyId))
                         {
                             MessageBoxUtils.Info("请选择密钥文件");
                             return false;
                         }
 
-                        if (!File.Exists(this.SSHPrivateKeyFile))
-                        {
-                            MessageBoxUtils.Info("密钥文件不存在");
-                            return false;
-                        }
-
-                        // 密钥密码可以为空
+                        // 密钥密码可以为空，如果密钥需要密码，并且用户在新建会话的时候没有输入密码，那么在打开会话的时候提示用户输入密码
 
                         break;
                     }
@@ -958,7 +952,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.SSH_PORT, port);
             session.SetOption<string>(OptionKeyEnum.SSH_USER_NAME, this.SSHUserName);
             session.SetOption<string>(OptionKeyEnum.SSH_PASSWORD, this.SSHPassword);
-            session.SetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE, this.SSHPrivateKeyFile);
+            session.SetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE, this.SSHPrivateKeyId);
             session.SetOption<string>(OptionKeyEnum.SSH_Passphrase, this.SSHPassphrase);
             session.SetOption<int>(OptionKeyEnum.SSH_AUTH_TYPE, (int)authType);
             session.SetOption<List<PortForward>>(OptionKeyEnum.SSH_PORT_FORWARDS, this.PortForwards.ToList());

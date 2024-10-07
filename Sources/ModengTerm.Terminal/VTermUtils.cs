@@ -1,8 +1,8 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Rendering;
-using ModengTerm.ServiceAgents.DataModels;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Parsing;
 using System;
@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 
 namespace ModengTerm.Terminal
 {
-    public static class TermUtils
+    public static class VTermUtils
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("TermUtils");
 

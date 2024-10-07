@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Terminal;
-using ModengTerm.ServiceAgents;
+using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
@@ -20,7 +20,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WPFToolkit.MVVM;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Windows.Terminals
 {

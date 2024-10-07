@@ -1,11 +1,13 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System.IO;
+using System.Text;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session
@@ -26,6 +28,7 @@ namespace ModengTerm.Terminal.Session
         private SshClient sshClient;
         private ShellStream stream;
         private List<PortForwardState> portForwardStates;
+        private ServiceAgent serviceAgent;
 
         #endregion
 
@@ -42,6 +45,7 @@ namespace ModengTerm.Terminal.Session
         public SshNetSession(XTermSession options) :
             base(options)
         {
+            this.serviceAgent = VTApp.Context.ServiceAgent;
         }
 
         #endregion
@@ -59,7 +63,7 @@ namespace ModengTerm.Terminal.Session
             SSHAuthTypeEnum authType = this.session.GetOption<SSHAuthTypeEnum>(OptionKeyEnum.SSH_AUTH_TYPE);
             string userName = this.session.GetOption<string>(OptionKeyEnum.SSH_USER_NAME);
             string password = this.session.GetOption<string>(OptionKeyEnum.SSH_PASSWORD);
-            string privateKeyFile = this.session.GetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE);
+            string privateKeyId = this.session.GetOption<string>(OptionKeyEnum.SSH_PRIVATE_KEY_FILE);
             string passphrase = this.session.GetOption<string>(OptionKeyEnum.SSH_Passphrase);
 
             AuthenticationMethod authentication = null;
@@ -79,8 +83,15 @@ namespace ModengTerm.Terminal.Session
 
                 case SSHAuthTypeEnum.PrivateKey:
                     {
-                        byte[] privateKey = File.ReadAllBytes(privateKeyFile);
-                        using (MemoryStream ms = new MemoryStream(privateKey))
+                        PrivateKey privateKey = this.serviceAgent.GetPrivateKey(privateKeyId);
+                        if (privateKey == null) 
+                        {
+                            logger.ErrorFormat("登录失败, 密钥不存在");
+                            return ResponseCode.PRIVATE_KEY_NOT_FOUND;
+                        }
+
+                        byte[] privateKeyData = Encoding.ASCII.GetBytes(privateKey.Content);
+                        using (MemoryStream ms = new MemoryStream(privateKeyData))
                         {
                             var keyFile = new PrivateKeyFile(ms, passphrase);
                             authentication = new PrivateKeyAuthenticationMethod(userName, keyFile);

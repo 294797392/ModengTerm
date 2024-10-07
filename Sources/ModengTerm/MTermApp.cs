@@ -1,15 +1,14 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
-using ModengTerm.ServiceAgents;
+using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.UserControls.OptionsUserControl;
 using ModengTerm.UserControls.OptionsUserControl.RawTcp;
 using ModengTerm.UserControls.OptionsUserControl.SSH;
 using ModengTerm.UserControls.OptionsUserControl.Terminal;
 using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.Terminals;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Threading;
@@ -29,10 +28,15 @@ namespace ModengTerm
                 Children = new List<OptionDefinition>()
                 {
                     new OptionDefinition(OptionDefinition.CommandLineID, "命令行", typeof(CommandLineOptionsUserControl)),
-                    new OptionDefinition(OptionDefinition.SshID, "SSH", typeof(SSHOptionsUserControl)),
+                    new OptionDefinition(OptionDefinition.SshID, "SSH", typeof(SSHOptionsUserControl))
+                    {
+                        Children = new List<OptionDefinition>()
+                        {
+                            new OptionDefinition("端口转发", typeof(PortForwardOptionsUserControl))
+                        }
+                    },
                     new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl)),
-                    new OptionDefinition(OptionDefinition.RawTcpID, "RawTcp", typeof(RawTcpOptionsUserControl)),
-                    new OptionDefinition("端口转发", typeof(PortForwardOptionsUserControl))
+                    new OptionDefinition(OptionDefinition.RawTcpID, "Tcp", typeof(RawTcpOptionsUserControl)),
                 }
             },
 
@@ -87,17 +91,8 @@ namespace ModengTerm
             // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
             this.MainWindowVM = new MainWindowVM();
 
-
-            #region 启动后台工作线程
-
-            // 启动光标闪烁线程, 所有的终端共用同一个光标闪烁线程
-
-            //this.drawFrameTimer = new DispatcherTimer(DispatcherPriority.Render);
-            //this.drawFrameTimer.Interval = TimeSpan.FromMilliseconds(MTermConsts.DrawFrameInterval);
-            //this.drawFrameTimer.Tick += DrawFrameTimer_Tick;
-            //this.drawFrameTimer.IsEnabled = false;
-
-            #endregion
+            VTApp.Context.ServiceAgent = this.ServiceAgent;
+            VTApp.Context.Initialize();
 
             return ResponseCode.SUCCESS;
         }

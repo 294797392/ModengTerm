@@ -4,25 +4,20 @@
     <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>
-        <Setter Property="Margin" Value="0,0,10,0"/>
     </Style>
 
     <Style x:Key="StyleComboBoxValue" TargetType="{x:Type ComboBox}">
         <Setter Property="Height" Value="30"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
-    </Style>
-
-    <Style x:Key="StyleTextBoxValue" TargetType="{x:Type TextBox}">
-        <Setter Property="Height" Value="30"/>
-        <Setter Property="VerticalAlignment" Value="Center"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="3,0,3,0"/>
     </Style>
 
     <Style x:Key="StylePasswordBoxValue" TargetType="{x:Type PasswordBox}">
         <Setter Property="Height" Value="30"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="3,0,3,0"/>
     </Style>
 
     <Style x:Key="StyleCheckBoxLocal" TargetType="{x:Type CheckBox}">
@@ -36,9 +31,18 @@
         <Setter Property="Margin" Value="5"/>
     </Style>
 
+    <Style x:Key="StyleTextBoxValue" TargetType="{x:Type TextBox}">
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="3,0,3,0"/>
+    </Style>
+
     <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
-        <Setter Property="Margin" Value="5,3,0,3"/>
-        <Setter Property="Width" Value="50"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Margin" Value="3,0,3,0"/>
+        <Setter Property="Width" Value="70"/>
+        <Setter Property="Height" Value="30"/>
     </Style>
 
 </ResourceDictionary>
