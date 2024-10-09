@@ -72,12 +72,6 @@ namespace ModengTerm.Terminal.Session
 
             this.readBuffer = new byte[bufferSize];
             this.driver = SessionFactory.Create(session);
-            if (this.driver is SshNetSession)
-            {
-                SshNetSession sshNetSession = this.driver as SshNetSession;
-                sshNetSession.DataReceived = this.Stream_DataReceived;
-                sshNetSession.ErrorOccurred = this.Stream_ErrorOccurred;
-            }
 
             return ResponseCode.SUCCESS;
         }
@@ -87,13 +81,6 @@ namespace ModengTerm.Terminal.Session
             if (this.driver == null)
             {
                 return;
-            }
-
-            if (this.driver is SshNetSession)
-            {
-                SshNetSession sshNetSession = this.driver as SshNetSession;
-                sshNetSession.DataReceived = null;
-                sshNetSession.ErrorOccurred = null;
             }
 
             this.driver = null;
@@ -336,15 +323,6 @@ namespace ModengTerm.Terminal.Session
             }
 
             this.NotifyStatusChanged(SessionStatusEnum.Connected);
-
-            // SshNet使用回调获取数据，所以这里直接返回
-            if (this.driver is SshNetSession)
-            {
-                SshNetSession sshNetSession = this.driver as SshNetSession;
-                sshNetSession.DataReceived = Stream_DataReceived;
-                sshNetSession.ErrorOccurred = Stream_ErrorOccurred;
-                return;
-            }
 
             // 连接成功之后开始从远程主机读取数据
             // 读取失败会返回

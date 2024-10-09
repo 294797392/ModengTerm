@@ -323,6 +323,16 @@ namespace ModengTerm.Terminal.UserControls
             newDocument.EventInput.OnLoaded();
         }
 
+        private void VideoTerminal_RequestChangeWindowSize(IVideoTerminal arg1, double deltaX, double deltaY)
+        {
+            Window window = Window.GetWindow(this);
+
+            window.Width += deltaX;
+            window.Height += deltaY;
+
+            logger.InfoFormat("修改窗口大小");
+        }
+
         #endregion
 
         #region ISessionContent
@@ -357,6 +367,7 @@ namespace ModengTerm.Terminal.UserControls
 
             this.videoTerminal = this.shellSession.VideoTerminal;
             this.videoTerminal.DocumentChanged += VideoTerminal_DocumentChanged;
+            this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
             this.videoTerminal.ActiveDocument.EventInput.OnLoaded();
 
             this.SizeChanged += TerminalContentUserControl_SizeChanged;
@@ -378,6 +389,7 @@ namespace ModengTerm.Terminal.UserControls
             this.shellSession.Close();
 
             this.videoTerminal.DocumentChanged -= VideoTerminal_DocumentChanged;
+            this.videoTerminal.RequestChangeWindowSize -= VideoTerminal_RequestChangeWindowSize;
             this.videoTerminal = null;
         }
 

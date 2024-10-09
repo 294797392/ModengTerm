@@ -127,6 +127,11 @@ namespace ModengTerm.Terminal.Parsing
         DeIconifyWindow = 1,
         IconifyWindow = 2,
         RefreshWindow = 7,
+
+        /// <summary>
+        /// Resize the text area to given height and width in characters.  Omitted parameters reuse the current height or width.  Zero parameters use the display's height or width.
+        /// 将文本区域调整为给定的字符高度和宽度。省略的参数将重用当前的高度或宽度。零参数使用显示器的高度或宽度。
+        /// </summary>
         ResizeWindowInCharacters = 8,
     }
 
@@ -250,6 +255,7 @@ namespace ModengTerm.Terminal.Parsing
         DECSCNM_ScreenMode = 5,
         DECOM_OriginMode = 6,
         DECAWM_AutoWrapMode = 7,
+        DECARM_AutoRepeatMode = 8,
         ATT610_StartCursorBlink = 12,
 
         /// <summary>

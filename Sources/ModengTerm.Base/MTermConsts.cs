@@ -44,7 +44,7 @@ namespace ModengTerm.Base
         /// <summary>
         /// 每次读取的数据缓冲区大小
         /// </summary>
-        public const int DefaultReadBufferSize = 8192;
+        public const int DefaultReadBufferSize = 16384;
 
         /// <summary>
         /// 默认打开的会话

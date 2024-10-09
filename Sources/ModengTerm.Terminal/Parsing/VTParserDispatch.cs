@@ -51,6 +51,7 @@ namespace ModengTerm.Terminal.Parsing
 
         private void ActionPrint(char ch)
         {
+            this.WriteCode("Print");
             this.OnPrint?.Invoke(this, ch);
         }
 
@@ -114,17 +115,21 @@ namespace ModengTerm.Terminal.Parsing
                     }
 
                 case ASCIITable.SI:
+                    {
+                        this.WriteCode("SI");
+                        this.OnC0Actions?.Invoke(this, ASCIITable.SI);
+                        break;
+                    }
+
                 case ASCIITable.SO:
                     {
-                        // 这两个不知道是什么意思
                         this.WriteCode("SO");
-                        logger.FatalFormat("未处理的SI和SO");
+                        this.OnC0Actions?.Invoke(this, ASCIITable.SO);
                         break;
                     }
 
                 default:
                     {
-                        this.WriteCode("Print");
                         this.ActionPrint(Convert.ToChar(ch));
                         break;
                         //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));

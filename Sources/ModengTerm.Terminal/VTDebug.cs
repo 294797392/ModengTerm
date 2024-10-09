@@ -112,7 +112,7 @@ namespace ModengTerm.Terminal
 
             codeSequence += ",'\\0'";
 
-            string log = string.Format("char {0}[] = {{{1}}};printf({2}); // {3}", varName, codeSequence, varName, action);
+            string log = string.Format("char {0}[] = {{{1}}};printf({2});", varName, codeSequence, varName);
 
             this.codeLogger.Info(log);
         }

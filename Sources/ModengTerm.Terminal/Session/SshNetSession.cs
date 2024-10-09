@@ -32,14 +32,6 @@ namespace ModengTerm.Terminal.Session
 
         #endregion
 
-        #region 属性
-
-        public EventHandler<ShellDataEventArgs> DataReceived { get; set; }
-
-        public EventHandler<ExceptionEventArgs> ErrorOccurred { get; set; }
-
-        #endregion
-
         #region 构造方法
 
         public SshNetSession(XTermSession options) :
@@ -122,7 +114,7 @@ namespace ModengTerm.Terminal.Session
             int columns = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
             int rows = this.session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             int readBufferSize = this.session.GetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE);
-            this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, readBufferSize, null, this.DataReceived, this.ErrorOccurred);
+            this.stream = this.sshClient.CreateShellStream(terminalType, (uint)columns, (uint)rows, 0, 0, readBufferSize, null);
 
             #endregion
 
@@ -159,8 +151,6 @@ namespace ModengTerm.Terminal.Session
 
         public override void Close()
         {
-            this.stream.DataReceived -= this.DataReceived;
-            this.stream.ErrorOccurred -= this.ErrorOccurred;
             this.stream.Dispose();
             this.sshClient.Disconnect();
 
@@ -187,8 +177,6 @@ namespace ModengTerm.Terminal.Session
 
         internal override int Read(byte[] buffer)
         {
-            // SshNet必须使用异步方式，不可以同步读取
-            throw new InvalidOperationException();
             return this.stream.Read(buffer, 0, buffer.Length);
         }
 

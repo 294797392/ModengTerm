@@ -11,6 +11,8 @@ using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.ShellRender;
+using System.DirectoryServices.ActiveDirectory;
+using System.Reflection.Metadata;
 using System.Text;
 using XTerminal.Base.Definitions;
 
@@ -70,6 +72,8 @@ namespace ModengTerm.Terminal
         /// 当可视区域的行或列改变的时候触发
         /// </summary>
         public event Action<IVideoTerminal, int, int> ViewportChanged;
+
+        public event Action<IVideoTerminal, double, double> RequestChangeWindowSize;
 
         #endregion
 
@@ -525,7 +529,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 重置终端大小
         /// </summary>
-        /// <param name="newSize"></param>
+        /// <param name="newSize">以像素为单位的新的终端大小</param>
         public void Resize(VTSize newSize)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
@@ -533,13 +537,11 @@ namespace ModengTerm.Terminal
                 return;
             }
 
-            VTDocument document = this.activeDocument;
-
-            int oldRow = document.ViewportRow, oldCol = document.ViewportColumn;
+            int oldRow = this.ViewportRow, oldCol = this.ViewportColumn;
             int newRow = 0, newCol = 0;
-            VTUtils.CalculateAutoFitSize(newSize, document.Typeface, out newRow, out newCol);
+            VTUtils.CalculateAutoFitSize(newSize, this.activeDocument.Typeface, out newRow, out newCol);
 
-            if (newRow == document.ViewportRow && newCol == document.ViewportColumn)
+            if (newRow == oldRow && newCol == oldCol)
             {
                 // 变化之后的行和列和现在的行和列一样，什么都不做
                 return;
@@ -700,6 +702,8 @@ namespace ModengTerm.Terminal
             this.activeDocument.ScrollToBottom();
 
             document.Resize(newRow, newCol);
+
+            document.DeleteAll();
         }
 
         private void AlternateDocumentResize(VTDocument document, int newRow, int newCol)
@@ -846,42 +850,204 @@ namespace ModengTerm.Terminal
         ///         type options.
         /// </summary>
         /// <param name="parameters"></param>
-        private void PerformSetGraphicsRendition(List<int> parameters)
+        private void ApplyGraphicsOptions(List<int> parameters)
         {
             if (parameters.Count == 0)
             {
                 // 如果未指定任何参数，它会被视为单个 0 参数
-                parameters.Add(0);
+                // 0就表示设置为默认值
+                this.activeDocument.ClearAttribute();
+                return;
             }
 
             int size = parameters.Count;
 
             for (int i = 0; i < size; i++)
             {
-                byte option = (byte)parameters[i];
-
-                VTColor rgbColor = null;
-
-                switch ((GraphicsOptions)option)
-                {
-                    case GraphicsOptions.ForegroundExtended:
-                        {
-                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            break;
-                        }
-
-                    case GraphicsOptions.BackgroundExtended:
-                        {
-                            i += this.SetRgbColorsHelper(parameters, i + 1, out rgbColor);
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
-
-                this.PerformSGR((GraphicsOptions)option, rgbColor);
+                i += this.ApplyGraphicsOption(parameters, i);
             }
+        }
+
+        private int ApplyGraphicsOption(List<int> parameters, int optionIndex)
+        {
+            GraphicsOptions options = (GraphicsOptions)parameters[optionIndex];
+
+            VTDebug.Context.WriteInteractive(string.Format("SGR - {0}", options), string.Empty);
+
+            int i = 0;
+
+            switch (options)
+            {
+                case GraphicsOptions.Off:
+                    {
+                        // 重置所有文本装饰
+                        activeDocument.ClearAttribute();
+                        break;
+                    }
+
+                case GraphicsOptions.ForegroundDefault:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.Foreground, false, null);
+                        break;
+                    }
+
+                case GraphicsOptions.BackgroundDefault:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.Background, false, null);
+                        break;
+                    }
+
+                case GraphicsOptions.NotBoldOrFaint:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.Bold, false, null);
+                        this.activeDocument.SetAttribute(VTextAttributes.Faint, false, null);
+                        break;
+                    }
+
+                case GraphicsOptions.RGBColorOrFaint:
+                    {
+                        logger.ErrorFormat("Faint");
+                        this.activeDocument.SetAttribute(VTextAttributes.Faint, true, null);
+                        break;
+                    }
+
+                case GraphicsOptions.Negative:
+                    {
+                        // ReverseVideo
+                        VTColor foreColor = VTColor.CreateFromRgbKey(backgroundColor);
+                        VTColor backColor = VTColor.CreateFromRgbKey(foregroundColor);
+                        activeDocument.SetAttribute(VTextAttributes.Background, true, backColor);
+                        activeDocument.SetAttribute(VTextAttributes.Foreground, true, foreColor);
+                        break;
+                    }
+
+                case GraphicsOptions.Positive:
+                    {
+                        // ReverseVideoUnset
+                        activeDocument.SetAttribute(VTextAttributes.Background, false, null);
+                        activeDocument.SetAttribute(VTextAttributes.Foreground, false, null);
+                        break;
+                    }
+
+                case GraphicsOptions.BoldBright:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.Bold, true, null);
+                        break;
+                    }
+
+                case GraphicsOptions.Italics:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.Italics, true, null);
+                        break;
+                    }
+
+                case GraphicsOptions.NotItalics:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.Italics, false, null);
+                        break;
+                    }
+
+                case GraphicsOptions.Underline:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.Underline, true, null);
+                        break;
+                    }
+
+                case GraphicsOptions.DoublyUnderlined:
+                    {
+                        this.activeDocument.SetAttribute(VTextAttributes.DoublyUnderlined, true, null);
+                        break;
+                    }
+
+                case GraphicsOptions.NoUnderline:
+                    {
+                        // UnderlineUnset
+                        activeDocument.SetAttribute(VTextAttributes.Underline, false, null);
+
+                        // DoublyUnderlineUnset
+                        activeDocument.SetAttribute(VTextAttributes.DoublyUnderlined, false, null);
+                        break;
+                    }
+
+                case GraphicsOptions.ForegroundBlack:
+                case GraphicsOptions.ForegroundBlue:
+                case GraphicsOptions.ForegroundGreen:
+                case GraphicsOptions.ForegroundCyan:
+                case GraphicsOptions.ForegroundRed:
+                case GraphicsOptions.ForegroundMagenta:
+                case GraphicsOptions.ForegroundYellow:
+                case GraphicsOptions.ForegroundWhite:
+                case GraphicsOptions.BrightForegroundBlack:
+                case GraphicsOptions.BrightForegroundBlue:
+                case GraphicsOptions.BrightForegroundGreen:
+                case GraphicsOptions.BrightForegroundCyan:
+                case GraphicsOptions.BrightForegroundRed:
+                case GraphicsOptions.BrightForegroundMagenta:
+                case GraphicsOptions.BrightForegroundYellow:
+                case GraphicsOptions.BrightForegroundWhite:
+                    {
+                        VTColorIndex colorIndex = VTermUtils.GraphicsOptions2VTColorIndex(options);
+                        this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, this.colorTable.GetColor(colorIndex));
+                        break;
+                    }
+
+                case GraphicsOptions.BackgroundBlack:
+                case GraphicsOptions.BackgroundBlue:
+                case GraphicsOptions.BackgroundGreen:
+                case GraphicsOptions.BackgroundCyan:
+                case GraphicsOptions.BackgroundRed:
+                case GraphicsOptions.BackgroundMagenta:
+                case GraphicsOptions.BackgroundYellow:
+                case GraphicsOptions.BackgroundWhite:
+                case GraphicsOptions.BrightBackgroundBlack:
+                case GraphicsOptions.BrightBackgroundBlue:
+                case GraphicsOptions.BrightBackgroundGreen:
+                case GraphicsOptions.BrightBackgroundCyan:
+                case GraphicsOptions.BrightBackgroundRed:
+                case GraphicsOptions.BrightBackgroundMagenta:
+                case GraphicsOptions.BrightBackgroundYellow:
+                case GraphicsOptions.BrightBackgroundWhite:
+                    {
+                        VTColorIndex colorIndex = VTermUtils.GraphicsOptions2VTColorIndex(options);
+                        this.activeDocument.SetAttribute(VTextAttributes.Background, true, this.colorTable.GetColor(colorIndex));
+                        break;
+                    }
+
+                case GraphicsOptions.NotCrossedOut:
+                case GraphicsOptions.CrossedOut:
+                case GraphicsOptions.Steady:
+                case GraphicsOptions.BlinkOrXterm256Index:
+                case GraphicsOptions.RapidBlink:
+                    {
+                        logger.FatalFormat("未实现SGR, {0}", options);
+                        break;
+                    }
+
+                case GraphicsOptions.BackgroundExtended:
+                    {
+                        VTColor extColor;
+                        i += this.SetRgbColorsHelper(parameters, i + 1, out extColor);
+                        this.activeDocument.SetAttribute(VTextAttributes.Background, true, extColor);
+                        break;
+                    }
+
+                case GraphicsOptions.ForegroundExtended:
+                    {
+                        VTColor extColor;
+                        i += this.SetRgbColorsHelper(parameters, i + 1, out extColor);
+                        this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, extColor);
+                        break;
+                    }
+
+                default:
+                    {
+                        // TODO：
+                        logger.ErrorFormat("未实现的SGR, {0}", options.ToString());
+                        throw new NotImplementedException();
+                    }
+            }
+
+            return i;
         }
 
         /// <summary>
@@ -1033,6 +1199,32 @@ namespace ModengTerm.Terminal
                             break;
                         }
 
+                    case DECPrivateMode.DECARM_AutoRepeatMode:
+                        {
+                            logger.FatalFormat("未实现DECARM_AutoRepeatMode");
+                            break;
+                        }
+
+                    case DECPrivateMode.DECSCNM_ScreenMode:
+                        {
+                            // This control function selects a dark or light background on the screen.
+                            // Default: Dark background.
+
+                            // When DECSCNM is set, the screen displays dark characters on a light background.
+                            // When DECSCNM is reset, the screen displays light characters on a dark background.
+
+                            break;
+                        }
+
+                    case (DECPrivateMode)20:
+                    case (DECPrivateMode)42:
+                    case (DECPrivateMode)45:
+                    case (DECPrivateMode)4:
+                        {
+                            logger.FatalFormat("未实现DECPrivateMode {0}", mode);
+                            break;
+                        }
+
                     default:
                         throw new NotImplementedException(string.Format("未实现DECSETPrivateMode, {0}", mode));
                 }
@@ -1055,7 +1247,48 @@ namespace ModengTerm.Terminal
         {
             WindowManipulationType type = (WindowManipulationType)parameters[0];
 
-            logger.ErrorFormat("未处理的WindowManipulationType, {0}", type);
+            switch (type)
+            {
+                case WindowManipulationType.ResizeWindowInCharacters:
+                    {
+                        int newRow = VTParameter.GetParameter(parameters, 1, -1);
+                        int newCol = VTParameter.GetParameter(parameters, 2, -1);
+
+                        // 省略了参数
+                        if (newRow == -1 || newCol == -1)
+                        {
+                            return;
+                        }
+
+                        // 零参数表示使用显示器的高度和宽度
+                        if (newRow == 0 || newCol == 0)
+                        {
+                            logger.FatalFormat("未实现ResizeWindowInCharacters, 参数为0的情况");
+                            return;
+                        }
+
+                        int oldRow = this.ViewportRow;
+                        int oldCol = this.ViewportColumn;
+
+                        int columns = newCol - oldCol;
+                        int rows = newRow - oldRow;
+
+                        double width = this.activeDocument.Typeface.Width;
+                        double height = this.activeDocument.Typeface.Height;
+                        double deltaX = columns * width;
+                        double deltaY = rows * width;
+
+                        this.RequestChangeWindowSize?.Invoke(this, deltaX, deltaY);
+
+                        break;
+                    }
+
+                default:
+                    {
+                        logger.FatalFormat("未处理的WindowManipulationType, {0}", type);
+                        break;
+                    }
+            }
         }
 
         /// <summary>
@@ -1221,6 +1454,20 @@ namespace ModengTerm.Terminal
                         break;
                     }
 
+                case ASCIITable.SI:
+                    {
+                        this.glSetNumber = 0;
+                        this.glTranslationTable = this.gsetList[this.glSetNumber];
+                        break;
+                    }
+
+                case ASCIITable.SO: 
+                    {
+                        this.glSetNumber = 1;
+                        this.glTranslationTable = this.gsetList[this.glSetNumber];
+                        break;
+                    }
+
                 default:
                     {
                         throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ascii));
@@ -1327,7 +1574,7 @@ namespace ModengTerm.Terminal
             {
                 case CsiActionCodes.SGR_SetGraphicsRendition:
                     {
-                        this.PerformSetGraphicsRendition(parameters);
+                        this.ApplyGraphicsOptions(parameters);
                         break;
                     }
 
@@ -2230,6 +2477,17 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.CrossedOut:
                     {
                         logger.ErrorFormat("未实现SGR, {0}", options.ToString());
+                        break;
+                    }
+
+                case GraphicsOptions.BlinkOrXterm256Index:
+                case GraphicsOptions.RapidBlink:
+                    {
+                        break;
+                    }
+
+                case GraphicsOptions.Steady:
+                    {
                         break;
                     }
 

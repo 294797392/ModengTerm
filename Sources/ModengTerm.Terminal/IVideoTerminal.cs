@@ -34,6 +34,14 @@ namespace ModengTerm.Terminal
         event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
 
         /// <summary>
+        /// 请求改变窗口大小
+        /// 
+        /// double：窗口宽度增量，可以有负值
+        /// double：窗口高度增量，可以有负值
+        /// </summary>
+        event Action<IVideoTerminal, double, double> RequestChangeWindowSize;
+
+        /// <summary>
         /// 会话名字
         /// </summary>
         string Name { get; set; }
