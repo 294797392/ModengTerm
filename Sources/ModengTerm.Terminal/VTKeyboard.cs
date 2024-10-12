@@ -322,7 +322,7 @@ namespace ModengTerm.Terminal
         /// 代码参考terminal - terminalInput.cpp
         /// </summary>
         /// <returns></returns>
-        public byte[] TranslateInput(VTKeyInput userInput)
+        public byte[] TranslateInput(VTKeyboardInput userInput)
         {
             byte[] bytes = null;
 

@@ -9,10 +9,8 @@ using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
+using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
-using ModengTerm.Terminal.ShellRender;
-using System.DirectoryServices.ActiveDirectory;
-using System.Reflection.Metadata;
 using System.Text;
 using XTerminal.Base.Definitions;
 
@@ -1213,6 +1211,8 @@ namespace ModengTerm.Terminal
                             // When DECSCNM is set, the screen displays dark characters on a light background.
                             // When DECSCNM is reset, the screen displays light characters on a dark background.
 
+                            logger.FatalFormat("未实现DECSCNM_ScreenMode");
+
                             break;
                         }
 
@@ -1226,7 +1226,10 @@ namespace ModengTerm.Terminal
                         }
 
                     default:
-                        throw new NotImplementedException(string.Format("未实现DECSETPrivateMode, {0}", mode));
+                        {
+                            logger.FatalFormat(string.Format("未实现DECSETPrivateMode, {0}", mode));
+                            break;
+                        }
                 }
             }
 

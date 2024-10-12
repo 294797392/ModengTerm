@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.ShellRender
+namespace ModengTerm.Terminal.Renderer
 {
     /// <summary>
     /// 渲染为终端界面

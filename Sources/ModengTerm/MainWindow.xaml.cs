@@ -47,7 +47,7 @@ namespace ModengTerm
 
         private OpenedSessionDataTemplateSelector templateSelector;
         private OpenedSessionItemContainerStyleSelector itemContainerStyleSelector;
-        private VTKeyInput userInput;
+        private VTKeyboardInput userInput;
         private MainWindowVM mainWindowVM;
         private OpenedSessionsVM sessionListVM;
         private ServiceAgent serviceAgent;
@@ -74,7 +74,7 @@ namespace ModengTerm
             this.mainWindowVM = MTermApp.Context.MainWindowVM;
             base.DataContext = this.mainWindowVM;
 
-            this.userInput = new VTKeyInput();
+            this.userInput = new VTKeyboardInput();
             this.templateSelector = new OpenedSessionDataTemplateSelector();
             this.templateSelector.DataTemplateOpenedSession = this.FindResource("DataTemplateOpenedSession") as DataTemplate;
             this.templateSelector.DataTemplateOpenSession = this.FindResource("DataTemplateOpenSession") as DataTemplate;

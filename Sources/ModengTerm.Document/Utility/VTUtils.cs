@@ -553,5 +553,17 @@ namespace ModengTerm.Document.Utility
                 break;
             }
         }
+
+        /// <summary>
+        /// 把字符列表根据指定的分隔符分割成一个个的单词
+        /// </summary>
+        /// <param name="characters">要分割的字符列表</param>
+        /// <param name="splitters">分隔符列表</param>
+        /// <param name="result">分割之后的单词列表</param>
+        public static void Split(List<VTCharacter> characters, string[] splitters, out string[] result)
+        {
+            string text = VTUtils.CreatePlainText(characters);
+            result = text.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
+        }
     }
 }

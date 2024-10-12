@@ -19,7 +19,7 @@ namespace ModengTerm.ViewModels.Terminals
         /// 处理用户按键输入数据
         /// </summary>
         /// <param name="keyInput">按键输入信息</param>
-        public abstract void SendInput(VTKeyInput keyInput);
+        public abstract void SendInput(VTKeyboardInput keyInput);
 
         /// <summary>
         /// 输入原始数据

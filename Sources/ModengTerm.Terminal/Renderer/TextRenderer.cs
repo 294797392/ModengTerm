@@ -1,5 +1,4 @@
-﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Terminal.Enumerations;
 using System;
@@ -8,15 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.ShellRender
+namespace ModengTerm.Terminal.Renderer
 {
     /// <summary>
-    /// 将收到的数据渲染为hexdump形式的格式
+    /// 将收到的数据按照可打印字符渲染（包含中文）
+    /// 会处理换行逻辑
     /// </summary>
-    public class HexdumpRenderer : ShellRenderer
+    public class TextRenderer : ShellRenderer
     {
-        #region 实例变量
-
         private VTDocument document;
 
         /// <summary>
@@ -32,31 +30,15 @@ namespace ModengTerm.Terminal.ShellRender
         /// </summary>
         private bool renderOnce;
 
-        #endregion
-
-        #region 属性
-
-        #endregion
-
-        #region 构造方法
-
-        public HexdumpRenderer(VideoTerminal vt) :
+        public TextRenderer(VideoTerminal vt) : 
             base(vt)
         {
             this.document = vt.MainDocument;
         }
 
-        #endregion
-
-        #region ShellRenderer
-
         public override void Initialize()
         {
             this.renderAtNewLine = this.session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_AT_NEWLINE);
-        }
-
-        public override void Release()
-        {
         }
 
         public override void OnInteractionStateChanged(InteractionStateEnum istate)
@@ -87,6 +69,10 @@ namespace ModengTerm.Terminal.ShellRender
             }
         }
 
+        public override void Release()
+        {
+        }
+
         public override void Render(byte[] bytes, int length)
         {
             VTDocument document = this.document;
@@ -113,25 +99,34 @@ namespace ModengTerm.Terminal.ShellRender
                 }
             }
 
-            for (int i = 0; i < length; i++)
+            string text = Encoding.UTF8.GetString(bytes, 0, length);
+
+            foreach (char ch in text)
             {
-                byte value = bytes[i];
+                int cursorRow = this.document.Cursor.Row;
+                int cursorCol = this.document.Cursor.Column;
 
-                int cursorRow = document.Cursor.Row;
-                int cursorCol = document.Cursor.Column;
-
-                // 要在第几列显示
-                int printColumn = 0;
-
-                // 要在第几行显示
-                int printRow = 0;
+                // 要在哪一行打印
+                int printRow = 0, printColumn = 0;
 
                 // 计算剩余可以显示多少列
                 VTextLine activeLine = document.ActiveLine;
                 int leftCols = viewportColumn - activeLine.Columns;
 
-                // 光标所在行的剩余列数至少得有3个字符的位置才能显示一个十六进制数（包含一个空字符)
-                if (leftCols <= 3)
+                int column = 0;
+
+                if (ch >= 32 && ch <= 127)
+                {
+                    // 这个是ASCII码表里的可打印字符，占1列
+                    column = 1;
+                }
+                else
+                {
+                    // 这个是多字节字符，要占两列
+                    column = 2;
+                }
+
+                if (leftCols < column)
                 {
                     printRow = cursorRow == viewportRow - 1 ? cursorRow : cursorRow + 1;
                     printColumn = 0;
@@ -143,24 +138,10 @@ namespace ModengTerm.Terminal.ShellRender
                     printColumn = cursorCol;
                 }
 
-                string hexstr = value.ToString("X2");
-
                 document.SetCursor(printRow, printColumn);
-                VTCharacter character1 = VTCharacter.CreateNull();
-                document.PrintCharacter(character1);
-
-                document.SetCursor(printRow, printColumn + 1);
-                VTCharacter character2 = VTCharacter.Create(hexstr[0], 1);
-                document.PrintCharacter(character2);
-
-                document.SetCursor(printRow, printColumn + 2);
-                VTCharacter character3 = VTCharacter.Create(hexstr[1], 1);
-                document.PrintCharacter(character3);
-
-                document.SetCursor(printRow, printColumn + 3);
+                VTCharacter character = VTCharacter.Create(ch, column);
+                this.document.PrintCharacter(character);
             }
         }
-
-        #endregion
     }
 }

@@ -6,10 +6,10 @@ using System.Text;
 namespace ModengTerm.Terminal
 {
     /// <summary>
-    /// 存储按键输入事件
-    /// 你需要把你使用的GUI框架（WPF,Winform...etc）的键盘事件转换成VTInputEventArgs
+    /// 存储通过键盘输入的数据
+    /// 你需要把你使用的GUI框架（WPF,Winform...etc）的键盘事件转换成VTKeyInput
     /// </summary>
-    public class VTKeyInput
+    public class VTKeyboardInput
     {
         /// <summary>
         /// 用户按下的按键
@@ -25,5 +25,9 @@ namespace ModengTerm.Terminal
         /// CapsLock按键的状态
         /// </summary>
         public bool CapsLock { get; set; }
+
+        public VTKeyboardInput() 
+        {
+        }
     }
 }

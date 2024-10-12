@@ -28,7 +28,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private ShellSessionVM shellSession;
         private IVideoTerminal videoTerminal;
-        private VTKeyInput userInput;
+        private VTKeyboardInput userInput;
 
         #endregion
 
@@ -58,7 +58,7 @@ namespace ModengTerm.Terminal.UserControls
             // 必须设置Focusable=true，调用Focus才生效
             GridDocument.Focusable = true;
             this.Background = Brushes.Transparent;
-            this.userInput = new VTKeyInput();
+            this.userInput = new VTKeyboardInput();
         }
 
         /// <summary>
@@ -232,13 +232,7 @@ namespace ModengTerm.Terminal.UserControls
                 case Key.Left:
                 case Key.Right:
                     {
-                        this.userInput.CapsLock = Console.CapsLock;
-                        this.userInput.Key = VTermUtils.ConvertToVTKey(e.Key);
-                        this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-                        this.shellSession.SendInput(this.userInput);
-
                         // 防止焦点移动到其他控件上
-                        e.Handled = true;
                         break;
                     }
 
@@ -246,6 +240,16 @@ namespace ModengTerm.Terminal.UserControls
                     {
                         break;
                     }
+            }
+
+            this.userInput.CapsLock = Console.CapsLock;
+            this.userInput.Key = VTermUtils.ConvertToVTKey(e.Key);
+            this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+            this.shellSession.SendInput(this.userInput);
+
+            if (e.Key != Key.ImeProcessed)
+            {
+                e.Handled = true;
             }
         }
 

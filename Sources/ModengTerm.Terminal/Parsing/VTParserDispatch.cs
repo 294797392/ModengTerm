@@ -450,7 +450,7 @@ namespace ModengTerm.Terminal.Parsing
                 default:
                     {
                         this.WriteCode(string.Format("UnkownCSIAction_{0}", finalByte));
-                        logger.ErrorFormat("未实现CSIAction, {0}", (char)finalByte);
+                        logger.FatalFormat("未实现CSIAction, {0}", (char)finalByte);
                         break;
                     }
             }

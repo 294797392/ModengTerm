@@ -9,6 +9,7 @@ using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Hooks;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
@@ -276,6 +277,11 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public BindableCollection<SyncInputSessionVM> SyncInputSessions { get; private set; }
 
+        /// <summary>
+        /// 事件钩子列表
+        /// </summary>
+        public VTHooks Hooks { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -358,6 +364,8 @@ namespace ModengTerm.Terminal.ViewModels
 
             #endregion
 
+            this.Hooks = new VTHooks(videoTerminal);
+
             this.Uri = this.InitializeURI();
 
             this.isRunning = true;
@@ -371,6 +379,8 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 return;
             }
+
+            this.Hooks.Release();
 
             // 停止对终端的日志记录
             this.StopLogger();
@@ -603,7 +613,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// 模拟用户输入发送数据
         /// </summary>
         /// <param name="keyInput">用户输入信息</param>
-        public override void SendInput(VTKeyInput keyInput)
+        public override void SendInput(VTKeyboardInput keyInput)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {

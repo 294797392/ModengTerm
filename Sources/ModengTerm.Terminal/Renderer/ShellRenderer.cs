@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Interactivity;
 
-namespace ModengTerm.Terminal.ShellRender
+namespace ModengTerm.Terminal.Renderer
 {
     /// <summary>
     /// 定义一个用来解析并渲染终端数据的渲染器
