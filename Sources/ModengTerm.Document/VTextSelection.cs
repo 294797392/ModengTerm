@@ -197,7 +197,7 @@ namespace ModengTerm.Document
 
             VTDocument document = this.OwnerDocument;
             double charWidth = document.Typeface.Width;
-            VTSize displaySize = document.Renderer.ContentSize;
+            VTSize displaySize = document.Renderer.DrawAreaSize;
 
             // 单独处理选中的是同一行的情况
             if (startRow == endRow)

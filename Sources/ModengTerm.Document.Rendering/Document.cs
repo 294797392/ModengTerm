@@ -13,26 +13,34 @@ using System.Windows.Media;
 namespace ModengTerm.Document.Rendering
 {
     /// <summary>
-    /// WPF实现的文档渲染器
+    /// 文档控件
     /// </summary>
-    [TemplatePart(Name = "PART_DocumentCanvas", Type = typeof(WPFDocumentCanvas))]
+    [TemplatePart(Name = "PART_DrawingArea", Type = typeof(DrawingArea))]
     [TemplatePart(Name = "PART_Scrollbar", Type = typeof(ScrollBar))]
-    public class WPFDocument : Control, IDocument
+    public class Document : Control, IDocument
     {
         #region 实例变量
 
         /// <summary>
         /// 用来渲染内容的区域
         /// </summary>
-        private WPFDocumentCanvas content;
+        private DrawingArea drawArea;
         private ScrollBar scrollbar;
-        private double contentMargin;
+        private double padding;
 
         #endregion
 
         #region 属性
 
-        public WPFDocumentCanvas Content { get { return this.content; } }
+        public DrawingArea DrawArea { get { return this.drawArea; } }
+
+        public VTSize DrawAreaSize
+        {
+            get
+            {
+                return new VTSize(this.drawArea.ActualWidth, this.drawArea.ActualHeight);
+            }
+        }
 
         public VTScrollbar Scrollbar { get; private set; }
 
@@ -56,57 +64,47 @@ namespace ModengTerm.Document.Rendering
             }
         }
 
-        public VTSize ContentSize
-        {
-            get
-            {
-                return new VTSize(this.content.ActualWidth, this.content.ActualHeight);
-            }
-        }
-
-        public double ContentMargin
-        {
-            get { return this.contentMargin; }
-            set
-            {
-                if (this.contentMargin != value)
-                {
-                    this.contentMargin = value;
-                    this.content.Margin = new Thickness(value);
-                }
-            }
-        }
-
         #endregion
 
         #region 构造方法
 
-        public WPFDocument()
+        public Document()
         {
             this.Style = Application.Current.FindResource("StyleWPFDocument") as Style;
         }
 
         #endregion
 
-        #region IDocumentRenderer
+        #region IDocument
+
+        public void SetPadding(double padding)
+        {
+            if (this.padding == padding) 
+            {
+                return;
+            }
+
+            this.padding = padding;
+            base.Padding = new Thickness(padding);
+        }
 
         public IDocumentObject CreateDrawingObject()
         {
             DrawingObject drawingObject = new DrawingObject();
 
-            this.content.AddVisual(drawingObject);
+            this.drawArea.AddVisual(drawingObject);
 
             return drawingObject;
         }
 
         public void DeleteDrawingObject(IDocumentObject drawingObject)
         {
-            content.RemoveVisual(drawingObject as DrawingObject);
+            drawArea.RemoveVisual(drawingObject as DrawingObject);
         }
 
         public void DeleteDrawingObjects()
         {
-            List<IDocumentObject> drawingObjects = content.GetAllVisual().Cast<IDocumentObject>().ToList();
+            List<IDocumentObject> drawingObjects = drawArea.GetAllVisual().Cast<IDocumentObject>().ToList();
 
             foreach (IDocumentObject drawingObject in drawingObjects)
             {
@@ -137,7 +135,7 @@ namespace ModengTerm.Document.Rendering
         {
             base.OnApplyTemplate();
 
-            this.content = base.Template.FindName("PART_DocumentCanvas", this) as WPFDocumentCanvas;
+            this.drawArea = base.Template.FindName("PART_DrawingArea", this) as DrawingArea;
             this.scrollbar = base.Template.FindName("PART_Scrollbar", this) as ScrollBar;
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
         }

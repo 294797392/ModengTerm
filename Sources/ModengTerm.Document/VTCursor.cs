@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using ModengTerm.Document.Utility;
 using System.Windows.Media.Animation;
 using System.Windows;
+using System.Windows.Media.Converters;
 
 namespace ModengTerm.Document
 {
@@ -165,6 +166,38 @@ namespace ModengTerm.Document
             }
         }
 
+        /// <summary>
+        /// 获取光标的宽度
+        /// </summary>
+        public double Width { get; private set; }
+
+        /// <summary>
+        /// 获取光标高度
+        /// </summary>
+        public double Height { get; private set; }
+
+        /// <summary>
+        /// 获取距离渲染区域的底部的距离
+        /// </summary>
+        public double Bottom
+        {
+            get
+            {
+                return this.OffsetY + this.Height;
+            }
+        }
+
+        /// <summary>
+        /// 获取距离渲染区域的顶部的距离
+        /// </summary>
+        public double Top
+        {
+            get
+            {
+                return this.OffsetY;
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -219,6 +252,9 @@ namespace ModengTerm.Document
                 default:
                     throw new NotImplementedException();
             }
+
+            this.Width = this.Typeface.Width;
+            this.Height = this.Typeface.Height;
         }
 
         protected override void OnRelease()
@@ -275,10 +311,10 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 移动到当前位置
+        /// 根据当前的CursorRow和CursorCol对光标进行重新定位
         /// 每次收到数据渲染完之后调用
         /// </summary>
-        public void Move() 
+        public void Reposition() 
         {
             VTextLine activeLine = this.OwnerDocument.ActiveLine;
             if (activeLine == null)

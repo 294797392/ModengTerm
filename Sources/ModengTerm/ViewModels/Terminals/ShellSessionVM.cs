@@ -203,6 +203,16 @@ namespace ModengTerm.Terminal.ViewModels
         public IDocument AlternateDocument { get; set; }
 
         /// <summary>
+        /// 获取或设置终端宽度
+        /// </summary>
+        public double Width { get; set; }
+
+        /// <summary>
+        /// 获取或设置终端高度
+        /// </summary>
+        public double Height { get; set; }
+
+        /// <summary>
         /// 总行数
         /// </summary>
         public int TotalRows
@@ -349,7 +359,9 @@ namespace ModengTerm.Terminal.ViewModels
                 Session = this.Session,
                 SessionTransport = new SessionTransport(),
                 AlternateDocument = this.AlternateDocument,
-                MainDocument = this.MainDocument
+                MainDocument = this.MainDocument,
+                Width = this.Width,
+                Height = this.Height
             };
 
             VideoTerminal videoTerminal = new VideoTerminal();

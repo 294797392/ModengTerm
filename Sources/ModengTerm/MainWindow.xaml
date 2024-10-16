@@ -117,6 +117,7 @@
                 <Setter Property="BorderBrush" Value="{x:Null}"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
+                <Setter Property="Margin" Value="0,0,5,0"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ListBox}">

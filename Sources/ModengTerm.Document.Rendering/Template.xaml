@@ -159,11 +159,11 @@
         </Setter>
     </Style>
 
-    <Style x:Key="StyleWPFDocument" TargetType="{x:Type mrendering:WPFDocument}">
+    <Style x:Key="StyleWPFDocument" TargetType="{x:Type mrendering:Document}">
         <Setter Property="Template">
             <Setter.Value>
 
-                <ControlTemplate TargetType="{x:Type mrendering:WPFDocument}">
+                <ControlTemplate TargetType="{x:Type mrendering:Document}">
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -172,7 +172,8 @@
                             <ColumnDefinition Width="15"/>
                         </Grid.ColumnDefinitions>
 
-                        <mrendering:WPFDocumentCanvas Grid.Column="0" x:Name="PART_DocumentCanvas" Background="Transparent"/>
+                        <mrendering:DrawingArea Grid.Column="0" x:Name="PART_DrawingArea" Background="Transparent"
+                                                Margin="{TemplateBinding Padding}"/>
 
                         <ScrollBar Grid.Column="2" x:Name="PART_Scrollbar" Visibility="Collapsed"
                                    Style="{StaticResource ResourceKey=StyleScrollBar}"/>

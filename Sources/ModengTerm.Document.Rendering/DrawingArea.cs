@@ -13,9 +13,9 @@ using System.Windows.Media;
 namespace ModengTerm.Document.Rendering
 {
     /// <summary>
-    /// 用来渲染终端输出的表面
+    /// 渲染文档的区域
     /// </summary>
-    public class WPFDocumentCanvas : FrameworkElement
+    public class DrawingArea : FrameworkElement
     {
         #region 类变量
 
@@ -39,7 +39,7 @@ namespace ModengTerm.Document.Rendering
 
         // Using a DependencyProperty as the backing store for Background.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty BackgroundProperty =
-            DependencyProperty.Register("Background", typeof(Brush), typeof(WPFDocumentCanvas), new PropertyMetadata(Brushes.Transparent));
+            DependencyProperty.Register("Background", typeof(Brush), typeof(DrawingArea), new PropertyMetadata(Brushes.Transparent));
 
 
 
@@ -53,7 +53,7 @@ namespace ModengTerm.Document.Rendering
 
         #region 构造方法
 
-        public WPFDocumentCanvas()
+        public DrawingArea()
         {
             this.visuals = new VisualCollection(this);
         }

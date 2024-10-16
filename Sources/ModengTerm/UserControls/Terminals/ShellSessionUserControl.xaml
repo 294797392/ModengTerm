@@ -55,8 +55,8 @@
 
             <Border x:Name="BorderBackground"/>
 
-            <renderer:WPFDocument x:Name="DocumentAlternate"/>
-            <renderer:WPFDocument x:Name="DocumentMain"/>
+            <renderer:Document x:Name="DocumentAlternate"/>
+            <renderer:Document x:Name="DocumentMain"/>
         </Grid>
 
         <!-- 输入栏 -->

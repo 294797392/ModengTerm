@@ -162,17 +162,6 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 手动使该对象处于dirty状态，下次调用RequestInvalidate的时候会执行渲染动作
-        /// </summary>
-        public void MakeInvalidate()
-        {
-            this.SetDirtyFlags(VTDirtyFlags.PositionDirty, true);
-            this.SetDirtyFlags(VTDirtyFlags.SizeDirty, true);
-            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-            this.SetDirtyFlags(VTDirtyFlags.VisibleDirty, true);
-        }
-
-        /// <summary>
         /// 在这个阶段，DrawingObject已经被创建出来了
         /// 子类需要做的事情就是对DrawingObject里的一些属性和字段进行初始化赋值
         /// 子类不需要调用DrawingObject的Initialize方法，OnInitialize完之后会自动调用DrawingObject.Initialize

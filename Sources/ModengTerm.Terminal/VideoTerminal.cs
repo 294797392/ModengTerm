@@ -31,6 +31,16 @@ namespace ModengTerm.Terminal
         /// 发送数据给主机的回调
         /// </summary>
         public SessionTransport SessionTransport { get; set; }
+
+        /// <summary>
+        /// 终端的宽度
+        /// </summary>
+        public double Width { get; set; }
+
+        /// <summary>
+        /// 终端的高度
+        /// </summary>
+        public double Height { get; set; }
     }
 
     /// <summary>
@@ -679,7 +689,7 @@ namespace ModengTerm.Terminal
             typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
 
-            VTSize displaySize = drawingDocument.ContentSize;
+            VTSize displaySize = new VTSize(this.vtOptions.Width, this.vtOptions.Height);
             TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
 
             int viewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);

@@ -473,7 +473,7 @@ namespace ModengTerm.Document
         /// <returns>如果进行了滚动，那么返回滚动数据，如果因为某种原因没进行滚动，那么返回空</returns>
         private VTScrollData ScrollIfCursorOutsideDocument(VTPoint mousePosition)
         {
-            VTSize displaySize = this.Renderer.ContentSize;
+            VTSize displaySize = this.Renderer.DrawAreaSize;
 
             // 要滚动到的目标行
             int scrollTarget = -1;
@@ -522,7 +522,7 @@ namespace ModengTerm.Document
             double mouseY = mousePosition.Y;
 
             VTDocument document = this;
-            VTSize displaySize = this.Renderer.ContentSize;
+            VTSize displaySize = this.Renderer.DrawAreaSize;
 
             #region 先计算鼠标位于哪一行上
 
@@ -1387,8 +1387,8 @@ namespace ModengTerm.Document
 
             #region 重绘光标
 
-            // 光标闪烁在单独线程处理，这里只改变光标位置
-            Cursor.Move();
+            // 光标闪烁在单独线程处理，这里只对光标进行重新定位
+            Cursor.Reposition();
 
             #endregion
 
@@ -1804,8 +1804,6 @@ namespace ModengTerm.Document
             }
 
             // 重新渲染
-            this.Selection.MakeInvalidate();
-
             // 此处要全部刷新，因为有可能会触发ScrollIfCursorOutsideDocument
             // ScrollIfCursorOutsideDocument的情况下，要显示滚动后的数据
             RequestInvalidate();

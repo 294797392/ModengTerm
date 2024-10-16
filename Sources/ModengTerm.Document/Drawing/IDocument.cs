@@ -28,14 +28,15 @@ namespace ModengTerm.Document.Drawing
         bool Visible { get; set; }
 
         /// <summary>
-        /// 获取显示内容区域的像素大小
+        /// 获取渲染区域的大小
         /// </summary>
-        VTSize ContentSize { get; }
+        VTSize DrawAreaSize { get; }
 
         /// <summary>
-        /// 设置文档内容距离文档的边距
+        /// 设置文档的内边距（文档渲染区域和文档之间的距离）
         /// </summary>
-        double ContentMargin { get; set; }
+        /// <param name="padding">内边距</param>
+        void SetPadding(double padding);
 
         /// <summary>
         /// 创建一个绘图对象

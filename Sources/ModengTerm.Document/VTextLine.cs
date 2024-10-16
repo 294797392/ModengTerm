@@ -111,8 +111,8 @@ namespace ModengTerm.Document
         public double Height { get { return this.Typeface.Height; return Metrics.Height; } }
 
         /// <summary>
-        /// 获取该文本的边界框信息
-        /// 在画完之后会更新测量的矩形框信息
+        /// 获取该文本行相对于渲染区域的位置信息
+        /// 在渲染完之后更新
         /// </summary>
         public VTRect Bounds { get { return new VTRect(OffsetX, OffsetY, Width, Height); } }
 

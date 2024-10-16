@@ -8,6 +8,8 @@ using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -76,7 +78,7 @@ namespace ModengTerm.Terminal.UserControls
             return this.videoTerminal.ActiveDocument.EventInput;
         }
 
-        private WPFDocument GetActiveDocument()
+        private Document.Rendering.Document GetActiveDocument()
         {
             return this.videoTerminal.IsAlternate ?
                 DocumentAlternate : DocumentMain;
@@ -84,7 +86,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private MouseData GetMouseData(object sender, MouseButtonEventArgs e)
         {
-            WPFDocument document = this.GetActiveDocument();
+            Document.Rendering.Document document = this.GetActiveDocument();
             Point mousePosition = e.GetPosition(document);
             MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, e.ClickCount, (sender as FrameworkElement).IsMouseCaptured);
 
@@ -93,8 +95,8 @@ namespace ModengTerm.Terminal.UserControls
 
         private MouseData GetMouseData(object sender, MouseEventArgs e)
         {
-            WPFDocument document = this.GetActiveDocument();
-            WPFDocumentCanvas canvas = document.Content;
+            Document.Rendering.Document document = this.GetActiveDocument();
+            DrawingArea canvas = document.DrawArea;
             Point mousePosition = e.GetPosition(canvas);
             MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0, (sender as FrameworkElement).IsMouseCaptured);
 
@@ -193,9 +195,9 @@ namespace ModengTerm.Terminal.UserControls
 
         private void TerminalContentUserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            WPFDocument document = this.GetActiveDocument();
+            Document.Rendering.Document document = this.GetActiveDocument();
 
-            this.videoTerminal.Resize(document.ContentSize);
+            this.videoTerminal.Resize(document.DrawAreaSize);
         }
 
 
@@ -369,28 +371,29 @@ namespace ModengTerm.Terminal.UserControls
             string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
 
-            double margin = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_CONTENT_MARGIN);
-            DocumentAlternate.ContentMargin = margin;
-            DocumentAlternate.Content.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentAlternate.Content.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentAlternate.Content.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
-            DocumentAlternate.Content.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
-            DocumentMain.ContentMargin = margin;
-            DocumentMain.Content.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentMain.Content.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentMain.Content.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
-            DocumentMain.Content.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
+            // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
+            // 在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会实时变化
+            // 根据Padding手动计算终端宽度和高度
+            double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
+            double width = DocumentMain.DrawAreaSize.Width - padding * 2;
+            double height = DocumentMain.DrawAreaSize.Height - padding * 2;
 
-
-            // 设置了ContentMargin，等待界面加载完毕
-            // TODO：
-            // 设置了ContentMargin之后，不会立即更新ActualWidth和ActualHeight，要等Loaded之后才能获取到
-            // 暂时没找到更好的办法去获取到设置了Margin之后的ContentSize
-            base.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Loaded);
+            DocumentAlternate.SetPadding(padding);
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentAlternate.DrawArea.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
+            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
+            DocumentMain.SetPadding(padding);
+            DocumentMain.DrawArea.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentMain.DrawArea.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentMain.DrawArea.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
+            DocumentMain.DrawArea.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
 
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
             this.shellSession.AlternateDocument = DocumentAlternate;
+            this.shellSession.Width = width;
+            this.shellSession.Height = height;
             this.shellSession.Open();
 
             this.videoTerminal = this.shellSession.VideoTerminal;
@@ -399,7 +402,7 @@ namespace ModengTerm.Terminal.UserControls
             this.videoTerminal.ActiveDocument.EventInput.OnLoaded();
 
             // 自动完成列表和文本行对齐
-            AutoCompletionUserControl.Margin = new Thickness(margin);
+            AutoCompletionUserControl.Margin = new Thickness(padding);
             AutoCompletionUserControl.DataContext = this.shellSession.AutoCompletionVM;
             this.SizeChanged += TerminalContentUserControl_SizeChanged;
 
@@ -410,12 +413,12 @@ namespace ModengTerm.Terminal.UserControls
         {
             this.SizeChanged -= TerminalContentUserControl_SizeChanged;
 
-            DocumentAlternate.Content.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentAlternate.Content.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentAlternate.Content.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
-            DocumentMain.Content.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentMain.Content.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentMain.Content.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentAlternate.DrawArea.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
+            DocumentMain.DrawArea.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
+            DocumentMain.DrawArea.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
+            DocumentMain.DrawArea.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
 
             this.shellSession.Close();
 

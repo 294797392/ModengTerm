@@ -89,9 +89,9 @@ namespace ModengTerm.Base.Enumerations
 
 
         /// <summary>
-        /// 文档边距
+        /// 文档内边距
         /// </summary>
-        SSH_THEME_CONTENT_MARGIN = 501,
+        SSH_THEME_DOCUMENT_PADDING = 501,
 
         /// <summary>
         /// 是否显示书签

@@ -10,20 +10,21 @@
     <UserControl.Resources>
 
         <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}">
-            
+
         </Style>
-        
+
         <Style x:Key="StyleListBoxLocal" TargetType="{x:Type ListBox}">
             <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemLocal}"/>
         </Style>
-        
+
     </UserControl.Resources>
-    
-    
+
+
     <!-- 自动完成下拉列表 -->
     <Canvas>
         <ListBox x:Name="ListBoxAutoCompletionItems" Width="200" MaxHeight="300"
                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 SizeChanged="ListBoxAutoCompletionItems_SizeChanged"
                  Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
     </Canvas>
 

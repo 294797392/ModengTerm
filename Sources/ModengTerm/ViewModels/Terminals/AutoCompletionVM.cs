@@ -6,6 +6,7 @@ using ModengTerm.Terminal.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Xaml;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals
