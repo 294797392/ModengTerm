@@ -56,7 +56,7 @@ namespace ModengTerm.Terminal
         /// 如果同一行被多次打印（top命令），那么只会在第一次打印的时候触发
         /// 只有在主缓冲区的时候才会触发
         /// </summary>
-        public event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
+        public event Action<IVideoTerminal, VTHistoryLine> OnLineFeed;
 
         /// <summary>
         /// 当切换显示文档之后触发
@@ -64,14 +64,28 @@ namespace ModengTerm.Terminal
         /// VTDocument：oldDocument，切换之前显示的文档
         /// VTDocument：newDocument，切换之后显示的文档
         /// </summary>
-        public event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
+        public event Action<IVideoTerminal, VTDocument, VTDocument> OnDocumentChanged;
+
+        /// <summary>
+        /// 当用户通过键盘输入数据的时候触发
+        /// </summary>
+        public event Action<IVideoTerminal, VTKeyboardInput> OnKeyboardInput;
+
+        /// <summary>
+        /// 打印一个字符的时候触发
+        /// </summary>
+        public event Action<IVideoTerminal> OnPrint;
 
         /// <summary>
         /// 当可视区域的行或列改变的时候触发
         /// </summary>
-        public event Action<IVideoTerminal, int, int> ViewportChanged;
+        public event Action<IVideoTerminal, int, int> OnViewportChanged;
 
         public event Action<IVideoTerminal, double, double> RequestChangeWindowSize;
+
+        public event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
+
+        public event Action<IVideoTerminal> OnRendered;
 
         #endregion
 
@@ -246,6 +260,11 @@ namespace ModengTerm.Terminal
         /// </summary>
         public XTermSession Session { get { return this.vtOptions.Session; } }
 
+        /// <summary>
+        /// 终端使用的字体信息
+        /// </summary>
+        public VTypeface Typeface { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -338,13 +357,14 @@ namespace ModengTerm.Terminal
             this.alternateDocument.SetVisible(false);
 
             this.activeDocument = this.mainDocument;
+            this.Typeface = this.mainDocument.Typeface;
 
             // 初始化完VTDocument之后，真正要使用的Column和Row已经被计算出来并保存到了VTDocumentOptions里
             // 此时重新设置sessionInfo里的Row和Column，因为SessionTransport要使用
             sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, mainOptions.ViewportRow);
             sessionInfo.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, mainOptions.ViewportColumn);
 
-            this.ViewportChanged?.Invoke(this, this.mainDocument.ViewportRow, this.mainDocument.ViewportColumn);
+            this.OnViewportChanged?.Invoke(this, this.mainDocument.ViewportRow, this.mainDocument.ViewportColumn);
 
             #endregion
 
@@ -558,10 +578,7 @@ namespace ModengTerm.Terminal
             // 在数据处理线程和UI线程同时在修改VTDocument，导致多线程访问冲突
             this.sessionTransport.Resize(newRow, newCol);
 
-            if (this.ViewportChanged != null)
-            {
-                this.ViewportChanged(this, newRow, newCol);
-            }
+            this.OnViewportChanged?.Invoke(this, newRow, newCol);
         }
 
         /// <summary>
@@ -569,7 +586,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <param name="bytes">要渲染的数据</param>
         /// <param name="size">要渲染的数据长度</param>
-        public void ProcessHostData(byte[] bytes, int size)
+        public void Render(byte[] bytes, int size)
         {
             VTDocument document = this.activeDocument;
             int oldScroll = document.Scrollbar.Value;
@@ -593,6 +610,8 @@ namespace ModengTerm.Terminal
                 VTScrollData scrollData = document.GetScrollData(oldScroll, newScroll);
                 document.InvokeScrollChanged(scrollData);
             }
+
+            this.OnRendered?.Invoke(this);
         }
 
         /// <summary>
@@ -603,6 +622,15 @@ namespace ModengTerm.Terminal
         public void OnInteractionStateChanged(InteractionStateEnum istate)
         {
             this.renderer.OnInteractionStateChanged(istate);
+        }
+
+        /// <summary>
+        /// 触发OnKeyboardInput事件
+        /// </summary>
+        /// <param name="kbdInput">事件参数</param>
+        public void RaiseKeyboardInput(VTKeyboardInput kbdInput)
+        {
+            this.OnKeyboardInput?.Invoke(this, kbdInput);
         }
 
         #endregion
@@ -1146,7 +1174,7 @@ namespace ModengTerm.Terminal
 
                                 activeDocument = alternateDocument;
 
-                                DocumentChanged?.Invoke(this, mainDocument, alternateDocument);
+                                this.OnDocumentChanged?.Invoke(this, mainDocument, alternateDocument);
                             }
                             else
                             {
@@ -1168,7 +1196,7 @@ namespace ModengTerm.Terminal
 
                                 activeDocument = mainDocument;
 
-                                DocumentChanged?.Invoke(this, alternateDocument, mainDocument);
+                                this.OnDocumentChanged?.Invoke(this, alternateDocument, mainDocument);
                             }
                             break;
                         }
@@ -1401,9 +1429,32 @@ namespace ModengTerm.Terminal
 
         #region VTParser事件
 
-        private void VtParser_OnPrint(VTParser arg1, char character)
+        private void VtParser_OnPrint(VTParser arg1, char ch)
         {
-            this.PrintCharacter(character);
+            int row = this.Cursor.Row;
+            int col = this.Cursor.Column;
+
+            // 根据测试得出结论：
+            // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
+            // 在正常模式下，如果遇到中文字符，也使用2列来显示
+            // 也就是说，如果终端列数一共是80，那么可以显示40个中文字符，显示完40个中文字符后就要换行
+
+            // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
+            // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
+
+            // 用户输入的时候，如果滚动条没滚动到底，那么先把滚动条滚动到底
+            // 不然会出现在VTDocument当前的最后一行打印字符的问题
+            activeDocument.ScrollToBottom();
+
+            char chPrint = this.TranslateCharacter(ch);
+
+            // 创建并打印新的字符
+            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
+            VTCharacter character = this.CreateCharacter(chPrint, activeDocument.AttributeState);
+            activeDocument.PrintCharacter(character);
+            activeDocument.SetCursor(CursorRow, CursorCol + character.ColumnSize);
+
+            this.OnPrint?.Invoke(this);
         }
 
         private void VtParser_OnC0Actions(VTParser arg1, ASCIITable ascii)
@@ -1464,7 +1515,7 @@ namespace ModengTerm.Terminal
                         break;
                     }
 
-                case ASCIITable.SO: 
+                case ASCIITable.SO:
                     {
                         this.glSetNumber = 1;
                         this.glTranslationTable = this.gsetList[this.glSetNumber];
@@ -1476,6 +1527,8 @@ namespace ModengTerm.Terminal
                         throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ascii));
                     }
             }
+
+            this.OnC0ActionExecuted?.Invoke(this, ascii);
         }
 
         private void VtParser_OnESCActions(VTParser arg1, EscActionCodes escCode, VTID vtid)
@@ -1830,6 +1883,9 @@ namespace ModengTerm.Terminal
             // 也表示即将滚动
             if (last == ActiveLine)
             {
+                // 没换行之前的光标所在行，该行数据被打印完了
+                VTextLine oldActiveLine = document.ActiveLine;
+
                 // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
                 logger.DebugFormat("LineFeed，光标在可滚动区域最后一行，向下滚动一行");
 
@@ -1870,16 +1926,19 @@ namespace ModengTerm.Terminal
                     history.AddHistory(historyLine);
 
                     // 触发行被完全打印的事件
-                    this.LinePrinted?.Invoke(this, last.History);
+                    this.OnLineFeed?.Invoke(this, oldActiveLine.History);
                 }
             }
             else
             {
+                // 没换行之前的光标所在行，该行数据被打印完了
+                VTextLine oldActiveLine = document.ActiveLine;
+
                 // 光标不在可滚动区域的最后一行，说明可以直接移动光标
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 document.SetCursor(Cursor.Row + 1, Cursor.Column);
 
-                VTextLine activeLine = this.ActiveLine;
+                VTextLine activeLine = document.ActiveLine;
 
                 // 光标移动到该行的时候再加入历史记录
                 if (!this.IsAlternate)
@@ -1891,7 +1950,7 @@ namespace ModengTerm.Terminal
                     {
                         history.AddHistory(activeLine.History);
 
-                        this.LinePrinted?.Invoke(this, activeLine.History);
+                        this.OnLineFeed?.Invoke(this, oldActiveLine.History);
                     }
                 }
             }
@@ -1953,29 +2012,6 @@ namespace ModengTerm.Terminal
             int newCol = this.CursorCol;
 
             VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
-        }
-
-        public void PrintCharacter(char ch)
-        {
-            // 根据测试得出结论：
-            // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
-            // 在正常模式下，如果遇到中文字符，也使用2列来显示
-            // 也就是说，如果终端列数一共是80，那么可以显示40个中文字符，显示完40个中文字符后就要换行
-
-            // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
-            // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
-
-            // 用户输入的时候，如果滚动条没滚动到底，那么先把滚动条滚动到底
-            // 不然会出现在VTDocument当前的最后一行打印字符的问题
-            activeDocument.ScrollToBottom();
-
-            char chPrint = this.TranslateCharacter(ch);
-
-            // 创建并打印新的字符
-            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
-            VTCharacter character = this.CreateCharacter(chPrint, activeDocument.AttributeState);
-            activeDocument.PrintCharacter(character);
-            activeDocument.SetCursor(CursorRow, CursorCol + character.ColumnSize);
         }
 
         public void EraseDisplay(VTEraseType eraseType)

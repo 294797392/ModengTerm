@@ -90,6 +90,8 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        private bool acEnabled;
+
         private string rawTcpAddress;
         private int rawTcpPort;
 
@@ -444,6 +446,22 @@ namespace ModengTerm.ViewModels
         #region 终端行为选项
 
         public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
+
+        /// <summary>
+        /// 是否启用自动完成列表
+        /// </summary>
+        public bool AcEnabled
+        {
+            get { return this.acEnabled; }
+            set 
+            {
+                if (this.acEnabled != value)
+                {
+                    this.acEnabled = value;
+                    this.NotifyPropertyChanged("AcEnabled");
+                }
+            }
+        }
 
         #endregion
 
@@ -1123,6 +1141,7 @@ namespace ModengTerm.ViewModels
         {
             session.SetOption<RenderModeEnum>(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, this.RenderModes.SelectedItem);
             session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_AT_NEWLINE, this.DisplayAtNewLine);
+            session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, this.AcEnabled);
 
             return true;
         }

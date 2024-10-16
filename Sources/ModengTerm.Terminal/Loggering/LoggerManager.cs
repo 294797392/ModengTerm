@@ -80,7 +80,7 @@ namespace ModengTerm.Terminal.Loggering
             };
 
             vt.Logger = logger;
-            vt.LinePrinted += this.VideoTerminal_LinePrinted;
+            vt.OnLineFeed += this.VideoTerminal_LinePrinted;
 
             lock (this.listLock)
             {
@@ -100,7 +100,7 @@ namespace ModengTerm.Terminal.Loggering
             }
 
             vt.Logger = null;
-            vt.LinePrinted -= this.VideoTerminal_LinePrinted;
+            vt.OnLineFeed -= this.VideoTerminal_LinePrinted;
             logger.Dispose();
 
             lock (this.listLock)

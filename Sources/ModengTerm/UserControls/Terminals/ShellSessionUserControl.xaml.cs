@@ -6,10 +6,13 @@ using ModengTerm.Document;
 using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal.ViewModels;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace ModengTerm.Terminal.UserControls
 {
@@ -55,8 +58,11 @@ namespace ModengTerm.Terminal.UserControls
 
         private void InitializeUserControl()
         {
+            // https://learn.microsoft.com/zh-cn/dotnet/desktop/wpf/advanced/focus-overview?view=netframeworkdesktop-4.8
             // 必须设置Focusable=true，调用Focus才生效
+            // 为使元素获得键盘焦点，必须将基元素的 Focusable 和 IsVisible 属性设置为 true。 某些类（例如 Panel 基类）默认将 Focusable 设置为 false；因此，如果要此类元素能够获得键盘焦点，必须将 Focusable 设置为 true。
             GridDocument.Focusable = true;
+
             this.Background = Brushes.Transparent;
             this.userInput = new VTKeyboardInput();
         }
@@ -221,53 +227,52 @@ namespace ModengTerm.Terminal.UserControls
             functionMenu.Execute();
         }
 
-
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
+            if (e.Key == Key.ImeProcessed)
             {
-                case Key.Tab:
-                case Key.Up:
-                case Key.Down:
-                case Key.Left:
-                case Key.Right:
-                    {
-                        // 防止焦点移动到其他控件上
-                        break;
-                    }
+                return;
+            }
 
-                default:
-                    {
-                        break;
-                    }
+            // 1. 不继续传播到TextInput事件
+            // 2. 如果按了Tab或者方向键，焦点不会移动到其他控件上
+            e.Handled = true;
+
+            VTKeys vtKey = VTermUtils.ConvertToVTKey(e.Key);
+
+            // 如果启用了自动完成功能，那么先把按键事件传递给自动完成功能
+            if (this.shellSession.AutoCompletionVM.Enabled)
+            {
+                if (!this.shellSession.AutoCompletionVM.OnKeyDown(vtKey)) 
+                {
+                    return;
+                }
             }
 
             this.userInput.CapsLock = Console.CapsLock;
-            this.userInput.Key = VTermUtils.ConvertToVTKey(e.Key);
+            this.userInput.Key = vtKey;
             this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+            this.userInput.FromIMEInput = false;
             this.shellSession.SendInput(this.userInput);
-
-            if (e.Key != Key.ImeProcessed)
-            {
-                e.Handled = true;
-            }
         }
 
         private void GridDocument_TextInput(object sender, TextCompositionEventArgs e)
         {
-            this.shellSession.SendText(e.Text);
+            this.userInput.Text = e.Text;
+            this.userInput.FromIMEInput = true;
+            this.shellSession.SendInput(this.userInput);
         }
 
         private void GridDocument_Loaded(object sender, RoutedEventArgs e)
         {
             // Loaded事件里让控件获取焦点，这样才能触发OnKeyDown和OnTextInput事件
-            GridDocument.Focus();
+            Keyboard.Focus(GridDocument);
         }
 
         private void GridDocument_MouseDown(object sender, MouseButtonEventArgs e)
         {
             // 获取焦点，才能收到OnKeyDown和OnTextInput回调
-            GridDocument.Focus();
+            Keyboard.Focus(GridDocument);
         }
 
 
@@ -334,7 +339,25 @@ namespace ModengTerm.Terminal.UserControls
             window.Width += deltaX;
             window.Height += deltaY;
 
-            logger.InfoFormat("修改窗口大小");
+            logger.DebugFormat("RequestChangeWindowSize, deltaX = {0}, deltaY = {1}", deltaX, deltaY);
+        }
+
+
+
+        private void AutoCompletionUserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            UIElement element = sender as UIElement;
+            if (element.Visibility == Visibility.Collapsed)
+            {
+                // 重新获取焦点，以便于可以接收键盘输入
+                Keyboard.Focus(GridDocument);
+            }
+        }
+
+        private void AutoCompletionUserControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            // 模拟输入Enter
+            this.shellSession.AutoCompletionVM.OnKeyDown(VTKeys.Enter);
         }
 
         #endregion
@@ -358,6 +381,7 @@ namespace ModengTerm.Terminal.UserControls
             DocumentMain.Content.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
             DocumentMain.Content.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
 
+
             // 设置了ContentMargin，等待界面加载完毕
             // TODO：
             // 设置了ContentMargin之后，不会立即更新ActualWidth和ActualHeight，要等Loaded之后才能获取到
@@ -370,10 +394,13 @@ namespace ModengTerm.Terminal.UserControls
             this.shellSession.Open();
 
             this.videoTerminal = this.shellSession.VideoTerminal;
-            this.videoTerminal.DocumentChanged += VideoTerminal_DocumentChanged;
+            this.videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
             this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
             this.videoTerminal.ActiveDocument.EventInput.OnLoaded();
 
+            // 自动完成列表和文本行对齐
+            AutoCompletionUserControl.Margin = new Thickness(margin);
+            AutoCompletionUserControl.DataContext = this.shellSession.AutoCompletionVM;
             this.SizeChanged += TerminalContentUserControl_SizeChanged;
 
             return ResponseCode.SUCCESS;
@@ -392,7 +419,7 @@ namespace ModengTerm.Terminal.UserControls
 
             this.shellSession.Close();
 
-            this.videoTerminal.DocumentChanged -= VideoTerminal_DocumentChanged;
+            this.videoTerminal.OnDocumentChanged -= VideoTerminal_DocumentChanged;
             this.videoTerminal.RequestChangeWindowSize -= VideoTerminal_RequestChangeWindowSize;
             this.videoTerminal = null;
         }

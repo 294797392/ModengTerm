@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,8 @@ namespace ModengTerm.Terminal
     /// </summary>
     public class VTKeyboardInput
     {
+        private string text;
+
         /// <summary>
         /// 用户按下的按键
         /// </summary>
@@ -25,6 +28,28 @@ namespace ModengTerm.Terminal
         /// CapsLock按键的状态
         /// </summary>
         public bool CapsLock { get; set; }
+
+        public string Text 
+        {
+            get { return this.text; }
+            set
+            {
+                if (this.text != value) 
+                {
+                    this.text = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 是否是通过输入法输入的数据
+        /// </summary>
+        public bool FromIMEInput { get; set; }
+
+        /// <summary>
+        /// 经过转换之后的要发送的数据
+        /// </summary>
+        public byte[] SendBytes { get; set; }
 
         public VTKeyboardInput() 
         {

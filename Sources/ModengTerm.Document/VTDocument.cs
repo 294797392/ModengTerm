@@ -1388,14 +1388,13 @@ namespace ModengTerm.Document
             #region 重绘光标
 
             // 光标闪烁在单独线程处理，这里只改变光标位置
-            Cursor.MakeInvalidate();
-            Cursor.RequestInvalidate();
+            Cursor.Move();
 
             #endregion
 
             #region 移动滚动条
 
-            Scrollbar.RequestInvalidate();
+            Scrollbar.Render();
 
             #endregion
 
@@ -1722,7 +1721,7 @@ namespace ModengTerm.Document
                 // 双击就是选中单词
                 // 三击就是选中整行内容
 
-                int startIndex = 0, endIndex = 0, logicalRow = 0;
+                int startIndex = 0, count = 0, logicalRow = 0;
 
                 VTextLine textLine = HitTestHelper.HitTestVTextLine(this, mouseData.Y, out logicalRow);
                 if (textLine == null)
@@ -1735,7 +1734,6 @@ namespace ModengTerm.Document
                     case 2:
                         {
                             // 选中单词
-                            string text = VTUtils.CreatePlainText(textLine.Characters);
                             int characterIndex;
                             int columnIndex;
                             VTextRange characterRange;
@@ -1744,8 +1742,8 @@ namespace ModengTerm.Document
                             {
                                 return;
                             }
-                            VTUtils.GetSegement(text, characterIndex, out startIndex, out endIndex);
-                            this.Selection.SelectRange(textLine, logicalRow, startIndex, endIndex - startIndex + 1);
+                            VTUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
+                            this.Selection.SelectRange(textLine, logicalRow, startIndex, count);
                             break;
                         }
 

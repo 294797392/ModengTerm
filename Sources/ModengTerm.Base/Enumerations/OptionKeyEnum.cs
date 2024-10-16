@@ -184,6 +184,11 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         TERM_ADVANCE_RENDER_AT_NEWLINE = 3002,
 
+        /// <summary>
+        /// 是否启用自动完成
+        /// </summary>
+        TERM_ADVANCE_AUTO_COMPLETION_ENABLED = 3003,
+
         #endregion
 
         #region RawTcp 4001 - 4500

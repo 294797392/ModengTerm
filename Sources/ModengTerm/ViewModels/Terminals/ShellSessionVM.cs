@@ -9,9 +9,7 @@ using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.Hooks;
 using ModengTerm.Terminal.Loggering;
-using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
@@ -22,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.AccessControl;
 using System.Text;
 using System.Windows;
 using WPFToolkit.MVVM;
@@ -137,6 +134,8 @@ namespace ModengTerm.Terminal.ViewModels
         private BindableCollection<ShellCommandVM> shellCommands;
 
         private LoggerManager logMgr;
+
+        private AutoCompletionVM autoCompletionVM;
 
         #endregion
 
@@ -278,9 +277,20 @@ namespace ModengTerm.Terminal.ViewModels
         public BindableCollection<SyncInputSessionVM> SyncInputSessions { get; private set; }
 
         /// <summary>
-        /// 事件钩子列表
+        /// 自动完成功能ViewModel
         /// </summary>
-        public VTHooks Hooks { get; private set; }
+        public AutoCompletionVM AutoCompletionVM 
+        {
+            get { return this.autoCompletionVM; }
+            private set
+            {
+                if (this.autoCompletionVM != value) 
+                {
+                    this.autoCompletionVM = value;
+                    this.NotifyPropertyChanged("AutoCompletionVM");
+                }
+            }
+        }
 
         #endregion
 
@@ -343,11 +353,19 @@ namespace ModengTerm.Terminal.ViewModels
             };
 
             VideoTerminal videoTerminal = new VideoTerminal();
-            videoTerminal.ViewportChanged += this.VideoTerminal_ViewportChanged;
-            videoTerminal.LinePrinted += VideoTerminal_LinePrinted;
-            videoTerminal.DocumentChanged += VideoTerminal_DocumentChanged;
+            videoTerminal.OnViewportChanged += this.VideoTerminal_ViewportChanged;
+            videoTerminal.OnLineFeed += VideoTerminal_LinePrinted;
+            videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
+
+            #endregion
+
+            #region 加载自动完成列表功能
+
+            this.AutoCompletionVM = new AutoCompletionVM();
+            this.AutoCompletionVM.Initialize(this);
+            this.AutoCompletionVM.Enabled = this.Session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
 
             #endregion
 
@@ -364,8 +382,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             #endregion
 
-            this.Hooks = new VTHooks(videoTerminal);
-
             this.Uri = this.InitializeURI();
 
             this.isRunning = true;
@@ -380,7 +396,7 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            this.Hooks.Release();
+            this.AutoCompletionVM.Release();
 
             // 停止对终端的日志记录
             this.StopLogger();
@@ -393,9 +409,9 @@ namespace ModengTerm.Terminal.ViewModels
             this.sessionTransport.Close();
             this.sessionTransport.Release();
 
-            this.videoTerminal.ViewportChanged -= this.VideoTerminal_ViewportChanged;
-            this.videoTerminal.LinePrinted -= this.VideoTerminal_LinePrinted;
-            this.videoTerminal.DocumentChanged -= this.VideoTerminal_DocumentChanged;
+            this.videoTerminal.OnViewportChanged -= this.VideoTerminal_ViewportChanged;
+            this.videoTerminal.OnLineFeed -= this.VideoTerminal_LinePrinted;
+            this.videoTerminal.OnDocumentChanged -= this.VideoTerminal_DocumentChanged;
             this.videoTerminal.Release();
 
             // 释放剪贴板
@@ -610,23 +626,38 @@ namespace ModengTerm.Terminal.ViewModels
         #region 公开接口
 
         /// <summary>
-        /// 模拟用户输入发送数据
+        /// 通过键盘输入发送数据
         /// </summary>
-        /// <param name="keyInput">用户输入信息</param>
-        public override void SendInput(VTKeyboardInput keyInput)
+        /// <param name="kbdInput">用户输入信息</param>
+        public override void SendInput(VTKeyboardInput kbdInput)
         {
             if (this.sessionTransport.Status != SessionStatusEnum.Connected)
             {
                 return;
             }
 
-            VTKeyboard keyboard = this.videoTerminal.Keyboard;
+            // 要发送的数据
+            byte[] bytes = null;
 
-            byte[] bytes = keyboard.TranslateInput(keyInput);
+            if (kbdInput.FromIMEInput)
+            {
+                bytes = this.writeEncoding.GetBytes(kbdInput.Text);
+            }
+            else
+            {
+                VTKeyboard keyboard = this.videoTerminal.Keyboard;
+
+                bytes = keyboard.TranslateInput(kbdInput);
+            }
+
             if (bytes == null)
             {
                 return;
             }
+
+            kbdInput.SendBytes = bytes;
+
+            this.videoTerminal.RaiseKeyboardInput(kbdInput);
 
             this.PerformSend(bytes);
 
@@ -735,7 +766,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 try
                 {
-                    this.videoTerminal.ProcessHostData(bytes, size);
+                    this.videoTerminal.Render(bytes, size);
                 }
                 catch (Exception ex)
                 {

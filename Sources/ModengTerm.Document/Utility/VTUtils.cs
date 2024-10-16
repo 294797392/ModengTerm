@@ -419,85 +419,6 @@ namespace ModengTerm.Document.Utility
             }
         }
 
-        ///// <summary>
-        ///// 当Wallpaper是动态图的时候，获取动态图的元数据，用来实时渲染
-        ///// </summary>
-        ///// <param name="uri"></param>
-        ///// <returns></returns>
-        //public static GifMetadata GetWallpaperMetadata(string uri)
-        //{
-        //    GifMetadata gifMetadata;
-        //    if (!GifMetadataMap.TryGetValue(uri, out gifMetadata))
-        //    {
-        //        Stream stream = GetWallpaperStream(uri);
-        //        if (stream == null)
-        //        {
-        //            return new GifMetadata();
-        //        }
-
-        //        gifMetadata = GifParser.GetFrames(uri, stream);
-        //        GifMetadataMap[uri] = gifMetadata;
-        //    }
-        //    return gifMetadata;
-        //}
-
-        ///// <summary>
-        ///// 获取动态背景或静态背景的预览图
-        ///// </summary>
-        ///// <param name="paperType">标识是静态图还是动态图</param>
-        ///// <param name="uri">背景图的路径</param>
-        ///// <returns></returns>
-        //public static BitmapSource GetWallpaperThumbnail(WallpaperTypeEnum paperType, string uri)
-        //{
-        //    switch (paperType)
-        //    {
-        //        case WallpaperTypeEnum.Image:
-        //            {
-        //                return GetWallpaperBitmap(uri, 200, 200);
-        //            }
-
-        //        case WallpaperTypeEnum.Live:
-        //            {
-        //                Stream stream = VTUtils.GetWallpaperStream(uri);
-        //                if (stream == null)
-        //                {
-        //                    throw new NotImplementedException();
-        //                }
-
-        //                return GifParser.GetThumbnail(stream);
-        //            }
-
-        //        default:
-        //            throw new NotImplementedException();
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 当Wallpaper是静态图的时候，获取静态图
-        ///// </summary>
-        ///// <param name="uri"></param>
-        ///// <param name="pixelWidth">设置解码后的图像宽度，减少这个值可以减少内存占用</param>
-        ///// <param name="pixelHeight">设置解码后的图像高度，减少这个值可以减少内存占用</param>
-        ///// <returns></returns>
-        //public static BitmapSource GetWallpaperBitmap(string uri, int pixelWidth = 0, int pixelHeight = 0)
-        //{
-        //    Stream stream = VTUtils.GetWallpaperStream(uri);
-        //    if (stream == null)
-        //    {
-        //        throw new NotImplementedException();
-        //    }
-
-        //    BitmapImage bitmapImage = new BitmapImage();
-        //    bitmapImage.BeginInit();
-        //    bitmapImage.DecodePixelHeight = pixelHeight;
-        //    bitmapImage.DecodePixelWidth = pixelWidth;
-        //    bitmapImage.StreamSource = stream;
-        //    bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-        //    bitmapImage.EndInit();
-
-        //    return bitmapImage;
-        //}
-
         /// <summary>
         /// 根据当前屏幕大小计算终端的自适应大小
         /// </summary>
@@ -517,23 +438,26 @@ namespace ModengTerm.Document.Utility
             //logger.InfoFormat("计算行数, {0}, {1}, {2}", displaySize.Height, typeface.Height, rowSize);
         }
 
-        public static void GetSegement(string text, int characterIndex, out int startIndex, out int endIndex)
+        public static void GetSegement(List<VTCharacter> characters, int characterIndex, out int startIndex, out int count)
         {
             startIndex = 0;
-            endIndex = text.Length - 1;
+            count = 0;
 
-            if (!char.IsLetterOrDigit(text[characterIndex]))
+            // IsLetterOrDigit也可以判断是否是中文，如果是中文，那么就是true
+            if (!char.IsLetterOrDigit(characters[characterIndex].Character))
             {
                 startIndex = characterIndex;
-                endIndex = characterIndex;
+                count = 1;
                 return;
             }
 
+            // 从characterIndex向左搜索，找到statIndex
             for (int i = characterIndex; i >= 0; i--)
             {
-                char c = text[i];
+                char c = characters[i].Character;
                 if (char.IsLetterOrDigit(c))
                 {
+                    count++;
                     continue;
                 }
 
@@ -541,15 +465,16 @@ namespace ModengTerm.Document.Utility
                 break;
             }
 
-            for (int i = characterIndex + 1; i < text.Length; i++)
+            // 从characterIndex向右搜索，找到count
+            for (int i = characterIndex + 1; i < characters.Count; i++)
             {
-                char c = text[i];
+                char c = characters[i].Character;
                 if (char.IsLetterOrDigit(c))
                 {
+                    count++;
                     continue;
                 }
 
-                endIndex = i - 1;
                 break;
             }
         }
@@ -562,7 +487,14 @@ namespace ModengTerm.Document.Utility
         /// <param name="result">分割之后的单词列表</param>
         public static void Split(List<VTCharacter> characters, string[] splitters, out string[] result)
         {
+            result = null;
+
             string text = VTUtils.CreatePlainText(characters);
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
             result = text.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
         }
     }

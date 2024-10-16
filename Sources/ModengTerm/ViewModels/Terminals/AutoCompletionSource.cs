@@ -4,19 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Hooks.AutoCompleted
+namespace ModengTerm.ViewModels.Terminals
 {
     /// <summary>
     /// 封装自动完成数据源模块
     /// 对自动完成列表进行维护
     /// </summary>
-    public class AutoCompletedSource
+    public class AutoCompletionSource
     {
+        private List<string> items;
         private HashSet<string> strings;
 
-        public AutoCompletedSource() 
+        public AutoCompletionSource()
         {
-            this.strings = new HashSet<string>();
+            strings = new HashSet<string>();
+            items = new List<string>();
         }
 
         /// <summary>
@@ -24,16 +26,16 @@ namespace ModengTerm.Terminal.Hooks.AutoCompleted
         /// </summary>
         public void AddItem(string keyword)
         {
-            this.strings.Add(keyword);
+            strings.Add(keyword);
         }
 
         /// <summary>
         /// 从自动完成列表里删除一个备选项目
         /// </summary>
         /// <param name="keyword"></param>
-        public void RemoveItem(string keyword) 
+        public void RemoveItem(string keyword)
         {
-            this.strings.Remove(keyword);
+            strings.Remove(keyword);
         }
 
         /// <summary>
@@ -41,9 +43,11 @@ namespace ModengTerm.Terminal.Hooks.AutoCompleted
         /// </summary>
         /// <param name="keyword">关键字</param>
         /// <returns></returns>
-        public IEnumerable<string> GetItems(string keyword)
+        public List<string> SearchItems(string keyword)
         {
-            return strings.Where(v => v.StartsWith(keyword));
+            this.items.Clear();
+            this.items.AddRange(strings.Where(v => v.StartsWith(keyword)));
+            return this.items;
         }
     }
 }

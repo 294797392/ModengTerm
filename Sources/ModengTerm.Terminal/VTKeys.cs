@@ -815,13 +815,5 @@ namespace ModengTerm.Terminal
         //     该键与另一个键配合使用，用于创建单一的组合字符。
         DeadCharProcessed = 172
     }
-
-    public static class VTKeyConverter
-    {
-        public static VTKeys ConvertConsoleKey(ConsoleKey key)
-        {
-            return (VTKeys)key;
-        }
-    }
 }
 

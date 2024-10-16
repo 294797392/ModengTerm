@@ -1,14 +1,8 @@
-﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Document;
+﻿using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+using ModengTerm.Terminal.Parsing;
+using System.Reflection;
 
 namespace ModengTerm.Terminal
 {
@@ -20,8 +14,9 @@ namespace ModengTerm.Terminal
     {
         /// <summary>
         /// 当某一行被完整打印之后触发
+        /// 只在主缓冲区换行的时候触发
         /// </summary>
-        event Action<IVideoTerminal, VTHistoryLine> LinePrinted;
+        event Action<IVideoTerminal, VTHistoryLine> OnLineFeed;
 
         /// <summary>
         /// 当前显示的文档改变的时候触发
@@ -31,7 +26,18 @@ namespace ModengTerm.Terminal
         /// 第一个VTDocument是oldDocument，意思是切换之前显示的Document
         /// 第二个VTDocument是newDocument，意思是切换之后显示的Document
         /// </summary>
-        event Action<IVideoTerminal, VTDocument, VTDocument> DocumentChanged;
+        event Action<IVideoTerminal, VTDocument, VTDocument> OnDocumentChanged;
+
+        /// <summary>
+        /// 当用户通过键盘输入数据的时候触发
+        /// 在用户输入之后，发送给主机之前触发
+        /// </summary>
+        event Action<IVideoTerminal, VTKeyboardInput> OnKeyboardInput;
+
+        /// <summary>
+        /// 打印一个字符的时候触发
+        /// </summary>
+        event Action<IVideoTerminal> OnPrint;
 
         /// <summary>
         /// 请求改变窗口大小
@@ -40,6 +46,16 @@ namespace ModengTerm.Terminal
         /// double：窗口高度增量，可以有负值
         /// </summary>
         event Action<IVideoTerminal, double, double> RequestChangeWindowSize;
+
+        /// <summary>
+        /// 当处理完C0指令之后触发
+        /// </summary>
+        event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
+
+        /// <summary>
+        /// 在渲染结束的时候触发
+        /// </summary>
+        event Action<IVideoTerminal> OnRendered;
 
         /// <summary>
         /// 会话名字
@@ -76,6 +92,11 @@ namespace ModengTerm.Terminal
         /// 保存日志记录器
         /// </summary>
         VTLogger Logger { get; set; }
+
+        /// <summary>
+        /// 获取终端使用的字体信息
+        /// </summary>
+        VTypeface Typeface { get; }
 
         /// <summary>
         /// 滚动到某个物理行

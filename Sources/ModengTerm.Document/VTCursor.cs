@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ModengTerm.Document.Utility;
+using System.Windows.Media.Animation;
+using System.Windows;
 
 namespace ModengTerm.Document
 {
@@ -223,51 +225,9 @@ namespace ModengTerm.Document
         {
         }
 
-        /// <summary>
-        /// 重绘光标位置
-        /// 每次收到数据渲染完之后调用
-        /// </summary>
         protected override void OnRender()
         {
-            VTextLine activeLine = this.OwnerDocument.ActiveLine;
-            if (activeLine == null)
-            {
-                // 光标不存在
-                // 不要使用SetOpticty隐藏光标，只有闪烁线程才可以调用SetOpacty显隐光标，其他地方如果调用的话会导致光标闪烁不流畅
-                DrawingObject.Arrange(99999, 99999); // 不能使用负数，负数会导致鼠标事件出问题
-                return;
-            }
 
-            // Column表示要输入的下一个字符的位置，从0开始计算
-
-            // 分三种情况去确定光标位置
-
-            // 1. 光标在开头
-            if (this.column == 0)
-            {
-                // 光标所在行没有字符，那么光标在位置0处显示
-                DrawingObject.Arrange(0, activeLine.OffsetY);
-            }
-
-            // 2. 光标在结尾
-            else if (this.column == activeLine.Columns)
-            {
-                DrawingObject.Arrange(activeLine.Width, activeLine.OffsetY);
-            }
-
-            // 3. 光标在中间
-            else if (this.column > 0 && this.column < activeLine.Columns)
-            {
-                int characterIndex = activeLine.FindCharacterIndex(this.column);
-                VTextRange textRange = activeLine.MeasureCharacter(characterIndex);
-                double offsetX = textRange.Left;
-                double offsetY = activeLine.OffsetY;
-                DrawingObject.Arrange(offsetX, offsetY);
-            }
-            else
-            {
-                logger.ErrorFormat("渲染光标失败, 没有考虑到的光标所在位置, cursorColumn = {0}, activeLine.Columns = {1}", this.column, activeLine.Columns);
-            }
         }
 
         #endregion
@@ -312,6 +272,68 @@ namespace ModengTerm.Document
             }
 
             this.RequestInvalidate();
+        }
+
+        /// <summary>
+        /// 移动到当前位置
+        /// 每次收到数据渲染完之后调用
+        /// </summary>
+        public void Move() 
+        {
+            VTextLine activeLine = this.OwnerDocument.ActiveLine;
+            if (activeLine == null)
+            {
+                // 光标不存在
+                // 不要使用SetOpticty隐藏光标，只有闪烁线程才可以调用SetOpacty显隐光标，其他地方如果调用的话会导致光标闪烁不流畅
+                DrawingObject.Arrange(99999, 99999); // 不能使用负数，负数会导致鼠标事件出问题
+                return;
+            }
+
+            // Column表示要输入的下一个字符的位置，从0开始计算
+
+            double offsetX = -1, offsetY = -1;
+
+            // 分三种情况去确定光标位置
+
+            // 1. 光标在开头
+            if (this.column == 0)
+            {
+                // 光标所在行没有字符，那么光标在位置0处显示
+                offsetX = 0;
+                offsetY = activeLine.OffsetY;
+            }
+
+            // 2. 光标在结尾
+            else if (this.column == activeLine.Columns)
+            {
+                offsetX = activeLine.Width;
+                offsetY = activeLine.OffsetY;
+            }
+
+            // 3. 光标在中间
+            else if (this.column > 0 && this.column < activeLine.Columns)
+            {
+                int characterIndex = activeLine.FindCharacterIndex(this.column);
+                VTextRange textRange = activeLine.MeasureCharacter(characterIndex);
+                offsetX = textRange.Left;
+                offsetY = activeLine.OffsetY;
+            }
+            else
+            {
+                logger.ErrorFormat("渲染光标失败, 没有考虑到的光标所在位置, cursorColumn = {0}, activeLine.Columns = {1}", this.column, activeLine.Columns);
+                return;
+            }
+
+            // 要移动的位置和当前的位置一样
+            if (this.OffsetX == offsetX && this.OffsetY == offsetY)
+            {
+                return;
+            }
+
+            this.OffsetX = offsetX;
+            this.OffsetY = offsetY;
+
+            DrawingObject.Arrange(offsetX, offsetY);
         }
 
         #endregion

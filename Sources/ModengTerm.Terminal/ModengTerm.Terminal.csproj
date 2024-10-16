@@ -17,15 +17,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="AutoCompletions\**" />
     <Compile Remove="Document\**" />
     <Compile Remove="Rendering\**" />
     <Compile Remove="TestCase\**" />
+    <EmbeddedResource Remove="AutoCompletions\**" />
     <EmbeddedResource Remove="Document\**" />
     <EmbeddedResource Remove="Rendering\**" />
     <EmbeddedResource Remove="TestCase\**" />
+    <None Remove="AutoCompletions\**" />
     <None Remove="Document\**" />
     <None Remove="Rendering\**" />
     <None Remove="TestCase\**" />
+    <Page Remove="AutoCompletions\**" />
     <Page Remove="Document\**" />
     <Page Remove="Rendering\**" />
     <Page Remove="TestCase\**" />
@@ -42,6 +46,7 @@
     <Compile Remove="PrimaryScreen.cs" />
     <Compile Remove="VTBookmark.cs" />
     <Compile Remove="VTColor.cs" />
+    <Compile Remove="VTKeys.cs" />
     <Compile Remove="VTScreen.cs" />
     <Compile Remove="VTUtils.cs" />
   </ItemGroup>

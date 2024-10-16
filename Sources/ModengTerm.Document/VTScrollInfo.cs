@@ -154,7 +154,7 @@ namespace ModengTerm.Document
         {
         }
 
-        public void RequestInvalidate()
+        public void Render()
         {
             if (!HasScroll)
             {

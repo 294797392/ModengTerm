@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Document;
 using ModengTerm.Terminal.Parsing;
 using System;
 using System.Collections.Generic;
