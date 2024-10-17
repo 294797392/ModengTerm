@@ -32,6 +32,11 @@ namespace ModengTerm.Base
 
         #endregion
 
+        /// <summary>
+        /// 最多保存10个最近打开的会话
+        /// </summary>
+        public const int MaxRecentSessions = 10;
+
         public const int DrawFrameInterval = 40;
 
         public const int MIN_PORT = 1;

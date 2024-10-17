@@ -366,7 +366,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             VideoTerminal videoTerminal = new VideoTerminal();
             videoTerminal.OnViewportChanged += this.VideoTerminal_ViewportChanged;
-            videoTerminal.OnLineFeed += VideoTerminal_LinePrinted;
+            videoTerminal.OnLineFeed += VideoTerminal_LineFeed;
             videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
@@ -422,7 +422,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.sessionTransport.Release();
 
             this.videoTerminal.OnViewportChanged -= this.VideoTerminal_ViewportChanged;
-            this.videoTerminal.OnLineFeed -= this.VideoTerminal_LinePrinted;
+            this.videoTerminal.OnLineFeed -= this.VideoTerminal_LineFeed;
             this.videoTerminal.OnDocumentChanged -= this.VideoTerminal_DocumentChanged;
             this.videoTerminal.Release();
 
@@ -755,11 +755,19 @@ namespace ModengTerm.Terminal.ViewModels
             this.ViewportColumn = newColumn;
         }
 
-        private void VideoTerminal_LinePrinted(IVideoTerminal vt, VTHistoryLine historyLine)
+        private void VideoTerminal_LineFeed(IVideoTerminal vt, bool isAlternate, int oldPhysicsRow, VTHistoryLine historyLine)
         {
-            VTHistory history = vt.MainDocument.History;
+            if (isAlternate)
+            {
+                return;
+            }
 
-            this.TotalRows = history.Lines;
+            int totalRows = oldPhysicsRow + 1;
+
+            if (totalRows > this.TotalRows)
+            {
+                this.TotalRows = totalRows;
+            }
         }
 
         private void VideoTerminal_DocumentChanged(IVideoTerminal arg1, VTDocument oldDocument, VTDocument newDocument)

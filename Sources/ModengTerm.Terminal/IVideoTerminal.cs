@@ -13,10 +13,15 @@ namespace ModengTerm.Terminal
     public interface IVideoTerminal
     {
         /// <summary>
-        /// 当某一行被完整打印之后触发
-        /// 只在主缓冲区换行的时候触发
+        /// 当执行换行之后触发
+        /// 主缓冲区和备用缓冲区换行的时候都会触发，使用第二个参数标识当前换行的是主缓冲区还是备用缓冲区
+        /// 
+        /// IVideoTerminal：终端对象
+        /// bool：是否是备用缓冲区
+        /// int：换行之前的光标所在物理行数，从0开始计数
+        /// VTHistoryLine：被完整打印的行
         /// </summary>
-        event Action<IVideoTerminal, VTHistoryLine> OnLineFeed;
+        event Action<IVideoTerminal, bool, int, VTHistoryLine> OnLineFeed;
 
         /// <summary>
         /// 当前显示的文档改变的时候触发

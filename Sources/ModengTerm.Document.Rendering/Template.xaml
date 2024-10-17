@@ -121,10 +121,9 @@
                         <!-- 上面的三角形 -->
                         <RepeatButton Grid.Row="0" x:Name="DecreaseRepeat" Command="ScrollBar.LineUpCommand" Style="{StaticResource ResourceKey=StyleRepeatButtonDecrease}"/>
 
-                        <Grid Grid.Row="1" Margin="4">
+                        <Grid Grid.Row="1">
                             <!-- 滑动条 -->
-                            <Track x:Name="PART_Track" Orientation="Vertical" 
-                                   IsDirectionReversed="true" Width="{TemplateBinding Width}">
+                            <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="true">
                                 <Track.Thumb>
                                     <Thumb x:Name="Thumb" Style="{StaticResource ResourceKey=StyleThumbLocal}"/>
                                 </Track.Thumb>
@@ -168,8 +167,9 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="5"/>
-                            <ColumnDefinition Width="15"/>
+                            <ColumnDefinition Width="0"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="3"/>
                         </Grid.ColumnDefinitions>
 
                         <mrendering:DrawingArea Grid.Column="0" x:Name="PART_DrawingArea" Background="Transparent"

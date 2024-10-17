@@ -251,7 +251,7 @@ namespace ModengTerm.ViewModels.Terminals
             // 这里说明可以显示自动完成列表了
         }
 
-        private void Terminal_OnLineFeed(IVideoTerminal arg1, VTHistoryLine historyLine)
+        private void Terminal_OnLineFeed(IVideoTerminal arg1, bool isAlternate, int oldPhysicsRow, VTHistoryLine historyLine)
         {
             string[] strings;
             VTUtils.Split(historyLine.Characters, Splitters, out strings);

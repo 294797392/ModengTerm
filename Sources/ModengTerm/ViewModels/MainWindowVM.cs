@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
 using System;
@@ -94,6 +95,15 @@ namespace ModengTerm.ViewModels
                 SessionId = session.ID,
                 SessionName = session.Name,
             };
+
+            // 保存的最近打开会话超出了最大个数
+            // 删除最早保存的会话
+            if (this.RecentlyOpenedSession.Count > MTermConsts.MaxRecentSessions)
+            {
+                RecentlySessionVM oldestSession = this.RecentlyOpenedSession[0];
+                this.RecentlyOpenedSession.RemoveAt(0);
+                this.serviceAgent.DeleteRecentSession(oldestSession.ID.ToString());
+            }
 
             this.RecentlyOpenedSession.Add(new RecentlySessionVM(recentlySession));
 

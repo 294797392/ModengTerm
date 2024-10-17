@@ -140,9 +140,16 @@ namespace ModengTerm.Terminal.Loggering
         /// 当行被打印的时候触发
         /// </summary>
         /// <param name="vt">触发该事件的终端</param>
+        /// <param name="isAlternate">是否是备用缓冲区</param>
+        /// <param name="oldPhysicsRow">换行之前光标所在的物理行数</param>
         /// <param name="historyLine">被打印出来的行数据</param>
-        private void VideoTerminal_LinePrinted(IVideoTerminal vt, VTHistoryLine historyLine)
+        private void VideoTerminal_LinePrinted(IVideoTerminal vt, bool isAlternate, int oldPhysicsRow, VTHistoryLine historyLine)
         {
+            if (isAlternate) 
+            {
+                return;
+            }
+
             VTLogger logger = vt.Logger;
             if (logger.IsPaused)
             {

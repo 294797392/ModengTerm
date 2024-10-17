@@ -64,9 +64,8 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 当某一行被完整打印之后触发
         /// 如果同一行被多次打印（top命令），那么只会在第一次打印的时候触发
-        /// 只有在主缓冲区的时候才会触发
         /// </summary>
-        public event Action<IVideoTerminal, VTHistoryLine> OnLineFeed;
+        public event Action<IVideoTerminal, bool, int, VTHistoryLine> OnLineFeed;
 
         /// <summary>
         /// 当切换显示文档之后触发
@@ -574,6 +573,8 @@ namespace ModengTerm.Terminal
                 // 变化之后的行和列和现在的行和列一样，什么都不做
                 return;
             }
+
+            logger.InfoFormat("Resize, newRow = {0}, newCol = {1}, oldRow = {2}, oldCol = {3}", newRow, newCol, oldRow, oldCol);
 
             // 对Document执行Resize
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的？暂时先这样
@@ -1895,6 +1896,7 @@ namespace ModengTerm.Terminal
             {
                 // 没换行之前的光标所在行，该行数据被打印完了
                 VTextLine oldActiveLine = document.ActiveLine;
+                int oldPhysicsRow = oldActiveLine.GetPhysicsRow();
 
                 // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
                 logger.DebugFormat("LineFeed，光标在可滚动区域最后一行，向下滚动一行");
@@ -1934,35 +1936,37 @@ namespace ModengTerm.Terminal
                     VTHistoryLine historyLine = new VTHistoryLine();
                     activeLine.SetHistory(historyLine);
                     history.AddHistory(historyLine);
-
-                    // 触发行被完全打印的事件
-                    this.OnLineFeed?.Invoke(this, oldActiveLine.History);
                 }
+
+                // 触发行被完全打印的事件
+                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
             }
             else
             {
                 // 没换行之前的光标所在行，该行数据被打印完了
                 VTextLine oldActiveLine = document.ActiveLine;
+                int oldPhysicsRow = oldActiveLine.GetPhysicsRow();
 
                 // 光标不在可滚动区域的最后一行，说明可以直接移动光标
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
                 document.SetCursor(Cursor.Row + 1, Cursor.Column);
 
-                VTextLine activeLine = document.ActiveLine;
-
                 // 光标移动到该行的时候再加入历史记录
                 if (!this.IsAlternate)
                 {
+                    VTextLine activeLine = document.ActiveLine;
+
                     // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
                     // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
                     int physicsRow = activeLine.GetPhysicsRow();
                     if (!history.ContainHistory(physicsRow))
                     {
                         history.AddHistory(activeLine.History);
-
-                        this.OnLineFeed?.Invoke(this, oldActiveLine.History);
                     }
                 }
+
+                // 触发行被完全打印的事件
+                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
             }
 
             int newRow = this.CursorRow;
