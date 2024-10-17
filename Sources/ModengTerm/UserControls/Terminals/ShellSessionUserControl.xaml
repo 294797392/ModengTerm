@@ -88,6 +88,10 @@
         </Grid>
 
         <!-- 自动完成下拉列表 -->
+        <!--
+            KeyDown是路由事件，当AutoCompletionUserControl里的ListBox控件触发KeyDown事件的时候，事件会被继续传播到它的父元素
+            也就是AutoCompletionUserControl
+        -->
         <termuc:AutoCompletionUserControl Grid.Row="0" Grid.RowSpan="9999" x:Name="AutoCompletionUserControl"
                                           Items="{Binding Path=Items}" IsOpen="{Binding Path=IsOpen}"
                                           VideoTerminal="{Binding Path=VideoTerminal}" Visibility="Collapsed"

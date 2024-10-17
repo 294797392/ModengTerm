@@ -13,7 +13,7 @@ namespace ModengTerm.Terminal.Renderer
     /// 将收到的数据按照可打印字符渲染（包含中文）
     /// 会处理换行逻辑
     /// </summary>
-    public class TextRenderer : ShellRenderer
+    public class TextRenderer : VTermRenderer
     {
         private VTDocument document;
 

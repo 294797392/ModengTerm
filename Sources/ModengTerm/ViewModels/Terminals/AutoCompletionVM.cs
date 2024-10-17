@@ -6,6 +6,7 @@ using ModengTerm.Terminal.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Forms;
 using System.Xaml;
 using WPFToolkit.MVVM;
 
@@ -38,8 +39,6 @@ namespace ModengTerm.ViewModels.Terminals
         private AutoCompletionSource source;
         private bool enabled;
         private bool bsEntered;
-        private double offsetX;
-        private double offsetY;
         private bool isOpen;
 
         /// <summary>
@@ -114,32 +113,6 @@ namespace ModengTerm.ViewModels.Terminals
             }
         }
 
-        public double OffsetX
-        {
-            get { return this.offsetX; }
-            private set
-            {
-                if (this.offsetX != value)
-                {
-                    this.offsetX = value;
-                    this.NotifyPropertyChanged("OffsetX");
-                }
-            }
-        }
-
-        public double OffsetY
-        {
-            get { return this.offsetY; }
-            private set
-            {
-                if (this.offsetY != value)
-                {
-                    this.offsetY = value;
-                    this.NotifyPropertyChanged("OffsetY");
-                }
-            }
-        }
-
         #endregion
 
         #region 公开接口
@@ -181,12 +154,14 @@ namespace ModengTerm.ViewModels.Terminals
             VTUtils.GetSegement(characters, col - 1, out startIndex, out count);
             if (count == 0)
             {
+                this.Close();
                 return;
             }
 
             string text = VTUtils.CreatePlainText(characters, startIndex, count);
             if (string.IsNullOrEmpty(text))
             {
+                this.Close();
                 return;
             }
 
@@ -201,7 +176,7 @@ namespace ModengTerm.ViewModels.Terminals
             }
             else
             {
-                logger.DebugFormat("打开自动完成列表, {0}", autoCompleteItems.Count);
+                //logger.FatalFormat("打开自动完成列表, {0}", autoCompleteItems.Count);
                 this.Items.Clear();
                 this.Items.AddRange(autoCompleteItems);
                 this.IsOpen = true;
@@ -271,6 +246,8 @@ namespace ModengTerm.ViewModels.Terminals
                 }
             }
 
+            logger.DebugFormat("OnKyeboardInput, {0}", this.waitPrintLen);
+
             // 这里说明可以显示自动完成列表了
         }
 
@@ -299,21 +276,23 @@ namespace ModengTerm.ViewModels.Terminals
 
         private void Terminal_OnPrint(IVideoTerminal arg1)
         {
-            if (this.waitPrintLen == 0)
+            if (this.waitPrintLen <= 0)
             {
                 return;
             }
 
             this.waitPrintLen--;
 
-            if (this.waitPrintLen != 0)
-            {
-                return;
-            }
+            logger.DebugFormat("OnPrint, {0}", this.waitPrintLen);
 
-            // 用户输入的字符已经接收完毕了，可以执行自动完成列表的显示逻辑了
-            // 在下次渲染结束的时候显示自动完成列表
-            this.showAcList = true;
+            if (this.waitPrintLen == 0)
+            {
+                logger.DebugFormat("showAcList");
+
+                // 用户输入的字符已经接收完毕了，可以执行自动完成列表的显示逻辑了
+                // 在下次渲染结束的时候显示自动完成列表
+                this.showAcList = true;
+            }
         }
 
         private void Terminal_OnC0ActionExecuted(IVideoTerminal arg1, ASCIITable ascii)
@@ -330,6 +309,7 @@ namespace ModengTerm.ViewModels.Terminals
 
                         this.bsEntered = false;
 
+                        // 使用退格键移动光标之后，等渲染完之后显示自动完成列表
                         this.showAcList = true;
 
                         // 在下次渲染结束的时候显示自动完成列表

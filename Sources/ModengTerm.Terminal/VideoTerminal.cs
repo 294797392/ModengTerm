@@ -183,7 +183,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 数据渲染器
         /// </summary>
-        private ShellRenderer renderer;
+        private VTermRenderer renderer;
 
         private bool isApplicationMode;
         private bool isAnsiMode;
@@ -837,7 +837,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private ShellRenderer CreateRenderer()
+        private VTermRenderer CreateRenderer()
         {
             XTermSession session = this.vtOptions.Session;
 

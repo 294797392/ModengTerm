@@ -1,20 +1,8 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Terminal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ModengTerm.Terminal.Renderer;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls.Terminals
@@ -25,6 +13,10 @@ namespace ModengTerm.UserControls.Terminals
     public partial class AutoCompletionUserControl : UserControl
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("AutoCompletionUserControl");
+
+        private double offsetX;
+        private double offsetY;
+
 
         public BindableCollection<string> Items
         {
@@ -56,7 +48,7 @@ namespace ModengTerm.UserControls.Terminals
 
         // Using a DependencyProperty as the backing store for VideoTerminal.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty VideoTerminalProperty =
-            DependencyProperty.Register("VideoTerminal", typeof(IVideoTerminal), typeof(AutoCompletionUserControl), new PropertyMetadata(null));
+            DependencyProperty.Register("VideoTerminal", typeof(IVideoTerminal), typeof(AutoCompletionUserControl), new PropertyMetadata(null, VideoTerminalPropertyChangedCallback));
 
 
         public AutoCompletionUserControl()
@@ -67,6 +59,11 @@ namespace ModengTerm.UserControls.Terminals
 
         private void Reposition()
         {
+            if (double.IsNaN(ListBoxAutoCompletionItems.ActualHeight))
+            {
+                return;
+            }
+
             IVideoTerminal vt = this.VideoTerminal;
             VTDocument document = vt.ActiveDocument;
             VTCursor cursor = document.Cursor;
@@ -79,17 +76,31 @@ namespace ModengTerm.UserControls.Terminals
             // 显示整个列表需要的高度
             double desireHeight = ListBoxAutoCompletionItems.ActualHeight;
 
+            double newOffsetX = 0, newOffsetY = 0;
+
             if (desireHeight > remainHeight)
             {
                 // 剩下的区域不够显示列表。把列表显示到光标上面   
-                Canvas.SetLeft(ListBoxAutoCompletionItems, cursor.OffsetX);
-                Canvas.SetTop(ListBoxAutoCompletionItems, cursor.OffsetY - desireHeight);
+                newOffsetX = cursor.OffsetX;
+                newOffsetY = cursor.OffsetY - desireHeight;
             }
             else
             {
                 // 显示到光标下面
-                Canvas.SetLeft(ListBoxAutoCompletionItems, cursor.OffsetX);
-                Canvas.SetTop(ListBoxAutoCompletionItems, cursor.Bottom);
+                newOffsetX = cursor.OffsetX;
+                newOffsetY = cursor.Bottom;
+            }
+
+            if (newOffsetX != this.offsetX)
+            {
+                Canvas.SetLeft(ListBoxAutoCompletionItems, newOffsetX);
+                this.offsetX = newOffsetX;
+            }
+
+            if (newOffsetY != this.offsetY)
+            {
+                Canvas.SetTop(ListBoxAutoCompletionItems, newOffsetY);
+                this.offsetY = newOffsetY;
             }
         }
 
@@ -125,6 +136,38 @@ namespace ModengTerm.UserControls.Terminals
             }
         }
 
+        private static void VideoTerminalPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            AutoCompletionUserControl me = d as AutoCompletionUserControl;
+            me.OnVideoTerminalPropertyChanged(e.OldValue, e.NewValue);
+        }
+
+        private void OnVideoTerminalPropertyChanged(object oldValue, object newValue)
+        {
+            IVideoTerminal newVt = newValue as IVideoTerminal;
+            if (newVt != null)
+            {
+                newVt.OnRendered += VideoTerminal_OnRendered;
+            }
+
+            IVideoTerminal oldVt = oldValue as IVideoTerminal;
+            if (oldVt != null) 
+            {
+                oldVt.OnRendered -= VideoTerminal_OnRendered;
+            }
+        }
+
+        private void VideoTerminal_OnRendered(IVideoTerminal obj)
+        {
+            if (this.IsOpen)
+            {
+                // 列表大小没变化，但是光标位置变化了
+                // 自动完成列表要跟着光标位置移动
+
+                this.Reposition();
+            }
+        }
+
         private void ListBoxAutoCompletionItems_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!this.IsOpen)
@@ -132,9 +175,39 @@ namespace ModengTerm.UserControls.Terminals
                 return;
             }
 
+            // 宽度高度都没变化，不需要重新定位
+            if (!e.WidthChanged && !e.HeightChanged)
+            {
+                return;
+            }
+
             // SizeChanged的时候才能获取到正确的ListBox的高度
             // 所以在这个事件里去对自动完成列表重新定位
             this.Reposition();
+        }
+
+        private void ListBoxAutoCompletionItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // 让选中的项目获得焦点，以便于使用方向键移动的时候滚动条可以自动滚动
+            if (!this.IsOpen)
+            {
+                return;
+            }
+
+            ListBoxItem listBoxItem = ListBoxAutoCompletionItems.ItemContainerGenerator.ContainerFromItem(ListBoxAutoCompletionItems.SelectedItem) as ListBoxItem;
+            if (listBoxItem == null)
+            {
+                return;
+            }
+
+            if (!listBoxItem.IsFocused)
+            {
+                // ListBoxItem获取焦点后，可以使用方向键选中不同的项目
+                // 同时ListBoxItem也会触发KeyDown事件
+                // 因为KeyDown事件是路由事件，会传播到AutoCompletionUserControl
+                // ShellSessionUserControl再注册AutoCompletionUserControl的KeyDown事件作为终端的输入事件
+                listBoxItem.Focus();
+            }
         }
     }
 }

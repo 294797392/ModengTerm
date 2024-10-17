@@ -5,6 +5,7 @@ using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,7 @@ namespace ModengTerm.Terminal.UserControls
         #region 实例变量
 
         private ShellSessionVM shellSession;
+        private AutoCompletionVM autoCompleteVM;
         private IVideoTerminal videoTerminal;
         private VTKeyboardInput userInput;
 
@@ -133,7 +135,7 @@ namespace ModengTerm.Terminal.UserControls
 
         #region 事件处理器
 
-        private void ContentCanvas_PreviewMouseMove(object sender, MouseEventArgs e)
+        private void DrawArea_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
@@ -141,7 +143,7 @@ namespace ModengTerm.Terminal.UserControls
             this.HandleCaptureAction(sender, mouseData);
         }
 
-        private void ContentCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void DrawArea_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
@@ -149,7 +151,7 @@ namespace ModengTerm.Terminal.UserControls
             this.HandleCaptureAction(sender, mouseData);
         }
 
-        private void ContentCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void DrawArea_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MouseData mouseData = this.GetMouseData(sender, e);
             VTEventInput eventInput = this.GetActiveEventInput();
@@ -157,7 +159,7 @@ namespace ModengTerm.Terminal.UserControls
             this.HandleCaptureAction(sender, mouseData);
         }
 
-        private void ContentCanvas_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void DrawArea_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
             if (brc == BehaviorRightClicks.FastCopyPaste)
@@ -243,9 +245,9 @@ namespace ModengTerm.Terminal.UserControls
             VTKeys vtKey = VTermUtils.ConvertToVTKey(e.Key);
 
             // 如果启用了自动完成功能，那么先把按键事件传递给自动完成功能
-            if (this.shellSession.AutoCompletionVM.Enabled)
+            if (this.autoCompleteVM.Enabled)
             {
-                if (!this.shellSession.AutoCompletionVM.OnKeyDown(vtKey)) 
+                if (!this.autoCompleteVM.OnKeyDown(vtKey))
                 {
                     return;
                 }
@@ -359,7 +361,7 @@ namespace ModengTerm.Terminal.UserControls
         private void AutoCompletionUserControl_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             // 模拟输入Enter
-            this.shellSession.AutoCompletionVM.OnKeyDown(VTKeys.Enter);
+            this.autoCompleteVM.OnKeyDown(VTKeys.Enter);
         }
 
         #endregion
@@ -379,15 +381,15 @@ namespace ModengTerm.Terminal.UserControls
             double height = DocumentMain.DrawAreaSize.Height - padding * 2;
 
             DocumentAlternate.SetPadding(padding);
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentAlternate.DrawArea.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
-            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown += DrawArea_PreviewMouseLeftButtonDown;
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp += DrawArea_PreviewMouseLeftButtonUp;
+            DocumentAlternate.DrawArea.PreviewMouseMove += DrawArea_PreviewMouseMove;
+            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
             DocumentMain.SetPadding(padding);
-            DocumentMain.DrawArea.PreviewMouseLeftButtonDown += ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentMain.DrawArea.PreviewMouseLeftButtonUp += ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentMain.DrawArea.PreviewMouseMove += ContentCanvas_PreviewMouseMove;
-            DocumentMain.DrawArea.PreviewMouseRightButtonDown += ContentCanvas_PreviewMouseRightButtonDown;
+            DocumentMain.DrawArea.PreviewMouseLeftButtonDown += DrawArea_PreviewMouseLeftButtonDown;
+            DocumentMain.DrawArea.PreviewMouseLeftButtonUp += DrawArea_PreviewMouseLeftButtonUp;
+            DocumentMain.DrawArea.PreviewMouseMove += DrawArea_PreviewMouseMove;
+            DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
 
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
@@ -395,6 +397,8 @@ namespace ModengTerm.Terminal.UserControls
             this.shellSession.Width = width;
             this.shellSession.Height = height;
             this.shellSession.Open();
+
+            this.autoCompleteVM = this.shellSession.AutoCompletionVM;
 
             this.videoTerminal = this.shellSession.VideoTerminal;
             this.videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
@@ -413,12 +417,12 @@ namespace ModengTerm.Terminal.UserControls
         {
             this.SizeChanged -= TerminalContentUserControl_SizeChanged;
 
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentAlternate.DrawArea.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
-            DocumentMain.DrawArea.PreviewMouseLeftButtonDown -= ContentCanvas_PreviewMouseLeftButtonDown;
-            DocumentMain.DrawArea.PreviewMouseLeftButtonUp -= ContentCanvas_PreviewMouseLeftButtonUp;
-            DocumentMain.DrawArea.PreviewMouseMove -= ContentCanvas_PreviewMouseMove;
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown -= DrawArea_PreviewMouseLeftButtonDown;
+            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp -= DrawArea_PreviewMouseLeftButtonUp;
+            DocumentAlternate.DrawArea.PreviewMouseMove -= DrawArea_PreviewMouseMove;
+            DocumentMain.DrawArea.PreviewMouseLeftButtonDown -= DrawArea_PreviewMouseLeftButtonDown;
+            DocumentMain.DrawArea.PreviewMouseLeftButtonUp -= DrawArea_PreviewMouseLeftButtonUp;
+            DocumentMain.DrawArea.PreviewMouseMove -= DrawArea_PreviewMouseMove;
 
             this.shellSession.Close();
 

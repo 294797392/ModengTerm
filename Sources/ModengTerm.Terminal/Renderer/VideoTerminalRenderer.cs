@@ -12,7 +12,7 @@ namespace ModengTerm.Terminal.Renderer
     /// <summary>
     /// 渲染为终端界面
     /// </summary>
-    public class VideoTerminalRenderer : ShellRenderer
+    public class VideoTerminalRenderer : VTermRenderer
     {
         public VTParser Parser { get; set; }
 

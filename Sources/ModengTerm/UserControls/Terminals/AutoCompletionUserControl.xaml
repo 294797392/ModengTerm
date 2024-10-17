@@ -10,11 +10,12 @@
     <UserControl.Resources>
 
         <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}">
-
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         </Style>
 
         <Style x:Key="StyleListBoxLocal" TargetType="{x:Type ListBox}">
             <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemLocal}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         </Style>
 
     </UserControl.Resources>
@@ -24,7 +25,7 @@
     <Canvas>
         <ListBox x:Name="ListBoxAutoCompletionItems" Width="200" MaxHeight="300"
                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 SizeChanged="ListBoxAutoCompletionItems_SizeChanged"
+                 SizeChanged="ListBoxAutoCompletionItems_SizeChanged" SelectionChanged="ListBoxAutoCompletionItems_SelectionChanged"
                  Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
     </Canvas>
 

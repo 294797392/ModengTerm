@@ -105,7 +105,6 @@
                         <Setter Property="Background" Value="{DynamicResource ResourceKey=BrushSessionSelected}"/>
                     </Trigger>
                 </Style.Triggers>
-                <Setter Property="Padding" Value="10,0,0,0"/>
             </Style>
 
             <Style x:Key="StyleListBoxItemOpenSession" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemSession}">
@@ -338,6 +337,7 @@
                 <TextBlock Text="总行数：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 <TextBlock Text="{Binding Path=TotalRows}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="0,0,20,0"/>
 
+                <TextBlock Text="大小：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 <TextBlock Text="{Binding Path=ViewportRow}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 <TextBlock Text=" x " Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 <TextBlock Text="{Binding Path=ViewportColumn}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
