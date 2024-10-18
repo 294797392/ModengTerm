@@ -9,19 +9,52 @@
 
     <UserControl.Resources>
 
+        <DataTemplate x:Key="DataTemplateColorItem">
+            <Border Width="20" Height="20" Background="{Binding Path=Brush}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="DataTemplateFontItem">
+            <TextBlock Foreground="{Binding Path=Brush}" Text="{Binding Path=Character}"/>
+        </DataTemplate>
+
         <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}">
-            <Setter Property="Background" Value="{Binding Path=Brush}"/>
-            <Setter Property="Margin" Value="3"/>
-            <Setter Property="Height" Value="30"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="BorderBrush" Value="{x:Null}"/>
+            <!--<Setter Property="Background" Value="Pink"/>-->
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="Width" Value="22"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Grid>
+
+                            <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style x:Key="StyleListBoxLocal" TargetType="{x:Type ListBox}">
+            <Setter Property="IsHitTestVisible" Value="False"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="{x:Null}"/>
             <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="ItemsSource" Value="{Binding}"/>
             <Setter Property="SelectedItem" Value="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Setter Property="ItemTemplate" Value="{StaticResource ResourceKey=DataTemplateColorItem}"/>
             <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemLocal}"/>
+            <Setter Property="Margin" Value="3,0,3,0"/>
+            <Setter Property="Padding" Value="0"/>
             <Setter Property="ItemsPanel">
                 <Setter.Value>
                     <ItemsPanelTemplate>
@@ -29,21 +62,54 @@
                     </ItemsPanelTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBox}">
+
+                        <Grid>
+
+                            <ItemsPresenter/>
+
+                        </Grid>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+
         </Style>
 
     </UserControl.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="40"/>
-            <RowDefinition Height="40"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <Border Grid.Row="0" Grid.RowSpan="999"/>
+        <Border Grid.Column="0" Grid.ColumnSpan="999" x:Name="BorderBackground"/>
 
-        <ListBox Grid.Row="0" x:Name="ListBoxBrightColors" Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="5"/>
+            </Grid.RowDefinitions>
 
-        <ListBox Grid.Row="1" x:Name="ListBoxDarkColors" Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
+            <ListBox Grid.Row="1" x:Name="ListBoxBrightColors" Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
+            <ListBox Grid.Row="2" x:Name="ListBoxDarkColors" Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
+            <ListBox Grid.Row="3" x:Name="ListBoxBrightColorsFont" ItemTemplate="{StaticResource ResourceKey=DataTemplateFontItem}"
+                     Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
+            <ListBox Grid.Row="4" x:Name="ListBoxDarkColorsFont" ItemTemplate="{StaticResource ResourceKey=DataTemplateFontItem}"
+                     Style="{StaticResource ResourceKey=StyleListBoxLocal}"/>
+            
+        </Grid>
+
+        <TextBlock Grid.Column="1" x:Name="TextBlockFontPreview" Text="This is preview text." VerticalAlignment="Top" HorizontalAlignment="Left"
+                   Margin="5"/>
 
     </Grid>
 </UserControl>
