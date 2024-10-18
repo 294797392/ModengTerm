@@ -18,6 +18,7 @@ using ModengTerm.Windows;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -633,6 +634,48 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 处理录像
+        /// </summary>
+        /// <param name="bytes">收到的数据</param>
+        /// <param name="size">收到的数据长度</param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void HandleRecord(byte[] bytes, int size) 
+        {
+            switch (this.recordState)
+            {
+                case RecordStatusEnum.Pause:
+                    {
+                        break;
+                    }
+
+                case RecordStatusEnum.Stop:
+                    {
+                        break;
+                    }
+
+                case RecordStatusEnum.Recording:
+                    {
+                        // 拷贝回放数据
+                        byte[] frameData = new byte[size];
+                        Buffer.BlockCopy(bytes, 0, frameData, 0, frameData.Length);
+
+                        // 写入回放帧
+                        PlaybackFrame frame = new PlaybackFrame()
+                        {
+                            Timestamp = DateTime.Now.ToFileTime(),
+                            Data = frameData
+                        };
+                        this.playbackStream.WriteFrame(frame);
+
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -794,38 +837,7 @@ namespace ModengTerm.Terminal.ViewModels
                 }
             });
 
-            switch (this.recordState)
-            {
-                case RecordStatusEnum.Pause:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Stop:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Recording:
-                    {
-                        // 拷贝回放数据
-                        byte[] frameData = new byte[size];
-                        Buffer.BlockCopy(bytes, 0, frameData, 0, frameData.Length);
-
-                        // 写入回放帧
-                        PlaybackFrame frame = new PlaybackFrame()
-                        {
-                            Timestamp = DateTime.Now.ToFileTime(),
-                            Data = frameData
-                        };
-                        this.playbackStream.WriteFrame(frame);
-
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
+            this.HandleRecord(bytes, size);
         }
 
         private void SessionTransport_StatusChanged(object client, SessionStatusEnum status)
@@ -986,7 +998,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 开始录像
         /// </summary>
-        private void StartRecord()
+        public void StartRecord()
         {
             if (this.recordState == RecordStatusEnum.Recording)
             {
@@ -1000,18 +1012,14 @@ namespace ModengTerm.Terminal.ViewModels
             recordOptionsWindow.DataContext = recordOptionsVM;
             if ((bool)recordOptionsWindow.ShowDialog())
             {
-                XTermSession playbackSession = JSONHelper.CloneObject<XTermSession, XTermSession>(this.Session);
-                playbackSession.Type = (int)SessionTypeEnum.SSHPlayback;
-
-                PlaybackFile playbackFile = new PlaybackFile()
+                Playback playbackFile = new Playback()
                 {
                     ID = Guid.NewGuid().ToString(),
                     Name = recordOptionsVM.FileName,
-                    Session = playbackSession
+                    Session = this.Session
                 };
 
                 // 先打开录像文件
-                string filePath = VTermUtils.GetPlaybackFilePath(playbackFile);
                 this.playbackStream = new PlaybackStream();
                 int code = this.playbackStream.OpenWrite(playbackFile);
                 if (code != ResponseCode.SUCCESS)
@@ -1021,7 +1029,7 @@ namespace ModengTerm.Terminal.ViewModels
                 }
 
                 // 然后保存录像记录
-                code = this.ServiceAgent.AddPlaybackFile(playbackFile);
+                code = this.ServiceAgent.AddPlayback(playbackFile);
                 if (code != ResponseCode.SUCCESS)
                 {
                     MTMessageBox.Error("录制失败, 保存录制记录失败, {0}", ResponseCode.GetMessage(code));
@@ -1036,14 +1044,14 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 停止录像
         /// </summary>
-        private void StopRecord()
+        public void StopRecord()
         {
             if (this.recordState == RecordStatusEnum.Stop)
             {
                 return;
             }
 
-            // TODO：此时文件可能正在被写入，PlaybackFile里做了异常处理，所以直接这么写
+            // TODO：此时文件可能正在被写入，playbackStream里做了异常处理，所以直接这么写
             // 需要优化
             this.playbackStream.Close();
 
@@ -1100,16 +1108,11 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 打开录像
         /// </summary>
-        private void OpenRecord()
+        public void OpenRecord()
         {
-            OpenRecordWindow openRecordWindow = new OpenRecordWindow();
-            openRecordWindow.ServiceAgent = this.ServiceAgent;
-            openRecordWindow.Session = this.Session;
-            openRecordWindow.DisplayAllPlaybackList = false;
+            OpenRecordWindow openRecordWindow = new OpenRecordWindow(this.Session);
             openRecordWindow.Owner = Window.GetWindow(this.Content);
             openRecordWindow.Show();
-
-            openRecordWindow.InitializeWindow();
         }
 
         /// <summary>

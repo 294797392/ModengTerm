@@ -68,6 +68,11 @@ namespace ModengTerm.Terminal
         string Name { get; set; }
 
         /// <summary>
+        /// 获取是否存在选中区域
+        /// </summary>
+        bool HasSelection { get; }
+
+        /// <summary>
         /// 当前正在显示的Document
         /// </summary>
         VTDocument ActiveDocument { get; }
@@ -122,6 +127,11 @@ namespace ModengTerm.Terminal
         /// 选中所有内容
         /// </summary>
         void SelectAll();
+
+        /// <summary>
+        /// 取消选中所有区域
+        /// </summary>
+        void UnSelectAll();
 
         /// <summary>
         /// 当大小改变的时候由外部触发

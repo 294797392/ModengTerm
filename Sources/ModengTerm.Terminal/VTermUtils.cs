@@ -72,7 +72,7 @@ namespace ModengTerm.Terminal
         /// <param name="sessionId">回放文件所属的会话Id</param>
         /// <param name="playbackFile">回放文件</param>
         /// <returns></returns>
-        public static string GetPlaybackFilePath(PlaybackFile playbackFile)
+        public static string GetPlaybackFilePath(Playback playbackFile)
         {
             string directory = GetPlaybackFileDirectory(playbackFile.Session.ID);
 

@@ -66,11 +66,11 @@ namespace ModengTerm.Base.ServiceAgents
 
         #endregion
 
-        #region PlaybackFile管理
+        #region Playback管理
 
-        public abstract List<PlaybackFile> GetPlaybackFiles(string sessionId);
-        public abstract int AddPlaybackFile(PlaybackFile file);
-        public abstract int DeletePlaybackFile(string fileId);
+        public abstract List<Playback> GetPlaybacks(string sessionId);
+        public abstract int AddPlayback(Playback file);
+        public abstract int DeletePlayback(string fileId);
 
         #endregion
 

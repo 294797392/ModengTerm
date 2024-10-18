@@ -14,7 +14,7 @@ namespace ModengTerm.Terminal.Session
         private static log4net.ILog logger = log4net.LogManager.GetLogger("PlaybackSession");
 
         private string filePath;
-        private PlaybackFile playbackFile;
+        private Playback playbackFile;
         private PlaybackStream playbackStream;
         private AutoResetEvent playbackEvent;
         private long prevTimestamp = 0;

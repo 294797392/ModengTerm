@@ -164,9 +164,7 @@ namespace ModengTerm.Terminal.UserControls
             BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
             if (brc == BehaviorRightClicks.FastCopyPaste)
             {
-                VTDocument activeDocument = this.videoTerminal.ActiveDocument;
-
-                if (activeDocument.Selection.IsEmpty)
+                if (!this.videoTerminal.HasSelection)
                 {
                     // 粘贴剪贴板里的内容
                     string text = Clipboard.GetText();
@@ -180,7 +178,7 @@ namespace ModengTerm.Terminal.UserControls
                 else
                 {
                     this.shellSession.CopySelection();
-                    activeDocument.ClearSelection();
+                    this.videoTerminal.UnSelectAll();
                 }
             }
         }

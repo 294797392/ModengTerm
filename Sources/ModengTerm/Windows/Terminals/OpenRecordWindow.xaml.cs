@@ -3,10 +3,12 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.UserControls.Terminals;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,114 +29,95 @@ namespace ModengTerm.Terminal.Windows
     {
         #region 实例变量
 
-        private PlaybackVM playbackVM;
+        private ServiceAgent serviceAgent;
+        private bool isPlaying;
 
         #endregion
 
         #region 属性
 
-        /// <summary>
-        /// 访问服务的代理
-        /// </summary>
-        public ServiceAgent ServiceAgent { get; set; }
-
-        /// <summary>
-        /// 要显示的录像列表所属的Session
-        /// </summary>
-        public XTermSession Session { get; set; }
-
-        /// <summary>
-        /// 是否显示所有回放列表
-        /// 如果是，则显示所有Session的回放列表
-        /// 如果否，则只显示传进来的Session的回放列表
-        /// </summary>
-        public bool DisplayAllPlaybackList { get; set; }
-
         #endregion
 
         #region 构造方法
 
-        public OpenRecordWindow()
+        public OpenRecordWindow(XTermSession session)
         {
             InitializeComponent();
+
+            this.InitializeWindow(session);
         }
 
         #endregion
 
-        public void InitializeWindow()
+        #region 实例方法
+
+        private void InitializeWindow(XTermSession session)
         {
-            List<PlaybackFile> playbackList = this.ServiceAgent.GetPlaybackFiles(this.Session.ID);
+            this.serviceAgent = MTermApp.Context.ServiceAgent;
+
+            List<Playback> playbackList = this.serviceAgent.GetPlaybacks(session.ID);
 
             ComboBoxPlaybackList.ItemsSource = playbackList;
         }
 
+        #endregion
+
+        #region 事件处理器
+
         private void ButtonPlay_Click(object sender, RoutedEventArgs e)
         {
-            if (this.playbackVM != null)
+            if (this.isPlaying)
             {
-                // 如果打开了先关闭
-                this.playbackVM.Close();
-                this.playbackVM = null;
+                PlaybackUserControl.Close();
+                this.isPlaying = false;
             }
 
-            PlaybackFile playbackFile = ComboBoxPlaybackList.SelectedItem as PlaybackFile;
-            if (playbackFile == null)
+            Playback playback = ComboBoxPlaybackList.SelectedItem as Playback;
+            if (playback == null)
             {
                 MTMessageBox.Info("请选择要回放的文件");
                 return;
             }
 
-            string playbackFilePath = VTermUtils.GetPlaybackFilePath(playbackFile);
+            string playbackFilePath = VTermUtils.GetPlaybackFilePath(playback);
             if (!System.IO.File.Exists(playbackFilePath))
             {
                 MTMessageBox.Info("回放文件不存在");
                 return;
             }
 
-            TerminalContentUserControl.Session = playbackFile.Session;
-            TerminalContentUserControl.Open();
+            this.isPlaying = true;
 
-            this.playbackVM = playbackVM;
+            PlaybackUserControl.Open(playback);
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
-            PlaybackFile playbackFile = ComboBoxPlaybackList.SelectedItem as PlaybackFile;
-            if (playbackFile == null)
+            Playback playback = ComboBoxPlaybackList.SelectedItem as Playback;
+            if (playback == null)
             {
                 return;
             }
 
-            //string playbackFilePath = VTUtils.GetPlaybackFilePath(this.Session.ID, playbackFile);
-            //if (this.shellSessionVM != null)
-            //{
-            //    if (this.shellSessionVM.PlaybackFilePath == playbackFilePath)
-            //    {
-            //        if (this.shellSessionVM.PlaybackStatus != PlaybackStatusEnum.Idle)
-            //        {
-            //            MTMessageBox.Info("当前回放正在播放中, 无法删除, 请先停止当前回放");
-            //            return;
-            //        }
-            //    }
-            //}
+            if (this.isPlaying) 
+            {
+                MTMessageBox.Info("当前回放正在播放中, 无法删除, 请先停止当前回放");
+                return;
+            }
 
-            //try
-            //{
-            //    File.Delete(playbackFilePath);
-            //}
-            //catch (Exception ex)
-            //{
-
-            //}
+            this.serviceAgent.DeletePlayback(playback.ID);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (this.playbackVM != null)
+            if (this.isPlaying) 
             {
-                this.playbackVM.Close();
-                this.playbackVM = null;
+                PlaybackUserControl.Close();
+
+                this.isPlaying = false;
             }
         }
+
+        #endregion
     }
 }

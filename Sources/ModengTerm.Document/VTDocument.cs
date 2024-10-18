@@ -1340,20 +1340,19 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
+        /// 清空选中的区域
+        /// </summary>
+        public void UnSelectAll()
+        {
+            this.Selection.Clear();
+        }
+
+        /// <summary>
         /// 选中当前显示区域的所有文本
         /// </summary>
         public void SelectViewport()
         {
             this.Selection.SelectViewport();
-        }
-
-        /// <summary>
-        /// 清空选中的区域
-        /// </summary>
-        public void ClearSelection()
-        {
-            this.Selection.Clear();
-            this.Selection.RequestInvalidate();
         }
 
         /// <summary>
@@ -1609,6 +1608,12 @@ namespace ModengTerm.Document
                     {
                         startIndex = 0;
                         count = historyLine.Characters.Count;
+                    }
+
+                    // VTUtils.GetCharacterIndex有可能返回-1，在回放的时候复制会有这个问题，暂时没找到原因
+                    if (startIndex == -1)
+                    {
+                        continue;
                     }
 
                     createLine(historyLine.Characters, builder, startIndex, count, i == lastPhysicsRow);

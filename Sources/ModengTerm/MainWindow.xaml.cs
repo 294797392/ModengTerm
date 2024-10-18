@@ -463,6 +463,38 @@ namespace ModengTerm
             shellSession.ResumeLogger();
         }
 
+        private void MenuItemStartRecord_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.StartRecord();
+        }
+
+        private void MenuItemStopRecord_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.StopRecord();
+        }
+
+        private void MenuItemOpenRecord_Click(object sender, RoutedEventArgs e)
+        {
+            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
+            if (shellSession == null)
+            {
+                return;
+            }
+
+            shellSession.OpenRecord();
+        }
 
 
 

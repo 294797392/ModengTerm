@@ -33,8 +33,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="GridDocument" Background="Transparent"
-              MouseDown="GridDocument_MouseDown" Loaded="GridDocument_Loaded"
+        <Grid x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded"
+              MouseDown="GridDocument_MouseDown" 
               TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
             <Grid.ContextMenu>
                 <ContextMenu ItemsSource="{Binding Path=FunctionMenus}" MenuItem.Click="ContextMenu_Click"

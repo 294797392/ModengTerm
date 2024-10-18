@@ -17,5 +17,5 @@ ModengTerm - v1.0.2
 
 ModengTerm - V1.0.3
 1. 增加自动补全功能
-
+2. 增加录像和回放功能
 

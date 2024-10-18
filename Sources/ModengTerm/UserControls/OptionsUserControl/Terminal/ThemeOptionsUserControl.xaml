@@ -8,7 +8,7 @@
              xmlns:enums="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
              xmlns:documentenums="clr-namespace:ModengTerm.Document.Enumerations;assembly=ModengTerm.Document"
              xmlns:wpftoolkitcontrols="clr-namespace:WPFToolkit.Controls;assembly=WPFToolkit"
-                          xmlns:xceedtoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             xmlns:xceedtoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="UserControl1">

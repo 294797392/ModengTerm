@@ -28,7 +28,7 @@ namespace ModengTerm.Terminal
         public XTermSession Session { get; set; }
 
         /// <summary>
-        /// 发送数据给主机的回调
+        /// 用来发送数据给主机（比如终端的窗口大小改变了）
         /// </summary>
         public SessionTransport SessionTransport { get; set; }
 
@@ -274,6 +274,14 @@ namespace ModengTerm.Terminal
         /// </summary>
         public VTypeface Typeface { get; private set; }
 
+        public bool HasSelection 
+        {
+            get
+            {
+                return !this.activeDocument.Selection.IsEmpty;
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -439,6 +447,12 @@ namespace ModengTerm.Terminal
             }
         }
 
+        public void UnSelectAll()
+        {
+            this.activeDocument.UnSelectAll();
+            this.activeDocument.RequestInvalidate();
+        }
+
         /// <summary>
         /// 创建指定的段落内容
         /// </summary>
@@ -533,6 +547,8 @@ namespace ModengTerm.Terminal
                 LastPhysicsRow = lastPhysicsRow,
                 FormatType = formatType
             };
+
+            //logger.FatalFormat("start = {0},{1}, end = {2},{3}", firstPhysicsRow, startColumn, lastPhysicsRow, endColumn);
 
             return this.activeDocument.GetParagraph(paragraphOptions);
         }

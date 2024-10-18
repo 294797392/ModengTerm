@@ -48,7 +48,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="文件名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="名称：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
         <Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Content="确定" Click="ButtonOK_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>

@@ -12,9 +12,9 @@ namespace ModengTerm.Terminal.Enumerations
     public enum PlaybackStatusEnum
     {
         /// <summary>
-        /// 空闲，还没播放
+        /// 停止
         /// </summary>
-        Idle,
+        Stopped,
 
         /// <summary>
         /// 正在播放中

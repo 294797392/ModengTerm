@@ -56,7 +56,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         private Task playbackTask;
 
-        private PlaybackFile playbackFile;
+        private Playback playbackFile;
         private PlaybackStream playbackStream;
         private AutoResetEvent playbackEvent;
 
@@ -97,7 +97,7 @@ namespace ModengTerm.Terminal
         /// 打开文件以便进行写入
         /// </summary>
         /// <param name="file">要写入的文件</param>
-        public int OpenWrite(PlaybackFile file)
+        public int OpenWrite(Playback file)
         {
             if (this.stream != null)
             {
@@ -131,9 +131,9 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 打开文件以便进行读取
         /// </summary>
-        /// <param name="file">要读取的文件</param>
+        /// <param name="playback">要读取的文件</param>
         /// <returns></returns>
-        public int OpenRead(PlaybackFile file)
+        public int OpenRead(Playback playback)
         {
             if (this.stream != null)
             {
@@ -141,7 +141,7 @@ namespace ModengTerm.Terminal
                 return ResponseCode.FAILED;
             }
 
-            string filePath = VTermUtils.GetPlaybackFilePath(file);
+            string filePath = VTermUtils.GetPlaybackFilePath(playback);
 
             if (!File.Exists(filePath))
             {

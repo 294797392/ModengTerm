@@ -227,13 +227,18 @@
                     <MenuItem x:Name="MenuItemCreateShellCommand" Header="快捷命令" Click="MenuItemShellCommand_Click"/>
                 </MenuItem>
 
-                <MenuItem Header="记录日志" Width="70" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem x:Name="MenuItemStartLog" Header="开始" Click="MenuItemStartLog_Click"/>
-                    <MenuItem x:Name="MenuItemPauseLog" Header="暂停" Click="MenuItemPauseLog_Click"/>
-                    <MenuItem x:Name="MenuItemResumeLog" Header="继续" Click="MenuItemResumeLog_Click"/>
-                    <MenuItem x:Name="MenuItemStopLog" Header="停止" Click="MenuItemStopLog_Click"/>
+                <MenuItem Header="工具" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                    <MenuItem Header="记录日志">
+                        <MenuItem x:Name="MenuItemStartLog" Header="开始" Click="MenuItemStartLog_Click"/>
+                        <MenuItem x:Name="MenuItemStopLog" Header="停止" Click="MenuItemStopLog_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="录制">
+                        <MenuItem x:Name="MenuItemStartRecord" Header="开始" Click="MenuItemStartRecord_Click"/>
+                        <MenuItem x:Name="MenuItemStopRecord" Header="停止" Click="MenuItemStopRecord_Click"/>
+                        <MenuItem x:Name="MenuItemOpenRecord" Header="打开回放" Click="MenuItemOpenRecord_Click"/>
+                    </MenuItem>
                 </MenuItem>
-
+                
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
                     <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->

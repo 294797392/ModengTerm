@@ -305,6 +305,17 @@ namespace ModengTerm.Document.Utility
 
             for (int i = 0; i < count; i++)
             {
+                //if (startIndex + i >= characters.Count)
+                //{
+                //    logger.FatalFormat("{0}, {1},{2}", characters.Count, startIndex, count);
+                //    break;
+                //}
+                //if (startIndex + i < 0) 
+                //{
+                //    logger.FatalFormat("小于0, {0}, {1},{2}", characters.Count, startIndex, count);
+                //    break;
+                //}
+
                 text += characters[startIndex + i].Character;
             }
 

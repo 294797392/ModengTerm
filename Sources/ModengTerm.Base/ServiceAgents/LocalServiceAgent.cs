@@ -23,11 +23,11 @@ namespace ModengTerm.Base.ServiceAgents
 
         private static readonly string DefaultSessionFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "defaultSession.json");
 
-        public override int DeletePlaybackFile(string fileId)
+        public override int DeletePlayback(string fileId)
         {
             try
             {
-                JSONDatabase.Delete<PlaybackFile>(v => v.ID == fileId);
+                JSONDatabase.Delete<Playback>(v => v.ID == fileId);
 
                 return ResponseCode.SUCCESS;
             }
@@ -38,24 +38,24 @@ namespace ModengTerm.Base.ServiceAgents
             }
         }
 
-        public override List<PlaybackFile> GetPlaybackFiles(string sessionId)
+        public override List<Playback> GetPlaybacks(string sessionId)
         {
             try
             {
-                return JSONDatabase.SelectAll<PlaybackFile>();
+                return JSONDatabase.SelectAll<Playback>();
             }
             catch (Exception ex)
             {
                 logger.Error("GetPlaybackFiles异常", ex);
-                return new List<PlaybackFile>();
+                return new List<Playback>();
             }
         }
 
-        public override int AddPlaybackFile(PlaybackFile file)
+        public override int AddPlayback(Playback file)
         {
             try
             {
-                JSONDatabase.Insert<PlaybackFile>(file);
+                JSONDatabase.Insert<Playback>(file);
 
                 return ResponseCode.SUCCESS;
             }

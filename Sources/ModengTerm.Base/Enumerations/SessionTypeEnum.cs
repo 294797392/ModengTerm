@@ -38,6 +38,6 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// SSH回放
         /// </summary>
-        SSHPlayback,
+        //SSHPlayback,
     }
 }

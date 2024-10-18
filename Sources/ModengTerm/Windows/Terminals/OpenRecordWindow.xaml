@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Terminal.Windows"
-        xmlns:termusercontrols="clr-namespace:ModengTerm.Terminal.UserControls"
+        xmlns:termuc="clr-namespace:ModengTerm.UserControls.Terminals"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText5001}" 
         Height="450" Width="700"
@@ -45,7 +45,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <GroupBox Grid.Row="0" Header="回放列表">
+        <GroupBox Grid.Row="0" Header="选择录像">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0"/>
@@ -73,7 +73,7 @@
 
         <Grid Grid.Row="1">
             <GroupBox Header="播放器">
-                <termusercontrols:TerminalContentUserControl x:Name="TerminalContentUserControl"/>
+                <termuc:PlaybackUserControl x:Name="PlaybackUserControl"/>
             </GroupBox>
         </Grid>
 

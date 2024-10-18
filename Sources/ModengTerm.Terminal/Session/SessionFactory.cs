@@ -38,7 +38,7 @@ namespace ModengTerm.Terminal.Session
                         }
                     }
                 case SessionTypeEnum.SerialPort: return new SerialPortSession(options);
-                case SessionTypeEnum.SSHPlayback: return new PlaybackSession(options);
+                //case SessionTypeEnum.SSHPlayback: return new PlaybackSession(options);
                 default:
                     throw new NotImplementedException();
             }
