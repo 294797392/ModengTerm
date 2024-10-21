@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Controls;
 using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace XTerminal.Windows
     /// <summary>
     /// CreateSessionWindow2.xaml 的交互逻辑
     /// </summary>
-    public partial class CreateSessionOptionTreeWindow : Window
+    public partial class CreateSessionOptionTreeWindow : MdWindow
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionOptionTreeWindow");
 

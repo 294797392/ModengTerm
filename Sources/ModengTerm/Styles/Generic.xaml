@@ -63,43 +63,13 @@
         </Setter>
     </Style>
 
-    <Style x:Key="StyleButtonDefault" TargetType="{x:Type Button}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="Black"/>
-            </Trigger>
-        </Style.Triggers>
-        <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="BorderBrush" Value="Silver"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
-        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="Template">
-            <Setter.Value>
-
-                <ControlTemplate TargetType="{x:Type Button}">
-
-                    <Grid>
-
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}"/>
-                        <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
-
-                    </Grid>
-                    
-                </ControlTemplate>
-                
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style x:Key="StyleMTermButton" TargetType="{x:Type mcontrol:MTermButton}">
+    <Style x:Key="StyleMdButton" TargetType="{x:Type mcontrol:MdButton}">
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="{x:Type mcontrol:MTermButton}">
+                <ControlTemplate TargetType="{x:Type mcontrol:MdButton}">
 
                     <Grid>
 
@@ -142,7 +112,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="StyleMTermButtonTool" TargetType="{x:Type mcontrol:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
+    <Style x:Key="StyleMdButtonTool" TargetType="{x:Type mcontrol:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="Width" Value="20"/>
         <Setter Property="Height" Value="20"/>
@@ -157,13 +127,13 @@
         <!--<Setter Property="BorderBrush" Value="Silver"/>-->
     </Style>
 
-    <Style x:Key="StyleMToolPanel" TargetType="{x:Type mcontrol:MToolPanel}">
+    <Style x:Key="StyleMdToolPanel" TargetType="{x:Type mcontrol:MdToolPanel}">
         <Setter Property="BorderBrush" Value="Silver"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Template">
             <Setter.Value>
 
-                <ControlTemplate TargetType="{x:Type mcontrol:MToolPanel}">
+                <ControlTemplate TargetType="{x:Type mcontrol:MdToolPanel}">
 
                     <Grid>
 
@@ -179,9 +149,9 @@
                             <TextBlock DataContext="{TemplateBinding Menu}" Text="{Binding Path=SelectedMenu.Name}"
                                        VerticalAlignment="Center" Margin="10,0,0,0"/>
 
-                            <mcontrol:MTermButton x:Name="PART_CloseButton" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
+                            <mcontrol:MdButton x:Name="PART_CloseButton" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
                                                   SVGPath="{StaticResource ResourceKey=SVGIcon6}"
-                                                  Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
+                                                  Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
 
                         </Grid>
 
@@ -248,7 +218,7 @@
                                     <StackPanel Orientation="Horizontal" IsItemsHost="True"/>
                                 </ItemsPanelTemplate>
                             </ListBox.ItemsPanel>
-                            
+
                         </ListBox>
 
                         <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="{TemplateBinding BorderThickness}" 
@@ -258,9 +228,97 @@
                     </Grid>
 
                 </ControlTemplate>
-                
+
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+
+
+
+
+    <Style x:Key="StyleMdWindow" TargetType="{x:Type mcontrol:MdWindow}">
+        <Style.Triggers>
+            <Trigger Property="CanResize" Value="False">
+                <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome ResizeBorderThickness="5" GlassFrameThickness="1" NonClientFrameEdges="None" CaptionHeight="30" CornerRadius="0"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="WindowStyle" Value="None"/>
+        <Setter Property="CanResize" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type mcontrol:MdWindow}">
+
+                    <ControlTemplate.Resources>
+
+                        <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mcontrol:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
+                            <Setter Property="SVGColor" Value="Black"/>
+                            <Setter Property="SVGMargin" Value="7"/>
+                            <Setter Property="Margin" Value="3"/>
+                            <Setter Property="Width" Value="25"/>
+                            <Setter Property="MouseOverBrush" Value="{DynamicResource ResourceKey=BrushMainWindowButtonHoverBackground}"/>
+                            <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=BrushMainWindowButtonDownBackground}"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Focusable" Value="False"/>
+                        </Style>
+
+                    </ControlTemplate.Resources>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Grid.RowSpan="99" Background="{TemplateBinding Background}"/>
+
+                        <Grid Grid.Row="0" x:Name="PART_Title">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Grid.ColumnSpan="99" BorderBrush="{DynamicResource ResourceKey=BrushTitleBorder}" 
+                                    Background="{DynamicResource ResourceKey=BrushTitleBackground}" BorderThickness="0,0,0,1"/>
+
+                            <Image Grid.Column="0" Source="{DynamicResource ResourceKey=BitmapImageTitleIcon}" Width="20" Height="20"/>
+
+                            <TextBlock Grid.Column="1" Text="{TemplateBinding Title}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+                            <mcontrol:MdButton Grid.Column="2" x:Name="PART_MinButton" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+
+                            <mcontrol:MdButton Grid.Column="3" x:Name="PART_MaxButton" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+
+                            <mcontrol:MdButton Grid.Column="4" x:Name="PART_CloseButton" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+
+                        </Grid>
+
+                        <ContentPresenter Grid.Row="1"/>
+
+                        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="{DynamicResource ResourceKey=BrushWindowBorder}" IsHitTestVisible="False"/>
+
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="CanResize" Value="False">
+                            <!--<Setter Property="Visibility" Value="Collapsed" TargetName="PART_MinButton"/>-->
+                            <Setter Property="Visibility" Value="Collapsed" TargetName="PART_MaxButton"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
 </ResourceDictionary>

@@ -24,8 +24,8 @@
             <Border BorderBrush="{DynamicResource ResourceKey=BrushSplitter}" BorderThickness="0,0,0,1" Background="White"/>
 
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
-                <mcontrols:MTermButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
-                                       Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
+                <mcontrols:MdButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"   
+                                    Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
             </StackPanel>
 
         </Grid>

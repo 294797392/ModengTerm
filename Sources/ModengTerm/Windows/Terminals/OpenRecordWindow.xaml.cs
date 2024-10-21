@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Controls;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.UserControls.Terminals;
@@ -25,7 +26,7 @@ namespace ModengTerm.Terminal.Windows
     /// <summary>
     /// OpenRecordWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class OpenRecordWindow : Window
+    public partial class OpenRecordWindow : MdWindow
     {
         #region 实例变量
 

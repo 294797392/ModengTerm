@@ -237,7 +237,6 @@ namespace ModengTerm.Terminal.ViewModels
             logger.InfoFormat("回放线程运行结束, 关闭回放文件");
 
             playbackStream.Close();
-            playbackEvent.Dispose();
 
             this.playbackStatus = PlaybackStatusEnum.Stopped;
         }

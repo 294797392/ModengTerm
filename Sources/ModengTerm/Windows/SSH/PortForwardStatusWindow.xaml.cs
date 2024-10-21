@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Controls;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Session;
@@ -23,7 +24,7 @@ namespace ModengTerm.Windows.SSH
     /// <summary>
     /// PortForwardStatusWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class PortForwardStatusWindow : Window
+    public partial class PortForwardStatusWindow : MdWindow
     {
         private ShellSessionVM shellSession;
 

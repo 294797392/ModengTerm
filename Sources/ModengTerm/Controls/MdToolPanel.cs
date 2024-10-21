@@ -16,12 +16,12 @@ namespace ModengTerm.Controls
     /// </summary>
     [TemplatePart(Name = "PART_ItemsHeader", Type = typeof(ListBox))]
     [TemplatePart(Name = "PART_Content", Type = typeof(ContentControl))]
-    [TemplatePart(Name = "PART_CloseButton", Type = typeof(MTermButton))]
-    public class MToolPanel : Control
+    [TemplatePart(Name = "PART_CloseButton", Type = typeof(MdButton))]
+    public class MdToolPanel : Control
     {
         private ContentControl contentControl;
         private ListBox listBox;
-        private MTermButton buttonClose;
+        private MdButton buttonClose;
 
 
         public MenuVM Menu
@@ -32,7 +32,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for Menu.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MenuProperty =
-            DependencyProperty.Register("Menu", typeof(MenuVM), typeof(MToolPanel), new PropertyMetadata(null, MenuPropertyChangedCallback));
+            DependencyProperty.Register("Menu", typeof(MenuVM), typeof(MdToolPanel), new PropertyMetadata(null, MenuPropertyChangedCallback));
 
 
         public override void OnApplyTemplate()
@@ -43,7 +43,7 @@ namespace ModengTerm.Controls
             this.listBox = this.Template.FindName("PART_ItemsHeader", this) as ListBox;
             this.listBox.SelectionChanged += ListBox_SelectionChanged;
 
-            this.buttonClose = this.Template.FindName("PART_CloseButton", this) as MTermButton;
+            this.buttonClose = this.Template.FindName("PART_CloseButton", this) as MdButton;
             this.buttonClose.Click += ButtonClose_Click;
         }
 
@@ -65,7 +65,7 @@ namespace ModengTerm.Controls
 
         private static void MenuPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            MToolPanel me = d as MToolPanel;
+            MdToolPanel me = d as MdToolPanel;
             me.OnMenuPropertyChanged(e.OldValue as MenuVM, e.NewValue as MenuVM);
         }
     }

@@ -25,7 +25,7 @@ namespace ModengTerm.Windows
     /// <summary>
     /// LoggerOptionsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class LoggerOptionsWindow : MTermWindow
+    public partial class LoggerOptionsWindow : MdWindow
     {
         private LoggerOptionsVM viewModel;
         private ShellSessionVM shellSession;

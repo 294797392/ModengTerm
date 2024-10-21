@@ -1,16 +1,10 @@
-﻿using DotNEToolkit;
-using ModengTerm;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Controls;
 using ModengTerm.ViewModels;
-using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 using WPFToolkit.MVVM;
-using WPFToolkit.Utility;
-using XTerminal.Base;
-using XTerminal.Base.DataModels;
 using XTerminal.Windows;
 
 namespace ModengTerm.Windows
@@ -18,7 +12,7 @@ namespace ModengTerm.Windows
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionListWindow : Window
+    public partial class SessionListWindow : MdWindow
     {
         #region 类变量
 

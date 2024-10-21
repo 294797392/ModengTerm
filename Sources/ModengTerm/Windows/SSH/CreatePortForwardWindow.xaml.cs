@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Controls;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using System;
@@ -22,7 +23,7 @@ namespace ModengTerm.Windows.SSH
     /// <summary>
     /// CreatePortForwardWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class CreatePortForwardWindow : Window
+    public partial class CreatePortForwardWindow : MdWindow
     {
         /// <summary>
         /// 编辑之后的端口转发信息

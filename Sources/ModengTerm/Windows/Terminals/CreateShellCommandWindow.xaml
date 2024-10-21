@@ -72,14 +72,14 @@
 
                 <Border Grid.Row="1" BorderBrush="Silver" BorderThickness="0,1,0,0"/>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
-                    <mcontrol:MTermButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
-                                          Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
-                    <mcontrol:MTermButton ToolTip="删除" SVGPath="{StaticResource ResourceKey=SVGIcon7}"
-                                          Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
-                    <mcontrol:MTermButton ToolTip="上移" SVGPath="{StaticResource ResourceKey=SVGIcon8}"
-                                          Click="ButtonMoveUp_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
-                    <mcontrol:MTermButton ToolTip="下移" SVGPath="{StaticResource ResourceKey=SVGIcon9}"
-                                          Click="ButtonMoveDown_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTool}"/>
+                    <mcontrol:MdButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
+                                       Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
+                    <mcontrol:MdButton ToolTip="删除" SVGPath="{StaticResource ResourceKey=SVGIcon7}"
+                                       Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
+                    <mcontrol:MdButton ToolTip="上移" SVGPath="{StaticResource ResourceKey=SVGIcon8}"
+                                       Click="ButtonMoveUp_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
+                    <mcontrol:MdButton ToolTip="下移" SVGPath="{StaticResource ResourceKey=SVGIcon9}"
+                                       Click="ButtonMoveDown_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
                 </StackPanel>
 
             </Grid>

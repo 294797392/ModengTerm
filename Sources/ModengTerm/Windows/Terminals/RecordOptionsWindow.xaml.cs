@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.Controls;
+using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace ModengTerm.Terminal.Windows
     /// <summary>
     /// RecordOptionsWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class RecordOptionsWindow : Window
+    public partial class RecordOptionsWindow : MdWindow
     {
         public RecordOptionsWindow()
         {

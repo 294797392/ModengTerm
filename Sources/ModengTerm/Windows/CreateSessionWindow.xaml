@@ -1,4 +1,4 @@
-﻿<Window x:Class="XTerminal.Windows.CreateSessionOptionTreeWindow"
+﻿<mcontrols:MdWindow x:Class="XTerminal.Windows.CreateSessionOptionTreeWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,10 +6,12 @@
         xmlns:local="clr-namespace:XTerminal.Windows"
         xmlns:xtermconverter="clr-namespace:XTerminal"
         xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
+        xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText100}" 
-        Height="600" Width="600" ResizeMode="NoResize"
-        WindowStartupLocation="CenterOwner">
+        Height="600" Width="600" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+                       Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -96,4 +98,4 @@
         </StackPanel>
 
     </Grid>
-</Window>
+</mcontrols:MdWindow>

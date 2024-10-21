@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Controls;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
@@ -22,7 +23,7 @@ namespace ModengTerm.Windows.Terminals
     /// <summary>
     /// SendAllConfigurationWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SendAllConfigurationWindow : Window
+    public partial class SendAllConfigurationWindow : MdWindow
     {
         #region 实例变量
 

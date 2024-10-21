@@ -18,7 +18,7 @@
 
         <ResourceDictionary>
 
-            <Style x:Key="StyleMTermButtonLocal" TargetType="{x:Type mcontrol:MTermButton}">
+            <Style x:Key="StyleMTermButtonLocal" TargetType="{x:Type mcontrol:MdButton}">
                 <Setter Property="Width" Value="16"/>
                 <Setter Property="Height" Value="16"/>
                 <Setter Property="BorderThickness" Value="0"/>
@@ -48,7 +48,7 @@
 
                             <TextBlock Grid.Row="0" Text="{Binding Path=Content}"/>
 
-                            <StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                            <!--<StackPanel Grid.Row="1" HorizontalAlignment="Right" Orientation="Horizontal">
                                 <mcontrol:MTermButton ToolTip="定位到该位置" SVGPath="{StaticResource ResourceKey=SVGIcon1}"
                                                       Style="{StaticResource ResourceKey=StyleMTermButtonLocal}">
                                     <i:Interaction.Triggers>
@@ -76,7 +76,7 @@
                                     </i:Interaction.Triggers>
                                 </mcontrol:MTermButton>
 
-                            </StackPanel>
+                            </StackPanel>-->
 
                         </Grid>
 

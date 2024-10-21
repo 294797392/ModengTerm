@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Controls;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace ModengTerm.Terminal
     /// <summary>
     /// AboutWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class AboutWindow : Window
+    public partial class AboutWindow : MdWindow
     {
         public AboutWindow()
         {

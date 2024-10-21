@@ -2,6 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
 
+    <!-- 软件图标 -->
+    <BitmapImage x:Key="BitmapImageTitleIcon" UriSource="pack://application:,,,/ModengTerm;component/Images/app.png"/>
+
     <!-- 通用控件 10000 - 20000 -->
 
     <SolidColorBrush x:Key="BrushSelectionBackground">
@@ -63,6 +66,8 @@
 
     <SolidColorBrush x:Key="BrushMainWindowButtonHoverBackground" Color="#D0D0D0"/>
     <SolidColorBrush x:Key="BrushMainWindowButtonDownBackground" Color="#A4A4A4"/>
+
+    <SolidColorBrush x:Key="BrushWindowBorder" Color="Silver"/>
 
 
 </ResourceDictionary>

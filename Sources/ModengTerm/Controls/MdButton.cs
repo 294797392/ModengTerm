@@ -12,7 +12,7 @@ namespace ModengTerm.Controls
     /// <summary>
     /// 可以把SGV图像当背景的按钮
     /// </summary>
-    public class MTermButton : Button
+    public class MdButton : Button
     {
 
 
@@ -24,7 +24,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for MouseOverBorder.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MouseOverBorderProperty =
-            DependencyProperty.Register("MouseOverBorder", typeof(Brush), typeof(MTermButton), new PropertyMetadata(Brushes.Transparent));
+            DependencyProperty.Register("MouseOverBorder", typeof(Brush), typeof(MdButton), new PropertyMetadata(Brushes.Transparent));
 
 
 
@@ -36,7 +36,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for MouseOverBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MouseOverBrushProperty =
-            DependencyProperty.Register("MouseOverBrush", typeof(Brush), typeof(MTermButton), new PropertyMetadata(Brushes.Transparent));
+            DependencyProperty.Register("MouseOverBrush", typeof(Brush), typeof(MdButton), new PropertyMetadata(Brushes.Transparent));
 
         public Brush MouseDownBrush
         {
@@ -46,7 +46,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for MouseDownBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MouseDownBrushProperty =
-            DependencyProperty.Register("MouseDownBrush", typeof(Brush), typeof(MTermButton), new PropertyMetadata(Brushes.Transparent));
+            DependencyProperty.Register("MouseDownBrush", typeof(Brush), typeof(MdButton), new PropertyMetadata(Brushes.Transparent));
 
 
 
@@ -60,7 +60,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for SVGPath.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SVGPathProperty =
-            DependencyProperty.Register("SVGPath", typeof(PathFigureCollection), typeof(MTermButton), new PropertyMetadata(null));
+            DependencyProperty.Register("SVGPath", typeof(PathFigureCollection), typeof(MdButton), new PropertyMetadata(null));
 
 
 
@@ -72,7 +72,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for SVGColor.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SVGColorProperty =
-            DependencyProperty.Register("SVGColor", typeof(Brush), typeof(MTermButton), new PropertyMetadata(Brushes.Black));
+            DependencyProperty.Register("SVGColor", typeof(Brush), typeof(MdButton), new PropertyMetadata(Brushes.Black));
 
 
 
@@ -88,7 +88,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for SVGMargin.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SVGMarginProperty =
-            DependencyProperty.Register("SVGMargin", typeof(Thickness), typeof(MTermButton), new PropertyMetadata(new Thickness(0)));
+            DependencyProperty.Register("SVGMargin", typeof(Thickness), typeof(MdButton), new PropertyMetadata(new Thickness(0)));
 
 
 
@@ -103,7 +103,7 @@ namespace ModengTerm.Controls
 
         // Using a DependencyProperty as the backing store for CornerRadius.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CornerRadiusProperty =
-            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(MTermButton), new PropertyMetadata(new CornerRadius(0)));
+            DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(MdButton), new PropertyMetadata(new CornerRadius(0)));
 
 
 

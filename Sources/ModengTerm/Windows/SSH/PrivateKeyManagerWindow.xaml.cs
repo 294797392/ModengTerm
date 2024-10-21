@@ -2,6 +2,7 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Controls;
 using ModengTerm.Document;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace ModengTerm.Windows.SSH
     /// <summary>
     /// PrivateKeyManagerWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class PrivateKeyManagerWindow : Window
+    public partial class PrivateKeyManagerWindow : MdWindow
     {
         #region 实例变量
 

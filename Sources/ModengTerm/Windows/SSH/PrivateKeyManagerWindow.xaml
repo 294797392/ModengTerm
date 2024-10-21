@@ -1,12 +1,13 @@
-﻿<Window x:Class="ModengTerm.Windows.SSH.PrivateKeyManagerWindow"
+﻿<mcontrols:MdWindow x:Class="ModengTerm.Windows.SSH.PrivateKeyManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ModengTerm.Windows.SSH"
+        xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
         mc:Ignorable="d"
         Title="密钥管理" Height="450" Width="800"
-        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner" Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>
 
@@ -50,4 +51,4 @@
         </StackPanel>
 
     </Grid>
-</Window>
+</mcontrols:MdWindow>

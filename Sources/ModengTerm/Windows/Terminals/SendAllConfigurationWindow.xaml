@@ -1,4 +1,4 @@
-﻿<Window x:Class="ModengTerm.Windows.Terminals.SendAllConfigurationWindow"
+﻿<mcontrol:MdWindow x:Class="ModengTerm.Windows.Terminals.SendAllConfigurationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -7,7 +7,7 @@
         xmlns:mcontrol="clr-namespace:ModengTerm.Controls"
         mc:Ignorable="d"
         Title="发送配置"  Height="400" Width="600"
-        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner" Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>
 
@@ -88,4 +88,4 @@
         </StackPanel>
 
     </Grid>
-</Window>
+</mcontrol:MdWindow>

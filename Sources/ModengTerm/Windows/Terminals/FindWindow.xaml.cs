@@ -86,7 +86,7 @@ namespace ModengTerm.Windows
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindWindow : Window
+    public partial class FindWindow : MdWindow
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FindWindow");
 

@@ -50,11 +50,11 @@
                     <TextBlock Grid.Column="2" Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
                     <!--MouseOverBrush="Silver" MouseDownBrush="#9E9E9E"-->
-                    <mtermcontrols:MTermButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2"
+                    <mtermcontrols:MdButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2"
                                                SVGColor="Black" Tag="{Binding}" Visibility="Collapsed" Width="20" Height="20"
                                                MouseOverBrush="{DynamicResource ResourceKey=BrushCloseSessionHover}" MouseDownBrush="{DynamicResource ResourceKey=BrushCloseSessionDown}"
                                                SVGPath="M512 466.944l233.472-233.472a31.744 31.744 0 0 1 45.056 45.056L557.056 512l233.472 233.472a31.744 31.744 0 0 1-45.056 45.056L512 557.056l-233.472 233.472a31.744 31.744 0 0 1-45.056-45.056L466.944 512 233.472 278.528a31.744 31.744 0 0 1 45.056-45.056z"
-                                               Click="ButtonCloseSession_Click" Style="{StaticResource ResourceKey=StyleMTermButton}"/>
+                                               Click="ButtonCloseSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
 
                 </Grid>
 
@@ -67,11 +67,11 @@
             </DataTemplate>
 
             <DataTemplate x:Key="DataTemplateOpenSession">
-                <mtermcontrols:MTermButton Content="+" FontWeight="Bold" FontSize="16" Width="25" Height="25" CornerRadius="2"
+                <mtermcontrols:MdButton Content="+" FontWeight="Bold" FontSize="16" Width="25" Height="25" CornerRadius="2"
                                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
                                            MouseOverBrush="{DynamicResource ResourceKey=BrushOpenSessonHover}" 
                                            MouseDownBrush="{DynamicResource ResourceKey=BrushOpenSessionDown}"
-                                           Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMTermButton}"/>
+                                           Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
             </DataTemplate>
 
             <Style x:Key="StyleMenuItemLocal" TargetType="{x:Type MenuItem}">
@@ -134,7 +134,7 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mtermcontrols:MTermButton}" BasedOn="{StaticResource ResourceKey=StyleMTermButton}">
+            <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mtermcontrols:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
                 <Setter Property="SVGColor" Value="Black"/>
                 <Setter Property="SVGMargin" Value="7"/>
                 <Setter Property="Margin" Value="3"/>
@@ -184,7 +184,7 @@
                     Background="{DynamicResource ResourceKey=BrushTitleBackground}"
                     Padding="5,0,0,0" BorderThickness="0,0,0,1" Height="30"/>
 
-            <Image Grid.Column="0" Source="Images/app.png" Width="20" Height="20"/>
+            <Image Grid.Column="0" Source="{DynamicResource ResourceKey=BitmapImageTitleIcon}" Width="20" Height="20"/>
 
             <Menu Grid.Column="1" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0"
                   VerticalContentAlignment="Center" VerticalAlignment="Center">
@@ -246,13 +246,11 @@
 
             </Menu>
 
-            <mtermcontrols:MTermButton Grid.Column="2" SVGPath="M797.291117 486.21473 224.18848 486.21473c-14.078647 0-25.469068 11.342326-25.469068 25.472138 0 14.028505 11.390421 25.471115 25.469068 25.471115l573.101613 0c14.07967 0 25.470091-11.441587 25.470091-25.471115C822.760185 497.557056 811.370787 486.21473 797.291117 486.21473z" 
-                                       Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mtermcontrols:MdButton Grid.Column="2" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mtermcontrols:MTermButton Grid.Column="3" SVGPath="M819.61718723 863.56250027H204.38281277a43.9947507 43.9947507 0 0 1-43.94531304-43.94531304V204.38281277a43.9947507 43.9947507 0 0 1 43.94531304-43.94531304h615.23437446a43.9947507 43.9947507 0 0 1 43.94531304 43.94531304v615.23437446a43.9947507 43.9947507 0 0 1-43.94531304 43.94531304zM204.38281277 195.59375a8.78906277 8.78906277 0 0 0-8.78906277 8.78906277v615.23437446a8.78906277 8.78906277 0 0 0 8.78906277 8.78906277h615.23437446a8.78906277 8.78906277 0 0 0 8.78906277-8.78906277V204.38281277a8.78906277 8.78906277 0 0 0-8.78906277-8.78906277z"
-                                       Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mtermcontrols:MdButton Grid.Column="3" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mtermcontrols:MTermButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mtermcontrols:MdButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
         </Grid>
 
@@ -293,8 +291,8 @@
 
             <!-- 右侧窗格 -->
             <Grid Grid.Column="1">
-                <mtermcontrols:MToolPanel Menu="{Binding Path=RightPanelMenu}" Visibility="{Binding Path=ShellCommandPanelVisiblity, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMToolPanel}"/>
+                <mtermcontrols:MdToolPanel Menu="{Binding Path=RightPanelMenu}" Visibility="{Binding Path=ShellCommandPanelVisiblity, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                          BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
             </Grid>
 
         </Grid>
@@ -350,8 +348,7 @@
 
         </Grid>
 
-        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="Silver"
-                IsHitTestVisible="False"/>
+        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="{DynamicResource ResourceKey=BrushWindowBorder}" IsHitTestVisible="False"/>
 
     </Grid>
 
