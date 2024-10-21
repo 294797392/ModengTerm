@@ -9,6 +9,7 @@
         xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
         xmlns:converters="clr-namespace:ModengTerm"
         xmlns:terminaluc="clr-namespace:ModengTerm.UserControls.Terminals"
+        xmlns:termenum="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
         xmlns:mcmd="clr-namespace:ModengTerm"
         xmlns:local="clr-namespace:ModengTerm"
         mc:Ignorable="d"
@@ -34,6 +35,8 @@
             <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
             <local:SessionImageConverter x:Key="SessionImageConverter"/>
             <converters:SessionStatus2VisibleConverter x:Key="SessionStatus2VisibleConverter"/>
+            <converters:RecordStatusVisibilityConverter x:Key="RecordStatusVisibilityConverter"/>
+            <converters:RecordStatus2TextConverter x:Key="RecordStatus2TextConverter"/>
 
             <DataTemplate x:Key="DataTemplateOpenedSession">
 
@@ -228,7 +231,7 @@
                 </MenuItem>
 
                 <MenuItem Header="工具" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem Header="记录日志">
+                    <MenuItem Header="日志">
                         <MenuItem x:Name="MenuItemStartLog" Header="开始" Click="MenuItemStartLog_Click"/>
                         <MenuItem x:Name="MenuItemStopLog" Header="停止" Click="MenuItemStopLog_Click"/>
                     </MenuItem>
@@ -238,7 +241,7 @@
                         <MenuItem x:Name="MenuItemOpenRecord" Header="打开回放" Click="MenuItemOpenRecord_Click"/>
                     </MenuItem>
                 </MenuItem>
-                
+
                 <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
                     <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->
@@ -330,6 +333,18 @@
                 </StackPanel>
 
                 <TextBlock Text="{Binding Path=Uri}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="10,0,0,0"/>
+
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                    <Grid Visibility="Visible">
+                        <Ellipse Width="20" Height="20" StrokeThickness="1" Stroke="#6a6a6a"/>
+                        <!-- 停止录制状态 -->
+                        <Ellipse Width="14" Height="14" Fill="Red" Visibility="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatusVisibilityConverter}, ConverterParameter={x:Static termenum:RecordStatusEnum.Stop}}"/>
+                        <!-- 正在录制状态 -->
+                        <Border Width="10" Height="10" Background="Red" Visibility="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatusVisibilityConverter}, ConverterParameter={x:Static termenum:RecordStatusEnum.Recording}}"/>
+                    </Grid>
+
+                    <TextBlock Text="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatus2TextConverter}}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                </StackPanel>
 
             </StackPanel>
 

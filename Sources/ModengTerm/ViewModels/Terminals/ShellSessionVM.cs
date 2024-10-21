@@ -109,7 +109,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private Encoding writeEncoding;
 
-        private RecordStatusEnum recordState;
+        private RecordStatusEnum recordStatus;
 
         /// <summary>
         /// 是否正在运行
@@ -303,6 +303,22 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 录像状态
+        /// </summary>
+        public RecordStatusEnum RecordStatus
+        {
+            get { return this.recordStatus; }
+            set 
+            {
+                if (this.recordStatus != value) 
+                {
+                    this.recordStatus = value;
+                    this.NotifyPropertyChanged("RecordStatus");
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -321,7 +337,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.logMgr = MTermApp.Context.LoggerManager;
 
-            this.recordState = RecordStatusEnum.Stop;
+            this.RecordStatus = RecordStatusEnum.Stop;
             this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING));
             this.clipboard = new VTClipboard()
             {
@@ -642,7 +658,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <exception cref="NotImplementedException"></exception>
         private void HandleRecord(byte[] bytes, int size) 
         {
-            switch (this.recordState)
+            switch (this.recordStatus)
             {
                 case RecordStatusEnum.Pause:
                     {
@@ -1000,7 +1016,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void StartRecord()
         {
-            if (this.recordState == RecordStatusEnum.Recording)
+            if (this.recordStatus == RecordStatusEnum.Recording)
             {
                 return;
             }
@@ -1037,7 +1053,7 @@ namespace ModengTerm.Terminal.ViewModels
                     return;
                 }
 
-                this.recordState = RecordStatusEnum.Recording;
+                this.RecordStatus = RecordStatusEnum.Recording;
             }
         }
 
@@ -1046,7 +1062,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void StopRecord()
         {
-            if (this.recordState == RecordStatusEnum.Stop)
+            if (this.recordStatus == RecordStatusEnum.Stop)
             {
                 return;
             }
@@ -1055,7 +1071,7 @@ namespace ModengTerm.Terminal.ViewModels
             // 需要优化
             this.playbackStream.Close();
 
-            this.recordState = RecordStatusEnum.Stop;
+            this.RecordStatus = RecordStatusEnum.Stop;
         }
 
         /// <summary>
@@ -1063,12 +1079,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void PauseRecord()
         {
-            if (this.recordState == RecordStatusEnum.Pause)
+            if (this.recordStatus == RecordStatusEnum.Pause)
             {
                 return;
             }
 
-            this.recordState = RecordStatusEnum.Pause;
+            this.RecordStatus = RecordStatusEnum.Pause;
         }
 
         /// <summary>
@@ -1077,12 +1093,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// <exception cref="NotImplementedException"></exception>
         private void ResumeRecord()
         {
-            if (this.recordState == RecordStatusEnum.Recording)
+            if (this.recordStatus == RecordStatusEnum.Recording)
             {
                 return;
             }
 
-            switch (this.recordState)
+            switch (this.recordStatus)
             {
                 case RecordStatusEnum.Stop:
                     {
@@ -1096,7 +1112,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 case RecordStatusEnum.Pause:
                     {
-                        this.recordState = RecordStatusEnum.Recording;
+                        this.RecordStatus = RecordStatusEnum.Recording;
                         break;
                     }
 

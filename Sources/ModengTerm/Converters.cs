@@ -436,4 +436,48 @@ namespace ModengTerm
             throw new NotImplementedException();
         }
     }
+
+    public class RecordStatusVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            RecordStatusEnum targetStatus = (RecordStatusEnum)parameter;
+            RecordStatusEnum currentStatus = (RecordStatusEnum)value;
+
+            if (targetStatus == currentStatus)
+            {
+                return Visibility.Visible;
+            }
+            else
+            {
+                return Visibility.Collapsed;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class RecordStatus2TextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            RecordStatusEnum currentStatus = (RecordStatusEnum)value;
+
+            switch (currentStatus)
+            {
+                case RecordStatusEnum.Stop: return "未录制";
+                case RecordStatusEnum.Recording: return "录制中";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

@@ -20,6 +20,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.Terminal.Windows
 {
@@ -32,6 +33,7 @@ namespace ModengTerm.Terminal.Windows
 
         private ServiceAgent serviceAgent;
         private bool isPlaying;
+        private BindableCollection<Playback> playbacks;
 
         #endregion
 
@@ -57,8 +59,9 @@ namespace ModengTerm.Terminal.Windows
             this.serviceAgent = MTermApp.Context.ServiceAgent;
 
             List<Playback> playbackList = this.serviceAgent.GetPlaybacks(session.ID);
+            this.playbacks.AddRange(playbackList);
 
-            ComboBoxPlaybackList.ItemsSource = playbackList;
+            ComboBoxPlaybackList.ItemsSource = this.playbacks;
         }
 
         #endregion
@@ -106,7 +109,19 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            this.serviceAgent.DeletePlayback(playback.ID);
+            if (!MTMessageBox.Confirm("确定要删除{0}吗?", playback.Name))
+            {
+                return;
+            }
+
+            int code = this.serviceAgent.DeletePlayback(playback.ID);
+            if (code != ResponseCode.SUCCESS) 
+            {
+                MTMessageBox.Info("删除失败, {0}", code);
+                return;
+            }
+
+            this.playbacks.Remove(playback);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
