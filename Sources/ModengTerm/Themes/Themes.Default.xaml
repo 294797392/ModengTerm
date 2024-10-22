@@ -3,8 +3,9 @@
 
 
     <!-- 软件图标 -->
-    <BitmapImage x:Key="BitmapImageTitleIcon" UriSource="pack://application:,,,/ModengTerm;component/Images/app.png"/>
+    <BitmapImage x:Key="1" UriSource="pack://application:,,,/ModengTerm;component/Images/app.png"/>
 
+    
     <!-- 通用控件 10000 - 20000 -->
 
     <SolidColorBrush x:Key="BrushSelectionBackground">
@@ -68,6 +69,12 @@
     <SolidColorBrush x:Key="BrushMainWindowButtonDownBackground" Color="#A4A4A4"/>
 
     <SolidColorBrush x:Key="BrushWindowBorder" Color="Silver"/>
+
+    <!-- 会话连接状态 5001 - 5020 -->
+    <BitmapImage x:Key="5001" UriSource="pack://application:,,,/ModengTerm;component/Images/ok.png"/>
+    <BitmapImage x:Key="5002" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>
+    <BitmapImage x:Key="5003" UriSource="pack://application:,,,/ModengTerm;component/Images/connect.png"/>
+    <BitmapImage x:Key="5004" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>
 
 
 </ResourceDictionary>

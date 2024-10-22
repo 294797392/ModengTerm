@@ -15,7 +15,6 @@
     <UserControl.Resources>
 
         <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
-        <modengterm:SessionStatus2VisibleConverter x:Key="SessionStatus2VisibleConverter"/>
 
         <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="3"/>
@@ -37,7 +36,7 @@
               MouseDown="GridDocument_MouseDown" 
               TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
             <Grid.ContextMenu>
-                <ContextMenu ItemsSource="{Binding Path=FunctionMenus}" MenuItem.Click="ContextMenu_Click"
+                <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
                              Visibility="{Binding Path=ContextMenuVisibility}">
                     <ContextMenu.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">

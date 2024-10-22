@@ -7,7 +7,7 @@
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Languages/Chinese.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Themes/Chinese.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Themes/Themes.Default.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/SVGIcons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>

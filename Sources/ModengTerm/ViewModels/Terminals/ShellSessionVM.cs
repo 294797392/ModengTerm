@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
@@ -132,7 +133,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool sendCommandPanelVisible;
 
-        private BindableCollection<ShellCommandVM> shellCommands;
+        private BindableCollection<QuickCommandVM> shellCommands;
 
         private LoggerManager logMgr;
 
@@ -198,7 +199,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 该终端的菜单状态
         /// </summary>
-        public BindableCollection<ShellContextMenu> FunctionMenus { get; private set; }
+        public BindableCollection<ShellContextMenu> ContextMenus { get; private set; }
 
         public IDocument MainDocument { get; set; }
         public IDocument AlternateDocument { get; set; }
@@ -269,7 +270,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 该会话的所有快捷命令
         /// </summary>
-        public BindableCollection<ShellCommandVM> ShellCommands
+        public BindableCollection<QuickCommandVM> ShellCommands
         {
             get { return this.shellCommands; }
             private set
@@ -290,12 +291,12 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 自动完成功能ViewModel
         /// </summary>
-        public AutoCompletionVM AutoCompletionVM 
+        public AutoCompletionVM AutoCompletionVM
         {
             get { return this.autoCompletionVM; }
             private set
             {
-                if (this.autoCompletionVM != value) 
+                if (this.autoCompletionVM != value)
                 {
                     this.autoCompletionVM = value;
                     this.NotifyPropertyChanged("AutoCompletionVM");
@@ -309,9 +310,9 @@ namespace ModengTerm.Terminal.ViewModels
         public RecordStatusEnum RecordStatus
         {
             get { return this.recordStatus; }
-            set 
+            set
             {
-                if (this.recordStatus != value) 
+                if (this.recordStatus != value)
                 {
                     this.recordStatus = value;
                     this.NotifyPropertyChanged("RecordStatus");
@@ -344,8 +345,8 @@ namespace ModengTerm.Terminal.ViewModels
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
 
-            this.ShellCommands = new BindableCollection<ShellCommandVM>();
-            this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new ShellCommandVM(v)));
+            this.ShellCommands = new BindableCollection<QuickCommandVM>();
+            this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new QuickCommandVM(v)));
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
             #region 初始化工具栏菜单
@@ -456,20 +457,19 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void InitializeContextMenu()
         {
-            this.FunctionMenus = new BindableCollection<ShellContextMenu>()
+            this.ContextMenus = new BindableCollection<ShellContextMenu>()
                 {
                     new ShellContextMenu("复制", this.CopySelection),
                     new ShellContextMenu("粘贴", this.Paste),
                     new ShellContextMenu("全选", this.SelectAll),
                     new ShellContextMenu("查找...",  this.Find),
+                    new ShellContextMenu("添加到快捷命令列表", this.AddToQuickCommands),
                     new ShellContextMenu("日志")
                     {
                         Children = new BindableCollection<ShellContextMenu>()
                         {
                             new ShellContextMenu("启动",  this.StartLogger),
                             new ShellContextMenu("停止",  this.StopLogger),
-                            new ShellContextMenu("暂停",  this.PauseLogger),
-                            new ShellContextMenu("继续",  this.ResumeLogger)
                         }
                     },
                     //new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
@@ -492,17 +492,15 @@ namespace ModengTerm.Terminal.ViewModels
                     //        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
                     //    }
                     //},
-                    //new ShellFunctionMenu("录屏")
-                    //{
-                    //    Children = new BindableCollection<ShellFunctionMenu>()
-                    //    {
-                    //        new ShellFunctionMenu("启动录制", this.StartRecord),
-                    //        new ShellFunctionMenu("停止录制", this.StopRecord),
-                    //        new ShellFunctionMenu("暂停录制", this.PauseRecord),
-                    //        new ShellFunctionMenu("恢复录制", this.ResumeRecord),
-                    //        new ShellFunctionMenu("打开回放", this.OpenRecord)
-                    //    }
-                    //},
+                    new ShellContextMenu("录屏")
+                    {
+                        Children = new BindableCollection<ShellContextMenu>()
+                        {
+                            new ShellContextMenu("开始录制", this.StartRecord),
+                            new ShellContextMenu("停止录制", this.StopRecord),
+                            new ShellContextMenu("打开回放", this.OpenRecord)
+                        }
+                    },
                     new ShellContextMenu("保存")
                     {
                         Children = new BindableCollection<ShellContextMenu>()
@@ -656,7 +654,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="bytes">收到的数据</param>
         /// <param name="size">收到的数据长度</param>
         /// <exception cref="NotImplementedException"></exception>
-        private void HandleRecord(byte[] bytes, int size) 
+        private void HandleRecord(byte[] bytes, int size)
         {
             switch (this.recordStatus)
             {
@@ -790,7 +788,7 @@ namespace ModengTerm.Terminal.ViewModels
                 List<ShellCommand> shellCommands = MTermApp.Context.ServiceAgent.GetShellCommands(this.ID.ToString());
 
                 this.ShellCommands.Clear();
-                this.ShellCommands.AddRange(shellCommands.Select(v => new ShellCommandVM(v)));
+                this.ShellCommands.AddRange(shellCommands.Select(v => new QuickCommandVM(v)));
             }
         }
 
@@ -1189,6 +1187,38 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void OpenPortForwardWindow()
         {
+        }
+
+        /// <summary>
+        /// 把当前选中的内容添加到快捷输入列表里
+        /// </summary>
+        private void AddToQuickCommands()
+        {
+            VTParagraph selectedParagraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
+            if (selectedParagraph.IsEmpty) 
+            {
+                return;
+            }
+
+            ShellCommand shellCommand = new ShellCommand()
+            {
+                ID = Guid.NewGuid().ToString(),
+                AutoCRLF = false,
+                SessionId = this.Session.ID,
+                Name = string.Format("未命名_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss)),
+                Type = (int)CommandTypeEnum.PureText,
+                Command = selectedParagraph.Content
+            };
+
+            int code = this.ServiceAgent.AddShellCommand(shellCommand);
+            if (code != ResponseCode.SUCCESS) 
+            {
+                MTMessageBox.Info("新建快捷命令失败, {0}", code);
+                return;
+            }
+
+            QuickCommandVM qcvm = new QuickCommandVM(shellCommand);
+            this.ShellCommands.Add(qcvm);
         }
 
         #endregion

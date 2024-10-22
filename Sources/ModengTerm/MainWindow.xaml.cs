@@ -645,7 +645,7 @@ namespace ModengTerm
 
         private void SendCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ShellCommandVM shellCommand = e.Parameter as ShellCommandVM;
+            QuickCommandVM shellCommand = e.Parameter as QuickCommandVM;
             if (shellCommand == null)
             {
                 return;

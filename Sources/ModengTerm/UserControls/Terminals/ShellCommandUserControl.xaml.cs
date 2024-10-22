@@ -44,7 +44,7 @@ namespace ModengTerm.UserControls.Terminals
 
         private void ListBoxCommands_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ShellCommandVM selectedCommand = ListBoxCommands.SelectedItem as ShellCommandVM;
+            QuickCommandVM selectedCommand = ListBoxCommands.SelectedItem as QuickCommandVM;
             if (selectedCommand == null)
             {
                 return;

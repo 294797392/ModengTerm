@@ -15,7 +15,6 @@
     <UserControl.Resources>
 
         <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
-        <modengterm:SessionStatus2VisibleConverter x:Key="SessionStatus2VisibleConverter"/>
 
         <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="3"/>

@@ -7,6 +7,7 @@ using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.Themes;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,6 +18,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using XTerminal;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
@@ -223,21 +225,6 @@ namespace ModengTerm
             //}
             //return brush;
             return Brushes.Black;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SessionStatus2VisibleConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            SessionStatusEnum visibleStatus = (SessionStatusEnum)parameter;
-            SessionStatusEnum currentStatus = (SessionStatusEnum)value;
-            return visibleStatus == currentStatus ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -470,6 +457,75 @@ namespace ModengTerm
             {
                 case RecordStatusEnum.Stop: return "未录制";
                 case RecordStatusEnum.Recording: return "录制中";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SessionStatus2TextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            SessionStatusEnum sessionStatus = (SessionStatusEnum)value;
+
+            switch (sessionStatus)
+            {
+                case SessionStatusEnum.Connected: return "已连接";
+                case SessionStatusEnum.Connecting: return "连接中";
+                case SessionStatusEnum.ConnectError: return "连接失败";
+                case SessionStatusEnum.Disconnected: return "连接断开";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SessionStatus2BrushConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            SessionStatusEnum sessionStatus = (SessionStatusEnum)value;
+
+            switch (sessionStatus)
+            {
+                case SessionStatusEnum.Connected: return Brushes.Green;
+                case SessionStatusEnum.Connecting: return Brushes.Orange;
+                case SessionStatusEnum.ConnectError: return Brushes.DarkRed;
+                case SessionStatusEnum.Disconnected: return Brushes.Red;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SessionStatus2ImageConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            SessionStatusEnum sessionStatus = (SessionStatusEnum)value;
+
+            switch (sessionStatus)
+            {
+                case SessionStatusEnum.Connected: return ThemeManager.GetResource<ImageSource>("5001");
+                case SessionStatusEnum.Connecting: return ThemeManager.GetResource<ImageSource>("5003");
+                case SessionStatusEnum.ConnectError: return ThemeManager.GetResource<ImageSource>("5004");
+                case SessionStatusEnum.Disconnected: return ThemeManager.GetResource<ImageSource>("5002");
                 default:
                     throw new NotImplementedException();
             }

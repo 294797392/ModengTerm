@@ -289,7 +289,7 @@
                             <Border Grid.Column="0" Grid.ColumnSpan="99" BorderBrush="{DynamicResource ResourceKey=BrushTitleBorder}" 
                                     Background="{DynamicResource ResourceKey=BrushTitleBackground}" BorderThickness="0,0,0,1"/>
 
-                            <Image Grid.Column="0" Source="{DynamicResource ResourceKey=BitmapImageTitleIcon}" Width="20" Height="20"/>
+                            <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
                             <TextBlock Grid.Column="1" Text="{TemplateBinding Title}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 

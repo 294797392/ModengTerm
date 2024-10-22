@@ -12,7 +12,7 @@ namespace ModengTerm.ViewModels.Terminals
     /// <summary>
     /// 快捷命令ViewModel
     /// </summary>
-    public class ShellCommandVM : ItemViewModel
+    public class QuickCommandVM : ItemViewModel
     {
         private string command;
         private CommandTypeEnum type;
@@ -74,11 +74,11 @@ namespace ModengTerm.ViewModels.Terminals
             }
         }
 
-        public ShellCommandVM()
+        public QuickCommandVM()
         {
         }
 
-        public ShellCommandVM(ShellCommand command)
+        public QuickCommandVM(ShellCommand command)
         {
             this.ID = command.ID;
             this.Name = command.Name;

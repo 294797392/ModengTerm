@@ -30,10 +30,10 @@ namespace ModengTerm.Windows.Terminals
     {
         #region 实例变量
 
-        private List<ShellCommandVM> updateCommands; // 编辑的命令列表
-        private List<ShellCommandVM> newCommands;    // 新建的命令列表
-        private List<ShellCommandVM> deleteCommands; // 被删除的命令列表
-        private BindableCollection<ShellCommandVM> shellCommands;
+        private List<QuickCommandVM> updateCommands; // 编辑的命令列表
+        private List<QuickCommandVM> newCommands;    // 新建的命令列表
+        private List<QuickCommandVM> deleteCommands; // 被删除的命令列表
+        private BindableCollection<QuickCommandVM> shellCommands;
         private ServiceAgent serviceAgent;
         private ShellSessionVM shellSession;
 
@@ -41,11 +41,11 @@ namespace ModengTerm.Windows.Terminals
 
         #region 属性
 
-        public List<ShellCommandVM> UpdateCommands { get { return this.updateCommands; } }
+        public List<QuickCommandVM> UpdateCommands { get { return this.updateCommands; } }
 
-        public List<ShellCommandVM> NewCommands { get { return this.newCommands; } }
+        public List<QuickCommandVM> NewCommands { get { return this.newCommands; } }
 
-        public List<ShellCommandVM> DeleteCommands { get { return this.deleteCommands; } }
+        public List<QuickCommandVM> DeleteCommands { get { return this.deleteCommands; } }
 
         #endregion
 
@@ -67,16 +67,16 @@ namespace ModengTerm.Windows.Terminals
             this.serviceAgent = MTermApp.Context.ServiceAgent;
             this.shellSession = shellSession;
 
-            this.updateCommands = new List<ShellCommandVM>();
-            this.newCommands = new List<ShellCommandVM>();
-            this.deleteCommands = new List<ShellCommandVM>();
+            this.updateCommands = new List<QuickCommandVM>();
+            this.newCommands = new List<QuickCommandVM>();
+            this.deleteCommands = new List<QuickCommandVM>();
 
             ComboBoxCommandTypes.ItemsSource = Enum.GetValues(typeof(CommandTypeEnum));
             ComboBoxCommandTypes.SelectedIndex = 0;
 
             List<ShellCommand> commands = this.serviceAgent.GetShellCommands(this.shellSession.ID.ToString());
-            this.shellCommands = new BindableCollection<ShellCommandVM>();
-            this.shellCommands.AddRange(commands.Select(v => new ShellCommandVM(v)));
+            this.shellCommands = new BindableCollection<QuickCommandVM>();
+            this.shellCommands.AddRange(commands.Select(v => new QuickCommandVM(v)));
             ListBoxShellCommands.DataContext = this.shellCommands;
         }
 
@@ -92,7 +92,7 @@ namespace ModengTerm.Windows.Terminals
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             // 判断是否编辑了命令
-            ShellCommandVM command = ListBoxShellCommands.SelectedItem as ShellCommandVM;
+            QuickCommandVM command = ListBoxShellCommands.SelectedItem as QuickCommandVM;
             if (command != null)
             {
                 if (!this.newCommands.Contains(command))
@@ -101,7 +101,7 @@ namespace ModengTerm.Windows.Terminals
                 }
             }
 
-            foreach (ShellCommandVM cmd in this.newCommands)
+            foreach (QuickCommandVM cmd in this.newCommands)
             {
                 int code = this.serviceAgent.AddShellCommand(cmd.GetShellCommand());
                 if (code != ResponseCode.SUCCESS)
@@ -111,7 +111,7 @@ namespace ModengTerm.Windows.Terminals
                 }
             }
 
-            foreach (ShellCommandVM cmd in this.deleteCommands)
+            foreach (QuickCommandVM cmd in this.deleteCommands)
             {
                 int code = this.serviceAgent.DeleteShellCommand(cmd.ID.ToString());
                 if (code != ResponseCode.SUCCESS)
@@ -121,7 +121,7 @@ namespace ModengTerm.Windows.Terminals
                 }
             }
 
-            foreach (ShellCommandVM cmd in this.updateCommands)
+            foreach (QuickCommandVM cmd in this.updateCommands)
             {
                 int code = this.serviceAgent.UpdateShellCommand(cmd.GetShellCommand());
                 if (code != ResponseCode.SUCCESS)
@@ -138,7 +138,7 @@ namespace ModengTerm.Windows.Terminals
         {
             if (e.RemovedItems.Count > 0)
             {
-                ShellCommandVM command = e.RemovedItems[0] as ShellCommandVM;
+                QuickCommandVM command = e.RemovedItems[0] as QuickCommandVM;
                 if (!this.newCommands.Contains(command)) 
                 {
                     this.updateCommands.Add(command);
@@ -148,7 +148,7 @@ namespace ModengTerm.Windows.Terminals
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
-            ShellCommandVM command = new ShellCommandVM()
+            QuickCommandVM command = new QuickCommandVM()
             {
                 ID = Guid.NewGuid().ToString(),
                 Name = "新建命令",
@@ -163,7 +163,7 @@ namespace ModengTerm.Windows.Terminals
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
-            ShellCommandVM command = ListBoxShellCommands.SelectedItem as ShellCommandVM;
+            QuickCommandVM command = ListBoxShellCommands.SelectedItem as QuickCommandVM;
             if (command == null) 
             {
                 return;
@@ -189,7 +189,7 @@ namespace ModengTerm.Windows.Terminals
 
         private void ButtonMoveUp_Click(object sender, RoutedEventArgs e)
         {
-            ShellCommandVM shcmd = ListBoxShellCommands.SelectedItem as ShellCommandVM;
+            QuickCommandVM shcmd = ListBoxShellCommands.SelectedItem as QuickCommandVM;
             if (shcmd == null) 
             {
                 return;
@@ -200,7 +200,7 @@ namespace ModengTerm.Windows.Terminals
 
         private void ButtonMoveDown_Click(object sender, RoutedEventArgs e)
         {
-            ShellCommandVM shcmd = ListBoxShellCommands.SelectedItem as ShellCommandVM;
+            QuickCommandVM shcmd = ListBoxShellCommands.SelectedItem as QuickCommandVM;
             if (shcmd == null)
             {
                 return;
