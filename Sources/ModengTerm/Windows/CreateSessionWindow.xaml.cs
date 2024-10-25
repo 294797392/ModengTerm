@@ -3,8 +3,10 @@ using ModengTerm;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Controls;
 using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.Session;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +18,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Enumerations;
+using XTerminal.Base.Enumerations; 
 
-namespace XTerminal.Windows
+namespace ModengTerm.Windows
 {
     /// <summary>
     /// CreateSessionWindow2.xaml 的交互逻辑
@@ -122,5 +123,34 @@ namespace XTerminal.Windows
         }
 
         #endregion
+    }
+
+    public class SelectedGroupNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string groupName = string.Empty;
+
+            SessionGroupVM current = value as SessionGroupVM;
+
+            while (current != null)
+            {
+                groupName = string.Format("{0} > ", current.Name) + groupName;
+
+                current = current.Parent as SessionGroupVM;
+            }
+
+            if (!string.IsNullOrEmpty(groupName))
+            {
+                groupName = groupName.Substring(0, groupName.Length - 2);
+            }
+
+            return groupName;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

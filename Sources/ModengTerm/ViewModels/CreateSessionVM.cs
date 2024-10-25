@@ -11,6 +11,7 @@ using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.ViewModels.Session;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -182,6 +183,11 @@ namespace ModengTerm.ViewModels
         /// SSH的身份验证方式
         /// </summary>
         public BindableCollection<SSHAuthTypeEnum> SSHAuthTypeList { get; private set; }
+
+        /// <summary>
+        /// 所有的会话分组列表
+        /// </summary>
+        public SessionTreeVM SessionGroups { get; private set; }
 
         /// <summary>
         /// SSH端口号
@@ -453,7 +459,7 @@ namespace ModengTerm.ViewModels
         public bool AcEnabled
         {
             get { return this.acEnabled; }
-            set 
+            set
             {
                 if (this.acEnabled != value)
                 {
@@ -615,7 +621,7 @@ namespace ModengTerm.ViewModels
 
         public BindableCollection<RawTcpTypeEnum> RawTcpTypes { get; private set; }
 
-        public string RawTcpAddress 
+        public string RawTcpAddress
         {
             get { return this.rawTcpAddress; }
             set
@@ -628,12 +634,12 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public int RawTcpPort 
+        public int RawTcpPort
         {
             get { return this.rawTcpPort; }
             set
             {
-                if(this.rawTcpPort != value)
+                if (this.rawTcpPort != value)
                 {
                     this.rawTcpPort = value;
                     this.NotifyPropertyChanged("RawTcpPort");
@@ -702,7 +708,7 @@ namespace ModengTerm.ViewModels
 
             #endregion
 
-            #region 会话类型
+            #region 会话类型和会话分组
 
             this.SessionTypeList = new BindableCollection<SessionTypeVM>();
             foreach (SessionDefinition session in appManifest.SessionList)
@@ -710,6 +716,9 @@ namespace ModengTerm.ViewModels
                 this.SessionTypeList.Add(new SessionTypeVM(session));
             }
             this.SelectedSessionType = this.SessionTypeList.FirstOrDefault();
+
+            this.SessionGroups = MTermApp.Context.CreateSessionTreeVM(true, true);
+            this.SessionGroups.ExpandAll();
 
             #endregion
 
@@ -864,7 +873,7 @@ namespace ModengTerm.ViewModels
                     IsExpanded = true
                 };
 
-                parentNode.AddChildNode(vm);
+                parentNode.Add(vm);
 
                 this.LoadChildrenOptions(vm, option.Children);
             }
@@ -1327,12 +1336,20 @@ namespace ModengTerm.ViewModels
                 return null;
             }
 
+            string groupId = string.Empty;
+            if (this.SessionGroups.Context.SelectedItem != null &&
+                this.SessionGroups.Context.SelectedItem.Data != MTermConsts.RootGroup)
+            {
+                groupId = SessionGroups.Context.SelectedItem.ID.ToString();
+            }
+
             XTermSession session = new XTermSession()
             {
                 ID = Guid.NewGuid().ToString(),
                 CreationTime = DateTime.Now,
                 Name = this.Name,
                 Type = (int)sessionType.Type,
+                GroupId = groupId
             };
 
             if (!this.CollectOptions(session))

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session

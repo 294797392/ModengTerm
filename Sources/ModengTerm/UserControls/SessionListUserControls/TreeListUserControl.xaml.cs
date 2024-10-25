@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.ViewModels.Session;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,24 +13,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using XTerminal.Base.DataModels;
 
-namespace XTerminal.UserControls.OptionsUserControl
+namespace ModengTerm.UserControls.SessionListUserControls
 {
     /// <summary>
-    /// ThemeOptionsUserControl.xaml 的交互逻辑
+    /// TreeListUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class ThemeOptionsUserControl : UserControl
+    public partial class TreeListUserControl : SessionListView
     {
-        public ThemeOptionsUserControl()
+        public TreeListUserControl()
         {
             InitializeComponent();
-
-
-            this.InitializeUserControl();
         }
 
-        private void InitializeUserControl()
+        public override void OnLoad()
+        {
+        }
+
+        public override void OnUnload()
         {
         }
     }

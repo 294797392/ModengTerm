@@ -242,6 +242,10 @@ namespace ModengTerm
 
 
 
+        private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)
+        {
+            this.ShowSessionListWindow();
+        }
 
         private void MenuItemCreateSession_Click(object sender, RoutedEventArgs e)
         {
@@ -267,6 +271,13 @@ namespace ModengTerm
             this.OpenSession(session, false);
         }
 
+        private void MenuItemGroupManager_Click(object sender, RoutedEventArgs e)
+        {
+            CreateSessionGroupWindow window = new CreateSessionGroupWindow();
+            window.Owner = this;
+            window.ShowDialog();
+        }
+
         private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
         {
             AboutWindow aboutWindow = new AboutWindow();
@@ -274,31 +285,6 @@ namespace ModengTerm
             aboutWindow.ShowDialog();
         }
 
-        private void CheckBoxEnableDebugMode_CheckedChanged(object sender, RoutedEventArgs e)
-        {
-            //VTDebug.Enabled = CheckBoxEnableDebugMode.IsChecked.Value;
-        }
-
-        private void MenuItemDebugWindow_Click(object sender, RoutedEventArgs e)
-        {
-            //ISessionContent sessionContent = ContentControlSession.Content as ISessionContent;
-            //VideoTerminal terminalSession = sessionContent.DataContext as VideoTerminal;
-            //if (terminalSession == null)
-            //{
-            //    return;
-            //}
-
-            //DebugWindow debugWindow = new DebugWindow();
-            //debugWindow.VideoTerminal = terminalSession;
-            //debugWindow.Owner = this;
-            //debugWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            //debugWindow.ShowDialog();
-        }
-
-        private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)
-        {
-            this.ShowSessionListWindow();
-        }
 
         private void MenuItemFind_Click(object sender, RoutedEventArgs e)
         {

@@ -1,14 +1,4 @@
-﻿using DotNEToolkit.Modular;
-using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XTerminal.Base;
-using XTerminal.Base.DataModels;
-using XTerminal.Base.Definitions;
+﻿using ModengTerm.Base.DataModels;
 
 namespace ModengTerm.Base.ServiceAgents
 {
@@ -63,6 +53,14 @@ namespace ModengTerm.Base.ServiceAgents
         /// <param name="session"></param>
         /// <returns></returns>
         public abstract int UpdateSession(XTermSession session);
+
+        #endregion
+
+        #region SessionGroup管理
+
+        public abstract List<SessionGroup> GetSessionGroups();
+        public abstract int DeleteSessionGroup(string groupId);
+        public abstract int AddSessionGroup(SessionGroup sessionGroup);
 
         #endregion
 

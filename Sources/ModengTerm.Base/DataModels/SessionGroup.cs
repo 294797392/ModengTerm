@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Base.DataModels
+namespace ModengTerm.Base.DataModels
 {
     public class SessionGroup : ModelBase
     {

@@ -1,11 +1,12 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.ViewModels.Sessions;
 using System;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels
+namespace ModengTerm.ViewModels.Session
 {
-    public class XTermSessionVM : ItemViewModel
+    public class XTermSessionVM : SessionTreeNodeVM
     {
         private SessionTypeEnum type;
         private DateTime creationTime;
@@ -16,11 +17,11 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public SessionTypeEnum Type
         {
-            get { return this.type; }
+            get { return type; }
             set
             {
-                this.type = value;
-                this.NotifyPropertyChanged("Type");
+                type = value;
+                NotifyPropertyChanged("Type");
             }
         }
 
@@ -29,13 +30,13 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public DateTime CreationTime
         {
-            get { return this.creationTime; }
+            get { return creationTime; }
             set
             {
-                if (this.creationTime != value)
+                if (creationTime != value)
                 {
-                    this.creationTime = value;
-                    this.NotifyPropertyChanged("CreationTime");
+                    creationTime = value;
+                    NotifyPropertyChanged("CreationTime");
                 }
             }
         }
@@ -45,45 +46,50 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public string URI
         {
-            get { return this.uri; }
+            get { return uri; }
             set
             {
-                if (this.uri != value)
+                if (uri != value)
                 {
-                    this.uri = value;
-                    this.NotifyPropertyChanged("URI");
+                    uri = value;
+                    NotifyPropertyChanged("URI");
                 }
             }
         }
 
         public XTermSession Session { get; private set; }
 
-        public XTermSessionVM(XTermSession session)
-        {
-            this.Session = session;
-            this.ID = session.ID;
-            this.Name = session.Name;
-            this.Description = session.Description;
-            this.CreationTime = session.CreationTime;
-            this.Type = (SessionTypeEnum)session.Type;
+        public override SessionTreeNodeTypeEnum NodeType => SessionTreeNodeTypeEnum.Session;
 
-            switch((SessionTypeEnum)session.Type)
+        public XTermSessionVM(TreeViewModelContext context, object data = null)
+            : base(context, data)
+        {
+            XTermSession session = data as XTermSession;
+
+            Session = session;
+            ID = session.ID;
+            Name = session.Name;
+            Description = session.Description;
+            CreationTime = session.CreationTime;
+            Type = (SessionTypeEnum)session.Type;
+
+            switch ((SessionTypeEnum)session.Type)
             {
                 case SessionTypeEnum.SerialPort:
                     {
-                        this.URI = session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
+                        URI = session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
                         break;
                     }
 
                 case SessionTypeEnum.SSH:
                     {
-                        this.URI = session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
+                        URI = session.GetOption<string>(OptionKeyEnum.SSH_ADDR);
                         break;
                     }
 
                 case SessionTypeEnum.CommandLine:
                     {
-                        this.URI = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
+                        URI = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         break;
                     }
 

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base.Enumerations;
 using ModengTerm.Terminal.ViewModels;
-using XTerminal.Base.DataModels;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using XTerminal;

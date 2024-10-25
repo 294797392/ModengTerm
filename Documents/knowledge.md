@@ -17,6 +17,11 @@ https://github.com/Eugeny/tabby
 https://github.com/kingToolbox/WindTerm
 https://github.com/contour-terminal/
 https://www.hostbuf.com/
+termius
+XShell
+XTerminal
+iterm2
+MobaXterm
 
 
 # 压力测试命令

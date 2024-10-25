@@ -76,5 +76,12 @@
     <BitmapImage x:Key="5003" UriSource="pack://application:,,,/ModengTerm;component/Images/connect.png"/>
     <BitmapImage x:Key="5004" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>
 
+    <!-- 会话类型图标 5021 - 5050 -->
+    <BitmapImage x:Key="5021" UriSource="pack://application:,,,/ModengTerm;component/Images/group.png"/>
+    <BitmapImage x:Key="5022" UriSource="pack://application:,,,/ModengTerm;component/Images/cmdline.png"/>
+    <BitmapImage x:Key="5023" UriSource="pack://application:,,,/ModengTerm;component/Images/ssh.png"/>
+    <BitmapImage x:Key="5024" UriSource="pack://application:,,,/ModengTerm;component/Images/serialport.png"/>
+    <BitmapImage x:Key="5025" UriSource="pack://application:,,,/ModengTerm;component/Images/tcp.png"/>
+    <BitmapImage x:Key="5026" UriSource="pack://application:,,,/ModengTerm;component/Images/goback.png"/>
 
 </ResourceDictionary>

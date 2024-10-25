@@ -1,9 +1,15 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
-using ModengTerm.ViewModels;
+using ModengTerm.UserControls.SessionListUserControls;
+using ModengTerm.ViewModels.Session;
+using ModengTerm.ViewModels.Sessions;
+using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using WPFToolkit.MVVM;
 using XTerminal.Windows;
 
@@ -14,9 +20,42 @@ namespace ModengTerm.Windows
     /// </summary>
     public partial class SessionListWindow : MdWindow
     {
+        public enum SessionListViewEnum
+        {
+            /// <summary>
+            /// 普通DataGrid风格
+            /// </summary>
+            DataGrid,
+
+            /// <summary>
+            /// XShell DataList风格
+            /// </summary>
+            DataList,
+
+            ///// <summary>
+            ///// Win10任务管理器风格
+            ///// </summary>
+            //TreeList,
+
+            ///// <summary>
+            ///// termius风格
+            ///// </summary>
+            //GroupDataList
+        }
+
         #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("MainWindow");
+
+        #endregion
+
+        #region 实例变量
+
+        private SessionTreeVM sessionTreeVM;
+        private Dictionary<SessionListViewEnum, SessionListView> viewList;
+        private SessionListViewEnum currentViewType;
+        private SessionListView currentView;
+        private ServiceAgent serviceAgent;
 
         #endregion
 
@@ -53,17 +92,10 @@ namespace ModengTerm.Windows
 
         private void InitializeWindow()
         {
-            List<XTermSession> sessions = MTermApp.Context.ServiceAgent.GetSessions();
-
-            BindableCollection<XTermSessionVM> sessionVMs = new BindableCollection<XTermSessionVM>();
-
-            foreach (XTermSession session in sessions)
-            {
-                XTermSessionVM sessionVM = new XTermSessionVM(session);
-                sessionVMs.Add(sessionVM);
-            }
-
-            DataGridSessionList.DataContext = sessionVMs;
+            this.serviceAgent = MTermApp.Context.ServiceAgent;
+            this.sessionTreeVM = MTermApp.Context.CreateSessionTreeVM();
+            this.viewList = new Dictionary<SessionListViewEnum, SessionListView>();
+            this.SwitchView(SessionListViewEnum.DataGrid);
         }
 
         private void OpenSession(XTermSessionVM sessionVM)
@@ -74,9 +106,57 @@ namespace ModengTerm.Windows
             base.DialogResult = true;
         }
 
+        private SessionListView CreateListView(SessionListViewEnum listViewEnum)
+        {
+            switch (listViewEnum)
+            {
+                //case SessionListViewEnum.GroupDataList:
+                //case SessionListViewEnum.TreeList: return new TreeListUserControl();
+                case SessionListViewEnum.DataList:
+                case SessionListViewEnum.DataGrid: return new DataGridUserControl();
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void SwitchView(SessionListViewEnum listViewEnum)
+        {
+            SessionListView listView;
+            if (!this.viewList.TryGetValue(listViewEnum, out listView))
+            {
+                listView = this.CreateListView(listViewEnum);
+                listView.OpenSessionEvent += ListView_OpenSessionEvent;
+                this.viewList[listViewEnum] = listView;
+            }
+
+            ContentControlSessionList.Content = listView;
+            listView.SessionTreeVM = this.sessionTreeVM;
+            if (this.currentView != null)
+            {
+                this.currentView.OnUnload();
+                listView.CurrentGroup = this.currentView.CurrentGroup;
+            }
+
+            if (listView is DataGridUserControl) 
+            {
+                DataGridUserControl dataGridUserControl = listView as DataGridUserControl;
+                dataGridUserControl.SetMode(listViewEnum);
+            }
+
+            listView.OnLoad();
+
+            this.currentViewType = listViewEnum;
+            this.currentView = listView;
+        }
+
         #endregion
 
         #region 事件处理器
+
+        private void ListView_OpenSessionEvent(XTermSessionVM sessionVM)
+        {
+            this.OpenSession(sessionVM);
+        }
 
         private void ButtonCreateSession_Click(object sender, RoutedEventArgs e)
         {
@@ -105,45 +185,118 @@ namespace ModengTerm.Windows
 
         private void ButtonDeleteSession_Click(object sender, RoutedEventArgs e)
         {
-            XTermSessionVM selectedSession = DataGridSessionList.SelectedItem as XTermSessionVM;
-            if (selectedSession == null)
+            SessionTreeNodeVM selectedItem = this.sessionTreeVM.Context.SelectedItem as SessionTreeNodeVM;
+
+            if (selectedItem == null)
             {
-                MTMessageBox.Info("请选择要删除的会话");
+                MTMessageBox.Info("请选择要删除的会话或者分组");
                 return;
             }
 
-            if (!MTMessageBox.Confirm("确定要删除{0}吗", selectedSession.Name))
+            switch (selectedItem.NodeType)
             {
-                return;
+                case SessionTreeNodeTypeEnum.Session:
+                    {
+                        XTermSessionVM sessionVM = selectedItem as XTermSessionVM;
+
+                        if (!MTMessageBox.Confirm("确定要删除{0}吗?", sessionVM.Name))
+                        {
+                            return;
+                        }
+
+                        int code = this.serviceAgent.DeleteSession(sessionVM.ID.ToString());
+                        if (code != ResponseCode.SUCCESS)
+                        {
+                            MTMessageBox.Info("删除会话失败, {0}", code);
+                            return;
+                        }
+
+                        if (sessionVM.Parent != null)
+                        {
+                            sessionVM.Remove();
+                        }
+                        else
+                        {
+                            // 是根节点
+                            this.sessionTreeVM.Roots.Remove(sessionVM);
+                        }
+
+                        break;
+                    }
+
+                case SessionTreeNodeTypeEnum.Group:
+                    {
+                        this.sessionTreeVM.DeleteSelectedGroup();
+                        break;
+                    }
+
+                case SessionTreeNodeTypeEnum.GobackGroup:
+                    {
+                        break;
+                    }
+
+                default:
+                    {
+                        throw new NotImplementedException();
+                    }
             }
-
-            int code = MTermApp.Context.ServiceAgent.DeleteSession(selectedSession.ID.ToString());
-            if (code != ResponseCode.SUCCESS)
-            {
-                MTMessageBox.Error("删除会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));
-                return;
-            }
-
-            BindableCollection<XTermSessionVM> sessionVMs = DataGridSessionList.DataContext as BindableCollection<XTermSessionVM>;
-            sessionVMs.Remove(selectedSession);
-
-            DataGridSessionList.SelectedIndex = 0;
         }
 
         private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)
         {
-            DataGridSessionList_MouseDoubleClick(null, null);
         }
 
-        private void DataGridSessionList_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ButtonSwitchView_Click(object sender, RoutedEventArgs e)
         {
-            XTermSessionVM sessionVM = DataGridSessionList.SelectedItem as XTermSessionVM;
-            if (sessionVM == null)
+            SessionListViewEnum targetView = this.currentViewType + 1;
+            if (!Enum.IsDefined<SessionListViewEnum>(targetView))
             {
-                return;
+                targetView = SessionListViewEnum.DataGrid;
             }
 
-            this.OpenSession(sessionVM);
+            this.SwitchView(targetView);
+        }
+
+        private void ButtonCreateGroup_Click(object sender, RoutedEventArgs e)
+        {
+            SessionGroupVM currentGroup = this.currentView.CurrentGroup;
+            string groupId = currentGroup == null ? string.Empty : currentGroup.ID.ToString();
+
+            CreateSessionGroupWindow createSessionGroupWindow = new CreateSessionGroupWindow(groupId);
+            createSessionGroupWindow.OnSessionGroupCreated += CreateSessionGroupWindow_OnSessionGroupCreated;
+            createSessionGroupWindow.OnSessionGroupDeleted += CreateSessionGroupWindow_OnSessionGroupDeleted;
+            createSessionGroupWindow.Owner = this;
+            if ((bool)createSessionGroupWindow.ShowDialog())
+            {
+            }
+        }
+
+        private void CreateSessionGroupWindow_OnSessionGroupDeleted(SessionGroup sessionGroup)
+        {
+            TreeNodeViewModel treeNodeViewModel;
+            if (this.sessionTreeVM.TryGetNode(sessionGroup.ID.ToString(), out treeNodeViewModel))
+            {
+                treeNodeViewModel.Remove();
+            }
+        }
+
+        private void CreateSessionGroupWindow_OnSessionGroupCreated(SessionGroup sessionGroup)
+        {
+            SessionGroupVM sessionGroupVM = new SessionGroupVM(this.sessionTreeVM.Context, sessionGroup);
+
+            if (string.IsNullOrEmpty(sessionGroup.ParentId))
+            {
+                // 说明是根节点
+                this.sessionTreeVM.AddRootNode(sessionGroupVM);
+            }
+            else
+            {
+                TreeNodeViewModel parentNode;
+                if (this.sessionTreeVM.TryGetNode(sessionGroup.ParentId, out parentNode))
+                {
+                    parentNode.Add(sessionGroupVM);
+                }
+            }
         }
 
         #endregion

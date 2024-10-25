@@ -10,6 +10,19 @@
 
     <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
 
+    <Style x:Key="StyleButtonOK" TargetType="{x:Type Button}">
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="Width" Value="70"/>
+        <Setter Property="Height" Value="30"/>
+    </Style>
+
+    <Style x:Key="StyleButtonCancel" TargetType="{x:Type Button}">
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="Width" Value="70"/>
+        <Setter Property="Height" Value="30"/>
+    </Style>
+
+    
     <!-- 通用控件 -->
     <!-- 要改主题颜色的话直接在这个里面改 -->
 

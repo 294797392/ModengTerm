@@ -1,17 +1,19 @@
-﻿<mcontrols:MdWindow x:Class="XTerminal.Windows.CreateSessionOptionTreeWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:XTerminal.Windows"
-        xmlns:xtermconverter="clr-namespace:XTerminal"
-        xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
-        xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
-        mc:Ignorable="d"
-        Title="{DynamicResource ResourceKey=UIText100}" 
-        Height="600" Width="600" CanResize="False"
-        WindowStartupLocation="CenterOwner"
-                       Style="{StaticResource ResourceKey=StyleMdWindow}">
+﻿<mcontrols:MdWindow x:Class="ModengTerm.Windows.CreateSessionOptionTreeWindow"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:local="clr-namespace:ModengTerm.Windows"
+                    xmlns:xtermconverter="clr-namespace:XTerminal"
+                    xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
+                    xmlns:toolkitcontrol="clr-namespace:WPFToolkit.Controls;assembly=WPFToolkit"
+                    xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
+                    xmlns:converter="clr-namespace:ModengTerm"
+                    mc:Ignorable="d"
+                    Title="{DynamicResource ResourceKey=UIText100}" 
+                    Height="600" Width="600" CanResize="False"
+                    WindowStartupLocation="CenterOwner"
+                    Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -20,6 +22,8 @@
             </ResourceDictionary.MergedDictionaries>
 
             <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
+            <local:SelectedGroupNameConverter x:Key="SelectedGroupNameConverter"/>
+            <converter:SessionTreeNodeImageConverter x:Key="SessionTreeNodeImageConverter"/>
 
             <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions"
                                       ItemsSource="{Binding Path=Children}">
@@ -53,6 +57,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80"/>
@@ -73,6 +78,40 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="会话分组：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+            <toolkitcontrol:TreeComboBox Grid.Row="2" Grid.Column="1" x:Name="ComboBoxSessionGroups" Margin="0,0,10,0"
+                                         DataContext="{Binding Path=SessionGroups}" ItemsSource="{Binding Path=Roots}"
+                                         Style="{StaticResource ResourceKey=StyleTreeComboBoxValue}">
+                <toolkitcontrol:TreeComboBox.SelectionBoxItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource ResourceKey=SelectedGroupNameConverter}}"/>
+                    </DataTemplate>
+                </toolkitcontrol:TreeComboBox.SelectionBoxItemTemplate>
+                <toolkitcontrol:TreeComboBox.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Image Grid.Column="0" Width="16" Height="16" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                   Source="{Binding Converter={StaticResource ResourceKey=SessionTreeNodeImageConverter}}"/>
+
+                            <TextBlock Grid.Column="1" Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+
+                        </Grid>
+                    </HierarchicalDataTemplate>
+                </toolkitcontrol:TreeComboBox.ItemTemplate>
+                <toolkitcontrol:TreeComboBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Style>
+                </toolkitcontrol:TreeComboBox.ItemContainerStyle>
+            </toolkitcontrol:TreeComboBox>
+
         </Grid>
 
         <Grid Grid.Row="1" Margin="5">

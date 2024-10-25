@@ -9,7 +9,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session

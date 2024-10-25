@@ -10,7 +10,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XTerminal.Base;
-using XTerminal.Base.DataModels;
 
 namespace ModengTerm.Base.ServiceAgents
 {
@@ -134,6 +133,53 @@ namespace ModengTerm.Base.ServiceAgents
             {
                 logger.Error("UpdateSession异常", ex);
                 return ResponseCode.FAILED;
+            }
+        }
+
+        #endregion
+
+        #region SessionGroup管理
+
+        public override int AddSessionGroup(SessionGroup sessionGroup)
+        {
+            try
+            {
+                JSONDatabase.Insert<SessionGroup>(sessionGroup);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("AddSessionGroup异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        public override int DeleteSessionGroup(string groupId)
+        {
+            try
+            {
+                JSONDatabase.Delete<SessionGroup>(v => v.ID == groupId);
+
+                return ResponseCode.SUCCESS;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("DeleteSessionGroup异常", ex);
+                return ResponseCode.FAILED;
+            }
+        }
+
+        public override List<SessionGroup> GetSessionGroups()
+        {
+            try
+            {
+                return JSONDatabase.SelectAll<SessionGroup>();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetSessionGroups异常", ex);
+                return new List<SessionGroup>();
             }
         }
 

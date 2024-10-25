@@ -4,21 +4,16 @@ using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Rendering;
-using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Themes;
+using ModengTerm.ViewModels.Session;
+using ModengTerm.ViewModels.Sessions;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using XTerminal;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
@@ -235,34 +230,10 @@ namespace ModengTerm
 
     public class SessionImageConverter : IValueConverter
     {
-        public static ImageSource SSHImage = WPFToolkit.Utility.ImageUtility.FromURI("pack://application:,,,/ModengTerm;component/Images/ssh.png");
-        public static ImageSource HostCommandLineImage = WPFToolkit.Utility.ImageUtility.FromURI("pack://application:,,,/ModengTerm;component/Images/cmdline.png");
-        public static ImageSource SerialPortImage = WPFToolkit.Utility.ImageUtility.FromURI("pack://application:,,,/ModengTerm;component/Images/serialport.png");
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             SessionTypeEnum sessionType = (SessionTypeEnum)value;
-
-            switch (sessionType)
-            {
-                case SessionTypeEnum.SerialPort:
-                    {
-                        return SerialPortImage;
-                    }
-
-                case SessionTypeEnum.SSH:
-                    {
-                        return SSHImage;
-                    }
-
-                case SessionTypeEnum.CommandLine:
-                    {
-                        return HostCommandLineImage;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
+            return ThemeManager.GetSessionTypeImageSource(sessionType);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -526,6 +497,38 @@ namespace ModengTerm
                 case SessionStatusEnum.Connecting: return ThemeManager.GetResource<ImageSource>("5003");
                 case SessionStatusEnum.ConnectError: return ThemeManager.GetResource<ImageSource>("5004");
                 case SessionStatusEnum.Disconnected: return ThemeManager.GetResource<ImageSource>("5002");
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SessionTreeNodeImageConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null) 
+            {
+                return null;
+            }
+
+            SessionTreeNodeVM treeNode = value as SessionTreeNodeVM;
+
+            switch (treeNode.NodeType)
+            {
+                case SessionTreeNodeTypeEnum.Session:
+                    {
+                        XTermSessionVM sessionVM = treeNode as XTermSessionVM;
+                        return ThemeManager.GetSessionTypeImageSource(sessionVM.Type);
+                    }
+
+                case SessionTreeNodeTypeEnum.Group: return ThemeManager.GetResource<ImageSource>("5021");
+                case SessionTreeNodeTypeEnum.GobackGroup: return ThemeManager.GetResource<ImageSource>("5026");
                 default:
                     throw new NotImplementedException();
             }

@@ -8,7 +8,6 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using XTerminal.Base;
-using XTerminal.Base.DataModels;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session

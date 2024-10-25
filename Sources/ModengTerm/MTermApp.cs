@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal;
@@ -9,13 +10,21 @@ using ModengTerm.UserControls.OptionsUserControl.RawTcp;
 using ModengTerm.UserControls.OptionsUserControl.SSH;
 using ModengTerm.UserControls.OptionsUserControl.Terminal;
 using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.Session;
+using Renci.SshNet;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Threading;
+using WPFToolkit.MVVM;
 using XTerminal.UserControls.OptionsUserControl;
 
 namespace ModengTerm
 {
+    /// <summary>
+    /// 存储整个应用程序都需要使用的通用的数据和方法
+    /// </summary>
     public class MTermApp : ModularApp<MTermApp, MTermManifest>, INotifyPropertyChanged
     {
         /// <summary>
@@ -76,6 +85,11 @@ namespace ModengTerm
         /// </summary>
         public MainWindowVM MainWindowVM { get; private set; }
 
+        /// <summary>
+        /// 会话树形列表
+        /// </summary>
+        public SessionTreeVM SessionTreeVM { get; private set; }
+
         #endregion
 
         #region ModularApp
@@ -94,6 +108,8 @@ namespace ModengTerm
             VTApp.Context.ServiceAgent = this.ServiceAgent;
             VTApp.Context.Initialize();
 
+            this.SessionTreeVM = new SessionTreeVM();
+
             return ResponseCode.SUCCESS;
         }
 
@@ -105,9 +121,93 @@ namespace ModengTerm
 
         #region 实例方法
 
+        private void LoadSessionGroupNode(SessionGroupVM parentGroup, List<SessionGroup> groups)
+        {
+            // 先找到该分组的所有子节点
+            IEnumerable<SessionGroup> children = groups.Where(v => v.ParentId == parentGroup.ID.ToString());
+
+            foreach (SessionGroup child in children)
+            {
+                SessionGroupVM groupVM = new SessionGroupVM(parentGroup.Context, child);
+                parentGroup.Add(groupVM);
+                this.LoadSessionGroupNode(groupVM, groups);
+            }
+        }
+
         #endregion
 
         #region 公开接口
+
+        /// <summary>
+        /// 创建一个会话树形列表
+        /// </summary>
+        /// <param name="onlyGroup">树形列表里是否只有分组</param>
+        /// <param name="includeRootNode">是否包含无分组节点</param>
+        public SessionTreeVM CreateSessionTreeVM(bool onlyGroup = false, bool includeRootNode = false)
+        {
+            SessionTreeVM sessionTreeVM = new SessionTreeVM();
+            TreeViewModelContext context = sessionTreeVM.Context;
+
+            SessionGroupVM rootNode = null;
+
+            if (includeRootNode) 
+            {
+                rootNode = new SessionGroupVM(context, MTermConsts.RootGroup);
+                sessionTreeVM.AddRootNode(rootNode);
+            }
+
+            List<SessionGroup> groups = this.ServiceAgent.GetSessionGroups();
+            IEnumerable<SessionGroup> rootGroups = groups.Where(v => v.ParentId == string.Empty);
+            foreach (SessionGroup group in rootGroups)
+            {
+                SessionGroupVM groupVM = new SessionGroupVM(context, group);
+                if (rootNode != null)
+                {
+                    rootNode.Add(groupVM);
+                }
+                else
+                {
+                    sessionTreeVM.AddRootNode(groupVM);
+                }
+
+                this.LoadSessionGroupNode(groupVM, groups);
+            }
+
+            if (!onlyGroup)
+            {
+                List<XTermSession> sessions = this.ServiceAgent.GetSessions();
+                foreach (XTermSession session in sessions)
+                {
+                    XTermSessionVM sessionVM = new XTermSessionVM(context, session);
+
+                    if (string.IsNullOrEmpty(session.GroupId))
+                    {
+                        // 如果Session不属于任何分组，那么直接加到根节点
+                        if (rootNode != null)
+                        {
+                            rootNode.Add(sessionVM);
+                        }
+                        else
+                        {
+                            sessionTreeVM.AddRootNode(sessionVM);
+                        }
+                    }
+                    else
+                    {
+                        TreeNodeViewModel parentVM;
+                        if (!context.TryGetNode(session.GroupId, out parentVM))
+                        {
+                            logger.FatalFormat("没有找到Session对应的Gorup, {0},{1}", session.ID, session.GroupId);
+                            continue;
+                        }
+
+                        parentVM.Add(sessionVM);
+                    }
+                }
+            }
+
+            return sessionTreeVM;
+        }
 
         #endregion
 

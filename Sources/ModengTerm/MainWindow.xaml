@@ -197,6 +197,7 @@
                 <MenuItem Header="会话" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
                     <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
                     <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
+                    <MenuItem Header="分组管理" Click="MenuItemGroupManager_Click"/>
                     <MenuItem Header="最新打开的会话" ItemsSource="{Binding Path=RecentlyOpenedSession}">
                         <MenuItem.ItemTemplate>
                             <DataTemplate>

@@ -11,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using XTerminal.Base.DataModels;
 using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Base
@@ -21,6 +20,16 @@ namespace ModengTerm.Base
     /// </summary>
     public static class MTermConsts
     {
+        /// <summary>
+        /// 显示为“根节点”
+        /// 给用户选择
+        /// </summary>
+        public static readonly SessionGroup RootGroup = new SessionGroup()
+        {
+            ID = string.Empty,
+            Name = "根节点"
+        };
+
         #region 光标闪烁时间
 
         public const int LowSpeedBlinkInterval = 300;

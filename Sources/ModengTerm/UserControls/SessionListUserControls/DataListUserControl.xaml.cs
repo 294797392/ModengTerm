@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.ViewModels.Session;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,18 +13,25 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using XTerminal.Base.DataModels;
 
-namespace XTerminal.UserControls.OptionsUserControl
+namespace ModengTerm.UserControls.SessionListUserControls
 {
     /// <summary>
-    /// TerminalOptionsUserControl.xaml 的交互逻辑
+    /// DataListUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalOptionsUserControl : UserControl
+    public partial class DataListUserControl : SessionListView
     {
-        public TerminalOptionsUserControl()
+        public DataListUserControl()
         {
             InitializeComponent();
+        }
+
+        public override void OnLoad()
+        {
+        }
+
+        public override void OnUnload()
+        {
         }
     }
 }

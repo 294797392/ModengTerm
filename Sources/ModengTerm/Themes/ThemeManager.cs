@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ModengTerm.Base.Enumerations;
+using Renci.SshNet;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -28,6 +30,19 @@ namespace ModengTerm.Themes
             }
 
             return (TResource)resource;
+        }
+
+        public static ImageSource GetSessionTypeImageSource(SessionTypeEnum sessionType)
+        {
+            switch (sessionType)
+            {
+                case SessionTypeEnum.CommandLine: return ThemeManager.GetResource<ImageSource>("5022");
+                case SessionTypeEnum.SerialPort: return ThemeManager.GetResource<ImageSource>("5024");
+                case SessionTypeEnum.SSH: return ThemeManager.GetResource<ImageSource>("5023");
+                case SessionTypeEnum.RawTcp: return ThemeManager.GetResource<ImageSource>("5025");
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

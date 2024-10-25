@@ -88,6 +88,7 @@
 
         <!-- 自动完成下拉列表 -->
         <!--
+            当用户使用鼠标点击ListBox，此时ListBox获取焦点，键盘输入事件转移到ListBox身上。
             KeyDown是路由事件，当AutoCompletionUserControl里的ListBox控件触发KeyDown事件的时候，事件会被继续传播到它的父元素
             也就是AutoCompletionUserControl
         -->
