@@ -160,7 +160,9 @@ namespace ModengTerm.Windows
 
         private void ButtonCreateSession_Click(object sender, RoutedEventArgs e)
         {
-            CreateSessionOptionTreeWindow window = new CreateSessionOptionTreeWindow();
+            SessionGroupVM currentGroup = this.currentView.CurrentGroup;
+
+            CreateSessionWindow window = new CreateSessionWindow(currentGroup);
             window.Owner = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (!(bool)window.ShowDialog())

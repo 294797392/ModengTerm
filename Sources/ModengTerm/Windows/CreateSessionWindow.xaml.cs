@@ -25,9 +25,9 @@ namespace ModengTerm.Windows
     /// <summary>
     /// CreateSessionWindow2.xaml 的交互逻辑
     /// </summary>
-    public partial class CreateSessionOptionTreeWindow : MdWindow
+    public partial class CreateSessionWindow : MdWindow
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionOptionTreeWindow");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionWindow");
 
         #region 实例变量
 
@@ -46,24 +46,27 @@ namespace ModengTerm.Windows
 
         #region 构造方法
 
-        public CreateSessionOptionTreeWindow()
+        public CreateSessionWindow(SessionGroupVM sessionGroup = null)
         {
             InitializeComponent();
 
-            this.InitializeWindow();
+            this.InitializeWindow(sessionGroup);
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeWindow()
+        private void InitializeWindow(SessionGroupVM sessionGroup)
         {
             this.contentMap = new Dictionary<Type, Control>();
 
             CreateSessionVM createSessionVM = new CreateSessionVM(MTermApp.Context.ServiceAgent);
-
-            base.DataContext = new CreateSessionVM(MTermApp.Context.ServiceAgent);
+            base.DataContext = createSessionVM;
+            if (sessionGroup != null) 
+            {
+                createSessionVM.SessionGroups.SelectNode(sessionGroup.ID.ToString());
+            }
         }
 
         #endregion

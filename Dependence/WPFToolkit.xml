@@ -2682,6 +2682,11 @@
             存储树形列表上下文信息
             </summary>
         </member>
+        <member name="P:WPFToolkit.MVVM.TreeViewModel`1.SelectedItem">
+            <summary>
+            读取或设置树形列表的选中项
+            </summary>
+        </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModel`1.#ctor">
             <summary>
             构造方法
@@ -2718,6 +2723,7 @@
             选中某个节点
             </summary>
             <param name="nodeID">要选中的节点ID</param>
+            <returns>如果选中成功则返回被选中的节点，否则返回null</returns>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeViewModel`1.ExpandAll">
             <summary>

@@ -249,7 +249,7 @@ namespace ModengTerm
 
         private void MenuItemCreateSession_Click(object sender, RoutedEventArgs e)
         {
-            CreateSessionOptionTreeWindow window = new CreateSessionOptionTreeWindow();
+            CreateSessionWindow window = new CreateSessionWindow();
             window.Owner = this;
             window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             if (!(bool)window.ShowDialog())
