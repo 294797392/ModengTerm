@@ -17,6 +17,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 using XTerminal.Windows;
 
@@ -33,7 +34,7 @@ namespace ModengTerm
         private OpenedSessionItemContainerStyleSelector itemContainerStyleSelector;
         private VTKeyboardInput userInput;
         private MainWindowVM mainWindowVM;
-        private OpenedSessionsVM sessionListVM;
+        private OpenedSessionsVM openedSessionsVM;
         private ServiceAgent serviceAgent;
         private HomePageUserControl homePageUserControl;
 
@@ -70,8 +71,9 @@ namespace ModengTerm
             this.itemContainerStyleSelector.StyleOpenSession = this.FindResource("StyleListBoxItemOpenSession") as Style;
             ListBoxOpenedSession.ItemContainerStyleSelector = this.itemContainerStyleSelector;
 
-            this.sessionListVM = this.mainWindowVM.OpenedSessionsVM;
-            ListBoxOpenedSession.DataContext = this.sessionListVM;
+            this.openedSessionsVM = this.mainWindowVM.OpenedSessionsVM;
+            this.openedSessionsVM.OnSessionOpened += OpenedSessionsVM_OnSessionOpened;
+            ListBoxOpenedSession.DataContext = this.openedSessionsVM;
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
@@ -94,7 +96,7 @@ namespace ModengTerm
         /// <param name="addToRecent">是否加入到最新打开的会话列表里</param>
         private void OpenSession(XTermSession session, bool addToRecent = true)
         {
-            ISessionContent content = this.sessionListVM.OpenSession(session);
+            ISessionContent content = this.openedSessionsVM.OpenSession(session);
             ContentControlSession.Content = content;
             ScrollViewerOpenedSession.ScrollToRightEnd();
 
@@ -136,7 +138,7 @@ namespace ModengTerm
 
         public void SendToAllTerminal(string text)
         {
-            foreach (ShellSessionVM shellSession in this.sessionListVM.ShellSessions)
+            foreach (ShellSessionVM shellSession in this.openedSessionsVM.ShellSessions)
             {
                 shellSession.SendText(text);
             }
@@ -145,6 +147,19 @@ namespace ModengTerm
         #endregion
 
         #region 事件处理器
+
+
+        /// <summary>
+        /// 当会话被打开之后触发
+        /// 会话在OnLoad事件里打开
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="openedSession">被打开的会话</param>
+        private void OpenedSessionsVM_OnSessionOpened(OpenedSessionsVM arg1, OpenedSessionVM openedSession)
+        {
+            this.mainWindowVM.TitleMenus.Clear();
+            this.mainWindowVM.TitleMenus.AddRange(openedSession.ContextMenus);
+        }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -158,6 +173,8 @@ namespace ModengTerm
 
         private void ListBoxOpenedSession_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            this.mainWindowVM.TitleMenus.Clear();
+
             SessionItemVM selectedSession = ListBoxOpenedSession.SelectedItem as SessionItemVM;
             if (selectedSession == null)
             {
@@ -199,6 +216,15 @@ namespace ModengTerm
                     vt.ActiveDocument.EventInput.OnLoaded();
                 }
             }
+
+            if (selectedSession is OpenedSessionVM)
+            {
+                OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
+                if (openedSessionVM.ContextMenus != null)
+                {
+                    this.mainWindowVM.TitleMenus.AddRange(openedSessionVM.ContextMenus);
+                }
+            }
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -225,20 +251,20 @@ namespace ModengTerm
             FrameworkElement frameworkElement = sender as FrameworkElement;
             OpenedSessionVM openedSessionVM = frameworkElement.DataContext as OpenedSessionVM;
 
-            this.sessionListVM.CloseSession(openedSessionVM);
+            this.openedSessionsVM.CloseSession(openedSessionVM);
 
-            this.sessionListVM.SelectedSession = this.sessionListVM.SessionList.OfType<OpenedSessionVM>().FirstOrDefault();
+            this.openedSessionsVM.SelectedSession = this.openedSessionsVM.SessionList.OfType<OpenedSessionVM>().FirstOrDefault();
 
-            if (this.sessionListVM.SelectedSession == null)
+            if (this.openedSessionsVM.SelectedSession == null)
             {
                 ContentControlSession.Content = null;
                 ListBoxOpenedSession.SelectedItem = null;
             }
 
-            if (this.sessionListVM.SessionList.Count == 1 &&
-                this.sessionListVM.SessionList[0] is OpenSessionVM)
+            if (this.openedSessionsVM.SessionList.Count == 1 &&
+                this.openedSessionsVM.SessionList[0] is OpenSessionVM)
             {
-                if (this.homePageUserControl == null) 
+                if (this.homePageUserControl == null)
                 {
                     this.homePageUserControl = new HomePageUserControl();
                 }

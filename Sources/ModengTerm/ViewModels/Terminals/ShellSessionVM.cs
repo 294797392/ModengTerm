@@ -30,61 +30,6 @@ using XTerminal;
 
 namespace ModengTerm.Terminal.ViewModels
 {
-    public class ShellContextMenu : ViewModelBase
-    {
-        private bool canChecked;
-        private bool isChecked;
-
-        public BindableCollection<ShellContextMenu> Children { get; set; }
-
-        public bool CanChecked
-        {
-            get { return this.canChecked; }
-            set
-            {
-                if (this.canChecked != value)
-                {
-                    this.canChecked = value;
-                    this.NotifyPropertyChanged("CanChecked");
-                }
-            }
-        }
-
-        public bool IsChecked
-        {
-            get { return this.isChecked; }
-            set
-            {
-                if (this.isChecked != value)
-                {
-                    this.isChecked = value;
-                    this.NotifyPropertyChanged("IsChecked");
-                }
-            }
-        }
-
-        public ExecuteShellFunctionCallback Execute { get; private set; }
-
-        public ShellContextMenu(string name)
-        {
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = name;
-        }
-
-        public ShellContextMenu(string name, ExecuteShellFunctionCallback execute)
-        {
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = name;
-            this.Execute = execute;
-        }
-
-        public ShellContextMenu(string name, ExecuteShellFunctionCallback execute, bool canChecked) :
-            this(name, execute)
-        {
-            this.canChecked = canChecked;
-        }
-    }
-
     public class ShellSessionVM : InputSessionVM
     {
         #region 类变量
@@ -138,6 +83,8 @@ namespace ModengTerm.Terminal.ViewModels
         private LoggerManager logMgr;
 
         private AutoCompletionVM autoCompletionVM;
+
+        private Visibility shellCommandPanelVisiblity;
 
         #endregion
 
@@ -195,11 +142,6 @@ namespace ModengTerm.Terminal.ViewModels
                 }
             }
         }
-
-        /// <summary>
-        /// 该终端的菜单状态
-        /// </summary>
-        public BindableCollection<ShellContextMenu> ContextMenus { get; private set; }
 
         public IDocument MainDocument { get; set; }
         public IDocument AlternateDocument { get; set; }
@@ -320,6 +262,25 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 控制快捷命令窗口是否显示
+        /// </summary>
+        public Visibility ShellCommandPanelVisiblity
+        {
+            get
+            {
+                return this.shellCommandPanelVisiblity;
+            }
+            set
+            {
+                if (this.shellCommandPanelVisiblity != value) 
+                {
+                    this.shellCommandPanelVisiblity = value;
+                    this.NotifyPropertyChanged("ShellCommandPanelVisiblity");
+                }
+            }
+        }
+
         #endregion
 
         #region 构造方法
@@ -349,18 +310,11 @@ namespace ModengTerm.Terminal.ViewModels
             this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new QuickCommandVM(v)));
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
-            #region 初始化工具栏菜单
-
-            this.ToolbarMenus.Add(new SMenuItem("端口转发", "pack://application:,,,/ModengTerm;component/Images/portForward.png", this.OpenPortForwardWindow));
-
-            #endregion
-
-            #region 初始化右键菜单
+            #region 初始化上下文菜单
 
             BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
             if (brc == BehaviorRightClicks.ContextMenu)
             {
-                this.InitializeContextMenu();
                 this.ContextMenuVisibility = Visibility.Visible;
             }
             else
@@ -451,85 +405,77 @@ namespace ModengTerm.Terminal.ViewModels
             this.isRunning = false;
         }
 
+        protected override List<SessionContextMenu> GetContextMenus()
+        {
+            return new List<SessionContextMenu>()
+            {
+                new SessionContextMenu("编辑")
+                {
+                    Children = new BindableCollection<SessionContextMenu>()
+                    {
+                        new SessionContextMenu("查找", this.Find),
+                        new SessionContextMenu("复制", this.CopySelection),
+                        new SessionContextMenu("保存")
+                        {
+                            Children = new BindableCollection<SessionContextMenu>()
+                            {
+                                new SessionContextMenu("选中内容", this.SaveSelection),
+                                new SessionContextMenu("当前屏幕内容", this.SaveViewport),
+                                new SessionContextMenu("所有内容", this.SaveAllDocument)
+                            }
+                        },
+                        new SessionContextMenu("添加到快捷命令列表", this.AddToQuickCommands),
+                    },
+                },
+
+                new SessionContextMenu("查看")
+                {
+                    Children = new BindableCollection<SessionContextMenu>()
+                    {
+                        new SessionContextMenu("快捷命令", this.SwitchQuickCommandPanelVisiblity),
+                        new SessionContextMenu("输入栏", this.SwitchSendCommandPanelVisiblity)
+                    }
+                },
+
+                new SessionContextMenu("配置")
+                {
+                    Children = new BindableCollection<SessionContextMenu>()
+                    {
+                        new SessionContextMenu("端口转发", this.OpenPortForwardWindow),
+                        new SessionContextMenu("同步输入", this.OpenSyncInputConfigurationWindow),
+                        new SessionContextMenu("快捷命令", this.OpenCreateShellCommandWindow)
+                    }
+                },
+
+                new SessionContextMenu("工具")
+                {
+                    Children = new BindableCollection<SessionContextMenu>()
+                    {
+                        new SessionContextMenu("日志")
+                        {
+                            Children = new BindableCollection<SessionContextMenu>()
+                            {
+                                new SessionContextMenu("开始", this.StartLogger),
+                                new SessionContextMenu("停止", this.StartLogger)
+                            }
+                        },
+                        new SessionContextMenu("录制")
+                        {
+                            Children = new BindableCollection<SessionContextMenu>()
+                            {
+                                new SessionContextMenu("开始", this.StartRecord),
+                                new SessionContextMenu("停止", this.StopRecord),
+                                new SessionContextMenu("打开回放", this.OpenRecord)
+                            }
+                        }
+                    }
+                },
+            };
+        }
+
         #endregion
 
         #region 实例方法
-
-        private void InitializeContextMenu()
-        {
-            this.ContextMenus = new BindableCollection<ShellContextMenu>()
-                {
-                    new ShellContextMenu("复制", this.CopySelection),
-                    new ShellContextMenu("粘贴", this.Paste),
-                    new ShellContextMenu("全选", this.SelectAll),
-                    new ShellContextMenu("查找...",  this.Find),
-                    new ShellContextMenu("添加到快捷命令列表", this.AddToQuickCommands),
-                    new ShellContextMenu("日志")
-                    {
-                        Children = new BindableCollection<ShellContextMenu>()
-                        {
-                            new ShellContextMenu("启动",  this.StartLogger),
-                            new ShellContextMenu("停止",  this.StopLogger),
-                        }
-                    },
-                    //new ShellFunctionMenu("查看剪贴板历史", this.ClipboardHistory),
-                    //new ShellFunctionMenu("收藏夹")
-                    //{
-                    //    Children = new BindableCollection<ShellFunctionMenu>()
-                    //    {
-                    //        new ShellFunctionMenu("加入收藏夹", ShellFunctionEnum.AddFavorites, this.AddFavorites),
-                    //        new ShellFunctionMenu("查看收藏夹", ShellFunctionEnum.FaviritesList, this.FaviritesList),
-                    //    }
-                    //},
-                    //new ShellFunctionMenu("书签")
-                    //{
-                    //    Children = new BindableCollection<ShellFunctionMenu>()
-                    //    {
-                    //        new ShellFunctionMenu("新建书签", ShellFunctionEnum.AddBookmark, this.AddBookmark),
-                    //        new ShellFunctionMenu("删除书签", ShellFunctionEnum.RemoveBookmark, this.RemoveBookmark),
-                    //        new ShellFunctionMenu("查看书签列表", ShellFunctionEnum.BookmarkList, this.BookmarkList),
-                    //        new ShellFunctionMenu("显示书签栏", ShellFunctionEnum.DisplayBookmark, this.DisplayBookmark),
-                    //        new ShellFunctionMenu("隐藏书签栏", ShellFunctionEnum.HidenBookmark, this.HidenBookmark),
-                    //    }
-                    //},
-                    new ShellContextMenu("录屏")
-                    {
-                        Children = new BindableCollection<ShellContextMenu>()
-                        {
-                            new ShellContextMenu("开始录制", this.StartRecord),
-                            new ShellContextMenu("停止录制", this.StopRecord),
-                            new ShellContextMenu("打开回放", this.OpenRecord)
-                        }
-                    },
-                    new ShellContextMenu("保存")
-                    {
-                        Children = new BindableCollection<ShellContextMenu>()
-                        {
-                            new ShellContextMenu("选中内容", this.SaveSelection),
-                            new ShellContextMenu("当前屏幕内容", this.SaveViewport),
-                            new ShellContextMenu("所有内容", this.SaveAllDocument),
-                        }
-                    },
-                    new ShellContextMenu("发送到所有会话", this.SendToAll, true),
-                    //new ShellFunctionMenu("交互测试用例")
-                    //{
-                    //    Children = new BindableCollection<ShellFunctionMenu>()
-                    //    {
-                    //        new ShellFunctionMenu("记录", ShellFunctionEnum.SaveInteractve, this.SaveInteractive),
-                    //    }
-                    //},
-                    //new ShellFunctionMenu("记录调试日志")
-                    //{
-                    //    Children = new BindableCollection<ShellFunctionMenu>()
-                    //    {
-                    //        new ShellFunctionMenu("Interactive"),
-                    //        new ShellFunctionMenu("vttestCode"),
-                    //        new ShellFunctionMenu("RawRead")
-                    //    }
-                    //}
-                    new ShellContextMenu("关于", this.About)
-                };
-        }
 
         private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
         {
@@ -1195,7 +1141,7 @@ namespace ModengTerm.Terminal.ViewModels
         private void AddToQuickCommands()
         {
             VTParagraph selectedParagraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
-            if (selectedParagraph.IsEmpty) 
+            if (selectedParagraph.IsEmpty)
             {
                 return;
             }
@@ -1211,7 +1157,7 @@ namespace ModengTerm.Terminal.ViewModels
             };
 
             int code = this.ServiceAgent.AddShellCommand(shellCommand);
-            if (code != ResponseCode.SUCCESS) 
+            if (code != ResponseCode.SUCCESS)
             {
                 MTMessageBox.Info("新建快捷命令失败, {0}", code);
                 return;
@@ -1219,6 +1165,23 @@ namespace ModengTerm.Terminal.ViewModels
 
             QuickCommandVM qcvm = new QuickCommandVM(shellCommand);
             this.ShellCommands.Add(qcvm);
+        }
+
+        private void SwitchQuickCommandPanelVisiblity() 
+        {
+            if (this.ContextMenuVisibility == Visibility.Visible)
+            {
+                this.ContextMenuVisibility = Visibility.Collapsed;
+            }
+            else
+            {
+                this.ContextMenuVisibility = Visibility.Visible;
+            }
+        }
+
+        private void SwitchSendCommandPanelVisiblity() 
+        {
+            this.SendCommandPanelVisible = !this.SendCommandPanelVisible;
         }
 
         #endregion

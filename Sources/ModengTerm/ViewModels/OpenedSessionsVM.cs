@@ -22,12 +22,27 @@ namespace ModengTerm.ViewModels
     /// </summary>
     public class OpenedSessionsVM : ViewModelBase
     {
+        #region 类变量
+
         private static log4net.ILog logger = log4net.LogManager.GetLogger("OpenedSessionsVM");
 
         /// <summary>
         /// 最后一个打开会话的按钮
         /// </summary>
         public static readonly OpenSessionVM OpenSessionVM = new OpenSessionVM();
+
+        #endregion
+
+        #region 公开事件
+
+        /// <summary>
+        /// 当会话被完全打开之后触发
+        /// </summary>
+        public event Action<OpenedSessionsVM, OpenedSessionVM> OnSessionOpened;
+
+        #endregion
+
+        #region 公开属性
 
         /// <summary>
         /// 打开的所有会话列表
@@ -52,40 +67,42 @@ namespace ModengTerm.ViewModels
             }
         }
 
+        #endregion
+
+        #region 构造方法
+
         public OpenedSessionsVM()
         {
             this.SessionList = new BindableCollection<SessionItemVM>();
             this.SessionList.Add(OpenSessionVM);
         }
 
+        #endregion
+
         #region 公开接口
 
         public ISessionContent OpenSession(XTermSession session)
         {
-            // 先初始化UI，等UI显示出来在打开Session
-            // 因为初始化终端需要知道当前的界面大小，从而计算行大小和列大小
-
             ISessionContent content = SessionContentFactory.Create(session);
+            content.Session = session;
+            
             OpenedSessionVM viewModel = OpenedSessionVMFactory.Create(session);
-
-            // 给ViewModel赋值
             viewModel.ID = session.ID;
             viewModel.Name = session.Name;
             viewModel.Description = session.Description;
             viewModel.Content = content as DependencyObject;
             viewModel.ServiceAgent = MTermApp.Context.ServiceAgent;
 
-            // 给SessionContent赋值
-            content.Session = session;
-
-            FrameworkElement frameworkElement = content as UserControl;
-            frameworkElement.DataContext = viewModel;
-            frameworkElement.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
-
-            // 加到打开按钮前面
+            // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
             int index = this.SessionList.IndexOf(OpenSessionVM);
             this.SessionList.Insert(index, viewModel);
             this.SelectedSession = viewModel;
+
+            // 在OnLoad事件里执行打开会话的动作
+            // 因为初始化终端需要知道当前的界面大小，从而计算行大小和列大小
+            FrameworkElement frameworkElement = content as FrameworkElement;
+            frameworkElement.DataContext = viewModel;
+            frameworkElement.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
 
             return content;
         }
@@ -121,7 +138,7 @@ namespace ModengTerm.ViewModels
                 logger.ErrorFormat("打开会话失败, {0}", code);
             }
 
-            OpenedSessionVM sessionVM = frameworkElement.DataContext as OpenedSessionVM;
+            this.OnSessionOpened?.Invoke(this, frameworkElement.DataContext as OpenedSessionVM);
         }
 
         #endregion

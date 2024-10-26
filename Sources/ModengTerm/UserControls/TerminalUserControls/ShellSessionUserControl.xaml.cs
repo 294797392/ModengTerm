@@ -5,6 +5,7 @@ using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
@@ -41,6 +42,8 @@ namespace ModengTerm.Terminal.UserControls
 
         #region 属性
 
+        public OpenedSessionVM OpenedSessionVM { get { return shellSession; } }
+        
         public XTermSession Session { get; set; }
 
         public IVideoTerminal VideoTerminal { get; set; }
@@ -215,7 +218,7 @@ namespace ModengTerm.Terminal.UserControls
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            ShellContextMenu functionMenu = menuItem.DataContext as ShellContextMenu;
+            SessionContextMenu functionMenu = menuItem.DataContext as SessionContextMenu;
             if (functionMenu == null)
             {
                 return;

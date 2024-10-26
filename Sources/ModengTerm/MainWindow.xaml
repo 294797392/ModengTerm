@@ -163,6 +163,28 @@
                 <Setter Property="Margin" Value="3"/>
             </Style>
 
+            <Style x:Key="StyleMenuLocal" TargetType="{x:Type Menu}">
+                <Setter Property="Background" Value="{x:Null}"/>
+                <Setter Property="BorderBrush" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleMenuItemLocal}"/>
+            </Style>
+
+            <Style x:Key="StyleMenuItemSessionContextMenus" TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ResourceKey=StyleMenuItemLocal}">
+                <Setter Property="ItemsSource" Value="{Binding Path=Children}"/>
+                <Setter Property="UsesItemContainerTemplate" Value="False"/>
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
         </ResourceDictionary>
     </Window.Resources>
 
@@ -191,66 +213,44 @@
 
             <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
-            <Menu Grid.Column="1" Background="{x:Null}" BorderBrush="{x:Null}" BorderThickness="0"
-                  VerticalContentAlignment="Center" VerticalAlignment="Center">
-
-                <MenuItem Header="会话" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
-                    <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
-                    <MenuItem Header="分组管理" Click="MenuItemGroupManager_Click"/>
-                    <MenuItem Header="最新打开的会话" ItemsSource="{Binding Path=RecentlyOpenedSession}">
-                        <MenuItem.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path=Name}"/>
-                            </DataTemplate>
-                        </MenuItem.ItemTemplate>
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}">
-                                <EventSetter Event="Click" Handler="MenuItemOpenRecentSessions_Click"/>
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Menu Style="{StaticResource ResourceKey=StyleMenuLocal}">
+                    <MenuItem Header="会话">
+                        <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
+                        <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
+                        <MenuItem Header="分组管理" Click="MenuItemGroupManager_Click"/>
+                        <MenuItem Header="最新打开的会话" ItemsSource="{Binding Path=RecentlyOpenedSession}">
+                            <MenuItem.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=Name}"/>
+                                </DataTemplate>
+                            </MenuItem.ItemTemplate>
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="{x:Type MenuItem}">
+                                    <EventSetter Event="Click" Handler="MenuItemOpenRecentSessions_Click"/>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
                     </MenuItem>
-                </MenuItem>
+                </Menu>
 
-                <MenuItem Header="编辑" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem Header="查找" Click="MenuItemFind_Click"/>
-                    <MenuItem Header="复制" Click="MenuItemCopySelected_Click"/>
-                    <MenuItem Header="保存">
-                        <MenuItem Header="选中内容" Click="MenuItemSaveSelection_Click"/>
-                        <MenuItem Header="当前屏幕内容" Click="MenuItemSaveViewport_Click"/>
-                        <MenuItem Header="所有内容" Click="MenuItemSaveAllDocument_Click"/>
+                <Menu ItemsSource="{Binding Path=TitleMenus}" Style="{StaticResource ResourceKey=StyleMenuLocal}"
+                      ItemContainerStyle="{StaticResource ResourceKey=StyleMenuItemSessionContextMenus}">
+                    <Menu.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </DataTemplate>
+                    </Menu.ItemTemplate>
+                </Menu>
+
+                <Menu Style="{StaticResource ResourceKey=StyleMenuLocal}">
+                    <MenuItem Header="帮助">
+                        <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
+                        <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->
                     </MenuItem>
-                </MenuItem>
-
-                <MenuItem Header="查看" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem x:Name="MenuItemShellCommand" Header="快捷命令" IsCheckable="True" IsChecked="{Binding Path=ShellCommandPanelVisiblity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <MenuItem x:Name="MenuItemInputPanel" Header="输入栏" IsCheckable="True" IsChecked="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem.SendCommandPanelVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                </MenuItem>
-
-                <MenuItem Header="配置" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem x:Name="MenuItemPortForward" Header="端口转发" Click="MenuItemPortForward_Click" Visibility="Collapsed"/>
-                    <MenuItem x:Name="MenuItemSendAll" Header="同步输入" Click="MenuItemSendAll_Click"/>
-                    <MenuItem x:Name="MenuItemCreateShellCommand" Header="快捷命令" Click="MenuItemShellCommand_Click"/>
-                </MenuItem>
-
-                <MenuItem Header="工具" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem Header="日志">
-                        <MenuItem x:Name="MenuItemStartLog" Header="开始" Click="MenuItemStartLog_Click"/>
-                        <MenuItem x:Name="MenuItemStopLog" Header="停止" Click="MenuItemStopLog_Click"/>
-                    </MenuItem>
-                    <MenuItem Header="录制">
-                        <MenuItem x:Name="MenuItemStartRecord" Header="开始" Click="MenuItemStartRecord_Click"/>
-                        <MenuItem x:Name="MenuItemStopRecord" Header="停止" Click="MenuItemStopRecord_Click"/>
-                        <MenuItem x:Name="MenuItemOpenRecord" Header="打开回放" Click="MenuItemOpenRecord_Click"/>
-                    </MenuItem>
-                </MenuItem>
-
-                <MenuItem Header="帮助" Style="{StaticResource ResourceKey=StyleMenuItemLocal}">
-                    <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
-                    <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->
-                </MenuItem>
-
-            </Menu>
+                </Menu>
+            </StackPanel>
+            
 
             <mtermcontrols:MdButton Grid.Column="2" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 

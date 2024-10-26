@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Terminal.Callbacks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,35 +12,67 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
 {
-    public class SMenuItem : ViewModelBase
+    /// <summary>
+    /// 会话上下文菜单
+    /// </summary>
+    public class SessionContextMenu : ViewModelBase
     {
-        public delegate void SMenuItemClickDelegate();
+        private bool canChecked;
+        private bool isChecked;
 
-        private string icon;
+        public BindableCollection<SessionContextMenu> Children { get; set; }
 
-        public string Icon
+        public bool CanChecked
         {
-            get { return this.icon; }
+            get { return this.canChecked; }
             set
             {
-                if (this.icon != value) 
+                if (this.canChecked != value)
                 {
-                    this.icon = value;
-                    this.NotifyPropertyChanged("Icon");
+                    this.canChecked = value;
+                    this.NotifyPropertyChanged("CanChecked");
                 }
             }
         }
 
-        public SMenuItemClickDelegate ClickDelegate { get; private set; }
-
-        public SMenuItem(string name, string icon, SMenuItemClickDelegate clickDelegate)
+        public bool IsChecked
         {
+            get { return this.isChecked; }
+            set
+            {
+                if (this.isChecked != value)
+                {
+                    this.isChecked = value;
+                    this.NotifyPropertyChanged("IsChecked");
+                }
+            }
+        }
+
+        public ExecuteShellFunctionCallback Execute { get; private set; }
+
+        public SessionContextMenu(string name)
+        {
+            this.ID = Guid.NewGuid().ToString();
             this.Name = name;
-            this.Icon = icon;
-            ClickDelegate = clickDelegate;
+        }
+
+        public SessionContextMenu(string name, ExecuteShellFunctionCallback execute)
+        {
+            this.ID = Guid.NewGuid().ToString();
+            this.Name = name;
+            this.Execute = execute;
+        }
+
+        public SessionContextMenu(string name, ExecuteShellFunctionCallback execute, bool canChecked) :
+            this(name, execute)
+        {
+            this.canChecked = canChecked;
         }
     }
 
+    /// <summary>
+    /// 表示一个被打开的会话
+    /// </summary>
     public abstract class OpenedSessionVM : SessionItemVM
     {
         #region 公开事件
@@ -103,9 +136,10 @@ namespace ModengTerm.ViewModels
         public ServiceAgent ServiceAgent { get; set; }
 
         /// <summary>
-        /// 该会话的工具栏菜单
+        /// 该会话的上下文菜单
+        /// 不同类型的会话可以有不同的上上下文菜单
         /// </summary>
-        public BindableCollection<SMenuItem> ToolbarMenus { get; private set; }
+        public BindableCollection<SessionContextMenu> ContextMenus { get; private set; }
 
         #endregion
 
@@ -114,7 +148,6 @@ namespace ModengTerm.ViewModels
         public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
-            this.ToolbarMenus = new BindableCollection<SMenuItem>();
         }
 
         #endregion
@@ -123,6 +156,9 @@ namespace ModengTerm.ViewModels
 
         public int Open()
         {
+            this.ContextMenus = new BindableCollection<SessionContextMenu>();
+            this.ContextMenus.AddRange(this.GetContextMenus());
+
             return this.OnOpen();
         }
 
@@ -137,6 +173,12 @@ namespace ModengTerm.ViewModels
 
         protected abstract int OnOpen();
         protected abstract void OnClose();
+
+        /// <summary>
+        /// 获取该会话的上下文菜单
+        /// </summary>
+        /// <returns></returns>
+        protected abstract List<SessionContextMenu> GetContextMenus();
 
         #endregion
 

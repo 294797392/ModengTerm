@@ -52,6 +52,11 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public OpenedSessionsVM OpenedSessionsVM { get; private set; }
 
+        /// <summary>
+        /// 窗口顶部的菜单列表
+        /// </summary>
+        public BindableCollection<SessionContextMenu> TitleMenus { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -81,6 +86,8 @@ namespace ModengTerm.ViewModels
                 RecentlySessionVM recentlySessionVM = new RecentlySessionVM(recentSession);
                 this.RecentlyOpenedSession.Add(recentlySessionVM);
             }
+
+            this.TitleMenus = new BindableCollection<SessionContextMenu>();
         }
 
         #endregion
