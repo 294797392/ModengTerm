@@ -246,6 +246,31 @@ namespace ModengTerm.Windows
 
         private void ButtonOpenSession_Click(object sender, RoutedEventArgs e)
         {
+            SessionTreeNodeVM selectedNode = this.currentView.GetSelectedItem();
+            if (selectedNode == null) 
+            {
+                return;
+            }
+
+            switch (selectedNode.NodeType)
+            {
+                case SessionTreeNodeTypeEnum.Session:
+                    {
+                        this.OpenSession(selectedNode as XTermSessionVM);
+                        break;
+                    }
+
+                case SessionTreeNodeTypeEnum.Group:
+                    {
+                        this.currentView.EnterGroup(selectedNode as SessionGroupVM);
+                        break;
+                    }
+
+                default:
+                    {
+                        break;
+                    }
+            }
         }
 
         private void ButtonSwitchView_Click(object sender, RoutedEventArgs e)

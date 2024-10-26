@@ -33,9 +33,12 @@ namespace ModengTerm.ViewModels.Session
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="match">搜索到的节点</param>
         /// <returns>是否搜索结束</returns>
-        public bool PerformMatch()
+        public bool PerformMatch(out TreeNodeViewModel match)
         {
+            match = null;
+
             if (string.IsNullOrEmpty(this.Keyword))
             {
                 return false;
@@ -52,6 +55,7 @@ namespace ModengTerm.ViewModels.Session
                 {
                     this.enumerator.Current.IsExpanded = true;
                     this.enumerator.Current.IsSelected = true;
+                    match = this.enumerator.Current;
                     return false;
                 }
             }

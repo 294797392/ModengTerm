@@ -28,6 +28,8 @@ namespace ModengTerm.UserControls.SessionListUserControls
         {
         }
 
+        #region 事件处理器
+
         private void DataGridSessionList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             SessionTreeNodeVM selectedItem = this.GetSelectedItem();
@@ -78,6 +80,10 @@ namespace ModengTerm.UserControls.SessionListUserControls
             }
         }
 
+        #endregion
+
+        #region SessionListView
+
         public override void OnLoad()
         {
             if (this.gobackVM == null)
@@ -107,6 +113,26 @@ namespace ModengTerm.UserControls.SessionListUserControls
             }
         }
 
+        public override void EnterGroup(SessionGroupVM sessionGroup)
+        {
+            this.SwitchGroup(sessionGroup);
+        }
+
+        public override SessionTreeNodeVM GetSelectedItem()
+        {
+            switch (this.listViewEnum)
+            {
+                case SessionListViewEnum.DataGrid: return DataGridSessionList.SelectedItem as SessionTreeNodeVM;
+                case SessionListViewEnum.DataList: return ListBoxSessionList.SelectedItem as SessionTreeNodeVM;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+        #region 实例方法
+
         /// <summary>
         /// 显示指定的分组列表下的内容
         /// </summary>
@@ -134,18 +160,9 @@ namespace ModengTerm.UserControls.SessionListUserControls
             }
         }
 
-        private SessionTreeNodeVM GetSelectedItem()
-        {
-            switch (this.listViewEnum)
-            {
-                case SessionListViewEnum.DataGrid: return DataGridSessionList.SelectedItem as SessionTreeNodeVM;
-                case SessionListViewEnum.DataList: return ListBoxSessionList.SelectedItem as SessionTreeNodeVM;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
+        #endregion
 
-
+        #region 公开接口
 
         public void SetMode(SessionListViewEnum listViewEnum)
         {
@@ -171,5 +188,7 @@ namespace ModengTerm.UserControls.SessionListUserControls
                     throw new NotImplementedException();
             }
         }
+
+        #endregion
     }
 }

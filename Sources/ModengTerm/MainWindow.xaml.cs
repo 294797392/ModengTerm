@@ -7,6 +7,7 @@ using ModengTerm.Controls;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.UserControls;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
@@ -34,6 +35,7 @@ namespace ModengTerm
         private MainWindowVM mainWindowVM;
         private OpenedSessionsVM sessionListVM;
         private ServiceAgent serviceAgent;
+        private HomePageUserControl homePageUserControl;
 
         #endregion
 
@@ -236,7 +238,13 @@ namespace ModengTerm
             if (this.sessionListVM.SessionList.Count == 1 &&
                 this.sessionListVM.SessionList[0] is OpenSessionVM)
             {
-                this.ShowSessionListWindow();
+                if (this.homePageUserControl == null) 
+                {
+                    this.homePageUserControl = new HomePageUserControl();
+                }
+                ContentControlSession.Content = this.homePageUserControl;
+
+                //this.ShowSessionListWindow();
             }
         }
 

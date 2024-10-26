@@ -21,6 +21,10 @@ namespace ModengTerm.UserControls.SessionListUserControls
 
         public abstract void OnUnload();
 
+        public virtual void EnterGroup(SessionGroupVM sessionGroup) { }
+
+        public virtual SessionTreeNodeVM GetSelectedItem() { return null; }
+
         protected void NotifyOpenSessionEvent(XTermSessionVM sessionVM)
         {
             if (this.OpenSessionEvent != null)

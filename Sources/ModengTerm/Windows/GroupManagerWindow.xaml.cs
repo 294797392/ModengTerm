@@ -44,6 +44,7 @@ namespace ModengTerm.Windows
             this.serviceAgent = MTermApp.Context.ServiceAgent;
             this.sessionTreeVM = MTermApp.Context.CreateSessionTreeVM(false, true);
             SessionTreeViewUserControl.ViewModel = this.sessionTreeVM;
+            this.sessionTreeVM.ExpandAll();
 
             if (!string.IsNullOrEmpty(selectedGroupId))
             {
@@ -107,7 +108,10 @@ namespace ModengTerm.Windows
                 this.sessionTreeVM.ResetMatch();
             }
 
-            this.sessionTreeVM.PerformMatch();
+            TreeNodeViewModel matches;
+            this.sessionTreeVM.PerformMatch(out matches);
+
+            // TODO：滚动条滚动到匹配的节点位置
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)

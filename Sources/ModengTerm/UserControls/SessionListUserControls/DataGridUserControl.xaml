@@ -69,7 +69,7 @@
         </DataGrid>
 
         <ListBox x:Name="ListBoxSessionList" MouseDoubleClick="DataGridSessionList_MouseDoubleClick"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionMode="Single">
             <ListBox.Style>
                 <Style TargetType="{x:Type ListBox}">
                     <Setter Property="BorderBrush" Value="{x:Null}"/>
@@ -98,7 +98,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                             <RowDefinition Height="10"/>
-                            <RowDefinition Height="30"/>
+                            <RowDefinition MinHeight="30"/>
                         </Grid.RowDefinitions>
 
                         <Image Grid.Row="0" Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center"
