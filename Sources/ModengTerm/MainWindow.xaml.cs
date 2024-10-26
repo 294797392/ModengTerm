@@ -273,7 +273,7 @@ namespace ModengTerm
 
         private void MenuItemGroupManager_Click(object sender, RoutedEventArgs e)
         {
-            CreateSessionGroupWindow window = new CreateSessionGroupWindow();
+            GroupManagerWindow window = new GroupManagerWindow();
             window.Owner = this;
             window.ShowDialog();
         }

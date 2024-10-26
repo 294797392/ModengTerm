@@ -264,7 +264,7 @@ namespace ModengTerm.Windows
             SessionGroupVM currentGroup = this.currentView.CurrentGroup;
             string groupId = currentGroup == null ? string.Empty : currentGroup.ID.ToString();
 
-            CreateSessionGroupWindow createSessionGroupWindow = new CreateSessionGroupWindow(groupId);
+            GroupManagerWindow createSessionGroupWindow = new GroupManagerWindow(groupId);
             createSessionGroupWindow.OnSessionGroupCreated += CreateSessionGroupWindow_OnSessionGroupCreated;
             createSessionGroupWindow.OnSessionGroupDeleted += CreateSessionGroupWindow_OnSessionGroupDeleted;
             createSessionGroupWindow.Owner = this;

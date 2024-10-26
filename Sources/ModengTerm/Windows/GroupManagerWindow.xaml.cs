@@ -16,13 +16,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.Windows
 {
     /// <summary>
     /// CreateSessionGroupWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class CreateSessionGroupWindow : MdWindow
+    public partial class GroupManagerWindow : MdWindow
     {
         public event Action<SessionGroup> OnSessionGroupDeleted;
         public event Action<SessionGroup> OnSessionGroupCreated;
@@ -31,7 +32,7 @@ namespace ModengTerm.Windows
         private ServiceAgent serviceAgent;
         private string keyword;
 
-        public CreateSessionGroupWindow(string selectedGroupId = null)
+        public GroupManagerWindow(string selectedGroupId = null)
         {
             InitializeComponent();
 
@@ -47,6 +48,7 @@ namespace ModengTerm.Windows
             if (!string.IsNullOrEmpty(selectedGroupId))
             {
                 this.sessionTreeVM.SelectNode(selectedGroupId);
+                this.sessionTreeVM.ExpandNode(selectedGroupId);
             }
         }
 
