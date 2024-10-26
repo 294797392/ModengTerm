@@ -97,13 +97,15 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
+                            <RowDefinition Height="10"/>
                             <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
 
                         <Image Grid.Row="0" Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center"
                                Source="{Binding Converter={StaticResource ResourceKey=SessionTreeNodeImageConverter}}"/>
 
-                        <TextBlock Grid.Row="1" Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Row="2" Text="{Binding Path=Name}" VerticalAlignment="Top" HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"/>
 
                     </Grid>
                 </DataTemplate>

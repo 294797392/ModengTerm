@@ -1289,6 +1289,15 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
+                case SessionTypeEnum.RawTcp:
+                    {
+                        if (!this.GetRawTcpOptions(session)) 
+                        {
+                            return false;
+                        }
+                        break;
+                    }
+
                 default:
                     throw new NotImplementedException();
             }
