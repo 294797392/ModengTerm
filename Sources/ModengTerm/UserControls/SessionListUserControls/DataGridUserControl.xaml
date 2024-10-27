@@ -81,7 +81,7 @@
                     <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <Setter Property="Margin" Value="10"/>
                     <Setter Property="Width" Value="70"/>
-                    <Setter Property="Height" Value="70"/>
+                    <Setter Property="MinHeight" Value="60"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="VerticalContentAlignment" Value="Center"/>
                     <Setter Property="ToolTip" Value="{Binding Path=Name}"/>
@@ -97,8 +97,8 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
-                            <RowDefinition Height="10"/>
-                            <RowDefinition MinHeight="30"/>
+                            <RowDefinition Height="5"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <Image Grid.Row="0" Width="24" Height="24" VerticalAlignment="Center" HorizontalAlignment="Center"
