@@ -174,6 +174,17 @@ namespace ModengTerm.Terminal
         /// </summary>
         private VTCharsetMap grTranslationTable;
 
+        private bool isApplicationMode;
+        private bool isAnsiMode;
+        /// <summary>
+        /// DECAWM是否启用
+        /// </summary>
+        private bool autoWrapMode;
+        private bool xtermBracketedPasteMode;
+        private bool acceptC1Control;
+
+        private char lastPrintChar;
+
         /// <summary>
         /// 终端数据解析器
         /// </summary>
@@ -183,16 +194,6 @@ namespace ModengTerm.Terminal
         /// 数据渲染器
         /// </summary>
         private VTermRenderer renderer;
-
-        private bool isApplicationMode;
-        private bool isAnsiMode;
-        /// <summary>
-        /// DECAWM是否启用
-        /// </summary>
-        private bool autoWrapMode;
-        private bool xtermBracketedPasteMode;
-
-        private bool acceptC1Control;
 
         #endregion
 
@@ -1452,15 +1453,12 @@ namespace ModengTerm.Terminal
             return true;
         }
 
-        #endregion
-
-        #region VTParser事件
-
-        private void VtParser_OnPrint(VTParser arg1, char ch)
+        /// <summary>
+        /// 打印字符并移动光标到下一个打印位置
+        /// </summary>
+        /// <param name="ch"></param>
+        private void PerformPrint(char ch) 
         {
-            int row = this.Cursor.Row;
-            int col = this.Cursor.Column;
-
             // 根据测试得出结论：
             // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
             // 在正常模式下，如果遇到中文字符，也使用2列来显示
@@ -1473,15 +1471,30 @@ namespace ModengTerm.Terminal
             // 不然会出现在VTDocument当前的最后一行打印字符的问题
             activeDocument.ScrollToBottom();
 
-            char chPrint = this.TranslateCharacter(ch);
-
             // 创建并打印新的字符
-            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
-            VTCharacter character = this.CreateCharacter(chPrint, activeDocument.AttributeState);
+            VTCharacter character = this.CreateCharacter(ch, activeDocument.AttributeState);
             activeDocument.PrintCharacter(character);
             activeDocument.SetCursor(CursorRow, CursorCol + character.ColumnSize);
 
             this.OnPrint?.Invoke(this);
+
+            if (this.lastPrintChar != ch)
+            {
+                this.lastPrintChar = ch;
+            }
+        }
+
+        #endregion
+
+        #region VTParser事件
+
+        private void VtParser_OnPrint(VTParser arg1, char ch)
+        {
+            char chPrint = this.TranslateCharacter(ch);
+
+            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
+
+            this.PerformPrint(chPrint);
         }
 
         private void VtParser_OnC0Actions(VTParser arg1, ASCIITable ascii)
@@ -1854,6 +1867,18 @@ namespace ModengTerm.Terminal
                     {
                         int count = VTParameter.GetParameter(parameters, 0, 1);
                         this.ECH_EraseCharacters(count);
+                        break;
+                    }
+
+                case CsiActionCodes.REP_RepeatCharacter:
+                    {
+                        int n = VTParameter.GetParameter(parameters, 0, -1);
+
+                        for (int i = 0; i < n; i++)
+                        {
+                            this.PerformPrint(this.lastPrintChar);
+                        }
+
                         break;
                     }
 

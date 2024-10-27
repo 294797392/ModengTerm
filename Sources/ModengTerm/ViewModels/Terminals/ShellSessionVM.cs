@@ -16,6 +16,7 @@ using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
+using ModengTerm.Windows.SSH;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
@@ -1133,6 +1134,15 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void OpenPortForwardWindow()
         {
+            if (this.Session.Type != (int)SessionTypeEnum.SSH)
+            {
+                MTMessageBox.Info("该会话没有转发信息");
+                return;
+            }
+
+            PortForwardStatusWindow portForwardStatusWindow = new PortForwardStatusWindow(this);
+            portForwardStatusWindow.Owner = App.Current.MainWindow;
+            portForwardStatusWindow.Show();
         }
 
         /// <summary>

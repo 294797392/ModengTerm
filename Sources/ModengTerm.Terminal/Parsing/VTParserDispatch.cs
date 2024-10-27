@@ -440,6 +440,15 @@ namespace ModengTerm.Terminal.Parsing
                         break;
                     }
 
+                case CsiActionCodes.REP_RepeatCharacter:
+                    {
+                        // Repeat the preceding graphic character Ps times
+
+                        this.WriteCode("REP_RepeatCharacter");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
+                        break;
+                    }
+
                 case (CsiActionCodes)'~':
                     {
                         this.WriteCode("UnPerformed_CSI126_");

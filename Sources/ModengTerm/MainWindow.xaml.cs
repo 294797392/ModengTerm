@@ -319,63 +319,6 @@ namespace ModengTerm
             aboutWindow.ShowDialog();
         }
 
-
-        private void MenuItemFind_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                MTMessageBox.Info("请选中要搜索的终端");
-                return;
-            }
-
-            FindWindowMgr.Show(shellSession);
-        }
-
-        private void MenuItemCopySelected_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.CopySelection();
-        }
-
-        private void MenuItemSaveSelection_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.SaveSelection();
-        }
-
-        private void MenuItemSaveViewport_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.SaveViewport();
-        }
-
-        private void MenuItemSaveAllDocument_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.SaveAllDocument();
-        }
-
         private void MenuItemOpenRecentSessions_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = sender as MenuItem;
@@ -394,129 +337,12 @@ namespace ModengTerm
             this.OpenSession(session, false);
         }
 
-        private void MenuItemPortForward_Click(object sender, RoutedEventArgs e)
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                MTMessageBox.Info("请选择要查看的会话");
-                return;
-            }
-
-            if (shellSession.Session.Type != (int)SessionTypeEnum.SSH)
-            {
-                MTMessageBox.Info("该会话没有转发信息");
-                return;
-            }
-
-            PortForwardStatusWindow portForwardStatusWindow = new PortForwardStatusWindow(shellSession);
-            portForwardStatusWindow.Owner = this;
-            portForwardStatusWindow.Show();
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            SessionContextMenu contextMenu = menuItem.DataContext as SessionContextMenu;
+            contextMenu.Execute();
         }
-
-        private void MenuItemSendAll_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                MTMessageBox.Info("请选择要设置的会话");
-                return;
-            }
-
-            shellSession.OpenSyncInputConfigurationWindow();
-        }
-
-        private void MenuItemShellCommand_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                MTMessageBox.Info("请选择要设置的会话");
-                return;
-            }
-
-            shellSession.OpenCreateShellCommandWindow();
-        }
-
-        private void MenuItemStartLog_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                MTMessageBox.Info("请选择要启动的会话");
-                return;
-            }
-
-            shellSession.StartLogger();
-        }
-
-        private void MenuItemStopLog_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.StopLogger();
-        }
-
-        private void MenuItemPauseLog_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.PauseLogger();
-        }
-
-        private void MenuItemResumeLog_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.ResumeLogger();
-        }
-
-        private void MenuItemStartRecord_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.StartRecord();
-        }
-
-        private void MenuItemStopRecord_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.StopRecord();
-        }
-
-        private void MenuItemOpenRecord_Click(object sender, RoutedEventArgs e)
-        {
-            ShellSessionVM shellSession = ListBoxOpenedSession.SelectedItem as ShellSessionVM;
-            if (shellSession == null)
-            {
-                return;
-            }
-
-            shellSession.OpenRecord();
-        }
-
-
 
 
 
