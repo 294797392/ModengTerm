@@ -1,22 +1,16 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace ModengTerm.Terminal.UserControls
 {

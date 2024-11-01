@@ -7,7 +7,6 @@ using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
@@ -20,14 +19,12 @@ using ModengTerm.Windows.SSH;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
-using XTerminal;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -79,13 +76,11 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool sendCommandPanelVisible;
 
-        private BindableCollection<QuickCommandVM> shellCommands;
-
         private LoggerManager logMgr;
 
         private AutoCompletionVM autoCompletionVM;
 
-        private Visibility shellCommandPanelVisiblity;
+        private bool quickCommandPanelVisible;
 
         #endregion
 
@@ -213,18 +208,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 该会话的所有快捷命令
         /// </summary>
-        public BindableCollection<QuickCommandVM> ShellCommands
-        {
-            get { return this.shellCommands; }
-            private set
-            {
-                if (this.shellCommands != value)
-                {
-                    this.shellCommands = value;
-                    this.NotifyPropertyChanged("ShellCommands");
-                }
-            }
-        }
+        public BindableCollection<QuickCommandVM> ShellCommands { get; private set; }
 
         /// <summary>
         /// 要同步输入的会话列表
@@ -266,21 +250,26 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 控制快捷命令窗口是否显示
         /// </summary>
-        public Visibility ShellCommandPanelVisiblity
+        public bool QuickCommandPanelVisible
         {
             get
             {
-                return this.shellCommandPanelVisiblity;
+                return this.quickCommandPanelVisible;
             }
             set
             {
-                if (this.shellCommandPanelVisiblity != value) 
+                if (this.quickCommandPanelVisible != value) 
                 {
-                    this.shellCommandPanelVisiblity = value;
-                    this.NotifyPropertyChanged("ShellCommandPanelVisiblity");
+                    this.quickCommandPanelVisible = value;
+                    this.NotifyPropertyChanged("QuickCommandPanelVisible");
                 }
             }
         }
+
+        /// <summary>
+        /// 窗格列表
+        /// </summary>
+        public BindableCollection<MenuVM> Panels { get; private set; }
 
         #endregion
 
@@ -309,7 +298,22 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new QuickCommandVM(v)));
+            this.NotifyPropertyChanged("ShellCommands");
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
+
+            this.Panels = new BindableCollection<MenuVM>();
+            MenuVM panel = new MenuVM();
+            panel.Initialize(new List<MenuDefinition>()
+            {
+                new MenuDefinition()
+                {
+                    Name = "快捷命令",
+                    ClassName = "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm",
+                }
+            });
+            panel.SelectedMenu = panel.MenuItems.FirstOrDefault();
+            this.Panels.Add(panel);
+            this.NotifyPropertyChanged("Panels");
 
             #region 初始化上下文菜单
 
@@ -1179,14 +1183,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void SwitchQuickCommandPanelVisiblity() 
         {
-            if (this.ContextMenuVisibility == Visibility.Visible)
-            {
-                this.ContextMenuVisibility = Visibility.Collapsed;
-            }
-            else
-            {
-                this.ContextMenuVisibility = Visibility.Visible;
-            }
+            this.QuickCommandPanelVisible = !this.QuickCommandPanelVisible;
         }
 
         private void SwitchSendCommandPanelVisiblity() 

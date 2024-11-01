@@ -10,9 +10,8 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
-using XTerminal.Base;
 
-namespace XTerminal
+namespace ModengTerm
 {
     /// <summary>
     /// App.xaml 的交互逻辑

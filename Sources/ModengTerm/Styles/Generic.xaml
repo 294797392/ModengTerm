@@ -157,7 +157,7 @@
                         </Grid.RowDefinitions>
 
                         <Grid Grid.Row="0">
-                            <Border BorderBrush="#dfdfdf" BorderThickness="0,0,0,1"/>
+                            <Border BorderBrush="#dfdfdf" BorderThickness="1,1,0,1"/>
 
                             <TextBlock DataContext="{TemplateBinding Menu}" Text="{Binding Path=SelectedMenu.Name}"
                                        VerticalAlignment="Center" Margin="10,0,0,0"/>

@@ -9,12 +9,20 @@
              xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              xmlns:renderer="clr-namespace:ModengTerm.Document.Rendering;assembly=ModengTerm.Document.Rendering"
              xmlns:termuc="clr-namespace:ModengTerm.UserControls.Terminals"
+             xmlns:termctrl="clr-namespace:ModengTerm.Controls"
+             xmlns:termenum="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
+             xmlns:termconv="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
 
         <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
+        <termconv:RecordStatusVisibilityConverter x:Key="RecordStatusVisibilityConverter"/>
+        <termconv:RecordStatus2TextConverter x:Key="RecordStatus2TextConverter"/>
+        <termconv:SessionStatus2TextConverter x:Key="SessionStatus2TextConverter"/>
+        <termconv:SessionStatus2BrushConverter x:Key="SessionStatus2BrushConverter"/>
+        <termconv:SessionStatus2ImageConverter x:Key="SessionStatus2ImageConverter"/>
 
         <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="3"/>
@@ -24,38 +32,62 @@
             <Setter Property="Margin" Value="3"/>
         </Style>
 
+        <Style x:Key="StyleTextBlockStatusBar" TargetType="{x:Type TextBlock}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="StyleBorderSplitter" TargetType="{x:Type Border}">
+            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=BrushBackground1}"/>
+            <Setter Property="Margin" Value="3,6,3,6"/>
+            <Setter Property="Width" Value="2"/>
+        </Style>
+
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded"
-              MouseDown="GridDocument_MouseDown" 
-              TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
-            <Grid.ContextMenu>
-                <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
+                  MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
+                <Grid.ContextMenu>
+                    <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
                              Visibility="{Binding Path=ContextMenuVisibility}">
-                    <ContextMenu.ItemContainerStyle>
-                        <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="IsCheckable" Value="{Binding Path=CanChecked}"/>
-                            <Setter Property="IsChecked" Value="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        </Style>
-                    </ContextMenu.ItemContainerStyle>
-                    <ContextMenu.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                            <TextBlock Text="{Binding Path=Name}"/>
-                        </HierarchicalDataTemplate>
-                    </ContextMenu.ItemTemplate>
-                </ContextMenu>
-            </Grid.ContextMenu>
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <Setter Property="IsCheckable" Value="{Binding Path=CanChecked}"/>
+                                <Setter Property="IsChecked" Value="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                        <ContextMenu.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </HierarchicalDataTemplate>
+                        </ContextMenu.ItemTemplate>
+                    </ContextMenu>
+                </Grid.ContextMenu>
 
-            <Border x:Name="BorderBackground"/>
+                <Border x:Name="BorderBackground"/>
 
-            <renderer:Document x:Name="DocumentAlternate"/>
-            <renderer:Document x:Name="DocumentMain"/>
+                <renderer:Document x:Name="DocumentAlternate"/>
+                <renderer:Document x:Name="DocumentMain"/>
+            </Grid>
+
+            <!-- 右侧窗格 -->
+            <Grid Grid.Column="1">
+                <termctrl:MdToolPanel Menu="{Binding Path=Panels[0]}" Visibility="{Binding Path=QuickCommandPanelVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                      BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
+            </Grid>
+
         </Grid>
 
         <!-- 输入栏 -->
@@ -83,6 +115,55 @@
                 </Button.ContextMenu>
             </Button>
             <Button Grid.Column="4" Content="清空" Click="ButtonClear_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+
+        </Grid>
+
+        <!-- 状态栏 -->
+        <Grid Grid.Row="2" x:Name="GridStatusbar">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Grid.ColumnSpan="9999"
+                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
+                    BorderThickness="0,1,0,0"/>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2ImageConverter}}" Width="16" Height="16"/>
+                    <TextBlock Text="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2TextConverter}}" 
+                               Foreground="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2BrushConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding Path=Uri}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="10,0,0,0"/>
+
+                <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                    <Grid Visibility="Visible">
+                        <Ellipse Width="15" Height="15" StrokeThickness="1" Stroke="#6a6a6a"/>
+                        <!-- 停止录制状态 -->
+                        <Ellipse Width="10" Height="10" Fill="Red" Visibility="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatusVisibilityConverter}, ConverterParameter={x:Static termenum:RecordStatusEnum.Stop}}"/>
+                        <!-- 正在录制状态 -->
+                        <Border Width="8" Height="8" Background="Red" Visibility="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatusVisibilityConverter}, ConverterParameter={x:Static termenum:RecordStatusEnum.Recording}}"/>
+                    </Grid>
+
+                    <TextBlock Text="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatus2TextConverter}}" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                </StackPanel>
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                <Border Style="{StaticResource ResourceKey=StyleBorderSplitter}"/>
+
+                <TextBlock Text="总行数：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=TotalRows}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="0,0,20,0"/>
+
+                <TextBlock Text="大小：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=ViewportRow}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text=" x " Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                <TextBlock Text="{Binding Path=ViewportColumn}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+            </StackPanel>
 
         </Grid>
 

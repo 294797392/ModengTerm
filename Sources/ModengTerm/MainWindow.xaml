@@ -35,11 +35,6 @@
 
             <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
             <local:SessionImageConverter x:Key="SessionImageConverter"/>
-            <converters:RecordStatusVisibilityConverter x:Key="RecordStatusVisibilityConverter"/>
-            <converters:RecordStatus2TextConverter x:Key="RecordStatus2TextConverter"/>
-            <converters:SessionStatus2TextConverter x:Key="SessionStatus2TextConverter"/>
-            <converters:SessionStatus2BrushConverter x:Key="SessionStatus2BrushConverter"/>
-            <converters:SessionStatus2ImageConverter x:Key="SessionStatus2ImageConverter"/>
 
             <DataTemplate x:Key="DataTemplateOpenedSession">
 
@@ -150,16 +145,6 @@
                 <Setter Property="Focusable" Value="False"/>
             </Style>
 
-            <Style x:Key="StyleTextBlockStatusBar" TargetType="{x:Type TextBlock}">
-                <Setter Property="VerticalAlignment" Value="Center"/>
-            </Style>
-
-            <Style x:Key="StyleBorderSplitter" TargetType="{x:Type Border}">
-                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=BrushBackground1}"/>
-                <Setter Property="Margin" Value="3,6,3,6"/>
-                <Setter Property="Width" Value="2"/>
-            </Style>
-
             <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
                 <Setter Property="Margin" Value="3"/>
             </Style>
@@ -180,9 +165,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <!-- 菜单 -->
@@ -234,9 +217,9 @@
                                 <Style TargetType="{x:Type MenuItem}">
                                 </Style>
                             </HierarchicalDataTemplate.ItemContainerStyle>
-                            
+
                             <TextBlock Text="{Binding Path=Name}"/>
-                            
+
                         </HierarchicalDataTemplate>
                     </Menu.ItemTemplate>
                 </Menu>
@@ -258,95 +241,32 @@
 
         </Grid>
 
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- 终端显示区域 -->
+        <Grid Grid.Row="1" Margin="0,5,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-            <!-- 终端显示区域 -->
-            <Grid Grid.Column="0" Margin="0,5,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+            <!-- 打开的终端列表Tab页 -->
+            <Grid Grid.Row="0">
 
-                <!-- 打开的终端列表Tab页 -->
-                <Grid Grid.Row="0">
-
-                    <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
-                        <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
+                <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                    <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
                                  SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-                        </ListBox>
-                    </ScrollViewer>
-
-                </Grid>
-
-                <!-- 终端展示页面 -->
-                <Border Grid.Row="1" Background="{DynamicResource ResourceKey=Brush4003}"/>
-                <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </ScrollViewer>
 
             </Grid>
 
-            <!-- 右侧窗格 -->
-            <Grid Grid.Column="1">
-                <mtermcontrols:MdToolPanel Menu="{Binding Path=RightPanelMenu}" Visibility="{Binding Path=ShellCommandPanelVisiblity, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                          BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
-            </Grid>
-
-        </Grid>
-
-        <!-- 状态栏 -->
-        <Grid Grid.Row="3" x:Name="GridStatusbar" DataContext="{Binding ElementName=ListBoxOpenedSession, Path=SelectedItem}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Border Grid.Column="0" Grid.ColumnSpan="9999"
-                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
-                    BorderThickness="0,1,0,0"/>
-
-            <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2ImageConverter}}" Width="16" Height="16"/>
-                    <TextBlock Text="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2TextConverter}}" 
-                               Foreground="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2BrushConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                </StackPanel>
-
-                <TextBlock Text="{Binding Path=Uri}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="10,0,0,0"/>
-
-                <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                    <Grid Visibility="Visible">
-                        <Ellipse Width="15" Height="15" StrokeThickness="1" Stroke="#6a6a6a"/>
-                        <!-- 停止录制状态 -->
-                        <Ellipse Width="10" Height="10" Fill="Red" Visibility="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatusVisibilityConverter}, ConverterParameter={x:Static termenum:RecordStatusEnum.Stop}}"/>
-                        <!-- 正在录制状态 -->
-                        <Border Width="8" Height="8" Background="Red" Visibility="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatusVisibilityConverter}, ConverterParameter={x:Static termenum:RecordStatusEnum.Recording}}"/>
-                    </Grid>
-
-                    <TextBlock Text="{Binding Path=RecordStatus, Converter={StaticResource ResourceKey=RecordStatus2TextConverter}}" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                </StackPanel>
-
-            </StackPanel>
-
-            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-
-                <Border Style="{StaticResource ResourceKey=StyleBorderSplitter}"/>
-
-                <TextBlock Text="总行数：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text="{Binding Path=TotalRows}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="0,0,20,0"/>
-
-                <TextBlock Text="大小：" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text="{Binding Path=ViewportRow}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text=" x " Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-                <TextBlock Text="{Binding Path=ViewportColumn}" Margin="0,0,10,0" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
-            </StackPanel>
+            <!-- 终端展示页面 -->
+            <Border Grid.Row="1" Background="{DynamicResource ResourceKey=Brush4003}"/>
+            <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
 
         </Grid>
 
