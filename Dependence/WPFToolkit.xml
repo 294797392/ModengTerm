@@ -2473,48 +2473,48 @@
             每次从界面上移除之前都会触发
             </summary>
         </member>
-        <member name="T:WPFToolkit.MVVM.MenuVM">
+        <member name="T:WPFToolkit.MVVM.AbstractMenuVM`1">
             <summary>
             菜单ViewModel
             </summary>
         </member>
-        <member name="F:WPFToolkit.MVVM.MenuVM.currentContent">
+        <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.currentContent">
             <summary>
             当前选中的页面
             </summary>
         </member>
-        <member name="F:WPFToolkit.MVVM.MenuVM.previouseSelectedMenu">
+        <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.previouseSelectedMenu">
             <summary>
             上次选中的菜单
             </summary>
         </member>
-        <member name="F:WPFToolkit.MVVM.MenuVM.isContentLoading">
+        <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.isContentLoading">
             <summary>
             当前的内容是否正在初始化
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.MenuVM.SelectedMenu">
+        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.SelectedMenu">
             <summary>
             当前选中的菜单
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.MenuVM.MenuItems">
+        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.MenuItems">
             <summary>
             所有的菜单列表
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.MenuVM.IsContentLoading">
+        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.IsContentLoading">
             <summary>
             当前的内容是否正在初始化
             界面上可以通过这个值给用户显示一个“加载中”的界面
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.MenuVM.CurrentContent">
+        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.CurrentContent">
             <summary>
             当前显示的界面
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.MenuVM.LoadSubMenus(WPFToolkit.MVVM.MenuItemVM,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
+        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadSubMenus(WPFToolkit.MVVM.MenuItemVM,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
             <summary>
             递归加载子菜单
             </summary>

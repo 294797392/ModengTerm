@@ -84,7 +84,7 @@
 
             <!-- 右侧窗格 -->
             <Grid Grid.Column="1">
-                <termctrl:MdToolPanel Menu="{Binding Path=Panels[0]}" Visibility="{Binding Path=QuickCommandPanelVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                <termctrl:MdToolPanel Menu="{Binding Path=Panels[0]}" Visibility="{Binding Path=QuickCommandPanelVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Collapsed}" 
                                       BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
             </Grid>
 

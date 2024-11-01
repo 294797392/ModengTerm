@@ -369,7 +369,7 @@ namespace ModengTerm.Terminal.UserControls
             BorderBackground.Background = DrawingUtils.GetBrush(background);
 
             // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
-            // 在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会实时变化
+            // 因为在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会马上变化
             // 根据Padding手动计算终端宽度和高度
             double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
             double width = DocumentMain.DrawAreaSize.Width - padding * 2;

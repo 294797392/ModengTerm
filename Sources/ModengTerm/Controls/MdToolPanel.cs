@@ -39,17 +39,24 @@ namespace ModengTerm.Controls
         {
             base.OnApplyTemplate();
 
-            this.contentControl = this.Template.FindName("PART_Content", this) as ContentControl;
             this.listBox = this.Template.FindName("PART_ItemsHeader", this) as ListBox;
             this.listBox.SelectionChanged += ListBox_SelectionChanged;
 
             this.buttonClose = this.Template.FindName("PART_CloseButton", this) as MdButton;
             this.buttonClose.Click += ButtonClose_Click;
+
+            this.contentControl = this.Template.FindName("PART_Content", this) as ContentControl;
+            // 如果默认不显示MdToolPanel，那么就不会触发ListBox.SelectionChanged事件，界面就无法显示
+            // 所以这里重新触发一下SelectionChanged事件
+            if (this.Menu != null)
+            {
+                this.Menu.InvokeWhenSelectionChanged();
+            }
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            base.Visibility = Visibility.Collapsed;
+            base.SetValue(VisibilityProperty, System.Windows.Visibility.Collapsed);
         }
 
         private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -60,6 +67,11 @@ namespace ModengTerm.Controls
 
         private void OnMenuPropertyChanged(MenuVM oldValue, MenuVM newValue)
         {
+            if (this.contentControl == null)
+            {
+                return;
+            }
+
             this.contentControl.DataContext = newValue;
         }
 
