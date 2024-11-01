@@ -28,6 +28,9 @@
     <Compile Remove="ViewModels\Terminals\CommandLineVM.cs" />
     <Compile Remove="ViewModels\Terminals\ShellGlobalVM.cs" />
     <Compile Remove="ViewModels\Terminals\SyncMasterVM.cs" />
+    <Compile Remove="ViewModels\VTMenuGroupVM.cs" />
+    <Compile Remove="ViewModels\VTMenuItemVM.cs" />
+    <Compile Remove="ViewModels\VTMenuListVM.cs" />
   </ItemGroup>
 
   <ItemGroup>

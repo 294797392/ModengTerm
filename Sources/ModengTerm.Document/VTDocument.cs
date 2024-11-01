@@ -994,9 +994,9 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 删除当前视图中的所有文本数据
+        /// 清空当前视图中的所有文本数据
         /// </summary>
-        public void DeleteViewport()
+        public void ClearViewport()
         {
             VTextLine current = this.FirstLine;
 

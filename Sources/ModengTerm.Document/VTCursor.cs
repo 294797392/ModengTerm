@@ -40,24 +40,6 @@ namespace ModengTerm.Document
         Underscore
     }
 
-    public enum VTCursorPositions
-    {
-        /// <summary>
-        /// 光标位置在可视区域的最上面
-        /// </summary>
-        ViewportTop,
-
-        /// <summary>
-        /// 光标位置在可视区域的中间
-        /// </summary>
-        ViewportMiddle,
-
-        /// <summary>
-        /// 光标位置在可视区域的底部
-        /// </summary>
-        ViewportBottom,
-    }
-
     /// <summary>
     /// 光标的数据模型
     /// </summary>

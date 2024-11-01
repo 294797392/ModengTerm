@@ -882,7 +882,7 @@ namespace ModengTerm.Terminal
                     }
             }
 
-            document.DeleteViewport();
+            document.ClearViewport();
         }
 
         private void AlternateDocumentResize(VTDocument document, int newRow, int newCol)
@@ -890,7 +890,7 @@ namespace ModengTerm.Terminal
             document.Resize(newRow, newCol);
 
             // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
-            document.DeleteViewport();
+            document.ClearViewport();
         }
 
         private VTCharsetMap Select94CharsetMap(ulong charset)
