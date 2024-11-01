@@ -16,7 +16,7 @@ namespace ModengTerm.Terminal.Session
             switch ((SessionTypeEnum)options.Type)
             {
                 case SessionTypeEnum.SSH: return new SshNetSession(options);
-                case SessionTypeEnum.CommandLine:
+                case SessionTypeEnum.WindowsConsole:
                     {
                         CmdDriverEnum driver = options.GetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER);
 

@@ -157,11 +157,15 @@ namespace ModengTerm.Document
             return this.Characters[characterIndex];
         }
 
+        #endregion
+
+        #region 公开接口
+
         /// <summary>
         /// 把一行挂载到该行后面
         /// </summary>
         /// <param name="textLine"></param>
-        internal void Append(VTextLine textLine)
+        public void Append(VTextLine textLine)
         {
             VTextLine next = NextLine;
 
@@ -181,10 +185,6 @@ namespace ModengTerm.Document
             textLine.PreviousLine = this;
             textLine.NextLine = next;
         }
-
-        #endregion
-
-        #region 公开接口
 
         /// <summary>
         /// 查找某列的字符在集合中的索引
@@ -635,7 +635,7 @@ namespace ModengTerm.Document
             this.formattedText = formattedText;
 
             // 把物理行号打印出来，调试用
-            //formattedText.Text = string.Format("{0} - {1}", this.PhysicsRow, formattedText.Text);
+            //formattedText.Text = string.Format("{0} - {1}", this.GetPhysicsRow(), formattedText.Text);
 
             this.Metrics = this.DrawingObject.DrawText(formattedText);
         }

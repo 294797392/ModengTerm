@@ -275,7 +275,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         public VTypeface Typeface { get; private set; }
 
-        public bool HasSelection 
+        public bool HasSelection
         {
             get
             {
@@ -596,7 +596,6 @@ namespace ModengTerm.Terminal
             // 对Document执行Resize
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的？暂时先这样
             // 遇到过一种情况：如果终端名称不正确，比如XTerm，那么当行数增加的时候，光标会移动到该行的最右边，终端名称改成xterm就没问题了
-            // 目前的实现思路是：如果是减少行，那么从第一行开始删除；如果是增加行，那么从最后一行开始新建行。不考虑ScrollMargin
 
             this.MainDocumentResize(this.mainDocument, newRow, newCol);
             this.AlternateDocumentResize(this.alternateDocument, newRow, newCol);
@@ -620,10 +619,10 @@ namespace ModengTerm.Terminal
             int oldScroll = document.Scrollbar.Value;
 
             // 有些命令（top）会动态更新主缓冲区
-            // 执行动作之前先把主缓冲区滚动到底
+            // 执行动作之前先把光标滚动到可视区域内
             if (!this.IsAlternate)
             {
-                document.ScrollToBottom();
+                this.ScrollToBottom(document);
             }
 
             this.renderer.Render(bytes, size);
@@ -739,6 +738,71 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
+        /// 获取终端文档一共显示了多少行数据
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns>文档总行数</returns>
+        private int GetMaxRow(VTDocument document)
+        {
+            // Windows命令行窗口在放大之后，会打印空行，但是最后光标的位置还是在非空行上
+            // 所以在这里使用最后一个非空行当做最后一行
+
+            int lastRowWithText = this.GetLastRowWithText(document);
+
+            return Math.Max(lastRowWithText, document.Cursor.PhysicsRow) + 1;
+        }
+
+        /// <summary>
+        /// 获取最后一个非空行的物理行号
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        private int GetLastRowWithText(VTDocument document)
+        {
+            VTHistory history = document.History;
+
+            int lastRowIndex = history.Lines - 1;
+
+            while (true)
+            {
+                VTHistoryLine historyLine;
+                if (history.TryGetHistory(lastRowIndex, out historyLine))
+                {
+                    if (historyLine.Characters.FirstOrDefault(v => v.Character != ' ') != null)
+                    {
+                        return lastRowIndex;
+                    }
+
+                    lastRowIndex--;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 控制台会把所有行都打印一遍空字符，但是实际上只显示了前几行（缩小然后放大窗口的时候）
+        /// 这种情况下使用最后一个非空行作为总行数
+        /// </summary>
+        /// <param name="document"></param>
+        private void ScrollToBottom(VTDocument document)
+        {
+            // 先获取总行数
+            int maxRow = this.GetMaxRow(document);
+
+            // 如果总行数比可视区域的行数多，那么说明需要滚动
+            // 否则不需要滚动
+            if (maxRow <= document.ViewportRow)
+            {
+                return;
+            }
+
+            document.ScrollToBottom();
+        }
+
+        /// <summary>
         /// 重置终端大小
         /// 模仿Xshell的做法：
         /// 1. 扩大行的时候，如果有滚动内容，那么显示滚动内容。如果没有滚动内容，则直接在后面扩大。
@@ -752,12 +816,73 @@ namespace ModengTerm.Terminal
         /// <param name="newCol"></param>
         private void MainDocumentResize(VTDocument document, int newRow, int newCol)
         {
-            // 调整大小前前先滚动到底，不然会有问题
-            this.activeDocument.ScrollToBottom();
+            // 调整大小前先把光标滚动到可视区域
+            // 因为重新调整大小之后，HOST会重新打印所有内容
+            this.ScrollToBottom(document);
+
+            int oldRow = document.ViewportRow;
+            int oldCol = document.ViewportColumn;
 
             document.Resize(newRow, newCol);
 
-            document.DeleteAll();
+            switch ((SessionTypeEnum)this.Session.Type)
+            {
+                case SessionTypeEnum.WindowsConsole:
+                    {
+                        // 对Windows命令行做特殊处理
+                        // Windows的命令行比较特殊，在窗口放大的时候，它不会把上面被隐藏的行显示出来，而是在下面增加了新的行
+
+                        VTScrollInfo scrollInfo = document.Scrollbar;
+
+                        // 更新滚动条信息
+                        int maxRow = this.GetMaxRow(document);
+
+                        logger.DebugFormat("Windows Commandline, maxRow = {0}, newRow = {1}", maxRow, newRow);
+
+                        if (newRow > oldRow)
+                        {
+                            // 扩大
+
+                        }
+                        else
+                        {
+                            // 缩小
+                            if (maxRow > newRow)
+                            {
+                                scrollInfo.Maximum = maxRow - newRow;
+                                this.ScrollTo(scrollInfo.Maximum);
+                            }
+                        }
+
+                        break;
+                    }
+
+                default:
+                    {
+                        VTScrollInfo scrollInfo = document.Scrollbar;
+
+                        // 更新滚动条信息
+                        int maxRow = this.GetMaxRow(document);
+
+                        logger.DebugFormat("maxRow = {0}, newRow = {1}", maxRow, newRow);
+
+                        if (maxRow > newRow)
+                        {
+                            scrollInfo.Maximum = maxRow - newRow;
+                            this.ScrollTo(scrollInfo.Maximum);
+                        }
+                        else
+                        {
+                            this.ScrollTo(0);
+                            scrollInfo.Maximum = 0;
+                            scrollInfo.Value = 0;
+                        }
+
+                        break;
+                    }
+            }
+
+            document.DeleteViewport();
         }
 
         private void AlternateDocumentResize(VTDocument document, int newRow, int newCol)
@@ -765,7 +890,7 @@ namespace ModengTerm.Terminal
             document.Resize(newRow, newCol);
 
             // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
-            document.DeleteAll();
+            document.DeleteViewport();
         }
 
         private VTCharsetMap Select94CharsetMap(ulong charset)
@@ -1457,7 +1582,7 @@ namespace ModengTerm.Terminal
         /// 打印字符并移动光标到下一个打印位置
         /// </summary>
         /// <param name="ch"></param>
-        private void PerformPrint(char ch) 
+        private void PerformPrint(char ch)
         {
             // 根据测试得出结论：
             // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
@@ -1466,10 +1591,6 @@ namespace ModengTerm.Terminal
 
             // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
             // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
-
-            // 用户输入的时候，如果滚动条没滚动到底，那么先把滚动条滚动到底
-            // 不然会出现在VTDocument当前的最后一行打印字符的问题
-            activeDocument.ScrollToBottom();
 
             // 创建并打印新的字符
             VTCharacter character = this.CreateCharacter(ch, activeDocument.AttributeState);
@@ -1937,12 +2058,13 @@ namespace ModengTerm.Terminal
             {
                 // 没换行之前的光标所在行，该行数据被打印完了
                 VTextLine oldActiveLine = document.ActiveLine;
-                int oldPhysicsRow = oldActiveLine.GetPhysicsRow();
+                int oldPhysicsRow = document.Cursor.PhysicsRow;
+                int newPhysicsRow = oldPhysicsRow + 1;
+
+                document.SwapLine(head, last);
 
                 // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
                 logger.DebugFormat("LineFeed，光标在可滚动区域最后一行，向下滚动一行");
-
-                document.SwapLine(head, last);
 
                 if (this.IsAlternate)
                 {
@@ -1972,11 +2094,26 @@ namespace ModengTerm.Terminal
 
                     #endregion
 
-                    VTextLine activeLine = this.ActiveLine;
+                    // 设置光标所在物理行号并更新ActiveLine
+                    document.SetCursor(newPhysicsRow);
 
-                    VTHistoryLine historyLine = new VTHistoryLine();
-                    activeLine.SetHistory(historyLine);
-                    history.AddHistory(historyLine);
+                    VTextLine newActiveLine = document.ActiveLine;
+
+                    // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
+                    // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
+                    VTHistoryLine historyLine;
+                    if (!history.TryGetHistory(newPhysicsRow, out historyLine))
+                    {
+                        historyLine = new VTHistoryLine();
+                        newActiveLine.SetHistory(historyLine);
+                        history.AddHistory(historyLine);
+                    }
+                    else
+                    {
+                        // newActiveLine和HistoryLine可能不匹配，因为在缩小窗口的时候VTextLine直接被删除了
+                        // 所以在这里强制重新更新一下光标所在行的历史记录
+                        newActiveLine.SetHistory(historyLine);
+                    }
                 }
 
                 // 触发行被完全打印的事件
@@ -1986,23 +2123,30 @@ namespace ModengTerm.Terminal
             {
                 // 没换行之前的光标所在行，该行数据被打印完了
                 VTextLine oldActiveLine = document.ActiveLine;
-                int oldPhysicsRow = oldActiveLine.GetPhysicsRow();
+                int oldPhysicsRow = document.Cursor.PhysicsRow;
+                int newPhysicsRow = oldPhysicsRow + 1;
 
                 // 光标不在可滚动区域的最后一行，说明可以直接移动光标
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
-                document.SetCursor(Cursor.Row + 1, Cursor.Column);
+                document.SetCursor(newPhysicsRow);
 
                 // 光标移动到该行的时候再加入历史记录
                 if (!this.IsAlternate)
                 {
-                    VTextLine activeLine = document.ActiveLine;
+                    VTextLine newActiveLine = document.ActiveLine;
 
                     // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
                     // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
-                    int physicsRow = activeLine.GetPhysicsRow();
-                    if (!history.ContainHistory(physicsRow))
+                    VTHistoryLine historyLine;
+                    if (!history.TryGetHistory(newPhysicsRow, out historyLine))
                     {
-                        history.AddHistory(activeLine.History);
+                        history.AddHistory(newActiveLine.History);
+                    }
+                    else
+                    {
+                        // newActiveLine和HistoryLine可能不匹配，因为在缩小窗口的时候VTextLine直接被删除了
+                        // 所以在这里强制重新更新一下光标所在行的历史记录
+                        newActiveLine.SetHistory(historyLine);
                     }
                 }
 
@@ -2060,7 +2204,7 @@ namespace ModengTerm.Terminal
 
                 // 光标位置在可视区域里面
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
-                document.SetCursor(Cursor.Row - 1, Cursor.Column);
+                document.SetCursor(Cursor.PhysicsRow + 1);
             }
 
             int newRow = this.CursorRow;

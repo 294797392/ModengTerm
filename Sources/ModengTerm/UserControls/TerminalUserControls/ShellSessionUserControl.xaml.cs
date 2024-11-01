@@ -186,6 +186,13 @@ namespace ModengTerm.Terminal.UserControls
             }
         }
 
+        private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Document.Rendering.Document document = this.GetActiveDocument();
+
+            this.videoTerminal.Resize(e.NewSize.ToVTSize());
+        }
+
         protected override void OnMouseWheel(MouseWheelEventArgs e)
         {
             base.OnMouseWheel(e);
@@ -194,13 +201,6 @@ namespace ModengTerm.Terminal.UserControls
             eventInput.OnMouseWheel(e.Delta > 0);
 
             e.Handled = true;
-        }
-
-        private void TerminalContentUserControl_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Document.Rendering.Document document = this.GetActiveDocument();
-
-            this.videoTerminal.Resize(document.DrawAreaSize);
         }
 
 
@@ -386,11 +386,13 @@ namespace ModengTerm.Terminal.UserControls
             DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp += DrawArea_PreviewMouseLeftButtonUp;
             DocumentAlternate.DrawArea.PreviewMouseMove += DrawArea_PreviewMouseMove;
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            DocumentAlternate.DrawArea.SizeChanged += DrawArea_SizeChanged;
             DocumentMain.SetPadding(padding);
             DocumentMain.DrawArea.PreviewMouseLeftButtonDown += DrawArea_PreviewMouseLeftButtonDown;
             DocumentMain.DrawArea.PreviewMouseLeftButtonUp += DrawArea_PreviewMouseLeftButtonUp;
             DocumentMain.DrawArea.PreviewMouseMove += DrawArea_PreviewMouseMove;
             DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            DocumentMain.DrawArea.SizeChanged += DrawArea_SizeChanged;
 
             this.shellSession = this.DataContext as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
@@ -409,21 +411,20 @@ namespace ModengTerm.Terminal.UserControls
             // 自动完成列表和文本行对齐
             AutoCompletionUserControl.Margin = new Thickness(padding);
             AutoCompletionUserControl.DataContext = this.shellSession.AutoCompletionVM;
-            this.SizeChanged += TerminalContentUserControl_SizeChanged;
 
             return ResponseCode.SUCCESS;
         }
 
         public void Close()
         {
-            this.SizeChanged -= TerminalContentUserControl_SizeChanged;
-
             DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown -= DrawArea_PreviewMouseLeftButtonDown;
             DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp -= DrawArea_PreviewMouseLeftButtonUp;
             DocumentAlternate.DrawArea.PreviewMouseMove -= DrawArea_PreviewMouseMove;
+            DocumentAlternate.DrawArea.SizeChanged -= DrawArea_SizeChanged;
             DocumentMain.DrawArea.PreviewMouseLeftButtonDown -= DrawArea_PreviewMouseLeftButtonDown;
             DocumentMain.DrawArea.PreviewMouseLeftButtonUp -= DrawArea_PreviewMouseLeftButtonUp;
             DocumentMain.DrawArea.PreviewMouseMove -= DrawArea_PreviewMouseMove;
+            DocumentMain.DrawArea.SizeChanged -= DrawArea_SizeChanged;
 
             this.shellSession.Close();
 

@@ -11,9 +11,9 @@ namespace ModengTerm.Base.Enumerations
     public enum SessionTypeEnum
     {
         /// <summary>
-        /// 主机命令行
+        /// Windows控制台
         /// </summary>
-        CommandLine,
+        WindowsConsole,
 
         /// <summary>
         /// 是一个SSH远程主机

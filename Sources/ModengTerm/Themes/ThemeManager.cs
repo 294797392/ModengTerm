@@ -36,7 +36,7 @@ namespace ModengTerm.Themes
         {
             switch (sessionType)
             {
-                case SessionTypeEnum.CommandLine: return ThemeManager.GetResource<ImageSource>("5022");
+                case SessionTypeEnum.WindowsConsole: return ThemeManager.GetResource<ImageSource>("5022");
                 case SessionTypeEnum.SerialPort: return ThemeManager.GetResource<ImageSource>("5024");
                 case SessionTypeEnum.SSH: return ThemeManager.GetResource<ImageSource>("5023");
                 case SessionTypeEnum.RawTcp: return ThemeManager.GetResource<ImageSource>("5025");

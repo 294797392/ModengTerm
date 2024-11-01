@@ -24,7 +24,7 @@ namespace ModengTerm.ViewModels
             {
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.SSH:
-                case SessionTypeEnum.CommandLine:
+                case SessionTypeEnum.WindowsConsole:
                     {
                         return new ShellSessionVM(session);
                     }

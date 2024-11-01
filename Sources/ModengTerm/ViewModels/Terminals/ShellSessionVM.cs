@@ -518,7 +518,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             switch ((SessionTypeEnum)this.Session.Type)
             {
-                case SessionTypeEnum.CommandLine:
+                case SessionTypeEnum.WindowsConsole:
                     {
                         string cmdPath = this.Session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         uri = string.Format("{0}", cmdPath);

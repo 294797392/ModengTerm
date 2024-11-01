@@ -138,7 +138,7 @@ namespace ModengTerm.ViewModels
                                 break;
                             }
 
-                        case SessionTypeEnum.CommandLine:
+                        case SessionTypeEnum.WindowsConsole:
                             {
                                 this.serialPortNode.IsVisible = false;
                                 this.commandLineNode.IsVisible = true;
@@ -1271,7 +1271,7 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.CommandLine:
+                case SessionTypeEnum.WindowsConsole:
                     {
                         if (!this.GetCommandlineOptions(session))
                         {

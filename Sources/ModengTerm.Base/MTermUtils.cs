@@ -38,7 +38,7 @@ namespace ModengTerm.Base
             {
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.SSH:
-                case SessionTypeEnum.CommandLine:
+                case SessionTypeEnum.WindowsConsole:
                     {
                         return true;
                     }

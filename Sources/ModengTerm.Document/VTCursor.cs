@@ -9,6 +9,8 @@ using ModengTerm.Document.Utility;
 using System.Windows.Media.Animation;
 using System.Windows;
 using System.Windows.Media.Converters;
+using System.Windows.Controls.Primitives;
+using System.Reflection.Metadata;
 
 namespace ModengTerm.Document
 {
@@ -36,6 +38,24 @@ namespace ModengTerm.Document
         /// 光标是半个下划线
         /// </summary>
         Underscore
+    }
+
+    public enum VTCursorPositions
+    {
+        /// <summary>
+        /// 光标位置在可视区域的最上面
+        /// </summary>
+        ViewportTop,
+
+        /// <summary>
+        /// 光标位置在可视区域的中间
+        /// </summary>
+        ViewportMiddle,
+
+        /// <summary>
+        /// 光标位置在可视区域的底部
+        /// </summary>
+        ViewportBottom,
     }
 
     /// <summary>
@@ -131,6 +151,15 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
+        /// 获取光标所在的物理行号
+        /// 使用此值可以判断光标当前是否在可视区域内显示
+        /// 在什么时候需要更新：
+        /// 1. 增加，删除行（暂时没有方法）
+        /// 3. 设置光标逻辑位置的时候（SetCursor）
+        /// </summary>
+        public int PhysicsRow { get; internal set; }
+
+        /// <summary>
         /// 是否允许光标闪烁
         /// </summary>
         public bool AllowBlink
@@ -177,7 +206,7 @@ namespace ModengTerm.Document
         public double Height { get; private set; }
 
         /// <summary>
-        /// 获取距离渲染区域的底部的距离
+        /// 获取距离DrawingArea的底部的距离
         /// </summary>
         public double Bottom
         {
@@ -188,7 +217,7 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 获取距离渲染区域的顶部的距离
+        /// 获取距离DrawingArea的顶部的距离
         /// </summary>
         public double Top
         {
@@ -314,25 +343,27 @@ namespace ModengTerm.Document
         /// 根据当前的CursorRow和CursorCol对光标进行重新定位
         /// 每次收到数据渲染完之后调用
         /// </summary>
-        public void Reposition() 
+        public void Reposition()
         {
+            double offsetX = -1, offsetY = -1;
+
             VTextLine activeLine = this.OwnerDocument.ActiveLine;
             if (activeLine == null)
             {
                 // 光标不存在
                 // 不要使用SetOpticty隐藏光标，只有闪烁线程才可以调用SetOpacty显隐光标，其他地方如果调用的话会导致光标闪烁不流畅
-                DrawingObject.Arrange(99999, 99999); // 不能使用负数，负数会导致鼠标事件出问题
-                return;
+                // 不能使用负数，负数会导致鼠标事件出问题
+
+                offsetX = 99999;
+                offsetY = 99999;
             }
 
             // Column表示要输入的下一个字符的位置，从0开始计算
 
-            double offsetX = -1, offsetY = -1;
-
             // 分三种情况去确定光标位置
 
             // 1. 光标在开头
-            if (this.column == 0)
+            else if (this.column == 0)
             {
                 // 光标所在行没有字符，那么光标在位置0处显示
                 offsetX = 0;

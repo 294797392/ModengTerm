@@ -59,7 +59,7 @@ namespace ModengTerm
             {
                 case SessionTypeEnum.SerialPort: return "串口";
                 case SessionTypeEnum.SSH: return "SSH";
-                case SessionTypeEnum.CommandLine: return "命令行";
+                case SessionTypeEnum.WindowsConsole: return "命令行";
                 case SessionTypeEnum.SFTP: return "SFTP";
 
                 default:

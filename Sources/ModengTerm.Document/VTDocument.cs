@@ -8,6 +8,8 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media.Animation;
 using System.Xml.Linq;
 using static ModengTerm.Document.VTextLine;
 
@@ -328,30 +330,8 @@ namespace ModengTerm.Document
             // 需要进行滚动的行数
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
-            // 滚动前光标所在行
-            int oldCursorRow = this.Cursor.Row;
-            // 滚动后光标所在行
-            int newCursorRow = 0;
-
             List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
             List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
-
-            #region 更新光标位置
-
-            if (newScroll > oldScroll)
-            {
-                // 往下滚动，光标需要往上移动
-                newCursorRow = oldCursorRow - scrolledRows;
-                // 如果光标在第一行，那么newCursorRow就是负数
-            }
-            else
-            {
-                // 往上滚动，光标需要上下移动
-                newCursorRow = oldCursorRow + scrolledRows;
-                // 如果光标在最后一行，那么newCursorRow就会大于ViewportRow
-            }
-
-            #endregion
 
             #region 更新要显示的行
 
@@ -451,8 +431,14 @@ namespace ModengTerm.Document
             // 更新当前滚动条的值
             Scrollbar.Value = physicsRow;
 
-            // 有可能光标所在行被滚动到了文档外，此时要更新ActiveLine，ActiveLine就是空的
-            this.SetCursor(newCursorRow, this.Cursor.Column);
+            #region 更新ActiveLine
+
+            // 光标所在物理行号不变，ActiveLine有可能会为空（ActiveLine被滚动到可视区域外之后就是空）
+
+            // 更新ActiveLine
+            this.SetCursor(this.Cursor.PhysicsRow);
+
+            #endregion
 
             // 填充滚动数据
             return new VTScrollData()
@@ -592,32 +578,6 @@ namespace ModengTerm.Document
             return true;
         }
 
-        /// <summary>
-        /// 从链表中移除指定的行
-        /// </summary>
-        /// <param name="textLine"></param>
-        private void RemoveLine(VTextLine textLine)
-        {
-            if (textLine == this.FirstLine)
-            {
-                VTextLine next = textLine.NextLine;
-                next.PreviousLine = null;
-                this.FirstLine = next;
-            }
-            else if (textLine == this.LastLine)
-            {
-                VTextLine prev = textLine.PreviousLine;
-                prev.NextLine = null;
-                this.LastLine = prev;
-            }
-            else
-            {
-                VTextLine next = textLine.NextLine;
-                next.PreviousLine = textLine.PreviousLine;
-                textLine.PreviousLine.NextLine = next;
-            }
-        }
-
         #endregion
 
         #region 公开接口
@@ -697,7 +657,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 把src挂载到dest后面
-        /// 保持CursorY不变，更新光标所在行
+        /// 不更新光标所在行
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest"></param>
@@ -761,14 +721,11 @@ namespace ModengTerm.Document
                 src.NextLine = node1;
                 node1.PreviousLine = src;
             }
-
-            // 更新光标所在行
-            this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
         }
 
         /// <summary>
         /// 把src挂载到dest前面
-        /// 保持CursorY不变，并更新光标所在行
+        /// 不更新光标所在行
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest"></param>
@@ -832,9 +789,6 @@ namespace ModengTerm.Document
                 src.NextLine = dest;
                 dest.PreviousLine = src;
             }
-
-            // 更新光标所在行
-            this.ActiveLine = this.FirstLine.FindNext(this.Cursor.Row);
         }
 
         /// <summary>
@@ -972,6 +926,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 从光标所在行开始删除行，并把后面的行往前移动
+        /// TODO：也许该改个名字，文本编辑器的DeleteLines和终端的DeleteLines的动作不一样
         /// </summary>
         /// <param name="lines">要删除的行数</param>
         public void DeleteLines(int lines)
@@ -1039,9 +994,9 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 删除所有文本数据
+        /// 删除当前视图中的所有文本数据
         /// </summary>
-        public void DeleteAll()
+        public void DeleteViewport()
         {
             VTextLine current = this.FirstLine;
 
@@ -1056,6 +1011,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 在光标所在行的位置插入多个新行，并把光标所在行和后面的所有行往后移动
         /// 要考虑到TopMargin和BottomMargin
+        /// TODO：也许该改个名字，文本编辑器的InsertLine和终端的InsetLine的动作不一样
         /// </summary>
         /// <param name="lines">要插入的行数</param>
         public void InsertLines(int lines)
@@ -1168,7 +1124,7 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 设置光标位置和activeLine
+        /// 设置光标在当前视图中逻辑位置和activeLine
         /// row和column从0开始计数，0表示第一行或者第一列
         /// </summary>
         /// <param name="row">要设置的行</param>
@@ -1181,12 +1137,64 @@ namespace ModengTerm.Document
 
                 // 当光标所在行被滚动到了可视区域外，ActiveLine就是空的
                 ActiveLine = FirstLine.FindNext(row);
+
+                this.Cursor.PhysicsRow = this.Scrollbar.Value + row;
             }
 
             if (Cursor.Column != column)
             {
                 Cursor.Column = column;
             }
+        }
+
+        /// <summary>
+        /// 设置光标的物理行号
+        /// 如果物理行号没变化，那么尝试更新ActiveLine
+        /// </summary>
+        /// <param name="physicsRow"></param>
+        public void SetCursor(int physicsRow)
+        {
+            if (this.Cursor.PhysicsRow == physicsRow)
+            {
+                // 虽然光标的物理行号没变化，但是有可能ActiveLine改变了
+                int logicalRow = physicsRow - this.Scrollbar.Value;
+                this.ActiveLine = this.FirstLine.FindNext(logicalRow);
+                return;
+            }
+
+            if (this.OutsideViewport(physicsRow))
+            {
+                // 光标在可视区域外
+                this.ActiveLine = null;
+            }
+            else
+            {
+                int logicalRow = physicsRow - this.Scrollbar.Value;
+
+                this.Cursor.Row = logicalRow;
+                this.ActiveLine = this.FirstLine.FindNext(logicalRow);
+            }
+
+            this.Cursor.PhysicsRow = physicsRow;
+        }
+
+        /// <summary>
+        /// 判断物理行是否在可视区域外
+        /// </summary>
+        /// <param name="physicsRow">要判断的物理行号</param>
+        /// <returns></returns>
+        public bool OutsideViewport(int physicsRow)
+        {
+            VTScrollInfo scrollInfo = this.Scrollbar;
+
+            if (physicsRow >= scrollInfo.FirstPhysicsRow &&
+                physicsRow <= scrollInfo.LastPhysicsRow)
+            {
+                // 此时说明光标在可视区域内
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -1258,11 +1266,6 @@ namespace ModengTerm.Document
         public void CursorRestore()
         {
             SetCursor(cursorState.Row, cursorState.Column);
-        }
-
-        public VTScrollData ScrollTo(int physicsRow)
-        {
-            return this.ScrollTo(physicsRow, ScrollOptions.ScrollToTop);
         }
 
         /// <summary>
@@ -1439,21 +1442,17 @@ namespace ModengTerm.Document
             int oldRow = this.viewportRow;
             int oldCol = this.viewportColumn;
 
+            VTScrollInfo scrollInfo = this.Scrollbar;
+            int oldScrollValue = scrollInfo.Value;
+            int newScrollValue = 0;
+            int oldScrollMax = scrollInfo.Maximum;
+            int newScrollMax = 0;
+            int allRows = this.history.Lines;
+
             if (newRow != oldRow)
             {
-                VTScrollInfo scrollInfo = this.Scrollbar;
-
                 // 计算减了或者增加了多少行
                 int rows = Math.Abs(oldRow - newRow);
-
-                int oldCursorRow = this.Cursor.Row;
-                // 新的光标所在行
-                int newCursorRow = this.Cursor.Row;
-                // 第一行要显示的内容
-                int newScrollMax = scrollInfo.Maximum;
-
-                // 当前总行数
-                int allRows = this.history.Lines;
 
                 if (newRow > oldRow)
                 {
@@ -1464,69 +1463,21 @@ namespace ModengTerm.Document
                         VTextLine textLine = this.CreateTextLine();
                         this.LastLine.Append(textLine);
                     }
-
-                    // 总行数比显示区域的行数多的话更新显示区域的数据
-                    if (allRows > newRow)
-                    {
-                        newCursorRow += rows;
-                        newScrollMax = scrollInfo.Value - rows;
-                    }
                 }
                 else
                 {
                     // 减少了行数
 
-                    // 从文档上面删除减少了的行数
                     for (int i = 0; i < rows; i++)
                     {
                         this.LastLine.Release();
 
                         this.RemoveLine(this.LastLine);
                     }
-
-                    if (allRows > newRow)
-                    {
-                        newCursorRow -= rows;
-                        newScrollMax = scrollInfo.Value + rows;
-                    }
-                    else if (oldCursorRow > newRow)
-                    {
-                        newCursorRow = newRow - 1;
-                    }
-                }
-
-                // 更新文档显示内容，第一行显示scrollMax
-                if (allRows > newRow)
-                {
-                    scrollInfo.Maximum = newScrollMax;
-                    scrollInfo.Value = newScrollMax;
-
-                    VTextLine textLine = this.FirstLine;
-                    for (int i = 0; i < newRow; i++)
-                    {
-                        VTHistoryLine historyLine;
-                        if (this.History.TryGetHistory(newScrollMax + i, out historyLine))
-                        {
-                            textLine.SetHistory(historyLine);
-                        }
-                        else
-                        {
-                            historyLine = new VTHistoryLine();
-                            textLine.SetHistory(historyLine);
-                        }
-
-                        textLine = textLine.NextLine;
-                    }
                 }
 
                 // 更新滚动条信息
                 scrollInfo.ViewportRow = newRow;
-
-                #region 更新光标所在行
-
-                this.SetCursor(newCursorRow, this.Cursor.Column);
-
-                #endregion
             }
 
             if (newCol != oldCol)
@@ -1641,7 +1592,7 @@ namespace ModengTerm.Document
         /// <param name="oldScroll">滚动之前滚动条的值</param>
         /// <param name="newScroll">滚动之后滚动条的值</param>
         /// <returns></returns>
-        public VTScrollData GetScrollData(int oldScroll, int newScroll) 
+        public VTScrollData GetScrollData(int oldScroll, int newScroll)
         {
             int scrolledRows = Math.Abs(newScroll - oldScroll);
 
@@ -1701,6 +1652,33 @@ namespace ModengTerm.Document
                 AddedLines = addedLines,
                 RemovedLines = removedLines
             };
+        }
+
+        /// <summary>
+        /// 从文档中移除指定的行
+        /// 只移除，不释放被移除的行的资源
+        /// </summary>
+        /// <param name="textLine">要移除的行</param>
+        public void RemoveLine(VTextLine textLine)
+        {
+            if (textLine == this.FirstLine)
+            {
+                VTextLine next = textLine.NextLine;
+                next.PreviousLine = null;
+                this.FirstLine = next;
+            }
+            else if (textLine == this.LastLine)
+            {
+                VTextLine prev = textLine.PreviousLine;
+                prev.NextLine = null;
+                this.LastLine = prev;
+            }
+            else
+            {
+                VTextLine next = textLine.NextLine;
+                next.PreviousLine = textLine.PreviousLine;
+                textLine.PreviousLine.NextLine = next;
+            }
         }
 
         #endregion

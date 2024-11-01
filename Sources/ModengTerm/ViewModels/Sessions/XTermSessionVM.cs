@@ -87,7 +87,7 @@ namespace ModengTerm.ViewModels.Session
                         break;
                     }
 
-                case SessionTypeEnum.CommandLine:
+                case SessionTypeEnum.WindowsConsole:
                     {
                         URI = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         break;

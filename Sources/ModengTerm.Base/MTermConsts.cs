@@ -67,7 +67,7 @@ namespace ModengTerm.Base
         {
             ID = Guid.Empty.ToString(),
             Name = "命令行",
-            Type = (int)SessionTypeEnum.CommandLine,
+            Type = (int)SessionTypeEnum.WindowsConsole,
         };
 
         /// <summary>

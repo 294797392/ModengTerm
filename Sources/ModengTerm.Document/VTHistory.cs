@@ -101,6 +101,11 @@ namespace ModengTerm.Document
         {
             historyLine = null;
 
+            if (rowIndex < 0) 
+            {
+                return false;
+            }
+
             if (rowIndex >= this.historyLines.Count)
             {
                 return false;

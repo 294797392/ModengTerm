@@ -141,6 +141,8 @@ namespace ModengTerm.Document
 
         #endregion
 
+        #region 公开接口
+
         public void Initialize()
         {
             this.scrollbar = ownerDocument.Renderer.Scrollbar;
@@ -175,5 +177,7 @@ namespace ModengTerm.Document
                 this.scrollbar.Value = this.Value;
             }
         }
+
+        #endregion
     }
 }
