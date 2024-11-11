@@ -53,11 +53,18 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Grid Grid.Column="0" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
+            <!-- 左侧窗格 -->
+            <Grid Grid.Column="0">
+                <termctrl:MdToolPanel Menu="{Binding Path=Panels[1]}" Visibility="{Binding Path=Panels[1].Visible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Collapsed}" 
+                                      BorderThickness="0,0,1,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
+            </Grid>
+
+            <Grid Grid.Column="1" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
                   MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
                 <Grid.ContextMenu>
                     <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
@@ -83,15 +90,15 @@
             </Grid>
 
             <!-- 右侧窗格 -->
-            <Grid Grid.Column="1">
-                <termctrl:MdToolPanel Menu="{Binding Path=Panels[0]}" Visibility="{Binding Path=QuickCommandPanelVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Collapsed}" 
+            <Grid Grid.Column="2">
+                <termctrl:MdToolPanel Menu="{Binding Path=Panels[0]}" Visibility="{Binding Path=Panels[0].Visible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Collapsed}" 
                                       BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
             </Grid>
 
         </Grid>
 
         <!-- 输入栏 -->
-        <Grid Grid.Row="1" Height="30" Visibility="{Binding Path=SendCommandPanelVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+        <Grid Grid.Row="1" Height="30" Visibility="{Binding Path=InputPanelVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Collapsed}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="50"/>
                 <ColumnDefinition Width="*"/>
@@ -170,8 +177,7 @@
         <!-- 自动完成下拉列表 -->
         <!--
             当用户使用鼠标点击ListBox，此时ListBox获取焦点，键盘输入事件转移到ListBox身上。
-            KeyDown是路由事件，当AutoCompletionUserControl里的ListBox控件触发KeyDown事件的时候，事件会被继续传播到它的父元素
-            也就是AutoCompletionUserControl
+            KeyDown是路由事件，当AutoCompletionUserControl里的ListBox控件触发KeyDown事件的时候，事件会被继续传播到它的父元素AutoCompletionUserControl
         -->
         <termuc:AutoCompletionUserControl Grid.Row="0" Grid.RowSpan="9999" x:Name="AutoCompletionUserControl"
                                           Items="{Binding Path=Items}" IsOpen="{Binding Path=IsOpen}"

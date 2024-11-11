@@ -8,15 +8,56 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
 {
+    public enum ToolPanelTypeEnum
+    {
+        /// <summary>
+        /// 资源管理器
+        /// </summary>
+        ResourceManager,
+
+        /// <summary>
+        /// 快捷命令输入窗格
+        /// </summary>
+        QuickCommand,
+    }
+
     public class ToolPanelItemVM : MenuItemVM
     {
+        public ToolPanelTypeEnum Type { get; set; }
+
+        /// <summary>
+        /// 该PanelItem属于哪个Panel
+        /// </summary>
+        public ToolPanelVM OwnerPanel { get; set; }
+
+        public ToolPanelItemVM() { }
+
         public ToolPanelItemVM(MenuDefinition menu) :
             base(menu)
         {
         }
     }
 
-    public class ToolPanelVM : MenuVM
+    public class ToolPanelVM : AbstractMenuVM<ToolPanelItemVM>
     {
+        private bool visible;
+
+        /// <summary>
+        /// 是否显示该菜单
+        /// </summary>
+        public bool Visible
+        {
+            get { return this.visible; }
+            set
+            {
+                if (this.visible != value)
+                {
+                    this.visible = value;
+                    this.NotifyPropertyChanged("Visible");
+                }
+            }
+        }
+
+        public ToolPanelVM() { }
     }
 }

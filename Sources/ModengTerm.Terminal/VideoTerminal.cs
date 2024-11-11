@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -12,6 +13,8 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Text;
+using System.Windows.Input;
+using System.Windows.Media;
 using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Terminal
@@ -610,6 +613,7 @@ namespace ModengTerm.Terminal
 
         /// <summary>
         /// 渲染数据
+        /// 该方法必须在UI线程调用
         /// </summary>
         /// <param name="bytes">要渲染的数据</param>
         /// <param name="size">要渲染的数据长度</param>
@@ -634,7 +638,7 @@ namespace ModengTerm.Terminal
             if (newScroll != oldScroll)
             {
                 // 计算ScrollData
-                VTScrollData scrollData = document.GetScrollData(oldScroll, newScroll);
+                VTScrollData scrollData = this.GetScrollData(document, oldScroll, newScroll);
                 document.InvokeScrollChanged(scrollData);
             }
 
@@ -739,12 +743,14 @@ namespace ModengTerm.Terminal
 
         /// <summary>
         /// 获取终端文档一共显示了多少行数据
+        /// Windows控制台刚启动或者窗口放大之后，会把所有行都打印一遍空字符，但是实际上只显示了前几行（缩小然后放大窗口的时候）
+        /// 这种情况下使用最后一个非空行作为总行数
         /// </summary>
         /// <param name="document"></param>
         /// <returns>文档总行数</returns>
         private int GetMaxRow(VTDocument document)
         {
-            // Windows命令行窗口在放大之后，会打印空行，但是最后光标的位置还是在非空行上
+            // Windows命令行窗口在放大之后，会打印空行，但是实际上只显示了前几行
             // 所以在这里使用最后一个非空行当做最后一行
 
             int lastRowWithText = this.GetLastRowWithText(document);
@@ -783,7 +789,7 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 控制台会把所有行都打印一遍空字符，但是实际上只显示了前几行（缩小然后放大窗口的时候）
+        /// 控制台刚启动或者窗口放大之后，会把所有行都打印一遍空字符，但是实际上只显示了前几行（缩小然后放大窗口的时候）
         /// 这种情况下使用最后一个非空行作为总行数
         /// </summary>
         /// <param name="document"></param>
@@ -1599,10 +1605,80 @@ namespace ModengTerm.Terminal
 
             this.OnPrint?.Invoke(this);
 
+            // REP_RepeatCharacter会重复打印最后一个字符
+            // 这里记录一下打印的最后一个字符
             if (this.lastPrintChar != ch)
             {
                 this.lastPrintChar = ch;
             }
+        }
+
+        /// <summary>
+        /// 根据滚动之前的值和滚动之后的值生成VTScrollData数据
+        /// </summary>
+        /// <param name="oldScroll">滚动之前滚动条的值</param>
+        /// <param name="newScroll">滚动之后滚动条的值</param>
+        /// <returns></returns>
+        private VTScrollData GetScrollData(VTDocument document, int oldScroll, int newScroll)
+        {
+            int scrolledRows = Math.Abs(newScroll - oldScroll);
+
+            int scrollValue = newScroll;
+            int viewportRow = document.ViewportRow;
+            VTHistory history = document.History;
+            VTScrollInfo scrollbar = document.Scrollbar;
+
+            List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
+            List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
+
+            if (scrolledRows >= viewportRow)
+            {
+                // 此时说明把所有行都滚动到屏幕外了
+
+                // 遍历显示
+                VTextLine current = document.FirstLine;
+                for (int i = 0; i < viewportRow; i++)
+                {
+                    addedLines.Add(current.History);
+                }
+
+                // 我打赌不会报异常
+                IEnumerable<VTHistoryLine> historyLines;
+                history.TryGetHistories(oldScroll, oldScroll + viewportRow, out historyLines);
+                removedLines.AddRange(historyLines);
+            }
+            else
+            {
+                // 此时说明有部分行被移动出去了
+                if (newScroll > oldScroll)
+                {
+                    // 往下滚动
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll, oldScroll + scrolledRows, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(oldScroll + viewportRow, oldScroll + viewportRow + scrolledRows - 1, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+                else
+                {
+                    // 往上滚动,2
+                    IEnumerable<VTHistoryLine> historyLines;
+                    history.TryGetHistories(oldScroll + viewportRow - scrolledRows, oldScroll + viewportRow - 1, out historyLines);
+                    removedLines.AddRange(historyLines);
+
+                    history.TryGetHistories(newScroll, newScroll + scrolledRows, out historyLines);
+                    addedLines.AddRange(historyLines);
+                }
+            }
+
+            return new VTScrollData()
+            {
+                NewScroll = newScroll,
+                OldScroll = oldScroll,
+                AddedLines = addedLines,
+                RemovedLines = removedLines
+            };
         }
 
         #endregion
@@ -2031,7 +2107,7 @@ namespace ModengTerm.Terminal
         }
 
         // 换行和反向换行
-        public void LineFeed()
+        internal void LineFeed()
         {
             int oldRow = this.CursorRow;
             int oldCol = this.CursorCol;

@@ -11,25 +11,11 @@ namespace ModengTerm.ViewModels
     {
         #region 实例变量
 
-        private bool shellCommandPanelVisibility;
         private ServiceAgent serviceAgent;
 
         #endregion
 
         #region 属性
-
-        public bool ShellCommandPanelVisiblity
-        {
-            get { return this.shellCommandPanelVisibility; }
-            set
-            {
-                if (this.shellCommandPanelVisibility != value)
-                {
-                    this.shellCommandPanelVisibility = value;
-                    this.NotifyPropertyChanged("ShellCommandPanelVisiblity");
-                }
-            }
-        }
 
         /// <summary>
         /// 最近打开的会话列表
@@ -72,6 +58,11 @@ namespace ModengTerm.ViewModels
 
         #region 公开接口
 
+        /// <summary>
+        /// 把一个会话加入到最近打开的会话列表里
+        /// 如果最近的会话列表数量比设定的最大值多，那么会移除最早打开的一个会话
+        /// </summary>
+        /// <param name="session"></param>
         public void AddToRecentSession(XTermSession session)
         {
             RecentlySession recentlySession = new RecentlySession()
@@ -95,6 +86,10 @@ namespace ModengTerm.ViewModels
             this.serviceAgent.AddRecentSession(recentlySession);
         }
 
+        /// <summary>
+        /// 从最近打开的会话列表里删除一个会话
+        /// </summary>
+        /// <param name="recentlySession"></param>
         public void DeleteRecentSession(RecentlySessionVM recentlySession)
         {
             this.RecentlyOpenedSession.Remove(recentlySession);

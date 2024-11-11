@@ -7,6 +7,7 @@ using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Terminal.Callbacks;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
@@ -22,6 +23,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Transactions;
 using System.Windows;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
@@ -33,6 +35,32 @@ namespace ModengTerm.Terminal.ViewModels
         #region 类变量
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("ShellSessionVM");
+
+        private static readonly List<MenuDefinition> ToolPanels1 = new List<MenuDefinition>()
+        {
+            new MenuDefinition()
+            {
+                Name = "快捷命令",
+                ClassName = "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm",
+                Parameters = new Dictionary<string, object>()
+                {
+                    { "type", ToolPanelTypeEnum.QuickCommand }
+                }
+            },
+        };
+
+        private static readonly List<MenuDefinition> ToolPanels2 = new List<MenuDefinition>()
+        {
+            new MenuDefinition()
+            {
+                Name = "资源管理器",
+                ClassName = "ModengTerm.UserControls.TerminalUserControls.ResourceManagerUserControl, ModengTerm",
+                Parameters = new Dictionary<string, object>()
+                {
+                    { "type", ToolPanelTypeEnum.ResourceManager }
+                }
+            },
+        };
 
         #endregion
 
@@ -74,13 +102,11 @@ namespace ModengTerm.Terminal.ViewModels
 
         private Visibility contextMenuVisibility;
 
-        private bool sendCommandPanelVisible;
-
         private LoggerManager logMgr;
 
         private AutoCompletionVM autoCompletionVM;
 
-        private bool quickCommandPanelVisible;
+        private bool inputPanelVisible;
 
         #endregion
 
@@ -190,22 +216,6 @@ namespace ModengTerm.Terminal.ViewModels
         public BindableCollection<string> HistoryCommands { get; private set; }
 
         /// <summary>
-        /// 是否显示发送命令窗口
-        /// </summary>
-        public bool SendCommandPanelVisible
-        {
-            get { return this.sendCommandPanelVisible; }
-            set
-            {
-                if (this.sendCommandPanelVisible != value)
-                {
-                    this.sendCommandPanelVisible = value;
-                    this.NotifyPropertyChanged("SendCommandPanelVisible");
-                }
-            }
-        }
-
-        /// <summary>
         /// 该会话的所有快捷命令
         /// </summary>
         public BindableCollection<QuickCommandVM> ShellCommands { get; private set; }
@@ -248,28 +258,25 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 控制快捷命令窗口是否显示
+        /// 窗格列表
         /// </summary>
-        public bool QuickCommandPanelVisible
+        public BindableCollection<ToolPanelVM> Panels { get; private set; }
+
+        /// <summary>
+        /// 是否显示输入栏
+        /// </summary>
+        public bool InputPanelVisible
         {
-            get
-            {
-                return this.quickCommandPanelVisible;
-            }
+            get { return this.inputPanelVisible; }
             set
             {
-                if (this.quickCommandPanelVisible != value) 
+                if (this.inputPanelVisible != value)
                 {
-                    this.quickCommandPanelVisible = value;
-                    this.NotifyPropertyChanged("QuickCommandPanelVisible");
+                    this.inputPanelVisible = value;
+                    this.NotifyPropertyChanged("InputPanelVisible");
                 }
             }
         }
-
-        /// <summary>
-        /// 窗格列表
-        /// </summary>
-        public BindableCollection<MenuVM> Panels { get; private set; }
 
         #endregion
 
@@ -301,18 +308,11 @@ namespace ModengTerm.Terminal.ViewModels
             this.NotifyPropertyChanged("ShellCommands");
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
-            this.Panels = new BindableCollection<MenuVM>();
-            MenuVM panel = new MenuVM();
-            panel.Initialize(new List<MenuDefinition>()
-            {
-                new MenuDefinition()
-                {
-                    Name = "快捷命令",
-                    ClassName = "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm",
-                }
-            });
-            panel.SelectedMenu = panel.MenuItems.FirstOrDefault();
-            this.Panels.Add(panel);
+            ToolPanelVM toolPanel1 = this.CreateToolPanelVM(ToolPanels1);
+            ToolPanelVM toolPanel2 = this.CreateToolPanelVM(ToolPanels2);
+            this.Panels = new BindableCollection<ToolPanelVM>();
+            this.Panels.Add(toolPanel1);
+            this.Panels.Add(toolPanel2);
             this.NotifyPropertyChanged("Panels");
 
             #region 初始化上下文菜单
@@ -437,8 +437,9 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     Children = new BindableCollection<SessionContextMenu>()
                     {
-                        new SessionContextMenu("快捷命令", this.SwitchQuickCommandPanelVisiblity),
-                        new SessionContextMenu("输入栏", this.SwitchSendCommandPanelVisiblity)
+                        new SessionContextMenu("资源管理器", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.ResourceManager); })),
+                        new SessionContextMenu("快捷命令", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.QuickCommand); })),
+                        new SessionContextMenu("输入栏", this.SwitchInputPanelVisible)
                     }
                 },
 
@@ -638,6 +639,80 @@ namespace ModengTerm.Terminal.ViewModels
 
                 default:
                     throw new NotImplementedException();
+            }
+        }
+
+        private ToolPanelVM CreateToolPanelVM(List<MenuDefinition> menus)
+        {
+            ToolPanelVM toolPanelVM = new ToolPanelVM();
+            toolPanelVM.Initialize(menus);
+            toolPanelVM.SelectedMenu = toolPanelVM.MenuItems.FirstOrDefault();
+
+            foreach (ToolPanelItemVM panelItem in toolPanelVM.MenuItems)
+            {
+                panelItem.Type = panelItem.Parameters.GetValue<ToolPanelTypeEnum>("type");
+                panelItem.OwnerPanel = toolPanelVM;
+            }
+
+            return toolPanelVM;
+        }
+
+        private bool FindToolPanelItem(ToolPanelTypeEnum panelType, out ToolPanelVM panel, out ToolPanelItemVM panelItem)
+        {
+            panel = null;
+            panelItem = null;
+
+            foreach (ToolPanelVM toolPanel in this.Panels)
+            {
+                panelItem = toolPanel.MenuItems.FirstOrDefault(v => v.Type == panelType);
+                if (panelItem != null)
+                {
+                    panel = toolPanel;
+                    break;
+                }
+            }
+
+            if (panel == null || panelItem == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void SwitchPanelVisible(ToolPanelTypeEnum panelType)
+        {
+            ToolPanelVM toolPanel = null;
+            ToolPanelItemVM panelItem = null;
+
+            if (!this.FindToolPanelItem(panelType, out toolPanel, out panelItem))
+            {
+                logger.ErrorFormat("SwitchPanelVisible失败, 未找到对应的Panel, {0}", panelType);
+                return;
+            }
+
+            // 当前状态
+            bool visible = false;
+
+            if (toolPanel.Visible)
+            {
+                if (toolPanel.SelectedMenu == panelItem)
+                {
+                    visible = true;
+                }
+            }
+
+            if (visible)
+            {
+                // 当前是显示状态，隐藏
+                toolPanel.Visible = false;
+            }
+            else
+            {
+                // 当前是隐藏状态，显示
+                toolPanel.Visible = true;
+                toolPanel.SelectedMenu = null;
+                toolPanel.InvokeWhenSelectionChanged(panelItem);
             }
         }
 
@@ -1181,14 +1256,9 @@ namespace ModengTerm.Terminal.ViewModels
             this.ShellCommands.Add(qcvm);
         }
 
-        private void SwitchQuickCommandPanelVisiblity() 
+        private void SwitchInputPanelVisible()
         {
-            this.QuickCommandPanelVisible = !this.QuickCommandPanelVisible;
-        }
-
-        private void SwitchSendCommandPanelVisiblity() 
-        {
-            this.SendCommandPanelVisible = !this.SendCommandPanelVisible;
+            this.InputPanelVisible = !this.InputPanelVisible;
         }
 
         #endregion

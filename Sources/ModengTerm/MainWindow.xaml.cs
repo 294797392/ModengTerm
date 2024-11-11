@@ -137,15 +137,6 @@ namespace ModengTerm
         #endregion
 
         #region 公开接口
-
-        public void SendToAllTerminal(string text)
-        {
-            foreach (ShellSessionVM shellSession in this.openedSessionsVM.ShellSessions)
-            {
-                shellSession.SendText(text);
-            }
-        }
-
         #endregion
 
         #region 事件处理器

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -24,15 +25,15 @@ namespace ModengTerm.Controls
         private MdButton buttonClose;
 
 
-        public MenuVM Menu
+        public ToolPanelVM Menu
         {
-            get { return (MenuVM)GetValue(MenuProperty); }
+            get { return (ToolPanelVM)GetValue(MenuProperty); }
             set { SetValue(MenuProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for Menu.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty MenuProperty =
-            DependencyProperty.Register("Menu", typeof(MenuVM), typeof(MdToolPanel), new PropertyMetadata(null, MenuPropertyChangedCallback));
+            DependencyProperty.Register("Menu", typeof(ToolPanelVM), typeof(MdToolPanel), new PropertyMetadata(null, MenuPropertyChangedCallback));
 
 
         public override void OnApplyTemplate()
@@ -48,10 +49,10 @@ namespace ModengTerm.Controls
             this.contentControl = this.Template.FindName("PART_Content", this) as ContentControl;
             // 如果默认不显示MdToolPanel，那么就不会触发ListBox.SelectionChanged事件，界面就无法显示
             // 所以这里重新触发一下SelectionChanged事件
-            if (this.Menu != null)
-            {
-                this.Menu.InvokeWhenSelectionChanged();
-            }
+            //if (this.Menu != null)
+            //{
+            //    this.Menu.InvokeWhenSelectionChanged();
+            //}
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
@@ -65,7 +66,7 @@ namespace ModengTerm.Controls
         }
 
 
-        private void OnMenuPropertyChanged(MenuVM oldValue, MenuVM newValue)
+        private void OnMenuPropertyChanged(ToolPanelVM oldValue, ToolPanelVM newValue)
         {
             if (this.contentControl == null)
             {
@@ -78,7 +79,7 @@ namespace ModengTerm.Controls
         private static void MenuPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             MdToolPanel me = d as MdToolPanel;
-            me.OnMenuPropertyChanged(e.OldValue as MenuVM, e.NewValue as MenuVM);
+            me.OnMenuPropertyChanged(e.OldValue as ToolPanelVM, e.NewValue as ToolPanelVM);
         }
     }
 }
