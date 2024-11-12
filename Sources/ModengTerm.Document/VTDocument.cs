@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
@@ -35,10 +36,10 @@ namespace ModengTerm.Document
         /// 触发的时候，所有渲染对象的测量信息都是最新的
         /// 
         /// 有三个地方会触发该事件：
-        /// 1. 使用鼠标中间滚动的时候（OnMouseWheel）
+        /// 1. 使用鼠标滚轮滚动的时候（OnMouseWheel）
         /// 2. 使用鼠标拖动滚动条的时候（OnScrollChanged）
         /// 3. 选中屏幕之外的数据的时候（ScrollIfCursorOutsideDocument）
-        /// 4. 在VideoTerminal接收并处理完数据之后触发（VideoTerminal.ProcessData，考虑到每换一行都会触发该事件，优化换行的时候触发该事件的时机）
+        /// 4. 在VideoTerminal.Render的时候触发
         /// </summary>
         public event Action<VTDocument, VTScrollData> ScrollChanged;
 
@@ -46,6 +47,11 @@ namespace ModengTerm.Document
         /// 当历史记录条数到达了设定的最大值并且被丢弃的时候触发
         /// </summary>
         public event Action<VTDocument> DiscardLine;
+
+        /// <summary>
+        /// 当渲染结束之后触发
+        /// </summary>
+        public event Action<VTDocument, VTRenderData> Render;
 
         #endregion
 
@@ -1414,6 +1420,8 @@ namespace ModengTerm.Document
             Selection.RequestInvalidate();
 
             #endregion
+
+            this.Render?.Invoke(this, VTRenderData.Instance);
         }
 
         /// <summary>
@@ -1718,14 +1726,17 @@ namespace ModengTerm.Document
                 return;
             }
 
-            // 重新渲染
-            // 此处要全部刷新，因为有可能会触发ScrollIfCursorOutsideDocument
-            // ScrollIfCursorOutsideDocument的情况下，要显示滚动后的数据
-            this.RequestInvalidate();
-
+            // 此时说明文档被滚动了，需要全部渲染。显示滚动后的数据
             if (scrollData != null)
             {
+                this.RequestInvalidate();
                 this.InvokeScrollChanged(scrollData);
+            }
+            else
+            {
+                // 此时只需要渲染选中区域
+                this.Selection.UpdateGeometry();
+                this.Selection.RequestInvalidate();
             }
         }
 

@@ -9,21 +9,10 @@ namespace ModengTerm.Terminal
 {
     public class RenderEventArgs
     {
-        public class ChangedLine
+        public static readonly RenderEventArgs Instance = new RenderEventArgs();
+
+        private RenderEventArgs()
         {
-            public int PhysicsRow { get; set; }
-
-            public VTHistoryLine HistoryLine { get; set; }
-        }
-
-        /// <summary>
-        /// 存储被修改的行列表
-        /// </summary>
-        public List<ChangedLine> ChangedLines { get; private set; }
-
-        public RenderEventArgs()
-        {
-            this.ChangedLines = new List<ChangedLine>();
         }
     }
 }

@@ -641,8 +641,6 @@ namespace ModengTerm.Terminal
                 VTScrollData scrollData = this.GetScrollData(document, oldScroll, newScroll);
                 document.InvokeScrollChanged(scrollData);
             }
-
-            this.OnRendered?.Invoke(this);
         }
 
         /// <summary>

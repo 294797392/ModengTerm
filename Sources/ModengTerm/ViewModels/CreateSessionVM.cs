@@ -20,8 +20,6 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net;
-using System.Printing;
-using System.Windows;
 using System.Windows.Media;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
