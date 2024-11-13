@@ -17,7 +17,8 @@
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="900" Height="700" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" WindowStyle="None"
-        SourceInitialized="Window_SourceInitialized">
+        SourceInitialized="Window_SourceInitialized"
+        WindowState="Maximized">
 
     <!-- 看不到窗口的拖动标，并且窗口四周有阴影更好看 -->
     <WindowChrome.WindowChrome>

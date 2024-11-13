@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.Document
 {
     /// <summary>
-    /// 使用R,G,B或者RgbKey表示一个颜色
+    /// 使用R,G,B,A或者RgbKey表示一个颜色
     /// </summary>
     public class VTColor
     {
@@ -22,7 +22,7 @@ namespace ModengTerm.Document
         private static readonly string[] Splitter = new string[] { "," };
 
         /// <summary>
-        /// r,g,b,a
+        /// 格式：r,g,b,a
         /// </summary>
         public string Key { get; protected set; }
 
