@@ -50,10 +50,10 @@ namespace ModengTerm.Controls
             Button closeButton = this.Template.FindName("PART_CloseButton", this) as Button;
             closeButton.Click += CloseButton_Click;
 
-            Button minButton = this.Template.FindName("PART_CloseButton", this) as Button;
+            Button minButton = this.Template.FindName("PART_MinButton", this) as Button;
             minButton.Click += MinButton_Click;
 
-            Button maxButton = this.Template.FindName("PART_CloseButton", this) as Button;
+            Button maxButton = this.Template.FindName("PART_MaxButton", this) as Button;
             maxButton.Click += MaxButton_Click;
         }
 
