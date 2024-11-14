@@ -11,7 +11,6 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Themes/Themes.Default.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/SVGIcons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/ModengTerm.Document.Rendering;component/Template.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 

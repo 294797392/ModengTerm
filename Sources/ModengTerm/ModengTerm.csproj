@@ -53,6 +53,7 @@
 
   <ItemGroup>
     <Page Remove="UserControls\SFTPContentUserControl.xaml" />
+    <Page Remove="UserControls\TerminalUserControls\Rendering\Template.xaml" />
     <Page Remove="UserControls\ViewportUserControl.xaml" />
   </ItemGroup>
 

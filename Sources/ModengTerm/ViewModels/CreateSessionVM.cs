@@ -7,10 +7,10 @@ using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.UserControls.TerminalUserControls.Rendering;
 using ModengTerm.ViewModels.Session;
 using System;
 using System.Collections.Generic;
@@ -557,6 +557,9 @@ namespace ModengTerm.ViewModels
             }
         }
 
+        /// <summary>
+        /// 选中颜色
+        /// </summary>
         public Color SelectionColor
         {
             get { return this.selectionColor; }

@@ -17,6 +17,12 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <Style x:Key="StyleButtonOK" TargetType="{x:Type Button}">
+                <Setter Property="Margin" Value="3"/>
+                <Setter Property="Width" Value="70"/>
+                <Setter Property="Height" Value="30"/>
+            </Style>
+
             <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
                 <Setter Property="Margin" Value="3"/>
                 <Setter Property="Height" Value="30"/>

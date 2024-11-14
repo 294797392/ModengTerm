@@ -3,7 +3,6 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Rendering;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;

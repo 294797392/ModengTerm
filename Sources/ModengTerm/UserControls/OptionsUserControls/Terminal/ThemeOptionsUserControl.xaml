@@ -82,6 +82,11 @@
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
                         <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="50"/>
@@ -115,6 +120,9 @@
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="背景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                     <xceedtoolkit:ColorPicker Grid.Row="3" Grid.Column="1" x:Name="ColorPickerBackground" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="滚动条：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="1" x:Name="ColorPickerScrollbar" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
 
                 </Grid>
             </GroupBox>

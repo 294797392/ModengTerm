@@ -35,8 +35,10 @@
     <SolidColorBrush x:Key="Brush1007" Color="#666666"/>
 
     <!-- MTerm控件 1501 - 4000 -->
+    <SolidColorBrush x:Key="1501" Color="#F4F1F4"/>         <!-- 文本框默认边框 -->
+    <SolidColorBrush x:Key="1502" Color="#0078D4"/>        <!-- 鼠标移动到文本框上的边框 -->
 
-    
+
     <!-- Window颜色 4001 - 5000 -->
     
     <!-- 打开的会话列表Tab背景色 -->

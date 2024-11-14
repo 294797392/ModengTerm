@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Document;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
-namespace ModengTerm.Document.Rendering
+namespace ModengTerm.UserControls.TerminalUserControls.Rendering
 {
     public class VTScrollbarImpl : VTScrollbar
     {

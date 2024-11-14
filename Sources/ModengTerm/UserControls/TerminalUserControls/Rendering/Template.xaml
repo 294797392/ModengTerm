@@ -1,13 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:mrendering="clr-namespace:ModengTerm.Document.Rendering"
+                    xmlns:mrendering="clr-namespace:ModengTerm.UserControls.TerminalUserControls.Rendering"
                     xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/WPFToolkit;component/ClearDefaultStyles.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-
-    <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
 
     <Style x:Key="StyleScrollBar" TargetType="{x:Type ScrollBar}">
         <Style.Resources>
@@ -168,11 +166,11 @@
         </Setter>
     </Style>
 
-    <Style x:Key="StyleWPFDocument" TargetType="{x:Type mrendering:Document}">
+    <Style x:Key="StyleDocumentControl" TargetType="{x:Type mrendering:DocumentControl}">
         <Setter Property="Template">
             <Setter.Value>
 
-                <ControlTemplate TargetType="{x:Type mrendering:Document}">
+                <ControlTemplate TargetType="{x:Type mrendering:DocumentControl}">
 
                     <Grid>
                         <Grid.ColumnDefinitions>

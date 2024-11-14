@@ -1,4 +1,5 @@
-﻿using ModengTerm.Document.Drawing;
+﻿using ModengTerm.Document;
+using ModengTerm.Document.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -10,14 +11,14 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace ModengTerm.Document.Rendering
+namespace ModengTerm.UserControls.TerminalUserControls.Rendering
 {
     /// <summary>
     /// 文档控件
     /// </summary>
     [TemplatePart(Name = "PART_DrawingArea", Type = typeof(DrawingArea))]
     [TemplatePart(Name = "PART_Scrollbar", Type = typeof(ScrollBar))]
-    public class Document : Control, IDocument
+    public class DocumentControl : Control, IDocument
     {
         #region 实例变量
 
@@ -68,9 +69,9 @@ namespace ModengTerm.Document.Rendering
 
         #region 构造方法
 
-        public Document()
+        public DocumentControl()
         {
-            this.Style = Application.Current.FindResource("StyleWPFDocument") as Style;
+            this.Style = Application.Current.FindResource("StyleDocumentControl") as Style;
         }
 
         #endregion

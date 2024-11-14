@@ -2,7 +2,6 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Rendering;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Parsing;
 using System;

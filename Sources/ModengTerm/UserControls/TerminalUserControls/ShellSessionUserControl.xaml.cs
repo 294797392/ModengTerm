@@ -2,8 +2,9 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
-using ModengTerm.Document.Rendering;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.UserControls.TerminalUserControls.Rendering;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
@@ -12,7 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace ModengTerm.Terminal.UserControls
+namespace ModengTerm.UserControls.TerminalUserControls
 {
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
@@ -77,7 +78,7 @@ namespace ModengTerm.Terminal.UserControls
             return this.videoTerminal.ActiveDocument.EventInput;
         }
 
-        private Document.Rendering.Document GetActiveDocument()
+        private DocumentControl GetActiveDocument()
         {
             return this.videoTerminal.IsAlternate ?
                 DocumentAlternate : DocumentMain;
@@ -85,7 +86,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private MouseData GetMouseData(object sender, MouseButtonEventArgs e)
         {
-            Document.Rendering.Document document = this.GetActiveDocument();
+            DocumentControl document = this.GetActiveDocument();
             Point mousePosition = e.GetPosition(document);
             MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, e.ClickCount, (sender as FrameworkElement).IsMouseCaptured);
 
@@ -94,7 +95,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private MouseData GetMouseData(object sender, MouseEventArgs e)
         {
-            Document.Rendering.Document document = this.GetActiveDocument();
+            DocumentControl document = this.GetActiveDocument();
             DrawingArea canvas = document.DrawArea;
             Point mousePosition = e.GetPosition(canvas);
             MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0, (sender as FrameworkElement).IsMouseCaptured);
@@ -182,7 +183,7 @@ namespace ModengTerm.Terminal.UserControls
 
         private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Document.Rendering.Document document = this.GetActiveDocument();
+            DocumentControl document = this.GetActiveDocument();
 
             this.videoTerminal.Resize(e.NewSize.ToVTSize());
         }

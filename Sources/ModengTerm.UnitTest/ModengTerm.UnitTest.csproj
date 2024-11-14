@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
-    <ProjectReference Include="..\ModengTerm.Document.Rendering\ModengTerm.Document.Rendering.csproj" />
     <ProjectReference Include="..\ModengTerm.Document\ModengTerm.Document.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
     <ProjectReference Include="..\ModengTerm\ModengTerm.csproj" />

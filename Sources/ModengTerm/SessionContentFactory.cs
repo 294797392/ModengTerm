@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
-using ModengTerm.Terminal.UserControls;
+using ModengTerm.UserControls.TerminalUserControls;
 using System;
 
 namespace ModengTerm

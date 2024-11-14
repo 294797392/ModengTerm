@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ModengTerm.Terminal.UserControls.TerminalContentUserControl"
+﻿<UserControl x:Class="ModengTerm.UserControls.TerminalUserControls.TerminalContentUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,7 @@
              xmlns:modengterm="clr-namespace:ModengTerm"
              xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
              xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
-             xmlns:renderer="clr-namespace:ModengTerm.Document.Rendering;assembly=ModengTerm.Document.Rendering"
+             xmlns:renderer="clr-namespace:ModengTerm.UserControls.TerminalUserControls.Rendering"
              xmlns:termuc="clr-namespace:ModengTerm.UserControls.Terminals"
              xmlns:termctrl="clr-namespace:ModengTerm.Controls"
              xmlns:termenum="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
@@ -85,8 +85,8 @@
 
                 <Border x:Name="BorderBackground"/>
 
-                <renderer:Document x:Name="DocumentAlternate"/>
-                <renderer:Document x:Name="DocumentMain"/>
+                <renderer:DocumentControl x:Name="DocumentAlternate"/>
+                <renderer:DocumentControl x:Name="DocumentMain"/>
             </Grid>
 
             <!-- 右侧窗格 -->
