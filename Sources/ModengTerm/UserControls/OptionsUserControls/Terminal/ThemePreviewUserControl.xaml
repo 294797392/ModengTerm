@@ -14,7 +14,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="DataTemplateFontItem">
-            <TextBlock Foreground="{Binding Path=Brush}" Text="{Binding Path=Character}"/>
+            <TextBlock Foreground="{Binding Path=Brush}" Text="{Binding Path=Character}" TextOptions.TextFormattingMode="Display"/>
         </DataTemplate>
 
         <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}">
@@ -109,7 +109,7 @@
         </Grid>
 
         <TextBlock Grid.Column="1" x:Name="TextBlockFontPreview" Text="This is preview text." VerticalAlignment="Top" HorizontalAlignment="Left"
-                   Margin="5"/>
+                   Margin="5" TextOptions.TextFormattingMode="Display"/>
 
     </Grid>
 </UserControl>

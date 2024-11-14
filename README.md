@@ -1,6 +1,6 @@
 # ModengTerm - simple and powerful terminal emulator
 
-ModengTerm is a terminal emulator developed using WPF, which has powerful features similar to XShell and is open source and free to use. Its ultimate goal is to serve as a replacement for XShell, providing you with a free, secure, and reliable virtual terminal software.  
+ModengTerm is a terminal emulator developed using WPF, which plagiarizes many features from other terminal software.  
 ModengTerm has done a lot of things, such as parsing terminal sequences, text rendering, cursor rendering, text selection, scrolling history records, and so on... So its customizability is particularly high, and the complexity of the code is also relatively high.
 
 ## Main Features
