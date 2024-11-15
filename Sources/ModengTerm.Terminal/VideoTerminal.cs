@@ -369,10 +369,10 @@ namespace ModengTerm.Terminal
             VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
             this.mainDocument = new VTDocument(mainOptions);
             this.mainDocument.Initialize();
-            this.mainDocument.History.AddHistory(this.mainDocument.FirstLine.History);
+            this.mainDocument.History.Add(this.mainDocument.FirstLine.History);
 
             VTDocumentOptions alternateOptions = this.CreateDocumentOptions("AlternateDocument", sessionInfo, options.AlternateDocument);
-            alternateOptions.ScrollbackMax = 0;
+            alternateOptions.RollbackMax = 0;
             this.alternateDocument = new VTDocument(alternateOptions);
             this.alternateDocument.Initialize();
             this.alternateDocument.SetVisible(false);
@@ -730,7 +730,7 @@ namespace ModengTerm.Terminal
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR),
                 CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.THEME_CURSOR_SPEED),
                 ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
-                ScrollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
+                RollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
                 Typeface = typeface,
                 Controller = drawingDocument,
                 SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR),
@@ -886,7 +886,7 @@ namespace ModengTerm.Terminal
                     }
             }
 
-            document.ClearViewport();
+            document.DeleteViewoprt();
         }
 
         private void AlternateDocumentResize(VTDocument document, int newRow, int newCol)
@@ -894,7 +894,7 @@ namespace ModengTerm.Terminal
             document.Resize(newRow, newCol);
 
             // 备用缓冲区，因为SSH主机会重新打印所有字符，所以清空所有文本
-            document.ClearViewport();
+            document.DeleteViewoprt();
         }
 
         private VTCharsetMap Select94CharsetMap(ulong charset)
@@ -2119,6 +2119,8 @@ namespace ModengTerm.Terminal
 
             // 要换行的文档
             VTDocument document = this.activeDocument;
+            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTCursor cursor = document.Cursor;
 
             // 可滚动区域的第一行和最后一行
             VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
@@ -2126,14 +2128,14 @@ namespace ModengTerm.Terminal
 
             VTHistory history = document.History;
 
+            int oldPhysicsRow = document.Cursor.PhysicsRow;
+
             // 光标所在行是可滚动区域的最后一行
             // 也表示即将滚动
             if (last == ActiveLine)
             {
                 // 没换行之前的光标所在行，该行数据被打印完了
                 VTextLine oldActiveLine = document.ActiveLine;
-                int oldPhysicsRow = document.Cursor.PhysicsRow;
-                int newPhysicsRow = oldPhysicsRow + 1;
 
                 document.SwapLine(head, last);
 
@@ -2153,40 +2155,47 @@ namespace ModengTerm.Terminal
                     // AlternateScreenBuffer是用来给man，vim等程序使用的
                     // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
 
-                    // 主缓冲区要创建一个新的VTHistoryLine
-                    #region 更新滚动条的值
-
-                    VTScrollInfo scrollInfo = document.Scrollbar;
-
-                    // 滚动条滚动到底
-                    // 计算滚动条可以滚动的最大值
-
-                    int scrollMax = scrollInfo.Maximum + 1;
-                    scrollMax = Math.Min(scrollMax, document.ScrollMax);
-                    scrollInfo.Maximum = scrollMax;
-                    scrollInfo.Value = scrollMax;
-
-                    #endregion
-
-                    // 设置光标所在物理行号并更新ActiveLine
-                    document.SetCursor(newPhysicsRow);
-
-                    VTextLine newActiveLine = document.ActiveLine;
-
-                    // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
-                    // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
-                    VTHistoryLine historyLine;
-                    if (!history.TryGetHistory(newPhysicsRow, out historyLine))
+                    if (scrollInfo.Maximum < document.RollbackMax)
                     {
-                        historyLine = new VTHistoryLine();
-                        newActiveLine.SetHistory(historyLine);
-                        history.AddHistory(historyLine);
+                        int scrollMax = scrollInfo.Maximum + 1;
+                        // 更新滚动条的值
+                        // 滚动条滚动到底
+                        // 计算滚动条可以滚动的最大值
+                        scrollInfo.Maximum = scrollMax;
+                        scrollInfo.Value = scrollMax;
+
+                        // 设置光标所在物理行号并更新ActiveLine
+                        document.SetCursor(oldPhysicsRow + 1);
+
+                        VTextLine newActiveLine = document.ActiveLine;
+
+                        // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
+                        // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
+                        VTHistoryLine historyLine;
+                        if (!history.TryGetHistory(cursor.PhysicsRow, out historyLine))
+                        {
+                            // 为新的ActiveLine创建一个新的VTHistoryLine
+                            historyLine = new VTHistoryLine();
+                            newActiveLine.SetHistory(historyLine);
+                            history.Add(historyLine);
+                        }
+                        else
+                        {
+                            // newActiveLine和HistoryLine可能不匹配，因为在缩小窗口的时候VTextLine直接被删除了
+                            // 所以在这里强制重新更新一下光标所在行的历史记录
+                            newActiveLine.SetHistory(historyLine);
+                        }
                     }
                     else
                     {
-                        // newActiveLine和HistoryLine可能不匹配，因为在缩小窗口的时候VTextLine直接被删除了
-                        // 所以在这里强制重新更新一下光标所在行的历史记录
+                        // 历史记录已经超出了设定的行数了
+                        // 此时最后一行的物理行号不变，需要更新ActiveLine
+                        document.SetCursor(document.Cursor.PhysicsRow);
+
+                        VTextLine newActiveLine = document.ActiveLine;
+                        VTHistoryLine historyLine = new VTHistoryLine();
                         newActiveLine.SetHistory(historyLine);
+                        history.Add(historyLine);
                     }
                 }
 
@@ -2197,12 +2206,12 @@ namespace ModengTerm.Terminal
             {
                 // 没换行之前的光标所在行，该行数据被打印完了
                 VTextLine oldActiveLine = document.ActiveLine;
-                int oldPhysicsRow = document.Cursor.PhysicsRow;
-                int newPhysicsRow = oldPhysicsRow + 1;
 
                 // 光标不在可滚动区域的最后一行，说明可以直接移动光标
                 logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
-                document.SetCursor(newPhysicsRow);
+                document.SetCursor(document.Cursor.Row + 1, document.Cursor.Column);
+
+                int newPhysicsRow = document.Cursor.PhysicsRow;
 
                 // 光标移动到该行的时候再加入历史记录
                 if (!this.IsAlternate)
@@ -2214,7 +2223,7 @@ namespace ModengTerm.Terminal
                     VTHistoryLine historyLine;
                     if (!history.TryGetHistory(newPhysicsRow, out historyLine))
                     {
-                        history.AddHistory(newActiveLine.History);
+                        history.Add(newActiveLine.History);
                     }
                     else
                     {
@@ -2340,7 +2349,7 @@ namespace ModengTerm.Terminal
 
                             // 计算滚动条的最大值
                             int newScrollMax = scrollInfo.Value + displayRows;
-                            newScrollMax = Math.Min(newScrollMax, document.ScrollMax);
+                            newScrollMax = Math.Min(newScrollMax, document.RollbackMax);
 
                             if (newScrollMax == scrollInfo.Maximum)
                             {

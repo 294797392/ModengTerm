@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,8 +12,16 @@ namespace ModengTerm.Document
     /// 对历史行数据进行管理（增删改查）
     /// 历史记录的第一行的PhysicsRow永远是0，PhysicsRow依次往下排列
     /// </summary>
-    public abstract class VTHistory
+    public class VTHistory
     {
+        #region 实例变量
+
+        private VTHistoryList historyList;
+
+        #endregion
+
+        #region 属性
+
         /// <summary>
         /// 历史记录的第一行
         /// </summary>
@@ -33,123 +42,73 @@ namespace ModengTerm.Document
         /// </summary>
         public int MaxHistory { get; set; }
 
+        #endregion
+
+        #region 公开接口
+
         /// <summary>
         /// 初始化
         /// </summary>
         /// <returns></returns>
-        public abstract int Initialize();
+        public int Initialize() 
+        {
+            this.historyList = new VTMemoryHistoryList();
+            this.historyList.Initialize();
+
+            return 0;
+        }
 
         /// <summary>
         /// 释放资源
         /// </summary>
-        public abstract void Release();
+        public void Release()
+        {
+            this.historyList.Release();
+        }
 
         /// <summary>
-        /// 是否存在某个历史记录
+        /// 根据物理行号移除一行
         /// </summary>
-        /// <param name="physicsRow">要查询的物理行号</param>
+        /// <param name="physicsRow">要移除的物理行号</param>
         /// <returns></returns>
-        public abstract bool ContainHistory(int physicsRow);
+        public void RemoveAt(int physicsRow)
+        {
+            // 要删除的物理行号比总行数多，无法删除
+            if (physicsRow >= this.Lines)
+            {
+                return;
+            }
+
+            this.historyList.RemoveAt(physicsRow);
+
+            if (physicsRow == 0)
+            {
+                // 删除的是第一行
+                VTHistoryLine newFirstLine;
+                this.TryGetHistory(physicsRow, out newFirstLine);
+                this.FirstLine = newFirstLine;
+            }
+            else if (physicsRow == this.Lines - 1)
+            {
+                // 删除的是最后一行
+                VTHistoryLine newLastLine;
+                this.TryGetHistory(physicsRow, out newLastLine);
+                this.LastLine = newLastLine;
+            }
+            else
+            {
+                // 删除的是第一行和最后一行之间的行，不需要做特殊操作
+            }
+
+            this.Lines--;
+        }
 
         /// <summary>
         /// 增加一个历史行
         /// </summary>
         /// <param name="historyLine">要增加的历史行</param>
         /// <returns></returns>
-        public abstract void AddHistory(VTHistoryLine historyLine);
-
-        public abstract void RemoveHistory(VTHistoryLine historyLine);
-
-        /// <summary>
-        /// 更新一个历史行
-        /// </summary>
-        /// <param name="textLine">历史行对应的文本行</param>
-        /// <param name="historyLine">要更新的历史行</param>
-        public abstract void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine);
-
-        /// <summary>
-        /// 获取指定的历史记录行
-        /// </summary>
-        /// <param name="physicsRow">要获取的行索引</param>
-        /// <returns></returns>
-        public abstract bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine);
-
-        /// <summary>
-        /// 获取指定的历史记录行
-        /// </summary>
-        /// <param name="startPhysicsRow">要获取的起始行（返回的行列表里包含该行）</param>
-        /// <param name="endPhysicsRow">要获取的结束行（返回的行列表里包含该行）</param>
-        /// <param name="historyLines">获取的行列表</param>
-        /// <returns>是否获取成功</returns>
-        public abstract bool TryGetHistories(int startPhysicsRow, int endPhysicsRow, out IEnumerable<VTHistoryLine> historyLines);
-
-        /// <summary>
-        /// 获取所有的历史记录
-        /// </summary>
-        /// <returns></returns>
-        public abstract IEnumerable<VTHistoryLine> GetAllHistoryLines();
-    }
-
-    /// <summary>
-    /// 所有的历史记录都存储在内存里
-    /// </summary>
-    public class VTMemoryHistory : VTHistory
-    {
-        private List<VTHistoryLine> historyLines;
-
-        public override bool TryGetHistory(int rowIndex, out VTHistoryLine historyLine)
-        {
-            historyLine = null;
-
-            if (rowIndex < 0) 
-            {
-                return false;
-            }
-
-            if (rowIndex >= this.historyLines.Count)
-            {
-                return false;
-            }
-
-            historyLine = this.historyLines[rowIndex];
-
-            return true;
-        }
-
-        public override bool TryGetHistories(int startRowIndex, int endRowIndex, out IEnumerable<VTHistoryLine> historyLines)
-        {
-            historyLines = null;
-
-            int count = endRowIndex - startRowIndex + 1;
-
-            historyLines = this.historyLines.Skip(startRowIndex).Take(count);
-
-            return true;
-        }
-
-        public override int Initialize()
-        {
-            historyLines = new List<VTHistoryLine>();
-
-            return 0;
-        }
-
-        public override void Release()
-        {
-            historyLines.Clear();
-        }
-
-        public override bool ContainHistory(int physicsRow)
-        {
-            if (physicsRow <= 0 || physicsRow >= this.historyLines.Count)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        public override void AddHistory(VTHistoryLine historyLine)
+        public void Add(VTHistoryLine historyLine)
         {
             // 最多可以保存0行历史记录，什么都不做
             if (this.MaxHistory == 0)
@@ -162,82 +121,186 @@ namespace ModengTerm.Document
                 this.FirstLine = historyLine;
             }
 
-            if (this.historyLines.Count == this.MaxHistory)
+            if (this.Lines == this.MaxHistory)
             {
-                this.historyLines.RemoveAt(0);
-                this.FirstLine = this.historyLines[0];
+                this.RemoveAt(0);
             }
 
-            this.historyLines.Add(historyLine);
+            this.historyList.Add(historyLine);
 
             this.LastLine = historyLine;
 
-            this.Lines = this.historyLines.Count;
+            this.Lines++;
         }
 
-        public override void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine)
+        /// <summary>
+        /// 获取指定的历史记录行
+        /// </summary>
+        /// <param name="physicsRow">要获取的行索引</param>
+        /// <returns></returns>
+        public bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine)
         {
+            historyLine = null;
+
+            if (physicsRow < 0)
+            {
+                return false;
+            }
+
+            if (physicsRow >= this.Lines)
+            {
+                return false;
+            }
+
+            historyLine = this.historyList.ElementAt(physicsRow);
+
+            return true;
         }
 
-        public override void RemoveHistory(VTHistoryLine historyLine)
+        /// <summary>
+        /// 获取指定的历史记录行
+        /// </summary>
+        /// <param name="startPhysicsRow">要获取的起始行（返回的行列表里包含该行）</param>
+        /// <param name="endPhysicsRow">要获取的结束行（返回的行列表里包含该行）</param>
+        /// <param name="historyLines">获取的行列表</param>
+        /// <returns>是否获取成功</returns>
+        public bool TryGetHistories(int startPhysicsRow, int endPhysicsRow, out IEnumerable<VTHistoryLine> historyLines)
         {
-            historyLines.Remove(historyLine);
+            historyLines = null;
+
+            if (this.Lines == 0) 
+            {
+                return false;
+            }
+
+            if (startPhysicsRow < 0) 
+            {
+                return false;
+            }
+
+            if (endPhysicsRow >= this.Lines)
+            {
+                return false;
+            }
+
+            historyLines = this.historyList.ElementsAt(startPhysicsRow, endPhysicsRow);
+
+            return true;
         }
 
-        public override IEnumerable<VTHistoryLine> GetAllHistoryLines()
-        {
-            return this.historyLines;
-        }
+        #endregion
     }
 
     /// <summary>
-    /// 使用内存映射文件实现的可以存储大容量历史记录
+    /// 维护历史记录列表
     /// </summary>
-    public class VTFileMappingHistory : VTHistory
+    public abstract class VTHistoryList
     {
+        public abstract int Initialize();
+
+        public abstract void Release();
+
+        public abstract void Add(VTHistoryLine historyLine);
+
+        public abstract void RemoveAt(int physicsRow);
+
+        /// <summary>
+        /// 获取指定的历史记录行
+        /// </summary>
+        /// <param name="physicsRow">要获取的行索引</param>
+        /// <returns></returns>
+        public abstract VTHistoryLine ElementAt(int physicsRow);
+
+        /// <summary>
+        /// 获取指定的历史记录行
+        /// </summary>
+        /// <param name="startPhysicsRow">要获取的起始行（返回的行列表里包含该行）</param>
+        /// <param name="endPhysicsRow">要获取的结束行（返回的行列表里包含该行）</param>
+        /// <param name="historyLines">获取的行列表</param>
+        /// <returns>是否获取成功</returns>
+        public abstract IEnumerable<VTHistoryLine> ElementsAt(int startPhysicsRow, int endPhysicsRow);
+    }
+
+    /// <summary>
+    /// 所有的历史记录都存储在内存里
+    /// </summary>
+    public class VTMemoryHistoryList : VTHistoryList
+    {
+        private List<VTHistoryLine> historyLines;
+
         public override int Initialize()
         {
-            throw new NotImplementedException();
+            this.historyLines = new List<VTHistoryLine>();
+
+            return 0;
         }
 
         public override void Release()
         {
-            throw new NotImplementedException();
+            historyLines.Clear();
         }
 
-        public override bool ContainHistory(int physicsRow)
+        public override void Add(VTHistoryLine historyLine)
         {
-            throw new NotImplementedException();
+            this.historyLines.Add(historyLine);
         }
 
-        public override bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine)
+        public override void RemoveAt(int physicsRow)
         {
-            throw new NotImplementedException();
+            this.historyLines.RemoveAt(physicsRow);
         }
 
-        public override bool TryGetHistories(int startRowIndex, int endRowIndex, out IEnumerable<VTHistoryLine> historyLines)
+        public override VTHistoryLine ElementAt(int rowIndex)
         {
-            throw new NotImplementedException();
+            return this.historyLines[rowIndex];
         }
 
-        public override void RemoveHistory(VTHistoryLine historyLine)
+        public override IEnumerable<VTHistoryLine> ElementsAt(int startPhysicsRow, int endPhysicsRow)
         {
-            throw new NotImplementedException();
-        }
+            int count = endPhysicsRow - startPhysicsRow + 1;
 
-        public override void AddHistory(VTHistoryLine historyLine)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void UpdateHistory(VTextLine textLine, VTHistoryLine historyLine)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IEnumerable<VTHistoryLine> GetAllHistoryLines()
-        {
-            throw new NotImplementedException();
+            return this.historyLines.Skip(startPhysicsRow).Take(count);
         }
     }
+
+    ///// <summary>
+    ///// 使用内存映射文件实现的可以存储大容量历史记录
+    ///// </summary>
+    //public class VTFileMappingHistory : VTHistory
+    //{
+    //    public override int Initialize()
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override void Release()
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override bool Contains(int physicsRow)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override bool TryGetHistory(int physicsRow, out VTHistoryLine historyLine)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override bool TryGetHistories(int startRowIndex, int endRowIndex, out IEnumerable<VTHistoryLine> historyLines)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override void AddHistory(VTHistoryLine historyLine)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public override IEnumerable<VTHistoryLine> GetAllHistoryLines()
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 }

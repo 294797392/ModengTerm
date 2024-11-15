@@ -43,9 +43,9 @@ namespace ModengTerm.Document
         public int ScrollDelta { get; set; }
 
         /// <summary>
-        /// 最多保存多少条历史记录
+        /// 最多可以有多少条回滚行数
         /// </summary>
-        public int ScrollbackMax { get; set; }
+        public int RollbackMax { get; set; }
 
         /// <summary>
         /// 当一行数据超出了ViewportColumn的时候，是否自动换行
@@ -75,7 +75,7 @@ namespace ModengTerm.Document
         public VTDocumentOptions()
         {
             this.ScrollDelta = 1;
-            this.ScrollbackMax = 100;
+            this.RollbackMax = 100;
         }
     }
 }

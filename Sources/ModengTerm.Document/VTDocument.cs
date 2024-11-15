@@ -236,21 +236,15 @@ namespace ModengTerm.Document
         public VTHistory History { get { return this.history; } }
 
         /// <summary>
+        /// 对历史记录行数做限制
         /// 获取滚动条可以滚动到的最大值
         /// 滚动条的最大值不可以超出该值
         /// </summary>
-        public int ScrollMax
+        public int RollbackMax
         {
             get
             {
-                if (this.options.ScrollbackMax == 0)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return this.options.ScrollbackMax - this.viewportRow;
-                }
+                return this.options.RollbackMax;
             }
         }
 
@@ -590,8 +584,9 @@ namespace ModengTerm.Document
 
         public void Initialize()
         {
-            this.history = new VTMemoryHistory();
-            this.history.MaxHistory = this.options.ScrollbackMax;
+            this.history = new VTHistory();
+            // 最多历史行数 = 回滚行数 + 可视区域行数
+            this.history.MaxHistory = this.options.RollbackMax + this.options.ViewportRow;
             this.history.Initialize();
 
             Cursor = new VTCursor(this);
@@ -663,7 +658,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 把src挂载到dest后面
-        /// 不更新光标所在行
+        /// 不更新光标所在行(ActiveLine)
         /// </summary>
         /// <param name="src"></param>
         /// <param name="dest"></param>
@@ -1000,9 +995,9 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 清空当前视图中的所有文本数据
+        /// 删除当前视图中的所有字符
         /// </summary>
-        public void ClearViewport()
+        public void DeleteViewoprt()
         {
             VTextLine current = this.FirstLine;
 
