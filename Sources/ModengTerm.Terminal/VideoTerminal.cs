@@ -617,7 +617,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <param name="bytes">要渲染的数据</param>
         /// <param name="size">要渲染的数据长度</param>
-        public void Render(byte[] bytes, int size)
+        public void ProcessData(byte[] bytes, int size)
         {
             VTDocument document = this.activeDocument;
             int oldScroll = document.Scrollbar.Value;
@@ -730,7 +730,7 @@ namespace ModengTerm.Terminal
                 CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR),
                 CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.THEME_CURSOR_SPEED),
                 ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
-                RollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK),
+                RollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK),
                 Typeface = typeface,
                 Controller = drawingDocument,
                 SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR),

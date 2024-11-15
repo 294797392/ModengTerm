@@ -128,7 +128,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 try
                 {
-                    this.videoTerminal.Render(bytes, size);
+                    this.videoTerminal.ProcessData(bytes, size);
                 }
                 catch (Exception ex)
                 {
@@ -222,7 +222,7 @@ namespace ModengTerm.Terminal.ViewModels
                         // 播放一帧
                         if (this.playbackStatus == PlaybackStatusEnum.Playing)
                         {
-                            this.videoTerminal.Render(nextFrame.Data, nextFrame.Data.Length);
+                            this.videoTerminal.ProcessData(nextFrame.Data, nextFrame.Data.Length);
                         }
                     });
 

@@ -869,7 +869,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                 try
                 {
-                    this.videoTerminal.Render(bytes, size);
+                    this.videoTerminal.ProcessData(bytes, size);
                 }
                 catch (Exception ex)
                 {

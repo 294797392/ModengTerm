@@ -1098,7 +1098,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.AutoFit);
             session.SetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
             session.SetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
-            session.SetOption<int>(OptionKeyEnum.TERM_MAX_SCROLLBACK, scrollback);
+            session.SetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
             session.SetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, MTermConsts.DefaultContentMargin);
             session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, this.BookmarkVisible);

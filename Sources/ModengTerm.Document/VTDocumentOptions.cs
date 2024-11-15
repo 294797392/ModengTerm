@@ -43,7 +43,7 @@ namespace ModengTerm.Document
         public int ScrollDelta { get; set; }
 
         /// <summary>
-        /// 最多可以有多少条回滚行数
+        /// 设置滚动条可以滚动到的最大值
         /// </summary>
         public int RollbackMax { get; set; }
 

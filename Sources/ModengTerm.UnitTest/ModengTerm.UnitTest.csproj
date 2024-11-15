@@ -14,4 +14,13 @@
     <ProjectReference Include="..\ModengTerm\ModengTerm.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

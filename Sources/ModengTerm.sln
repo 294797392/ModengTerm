@@ -21,7 +21,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvt", "libvt\msvc\libvt.v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winpty", "winpty\msvc\winpty.vcxproj", "{59478DFF-866C-4F7C-9A13-FDCD5D199158}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.UnitTest", "ModengTerm.UnitTest\ModengTerm.UnitTest.csproj", "{C18FAFF7-3C63-4F1F-903E-25857C4F433E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.UnitTest", "ModengTerm.UnitTest\ModengTerm.UnitTest.csproj", "{C18FAFF7-3C63-4F1F-903E-25857C4F433E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

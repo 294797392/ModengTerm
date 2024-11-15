@@ -3,28 +3,26 @@
   <configSections>
     <section name="log4net" type="log4net.Config.Log4NetConfigurationSectionHandler,log4net"></section>
   </configSections>
-  
-  
+
 <!--log4net 配置-->
   <log4net>
     <root>
-    	<!-- ALL/DEBUG/INFO/WARN/ERROR/FATAL/OFF -->
-      <level value="INFO"/>
+		<!-- ALL/DEBUG/INFO/WARN/ERROR/FATAL/OFF -->
+		<level value="INFO"/>
 		<appender-ref ref="RollingFileAppender"/>
-      <appender-ref ref="ColoredConsoleAppender"/>
+		<appender-ref ref="ColoredConsoleAppender"/>
     </root>
-	    
+
 	<logger name="code">
       <level value="OFF" />
       <appender-ref ref="codeFileAppender" />
     </logger>
-	
+
 	<logger name="interactive">
       <level value="OFF" />
       <appender-ref ref="interactiveFileAppender" />
     </logger>
 
-	
 	<appender name="codeFileAppender" type="log4net.Appender.RollingFileAppender">
       <param name="Encoding" value="utf-8" />
       <param name="File" value="code.log" />
@@ -38,7 +36,7 @@
 		</layout>
 	  <lockingModel type="log4net.Appender.FileAppender+MinimalLock"/>
     </appender>
-	
+
 	<appender name="interactiveFileAppender" type="log4net.Appender.RollingFileAppender">
       <param name="Encoding" value="utf-8" />
       <param name="File" value="interactive.log" />
@@ -52,8 +50,6 @@
 		</layout>
 	  <lockingModel type="log4net.Appender.FileAppender+MinimalLock"/>
     </appender>
-
-
 
     <appender name="RollingFileAppender" type="log4net.Appender.RollingFileAppender">
       <param name="Encoding" value="utf-8" />

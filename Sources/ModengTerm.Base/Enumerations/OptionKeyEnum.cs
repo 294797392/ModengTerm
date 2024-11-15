@@ -114,9 +114,9 @@ namespace ModengTerm.Base.Enumerations
         #region 终端 1001 - 1500
 
         /// <summary>
-        /// 最多可以回滚的行数
+        /// 设置滚动条可以滚动到的最大值
         /// </summary>
-        TERM_MAX_SCROLLBACK = 1001,
+        TERM_MAX_ROLLBACK = 1001,
         /// <summary>
         /// 最多可以保存的剪贴板历史记录数据
         /// </summary>
