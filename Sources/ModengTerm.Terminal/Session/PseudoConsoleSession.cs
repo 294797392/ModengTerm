@@ -39,7 +39,6 @@ namespace ModengTerm.Terminal.Session
             string startupPath = this.session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
             string startupArgs = this.session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_ARGUMENT);
             string startupDirectory = this.session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_DIR);
-
             string path = string.Format("{0} {1}", startupPath, startupArgs);
 
             this.terminal = new ConPTYTerminal();

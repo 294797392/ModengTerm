@@ -7,20 +7,25 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.UnitTest.TestCases
 {
+    public class TermData
+    {
+        public int ViewportRow { get; set; }
+
+        public int ViewportColumn { get; set; }
+    }
+
     /// <summary>
     /// 性能测试
     /// </summary>
     public class TestVideoTerminalPerformance
     {
+        /* 10000次耗时1100左右 */
         [UnitTest]
-        public byte[] PrintLine()
+        public byte[] PrintLine(TermData termData)
         {
             List<byte> bytes = new List<byte>();
 
-            //bytes.AddRange(File.ReadAllBytes("testData"));
-            //bytes.AddRange(ControlSequenceGenerator.CRLF());
-
-            bytes.AddRange(Encoding.ASCII.GetBytes(UnitTestHelper.BuildTextLine(400)));
+            bytes.AddRange(Encoding.ASCII.GetBytes(UnitTestHelper.BuildTextLine(termData.ViewportColumn)));
             bytes.AddRange(ControlSequenceGenerator.CRLF());
 
             return bytes.ToArray();

@@ -60,19 +60,32 @@ namespace ModengTerm.UnitTest
 
             foreach (MethodInfo methodInfo in testMethods)
             {
-                int testTimes = 1000;
+                long totalElapsed = 0;
                 string testName = methodInfo.Name;
-                VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
-                byte[] bytes = (byte[])methodInfo.Invoke(testPerformance, null);
 
-                Stopwatch stopwatch = Stopwatch.StartNew();
-                for (int i = 0; i < testTimes; i++)
+                for (int j = 0; j < 10; j++)
                 {
-                    terminal.ProcessData(bytes, bytes.Length);
-                }
-                stopwatch.Stop();
+                    int testTimes = 10000;
+                    VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+                    TermData termData = new TermData()
+                    {
+                        ViewportRow = terminal.ViewportRow,
+                        ViewportColumn = terminal.ViewportColumn
+                    };
+                    byte[] bytes = (byte[])methodInfo.Invoke(testPerformance, new object[] { termData });
 
-                logger.InfoFormat("{0}, {1}次, 耗时{2}ms", testName, testTimes, stopwatch.ElapsedMilliseconds);
+                    Stopwatch stopwatch = Stopwatch.StartNew();
+                    for (int i = 0; i < testTimes; i++)
+                    {
+                        terminal.ProcessData(bytes, bytes.Length);
+                    }
+                    stopwatch.Stop();
+
+                    logger.InfoFormat("{0}, {1}次, 耗时{2}ms", testName, testTimes, stopwatch.ElapsedMilliseconds);
+                    totalElapsed += stopwatch.ElapsedMilliseconds;
+                }
+
+                logger.InfoFormat("{0}, 最终测试时间 = {1}", testName, totalElapsed / 10);
             }
         }
 

@@ -12,6 +12,7 @@ using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
+using System.Diagnostics;
 using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -629,10 +630,24 @@ namespace ModengTerm.Terminal
                 this.ScrollToBottom(document);
             }
 
+            //Stopwatch stopwatch = new Stopwatch();
+
+            //stopwatch.Start();
             this.renderer.Render(bytes, size);
+            //stopwatch.Stop();
+            //if (stopwatch.ElapsedMilliseconds > 10)
+            //{
+            //    logger.ErrorFormat("Render耗时 ; {0}ms", stopwatch.ElapsedMilliseconds);
+            //}
 
             // 全部数据都处理完了之后，只渲染一次
+            //stopwatch.Restart();
             document.RequestInvalidate();
+            //stopwatch.Stop();
+            //if (stopwatch.ElapsedMilliseconds > 10)
+            //{
+            //    logger.ErrorFormat("Draw耗时 ; {0}ms", stopwatch.ElapsedMilliseconds);
+            //}
 
             int newScroll = document.Scrollbar.Value;
             if (newScroll != oldScroll)
