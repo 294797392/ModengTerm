@@ -1,15 +1,4 @@
-﻿using ModengTerm.Document;
-using ModengTerm.Terminal;
-using ModengTerm.Terminal.Parsing;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using XTerminal.Base;
-
-namespace ModengTerm.Terminal.Parsing
+﻿namespace ModengTerm.Terminal.Parsing
 {
     /// <summary>
     /// 负责分发VTParser的事件
@@ -291,8 +280,8 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.EL_EraseLine:
                     {
-                        // 使用空白字符填充该行
-                        // 注意空白字符需要应用当前样式
+                        // 使用空白字符填充光标所在行
+                        // 注意空白字符需要应用当前字符样式
 
                         this.WriteCode("EL_EraseLine");
                         this.OnCSIActions?.Invoke(this, code, parameters);
@@ -301,7 +290,8 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.DCH_DeleteCharacter:
                     {
-                        // 从指定位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
+                        // 从光标位置删除n个字符，删除后的字符串要左对齐，默认删除1个字符
+                        // 删除的字符包含光标所在位置的字符
 
                         this.WriteCode("DCH_DeleteCharacter");
                         this.OnCSIActions?.Invoke(this, code, parameters);
@@ -310,14 +300,12 @@ namespace ModengTerm.Terminal.Parsing
 
                 case CsiActionCodes.ICH_InsertCharacter:
                     {
-
                         // 相关命令：
                         // MainDocument：sudo apt install pstat，然后回车，最后按方向键上回到历史命令
                         // AlternateDocument：暂无
 
                         // Insert Ps (Blank) Character(s) (default = 1) (ICH).
                         // 在当前光标处插入N个空白字符,这会将所有现有文本移到右侧。 向右溢出屏幕的文本会被删除
-                        // 目前没发现这个操作对终端显示有什么影响，所以暂时不实现
 
                         this.WriteCode("ICH_InsertCharacter");
                         this.OnCSIActions?.Invoke(this, code, parameters);
@@ -590,10 +578,6 @@ namespace ModengTerm.Terminal.Parsing
         private void ActionVt52EscDispatch(byte ch, List<int> parameters)
         {
             VT52ActionCodes code = (VT52ActionCodes)ch;
-            if (Enum.IsDefined<VT52ActionCodes>(code))
-            {
-                this.WriteCode(code.ToString());
-            }
 
             switch (code)
             {

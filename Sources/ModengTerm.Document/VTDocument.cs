@@ -967,7 +967,7 @@ namespace ModengTerm.Document
                 {
                     node2Next.PreviousLine = node1;
                 }
-                node1.EraseAll();
+                node1.DeleteAll();
 
                 // 更新FirstLine
                 if (ScrollMarginTop == 0)
@@ -1048,7 +1048,7 @@ namespace ModengTerm.Document
                 node2.PreviousLine = node1Prev;
                 node1Prev = node1.PreviousLine;
                 node1Next = node1.NextLine;
-                node2.EraseAll();  // 把新行清空
+                node2.DeleteAll();  // 把新行清空
 
                 // 更新下半部分
                 node2Prev.NextLine = node2Next;

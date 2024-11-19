@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using ModengTerm.Terminal.Parsing;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.UnitTest
 {
     /// <summary>
-    /// 负责生成Ssh返回给客户端的原始控制序列
+    /// 负责原始控制序列
     /// </summary>
     public static class ControlSequenceGenerator
     {
@@ -81,6 +78,94 @@ namespace ModengTerm.UnitTest
         {
             return new byte[] { ESC, (byte)'[', (byte)'D' };
         }
-    }
 
+        public static byte[] ED_EraseDisplay(VTEraseType type)
+        {
+            int v = (int)type;
+            byte[] bytes = Encoding.ASCII.GetBytes(v.ToString());
+
+            return new byte[] { ESC, (byte)'[', bytes[0], (byte)'J' };
+        }
+
+        public static byte[] EL_EraseLine(VTEraseType eraseType)
+        {
+            int v = (int)eraseType;
+            byte[] bytes = Encoding.ASCII.GetBytes(v.ToString());
+
+            return new byte[] { ESC, (byte)'[', bytes[0], (byte)'K' };
+        }
+
+        public static byte[] DCH_DeleteCharacter(int n) 
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'P');
+
+            return bytes.ToArray();
+        }
+
+        public static byte[] ICH_InsertCharacter(int n) 
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'@');
+
+            return bytes.ToArray();
+        }
+
+        public static byte[] CRLF()
+        {
+            return new byte[] { (byte)'\r', (byte)'\n' };
+        }
+
+        public static byte[] DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(topMargin.ToString()));
+            bytes.Add((byte)';');
+            bytes.AddRange(Encoding.ASCII.GetBytes(bottomMargin.ToString()));
+            bytes.Add((byte)'r');
+
+            return bytes.ToArray();
+        }
+
+        public static byte[] DL_DeleteLine(int n) 
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'M');
+
+            return bytes.ToArray();
+        }
+
+        public static byte[] IL_InsertLine(int n)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'L');
+
+            return bytes.ToArray();
+        }
+
+        public static byte[] ECH_EraseCharacters(int n) 
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'X');
+
+            return bytes.ToArray();
+        }
+    }
 }

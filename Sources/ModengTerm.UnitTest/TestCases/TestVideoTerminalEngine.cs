@@ -96,7 +96,7 @@ namespace ModengTerm.UnitTest.TestCases
             }
 
             // 检查历史记录内容是否正确
-            if (!UnitTestHelper.VideoTerminalCompareHistory(document.History, textLines))
+            if (!UnitTestHelper.HistoryCompare(document.History, textLines))
             {
                 return false;
             }

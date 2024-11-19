@@ -54,6 +54,18 @@ namespace ModengTerm.UnitTest
                 current = current.NextLine;
             }
 
+            // 如果还有剩下的，都必须是空
+            while (current != null)
+            {
+                string line = VTUtils.CreatePlainText(current.Characters);
+                if (!string.IsNullOrEmpty(line))
+                {
+                    return false;
+                }
+
+                current = current.NextLine;
+            }
+
             return true;
         }
 
@@ -62,24 +74,6 @@ namespace ModengTerm.UnitTest
         #region VideoTerminal
 
         private static int seed = 0;
-
-        public static string GenerateRandomLine(int cols) 
-        {
-            string textLine = string.Empty;
-
-            for (int i = 0; i < cols; i++)
-            {
-                Random random = new Random(seed++);
-                if (seed == int.MaxValue)
-                {
-                    seed = 0;
-                }
-                char c = (char)random.Next(33, 126);
-                textLine += c;
-            }
-
-            return textLine;
-        }
 
         public static VideoTerminal CreateVideoTerminal()
         {
@@ -123,13 +117,13 @@ namespace ModengTerm.UnitTest
             terminal.ProcessData(rawData.ToArray(), rawData.Count - 2); // 去掉最后的CRLF
         }
 
-        public static void VideoTerminalRender(VideoTerminal terminal, string textLine)
+        public static void DrawTextLine(VideoTerminal terminal, string textLine)
         {
             byte[] rawData = Encoding.UTF8.GetBytes(textLine);
             terminal.ProcessData(rawData, rawData.Length);
         }
 
-        public static bool VideoTerminalCompareHistory(VTHistory history, List<string> textLines)
+        public static bool HistoryCompare(VTHistory history, List<string> textLines)
         {
             if (history.Lines != textLines.Count)
             {
@@ -159,6 +153,24 @@ namespace ModengTerm.UnitTest
             return true;
         }
 
+        public static string BuildTextLine(int cols)
+        {
+            string textLine = string.Empty;
+
+            for (int i = 0; i < cols; i++)
+            {
+                Random random = new Random(seed++);
+                if (seed == int.MaxValue)
+                {
+                    seed = 0;
+                }
+                char c = (char)random.Next(33, 126);
+                textLine += c;
+            }
+
+            return textLine;
+        }
+
         public static List<string> BuildTextLines(int rows)
         {
             List<string> textLines = new List<string>();
@@ -177,12 +189,44 @@ namespace ModengTerm.UnitTest
 
             for (int i = 0; i < rows; i++)
             {
-                string textLine = GenerateRandomLine(cols);
+                string textLine = BuildTextLine(cols);
 
                 textLines.Add(textLine);
             }
 
             return textLines;
+        }
+
+        public static List<string> BuildWhitespaceTextLines(int rows, int cols) 
+        {
+            List<string> textLines = new List<string>();
+
+            string textLine1 = string.Join("", Enumerable.Repeat(" ", cols));
+
+            return Enumerable.Repeat(textLine1, rows).ToList();
+        }
+
+        public static List<string> BuildTextLines(VTDocument document)
+        {
+            List<string> textLines = new List<string>();
+
+            VTextLine textLine = document.FirstLine;
+
+            while (textLine != null)
+            {
+                string line = VTUtils.CreatePlainText(textLine.Characters);
+
+                textLines.Add(line);
+
+                textLine = textLine.NextLine;
+            }
+
+            return textLines;
+        }
+
+        public static string BuildWhitespaceTextLine(int cols) 
+        {
+            return string.Join(string.Empty, Enumerable.Repeat<string>(" ", cols));
         }
 
         #endregion

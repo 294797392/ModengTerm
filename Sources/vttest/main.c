@@ -22,23 +22,7 @@ static char TEST[99999] = { 13,10,27,93,48,59,122,121,102,64,108,105,110,117,120
 
 static char TAB[1] = { 0x9 };
 
-
-static void TestDCH()
-{
-	printf("1234567");
-	printf(CUB);
-	printf(CUB);
-	printf(CUB);
-	printf(CUB);
-	//printf(DCH);
-}
-
-static void TestSGR()
-{
-	printf(SGR);
-	printf("123");
-}
-
+static char IL_InsertLine[5] = { 0x1b, '[','3', '0', 'L' };
 
 int main()
 {
@@ -61,35 +45,9 @@ int main()
 	//}
 
 	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
-	printf("123\n");
+	printf("456");
 
-
-	printf(CUP00);
+	printf(IL_InsertLine);
 
 	char read[1024];
 	fgets(read, sizeof(read), stdin);

@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.UnitTest.TestCases;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 
@@ -10,10 +11,8 @@ namespace ModengTerm.UnitTest
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("Program");
 
-        static void RunTestCase(Type type)
+        static List<MethodInfo> GetUnitTestMethods(Type type) 
         {
-            object testObject = Activator.CreateInstance(type);
-
             MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
             // 过滤标记了UnitTestAttribute的方法
@@ -27,6 +26,15 @@ namespace ModengTerm.UnitTest
                 }
             }
 
+            return testMethods;
+        }
+
+        static void RunTestCase(Type type)
+        {
+            object testObject = Activator.CreateInstance(type);
+
+            List<MethodInfo> testMethods = GetUnitTestMethods(type);
+
             foreach (MethodInfo methodInfo in testMethods)
             {
                 string testName = methodInfo.Name;
@@ -39,6 +47,32 @@ namespace ModengTerm.UnitTest
                 {
                     logger.ErrorFormat("{0}:{1}", testName, result);
                 }
+            }
+        }
+
+        static void RunPerformanceTest() 
+        {
+            TestVideoTerminalPerformance testPerformance = new TestVideoTerminalPerformance();
+
+            Type type = typeof(TestVideoTerminalPerformance);
+
+            List<MethodInfo> testMethods = GetUnitTestMethods(type);
+
+            foreach (MethodInfo methodInfo in testMethods)
+            {
+                int testTimes = 1000;
+                string testName = methodInfo.Name;
+                VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+                byte[] bytes = (byte[])methodInfo.Invoke(testPerformance, null);
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                for (int i = 0; i < testTimes; i++)
+                {
+                    terminal.ProcessData(bytes, bytes.Length);
+                }
+                stopwatch.Stop();
+
+                logger.InfoFormat("{0}, {1}次, 耗时{2}ms", testName, testTimes, stopwatch.ElapsedMilliseconds);
             }
         }
 
@@ -58,6 +92,10 @@ namespace ModengTerm.UnitTest
             logger.InfoFormat("--- TestVideoTerminalOptions ---");
 
             RunTestCase(typeof(TestVideoTerminalOptions));
+
+            logger.InfoFormat("--- TestPerformance ---");
+
+            RunPerformanceTest();
 
             Console.ReadLine();
         }
