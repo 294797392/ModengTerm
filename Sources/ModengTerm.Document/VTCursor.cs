@@ -55,11 +55,13 @@ namespace ModengTerm.Document
 
         private int column;
         private int row;
+        private int physicsRow;
         private bool blinkState;
         private bool blinkAllowed;
         private VTCursorStyles style;
         private string color;
         private int interval;
+        private bool positionChanged;
 
         #endregion
 
@@ -110,7 +112,8 @@ namespace ModengTerm.Document
                 if (column != value)
                 {
                     column = value;
-                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+
+                    this.positionChanged = true;
                 }
             }
         }
@@ -127,7 +130,8 @@ namespace ModengTerm.Document
                 if (row != value)
                 {
                     row = value;
-                    SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
+
+                    this.positionChanged = true;
                 }
             }
         }
@@ -139,7 +143,19 @@ namespace ModengTerm.Document
         /// 1. 增加，删除行（暂时没有方法）
         /// 3. 设置光标逻辑位置的时候（SetCursor）
         /// </summary>
-        public int PhysicsRow { get; internal set; }
+        public int PhysicsRow 
+        {
+            get { return this.physicsRow; }
+            internal set
+            {
+                if (this.physicsRow != value) 
+                {
+                    this.physicsRow = value;
+
+                    this.positionChanged = true;
+                }
+            }
+        }
 
         /// <summary>
         /// 是否允许光标闪烁
@@ -327,62 +343,40 @@ namespace ModengTerm.Document
         /// </summary>
         public void Reposition()
         {
-            double offsetX = -1, offsetY = -1;
-
-            VTextLine activeLine = this.OwnerDocument.ActiveLine;
-            if (activeLine == null)
+            // 如果光标位置没改变，那么不用动
+            if (!this.positionChanged)
             {
-                // 光标不存在
+                return;
+            }
+
+            this.positionChanged = false;
+
+            double newOffsetX = 99999, newOffsetY = 99999;
+            VTDocument document = this.OwnerDocument;
+
+            if (document.OutsideViewport(this.PhysicsRow))
+            {
+                // 光标在可视区域外
                 // 不要使用SetOpticty隐藏光标，只有闪烁线程才可以调用SetOpacty显隐光标，其他地方如果调用的话会导致光标闪烁不流畅
-                // 不能使用负数，负数会导致鼠标事件出问题
-
-                offsetX = 99999;
-                offsetY = 99999;
-            }
-
-            // Column表示要输入的下一个字符的位置，从0开始计算
-
-            // 分三种情况去确定光标位置
-
-            // 1. 光标在开头
-            else if (this.column == 0)
-            {
-                // 光标所在行没有字符，那么光标在位置0处显示
-                offsetX = 0;
-                offsetY = activeLine.OffsetY;
-            }
-
-            // 2. 光标在结尾
-            else if (this.column == activeLine.Columns)
-            {
-                offsetX = activeLine.Width;
-                offsetY = activeLine.OffsetY;
-            }
-
-            // 3. 光标在中间
-            else if (this.column > 0 && this.column < activeLine.Columns)
-            {
-                int characterIndex = activeLine.FindCharacterIndex(this.column);
-                VTextRange textRange = activeLine.MeasureCharacter(characterIndex);
-                offsetX = textRange.Left;
-                offsetY = activeLine.OffsetY;
+                // 不能使用负数，负数会导致鼠标事件出问题，直接把光标移动到99999的位置隐藏光标
             }
             else
             {
-                logger.WarnFormat("渲染光标失败, 没有考虑到的光标所在位置, cursorColumn = {0}, activeLine.Columns = {1}", this.column, activeLine.Columns);
-                return;
+                // 光标在可视区域内，直接计算光标的像素位置
+                newOffsetX = this.column * this.Typeface.Width;
+                newOffsetY = this.row * this.Typeface.Height;
             }
 
-            // 要移动的位置和当前的位置一样
-            if (this.OffsetX == offsetX && this.OffsetY == offsetY)
+            // 光标位置没变化
+            if (newOffsetX == this.OffsetX && newOffsetY == this.OffsetY)
             {
                 return;
             }
 
-            this.OffsetX = offsetX;
-            this.OffsetY = offsetY;
+            this.OffsetX = newOffsetX;
+            this.OffsetY = newOffsetY;
 
-            DrawingObject.Arrange(offsetX, offsetY);
+            DrawingObject.Arrange(newOffsetX, newOffsetY);
         }
 
         #endregion

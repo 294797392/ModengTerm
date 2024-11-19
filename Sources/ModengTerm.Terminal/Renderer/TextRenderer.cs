@@ -138,7 +138,7 @@ namespace ModengTerm.Terminal.Renderer
                     printColumn = cursorCol;
                 }
 
-                document.SetCursor(printRow, printColumn);
+                document.SetCursorLogical(printRow, printColumn);
                 VTCharacter character = VTCharacter.Create(ch, column);
                 this.document.PrintCharacter(character);
             }

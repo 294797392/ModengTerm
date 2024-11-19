@@ -75,7 +75,7 @@ namespace ModengTerm.UnitTest
 
         private static int seed = 0;
 
-        public static VideoTerminal CreateVideoTerminal()
+        public static VideoTerminal CreateVideoTerminal(int width, int height)
         {
             MTermManifest manifest = JSONHelper.File2Object<MTermManifest>("app.json");
 
@@ -85,8 +85,8 @@ namespace ModengTerm.UnitTest
 
             VTOptions options = new VTOptions()
             {
-                Width = 800,
-                Height = 600,
+                Width = width,
+                Height = height,
                 Session = session,
                 AlternateDocument = new FakeDocument(),
                 MainDocument = new FakeDocument()
@@ -95,6 +95,12 @@ namespace ModengTerm.UnitTest
             VideoTerminal terminal = new VideoTerminal();
             terminal.Initialize(options);
             return terminal;
+        }
+
+
+        public static VideoTerminal CreateVideoTerminal()
+        {
+            return CreateVideoTerminal(800, 600);
         }
 
         /// <summary>

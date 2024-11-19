@@ -145,19 +145,19 @@ namespace ModengTerm.Terminal.Renderer
 
                 string hexstr = value.ToString("X2");
 
-                document.SetCursor(printRow, printColumn);
+                document.SetCursorLogical(printRow, printColumn);
                 VTCharacter character1 = VTCharacter.CreateNull();
                 document.PrintCharacter(character1);
 
-                document.SetCursor(printRow, printColumn + 1);
+                document.SetCursorLogical(printRow, printColumn + 1);
                 VTCharacter character2 = VTCharacter.Create(hexstr[0], 1);
                 document.PrintCharacter(character2);
 
-                document.SetCursor(printRow, printColumn + 2);
+                document.SetCursorLogical(printRow, printColumn + 2);
                 VTCharacter character3 = VTCharacter.Create(hexstr[1], 1);
                 document.PrintCharacter(character3);
 
-                document.SetCursor(printRow, printColumn + 3);
+                document.SetCursorLogical(printRow, printColumn + 3);
             }
         }
 

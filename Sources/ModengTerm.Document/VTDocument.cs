@@ -1,18 +1,10 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using ModengTerm.Document.Drawing;
+﻿using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
-using System.Windows.Controls.Primitives;
-using System.Windows.Media.Animation;
-using System.Xml.Linq;
-using static ModengTerm.Document.VTextLine;
 
 namespace ModengTerm.Document
 {
@@ -436,7 +428,7 @@ namespace ModengTerm.Document
             // 光标所在物理行号不变，ActiveLine有可能会为空（ActiveLine被滚动到可视区域外之后就是空）
 
             // 更新ActiveLine
-            this.SetCursor(this.Cursor.PhysicsRow);
+            this.SetCursorPhysical(this.Cursor.PhysicsRow);
 
             #endregion
 
@@ -1130,7 +1122,7 @@ namespace ModengTerm.Document
         /// </summary>
         /// <param name="row">要设置的行</param>
         /// <param name="column">要设置的列</param>
-        public void SetCursor(int row, int column)
+        public void SetCursorLogical(int row, int column)
         {
             if (Cursor.Row != row)
             {
@@ -1152,31 +1144,30 @@ namespace ModengTerm.Document
         /// 设置光标的物理行号
         /// 如果物理行号没变化，那么尝试更新ActiveLine
         /// </summary>
-        /// <param name="physicsRow"></param>
-        public void SetCursor(int physicsRow)
+        /// <param name="row"></param>
+        public void SetCursorPhysical(int row)
         {
-            if (this.Cursor.PhysicsRow == physicsRow)
+            // 物理行号没变化，但是有可能ActiveLine改变了
+            if (this.Cursor.PhysicsRow == row)
             {
-                // 虽然光标的物理行号没变化，但是有可能ActiveLine改变了
-                int logicalRow = physicsRow - this.Scrollbar.Value;
+                int logicalRow = row - this.Scrollbar.Value;
                 this.ActiveLine = this.FirstLine.FindNext(logicalRow);
                 return;
             }
 
-            if (this.OutsideViewport(physicsRow))
+            if (this.OutsideViewport(row))
             {
                 // 光标在可视区域外
                 this.ActiveLine = null;
             }
             else
             {
-                int logicalRow = physicsRow - this.Scrollbar.Value;
-
+                int logicalRow = row - this.Scrollbar.Value;
                 this.Cursor.Row = logicalRow;
                 this.ActiveLine = this.FirstLine.FindNext(logicalRow);
             }
 
-            this.Cursor.PhysicsRow = physicsRow;
+            this.Cursor.PhysicsRow = row;
         }
 
         /// <summary>
@@ -1266,7 +1257,7 @@ namespace ModengTerm.Document
 
         public void CursorRestore()
         {
-            SetCursor(cursorState.Row, cursorState.Column);
+            SetCursorLogical(cursorState.Row, cursorState.Column);
         }
 
         /// <summary>

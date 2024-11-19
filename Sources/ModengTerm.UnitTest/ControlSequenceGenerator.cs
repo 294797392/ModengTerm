@@ -122,6 +122,11 @@ namespace ModengTerm.UnitTest
             return new byte[] { (byte)'\r', (byte)'\n' };
         }
 
+        public static byte[] RI_ReverseLineFeed() 
+        {
+            return new byte[] { ESC, (byte)'M' };
+        }
+
         public static byte[] DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin)
         {
             List<byte> bytes = new List<byte>();

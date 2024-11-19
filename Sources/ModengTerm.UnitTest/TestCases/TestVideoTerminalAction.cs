@@ -6,10 +6,120 @@ namespace ModengTerm.UnitTest.TestCases
 {
     /// <summary>
     /// 模拟SshServer，手动生成原始的控制序列让终端处理，然后判断终端渲染之后的数据是否正确
+    /// 每个指令除了测试自己，还要测试受自身影响的其他指令
     /// </summary>
     public class TestVideoTerminalAction
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("TestVideoTerminalAction");
+
+        private bool DECSTBM_SetScrollingRegion_LineFeed() 
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal(100, 200);
+            VTDocument document = terminal.MainDocument;
+            VTHistory history = document.History;
+            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTCursor cursor = document.Cursor;
+            int row = document.ViewportRow;
+            int col = document.ViewportColumn;
+            byte[] buffer = null;
+            int oldScrollValue = scrollInfo.Value;
+            int oldScrollMax = scrollInfo.Maximum;
+
+            List<string> textLines = UnitTestHelper.BuildTextLines(row);
+            UnitTestHelper.DrawTextLines(terminal, textLines);
+
+            #region LineFeed
+
+            /* 先设置上下10边距的滚动区域，然后在最后一行滚动，最后比对 */
+
+            /* marginTop = 1, marginBottom = 2 */
+
+            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, row - 2);
+            terminal.ProcessData(buffer, buffer.Length);
+            buffer = ControlSequenceGenerator.CUP_CursorPosition(row - 2, 0);
+            terminal.ProcessData(buffer, buffer.Length);
+            // 在滚动区域内最后一行执行LineFeed动作，此时滚动区域内最后一行应该为空
+            buffer = ControlSequenceGenerator.CRLF();
+            terminal.ProcessData(buffer, buffer.Length);
+
+            List<string> textLines2 = UnitTestHelper.BuildTextLines(document);
+
+            textLines.RemoveAt(1);
+            textLines.Insert(row - 3, string.Empty);
+
+            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            {
+                logger.Error("{7C858FAE-493B-4CC9-AAC6-361356D46AC2}");
+                return false;
+            }
+
+            #endregion
+
+            // 保证滚动条不变
+            int newScrollValue = scrollInfo.Value;
+            int newScrollMax = scrollInfo.Maximum;
+
+            if (newScrollValue != oldScrollValue || newScrollMax != oldScrollMax)
+            {
+                logger.Error("{CC5DFE1C-E627-4B43-91F8-A5511288810B}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool DECSTBM_SetScrollingRegion_RI_ReserveLine() 
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal(100, 200);
+            VTDocument document = terminal.MainDocument;
+            VTHistory history = document.History;
+            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTCursor cursor = document.Cursor;
+            int row = document.ViewportRow;
+            int col = document.ViewportColumn;
+            byte[] buffer = null;
+            int oldScrollValue = scrollInfo.Value;
+            int oldScrollMax = scrollInfo.Maximum;
+
+            List<string> textLines = UnitTestHelper.BuildTextLines(row);
+            UnitTestHelper.DrawTextLines(terminal, textLines);
+
+            #region RI_ReserveLine
+
+            /* marginTop = 1, marginBottom = 2 */
+
+            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, row - 2);
+            terminal.ProcessData(buffer, buffer.Length);
+            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
+            terminal.ProcessData(buffer, buffer.Length);
+            buffer = ControlSequenceGenerator.RI_ReverseLineFeed();
+            terminal.ProcessData(buffer, buffer.Length);
+
+            List<string> textLines2 = UnitTestHelper.BuildTextLines(document);
+
+            textLines.RemoveAt(row - 3);
+            textLines.Insert(1, string.Empty);
+
+            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            {
+                logger.Error("{45D08A62-0031-4DB1-96F0-70779B51CE81}");
+                return false;
+            }
+
+            #endregion
+
+            // 保证滚动条不变
+            int newScrollValue = scrollInfo.Value;
+            int newScrollMax = scrollInfo.Maximum;
+
+            if (newScrollValue != oldScrollValue || newScrollMax != oldScrollMax)
+            {
+                logger.Error("{42BA0D02-7AAA-460E-AE47-B149A46A1974}");
+                return false;
+            }
+
+            return true;
+        }
 
         #region 针对于每个指令做单元测试
 
@@ -511,11 +621,21 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
-        //[UnitTest]
-        //public bool DECSTBM_SetScrollingRegion()
-        //{
-        //    return false;
-        //}
+        [UnitTest]
+        public bool DECSTBM_SetScrollingRegion()
+        {
+            if (!this.DECSTBM_SetScrollingRegion_LineFeed())
+            {
+                return false;
+            }
+
+            if (!this.DECSTBM_SetScrollingRegion_RI_ReserveLine())
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         [UnitTest]
         public bool DL_DeleteLine()
@@ -633,4 +753,3 @@ namespace ModengTerm.UnitTest.TestCases
         #endregion
     }
 }
-

@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Media.Animation;
 using System.Xml;
 
@@ -29,6 +30,11 @@ namespace ModengTerm.Document
         /// 从1开始计数
         /// </summary>
         private int columns;
+
+        /// <summary>
+        /// 最后一个字符的索引
+        /// </summary>
+        private int endCharIndex;
 
         private int physicsRow;
 
