@@ -13,6 +13,7 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -279,6 +280,9 @@ namespace ModengTerm.Terminal
         /// </summary>
         public VTypeface Typeface { get; private set; }
 
+        /// <summary>
+        /// 获取当前是否有选中区域
+        /// </summary>
         public bool HasSelection
         {
             get
@@ -286,6 +290,11 @@ namespace ModengTerm.Terminal
                 return !this.activeDocument.Selection.IsEmpty;
             }
         }
+
+        /// <summary>
+        /// 是否禁用响铃
+        /// </summary>
+        public bool DisableBell { get; set; }
 
         #endregion
 
@@ -630,14 +639,15 @@ namespace ModengTerm.Terminal
                 this.ScrollToBottom(document);
             }
 
-            //Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = new Stopwatch();
 
             //stopwatch.Start();
             this.renderer.Render(bytes, size);
             //stopwatch.Stop();
-            //if (stopwatch.ElapsedMilliseconds > 10)
+            //if (stopwatch.ElapsedMilliseconds > 20)
             //{
             //    logger.ErrorFormat("Render耗时 ; {0}ms", stopwatch.ElapsedMilliseconds);
+            //    File.WriteAllBytes("1", bytes.Take(size).ToArray());
             //}
 
             // 全部数据都处理完了之后，只渲染一次
@@ -653,8 +663,7 @@ namespace ModengTerm.Terminal
             if (newScroll != oldScroll)
             {
                 // 计算ScrollData
-                // TODO：设置了ScollMargin后，AddedLines会获取不到
-                VTScrollData scrollData = null;// this.GetScrollData(document, oldScroll, newScroll);
+                VTScrollData scrollData = this.GetScrollData(document, oldScroll, newScroll);
                 document.InvokeScrollChanged(scrollData);
             }
         }
@@ -1715,7 +1724,10 @@ namespace ModengTerm.Terminal
                 case ASCIITable.BEL:
                     {
                         // 响铃
-                        Console.Beep();
+                        if (!this.DisableBell)
+                        {
+                            BellPlayer.Context.Enqueue();
+                        }
                         break;
                     }
 
@@ -2566,11 +2578,6 @@ namespace ModengTerm.Terminal
                 // 如果没有参数，那么说明就是定位到原点(0,0)
             }
 
-            if (this.ActiveLine.Columns < col)
-            {
-                this.ActiveLine.PadColumns(col);
-            }
-
             activeDocument.SetCursorLogical(row, col);
 
             int newRow = this.CursorRow;
@@ -2593,7 +2600,6 @@ namespace ModengTerm.Terminal
             else
             {
                 int col = n - 1;
-                ActiveLine.PadColumns(col);
                 activeDocument.SetCursorLogical(CursorRow, col);
 
                 int newRow = this.CursorRow;

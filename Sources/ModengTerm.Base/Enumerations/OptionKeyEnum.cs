@@ -124,6 +124,11 @@ namespace ModengTerm.Base.Enumerations
 
         MOUSE_SCROLL_DELTA = 1004,
 
+        /// <summary>
+        /// 是否禁用响铃
+        /// </summary>
+        TERM_DISABLE_BELL = 1005,
+
         #endregion
 
         #region 终端行为 1501 - 2000
@@ -132,7 +137,7 @@ namespace ModengTerm.Base.Enumerations
         /// 当鼠标右键点击的时候的行为
         /// </summary>
         [EnumDataType(typeof(BehaviorRightClicks))]
-        BEHAVIOR_RIGHT_CLICK = 1005,
+        BEHAVIOR_RIGHT_CLICK = 1501,
 
         #endregion
 

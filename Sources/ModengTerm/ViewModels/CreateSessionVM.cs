@@ -83,6 +83,12 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        #region 终端
+
+        private bool disableBell;
+
+        #endregion
+
         #region 终端高级选项
 
         private bool displayAtNewLine;
@@ -447,6 +453,23 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        #region 终端
+
+        public bool DisableBell
+        {
+            get { return this.disableBell; }
+            set 
+            {
+                if (this.disableBell != value) 
+                {
+                    this.disableBell = value;
+                    this.NotifyPropertyChanged("DisableBell");
+                }
+            }
+        }
+
+        #endregion
+
         #region 终端行为选项
 
         public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
@@ -463,6 +486,25 @@ namespace ModengTerm.ViewModels
                 {
                     this.acEnabled = value;
                     this.NotifyPropertyChanged("AcEnabled");
+                }
+            }
+        }
+
+        #endregion
+
+        #region 终端高级选项
+
+        public BindableCollection<RenderModeEnum> RenderModes { get; private set; }
+
+        public bool DisplayAtNewLine
+        {
+            get { return this.displayAtNewLine; }
+            set
+            {
+                if (this.displayAtNewLine != value)
+                {
+                    this.displayAtNewLine = value;
+                    this.NotifyPropertyChanged("DisplayAtNewLine");
                 }
             }
         }
@@ -644,25 +686,6 @@ namespace ModengTerm.ViewModels
                 {
                     this.rawTcpPort = value;
                     this.NotifyPropertyChanged("RawTcpPort");
-                }
-            }
-        }
-
-        #endregion
-
-        #region 终端高级选项
-
-        public BindableCollection<RenderModeEnum> RenderModes { get; private set; }
-
-        public bool DisplayAtNewLine
-        {
-            get { return this.displayAtNewLine; }
-            set
-            {
-                if (this.displayAtNewLine != value)
-                {
-                    this.displayAtNewLine = value;
-                    this.NotifyPropertyChanged("DisplayAtNewLine");
                 }
             }
         }
@@ -1102,6 +1125,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
             session.SetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, MTermConsts.DefaultContentMargin);
             session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, this.BookmarkVisible);
+            session.SetOption<bool>(OptionKeyEnum.TERM_DISABLE_BELL, this.DisableBell);
 
             return true;
         }

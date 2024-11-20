@@ -345,6 +345,7 @@ namespace ModengTerm.Terminal.ViewModels
             videoTerminal.OnViewportChanged += this.VideoTerminal_ViewportChanged;
             videoTerminal.OnLineFeed += VideoTerminal_LineFeed;
             videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
+            videoTerminal.DisableBell = this.Session.GetOption<bool>(OptionKeyEnum.TERM_DISABLE_BELL);
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
 

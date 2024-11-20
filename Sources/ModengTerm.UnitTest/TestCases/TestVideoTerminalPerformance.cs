@@ -30,5 +30,11 @@ namespace ModengTerm.UnitTest.TestCases
 
             return bytes.ToArray();
         }
+
+        [UnitTest]
+        public byte[] PrintFile(TermData termData)
+        {
+            return File.ReadAllBytes("1");
+        }
     }
 }

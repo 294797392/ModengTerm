@@ -146,23 +146,6 @@ namespace ModengTerm.Document
 
         #region 实例方法
 
-        /// <summary>
-        /// 查找某列的字符
-        /// 注意一个字符可能占两列
-        /// </summary>
-        /// <param name="column"></param>
-        /// <returns></returns>
-        private VTCharacter FindCharacter(int column)
-        {
-            int characterIndex = FindCharacterIndex(column);
-            if (characterIndex == -1)
-            {
-                return null;
-            }
-
-            return this.Characters[characterIndex];
-        }
-
         #endregion
 
         #region 公开接口
@@ -245,35 +228,54 @@ namespace ModengTerm.Document
             return column;
         }
 
-
         /// <summary>
         /// 设置指定位置处的字符
         /// 该方法不会移动光标，单纯的设置某个列的字符
         /// </summary>
         /// <param name="character">要插入的字符</param>
-        /// <param name="column">索引位置，在此处插入字符串</param>
+        /// <param name="column">要插入的字符所在列索引</param>
         public void PrintCharacter(VTCharacter character, int column)
         {
-            if (column + 1 > columns)
+            if (column < this.columns)
             {
-                PadColumns(column + 1);
-            }
+                // 说明这一列已经被打印过了
 
-            // 替换指定列的文本
-            int characterIndex = FindCharacterIndex(column);
-            if (characterIndex < 0)
+                // 替换指定列的文本
+                int characterIndex = FindCharacterIndex(column);
+                if (characterIndex < 0)
+                {
+                    logger.ErrorFormat("PrintCharacter失败, FindCharacterIndex失败, column = {0}", column);
+                    return;
+                }
+
+                VTCharacter oldCharacter = this.Characters[characterIndex];
+                this.Characters[characterIndex] = character;
+                if (oldCharacter.ColumnSize != character.ColumnSize)
+                {
+                    this.columns -= oldCharacter.ColumnSize;
+                    this.columns += character.ColumnSize;
+                }
+            }
+            else if (column == this.columns)
             {
-                logger.ErrorFormat("PrintCharacter失败, FindCharacterIndex失败, column = {0}", column);
-                return;
+                // 在最后一个字符后面打印，直接加
+                this.Characters.Add(character);
+                this.columns += character.ColumnSize;
             }
+            else
+            {
+                // 要打印的位置和最后一个字符之间还有多余的空间
+                // 补齐字符
+                int count = columns - this.columns;
+                for (int i = 0; i < count; i++)
+                {
+                    this.Characters.Add(VTCharacter.CreateNull());
+                }
+                this.columns += count;
 
-            VTCharacter oldCharacter = this.Characters[characterIndex];
-
-            this.Characters.RemoveAt(characterIndex);
-            columns -= oldCharacter.ColumnSize;
-
-            this.Characters.Insert(characterIndex, character);
-            columns += character.ColumnSize;
+                this.Characters.Add(character);
+                this.columns += character.ColumnSize;
+            }
 
             SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
@@ -431,31 +433,6 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 如果该行的列不足n个，那么补齐空字符直到有n列
-        /// </summary>
-        /// <param name="columns">要补齐到的列数。是从1开始的列数，而不是从0开始</param>
-        public void PadColumns(int columns)
-        {
-            if (this.columns >= columns)
-            {
-                return;
-            }
-
-            // 要补齐的字符数
-            int count = columns - this.columns;
-
-            // 补齐字符
-            for (int i = 0; i < count; i++)
-            {
-                this.Characters.Add(VTCharacter.CreateNull());
-            }
-
-            this.columns += count;
-
-            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
-        }
-
-        /// <summary>
         /// 把一个历史行的数据应用到VTextLine上
         /// </summary>
         /// <param name="historyLine">要应用的历史行数据</param>
@@ -599,7 +576,7 @@ namespace ModengTerm.Document
 
             while (textLine != null)
             {
-                if (textLine == this) 
+                if (textLine == this)
                 {
                     break;
                     //return scrollInfo.ScrollValue + logicalRow;
