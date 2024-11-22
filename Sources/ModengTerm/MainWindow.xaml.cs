@@ -317,7 +317,7 @@ namespace ModengTerm
 
         private void MenuItemOpenRecentSessions_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem menuItem = sender as MenuItem;
+            MenuItem menuItem = e.OriginalSource as MenuItem;
             RecentlySessionVM recentSession = menuItem.DataContext as RecentlySessionVM;
 
             XTermSession session = this.serviceAgent.GetSession(recentSession.SessionId);

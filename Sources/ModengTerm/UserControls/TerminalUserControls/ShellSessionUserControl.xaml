@@ -68,13 +68,7 @@
                   MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
                 <Grid.ContextMenu>
                     <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
-                             Visibility="{Binding Path=ContextMenuVisibility}">
-                        <ContextMenu.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}">
-                                <Setter Property="IsCheckable" Value="{Binding Path=CanChecked}"/>
-                                <Setter Property="IsChecked" Value="{Binding Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                            </Style>
-                        </ContextMenu.ItemContainerStyle>
+                                 Visibility="{Binding Path=ContextMenuVisibility}" Style="{StaticResource ResourceKey=StyleContextMenu}">
                         <ContextMenu.ItemTemplate>
                             <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
                                 <TextBlock Text="{Binding Path=Name}"/>

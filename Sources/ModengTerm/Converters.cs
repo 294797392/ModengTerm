@@ -557,19 +557,4 @@ namespace ModengTerm
             throw new NotImplementedException();
         }
     }
-
-    public class TreeViewItemIndentConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            TreeViewItem treeViewItem = value as TreeViewItem;
-            TreeNodeViewModel treeNodeViewModel = treeViewItem.DataContext as TreeNodeViewModel;
-            return new Thickness(treeNodeViewModel.Level * MTermConsts.TreeViewItemIndent, 0, 0, 0);
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }

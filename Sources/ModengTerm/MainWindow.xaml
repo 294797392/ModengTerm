@@ -77,11 +77,6 @@
                                            Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
             </DataTemplate>
 
-            <Style x:Key="StyleMenuItemLocal" TargetType="{x:Type MenuItem}">
-                <Setter Property="Height" Value="25"/>
-                <Setter Property="Width" Value="50"/>
-            </Style>
-
             <Style x:Key="StyleListBoxItemSession" TargetType="{x:Type ListBoxItem}">
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Setter Property="BorderThickness" Value="1,1,1,0"/>
@@ -151,16 +146,6 @@
                 <Setter Property="Margin" Value="3"/>
             </Style>
 
-            <Style x:Key="StyleMenuLocal" TargetType="{x:Type Menu}">
-                <Setter Property="Background" Value="{x:Null}"/>
-                <Setter Property="BorderBrush" Value="{x:Null}"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="VerticalContentAlignment" Value="Center"/>
-                <Setter Property="VerticalAlignment" Value="Center"/>
-                <Setter Property="HorizontalAlignment" Value="Center"/>
-                <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleMenuItemLocal}"/>
-            </Style>
-
         </ResourceDictionary>
     </Window.Resources>
 
@@ -187,53 +172,38 @@
 
             <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal">
-
-                <Menu Style="{StaticResource ResourceKey=StyleMenuLocal}">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,2,0,0">
+                <Menu>
                     <MenuItem Header="会话">
                         <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
                         <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
                         <MenuItem Header="分组管理" Click="MenuItemGroupManager_Click"/>
-                        <MenuItem Header="最新打开的会话" ItemsSource="{Binding Path=RecentlyOpenedSession}">
+                        <MenuItem Header="最新打开的会话" ItemsSource="{Binding Path=RecentlyOpenedSession}"
+                                  MenuItem.Click="MenuItemOpenRecentSessions_Click">
                             <MenuItem.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Path=Name}"/>
                                 </DataTemplate>
                             </MenuItem.ItemTemplate>
-                            <MenuItem.ItemContainerStyle>
-                                <Style TargetType="{x:Type MenuItem}">
-                                    <EventSetter Event="Click" Handler="MenuItemOpenRecentSessions_Click"/>
-                                </Style>
-                            </MenuItem.ItemContainerStyle>
                         </MenuItem>
                     </MenuItem>
                 </Menu>
 
-                <Menu ItemsSource="{Binding Path=TitleMenus}" Style="{StaticResource ResourceKey=StyleMenuLocal}"
-                      MenuItem.Click="MenuItem_Click">
+                <Menu ItemsSource="{Binding Path=TitleMenus}" MenuItem.Click="MenuItem_Click">
                     <Menu.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-
-                            <!-- 设置了HierarchicalDataTemplate.ItemContainerStyle之后，所有Children的数据模板就使用同一个了，暂时不知道什么原理.. -->
-                            <HierarchicalDataTemplate.ItemContainerStyle>
-                                <Style TargetType="{x:Type MenuItem}">
-                                </Style>
-                            </HierarchicalDataTemplate.ItemContainerStyle>
-
                             <TextBlock Text="{Binding Path=Name}"/>
-
                         </HierarchicalDataTemplate>
                     </Menu.ItemTemplate>
                 </Menu>
 
-                <Menu Style="{StaticResource ResourceKey=StyleMenuLocal}">
+                <Menu>
                     <MenuItem Header="帮助">
                         <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
                         <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->
                     </MenuItem>
                 </Menu>
             </StackPanel>
-
 
             <mtermcontrols:MdButton Grid.Column="2" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 

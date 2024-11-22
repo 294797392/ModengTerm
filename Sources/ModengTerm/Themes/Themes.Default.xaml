@@ -62,8 +62,36 @@
     <!-- 鼠标移动到TreeViewItem上的边框色 -->
     <SolidColorBrush x:Key="1515" Color="#C7E3FF" Opacity="0.7"/>
 
+    <!-- 鼠标移动到MenuItem上的背景色 -->
+    <SolidColorBrush x:Key="1516" Color="#ECF4FF"/>
+    <!-- 鼠标移动到MenuItem上的边框 -->
+    <SolidColorBrush x:Key="1517" Color="#5D6B99"/>
+    <!-- 选中MenuItem的背景色 -->
+    <SolidColorBrush x:Key="1518" Color="#ECF4FF"/>
+    <!-- 选中MenuItem的边框色 -->
+    <SolidColorBrush x:Key="1519" Color="#94A6CA"/>
+    <!-- 分割线颜色 -->
+    <SolidColorBrush x:Key="1520" Color="#FFD7D7D7"/>
 
+    <!-- 鼠标移动到子节点上的背景色 -->
+    <SolidColorBrush x:Key="1521" Color="#B1C5FF"/>
+    <!-- 鼠标移动到子节点上的边框色 -->
+    <SolidColorBrush x:Key="1522" Color="#203D77"/>
 
+    <!-- ContextMenu背景色 -->
+    <SolidColorBrush x:Key="1523" Color="#ECF4FF"/>
+    <!-- ContextMenu边框色 -->
+    <SolidColorBrush x:Key="1524" Color="#94A6CA"/>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <!-- Window颜色 4001 - 5000 -->
     
     <!-- 打开的会话列表Tab背景色 -->
