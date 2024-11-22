@@ -58,11 +58,6 @@ namespace ModengTerm.Terminal
         event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
 
         /// <summary>
-        /// 在渲染结束的时候触发
-        /// </summary>
-        event Action<IVideoTerminal> OnRendered;
-
-        /// <summary>
         /// 会话名字
         /// </summary>
         string Name { get; set; }

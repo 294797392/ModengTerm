@@ -1,15 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.DataModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using XTerminal.Base;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Terminal.Session
 {
@@ -53,6 +44,11 @@ namespace ModengTerm.Terminal.Session
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 获取传输层所使用的驱动对象
+        /// </summary>
+        internal SessionDriver Driver { get { return this.driver; } }
 
         /// <summary>
         /// 获取当前Session的连接状态

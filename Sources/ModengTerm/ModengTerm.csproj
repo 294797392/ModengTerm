@@ -39,6 +39,10 @@
     <None Remove="Images\cmdline.png" />
     <None Remove="Images\connect.png" />
     <None Remove="Images\create.png" />
+    <None Remove="Images\create_session_window\create.png" />
+    <None Remove="Images\create_session_window\create_group.png" />
+    <None Remove="Images\create_session_window\delete.png" />
+    <None Remove="Images\create_session_window\switch.png" />
     <None Remove="Images\error.png" />
     <None Remove="Images\fail.png" />
     <None Remove="Images\goback.png" />
@@ -97,6 +101,10 @@
     <Resource Include="Images\cmdline.png" />
     <Resource Include="Images\connect.png" />
     <Resource Include="Images\create.png" />
+    <Resource Include="Images\create_session_window\create.png" />
+    <Resource Include="Images\create_session_window\create_group.png" />
+    <Resource Include="Images\create_session_window\delete.png" />
+    <Resource Include="Images\create_session_window\switch.png" />
     <Resource Include="Images\fail.png" />
     <Resource Include="Images\goback.png" />
     <Resource Include="Images\group.png" />

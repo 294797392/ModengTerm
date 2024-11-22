@@ -5,7 +5,6 @@
     <!-- 软件图标 -->
     <BitmapImage x:Key="1" UriSource="pack://application:,,,/ModengTerm;component/Images/app.png"/>
 
-    
     <!-- 通用控件 10000 - 20000 -->
 
     <SolidColorBrush x:Key="BrushSelectionBackground">
@@ -35,8 +34,34 @@
     <SolidColorBrush x:Key="Brush1007" Color="#666666"/>
 
     <!-- MTerm控件 1501 - 4000 -->
-    <SolidColorBrush x:Key="1501" Color="#F4F1F4"/>         <!-- 文本框默认边框 -->
-    <SolidColorBrush x:Key="1502" Color="#0078D4"/>        <!-- 鼠标移动到文本框上的边框 -->
+    <SolidColorBrush x:Key="1501" Color="#D5DDE0"/>        <!-- 文本框默认边框 -->
+    <SolidColorBrush x:Key="1502" Color="#63B5FF"/>        <!-- 鼠标移动到文本框上的边框 -->
+    <SolidColorBrush x:Key="1503" Color="#D3D3D3"/>        <!-- 按钮默认边框 -->
+    <!-- 鼠标移动到Item上的背景色 -->
+    <SolidColorBrush x:Key="1504" Color="#99CCFF" Opacity="0.5"/>
+    <!-- Item被选中的背景色 -->
+    <SolidColorBrush x:Key="1505" Color="#99CCFF"/>
+    <!-- 交替Item的背景色 -->
+    <SolidColorBrush x:Key="1506" Color="#F6F6F6"/>
+    <!-- 鼠标移动到ListBoxItem上边框颜色 -->
+    <SolidColorBrush x:Key="1507" Color="#C7E3FF" Opacity="0.5"/>
+    <!-- ListBoxItem被选中的边框颜色 -->
+    <SolidColorBrush x:Key="1508" Color="#5AACFF"/>
+    <!-- 鼠标移动到ListBoxItem上的背景色 -->
+    <SolidColorBrush x:Key="1509" Color="#C7E3FF" Opacity="0.5"/>
+    <!-- ListBoxItem被选中的背景色 -->
+    <SolidColorBrush x:Key="1510" Color="#C7E3FF"/>
+    <!-- 文本框获取焦点的时候边框颜色 -->
+    <SolidColorBrush x:Key="1511" Color="#128FFF"/>
+    <!-- ComboBoxItem鼠标移动上去边框 -->
+    <SolidColorBrush x:Key="1512" Color="#8FC6FE"/>
+    <!-- ListBoxItem鼠标移动上去边框 -->
+    <SolidColorBrush x:Key="1513" Color="#8FC6FE"/>
+    <!-- 鼠标移动到TreeViewItem上的背景色 -->
+    <SolidColorBrush x:Key="1514" Color="#C7E3FF" Opacity="0.7"/>
+    <!-- 鼠标移动到TreeViewItem上的边框色 -->
+    <SolidColorBrush x:Key="1515" Color="#C7E3FF" Opacity="0.7"/>
+
 
 
     <!-- Window颜色 4001 - 5000 -->
@@ -85,5 +110,11 @@
     <BitmapImage x:Key="5024" UriSource="pack://application:,,,/ModengTerm;component/Images/serialport.png"/>
     <BitmapImage x:Key="5025" UriSource="pack://application:,,,/ModengTerm;component/Images/tcp.png"/>
     <BitmapImage x:Key="5026" UriSource="pack://application:,,,/ModengTerm;component/Images/goback.png"/>
+
+    <!-- 新建会话窗口 5051 - 5100 -->
+    <BitmapImage x:Key="5051" UriSource="pack://application:,,,/ModengTerm;component/Images/create_session_window/create.png"/>
+    <BitmapImage x:Key="5052" UriSource="pack://application:,,,/ModengTerm;component/Images/create_session_window/create_group.png"/>
+    <BitmapImage x:Key="5053" UriSource="pack://application:,,,/ModengTerm;component/Images/create_session_window/delete.png"/>
+    <BitmapImage x:Key="5054" UriSource="pack://application:,,,/ModengTerm;component/Images/create_session_window/switch.png"/>
 
 </ResourceDictionary>

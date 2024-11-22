@@ -43,7 +43,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 当渲染结束之后触发
         /// </summary>
-        public event Action<VTDocument, VTRenderData> Render;
+        public event Action<VTDocument, VTRenderData> Rendering;
 
         #endregion
 
@@ -1407,7 +1407,7 @@ namespace ModengTerm.Document
 
             #endregion
 
-            this.Render?.Invoke(this, VTRenderData.Instance);
+            this.Rendering?.Invoke(this, VTRenderData.Instance);
         }
 
         /// <summary>

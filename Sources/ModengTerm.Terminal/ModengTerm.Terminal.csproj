@@ -22,25 +22,31 @@
     <Compile Remove="EventArgs\**" />
     <Compile Remove="Rendering\**" />
     <Compile Remove="TestCase\**" />
+    <Compile Remove="Watchers\**" />
     <EmbeddedResource Remove="AutoCompletions\**" />
     <EmbeddedResource Remove="Document\**" />
     <EmbeddedResource Remove="EventArgs\**" />
     <EmbeddedResource Remove="Rendering\**" />
     <EmbeddedResource Remove="TestCase\**" />
+    <EmbeddedResource Remove="Watchers\**" />
     <None Remove="AutoCompletions\**" />
     <None Remove="Document\**" />
     <None Remove="EventArgs\**" />
     <None Remove="Rendering\**" />
     <None Remove="TestCase\**" />
+    <None Remove="Watchers\**" />
     <Page Remove="AutoCompletions\**" />
     <Page Remove="Document\**" />
     <Page Remove="EventArgs\**" />
     <Page Remove="Rendering\**" />
     <Page Remove="TestCase\**" />
+    <Page Remove="Watchers\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="AlternateScreen.cs" />
+    <Compile Remove="DataModels\SyncMaster.cs" />
+    <Compile Remove="DataModels\SyncSlave.cs" />
     <Compile Remove="DataModels\ThemeManifest.cs" />
     <Compile Remove="DataModels\VTCharacterSM.cs" />
     <Compile Remove="ITerminalAgent.cs" />
@@ -109,6 +115,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="vtermapp.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

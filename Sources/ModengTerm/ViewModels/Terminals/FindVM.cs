@@ -3,27 +3,23 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.Terminal.ViewModels
 {
-    /// <summary>
-    /// 定义查找范围
-    /// </summary>
-    public enum FindScopes
-    {
-        AllDocument,
-    }
-
     /// <summary>
     /// 搜索ViewModel
     /// 模仿XShell和VS2022的搜索功能
@@ -76,6 +72,12 @@ namespace ModengTerm.Terminal.ViewModels
         private IDocumentObject mainRectElement;
         private IDocumentObject alternateRectElement;
         private IDocumentObject activeRectElement;
+
+        /// <summary>
+        /// 如果某一行内容没有变化，那么不需要重新搜索
+        /// 根据渲染计数（Version）来判断VTextLine的内容是否有变化
+        /// </summary>
+        private Dictionary<VTextLine, int> textLineVersions;
 
         #endregion
 
@@ -212,6 +214,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         public FindVM()
         {
+            this.textLineVersions = new Dictionary<VTextLine, int>();
         }
 
         #endregion
@@ -378,30 +381,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         #endregion
 
-        #region 事件处理器
-
-        /// <summary>
-        /// 当滚动结束并渲染结束之后触发
-        /// </summary>
-        /// <param name="arg1"></param>
-        /// <param name="arg2"></param>
-        private void MainDocument_ScrollChanged(VTDocument arg1, VTScrollData arg2)
-        {
-            this.PerformFind(this.keyword);
-        }
-
-        /// <summary>
-        /// 当丢弃行的时候触发
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        private void MainDocument_DiscardLine(VTDocument obj)
-        {
-            this.PerformFind(this.keyword);
-        }
-
-        #endregion
-
         #region 公开接口
 
         /// <summary>
@@ -419,14 +398,16 @@ namespace ModengTerm.Terminal.ViewModels
             if (oldTerminal != null)
             {
                 // 先释放之前搜索的终端资源
-                oldTerminal.MainDocument.ScrollChanged -= this.MainDocument_ScrollChanged;
+                oldTerminal.MainDocument.Rendering -= this.MainDocument_Rendering;
                 oldTerminal.MainDocument.Renderer.DeleteDrawingObject(this.mainRectElement);
+                oldTerminal.AlternateDocument.Rendering -= this.MainDocument_Rendering;
                 oldTerminal.AlternateDocument.Renderer.DeleteDrawingObject(this.alternateRectElement);
             }
 
             IVideoTerminal newTerminal = vt;
-            newTerminal.MainDocument.ScrollChanged += this.MainDocument_ScrollChanged;
+            newTerminal.MainDocument.Rendering += this.MainDocument_Rendering;
             this.mainRectElement = newTerminal.MainDocument.Renderer.CreateDrawingObject();
+            newTerminal.AlternateDocument.Rendering += this.MainDocument_Rendering;
             this.alternateRectElement = newTerminal.AlternateDocument.Renderer.CreateDrawingObject();
             if (newTerminal.IsAlternate)
             {
@@ -436,6 +417,9 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.activeRectElement = this.mainRectElement;
             }
+
+            // 更新渲染计数缓存
+            this.textLineVersions.Clear();
 
             this.videoTerminal = vt;
 
@@ -447,11 +431,36 @@ namespace ModengTerm.Terminal.ViewModels
 
         public void Release()
         {
-            this.videoTerminal.MainDocument.ScrollChanged -= this.MainDocument_ScrollChanged;
+            this.videoTerminal.MainDocument.Rendering -= MainDocument_Rendering;
             this.videoTerminal.MainDocument.Renderer.DeleteDrawingObject(this.mainRectElement);
+            this.videoTerminal.AlternateDocument.Rendering -= MainDocument_Rendering;
             this.videoTerminal.AlternateDocument.Renderer.DeleteDrawingObject(this.alternateRectElement);
             this.matchResult = null;
             this.Message = string.Empty;
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        /// <summary>
+        /// 当滚动结束并渲染结束之后触发
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        private void MainDocument_Rendering(VTDocument document, VTRenderData renderData)
+        {
+            this.PerformFind(this.keyword);
+        }
+
+        /// <summary>
+        /// 当丢弃行的时候触发
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void MainDocument_DiscardLine(VTDocument obj)
+        {
+            this.PerformFind(this.keyword);
         }
 
         #endregion

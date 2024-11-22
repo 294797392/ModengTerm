@@ -14,15 +14,16 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
 
-        <converter:SessionTypeStringConverter x:Key="SessionTypeStringConverter"/>
+        <converter:SessionTreeNodeTypeNameConverter x:Key="SessionTreeNodeTypeNameConverter"/>
         <converter:SessionTreeNodeImageConverter x:Key="SessionTreeNodeImageConverter"/>
 
     </UserControl.Resources>
 
     <Grid>
         <DataGrid x:Name="DataGridSessionList" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column"
-                          ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                          MouseDoubleClick="DataGridSessionList_MouseDoubleClick">
+                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  ColumnHeaderHeight="20" RowHeight="30"
+                  MouseDoubleClick="DataGridSessionList_MouseDoubleClick" Style="{StaticResource ResourceKey=StyleDataGrid}">
 
             <DataGrid.ItemContainerStyle>
                 <Style TargetType="{x:Type DataGridRow}">
@@ -31,26 +32,26 @@
             </DataGrid.ItemContainerStyle>
             
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="名称" Width="1*">
+                <DataGridTemplateColumn Header="名称" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Image Height="24" Width="24" Source="{Binding Converter={StaticResource ResourceKey=SessionTreeNodeImageConverter}}"/>
+                                <Image Height="18" Width="18" Source="{Binding Converter={StaticResource ResourceKey=SessionTreeNodeImageConverter}}"/>
                                 <TextBlock Text="{Binding Path=Name}" Margin="5,0,0,0" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="类型" Width="1*">
+                <DataGridTemplateColumn Header="类型" MinWidth="50" MaxWidth="100">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding Path=Type, Converter={StaticResource ResourceKey=SessionTypeStringConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
+                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=SessionTreeNodeTypeNameConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="URI" Width="1*">
+                <DataGridTemplateColumn Header="URI" Width="Auto" MinWidth="100" MaxWidth="200">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=URI}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
@@ -58,7 +59,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="创建时间" Width="1*">
+                <DataGridTemplateColumn Header="创建时间" Width="150">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=CreationTime, StringFormat='yyyy-MM-dd HH:mm:ss'}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
@@ -71,15 +72,15 @@
         <ListBox x:Name="ListBoxSessionList" MouseDoubleClick="DataGridSessionList_MouseDoubleClick"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionMode="Single">
             <ListBox.Style>
-                <Style TargetType="{x:Type ListBox}">
+                <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource ResourceKey=StyleListBox}">
                     <Setter Property="BorderBrush" Value="{x:Null}"/>
                     <Setter Property="BorderThickness" Value="0"/>
                 </Style>
             </ListBox.Style>
             <ListBox.ItemContainerStyle>
-                <Style TargetType="{x:Type ListBoxItem}">
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItem}">
                     <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Setter Property="Margin" Value="10"/>
+                    <Setter Property="Margin" Value="5"/>
                     <Setter Property="Width" Value="70"/>
                     <Setter Property="MinHeight" Value="60"/>
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -111,6 +112,5 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
     </Grid>
 </local:SessionListView>

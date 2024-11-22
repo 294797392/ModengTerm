@@ -109,6 +109,36 @@
             Pass a prarameter if you want a unit length other than 19.0.
             </summary>
         </member>
+        <member name="T:WPFToolkit.Controls.Panels.AVGPanel">
+            <summary>
+            一个可以根据内容平分高度的面板
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Controls.Panels.CirclePanel">
+            <summary>
+            圆形布局
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Controls.Panels.CirclePanel.CircleMargin">
+            <summary>
+            边框距离每个元素的距离
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Controls.Panels.CirclePanel.CircleWidth">
+            <summary>
+            边框宽度
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Controls.Panels.CirclePanel.Diameter">
+            <summary>
+            指定圆形的直径
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.Controls.Panels.CirclePanel.AngleOffset">
+            <summary>
+            指定每个元素的角度偏移
+            </summary>
+        </member>
         <member name="T:WPFToolkit.Controls.KColorPicker">
             <summary>
             颜色选择器
@@ -164,12 +194,6 @@
         <member name="M:WPFToolkit.Controls.PanAndZoomViewer.DoZoom(System.Double,System.Windows.Point,System.Windows.Point)">
             <summary>Zoom into or out of the content.</summary>
             <param name="deltaZoom">Factor to mutliply the zoom level by. </param>
-            <param name="mousePosition">Logical mouse position relative to the original content.</param>
-            <param name="physicalPosition">Actual mouse position on the screen (relative to the parent window)</param>
-        </member>
-        <member name="M:WPFToolkit.Controls.PanAndZoomViewer.DoZoomPercent(System.Double,System.Windows.Point,System.Windows.Point)">
-            <summary>Zoom into or out of the content by percent.</summary>
-            <param name="deltaZoom">Percent to set zoom too.</param>
             <param name="mousePosition">Logical mouse position relative to the original content.</param>
             <param name="physicalPosition">Actual mouse position on the screen (relative to the parent window)</param>
         </member>
@@ -2514,7 +2538,7 @@
             当前显示的界面
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadSubMenus(WPFToolkit.MVVM.MenuItemVM,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
+        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadSubMenus(`0,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
             <summary>
             递归加载子菜单
             </summary>
@@ -2626,6 +2650,11 @@
         <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.IsVisible">
             <summary>
             控制该节点是否显示
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.Level">
+            <summary>
+            节点的等级
             </summary>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.#ctor(WPFToolkit.MVVM.TreeViewModelContext,System.Object)">
@@ -2763,36 +2792,6 @@
         <member name="P:WPFToolkit.MVVM.ViewModelBase.ID">
             <summary>
             唯一标识符
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Panels.AVGPanel">
-            <summary>
-            一个可以根据内容平分高度的面板
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Panels.CirclePanel">
-            <summary>
-            圆形布局
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.Panels.CirclePanel.CircleMargin">
-            <summary>
-            边框距离每个元素的距离
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.Panels.CirclePanel.CircleWidth">
-            <summary>
-            边框宽度
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.Panels.CirclePanel.Diameter">
-            <summary>
-            指定圆形的直径
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.Panels.CirclePanel.AngleOffset">
-            <summary>
-            指定每个元素的角度偏移
             </summary>
         </member>
         <member name="T:WPFToolkit.Utils.SelectionArea">

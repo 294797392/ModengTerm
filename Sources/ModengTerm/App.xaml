@@ -12,6 +12,11 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/SVGIcons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type Control}">
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            </Style>
+
         </ResourceDictionary>
 
     </Application.Resources>

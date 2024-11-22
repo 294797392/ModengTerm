@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Document;
+using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Parsing;
@@ -73,7 +74,8 @@ namespace ModengTerm.ViewModels.Terminals
                         this.terminal.OnLineFeed += Terminal_OnLineFeed;
                         this.terminal.OnKeyboardInput += Terminal_OnKeyboardInput;
                         this.terminal.OnC0ActionExecuted += Terminal_OnC0ActionExecuted;
-                        this.terminal.OnRendered += Terminal_OnRendered;
+                        this.terminal.MainDocument.Rendering += VTDocument_Rendering;
+                        this.terminal.AlternateDocument.Rendering += VTDocument_Rendering;
                     }
                     else
                     {
@@ -81,7 +83,8 @@ namespace ModengTerm.ViewModels.Terminals
                         this.terminal.OnLineFeed -= Terminal_OnLineFeed;
                         this.terminal.OnKeyboardInput -= Terminal_OnKeyboardInput;
                         this.terminal.OnC0ActionExecuted -= Terminal_OnC0ActionExecuted;
-                        this.terminal.OnRendered -= Terminal_OnRendered;
+                        this.terminal.MainDocument.Rendering -= VTDocument_Rendering;
+                        this.terminal.AlternateDocument.Rendering -= VTDocument_Rendering;
                     }
                 }
             }
@@ -332,7 +335,7 @@ namespace ModengTerm.ViewModels.Terminals
             }
         }
 
-        private void Terminal_OnRendered(IVideoTerminal vt)
+        private void VTDocument_Rendering(VTDocument document, VTRenderData renderData)
         {
             if (this.showAcList)
             {

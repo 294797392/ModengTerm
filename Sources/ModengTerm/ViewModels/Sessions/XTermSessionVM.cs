@@ -87,7 +87,7 @@ namespace ModengTerm.ViewModels.Session
                         break;
                     }
 
-                case SessionTypeEnum.WindowsConsole:
+                case SessionTypeEnum.Localhost:
                     {
                         URI = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         break;

@@ -1,14 +1,8 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal.DataModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using XTerminal.Base;
-using XTerminal.Base.Enumerations;
+using System.Reflection.Emit;
+using System.Windows.Documents.DocumentStructures;
 
 namespace ModengTerm.Terminal.Session
 {
@@ -40,6 +34,21 @@ namespace ModengTerm.Terminal.Session
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 是否支持显示进程列表
+        /// </summary>
+        public virtual bool SupportProcessInfo { get; }
+
+        /// <summary>
+        /// 是否支持显示磁盘信息
+        /// </summary>
+        public virtual bool SupportDiskInfo { get; }
+
+        /// <summary>
+        /// 是否支持显示系统信息
+        /// </summary>
+        public virtual bool SupportSystemInfo { get; }
 
         /// <summary>
         /// 通道类型

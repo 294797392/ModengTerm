@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Document;
+using ModengTerm.Document.EventData;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Renderer;
 using System.Windows;
@@ -147,17 +148,19 @@ namespace ModengTerm.UserControls.Terminals
             IVideoTerminal newVt = newValue as IVideoTerminal;
             if (newVt != null)
             {
-                newVt.OnRendered += VideoTerminal_OnRendered;
+                newVt.MainDocument.Rendering += this.VTDocument_Rendering;
+                newVt.AlternateDocument.Rendering += this.VTDocument_Rendering;
             }
 
             IVideoTerminal oldVt = oldValue as IVideoTerminal;
             if (oldVt != null) 
             {
-                oldVt.OnRendered -= VideoTerminal_OnRendered;
+                newVt.MainDocument.Rendering -= this.VTDocument_Rendering;
+                newVt.AlternateDocument.Rendering -= this.VTDocument_Rendering;
             }
         }
 
-        private void VideoTerminal_OnRendered(IVideoTerminal obj)
+        private void VTDocument_Rendering(VTDocument document, VTRenderData renderData)
         {
             if (this.IsOpen)
             {

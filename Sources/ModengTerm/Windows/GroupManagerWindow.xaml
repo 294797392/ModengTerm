@@ -7,7 +7,7 @@
                     xmlns:uc="clr-namespace:ModengTerm.UserControls"
                     xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
                     mc:Ignorable="d"
-                    Title="分组管理" Height="500" Width="400"
+                    Title="分组管理" Height="600" Width="500"
                     WindowStartupLocation="CenterOwner" CanResize="False"
                     Style="{StaticResource ResourceKey=StyleMdWindow}">
 
@@ -17,13 +17,13 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="StyleButtonOK" TargetType="{x:Type Button}">
+            <Style x:Key="StyleButtonOK" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
                 <Setter Property="Margin" Value="3"/>
                 <Setter Property="Width" Value="70"/>
                 <Setter Property="Height" Value="30"/>
             </Style>
 
-            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
                 <Setter Property="Margin" Value="3"/>
                 <Setter Property="Height" Value="30"/>
             </Style>
@@ -47,7 +47,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" Text="分组名字：" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-            <TextBox Grid.Column="1" Margin="3" Height="30" x:Name="TextBoxName" VerticalContentAlignment="Center"/>
+            <TextBox Grid.Column="1" Margin="3" Height="30" x:Name="TextBoxName" VerticalContentAlignment="Center" Style="{StaticResource ResourceKey=StyleTextBox}"/>
 
             <Button Grid.Column="2" Content="新建" Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
             <Button Grid.Column="3" Content="删除" Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>

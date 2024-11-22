@@ -99,8 +99,6 @@ namespace ModengTerm.Terminal
 
         public event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
 
-        public event Action<IVideoTerminal> OnRendered;
-
         #endregion
 
         #region 实例变量
@@ -199,6 +197,8 @@ namespace ModengTerm.Terminal
         /// 数据渲染器
         /// </summary>
         private VTermRenderer renderer;
+
+        private BellPlayer bellPlayer;
 
         #endregion
 
@@ -334,6 +334,8 @@ namespace ModengTerm.Terminal
             this.grTranslationTable = VTCharsetMap.Latin1;
 
             #endregion
+
+            this.bellPlayer = VTermApp.Context.Factory.LookupModule<BellPlayer>();
 
             // DECAWM
             autoWrapMode = false;
@@ -639,12 +641,12 @@ namespace ModengTerm.Terminal
                 this.ScrollToBottom(document);
             }
 
-            Stopwatch stopwatch = new Stopwatch();
+            //Stopwatch stopwatch = new Stopwatch();
 
             //stopwatch.Start();
             this.renderer.Render(bytes, size);
             //stopwatch.Stop();
-            //if (stopwatch.ElapsedMilliseconds > 20)
+            //if (stopwatch.ElapsedMilliseconds > 10)
             //{
             //    logger.ErrorFormat("Render耗时 ; {0}ms", stopwatch.ElapsedMilliseconds);
             //    File.WriteAllBytes("1", bytes.Take(size).ToArray());
@@ -856,7 +858,7 @@ namespace ModengTerm.Terminal
 
             switch ((SessionTypeEnum)this.Session.Type)
             {
-                case SessionTypeEnum.WindowsConsole:
+                case SessionTypeEnum.Localhost:
                     {
                         // 对Windows命令行做特殊处理
                         // Windows的命令行比较特殊，在窗口放大的时候，它不会把上面被隐藏的行显示出来，而是在下面增加了新的行
@@ -1726,7 +1728,7 @@ namespace ModengTerm.Terminal
                         // 响铃
                         if (!this.DisableBell)
                         {
-                            BellPlayer.Context.Enqueue();
+                            this.bellPlayer.Enqueue();
                         }
                         break;
                     }
@@ -2925,10 +2927,6 @@ namespace ModengTerm.Terminal
         #endregion
 
         #region 事件处理器
-
-        private void SshMonitorThreadProc()
-        {
-        }
 
         #endregion
     }

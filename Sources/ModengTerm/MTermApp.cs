@@ -105,8 +105,8 @@ namespace ModengTerm
             // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
             this.MainWindowVM = new MainWindowVM();
 
-            VTApp.Context.ServiceAgent = this.ServiceAgent;
-            VTApp.Context.Initialize();
+            VTermApp.Context.ServiceAgent = this.ServiceAgent;
+            VTermApp.Context.Initialize("vtermapp.json");
 
             this.SessionTreeVM = new SessionTreeVM();
 
@@ -129,6 +129,7 @@ namespace ModengTerm
             foreach (SessionGroup child in children)
             {
                 SessionGroupVM groupVM = new SessionGroupVM(parentGroup.Context, child);
+                groupVM.Level = parentGroup.Level + 1;
                 parentGroup.Add(groupVM);
                 this.LoadSessionGroupNode(groupVM, groups);
             }
@@ -163,6 +164,7 @@ namespace ModengTerm
                 SessionGroupVM groupVM = new SessionGroupVM(context, group);
                 if (rootNode != null)
                 {
+                    groupVM.Level = 1;
                     rootNode.Add(groupVM);
                 }
                 else
@@ -185,6 +187,7 @@ namespace ModengTerm
                         // 如果Session不属于任何分组，那么直接加到根节点
                         if (rootNode != null)
                         {
+                            sessionVM.Level = rootNode.Level + 1;
                             rootNode.Add(sessionVM);
                         }
                         else

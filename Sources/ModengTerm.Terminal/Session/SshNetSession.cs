@@ -37,7 +37,7 @@ namespace ModengTerm.Terminal.Session
         public SshNetSession(XTermSession options) :
             base(options)
         {
-            this.serviceAgent = VTApp.Context.ServiceAgent;
+            this.serviceAgent = VTermApp.Context.ServiceAgent;
         }
 
         #endregion

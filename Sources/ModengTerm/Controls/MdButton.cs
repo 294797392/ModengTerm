@@ -16,6 +16,52 @@ namespace ModengTerm.Controls
     {
 
 
+
+
+        public ImageSource ImageSource
+        {
+            get { return (ImageSource)GetValue(ImageSourceProperty); }
+            set { SetValue(ImageSourceProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ImageSource.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ImageSourceProperty =
+            DependencyProperty.Register("ImageSource", typeof(ImageSource), typeof(MdButton), new PropertyMetadata(null));
+
+
+
+
+        public double ImageWidth
+        {
+            get { return (double)GetValue(ImageWidthProperty); }
+            set { SetValue(ImageWidthProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ImageWidth.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ImageWidthProperty =
+            DependencyProperty.Register("ImageWidth", typeof(double), typeof(MdButton), new PropertyMetadata(18.0D));
+
+
+
+        public double ImageHeight
+        {
+            get { return (double)GetValue(ImageHeightProperty); }
+            set { SetValue(ImageHeightProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ImageHeight.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ImageHeightProperty =
+            DependencyProperty.Register("ImageHeight", typeof(double), typeof(MdButton), new PropertyMetadata(18.0D));
+
+
+
+
+
+
+
+
+
+
         public Brush MouseOverBorder
         {
             get { return (Brush)GetValue(MouseOverBorderProperty); }

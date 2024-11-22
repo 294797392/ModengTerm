@@ -19,7 +19,7 @@
         <Setter Property="HorizontalAlignment" Value="Right"/>
     </Style>
 
-    <Style x:Key="StyleComboBoxValue" TargetType="{x:Type ComboBox}">
+    <Style x:Key="StyleComboBoxValue" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ResourceKey=StyleComboBox}">
         <Setter Property="Height" Value="30"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>

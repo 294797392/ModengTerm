@@ -12,8 +12,10 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using WPFToolkit.MVVM;
 using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
@@ -33,35 +35,6 @@ namespace ModengTerm
                 case SSHAuthTypeEnum.None: return "不需要身份验证";
                 case SSHAuthTypeEnum.Password: return "用户名和密码";
                 case SSHAuthTypeEnum.PrivateKey: return "密钥验证";
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class SessionTypeStringConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value == null)
-            {
-                return "未知类型";
-            }
-
-            SessionTypeEnum type = (SessionTypeEnum)value;
-
-            switch (type)
-            {
-                case SessionTypeEnum.SerialPort: return "串口";
-                case SessionTypeEnum.SSH: return "SSH";
-                case SessionTypeEnum.WindowsConsole: return "命令行";
-                case SessionTypeEnum.SFTP: return "SFTP";
-
                 default:
                     throw new NotImplementedException();
             }
@@ -512,7 +485,7 @@ namespace ModengTerm
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) 
+            if (value == null)
             {
                 return null;
             }
@@ -532,6 +505,66 @@ namespace ModengTerm
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class SessionTreeNodeTypeNameConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            SessionTreeNodeVM treeNode = value as SessionTreeNodeVM;
+
+            switch (treeNode.NodeType)
+            {
+                case SessionTreeNodeTypeEnum.Session:
+                    {
+                        XTermSessionVM sessionVM = treeNode as XTermSessionVM;
+
+                        SessionTypeEnum type = (SessionTypeEnum)sessionVM.Type;
+
+                        switch (type)
+                        {
+                            case SessionTypeEnum.SerialPort: return "串口";
+                            case SessionTypeEnum.SSH: return "SSH";
+                            case SessionTypeEnum.Localhost: return "命令行";
+                            case SessionTypeEnum.SFTP: return "SFTP";
+
+                            default:
+                                throw new NotImplementedException();
+                        }
+
+                    }
+
+                case SessionTreeNodeTypeEnum.Group: return "分组";
+                case SessionTreeNodeTypeEnum.GobackGroup: return "返回";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class TreeViewItemIndentConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            TreeViewItem treeViewItem = value as TreeViewItem;
+            TreeNodeViewModel treeNodeViewModel = treeViewItem.DataContext as TreeNodeViewModel;
+            return new Thickness(treeNodeViewModel.Level * MTermConsts.TreeViewItemIndent, 0, 0, 0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

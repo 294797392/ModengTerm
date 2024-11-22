@@ -67,7 +67,7 @@ namespace ModengTerm.Base
         {
             ID = Guid.Empty.ToString(),
             Name = "命令行",
-            Type = (int)SessionTypeEnum.WindowsConsole,
+            Type = (int)SessionTypeEnum.Localhost,
         };
 
         /// <summary>
@@ -138,5 +138,13 @@ namespace ModengTerm.Base
         public const int MaxHistoryDirectory = 100;
 
         #endregion
+
+        public const string VTermAppKey_WatchInterval = "watch_interval";
+        public const int DefaultWatchInterval = 3000;
+
+        /// <summary>
+        /// TreeViewItem的缩进
+        /// </summary>
+        public const int TreeViewItemIndent = 15;
     }
 }

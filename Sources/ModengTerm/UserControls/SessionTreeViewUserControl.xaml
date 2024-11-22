@@ -11,12 +11,12 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <converter:SessionTreeNodeImageConverter x:Key="SessionTreeNodeImageConverter"/>
 
-            <Style x:Key="StyleTreeViewItemLocal" TargetType="{x:Type TreeViewItem}">
+            <Style x:Key="StyleTreeViewItemLocal" TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ResourceKey=StyleTreeViewItem}">
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             </Style>
@@ -42,7 +42,8 @@
     <Grid>
 
         <TreeView x:Name="TreeViewSessionList" ItemTemplate="{StaticResource ResourceKey=HierarchicalDataTemplateLocal}"
-                  ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemLocal}" ItemsSource="{Binding Path=Roots}">
+                  ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemLocal}" ItemsSource="{Binding Path=Roots}"
+                  Style="{StaticResource ResourceKey=StyleTreeView}">
 
         </TreeView>
 

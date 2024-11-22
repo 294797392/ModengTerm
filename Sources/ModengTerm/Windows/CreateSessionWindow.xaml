@@ -11,7 +11,7 @@
                     xmlns:converter="clr-namespace:ModengTerm"
                     mc:Ignorable="d"
                     Title="{DynamicResource ResourceKey=UIText100}" 
-                    Height="600" Width="600" CanResize="False"
+                    Height="700" Width="700" CanResize="False"
                     WindowStartupLocation="CenterOwner"
                     Style="{StaticResource ResourceKey=StyleMdWindow}">
 
@@ -25,20 +25,19 @@
             <local:SelectedGroupNameConverter x:Key="SelectedGroupNameConverter"/>
             <converter:SessionTreeNodeImageConverter x:Key="SessionTreeNodeImageConverter"/>
 
-            <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions"
-                                      ItemsSource="{Binding Path=Children}">
+            <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions" ItemsSource="{Binding Path=Children}">
                 <Grid>
-                    <TextBlock Text="{Binding Path=Name}"/>
+                    <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
                 </Grid>
             </HierarchicalDataTemplate>
 
-            <Style x:Key="StyleTreeViewItemOption" TargetType="{x:Type TreeViewItem}">
+            <Style x:Key="StyleTreeViewItemOption" TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ResourceKey=StyleTreeViewItem}">
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Setter Property="Visibility" Value="{Binding Path=IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
             </Style>
 
-            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
                 <Setter Property="Margin" Value="5"/>
                 <Setter Property="Width" Value="70"/>
             </Style>
@@ -106,7 +105,7 @@
                     </HierarchicalDataTemplate>
                 </toolkitcontrol:TreeComboBox.ItemTemplate>
                 <toolkitcontrol:TreeComboBox.ItemContainerStyle>
-                    <Style TargetType="{x:Type TreeViewItem}">
+                    <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource ResourceKey=StyleTreeViewItem}">
                         <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Style>
@@ -117,7 +116,7 @@
 
         <Grid Grid.Row="1" Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="170"/>
+                <ColumnDefinition Width="180"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -125,7 +124,8 @@
                 <TreeView x:Name="TreeViewOptions" DataContext="{Binding Path=OptionTreeVM}"
                           ItemTemplate="{StaticResource ResourceKey=HierarchicalDataTemplateOptions}"
                           SelectedItemChanged="TreeViewOptions_SelectedItemChanged" ItemsSource="{Binding Path=Roots}"
-                          ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemOption}"/>
+                          ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemOption}"
+                          Style="{StaticResource ResourceKey=StyleTreeView}"/>
             </GroupBox>
 
             <ContentControl Grid.Column="1" x:Name="ContentControlContent" Margin="0,10,0,0"/>

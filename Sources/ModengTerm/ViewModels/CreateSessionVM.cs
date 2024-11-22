@@ -142,7 +142,7 @@ namespace ModengTerm.ViewModels
                                 break;
                             }
 
-                        case SessionTypeEnum.WindowsConsole:
+                        case SessionTypeEnum.Localhost:
                             {
                                 this.serialPortNode.IsVisible = false;
                                 this.commandLineNode.IsVisible = true;
@@ -458,9 +458,9 @@ namespace ModengTerm.ViewModels
         public bool DisableBell
         {
             get { return this.disableBell; }
-            set 
+            set
             {
-                if (this.disableBell != value) 
+                if (this.disableBell != value)
                 {
                     this.disableBell = value;
                     this.NotifyPropertyChanged("DisableBell");
@@ -645,10 +645,14 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<string> PortList { get; private set; }
 
+        public string SelectedPort { get; set; }
+
         /// <summary>
         /// 波特率列表
         /// </summary>
         public BindableCollection<string> BaudRateList { get; private set; }
+
+        public string SelectedBaudRate { get; set; }
 
         public BindableCollection<int> DataBitsList { get; private set; }
 
@@ -715,7 +719,8 @@ namespace ModengTerm.ViewModels
             this.appManifest = appManifest;
             this.terminalManifest = terminalManifest;
 
-            this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            //this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            this.Name = "新建会话";
 
             #region 加载参数树形列表
 
@@ -894,7 +899,8 @@ namespace ModengTerm.ViewModels
                     ID = option.ID,
                     Name = option.Name,
                     EntryType = option.EntryType,
-                    IsExpanded = true
+                    IsExpanded = true,
+                    Level = parentNode.Level + 1
                 };
 
                 parentNode.Add(vm);
@@ -1013,7 +1019,7 @@ namespace ModengTerm.ViewModels
 
         private bool GetSerialPortOptions(XTermSession session)
         {
-            string portName = this.PortList.SelectedItem;
+            string portName = this.SelectedPort;
             if (string.IsNullOrEmpty(portName))
             {
                 MessageBoxUtils.Info("请输入正确的端口号");
@@ -1021,7 +1027,7 @@ namespace ModengTerm.ViewModels
             }
 
             int baudRate;
-            string baudRateText = this.BaudRateList.SelectedItem;
+            string baudRateText = this.SelectedBaudRate;
             if (string.IsNullOrEmpty(baudRateText) ||
                 !int.TryParse(baudRateText, out baudRate))
             {
@@ -1296,7 +1302,7 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.WindowsConsole:
+                case SessionTypeEnum.Localhost:
                     {
                         if (!this.GetCommandlineOptions(session))
                         {
@@ -1316,7 +1322,7 @@ namespace ModengTerm.ViewModels
 
                 case SessionTypeEnum.RawTcp:
                     {
-                        if (!this.GetRawTcpOptions(session)) 
+                        if (!this.GetRawTcpOptions(session))
                         {
                             return false;
                         }

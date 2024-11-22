@@ -20,10 +20,12 @@ using ModengTerm.Windows.SSH;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Transactions;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
@@ -47,6 +49,15 @@ namespace ModengTerm.Terminal.ViewModels
                     { "type", ToolPanelTypeEnum.QuickCommand }
                 }
             },
+            new MenuDefinition()
+            {
+                Name = "进程列表",
+                ClassName = "ModengTerm.UserControls.TerminalUserControls.ProcessManagerUserControl, ModengTerm",
+                Parameters = new Dictionary<string, object>()
+                {
+                    { "type", ToolPanelTypeEnum.ProcessManager }
+                }
+            }
         };
 
         private static readonly List<MenuDefinition> ToolPanels2 = new List<MenuDefinition>()
@@ -107,6 +118,10 @@ namespace ModengTerm.Terminal.ViewModels
         private AutoCompletionVM autoCompletionVM;
 
         private bool inputPanelVisible;
+
+        private Task watchTask;
+        private ManualResetEvent watchEvent;
+        private bool isWatch;
 
         #endregion
 
@@ -278,6 +293,8 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        public BindableCollection<ProcessVM> ProcessList { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -314,6 +331,9 @@ namespace ModengTerm.Terminal.ViewModels
             this.Panels.Add(toolPanel1);
             this.Panels.Add(toolPanel2);
             this.NotifyPropertyChanged("Panels");
+
+            this.ProcessList = new BindableCollection<ProcessVM>();
+            this.NotifyPropertyChanged("ProcessList");
 
             #region 初始化上下文菜单
 
@@ -408,6 +428,14 @@ namespace ModengTerm.Terminal.ViewModels
             this.clipboard.Release();
             this.SyncInputSessions.Clear();
 
+            if (this.watchTask != null)
+            {
+                this.isWatch = false;
+                this.watchEvent.Set();
+                this.watchEvent.Close();
+                this.watchTask = null;
+            }
+
             this.isRunning = false;
         }
 
@@ -438,8 +466,19 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     Children = new BindableCollection<SessionContextMenu>()
                     {
-                        new SessionContextMenu("资源管理器", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.ResourceManager); })),
+                        //new SessionContextMenu("资源管理器", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.ResourceManager); })),
                         new SessionContextMenu("快捷命令", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.QuickCommand); })),
+                        new SessionContextMenu("系统监控", new ExecuteShellFunctionCallback(()=>
+                        {
+                            if(!this.SupportWatch())
+                            {
+                                MTMessageBox.Info("该会话不支持系统监控");
+                                return;
+                            }
+
+                            this.SwitchPanelVisible(ToolPanelTypeEnum.ProcessManager);
+                            this.EnableWatcher(true);
+                        })),
                         new SessionContextMenu("输入栏", this.SwitchInputPanelVisible)
                     }
                 },
@@ -524,7 +563,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             switch ((SessionTypeEnum)this.Session.Type)
             {
-                case SessionTypeEnum.WindowsConsole:
+                case SessionTypeEnum.Localhost:
                     {
                         string cmdPath = this.Session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
                         uri = string.Format("{0}", cmdPath);
@@ -717,6 +756,113 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 获取该会话是否支持系统监控
+        /// </summary>
+        /// <returns></returns>
+        private bool SupportWatch() 
+        {
+            switch ((SessionTypeEnum)this.Session.Type)
+            {
+                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.SSH: return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void EnableWatcher(bool enable)
+        {
+            if (enable)
+            {
+                if (this.watchTask == null)
+                {
+                    this.watchEvent = new ManualResetEvent(false);
+                    this.watchTask = Task.Factory.StartNew(this.WatchThreadProc);
+                    this.isWatch = true;
+                }
+
+                this.watchEvent.Set();
+            }
+            else
+            {
+                this.watchEvent.Reset();
+            }
+        }
+
+        private void WatchLocalhostProcess()
+        {
+            Process[] newProcs = Process.GetProcesses();
+
+            if (this.ProcessList.Count == 0) 
+            {
+                List<ProcessVM> processVMs = new List<ProcessVM>();
+                foreach (Process proc in newProcs)
+                {
+                    processVMs.Add(new ProcessVM(proc));
+                }
+
+                Application.Current.Dispatcher.Invoke(() => 
+                {
+                    this.ProcessList.AddRange(processVMs);
+                });
+
+                return;
+            }
+
+            IEnumerable<int> newProcIds = newProcs.Select(v => v.Id);
+            IEnumerable<int> oldProcIds = this.ProcessList.Select(v => v.PID);
+
+            // oldProcs里有，newProcs里没有的，removeProcs
+            List<int> removeProcIds = oldProcIds.ExceptBy(newProcIds, (v) => { return v; }).ToList();
+            // newProcs里有，oldProcs里没有的，addProcs
+            List<int> addProcIds = newProcIds.ExceptBy(oldProcIds, (v) => { return v; }).ToList();
+
+            foreach (int removeId in removeProcIds)
+            {
+                ProcessVM pvm = this.ProcessList.FirstOrDefault(v => v.PID == removeId);
+                if (pvm != null)
+                {
+                    Application.Current.Dispatcher.Invoke(() => 
+                    {
+                        this.ProcessList.Remove(pvm);
+                    });
+                }
+            }
+
+            foreach (int addId in addProcIds)
+            {
+                Process pvm = newProcs.FirstOrDefault(v => v.Id == addId);
+                if (pvm != null)
+                {
+                    ProcessVM processVM = new ProcessVM(pvm);
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        this.ProcessList.Add(processVM);
+                    });
+                }
+            }
+
+            foreach (Process newProc in newProcs)
+            {
+                ProcessVM pvm = this.ProcessList.FirstOrDefault(v => v.PID == newProc.Id);
+                if (pvm != null) 
+                {
+                    if (!pvm.CompareTo(newProc))
+                    {
+                        pvm.Update(newProc);
+                    }
+                }
+            }
+
+            logger.DebugFormat("总进程数 = {0}", this.ProcessList.Count);
+        }
+
+        private void WatchSshProcess()
+        {
+
+        }
+
         #endregion
 
         #region 公开接口
@@ -832,6 +978,46 @@ namespace ModengTerm.Terminal.ViewModels
         #endregion
 
         #region 事件处理器
+
+        private void WatchThreadProc()
+        {
+            while (this.isWatch)
+            {
+                try
+                {
+                    this.watchEvent.WaitOne();
+
+                    SessionTypeEnum sessionType = (SessionTypeEnum)this.Session.Type;
+
+                    switch (sessionType)
+                    {
+                        case SessionTypeEnum.Localhost:
+                            {
+                                Stopwatch stopwatch = Stopwatch.StartNew();
+                                this.WatchLocalhostProcess();
+                                stopwatch.Stop();
+                                logger.ErrorFormat("{0}ms", stopwatch.ElapsedMilliseconds);
+                                break;
+                            }
+
+                        case SessionTypeEnum.SSH:
+                            {
+                                this.WatchSshProcess();
+                                break;
+                            }
+
+                        default:
+                            throw new NotImplementedException();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("WatchThread异常", ex);
+                }
+
+                Thread.Sleep(3000);
+            }
+        }
 
         private void VideoTerminal_ViewportChanged(IVideoTerminal vt, int newRow, int newColumn)
         {

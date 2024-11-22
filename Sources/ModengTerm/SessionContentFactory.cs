@@ -13,7 +13,7 @@ namespace ModengTerm
             switch ((SessionTypeEnum)session.Type)
             {
                 case SessionTypeEnum.SerialPort:
-                case SessionTypeEnum.WindowsConsole:
+                case SessionTypeEnum.Localhost:
                 case SessionTypeEnum.SSH:
                     {
                         return new TerminalContentUserControl();

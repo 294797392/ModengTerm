@@ -19,6 +19,11 @@ namespace ModengTerm.ViewModels
         /// 快捷命令输入窗格
         /// </summary>
         QuickCommand,
+
+        /// <summary>
+        /// 进程管理
+        /// </summary>
+        ProcessManager
     }
 
     public class ToolPanelItemVM : MenuItemVM
