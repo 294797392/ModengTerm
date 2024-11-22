@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ModengTerm.UserControls
 {
     /// <summary>
-    /// HomePageUserControl.xaml 的交互逻辑
+    /// DefaultMainUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class HomePageUserControl : UserControl
+    public partial class DefaultMainUserControl : UserControl
     {
-        public HomePageUserControl()
+        public DefaultMainUserControl()
         {
             InitializeComponent();
         }

@@ -59,6 +59,7 @@ namespace ModengTerm.Terminal.Windows
             this.serviceAgent = MTermApp.Context.ServiceAgent;
 
             List<Playback> playbackList = this.serviceAgent.GetPlaybacks(session.ID);
+            this.playbacks = new BindableCollection<Playback>();
             this.playbacks.AddRange(playbackList);
 
             ComboBoxPlaybackList.ItemsSource = this.playbacks;

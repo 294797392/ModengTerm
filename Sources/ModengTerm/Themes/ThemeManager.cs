@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using XTerminal;
 
@@ -15,13 +16,20 @@ namespace ModengTerm.Themes
     {
         private static Dictionary<string, object> resourceMap = new Dictionary<string, object>();
 
-        public static TResource GetResource<TResource>(string resourceKey) 
+        public static TResource GetResource<TResource>(string resourceKey) where TResource : Freezable
         {
             object resource;
             if (!resourceMap.TryGetValue(resourceKey, out resource))
             {
                 resource = App.Current.FindResource(resourceKey);
                 resourceMap[resourceKey] = resource;
+
+                Freezable freezable = resource as Freezable;
+                if (freezable != null) 
+                {
+                    //使用Freeze可以提高性能
+                    freezable.Freeze();
+                }
             }
 
             if (!(resource is TResource))
@@ -36,10 +44,10 @@ namespace ModengTerm.Themes
         {
             switch (sessionType)
             {
-                case SessionTypeEnum.Localhost: return ThemeManager.GetResource<ImageSource>("5022");
-                case SessionTypeEnum.SerialPort: return ThemeManager.GetResource<ImageSource>("5024");
-                case SessionTypeEnum.SSH: return ThemeManager.GetResource<ImageSource>("5023");
-                case SessionTypeEnum.RawTcp: return ThemeManager.GetResource<ImageSource>("5025");
+                case SessionTypeEnum.Localhost: return ThemeManager.GetResource<ImageSource>("501");
+                case SessionTypeEnum.SerialPort: return ThemeManager.GetResource<ImageSource>("503");
+                case SessionTypeEnum.SSH: return ThemeManager.GetResource<ImageSource>("502");
+                case SessionTypeEnum.RawTcp: return ThemeManager.GetResource<ImageSource>("504");
                 default:
                     throw new NotImplementedException();
             }

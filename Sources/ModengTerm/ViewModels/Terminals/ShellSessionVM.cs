@@ -1170,10 +1170,10 @@ namespace ModengTerm.Terminal.ViewModels
 
             ClipboardVM clipboardVM = new ClipboardVM(clipboardParagraphSource, this);
 
-            ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
-            paragraphsWindow.Title = "剪贴板历史";
-            paragraphsWindow.Owner = Window.GetWindow(this.Content);
-            paragraphsWindow.Show();
+            //ParagraphsWindow paragraphsWindow = new ParagraphsWindow(clipboardVM);
+            //paragraphsWindow.Title = "剪贴板历史";
+            //paragraphsWindow.Owner = Window.GetWindow(this.Content);
+            //paragraphsWindow.Show();
         }
 
         /// <summary>

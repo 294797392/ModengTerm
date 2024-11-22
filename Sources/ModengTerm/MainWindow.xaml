@@ -42,23 +42,22 @@
 
                 <Grid Background="Transparent">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="30"/>
+                        <ColumnDefinition Width="25"/>
                         <ColumnDefinition Width="5"/>
-                        <ColumnDefinition Width="*" MinWidth="80"/>
+                        <ColumnDefinition Width="*" MinWidth="60"/>
                         <ColumnDefinition Width="30"/>
                     </Grid.ColumnDefinitions>
 
-                    <Image Grid.Column="0" Width="24" Height="24" Source="{Binding Path=Session.Type, Converter={StaticResource ResourceKey=SessionImageConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Image Grid.Column="0" Width="18" Height="18" Source="{Binding Path=Session.Type, Converter={StaticResource ResourceKey=SessionImageConverter}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
-                    <TextBlock Grid.Column="2" Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                    <TextBlock Grid.Column="2" Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"
+                               TextOptions.TextFormattingMode="Display"/>
 
-                    <!--MouseOverBrush="Silver" MouseDownBrush="#9E9E9E"-->
-                    <mtermcontrols:MdButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2"
-                                               SVGColor="Black" Tag="{Binding}" Visibility="Collapsed" Width="20" Height="20"
-                                               MouseOverBrush="{DynamicResource ResourceKey=BrushCloseSessionHover}" MouseDownBrush="{DynamicResource ResourceKey=BrushCloseSessionDown}"
-                                               SVGPath="M512 466.944l233.472-233.472a31.744 31.744 0 0 1 45.056 45.056L557.056 512l233.472 233.472a31.744 31.744 0 0 1-45.056 45.056L512 557.056l-233.472 233.472a31.744 31.744 0 0 1-45.056-45.056L466.944 512 233.472 278.528a31.744 31.744 0 0 1 45.056-45.056z"
-                                               Click="ButtonCloseSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
-
+                    <mtermcontrols:MdButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2" ToolTip="关闭"
+                                            Tag="{Binding}" Visibility="{Binding Path=IsSelected, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}" Width="20" Height="20"
+                                            SVGColor="{DynamicResource ResourceKey=RES4022}" SVGMouseOverColor="{DynamicResource ResourceKey=RES4023}" SVGMouseDownColor="{DynamicResource ResourceKey=RES4024}"
+                                            SVGPath="M512 466.944l233.472-233.472a31.744 31.744 0 0 1 45.056 45.056L557.056 512l233.472 233.472a31.744 31.744 0 0 1-45.056 45.056L512 557.056l-233.472 233.472a31.744 31.744 0 0 1-45.056-45.056L466.944 512 233.472 278.528a31.744 31.744 0 0 1 45.056-45.056z"
+                                            Click="ButtonCloseSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
                 </Grid>
 
                 <DataTemplate.Triggers>
@@ -72,15 +71,34 @@
             <DataTemplate x:Key="DataTemplateOpenSession">
                 <mtermcontrols:MdButton Content="+" FontWeight="Bold" FontSize="16" Width="25" Height="25" CornerRadius="2"
                                            VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                                           MouseOverBrush="{DynamicResource ResourceKey=BrushOpenSessonHover}" 
-                                           MouseDownBrush="{DynamicResource ResourceKey=BrushOpenSessionDown}"
+                                           MouseOverBrush="{DynamicResource ResourceKey=4005}" 
+                                           MouseDownBrush="{DynamicResource ResourceKey=4006}"
                                            Click="ButtonOpenSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
             </DataTemplate>
 
             <Style x:Key="StyleListBoxItemSession" TargetType="{x:Type ListBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES4018}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES4006}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES4017}"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                    </Trigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsSelected" Value="False"/>
+                            <Condition Property="IsMouseOver" Value="True"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES4021}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES4019}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES4020}"/>
+                    </MultiTrigger>
+                </Style.Triggers>
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <Setter Property="BorderThickness" Value="1,1,1,0"/>
-                <Setter Property="BorderBrush" Value="Black"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES4014}"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES4013}"/>
+                <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES4015}"/>
                 <Setter Property="VerticalAlignment" Value="Bottom"/>
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="Margin" Value="2,0,0,0"/>
@@ -100,7 +118,7 @@
             <Style x:Key="StyleListBoxItemOpenedSession" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItemSession}">
                 <Style.Triggers>
                     <Trigger Property="IsSelected" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource ResourceKey=BrushSessionSelected}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES4002}"/>
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -133,11 +151,13 @@
             </Style>
 
             <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mtermcontrols:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
-                <Setter Property="SVGColor" Value="Black"/>
+                <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES4032}"/>
+                <Setter Property="SVGMouseDownColor" Value="{DynamicResource ResourceKey=RES4032}"/>
+                <Setter Property="SVGMouseOverColor" Value="{DynamicResource ResourceKey=RES4032}"/>
                 <Setter Property="SVGMargin" Value="7"/>
                 <Setter Property="Margin" Value="3"/>
-                <Setter Property="MouseOverBrush" Value="{DynamicResource ResourceKey=BrushMainWindowButtonHoverBackground}"/>
-                <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=BrushMainWindowButtonDownBackground}"/>
+                <Setter Property="MouseOverBrush" Value="{DynamicResource ResourceKey=RES4030}"/>
+                <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=RES4031}"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Focusable" Value="False"/>
             </Style>
@@ -155,8 +175,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- 菜单 -->
-
+        <!-- 顶部菜单 -->
         <Grid Grid.Row="0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
@@ -166,9 +185,8 @@
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" Grid.ColumnSpan="99" BorderBrush="{DynamicResource ResourceKey=BrushTitleBorder}" 
-                    Background="{DynamicResource ResourceKey=BrushTitleBackground}"
-                    Padding="5,0,0,0" BorderThickness="0,0,0,1" Height="30"/>
+            <Border Grid.Column="0" Grid.ColumnSpan="99" BorderBrush="{DynamicResource ResourceKey=4007}" 
+                    Background="{DynamicResource ResourceKey=4008}" Padding="5,0,0,0" Height="30"/>
 
             <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
@@ -214,14 +232,16 @@
         </Grid>
 
         <!-- 终端显示区域 -->
-        <Grid Grid.Row="1" Margin="0,5,0,0">
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
+            <Border Grid.Row="0" Grid.RowSpan="9999" Background="{DynamicResource ResourceKey=RES4012}"/>
+
             <!-- 打开的终端列表Tab页 -->
-            <Grid Grid.Row="0">
+            <Grid Grid.Row="0" Margin="0,5,0,0">
 
                 <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
                     <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
@@ -237,12 +257,11 @@
             </Grid>
 
             <!-- 终端展示页面 -->
-            <Border Grid.Row="1" Background="{DynamicResource ResourceKey=Brush4003}"/>
             <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
 
         </Grid>
 
-        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="{DynamicResource ResourceKey=BrushWindowBorder}" IsHitTestVisible="False"/>
+        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="{DynamicResource ResourceKey=4011}" IsHitTestVisible="False"/>
 
     </Grid>
 

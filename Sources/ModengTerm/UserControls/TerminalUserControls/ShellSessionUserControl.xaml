@@ -37,7 +37,7 @@
         </Style>
 
         <Style x:Key="StyleBorderSplitter" TargetType="{x:Type Border}">
-            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=BrushBackground1}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=5500}"/>
             <Setter Property="Margin" Value="3,6,3,6"/>
             <Setter Property="Width" Value="2"/>
         </Style>
@@ -120,21 +120,21 @@
         </Grid>
 
         <!-- 状态栏 -->
-        <Grid Grid.Row="2" x:Name="GridStatusbar">
+        <Grid Grid.Row="2" x:Name="GridStatusbar" TextElement.Foreground="{DynamicResource ResourceKey=RES5502}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Grid.ColumnSpan="9999"
-                    BorderBrush="{DynamicResource ResourceKey=BrushStatsuBarBorder}"
+                    BorderBrush="{DynamicResource ResourceKey=RES5501}"
                     BorderThickness="0,1,0,0"/>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2ImageConverter}}" Width="16" Height="16"/>
                     <TextBlock Text="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2TextConverter}}" 
-                               Foreground="{Binding Path=Status, Converter={StaticResource ResourceKey=SessionStatus2BrushConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
+                               Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}"/>
                 </StackPanel>
 
                 <TextBlock Text="{Binding Path=Uri}" Style="{StaticResource ResourceKey=StyleTextBlockStatusBar}" Margin="10,0,0,0"/>

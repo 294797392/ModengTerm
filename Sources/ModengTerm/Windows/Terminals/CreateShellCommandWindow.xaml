@@ -14,7 +14,7 @@
 
         <converter:ShellCommandTypeConverter x:Key="ShellCommandTypeConverter"/>
 
-        <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+        <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
             <Setter Property="Margin" Value="3"/>
             <Setter Property="Width" Value="70"/>
             <Setter Property="Height" Value="30"/>
@@ -25,7 +25,7 @@
             <Setter Property="HorizontalAlignment" Value="Right"/>
         </Style>
 
-        <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}">
+        <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=StyleTextBox}">
             <Setter Property="Margin" Value="3"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
@@ -56,7 +56,7 @@
                 <ListBox Grid.Row="0" x:Name="ListBoxShellCommands" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          SelectedIndex="0" SelectionChanged="ListBoxShellCommands_SelectionChanged">
                     <ListBox.Style>
-                        <Style TargetType="{x:Type ListBox}">
+                        <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource ResourceKey=StyleListBox}">
                             <Setter Property="BorderBrush" Value="{x:Null}"/>
                             <Setter Property="BorderThickness" Value="0"/>
                         </Style>
@@ -103,7 +103,7 @@
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="类型：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                 <ComboBox Grid.Row="1" Grid.Column="2" x:Name="ComboBoxCommandTypes" Height="25" Margin="3,0,3,0"
-                          SelectedItem="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                          SelectedItem="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleComboBox}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource ResourceKey=ShellCommandTypeConverter}}"/>

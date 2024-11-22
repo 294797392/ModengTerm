@@ -9,11 +9,11 @@
 
     <UserControl.Resources>
 
-        <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}">
+        <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItem}">
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         </Style>
 
-        <Style x:Key="StyleListBoxLocal" TargetType="{x:Type ListBox}">
+        <Style x:Key="StyleListBoxLocal" TargetType="{x:Type ListBox}" BasedOn="{StaticResource ResourceKey=StyleListBox}">
             <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemLocal}"/>
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         </Style>

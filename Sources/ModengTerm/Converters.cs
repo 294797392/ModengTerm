@@ -466,10 +466,10 @@ namespace ModengTerm
 
             switch (sessionStatus)
             {
-                case SessionStatusEnum.Connected: return ThemeManager.GetResource<ImageSource>("5001");
-                case SessionStatusEnum.Connecting: return ThemeManager.GetResource<ImageSource>("5003");
-                case SessionStatusEnum.ConnectError: return ThemeManager.GetResource<ImageSource>("5004");
-                case SessionStatusEnum.Disconnected: return ThemeManager.GetResource<ImageSource>("5002");
+                case SessionStatusEnum.Connected: return ThemeManager.GetResource<ImageSource>("5520");
+                case SessionStatusEnum.Connecting: return ThemeManager.GetResource<ImageSource>("5522");
+                case SessionStatusEnum.ConnectError: return ThemeManager.GetResource<ImageSource>("5523");
+                case SessionStatusEnum.Disconnected: return ThemeManager.GetResource<ImageSource>("5521");
                 default:
                     throw new NotImplementedException();
             }
@@ -500,8 +500,8 @@ namespace ModengTerm
                         return ThemeManager.GetSessionTypeImageSource(sessionVM.Type);
                     }
 
-                case SessionTreeNodeTypeEnum.Group: return ThemeManager.GetResource<ImageSource>("5021");
-                case SessionTreeNodeTypeEnum.GobackGroup: return ThemeManager.GetResource<ImageSource>("5026");
+                case SessionTreeNodeTypeEnum.Group: return ThemeManager.GetResource<ImageSource>("500");
+                case SessionTreeNodeTypeEnum.GobackGroup: return ThemeManager.GetResource<ImageSource>("505");
                 default:
                     throw new NotImplementedException();
             }

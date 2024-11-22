@@ -22,16 +22,16 @@
                 <Setter Property="HorizontalAlignment" Value="Right"/>
             </Style>
 
-            <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}">
+            <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=StyleTextBox}">
                 <Setter Property="Margin" Value="3"/>
             </Style>
 
-            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
                 <Setter Property="Margin" Value="3"/>
                 <Setter Property="Height" Value="30"/>
             </Style>
 
-            <Style x:Key="StyleComboBoxPlaybackList" TargetType="{x:Type ComboBox}">
+            <Style x:Key="StyleComboBoxPlaybackList" TargetType="{x:Type ComboBox}" BasedOn="{StaticResource ResourceKey=StyleComboBox}">
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="VerticalContentAlignment" Value="Center"/>
             </Style>

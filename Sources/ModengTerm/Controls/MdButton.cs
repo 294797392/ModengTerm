@@ -123,6 +123,37 @@ namespace ModengTerm.Controls
 
 
 
+        public Brush SVGMouseOverColor
+        {
+            get { return (Brush)GetValue(SVGMouseOverColorProperty); }
+            set { SetValue(SVGMouseOverColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SVGMouseOverColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SVGMouseOverColorProperty =
+            DependencyProperty.Register("SVGMouseOverColor", typeof(Brush), typeof(MdButton), new PropertyMetadata(Brushes.Transparent));
+
+
+
+
+        public Brush SVGMouseDownColor
+        {
+            get { return (Brush)GetValue(SVGMouseDownColorProperty); }
+            set { SetValue(SVGMouseDownColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SVGMouseDownColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SVGMouseDownColorProperty =
+            DependencyProperty.Register("SVGMouseDownColor", typeof(Brush), typeof(MdButton), new PropertyMetadata(Brushes.Transparent));
+
+
+
+
+
+
+
+
+
         /// <summary>
         /// SVG图标距离按钮的边距
         /// </summary>

@@ -31,6 +31,7 @@
     <Compile Remove="ViewModels\VTMenuGroupVM.cs" />
     <Compile Remove="ViewModels\VTMenuItemVM.cs" />
     <Compile Remove="ViewModels\VTMenuListVM.cs" />
+    <Compile Remove="Windows\Terminals\ParagraphsWindow.xaml.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,9 +57,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="Themes\Themes.Default.xaml" />
+    <Page Remove="Themes\Themes.Ubuntu.Ambiance.xaml" />
+    <Page Remove="Themes\Themes.XShell.xaml" />
     <Page Remove="UserControls\SFTPContentUserControl.xaml" />
     <Page Remove="UserControls\TerminalUserControls\Rendering\Template.xaml" />
     <Page Remove="UserControls\ViewportUserControl.xaml" />
+    <Page Remove="Windows\Terminals\ParagraphsWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>

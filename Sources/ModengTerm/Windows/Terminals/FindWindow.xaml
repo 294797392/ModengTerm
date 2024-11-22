@@ -18,7 +18,7 @@
             <Setter Property="HorizontalAlignment" Value="Right"/>
         </Style>
 
-        <Style x:Key="StyleTextBoxValue" TargetType="{x:Type TextBox}">
+        <Style x:Key="StyleTextBoxValue" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=StyleTextBox}">
             <Setter Property="Margin" Value="3"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Height" Value="30"/>

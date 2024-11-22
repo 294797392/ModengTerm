@@ -41,7 +41,7 @@ namespace ModengTerm
         private MainWindowVM mainWindowVM;
         private OpenedSessionsVM openedSessionsVM;
         private ServiceAgent serviceAgent;
-        private HomePageUserControl homePageUserControl;
+        private DefaultMainUserControl defaultMainUserControl;
 
         #endregion
 
@@ -260,11 +260,11 @@ namespace ModengTerm
             if (this.openedSessionsVM.SessionList.Count == 1 &&
                 this.openedSessionsVM.SessionList[0] is OpenSessionVM)
             {
-                if (this.homePageUserControl == null)
+                if (this.defaultMainUserControl == null)
                 {
-                    this.homePageUserControl = new HomePageUserControl();
+                    this.defaultMainUserControl = new DefaultMainUserControl();
                 }
-                ContentControlSession.Content = this.homePageUserControl;
+                ContentControlSession.Content = this.defaultMainUserControl;
 
                 //this.ShowSessionListWindow();
             }
