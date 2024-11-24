@@ -36,8 +36,9 @@
 
                                         <Grid>
                                             <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"/>
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"/>
+                                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" x:Name="contentPresenter" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"/>
                                         </Grid>
 
                                     </ControlTemplate>
@@ -54,7 +55,8 @@
                                           IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                           SnapsToDevicePixels="True" UseLayoutRounding="True"
                                           Style="{StaticResource ResourceKey=StyleDropDownButton}">
-                                <Path Height="4" Margin="0,0,6,0" x:Name="BtnArrow" Width="8" Stretch="Uniform"  Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " Fill="Black"/>
+                                <Path Height="4" Margin="0,0,6,0" x:Name="BtnArrow" Width="8" Stretch="Uniform"  Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " Fill="Black"
+                                      HorizontalAlignment="Right"/>
                             </ToggleButton>
                             <ContentPresenter
                                     x:Name="contentPresenter"
@@ -66,9 +68,11 @@
                                     IsHitTestVisible="False" />
                         </Grid>
 
-                        <Popup x:Name="PART_Popup" Grid.ColumnSpan="2" AllowsTransparency="true"
+                        <!--AllowsTransparency="true"
                                IsOpen="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Placement="Bottom" Focusable="False"
-                               StaysOpen="False">
+                               StaysOpen="False"-->
+
+                        <Popup x:Name="PART_Popup" Grid.ColumnSpan="2" IsOpen="{Binding ElementName=PART_DropDownButton, Path=IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Placement="Bottom" Focusable="False" AllowsTransparency="True" PopupAnimation="None">
                             <Grid MaxHeight="{TemplateBinding MaxDropDownHeight}" Width="Auto" MinWidth="{TemplateBinding ActualWidth}" >
                                 <Border
                                     x:Name="PART_Border"
@@ -112,7 +116,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="HorizontalAlignment" Value="Right"/>

@@ -309,7 +309,7 @@ namespace ModengTerm.Windows
 
         private void CreateSessionGroupWindow_OnSessionGroupCreated(SessionGroup sessionGroup)
         {
-            SessionGroupVM sessionGroupVM = new SessionGroupVM(this.sessionTreeVM.Context, sessionGroup);
+            SessionGroupVM sessionGroupVM = new SessionGroupVM(this.sessionTreeVM.Context, 0, sessionGroup);
 
             if (string.IsNullOrEmpty(sessionGroup.ParentId))
             {
@@ -322,6 +322,7 @@ namespace ModengTerm.Windows
                 if (this.sessionTreeVM.TryGetNode(sessionGroup.ParentId, out parentNode))
                 {
                     parentNode.Add(sessionGroupVM);
+                    sessionGroupVM.Level = parentNode.Level + 1;
                 }
             }
         }

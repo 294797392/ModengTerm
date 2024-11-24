@@ -128,8 +128,7 @@ namespace ModengTerm
 
             foreach (SessionGroup child in children)
             {
-                SessionGroupVM groupVM = new SessionGroupVM(parentGroup.Context, child);
-                groupVM.Level = parentGroup.Level + 1;
+                SessionGroupVM groupVM = new SessionGroupVM(parentGroup.Context, parentGroup.Level + 1, child);
                 parentGroup.Add(groupVM);
                 this.LoadSessionGroupNode(groupVM, groups);
             }
@@ -153,7 +152,7 @@ namespace ModengTerm
 
             if (includeRootNode) 
             {
-                rootNode = new SessionGroupVM(context, MTermConsts.RootGroup);
+                rootNode = new SessionGroupVM(context, 0, MTermConsts.RootGroup);
                 sessionTreeVM.AddRootNode(rootNode);
             }
 
@@ -161,7 +160,7 @@ namespace ModengTerm
             IEnumerable<SessionGroup> rootGroups = groups.Where(v => v.ParentId == string.Empty);
             foreach (SessionGroup group in rootGroups)
             {
-                SessionGroupVM groupVM = new SessionGroupVM(context, group);
+                SessionGroupVM groupVM = new SessionGroupVM(context, 0, group);
                 if (rootNode != null)
                 {
                     groupVM.Level = 1;
@@ -180,7 +179,7 @@ namespace ModengTerm
                 List<XTermSession> sessions = this.ServiceAgent.GetSessions();
                 foreach (XTermSession session in sessions)
                 {
-                    XTermSessionVM sessionVM = new XTermSessionVM(context, session);
+                    XTermSessionVM sessionVM = new XTermSessionVM(context, 0, session);
 
                     if (string.IsNullOrEmpty(session.GroupId))
                     {
@@ -204,6 +203,7 @@ namespace ModengTerm
                             continue;
                         }
 
+                        sessionVM.Level = parentVM.Level + 1;
                         parentVM.Add(sessionVM);
                     }
                 }

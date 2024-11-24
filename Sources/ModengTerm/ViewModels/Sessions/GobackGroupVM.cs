@@ -10,7 +10,7 @@ namespace ModengTerm.ViewModels.Sessions
 {
     public class GobackGroupVM : SessionTreeNodeVM
     {
-        public GobackGroupVM(TreeViewModelContext context, object data = null) : base(context, data)
+        public GobackGroupVM(TreeViewModelContext context, int level, object data = null) : base(context, level, data)
         {
         }
 

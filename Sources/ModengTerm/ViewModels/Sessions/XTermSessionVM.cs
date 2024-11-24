@@ -61,8 +61,8 @@ namespace ModengTerm.ViewModels.Session
 
         public override SessionTreeNodeTypeEnum NodeType => SessionTreeNodeTypeEnum.Session;
 
-        public XTermSessionVM(TreeViewModelContext context, object data = null)
-            : base(context, data)
+        public XTermSessionVM(TreeViewModelContext context, int level, object data = null)
+            : base(context, level, data)
         {
             XTermSession session = data as XTermSession;
 

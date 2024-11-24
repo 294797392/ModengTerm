@@ -17,171 +17,176 @@
     <!-- 通用控件 -->
     <!-- 动态引用Themes里的资源来实现动态换肤功能 -->
 
-    <Style x:Key="StyleScrollBar" TargetType="{x:Type ScrollBar}">
-        <Style.Resources>
-            <!-- 拖动标样式 -->
-            <Style x:Key="StyleThumbLocal" TargetType="{x:Type Thumb}">
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Opacity" Value="1"/>
-                    </Trigger>
-                </Style.Triggers>
-                <Setter Property="Opacity" Value="0.7"/>
-                <Setter Property="Background" Value="#E8E8EC"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Thumb}">
-                            <Grid x:Name="Grid">
-                                <Border Background="{TemplateBinding Background}" Width="{TemplateBinding Width}"
-                                        CornerRadius="3" Opacity="{TemplateBinding Opacity}"/>
-                                <!--<Rectangle HorizontalAlignment="Stretch" x:Name="HoverRectangle" 
-                                           VerticalAlignment="Stretch" Width="{TemplateBinding Width}" 
-                                           Stroke="{x:Null}" Fill="{TemplateBinding Background}"
-                                           Opacity="{TemplateBinding Opacity}"/>-->
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsFocused" Value="True" />
-                                <Trigger Property="IsEnabled" Value="False" >
-                                    <Setter Property="Opacity" TargetName="Grid" Value="0.1"/>
-                                </Trigger>
-                                <Trigger Property="IsDragging" Value="True">
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <!-- 拖动条两边的RepeatButton -->
-            <Style x:Key="NuclearScrollRepeatButtonStyle" TargetType="{x:Type RepeatButton}">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderBrush" Value="Transparent" />
-                <Setter Property="IsTabStop" Value="false" />
-                <Setter Property="Focusable" Value="false" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type RepeatButton}">
-                            <Grid>
-                                <Rectangle Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" 
-                                       StrokeThickness="{TemplateBinding BorderThickness}" />
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <Style x:Key="StyleRepeatButtonBase" TargetType="{x:Type RepeatButton}">
-                <!--<Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#999999"/>
-                    </Trigger>
-                </Style.Triggers>-->
-                <Setter Property="BorderBrush" Value="{x:Null}"/>
-                <Setter Property="BorderThickness" Value="0"/>
-                <!--<Setter Property="Background" Value="#4D4D4D"/>-->
-            </Style>
-            <Style x:Key="StyleRepeatButtonDecrease" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource ResourceKey=StyleRepeatButtonBase}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type RepeatButton}">
-                            <Grid>
-                                <Path x:Name="Up_Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                      Data="M 0 0 L 5 5 L 10 0 Z" Fill="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                    <Path.LayoutTransform>
-                                        <RotateTransform x:Name="RotateTransform" Angle="180"/>
-                                    </Path.LayoutTransform>
-                                </Path>
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <Style x:Key="StyleRepeatButtonIncrease" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource ResourceKey=StyleRepeatButtonBase}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type RepeatButton}">
-                            <Grid>
-                                <Path x:Name="Up_Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" 
-                                      Data="M 0 0 L 5 5 L 10 0 Z" Fill="{TemplateBinding Background}" SnapsToDevicePixels="True">
-                                    <Path.LayoutTransform>
-                                        <RotateTransform x:Name="RotateTransform" Angle="0"/>
-                                    </Path.LayoutTransform>
-                                </Path>
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </Style.Resources>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background">
-                    <Setter.Value>
-                        <SolidColorBrush Color="White" Opacity="0.3"/>
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-        </Style.Triggers>
-        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type ScrollBar}">
-                    <Grid x:Name="GridRoot">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="10" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="10" />
-                        </Grid.RowDefinitions>
-
-                        <Border Grid.Row="1" Background="{TemplateBinding Background}" CornerRadius="3"/>
-
-                        <!-- 上面的三角形 -->
-                        <RepeatButton Grid.Row="0" x:Name="DecreaseRepeat" Command="ScrollBar.LineUpCommand" Style="{StaticResource ResourceKey=StyleRepeatButtonDecrease}"/>
-
-                        <Grid Grid.Row="1">
-                            <!-- 滑动条 -->
-                            <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="true">
-                                <Track.Thumb>
-                                    <Thumb x:Name="Thumb" Style="{StaticResource ResourceKey=StyleThumbLocal}"/>
-                                </Track.Thumb>
-                                <Track.IncreaseRepeatButton>
-                                    <RepeatButton x:Name="PageUp" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageDownCommand" />
-                                </Track.IncreaseRepeatButton>
-                                <Track.DecreaseRepeatButton>
-                                    <RepeatButton x:Name="PageDown" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageUpCommand" />
-                                </Track.DecreaseRepeatButton>
-                            </Track>
-                        </Grid>
-
-                        <!-- 下面的三角形 -->
-                        <RepeatButton Grid.Row="2" x:Name="IncreaseRepeat" Command="ScrollBar.LineDownCommand" Style="{StaticResource ResourceKey=StyleRepeatButtonIncrease}"/>
-                    </Grid>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="Orientation" Value="Horizontal">
-                            <Setter Property="LayoutTransform" TargetName="GridRoot">
-                                <Setter.Value>
-                                    <RotateTransform Angle="-90" />
-                                </Setter.Value>
-                            </Setter>
-                            <Setter TargetName="PART_Track" Property="Orientation" Value="Vertical" />
-                            <Setter Property="Command" Value="ScrollBar.LineLeftCommand" TargetName="DecreaseRepeat" />
-                            <Setter Property="Command" Value="ScrollBar.LineRightCommand" TargetName="IncreaseRepeat" />
-                            <Setter Property="Command" Value="ScrollBar.PageLeftCommand" TargetName="PageDown" />
-                            <Setter Property="Command" Value="ScrollBar.PageRightCommand" TargetName="PageUp" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style x:Key="StyleDocumentControl" TargetType="{x:Type mrendering:DocumentControl}">
         <Setter Property="Template">
             <Setter.Value>
 
                 <ControlTemplate TargetType="{x:Type mrendering:DocumentControl}">
 
+                    <ControlTemplate.Resources>
+
+
+                        <Style x:Key="StyleScrollBar" TargetType="{x:Type ScrollBar}">
+                            <Style.Resources>
+                                <!-- 拖动标样式 -->
+                                <Style x:Key="StyleThumbLocal" TargetType="{x:Type Thumb}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="1"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Opacity" Value="0.7"/>
+                                    <Setter Property="Background" Value="#E8E8EC"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Grid x:Name="Grid">
+                                                    <Border Background="{TemplateBinding Background}" Width="{TemplateBinding Width}"
+                                        CornerRadius="3" Opacity="{TemplateBinding Opacity}"/>
+                                                    <!--<Rectangle HorizontalAlignment="Stretch" x:Name="HoverRectangle" 
+                                           VerticalAlignment="Stretch" Width="{TemplateBinding Width}" 
+                                           Stroke="{x:Null}" Fill="{TemplateBinding Background}"
+                                           Opacity="{TemplateBinding Opacity}"/>-->
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsFocused" Value="True" />
+                                                    <Trigger Property="IsEnabled" Value="False" >
+                                                        <Setter Property="Opacity" TargetName="Grid" Value="0.1"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsDragging" Value="True">
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+
+                                <!-- 拖动条两边的RepeatButton -->
+                                <Style x:Key="NuclearScrollRepeatButtonStyle" TargetType="{x:Type RepeatButton}">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
+                                    <Setter Property="IsTabStop" Value="false" />
+                                    <Setter Property="Focusable" Value="false" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Grid>
+                                                    <Rectangle Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" 
+                                       StrokeThickness="{TemplateBinding BorderThickness}" />
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+
+                                <Style x:Key="StyleRepeatButtonBase" TargetType="{x:Type RepeatButton}">
+                                    <!--<Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#999999"/>
+                    </Trigger>
+                </Style.Triggers>-->
+                                    <Setter Property="BorderBrush" Value="{x:Null}"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <!--<Setter Property="Background" Value="#4D4D4D"/>-->
+                                </Style>
+                                <Style x:Key="StyleRepeatButtonDecrease" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource ResourceKey=StyleRepeatButtonBase}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Grid>
+                                                    <Path x:Name="Up_Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                      Data="M 0 0 L 5 5 L 10 0 Z" Fill="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                        <Path.LayoutTransform>
+                                                            <RotateTransform x:Name="RotateTransform" Angle="180"/>
+                                                        </Path.LayoutTransform>
+                                                    </Path>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                                <Style x:Key="StyleRepeatButtonIncrease" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource ResourceKey=StyleRepeatButtonBase}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type RepeatButton}">
+                                                <Grid>
+                                                    <Path x:Name="Up_Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                      Data="M 0 0 L 5 5 L 10 0 Z" Fill="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                        <Path.LayoutTransform>
+                                                            <RotateTransform x:Name="RotateTransform" Angle="0"/>
+                                                        </Path.LayoutTransform>
+                                                    </Path>
+                                                </Grid>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Style.Resources>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <SolidColorBrush Color="White" Opacity="0.3"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Setter Property="OverridesDefaultStyle" Value="True"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                                        <Grid x:Name="GridRoot">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="10" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="10" />
+                                            </Grid.RowDefinitions>
+
+                                            <Border Grid.Row="1" Background="{TemplateBinding Background}" CornerRadius="3"/>
+
+                                            <!-- 上面的三角形 -->
+                                            <RepeatButton Grid.Row="0" x:Name="DecreaseRepeat" Command="ScrollBar.LineUpCommand" Style="{StaticResource ResourceKey=StyleRepeatButtonDecrease}"/>
+
+                                            <Grid Grid.Row="1">
+                                                <!-- 滑动条 -->
+                                                <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="true">
+                                                    <Track.Thumb>
+                                                        <Thumb x:Name="Thumb" Style="{StaticResource ResourceKey=StyleThumbLocal}"/>
+                                                    </Track.Thumb>
+                                                    <Track.IncreaseRepeatButton>
+                                                        <RepeatButton x:Name="PageUp" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageDownCommand" />
+                                                    </Track.IncreaseRepeatButton>
+                                                    <Track.DecreaseRepeatButton>
+                                                        <RepeatButton x:Name="PageDown" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageUpCommand" />
+                                                    </Track.DecreaseRepeatButton>
+                                                </Track>
+                                            </Grid>
+
+                                            <!-- 下面的三角形 -->
+                                            <RepeatButton Grid.Row="2" x:Name="IncreaseRepeat" Command="ScrollBar.LineDownCommand" Style="{StaticResource ResourceKey=StyleRepeatButtonIncrease}"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="Orientation" Value="Horizontal">
+                                                <Setter Property="LayoutTransform" TargetName="GridRoot">
+                                                    <Setter.Value>
+                                                        <RotateTransform Angle="-90" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter TargetName="PART_Track" Property="Orientation" Value="Vertical" />
+                                                <Setter Property="Command" Value="ScrollBar.LineLeftCommand" TargetName="DecreaseRepeat" />
+                                                <Setter Property="Command" Value="ScrollBar.LineRightCommand" TargetName="IncreaseRepeat" />
+                                                <Setter Property="Command" Value="ScrollBar.PageLeftCommand" TargetName="PageDown" />
+                                                <Setter Property="Command" Value="ScrollBar.PageRightCommand" TargetName="PageUp" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                    </ControlTemplate.Resources>
+                    
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -1028,6 +1033,177 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!-- 不知道怎么给每个控件单独指定Scrollbar的样式，所以写成全局的 -->
+    <Style TargetType="{x:Type ScrollBar}">
+        <Style.Resources>
+            <!-- 拖动标样式 -->
+            <Style x:Key="StyleThumbLocal" TargetType="{x:Type Thumb}">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10508E}"/>
+                    </Trigger>
+                    <Trigger Property="IsDragging" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10510E}"/>
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10506E}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Thumb}">
+                            <Grid x:Name="Grid">
+                                <Border Background="{TemplateBinding Background}" Width="{TemplateBinding Width}"
+                                        CornerRadius="3" Opacity="{TemplateBinding Opacity}"/>
+                                <!--<Rectangle HorizontalAlignment="Stretch" x:Name="HoverRectangle" 
+                                           VerticalAlignment="Stretch" Width="{TemplateBinding Width}" 
+                                           Stroke="{x:Null}" Fill="{TemplateBinding Background}"
+                                           Opacity="{TemplateBinding Opacity}"/>-->
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsFocused" Value="True" />
+                                <Trigger Property="IsEnabled" Value="False" >
+                                    <Setter Property="Opacity" TargetName="Grid" Value="0.1"/>
+                                </Trigger>
+                                <Trigger Property="IsDragging" Value="True">
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- 拖动条两边的RepeatButton -->
+            <Style x:Key="NuclearScrollRepeatButtonStyle" TargetType="{x:Type RepeatButton}">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10520E}"/>
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10522E}"/>
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10518E}" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+                <Setter Property="IsTabStop" Value="false" />
+                <Setter Property="Focusable" Value="false" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type RepeatButton}">
+                            <Grid>
+                                <Rectangle Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" 
+                                       StrokeThickness="{TemplateBinding BorderThickness}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="StyleRepeatButtonBase" TargetType="{x:Type RepeatButton}">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10514E}"/>
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10516E}"/>
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="BorderBrush" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10512E}"/>
+            </Style>
+            <Style x:Key="StyleRepeatButtonDecrease" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource ResourceKey=StyleRepeatButtonBase}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type RepeatButton}">
+                            <Grid>
+                                <Path x:Name="Up_Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                      Data="M 0 0 L 5 5 L 10 0 Z" Fill="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                    <Path.LayoutTransform>
+                                        <RotateTransform x:Name="RotateTransform" Angle="180"/>
+                                    </Path.LayoutTransform>
+                                </Path>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="StyleRepeatButtonIncrease" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource ResourceKey=StyleRepeatButtonBase}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type RepeatButton}">
+                            <Grid>
+                                <Path x:Name="Up_Arrow" HorizontalAlignment="Center" VerticalAlignment="Center" 
+                                      Data="M 0 0 L 5 5 L 10 0 Z" Fill="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                    <Path.LayoutTransform>
+                                        <RotateTransform x:Name="RotateTransform" Angle="0"/>
+                                    </Path.LayoutTransform>
+                                </Path>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Style.Resources>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10502E}"/>
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10500E}"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid x:Name="GridRoot">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="10" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="1" Background="{TemplateBinding Background}" CornerRadius="3"/>
+
+                        <!-- 上面的三角形 -->
+                        <RepeatButton Grid.Row="0" x:Name="DecreaseRepeat" Command="ScrollBar.LineUpCommand" Style="{StaticResource ResourceKey=StyleRepeatButtonDecrease}"/>
+
+                        <Grid Grid.Row="1">
+                            <!-- 滑动条 -->
+                            <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="true">
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb" Style="{StaticResource ResourceKey=StyleThumbLocal}"/>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton x:Name="PageUp" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageDownCommand" />
+                                </Track.IncreaseRepeatButton>
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton x:Name="PageDown" Style="{StaticResource NuclearScrollRepeatButtonStyle}" Command="ScrollBar.PageUpCommand" />
+                                </Track.DecreaseRepeatButton>
+                            </Track>
+                        </Grid>
+
+                        <!-- 下面的三角形 -->
+                        <RepeatButton Grid.Row="2" x:Name="IncreaseRepeat" Command="ScrollBar.LineDownCommand" Style="{StaticResource ResourceKey=StyleRepeatButtonIncrease}"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Orientation" Value="Horizontal">
+                            <Setter Property="LayoutTransform" TargetName="GridRoot">
+                                <Setter.Value>
+                                    <RotateTransform Angle="-90" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="PART_Track" Property="Orientation" Value="Vertical" />
+                            <Setter Property="Command" Value="ScrollBar.LineLeftCommand" TargetName="DecreaseRepeat" />
+                            <Setter Property="Command" Value="ScrollBar.LineRightCommand" TargetName="IncreaseRepeat" />
+                            <Setter Property="Command" Value="ScrollBar.PageLeftCommand" TargetName="PageDown" />
+                            <Setter Property="Command" Value="ScrollBar.PageRightCommand" TargetName="PageUp" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 
 
 

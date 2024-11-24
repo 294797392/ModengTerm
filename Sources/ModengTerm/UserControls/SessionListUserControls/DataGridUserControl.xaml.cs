@@ -88,7 +88,7 @@ namespace ModengTerm.UserControls.SessionListUserControls
         {
             if (this.gobackVM == null)
             {
-                this.gobackVM = new GobackGroupVM(this.SessionTreeVM.Context);
+                this.gobackVM = new GobackGroupVM(this.SessionTreeVM.Context, 0);
                 this.gobackVM.ID = Guid.Empty;
                 this.gobackVM.Name = "...";
             }

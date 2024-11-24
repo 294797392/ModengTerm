@@ -12,6 +12,7 @@
 
         <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
             <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}"/>
         </Style>
 
         <converter:SessionTreeNodeTypeNameConverter x:Key="SessionTreeNodeTypeNameConverter"/>
@@ -31,7 +32,7 @@
             </DataGrid.ItemContainerStyle>
             
             <DataGrid.Columns>
-                <DataGridTemplateColumn Header="名称" Width="*">
+                <DataGridTemplateColumn Header="名称" Width="2*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
@@ -42,7 +43,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="类型" MinWidth="50" MaxWidth="100">
+                <DataGridTemplateColumn Header="类型" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource ResourceKey=SessionTreeNodeTypeNameConverter}}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
@@ -50,7 +51,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTemplateColumn Header="URI" Width="Auto" MinWidth="100" MaxWidth="200">
+                <DataGridTemplateColumn Header="URI" Width="1*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=URI}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>

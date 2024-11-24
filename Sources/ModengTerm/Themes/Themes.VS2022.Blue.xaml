@@ -117,6 +117,34 @@
     <SolidColorBrush x:Key="RES10005E" Color="#FCFCFC"/><!-- 选中背景 -->
     <SolidColorBrush x:Key="RES10006E" Color="#203D77"/><!-- 选中边框 -->
 
+    <!-- Scrollbar 10500 - 11000 -->
+    <SolidColorBrush x:Key="RES10500E" Color="#E8E8EC"/><!-- 默认背景 -->
+    <SolidColorBrush x:Key="RES10501E"/><!-- 默认边框 -->
+    <SolidColorBrush x:Key="RES10502E" Color="#E8E8EC"/><!-- 悬浮背景 -->
+    <SolidColorBrush x:Key="RES10503E"/><!-- 悬浮边框 -->
+    <SolidColorBrush x:Key="RES10504E" Color="#E8E8EC"/><!-- 按下背景 -->
+    <SolidColorBrush x:Key="RES10505E"/><!-- 按下边框 -->
+    <SolidColorBrush x:Key="RES10506E" Color="#C2C3C9"/><!-- Thumb默认背景 -->
+    <SolidColorBrush x:Key="RES10507E"/><!-- Thumb默认边框 -->
+    <SolidColorBrush x:Key="RES10508E" Color="#686868"/><!-- Thumb悬浮背景 -->
+    <SolidColorBrush x:Key="RES10509E"/><!-- Thumb悬浮边框 -->
+    <SolidColorBrush x:Key="RES10510E" Color="#5B5B5B"/><!-- Thumb按下背景 -->
+    <SolidColorBrush x:Key="RES10511E"/><!-- Thumb按下边框 -->
+    <SolidColorBrush x:Key="RES10512E" Color="#868999"/><!-- UpDownButton默认背景 -->
+    <SolidColorBrush x:Key="RES10513E"/><!-- UpDownButton默认边框 -->
+    <SolidColorBrush x:Key="RES10514E" Color="#4971B9"/><!-- UpDownButton悬浮背景 -->
+    <SolidColorBrush x:Key="RES10515E"/><!-- UpDownButton悬浮边框 -->
+    <SolidColorBrush x:Key="RES10516E" Color="#1E4F97"/><!-- UpDownButton按下背景 -->
+    <SolidColorBrush x:Key="RES10517E"/><!-- UpDownButton按下边框 -->
+    <SolidColorBrush x:Key="RES10518E" Color="#E8E8EC"/><!-- RepeatButton默认背景 -->
+    <SolidColorBrush x:Key="RES10519E"/><!-- RepeatButton默认边框 -->
+    <SolidColorBrush x:Key="RES10520E" Color="#E8E8EC"/><!-- RepeatButton悬浮背景 -->
+    <SolidColorBrush x:Key="RES10521E"/><!-- RepeatButton悬浮边框 -->
+    <SolidColorBrush x:Key="RES10522E" Color="#E8E8EC"/><!-- RepeatButton按下背景 -->
+    <SolidColorBrush x:Key="RES10523E"/><!-- RepeatButton按下边框 -->
+
+
+
 
 
 

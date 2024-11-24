@@ -15,8 +15,8 @@ namespace ModengTerm.ViewModels.Session
 
         public bool IsRoot { get { return string.IsNullOrEmpty(this.ID.ToString()); } }
 
-        public SessionGroupVM(TreeViewModelContext context, object data = null)
-            : base(context, data)
+        public SessionGroupVM(TreeViewModelContext context, int level, object data = null)
+            : base(context, level, data)
         {
             SessionGroup sessionGroup = data as SessionGroup;
 

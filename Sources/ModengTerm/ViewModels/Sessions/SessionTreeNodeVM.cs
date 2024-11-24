@@ -12,9 +12,10 @@ namespace ModengTerm.ViewModels.Session
     {
         public abstract SessionTreeNodeTypeEnum NodeType { get; }
 
-        protected SessionTreeNodeVM(TreeViewModelContext context, object data = null) :
+        protected SessionTreeNodeVM(TreeViewModelContext context, int level, object data = null) :
             base(context, null)
         {
+            this.Level = level;
         }
     }
 }

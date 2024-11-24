@@ -81,7 +81,7 @@ namespace ModengTerm.Windows
                 return;
             }
 
-            SessionGroupVM sessionGroupVM = new SessionGroupVM(this.sessionTreeVM.Context, sessionGroup);
+            SessionGroupVM sessionGroupVM = new SessionGroupVM(this.sessionTreeVM.Context, parentGroup.Level + 1, sessionGroup);
             parentGroup.Add(sessionGroupVM);
 
             parentGroup.IsExpanded = true;
