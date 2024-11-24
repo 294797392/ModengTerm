@@ -501,6 +501,7 @@
                         </Trigger>
                     </Style.Triggers>
                     <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                 </Style>
             </Setter.Value>
         </Setter>
@@ -522,6 +523,7 @@
                     <Setter Property="Padding" Value="10,0,10,0"/>
                     <Setter Property="BorderBrush" Value="{x:Null}" />
                     <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type DataGridCell}">
@@ -1109,18 +1111,21 @@
     <Style x:Key="StyleMdImageButton" TargetType="{x:Type mcontrol:MdButton}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3003}"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES200003}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES200004}"/>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Padding" Value="3,3,0,0"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES200005}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES200006}"/>
             </Trigger>
         </Style.Triggers>
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3001}"/>
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES200001}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES200002}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Width" Value="70"/>
         <Setter Property="Height" Value="30"/>
         <Setter Property="Template">

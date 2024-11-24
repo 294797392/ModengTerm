@@ -58,9 +58,8 @@
         </Grid>
 
         <Grid Grid.Row="1">
-            <GroupBox Header="会话列表">
-                <ContentControl x:Name="ContentControlSessionList"/>
-            </GroupBox>
+            <ContentControl x:Name="ContentControlSessionList" Margin="2,0,2,0"/>
+            <Border VerticalAlignment="Top" HorizontalAlignment="Stretch" Height="1" Background="{DynamicResource ResourceKey=RES500001E}"/>
         </Grid>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">

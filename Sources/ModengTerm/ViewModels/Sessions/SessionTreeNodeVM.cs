@@ -13,7 +13,7 @@ namespace ModengTerm.ViewModels.Session
         public abstract SessionTreeNodeTypeEnum NodeType { get; }
 
         protected SessionTreeNodeVM(TreeViewModelContext context, object data = null) :
-            base(context, data)
+            base(context, null)
         {
         }
     }

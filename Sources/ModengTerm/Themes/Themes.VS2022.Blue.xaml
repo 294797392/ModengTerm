@@ -16,7 +16,7 @@
 
 
 
-    <!-- 通用控件和MTerm控件 1501 - 50000 -->
+    <!-- WPF原生控件 1501 - 50000 -->
     <!-- TextBox 3001 - 3050 -->
     <SolidColorBrush x:Key="RES3001" Color="#8591A2"/><!-- TextBox默认边框 -->
     <SolidColorBrush x:Key="RES3002" Color="#FCFCFC"/><!-- TextBox默认背景色 -->
@@ -24,13 +24,13 @@
     <SolidColorBrush x:Key="RES3004" Color="#203D77"/><!-- TextBox获取焦点边框 -->
     
     <!-- Button 3051 - 3100 -->
-    <SolidColorBrush x:Key="RES3051" Color="#8591A2"/><!-- Button默认边框 -->
-    <SolidColorBrush x:Key="RES3052" Color="#F2F5FC"/><!-- Button默认背景色 -->
-    <SolidColorBrush x:Key="RES3053" Color="#203D77"/><!-- Button鼠标悬浮边框 -->
-    <SolidColorBrush x:Key="RES3054" Color="#C4D5FF"/><!-- Button鼠标悬浮背景 -->
-    <SolidColorBrush x:Key="RES3055" Color="#203D77"/><!-- Button鼠标按下边框 -->
-    <SolidColorBrush x:Key="RES3056" Color="#C4D5FF"/><!-- Button鼠标按下背景 -->
-    <SolidColorBrush x:Key="RES3057" Color="#203D77"/><!-- Button焦点边框 -->
+    <SolidColorBrush x:Key="RES3051" Color="#8591A2"/><!-- 默认边框 -->
+    <SolidColorBrush x:Key="RES3052" Color="#F2F5FC"/><!-- 默认背景 -->
+    <SolidColorBrush x:Key="RES3053" Color="#203D77"/><!-- 悬浮边框 -->
+    <SolidColorBrush x:Key="RES3054" Color="#C4D5FF"/><!-- 悬浮背景 -->
+    <SolidColorBrush x:Key="RES3055" Color="#203D77"/><!-- 按下边框 -->
+    <SolidColorBrush x:Key="RES3056" Color="#C4D5FF"/><!-- 按下背景 -->
+    <SolidColorBrush x:Key="RES3057" Color="#203D77"/><!-- 焦点边框 -->
     
     <!-- ComboBox 3101 - 3150 -->
     <SolidColorBrush x:Key="RES3101" Color="#203D77"/><!-- 悬浮边框 -->
@@ -120,10 +120,19 @@
 
 
 
+    <!-- MdControl 200001 - 300000 -->
+    <!-- MdImageButton -->
+    <SolidColorBrush x:Key="RES200001" Color="#F2F5FC"/><!-- 默认背景 -->
+    <SolidColorBrush x:Key="RES200002" Color="#8591A2"/><!-- 默认边框 -->
+    <SolidColorBrush x:Key="RES200003" Color="#C4D5FF"/><!-- 悬浮背景 -->
+    <SolidColorBrush x:Key="RES200004" Color="#203D77"/><!-- 悬浮边框 -->
+    <SolidColorBrush x:Key="RES200005" Color="#C4D5FF"/><!-- 按下背景 -->
+    <SolidColorBrush x:Key="RES200006" Color="#203D77"/><!-- 按下边框 -->
 
 
 
-    
+    <!-- Window 300001 - 500000 -->
+
     <!-- MainWindow 50001 - 55000 -->
     <SolidColorBrush x:Key="RES50001E" Color="#203D77"/><!-- 窗口边框颜色 -->
     <SolidColorBrush x:Key="RES50002E" Color="#CCD5F0"/><!-- 顶部菜单栏的背景色 -->
@@ -150,6 +159,13 @@
     <SolidColorBrush x:Key="RES50023E" Color="#FFFFFF"/><!-- 右上角按钮按下背景色 -->
     <SolidColorBrush x:Key="RES50024E" Color="Black"/><!-- 右上角按钮SVG图标颜色 -->
     <SolidColorBrush x:Key="RES50025E" Color="#F5CC84"/><!-- TabItem底边框 -->
+
+
+
+    <!-- UserControl 500001 - 800000 -->
+
+    <!-- OpenSessionWindow 500001 - 501001 -->
+    <SolidColorBrush x:Key="RES500001E" Color="#C0CAE9"/><!-- DataGrid上边框 -->
 
 
     <!-- CreateSessionWindow 55001 - 60000 -->

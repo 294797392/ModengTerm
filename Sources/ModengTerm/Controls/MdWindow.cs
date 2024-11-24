@@ -83,5 +83,16 @@ namespace ModengTerm.Controls
         {
             this.DragMove();
         }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (e.Key == Key.Escape) 
+            {
+                e.Handled = true;
+                base.DialogResult = false;
+            }
+        }
     }
 }
