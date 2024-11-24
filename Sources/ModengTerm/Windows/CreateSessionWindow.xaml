@@ -54,9 +54,9 @@
 
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="40"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80"/>
@@ -120,7 +120,9 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <GroupBox Grid.Column="0" Header="类别">
+            <Border Grid.Column="0" Grid.ColumnSpan="999" Background="White"/>
+
+            <GroupBox Grid.Column="0" Header="分类">
                 <TreeView x:Name="TreeViewOptions" DataContext="{Binding Path=OptionTreeVM}"
                           ItemTemplate="{StaticResource ResourceKey=HierarchicalDataTemplateOptions}"
                           SelectedItemChanged="TreeViewOptions_SelectedItemChanged" ItemsSource="{Binding Path=Roots}"

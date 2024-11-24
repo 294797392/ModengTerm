@@ -275,19 +275,20 @@
     <Style x:Key="StyleListBoxItem" TargetType="{x:Type ListBoxItem}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource ResourceKey=1509}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=1513}"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES9003E}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES9004E}"/>
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource ResourceKey=1510}"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=1508}"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES9005E}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES9006E}"/>
             </Trigger>
         </Style.Triggers>
         <Setter Property="Margin" Value="0,5,0,5"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="5"/>
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES9001E}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES9002E}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
@@ -305,7 +306,7 @@
         <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItem}"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES8001E}"/>
         <Setter Property="Padding" Value="0"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -417,12 +418,12 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True" SourceName="Bd">
-                            <Setter Property="Background" Value="{DynamicResource ResourceKey=1514}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=1515}"/>
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3253E}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3254E}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource ResourceKey=1510}"/>
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=1508}"/>
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3252E}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3251E}"/>
                         </Trigger>
                         <Trigger Property="IsExpanded" Value="True">
                             <Setter Property="Visibility" Value="Visible" TargetName="ItemsHost"/>
@@ -457,16 +458,16 @@
     </Style>
 
     <Style x:Key="StyleDataGrid" TargetType="{x:Type DataGrid}">
-        <Setter Property="Background" Value="White" />
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES4000E}" />
         <Setter Property="AlternationCount" Value="2"/>
-        <Setter Property="AlternatingRowBackground" Value="{DynamicResource ResourceKey=1506}" />
-        <Setter Property="BorderBrush" Value="#CCCCCC" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />
         <Setter Property="AutoGenerateColumns" Value="False" />
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="GridLinesVisibility" Value="None" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
 
         <!-- 定义列头的样式 -->
         <Setter Property="ColumnHeaderStyle">
@@ -485,10 +486,21 @@
             <Setter.Value>
                 <Style TargetType="{x:Type DataGridRow}">
                     <Style.Triggers>
+                        <Trigger Property="AlternationIndex" Value="1">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5031E}"/>
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES5030E}"/>
+                        </Trigger>
+                        <!--<Trigger Property="AlternationIndex" Value="0">
+                            <Setter Property="BorderBrush" Value="Blue"/>
+                        </Trigger>-->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource ResourceKey=1504}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5002E}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5011E}"/>
                         </Trigger>
                     </Style.Triggers>
+                    <Setter Property="BorderThickness" Value="1"/>
                 </Style>
             </Setter.Value>
         </Setter>
@@ -498,8 +510,12 @@
             <Setter.Value>
                 <Style TargetType="{x:Type DataGridCell}">
                     <Style.Triggers>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}, Path=IsMouseOver}" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES5001E}" />
+                            <Setter Property="Foreground" Value="Black"/>
+                        </DataTrigger>
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type DataGridRow}}, Path=IsSelected}" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource ResourceKey=1505}" />
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES5010E}" />
                             <Setter Property="Foreground" Value="Black"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -540,8 +556,8 @@
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3154}"/>
         <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3155}"/>
-        <Setter Property="Height" Value="30"/>
-        <Setter Property="Margin" Value="0,2,0,0"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBoxItem}">
@@ -644,7 +660,7 @@
                                         BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}"
                                         BorderThickness="1,0,1,1" ClipToBounds="False">
                                     <ScrollViewer BorderThickness="0" BorderBrush="{x:Null}" SnapsToDevicePixels="True" HorizontalScrollBarVisibility="Auto" 
-                                                      VerticalScrollBarVisibility="Auto" CanContentScroll="True" ClipToBounds="True" Margin="2,0,2,2">
+                                                      VerticalScrollBarVisibility="Auto" CanContentScroll="True" ClipToBounds="True" Margin="2,2,2,2">
                                         <ItemsPresenter VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
                                     </ScrollViewer>
                                 </Border>
@@ -750,9 +766,9 @@
                         <Popup x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
                                Placement="Bottom" PopupAnimation="None" PlacementTarget="{Binding ElementName=templateRoot}" VerticalOffset="-1">
                             <Grid>
-                                <Border x:Name="SubMenuBorder" Background="{DynamicResource ResourceKey=RES3401}" 
-                                        BorderBrush="{DynamicResource ResourceKey=RES3402}" BorderThickness="1"/>
-                                <Border Background="{DynamicResource ResourceKey=RES3401}" Height="1"
+                                <Border x:Name="SubMenuBorder" Background="{DynamicResource ResourceKey=RES3401E}" 
+                                        BorderBrush="{DynamicResource ResourceKey=RES3402E}" BorderThickness="1"/>
+                                <Border Background="{DynamicResource ResourceKey=RES3401E}" Height="1"
                                         Width="{TemplateBinding ActualWidth, Converter={StaticResource ResourceKey=MenuItemHeaderBottomBorderConverter}}"
                                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="1,0,0,0"/>
 
@@ -762,7 +778,7 @@
                                         <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
                                             <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=SubMenuBorder}" Height="{Binding ActualHeight, ElementName=SubMenuBorder}" Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
                                         </Canvas>
-                                        <Rectangle Fill="{DynamicResource ResourceKey=RES3440}" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1"/>
+                                        <Rectangle Fill="{DynamicResource ResourceKey=RES3440E}" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1"/>
                                         <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="true" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" KeyboardNavigation.TabNavigation="Cycle"/>
                                     </Grid>
                                 </ScrollViewer>
@@ -782,12 +798,12 @@
                         <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
                     </Trigger>
                     <Trigger Property="IsHighlighted" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3420}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3421}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3420E}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3421E}"/>
                     </Trigger>
                     <Trigger Property="IsOpen" Value="True" SourceName="PART_Popup">
-                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3401}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3402}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3401E}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3402E}"/>
                     </Trigger>
                     <!--<Trigger Property="IsEnabled" Value="False">
                             <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{StaticResource Menu.Disabled.Foreground}"/>
@@ -822,8 +838,8 @@
                         <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
                     </Trigger>
                     <Trigger Property="IsHighlighted" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3420}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3421}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3420E}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3421E}"/>
                     </Trigger>
                     <!--<Trigger Property="IsEnabled" Value="False">
                             <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{StaticResource Menu.Disabled.Foreground}"/>
@@ -869,8 +885,8 @@
                         <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
                     </Trigger>
                     <Trigger Property="IsHighlighted" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource ResourceKey=1521}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=1522}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3451E}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3452E}"/>
                     </Trigger>
                     <!--<Trigger Property="IsEnabled" Value="False">
                             <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{StaticResource Menu.Disabled.Foreground}"/>
@@ -900,7 +916,7 @@
                             <ColumnDefinition Width="20"/>
                         </Grid.ColumnDefinitions>
                         <ContentPresenter x:Name="Icon" ContentSource="Icon" HorizontalAlignment="Center" Height="16" Margin="3" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center" Width="16"/>
-                        <Border x:Name="GlyphPanel" Background="{DynamicResource ResourceKey=RES3401}" BorderBrush="{DynamicResource ResourceKey=RES3402}" BorderThickness="1" Height="22" Margin="-1,0,0,0" VerticalAlignment="Center" Visibility="Hidden" Width="22">
+                        <Border x:Name="GlyphPanel" Background="{DynamicResource ResourceKey=RES3401E}" BorderBrush="{DynamicResource ResourceKey=RES3402E}" BorderThickness="1" Height="22" Margin="-1,0,0,0" VerticalAlignment="Center" Visibility="Hidden" Width="22">
                             <Path x:Name="Glyph" Data="{DynamicResource Checkmark}" FlowDirection="LeftToRight" Fill="Black" Height="11" Width="9"/>
                         </Border>
                         <ContentPresenter ContentSource="Header" Grid.Column="2" HorizontalAlignment="Left" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
@@ -908,8 +924,8 @@
                         <Path x:Name="RightArrow" Grid.Column="5" Data="{StaticResource RightArrow}" Fill="Black" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Center"/>
                         <Popup x:Name="PART_Popup" AllowsTransparency="true" Focusable="false" HorizontalOffset="-2" IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" Placement="Right" PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}" VerticalOffset="-3">
                             <Grid>
-                                <Border x:Name="SubMenuBorder" Background="{DynamicResource ResourceKey=RES3401}" 
-                                            BorderBrush="{DynamicResource ResourceKey=RES3402}" BorderThickness="1"/>
+                                <Border x:Name="SubMenuBorder" Background="{DynamicResource ResourceKey=RES3401E}" 
+                                            BorderBrush="{DynamicResource ResourceKey=RES3402E}" BorderThickness="1"/>
 
                                 <ScrollViewer x:Name="SubMenuScrollViewer" Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer, TypeInTargetAssembly={x:Type FrameworkElement}}}"
                                                   Margin="2">
@@ -917,7 +933,7 @@
                                         <Canvas HorizontalAlignment="Left" Height="0" VerticalAlignment="Top" Width="0">
                                             <Rectangle x:Name="OpaqueRect" Fill="{Binding Background, ElementName=SubMenuBorder}" Height="{Binding ActualHeight, ElementName=SubMenuBorder}" Width="{Binding ActualWidth, ElementName=SubMenuBorder}"/>
                                         </Canvas>
-                                        <Rectangle Fill="{DynamicResource ResourceKey=RES3440}" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1"/>
+                                        <Rectangle Fill="{DynamicResource ResourceKey=RES3440E}" HorizontalAlignment="Left" Margin="29,2,0,2" Width="1"/>
                                         <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Cycle" Grid.IsSharedSizeScope="true" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" KeyboardNavigation.TabNavigation="Cycle"/>
                                     </Grid>
                                 </ScrollViewer>
@@ -938,8 +954,8 @@
                         <Setter Property="Visibility" TargetName="Icon" Value="Collapsed"/>
                     </Trigger>
                     <Trigger Property="IsHighlighted" Value="True">
-                        <Setter Property="Background" Value="{DynamicResource ResourceKey=1521}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=1522}"/>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES3451E}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES3452E}"/>
                     </Trigger>
                     <!--<Trigger Property="IsEnabled" Value="False">
                             <Setter Property="TextElement.Foreground" TargetName="templateRoot" Value="{StaticResource Menu.Disabled.Foreground}"/>
@@ -962,7 +978,7 @@
         <Setter Property="ScrollViewer.PanningMode" Value="Both"/>
         <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
         <Setter Property="Template" Value="{StaticResource SubmenuItemTemplateKey}"/>
-        <Setter Property="TextElement.Foreground" Value="{DynamicResource ResourceKey=RES3450}"/>
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource ResourceKey=RES3450E}"/>
         <Style.Triggers>
             <Trigger Property="Role" Value="TopLevelHeader">
                 <Setter Property="Template" Value="{StaticResource TopLevelHeaderTemplateKey}"/>
@@ -1010,8 +1026,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-
 
 
 
@@ -1269,6 +1283,9 @@
         </Setter>
         <Setter Property="WindowStyle" Value="None"/>
         <Setter Property="CanResize" Value="False"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES6001E}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES6003E}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type mcontrol:MdWindow}">
@@ -1276,14 +1293,17 @@
                     <ControlTemplate.Resources>
 
                         <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mcontrol:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
-                            <Setter Property="SVGColor" Value="Black"/>
-                            <Setter Property="SVGMargin" Value="7"/>
                             <Setter Property="Margin" Value="3"/>
                             <Setter Property="Width" Value="25"/>
-                            <Setter Property="MouseOverBrush" Value="{DynamicResource ResourceKey=RES4050}"/>
-                            <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=RES4051}"/>
-                            <Setter Property="Background" Value="Transparent"/>
-                            <Setter Property="Focusable" Value="False"/>
+                            <Setter Property="SVGMargin" Value="7"/>
+                            <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES6010E}"/>
+                            <Setter Property="SVGMouseOverColor" Value="{DynamicResource ResourceKey=RES6011E}"/>
+                            <Setter Property="SVGMouseDownColor" Value="{DynamicResource ResourceKey=RES6012E}"/>
+                            <Setter Property="MouseOverBrush" Value="{DynamicResource ResourceKey=RES6008E}"/>
+                            <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=RES6006E}"/>
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES6004E}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES6005E}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
                         </Style>
 
                     </ControlTemplate.Resources>
@@ -1294,7 +1314,8 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="0" Grid.RowSpan="99" Background="{TemplateBinding Background}"/>
+                        <Border Grid.Row="0" Grid.RowSpan="99" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
 
                         <Grid Grid.Row="0" x:Name="PART_Title">
                             <Grid.ColumnDefinitions>
@@ -1305,8 +1326,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Border Grid.Column="0" Grid.ColumnSpan="99" 
-                                    Background="{DynamicResource ResourceKey=4008}" BorderThickness="0,0,0,1"/>
+                            <Border Grid.Column="0" Grid.ColumnSpan="99" Background="{DynamicResource ResourceKey=RES6002E}"/>
 
                             <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
@@ -1322,7 +1342,7 @@
 
                         <ContentPresenter Grid.Row="1"/>
 
-                        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="{DynamicResource ResourceKey=RES4001}" IsHitTestVisible="False"/>
+                        <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="1" BorderBrush="{DynamicResource ResourceKey=RES50001E}" IsHitTestVisible="False"/>
 
                     </Grid>
 

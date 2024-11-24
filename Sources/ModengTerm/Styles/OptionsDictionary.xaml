@@ -3,15 +3,114 @@
                     xmlns:xceedtoolkit="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
                     xmlns:toolkitcontrol="clr-namespace:WPFToolkit.Controls;assembly=WPFToolkit">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="pack://application:,,,/WPFToolkit;component/Controls/TreeComboBox/Template.xaml"/>
-    </ResourceDictionary.MergedDictionaries>
-
-    <Style x:Key="StyleTreeComboBoxValue" TargetType="{x:Type toolkitcontrol:TreeComboBox}" BasedOn="{StaticResource ResourceKey=StyleTreeComboBox}">
+    <Style x:Key="StyleTreeComboBoxValue" TargetType="{x:Type toolkitcontrol:TreeComboBox}">
         <Setter Property="Height" Value="30"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="Margin" Value="3,0,3,0"/>
+        <Setter Property="Padding" Value="5,0,0,0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+
+                <ControlTemplate TargetType="{x:Type toolkitcontrol:TreeComboBox}">
+
+                    <ControlTemplate.Resources>
+
+                        <Style x:Key="StyleDropDownButton" TargetType="{x:Type ToggleButton}">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10001E}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES10002E}"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10005E}"/>
+                                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES10006E}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES10004E}"/>
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES10003E}"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+
+                                        <Grid>
+                                            <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"/>
+                                        </Grid>
+
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+
+                    </ControlTemplate.Resources>
+
+                    <Grid x:Name="templateRoot">
+                        <Grid>
+                            <ToggleButton x:Name="PART_DropDownButton"
+                                          HorizontalContentAlignment="Right" IsThreeState="False"
+                                          IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                          SnapsToDevicePixels="True" UseLayoutRounding="True"
+                                          Style="{StaticResource ResourceKey=StyleDropDownButton}">
+                                <Path Height="4" Margin="0,0,6,0" x:Name="BtnArrow" Width="8" Stretch="Uniform"  Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " Fill="Black"/>
+                            </ToggleButton>
+                            <ContentPresenter
+                                    x:Name="contentPresenter"
+                                    Margin="{TemplateBinding Padding}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Content="{TemplateBinding SelectionBoxItem}"
+                                    ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                    IsHitTestVisible="False" />
+                        </Grid>
+
+                        <Popup x:Name="PART_Popup" Grid.ColumnSpan="2" AllowsTransparency="true"
+                               IsOpen="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Placement="Bottom" Focusable="False"
+                               StaysOpen="False">
+                            <Grid MaxHeight="{TemplateBinding MaxDropDownHeight}" Width="Auto" MinWidth="{TemplateBinding ActualWidth}" >
+                                <Border
+                                    x:Name="PART_Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1,0,1,1"
+                                    SnapsToDevicePixels="true">
+                                    <ScrollViewer
+                                        x:Name="_tv_scrollviewer_"
+                                        Background="{TemplateBinding Background}"
+                                        CanContentScroll="false"
+                                        Focusable="false"
+                                        HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                        VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                        Margin="2">
+                                        <ItemsPresenter Margin="5"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Grid>
+                        </Popup>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="PART_Border" Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+                        </Trigger>
+                        <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
+                            <Setter TargetName="_tv_scrollviewer_" Property="CanContentScroll" Value="true" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsGrouping" Value="true" />
+                                <Condition Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="false" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+
+            </Setter.Value>
+        </Setter>
     </Style>
     
     <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">

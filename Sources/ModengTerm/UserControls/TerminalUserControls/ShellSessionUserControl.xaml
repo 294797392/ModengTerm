@@ -37,7 +37,7 @@
         </Style>
 
         <Style x:Key="StyleBorderSplitter" TargetType="{x:Type Border}">
-            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5500}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES60001}"/>
             <Setter Property="Margin" Value="3,6,3,6"/>
             <Setter Property="Width" Value="2"/>
         </Style>
@@ -120,14 +120,14 @@
         </Grid>
 
         <!-- 状态栏 -->
-        <Grid Grid.Row="2" x:Name="GridStatusbar" TextElement.Foreground="{DynamicResource ResourceKey=RES5502}">
+        <Grid Grid.Row="2" x:Name="GridStatusbar" TextElement.Foreground="{DynamicResource ResourceKey=RES60003}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Grid.ColumnSpan="9999"
-                    BorderBrush="{DynamicResource ResourceKey=RES5501}"
+                    BorderBrush="{DynamicResource ResourceKey=RES60002}"
                     BorderThickness="0,1,0,0"/>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,0,0">
