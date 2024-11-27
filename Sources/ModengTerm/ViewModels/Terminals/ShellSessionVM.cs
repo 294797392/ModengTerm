@@ -443,6 +443,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             return new List<SessionContextMenu>()
             {
+                new SessionContextMenu("清屏", this.ClearScreenContextMenu_Click),
                 new SessionContextMenu("编辑")
                 {
                     Children = new BindableCollection<SessionContextMenu>()
@@ -1446,6 +1447,14 @@ namespace ModengTerm.Terminal.ViewModels
         private void SwitchInputPanelVisible()
         {
             this.InputPanelVisible = !this.InputPanelVisible;
+        }
+
+        private void ClearScreenContextMenu_Click() 
+        {
+            VTDocument document = this.videoTerminal.ActiveDocument;
+            document.DeleteViewoprt();
+            document.SetCursorLogical(0, 0);
+            document.RequestInvalidate();
         }
 
         #endregion

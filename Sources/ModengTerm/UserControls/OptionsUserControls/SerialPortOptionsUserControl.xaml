@@ -32,14 +32,12 @@
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="端口号：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <ComboBox Grid.Row="0" Grid.Column="1" x:Name="ComboBoxSerialPortNames" IsEditable="True"
-                  DataContext="{Binding Path=PortList}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Text="{Binding Path=SelectedPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding Path=PortList}" Text="{Binding Path=SelectedPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                   Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
         <TextBlock Grid.Row="1" Grid.Column="0" Text="波特率：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="ComboBoxSerialPortBaudRate" IsEditable="True"
-                  DataContext="{Binding Path=BaudRateList}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Text="{Binding Path=SelectedBaudRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  ItemsSource="{Binding Path=BaudRateList}" Text="{Binding Path=SelectedBaudRate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                   Style="{StaticResource ResourceKey=StyleComboBoxValue}"/>
 
         <TextBlock Grid.Row="2" Grid.Column="0" Text="数据位：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>

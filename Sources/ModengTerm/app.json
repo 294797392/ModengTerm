@@ -155,5 +155,43 @@
         ],
         "id": "0",
         "name": "本地会话"
-    }
+    },
+
+    "themes": [
+        {
+            "id": "1",
+            "name": "VS2022蓝色",
+            "uri": "pack://application:,,,/ModengTerm;component/Themes/Themes.VS2022.Blue.xaml",
+            "previews": [
+                "#203D77",
+                "#CCD5F0",
+                "#5D6B99",
+                "#C4D5FF",
+                "#E9F0FF",
+                "#E9F0FF"
+            ],
+            "previewsKey": [
+                "RES50001E",
+                "RES50002E",
+                "RES50003E",
+                "RES9005E",
+                "RES9004E",
+                "RES9003E"
+            ]
+        },
+
+        //{
+        //    "id": "2",
+        //    "name": "VS2022浅色",
+        //    "uri": "pack://application:,,,/ModengTerm;component/Themes/Themes.VS2022.Light.xaml",
+        //    "previews": [
+        //        "#203D77",
+        //        "#CCD5F0",
+        //        "#5D6B99",
+        //        "#C4D5FF",
+        //        "#E9F0FF",
+        //        "#E9F0FF"
+        //    ]
+        //}
+    ]
 }

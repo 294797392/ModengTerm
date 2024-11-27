@@ -3,6 +3,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
@@ -32,6 +33,11 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<SessionContextMenu> TitleMenus { get; private set; }
 
+        /// <summary>
+        /// 所有主题列表
+        /// </summary>
+        public BindableCollection<AppThemeVM> Themes { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -52,6 +58,10 @@ namespace ModengTerm.ViewModels
             }
 
             this.TitleMenus = new BindableCollection<SessionContextMenu>();
+
+            this.Themes = new BindableCollection<AppThemeVM>();
+            this.Themes.AddRange(MTermApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
+            this.Themes.SelectedItem = this.Themes[0];//.FirstOrDefault();
         }
 
         #endregion

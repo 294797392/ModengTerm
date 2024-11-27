@@ -166,6 +166,38 @@
                 <Setter Property="Margin" Value="3"/>
             </Style>
 
+            <Style x:Key="StyleListBoxItemAppTheme" TargetType="{x:Type ListBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES50050E}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES50051E}"/>
+                    </Trigger>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES50052E}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES50053E}"/>
+                    </Trigger>
+                </Style.Triggers>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                            <Grid>
+                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" 
+                                        BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0,0,0,0"/>
+                                <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            
+            <Style x:Key="StyleListBoxAppTheme" TargetType="{x:Type ListBox}">
+                <Setter Property="BorderBrush" Value="{x:Null}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemAppTheme}"/>
+            </Style>
+            
         </ResourceDictionary>
     </Window.Resources>
 
@@ -180,6 +212,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="30"/>
@@ -222,11 +255,66 @@
                 </Menu>
             </StackPanel>
 
-            <mtermcontrols:MdButton Grid.Column="2" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mtermcontrols:MdButton Grid.Column="2" x:Name="ButtonSwitchTheme" SVGMargin="5" SVGPath="{StaticResource ResourceKey=SVG12E}" Click="ButtonSwitchTheme_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <Popup x:Name="PopupThemes" PopupAnimation="None" AllowsTransparency="True" StaysOpen="False"
+                   Placement="Bottom" PlacementTarget="{Binding ElementName=ButtonSwitchTheme}">
+                <Border Background="{DynamicResource ResourceKey=RES50054E}" BorderBrush="{DynamicResource ResourceKey=RES50055E}"
+                        BorderThickness="1">
+                    <Grid MaxHeight="300" Margin="3">
+                        <ListBox x:Name="ListBoxThemes" DataContext="{Binding Path=Themes}" ItemsSource="{Binding}"
+                                 SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 SelectionChanged="ListBoxThemes_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxAppTheme}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="5"/>
+                                            <ColumnDefinition Width="100"/>
+                                        </Grid.ColumnDefinitions>
 
-            <mtermcontrols:MdButton Grid.Column="3" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+                                        <Grid Grid.Column="0">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="10"/>
+                                                <RowDefinition Height="10"/>
+                                                <RowDefinition Height="30"/>
+                                            </Grid.RowDefinitions>
 
-            <mtermcontrols:MdButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+                                            <Border Grid.Row="0" Grid.RowSpan="3" BorderThickness="1"
+                                                    BorderBrush="{Binding Path=Previews[0]}" Background="White"/>
+
+                                            <Border Grid.Row="0" Background="{Binding Path=Previews[1]}" Margin="2"/>
+                                            <Grid Grid.Row="1">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <Border Grid.Column="0" Background="{Binding Path=Previews[3]}" Margin="2"/>
+                                                <Border Grid.Column="1" Background="{Binding Path=Previews[4]}" Margin="2"/>
+                                                <Border Grid.Column="2" Background="{Binding Path=Previews[5]}" Margin="2"/>
+                                            </Grid>
+
+                                            <Border Grid.Row="2" Background="{Binding Path=Previews[2]}" Margin="2"/>
+
+                                        </Grid>
+
+                                        <TextBlock Grid.Column="2" Text="{Binding Path=Name}"/>
+
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Popup>
+
+            <mtermcontrols:MdButton Grid.Column="3" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+
+            <mtermcontrols:MdButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+
+            <mtermcontrols:MdButton Grid.Column="5" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
         </Grid>
 

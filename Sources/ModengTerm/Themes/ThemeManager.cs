@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,6 +16,8 @@ namespace ModengTerm.Themes
     public static class ThemeManager
     {
         private static Dictionary<string, object> resourceMap = new Dictionary<string, object>();
+        private static Dictionary<string, ResourceDictionary> resDictMap = new Dictionary<string, ResourceDictionary>();
+        private static ResourceDictionary currentTheme;
 
         public static TResource GetResource<TResource>(string resourceKey) where TResource : Freezable
         {
@@ -51,6 +54,48 @@ namespace ModengTerm.Themes
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        /// <summary>
+        /// 清除所有资源缓存
+        /// </summary>
+        public static void ClearResource() 
+        {
+            resourceMap.Clear();
+        }
+
+        public static ResourceDictionary GetResourceDictionary(string resourceUri)
+        {
+            ResourceDictionary resourceDictionary;
+            if (!resDictMap.TryGetValue(resourceUri, out resourceDictionary))
+            {
+                resourceDictionary = new ResourceDictionary();
+                resourceDictionary.Source = new Uri(resourceUri);
+                resDictMap[resourceUri] = resourceDictionary;
+            }
+            return resourceDictionary;
+        }
+
+        /// <summary>
+        /// 应用主题
+        /// </summary>
+        public static void ApplyTheme(string uri)
+        {
+            ResourceDictionary resourceDictionary = GetResourceDictionary(uri);
+
+            if (currentTheme == resourceDictionary)
+            {
+                return;
+            }
+
+            if (currentTheme != null) 
+            {
+                Application.Current.Resources.MergedDictionaries.Remove(currentTheme);
+            }
+
+            Application.Current.Resources.MergedDictionaries.Add(resourceDictionary);
+
+            currentTheme = resourceDictionary;
         }
     }
 }

@@ -631,8 +631,6 @@
                                 </Setter.Value>
                             </Setter>
                         </Style>
-                        <!--<Style TargetType="{x:Type ScrollViewer}" BasedOn="{StaticResource ResourceKey=StyleScrollViewer}"></Style>
-                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ResourceKey=StyleScrollBar}"></Style>-->
                     </ControlTemplate.Resources>
 
                     <Grid>
@@ -653,11 +651,11 @@
                                 </ToggleButton>
 
                                 <ContentPresenter Grid.Column="0" x:Name="ContentSite" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,5,0"
-                                                      Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" 
-                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" IsHitTestVisible="False"/>
+                                                  Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"     
+                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" IsHitTestVisible="False"/>
 
                                 <TextBox Grid.Column="0" x:Name="PART_EditableTextBox" Visibility="Collapsed" VerticalContentAlignment="Center" Margin="5,0,5,0"
-                                         BorderBrush="{x:Null}" BorderThickness="0" Background="Transparent"/>
+                                         BorderBrush="{x:Null}" BorderThickness="0" Background="Transparent" Text="{Binding Path=Text, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
 
                             </Grid>
                         </Border>

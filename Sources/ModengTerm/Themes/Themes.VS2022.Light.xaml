@@ -19,7 +19,7 @@
     <!-- WPF原生控件 1501 - 50000 -->
     <!-- TextBox 3001 - 3050 -->
     <SolidColorBrush x:Key="RES3001" Color="#8591A2"/><!-- TextBox默认边框 -->
-    <SolidColorBrush x:Key="RES3002" Color="#FCFCFC"/><!-- TextBox默认背景色 -->
+    <SolidColorBrush x:Key="RES3002" Color="Red"/><!-- TextBox默认背景色 -->
     <SolidColorBrush x:Key="RES3003" Color="#203D77"/><!-- TextBox鼠标悬浮边框 -->
     <SolidColorBrush x:Key="RES3004" Color="#203D77"/><!-- TextBox获取焦点边框 -->
     
@@ -168,7 +168,7 @@
     <SolidColorBrush x:Key="RES50004E" Color="#3B4F81"/><!-- TabItem默认背景 -->
     <SolidColorBrush x:Key="RES50005E" Color="Transparent"/><!-- TabItem默认边框 -->
     <SolidColorBrush x:Key="RES50006E" Color="White"/><!-- TabItem默认前景色 -->
-    <SolidColorBrush x:Key="RES50007E" Color="#F5CC84"/><!-- TabItem选中背景 -->
+    <SolidColorBrush x:Key="RES50007E" Color="Red"/><!-- TabItem选中背景 -->
     <SolidColorBrush x:Key="RES50008E" Color="Transparent"/><!-- TabItem选中边框 -->
     <SolidColorBrush x:Key="RES50009E" Color="Black"/><!-- TabItem选中前景色 -->
     <SolidColorBrush x:Key="RES50010E" Color="#BBC6F1"/><!-- TabItem悬浮背景 -->
@@ -186,7 +186,7 @@
     <SolidColorBrush x:Key="RES50022E" Color="#F8F9FF"/><!-- 右上角按钮悬浮背景色 -->
     <SolidColorBrush x:Key="RES50023E" Color="#FFFFFF"/><!-- 右上角按钮按下背景色 -->
     <SolidColorBrush x:Key="RES50024E" Color="Black"/><!-- 右上角按钮SVG图标颜色 -->
-    <SolidColorBrush x:Key="RES50025E" Color="#F5CC84"/><!-- TabItem底边框 -->
+    <SolidColorBrush x:Key="RES50025E" Color="Red"/><!-- TabItem底边框 -->
     <SolidColorBrush x:Key="RES50050E" Color="#BBC6F1"/><!-- 主题选择悬浮背景 -->
     <SolidColorBrush x:Key="RES50051E" Color="Transparent"/><!-- 主题选择悬浮边框 -->
     <SolidColorBrush x:Key="RES50052E" Color="#BBC6F1"/><!-- 主题选择选中背景 -->

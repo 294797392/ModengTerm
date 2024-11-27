@@ -22,8 +22,8 @@
 
     <Grid>
         <DataGrid x:Name="DataGridSessionList" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column"
-                  ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  ColumnHeaderHeight="20" RowHeight="30" MouseDoubleClick="DataGridSessionList_MouseDoubleClick" Style="{StaticResource ResourceKey=StyleDataGrid}">
+                  ItemsSource="{Binding}" ColumnHeaderHeight="20" RowHeight="30" MouseDoubleClick="DataGridSessionList_MouseDoubleClick" 
+                  Style="{StaticResource ResourceKey=StyleDataGrid}">
 
             <DataGrid.ItemContainerStyle>
                 <Style TargetType="{x:Type DataGridRow}">

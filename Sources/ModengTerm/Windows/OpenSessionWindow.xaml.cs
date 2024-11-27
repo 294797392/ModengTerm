@@ -187,8 +187,7 @@ namespace ModengTerm.Windows
 
         private void ButtonDeleteSession_Click(object sender, RoutedEventArgs e)
         {
-            SessionTreeNodeVM selectedItem = this.sessionTreeVM.Context.SelectedItem as SessionTreeNodeVM;
-
+            SessionTreeNodeVM selectedItem = this.currentView.GetSelectedItem();
             if (selectedItem == null)
             {
                 MTMessageBox.Info("请选择要删除的会话或者分组");

@@ -5,6 +5,7 @@ using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
+using ModengTerm.Themes;
 using ModengTerm.UserControls.OptionsUserControl;
 using ModengTerm.UserControls.OptionsUserControl.RawTcp;
 using ModengTerm.UserControls.OptionsUserControl.SSH;
@@ -13,6 +14,7 @@ using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Session;
 using Renci.SshNet;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
@@ -102,13 +104,13 @@ namespace ModengTerm
             this.LoggerManager = new LoggerManager();
             this.LoggerManager.Initialize();
 
-            // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
-            this.MainWindowVM = new MainWindowVM();
-
             VTermApp.Context.ServiceAgent = this.ServiceAgent;
             VTermApp.Context.Initialize("vtermapp.json");
 
             this.SessionTreeVM = new SessionTreeVM();
+
+            // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
+            this.MainWindowVM = new MainWindowVM();
 
             return ResponseCode.SUCCESS;
         }

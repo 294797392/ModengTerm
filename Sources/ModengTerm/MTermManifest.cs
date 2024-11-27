@@ -2,12 +2,7 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XTerminal.Base.Definitions;
 
 namespace ModengTerm
 {
@@ -25,9 +20,16 @@ namespace ModengTerm
         [JsonProperty("defaultSession")]
         public XTermSession DefaultSession { get; set; }
 
+        /// <summary>
+        /// 窗口主题列表
+        /// </summary>
+        [JsonProperty("themes")]
+        public List<AppTheme> AppThemes { get; private set; }
+
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
+            this.AppThemes = new List<AppTheme>();
         }
     }
 }

@@ -3,28 +3,22 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Controls;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
+using ModengTerm.Themes;
 using ModengTerm.UserControls;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
-using ModengTerm.Windows.SSH;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
-using XTerminal.Windows;
-using static DotNEToolkit.Win32API;
 
 namespace ModengTerm
 {
@@ -342,6 +336,11 @@ namespace ModengTerm
 
 
 
+        private void ButtonSwitchTheme_Click(object sender, RoutedEventArgs e)
+        {
+            PopupThemes.IsOpen = true;
+        }
+
         private void ButtonMinmizedWindow_Click(object sender, RoutedEventArgs e)
         {
             base.WindowState = WindowState.Minimized;
@@ -478,6 +477,17 @@ namespace ModengTerm
             //ListBoxToolbarMenus.SelectedItem = null; // 使下次可以继续点击
         }
 
+        private void ListBoxThemes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            AppThemeVM appTheme = ListBoxThemes.SelectedItem as AppThemeVM;
+            if (appTheme == null) 
+            {
+                return;
+            }
+
+            ThemeManager.ApplyTheme(appTheme.Uri);
+            ThemeManager.ClearResource();
+        }
 
 
 

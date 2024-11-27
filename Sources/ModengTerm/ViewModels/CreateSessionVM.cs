@@ -95,6 +95,12 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        #region 串口
+
+        private string selectedPort;
+
+        #endregion
+
         private bool acEnabled;
 
         private string rawTcpAddress;
@@ -645,7 +651,18 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<string> PortList { get; private set; }
 
-        public string SelectedPort { get; set; }
+        public string SelectedPort 
+        {
+            get { return this.selectedPort; }
+            set
+            {
+                if (this.selectedPort != value) 
+                {
+                    this.selectedPort = value;
+                    this.NotifyPropertyChanged("SelectedPort");
+                }
+            }
+        }
 
         /// <summary>
         /// 波特率列表
