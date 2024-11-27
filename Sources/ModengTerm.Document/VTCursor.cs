@@ -298,19 +298,17 @@ namespace ModengTerm.Document
         #region 公开接口
 
         /// <summary>
-        /// 重绘光标闪烁
+        /// 闪烁光标
         /// 在闪烁定时器里调用
-        /// 该方法会重新渲染光标
         /// </summary>
         public void Flash()
         {
-            VTextLine activeLine = this.OwnerDocument.ActiveLine;
+            VTDocument document = this.OwnerDocument;
 
-            if (activeLine == null)
+            if (document.OutsideViewport(this.PhysicsRow))
             {
-                // 光标所在行不可见
+                // 光标在可视区域外
                 // 此时说明有滚动，有滚动的情况下直接隐藏光标
-                // 滚动之后会调用VTDocument.SetCursorPhysicsRow重新设置光标所在物理行号，这个时候有可能ActiveLine就是空的
                 DrawingObject.SetOpacity(0);
             }
             else
@@ -333,8 +331,6 @@ namespace ModengTerm.Document
                     }
                 }
             }
-
-            this.RequestInvalidate();
         }
 
         /// <summary>

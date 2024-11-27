@@ -54,7 +54,8 @@ namespace ModengTerm.ViewModels
         private TreeNodeViewModel commandLineNode;
         private TreeNodeViewModel sshNode;
         private TreeNodeViewModel serialPortNode;
-        private TreeNodeViewModel rawTcpNode;
+        private TreeNodeViewModel tcpNode;
+        private TreeNodeViewModel adbShellNode;
 
         private string mouseScrollDelta;
 
@@ -128,23 +129,25 @@ namespace ModengTerm.ViewModels
                     {
                         case SessionTypeEnum.SerialPort:
                             {
+                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 this.serialPortNode.IsVisible = true;
                                 this.commandLineNode.IsVisible = false;
                                 this.sshNode.IsVisible = false;
-                                this.rawTcpNode.IsVisible = false;
-                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
+                                this.tcpNode.IsVisible = false;
+                                this.adbShellNode.IsVisible = false;
                                 this.serialPortNode.IsSelected = true;
                                 break;
                             }
 
                         case SessionTypeEnum.SSH:
                             {
+                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 this.serialPortNode.IsVisible = false;
                                 this.commandLineNode.IsVisible = false;
                                 this.sshNode.IsVisible = true;
-                                this.rawTcpNode.IsVisible = false;
-                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
+                                this.tcpNode.IsVisible = false;
                                 this.sshNode.IsSelected = true;
+                                this.adbShellNode.IsVisible = false;
                                 break;
                             }
 
@@ -153,20 +156,34 @@ namespace ModengTerm.ViewModels
                                 this.serialPortNode.IsVisible = false;
                                 this.commandLineNode.IsVisible = true;
                                 this.sshNode.IsVisible = false;
-                                this.rawTcpNode.IsVisible = false;
+                                this.tcpNode.IsVisible = false;
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 this.commandLineNode.IsSelected = true;
+                                this.adbShellNode.IsVisible = false;
                                 break;
                             }
 
-                        case SessionTypeEnum.RawTcp:
+                        case SessionTypeEnum.Tcp:
                             {
                                 this.serialPortNode.IsVisible = false;
                                 this.commandLineNode.IsVisible = false;
                                 this.sshNode.IsVisible = false;
-                                this.rawTcpNode.IsVisible = true;
-                                this.rawTcpNode.IsSelected = true;
+                                this.tcpNode.IsVisible = true;
+                                this.tcpNode.IsSelected = true;
+                                this.adbShellNode.IsVisible = false;
+                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
+                                break;
+                            }
 
+                        case SessionTypeEnum.AdbShell:
+                            {
+                                this.serialPortNode.IsVisible = false;
+                                this.commandLineNode.IsVisible = false;
+                                this.sshNode.IsVisible = false;
+                                this.tcpNode.IsVisible = false;
+                                this.tcpNode.IsSelected = false;
+                                this.adbShellNode.IsVisible = true;
+                                this.adbShellNode.IsSelected = true;
                                 this.OptionTreeVM = this.TerminalOptionsTreeVM;
                                 break;
                             }
@@ -681,7 +698,7 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
-        #region RawTcp
+        #region Tcp
 
         public BindableCollection<RawTcpTypeEnum> RawTcpTypes { get; private set; }
 
@@ -722,6 +739,20 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        #region AdbShell
+
+        public BindableCollection<AdbLoginTypeEnum> AdbLoginTypes { get; private set; }
+
+        public string AdbUserName { get; set; }
+        public string AdbUserNamePrompt { get; set; }
+        public string AdbPassword { get; set; }
+        public string AdbPasswordPrompt { get; set; }
+        public string AdbShellPrompt { get; set; }
+        public string AdbPath { get; set; }
+        public string AdbLoginTimeout { get; set; }
+
+        #endregion
+
         #endregion
 
         #region 构造方法
@@ -749,7 +780,8 @@ namespace ModengTerm.ViewModels
             this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.CommandLineID, out this.commandLineNode);
             this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SshID, out this.sshNode);
             this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SerialPortID, out this.serialPortNode);
-            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.RawTcpID, out this.rawTcpNode);
+            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.TcpID, out this.tcpNode);
+            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.AdbShellID, out this.adbShellNode);
             this.OptionTreeVM = this.TerminalOptionsTreeVM;
 
             #endregion
@@ -861,10 +893,19 @@ namespace ModengTerm.ViewModels
 
             #endregion
 
-            #region RawTcp
+            #region Tcp
 
             this.RawTcpTypes = new BindableCollection<RawTcpTypeEnum>();
             this.RawTcpTypes.AddRange(MTermUtils.GetEnumValues<RawTcpTypeEnum>());
+
+            #endregion
+
+            #region AdbShell
+
+            this.AdbLoginTypes = new BindableCollection<AdbLoginTypeEnum>();
+            this.AdbLoginTypes.AddRange(MTermUtils.GetEnumValues<AdbLoginTypeEnum>());
+            this.AdbPath = "adb.exe";
+            this.AdbLoginTimeout = MTermConsts.DefaultAdbLoginTimeout.ToString();
 
             #endregion
 
@@ -1225,7 +1266,7 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
-        private bool GetRawTcpOptions(XTermSession session)
+        private bool GetTcpOptions(XTermSession session)
         {
             if (this.RawTcpTypes.SelectedItem == RawTcpTypeEnum.Client)
             {
@@ -1237,7 +1278,7 @@ namespace ModengTerm.ViewModels
                 }
             }
 
-            if (this.RawTcpPort <= 0 || this.RawTcpPort >= 65535)
+            if (!MTermUtils.IsValidNetworkPort(this.RawTcpPort))
             {
                 MTMessageBox.Info("请输入正确的端口号");
                 return false;
@@ -1246,6 +1287,27 @@ namespace ModengTerm.ViewModels
             session.SetOption<RawTcpTypeEnum>(OptionKeyEnum.RAW_TCP_TYPE, this.RawTcpTypes.SelectedItem);
             session.SetOption<string>(OptionKeyEnum.RAW_TCP_ADDRESS, this.RawTcpAddress);
             session.SetOption<int>(OptionKeyEnum.RAW_TCP_PORT, this.RawTcpPort);
+
+            return true;
+        }
+
+        private bool GetAdbShellOptions(XTermSession session) 
+        {
+            int timeout;
+            if (!int.TryParse(this.AdbLoginTimeout, out timeout))
+            {
+                MTMessageBox.Info("请输入正确的超时时间");
+                return false;
+            }
+
+            session.SetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH, this.AdbPath);
+            session.SetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE, this.AdbLoginTypes.SelectedItem);
+            session.SetOption<string>(OptionKeyEnum.ADBSH_USERNAME, this.AdbUserName);
+            session.SetOption<string>(OptionKeyEnum.ADBSH_USERNAME_PROMPT, this.AdbUserNamePrompt);
+            session.SetOption<string>(OptionKeyEnum.ADBSH_PASSWORD, this.AdbPassword);
+            session.SetOption<string>(OptionKeyEnum.ADBSH_PASSWORD_PROMPT, this.AdbPasswordPrompt);
+            session.SetOption<int>(OptionKeyEnum.ADBSH_LOGIN_TIMEOUT, timeout);
+            session.SetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT, this.AdbShellPrompt);
 
             return true;
         }
@@ -1337,9 +1399,18 @@ namespace ModengTerm.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.RawTcp:
+                case SessionTypeEnum.Tcp:
                     {
-                        if (!this.GetRawTcpOptions(session))
+                        if (!this.GetTcpOptions(session))
+                        {
+                            return false;
+                        }
+                        break;
+                    }
+
+                case SessionTypeEnum.AdbShell:
+                    {
+                        if (!this.GetAdbShellOptions(session))
                         {
                             return false;
                         }

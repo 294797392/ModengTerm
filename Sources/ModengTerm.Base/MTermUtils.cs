@@ -36,6 +36,7 @@ namespace ModengTerm.Base
         {
             switch (sessionType)
             {
+                case SessionTypeEnum.AdbShell:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.SSH:
                 case SessionTypeEnum.Localhost:
@@ -114,6 +115,16 @@ namespace ModengTerm.Base
         public static bool IsWin10()
         {
             return Environment.OSVersion.Version.Major >= 10;
+        }
+
+        /// <summary>
+        /// 判断是否是正确的端口号
+        /// </summary>
+        /// <param name="port"></param>
+        /// <returns></returns>
+        public static bool IsValidNetworkPort(int port)
+        {
+            return port > 0 && port < 65535;
         }
     }
 }

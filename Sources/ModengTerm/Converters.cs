@@ -538,6 +538,7 @@ namespace ModengTerm
                             case SessionTypeEnum.SSH: return "SSH";
                             case SessionTypeEnum.Localhost: return "命令行";
                             case SessionTypeEnum.SFTP: return "SFTP";
+                            case SessionTypeEnum.AdbShell: return "AdbShell";
 
                             default:
                                 throw new NotImplementedException();
@@ -547,6 +548,33 @@ namespace ModengTerm
 
                 case SessionTreeNodeTypeEnum.Group: return "分组";
                 case SessionTreeNodeTypeEnum.GobackGroup: return "返回";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class AdbLoginTypesConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is AdbLoginTypeEnum))
+            {
+                return string.Empty;
+            }
+
+            AdbLoginTypeEnum commandType = (AdbLoginTypeEnum)value;
+
+            switch (commandType)
+            {
+                case AdbLoginTypeEnum.None: return "不需要登录";
+                case AdbLoginTypeEnum.Password: return "仅使用密码";
+                case AdbLoginTypeEnum.UserNamePassword: return "使用用户名和密码";
                 default:
                     throw new NotImplementedException();
             }

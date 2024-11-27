@@ -146,5 +146,10 @@ namespace ModengTerm.Base
         /// TreeViewItem的缩进
         /// </summary>
         public const int TreeViewItemIndent = 15;
+
+        /// <summary>
+        /// 默认Adb登录超时时间，单位毫秒
+        /// </summary>
+        public const int DefaultAdbLoginTimeout = 5000;
     }
 }

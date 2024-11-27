@@ -1023,7 +1023,7 @@ namespace ModengTerm.Terminal
                     {
                         switch ((SessionTypeEnum)this.Session.Type)
                         {
-                            case SessionTypeEnum.RawTcp:
+                            case SessionTypeEnum.Tcp:
                                 {
                                     // RawTcp默认使用文本显示
                                     return new TextRenderer(this);

@@ -33,11 +33,11 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// Tcp会话
         /// </summary>
-        RawTcp,
+        Tcp,
 
         /// <summary>
         /// SSH回放
         /// </summary>
-        //SSHPlayback,
+        AdbShell,
     }
 }

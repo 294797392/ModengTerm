@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -585,6 +586,39 @@ namespace ModengTerm.Terminal.ViewModels
                         string portName = this.Session.GetOption<string>(OptionKeyEnum.SERIAL_PORT_NAME);
                         int baudRate = this.Session.GetOption<int>(OptionKeyEnum.SERIAL_PORT_BAUD_RATE);
                         uri = string.Format("serialPort://{0} {1}", portName, baudRate);
+                        break;
+                    }
+
+                case SessionTypeEnum.AdbShell:
+                    {
+                        AdbLoginTypeEnum loginType = this.Session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE);
+                        switch (loginType)
+                        {
+                            case AdbLoginTypeEnum.UserNamePassword:
+                                {
+                                    string userName = this.Session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME);
+                                    string password = this.Session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD);
+                                    uri = string.Format("adb://{0}", userName);
+                                    break;
+                                }
+
+                            case AdbLoginTypeEnum.Password:
+                                {
+                                    string password = this.Session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD);
+                                    uri = string.Format("adb://{0}", password);
+                                    break;
+                                }
+
+                            case AdbLoginTypeEnum.None:
+                                {
+                                    uri = string.Format("adb");
+                                    break;
+                                }
+
+                            default:
+                                throw new NotImplementedException();
+                        }
+
                         break;
                     }
 

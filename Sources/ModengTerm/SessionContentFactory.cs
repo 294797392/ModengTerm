@@ -12,6 +12,7 @@ namespace ModengTerm
         {
             switch ((SessionTypeEnum)session.Type)
             {
+                case SessionTypeEnum.AdbShell:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.Localhost:
                 case SessionTypeEnum.SSH:

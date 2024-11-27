@@ -10,6 +10,7 @@ using ModengTerm.UserControls.OptionsUserControl;
 using ModengTerm.UserControls.OptionsUserControl.RawTcp;
 using ModengTerm.UserControls.OptionsUserControl.SSH;
 using ModengTerm.UserControls.OptionsUserControl.Terminal;
+using ModengTerm.UserControls.OptionsUserControls.AdbShell;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Session;
 using Renci.SshNet;
@@ -47,7 +48,8 @@ namespace ModengTerm
                         }
                     },
                     new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl)),
-                    new OptionDefinition(OptionDefinition.RawTcpID, "Tcp", typeof(RawTcpOptionsUserControl)),
+                    new OptionDefinition(OptionDefinition.TcpID, "Tcp", typeof(RawTcpOptionsUserControl)),
+                    new OptionDefinition(OptionDefinition.AdbShellID, "AdbShell", typeof(AdbShellOptionsUserControl))
                 }
             },
 

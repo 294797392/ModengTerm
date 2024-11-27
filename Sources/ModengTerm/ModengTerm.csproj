@@ -36,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Images\adb.png" />
     <None Remove="Images\app.png" />
     <None Remove="Images\close.png" />
     <None Remove="Images\cmdline.png" />
@@ -103,6 +104,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\adb.png" />
     <Resource Include="Images\app.png" />
     <Resource Include="Images\cmdline.png" />
     <Resource Include="Images\connect.png" />
@@ -135,7 +137,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy $(SolutionDir)..\Dependence\log4net.xml $(TargetDir) /y" />
+    <Exec Command="xcopy $(SolutionDir)..\Dependence\log4net.xml $(TargetDir) /y&#xD;&#xA;xcopy $(SolutionDir)..\Dependence\adb\* $(TargetDir) /y" />
   </Target>
 
 </Project>

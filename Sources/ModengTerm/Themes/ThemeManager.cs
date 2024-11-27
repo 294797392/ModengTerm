@@ -50,7 +50,8 @@ namespace ModengTerm.Themes
                 case SessionTypeEnum.Localhost: return ThemeManager.GetResource<ImageSource>("501");
                 case SessionTypeEnum.SerialPort: return ThemeManager.GetResource<ImageSource>("503");
                 case SessionTypeEnum.SSH: return ThemeManager.GetResource<ImageSource>("502");
-                case SessionTypeEnum.RawTcp: return ThemeManager.GetResource<ImageSource>("504");
+                case SessionTypeEnum.Tcp: return ThemeManager.GetResource<ImageSource>("504");
+                case SessionTypeEnum.AdbShell: return ThemeManager.GetResource<ImageSource>("RES506E");
                 default:
                     throw new NotImplementedException();
             }

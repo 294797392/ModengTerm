@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
+using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace ModengTerm.ViewModels
 {

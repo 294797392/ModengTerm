@@ -166,7 +166,7 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
-        #region 串口 2501 - 3000
+        #region 串口 2501 - 2800
 
         SERIAL_PORT_NAME = 2501,
         SERIAL_PORT_BAUD_RATE = 2502,
@@ -174,6 +174,22 @@ namespace ModengTerm.Base.Enumerations
         SERIAL_PORT_STOP_BITS = 2504,
         SERIAL_PORT_PARITY = 2505,
         SERIAL_PORT_HANDSHAKE = 2506,
+
+        #endregion
+
+        #region AdbShell 2801 - 3000
+
+        ADBSH_ADB_PATH = 2801,
+        ADBSH_USERNAME_PROMPT = 2802,
+        ADBSH_PASSWORD_PROMPT = 2803,
+        ADBSH_SH_PROMPT = 2804,
+        ADBSH_USERNAME = 2805,
+        ADBSH_PASSWORD = 2806,
+        /// <summary>
+        /// 登录超时时间
+        /// </summary>
+        ADBSH_LOGIN_TIMEOUT = 2808,
+        ADBSH_LOGIN_TYPE = 2809,
 
         #endregion
 

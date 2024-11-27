@@ -22,6 +22,7 @@ namespace ModengTerm.ViewModels
         {
             switch ((SessionTypeEnum)session.Type)
             {
+                case SessionTypeEnum.AdbShell:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.SSH:
                 case SessionTypeEnum.Localhost:

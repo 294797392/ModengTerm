@@ -93,6 +93,38 @@ namespace ModengTerm.ViewModels.Session
                         break;
                     }
 
+                case SessionTypeEnum.AdbShell:
+                    {
+                        AdbLoginTypeEnum loginType = session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE);
+                        switch (loginType)
+                        {
+                            case AdbLoginTypeEnum.UserNamePassword:
+                                {
+                                    string userName = session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME);
+                                    string password = session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD);
+                                    URI = string.Format("{0}", userName);
+                                    break;
+                                }
+
+                            case AdbLoginTypeEnum.Password:
+                                {
+                                    string password = this.Session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD);
+                                    URI = string.Format("{0}", password);
+                                    break;
+                                }
+
+                            case AdbLoginTypeEnum.None:
+                                {
+                                    break;
+                                }
+
+                            default:
+                                throw new NotImplementedException();
+                        }
+
+                        break;
+                    }
+
                 default:
                     throw new NotImplementedException();
             }

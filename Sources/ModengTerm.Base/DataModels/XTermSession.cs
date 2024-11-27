@@ -42,7 +42,7 @@ namespace ModengTerm.Base.DataModels
             SessionOption sessionOption = this.Options.FirstOrDefault(v => v.Key == (int)key);
             if (sessionOption == null)
             {
-                return default(T);
+                throw new KeyNotFoundException(string.Format("{0} NotFound", key));
             }
 
             Type t = typeof(T);

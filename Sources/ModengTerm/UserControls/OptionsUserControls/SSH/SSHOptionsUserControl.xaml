@@ -54,7 +54,7 @@
 
         <TextBlock Grid.Row="3" Grid.Column="0" x:Name="TextBlockSSHPrivateKey" Text="密钥：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="3" Grid.Column="1" x:Name="TextBoxSSHPrivateKey" Tag="{Binding Path=SSHPrivateKeyId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" Margin="3,0,90,0" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
-        <Button Grid.Row="3" Grid.Column="1" Width="80" Content="浏览" HorizontalAlignment="Right" Margin="3" Click="ButtonBrowsePrivateKeyFile_Click"/>
+        <Button Grid.Row="3" Grid.Column="1" Width="80" Content="浏览" HorizontalAlignment="Right" Margin="0,0,3,0" Click="ButtonBrowsePrivateKeyFile_Click" Style="{StaticResource ResourceKey=StyleButton}"/>
 
         <TextBlock Grid.Row="4" Grid.Column="0" x:Name="TextBlockSSHUserName" Text="用户名：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
         <TextBox Grid.Row="4" Grid.Column="1" x:Name="TextBoxSSHUserName" Text="{Binding Path=SSHUserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>

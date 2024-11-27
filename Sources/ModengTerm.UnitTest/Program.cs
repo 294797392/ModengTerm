@@ -11,7 +11,7 @@ namespace ModengTerm.UnitTest
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("Program");
 
-        static List<MethodInfo> GetUnitTestMethods(Type type) 
+        static List<MethodInfo> GetUnitTestMethods(Type type)
         {
             MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
@@ -50,7 +50,7 @@ namespace ModengTerm.UnitTest
             }
         }
 
-        static void RunPerformanceTest() 
+        static void RunPerformanceTest()
         {
             TestVideoTerminalPerformance testPerformance = new TestVideoTerminalPerformance();
 
@@ -63,29 +63,26 @@ namespace ModengTerm.UnitTest
                 long totalElapsed = 0;
                 string testName = methodInfo.Name;
 
-                for (int j = 0; j < 10; j++)
+                int testTimes = 10000;
+                VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+                TermData termData = new TermData()
                 {
-                    int testTimes = 10000;
-                    VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
-                    TermData termData = new TermData()
-                    {
-                        ViewportRow = terminal.ViewportRow,
-                        ViewportColumn = terminal.ViewportColumn
-                    };
-                    byte[] bytes = (byte[])methodInfo.Invoke(testPerformance, new object[] { termData });
+                    ViewportRow = terminal.ViewportRow,
+                    ViewportColumn = terminal.ViewportColumn
+                };
+                byte[] bytes = (byte[])methodInfo.Invoke(testPerformance, new object[] { termData });
 
-                    Stopwatch stopwatch = Stopwatch.StartNew();
-                    for (int i = 0; i < testTimes; i++)
-                    {
-                        terminal.ProcessData(bytes, bytes.Length);
-                    }
-                    stopwatch.Stop();
-
-                    logger.InfoFormat("{0}, {1}次, 耗时{2}ms", testName, testTimes, stopwatch.ElapsedMilliseconds);
-                    totalElapsed += stopwatch.ElapsedMilliseconds;
+                Stopwatch stopwatch = Stopwatch.StartNew();
+                for (int i = 0; i < testTimes; i++)
+                {
+                    terminal.ProcessData(bytes, bytes.Length);
                 }
+                stopwatch.Stop();
 
-                logger.InfoFormat("{0}, 最终测试时间 = {1}", testName, totalElapsed / 10);
+                logger.InfoFormat("{0}, {1}次, 耗时{2}ms", testName, testTimes, stopwatch.ElapsedMilliseconds);
+                totalElapsed += stopwatch.ElapsedMilliseconds;
+
+                logger.InfoFormat("{0}, 最终测试时间 = {1}", testName, totalElapsed);
             }
         }
 
@@ -93,6 +90,8 @@ namespace ModengTerm.UnitTest
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DotNEToolkit.Log4net.InitializeLog4net();
+
+            VTermApp.Context.Initialize("vtermapp.json");
 
             logger.InfoFormat("--- TestVideoTerminalEngine ---");
 
