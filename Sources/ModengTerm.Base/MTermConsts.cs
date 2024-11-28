@@ -151,5 +151,6 @@ namespace ModengTerm.Base
         /// 默认Adb登录超时时间，单位毫秒
         /// </summary>
         public const int DefaultAdbLoginTimeout = 5000;
+        public const int DefaultAdbStartServerTimeout = 10000;
     }
 }

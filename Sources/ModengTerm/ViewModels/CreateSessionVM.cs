@@ -1308,6 +1308,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.ADBSH_PASSWORD_PROMPT, this.AdbPasswordPrompt);
             session.SetOption<int>(OptionKeyEnum.ADBSH_LOGIN_TIMEOUT, timeout);
             session.SetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT, this.AdbShellPrompt);
+            session.SetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, MTermConsts.DefaultAdbStartServerTimeout);
 
             return true;
         }

@@ -37,6 +37,13 @@ namespace ModengTerm.Base.DataModels
             this.Options = new List<SessionOption>();
         }
 
+        /// <summary>
+        /// TODO：删除该方法，改用带有defaultValue的方法
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        /// <exception cref="KeyNotFoundException"></exception>
         public T GetOption<T>(OptionKeyEnum key)
         {
             SessionOption sessionOption = this.Options.FirstOrDefault(v => v.Key == (int)key);
@@ -55,6 +62,24 @@ namespace ModengTerm.Base.DataModels
             {
                 return JSONHelper.Parse<T>(sessionOption.Value);
             }
+        }
+
+        /// <summary>
+        /// 当使用新版本软件缺少某个配置项（配置文件是旧版本）的时候，确保不出问题
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public T GetOption<T>(OptionKeyEnum key, T defaultValue) 
+        {
+            SessionOption sessionOption = this.Options.FirstOrDefault(v => v.Key == (int)key);
+            if (sessionOption == null)
+            {
+                return defaultValue;
+            }
+
+            return this.GetOption<T>(key);
         }
 
         public void SetOption<T>(OptionKeyEnum key, T value)

@@ -7,6 +7,10 @@ using System.Text;
 
 namespace ModengTerm.Terminal.Session
 {
+    /// <summary>
+    /// adb 的工作原理：
+    /// 当您启动某个adb客户端时，该客户端会先检查是否有adb服务器进程已在运行。如果没有，它会启动服务器进程。服务器在启动后会与本地TCP端口5037绑定，并监听adb客户端发出的命令。
+    /// </summary>
     public class AdbShellSession : SessionDriver
     {
         #region 类变量
@@ -51,6 +55,11 @@ namespace ModengTerm.Terminal.Session
             string exePath = this.session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH);
             AdbLoginTypeEnum loginType = this.session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE);
 
+            if (!this.EnsureStartServer()) 
+            {
+                return ResponseCode.FAILED;
+            }
+
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {
                 FileName = exePath,
@@ -83,7 +92,7 @@ namespace ModengTerm.Terminal.Session
                 Task.Factory.StartNew(this.UserLogin);
                 bool success = this.loginEvent.WaitOne(timeout);
                 this.loginEvent.Dispose();
-                if(!success)
+                if (!success)
                 {
                     logger.ErrorFormat("adb登录超时");
                     this.Close();
@@ -255,6 +264,58 @@ namespace ModengTerm.Terminal.Session
             streamWriter.Flush();
 
             return true;
+        }
+
+        /// <summary>
+        /// 确保Adb守护进程已启动
+        /// </summary>
+        private bool EnsureStartServer()
+        {
+            string exePath = this.session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH);
+            int timeout = this.session.GetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, MTermConsts.DefaultAdbStartServerTimeout);
+
+            ProcessStartInfo startInfo = new ProcessStartInfo()
+            {
+                FileName = exePath,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                CreateNoWindow = true,
+                Arguments = "start-server"
+            };
+
+            try
+            {
+                Process process = Process.Start(startInfo);
+                if (!process.WaitForExit(timeout))
+                {
+                    logger.ErrorFormat("启动adb server失败, 超时了, 可能端口被占用了");
+                    // 进程超时了还没退出
+                    // 此时表示启动失败
+                    process.Kill();
+                    process.Dispose();
+                    return false;
+                }
+                else
+                {
+                    if (process.ExitCode != 0)
+                    {
+                        // 说明进程因为启动失败退出
+                        // 比如5037端口被占用，adb尝试连接5037端口，然后占用5037端口的进程退出，此时exitCode不等于0
+                        logger.ErrorFormat("启动adb server失败, exitCode = {0}", process.ExitCode);
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("启动adb守护进程", ex);
+                return false;
+            }
         }
 
         #endregion

@@ -190,6 +190,10 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         ADBSH_LOGIN_TIMEOUT = 2808,
         ADBSH_LOGIN_TYPE = 2809,
+        /// <summary>
+        /// 启动Adb守护进程的超时时间
+        /// </summary>
+        ADBSH_START_SVR_TIMEOUT = 2810,
 
         #endregion
 
@@ -231,6 +235,5 @@ namespace ModengTerm.Base.Enumerations
         SFTP_CLIENT_INITIAL_DIRECTORY = 10006,
 
         #endregion
-
     }
 }
