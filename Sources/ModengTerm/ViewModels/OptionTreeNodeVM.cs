@@ -9,7 +9,7 @@ namespace ModengTerm.ViewModels
 {
     public class OptionTreeNodeVM : TreeNodeViewModel
     {
-        public Type EntryType { get; set; }
+        public string Entry { get; set; }
 
         public OptionTreeNodeVM(TreeViewModelContext context, object data = null) :
             base(context, data)

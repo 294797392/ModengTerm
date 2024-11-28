@@ -198,7 +198,7 @@ namespace ModengTerm.UnitTest.TestCases
         [UnitTest]
         public bool WindowResize()
         {
-            return true;
+            return false;
         }
     }
 }

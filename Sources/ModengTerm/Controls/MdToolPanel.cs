@@ -1,8 +1,10 @@
 ﻿using ModengTerm.ViewModels;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +25,63 @@ namespace ModengTerm.Controls
         private ContentControl contentControl;
         private ListBox listBox;
         private MdButton buttonClose;
+
+
+
+        public string Title
+        {
+            get { return (string)GetValue(TitleProperty); }
+            set { SetValue(TitleProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Title.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty TitleProperty =
+            DependencyProperty.Register("Title", typeof(string), typeof(MdToolPanel), new PropertyMetadata(string.Empty));
+
+        public bool IsSelected
+        {
+            get { return (bool)GetValue(IsSelectedProperty); }
+            set { SetValue(IsSelectedProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsSelected.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(MdToolPanel), new PropertyMetadata(false));
+
+        public object Content
+        {
+            get { return (object)GetValue(ContentProperty); }
+            set { SetValue(ContentProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Content.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ContentProperty =
+            DependencyProperty.Register("Content", typeof(object), typeof(MdToolPanel), new PropertyMetadata(false));
+
+        public IEnumerable ItemsSource
+        {
+            get { return (IEnumerable)GetValue(ItemsSourceProperty); }
+            set { SetValue(ItemsSourceProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ItemsSource.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ItemsSourceProperty =
+            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(MdToolPanel), new PropertyMetadata(null));
+
+        public object SelectedItem
+        {
+            get { return (object)GetValue(SelectedItemProperty); }
+            set { SetValue(SelectedItemProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SelectedItem.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register("SelectedItem", typeof(object), typeof(MdToolPanel), new PropertyMetadata(null));
+
+
+
+
+
 
 
         public ToolPanelVM Menu
@@ -73,7 +132,7 @@ namespace ModengTerm.Controls
                 return;
             }
 
-            this.contentControl.DataContext = newValue;
+            //this.contentControl.DataContext = newValue;
         }
 
         private static void MenuPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

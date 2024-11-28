@@ -150,14 +150,14 @@
 
 
     <!-- MdControl 200001 - 300000 -->
-    <!-- MdImageButton -->
+
+    <!-- MdImageButton 200001 - 200100 -->
     <SolidColorBrush x:Key="RES200001" Color="#F2F5FC"/><!-- 默认背景 -->
     <SolidColorBrush x:Key="RES200002" Color="#8591A2"/><!-- 默认边框 -->
     <SolidColorBrush x:Key="RES200003" Color="#C4D5FF"/><!-- 悬浮背景 -->
     <SolidColorBrush x:Key="RES200004" Color="#203D77"/><!-- 悬浮边框 -->
     <SolidColorBrush x:Key="RES200005" Color="#C4D5FF"/><!-- 按下背景 -->
     <SolidColorBrush x:Key="RES200006" Color="#203D77"/><!-- 按下边框 -->
-
 
 
     <!-- Window 300001 - 500000 -->
@@ -214,6 +214,23 @@
     <SolidColorBrush x:Key="RES60002" Color="#40508D"/><!-- 状态栏背景色 -->
     <SolidColorBrush x:Key="RES60003" Color="White"/><!-- 状态栏前景色 -->
 
+    <!-- ToolPanelUserControl 65001 - 70000 -->
+    <SolidColorBrush x:Key="RES65001E" Color="#F7F9FE"/><!-- 背景 -->
+    <SolidColorBrush x:Key="RES65002E" Color="#40568D"/><!-- 标题背景 -->
+    <SolidColorBrush x:Key="RES65003E" Color="#F5CC84"/><!-- 标题选中背景 -->
+    <SolidColorBrush x:Key="RES65004E" Color="#CCD5F0"/><!-- 工具栏背景 -->
+    <SolidColorBrush x:Key="RES65005E" Color="#F7F9FE"/><!-- TabItem选中背景 -->
+    <SolidColorBrush x:Key="RES65006E" Color="#40568D"/><!-- TabItem默认背景 -->
+    <SolidColorBrush x:Key="RES65007E" Color="#BBC6F1"/><!-- TabItem悬浮背景 -->
+    <SolidColorBrush x:Key="RES65008E" Color="White"/><!-- 标题前景色 -->
+    <SolidColorBrush x:Key="RES65009E" Color="Black"/><!-- 标题选中前景色 -->
+    <SolidColorBrush x:Key="RES65010E" Color="#D9E1FA"/><!-- TabItem默认前景 -->
+    <SolidColorBrush x:Key="RES65011E" Color="Black"/><!-- TabItem悬浮前景 -->
+    <SolidColorBrush x:Key="RES65012E" Color="Black"/><!-- TabItem选中前景 -->
+    <SolidColorBrush x:Key="RES65013E" Color="#A0ACD2"/><!-- 关闭按钮背景 -->
+    <SolidColorBrush x:Key="RES65014E" Color="#C0CAE9"/><!-- 关闭按钮悬浮背景 -->
+    <SolidColorBrush x:Key="RES65015E" Color="#C0CAE9"/><!-- 关闭按钮按下背景 -->
+
     <!-- 四种连接状态图标 -->
     <BitmapImage x:Key="5520" UriSource="pack://application:,,,/ModengTerm;component/Images/ok.png"/>
     <BitmapImage x:Key="5521" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>
@@ -222,5 +239,6 @@
 
     <!-- 终端ToolWindow 6001 - 6500 -->
     <SolidColorBrush x:Key="6001" Color="#ededed"/><!-- 分割线颜色 -->
-
+    
+    
 </ResourceDictionary>

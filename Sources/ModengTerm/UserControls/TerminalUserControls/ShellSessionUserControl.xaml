@@ -9,6 +9,7 @@
              xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              xmlns:renderer="clr-namespace:ModengTerm.UserControls.TerminalUserControls.Rendering"
              xmlns:termuc="clr-namespace:ModengTerm.UserControls.Terminals"
+             xmlns:termuc2="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
              xmlns:termctrl="clr-namespace:ModengTerm.Controls"
              xmlns:termenum="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
              xmlns:termconv="clr-namespace:ModengTerm"
@@ -60,8 +61,6 @@
 
             <!-- 左侧窗格 -->
             <Grid Grid.Column="0">
-                <termctrl:MdToolPanel Menu="{Binding Path=Panels[1]}" Visibility="{Binding Path=Panels[1].Visible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Collapsed}" 
-                                      BorderThickness="0,0,1,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
             </Grid>
 
             <Grid Grid.Column="1" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
@@ -85,8 +84,7 @@
 
             <!-- 右侧窗格 -->
             <Grid Grid.Column="2">
-                <termctrl:MdToolPanel Menu="{Binding Path=Panels[0]}" Visibility="{Binding Path=Panels[0].Visible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=Collapsed}" 
-                                      BorderThickness="1,0,0,0" Width="300" Style="{StaticResource ResourceKey=StyleMdToolPanel}"/>
+                <termuc2:ToolPanelUserControl PanelVM="{Binding Path=Panels[0]}" Width="300" Margin="5,0,0,0"/>
             </Grid>
 
         </Grid>

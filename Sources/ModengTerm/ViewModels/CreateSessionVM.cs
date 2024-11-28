@@ -33,7 +33,11 @@ namespace ModengTerm.ViewModels
     /// </summary>
     public class CreateSessionVM : ViewModelBase
     {
+        #region 类变量
+
         private static log4net.ILog logger = log4net.LogManager.GetLogger("CreateSessionVM");
+
+        #endregion
 
         #region 实例变量
 
@@ -51,11 +55,6 @@ namespace ModengTerm.ViewModels
 
         private SessionTypeVM selectedSessionType;
         private OptionTreeVM optionTreeVM;
-        private TreeNodeViewModel commandLineNode;
-        private TreeNodeViewModel sshNode;
-        private TreeNodeViewModel serialPortNode;
-        private TreeNodeViewModel tcpNode;
-        private TreeNodeViewModel adbShellNode;
 
         private string mouseScrollDelta;
 
@@ -107,6 +106,11 @@ namespace ModengTerm.ViewModels
         private string rawTcpAddress;
         private int rawTcpPort;
 
+        /// <summary>
+        /// 当前选中的菜单节点
+        /// </summary>
+        private TreeNodeViewModel selectedMenuNode;
+
         #endregion
 
         #region 属性
@@ -124,79 +128,34 @@ namespace ModengTerm.ViewModels
                     this.selectedSessionType = value;
                     this.NotifyPropertyChanged("SelectedSessionType");
 
-                    // 根据不同的会话类型，切换不同的配置选项树形列表
                     switch (value.Type)
                     {
-                        case SessionTypeEnum.SerialPort:
-                            {
-                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
-                                this.serialPortNode.IsVisible = true;
-                                this.commandLineNode.IsVisible = false;
-                                this.sshNode.IsVisible = false;
-                                this.tcpNode.IsVisible = false;
-                                this.adbShellNode.IsVisible = false;
-                                this.serialPortNode.IsSelected = true;
-                                break;
-                            }
-
-                        case SessionTypeEnum.SSH:
-                            {
-                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
-                                this.serialPortNode.IsVisible = false;
-                                this.commandLineNode.IsVisible = false;
-                                this.sshNode.IsVisible = true;
-                                this.tcpNode.IsVisible = false;
-                                this.sshNode.IsSelected = true;
-                                this.adbShellNode.IsVisible = false;
-                                break;
-                            }
-
-                        case SessionTypeEnum.Localhost:
-                            {
-                                this.serialPortNode.IsVisible = false;
-                                this.commandLineNode.IsVisible = true;
-                                this.sshNode.IsVisible = false;
-                                this.tcpNode.IsVisible = false;
-                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
-                                this.commandLineNode.IsSelected = true;
-                                this.adbShellNode.IsVisible = false;
-                                break;
-                            }
-
-                        case SessionTypeEnum.Tcp:
-                            {
-                                this.serialPortNode.IsVisible = false;
-                                this.commandLineNode.IsVisible = false;
-                                this.sshNode.IsVisible = false;
-                                this.tcpNode.IsVisible = true;
-                                this.tcpNode.IsSelected = true;
-                                this.adbShellNode.IsVisible = false;
-                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
-                                break;
-                            }
-
-                        case SessionTypeEnum.AdbShell:
-                            {
-                                this.serialPortNode.IsVisible = false;
-                                this.commandLineNode.IsVisible = false;
-                                this.sshNode.IsVisible = false;
-                                this.tcpNode.IsVisible = false;
-                                this.tcpNode.IsSelected = false;
-                                this.adbShellNode.IsVisible = true;
-                                this.adbShellNode.IsSelected = true;
-                                this.OptionTreeVM = this.TerminalOptionsTreeVM;
-                                break;
-                            }
-
                         case SessionTypeEnum.SFTP:
                             {
-                                this.OptionTreeVM = this.SFTPOptionsTreeVM;
                                 break;
                             }
 
                         default:
-                            throw new NotImplementedException();
+                            {
+                                // 根据不同的会话类型，切换不同的配置选项树形列表
+                                TreeNodeViewModel selectedNode;
+                                if (this.OptionTreeVM.TryGetNode(value.MenuId, out selectedNode)) 
+                                {
+                                    selectedNode.IsVisible = true;
+                                    selectedNode.IsSelected = true;
+
+                                    if (this.selectedMenuNode != null)
+                                    {
+                                        this.selectedMenuNode.IsVisible = false;
+                                    }
+
+                                    this.selectedMenuNode = selectedNode;
+                                }
+
+                                break;
+                            }
                     }
+
                 }
             }
         }
@@ -776,12 +735,7 @@ namespace ModengTerm.ViewModels
             this.SFTPOptionsTreeVM = new OptionTreeVM();
             this.TerminalOptionsTreeVM = new OptionTreeVM();
             //this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
-            this.LoadOptionsTree(this.TerminalOptionsTreeVM, MTermApp.TerminalOptionList);
-            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.CommandLineID, out this.commandLineNode);
-            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SshID, out this.sshNode);
-            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.SerialPortID, out this.serialPortNode);
-            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.TcpID, out this.tcpNode);
-            this.TerminalOptionsTreeVM.TryGetNode(OptionDefinition.AdbShellID, out this.adbShellNode);
+            this.LoadOptionsTree(this.TerminalOptionsTreeVM, appManifest.TerminalOptionMenu);
             this.OptionTreeVM = this.TerminalOptionsTreeVM;
 
             #endregion
@@ -792,7 +746,14 @@ namespace ModengTerm.ViewModels
             foreach (SessionDefinition session in appManifest.SessionList)
             {
                 this.SessionTypeList.Add(new SessionTypeVM(session));
+                // 隐藏会话类型对应的菜单，等选中的时候再显示
+                TreeNodeViewModel treeNodeViewModel;
+                if (this.TerminalOptionsTreeVM.TryGetNode(session.MenuId, out treeNodeViewModel)) 
+                {
+                    treeNodeViewModel.IsVisible = false;
+                }
             }
+            // 选择第一个会话
             this.SelectedSessionType = this.SessionTypeList.FirstOrDefault();
 
             this.SessionGroups = MTermApp.Context.CreateSessionTreeVM(true, true);
@@ -956,7 +917,7 @@ namespace ModengTerm.ViewModels
                 {
                     ID = option.ID,
                     Name = option.Name,
-                    EntryType = option.EntryType,
+                    Entry = option.Entry,
                     IsExpanded = true,
                     Level = parentNode.Level + 1
                 };
@@ -975,7 +936,7 @@ namespace ModengTerm.ViewModels
                 {
                     ID = option.ID,
                     Name = option.Name,
-                    EntryType = option.EntryType,
+                    Entry = option.Entry,
                     IsExpanded = true
                 };
 

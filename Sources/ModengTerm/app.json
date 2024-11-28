@@ -5,7 +5,8 @@
             "name": "命令行",
             "description": "",
             "icon": "",
-            "type": 0
+            "type": 0,
+            "menuId": "91A9E520-E632-471B-B238-E070AFE742DB"
         },
 
         {
@@ -13,7 +14,8 @@
             "name": "SSH",
             "description": "",
             "icon": "",
-            "type": 1
+            "type": 1,
+            "menuId": "7E893889-F18F-4F23-B5EF-7646FDB859EE"
         },
 
         {
@@ -21,7 +23,8 @@
             "name": "串口",
             "description": "",
             "icon": "",
-            "type": 2
+            "type": 2,
+            "menuId": "9CCE099F-DBC2-4193-B557-239CA48F3F4C"
         },
 
         {
@@ -29,7 +32,8 @@
             "name": "Tcp",
             "description": "",
             "icon": "",
-            "type": 4
+            "type": 4,
+            "menuId": "B940611E-C437-4E3B-A490-15F3E4C7E197"
         },
 
         {
@@ -37,7 +41,73 @@
             "name": "AdbShell",
             "description": "",
             "icon": "",
-            "type": 5
+            "type": 5,
+            "menuId": "EBDDC4E2-BEE9-4E01-B8E1-CA8B7D80A573"
+        }
+    ],
+
+    "termOptionMenu": [
+        {
+            "id": "20C693D5-0186-4CCF-A019-D95E6A05BDDD",
+            "name": "会话",
+            "entry": "",
+            "children": [
+                {
+                    "id": "91A9E520-E632-471B-B238-E070AFE742DB",
+                    "name": "命令行",
+                    "entry": "ModengTerm.UserControls.OptionsUserControl.CommandLineOptionsUserControl, ModengTerm"
+                },
+                {
+                    "id": "7E893889-F18F-4F23-B5EF-7646FDB859EE",
+                    "name": "SSH",
+                    "entry": "ModengTerm.UserControls.OptionsUserControl.SSH.SSHOptionsUserControl, ModengTerm",
+                    "children": [
+                        {
+                            "id": "5919A665-EB86-437F-A227-124783A410F6",
+                            "name": "端口转发",
+                            "entry": "ModengTerm.UserControls.OptionsUserControl.SSH.PortForwardOptionsUserControl, ModengTerm"
+                        }
+                    ]
+                },
+                {
+                    "id": "9CCE099F-DBC2-4193-B557-239CA48F3F4C",
+                    "name": "串口",
+                    "entry": "XTerminal.UserControls.OptionsUserControl.SerialPortOptionsUserControl, ModengTerm"
+                },
+                {
+                    "id": "B940611E-C437-4E3B-A490-15F3E4C7E197",
+                    "name": "Tcp",
+                    "entry": "ModengTerm.UserControls.OptionsUserControl.RawTcp.RawTcpOptionsUserControl, ModengTerm"
+                },
+                {
+                    "id": "EBDDC4E2-BEE9-4E01-B8E1-CA8B7D80A573",
+                    "name": "AdbShell",
+                    "entry": "ModengTerm.UserControls.OptionsUserControls.AdbShell.AdbShellOptionsUserControl, ModengTerm"
+                }
+            ]
+        },
+
+        {
+            "id": "24AFB18B-79BB-435A-B4F1-A62006F1A026",
+            "name": "终端",
+            "entry": "XTerminal.UserControls.OptionsUserControl.TerminalOptionsUserControl, ModengTerm",
+            "children": [
+                {
+                    "id": "0FA6848B-5FC8-4B4A-B387-544EEF845498",
+                    "name": "外观",
+                    "entry": "XTerminal.UserControls.OptionsUserControl.ThemeOptionsUserControl, ModengTerm"
+                },
+                {
+                    "id": "5ABD09D0-3F88-45DC-A2DA-1E528914DF00",
+                    "name": "行为",
+                    "entry": "ModengTerm.UserControls.OptionsUserControl.Terminal.BehaviorOptionsUserControl, ModengTerm"
+                },
+                {
+                    "id": "39C7B12B-479D-40DF-803F-FDDEC7B4CF61",
+                    "name": "高级",
+                    "entry": "ModengTerm.UserControls.OptionsUserControl.Terminal.AdvanceOptionsUserControl, ModengTerm"
+                }
+            ]
         }
     ],
 

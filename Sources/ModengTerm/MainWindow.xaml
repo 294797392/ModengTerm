@@ -328,9 +328,9 @@
             <Border Grid.Row="0" Grid.RowSpan="9999" Background="{DynamicResource ResourceKey=RES50003E}"/>
 
             <!-- 打开的终端列表Tab页 -->
-            <Grid Grid.Row="0" Margin="3,5,3,0">
+            <Grid Grid.Row="0">
 
-                <ScrollViewer x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                <ScrollViewer x:Name="ScrollViewerOpenedSession" Margin="3,5,3,0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
                     <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
                              SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
                         <ListBox.ItemsPanel>

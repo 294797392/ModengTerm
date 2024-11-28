@@ -31,7 +31,7 @@ namespace ModengTerm.Windows
 
         #region 实例变量
 
-        private Dictionary<Type, Control> contentMap;
+        private Dictionary<string, Control> contentMap;
 
         #endregion
 
@@ -59,7 +59,7 @@ namespace ModengTerm.Windows
 
         private void InitializeWindow(SessionGroupVM sessionGroup)
         {
-            this.contentMap = new Dictionary<Type, Control>();
+            this.contentMap = new Dictionary<string, Control>();
 
             CreateSessionVM createSessionVM = new CreateSessionVM(MTermApp.Context.ServiceAgent);
             base.DataContext = createSessionVM;
@@ -101,19 +101,19 @@ namespace ModengTerm.Windows
                 return;
             }
 
-            if (selectedOption.EntryType == null)
+            if (string.IsNullOrEmpty(selectedOption.Entry))
             {
                 return;
             }
 
             Control control;
-            if (!this.contentMap.TryGetValue(selectedOption.EntryType, out control))
+            if (!this.contentMap.TryGetValue(selectedOption.Entry, out control))
             {
                 try
                 {
-                    control = Activator.CreateInstance(selectedOption.EntryType) as Control;
+                    control = ConfigFactory<Control>.CreateInstance(selectedOption.Entry);
 
-                    this.contentMap[selectedOption.EntryType] = control;
+                    this.contentMap[selectedOption.Entry] = control;
                 }
                 catch (Exception ex)
                 {

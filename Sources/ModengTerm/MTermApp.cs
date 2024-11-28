@@ -30,40 +30,6 @@ namespace ModengTerm
     /// </summary>
     public class MTermApp : ModularApp<MTermApp, MTermManifest>, INotifyPropertyChanged
     {
-        /// <summary>
-        /// C#的代码混淆工具不能进行反射，因为会修改类名，所以把要动态创建的控件实例类型写死
-        /// </summary>
-        public static readonly List<OptionDefinition> TerminalOptionList = new List<OptionDefinition>()
-        {
-            new OptionDefinition("会话")
-            {
-                Children = new List<OptionDefinition>()
-                {
-                    new OptionDefinition(OptionDefinition.CommandLineID, "命令行", typeof(CommandLineOptionsUserControl)),
-                    new OptionDefinition(OptionDefinition.SshID, "SSH", typeof(SSHOptionsUserControl))
-                    {
-                        Children = new List<OptionDefinition>()
-                        {
-                            new OptionDefinition("端口转发", typeof(PortForwardOptionsUserControl))
-                        }
-                    },
-                    new OptionDefinition(OptionDefinition.SerialPortID, "串口", typeof(SerialPortOptionsUserControl)),
-                    new OptionDefinition(OptionDefinition.TcpID, "Tcp", typeof(RawTcpOptionsUserControl)),
-                    new OptionDefinition(OptionDefinition.AdbShellID, "AdbShell", typeof(AdbShellOptionsUserControl))
-                }
-            },
-
-            new OptionDefinition("终端", typeof(TerminalOptionsUserControl))
-            {
-                Children = new List<OptionDefinition>()
-                {
-                    new OptionDefinition("外观", typeof(ThemeOptionsUserControl)),
-                    new OptionDefinition("行为", typeof(BehaviorOptionsUserControl)),
-                    new OptionDefinition("高级", typeof(AdvanceOptionsUserControl))
-                }
-            },
-        };
-
         #region 实例变量
 
         private OpenedSessionVM selectedOpenedSession;

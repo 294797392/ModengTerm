@@ -1,14 +1,16 @@
-﻿<Window x:Class="ModengTerm.Windows.Terminals.CreateShellCommandWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ModengTerm.Windows.Terminals"
-        xmlns:converter="clr-namespace:ModengTerm"
-        xmlns:mcontrol="clr-namespace:ModengTerm.Controls"
-        mc:Ignorable="d"
-        Title="新建命令" Height="400" Width="600"
-        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+﻿<termctrl:MdWindow x:Class="ModengTerm.Windows.Terminals.CreateShellCommandWindow"
+                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:local="clr-namespace:ModengTerm.Windows.Terminals"
+                   xmlns:converter="clr-namespace:ModengTerm"
+                   xmlns:termctrl="clr-namespace:ModengTerm.Controls"
+                   mc:Ignorable="d"
+                   Title="新建命令" Height="400" Width="600"
+                   WindowStartupLocation="CenterOwner"
+                   CanResize="False"
+                   Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>
 
@@ -72,13 +74,13 @@
 
                 <Border Grid.Row="1" BorderBrush="Silver" BorderThickness="0,1,0,0"/>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
-                    <mcontrol:MdButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
+                    <termctrl:MdButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"
                                        Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
-                    <mcontrol:MdButton ToolTip="删除" SVGPath="{StaticResource ResourceKey=SVGIcon7}"
+                    <termctrl:MdButton ToolTip="删除" SVGPath="{StaticResource ResourceKey=SVGIcon7}"
                                        Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
-                    <mcontrol:MdButton ToolTip="上移" SVGPath="{StaticResource ResourceKey=SVGIcon8}"
+                    <termctrl:MdButton ToolTip="上移" SVGPath="{StaticResource ResourceKey=SVGIcon8}"
                                        Click="ButtonMoveUp_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
-                    <mcontrol:MdButton ToolTip="下移" SVGPath="{StaticResource ResourceKey=SVGIcon9}"
+                    <termctrl:MdButton ToolTip="下移" SVGPath="{StaticResource ResourceKey=SVGIcon9}"
                                        Click="ButtonMoveDown_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
                 </StackPanel>
 
@@ -129,4 +131,4 @@
 
     </Grid>
 
-</Window>
+</termctrl:MdWindow>

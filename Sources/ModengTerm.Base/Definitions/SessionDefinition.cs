@@ -27,5 +27,11 @@ namespace ModengTerm.Base.Definitions
         [EnumDataType(typeof(SessionTypeEnum))]
         [JsonProperty("type")]
         public int Type { get; set; }
+
+        /// <summary>
+        /// 该会话对应的选项菜单的Id
+        /// </summary>
+        [JsonProperty("menuId")]
+        public string MenuId { get; set; }
     }
 }

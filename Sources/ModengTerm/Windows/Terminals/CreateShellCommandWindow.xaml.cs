@@ -2,23 +2,14 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Controls;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.Windows.Terminals
@@ -26,7 +17,7 @@ namespace ModengTerm.Windows.Terminals
     /// <summary>
     /// CreateQuickCommandWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class CreateShellCommandWindow : Window
+    public partial class CreateShellCommandWindow : MdWindow
     {
         #region 实例变量
 

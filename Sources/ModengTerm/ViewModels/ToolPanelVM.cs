@@ -23,7 +23,12 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 进程管理
         /// </summary>
-        ProcessManager
+        ProcessManager,
+
+        /// <summary>
+        /// 系统监控
+        /// </summary>
+        SystemWatch
     }
 
     public class ToolPanelItemVM : MenuItemVM
@@ -63,6 +68,8 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public ToolPanelVM() { }
+        public ToolPanelVM()
+        {
+        }
     }
 }

@@ -21,8 +21,6 @@
         </Grid.RowDefinitions>
 
         <Grid>
-            <Border BorderBrush="{DynamicResource ResourceKey=6001}" BorderThickness="0,0,0,1" Background="White"/>
-
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
                 <mcontrols:MdButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"   
                                     Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
@@ -46,6 +44,7 @@
                 <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource ResourceKey=StyleListBox}">
                     <Setter Property="BorderBrush" Value="{x:Null}"/>
                     <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Background" Value="Transparent"/>
                 </Style>
             </ListBox.Style>
 
@@ -55,11 +54,9 @@
                     <Setter Property="Margin" Value="3"/>
                     <Setter Property="Padding" Value="5,0,5,0"/>
                     <Setter Property="HorizontalContentAlignment" Value="Left"/>
-                    <Setter Property="BorderBrush" Value="Silver"/>
-                    <Setter Property="BorderThickness" Value="1"/>
                 </Style>
             </ListBox.ItemContainerStyle>
-            
+
         </ListBox>
 
     </Grid>

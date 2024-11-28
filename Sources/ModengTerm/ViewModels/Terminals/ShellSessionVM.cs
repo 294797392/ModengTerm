@@ -29,7 +29,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -50,15 +49,15 @@ namespace ModengTerm.Terminal.ViewModels
                     { "type", ToolPanelTypeEnum.QuickCommand }
                 }
             },
-            new MenuDefinition()
-            {
-                Name = "进程列表",
-                ClassName = "ModengTerm.UserControls.TerminalUserControls.ProcessManagerUserControl, ModengTerm",
-                Parameters = new Dictionary<string, object>()
-                {
-                    { "type", ToolPanelTypeEnum.ProcessManager }
-                }
-            }
+            //new MenuDefinition()
+            //{
+            //    Name = "系统监控",
+            //    ClassName = "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm",
+            //    Parameters = new Dictionary<string, object>()
+            //    {
+            //        { "type", ToolPanelTypeEnum.SystemWatch }
+            //    }
+            //}
         };
 
         private static readonly List<MenuDefinition> ToolPanels2 = new List<MenuDefinition>()
@@ -468,9 +467,9 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     Children = new BindableCollection<SessionContextMenu>()
                     {
-                        //new SessionContextMenu("资源管理器", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.ResourceManager); })),
+                        new SessionContextMenu("系统监控", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.SystemWatch); })),
                         new SessionContextMenu("快捷命令", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.QuickCommand); })),
-                        new SessionContextMenu("系统监控", new ExecuteShellFunctionCallback(()=>
+                        new SessionContextMenu("端口转发", new ExecuteShellFunctionCallback(()=>
                         {
                             if(!this.SupportWatch())
                             {

@@ -26,10 +26,14 @@ namespace ModengTerm
         [JsonProperty("themes")]
         public List<AppTheme> AppThemes { get; private set; }
 
+        [JsonProperty("termOptionMenu")]
+        public List<OptionDefinition> TerminalOptionMenu { get; private set; }
+
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
             this.AppThemes = new List<AppTheme>();
+            this.TerminalOptionMenu = new List<OptionDefinition>();
         }
     }
 }

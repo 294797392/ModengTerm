@@ -23,6 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
     <Compile Remove="ViewModels\Terminals\CommandLineVM.cs" />
