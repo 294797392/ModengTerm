@@ -16,7 +16,7 @@ namespace ModengTerm
         XTermSession Session { get; set; }
 
         /// <summary>
-        /// 控件被完全Loaded的时候调用
+        /// 控件被完全显示之后调用
         /// </summary>
         /// <returns></returns>
         int Open(OpenedSessionVM sessionVM);

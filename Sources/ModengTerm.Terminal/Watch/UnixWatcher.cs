@@ -19,7 +19,9 @@ namespace ModengTerm.Terminal.Watch
 
         public override SystemInfo GetSystemInfo()
         {
-            throw new NotImplementedException();
+            string meminfo = this.proc_meminfo();
+
+            return new SystemInfo();
         }
 
         public override void GetDisks()

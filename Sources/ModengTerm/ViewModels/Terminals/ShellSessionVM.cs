@@ -269,11 +269,6 @@ namespace ModengTerm.Terminal.ViewModels
         public ShellSessionVM(XTermSession session) :
             base(session)
         {
-            this.watchList = new List<WatchVM>();
-            this.HistoryCommands = new BindableCollection<string>();
-            this.Panels = new BindableCollection<PanelVM>();
-            this.ShellCommands = new BindableCollection<QuickCommandVM>();
-            this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
         }
 
         #endregion
@@ -283,6 +278,12 @@ namespace ModengTerm.Terminal.ViewModels
         protected override int OnOpen()
         {
             this.logMgr = MTermApp.Context.LoggerManager;
+
+            this.watchList = new List<WatchVM>();
+            this.HistoryCommands = new BindableCollection<string>();
+            this.Panels = new BindableCollection<PanelVM>();
+            this.ShellCommands = new BindableCollection<QuickCommandVM>();
+            this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
             this.RecordStatus = RecordStatusEnum.Stop;
             this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING));

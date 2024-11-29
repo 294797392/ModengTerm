@@ -13,7 +13,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public override void Watch(AbstractWatcher watcher)
         {
-            logger.ErrorFormat(Guid.NewGuid().ToString());
+            SystemInfo systemInfo = watcher.GetSystemInfo();
+
+            //logger.ErrorFormat(Guid.NewGuid().ToString());
         }
     }
 }

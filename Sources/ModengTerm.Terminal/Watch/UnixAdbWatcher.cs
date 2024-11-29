@@ -266,7 +266,7 @@ namespace ModengTerm.Terminal.Watch
                 fileNames = new FileNames()
                 {
                     TempFileName = tempFileName,
-                    TempFilePath = string.Format("{0}\\{1}", this.tempDir, tempFileName),
+                    TempFilePath = string.Format("{0}/{1}", this.tempDir, tempFileName),
                     LocalFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Guid.NewGuid().ToString())
                 };
                 this.filePath2TempName[filePath] = fileNames;
@@ -274,7 +274,7 @@ namespace ModengTerm.Terminal.Watch
 
             #region 执行读取指令;
 
-            string write = string.Format("{0} > {1}\r\n", filePath, fileNames.TempFilePath);
+            string write = string.Format("cat {0} > {1}\r\n", filePath, fileNames.TempFilePath);
             byte[] writeBytes = this.writeEncoding.GetBytes(write);
 
             try

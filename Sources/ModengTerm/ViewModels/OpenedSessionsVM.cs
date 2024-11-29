@@ -15,6 +15,7 @@ using ModengTerm.Base;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Terminal;
 using System.Windows.Threading;
+using System.Windows.Media;
 
 namespace ModengTerm.ViewModels
 {
