@@ -129,6 +129,11 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         TERM_DISABLE_BELL = 1005,
 
+        /// <summary>
+        /// 发送数据的编码方式
+        /// </summary>
+        TERM_READ_ENCODING = 1006,
+
         #endregion
 
         #region 终端行为 1501 - 2000
@@ -194,6 +199,14 @@ namespace ModengTerm.Base.Enumerations
         /// 启动Adb守护进程的超时时间
         /// </summary>
         ADBSH_START_SVR_TIMEOUT = 2810,
+        /// <summary>
+        /// ADB系统信息监控超时时间
+        /// </summary>
+        ADBSH_ADVANCE_WATCH_TIMEOUT = 2811,
+        /// <summary>
+        /// 存储读取到的临时文件的目录
+        /// </summary>
+        ADBSH_ADVANCE_TEMP_DIR = 2812,
 
         #endregion
 

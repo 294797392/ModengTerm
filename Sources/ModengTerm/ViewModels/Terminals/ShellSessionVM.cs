@@ -12,6 +12,7 @@ using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Session;
+using ModengTerm.Terminal.Watch;
 using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
@@ -119,6 +120,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool inputPanelVisible;
 
+        private AbstractWatcher watcher;
         private Task watchTask;
         private ManualResetEvent watchEvent;
         private bool isWatch;
@@ -467,19 +469,8 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     Children = new BindableCollection<SessionContextMenu>()
                     {
-                        new SessionContextMenu("系统监控", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.SystemWatch); })),
+                        new SessionContextMenu("系统监控", new ExecuteShellFunctionCallback(()=>{ this.EnableWatcher(true); this.SwitchPanelVisible(ToolPanelTypeEnum.SystemWatch); })),
                         new SessionContextMenu("快捷命令", new ExecuteShellFunctionCallback(()=>{ this.SwitchPanelVisible(ToolPanelTypeEnum.QuickCommand); })),
-                        new SessionContextMenu("端口转发", new ExecuteShellFunctionCallback(()=>
-                        {
-                            if(!this.SupportWatch())
-                            {
-                                MTMessageBox.Info("该会话不支持系统监控");
-                                return;
-                            }
-
-                            this.SwitchPanelVisible(ToolPanelTypeEnum.ProcessManager);
-                            this.EnableWatcher(true);
-                        })),
                         new SessionContextMenu("输入栏", this.SwitchInputPanelVisible)
                     }
                 },
@@ -791,26 +782,16 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 获取该会话是否支持系统监控
+        /// 启用或禁用Watcher
         /// </summary>
-        /// <returns></returns>
-        private bool SupportWatch() 
-        {
-            switch ((SessionTypeEnum)this.Session.Type)
-            {
-                case SessionTypeEnum.Localhost:
-                case SessionTypeEnum.SSH: return true;
-                default:
-                    return false;
-            }
-        }
-
+        /// <param name="enable">启用或禁用</param>
         private void EnableWatcher(bool enable)
         {
             if (enable)
             {
                 if (this.watchTask == null)
                 {
+                    this.watcher = WatcherFactory.Create(this.Session);
                     this.watchEvent = new ManualResetEvent(false);
                     this.watchTask = Task.Factory.StartNew(this.WatchThreadProc);
                     this.isWatch = true;
@@ -822,79 +803,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.watchEvent.Reset();
             }
-        }
-
-        private void WatchLocalhostProcess()
-        {
-            Process[] newProcs = Process.GetProcesses();
-
-            if (this.ProcessList.Count == 0) 
-            {
-                List<ProcessVM> processVMs = new List<ProcessVM>();
-                foreach (Process proc in newProcs)
-                {
-                    processVMs.Add(new ProcessVM(proc));
-                }
-
-                Application.Current.Dispatcher.Invoke(() => 
-                {
-                    this.ProcessList.AddRange(processVMs);
-                });
-
-                return;
-            }
-
-            IEnumerable<int> newProcIds = newProcs.Select(v => v.Id);
-            IEnumerable<int> oldProcIds = this.ProcessList.Select(v => v.PID);
-
-            // oldProcs里有，newProcs里没有的，removeProcs
-            List<int> removeProcIds = oldProcIds.ExceptBy(newProcIds, (v) => { return v; }).ToList();
-            // newProcs里有，oldProcs里没有的，addProcs
-            List<int> addProcIds = newProcIds.ExceptBy(oldProcIds, (v) => { return v; }).ToList();
-
-            foreach (int removeId in removeProcIds)
-            {
-                ProcessVM pvm = this.ProcessList.FirstOrDefault(v => v.PID == removeId);
-                if (pvm != null)
-                {
-                    Application.Current.Dispatcher.Invoke(() => 
-                    {
-                        this.ProcessList.Remove(pvm);
-                    });
-                }
-            }
-
-            foreach (int addId in addProcIds)
-            {
-                Process pvm = newProcs.FirstOrDefault(v => v.Id == addId);
-                if (pvm != null)
-                {
-                    ProcessVM processVM = new ProcessVM(pvm);
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        this.ProcessList.Add(processVM);
-                    });
-                }
-            }
-
-            foreach (Process newProc in newProcs)
-            {
-                ProcessVM pvm = this.ProcessList.FirstOrDefault(v => v.PID == newProc.Id);
-                if (pvm != null) 
-                {
-                    if (!pvm.CompareTo(newProc))
-                    {
-                        pvm.Update(newProc);
-                    }
-                }
-            }
-
-            logger.DebugFormat("总进程数 = {0}", this.ProcessList.Count);
-        }
-
-        private void WatchSshProcess()
-        {
-
         }
 
         #endregion
@@ -1021,28 +929,7 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     this.watchEvent.WaitOne();
 
-                    SessionTypeEnum sessionType = (SessionTypeEnum)this.Session.Type;
-
-                    switch (sessionType)
-                    {
-                        case SessionTypeEnum.Localhost:
-                            {
-                                Stopwatch stopwatch = Stopwatch.StartNew();
-                                this.WatchLocalhostProcess();
-                                stopwatch.Stop();
-                                logger.ErrorFormat("{0}ms", stopwatch.ElapsedMilliseconds);
-                                break;
-                            }
-
-                        case SessionTypeEnum.SSH:
-                            {
-                                this.WatchSshProcess();
-                                break;
-                            }
-
-                        default:
-                            throw new NotImplementedException();
-                    }
+                    SystemInfo systemInfo = this.watcher.GetSystemInfo();
                 }
                 catch (Exception ex)
                 {
@@ -1482,7 +1369,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.InputPanelVisible = !this.InputPanelVisible;
         }
 
-        private void ClearScreenContextMenu_Click() 
+        private void ClearScreenContextMenu_Click()
         {
             VTDocument document = this.videoTerminal.ActiveDocument;
             document.DeleteViewoprt();

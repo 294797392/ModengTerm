@@ -70,11 +70,6 @@ namespace ModengTerm.Base
             Type = (int)SessionTypeEnum.Localhost,
         };
 
-        /// <summary>
-        /// 默认的输入编码方式
-        /// </summary>
-        public const string DefaultWriteEncoding = "UTF-8";
-
         public const int DefaultTerminalColumns = 80;
         public const int DefaultTerminalRows = 24;
         public const int DefaultTerminalScrollback = 99999;
@@ -152,5 +147,16 @@ namespace ModengTerm.Base
         /// </summary>
         public const int DefaultAdbLoginTimeout = 5000;
         public const int DefaultAdbStartServerTimeout = 10000;
+        public const string DefaultAdbPath = "adb.exe";
+        /// <summary>
+        /// 默认的输入编码方式
+        /// </summary>
+        public const string DefaultWriteEncoding = "UTF-8";
+        public const string DefaultReadEncoding = "UTF-8";
+        /// <summary>
+        /// Adb读取文件的超时时间，单位毫秒
+        /// </summary>
+        public const int DefaultAdbWatchTimeout = 5000;
+        public const string DefaultAdbTempDir = "/tmp";
     }
 }

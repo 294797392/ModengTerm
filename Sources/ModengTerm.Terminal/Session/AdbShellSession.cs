@@ -55,7 +55,7 @@ namespace ModengTerm.Terminal.Session
             string exePath = this.session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH);
             AdbLoginTypeEnum loginType = this.session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE);
 
-            if (!this.EnsureStartServer()) 
+            if (!VTermUtils.StartAdbServer(session))
             {
                 return ResponseCode.FAILED;
             }
@@ -264,58 +264,6 @@ namespace ModengTerm.Terminal.Session
             streamWriter.Flush();
 
             return true;
-        }
-
-        /// <summary>
-        /// 确保Adb守护进程已启动
-        /// </summary>
-        private bool EnsureStartServer()
-        {
-            string exePath = this.session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH);
-            int timeout = this.session.GetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, MTermConsts.DefaultAdbStartServerTimeout);
-
-            ProcessStartInfo startInfo = new ProcessStartInfo()
-            {
-                FileName = exePath,
-                RedirectStandardError = true,
-                RedirectStandardInput = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                WindowStyle = ProcessWindowStyle.Hidden,
-                CreateNoWindow = true,
-                Arguments = "start-server"
-            };
-
-            try
-            {
-                Process process = Process.Start(startInfo);
-                if (!process.WaitForExit(timeout))
-                {
-                    logger.ErrorFormat("启动adb server失败, 超时了, 可能端口被占用了");
-                    // 进程超时了还没退出
-                    // 此时表示启动失败
-                    process.Kill();
-                    process.Dispose();
-                    return false;
-                }
-                else
-                {
-                    if (process.ExitCode != 0)
-                    {
-                        // 说明进程因为启动失败退出
-                        // 比如5037端口被占用，adb尝试连接5037端口，然后占用5037端口的进程退出，此时exitCode不等于0
-                        logger.ErrorFormat("启动adb server失败, exitCode = {0}", process.ExitCode);
-                        return false;
-                    }
-
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("启动adb守护进程", ex);
-                return false;
-            }
         }
 
         #endregion
