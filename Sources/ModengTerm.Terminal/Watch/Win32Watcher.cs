@@ -7,19 +7,11 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Watch
 {
-    public abstract class UnixWatcher : AbstractWatcher
+    public class Win32Watcher : AbstractWatcher
     {
-        protected XTermSession session;
-
-        public UnixWatcher(XTermSession session) :
+        public Win32Watcher(XTermSession session) :
             base(session)
         {
-            this.session = session;
-        }
-
-        public override SystemInfo GetSystemInfo()
-        {
-            throw new NotImplementedException();
         }
 
         public override void GetDisks()
@@ -32,8 +24,9 @@ namespace ModengTerm.Terminal.Watch
             throw new NotImplementedException();
         }
 
-        public abstract string proc_meminfo();
-        public abstract string proc_stat();
-        public abstract string df_h();
+        public override SystemInfo GetSystemInfo()
+        {
+            return new SystemInfo();
+        }
     }
 }

@@ -33,6 +33,16 @@ namespace ModengTerm.ViewModels.Terminals
 
     public class PanelVM : AbstractMenuVM<ContextMenuVM>
     {
+        /// <summary>
+        /// 用户手动关闭的时候触发
+        /// </summary>
+        public Action<PanelVM> CloseDelegate { get; set; }
+
+        /// <summary>
+        /// 用户手动切换内容的时候触发
+        /// </summary>
+        public Action<PanelVM, ContextMenuVM, ContextMenuVM> SelectionChangedDelegate { get; set; }
+
         #region 实例变量
 
         private bool visible;

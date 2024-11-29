@@ -1,0 +1,43 @@
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Terminal.Watch;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using WPFToolkit.MVVM;
+
+namespace ModengTerm.ViewModels.Terminals
+{
+    /// <summary>
+    /// 所有PanelContent的基类
+    /// </summary>
+    public abstract class PanelContentVM : MenuContentVM
+    {
+        public const string KEY_SERVICE_AGENT = "serviceAgent";
+        public const string KEY_XTERM_SESSION = "xtermSession";
+
+        protected ServiceAgent ServiceAgent { get; private set; }
+        protected XTermSession Session { get; private set; }
+
+        public override void OnInitialize()
+        {
+            base.OnInitialize();
+
+            this.ServiceAgent = this.Parameters[KEY_SERVICE_AGENT] as ServiceAgent;
+            this.Session = this.Parameters[KEY_XTERM_SESSION] as XTermSession;
+        }
+    }
+
+    /// <summary>
+    /// 带有监控功能的PanelContent基类
+    /// </summary>
+    public abstract class WatchVM : PanelContentVM
+    {
+        /// <summary>
+        /// 执行定时任务
+        /// </summary>
+        public abstract void Watch(AbstractWatcher watcher);
+    }
+}

@@ -14,6 +14,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Base;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Terminal;
+using System.Windows.Threading;
 
 namespace ModengTerm.ViewModels
 {
@@ -85,7 +86,7 @@ namespace ModengTerm.ViewModels
         {
             ISessionContent content = SessionContentFactory.Create(session);
             content.Session = session;
-            
+
             OpenedSessionVM viewModel = OpenedSessionVMFactory.Create(session);
             viewModel.ID = session.ID;
             viewModel.Name = session.Name;
@@ -98,11 +99,21 @@ namespace ModengTerm.ViewModels
             this.SessionList.Insert(index, viewModel);
             this.SelectedSession = viewModel;
 
-            // 在OnLoad事件里执行打开会话的动作
-            // 因为初始化终端需要知道当前的界面大小，从而计算行大小和列大小
             FrameworkElement frameworkElement = content as FrameworkElement;
-            frameworkElement.DataContext = viewModel;
-            frameworkElement.Loaded += SessionContent_Loaded;  // Content完全显示出来会触发这个事件
+            frameworkElement.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                int code = content.Open(viewModel);
+                if (code != ResponseCode.SUCCESS)
+                {
+                    logger.ErrorFormat("打开会话失败, {0}", code);
+                }
+
+                // 打开结束再设置DataContext，绑定数据
+                frameworkElement.DataContext = viewModel;
+
+                this.OnSessionOpened?.Invoke(this, viewModel);
+
+            }), DispatcherPriority.Loaded); // 等待Loaded结束再执行Open方法，因为Open需要获取控件大小计算终端的行和列
 
             return content;
         }
@@ -117,28 +128,6 @@ namespace ModengTerm.ViewModels
             content.Close();
 
             this.SessionList.Remove(session);
-        }
-
-        #endregion
-
-        #region 事件处理器
-
-        private void SessionContent_Loaded(object sender, RoutedEventArgs e)
-        {
-            // 此时所有的界面都加载完了，可以真正打开Session了
-            ISessionContent content = sender as ISessionContent;
-
-            // 要反注册事件，不然每次显示界面就会多打开一个VideoTerminal
-            FrameworkElement frameworkElement = content as FrameworkElement;
-            frameworkElement.Loaded -= this.SessionContent_Loaded;
-
-            int code = content.Open();
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("打开会话失败, {0}", code);
-            }
-
-            this.OnSessionOpened?.Invoke(this, frameworkElement.DataContext as OpenedSessionVM);
         }
 
         #endregion

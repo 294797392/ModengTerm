@@ -11,11 +11,6 @@ namespace ModengTerm
     public interface ISessionContent
     {
         /// <summary>
-        /// 当前打开的会话的ViewModel
-        /// </summary>
-        OpenedSessionVM OpenedSessionVM { get; }
-
-        /// <summary>
         /// 对应的打开的会话
         /// </summary>
         XTermSession Session { get; set; }
@@ -24,7 +19,7 @@ namespace ModengTerm
         /// 控件被完全Loaded的时候调用
         /// </summary>
         /// <returns></returns>
-        int Open();
+        int Open(OpenedSessionVM sessionVM);
 
         void Close();
     }

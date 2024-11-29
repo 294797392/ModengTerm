@@ -88,6 +88,9 @@ namespace ModengTerm.Terminal.ViewModels
         private Task watchTask;
         private ManualResetEvent watchEvent;
         private bool isWatch;
+        private List<WatchVM> watchList; // 当前被激活的监控列表
+        private bool watchListChanged;
+        private object watchListLock = new object();
 
         #endregion
 
@@ -266,6 +269,7 @@ namespace ModengTerm.Terminal.ViewModels
         public ShellSessionVM(XTermSession session) :
             base(session)
         {
+            this.watchList = new List<WatchVM>();
             this.HistoryCommands = new BindableCollection<string>();
             this.Panels = new BindableCollection<PanelVM>();
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
@@ -431,8 +435,8 @@ namespace ModengTerm.Terminal.ViewModels
                 {
                     Children = new BindableCollection<ContextMenuVM>()
                     {
-                        new ContextMenuVM("系统监控", this.ContextMenuVisiblePanelContent_Click, new PanelContent("group1","ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", PanelContentTypeEnum.SystemWatch)),
-                        new ContextMenuVM("快捷命令", this.ContextMenuVisiblePanelContent_Click, new PanelContent("group1","ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", PanelContentTypeEnum.QuickCommand)),
+                        new ContextMenuVM("系统监控", this.ContextMenuVisiblePanelContent_Click, "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm", "panel1"),
+                        new ContextMenuVM("快捷命令", this.ContextMenuVisiblePanelContent_Click, "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", string.Empty, "panel1"),
                         new ContextMenuVM("输入栏", this.ContextMenuSwitchInputPanelVisible_Click)
                     }
                 },
@@ -669,27 +673,31 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        /// <summary>
+        /// 初始化PanelVM
+        /// </summary>
         private void InitializePanelList()
         {
             foreach (ContextMenuVM contextMenu in this.ContextMenus)
             {
-                IEnumerable<ContextMenuVM> children = contextMenu.GetChildrenRecursive().Where(v => v.Data is PanelContent);
+                IEnumerable<ContextMenuVM> children = contextMenu.GetChildrenRecursive().Where(v => !string.IsNullOrEmpty(v.ClassName));
 
                 foreach (ContextMenuVM child in children)
                 {
-                    PanelContent panelContent = child.Data as PanelContent;
-
-                    PanelVM panelVM = this.Panels.FirstOrDefault(v => v.ID.ToString() == panelContent.Group);
+                    PanelVM panelVM = this.Panels.FirstOrDefault(v => v.ID.ToString() == child.PanelId);
                     if (panelVM == null)
                     {
                         panelVM = new PanelVM();
-                        panelVM.ID = panelContent.Group;
-                        panelVM.Name = panelContent.Group;
+                        panelVM.ID = child.PanelId;
+                        panelVM.Name = child.Name;
+                        panelVM.CloseDelegate = this.PerformPanelClosed;
+                        panelVM.SelectionChangedDelegate = this.PerformPanelSelectionChanged;
                         this.Panels.Add(panelVM);
                     }
 
-                    panelContent.OwnerPanel = panelVM;
-                    child.ClassName = panelContent.EntryClass;
+                    child.Parameters[PanelContentVM.KEY_SERVICE_AGENT] = this.ServiceAgent;
+                    child.Parameters[PanelContentVM.KEY_XTERM_SESSION] = this.Session;
+                    child.OwnerPanel = panelVM;
                     panelVM.MenuItems.Add(child);
                 }
             }
@@ -719,7 +727,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void StopRecord() 
+        private void StopRecord()
         {
             if (this.recordStatus == RecordStatusEnum.Stop)
             {
@@ -736,6 +744,50 @@ namespace ModengTerm.Terminal.ViewModels
         private void StopLogger()
         {
             this.logMgr.Stop(this.videoTerminal);
+        }
+
+        /// <summary>
+        /// 把一个WatchVM添加到监控列表里
+        /// 或者把WatchVM从监控列表里移除
+        /// </summary>
+        /// <param name="contextMenu"></param>
+        /// <param name="added">如果为true，那么表示加入监控列表，否则从监控列表里移除</param>
+        private void ModifyWatchList(ContextMenuVM contextMenu, bool added)
+        {
+            if (contextMenu == null) 
+            {
+                return;
+            }
+
+            WatchVM watchVM = contextMenu.ContentVM as WatchVM;
+            if (watchVM == null)
+            {
+                return;
+            }
+
+            if (added)
+            {
+                lock (this.watchListLock)
+                {
+                    this.watchList.Add(watchVM);
+                    this.watchListChanged = true;
+                }
+
+                this.EnableWatcher(true);
+            }
+            else
+            {
+                lock(this.watchListLock)
+                {
+                    this.watchList.Remove(watchVM);
+                    this.watchListChanged = true;
+                }
+
+                if (this.watchList.Count == 0) 
+                {
+                    this.EnableWatcher(false);
+                }
+            }
         }
 
         #endregion
@@ -850,7 +902,7 @@ namespace ModengTerm.Terminal.ViewModels
             sendAllConfigurationWindow.ShowDialog();
         }
 
-        public void CopySelection() 
+        public void CopySelection()
         {
             VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
             if (paragraph.IsEmpty)
@@ -870,13 +922,29 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void WatchThreadProc()
         {
+            List<WatchVM> watchList = new List<WatchVM>();
+
             while (this.isWatch)
             {
                 try
                 {
                     this.watchEvent.WaitOne();
 
-                    SystemInfo systemInfo = this.watcher.GetSystemInfo();
+                    if (this.watchListChanged)
+                    {
+                        watchList.Clear();
+
+                        lock (this.watchListLock)
+                        {
+                            watchList.AddRange(this.watchList);
+                            this.watchListChanged = false;
+                        }
+                    }
+
+                    foreach (WatchVM watch in watchList)
+                    {
+                        watch.Watch(this.watcher);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -884,6 +952,24 @@ namespace ModengTerm.Terminal.ViewModels
                 }
 
                 Thread.Sleep(3000);
+            }
+        }
+
+        private void PerformPanelClosed(PanelVM panelVM)
+        {
+            this.ModifyWatchList(panelVM.SelectedMenu, false);
+        }
+
+        private void PerformPanelSelectionChanged(PanelVM panelVM, ContextMenuVM removed, ContextMenuVM added)
+        {
+            if (removed != null)
+            {
+                this.ModifyWatchList(removed, false);
+            }
+
+            if(added != null)
+            {
+                this.ModifyWatchList(added, true);
             }
         }
 
@@ -1241,13 +1327,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void About()
-        {
-            AboutWindow aboutWindow = new AboutWindow();
-            aboutWindow.Owner = Application.Current.MainWindow;
-            aboutWindow.ShowDialog();
-        }
-
         private void ContextMenuOpenPortForwardWindow_Click(ContextMenuVM sender)
         {
             if (this.Session.Type != (int)SessionTypeEnum.SSH)
@@ -1313,8 +1392,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender)
         {
-            PanelContent panelContent = sender.Data as PanelContent;
-            PanelVM panelVM = panelContent.OwnerPanel;
+            PanelVM panelVM = sender.OwnerPanel;
             ContextMenuVM contextMenu = sender;
 
             // 当前状态
@@ -1333,39 +1411,15 @@ namespace ModengTerm.Terminal.ViewModels
                 // 当前是显示状态，隐藏
                 panelVM.Visible = false;
 
-                switch (panelContent.Type) 
-                {
-                    case PanelContentTypeEnum.ProcessManager:
-                    case PanelContentTypeEnum.SystemWatch:
-                        {
-                            this.EnableWatcher(false);
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
-
+                // 如果当前显示的界面是Watch，那么从列表里移除
+                this.ModifyWatchList(panelVM.SelectedMenu, false);
             }
             else
             {
                 // 当前是隐藏状态，显示
                 panelVM.Visible = true;
                 panelVM.SelectedMenu = null;
-                panelVM.InvokeWhenSelectionChanged(contextMenu);
-
-                switch (panelContent.Type)
-                {
-                    case PanelContentTypeEnum.ProcessManager:
-                    case PanelContentTypeEnum.SystemWatch:
-                        {
-                            this.EnableWatcher(true);
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
+                panelVM.SwitchContent(contextMenu);
             }
         }
 

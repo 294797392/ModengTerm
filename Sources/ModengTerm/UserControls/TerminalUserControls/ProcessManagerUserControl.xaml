@@ -6,8 +6,7 @@
              xmlns:local="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
              xmlns:mterm="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             DataContext="{Binding Source={x:Static mterm:MTermApp.Context}, Path=MainWindowVM.OpenedSessionsVM.SelectedSession}">
+             d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
 

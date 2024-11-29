@@ -16,6 +16,7 @@ namespace ModengTerm.Terminal.Watch
             {
                 case SessionTypeEnum.SSH: return new UnixSshWatcher(session);
                 case SessionTypeEnum.AdbShell: return new UnixAdbWatcher(session);
+                case SessionTypeEnum.Localhost: return new Win32Watcher(session);
                 default:
                     throw new NotImplementedException();
             }

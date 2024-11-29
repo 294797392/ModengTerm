@@ -1,20 +1,8 @@
-﻿using ModengTerm.Controls;
+﻿using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls.TerminalUserControls
 {
@@ -85,15 +73,16 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ListBoxMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            MenuItemVM selectedItem = ListBoxMenus.SelectedItem as MenuItemVM;
+            ContextMenuVM selectedItem = ListBoxMenus.SelectedItem as ContextMenuVM;
             if (selectedItem == null) 
             {
                 return;
             }
 
-            this.PanelVM.InvokeWhenSelectionChanged();
+            this.PanelVM.SwitchContent(selectedItem);
             ContentControl1.Content = this.PanelVM.CurrentContent;
             TextBlockTitle.Text = selectedItem.Name;
+            this.PanelVM.SelectionChangedDelegate(this.PanelVM, e.RemovedItems.Count > 0 ? e.RemovedItems[0] as ContextMenuVM : null, e.AddedItems[0] as ContextMenuVM);
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
@@ -101,6 +90,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             if (this.PanelVM != null)
             {
                 this.PanelVM.Visible = false;
+                this.PanelVM.CloseDelegate(this.PanelVM);
             }
             else
             {

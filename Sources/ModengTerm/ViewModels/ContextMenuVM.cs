@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.ViewModels.Terminals;
+using System;
 using System.Collections.Generic;
 using System.Security.RightsManagement;
 using System.Windows.Documents;
@@ -11,13 +12,9 @@ namespace ModengTerm.ViewModels
     /// </summary>
     public delegate void ContextMenuDelegate(ContextMenuVM sender);
 
-    public interface IContextMenuData
-    {
-
-    }
-
     /// <summary>
-    /// 会话上下文菜单
+    /// 标题栏菜单ViewModel
+    /// 同时也是侧边栏窗格的ViewModel
     /// </summary>
     public class ContextMenuVM : MenuItemVM
     {
@@ -52,9 +49,14 @@ namespace ModengTerm.ViewModels
         }
 
         /// <summary>
-        /// 菜单的扩展数据
+        /// 作为侧边栏窗格的ViewModel，它所属的侧边栏窗格容器Id
         /// </summary>
-        public IContextMenuData Data { get; private set; }
+        public string PanelId { get; private set; }
+
+        /// <summary>
+        /// 作为侧边栏窗格的ViewModel，它所属的侧边栏窗格容器
+        /// </summary>
+        public PanelVM OwnerPanel { get; set; }
 
         #endregion
 
@@ -83,10 +85,13 @@ namespace ModengTerm.ViewModels
             this.canChecked = canChecked;
         }
 
-        public ContextMenuVM(string name, ContextMenuDelegate execute, IContextMenuData menuData) :
+        public ContextMenuVM(string name, ContextMenuDelegate execute, string entryClass, string vmClassEntry, string panelId) :
             this(name, execute, true)
         {
-            this.Data = menuData;
+            this.ClassName = entryClass;
+            this.VMClassName = vmClassEntry;
+            this.PanelId = panelId;
+            this.Parameters = new Dictionary<string, object>();
         }
 
         #endregion

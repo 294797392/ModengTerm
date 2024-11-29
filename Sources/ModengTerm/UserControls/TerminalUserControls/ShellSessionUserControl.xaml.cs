@@ -364,7 +364,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region ISessionContent
 
-        public int Open()
+        public int Open(OpenedSessionVM sessionVM)
         {
             string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
@@ -389,7 +389,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
             DocumentMain.DrawArea.SizeChanged += DrawArea_SizeChanged;
 
-            this.shellSession = this.DataContext as ShellSessionVM;
+            this.shellSession = sessionVM as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
             this.shellSession.AlternateDocument = DocumentAlternate;
             this.shellSession.Width = width;
