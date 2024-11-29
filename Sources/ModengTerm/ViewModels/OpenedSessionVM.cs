@@ -1,76 +1,13 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Terminal.Callbacks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
-using Xceed.Wpf.Toolkit.Core.Utilities;
 
 namespace ModengTerm.ViewModels
 {
-    /// <summary>
-    /// 会话上下文菜单
-    /// </summary>
-    public class SessionContextMenu : ViewModelBase
-    {
-        private bool canChecked;
-        private bool isChecked;
-
-        public BindableCollection<SessionContextMenu> Children { get; set; }
-
-        public bool CanChecked
-        {
-            get { return this.canChecked; }
-            set
-            {
-                if (this.canChecked != value)
-                {
-                    this.canChecked = value;
-                    this.NotifyPropertyChanged("CanChecked");
-                }
-            }
-        }
-
-        public bool IsChecked
-        {
-            get { return this.isChecked; }
-            set
-            {
-                if (this.isChecked != value)
-                {
-                    this.isChecked = value;
-                    this.NotifyPropertyChanged("IsChecked");
-                }
-            }
-        }
-
-        public ExecuteShellFunctionCallback Execute { get; private set; }
-
-        public SessionContextMenu(string name)
-        {
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = name;
-        }
-
-        public SessionContextMenu(string name, ExecuteShellFunctionCallback execute)
-        {
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = name;
-            this.Execute = execute;
-        }
-
-        public SessionContextMenu(string name, ExecuteShellFunctionCallback execute, bool canChecked) :
-            this(name, execute)
-        {
-            this.canChecked = canChecked;
-        }
-    }
-
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
@@ -138,9 +75,9 @@ namespace ModengTerm.ViewModels
 
         /// <summary>
         /// 该会话的上下文菜单
-        /// 不同类型的会话可以有不同的上上下文菜单
+        /// 标题菜单和右键菜单（如果有的话）
         /// </summary>
-        public BindableCollection<SessionContextMenu> ContextMenus { get; private set; }
+        public BindableCollection<ContextMenuVM> ContextMenus { get; private set; }
 
         #endregion
 
@@ -157,8 +94,8 @@ namespace ModengTerm.ViewModels
 
         public int Open()
         {
-            this.ContextMenus = new BindableCollection<SessionContextMenu>();
-            this.ContextMenus.AddRange(this.GetContextMenus());
+            this.ContextMenus = new BindableCollection<ContextMenuVM>();
+            this.ContextMenus.AddRange(this.OnCreateContextMenu());
 
             return this.OnOpen();
         }
@@ -176,10 +113,10 @@ namespace ModengTerm.ViewModels
         protected abstract void OnClose();
 
         /// <summary>
-        /// 获取该会话的上下文菜单
+        /// 创建该会话的上下文菜单
         /// </summary>
         /// <returns></returns>
-        protected abstract List<SessionContextMenu> GetContextMenus();
+        protected abstract List<ContextMenuVM> OnCreateContextMenu();
 
         #endregion
 

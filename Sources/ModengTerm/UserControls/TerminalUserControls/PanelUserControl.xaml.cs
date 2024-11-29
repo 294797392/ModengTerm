@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Controls;
-using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,31 +14,32 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls.TerminalUserControls
 {
     /// <summary>
     /// ToolPanelUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class ToolPanelUserControl : UserControl
+    public partial class PanelUserControl : UserControl
     {
         #region 依赖属性
 
-        public ToolPanelVM PanelVM
+        public PanelVM PanelVM
         {
-            get { return (ToolPanelVM)GetValue(PanelVMProperty); }
+            get { return (PanelVM)GetValue(PanelVMProperty); }
             set { SetValue(PanelVMProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for PanelVM.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PanelVMProperty =
-            DependencyProperty.Register("PanelVM", typeof(ToolPanelVM), typeof(ToolPanelUserControl), new PropertyMetadata(null, PanelVMPropertyChangedCallback));
+            DependencyProperty.Register("PanelVM", typeof(PanelVM), typeof(PanelUserControl), new PropertyMetadata(null, PanelVMPropertyChangedCallback));
 
         #endregion
 
         #region 构造方法
 
-        public ToolPanelUserControl()
+        public PanelUserControl()
         {
             InitializeComponent();
 
@@ -58,7 +59,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 依赖属性回调
 
-        private void OnPanelVMPropertyChanged(ToolPanelVM oldValue, ToolPanelVM newValue)
+        private void OnPanelVMPropertyChanged(PanelVM oldValue, PanelVM newValue)
         {
             ListBoxMenus.DataContext = newValue;
 
@@ -74,8 +75,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private static void PanelVMPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            ToolPanelUserControl me = d as ToolPanelUserControl;
-            me.OnPanelVMPropertyChanged(e.OldValue as ToolPanelVM, e.NewValue as ToolPanelVM);
+            PanelUserControl me = d as PanelUserControl;
+            me.OnPanelVMPropertyChanged(e.OldValue as PanelVM, e.NewValue as PanelVM);
         }
 
         #endregion
@@ -84,7 +85,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ListBoxMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ToolPanelItemVM selectedItem = ListBoxMenus.SelectedItem as ToolPanelItemVM;
+            MenuItemVM selectedItem = ListBoxMenus.SelectedItem as MenuItemVM;
             if (selectedItem == null) 
             {
                 return;

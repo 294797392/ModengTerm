@@ -31,7 +31,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 窗口顶部的菜单列表
         /// </summary>
-        public BindableCollection<SessionContextMenu> TitleMenus { get; private set; }
+        public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
 
         /// <summary>
         /// 所有主题列表
@@ -57,7 +57,7 @@ namespace ModengTerm.ViewModels
                 this.RecentlyOpenedSession.Add(recentlySessionVM);
             }
 
-            this.TitleMenus = new BindableCollection<SessionContextMenu>();
+            this.TitleMenus = new BindableCollection<ContextMenuVM>();
 
             this.Themes = new BindableCollection<AppThemeVM>();
             this.Themes.AddRange(MTermApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));

@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels
+namespace ModengTerm.ViewModels.Terminals
 {
-    public enum ToolPanelTypeEnum
+    public enum PanelContentTypeEnum
     {
         /// <summary>
         /// 资源管理器
@@ -31,45 +31,40 @@ namespace ModengTerm.ViewModels
         SystemWatch
     }
 
-    public class ToolPanelItemVM : MenuItemVM
+    public class PanelVM : AbstractMenuVM<ContextMenuVM>
     {
-        public ToolPanelTypeEnum Type { get; set; }
+        #region 实例变量
 
-        /// <summary>
-        /// 该PanelItem属于哪个Panel
-        /// </summary>
-        public ToolPanelVM OwnerPanel { get; set; }
-
-        public ToolPanelItemVM() { }
-
-        public ToolPanelItemVM(MenuDefinition menu) :
-            base(menu)
-        {
-        }
-    }
-
-    public class ToolPanelVM : AbstractMenuVM<ToolPanelItemVM>
-    {
         private bool visible;
 
+        #endregion
+
+        #region 属性
+
         /// <summary>
-        /// 是否显示该菜单
+        /// 是否显示该窗口
         /// </summary>
         public bool Visible
         {
-            get { return this.visible; }
+            get { return visible; }
             set
             {
-                if (this.visible != value)
+                if (visible != value)
                 {
-                    this.visible = value;
-                    this.NotifyPropertyChanged("Visible");
+                    visible = value;
+                    NotifyPropertyChanged("Visible");
                 }
             }
         }
 
-        public ToolPanelVM()
+        #endregion
+
+        #region 构造方法
+
+        public PanelVM()
         {
         }
+
+        #endregion
     }
 }

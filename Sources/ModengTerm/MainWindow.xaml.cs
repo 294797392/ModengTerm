@@ -330,7 +330,7 @@ namespace ModengTerm
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            SessionContextMenu contextMenu = menuItem.DataContext as SessionContextMenu;
+            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             contextMenu.Execute();
         }
 

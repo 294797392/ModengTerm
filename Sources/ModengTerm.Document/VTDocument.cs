@@ -1147,10 +1147,11 @@ namespace ModengTerm.Document
         /// <param name="row"></param>
         public void SetCursorPhysical(int row)
         {
-            // 物理行号没变化，但是有可能ActiveLine改变了
+            // 物理行号没变化，逻辑行号或者ActiveLine会变化（当光标在可视区域内，滚动滚动条）
             if (this.Cursor.PhysicsRow == row)
             {
                 int logicalRow = row - this.Scrollbar.Value;
+                this.Cursor.Row = logicalRow;
                 this.ActiveLine = this.FirstLine.FindNext(logicalRow);
                 return;
             }

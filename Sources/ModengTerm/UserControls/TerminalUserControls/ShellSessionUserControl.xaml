@@ -84,7 +84,7 @@
 
             <!-- 右侧窗格 -->
             <Grid Grid.Column="2">
-                <termuc2:ToolPanelUserControl PanelVM="{Binding Path=Panels[0]}" Width="300" Margin="5,0,0,0"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[0]}" Width="300" Margin="5,0,0,0"/>
             </Grid>
 
         </Grid>

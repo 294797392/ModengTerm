@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.UnitTest.TestCases
 {
     /// <summary>
+    /// 调用VideoTerminal或者VTDocument的公开接口
     /// 对VideoTerminal各个功能做测试
     /// </summary>
     public class TestVideoTerminalEngine
@@ -134,6 +135,7 @@ namespace ModengTerm.UnitTest.TestCases
 
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
             VTDocument document = terminal.MainDocument;
+            VTCursor cursor = terminal.Cursor;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             int row = document.ViewportRow;
@@ -155,7 +157,7 @@ namespace ModengTerm.UnitTest.TestCases
                     return false;
                 }
 
-                if (document.ActiveLine != null) 
+                if (document.ActiveLine != null)
                 {
                     logger.Error("{BBC100AD-CD16-4C94-880C-81B4FA0007E5}");
                     return false;
@@ -169,7 +171,7 @@ namespace ModengTerm.UnitTest.TestCases
                 logger.ErrorFormat("ScrollTo(50)数据不正确");
                 return false;
             }
-            if (document.ActiveLine != null) 
+            if (document.ActiveLine != null)
             {
                 logger.Error("{3564D449-C71A-452A-86C5-CE3234AC0564}");
                 return false;
@@ -187,6 +189,52 @@ namespace ModengTerm.UnitTest.TestCases
                 logger.Error("{CF8169A0-F0FE-4A0E-AB4A-55E629854A9E}");
                 return false;
             }
+
+            #region 测试滚动之后的光标位置
+
+            #region 设置物理行号测试逻辑行号
+
+            terminal.ScrollTo(200);
+            // 把光标移动到可视区域中间
+            document.SetCursorPhysical(210);
+            // 判断光标的逻辑行号
+            if (cursor.Row != 10)
+            {
+                logger.Error("{13C28187-51FD-47AF-8099-CFDDFC2AA41A}");
+                return false;
+            }
+
+            // 往下滚动一行
+            terminal.ScrollTo(201);
+            // 判断光标物理行号
+            if (cursor.PhysicsRow != 210 || cursor.Row != 9)
+            {
+                logger.Error("{9CE8BA0B-E53C-428A-9CC1-0CF7D394881E}");
+                return false;
+            }
+
+            // 往上滚动一行
+            terminal.ScrollTo(200);
+            if (cursor.PhysicsRow != 210 || cursor.Row != 10)
+            {
+                logger.Error("{A75E7F33-5284-4FE6-A89B-E85DF00F0A01}");
+                return false;
+            }
+
+            #endregion
+
+            #region 设置逻辑行号测试物理行号
+
+            document.SetCursorLogical(20, cursor.Column);
+            if (cursor.PhysicsRow != 220)
+            {
+                logger.Error("{64ECE4F9-D880-43E0-9E16-B9D2C9D58236}");
+                return false;
+            }
+
+            #endregion
+
+            #endregion
 
             return true;
         }

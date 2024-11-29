@@ -213,7 +213,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            SessionContextMenu functionMenu = menuItem.DataContext as SessionContextMenu;
+            ContextMenuVM functionMenu = menuItem.DataContext as ContextMenuVM;
             if (functionMenu == null)
             {
                 return;
