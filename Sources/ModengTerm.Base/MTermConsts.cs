@@ -158,5 +158,10 @@ namespace ModengTerm.Base
         /// </summary>
         public const int DefaultAdbWatchTimeout = 5000;
         public const string DefaultAdbTempDir = "/tmp";
+
+        public const int WatchIntervalNormal = 2000;
+        public const int WatchIntervalHigh = 1000;
+        public const int WatchIntervalLow = 3000;
+        public const WatchFrequencyEnum DefaultWatchFrequency = WatchFrequencyEnum.Normal;
     }
 }

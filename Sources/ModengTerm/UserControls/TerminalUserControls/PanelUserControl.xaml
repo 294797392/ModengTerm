@@ -14,13 +14,13 @@
         <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type termctrl:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES65014E}"/>
+                    <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES501014E}"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES65015E}"/>
+                    <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES501015E}"/>
                 </Trigger>
             </Style.Triggers>
-            <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES65013E}"/>
+            <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES501013E}"/>
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="Width" Value="20"/>
             <Setter Property="Height" Value="20"/>
@@ -41,15 +41,15 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
-            <Border x:Name="BorderTitle" Background="{DynamicResource ResourceKey=RES65002E}" BorderThickness="0"/>
-            <TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource ResourceKey=RES65008E}"/>
+            <Border x:Name="BorderTitle" Background="{DynamicResource ResourceKey=RES501002E}" BorderThickness="0"/>
+            <TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource ResourceKey=RES501008E}"/>
             <termctrl:MdButton x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
                                SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonClose_Click"
                                Style="{StaticResource ResourceKey=StyleMdButtonLocal}"/>
 
         </Grid>
 
-        <Border Grid.Row="1" Background="{DynamicResource ResourceKey=RES65001E}"/>
+        <Border Grid.Row="1" Background="{DynamicResource ResourceKey=RES501001E}"/>
         <ContentControl Grid.Row="1" x:Name="ContentControl1"/>
 
         <ListBox Grid.Row="2" x:Name="ListBoxMenus" ItemsSource="{Binding Path=MenuItems}"
@@ -89,8 +89,8 @@
                 <Style TargetType="{x:Type ListBoxItem}">
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES65005E}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES65012E}"/>
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501005E}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES501012E}"/>
                             <Setter Property="Margin" Value="0,0,2,0"/>
                             <Setter Property="Height" Value="27"/>
                         </Trigger>
@@ -99,8 +99,8 @@
                                 <Condition Property="IsSelected" Value="False"/>
                                 <Condition Property="IsMouseOver" Value="True"/>
                             </MultiTrigger.Conditions>
-                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES65007E}"/>
-                            <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES65011E}"/>
+                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501007E}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES501011E}"/>
                         </MultiTrigger>
                     </Style.Triggers>
                     <Setter Property="VerticalAlignment" Value="Top"/>
@@ -110,8 +110,8 @@
                     <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <Setter Property="BorderThickness" Value="0"/>
                     <Setter Property="BorderBrush" Value="{x:Null}"/>
-                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES65006E}"/>
-                    <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES65010E}"/>
+                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501006E}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES501010E}"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type ListBoxItem}">

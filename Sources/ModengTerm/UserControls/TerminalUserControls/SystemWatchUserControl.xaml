@@ -6,7 +6,113 @@
              xmlns:local="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style x:Key="StyleTextBlockKey" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StyleProgressBarLocal" TargetType="{x:Type ProgressBar}">
+                <Setter Property="Height" Value="20"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItem}">
+            </Style>
             
+            <Style x:Key="StyleListBoxLocal" TargetType="{x:Type ListBox}" BasedOn="{StaticResource ResourceKey=StyleListBox}">
+                <Setter Property="Margin" Value="5,0,5,0"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES505002E}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES505001E}"/>
+                <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemLocal}"/>
+            </Style>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- CPU和内存 -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="25"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="CPU" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+            <ProgressBar Grid.Row="0" Grid.Column="1" Value="{Binding Path=CpuPercent}" Minimum="0" Maximum="100" Style="{StaticResource ResourceKey=StyleProgressBarLocal}"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=CpuPercent, StringFormat='{}{0}%'}"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="内存" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+            <ProgressBar Grid.Row="1" Grid.Column="1" Value="{Binding Path=MemoryPercent}" Minimum="0" Maximum="100" Style="{StaticResource ResourceKey=StyleProgressBarLocal}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=MemoryPercent, StringFormat='{}{0}%'}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Path=MemoryRatio}"/>
+
+        </Grid>
+
+        <!-- 磁盘信息 -->
+        <Grid Grid.Row="2" MinHeight="100" MaxHeight="250" Margin="0,5,0,0">
+            <DataGrid DataContext="{Binding Path=Disks}" ItemsSource="{Binding}" RowHeight="25"
+                      ColumnHeaderHeight="25"
+                      Margin="5,0,5,0" Style="{StaticResource ResourceKey=StyleDataGrid}">
+
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ResourceKey=StyleDataGridColumnHeader}">
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn Header="路径" MinWidth="70">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" 
+                                           HorizontalAlignment="Left" Margin="5,0,0,0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="可用/大小" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=FreeRatio}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- 网络接口信息 -->
+        <Grid Grid.Row="3" MinHeight="100" MaxHeight="400" Margin="0,5,0,0">
+            <ListBox Style="{StaticResource ResourceKey=StyleListBoxLocal}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        
+        
     </Grid>
 </UserControl>

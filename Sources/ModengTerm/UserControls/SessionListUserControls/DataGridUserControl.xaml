@@ -21,7 +21,7 @@
     </UserControl.Resources>
 
     <Grid>
-        <DataGrid x:Name="DataGridSessionList" IsReadOnly="True" AutoGenerateColumns="False" HeadersVisibility="Column"
+        <DataGrid x:Name="DataGridSessionList" 
                   ItemsSource="{Binding}" ColumnHeaderHeight="20" RowHeight="30" MouseDoubleClick="DataGridSessionList_MouseDoubleClick" 
                   Style="{StaticResource ResourceKey=StyleDataGrid}">
 

@@ -84,7 +84,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         private bool inputPanelVisible;
 
-        private AbstractWatcher watcher;
         private Task watchTask;
         private ManualResetEvent watchEvent;
         private bool isWatch;
@@ -714,7 +713,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 if (this.watchTask == null)
                 {
-                    this.watcher = WatcherFactory.Create(this.Session);
                     this.watchEvent = new ManualResetEvent(false);
                     this.watchTask = Task.Factory.StartNew(this.WatchThreadProc);
                     this.isWatch = true;
@@ -923,7 +921,11 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void WatchThreadProc()
         {
+            WatchFrequencyEnum frequency = this.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, MTermConsts.DefaultWatchFrequency);
+            int updateInterval = MTermUtils.GetWatchInterval(frequency);
             List<WatchVM> watchList = new List<WatchVM>();
+            AbstractWatcher watcher = WatcherFactory.Create(this.Session);
+            watcher.Initialize();
 
             while (this.isWatch)
             {
@@ -944,7 +946,7 @@ namespace ModengTerm.Terminal.ViewModels
 
                     foreach (WatchVM watch in watchList)
                     {
-                        watch.Watch(this.watcher);
+                        watch.Watch(watcher);
                     }
                 }
                 catch (Exception ex)
@@ -952,8 +954,10 @@ namespace ModengTerm.Terminal.ViewModels
                     logger.Error("WatchThread异常", ex);
                 }
 
-                Thread.Sleep(3000);
+                Thread.Sleep(updateInterval);
             }
+
+            watcher.Release();
         }
 
         private void PerformPanelClosed(PanelVM panelVM)

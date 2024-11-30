@@ -462,29 +462,26 @@
         </Setter>
     </Style>
 
+    <Style x:Key="StyleDataGridColumnHeader" TargetType="{x:Type DataGridColumnHeader}">
+        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES5033E}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5032E}"/>
+        <Setter Property="BorderThickness" Value="0,0,1,0"/>
+        <Setter Property="Padding" Value="10,0,0,0" />
+    </Style>
     <Style x:Key="StyleDataGrid" TargetType="{x:Type DataGrid}">
         <Setter Property="Background" Value="{DynamicResource ResourceKey=RES4000E}" />
         <Setter Property="AlternationCount" Value="2"/>
-        <Setter Property="BorderBrush" Value="Transparent" />
-        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES4001E}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CanUserAddRows" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />
         <Setter Property="AutoGenerateColumns" Value="False" />
         <Setter Property="IsReadOnly" Value="True" />
         <Setter Property="GridLinesVisibility" Value="None" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
-
+        <Setter Property="HeadersVisibility" Value="Column"/>
         <!-- 定义列头的样式 -->
-        <Setter Property="ColumnHeaderStyle">
-            <Setter.Value>
-                <Style TargetType="{x:Type DataGridColumnHeader}">
-                    <Setter Property="Background" Value="White"/>
-                    <Setter Property="BorderBrush" Value="#DFDFDF"/>
-                    <Setter Property="BorderThickness" Value="0,0,1,0"/>
-                    <Setter Property="Padding" Value="10,0,0,0" />
-                </Style>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource ResourceKey=StyleDataGridColumnHeader}"/>
 
         <!-- 定义行的样式 -->
         <Setter Property="RowStyle">

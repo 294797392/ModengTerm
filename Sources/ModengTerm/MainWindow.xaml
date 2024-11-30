@@ -177,6 +177,7 @@
                         <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES50053E}"/>
                     </Trigger>
                 </Style.Triggers>
+                <EventSetter Event="PreviewMouseLeftButtonUp" Handler="ListBoxItemAppTheme_MouseLeftButtonDown"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Padding" Value="5"/>
                 <Setter Property="Template">
@@ -263,7 +264,8 @@
                     <Grid MaxHeight="300" Margin="3">
                         <ListBox x:Name="ListBoxThemes" DataContext="{Binding Path=Themes}" ItemsSource="{Binding}"
                                  SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 SelectionChanged="ListBoxThemes_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxAppTheme}">
+                                 SelectionChanged="ListBoxThemes_SelectionChanged"
+                                 Style="{StaticResource ResourceKey=StyleListBoxAppTheme}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>

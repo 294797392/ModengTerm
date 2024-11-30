@@ -14,6 +14,15 @@ namespace ModengTerm.Terminal.Watch
         {
         }
 
+        public override void Initialize()
+        {
+        }
+
+        public override void Release()
+        {
+        }
+
+
         public override string df_h()
         {
             throw new NotImplementedException();

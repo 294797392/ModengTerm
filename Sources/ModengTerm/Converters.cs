@@ -585,4 +585,31 @@ namespace ModengTerm
             throw new NotImplementedException();
         }
     }
+
+    public class WatchFrequencyTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is WatchFrequencyEnum))
+            {
+                return string.Empty;
+            }
+
+            WatchFrequencyEnum commandType = (WatchFrequencyEnum)value;
+
+            switch (commandType)
+            {
+                case WatchFrequencyEnum.Normal: return "正常";
+                case WatchFrequencyEnum.Low: return "低";
+                case WatchFrequencyEnum.High: return "高";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

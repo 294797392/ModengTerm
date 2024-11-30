@@ -74,6 +74,7 @@
 
     <!-- DataGrid 4000 - 5000 -->
     <SolidColorBrush x:Key="RES4000E" Color="White"/><!-- 背景 -->
+    <SolidColorBrush x:Key="RES4001E" Color="#D9E1FA"/><!-- 边框 -->
 
     <!-- DataGridRow 5001 - 6000 -->
     <SolidColorBrush x:Key="RES5001E" Color="#E9F0FF"/><!-- 悬浮背景 -->
@@ -84,6 +85,8 @@
     <SolidColorBrush x:Key="RES5021E"/><!-- 默认边框 -->
     <SolidColorBrush x:Key="RES5030E" Color="#E9F0FF" Opacity="0.5"/><!-- 交替背景 -->
     <SolidColorBrush x:Key="RES5031E" Color="#E9F0FF" Opacity="0.5"/><!-- 交替边框 -->
+    <SolidColorBrush x:Key="RES5032E" Color="#DFDFDF"/><!-- 列头边框 -->
+    <SolidColorBrush x:Key="RES5033E" Color="White"/><!-- 列头背景 -->
 
     <!-- MdWindow 6001 - 8000 -->
     <SolidColorBrush x:Key="RES6001E" Color="#203D77"/><!-- 边框 -->
@@ -200,7 +203,27 @@
     <!-- UserControl 500001 - 800000 -->
 
     <!-- OpenSessionWindow 500001 - 501001 -->
-    <SolidColorBrush x:Key="RES500001E" Color="#C0CAE9"/><!-- DataGrid上边框 -->
+
+    <!-- PanelUserControl 501001 - 505000 -->
+    <SolidColorBrush x:Key="RES501001E" Color="#F7F9FE"/><!-- 背景 -->
+    <SolidColorBrush x:Key="RES501002E" Color="#40568D"/><!-- 标题背景 -->
+    <SolidColorBrush x:Key="RES501003E" Color="#F5CC84"/><!-- 标题选中背景 -->
+    <SolidColorBrush x:Key="RES501004E" Color="#CCD5F0"/><!-- 工具栏背景 -->
+    <SolidColorBrush x:Key="RES501005E" Color="#F7F9FE"/><!-- TabItem选中背景 -->
+    <SolidColorBrush x:Key="RES501006E" Color="#40568D"/><!-- TabItem默认背景 -->
+    <SolidColorBrush x:Key="RES501007E" Color="#BBC6F1"/><!-- TabItem悬浮背景 -->
+    <SolidColorBrush x:Key="RES501008E" Color="White"/><!-- 标题前景色 -->
+    <SolidColorBrush x:Key="RES501009E" Color="Black"/><!-- 标题选中前景色 -->
+    <SolidColorBrush x:Key="RES501010E" Color="#D9E1FA"/><!-- TabItem默认前景 -->
+    <SolidColorBrush x:Key="RES501011E" Color="Black"/><!-- TabItem悬浮前景 -->
+    <SolidColorBrush x:Key="RES501012E" Color="Black"/><!-- TabItem选中前景 -->
+    <SolidColorBrush x:Key="RES501013E" Color="#A0ACD2"/><!-- 关闭按钮背景 -->
+    <SolidColorBrush x:Key="RES501014E" Color="#C0CAE9"/><!-- 关闭按钮悬浮背景 -->
+    <SolidColorBrush x:Key="RES501015E" Color="#C0CAE9"/><!-- 关闭按钮按下背景 -->
+
+    <!-- SystemWatchUserControl 505001 - 510000 -->
+    <SolidColorBrush x:Key="RES505001E" Color="#D9E1FA"/><!-- 网络接口列表边框 -->
+    <SolidColorBrush x:Key="RES505002E" Color="Transparent"/><!-- 网络接口列表背景 -->
 
 
     <!-- CreateSessionWindow 55001 - 60000 -->
@@ -214,23 +237,8 @@
     <SolidColorBrush x:Key="RES60002" Color="#40508D"/><!-- 状态栏背景色 -->
     <SolidColorBrush x:Key="RES60003" Color="White"/><!-- 状态栏前景色 -->
 
-    <!-- ToolPanelUserControl 65001 - 70000 -->
-    <SolidColorBrush x:Key="RES65001E" Color="#F7F9FE"/><!-- 背景 -->
-    <SolidColorBrush x:Key="RES65002E" Color="#40568D"/><!-- 标题背景 -->
-    <SolidColorBrush x:Key="RES65003E" Color="#F5CC84"/><!-- 标题选中背景 -->
-    <SolidColorBrush x:Key="RES65004E" Color="#CCD5F0"/><!-- 工具栏背景 -->
-    <SolidColorBrush x:Key="RES65005E" Color="#F7F9FE"/><!-- TabItem选中背景 -->
-    <SolidColorBrush x:Key="RES65006E" Color="#40568D"/><!-- TabItem默认背景 -->
-    <SolidColorBrush x:Key="RES65007E" Color="#BBC6F1"/><!-- TabItem悬浮背景 -->
-    <SolidColorBrush x:Key="RES65008E" Color="White"/><!-- 标题前景色 -->
-    <SolidColorBrush x:Key="RES65009E" Color="Black"/><!-- 标题选中前景色 -->
-    <SolidColorBrush x:Key="RES65010E" Color="#D9E1FA"/><!-- TabItem默认前景 -->
-    <SolidColorBrush x:Key="RES65011E" Color="Black"/><!-- TabItem悬浮前景 -->
-    <SolidColorBrush x:Key="RES65012E" Color="Black"/><!-- TabItem选中前景 -->
-    <SolidColorBrush x:Key="RES65013E" Color="#A0ACD2"/><!-- 关闭按钮背景 -->
-    <SolidColorBrush x:Key="RES65014E" Color="#C0CAE9"/><!-- 关闭按钮悬浮背景 -->
-    <SolidColorBrush x:Key="RES65015E" Color="#C0CAE9"/><!-- 关闭按钮按下背景 -->
-
+    
+    
     <!-- 四种连接状态图标 -->
     <BitmapImage x:Key="5520" UriSource="pack://application:,,,/ModengTerm;component/Images/ok.png"/>
     <BitmapImage x:Key="5521" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>

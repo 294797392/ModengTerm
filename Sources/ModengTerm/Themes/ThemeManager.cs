@@ -57,14 +57,6 @@ namespace ModengTerm.Themes
             }
         }
 
-        /// <summary>
-        /// 清除所有资源缓存
-        /// </summary>
-        public static void ClearResource() 
-        {
-            resourceMap.Clear();
-        }
-
         public static ResourceDictionary GetResourceDictionary(string resourceUri)
         {
             ResourceDictionary resourceDictionary;
@@ -97,6 +89,8 @@ namespace ModengTerm.Themes
             Application.Current.Resources.MergedDictionaries.Add(resourceDictionary);
 
             currentTheme = resourceDictionary;
+
+            resourceMap.Clear();
         }
     }
 }

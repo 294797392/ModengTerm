@@ -126,5 +126,17 @@ namespace ModengTerm.Base
         {
             return port > 0 && port < 65535;
         }
+
+        public static int GetWatchInterval(WatchFrequencyEnum frequency)
+        {
+            switch (frequency)
+            {
+                case WatchFrequencyEnum.Normal: return MTermConsts.WatchIntervalNormal;
+                case WatchFrequencyEnum.High: return MTermConsts.WatchIntervalHigh;
+                case WatchFrequencyEnum.Low: return MTermConsts.WatchIntervalLow;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
     }
 }

@@ -11,11 +11,13 @@ namespace ModengTerm.Terminal.Watch
     {
         public AbstractWatcher(XTermSession session) { }
 
+        public abstract void Initialize();
+
+        public abstract void Release();
+
         public abstract SystemInfo GetSystemInfo();
 
-        public abstract void GetDisks();
-
-        public abstract void GetNetworkInterfaces();
+        //public abstract void GetNetworkInterfaces();
 
         //public abstract void GetProcesses();
     }

@@ -16,6 +16,7 @@ using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Terminal;
 using System.Windows.Threading;
 using System.Windows.Media;
+using System.Reflection.Metadata;
 
 namespace ModengTerm.ViewModels
 {
@@ -101,20 +102,8 @@ namespace ModengTerm.ViewModels
             this.SelectedSession = viewModel;
 
             FrameworkElement frameworkElement = content as FrameworkElement;
-            frameworkElement.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                int code = content.Open(viewModel);
-                if (code != ResponseCode.SUCCESS)
-                {
-                    logger.ErrorFormat("打开会话失败, {0}", code);
-                }
-
-                // 打开结束再设置DataContext，绑定数据
-                frameworkElement.DataContext = viewModel;
-
-                this.OnSessionOpened?.Invoke(this, viewModel);
-
-            }), DispatcherPriority.Loaded); // 等待Loaded结束再执行Open方法，因为Open需要获取控件大小计算终端的行和列
+            frameworkElement.Tag = viewModel;
+            frameworkElement.Loaded += FrameworkElement_Loaded;
 
             return content;
         }
@@ -129,6 +118,35 @@ namespace ModengTerm.ViewModels
             content.Close();
 
             this.SessionList.Remove(session);
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        /// <summary>
+        /// 等待Loaded结束再执行Open方法，因为Open需要获取控件大小计算终端的行和列
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void FrameworkElement_Loaded(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            frameworkElement.Loaded -= FrameworkElement_Loaded;
+
+            ISessionContent content = frameworkElement as ISessionContent;
+            OpenedSessionVM viewModel = frameworkElement.Tag as OpenedSessionVM;
+
+            int code = content.Open(viewModel);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("打开会话失败, {0}", code);
+            }
+
+            // 打开结束再设置一次DataContext，绑定数据
+            frameworkElement.DataContext = viewModel;
+
+            this.OnSessionOpened?.Invoke(this, viewModel);
         }
 
         #endregion

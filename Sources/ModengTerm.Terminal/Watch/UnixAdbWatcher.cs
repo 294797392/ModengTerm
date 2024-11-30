@@ -316,6 +316,14 @@ namespace ModengTerm.Terminal.Watch
 
         #region UnixWatcher
 
+        public override void Initialize()
+        {
+        }
+
+        public override void Release()
+        {
+        }
+
         public override string proc_stat()
         {
             return this.ReadFile("/proc/stat");

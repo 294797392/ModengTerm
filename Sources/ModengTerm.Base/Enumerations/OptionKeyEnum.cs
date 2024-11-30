@@ -237,6 +237,12 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
+        #region 会话 - 系统监控 4501 - 5000
+
+        WATCH_FREQUENCY = 4501,
+
+        #endregion
+
         #region SFTP 10000 - 11000
 
         SFTP_SERVER_ADDRESS = 10000,

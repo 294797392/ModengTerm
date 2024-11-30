@@ -477,16 +477,20 @@ namespace ModengTerm
             //ListBoxToolbarMenus.SelectedItem = null; // 使下次可以继续点击
         }
 
+        private void ListBoxItemAppTheme_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            PopupThemes.IsOpen = false;
+        }
+
         private void ListBoxThemes_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             AppThemeVM appTheme = ListBoxThemes.SelectedItem as AppThemeVM;
-            if (appTheme == null) 
+            if (appTheme == null)
             {
                 return;
             }
 
             ThemeManager.ApplyTheme(appTheme.Uri);
-            ThemeManager.ClearResource();
         }
 
 
