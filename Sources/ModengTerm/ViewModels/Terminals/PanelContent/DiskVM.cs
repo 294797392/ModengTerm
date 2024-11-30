@@ -13,7 +13,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
     /// <summary>
     /// 磁盘驱动器ViewModel
     /// </summary>
-    public class DiskVM : ItemViewModel
+    public class DiskVM : UpdatableVM<DiskInfo>
     {
         #region 实例变量
 
@@ -66,18 +66,17 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         #region 构造方法
 
-        public DiskVM(DiskInfo diskInfo)
+        public DiskVM()
         {
             this.TotalSpace = new UnitValue();
             this.FreeSpace = new UnitValue();
-
-            this.Update(diskInfo);
         }
 
         #endregion
 
-        public void Update(DiskInfo diskInfo)
+        public override void Update(DiskInfo diskInfo)
         {
+            this.ID = diskInfo.ID;
             this.Name = diskInfo.Name;
             this.Format = diskInfo.Format;
 

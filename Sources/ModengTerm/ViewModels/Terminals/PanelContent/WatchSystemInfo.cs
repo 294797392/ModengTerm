@@ -1,4 +1,5 @@
-﻿using ModengTerm.Enumerations;
+﻿using DotNEToolkit.DataModels;
+using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections;
@@ -8,30 +9,10 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    //public class UpdatableVM : ViewModelBase
-    //{ 
-    //}
-
-    //public class Updater<TViewModel, TDataModel>
-    //{ 
-    //    public IList<TViewModel> ViewModels { get; set; }
-
-    //    public IList<TDataModel> DataModels { get; set; }
-
-    //    public IList<TDataModel> RemoveItems { get; set; }
-
-    //    public IList<TDataModel> AddItems { get; set; }
-
-    //    public void Update() 
-    //    {
-    //        if (this.AddItems.Count > 0) 
-    //        {
-    //            foreach (TDataModel dataModel in this.AddItems)
-    //            {
-    //            }
-    //        }
-    //    }
-    //}
+    public abstract class UpdatableVM<TDataModel> : ItemViewModel
+    {
+        public abstract void Update(TDataModel dataModel);
+    }
 
     public class WatchSystemInfo : WatchVM
     {
@@ -147,50 +128,59 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.MemoryPercent = Math.Round((double)this.UsedMemory.Bytes / this.TotalMemory.Bytes * 100, 2);
             this.MemoryRatio = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
 
-            #region 更新磁盘信息
-
-            if (systemInfo.AddDisks.Count > 0)
-            {
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    foreach (DiskInfo diskInfo in systemInfo.AddDisks)
-                    {
-                        DiskVM diskVM = new DiskVM(diskInfo);
-                        this.Disks.Add(diskVM);
-                    }
-                });
-            }
-
-            if (systemInfo.RemoveDisks.Count > 0)
-            {
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    foreach (DiskInfo removeDisk in systemInfo.RemoveDisks)
-                    {
-                        DiskVM toRemove = this.Disks.FirstOrDefault(v => v.Name == removeDisk.Name);
-                        if (toRemove != null)
-                        {
-                            this.Disks.Remove(toRemove);
-                        }
-                    }
-                });
-            }
-
-            foreach (DiskVM diskVM in this.Disks)
-            {
-                DiskInfo diskInfo = systemInfo.DiskInfos.FirstOrDefault(v => v.Name == diskVM.Name);
-                if (diskInfo != null)
-                {
-                    diskVM.Update(diskInfo);
-                }
-            }
-
-            #endregion
+            // 更新磁盘信息
+            this.UpdateList<DiskVM, DiskInfo>(systemInfo.DiskItems, this.Disks);
         }
 
         #endregion
 
         #region 实例方法
+
+        private void UpdateList<TViewModel, TDataModel>(ChangedItems<TDataModel> dataModels, IList<TViewModel> viewModels)
+            where TViewModel : UpdatableVM<TDataModel>, new()
+            where TDataModel : UpdatableModel
+        {
+            IList<TDataModel> items = dataModels.Items;
+            IList<TDataModel> addItems = dataModels.AddItems;
+            IList<TDataModel> removeItems = dataModels.RemoveItems;
+
+            if (addItems.Count > 0)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    foreach (TDataModel add in addItems)
+                    {
+                        TViewModel viewModel = new TViewModel();
+                        viewModel.Update(add);
+                        viewModels.Add(viewModel);
+                    }
+                });
+            }
+
+            if (removeItems.Count > 0)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    foreach (TDataModel remove in removeItems)
+                    {
+                        TViewModel toRemove = viewModels.FirstOrDefault(v => v.ID.ToString() == remove.ID);
+                        if (toRemove != null)
+                        {
+                            viewModels.Remove(toRemove);
+                        }
+                    }
+                });
+            }
+
+            foreach (TViewModel viewModel in viewModels)
+            {
+                TDataModel toUpdate = items.FirstOrDefault(v => v.ID == viewModel.ID.ToString());
+                if (toUpdate != null)
+                {
+                    viewModel.Update(toUpdate);
+                }
+            }
+        }
 
         #endregion
     }

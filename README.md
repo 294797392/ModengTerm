@@ -1,6 +1,6 @@
 # ModengTerm - simple and powerful terminal emulator
 
-ModengTerm is a terminal emulator developed using WPF, and it borrows many features from other terminal software.  
+ModengTerm is a terminal emulator developed using WPF, and it borrows many features from other terminal software, and hopes to introduce innovations based on its current features and user needs.  
 ModengTerm has done a lot of things, such as parsing terminal sequences, text rendering, cursor rendering, text selection, scrolling history records, and so on... So its customizability is particularly high, and the complexity of the code is also relatively high.
 
 ## Main Features

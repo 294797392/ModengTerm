@@ -1,7 +1,9 @@
 ﻿using ModengTerm.Base.DataModels;
 using System.Diagnostics;
 using System.IO;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Windows.Shell;
 
 namespace ModengTerm.Terminal.Watch
 {
@@ -51,7 +53,7 @@ namespace ModengTerm.Terminal.Watch
         {
             MEMORYSTATUSEX memstat;
             memstat.dwLength = (uint)this.memstatSize;
-            if (!GlobalMemoryStatusEx(out memstat)) 
+            if (!GlobalMemoryStatusEx(out memstat))
             {
                 logger.ErrorFormat("GlobalMemoryStatusEx失败, {0}", Marshal.GetLastWin32Error());
                 return null;
@@ -61,56 +63,16 @@ namespace ModengTerm.Terminal.Watch
             this.systemInfo.AvailableMemory = memstat.dwAvailPhys / 1024;
             this.systemInfo.CpuPercent = this.cpuPerf.NextValue();
 
-            #region 更新磁盘信息
-
             // 更新磁盘信息
-            List<DiskInfo> oldDisks = this.systemInfo.DiskInfos;
-            List<DiskInfo> addDisks = this.systemInfo.AddDisks;
-            addDisks.Clear();
-            List<DiskInfo> removeDisks = this.systemInfo.RemoveDisks;
-            removeDisks.Clear();
             DriveInfo[] newDisks = DriveInfo.GetDrives();
-
-            // 判断是否有新的磁盘和更新磁盘信息
-            foreach (DriveInfo driveInfo in newDisks)
-            {
-                DiskInfo disk = oldDisks.FirstOrDefault(v => v.Name == driveInfo.Name);
-                if (disk == null)
-                {
-                    disk = new DiskInfo();
-                    oldDisks.Add(disk);
-                    addDisks.Add(disk);
-                }
-
-                // 更新磁盘信息
-                disk.Name = driveInfo.Name;
-                disk.TotalSpace = driveInfo.TotalSize;
-                disk.FreeSpace = driveInfo.TotalFreeSpace;
-                disk.Format = driveInfo.DriveFormat;
-            }
-
-            // 判断是否有磁盘被移除了
-            if (oldDisks.Count != newDisks.Length)
-            {
-                foreach (DiskInfo diskInfo in oldDisks)
-                {
-                    DriveInfo driveInfo = newDisks.FirstOrDefault(v => v.Name == diskInfo.Name);
-                    if (driveInfo == null)
-                    {
-                        removeDisks.Add(diskInfo);
-                    }
-                }
-
-                foreach (DiskInfo diskInfo in removeDisks)
-                {
-                    oldDisks.Remove(diskInfo);
-                }
-            }
-
-            #endregion
+            //this.UpdateItems<DriveInfo, DiskInfo>(this.systemInfo.DiskItems, newDisks, (v => {v.Name == }), null);
 
             return this.systemInfo;
         }
+
+        #endregion
+
+        #region 实例方法
 
         #endregion
 
@@ -153,3 +115,4 @@ namespace ModengTerm.Terminal.Watch
         #endregion
     }
 }
+
