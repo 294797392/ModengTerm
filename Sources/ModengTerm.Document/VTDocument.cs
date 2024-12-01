@@ -1128,11 +1128,11 @@ namespace ModengTerm.Document
             {
                 Cursor.Row = row;
 
-                // 当光标所在行被滚动到了可视区域外，ActiveLine就是空的
-                ActiveLine = FirstLine.FindNext(row);
-
                 this.Cursor.PhysicsRow = this.Scrollbar.Value + row;
             }
+
+            // 有可能ActiveLine变了，更新ActiveLine
+            this.ActiveLine = this.FirstLine.FindNext(row);
 
             if (Cursor.Column != column)
             {

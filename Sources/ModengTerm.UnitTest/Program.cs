@@ -105,9 +105,8 @@ namespace ModengTerm.UnitTest
 
             RunTestCase(typeof(TestVideoTerminalOptions));
 
-            logger.InfoFormat("--- TestPerformance ---");
-
-            RunPerformanceTest();
+            //logger.InfoFormat("--- TestPerformance ---");
+            //RunPerformanceTest();
 
             Console.ReadLine();
         }

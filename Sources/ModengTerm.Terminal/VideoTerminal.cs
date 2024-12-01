@@ -2078,13 +2078,17 @@ namespace ModengTerm.Terminal
 
                 case CsiActionCodes.SD_ScrollDown:
                     {
-                        logger.ErrorFormat("未实现SD_ScrollDown");
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
+                        this.ScrollRegionVertically(n);
+                        VTDebug.Context.WriteInteractive("SD_ScrollDown", "{0}", n);
                         break;
                     }
 
                 case CsiActionCodes.SU_ScrollUp:
                     {
-                        logger.ErrorFormat("未实现SU_ScrollUp");
+                        int n = VTParameter.GetParameter(parameters, 0, 1);
+                        this.ScrollRegionVertically(-n);
+                        VTDebug.Context.WriteInteractive("SU_ScrollUp", "{0}", n);
                         break;
                     }
 
@@ -2116,7 +2120,74 @@ namespace ModengTerm.Terminal
 
         #endregion
 
-        #region Dispatch
+        #region VTActions
+
+        /// <summary>
+        /// 对滚动区域内的数据进行滚动
+        /// </summary>
+        /// <param name="delta">要滚动的行数。大于0表示往下滚动，小于0表示往上滚动</param>
+        private void ScrollRegionVertically(int delta)
+        {
+            VTDocument document = this.activeDocument;
+            VTCursor cursor = document.Cursor;
+            VTHistory history = document.History;
+            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTextLine scrollRegionTopLine = document.FirstLine.FindNext(document.ScrollMarginTop);
+            VTextLine scrollRegionBottomLine = document.LastLine.FindPrevious(document.ScrollMarginBottom);
+
+            int n = Math.Abs(delta);
+
+            // 更新可视区域的记录
+            if (delta > 0)
+            {
+                VTextLine newTopLine = scrollRegionBottomLine;
+                for (int i = 0; i < n; i++)
+                {
+                    VTextLine previous = newTopLine.PreviousLine;
+
+                    document.SwapLineReverse(newTopLine, scrollRegionTopLine);
+                    newTopLine.DeleteAll();
+
+                    newTopLine = previous;
+                }
+            }
+            else
+            {
+                VTextLine newBottomLine = scrollRegionTopLine;
+                for (int i = 0; i < n; i++)
+                {
+                    VTextLine next = newBottomLine.NextLine;
+
+                    document.SwapLine(newBottomLine, scrollRegionBottomLine);
+                    newBottomLine.DeleteAll();
+
+                    newBottomLine = next;
+                }
+            }
+
+            // 更新历史记录，让历史记录的行的顺序和可视区域一致
+
+            // 滚动区域内的第一行的物理行号
+            int scrollRegionTopPhysicsRow = scrollInfo.Value + document.ScrollMarginTop;
+            scrollRegionTopLine = document.FirstLine.FindNext(document.ScrollMarginTop);
+            scrollRegionBottomLine = document.LastLine.FindPrevious(document.ScrollMarginBottom);
+            VTextLine current = scrollRegionTopLine;
+            while (true)
+            {
+                history.Set(scrollRegionTopPhysicsRow, current.History);
+                scrollRegionTopPhysicsRow++;
+
+                if (current == scrollRegionBottomLine)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
+            }
+
+            // 更新光标所在行
+            document.SetCursorLogical(cursor.Row, cursor.Column);
+        }
 
         public void CarriageReturn()
         {
@@ -2220,7 +2291,7 @@ namespace ModengTerm.Terminal
                             }
                             else
                             {
-                                // newActiveLine和HistoryLine可能不匹配，因为在缩小窗口的时候VTextLine直接被删除了
+                                // newActiveLine和HistoryLine可能不匹配
                                 // 所以在这里强制重新更新一下光标所在行的历史记录
                                 newActiveLine.SetHistory(historyLine);
                             }

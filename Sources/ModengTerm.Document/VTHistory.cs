@@ -68,10 +68,11 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 根据物理行号移除一行
+        /// 如果历史记录特别多，Remove的时候会很慢，暂时不开放这个接口
         /// </summary>
         /// <param name="physicsRow">要移除的物理行号</param>
         /// <returns></returns>
-        public void RemoveAt(int physicsRow)
+        private void RemoveAt(int physicsRow)
         {
             // 要删除的物理行号比总行数多，无法删除
             if (physicsRow >= this.Lines)
@@ -131,6 +132,22 @@ namespace ModengTerm.Document
             this.LastLine = historyLine;
 
             this.Lines++;
+        }
+
+        /// <summary>
+        /// 把指定的行的历史记录设置为指定的值
+        /// </summary>
+        /// <param name="physicsRow">要设置的行的物理行号</param>
+        /// <param name="historyLine">要设置的历史记录</param>
+        public void Set(int physicsRow, VTHistoryLine historyLine)
+        {
+            // 要删除的物理行号比总行数多，无法删除
+            if (physicsRow >= this.Lines)
+            {
+                return;
+            }
+
+            this.historyList.Set(physicsRow, historyLine);
         }
 
         /// <summary>
@@ -204,6 +221,8 @@ namespace ModengTerm.Document
 
         public abstract void RemoveAt(int physicsRow);
 
+        public abstract void Set(int physicsRow, VTHistoryLine historyLine);
+
         /// <summary>
         /// 获取指定的历史记录行
         /// </summary>
@@ -219,6 +238,7 @@ namespace ModengTerm.Document
         /// <param name="historyLines">获取的行列表</param>
         /// <returns>是否获取成功</returns>
         public abstract IEnumerable<VTHistoryLine> ElementsAt(int startPhysicsRow, int endPhysicsRow);
+
     }
 
     /// <summary>
@@ -248,6 +268,11 @@ namespace ModengTerm.Document
         public override void RemoveAt(int physicsRow)
         {
             this.historyLines.RemoveAt(physicsRow);
+        }
+
+        public override void Set(int physicsRow, VTHistoryLine historyLine)
+        {
+            this.historyLines[physicsRow] = historyLine;
         }
 
         public override VTHistoryLine ElementAt(int rowIndex)

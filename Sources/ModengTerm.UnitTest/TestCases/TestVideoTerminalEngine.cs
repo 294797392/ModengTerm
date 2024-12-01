@@ -40,6 +40,7 @@ namespace ModengTerm.UnitTest.TestCases
             // 判断可视区域内容
             if (!UnitTestHelper.DocumentCompare(mainDocument, textLines))
             {
+                logger.Error("34F9275C-F871-2A07-C1CA-28A32FF7BB0E");
                 return false;
             }
 

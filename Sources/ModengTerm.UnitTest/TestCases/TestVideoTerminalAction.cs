@@ -123,6 +123,35 @@ namespace ModengTerm.UnitTest.TestCases
 
         #region 针对于每个指令做单元测试
 
+        [UnitTest]
+        public bool Print() 
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            VTDocument mainDocument = terminal.MainDocument;
+            VTScrollInfo scrollInfo = mainDocument.Scrollbar;
+            int row = mainDocument.ViewportRow;
+            int col = mainDocument.ViewportColumn;
+
+            #region 直接打印到第5列
+
+            /* 当前行里的VTCharacters是空的，光标直接移动到第5列去打印一个字符A */
+
+            byte[] bytes = ControlSequenceGenerator.CUP_CursorPosition(1, 5);
+            terminal.ProcessData(bytes, bytes.Length);
+            bytes = new byte[] { (byte)'A' };
+            terminal.ProcessData(bytes, bytes.Length);
+            string firstLine = VTUtils.CreatePlainText(mainDocument.FirstLine.Characters);
+            if (firstLine != "    A")
+            {
+                logger.ErrorFormat("15595312-F6A2-72B7-5901-1DBE0768BEDA");
+                return false;
+            }
+
+            #endregion
+
+            return true;
+        }
+
         /// <summary>
         /// 测试移动光标之后光标数据是否正确
         /// </summary>
@@ -633,6 +662,8 @@ namespace ModengTerm.UnitTest.TestCases
             {
                 return false;
             }
+
+            logger.ErrorFormat("DECSTBM_SetScrollingRegion, SD_ScrollDown And SU_ScrollUp");
 
             return true;
         }

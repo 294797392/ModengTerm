@@ -266,7 +266,7 @@ namespace ModengTerm.Document
             {
                 // 要打印的位置和最后一个字符之间还有多余的空间
                 // 补齐字符
-                int count = columns - this.columns;
+                int count = column - this.columns;
                 for (int i = 0; i < count; i++)
                 {
                     this.Characters.Add(VTCharacter.CreateNull());
@@ -556,7 +556,9 @@ namespace ModengTerm.Document
         /// </summary>
         public void DeleteAll()
         {
-            this.DeleteRange(0, this.Characters.Count);
+            this.Characters.Clear();
+            this.columns = 0;
+            this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
         /// <summary>
