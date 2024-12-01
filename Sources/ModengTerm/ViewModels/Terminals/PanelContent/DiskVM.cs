@@ -13,7 +13,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
     /// <summary>
     /// 磁盘驱动器ViewModel
     /// </summary>
-    public class DiskVM : UpdatableVM<DiskInfo>
+    public class DiskVM : ItemViewModel
     {
         #region 实例变量
 
@@ -73,21 +73,29 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         }
 
         #endregion
+    }
 
-        public override void Update(DiskInfo diskInfo)
+    public class DiskVMCopy : ObjectCopy<DiskVM, DiskInfo>
+    {
+        public override bool Compare(DiskVM target, DiskInfo source)
         {
-            this.ID = diskInfo.ID;
-            this.Name = diskInfo.Name;
-            this.Format = diskInfo.Format;
+            return target.Name == source.Name;
+        }
+
+        public override void CopyTo(DiskVM target, DiskInfo source)
+        {
+            target.ID = source.Name;
+            target.Name = source.Name;
+            target.Format = source.Format;
 
             bool sizeChanged = false;
 
-            sizeChanged = ClientUtils.UpdateSpaceSize(this.TotalSpace, diskInfo.TotalSpace);
-            sizeChanged = ClientUtils.UpdateSpaceSize(this.FreeSpace, diskInfo.FreeSpace);
+            sizeChanged = ClientUtils.UpdateSpaceSize(target.TotalSpace, source.TotalSpace);
+            sizeChanged = ClientUtils.UpdateSpaceSize(target.FreeSpace, source.FreeSpace);
 
             if (sizeChanged)
             {
-                this.FreeRatio = string.Format("{0}/{1}", this.FreeSpace, this.TotalSpace);
+                target.FreeRatio = string.Format("{0}/{1}", target.FreeSpace, target.TotalSpace);
             }
         }
     }

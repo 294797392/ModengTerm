@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Watch
 {
-    public class DiskInfo : UpdatableModel
+    public class DiskInfo
     {
         private string name;
         private double totalSpace;
@@ -75,13 +75,12 @@ namespace ModengTerm.Terminal.Watch
         }
     }
 
-    public class Win32DiskSync : Sync<DiskInfo, DriveInfo>
+    public class Win32DiskCopy : ObjectCopy<DiskInfo, DriveInfo>
     {
-        public override void Update(DiskInfo diskInfo, DriveInfo platformDisk)
+        public override void CopyTo(DiskInfo diskInfo, DriveInfo platformDisk)
         {
             DriveInfo driveInfo = platformDisk as DriveInfo;
 
-            diskInfo.ID = driveInfo.Name;
             diskInfo.Name = driveInfo.Name;
             diskInfo.TotalSpace = driveInfo.TotalSize;
             diskInfo.FreeSpace = driveInfo.TotalFreeSpace;

@@ -23,6 +23,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DataModels\**" />
+    <EmbeddedResource Remove="DataModels\**" />
+    <None Remove="DataModels\**" />
+    <Page Remove="DataModels\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
@@ -137,10 +144,6 @@
     <Page Update="UserControls\TerminalUserControls\ShellSessionUserControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DataModels\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

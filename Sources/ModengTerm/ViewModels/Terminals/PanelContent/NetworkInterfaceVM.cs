@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Terminal.Watch;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,6 +43,20 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                     this.NotifyPropertyChanged("DownloadSpeed");
                 }
             }
+        }
+    }
+
+    public class NetworkInterfaceVMCopy : ObjectCopy<NetworkInterfaceVM, NetInterfaceInfo>
+    {
+        public override bool Compare(NetworkInterfaceVM target, NetInterfaceInfo source)
+        {
+            return target.ID.ToString() == source.ID;
+        }
+
+        public override void CopyTo(NetworkInterfaceVM target, NetInterfaceInfo source)
+        {
+            target.ID = source.ID;
+            target.Name = source.Name;
         }
     }
 }

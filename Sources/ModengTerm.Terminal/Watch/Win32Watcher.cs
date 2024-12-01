@@ -11,6 +11,8 @@ namespace ModengTerm.Terminal.Watch
     {
         #region 类变量
 
+        public static readonly Win32DiskCopy Win32DiskSync = new Win32DiskCopy();
+        public static readonly Win32NetworkInterfaceCopy Win32NetworkInterfaceCopy = new Win32NetworkInterfaceCopy();
         private static log4net.ILog logger = log4net.LogManager.GetLogger("Win32Watcher");
 
         #endregion
@@ -65,7 +67,11 @@ namespace ModengTerm.Terminal.Watch
 
             // 更新磁盘信息
             DriveInfo[] newDisks = DriveInfo.GetDrives();
-            //this.UpdateItems<DriveInfo, DiskInfo>(this.systemInfo.DiskItems, newDisks, (v => {v.Name == }), null);
+            this.Copy<DriveInfo, DiskInfo>(this.systemInfo.DiskItems, newDisks, Win32DiskSync);
+
+            // 更新网络接口信息
+            NetworkInterface[] newIfaces = NetworkInterface.GetAllNetworkInterfaces();
+            this.Copy<NetworkInterface, NetInterfaceInfo>(this.systemInfo.NetworkInterfaces, newIfaces, Win32NetworkInterfaceCopy);
 
             return this.systemInfo;
         }

@@ -1,23 +1,17 @@
-﻿using DotNEToolkit.DataModels;
-using ModengTerm.Enumerations;
+﻿using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public abstract class UpdatableVM<TDataModel> : ItemViewModel
-    {
-        public abstract void Update(TDataModel dataModel);
-    }
-
     public class WatchSystemInfo : WatchVM
     {
         #region 类变量
 
+        private static readonly DiskVMCopy DiskVMSync = new DiskVMCopy();
+        private static readonly NetworkInterfaceVMCopy NetworkInterfaceVMCopy = new NetworkInterfaceVMCopy();
         private static log4net.ILog logger = log4net.LogManager.GetLogger("WatchSystemInfo");
 
         #endregion
@@ -129,30 +123,33 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.MemoryRatio = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
 
             // 更新磁盘信息
-            this.UpdateList<DiskVM, DiskInfo>(systemInfo.DiskItems, this.Disks);
+            this.Copy<DiskVM, DiskInfo>(systemInfo.DiskItems, this.Disks, DiskVMSync);
+
+            // 更新网络接口信息
+            this.Copy<NetworkInterfaceVM, NetInterfaceInfo>(systemInfo.NetworkInterfaces, this.NetworkInterfaces, NetworkInterfaceVMCopy);
         }
 
         #endregion
 
         #region 实例方法
 
-        private void UpdateList<TViewModel, TDataModel>(ChangedItems<TDataModel> dataModels, IList<TViewModel> viewModels)
-            where TViewModel : UpdatableVM<TDataModel>, new()
-            where TDataModel : UpdatableModel
+        private void Copy<Target, TSource>(ChangedItems<TSource> copyTo, IList<Target> copyFrom, ObjectCopy<Target, TSource> copy)
+            where Target : class, new()
+            where TSource : class
         {
-            IList<TDataModel> items = dataModels.Items;
-            IList<TDataModel> addItems = dataModels.AddItems;
-            IList<TDataModel> removeItems = dataModels.RemoveItems;
+            IList<TSource> items = copyTo.Items;
+            IList<TSource> addItems = copyTo.AddItems;
+            IList<TSource> removeItems = copyTo.RemoveItems;
 
             if (addItems.Count > 0)
             {
                 App.Current.Dispatcher.Invoke(() =>
                 {
-                    foreach (TDataModel add in addItems)
+                    foreach (TSource add in addItems)
                     {
-                        TViewModel viewModel = new TViewModel();
-                        viewModel.Update(add);
-                        viewModels.Add(viewModel);
+                        Target viewModel = new Target();
+                        copy.CopyTo(viewModel, add);
+                        copyFrom.Add(viewModel);
                     }
                 });
             }
@@ -161,23 +158,43 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             {
                 App.Current.Dispatcher.Invoke(() =>
                 {
-                    foreach (TDataModel remove in removeItems)
+                    foreach (TSource remove in removeItems)
                     {
-                        TViewModel toRemove = viewModels.FirstOrDefault(v => v.ID.ToString() == remove.ID);
+                        Target toRemove = null;
+
+                        foreach (Target target in copyFrom)
+                        {
+                            if (copy.Compare(target, remove))
+                            {
+                                toRemove = target;
+                                break;
+                            }
+                        }
+
                         if (toRemove != null)
                         {
-                            viewModels.Remove(toRemove);
+                            copyFrom.Remove(toRemove);
                         }
                     }
                 });
             }
 
-            foreach (TViewModel viewModel in viewModels)
+            foreach (Target viewModel in copyFrom)
             {
-                TDataModel toUpdate = items.FirstOrDefault(v => v.ID == viewModel.ID.ToString());
+                TSource toUpdate = null;
+
+                foreach (TSource source in items)
+                {
+                    if (copy.Compare(viewModel, source))
+                    {
+                        toUpdate = source;
+                        break;
+                    }
+                }
+
                 if (toUpdate != null)
                 {
-                    viewModel.Update(toUpdate);
+                    copy.CopyTo(viewModel, toUpdate);
                 }
             }
         }

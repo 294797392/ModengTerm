@@ -104,10 +104,11 @@
 
         <!-- 网络接口信息 -->
         <Grid Grid.Row="3" MinHeight="100" MaxHeight="400" Margin="0,5,0,0">
-            <ListBox Style="{StaticResource ResourceKey=StyleListBoxLocal}">
+            <ListBox DataContext="{Binding Path=NetworkInterfaces}" ItemsSource="{Binding}" 
+                     Style="{StaticResource ResourceKey=StyleListBoxLocal}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock/>
+                        <TextBlock Text="{Binding Path=Name}"/>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

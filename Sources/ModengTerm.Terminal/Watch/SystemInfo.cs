@@ -8,15 +8,6 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Watch
 {
-    public class NetworkIface
-    {
-        public string Name { get; set; }
-
-        public int DownloadSpeed { get; set; }
-
-        public int UploadSpeed { get; set; }
-    }
-
     public class SystemInfo
     {
         /// <summary>
@@ -38,9 +29,12 @@ namespace ModengTerm.Terminal.Watch
 
         public ChangedItems<DiskInfo> DiskItems { get; private set; }
 
+        public ChangedItems<NetInterfaceInfo> NetworkInterfaces { get; private set; }
+
         public SystemInfo()
         {
             this.DiskItems = new ChangedItems<DiskInfo>();
+            this.NetworkInterfaces = new ChangedItems<NetInterfaceInfo>();
         }
     }
 }

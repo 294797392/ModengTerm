@@ -10,7 +10,7 @@ namespace ModengTerm.Terminal.Watch
     /// 存储集合被修改之后的数据
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ChangedItems<T> where T : UpdatableModel
+    public class ChangedItems<T>
     {
         /// <summary>
         /// 所有数据项

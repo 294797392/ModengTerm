@@ -8,14 +8,14 @@ namespace ModengTerm.Terminal.Watch
 {
     /// <summary>
     /// 数据同步器
-    /// 用于把不同平台的数据转换成统一类型的数据
+    /// 用于Source拷贝到Target里
     /// </summary>
-    public abstract class Sync<Target, Source>
+    public abstract class ObjectCopy<Target, Source>
     {
         /// <summary>
-        /// 把Source的数据填充到target
+        /// 把Source的数据更新到target
         /// </summary>
-        public abstract void Update(Target target, Source source);
+        public abstract void CopyTo(Target target, Source source);
 
         /// <summary>
         /// target和source做比对看是否一致

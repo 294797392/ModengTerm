@@ -17,55 +17,58 @@ namespace ModengTerm.Terminal.Watch
 
         public abstract SystemInfo GetSystemInfo();
 
-
-        private void UpdateItems<TSystemModel, TDataModel>(ChangedItems<TDataModel> toUpdate, IEnumerable<TSystemModel> systemModels, Sync<TDataModel, TSystemModel> sync)
-            where TDataModel : UpdatableModel, new()
+        /// <summary>
+        /// 把source集合拷贝到target集合里
+        /// </summary>
+        /// <typeparam name="TSource">被拷贝的集合里的元素类型</typeparam>
+        /// <typeparam name="TTarget">拷贝到的集合里的元素类型</typeparam>
+        /// <param name="copyTo"></param>
+        /// <param name="copyFrom"></param>
+        /// <param name="copy"></param>
+        protected void Copy<TSource, TTarget>(ChangedItems<TTarget> copyTo, IEnumerable<TSource> copyFrom, ObjectCopy<TTarget, TSource> copy)
+            where TTarget : class, new()
         {
-            IList<TDataModel> items = toUpdate.Items;
-            IList<TDataModel> addItems = toUpdate.AddItems;
-            IList<TDataModel> removeItems = toUpdate.RemoveItems;
+            IList<TTarget> items = copyTo.Items;
+            IList<TTarget> addItems = copyTo.AddItems;
+            IList<TTarget> removeItems = copyTo.RemoveItems;
             addItems.Clear();
             removeItems.Clear();
 
             // 判断是否需要新建项
-            foreach (TSystemModel systemModel in systemModels)
+            foreach (TSource source in copyFrom)
             {
-                TDataModel found = null;
-
-                bool exist = false;
-
-                foreach (TDataModel dataModel in items)
+                TTarget found = null;
+                foreach (TTarget item in items)
                 {
-                    if (sync.Compare(dataModel, systemModel))
+                    if (copy.Compare(item, source))
                     {
-                        found = dataModel;
-                        exist = true;
+                        found = item;
                         break;
                     }
                 }
 
-                if (!exist)
+                if (found == null)
                 {
-                    found = new TDataModel();
+                    found = new TTarget();
                     items.Add(found);
                     addItems.Add(found);
                 }
 
-                sync.Update(found, systemModel);
+                copy.CopyTo(found, source);
             }
 
             // 判断是否需要删除项
-            if (items.Count != systemModels.Count())
+            if (items.Count != copyFrom.Count())
             {
                 // 查询每个DataModel是否存在于systemModels里
 
-                foreach (TDataModel dataModel in items)
+                foreach (TTarget target in items)
                 {
                     bool exist = false;
 
-                    foreach (TSystemModel systemModel in systemModels)
+                    foreach (TSource systemModel in copyFrom)
                     {
-                        if (sync.Compare(dataModel, systemModel))
+                        if (copy.Compare(target, systemModel))
                         {
                             exist = true;
                             break;
@@ -75,11 +78,11 @@ namespace ModengTerm.Terminal.Watch
                     // DataModel不存在于SystemModels里，说明要删除
                     if (!exist)
                     {
-                        removeItems.Add(dataModel);
+                        removeItems.Add(target);
                     }
                 }
 
-                foreach (TDataModel remove in removeItems)
+                foreach (TTarget remove in removeItems)
                 {
                     items.Remove(remove);
                 }
