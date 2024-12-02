@@ -38,7 +38,7 @@ namespace ModengTerm.UnitTest.TestCases
             List<string> textLines = UnitTestHelper.BuildTextLines(row);
             UnitTestHelper.DrawTextLines(terminal, textLines);
             // 判断可视区域内容
-            if (!UnitTestHelper.DocumentCompare(mainDocument, textLines))
+            if (!UnitTestHelper.CompareDocument(mainDocument, textLines))
             {
                 logger.Error("34F9275C-F871-2A07-C1CA-28A32FF7BB0E");
                 return false;
@@ -57,7 +57,7 @@ namespace ModengTerm.UnitTest.TestCases
             }
             // 判断滚动后的可视区域的内容
             textLines.AddRange(textLines1);
-            if (!UnitTestHelper.DocumentCompare(mainDocument, textLines.Skip(10).ToList()))
+            if (!UnitTestHelper.CompareDocument(mainDocument, textLines.Skip(10).ToList()))
             {
                 logger.Error("{862A001F-7570-4F32-8253-C715D8D35821}");
                 return false;
@@ -98,7 +98,7 @@ namespace ModengTerm.UnitTest.TestCases
             }
 
             // 检查历史记录内容是否正确
-            if (!UnitTestHelper.HistoryCompare(document.History, textLines))
+            if (!UnitTestHelper.CompareHistory(document.History, textLines))
             {
                 return false;
             }
@@ -152,7 +152,7 @@ namespace ModengTerm.UnitTest.TestCases
             for (int i = 0; i < 10; i++)
             {
                 terminal.ScrollTo(i);
-                if (!UnitTestHelper.DocumentCompare(document, textLines.Skip(i).Take(row).ToList()))
+                if (!UnitTestHelper.CompareDocument(document, textLines.Skip(i).Take(row).ToList()))
                 {
                     logger.ErrorFormat("ScrollTo({0})数据不正确", i);
                     return false;
@@ -167,7 +167,7 @@ namespace ModengTerm.UnitTest.TestCases
 
             // 测试滚动到第50行
             terminal.ScrollTo(50);
-            if (!UnitTestHelper.DocumentCompare(document, textLines.Skip(50).Take(row).ToList()))
+            if (!UnitTestHelper.CompareDocument(document, textLines.Skip(50).Take(row).ToList()))
             {
                 logger.ErrorFormat("ScrollTo(50)数据不正确");
                 return false;
@@ -180,7 +180,7 @@ namespace ModengTerm.UnitTest.TestCases
 
             // 滚动条滚动到底
             terminal.ScrollTo(500);
-            if (!UnitTestHelper.DocumentCompare(document, textLines.TakeLast(row).ToList()))
+            if (!UnitTestHelper.CompareDocument(document, textLines.TakeLast(row).ToList()))
             {
                 logger.ErrorFormat("ScrollTo(500)数据不正确");
                 return false;

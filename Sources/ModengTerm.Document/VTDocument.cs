@@ -4,7 +4,9 @@ using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Windows.Controls.Primitives;
 
 namespace ModengTerm.Document
 {
@@ -918,75 +920,6 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 从光标所在行开始删除行，并把后面的行往前移动
-        /// TODO：也许该改个名字，文本编辑器的DeleteLines和终端的DeleteLines的动作不一样
-        /// </summary>
-        /// <param name="lines">要删除的行数</param>
-        public void DeleteLines(int lines)
-        {
-            VTextLine activeLine = this.ActiveLine;
-
-            VTextLine current = activeLine;
-
-            VTextLine head = FirstLine.FindNext(ScrollMarginTop);
-            VTextLine last = LastLine.FindPrevious(ScrollMarginBottom);
-
-            VTextLine node1 = activeLine;
-            VTextLine node1Prev = node1.PreviousLine;
-            VTextLine node1Next = node1.NextLine;
-
-            VTextLine node2 = last;
-            VTextLine node2Prev = node2.PreviousLine;
-            VTextLine node2Next = node2.NextLine;
-
-            for (int i = 0; i < lines; i++)
-            {
-                // node1就是要删除的节点
-                // 把node1插到node2下面
-
-                // 更新上半部分
-                node1Next.PreviousLine = node1Prev;
-                if (node1Prev != null)
-                {
-                    node1Prev.NextLine = node1Next;
-                }
-
-                // 更新下半部分
-                node2.NextLine = node1;
-                node1.PreviousLine = node2;
-                node1.NextLine = node2Next;
-                if (node2Next != null)
-                {
-                    node2Next.PreviousLine = node1;
-                }
-                node1.DeleteAll();
-
-                // 更新FirstLine
-                if (ScrollMarginTop == 0)
-                {
-                    FirstLine = node1Next;
-                }
-
-                // 更新LastLine
-                if (ScrollMarginBottom == 0)
-                {
-                    LastLine = node1;
-                }
-
-                node2 = node1;
-                node1Prev = node2.PreviousLine;
-                node2Next = node2.NextLine;
-
-                node1 = node1Next;
-                node1Prev = node1.PreviousLine;
-                node1Next = node1.NextLine;
-            }
-
-            // 更新ActiveLine
-            ActiveLine = FirstLine.FindNext(Cursor.Row);
-        }
-
-        /// <summary>
         /// 删除当前视图中的所有字符
         /// </summary>
         public void DeleteViewoprt()
@@ -999,78 +932,6 @@ namespace ModengTerm.Document
 
                 current = current.NextLine;
             }
-        }
-
-        /// <summary>
-        /// 在光标所在行的位置插入多个新行，并把光标所在行和后面的所有行往后移动
-        /// 要考虑到TopMargin和BottomMargin
-        /// TODO：也许该改个名字，文本编辑器的InsertLine和终端的InsetLine的动作不一样
-        /// </summary>
-        /// <param name="lines">要插入的行数</param>
-        public void InsertLines(int lines)
-        {
-            VTextLine activeLine = this.ActiveLine;
-
-            VTextLine head = FirstLine.FindNext(ScrollMarginTop);
-            VTextLine last = LastLine.FindPrevious(ScrollMarginBottom);
-
-            VTextLine node1 = activeLine;
-            VTextLine node1Prev = node1.PreviousLine;
-            VTextLine node1Next = node1.NextLine;
-
-            VTextLine node2 = last;
-            VTextLine node2Prev = node2.PreviousLine;
-            VTextLine node2Next = node2.NextLine;
-
-            VTextLine newHead = null;
-            VTextLine newLast = null;
-
-            for (int i = 0; i < lines; i++)
-            {
-                // 新行就是node2
-                // 每次都要把新行挂到node1上面
-
-                // 更新上半部分
-                node1.PreviousLine = node2;
-                if (node1Prev != null)
-                {
-                    node1Prev.NextLine = node2;
-                }
-                node2.NextLine = node1;
-                node2.PreviousLine = node1Prev;
-                node1Prev = node1.PreviousLine;
-                node1Next = node1.NextLine;
-                node2.DeleteAll();  // 把新行清空
-
-                // 更新下半部分
-                node2Prev.NextLine = node2Next;
-                if (node2Next != null)
-                {
-                    node2Next.PreviousLine = node2Prev;
-                }
-                node2 = node2Prev;
-                node2Prev = node2.PreviousLine;
-                node2Next = node2.NextLine;
-
-                // 更新FirstLine
-                if (ScrollMarginTop == 0)
-                {
-                    if (newHead == null)
-                    {
-                        newHead = node1.PreviousLine;
-                        FirstLine = newHead;
-                    }
-                }
-
-                // 更新LastLine
-                if (ScrollMarginBottom == 0)
-                {
-                    LastLine = node2Prev;
-                }
-            }
-
-            // 更新ActiveLine
-            ActiveLine = FirstLine.FindNext(Cursor.Row);
         }
 
         /// <summary>
@@ -1605,6 +1466,35 @@ namespace ModengTerm.Document
                 VTextLine next = textLine.NextLine;
                 next.PreviousLine = textLine.PreviousLine;
                 textLine.PreviousLine.NextLine = next;
+            }
+        }
+
+        /// <summary>
+        /// 把Viewport里的指定区域里的数据更新到History里
+        /// 只更指定区域里的数据
+        /// </summary>
+        /// <param name="marginTop">要更新的区域的MarginTop</param>
+        /// <param name="marginBottom">要更新的区域的MarginBottom</param>
+        public void UpdateViewportHistory(int marginTop, int marginBottom)
+        {
+            VTScrollInfo scrollInfo = this.Scrollbar;
+
+            // 更新区域内的第一行的物理行号
+            int scrollRegionTopPhysicsRow = scrollInfo.Value + marginTop;
+            VTextLine scrollRegionTopLine = this.FirstLine.FindNext(marginTop);
+            VTextLine scrollRegionBottomLine = this.LastLine.FindPrevious(marginBottom);
+            VTextLine current = scrollRegionTopLine;
+            while (true)
+            {
+                history.Set(scrollRegionTopPhysicsRow, current.History);
+                scrollRegionTopPhysicsRow++;
+
+                if (current == scrollRegionBottomLine)
+                {
+                    break;
+                }
+
+                current = current.NextLine;
             }
         }
 

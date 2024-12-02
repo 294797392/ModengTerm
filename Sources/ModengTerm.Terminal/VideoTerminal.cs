@@ -14,9 +14,12 @@ using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Terminal
@@ -1706,6 +1709,56 @@ namespace ModengTerm.Terminal
             };
         }
 
+        /// <summary>
+        /// 对滚动区域内的数据进行滚动
+        /// </summary>
+        /// <param name="delta">要滚动的行数。大于0表示往下滚动，小于0表示往上滚动</param>
+        private void ScrollViewportVertically(int marginTop, int marginBottom, int delta)
+        {
+            VTDocument document = this.activeDocument;
+            VTCursor cursor = document.Cursor;
+            VTHistory history = document.History;
+            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTextLine scrollRegionTopLine = document.FirstLine.FindNext(marginTop);
+            VTextLine scrollRegionBottomLine = document.LastLine.FindPrevious(marginBottom);
+
+            int n = Math.Abs(delta);
+
+            // 更新可视区域的记录
+            if (delta > 0)
+            {
+                VTextLine newTopLine = scrollRegionBottomLine;
+                for (int i = 0; i < n; i++)
+                {
+                    VTextLine previous = newTopLine.PreviousLine;
+
+                    document.SwapLineReverse(newTopLine, scrollRegionTopLine);
+                    newTopLine.DeleteAll();
+
+                    newTopLine = previous;
+                }
+            }
+            else
+            {
+                VTextLine newBottomLine = scrollRegionTopLine;
+                for (int i = 0; i < n; i++)
+                {
+                    VTextLine next = newBottomLine.NextLine;
+
+                    document.SwapLine(newBottomLine, scrollRegionBottomLine);
+                    newBottomLine.DeleteAll();
+
+                    newBottomLine = next;
+                }
+            }
+
+            // 更新历史记录，让历史记录的行的顺序和可视区域一致
+            document.UpdateViewportHistory(marginTop, marginBottom);
+
+            // 更新光标所在行
+            document.SetCursorLogical(cursor.Row, cursor.Column);
+        }
+
         #endregion
 
         #region VTParser事件
@@ -2048,7 +2101,9 @@ namespace ModengTerm.Terminal
                         VTDebug.Context.WriteInteractive("IL_InsertLine", "{0}", n);
                         if (n > 0)
                         {
-                            this.activeDocument.InsertLines(n);
+                            VTDocument document = this.activeDocument;
+                            VTCursor cursor = document.Cursor;
+                            this.ScrollViewportVertically(cursor.Row, document.ScrollMarginBottom, n);
                         }
                         break;
                     }
@@ -2059,7 +2114,9 @@ namespace ModengTerm.Terminal
                         VTDebug.Context.WriteInteractive("DL_DeleteLine", "{0}", n);
                         if (n > 0)
                         {
-                            activeDocument.DeleteLines(n);
+                            VTDocument document = this.activeDocument;
+                            VTCursor cursor = document.Cursor;
+                            this.ScrollViewportVertically(cursor.Row, document.ScrollMarginBottom, -n);
                         }
                         break;
                     }
@@ -2079,16 +2136,18 @@ namespace ModengTerm.Terminal
                 case CsiActionCodes.SD_ScrollDown:
                     {
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-                        this.ScrollRegionVertically(n);
                         VTDebug.Context.WriteInteractive("SD_ScrollDown", "{0}", n);
+                        VTDocument document = this.activeDocument;
+                        this.ScrollViewportVertically(document.ScrollMarginTop, document.ScrollMarginBottom, n);
                         break;
                     }
 
                 case CsiActionCodes.SU_ScrollUp:
                     {
                         int n = VTParameter.GetParameter(parameters, 0, 1);
-                        this.ScrollRegionVertically(-n);
                         VTDebug.Context.WriteInteractive("SU_ScrollUp", "{0}", n);
+                        VTDocument document = this.activeDocument;
+                        this.ScrollViewportVertically(document.ScrollMarginTop, document.ScrollMarginBottom, -n);
                         break;
                     }
 
@@ -2121,73 +2180,6 @@ namespace ModengTerm.Terminal
         #endregion
 
         #region VTActions
-
-        /// <summary>
-        /// 对滚动区域内的数据进行滚动
-        /// </summary>
-        /// <param name="delta">要滚动的行数。大于0表示往下滚动，小于0表示往上滚动</param>
-        private void ScrollRegionVertically(int delta)
-        {
-            VTDocument document = this.activeDocument;
-            VTCursor cursor = document.Cursor;
-            VTHistory history = document.History;
-            VTScrollInfo scrollInfo = document.Scrollbar;
-            VTextLine scrollRegionTopLine = document.FirstLine.FindNext(document.ScrollMarginTop);
-            VTextLine scrollRegionBottomLine = document.LastLine.FindPrevious(document.ScrollMarginBottom);
-
-            int n = Math.Abs(delta);
-
-            // 更新可视区域的记录
-            if (delta > 0)
-            {
-                VTextLine newTopLine = scrollRegionBottomLine;
-                for (int i = 0; i < n; i++)
-                {
-                    VTextLine previous = newTopLine.PreviousLine;
-
-                    document.SwapLineReverse(newTopLine, scrollRegionTopLine);
-                    newTopLine.DeleteAll();
-
-                    newTopLine = previous;
-                }
-            }
-            else
-            {
-                VTextLine newBottomLine = scrollRegionTopLine;
-                for (int i = 0; i < n; i++)
-                {
-                    VTextLine next = newBottomLine.NextLine;
-
-                    document.SwapLine(newBottomLine, scrollRegionBottomLine);
-                    newBottomLine.DeleteAll();
-
-                    newBottomLine = next;
-                }
-            }
-
-            // 更新历史记录，让历史记录的行的顺序和可视区域一致
-
-            // 滚动区域内的第一行的物理行号
-            int scrollRegionTopPhysicsRow = scrollInfo.Value + document.ScrollMarginTop;
-            scrollRegionTopLine = document.FirstLine.FindNext(document.ScrollMarginTop);
-            scrollRegionBottomLine = document.LastLine.FindPrevious(document.ScrollMarginBottom);
-            VTextLine current = scrollRegionTopLine;
-            while (true)
-            {
-                history.Set(scrollRegionTopPhysicsRow, current.History);
-                scrollRegionTopPhysicsRow++;
-
-                if (current == scrollRegionBottomLine)
-                {
-                    break;
-                }
-
-                current = current.NextLine;
-            }
-
-            // 更新光标所在行
-            document.SetCursorLogical(cursor.Row, cursor.Column);
-        }
 
         public void CarriageReturn()
         {
@@ -2224,8 +2216,10 @@ namespace ModengTerm.Terminal
             VTCursor cursor = document.Cursor;
 
             // 可滚动区域的第一行和最后一行
-            VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
-            VTextLine last = document.LastLine.FindPrevious(document.ScrollMarginBottom);
+            int scrollRegionTop = document.ScrollMarginTop;
+            int scrollRegionBottom = document.ScrollMarginBottom;
+            VTextLine head = document.FirstLine.FindNext(scrollRegionTop);
+            VTextLine last = document.LastLine.FindPrevious(scrollRegionBottom);
             bool hasScrollMargin = last != document.LastLine;
 
             VTHistory history = document.History;
@@ -2257,11 +2251,15 @@ namespace ModengTerm.Terminal
                     // AlternateScreenBuffer是用来给man，vim等程序使用的
                     // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
 
+                    // 在主缓冲区换行并且主缓冲区有ScorllMargin
                     // 如果有滚动边距，保持总行数不变
                     if (hasScrollMargin)
                     {
                         document.SetCursorPhysical(oldPhysicsRow);
                         document.ActiveLine.DeleteAll();
+
+                        // 更新历史记录
+                        document.UpdateViewportHistory(scrollRegionTop, scrollRegionBottom);
                     }
                     else
                     {
@@ -2354,51 +2352,44 @@ namespace ModengTerm.Terminal
             VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }
 
-        public void RI_ReverseLineFeed()
+        private void RI_ReverseLineFeed()
         {
             int oldRow = this.CursorRow;
             int oldCol = this.CursorCol;
-
-            // 和LineFeed相反，也就是把光标往上移一个位置
+            
+            // 和LineFeed相反，把光标所在行向上移动一行
             // 在用man命令的时候往上滚动会触发这个指令
-            // 反向换行 – 执行\n的反向操作，将光标向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
+            // 反向换行 – 执行\n的反向操作，将光标所在行向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
 
-            // 反向换行不增加新行，也不减少新行，保持总行数不变
+            // 反向换行不增加新行，也不减少新行，保持总行数和物理行号不变
 
             VTDocument document = this.activeDocument;
+            VTCursor cursor = document.Cursor;
+            int scrollRegionTop = document.ScrollMarginTop;
+            int scrollRegionBottom = document.ScrollMarginBottom;
 
             // 可滚动区域的第一行和最后一行
-            VTextLine head = document.FirstLine.FindNext(document.ScrollMarginTop);
-            VTextLine last = document.LastLine.FindPrevious(document.ScrollMarginBottom);
+            VTextLine scrollRegionTopLine = document.FirstLine.FindNext(scrollRegionTop);
+            VTextLine scrollRegionBottomLine = document.LastLine.FindPrevious(scrollRegionBottom);
 
-            if (head == ActiveLine)
+            if (scrollRegionTopLine == ActiveLine)
             {
-                // 此时光标位置在可视区域的第一行
+                // 此时光标位置在滚动区域的第一行
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域第一行，向上移动一行并且可视区域往上移动一行");
 
-                // 上移之后，删除整行数据，终端会重新打印该行数据的
-                // 如果不删除的话，在man程序下有可能会显示重叠的信息
-                // 复现步骤：man cc -> enter10次 -> help -> enter10次 -> q -> 一直按上键
-                document.SwapLineReverse(last, head);
+                // 把滚动区域最后一行拿到滚动区域第一行前面
+                document.SwapLineReverse(scrollRegionBottomLine, scrollRegionTopLine);
 
-                last.DeleteAll();
+                // 清除滚动区域第一行的数据
+                scrollRegionBottomLine.DeleteAll();
 
-                if (this.IsAlternate)
-                {
-                }
-                else
-                {
-                    // 物理行号和scrollMargin无关，保持物理行号不变
-                }
+                document.UpdateViewportHistory(scrollRegionTop, scrollRegionBottom);
             }
             else
             {
-                // 这里假设光标在可视区域里面
-                // 实际上有可能光标在可视区域上的上面或者下面，但是目前还没找到判断方式
-
-                // 光标位置在可视区域里面
+                // 光标位置在可滚动区域里面
                 logger.DebugFormat("RI_ReverseLineFeed，光标在可视区域里，直接移动光标到上一行");
-                document.SetCursorPhysical(Cursor.PhysicsRow + 1);
+                document.SetCursorLogical(cursor.Row - 1, cursor.Column);
             }
 
             int newRow = this.CursorRow;

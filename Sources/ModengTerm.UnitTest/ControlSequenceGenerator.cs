@@ -172,5 +172,27 @@ namespace ModengTerm.UnitTest
 
             return bytes.ToArray();
         }
+
+        public static byte[] SD_ScrollDown(int n)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'T');
+
+            return bytes.ToArray();
+        }
+
+        public static byte[] SU_ScrollUp(int n)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'S');
+
+            return bytes.ToArray();
+        }
     }
 }

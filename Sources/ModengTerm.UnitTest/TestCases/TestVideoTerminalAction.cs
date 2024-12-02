@@ -1,20 +1,22 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
+using System.Windows.Documents.DocumentStructures;
 
 namespace ModengTerm.UnitTest.TestCases
 {
     /// <summary>
     /// 模拟SshServer，手动生成原始的控制序列让终端处理，然后判断终端渲染之后的数据是否正确
     /// 每个指令除了测试自己，还要测试受自身影响的其他指令
+    /// 验证方式：把C#生成的指令在C++控制台程序里编译，然后用WindowsTerminal运行看最终效果是否和ModengTerm一致
     /// </summary>
     public class TestVideoTerminalAction
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("TestVideoTerminalAction");
 
-        private bool DECSTBM_SetScrollingRegion_LineFeed() 
+        private bool DECSTBM_SetScrollingRegion_LineFeed()
         {
-            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal(100, 200);
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
@@ -30,24 +32,22 @@ namespace ModengTerm.UnitTest.TestCases
 
             #region LineFeed
 
-            /* 先设置上下10边距的滚动区域，然后在最后一行滚动，最后比对 */
+            /* 先设置滚动边距，然后在最后一行滚动，最后比对 */
 
             /* marginTop = 1, marginBottom = 2 */
 
             buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, row - 2);
             terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(row - 2, 0);
+            buffer = ControlSequenceGenerator.CUP_CursorPosition(7, 0);
             terminal.ProcessData(buffer, buffer.Length);
             // 在滚动区域内最后一行执行LineFeed动作，此时滚动区域内最后一行应该为空
             buffer = ControlSequenceGenerator.CRLF();
             terminal.ProcessData(buffer, buffer.Length);
 
-            List<string> textLines2 = UnitTestHelper.BuildTextLines(document);
+            List<string> textLines2 = new List<string>() { "1", "3", "4", "5", "6", "7", "", "8", "9" };
+            List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
 
-            textLines.RemoveAt(1);
-            textLines.Insert(row - 3, string.Empty);
-
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
             {
                 logger.Error("{7C858FAE-493B-4CC9-AAC6-361356D46AC2}");
                 return false;
@@ -68,9 +68,9 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
-        private bool DECSTBM_SetScrollingRegion_RI_ReserveLine() 
+        private bool DECSTBM_SetScrollingRegion_RI_ReserveLine()
         {
-            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal(100, 200);
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
@@ -88,19 +88,17 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* marginTop = 1, marginBottom = 2 */
 
-            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, row - 2);
+            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, 7);
             terminal.ProcessData(buffer, buffer.Length);
             buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
             terminal.ProcessData(buffer, buffer.Length);
             buffer = ControlSequenceGenerator.RI_ReverseLineFeed();
             terminal.ProcessData(buffer, buffer.Length);
 
-            List<string> textLines2 = UnitTestHelper.BuildTextLines(document);
+            List<string> textLines2 = new List<string>() { "1", "", "2", "3", "4", "5", "6", "8", "9" };
+            List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
 
-            textLines.RemoveAt(row - 3);
-            textLines.Insert(1, string.Empty);
-
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
             {
                 logger.Error("{45D08A62-0031-4DB1-96F0-70779B51CE81}");
                 return false;
@@ -121,10 +119,70 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
+        private bool DECSTBM_SetScrollingRegion_SD_ScrollDown()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(5, 10);
+            VTDocument document = terminal.MainDocument;
+            VTHistory history = document.History;
+            byte[] buffer = new byte[0];
+
+            List<string> textLines = UnitTestHelper.BuildTextLines(5);
+            UnitTestHelper.DrawTextLines(terminal, textLines);
+
+            /* 先设置滚动边距，然后执行SD_ScrollDown，最后比对 */
+
+            /* marginTop = 1, marginBottom = 1 */
+            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, 5 - 1);
+            terminal.ProcessData(buffer, buffer.Length);
+            buffer = ControlSequenceGenerator.SD_ScrollDown(2);
+            terminal.ProcessData(buffer, buffer.Length);
+
+            List<string> textLines2 = new List<string>() { "1", "", "", "2", "5" };
+            List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
+
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
+            {
+                logger.Error("{8C7A0E81-776D-43B6-BBDB-50937E0D1577}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool DECSTBM_SetScrollingRegion_SU_ScrollUp()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(5, 10);
+            VTDocument document = terminal.MainDocument;
+            VTHistory history = document.History;
+            byte[] buffer = new byte[0];
+
+            List<string> textLines = UnitTestHelper.BuildTextLines(5);
+            UnitTestHelper.DrawTextLines(terminal, textLines);
+
+            /* 先设置滚动边距，然后执行SD_ScrollUp，最后比对 */
+
+            /* marginTop = 1, marginBottom = 1 */
+            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, 5 - 1);
+            terminal.ProcessData(buffer, buffer.Length);
+            buffer = ControlSequenceGenerator.SU_ScrollUp(2);
+            terminal.ProcessData(buffer, buffer.Length);
+
+            List<string> textLines2 = new List<string>() { "1", "4", "", "", "5" };
+            List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
+
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
+            {
+                logger.Error("{4BF1251C-9743-45C7-AC2A-FBE8EF35970F}");
+                return false;
+            }
+
+            return true;
+        }
+
         #region 针对于每个指令做单元测试
 
         [UnitTest]
-        public bool Print() 
+        public bool Print()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
             VTDocument mainDocument = terminal.MainDocument;
@@ -188,7 +246,7 @@ namespace ModengTerm.UnitTest.TestCases
 
                 textLines[i] = UnitTestHelper.BuildTextLine(col);
                 UnitTestHelper.DrawTextLine(terminal, textLines[i]);
-                if (!UnitTestHelper.DocumentCompare(document, textLines))
+                if (!UnitTestHelper.CompareDocument(document, textLines))
                 {
                     logger.ErrorFormat("30C0E8F1-CF91-41AA-AE57-2922485A98AD");
                     return false;
@@ -371,7 +429,7 @@ namespace ModengTerm.UnitTest.TestCases
             List<string> textLines2 = UnitTestHelper.BuildWhitespaceTextLines(row, col);
             textLines2[0] = textLines[0];
 
-            if (!UnitTestHelper.DocumentCompare(document, textLines2))
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
             {
                 logger.Error("{D9B3DD17-A935-4323-8673-D36662D36C93}");
                 return false;
@@ -410,7 +468,7 @@ namespace ModengTerm.UnitTest.TestCases
             terminal.ProcessData(buffer, buffer.Length);
 
             textLines = UnitTestHelper.BuildWhitespaceTextLines(row, col);
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("B5AACA29-02DE-49BF-85D9-7F957FFF5922");
                 return false;
@@ -446,7 +504,7 @@ namespace ModengTerm.UnitTest.TestCases
             terminal.ProcessData(buffer, buffer.Length);
 
             textLines[0] = UnitTestHelper.BuildWhitespaceTextLine(col);
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("{69707744-06DA-48DD-B234-E5121231DD20}");
                 return false;
@@ -464,7 +522,7 @@ namespace ModengTerm.UnitTest.TestCases
             terminal.ProcessData(buffer, buffer.Length);
 
             textLines[1] = textLines[1].Substring(10, col - 10).PadLeft(col, ' ');
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("{9B986000-DFBD-4031-AEE1-BBE2349234C5}");
                 return false;
@@ -480,7 +538,7 @@ namespace ModengTerm.UnitTest.TestCases
             terminal.ProcessData(buffer, buffer.Length);
 
             textLines[2] = UnitTestHelper.BuildWhitespaceTextLine(col);
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("{0B60EBEA-501A-4DA0-AE1F-C915828D5A83}");
                 return false;
@@ -514,7 +572,7 @@ namespace ModengTerm.UnitTest.TestCases
 
             textLines[0] = textLines[0].Substring(3);
 
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("{2076DDD6-2EE4-4C68-852D-6E5E144BBB25}");
                 return false;
@@ -549,7 +607,7 @@ namespace ModengTerm.UnitTest.TestCases
             textLines[1] = textLines[1].Substring(0, 4) + string.Join("", Enumerable.Repeat(" ", 5)) + textLines[1].Substring(4);
             textLines[1] = textLines[1].Substring(0, col);
 
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("{2FD3CAFF-091C-4000-A44B-6006E05CC5B4}");
                 return false;
@@ -586,7 +644,7 @@ namespace ModengTerm.UnitTest.TestCases
                 }
             }
 
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("{9793EEF6-D2F6-45F9-8D3F-D0B87EB733B7}");
                 return false;
@@ -616,14 +674,14 @@ namespace ModengTerm.UnitTest.TestCases
             }
 
             // 判断历史数据
-            if (!UnitTestHelper.HistoryCompare(history, textLines))
+            if (!UnitTestHelper.CompareHistory(history, textLines))
             {
                 logger.Error("{6094AC7A-BF13-4054-A13D-D5066F9A163B}");
                 return false;
             }
 
             // 判断可视区域数据
-            if (!UnitTestHelper.DocumentCompare(document, textLines.Skip(10).ToList()))
+            if (!UnitTestHelper.CompareDocument(document, textLines.Skip(10).ToList()))
             {
                 logger.Error("{7292BC12-A9EE-4112-BC5C-F63314758B16}");
                 return false;
@@ -663,7 +721,15 @@ namespace ModengTerm.UnitTest.TestCases
                 return false;
             }
 
-            logger.ErrorFormat("DECSTBM_SetScrollingRegion, SD_ScrollDown And SU_ScrollUp");
+            if (!this.DECSTBM_SetScrollingRegion_SD_ScrollDown())
+            {
+                return false;
+            }
+
+            if (!this.DECSTBM_SetScrollingRegion_SU_ScrollUp())
+            {
+                return false;
+            }
 
             return true;
         }
@@ -671,7 +737,7 @@ namespace ModengTerm.UnitTest.TestCases
         [UnitTest]
         public bool DL_DeleteLine()
         {
-            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
@@ -680,26 +746,28 @@ namespace ModengTerm.UnitTest.TestCases
             int col = document.ViewportColumn;
             byte[] buffer = null;
 
-            List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
+            List<string> textLines = UnitTestHelper.BuildTextLines(9);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
-            /* 从第1行开始删除，删除1行，然后比对可视区域内容 */
+            /* 从第2行开始删除，删除2行，然后比对可视区域内容 */
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, 1);
+            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
             terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.DL_DeleteLine(1);
+            buffer = ControlSequenceGenerator.DL_DeleteLine(2);
             terminal.ProcessData(buffer, buffer.Length);
 
-            textLines.RemoveRange(0, 1);
+            List<string> textLines2 = new List<string>() { "1", "4", "5", "6", "7", "8", "9", "", "" };
+            List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
 
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
             {
                 logger.Error("{ADA8B1B0-D2D4-491F-92A5-85CFCD66C47A}");
                 return false;
             }
 
             /* 比对ActiveLine */
-            if (document.ActiveLine != document.FirstLine)
+            VTextLine activeLine = document.FindLine(cursor.Row);
+            if (document.ActiveLine != activeLine)
             {
                 logger.Error("{C4D7CBCD-1149-4F25-8537-A1E939405FF0}");
                 return false;
@@ -711,35 +779,33 @@ namespace ModengTerm.UnitTest.TestCases
         [UnitTest]
         public bool IL_InsertLine()
         {
-            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
             VTDocument document = terminal.MainDocument;
-            VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
-            int row = document.ViewportRow;
-            int col = document.ViewportColumn;
             byte[] buffer = null;
 
-            List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
+            List<string> textLines = UnitTestHelper.BuildTextLines(9);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
-            /* 在第5行之前插入10行数据，然后比对 */
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(5, 1);
+            /* 在第2行之前插入2行数据，然后比对 */
+            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
             terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.IL_InsertLine(10);
+            buffer = ControlSequenceGenerator.IL_InsertLine(2);
             terminal.ProcessData(buffer, buffer.Length);
 
-            textLines.RemoveRange(row - 10, 10);
-            for (int i = 0; i < 10; i++)
-            {
-                textLines.Insert(4, string.Empty);
-            }
+            List<string> textLines2 = new List<string>() { "1", "", "", "2", "3", "4", "5", "6", "7" };
+            List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
 
-            List<string> textLines2 = UnitTestHelper.BuildTextLines(document);
-
-            if (!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
             {
                 logger.Error("{29B02C4A-048B-43C1-ACE5-9C6A0737C0B4}");
+                return false;
+            }
+
+            VTextLine activeLine = document.FindLine(cursor.Row);
+            if (document.ActiveLine != activeLine)
+            {
+                logger.Error("{FDC6B154-1CE6-40F0-813F-1800AEC9493D}");
                 return false;
             }
 
@@ -747,7 +813,7 @@ namespace ModengTerm.UnitTest.TestCases
         }
 
         [UnitTest]
-        public bool ECH_EraseCharacters() 
+        public bool ECH_EraseCharacters()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
             VTDocument document = terminal.MainDocument;
@@ -772,9 +838,61 @@ namespace ModengTerm.UnitTest.TestCases
             string str = textLines[1];
             textLines[1] = str.Substring(0, 4) + string.Join("", Enumerable.Repeat(" ", 5)) + str.Substring(9);
 
-            if(!UnitTestHelper.DocumentCompare(document, textLines))
+            if (!UnitTestHelper.CompareDocument(document, textLines))
             {
                 logger.Error("{CA3CBE88-2B00-47AC-9084-651AFC05FED7}");
+                return false;
+            }
+
+            return true;
+        }
+
+        [UnitTest]
+        public bool SD_ScrollDown()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            VTDocument document = terminal.MainDocument;
+            VTHistory history = document.History;
+            byte[] buffer = new byte[0];
+
+            List<string> textLines = UnitTestHelper.BuildTextLines(9);
+            UnitTestHelper.DrawTextLines(terminal, textLines);
+
+            /* 执行SD_ScrollDown，最后比对 */
+
+            buffer = ControlSequenceGenerator.SD_ScrollDown(2);
+            terminal.ProcessData(buffer, buffer.Length);
+
+            List<string> textLines2 = new List<string>() { "", "", "1", "2", "3", "4", "5", "6", "7" };
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
+            {
+                logger.Error("{D48D1480-EAD1-4AE7-BD9C-BD396745839E}");
+                return false;
+            }
+
+            return true;
+        }
+
+        [UnitTest]
+        public bool SU_ScrollUp()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            VTDocument document = terminal.MainDocument;
+            VTHistory history = document.History;
+            byte[] buffer = new byte[0];
+
+            List<string> textLines = UnitTestHelper.BuildTextLines(9);
+            UnitTestHelper.DrawTextLines(terminal, textLines);
+
+            /* 执行SD_ScrollUp，最后比对 */
+
+            buffer = ControlSequenceGenerator.SU_ScrollUp(2);
+            terminal.ProcessData(buffer, buffer.Length);
+
+            List<string> textLines2 = new List<string>() { "3", "4", "5", "6", "7", "8", "9", "", "" };
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
+            {
+                logger.Error("{0737A7E6-32B1-4367-9858-56045F894888}");
                 return false;
             }
 

@@ -43,7 +43,7 @@ namespace ModengTerm.UnitTest.TestCases
             }
 
             // 比对历史记录，此时历史记录应该从第100行开始记录
-            if (!UnitTestHelper.HistoryCompare(history, textLines.Skip(100).ToList()))
+            if (!UnitTestHelper.CompareHistory(history, textLines.Skip(100).ToList()))
             {
                 return false;
             }
