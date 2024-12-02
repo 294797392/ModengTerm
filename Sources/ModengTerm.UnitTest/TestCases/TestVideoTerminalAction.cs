@@ -1,7 +1,6 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
-using System.Windows.Documents.DocumentStructures;
 
 namespace ModengTerm.UnitTest.TestCases
 {
@@ -170,6 +169,18 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
+        private VTextLine FindLogicalRow(VTDocument document, int logicalRow)
+        {
+            VTextLine current = document.FirstLine;
+
+            for (int i = 0; i < logicalRow; i++)
+            {
+                current = current.NextLine;
+            }
+
+            return current;
+        }
+
         #region 针对于每个指令做单元测试
 
         [UnitTest]
@@ -221,7 +232,8 @@ namespace ModengTerm.UnitTest.TestCases
                 return false;
             }
 
-            if (document.ActiveLine != document.FirstLine.NextLine)
+            VTextLine activeLine = this.FindLogicalRow(document, 1);
+            if (document.ActiveLine != activeLine)
             {
                 logger.Error("{AC7ED387-9205-418A-B4A4-F54757D89795}");
                 return false;
@@ -312,7 +324,8 @@ namespace ModengTerm.UnitTest.TestCases
                 return false;
             }
 
-            if (document.ActiveLine != document.FirstLine)
+            VTextLine activeLine = this.FindLogicalRow(document, 0);
+            if (activeLine != document.ActiveLine)
             {
                 logger.Error("{2BFF7503-D6FA-4EB2-86FC-C9A33075F00D}");
                 return false;
@@ -342,7 +355,8 @@ namespace ModengTerm.UnitTest.TestCases
                 return false;
             }
 
-            if (document.ActiveLine != document.FirstLine.NextLine)
+            VTextLine activeLine = this.FindLogicalRow(document, 1);
+            if (activeLine != document.ActiveLine)
             {
                 logger.Error("{AF867E5F-4526-4B84-9817-F4F182DF912F}");
                 return false;
@@ -822,6 +836,85 @@ namespace ModengTerm.UnitTest.TestCases
             if (!UnitTestHelper.CompareDocument(document, textLines2))
             {
                 logger.Error("{0737A7E6-32B1-4367-9858-56045F894888}");
+                return false;
+            }
+
+            return true;
+        }
+
+        [UnitTest]
+        public bool REP_RepeatCharacter()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.MainDocument;
+            VTHistory history = document.History;
+
+            invoker.Print('A');
+            invoker.REP_RepeatCharacter(3);
+            invoker.Print('B');
+            invoker.REP_RepeatCharacter(3);
+
+            string textLine1 = VTUtils.CreatePlainText(document.FirstLine.Characters);
+            string textLine2 = "AAAABBBB";
+            if (textLine1 != textLine2)
+            {
+                logger.Error("{683D04DC-8960-461D-AC29-3D40DECCF7DF}");
+                return false;
+            }
+
+            return true;
+        }
+
+        [UnitTest]
+        public bool CHA_CursorHorizontalAbsolute()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.MainDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.CHA_CursorHorizontalAbsolute(5);
+            if (cursor.Row != 0)
+            {
+                logger.Error("{7582EB69-FE89-4A5A-B3BF-95880A6BCD8D}");
+                return false;
+            }
+
+            if (cursor.Column != 4)
+            {
+                logger.Error("{3CE1028D-A0DE-4CA4-B0ED-ED645AB40F9E}");
+                return false;
+            }
+
+            return true;
+        }
+
+        [UnitTest]
+        public bool VPA_VerticalLinePositionAbsolute()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.MainDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.VPA_VerticalLinePositionAbsolute(5);
+            if (cursor.Row != 4)
+            {
+                logger.Error("{8A6C67F1-51A6-422E-9261-A05BDF67D7F2}");
+                return false;
+            }
+
+            if (cursor.Column != 0)
+            {
+                logger.Error("{9DA567C6-3562-4748-ADDD-196C1D3CF736}");
+                return false;
+            }
+
+            VTextLine activeLine = this.FindLogicalRow(document, 4);
+            if (activeLine != document.ActiveLine)
+            {
+                logger.Error("{DED00A90-CC09-4BDC-B297-5505C817B305}");
                 return false;
             }
 

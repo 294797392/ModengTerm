@@ -213,5 +213,35 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'S');
             this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
+
+        public void REP_RepeatCharacter(int n)
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
+            bytes.Add((byte)'b');
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+        }
+
+        public void CHA_CursorHorizontalAbsolute(int col) 
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(col.ToString()));
+            bytes.Add((byte)'G');
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+        }
+
+        public void VPA_VerticalLinePositionAbsolute(int row) 
+        {
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(row.ToString()));
+            bytes.Add((byte)'d');
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+        }
     }
 }

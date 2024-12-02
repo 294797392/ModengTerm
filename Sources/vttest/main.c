@@ -71,7 +71,23 @@ static void DL_DeleteLine(char n)
 	putseq(seq);
 }
 
+static void REP_RepeatCharacter(char n)
+{
+	char seq[4] = { 0x1b,'[', n, 'b' };
+	putseq(seq);
+}
 
+static void CHA_CursorHorizontalAbsolute(char n)
+{
+	char seq[4] = { 0x1b,'[', n, 'G' };
+	putseq(seq);
+}
+
+static void VPA_VerticalLinePositionAbsolute(char n)
+{
+	char seq[4] = { 0x1b,'[', n, 'd' };
+	putseq(seq);
+}
 
 
 
@@ -90,8 +106,23 @@ void TestVideoTerminalAction_DL_DeleteLine()
 	DL_DeleteLine('2');
 }
 
+void TestVideoTerminalAction_REP_RepeatCharacter() 
+{
+	printf("%s", "a\0");
+	REP_RepeatCharacter('3');
+	printf("%s", "b\0");
+	REP_RepeatCharacter('3');
+}
 
+void TestVideoTerminalAction_CHA_CursorHorizontalAbsolute()
+{
+	CHA_CursorHorizontalAbsolute('5');
+}
 
+void TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute()
+{
+	VPA_VerticalLinePositionAbsolute('5');
+}
 
 
 
@@ -99,7 +130,7 @@ void TestVideoTerminalAction_DL_DeleteLine()
 
 int main()
 {
-	TestVideoTerminalAction_DL_DeleteLine();
+	TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute();
 
 	char read[1024];
 	fgets(read, sizeof(read), stdin);
