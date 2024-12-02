@@ -17,13 +17,13 @@ namespace ModengTerm.UnitTest.TestCases
         private bool DECSTBM_SetScrollingRegion_LineFeed()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
             int oldScrollValue = scrollInfo.Value;
             int oldScrollMax = scrollInfo.Maximum;
 
@@ -36,13 +36,10 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* marginTop = 1, marginBottom = 2 */
 
-            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, row - 2);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(7, 0);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.DECSTBM_SetScrollingRegion(2, row - 2);
+            invoker.CUP_CursorPosition(7, 0);
             // 在滚动区域内最后一行执行LineFeed动作，此时滚动区域内最后一行应该为空
-            buffer = ControlSequenceGenerator.CRLF();
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CRLF();
 
             List<string> textLines2 = new List<string>() { "1", "3", "4", "5", "6", "7", "", "8", "9" };
             List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
@@ -71,13 +68,13 @@ namespace ModengTerm.UnitTest.TestCases
         private bool DECSTBM_SetScrollingRegion_RI_ReserveLine()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
             int oldScrollValue = scrollInfo.Value;
             int oldScrollMax = scrollInfo.Maximum;
 
@@ -88,12 +85,9 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* marginTop = 1, marginBottom = 2 */
 
-            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, 7);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.RI_ReverseLineFeed();
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.DECSTBM_SetScrollingRegion(2, 7);
+            invoker.CUP_CursorPosition(2, 1);
+            invoker.RI_ReverseLineFeed();
 
             List<string> textLines2 = new List<string>() { "1", "", "2", "3", "4", "5", "6", "8", "9" };
             List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
@@ -122,9 +116,9 @@ namespace ModengTerm.UnitTest.TestCases
         private bool DECSTBM_SetScrollingRegion_SD_ScrollDown()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(5, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            byte[] buffer = new byte[0];
 
             List<string> textLines = UnitTestHelper.BuildTextLines(5);
             UnitTestHelper.DrawTextLines(terminal, textLines);
@@ -132,10 +126,8 @@ namespace ModengTerm.UnitTest.TestCases
             /* 先设置滚动边距，然后执行SD_ScrollDown，最后比对 */
 
             /* marginTop = 1, marginBottom = 1 */
-            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, 5 - 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.SD_ScrollDown(2);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.DECSTBM_SetScrollingRegion(2, 5 - 1);
+            invoker.SD_ScrollDown(2);
 
             List<string> textLines2 = new List<string>() { "1", "", "", "2", "5" };
             List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
@@ -152,6 +144,7 @@ namespace ModengTerm.UnitTest.TestCases
         private bool DECSTBM_SetScrollingRegion_SU_ScrollUp()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(5, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             byte[] buffer = new byte[0];
@@ -162,10 +155,8 @@ namespace ModengTerm.UnitTest.TestCases
             /* 先设置滚动边距，然后执行SD_ScrollUp，最后比对 */
 
             /* marginTop = 1, marginBottom = 1 */
-            buffer = ControlSequenceGenerator.DECSTBM_SetScrollingRegion(2, 5 - 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.SU_ScrollUp(2);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.DECSTBM_SetScrollingRegion(2, 5 - 1);
+            invoker.SU_ScrollUp(2);
 
             List<string> textLines2 = new List<string>() { "1", "4", "", "", "5" };
             List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
@@ -184,7 +175,8 @@ namespace ModengTerm.UnitTest.TestCases
         [UnitTest]
         public bool Print()
         {
-            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument mainDocument = terminal.MainDocument;
             VTScrollInfo scrollInfo = mainDocument.Scrollbar;
             int row = mainDocument.ViewportRow;
@@ -194,10 +186,9 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* 当前行里的VTCharacters是空的，光标直接移动到第5列去打印一个字符A */
 
-            byte[] bytes = ControlSequenceGenerator.CUP_CursorPosition(1, 5);
-            terminal.ProcessData(bytes, bytes.Length);
-            bytes = new byte[] { (byte)'A' };
-            terminal.ProcessData(bytes, bytes.Length);
+            invoker.CUP_CursorPosition(1, 5);
+            invoker.Print('A');
+
             string firstLine = VTUtils.CreatePlainText(mainDocument.FirstLine.Characters);
             if (firstLine != "    A")
             {
@@ -211,187 +202,151 @@ namespace ModengTerm.UnitTest.TestCases
         }
 
         /// <summary>
-        /// 测试移动光标之后光标数据是否正确
+        /// 定位光标
         /// </summary>
         /// <returns></returns>
         [UnitTest]
-        public bool CursorMovement()
+        public bool CUP_CursorPosition()
         {
-            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
-            VTDocument document = terminal.MainDocument;
-            VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.ActiveDocument;
             VTCursor cursor = document.Cursor;
-            int row = document.ViewportRow;
-            int col = document.ViewportColumn;
-            byte[] buffer = null;
 
-            List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
-            UnitTestHelper.DrawTextLines(terminal, textLines);
+            invoker.CUP_CursorPosition(2, 1);
 
-            #region 定位测试
-
-            // 移动到左上角
-            for (int i = 0; i < row; i++)
+            if (cursor.Row != 1)
             {
-                // 光标移动到每一行的开头
-                buffer = ControlSequenceGenerator.CUP_CursorPosition(i + 1, 1);
-                terminal.ProcessData(buffer, buffer.Length);
-
-                if (cursor.Row != i || cursor.Column != 0)
-                {
-                    logger.ErrorFormat("C6855363-EBF8-4DAB-B46D-6FF511C18526");
-                    return false;
-                }
-
-                textLines[i] = UnitTestHelper.BuildTextLine(col);
-                UnitTestHelper.DrawTextLine(terminal, textLines[i]);
-                if (!UnitTestHelper.CompareDocument(document, textLines))
-                {
-                    logger.ErrorFormat("30C0E8F1-CF91-41AA-AE57-2922485A98AD");
-                    return false;
-                }
+                logger.Error("{0C389692-399F-4A1E-9058-251F4CDC6786}");
+                return false;
             }
 
-            #endregion
-
-            #region 左移测试
-
-            // 光标回到第一行最右边
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, col);
-            terminal.ProcessData(buffer, buffer.Length);
-
-            // 左移到最左边
-            for (int i = 0; i < col; i++)
+            if (document.ActiveLine != document.FirstLine.NextLine)
             {
-                buffer = ControlSequenceGenerator.CUB_CursorBackward();
-                terminal.ProcessData(buffer, buffer.Length);
+                logger.Error("{AC7ED387-9205-418A-B4A4-F54757D89795}");
+                return false;
             }
 
-            // 判断移动后的光标位置
+            return true;
+        }
+
+        /// <summary>
+        /// 光标左移
+        /// </summary>
+        /// <returns></returns>
+        [UnitTest]
+        public bool CUB_CursorBackward()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.ActiveDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.CUP_CursorPosition(1, 10);
+            invoker.CUB_CursorBackward();
+
+            if (cursor.Row != 0 || cursor.Column != 8)
+            {
+                logger.Error("{9BCFDD25-A5EB-4525-BE84-1F8691894618}");
+                return false;
+            }
+
+            if (document.ActiveLine != document.FirstLine)
+            {
+                logger.Error("{3EE2E8F7-644B-4ECC-9F7F-98827FE813E7}");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 光标右移
+        /// </summary>
+        /// <returns></returns>
+        [UnitTest]
+        public bool CUF_CursorForward()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.ActiveDocument;
+            VTCursor cursor = document.Cursor;
+
+
+            invoker.CUP_CursorPosition(2, 1);
+            invoker.CUF_CursorForward();
+
+            if (cursor.Row != 1 || cursor.Column != 1)
+            {
+                logger.Error("{82EE7106-43DF-40F7-A634-2A073473A163}");
+                return false;
+            }
+
+            if (document.ActiveLine != document.FirstLine.NextLine)
+            {
+                logger.Error("{4F32BFBB-15AC-4524-A2C9-A6A7294F7A50}");
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 光标上移
+        /// </summary>
+        /// <returns></returns>
+        [UnitTest]
+        public bool CUU_CursorUp()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.ActiveDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.CUP_CursorPosition(2, 1);
+            invoker.CUU_CursorUp();
+
             if (cursor.Row != 0 || cursor.Column != 0)
             {
-                logger.ErrorFormat("D9055CAA-FEE9-4A83-9192-7DF44FBBB66A");
+                logger.Error("{E007FC7E-204E-4183-A5DF-6CAEB29F6B01}");
                 return false;
             }
 
-            // 该行打印相同的字符A
-            string textLine1 = string.Empty;
-            buffer = new byte[] { (byte)'A' };
-            for (int i = 0; i < col; i++)
+            if (document.ActiveLine != document.FirstLine)
             {
-                textLine1 += 'A';
-                terminal.ProcessData(buffer, buffer.Length);
-            }
-
-            textLines[0] = textLine1;
-
-            // 判断打印之后的字符
-            string textLine2 = VTUtils.CreatePlainText(document.FirstLine.Characters);
-            if (textLine1 != textLine2)
-            {
-                logger.ErrorFormat("48421434-48F8-4945-8E9A-16A61A8450FF");
+                logger.Error("{2BFF7503-D6FA-4EB2-86FC-C9A33075F00D}");
                 return false;
             }
 
-            #endregion
+            return true;
+        }
 
-            #region 右移测试
+        /// <summary>
+        /// 光标下移
+        /// </summary>
+        /// <returns></returns>
+        [UnitTest]
+        public bool CUD_CursorDown()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.ActiveDocument;
+            VTCursor cursor = document.Cursor;
 
-            /* 先把光标移动到左上方，然后使用CUF指令移动到最后一列，每次执行完CUF判断光标的位置 */
+            invoker.CUP_CursorPosition(1, 1);
+            invoker.CUD_CursorDown();
 
-            // 光标移动到左上方
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.CUF_CursorForward();
-
-            // 一直往右移直到移动到最右边
-            for (int i = 0; i < col - 1; i++)
+            if (cursor.Row != 1 || cursor.Column != 0)
             {
-                terminal.ProcessData(buffer, buffer.Length);
-
-                if (cursor.Row != 0 || cursor.Column != i + 1)
-                {
-                    logger.ErrorFormat("F5B5595F-5F27-47F4-A71B-156FA75E0DDB");
-                    return false;
-                }
-            }
-
-            #endregion
-
-            #region 上移测试
-
-            /* 先把光标移动到右下方，然后执行5次CUU指令，每次执行完之后判断光标的位置和ActiveLine */
-
-            // 光标移动到右下角
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(row, col);
-            terminal.ProcessData(buffer, buffer.Length);
-            if (cursor.Row != row - 1 || cursor.Column != col - 1)
-            {
-                logger.ErrorFormat("D74BE3D3-4B08-4A6F-84B5-14B41799B93B");
+                logger.Error("{91FF0537-E95C-484E-86AA-16573CF03E56}");
                 return false;
             }
 
-            // 往上移5行
-            VTextLine currentLine = document.LastLine;
-            buffer = ControlSequenceGenerator.CUU_CursorUp();
-            for (int i = 0; i < 5; i++)
+            if (document.ActiveLine != document.FirstLine.NextLine)
             {
-                terminal.ProcessData(buffer, buffer.Length);
-                // 判断ActiveLine
-                currentLine = currentLine.PreviousLine;
-                if (document.ActiveLine != currentLine)
-                {
-                    logger.ErrorFormat("DBEF83F7-C535-422D-BD28-F542811059C3");
-                    return false;
-                }
-
-                if (cursor.Row != row - i - 2 || cursor.Column != col - 1)
-                {
-                    logger.ErrorFormat("BA1FAA78-A0E6-4C31-A1E6-DAA080EE3FE1");
-                    return false;
-                }
-            }
-
-            #endregion
-
-            #region 下移测试
-
-            /* 先把光标移动到左上方，然后执行5次CUD指令，每次执行完之后判断光标的位置和ActiveLine */
-
-            // 光标移动到左上角
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            if (cursor.Row != 0 || cursor.Column != 0)
-            {
-                logger.ErrorFormat("B7EB3D01-38E3-4165-BE53-1ECCE4697850");
+                logger.Error("{AF867E5F-4526-4B84-9817-F4F182DF912F}");
                 return false;
             }
-
-            // 往上移5行
-            currentLine = document.FirstLine;
-            buffer = ControlSequenceGenerator.CUD_CursorDown();
-            for (int i = 0; i < 5; i++)
-            {
-                terminal.ProcessData(buffer, buffer.Length);
-                // 判断ActiveLine
-                currentLine = currentLine.NextLine;
-                if (document.ActiveLine != currentLine)
-                {
-                    logger.ErrorFormat("B7EB3D01-38E3-4165-BE53-1ECCE4697850");
-                    return false;
-                }
-
-                if (cursor.Row != i + 1 || cursor.Column != 0)
-                {
-                    logger.ErrorFormat("3DCF1118-26CF-4226-8D3E-2493DCBE728B");
-                    return false;
-                }
-            }
-
-            #endregion
-
-            // TODO：加一些边缘测试（比如光标移动到了一个无法到达的地方）
 
             return true;
         }
@@ -406,13 +361,13 @@ namespace ModengTerm.UnitTest.TestCases
         public bool ED_EraseDisplay()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
 
             List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
             UnitTestHelper.DrawTextLines(terminal, textLines);
@@ -421,10 +376,8 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* 从第2行开始删除到结尾，然后判断内容是否正确 */
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.ED_EraseDisplay(Terminal.Parsing.VTEraseType.ToEnd);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(2, 1);
+            invoker.ED_EraseDisplay(Terminal.Parsing.VTEraseType.ToEnd);
 
             List<string> textLines2 = UnitTestHelper.BuildWhitespaceTextLines(row, col);
             textLines2[0] = textLines[0];
@@ -441,10 +394,8 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* 光标移动到右上角，删除之前的所有数据，然后判断内容是否正确 */
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, col);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.ED_EraseDisplay(Terminal.Parsing.VTEraseType.FromBeginning);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(1, col);
+            invoker.ED_EraseDisplay(Terminal.Parsing.VTEraseType.FromBeginning);
 
             string line1 = VTUtils.CreatePlainText(document.FirstLine.Characters);
             string line2 = string.Join(string.Empty, Enumerable.Repeat<string>(" ", col));
@@ -460,12 +411,10 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* 光标移动到左上角，重新打印文档，然后删除所有内容，最后比对 */
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, 1);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(1, 1);
             textLines = UnitTestHelper.BuildTextLines(row);
             UnitTestHelper.DrawTextLines(terminal, textLines);
-            buffer = ControlSequenceGenerator.ED_EraseDisplay(Terminal.Parsing.VTEraseType.All);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.ED_EraseDisplay(Terminal.Parsing.VTEraseType.All);
 
             textLines = UnitTestHelper.BuildWhitespaceTextLines(row, col);
             if (!UnitTestHelper.CompareDocument(document, textLines))
@@ -483,13 +432,13 @@ namespace ModengTerm.UnitTest.TestCases
         public bool EL_EraseLine()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
 
             List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
             UnitTestHelper.DrawTextLines(terminal, textLines);
@@ -498,10 +447,8 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* 光标移动到左上角，执行ToEnd，然后比对所有数据 */
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.EL_EraseLine(Terminal.Parsing.VTEraseType.ToEnd);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(1, 1);
+            invoker.EL_EraseLine(Terminal.Parsing.VTEraseType.ToEnd);
 
             textLines[0] = UnitTestHelper.BuildWhitespaceTextLine(col);
             if (!UnitTestHelper.CompareDocument(document, textLines))
@@ -516,10 +463,8 @@ namespace ModengTerm.UnitTest.TestCases
 
             /* 光标移动到第二行第10列，执行ToEnd指令，然后比对所有数据 */
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 10);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.EL_EraseLine(Terminal.Parsing.VTEraseType.FromBeginning);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(2, 10);
+            invoker.EL_EraseLine(Terminal.Parsing.VTEraseType.FromBeginning);
 
             textLines[1] = textLines[1].Substring(10, col - 10).PadLeft(col, ' ');
             if (!UnitTestHelper.CompareDocument(document, textLines))
@@ -532,10 +477,8 @@ namespace ModengTerm.UnitTest.TestCases
 
             #region All
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(3, 30);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.EL_EraseLine(Terminal.Parsing.VTEraseType.All);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(3, 30);
+            invoker.EL_EraseLine(Terminal.Parsing.VTEraseType.All);
 
             textLines[2] = UnitTestHelper.BuildWhitespaceTextLine(col);
             if (!UnitTestHelper.CompareDocument(document, textLines))
@@ -553,22 +496,20 @@ namespace ModengTerm.UnitTest.TestCases
         public bool DCH_DeleteCharacter()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
 
             List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
             /* 移动到左上角，删除3个字符，然后比对 */
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(1, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.DCH_DeleteCharacter(3);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(1, 1);
+            invoker.DCH_DeleteCharacter(3);
 
             textLines[0] = textLines[0].Substring(3);
 
@@ -585,22 +526,20 @@ namespace ModengTerm.UnitTest.TestCases
         public bool ICH_InsertCharacter()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
 
             List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
             /* 从第2行第5个字符开始插入10个空白字符，然后比对 */
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 5);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.ICH_InsertCharacter(5);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(2, 5);
+            invoker.ICH_InsertCharacter(5);
 
             List<string> textLines2 = UnitTestHelper.BuildTextLines(document);
 
@@ -620,13 +559,13 @@ namespace ModengTerm.UnitTest.TestCases
         public bool LineFeed()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
             List<string> textLines = new List<string>();
 
             /* 先打印满屏数据，再判断 */
@@ -639,8 +578,7 @@ namespace ModengTerm.UnitTest.TestCases
 
                 if (i < row - 1)
                 {
-                    buffer = ControlSequenceGenerator.CRLF();
-                    terminal.ProcessData(buffer, buffer.Length);
+                    invoker.CRLF();
                 }
             }
 
@@ -666,8 +604,7 @@ namespace ModengTerm.UnitTest.TestCases
 
             for (int i = 0; i < 10; i++)
             {
-                buffer = ControlSequenceGenerator.CRLF();
-                terminal.ProcessData(buffer, buffer.Length);
+                invoker.CRLF();
                 string textLine = UnitTestHelper.BuildTextLine(col);
                 textLines.Add(textLine);
                 UnitTestHelper.DrawTextLine(terminal, textLine);
@@ -738,23 +675,21 @@ namespace ModengTerm.UnitTest.TestCases
         public bool DL_DeleteLine()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
 
             List<string> textLines = UnitTestHelper.BuildTextLines(9);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
             /* 从第2行开始删除，删除2行，然后比对可视区域内容 */
 
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.DL_DeleteLine(2);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(2, 1);
+            invoker.DL_DeleteLine(2);
 
             List<string> textLines2 = new List<string>() { "1", "4", "5", "6", "7", "8", "9", "", "" };
             List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
@@ -780,18 +715,16 @@ namespace ModengTerm.UnitTest.TestCases
         public bool IL_InsertLine()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTCursor cursor = document.Cursor;
-            byte[] buffer = null;
 
             List<string> textLines = UnitTestHelper.BuildTextLines(9);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
             /* 在第2行之前插入2行数据，然后比对 */
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 1);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.IL_InsertLine(2);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(2, 1);
+            invoker.IL_InsertLine(2);
 
             List<string> textLines2 = new List<string>() { "1", "", "", "2", "3", "4", "5", "6", "7" };
             List<string> textLines3 = UnitTestHelper.BuildTextLines(document);
@@ -816,22 +749,20 @@ namespace ModengTerm.UnitTest.TestCases
         public bool ECH_EraseCharacters()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTScrollInfo scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
-            byte[] buffer = null;
 
             List<string> textLines = UnitTestHelper.BuildTextLines(row, col);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
             /* 光标移动到第2行5列，然后擦除5个字符，比对 */
-            buffer = ControlSequenceGenerator.CUP_CursorPosition(2, 5);
-            terminal.ProcessData(buffer, buffer.Length);
-            buffer = ControlSequenceGenerator.ECH_EraseCharacters(5);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.CUP_CursorPosition(2, 5);
+            invoker.ECH_EraseCharacters(5);
 
             List<string> textLines2 = UnitTestHelper.BuildTextLines(document);
 
@@ -851,17 +782,16 @@ namespace ModengTerm.UnitTest.TestCases
         public bool SD_ScrollDown()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            byte[] buffer = new byte[0];
 
             List<string> textLines = UnitTestHelper.BuildTextLines(9);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
             /* 执行SD_ScrollDown，最后比对 */
 
-            buffer = ControlSequenceGenerator.SD_ScrollDown(2);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.SD_ScrollDown(2);
 
             List<string> textLines2 = new List<string>() { "", "", "1", "2", "3", "4", "5", "6", "7" };
             if (!UnitTestHelper.CompareDocument(document, textLines2))
@@ -877,17 +807,16 @@ namespace ModengTerm.UnitTest.TestCases
         public bool SU_ScrollUp()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            byte[] buffer = new byte[0];
 
             List<string> textLines = UnitTestHelper.BuildTextLines(9);
             UnitTestHelper.DrawTextLines(terminal, textLines);
 
             /* 执行SD_ScrollUp，最后比对 */
 
-            buffer = ControlSequenceGenerator.SU_ScrollUp(2);
-            terminal.ProcessData(buffer, buffer.Length);
+            invoker.SU_ScrollUp(2);
 
             List<string> textLines2 = new List<string>() { "3", "4", "5", "6", "7", "8", "9", "", "" };
             if (!UnitTestHelper.CompareDocument(document, textLines2))

@@ -1,4 +1,6 @@
-﻿using ModengTerm.Terminal.Parsing;
+﻿using ModengTerm.Terminal;
+using ModengTerm.Terminal.Parsing;
+using ModengTerm.Terminal.Renderer;
 using System.Text;
 
 namespace ModengTerm.UnitTest
@@ -6,9 +8,21 @@ namespace ModengTerm.UnitTest
     /// <summary>
     /// 负责原始控制序列
     /// </summary>
-    public static class ControlSequenceGenerator
+    public class TerminalInvoker
     {
         private static readonly byte ESC = 0x1b;
+
+        private VideoTerminal videoTerminal;
+
+        public TerminalInvoker(VideoTerminal videoTerminal)
+        {
+            this.videoTerminal = videoTerminal;
+        }
+
+        public void Print(char c)
+        {
+            this.videoTerminal.ProcessData(new byte[] { (byte)c }, 1);
+        }
 
         /// <summary>
         /// 光标移动到一个指定的位置
@@ -17,7 +31,7 @@ namespace ModengTerm.UnitTest
         /// <param name="row"></param>
         /// <param name="col"></param>
         /// <returns></returns>
-        public static byte[] CUP_CursorPosition(int row, int col)
+        public void CUP_CursorPosition(int row, int col)
         {
             List<byte> result = new List<byte>();
             result.Add(ESC);
@@ -27,16 +41,17 @@ namespace ModengTerm.UnitTest
             result.AddRange(Encoding.ASCII.GetBytes(col.ToString()));
             result.Add((byte)'H');
 
-            return result.ToArray();
+            this.videoTerminal.ProcessData(result.ToArray(), result.Count);
         }
 
         /// <summary>
         /// 构造一个无参数的CUP指令
         /// </summary>
         /// <returns></returns>
-        public static byte[] CUP_CursorPosition()
+        public void CUP_CursorPosition()
         {
-            return new byte[] { ESC, (byte)'[', (byte)'H' };
+            byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'H' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -44,9 +59,10 @@ namespace ModengTerm.UnitTest
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public static byte[] CUF_CursorForward()
+        public void CUF_CursorForward()
         {
-            return new byte[] { ESC, (byte)'[', (byte)'C' };
+            byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'C' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -54,9 +70,10 @@ namespace ModengTerm.UnitTest
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public static byte[] CUU_CursorUp()
+        public void CUU_CursorUp()
         {
-            return new byte[] { ESC, (byte)'[', (byte)'A' };
+            byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'A' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -64,9 +81,10 @@ namespace ModengTerm.UnitTest
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public static byte[] CUD_CursorDown()
+        public void CUD_CursorDown()
         {
-            return new byte[] { ESC, (byte)'[', (byte)'B' };
+            byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'B' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -74,60 +92,67 @@ namespace ModengTerm.UnitTest
         /// </summary>
         /// <param name="n"></param>
         /// <returns></returns>
-        public static byte[] CUB_CursorBackward()
+        public void CUB_CursorBackward()
         {
-            return new byte[] { ESC, (byte)'[', (byte)'D' };
+            byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'D' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
-        public static byte[] ED_EraseDisplay(VTEraseType type)
-        {
-            int v = (int)type;
-            byte[] bytes = Encoding.ASCII.GetBytes(v.ToString());
-
-            return new byte[] { ESC, (byte)'[', bytes[0], (byte)'J' };
-        }
-
-        public static byte[] EL_EraseLine(VTEraseType eraseType)
+        public void ED_EraseDisplay(VTEraseType eraseType)
         {
             int v = (int)eraseType;
-            byte[] bytes = Encoding.ASCII.GetBytes(v.ToString());
-
-            return new byte[] { ESC, (byte)'[', bytes[0], (byte)'K' };
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(v.ToString()));
+            bytes.Add((byte)'J');
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count); 
         }
 
-        public static byte[] DCH_DeleteCharacter(int n) 
+        public void EL_EraseLine(VTEraseType eraseType)
+        {
+            int v = (int)eraseType;
+            List<byte> bytes = new List<byte>();
+            bytes.Add(ESC);
+            bytes.Add((byte)'[');
+            bytes.AddRange(Encoding.ASCII.GetBytes(v.ToString()));
+            bytes.Add((byte)'K');
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+        }
+
+        public void DCH_DeleteCharacter(int n)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'P');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public static byte[] ICH_InsertCharacter(int n) 
+        public void ICH_InsertCharacter(int n)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'@');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public static byte[] CRLF()
+        public void CRLF()
         {
-            return new byte[] { (byte)'\r', (byte)'\n' };
+            byte[] bytes = new byte[] { (byte)'\r', (byte)'\n' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
-        public static byte[] RI_ReverseLineFeed() 
+        public void RI_ReverseLineFeed()
         {
-            return new byte[] { ESC, (byte)'M' };
+            byte[] bytes = new byte[] { ESC, (byte)'M' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
-        public static byte[] DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin)
+        public void DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
@@ -136,63 +161,57 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)';');
             bytes.AddRange(Encoding.ASCII.GetBytes(bottomMargin.ToString()));
             bytes.Add((byte)'r');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public static byte[] DL_DeleteLine(int n) 
+        public void DL_DeleteLine(int n)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'M');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public static byte[] IL_InsertLine(int n)
+        public void IL_InsertLine(int n)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'L');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public static byte[] ECH_EraseCharacters(int n) 
+        public void ECH_EraseCharacters(int n)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'X');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public static byte[] SD_ScrollDown(int n)
+        public void SD_ScrollDown(int n)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'T');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public static byte[] SU_ScrollUp(int n)
+        public void SU_ScrollUp(int n)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'S');
-
-            return bytes.ToArray();
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
     }
 }

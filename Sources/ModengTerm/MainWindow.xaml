@@ -18,7 +18,7 @@
         Width="900" Height="700" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" WindowStyle="None"
         SourceInitialized="Window_SourceInitialized"
-        >
+        WindowState="Maximized">
 
     <!--WindowState="Maximized"-->
     

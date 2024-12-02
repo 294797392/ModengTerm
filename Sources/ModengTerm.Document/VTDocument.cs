@@ -4,9 +4,7 @@ using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata;
 using System.Text;
-using System.Windows.Controls.Primitives;
 
 namespace ModengTerm.Document
 {
@@ -1480,21 +1478,23 @@ namespace ModengTerm.Document
             VTScrollInfo scrollInfo = this.Scrollbar;
 
             // 更新区域内的第一行的物理行号
-            int scrollRegionTopPhysicsRow = scrollInfo.Value + marginTop;
-            VTextLine scrollRegionTopLine = this.FirstLine.FindNext(marginTop);
-            VTextLine scrollRegionBottomLine = this.LastLine.FindPrevious(marginBottom);
-            VTextLine current = scrollRegionTopLine;
+            int regionTopLinePhysicsRow = scrollInfo.Value + marginTop;
+            VTextLine regionTopLine = this.FirstLine.FindNext(marginTop);
+            VTextLine regionBottomLine = this.LastLine.FindPrevious(marginBottom);
+
+            VTextLine nextLine = regionTopLine;
+            int nextPhysicsRow = regionTopLinePhysicsRow;
             while (true)
             {
-                history.Set(scrollRegionTopPhysicsRow, current.History);
-                scrollRegionTopPhysicsRow++;
+                history.Set(nextPhysicsRow, nextLine.History);
+                nextPhysicsRow++;
 
-                if (current == scrollRegionBottomLine)
+                if (nextLine == regionBottomLine)
                 {
                     break;
                 }
 
-                current = current.NextLine;
+                nextLine = nextLine.NextLine;
             }
         }
 

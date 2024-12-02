@@ -49,20 +49,20 @@ static void fillscreen(int rows)
 
 static void DECSTBM_SetScrollingRegion(char topMargin, char bottomMargin)
 {
-	char sequence[6] = { 0x1b,'[', topMargin,';', bottomMargin,'r' };
-	putseq(sequence);
+	char seq[6] = { 0x1b,'[', topMargin,';', bottomMargin,'r' };
+	putseq(seq);
 }
 
 static void CUP_CursorPosition(char row, char col)
 {
-	char sequence[7] = { 0x1b,'[', row, ';', col, 'H' };
-	putseq(sequence);
+	char seq[7] = { 0x1b,'[', row, ';', col, 'H' };
+	putseq(seq);
 }
 
 static void RI_ReverseLineFeed()
 {
-	char sequence[2] = { 0x1b,'M' };
-	putseq(sequence);
+	char seq[2] = { 0x1b,'M' };
+	putseq(seq);
 }
 
 static void DL_DeleteLine(char n)
