@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,10 +12,9 @@ namespace ModengTerm.Terminal.Watch
     {
         private string id;
         private string name;
-        private int downloadSpeed;
-        private int uploadSpeed;
-        private ulong totalSend;
-        private ulong totalReceive;
+        private ulong bytesSent;
+        private ulong bytesReceived;
+        private string ipaddr;
 
         public string ID
         {
@@ -43,14 +43,14 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// 总发送字节数
         /// </summary>
-        public ulong TotalSend
+        public ulong BytesSent
         {
-            get { return this.totalSend; }
+            get { return this.bytesSent; }
             set
             {
-                if (this.totalSend != value)
+                if (this.bytesSent != value)
                 {
-                    this.totalSend = value;
+                    this.bytesSent = value;
                 }
             }
         }
@@ -58,38 +58,29 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// 总接收字节数
         /// </summary>
-        public ulong TotalReceive
+        public ulong BytesReceived
         {
-            get { return this.totalReceive; }
+            get { return this.bytesReceived; }
             set
             {
-                if (this.totalReceive != value)
+                if (this.bytesReceived != value)
                 {
-                    this.totalReceive = value;
+                    this.bytesReceived = value;
                 }
             }
         }
 
-        public int DownloadSpeed
+        /// <summary>
+        /// IP地址
+        /// </summary>
+        public string IPAddress
         {
-            get { return this.downloadSpeed; }
+            get { return this.ipaddr; }
             set
             {
-                if (this.downloadSpeed != value)
+                if (this.ipaddr != value)
                 {
-                    this.downloadSpeed = value;
-                }
-            }
-        }
-
-        public int UploadSpeed
-        {
-            get { return this.uploadSpeed; }
-            set
-            {
-                if (this.uploadSpeed != value)
-                {
-                    this.uploadSpeed = value;
+                    this.ipaddr = value;
                 }
             }
         }
@@ -97,6 +88,20 @@ namespace ModengTerm.Terminal.Watch
 
     public class Win32NetworkInterfaceCopy : ObjectCopy<NetInterfaceInfo, NetworkInterface>
     {
+        private string GetIPAddress(NetworkInterface @interface) 
+        {
+            IPInterfaceProperties properties = @interface.GetIPProperties();
+
+            // 一张网卡可以设置多个IP地址，这里取第一个，取IPV4
+            UnicastIPAddressInformation unicastIPAddress = properties.UnicastAddresses.FirstOrDefault(v => v.Address.AddressFamily == AddressFamily.InterNetwork);
+            if (unicastIPAddress == null)
+            {
+                return string.Empty;
+            }
+
+            return unicastIPAddress.Address.ToString();
+        }
+
         public override bool Compare(NetInterfaceInfo target, NetworkInterface source)
         {
             return source.Id == target.ID;
@@ -107,9 +112,10 @@ namespace ModengTerm.Terminal.Watch
             target.ID = source.Id;
             target.Name = source.Description;
 
-            IPInterfaceStatistics statistics = source.GetIPStatistics();
-            target.TotalSend = (ulong)statistics.BytesSent;
-            target.TotalReceive = (ulong)statistics.BytesReceived;
+            IPv4InterfaceStatistics statistics = source.GetIPv4Statistics();
+            target.BytesSent = (ulong)statistics.BytesSent;
+            target.BytesReceived = (ulong)statistics.BytesReceived;
+            target.IPAddress = this.GetIPAddress(source);
         }
     }
 }

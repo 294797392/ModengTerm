@@ -320,7 +320,11 @@
                         <Border BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 Background="{TemplateBinding Background}"/>
-                        <ItemsPresenter Margin="{TemplateBinding Padding}"/>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                                      CanContentScroll="False">
+                            <ItemsPresenter Margin="{TemplateBinding Padding}"/>
+                        </ScrollViewer>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

@@ -24,12 +24,27 @@
             </Style>
 
             <Style x:Key="StyleListBoxItemLocal" TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItem}">
+                <Style.Triggers>
+                    <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES505003E}"/>
+                    </Trigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="ItemsControl.AlternationIndex" Value="1"/>
+                            <Condition Property="IsSelected" Value="True"/>
+                        </MultiTrigger.Conditions>
+                        <Setter Property="Background" Value="{DynamicResource ResourceKey=RES9005E}"/>
+                    </MultiTrigger>
+                </Style.Triggers>
+                <Setter Property="Margin" Value="0"/>
             </Style>
-            
+
             <Style x:Key="StyleListBoxLocal" TargetType="{x:Type ListBox}" BasedOn="{StaticResource ResourceKey=StyleListBox}">
+                <Setter Property="AlternationCount" Value="2"/>
                 <Setter Property="Margin" Value="5,0,5,0"/>
                 <Setter Property="Background" Value="{DynamicResource ResourceKey=RES505002E}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES505001E}"/>
+                <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemLocal}"/>
             </Style>
 
@@ -64,7 +79,6 @@
             <ProgressBar Grid.Row="1" Grid.Column="1" Value="{Binding Path=MemoryPercent}" Minimum="0" Maximum="100" Style="{StaticResource ResourceKey=StyleProgressBarLocal}"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=MemoryPercent, StringFormat='{}{0}%'}"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Path=MemoryRatio}"/>
-
         </Grid>
 
         <!-- 磁盘信息 -->
@@ -103,17 +117,60 @@
         </Grid>
 
         <!-- 网络接口信息 -->
-        <Grid Grid.Row="3" MinHeight="100" MaxHeight="400" Margin="0,5,0,0">
+        <Grid Grid.Row="3" MinHeight="100" MaxHeight="300" Margin="0,5,0,0">
             <ListBox DataContext="{Binding Path=NetworkInterfaces}" ItemsSource="{Binding}" 
                      Style="{StaticResource ResourceKey=StyleListBoxLocal}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Path=Name}"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="20"/>
+                                <RowDefinition Height="20"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="15"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="15"/>
+                                    <ColumnDefinition Width="40"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0" Text="{Binding Path=IPAddress}" VerticalAlignment="Center"/>
+
+                                <Path Grid.Column="1" Stroke="Red" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <Path.Data>
+                                        <GeometryGroup>
+                                            <LineGeometry StartPoint="0,4" EndPoint="4,0"/>
+                                            <LineGeometry StartPoint="4,0" EndPoint="8,4"/>
+                                            <LineGeometry StartPoint="4,0" EndPoint="4,8"/>
+                                        </GeometryGroup>
+                                    </Path.Data>
+                                </Path>
+                                <TextBlock Grid.Column="2" Text="{Binding Path=UploadSpeed}" VerticalAlignment="Center"/>
+
+                                <Path Grid.Column="4" Stroke="Green" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                    <Path.Data>
+                                        <GeometryGroup>
+                                            <LineGeometry StartPoint="0,4" EndPoint="4,8"/>
+                                            <LineGeometry StartPoint="4,8" EndPoint="8,4"/>
+                                            <LineGeometry StartPoint="4,0" EndPoint="4,8"/>
+                                        </GeometryGroup>
+                                    </Path.Data>
+                                </Path>
+                                <TextBlock Grid.Column="5" Text="{Binding Path=DownloadSpeed}" VerticalAlignment="Center"/>
+
+                            </Grid>
+
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
-        
-        
+
     </Grid>
 </UserControl>

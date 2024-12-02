@@ -18,7 +18,7 @@ namespace ModengTerm
         /// <param name="bytes"></param>
         /// <param name="unit"></param>
         /// <returns></returns>
-        private static double CalcSpaceSize(double bytes, out SizeUnitsEnum unit, int decimals = 2)
+        public static double ConvertToHumanReadableUnit(double bytes, out SizeUnitsEnum unit, int decimals = 2)
         {
             unit = SizeUnitsEnum.KB;
 
@@ -65,7 +65,7 @@ namespace ModengTerm
             {
                 case SizeUnitsEnum.GB: return "GB";
                 case SizeUnitsEnum.TB: return "TB";
-                case SizeUnitsEnum.KB: return "kb";
+                case SizeUnitsEnum.KB: return "KB";
                 case SizeUnitsEnum.MB: return "MB";
                 default:
                     throw new NotImplementedException();
@@ -113,7 +113,7 @@ namespace ModengTerm
 
             ssize.Bytes = bytes;
             SizeUnitsEnum newUnit;
-            ssize.Value = ClientUtils.CalcSpaceSize(bytes, out newUnit);
+            ssize.Value = ClientUtils.ConvertToHumanReadableUnit(bytes, out newUnit);
             ssize.Unit = newUnit;
 
             return true;

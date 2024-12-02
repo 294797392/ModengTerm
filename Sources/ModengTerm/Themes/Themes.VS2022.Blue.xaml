@@ -223,7 +223,8 @@
 
     <!-- SystemWatchUserControl 505001 - 510000 -->
     <SolidColorBrush x:Key="RES505001E" Color="#D9E1FA"/><!-- 网络接口列表边框 -->
-    <SolidColorBrush x:Key="RES505002E" Color="Transparent"/><!-- 网络接口列表背景 -->
+    <SolidColorBrush x:Key="RES505002E" Color="White"/><!-- 网络接口列表背景 -->
+    <SolidColorBrush x:Key="RES505003E" Color="#E9F0FF" Opacity="0.5"/><!-- 网络接口列表交互项背景 -->
 
 
     <!-- CreateSessionWindow 55001 - 60000 -->
