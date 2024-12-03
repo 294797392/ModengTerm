@@ -27,14 +27,26 @@ namespace ModengTerm.Terminal.Watch
         /// </summary>
         public double AvailableMemory { get; set; }
 
+        /// <summary>
+        /// 所有磁盘列表
+        /// </summary>
         public ChangedItems<DiskInfo> DiskItems { get; private set; }
 
+        /// <summary>
+        /// 网路接口列表
+        /// </summary>
         public ChangedItems<NetInterfaceInfo> NetworkInterfaces { get; private set; }
+
+        /// <summary>
+        /// 所有进程列表
+        /// </summary>
+        public ChangedItems<ProcessInfo> Processes { get; private set; }
 
         public SystemInfo()
         {
             this.DiskItems = new ChangedItems<DiskInfo>();
             this.NetworkInterfaces = new ChangedItems<NetInterfaceInfo>();
+            this.Processes = new ChangedItems<ProcessInfo>();
         }
     }
 }

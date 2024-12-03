@@ -79,7 +79,7 @@ namespace ModengTerm
         /// <param name="size"></param>
         /// <param name="sizeUnit"></param>
         /// <returns>是否更新了</returns>
-        public static bool UpdateSpaceSize(UnitValue ssize, double size, SizeUnitsEnum sizeUnit = SizeUnitsEnum.Byte)
+        public static bool UpdateUnitValue(UnitValue ssize, double size, SizeUnitsEnum sizeUnit = SizeUnitsEnum.Byte)
         {
             if (sizeUnit == SizeUnitsEnum.Byte)
             {

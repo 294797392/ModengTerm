@@ -15,11 +15,13 @@ using ModengTerm.Terminal.Watch;
 using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
+using ModengTerm.ViewModels.Terminals.PanelContent;
 using ModengTerm.Windows;
 using ModengTerm.Windows.SSH;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -87,7 +89,7 @@ namespace ModengTerm.Terminal.ViewModels
         private Task watchTask;
         private ManualResetEvent watchEvent;
         private bool isWatch;
-        private List<WatchVM> watchList; // 当前被激活的监控列表
+        private List<WatchObject> watchList; // 当前被激活的监控列表
         private bool watchListChanged;
         private object watchListLock = new object();
 
@@ -278,7 +280,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.logMgr = MTermApp.Context.LoggerManager;
 
-            this.watchList = new List<WatchVM>();
+            this.watchList = new List<WatchObject>();
             this.HistoryCommands = new BindableCollection<string>();
             this.Panels = new BindableCollection<PanelVM>();
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
@@ -703,6 +705,25 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        private void StopRecord()
+        {
+            if (this.recordStatus == RecordStatusEnum.Stop)
+            {
+                return;
+            }
+
+            // TODO：此时文件可能正在被写入，playbackStream里做了异常处理，所以直接这么写
+            // 需要优化
+            this.playbackStream.Close();
+
+            this.RecordStatus = RecordStatusEnum.Stop;
+        }
+
+        private void StopLogger()
+        {
+            this.logMgr.Stop(this.videoTerminal);
+        }
+
         /// <summary>
         /// 启用或禁用Watcher
         /// </summary>
@@ -726,25 +747,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void StopRecord()
-        {
-            if (this.recordStatus == RecordStatusEnum.Stop)
-            {
-                return;
-            }
-
-            // TODO：此时文件可能正在被写入，playbackStream里做了异常处理，所以直接这么写
-            // 需要优化
-            this.playbackStream.Close();
-
-            this.RecordStatus = RecordStatusEnum.Stop;
-        }
-
-        private void StopLogger()
-        {
-            this.logMgr.Stop(this.videoTerminal);
-        }
-
         /// <summary>
         /// 把一个WatchVM添加到监控列表里
         /// 或者把WatchVM从监控列表里移除
@@ -758,8 +760,8 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
-            WatchVM watchVM = contextMenu.ContentVM as WatchVM;
-            if (watchVM == null)
+            WatchObject watch = contextMenu.ContentVM as WatchObject;
+            if (watch == null)
             {
                 return;
             }
@@ -768,7 +770,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 lock (this.watchListLock)
                 {
-                    this.watchList.Add(watchVM);
+                    this.watchList.Add(watch);
                     this.watchListChanged = true;
                 }
 
@@ -776,9 +778,10 @@ namespace ModengTerm.Terminal.ViewModels
             }
             else
             {
+
                 lock(this.watchListLock)
                 {
-                    this.watchList.Remove(watchVM);
+                    this.watchList.Remove(watch);
                     this.watchListChanged = true;
                 }
 
@@ -923,7 +926,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             WatchFrequencyEnum frequency = this.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, MTermConsts.DefaultWatchFrequency);
             int updateInterval = MTermUtils.GetWatchInterval(frequency);
-            List<WatchVM> watchList = new List<WatchVM>();
+            List<WatchObject> watchList = new List<WatchObject>();
             AbstractWatcher watcher = WatcherFactory.Create(this.Session);
             watcher.Initialize();
 
@@ -944,7 +947,7 @@ namespace ModengTerm.Terminal.ViewModels
                         }
                     }
 
-                    foreach (WatchVM watch in watchList)
+                    foreach (WatchObject watch in watchList)
                     {
                         watch.Watch(watcher);
                     }

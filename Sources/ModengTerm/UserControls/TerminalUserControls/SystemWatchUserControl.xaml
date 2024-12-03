@@ -57,6 +57,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- CPU和内存 -->
@@ -117,15 +118,15 @@
         </Grid>
 
         <!-- 网络接口信息 -->
-        <Grid Grid.Row="3" MinHeight="100" MaxHeight="300" Margin="0,5,0,0">
+        <Grid Grid.Row="3" MinHeight="100" MaxHeight="250" Margin="0,5,0,0">
             <ListBox DataContext="{Binding Path=NetworkInterfaces}" ItemsSource="{Binding}" 
                      Style="{StaticResource ResourceKey=StyleListBoxLocal}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="20"/>
-                                <RowDefinition Height="20"/>
+                                <RowDefinition Height="25"/>
+                                <RowDefinition Height="25"/>
                             </Grid.RowDefinitions>
 
                             <TextBlock Grid.Row="0" Text="{Binding Path=Name}" VerticalAlignment="Center"/>
@@ -134,15 +135,15 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="15"/>
-                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="50"/>
                                     <ColumnDefinition Width="10"/>
                                     <ColumnDefinition Width="15"/>
-                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="50"/>
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0" Text="{Binding Path=IPAddress}" VerticalAlignment="Center"/>
 
-                                <Path Grid.Column="1" Stroke="Red" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                <Path Grid.Column="1" Stroke="{DynamicResource ResourceKey=RES505004E}" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Left">
                                     <Path.Data>
                                         <GeometryGroup>
                                             <LineGeometry StartPoint="0,4" EndPoint="4,0"/>
@@ -153,7 +154,7 @@
                                 </Path>
                                 <TextBlock Grid.Column="2" Text="{Binding Path=UploadSpeed}" VerticalAlignment="Center"/>
 
-                                <Path Grid.Column="4" Stroke="Green" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+                                <Path Grid.Column="4" Stroke="{DynamicResource ResourceKey=RES505005E}" StrokeThickness="2" VerticalAlignment="Center" HorizontalAlignment="Left">
                                     <Path.Data>
                                         <GeometryGroup>
                                             <LineGeometry StartPoint="0,4" EndPoint="4,8"/>
@@ -171,6 +172,57 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
+
+        <!-- 进程信息 -->
+        <Grid Grid.Row="4" Margin="0,5,0,0">
+            <DataGrid DataContext="{Binding Path=Processes}" ItemsSource="{Binding}" RowHeight="25"
+                      CanUserSortColumns="True"
+                      ColumnHeaderHeight="25" Margin="5,0,5,0" Style="{StaticResource ResourceKey=StyleDataGrid}">
+
+                <DataGrid.ColumnHeaderStyle>
+                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ResourceKey=StyleDataGridColumnHeader}">
+                        <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn Header="PID" Width="Auto" CanUserSort="True" SortMemberPath="PID">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=PID}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="名称" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,5,0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="内存" Width="70" CanUserSort="True" SortMemberPath="Memory">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=DisplayMemory}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="CPU" Width="50" CanUserSort="True" SortMemberPath="CpuUsage">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Path=DisplayCpuUsage}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
 
     </Grid>
 </UserControl>

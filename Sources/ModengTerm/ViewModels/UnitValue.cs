@@ -11,7 +11,7 @@ namespace ModengTerm.ViewModels
     /// <summary>
     /// 封装一个带有单位的数值类型
     /// </summary>
-    public class UnitValue : INotifyPropertyChanged
+    public class UnitValue : INotifyPropertyChanged, IComparable
     {
         private ulong bytes;
         private double value;
@@ -52,7 +52,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 该值的单位
         /// </summary>
-        public SizeUnitsEnum Unit 
+        public SizeUnitsEnum Unit
         {
             get { return this.unit; }
             set
@@ -66,6 +66,35 @@ namespace ModengTerm.ViewModels
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        public int CompareTo(object? obj)
+        {
+            UnitValue v2 = obj as UnitValue;
+
+            if (v2.Unit == this.Unit && v2.Value == this.Value)
+            {
+                return 0;           
+            }
+
+            if (v2.Unit == this.Unit)
+            {
+                if (v2.value > this.Value)
+                {
+                    return -1;
+                }
+
+                return 1;
+            }
+            else
+            {
+                if (v2.Unit > this.Unit)
+                {
+                    return -1;
+                }
+
+                return 1;
+            }
+        }
 
         public override string ToString()
         {

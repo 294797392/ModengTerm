@@ -3,6 +3,7 @@ using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,16 +29,5 @@ namespace ModengTerm.ViewModels.Terminals
             this.ServiceAgent = this.Parameters[KEY_SERVICE_AGENT] as ServiceAgent;
             this.Session = this.Parameters[KEY_XTERM_SESSION] as XTermSession;
         }
-    }
-
-    /// <summary>
-    /// 带有监控功能的PanelContent基类
-    /// </summary>
-    public abstract class WatchVM : PanelContentVM
-    {
-        /// <summary>
-        /// 执行定时任务
-        /// </summary>
-        public abstract void Watch(AbstractWatcher watcher);
     }
 }

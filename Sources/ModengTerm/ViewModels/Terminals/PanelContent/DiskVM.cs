@@ -3,6 +3,7 @@ using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -90,8 +91,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             bool sizeChanged = false;
 
-            sizeChanged = ClientUtils.UpdateSpaceSize(target.TotalSpace, source.TotalSpace);
-            sizeChanged = ClientUtils.UpdateSpaceSize(target.FreeSpace, source.FreeSpace);
+            sizeChanged = ClientUtils.UpdateUnitValue(target.TotalSpace, source.TotalSpace);
+            sizeChanged = ClientUtils.UpdateUnitValue(target.FreeSpace, source.FreeSpace);
 
             if (sizeChanged)
             {

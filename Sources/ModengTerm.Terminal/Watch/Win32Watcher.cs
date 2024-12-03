@@ -13,6 +13,7 @@ namespace ModengTerm.Terminal.Watch
 
         public static readonly Win32DiskCopy Win32DiskSync = new Win32DiskCopy();
         public static readonly Win32NetworkInterfaceCopy Win32NetworkInterfaceCopy = new Win32NetworkInterfaceCopy();
+        public static readonly Win32ProcessCopy Win32ProcessCopy = new Win32ProcessCopy();
         private static log4net.ILog logger = log4net.LogManager.GetLogger("Win32Watcher");
 
         #endregion
@@ -72,6 +73,10 @@ namespace ModengTerm.Terminal.Watch
             // 更新网络接口信息
             NetworkInterface[] newIfaces = NetworkInterface.GetAllNetworkInterfaces();
             this.Copy<NetworkInterface, NetInterfaceInfo>(this.systemInfo.NetworkInterfaces, newIfaces, Win32NetworkInterfaceCopy);
+
+            // 更新进程信息
+            Process[] newProcs = Process.GetProcesses();
+            this.Copy<Process, ProcessInfo>(this.systemInfo.Processes, newProcs, Win32ProcessCopy);
 
             return this.systemInfo;
         }

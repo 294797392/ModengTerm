@@ -2,17 +2,14 @@
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public class WatchSystemInfo : WatchVM
+    public class WatchSystemInfo : WatchObject
     {
         #region 类变量
 
-        private static readonly DiskVMCopy DiskVMSync = new DiskVMCopy();
-        private static readonly NetworkInterfaceVMCopy NetworkInterfaceVMCopy = new NetworkInterfaceVMCopy();
         private static log4net.ILog logger = log4net.LogManager.GetLogger("WatchSystemInfo");
 
         #endregion
@@ -22,7 +19,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         private double cpuPercent;
         private double memoryPercent;
         private string memoryRatio;
-        private Stopwatch speedWatch;
+        private DiskVMCopy diskCopy;
+        private NetworkInterfaceVMCopy ifaceCopy;
+        private ProcessVMCopy processCopy;
 
         #endregion
 
@@ -98,9 +97,14 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public BindableCollection<NetworkInterfaceVM> NetworkInterfaces { get; private set; }
 
+        /// <summary>
+        /// 所有进程列表
+        /// </summary>
+        public BindableCollection<ProcessVM> Processes { get; private set; }
+
         #endregion
 
-        #region WatchVM
+        #region WatchObject
 
         public override void OnInitialize()
         {
@@ -111,7 +115,16 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.TotalMemory = new UnitValue();
             this.UsedMemory = new UnitValue();
             this.AvailableMemory = new UnitValue();
-            this.speedWatch = new Stopwatch();
+            this.Processes = new BindableCollection<ProcessVM>();
+
+            this.diskCopy = new DiskVMCopy();
+            this.ifaceCopy = new NetworkInterfaceVMCopy();
+            this.processCopy = new ProcessVMCopy();
+        }
+
+        public override void OnRelease()
+        {
+            base.OnRelease();
         }
 
         public override void Watch(AbstractWatcher watcher)
@@ -119,41 +132,20 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             SystemInfo systemInfo = watcher.GetSystemInfo();
 
             this.CpuPercent = Math.Round(systemInfo.CpuPercent, 2);
-            ClientUtils.UpdateSpaceSize(this.AvailableMemory, systemInfo.AvailableMemory, SizeUnitsEnum.KB);
-            ClientUtils.UpdateSpaceSize(this.TotalMemory, systemInfo.TotalMemory, SizeUnitsEnum.KB);
-            ClientUtils.UpdateSpaceSize(this.UsedMemory, systemInfo.TotalMemory - systemInfo.AvailableMemory, SizeUnitsEnum.KB);
+            ClientUtils.UpdateUnitValue(this.AvailableMemory, systemInfo.AvailableMemory, SizeUnitsEnum.KB);
+            ClientUtils.UpdateUnitValue(this.TotalMemory, systemInfo.TotalMemory, SizeUnitsEnum.KB);
+            ClientUtils.UpdateUnitValue(this.UsedMemory, systemInfo.TotalMemory - systemInfo.AvailableMemory, SizeUnitsEnum.KB);
             this.MemoryPercent = Math.Round((double)this.UsedMemory.Bytes / this.TotalMemory.Bytes * 100, 2);
             this.MemoryRatio = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
 
             // 更新磁盘信息
-            this.Copy<DiskVM, DiskInfo>(systemInfo.DiskItems, this.Disks, DiskVMSync);
+            this.Copy<DiskVM, DiskInfo>(systemInfo.DiskItems, this.Disks, this.diskCopy);
 
             // 更新网络接口信息
-            this.Copy<NetworkInterfaceVM, NetInterfaceInfo>(systemInfo.NetworkInterfaces, this.NetworkInterfaces, NetworkInterfaceVMCopy);
+            this.Copy<NetworkInterfaceVM, NetInterfaceInfo>(systemInfo.NetworkInterfaces, this.NetworkInterfaces, this.ifaceCopy);
 
-            // 更新网络接口实时速度
-            // 上次到这次的总运行时间
-            double seconds = this.speedWatch.Elapsed.Seconds;
-            if (seconds > 0)
-            {
-                foreach (NetworkInterfaceVM interfaze in this.NetworkInterfaces)
-                {
-                    ulong sent = interfaze.BytesSent - interfaze.PreviousBytesSent;
-                    ulong received = interfaze.BytesReceived - interfaze.PreviousBytesReceived;
-
-                    // 单位是字节
-                    double upspeedBytes = sent / seconds;
-                    double downspeedBytes = received / seconds;
-
-                    SizeUnitsEnum upspeedUnit, downspeedUnit;
-                    int upspeed = (int)ClientUtils.ConvertToHumanReadableUnit(upspeedBytes, out upspeedUnit, 1);
-                    int downspeed = (int)ClientUtils.ConvertToHumanReadableUnit(downspeedBytes, out downspeedUnit, 1);
-
-                    interfaze.UploadSpeed = string.Format("{0}{1}/s", upspeed, ClientUtils.Unit2Suffix(upspeedUnit));
-                    interfaze.DownloadSpeed = string.Format("{0}{1}/s", downspeed, ClientUtils.Unit2Suffix(downspeedUnit));
-                }
-            }
-            this.speedWatch.Restart();
+            // 更新进程信息
+            this.Copy<ProcessVM, ProcessInfo>(systemInfo.Processes, this.Processes, this.processCopy);
         }
 
         #endregion
@@ -224,6 +216,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                     copy.CopyTo(viewModel, toUpdate);
                 }
             }
+
+            // 所有数据都刷新完了，重置计时器
+            copy.Stopwatch.Restart();
         }
 
         #endregion
