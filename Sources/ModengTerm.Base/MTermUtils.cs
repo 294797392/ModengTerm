@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -137,6 +138,20 @@ namespace ModengTerm.Base
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        public static string TrimInvalidFileNameChars(string srcFileName) 
+        {
+            char[] invalidFileNameChars = Path.GetInvalidFileNameChars();
+
+            foreach (char invalidChar in invalidFileNameChars)
+            {
+                 srcFileName = srcFileName.Replace(invalidChar, '_');
+            }
+
+            srcFileName = srcFileName.Replace(" ", "_");
+
+            return srcFileName;
         }
     }
 }

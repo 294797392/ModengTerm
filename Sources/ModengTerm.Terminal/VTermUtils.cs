@@ -280,7 +280,7 @@ namespace ModengTerm.Terminal
         {
             message = string.Empty;
 
-            logger.InfoFormat("adb pull, remotePath = {0}, localPath = {1}", remotePath, localPath);
+            //logger.InfoFormat("adb pull, remotePath = {0}, localPath = {1}", remotePath, localPath);
 
             try
             {

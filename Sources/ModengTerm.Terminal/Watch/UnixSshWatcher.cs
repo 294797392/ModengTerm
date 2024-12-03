@@ -16,24 +16,20 @@ namespace ModengTerm.Terminal.Watch
 
         public override void Initialize()
         {
+            base.Initialize();
         }
 
         public override void Release()
         {
+            base.Release();
         }
 
-
-        public override string df_h()
+        protected override string ReadFile(string filePath)
         {
             throw new NotImplementedException();
         }
 
-        public override string proc_meminfo()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string proc_stat()
+        protected override string Execute(string command)
         {
             throw new NotImplementedException();
         }

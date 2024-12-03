@@ -32,7 +32,7 @@ namespace ModengTerm
             if (size < 1024)
             {
                 unit = SizeUnitsEnum.KB;
-                return size;
+                return Math.Round(size, decimals);
             }
 
             size = size / 1024;

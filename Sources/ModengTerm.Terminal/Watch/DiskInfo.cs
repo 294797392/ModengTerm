@@ -30,7 +30,7 @@ namespace ModengTerm.Terminal.Watch
         }
 
         /// <summary>
-        /// 磁盘总空间
+        /// 磁盘总空间，单位字节
         /// </summary>
         public double TotalSpace
         {
@@ -45,7 +45,7 @@ namespace ModengTerm.Terminal.Watch
         }
 
         /// <summary>
-        /// 磁盘空闲空间
+        /// 磁盘空闲空间，单位字节
         /// </summary>
         public double FreeSpace
         {
@@ -90,6 +90,39 @@ namespace ModengTerm.Terminal.Watch
         public override bool Compare(DiskInfo diskInfo, DriveInfo osDisk)
         {
             return diskInfo.Name == osDisk.Name;
+        }
+    }
+
+    public class UnixDiskCopy : ObjectCopy<DiskInfo, string[]>
+    {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("");
+
+        public override bool Compare(DiskInfo target, string[] source)
+        {
+            return target.Name == source[0];
+        }
+
+        public override void CopyTo(DiskInfo target, string[] source)
+        {
+            if (source.Length < 5)
+            {
+                logger.ErrorFormat("UnixDiskCopy, {0}", source.Length);
+                return;
+            }
+
+            target.Name = source[0];
+
+            int size;
+            if (int.TryParse(source[1], out size))
+            {
+                target.TotalSpace = size;
+            }
+
+            int available;
+            if (int.TryParse(source[3], out available))
+            {
+                target.FreeSpace = available;
+            }
         }
     }
 }

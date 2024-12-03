@@ -4,6 +4,7 @@ using ModengTerm.Base.Enumerations;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Windows.Markup;
 
 namespace ModengTerm.Terminal.Watch
 {
@@ -11,9 +12,19 @@ namespace ModengTerm.Terminal.Watch
     {
         public class FileNames
         {
+            /// <summary>
+            /// 保存到设备里的临时文件名
+            /// </summary>
             public string TempFileName { get; set; }
+
+            /// <summary>
+            /// 保存到设备里的临时文件路径
+            /// </summary>
             public string TempFilePath { get; set; }
 
+            /// <summary>
+            /// 本地保存从设备上pull下来的文件路径
+            /// </summary>
             public string LocalFilePath { get; set; }
         }
 
@@ -39,7 +50,7 @@ namespace ModengTerm.Terminal.Watch
         private Encoding writeEncoding;
         private Encoding readEncoding;
         private string tempDir;
-        private Dictionary<string, FileNames> filePath2TempName;
+        private Dictionary<string, FileNames> cmd2FileName;
 
         #endregion
 
@@ -48,7 +59,7 @@ namespace ModengTerm.Terminal.Watch
         public UnixAdbWatcher(XTermSession session) :
             base(session)
         {
-            this.filePath2TempName = new Dictionary<string, FileNames>();
+            this.cmd2FileName = new Dictionary<string, FileNames>();
 
             this.shellPrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT, string.Empty);
             this.adbPath = session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH, MTermConsts.DefaultAdbPath);
@@ -245,12 +256,7 @@ namespace ModengTerm.Terminal.Watch
             this.readProcess = null;
         }
 
-        /// <summary>
-        /// 读取指定目录下的文件
-        /// </summary>
-        /// <param name="filePath"></param>
-        /// <returns>如果读取失败则返回string.Empty</returns>
-        private string ReadFile(string filePath)
+        private string CommonExecute(string command)
         {
             if (!this.OpenProcess())
             {
@@ -259,22 +265,23 @@ namespace ModengTerm.Terminal.Watch
 
             // 根据要读取的文件生成一个保存在临时目录里的临时文件名
             FileNames fileNames;
-            if (!this.filePath2TempName.TryGetValue(filePath, out fileNames))
+            if (!this.cmd2FileName.TryGetValue(command, out fileNames))
             {
-                string tempFileName = string.Format("modengterm_watch_{0}", filePath.Replace("/", "_").Replace(" ", "_"));
+                string tempFileName = string.Format("modengterm_watch_{0}", command);
+                tempFileName = MTermUtils.TrimInvalidFileNameChars(tempFileName);
 
                 fileNames = new FileNames()
                 {
                     TempFileName = tempFileName,
                     TempFilePath = string.Format("{0}/{1}", this.tempDir, tempFileName),
-                    LocalFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Guid.NewGuid().ToString())
+                    LocalFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, tempFileName)
                 };
-                this.filePath2TempName[filePath] = fileNames;
+                this.cmd2FileName[command] = fileNames;
             }
 
             #region 执行读取指令;
 
-            string write = string.Format("cat {0} > {1}\r\n", filePath, fileNames.TempFilePath);
+            string write = string.Format("{0} > {1}\r\n", command, fileNames.TempFilePath);
             byte[] writeBytes = this.writeEncoding.GetBytes(write);
 
             try
@@ -301,7 +308,7 @@ namespace ModengTerm.Terminal.Watch
             string content;
             string message;
             AdbReadResult readResult = VTermUtils.AdbReadFile(this.adbPath, fileNames.TempFilePath, fileNames.LocalFilePath, out content, out message);
-            if (readResult != AdbReadResult.Susccess) 
+            if (readResult != AdbReadResult.Susccess)
             {
                 logger.ErrorFormat("{0}, {1}", readResult, message);
                 return string.Empty;
@@ -318,25 +325,24 @@ namespace ModengTerm.Terminal.Watch
 
         public override void Initialize()
         {
+            base.Initialize();
         }
 
         public override void Release()
         {
+            base.Release();
         }
 
-        public override string proc_stat()
+        protected override string ReadFile(string filePath)
         {
-            return this.ReadFile("/proc/stat");
+            string command = string.Format("cat {0}", filePath);
+
+            return this.CommonExecute(command);
         }
 
-        public override string proc_meminfo()
+        protected override string Execute(string command)
         {
-            return this.ReadFile("/proc/meminfo");
-        }
-
-        public override string df_h()
-        {
-            return this.ReadFile("df -h");
+            return this.CommonExecute(command);
         }
 
         #endregion
