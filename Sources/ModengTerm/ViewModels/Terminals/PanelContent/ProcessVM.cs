@@ -1,7 +1,10 @@
-﻿using ModengTerm.Enumerations;
+﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Drawing.Printing;
+using System.Formats.Asn1;
+using System.Windows.Interactivity;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
@@ -11,9 +14,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         private int pid;
         private UnitValue memory;
         private string displayMemory;
-        private ulong totalProcessorTime;
+        private double totalProcessorTime;
         private string displayCpuUsage;
-        private int cpuUsage;
+        private double cpuUsage;
 
         public int PID
         {
@@ -54,7 +57,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             }
         }
 
-        public ulong TotalProcessorTime
+        public double TotalProcessorTime
         {
             get { return this.totalProcessorTime; }
             set
@@ -79,7 +82,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             }
         }
 
-        public int CpuUsage
+        public double CpuUsage
         {
             get { return this.cpuUsage; }
             set
@@ -94,6 +97,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         public ProcessVM()
         {
             this.Memory = new UnitValue();
+            this.CpuUsage = 0;
+            this.displayCpuUsage = "0";
         }
     }
 
@@ -108,7 +113,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public override void CopyTo(ProcessVM target, ProcessInfo source)
         {
-            ulong previousProcessorTime = target.TotalProcessorTime;
+            double previousProcessorTime = target.TotalProcessorTime;
 
             target.PID = source.PID;
             target.Name = source.Name;
@@ -120,11 +125,16 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             if (this.Elapsed.Milliseconds > 0)
             {
-                int time = (int)(target.TotalProcessorTime - previousProcessorTime);
-                double cpuUsage = time / this.Elapsed.Milliseconds * 100;
-                cpuUsage /= ProcessVMCopy.ProcessorCount;
-                target.DisplayCpuUsage = Math.Round(cpuUsage, 0).ToString().PadLeft(2, '0');
-                target.CpuUsage = time;
+                if (target.TotalProcessorTime != previousProcessorTime)
+                {
+                    double time = target.TotalProcessorTime - previousProcessorTime;
+                    double cpuUsage = time / this.Elapsed.Milliseconds * 100;
+                    cpuUsage /= ProcessVMCopy.ProcessorCount;
+                    cpuUsage = Math.Round(cpuUsage, 2);
+                    //target.DisplayCpuUsage = Math.Round(cpuUsage, 2).ToString(); // Math.Round(cpuUsage, 0).ToString().PadLeft(2, '0');
+                    target.CpuUsage = cpuUsage;
+                    target.DisplayCpuUsage = cpuUsage.ToString();
+                }
             }
         }
     }

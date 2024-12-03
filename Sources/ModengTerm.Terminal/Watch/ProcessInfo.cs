@@ -16,7 +16,7 @@ namespace ModengTerm.Terminal.Watch
         private int pid;
         private string name;
         private string filePath;
-        private ulong totalProcessorTime;
+        private double totalProcessorTime;
         private bool canRead;
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// Cpu总使用时间，单位是毫秒
         /// </summary>
-        public ulong TotalProcessorTime
+        public double TotalProcessorTime
         {
             get { return this.totalProcessorTime; }
             set
@@ -139,7 +139,8 @@ namespace ModengTerm.Terminal.Watch
                     target.FilePath = source.MainModule.FileName;
                 }
 
-                target.TotalProcessorTime = (ulong)source.TotalProcessorTime.TotalMilliseconds;
+                //target.TotalProcessorTime = source.TotalProcessorTime.TotalMilliseconds;
+                target.TotalProcessorTime = source.UserProcessorTime.TotalMilliseconds;
             }
             catch (Win32Exception e)
             {
