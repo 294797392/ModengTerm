@@ -66,9 +66,13 @@ namespace ModengTerm.Terminal.Watch
             FILETIME idleTime, kernelTime, userTime;
             if (GetSystemTimes(out idleTime, out kernelTime, out userTime))
             {
-                this.systemInfo.IdleProcessorTime = (ulong)(idleTime.dwHighDateTime << 32 | idleTime.dwLowDateTime);
-                this.systemInfo.KernelProcessorTime = (ulong)(kernelTime.dwHighDateTime << 32 | kernelTime.dwLowDateTime) - this.systemInfo.IdleProcessorTime;
-                this.systemInfo.UserProcessorTime = (ulong)(userTime.dwHighDateTime << 32 | userTime.dwLowDateTime);
+                ulong a = ((ulong)idleTime.dwHighDateTime) << 32 | idleTime.dwLowDateTime;
+                ulong b = ((ulong)kernelTime.dwHighDateTime) << 32 | kernelTime.dwLowDateTime;
+                ulong c = ((ulong)userTime.dwHighDateTime) << 32 | userTime.dwLowDateTime;
+
+                this.systemInfo.IdleProcessorTime = ((ulong)idleTime.dwHighDateTime) << 32 | idleTime.dwLowDateTime;
+                this.systemInfo.KernelProcessorTime = (((ulong)kernelTime.dwHighDateTime) << 32 | kernelTime.dwLowDateTime) - this.systemInfo.IdleProcessorTime;
+                this.systemInfo.UserProcessorTime = ((ulong)userTime.dwHighDateTime) << 32 | userTime.dwLowDateTime;
             }
 
             // 更新磁盘信息
@@ -97,8 +101,8 @@ namespace ModengTerm.Terminal.Watch
         [StructLayout(LayoutKind.Sequential)]
         public struct FILETIME
         {
-            public int dwLowDateTime;
-            public int dwHighDateTime;
+            public uint dwLowDateTime;
+            public uint dwHighDateTime;
         }
         [DllImport("kernel32")]
         private static extern bool GetSystemTimes(out FILETIME lpIdleTime, out FILETIME lpKernelTime, out FILETIME lpUserTime);

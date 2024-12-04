@@ -144,7 +144,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             #region 计算CPU使用率
 
-            if (this.prevIdleProcessorTime > 0)
+            if (this.prevKernelProcessorTime > 0)
             {
                 ulong idleTime = systemInfo.IdleProcessorTime - this.prevIdleProcessorTime;
                 ulong kernelTime = systemInfo.KernelProcessorTime - this.prevKernelProcessorTime;
@@ -152,9 +152,15 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 ulong totalTime = idleTime + kernelTime + userTime;
                 ulong totalProcessorTime = kernelTime + userTime;
                 this.CpuPercent = Math.Round((double)totalProcessorTime / totalTime * 100, 2);
+                if (this.cpuPercent > 100) 
+                {
+                    logger.FatalFormat("3. {0}, totalProcessorTime = {1}, totalTime = {2}, kernelTime = {3}, userTime = {4}, idleTime = {4}, prevIdleProcessorTime = {5}", this.CpuPercent, totalProcessorTime, totalTime, kernelTime, userTime, idleTime, this.prevIdleProcessorTime);
+                }
             }
 
+            //logger.ErrorFormat("1. IdlProcessorTime = {0}", systemInfo.IdleProcessorTime);
             this.prevIdleProcessorTime = systemInfo.IdleProcessorTime;
+            //logger.ErrorFormat("2. prevIdleProcessorTime = {0}", this.prevIdleProcessorTime);
             this.prevKernelProcessorTime = systemInfo.KernelProcessorTime;
             this.prevUserProcessorTime = systemInfo.UserProcessorTime;
 
