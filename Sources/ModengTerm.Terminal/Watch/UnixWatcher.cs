@@ -7,6 +7,7 @@ using System.Linq;
 using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls.Ribbon;
 
 namespace ModengTerm.Terminal.Watch
 {
@@ -16,13 +17,14 @@ namespace ModengTerm.Terminal.Watch
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("UnixWatcher");
 
-        private List<int> CPU_TIME_INDEX = new List<int>() { 1, 2, 3, 6, 7, 8 };
+        private static readonly List<int> CPU_USER_TIME_INDEX = new List<int>() { 1, 2 };
+        private static readonly List<int> CPU_KERNEL_TIME_INDEX = new List<int>() { 3, 5, 6, 7, 8 };
+        private static readonly List<int> CPU_IDLE_TIME_INDEX = new List<int>() { 4 };
 
         #endregion
 
         #region 实例变量
 
-        private Stopwatch stopwatch;
         private int lastCputime;
         private SystemInfo systemInfo;
         protected XTermSession session;
@@ -68,12 +70,32 @@ namespace ModengTerm.Terminal.Watch
             return true;
         }
 
-        private bool parse_cpu(string cpu, out int totaltime)
+        private bool calc_cpu_time(string[] strs, List<int> indexs, out ulong cpu_time)
         {
-            totaltime = 0;
+            cpu_time = 0;
+
+            foreach (int index in indexs)
+            {
+                ulong v;
+                if (!ulong.TryParse(strs[index], out v))
+                {
+                    return false;
+                }
+
+                cpu_time += v;
+            }
+
+            return true;
+        }
+
+        private bool handle_cpu(string cpu)
+        {
+            //        
+            // cpu  1661515 33740 1757851 27139465 233 0 387078 0 0 0
 
             if (string.IsNullOrEmpty(cpu))
             {
+                logger.ErrorFormat("cpu empty");
                 return false;
             }
 
@@ -84,16 +106,37 @@ namespace ModengTerm.Terminal.Watch
                 return false;
             }
 
-            foreach (int index in CPU_TIME_INDEX)
+            // 用户时间
+            ulong user_time;
+            if (!this.calc_cpu_time(strs, CPU_USER_TIME_INDEX, out user_time))
             {
-                int v;
-                if (!int.TryParse(strs[index], out v))
-                {
-                    logger.ErrorFormat("cpu error2 = {0}", cpu);
-                    return false;
-                }
+                logger.ErrorFormat("cpu user time error = {0}", cpu);
+            }
+            else
+            {
+                this.systemInfo.UserProcessorTime = user_time;
+            }
 
-                totaltime += v;
+            // 内核时间
+            ulong kernel_time;
+            if (!this.calc_cpu_time(strs, CPU_KERNEL_TIME_INDEX, out kernel_time))
+            {
+                logger.ErrorFormat("cpu kernel time error = {0}", cpu);
+            }
+            else
+            {
+                this.systemInfo.KernelProcessorTime = kernel_time;
+            }
+
+            // 空闲时间
+            ulong idle_time;
+            if (!this.calc_cpu_time(strs, CPU_IDLE_TIME_INDEX, out idle_time))
+            {
+                logger.ErrorFormat("cpu idle time error = {0}", cpu);
+            }
+            else
+            {
+                this.systemInfo.IdleProcessorTime = idle_time;
             }
 
             return true;
@@ -122,7 +165,6 @@ namespace ModengTerm.Terminal.Watch
         public override void Initialize()
         {
             this.systemInfo = new SystemInfo();
-            this.stopwatch = new Stopwatch();
             this.diskCopy = new UnixDiskCopy();
         }
 
@@ -156,22 +198,10 @@ namespace ModengTerm.Terminal.Watch
 
             #region 读取CPU信息
 
-            int cputime;
             string cpuinfo = this.ReadFile("/proc/stat");
             string[] cpuitems = cpuinfo.Split('\n', StringSplitOptions.RemoveEmptyEntries);
             string cpu = cpuitems.FirstOrDefault(v => v.Contains("cpu "));
-            if (this.parse_cpu(cpu, out cputime))
-            {
-                TimeSpan elapsed = this.stopwatch.Elapsed;
-                if (elapsed.TotalMilliseconds > 0 && this.lastCputime > 0)
-                {
-                    int diff = cputime - this.lastCputime;
-                    this.systemInfo.CpuPercent = Math.Round(diff / elapsed.TotalMilliseconds * 100, 2);
-                }
-
-                this.lastCputime = cputime;
-            }
-            this.stopwatch.Restart();
+            this.handle_cpu(cpu);
 
             #endregion
 

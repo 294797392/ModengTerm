@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Windows.Documents;
 using System.Windows.Shell;
 
 namespace ModengTerm.Terminal.Watch
@@ -23,7 +24,6 @@ namespace ModengTerm.Terminal.Watch
         public Win32ProcessCopy Win32ProcessCopy = new Win32ProcessCopy();
         private SystemInfo systemInfo;
         private int memstatSize;
-        private PerformanceCounter cpuPerf;
 
         #endregion
 
@@ -41,16 +41,12 @@ namespace ModengTerm.Terminal.Watch
         public override void Initialize()
         {
             this.systemInfo = new SystemInfo();
-            this.cpuPerf = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-            this.cpuPerf.NextValue();
             MEMORYSTATUSEX memstat = new MEMORYSTATUSEX();
             this.memstatSize = Marshal.SizeOf(memstat);
         }
 
         public override void Release()
         {
-            this.cpuPerf.Close();
-            this.cpuPerf.Dispose();
         }
 
         public override SystemInfo GetSystemInfo()
@@ -67,7 +63,13 @@ namespace ModengTerm.Terminal.Watch
             this.systemInfo.TotalMemory.Unit = UnitType.Byte;
             this.systemInfo.AvailableMemory.Value = memstat.dwAvailPhys;
             this.systemInfo.AvailableMemory.Unit = UnitType.Byte;
-            this.systemInfo.CpuPercent = this.cpuPerf.NextValue();
+            FILETIME idleTime, kernelTime, userTime;
+            if (GetSystemTimes(out idleTime, out kernelTime, out userTime))
+            {
+                this.systemInfo.IdleProcessorTime = (ulong)(idleTime.dwHighDateTime << 32 | idleTime.dwLowDateTime);
+                this.systemInfo.KernelProcessorTime = (ulong)(kernelTime.dwHighDateTime << 32 | kernelTime.dwLowDateTime) - this.systemInfo.IdleProcessorTime;
+                this.systemInfo.UserProcessorTime = (ulong)(userTime.dwHighDateTime << 32 | userTime.dwLowDateTime);
+            }
 
             // 更新磁盘信息
             DriveInfo[] newDisks = DriveInfo.GetDrives();
@@ -91,6 +93,15 @@ namespace ModengTerm.Terminal.Watch
         #endregion
 
         #region Win32API Interop
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FILETIME
+        {
+            public int dwLowDateTime;
+            public int dwHighDateTime;
+        }
+        [DllImport("kernel32")]
+        private static extern bool GetSystemTimes(out FILETIME lpIdleTime, out FILETIME lpKernelTime, out FILETIME lpUserTime);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct MEMORYSTATUSEX //此处全是以字节为单位

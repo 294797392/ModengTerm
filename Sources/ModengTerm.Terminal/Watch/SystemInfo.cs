@@ -11,15 +11,54 @@ namespace ModengTerm.Terminal.Watch
 {
     public class SystemInfo
     {
-        /// <summary>
-        /// CPU使用百分比
-        /// </summary>
-        public double CpuPercent { get; set; }
+        private ulong kerneProcessorTime;
+        private ulong userProcessorTime;
+        private ulong idleProcessorTime;
 
         /// <summary>
-        /// CPU运行总时间
+        /// 内核使用的cpu总时间
         /// </summary>
-        public ulong ProcessorTime { get; set; }
+        public ulong KernelProcessorTime 
+        {
+            get { return this.kerneProcessorTime; }
+            set
+            {
+                if (this.kerneProcessorTime != value)
+                {
+                    this.kerneProcessorTime = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 用户模式使用的cpu总时间
+        /// </summary>
+        public ulong UserProcessorTime 
+        {
+            get { return this.userProcessorTime; }
+            set
+            {
+                if (this.userProcessorTime != value)
+                {
+                    this.userProcessorTime = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// cpu总空闲时间
+        /// </summary>
+        public ulong IdleProcessorTime 
+        {
+            get { return this.idleProcessorTime; }
+            set
+            {
+                if (this.idleProcessorTime != value)
+                {
+                    this.idleProcessorTime = value;
+                }
+            }
+        }
 
         /// <summary>
         /// 总内存数

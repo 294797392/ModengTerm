@@ -25,12 +25,20 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         private NetworkInterfaceVMCopy ifaceCopy;
         private ProcessVMCopy processCopy;
 
+        private ulong prevKernelProcessorTime;
+        private ulong prevUserProcessorTime;
+        private ulong prevIdleProcessorTime;
+
         #endregion
 
         #region 属性
 
         /// <summary>
         /// CPU占用百分比
+        /// 计算公式：
+        /// （CPU内核时间 + CPU用户时间） / （CPU内核时间 + CPU用户时间 + CPU空闲时间）
+        /// 参考：
+        /// https://blog.csdn.net/zxf347085420/article/details/137209188
         /// </summary>
         public double CpuPercent
         {
@@ -122,6 +130,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.diskCopy = new DiskVMCopy();
             this.ifaceCopy = new NetworkInterfaceVMCopy();
             this.processCopy = new ProcessVMCopy();
+
         }
 
         public override void OnRelease()
@@ -133,7 +142,24 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         {
             SystemInfo systemInfo = watcher.GetSystemInfo();
 
-            this.CpuPercent = Math.Round(systemInfo.CpuPercent, 2);
+            #region 计算CPU使用率
+
+            if (this.prevIdleProcessorTime > 0)
+            {
+                ulong idleTime = systemInfo.IdleProcessorTime - this.prevIdleProcessorTime;
+                ulong kernelTime = systemInfo.KernelProcessorTime - this.prevKernelProcessorTime;
+                ulong userTime = systemInfo.UserProcessorTime - this.prevUserProcessorTime;
+                ulong totalTime = idleTime + kernelTime + userTime;
+                ulong totalProcessorTime = kernelTime + userTime;
+                this.CpuPercent = Math.Round((double)totalProcessorTime / totalTime * 100, 2);
+            }
+
+            this.prevIdleProcessorTime = systemInfo.IdleProcessorTime;
+            this.prevKernelProcessorTime = systemInfo.KernelProcessorTime;
+            this.prevUserProcessorTime = systemInfo.UserProcessorTime;
+
+            #endregion
+
             MTermUtils.UpdateReadable(this.AvailableMemory, systemInfo.AvailableMemory);
             MTermUtils.UpdateReadable(this.TotalMemory, systemInfo.TotalMemory);
             ulong used = systemInfo.TotalMemory.Value - systemInfo.AvailableMemory.Value;
