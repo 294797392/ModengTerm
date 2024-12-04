@@ -28,12 +28,12 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// <summary>
         /// 磁盘总空间
         /// </summary>
-        public UnitValue TotalSpace { get; private set; }
+        public UnitValueDouble TotalSpace { get; private set; }
 
         /// <summary>
         /// 磁盘空闲空间
         /// </summary>
-        public UnitValue FreeSpace { get; private set; }
+        public UnitValueDouble FreeSpace { get; private set; }
 
         /// <summary>
         /// 磁盘格式
@@ -69,8 +69,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public DiskVM()
         {
-            this.TotalSpace = new UnitValue();
-            this.FreeSpace = new UnitValue();
+            this.TotalSpace = new UnitValueDouble();
+            this.FreeSpace = new UnitValueDouble();
         }
 
         #endregion
@@ -91,8 +91,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             bool sizeChanged = false;
 
-            sizeChanged = ClientUtils.UpdateUnitValue(target.TotalSpace, source.TotalSpace);
-            sizeChanged = ClientUtils.UpdateUnitValue(target.FreeSpace, source.FreeSpace);
+            sizeChanged = MTermUtils.UpdateReadable(target.TotalSpace, source.TotalSpace);
+            sizeChanged = MTermUtils.UpdateReadable(target.FreeSpace, source.FreeSpace);
 
             if (sizeChanged)
             {

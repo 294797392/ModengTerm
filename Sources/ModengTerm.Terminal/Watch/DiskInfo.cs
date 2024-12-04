@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,8 +11,8 @@ namespace ModengTerm.Terminal.Watch
     public class DiskInfo
     {
         private string name;
-        private double totalSpace;
-        private double freeSpace;
+        private UnitValue64 totalSpace;
+        private UnitValue64 freeSpace;
         private string format;
 
         /// <summary>
@@ -32,7 +33,7 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// 磁盘总空间，单位字节
         /// </summary>
-        public double TotalSpace
+        public UnitValue64 TotalSpace
         {
             get { return this.totalSpace; }
             set
@@ -47,7 +48,7 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// 磁盘空闲空间，单位字节
         /// </summary>
-        public double FreeSpace
+        public UnitValue64 FreeSpace
         {
             get { return this.freeSpace; }
             set
@@ -73,17 +74,23 @@ namespace ModengTerm.Terminal.Watch
                 }
             }
         }
+
+        public DiskInfo()
+        {
+            this.TotalSpace = new UnitValue64();
+            this.FreeSpace = new UnitValue64();
+        }
     }
 
     public class Win32DiskCopy : ObjectCopy<DiskInfo, DriveInfo>
     {
-        public override void CopyTo(DiskInfo diskInfo, DriveInfo platformDisk)
+        public override void CopyTo(DiskInfo diskInfo, DriveInfo driveInfo)
         {
-            DriveInfo driveInfo = platformDisk as DriveInfo;
-
             diskInfo.Name = driveInfo.Name;
-            diskInfo.TotalSpace = driveInfo.TotalSize;
-            diskInfo.FreeSpace = driveInfo.TotalFreeSpace;
+            diskInfo.TotalSpace.Value = (ulong)driveInfo.TotalSize;
+            diskInfo.TotalSpace.Unit = UnitType.Byte;
+            diskInfo.FreeSpace.Value = (ulong)driveInfo.TotalFreeSpace;
+            diskInfo.FreeSpace.Unit = UnitType.Byte;
             diskInfo.Format = driveInfo.DriveFormat;
         }
 
@@ -93,35 +100,73 @@ namespace ModengTerm.Terminal.Watch
         }
     }
 
-    public class UnixDiskCopy : ObjectCopy<DiskInfo, string[]>
+    public class UnixDiskCopy : ObjectCopy<DiskInfo, string>
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("UnixDiskCopy");
 
-        public override bool Compare(DiskInfo target, string[] source)
+        public override bool Compare(DiskInfo target, string source)
         {
-            return target.Name == source[0];
+            int slen = source.Length;
+            int sidx = slen - 1;
+            int len = target.Name.Length;
+
+            // 先找到最后一个不是空的字符
+            for (int i = sidx; i > 0; i--)
+            {
+                if (source[i] != ' ')
+                {
+                    break;
+                }
+            }
+
+            if (sidx == 0)
+            {
+                return false;
+            }
+
+            // 从最后一个字符向前比较
+            for (int i = len - 1; i > 0; i--)
+            {
+                if (source[sidx--] != target.Name[i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        public override void CopyTo(DiskInfo target, string[] source)
+        public override void CopyTo(DiskInfo target, string source)
         {
-            if (source.Length < 5)
+            string[] strs = source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (strs.Length < 5)
             {
-                logger.ErrorFormat("UnixDiskCopy, {0}", source.Length);
+                logger.ErrorFormat("unix disk format error, {0}", source);
                 return;
             }
 
-            target.Name = source[0];
+            target.Name = strs[strs.Length - 1];
 
-            int size;
-            if (int.TryParse(source[1], out size))
+            ulong available;
+            if (ulong.TryParse(strs[3], out available))
             {
-                target.TotalSpace = size;
+                target.FreeSpace.Value = available;
+                target.FreeSpace.Unit = UnitType.KB;
+            }
+            else
+            {
+                logger.ErrorFormat("unix disk available error, {0}", source);
             }
 
-            int available;
-            if (int.TryParse(source[3], out available))
+            ulong size;
+            if (ulong.TryParse(strs[1], out size))
             {
-                target.FreeSpace = available;
+                target.TotalSpace.Value = size;
+                target.TotalSpace.Unit = UnitType.KB;
+            }
+            else
+            {
+                logger.ErrorFormat("unix disk size error, {0}", source);
             }
         }
     }

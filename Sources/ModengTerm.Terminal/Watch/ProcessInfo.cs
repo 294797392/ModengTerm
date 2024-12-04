@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -67,7 +68,7 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// 内存占用字节数
         /// </summary>
-        public long MemoryUsage { get; set; }
+        public UnitValue64 MemoryUsage { get; private set; }
 
         /// <summary>
         /// Cpu总使用时间，单位是毫秒
@@ -102,6 +103,7 @@ namespace ModengTerm.Terminal.Watch
         public ProcessInfo()
         {
             this.CanRead = true;
+            this.MemoryUsage = new UnitValue64();
         }
     }
 
@@ -115,7 +117,8 @@ namespace ModengTerm.Terminal.Watch
         public override void CopyTo(ProcessInfo target, Process source)
         {
             target.PID = source.Id;
-            target.MemoryUsage = source.WorkingSet64;
+            target.MemoryUsage.Value = (ulong)source.WorkingSet64;
+            target.MemoryUsage.Unit = UnitType.Byte;
             target.Name = source.ProcessName;
 
             if (source.Id == 0 || source.Id == 4)

@@ -1,4 +1,5 @@
-﻿using ModengTerm.Enumerations;
+﻿using ModengTerm.Base;
+using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using WPFToolkit.MVVM;
 
@@ -145,18 +146,18 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                     // 上次传输的数据和本次传输的数据的差值
                     ulong received = target.BytesReceived - previousBytesReceived;
                     double downspeedBytes = received / seconds;
-                    SizeUnitsEnum downunit;
-                    int downspeed = (int)ClientUtils.ConvertToHumanReadableUnit(downspeedBytes, out downunit, 1);
-                    target.DownloadSpeed = string.Format("{0}{1}/s", downspeed, ClientUtils.Unit2Suffix(downunit));
+                    UnitType downunit;
+                    int downspeed = (int)MTermUtils.ConvertToHumanReadableUnit(downspeedBytes, out downunit, 1);
+                    target.DownloadSpeed = string.Format("{0}{1}/s", downspeed, MTermUtils.Unit2Suffix(downunit));
                 }
 
                 if (target.BytesSent != previousBytesSent)
                 {
                     ulong sent = target.BytesSent - previousBytesSent;
                     double upspeedBytes = sent / seconds;
-                    SizeUnitsEnum upunit;
-                    int upspeed = (int)ClientUtils.ConvertToHumanReadableUnit(upspeedBytes, out upunit, 1);
-                    target.UploadSpeed = string.Format("{0}{1}/s", upspeed, ClientUtils.Unit2Suffix(upunit));
+                    UnitType upunit;
+                    int upspeed = (int)MTermUtils.ConvertToHumanReadableUnit(upspeedBytes, out upunit, 1);
+                    target.UploadSpeed = string.Format("{0}{1}/s", upspeed, MTermUtils.Unit2Suffix(upunit));
                 }
             }
         }

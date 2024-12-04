@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +14,7 @@ namespace ModengTerm.Terminal.Watch
     {
         #region 类变量
 
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("");
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("UnixWatcher");
 
         private List<int> CPU_TIME_INDEX = new List<int>() { 1, 2, 3, 6, 7, 8 };
 
@@ -41,7 +42,7 @@ namespace ModengTerm.Terminal.Watch
 
         #region 实例方法
 
-        private bool parse_meminfo_item(string[] items, string key, out int value)
+        private bool parse_meminfo_item(string[] items, string key, out ulong value)
         {
             value = 0;
 
@@ -58,7 +59,7 @@ namespace ModengTerm.Terminal.Watch
                 return false;
             }
 
-            if (!int.TryParse(strs[1], out value))
+            if (!ulong.TryParse(strs[1], out value))
             {
                 logger.ErrorFormat("mem error2 = {0}", text);
                 return false;
@@ -98,21 +99,20 @@ namespace ModengTerm.Terminal.Watch
             return true;
         }
 
-        private void handle_df(string df) 
+        private void handle_df(string df)
         {
-            if (string.IsNullOrEmpty(df)) 
+            if (string.IsNullOrEmpty(df))
             {
                 return;
             }
 
-            string[] lines = df.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            if (lines == null || lines.Length == 0) 
+            IEnumerable<string> lines = df.Split('\n', StringSplitOptions.RemoveEmptyEntries).Skip(1);
+            if (lines == null || lines.Count() == 0)
             {
                 return;
             }
 
-            IEnumerable<string[]> strslist = lines.Select(v => v.Split(' ', StringSplitOptions.RemoveEmptyEntries)).Skip(1);
-            this.Copy<string[], DiskInfo>(this.systemInfo.DiskItems, strslist, this.diskCopy);
+            this.Copy<string, DiskInfo>(this.systemInfo.DiskItems, lines, this.diskCopy);
         }
 
         #endregion
@@ -138,16 +138,18 @@ namespace ModengTerm.Terminal.Watch
             string meminfo = this.ReadFile("/proc/meminfo");
             string[] items = meminfo.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
-            int totalMem;
+            ulong totalMem;
             if (this.parse_meminfo_item(items, "MemTotal", out totalMem))
             {
-                this.systemInfo.TotalMemory = totalMem;
+                this.systemInfo.TotalMemory.Value = totalMem;
+                this.systemInfo.TotalMemory.Unit = UnitType.KB;
             }
 
-            int availableMem;
+            ulong availableMem;
             if (this.parse_meminfo_item(items, "MemAvailable", out availableMem))
             {
-                this.systemInfo.AvailableMemory = availableMem;
+                this.systemInfo.AvailableMemory.Value = availableMem;
+                this.systemInfo.AvailableMemory.Unit = UnitType.KB;
             }
 
             #endregion

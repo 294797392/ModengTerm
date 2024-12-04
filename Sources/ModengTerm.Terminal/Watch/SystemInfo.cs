@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit.DataModels;
+using ModengTerm.Base;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,15 +18,14 @@ namespace ModengTerm.Terminal.Watch
 
         /// <summary>
         /// 总内存数
-        /// 单位kb
         /// </summary>
-        public double TotalMemory { get; set; }
+        public UnitValue64 TotalMemory { get; private set; }
 
         /// <summary>
         /// 可用内存数
         /// 单位kb
         /// </summary>
-        public double AvailableMemory { get; set; }
+        public UnitValue64 AvailableMemory { get; private set; }
 
         /// <summary>
         /// 所有磁盘列表
@@ -44,6 +44,8 @@ namespace ModengTerm.Terminal.Watch
 
         public SystemInfo()
         {
+            this.TotalMemory = new UnitValue64();
+            this.AvailableMemory = new UnitValue64();
             this.DiskItems = new ChangedItems<DiskInfo>();
             this.NetworkInterfaces = new ChangedItems<NetInterfaceInfo>();
             this.Processes = new ChangedItems<ProcessInfo>();

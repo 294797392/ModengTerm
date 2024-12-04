@@ -105,6 +105,16 @@ namespace ModengTerm.ViewModels
             this.OnClose();
         }
 
+        /// <summary>
+        /// 当显示到界面上之后触发
+        /// </summary>
+        public void Load() { }
+
+        /// <summary>
+        /// 当从界面上移除之后触发
+        /// </summary>
+        public void Unload() { }
+
         #endregion
 
         #region 抽象方法

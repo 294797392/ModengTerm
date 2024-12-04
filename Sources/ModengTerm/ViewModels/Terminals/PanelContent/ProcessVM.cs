@@ -1,4 +1,5 @@
 ﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Base;
 using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using System;
@@ -12,7 +13,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
     public class ProcessVM : ItemViewModel
     {
         private int pid;
-        private UnitValue memory;
+        private UnitValueDouble memory;
         private string displayMemory;
         private double totalProcessorTime;
         private string displayCpuUsage;
@@ -31,7 +32,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             }
         }
 
-        public UnitValue Memory
+        public UnitValueDouble Memory
         {
             get { return this.memory; }
             set
@@ -96,7 +97,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public ProcessVM()
         {
-            this.Memory = new UnitValue();
+            this.Memory = new UnitValueDouble();
             this.CpuUsage = 0;
             this.displayCpuUsage = "0";
         }
@@ -118,7 +119,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             target.PID = source.PID;
             target.Name = source.Name;
             target.TotalProcessorTime = source.TotalProcessorTime;
-            if (ClientUtils.UpdateUnitValue(target.Memory, source.MemoryUsage, SizeUnitsEnum.Byte))
+            if (MTermUtils.UpdateReadable(target.Memory, source.MemoryUsage))
             {
                 target.DisplayMemory = target.Memory.ToString();
             }

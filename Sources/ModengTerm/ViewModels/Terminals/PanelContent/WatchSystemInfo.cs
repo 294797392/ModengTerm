@@ -1,4 +1,5 @@
-﻿using ModengTerm.Enumerations;
+﻿using ModengTerm.Base;
+using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         private double cpuPercent;
         private double memoryPercent;
-        private string memoryRatio;
+        private string displayMemoryUsage;
         private DiskVMCopy diskCopy;
         private NetworkInterfaceVMCopy ifaceCopy;
         private ProcessVMCopy processCopy;
@@ -63,27 +64,27 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// <summary>
         /// 内存总量
         /// </summary>
-        public UnitValue TotalMemory { get; private set; }
+        public UnitValueDouble TotalMemory { get; private set; }
 
         /// <summary>
         /// 已用内存总量
         /// </summary>
-        public UnitValue UsedMemory { get; private set; }
+        public UnitValueDouble UsedMemory { get; private set; }
 
         /// <summary>
         /// 可用内存总量
         /// </summary>
-        public UnitValue AvailableMemory { get; private set; }
+        public UnitValueDouble AvailableMemory { get; private set; }
 
-        public string MemoryRatio
+        public string DisplayMemoryUsage
         {
-            get { return this.memoryRatio; }
+            get { return this.displayMemoryUsage; }
             set
             {
-                if ((this.memoryRatio != value))
+                if ((this.displayMemoryUsage != value))
                 {
-                    this.memoryRatio = value;
-                    this.NotifyPropertyChanged("MemoryRatio");
+                    this.displayMemoryUsage = value;
+                    this.NotifyPropertyChanged("DisplayMemoryUsage");
                 }
             }
         }
@@ -113,9 +114,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             this.Disks = new BindableCollection<DiskVM>();
             this.NetworkInterfaces = new BindableCollection<NetworkInterfaceVM>();
-            this.TotalMemory = new UnitValue();
-            this.UsedMemory = new UnitValue();
-            this.AvailableMemory = new UnitValue();
+            this.TotalMemory = new UnitValueDouble();
+            this.UsedMemory = new UnitValueDouble();
+            this.AvailableMemory = new UnitValueDouble();
             this.Processes = new BindableCollection<ProcessVM>();
 
             this.diskCopy = new DiskVMCopy();
@@ -133,11 +134,12 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             SystemInfo systemInfo = watcher.GetSystemInfo();
 
             this.CpuPercent = Math.Round(systemInfo.CpuPercent, 2);
-            ClientUtils.UpdateUnitValue(this.AvailableMemory, systemInfo.AvailableMemory, SizeUnitsEnum.KB);
-            ClientUtils.UpdateUnitValue(this.TotalMemory, systemInfo.TotalMemory, SizeUnitsEnum.KB);
-            ClientUtils.UpdateUnitValue(this.UsedMemory, systemInfo.TotalMemory - systemInfo.AvailableMemory, SizeUnitsEnum.KB);
-            this.MemoryPercent = Math.Round((double)this.UsedMemory.Bytes / this.TotalMemory.Bytes * 100, 2);
-            this.MemoryRatio = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
+            MTermUtils.UpdateReadable(this.AvailableMemory, systemInfo.AvailableMemory);
+            MTermUtils.UpdateReadable(this.TotalMemory, systemInfo.TotalMemory);
+            ulong used = systemInfo.TotalMemory.Value - systemInfo.AvailableMemory.Value;
+            MTermUtils.UpdateReadable(this.UsedMemory, this.TotalMemory.Unit, used, systemInfo.TotalMemory.Unit);
+            this.MemoryPercent = Math.Round((double)used / systemInfo.TotalMemory.Value * 100, 2);
+            this.DisplayMemoryUsage = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
 
             // 更新磁盘信息
             this.Copy<DiskVM, DiskInfo>(systemInfo.DiskItems, this.Disks, this.diskCopy);
@@ -149,7 +151,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.Copy<ProcessVM, ProcessInfo>(systemInfo.Processes, this.Processes, this.processCopy);
             // 按照CPU使用率对进程列表排序
             List<ProcessVM> orderedProcs = this.Processes.OrderByDescending(v => v.CpuUsage).ToList();
-            App.Current.Dispatcher.Invoke(() => 
+            App.Current.Dispatcher.Invoke(() =>
             {
                 this.Processes.Clear();
                 this.Processes.AddRange(orderedProcs);

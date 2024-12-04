@@ -79,7 +79,7 @@
             <TextBlock Grid.Row="1" Grid.Column="0" Text="内存" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
             <ProgressBar Grid.Row="1" Grid.Column="1" Value="{Binding Path=MemoryPercent}" Minimum="0" Maximum="100" Style="{StaticResource ResourceKey=StyleProgressBarLocal}"/>
             <TextBlock Grid.Row="1" Grid.Column="1" Margin="5,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=MemoryPercent, StringFormat='{}{0}%'}"/>
-            <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Path=MemoryRatio}"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="{Binding Path=DisplayMemoryUsage}"/>
         </Grid>
 
         <!-- 磁盘信息 -->
@@ -175,8 +175,7 @@
 
         <!-- 进程信息 -->
         <Grid Grid.Row="4" Margin="0,5,0,0">
-            <DataGrid DataContext="{Binding Path=Processes}" ItemsSource="{Binding}" RowHeight="25"
-                      CanUserSortColumns="True"
+            <DataGrid DataContext="{Binding Path=Processes}" ItemsSource="{Binding}" RowHeight="25" CanUserSortColumns="True"
                       ColumnHeaderHeight="25" Margin="5,0,5,0" Style="{StaticResource ResourceKey=StyleDataGrid}">
 
                 <DataGrid.ColumnHeaderStyle>
@@ -222,7 +221,6 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
-
 
     </Grid>
 </UserControl>

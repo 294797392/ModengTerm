@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using System.Diagnostics;
 using System.IO;
 using System.Net.NetworkInformation;
@@ -11,15 +12,15 @@ namespace ModengTerm.Terminal.Watch
     {
         #region 类变量
 
-        public static readonly Win32DiskCopy Win32DiskSync = new Win32DiskCopy();
-        public static readonly Win32NetworkInterfaceCopy Win32NetworkInterfaceCopy = new Win32NetworkInterfaceCopy();
-        public static readonly Win32ProcessCopy Win32ProcessCopy = new Win32ProcessCopy();
         private static log4net.ILog logger = log4net.LogManager.GetLogger("Win32Watcher");
 
         #endregion
 
         #region 实例变量
 
+        public Win32DiskCopy Win32DiskSync = new Win32DiskCopy();
+        public Win32NetworkInterfaceCopy Win32NetworkInterfaceCopy = new Win32NetworkInterfaceCopy();
+        public Win32ProcessCopy Win32ProcessCopy = new Win32ProcessCopy();
         private SystemInfo systemInfo;
         private int memstatSize;
         private PerformanceCounter cpuPerf;
@@ -62,8 +63,10 @@ namespace ModengTerm.Terminal.Watch
                 return null;
             }
 
-            this.systemInfo.TotalMemory = memstat.dwTotalPhys / 1024;
-            this.systemInfo.AvailableMemory = memstat.dwAvailPhys / 1024;
+            this.systemInfo.TotalMemory.Value = memstat.dwTotalPhys;
+            this.systemInfo.TotalMemory.Unit = UnitType.Byte;
+            this.systemInfo.AvailableMemory.Value = memstat.dwAvailPhys;
+            this.systemInfo.AvailableMemory.Unit = UnitType.Byte;
             this.systemInfo.CpuPercent = this.cpuPerf.NextValue();
 
             // 更新磁盘信息
