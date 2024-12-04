@@ -17,6 +17,11 @@ namespace ModengTerm.Terminal.Watch
         public double CpuPercent { get; set; }
 
         /// <summary>
+        /// CPU运行总时间
+        /// </summary>
+        public ulong ProcessorTime { get; set; }
+
+        /// <summary>
         /// 总内存数
         /// </summary>
         public UnitValue64 TotalMemory { get; private set; }

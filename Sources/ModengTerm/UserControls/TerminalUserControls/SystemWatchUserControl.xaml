@@ -184,6 +184,12 @@
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
 
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource ResourceKey=StyleDataGridRow}">
+                        <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Style>
+                </DataGrid.RowStyle>
+
                 <DataGrid.Columns>
 
                     <DataGridTemplateColumn Header="PID" Width="Auto" CanUserSort="True" SortMemberPath="PID">
@@ -213,7 +219,7 @@
                     <DataGridTemplateColumn Header="CPU" Width="50" CanUserSort="True" SortMemberPath="CpuUsage">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=DisplayCpuUsage}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding Path=CpuUsage}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

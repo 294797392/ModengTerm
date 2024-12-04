@@ -1,11 +1,6 @@
-﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Base;
-using ModengTerm.Enumerations;
+﻿using ModengTerm.Base;
 using ModengTerm.Terminal.Watch;
 using System;
-using System.Drawing.Printing;
-using System.Formats.Asn1;
-using System.Windows.Interactivity;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
@@ -15,7 +10,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         private int pid;
         private UnitValueDouble memory;
         private string displayMemory;
-        private double totalProcessorTime;
+        private long totalProcessorTime;
         private string displayCpuUsage;
         private double cpuUsage;
 
@@ -58,7 +53,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             }
         }
 
-        public double TotalProcessorTime
+        public long TotalProcessorTime
         {
             get { return this.totalProcessorTime; }
             set
@@ -66,19 +61,6 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 if (this.totalProcessorTime != value)
                 {
                     this.totalProcessorTime = value;
-                }
-            }
-        }
-
-        public string DisplayCpuUsage
-        {
-            get { return this.displayCpuUsage; }
-            set
-            {
-                if (this.displayCpuUsage != value)
-                {
-                    this.displayCpuUsage = value;
-                    this.NotifyPropertyChanged("DisplayCpuUsage");
                 }
             }
         }
@@ -105,6 +87,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
     public class ProcessVMCopy : ObjectCopy<ProcessVM, ProcessInfo>
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("");
+
         private static readonly int ProcessorCount = Environment.ProcessorCount;
 
         public override bool Compare(ProcessVM target, ProcessInfo source)
@@ -114,7 +98,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public override void CopyTo(ProcessVM target, ProcessInfo source)
         {
-            double previousProcessorTime = target.TotalProcessorTime;
+            long previousProcessorTime = target.TotalProcessorTime;
 
             target.PID = source.PID;
             target.Name = source.Name;
@@ -124,17 +108,15 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 target.DisplayMemory = target.Memory.ToString();
             }
 
-            if (this.Elapsed.Milliseconds > 0)
+            if (this.Elapsed.TotalMilliseconds > 0)
             {
                 if (target.TotalProcessorTime != previousProcessorTime)
                 {
-                    double time = target.TotalProcessorTime - previousProcessorTime;
-                    double cpuUsage = time / this.Elapsed.Milliseconds * 100;
+                    long time = target.TotalProcessorTime - previousProcessorTime;
+                    double cpuUsage = time / this.Elapsed.TotalMilliseconds * 100;
                     cpuUsage /= ProcessVMCopy.ProcessorCount;
                     cpuUsage = Math.Round(cpuUsage, 2);
-                    //target.DisplayCpuUsage = Math.Round(cpuUsage, 2).ToString(); // Math.Round(cpuUsage, 0).ToString().PadLeft(2, '0');
                     target.CpuUsage = cpuUsage;
-                    target.DisplayCpuUsage = cpuUsage.ToString();
                 }
             }
         }

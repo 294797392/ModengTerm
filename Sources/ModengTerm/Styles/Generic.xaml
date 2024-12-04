@@ -472,6 +472,25 @@
         <Setter Property="BorderThickness" Value="0,0,1,0"/>
         <Setter Property="Padding" Value="10,0,0,0" />
     </Style>
+    <Style x:Key="StyleDataGridRow" TargetType="{x:Type DataGridRow}">
+        <Style.Triggers>
+            <Trigger Property="AlternationIndex" Value="1">
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5031E}"/>
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES5030E}"/>
+            </Trigger>
+            <!--<Trigger Property="AlternationIndex" Value="0">
+                            <Setter Property="BorderBrush" Value="Blue"/>
+                        </Trigger>-->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5002E}"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5011E}"/>
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+    </Style>
     <Style x:Key="StyleDataGrid" TargetType="{x:Type DataGrid}">
         <Setter Property="Background" Value="{DynamicResource ResourceKey=RES4000E}" />
         <Setter Property="AlternationCount" Value="2"/>
@@ -486,31 +505,8 @@
         <Setter Property="HeadersVisibility" Value="Column"/>
         <!-- 定义列头的样式 -->
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource ResourceKey=StyleDataGridColumnHeader}"/>
-
         <!-- 定义行的样式 -->
-        <Setter Property="RowStyle">
-            <Setter.Value>
-                <Style TargetType="{x:Type DataGridRow}">
-                    <Style.Triggers>
-                        <Trigger Property="AlternationIndex" Value="1">
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5031E}"/>
-                            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES5030E}"/>
-                        </Trigger>
-                        <!--<Trigger Property="AlternationIndex" Value="0">
-                            <Setter Property="BorderBrush" Value="Blue"/>
-                        </Trigger>-->
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5002E}"/>
-                        </Trigger>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES5011E}"/>
-                        </Trigger>
-                    </Style.Triggers>
-                    <Setter Property="BorderThickness" Value="1"/>
-                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                </Style>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="RowStyle" Value="{StaticResource ResourceKey=StyleDataGridRow}"/>
 
         <!-- 定义单元格的样式 -->
         <Setter Property="CellStyle">

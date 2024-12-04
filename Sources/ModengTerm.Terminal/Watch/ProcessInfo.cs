@@ -17,7 +17,7 @@ namespace ModengTerm.Terminal.Watch
         private int pid;
         private string name;
         private string filePath;
-        private double totalProcessorTime;
+        private long totalProcessorTime;
         private bool canRead;
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// Cpu总使用时间，单位是毫秒
         /// </summary>
-        public double TotalProcessorTime
+        public long TotalProcessorTime
         {
             get { return this.totalProcessorTime; }
             set
@@ -143,7 +143,7 @@ namespace ModengTerm.Terminal.Watch
                 }
 
                 //target.TotalProcessorTime = source.TotalProcessorTime.TotalMilliseconds;
-                target.TotalProcessorTime = source.UserProcessorTime.TotalMilliseconds;
+                target.TotalProcessorTime = (long)source.UserProcessorTime.TotalMilliseconds;
             }
             catch (Win32Exception e)
             {
@@ -155,4 +155,15 @@ namespace ModengTerm.Terminal.Watch
             }
         }
     }
+
+    //public class UnixProcessCopy : ObjectCopy<ProcessInfo, string>
+    //{
+    //    public override bool Compare(ProcessInfo target, string source)
+    //    {
+    //    }
+
+    //    public override void CopyTo(ProcessInfo target, string source)
+    //    {
+    //    }
+    //}
 }
