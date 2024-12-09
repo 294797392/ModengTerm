@@ -32,6 +32,12 @@ namespace ModengTerm.Terminal.Session
 
         #endregion
 
+        #region 属性
+
+        public SshClient SshClient { get { return this.sshClient; } }
+
+        #endregion
+
         #region 构造方法
 
         public SshNetSession(XTermSession options) :

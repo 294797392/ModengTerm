@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Terminal.Session;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,8 +35,8 @@ namespace ModengTerm.Terminal.Watch
 
         #region 构造方法
 
-        public UnixWatcher(XTermSession session) :
-            base(session)
+        public UnixWatcher(XTermSession session, SessionDriver driver) :
+            base(session, driver)
         {
             this.session = session;
         }

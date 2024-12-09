@@ -36,21 +36,6 @@ namespace ModengTerm.Terminal.Session
         #region 属性
 
         /// <summary>
-        /// 是否支持显示进程列表
-        /// </summary>
-        public virtual bool SupportProcessInfo { get; }
-
-        /// <summary>
-        /// 是否支持显示磁盘信息
-        /// </summary>
-        public virtual bool SupportDiskInfo { get; }
-
-        /// <summary>
-        /// 是否支持显示系统信息
-        /// </summary>
-        public virtual bool SupportSystemInfo { get; }
-
-        /// <summary>
         /// 通道类型
         /// </summary>
         public SessionTypeEnum Type { get { return (SessionTypeEnum)this.session.Type; } }

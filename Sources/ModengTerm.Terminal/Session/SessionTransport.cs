@@ -31,6 +31,7 @@ namespace ModengTerm.Terminal.Session
 
         #region 实例变量
 
+        private XTermSession session;
         private SessionDriver driver;
 
         private Task backgroundTask;
@@ -44,6 +45,8 @@ namespace ModengTerm.Terminal.Session
         #endregion
 
         #region 属性
+
+        public XTermSession Session { get { return this.session; } }
 
         /// <summary>
         /// 获取传输层所使用的驱动对象
@@ -61,6 +64,8 @@ namespace ModengTerm.Terminal.Session
 
         public int Initialize(XTermSession session)
         {
+            this.session = session;
+
             int bufferSize = session.GetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE);
             this.row = session.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
             this.col = session.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
