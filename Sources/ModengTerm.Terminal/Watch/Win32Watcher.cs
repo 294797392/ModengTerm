@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
-using System.Windows.Documents;
-using System.Windows.Shell;
 
 namespace ModengTerm.Terminal.Watch
 {

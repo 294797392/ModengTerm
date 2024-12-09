@@ -365,11 +365,18 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
-        //[UnitTest]
-        //public bool SGR_SetGraphicsRendition()
-        //{
-        //    return false;
-        //}
+        [UnitTest]
+        public bool SGR_SetGraphicsRendition()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.ActiveDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.SGR();
+
+            return false;
+        }
 
         [UnitTest]
         public bool ED_EraseDisplay()

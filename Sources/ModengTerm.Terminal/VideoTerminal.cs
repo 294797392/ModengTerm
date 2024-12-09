@@ -1083,6 +1083,7 @@ namespace ModengTerm.Terminal
 
         private int ApplyGraphicsOption(List<int> parameters, int optionIndex)
         {
+            int paramIndex = optionIndex;
             GraphicsOptions options = (GraphicsOptions)parameters[optionIndex];
 
             VTDebug.Context.WriteInteractive(string.Format("SGR - {0}", options), string.Empty);
@@ -1239,7 +1240,7 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.BackgroundExtended:
                     {
                         VTColor extColor;
-                        i += this.SetRgbColorsHelper(parameters, i + 1, out extColor);
+                        i += this.SetRgbColorsHelper(parameters, paramIndex + 1, out extColor);
                         this.activeDocument.SetAttribute(VTextAttributes.Background, true, extColor);
                         break;
                     }
@@ -1247,7 +1248,7 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.ForegroundExtended:
                     {
                         VTColor extColor;
-                        i += this.SetRgbColorsHelper(parameters, i + 1, out extColor);
+                        i += this.SetRgbColorsHelper(parameters, paramIndex + 1, out extColor);
                         this.activeDocument.SetAttribute(VTextAttributes.Foreground, true, extColor);
                         break;
                     }
@@ -1256,7 +1257,8 @@ namespace ModengTerm.Terminal
                     {
                         // TODO：
                         logger.ErrorFormat("未实现的SGR, {0}", options.ToString());
-                        throw new NotImplementedException();
+                        break;
+                        //throw new NotImplementedException();
                     }
             }
 

@@ -19,6 +19,13 @@ namespace ModengTerm.UnitTest
             this.videoTerminal = videoTerminal;
         }
 
+        private void ProcessCtlseq(string ctlseq) 
+        {
+            byte[] bytes = ctlseq.Select(v => Convert.ToByte(v)).ToArray();
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
+        }
+
+
         public void Print(char c)
         {
             this.videoTerminal.ProcessData(new byte[] { (byte)c }, 1);
@@ -242,6 +249,12 @@ namespace ModengTerm.UnitTest
             bytes.AddRange(Encoding.ASCII.GetBytes(row.ToString()));
             bytes.Add((byte)'d');
             this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+        }
+
+        public void SGR()
+        {
+            string ctlseq = "\x1b[48;5;10;38;5;16m";
+            this.ProcessCtlseq(ctlseq);
         }
     }
 }

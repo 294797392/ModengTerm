@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
@@ -130,7 +129,6 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.diskCopy = new DiskVMCopy();
             this.ifaceCopy = new NetworkInterfaceVMCopy();
             this.processCopy = new ProcessVMCopy();
-
         }
 
         public override void OnRelease()
