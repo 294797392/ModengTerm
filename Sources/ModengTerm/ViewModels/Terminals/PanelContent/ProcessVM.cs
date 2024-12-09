@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Terminal.Watch;
 using System;
+using System.ComponentModel;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
@@ -89,7 +90,10 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("");
 
-        private static readonly int ProcessorCount = Environment.ProcessorCount;
+        /// <summary>
+        /// 总的CPU占用（内核 + 空闲 + 用户）
+        /// </summary>
+        public ulong TotalProcessorTime { get; set; }
 
         public override bool Compare(ProcessVM target, ProcessInfo source)
         {
@@ -108,16 +112,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 target.DisplayMemory = target.Memory.ToString();
             }
 
-            if (this.Elapsed.TotalMilliseconds > 0)
+            if (this.Elapsed.TotalMilliseconds > 0 && this.TotalProcessorTime > 0)
             {
-                if (target.TotalProcessorTime != previousProcessorTime)
-                {
-                    long time = target.TotalProcessorTime - previousProcessorTime;
-                    double cpuUsage = time / this.Elapsed.TotalMilliseconds * 100;
-                    cpuUsage /= ProcessVMCopy.ProcessorCount;
-                    cpuUsage = Math.Round(cpuUsage, 2);
-                    target.CpuUsage = cpuUsage;
-                }
+                double processorTime = (source.TotalProcessorTime - previousProcessorTime);
+
+                logger.ErrorFormat("{0}, userProcessorTime = {1}", processorTime, this.TotalProcessorTime);
+
+                target.CpuUsage = Math.Round(processorTime / this.TotalProcessorTime * 100, 2);
             }
         }
     }

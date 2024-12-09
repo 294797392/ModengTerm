@@ -144,6 +144,7 @@ namespace ModengTerm.ViewModels
             }
 
             // 打开结束再设置一次DataContext，绑定数据
+            // 因为有些ViewModel是在Open里new的
             frameworkElement.DataContext = viewModel;
 
             this.OnSessionOpened?.Invoke(this, viewModel);

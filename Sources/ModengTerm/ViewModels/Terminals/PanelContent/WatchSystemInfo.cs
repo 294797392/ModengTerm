@@ -144,13 +144,15 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             #region 计算CPU使用率
 
+            ulong totalProcessorTime = 0;
+
             if (this.prevKernelProcessorTime > 0)
             {
                 ulong idleTime = systemInfo.IdleProcessorTime - this.prevIdleProcessorTime;
                 ulong kernelTime = systemInfo.KernelProcessorTime - this.prevKernelProcessorTime;
                 ulong userTime = systemInfo.UserProcessorTime - this.prevUserProcessorTime;
                 ulong totalTime = idleTime + kernelTime + userTime;
-                ulong totalProcessorTime = kernelTime + userTime;
+                totalProcessorTime = kernelTime + userTime;
                 this.CpuPercent = Math.Round((double)totalProcessorTime / totalTime * 100, 2);
                 if (this.cpuPercent > 100) 
                 {
@@ -158,9 +160,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 }
             }
 
-            //logger.ErrorFormat("1. IdlProcessorTime = {0}", systemInfo.IdleProcessorTime);
             this.prevIdleProcessorTime = systemInfo.IdleProcessorTime;
-            //logger.ErrorFormat("2. prevIdleProcessorTime = {0}", this.prevIdleProcessorTime);
             this.prevKernelProcessorTime = systemInfo.KernelProcessorTime;
             this.prevUserProcessorTime = systemInfo.UserProcessorTime;
 
@@ -180,6 +180,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.Copy<NetworkInterfaceVM, NetInterfaceInfo>(systemInfo.NetworkInterfaces, this.NetworkInterfaces, this.ifaceCopy);
 
             // 更新进程信息
+            this.processCopy.TotalProcessorTime = totalProcessorTime;
             this.Copy<ProcessVM, ProcessInfo>(systemInfo.Processes, this.Processes, this.processCopy);
             // 按照CPU使用率对进程列表排序
             List<ProcessVM> orderedProcs = this.Processes.OrderByDescending(v => v.CpuUsage).ToList();

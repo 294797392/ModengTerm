@@ -71,7 +71,7 @@ namespace ModengTerm.Terminal.Watch
         public UnitValue64 MemoryUsage { get; private set; }
 
         /// <summary>
-        /// Cpu总使用时间，单位是毫秒
+        /// Cpu总使用时间
         /// </summary>
         public long TotalProcessorTime
         {
@@ -143,7 +143,7 @@ namespace ModengTerm.Terminal.Watch
                 }
 
                 //target.TotalProcessorTime = source.TotalProcessorTime.TotalMilliseconds;
-                target.TotalProcessorTime = (long)source.UserProcessorTime.TotalMilliseconds;
+                target.TotalProcessorTime = (long)source.TotalProcessorTime.Ticks;
             }
             catch (Win32Exception e)
             {
