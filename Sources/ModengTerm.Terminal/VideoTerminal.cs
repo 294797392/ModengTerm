@@ -317,6 +317,8 @@ namespace ModengTerm.Terminal
         /// <param name="sessionInfo"></param>
         public void Initialize(VTOptions options)
         {
+            XTermSession sessionInfo = options.Session;
+
             uiSyncContext = SynchronizationContext.Current;
 
             vtOptions = options;
@@ -341,15 +343,13 @@ namespace ModengTerm.Terminal
             this.bellPlayer = VTermApp.Context.Factory.LookupModule<BellPlayer>();
 
             // DECAWM
-            autoWrapMode = false;
+            this.autoWrapMode = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true);
 
             // 初始化变量
 
             isRunning = true;
 
             sessionTransport = options.SessionTransport;
-
-            XTermSession sessionInfo = options.Session;
 
             Name = sessionInfo.Name;
 
@@ -1615,35 +1615,6 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 打印字符并移动光标到下一个打印位置
-        /// </summary>
-        /// <param name="ch"></param>
-        private void PerformPrint(char ch)
-        {
-            // 根据测试得出结论：
-            // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
-            // 在正常模式下，如果遇到中文字符，也使用2列来显示
-            // 也就是说，如果终端列数一共是80，那么可以显示40个中文字符，显示完40个中文字符后就要换行
-
-            // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
-            // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
-
-            // 创建并打印新的字符
-            VTCharacter character = this.CreateCharacter(ch, activeDocument.AttributeState);
-            activeDocument.PrintCharacter(character);
-            activeDocument.SetCursorLogical(CursorRow, CursorCol + character.ColumnSize);
-
-            this.OnPrint?.Invoke(this);
-
-            // REP_RepeatCharacter会重复打印最后一个字符
-            // 这里记录一下打印的最后一个字符
-            if (this.lastPrintChar != ch)
-            {
-                this.lastPrintChar = ch;
-            }
-        }
-
-        /// <summary>
         /// 根据滚动之前的值和滚动之后的值生成VTScrollData数据
         /// </summary>
         /// <param name="oldScroll">滚动之前滚动条的值</param>
@@ -1771,7 +1742,7 @@ namespace ModengTerm.Terminal
 
             VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
 
-            this.PerformPrint(chPrint);
+            this.PrintCharacter(chPrint);
         }
 
         private void VtParser_OnC0Actions(VTParser arg1, ASCIITable ascii)
@@ -2166,7 +2137,7 @@ namespace ModengTerm.Terminal
 
                         for (int i = 0; i < n; i++)
                         {
-                            this.PerformPrint(this.lastPrintChar);
+                            this.PrintCharacter(this.lastPrintChar);
                         }
 
                         break;
@@ -2182,6 +2153,56 @@ namespace ModengTerm.Terminal
         #endregion
 
         #region VTActions
+
+        /// <summary>
+        /// 打印字符并移动光标到下一个打印位置
+        /// </summary>
+        /// <param name="ch"></param>
+        private void PrintCharacter(char ch)
+        {
+            VTDocument document = this.activeDocument;
+            VTCursor cursor = document.Cursor;
+            int vpcols = document.ViewportColumn;
+
+            // 创建并打印新的字符
+            VTCharacter character = this.CreateCharacter(ch, document.AttributeState);
+
+            // 处理自动换行逻辑
+            if (this.autoWrapMode)
+            {
+                VTextLine activeLine = document.ActiveLine;
+
+                // 剩余多少列可以显示
+                int left = vpcols - cursor.Column;
+
+                if (left < character.ColumnSize ||
+                    left <= 0)
+                {
+                    // 剩余列没法容纳新字符，移动光标到下一行
+                    document.SetCursorLogical(cursor.Row, 0);
+                    this.LineFeed();
+                }
+            }
+
+            // 根据测试得出结论：
+            // 在VIM模式下输入中文字符，VIM会自动把光标往后移动2列，所以判断VIM里一个中文字符占用2列的宽度
+            // 在正常模式下，如果遇到中文字符，也使用2列来显示
+            // 也就是说，如果终端列数一共是80，那么可以显示40个中文字符，显示完40个中文字符后就要换行
+
+            // 如果在shell里删除一个中文字符，那么会执行两次光标向后移动的动作，然后EraseLine - ToEnd
+            // 由此可得出结论，不论是VIM还是shell，一个中文字符都是按照占用两列的空间来计算的
+            document.PrintCharacter(character);
+            document.SetCursorLogical(cursor.Row, cursor.Column + character.ColumnSize);
+
+            this.OnPrint?.Invoke(this);
+
+            // REP_RepeatCharacter会重复打印最后一个字符
+            // 这里记录一下打印的最后一个字符
+            if (this.lastPrintChar != ch)
+            {
+                this.lastPrintChar = ch;
+            }
+        }
 
         public void CarriageReturn()
         {

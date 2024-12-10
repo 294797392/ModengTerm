@@ -593,7 +593,7 @@ namespace ModengTerm.UnitTest.TestCases
 
             for (int i = 0; i < row; i++)
             {
-                string textLine = UnitTestHelper.BuildTextLine(col);
+                string textLine = UnitTestHelper.BuildTextLineRandom(col);
                 textLines.Add(textLine);
                 UnitTestHelper.DrawTextLine(terminal, textLine);
 
@@ -626,7 +626,7 @@ namespace ModengTerm.UnitTest.TestCases
             for (int i = 0; i < 10; i++)
             {
                 invoker.CRLF();
-                string textLine = UnitTestHelper.BuildTextLine(col);
+                string textLine = UnitTestHelper.BuildTextLineRandom(col);
                 textLines.Add(textLine);
                 UnitTestHelper.DrawTextLine(terminal, textLine);
             }

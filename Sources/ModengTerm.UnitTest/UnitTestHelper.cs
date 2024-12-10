@@ -70,15 +70,17 @@ namespace ModengTerm.UnitTest
                 current = current.NextLine;
             }
 
+            int left = textLines.Count;
+
             // 比对可视区域的历史记录
             VTHistory history = document.History;
             current = document.FirstLine;
-            while (current != null)
+            while (current != null && left > 0)
             {
                 int physicsRow = current.GetPhysicsRow();
 
                 VTHistoryLine historyLine;
-                if (!history.TryGetHistory(physicsRow, out historyLine)) 
+                if (!history.TryGetHistory(physicsRow, out historyLine))
                 {
                     logger.Error("CompareDocument, {1729E488-0A3A-499A-90C9-9C08572541AD}");
                     return false;
@@ -91,6 +93,7 @@ namespace ModengTerm.UnitTest
                 }
 
                 current = current.NextLine;
+                left--;
             }
 
             return true;
@@ -153,13 +156,7 @@ namespace ModengTerm.UnitTest
 
         private static int seed = 0;
 
-        /// <summary>
-        /// 指定row和col创建一个终端
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="col"></param>
-        /// <returns></returns>
-        public static VideoTerminal CreateVideoTerminal2(int row, int col) 
+        public static XTermSession CreateSession(int row, int col)
         {
             MTermManifest manifest = JSONHelper.File2Object<MTermManifest>("app.json");
 
@@ -170,6 +167,11 @@ namespace ModengTerm.UnitTest
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_ROW, row);
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, col);
 
+            return session;
+        }
+
+        public static VideoTerminal CreateVideoTerminal3(XTermSession session)
+        {
             VTOptions options = new VTOptions()
             {
                 Width = 0,
@@ -182,6 +184,18 @@ namespace ModengTerm.UnitTest
             VideoTerminal terminal = new VideoTerminal();
             terminal.Initialize(options);
             return terminal;
+        }
+
+        /// <summary>
+        /// 指定row和col创建一个终端
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="col"></param>
+        /// <returns></returns>
+        public static VideoTerminal CreateVideoTerminal2(int row, int col)
+        {
+            XTermSession session = CreateSession(row, col);
+            return CreateVideoTerminal3(session);
         }
 
         public static VideoTerminal CreateVideoTerminal(int width, int height)
@@ -237,7 +251,12 @@ namespace ModengTerm.UnitTest
             terminal.ProcessData(rawData, rawData.Length);
         }
 
-        public static string BuildTextLine(int cols)
+        /// <summary>
+        /// 生成一行随机字符串文本
+        /// </summary>
+        /// <param name="cols"></param>
+        /// <returns></returns>
+        public static string BuildTextLineRandom(int cols)
         {
             string textLine = string.Empty;
 
@@ -250,6 +269,23 @@ namespace ModengTerm.UnitTest
                 }
                 char c = (char)random.Next(33, 126);
                 textLine += c;
+            }
+
+            return textLine;
+        }
+
+        /// <summary>
+        /// 生成一行1,2,3,4...cols的文本
+        /// </summary>
+        /// <param name="cols"></param>
+        /// <returns></returns>
+        public static string BuildTextLine(int cols)
+        {
+            string textLine = string.Empty;
+
+            for (int i = 1; i <= cols; i++)
+            {
+                textLine += i.ToString();
             }
 
             return textLine;
@@ -278,7 +314,7 @@ namespace ModengTerm.UnitTest
 
             for (int i = 0; i < rows; i++)
             {
-                string textLine = BuildTextLine(cols);
+                string textLine = BuildTextLineRandom(cols);
 
                 textLines.Add(textLine);
             }
@@ -286,7 +322,7 @@ namespace ModengTerm.UnitTest
             return textLines;
         }
 
-        public static List<string> BuildWhitespaceTextLines(int rows, int cols) 
+        public static List<string> BuildWhitespaceTextLines(int rows, int cols)
         {
             List<string> textLines = new List<string>();
 
@@ -313,7 +349,7 @@ namespace ModengTerm.UnitTest
             return textLines;
         }
 
-        public static string BuildWhitespaceTextLine(int cols) 
+        public static string BuildWhitespaceTextLine(int cols)
         {
             return string.Join(string.Empty, Enumerable.Repeat<string>(" ", cols));
         }

@@ -1,4 +1,6 @@
 ﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
 using System;
@@ -6,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XTerminal.Base.Definitions;
 
 namespace ModengTerm.UnitTest.TestCases
 {
@@ -52,6 +55,33 @@ namespace ModengTerm.UnitTest.TestCases
             if (scrollInfo.Maximum != document.RollbackMax)
             {
                 logger.ErrorFormat("scrollInfo.Maximum数值不正确, scrollInfo.Maximum = {0}, rollbackMax = {1}", scrollInfo.Maximum, document.RollbackMax);
+                return false;
+            }
+
+            return true;
+        }
+
+        [UnitTest]
+        public bool Terminal_Advance_AutoWrapMode()
+        {
+            XTermSession session = UnitTestHelper.CreateSession(9, 9);
+            session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true);
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal3(session);
+            VTDocument document = terminal.MainDocument;
+
+            // 打印比最多回滚行数多100行的数据
+
+            string textLine = UnitTestHelper.BuildTextLine(10);
+            UnitTestHelper.DrawTextLine(terminal, textLine);
+
+            List<string> textLines = new List<string>()
+            {
+                "123456789", "10"
+            };
+
+            if (!UnitTestHelper.CompareDocument(document, textLines))
+            {
+                logger.Error("{6483E87E-0357-4FF6-88FE-36B2A43ED1A1}");
                 return false;
             }
 

@@ -25,7 +25,7 @@ namespace ModengTerm.UnitTest.TestCases
         {
             List<byte> bytes = new List<byte>();
 
-            bytes.AddRange(Encoding.ASCII.GetBytes(UnitTestHelper.BuildTextLine(termData.ViewportColumn)));
+            bytes.AddRange(Encoding.ASCII.GetBytes(UnitTestHelper.BuildTextLineRandom(termData.ViewportColumn)));
             bytes.AddRange(new byte[] { (byte)'\r', (byte)'\n' });
 
             return bytes.ToArray();
