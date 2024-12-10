@@ -11,6 +11,7 @@ using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.UserControls.TerminalUserControls.Rendering;
+using ModengTerm.ViewModels.CreateSession;
 using ModengTerm.ViewModels.Session;
 using System;
 using System.Collections.Generic;
@@ -89,20 +90,12 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
-        #region 终端 - 高级
-
-        private bool displayAtNewLine;
-        private bool autoWrapMode;
-
-        #endregion
-
         #region 串口
 
         private string selectedPort;
 
         #endregion
 
-        private bool acEnabled;
 
         private string rawTcpAddress;
         private int rawTcpPort;
@@ -466,46 +459,6 @@ namespace ModengTerm.ViewModels
 
         public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
 
-        /// <summary>
-        /// 是否启用自动完成列表
-        /// </summary>
-        public bool AcEnabled
-        {
-            get { return this.acEnabled; }
-            set
-            {
-                if (this.acEnabled != value)
-                {
-                    this.acEnabled = value;
-                    this.NotifyPropertyChanged("AcEnabled");
-                }
-            }
-        }
-
-        #endregion
-
-        #region 终端 - 高级
-
-        public BindableCollection<RenderModeEnum> RenderModes { get; private set; }
-
-        public bool DisplayAtNewLine
-        {
-            get { return this.displayAtNewLine; }
-            set
-            {
-                if (this.displayAtNewLine != value)
-                {
-                    this.displayAtNewLine = value;
-                    this.NotifyPropertyChanged("DisplayAtNewLine");
-                }
-            }
-        }
-
-        /// <summary>
-        /// 默认是否启用自动换行
-        /// </summary>
-        public bool AutoWrapMode { get; set; }
-
         #endregion
 
         #region 主题相关
@@ -821,14 +774,6 @@ namespace ModengTerm.ViewModels
             this.BehaviorRightClicks = new BindableCollection<BehaviorRightClicks>();
             this.BehaviorRightClicks.AddRange(MTermUtils.GetEnumValues<BehaviorRightClicks>());
             this.BehaviorRightClicks.SelectedItem = Base.Enumerations.BehaviorRightClicks.ContextMenu;
-
-            #endregion
-
-            #region 高级
-
-            this.RenderModes = new BindableCollection<RenderModeEnum>();
-            this.RenderModes.AddRange(MTermUtils.GetEnumValues<RenderModeEnum>());
-            this.RenderModes.SelectedItem = RenderModeEnum.Default;
 
             #endregion
 
@@ -1170,15 +1115,6 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
-        private bool GetTerminalAdvancedOptions(XTermSession session)
-        {
-            session.SetOption<RenderModeEnum>(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, this.RenderModes.SelectedItem);
-            session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_AT_NEWLINE, this.DisplayAtNewLine);
-            session.SetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, this.AcEnabled);
-
-            return true;
-        }
-
         private bool GetCommandlineOptions(XTermSession session)
         {
             if (string.IsNullOrEmpty(this.StartupPath))
@@ -1366,8 +1302,7 @@ namespace ModengTerm.ViewModels
             if (!this.GetTerminalThemeOptions(session) ||
                 !this.GetTerminalOptions(session) ||
                 !this.GetMouseOptions(session) ||
-                !this.GetTerminalBehaviorOptions(session) ||
-                !this.GetTerminalAdvancedOptions(session))
+                !this.GetTerminalBehaviorOptions(session))
             {
                 return false;
             }
@@ -1421,6 +1356,15 @@ namespace ModengTerm.ViewModels
                 Type = (int)sessionType.Type,
                 GroupId = groupId
             };
+
+            List<OptionContentVM> contentVMs = this.optionTreeVM.Context.AllItems.Where(v => v.IsVisible).Select(v => v.ContentVM).OfType<OptionContentVM>().ToList();
+            foreach (OptionContentVM contentVM in contentVMs)
+            {
+                if (!contentVM.SaveOptions(session))
+                {
+                    return null;
+                }
+            }
 
             if (!this.CollectOptions(session))
             {

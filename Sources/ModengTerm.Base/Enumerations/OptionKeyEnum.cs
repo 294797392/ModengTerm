@@ -227,6 +227,11 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         TERM_ADVANCE_AUTO_COMPLETION_ENABLED = 3003,
 
+        /// <summary>
+        /// 自动换行
+        /// </summary>
+        TERM_ADVANCE_AUTO_WRAP_MODE = 3004,
+
         #endregion
 
         #region RawTcp 4001 - 4500

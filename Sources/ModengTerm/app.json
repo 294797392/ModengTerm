@@ -110,7 +110,8 @@
                 {
                     "id": "39C7B12B-479D-40DF-803F-FDDEC7B4CF61",
                     "name": "高级",
-                    "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.AdvanceOptionsUserControl, ModengTerm"
+                    "className": "ModengTerm.UserControls.OptionsUserControl.Terminal.AdvanceOptionsUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.ViewModels.CreateSession.TerminalOptions.AdvancedOptionsVM, ModengTerm"
                 }
             ]
         }
