@@ -1,14 +1,7 @@
-﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XTerminal.Base.Definitions;
 
 namespace ModengTerm.UnitTest.TestCases
 {
