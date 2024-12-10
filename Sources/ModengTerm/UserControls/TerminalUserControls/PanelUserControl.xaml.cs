@@ -79,7 +79,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 return;
             }
 
-            this.PanelVM.SwitchContent(selectedItem);
+            DependencyObject dependencyObject = this.PanelVM.SwitchContent(selectedItem);
+            if (dependencyObject == null)
+            {
+                return;
+            }
+
             ContentControl1.Content = this.PanelVM.CurrentContent;
             TextBlockTitle.Text = selectedItem.Name;
             this.PanelVM.SelectionChangedDelegate(this.PanelVM, e.RemovedItems.Count > 0 ? e.RemovedItems[0] as ContextMenuVM : null, e.AddedItems[0] as ContextMenuVM);

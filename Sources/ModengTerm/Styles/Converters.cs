@@ -18,7 +18,7 @@ namespace ModengTerm.Styles
                 return 0;
             }
 
-            TreeNodeViewModel treeNodeViewModel = treeViewItem.DataContext as TreeNodeViewModel;
+            ItemViewModel treeNodeViewModel = treeViewItem.DataContext as ItemViewModel;
             if (treeNodeViewModel == null) 
             {
                 return 0;

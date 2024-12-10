@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,8 +8,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
 {
-    public class OptionTreeVM : TreeViewModel<TreeViewModelContext>
+    public class OptionMenuItemVM : MenuItemVM
     {
-
     }
 }

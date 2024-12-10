@@ -98,6 +98,12 @@
             <param name="brightness"></param>
             <param name="c"></param>
         </member>
+        <member name="M:WPFToolkit.Controls.TreeComboBox.OnMouseDown(System.Windows.Input.MouseButtonEventArgs)">
+            <summary>
+            When we have capture, all clicks off the popup will have the treeComboBox as the OriginalSource
+            </summary>
+            <param name="e"></param>
+        </member>
         <member name="P:WPFToolkit.Controls.TreeListViewItem.Level">
             <summary>
             Item's hierarchy in the tree
@@ -139,7 +145,7 @@
             指定每个元素的角度偏移
             </summary>
         </member>
-        <member name="T:WPFToolkit.Controls.KColorPicker">
+        <member name="T:WPFToolkit.Controls.ColorPicker">
             <summary>
             颜色选择器
             
@@ -157,17 +163,17 @@
             https://www.cnblogs.com/nabian/p/9267646.html
             </summary>
         </member>
-        <member name="F:WPFToolkit.Controls.KColorPicker.SelectionChangingEvent">
+        <member name="F:WPFToolkit.Controls.ColorPicker.SelectionChangingEvent">
             <summary>
                 An event fired when the selection changes.
             </summary>
         </member>
-        <member name="E:WPFToolkit.Controls.KColorPicker.SelectionChanging">
+        <member name="E:WPFToolkit.Controls.ColorPicker.SelectionChanging">
             <summary>
                 An event fired when the selection changes.
             </summary>
         </member>
-        <member name="M:WPFToolkit.Controls.KColorPicker.GetRelativeColor(System.Windows.Media.GradientStopCollection,System.Double)">
+        <member name="M:WPFToolkit.Controls.ColorPicker.GetRelativeColor(System.Windows.Media.GradientStopCollection,System.Double)">
             <summary>
             https://stackoverflow.com/questions/9650049/get-color-in-specific-location-on-gradient
             </summary>
@@ -175,11 +181,16 @@
             <param name="offset"></param>
             <returns></returns>
         </member>
-        <member name="M:WPFToolkit.Controls.KColorPicker.OnMouseDown(System.Windows.Input.MouseButtonEventArgs)">
+        <member name="M:WPFToolkit.Controls.ColorPicker.OnMouseDown(System.Windows.Input.MouseButtonEventArgs)">
             <summary>
             When we have capture, all clicks off the popup will have the combobox as the OriginalSource
             </summary>
             <param name="e"></param>
+        </member>
+        <member name="T:WPFToolkit.Controls.ColorTextConverter">
+            <summary>
+            颜色结构体转文本
+            </summary>
         </member>
         <member name="M:WPFToolkit.Controls.PanAndZoomViewer.CreatePanAnimation(System.Double)">
             <summary>Helper to create the panning animation for x,y coordinates.</summary>
@@ -199,139 +210,6 @@
         </member>
         <member name="M:WPFToolkit.Controls.PanAndZoomViewer.Reset">
             <summary>Reset to default zoom level and centered content.</summary>
-        </member>
-        <member name="T:WPFToolkit.Controls.HotKeyStrategy">
-            <summary>
-            快捷键的策略
-            注意，快捷键都使用字符键结尾，如果按了字符键后，继续按控制键，那么会进行重置操作
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.HotKeyStrategy.WeChat">
-            <summary>
-            微信的快捷键方式..
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.HotKeyStrategy.StartWithControlKey">
-            <summary>
-            以控制键开头的快捷键，控制键后可以有多个字符按键组合
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Controls.Hotkey">
-            <summary>
-            快捷键控件
-            快捷键设置规则：快捷键要使用控制按键开头，或者是一个单独的英文字母。英文字母后面不能出现控制按键
-            快捷键设置完毕判断策略：当输入英文字母的时候，就算设置完毕
-            
-            注意，这个控件继承自TextBox，因为之前发现过如果把该控件用于ListBox里，那么不会触发KeyDown事件。然而TextBox就可以触发KeyDown事件，所以就改成继承自TextBox
-            猜测是因为ListBoxItem给KeyDown事件做了特殊处理，设置了Handled=True
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Controls.Hotkey.KeyTypes">
-            <summary>
-            按键类型
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.KeyTypes.None">
-            <summary>
-            什么按键都没按
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.KeyTypes.ControlKey">
-            <summary>
-            控制按键
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.KeyTypes.CharacterKey">
-            <summary>
-            26个英文字母
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.MAXIMUM_COMBINATION_KEYS">
-            <summary>
-            最多有两个组合键
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.DefaultStrategy">
-            <summary>
-            默认的快捷键策略
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.previouseKey">
-            <summary>
-            上一次按下的按键
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.previouseKeyState">
-            <summary>
-            上一次按键的状态
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.previouseKeyType">
-            <summary>
-            最后一次记录的按键类型
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.Controls.Hotkey.reset">
-            <summary>
-            标识下一次按键的时候是否需要重置
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.Controls.Hotkey.MaximumCombinations">
-            <summary>
-            快捷键的组合键个数
-            </summary>
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.OnHotkeysPropertyChangedCallback(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
-            <summary>
-            依赖属性回调
-            </summary>
-            <param name="d">触发回调的对象</param>
-            <param name="e">回调参数</param>        
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.StartWithControlKeyProcess(System.Windows.Input.Key)">
-            <summary>
-            处理当策略是StartWithControlKey的时候的按键逻辑
-            </summary>
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.WeChatProcess(System.Windows.Input.Key)">
-            <summary>
-            处理当策略是Free的时候的按键逻辑
-            </summary>
-            <param name="pressedKey"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.UpdateHotkeyText">
-            <summary>
-            更新快捷键文本
-            </summary>
-            <param name="hotKeys"></param>
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.IsControlKey(System.Windows.Input.Key)">
-            <summary>
-            判断按键是否为控制键（ctrl, shift, alt）
-            </summary>
-            <param name="k"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.IsCharacterKey(System.Windows.Input.Key)">
-            <summary>
-            判断是否是字符
-            </summary>
-            <param name="k"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.IsKeySupported(System.Windows.Input.Key)">
-            <summary>
-            判断按键是否可以作为快捷键使用
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:WPFToolkit.Controls.Hotkey.GetPressedKey(System.Windows.Input.KeyEventArgs)">
-            <summary>
-            获取当前按下的按键
-            </summary>
-            <param name="e"></param>
-            <returns></returns>
         </member>
         <member name="T:WPFToolkit.Drawing.CommandBase">
             <summary>
@@ -2104,6 +1982,11 @@
             获取该菜单对应的内容控件
             </summary>
         </member>
+        <member name="P:WPFToolkit.MVVM.MenuContentVM.Parameters">
+            <summary>
+            获取该菜单内容的所有参数
+            </summary>
+        </member>
         <member name="M:WPFToolkit.MVVM.MenuContentVM.GetParameter``1(System.String)">
             <summary>
             读取该模块的输入参数，如果参数不存在则报异常
@@ -2120,6 +2003,22 @@
             <param name="key"></param>
             <param name="defaultValue"></param>
             <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.MVVM.MenuContentVM.OnInitialize">
+            <summary>
+            当菜单内容第一次加载的时候触发
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.MenuContentVM.OnLoaded">
+            <summary>
+            如果界面绑定了CurrentContent，那么当内容显示到界面之后触发
+            如果手动调用SwitchContent加载界面，那么在内容显示之前触发
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.MenuContentVM.OnRelease">
+            <summary>
+            释放的时候触发
+            </summary>
         </member>
         <member name="T:WPFToolkit.MVVM.BindableCollection`1">
             <summary>
@@ -2387,6 +2286,12 @@
             是否显示该节点
             </summary>
         </member>
+        <member name="P:WPFToolkit.MVVM.ItemViewModel.Level">
+            <summary>
+            该节点的等级
+            可以用来计算每个TreeItem的Margin
+            </summary>
+        </member>
         <member name="T:WPFToolkit.MVVM.ISelectableViewModel">
             <summary>
             表示一个可选中的项
@@ -2395,6 +2300,11 @@
         <member name="P:WPFToolkit.MVVM.ISelectableViewModel.IsSelected">
             <summary>
             当前是否被选中
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.MVVM.MenuItemVM">
+            <summary>
+            树形结构的菜单节点
             </summary>
         </member>
         <member name="P:WPFToolkit.MVVM.MenuItemVM.ClassName">
@@ -2430,6 +2340,22 @@
         <member name="P:WPFToolkit.MVVM.MenuItemVM.Parameters">
             <summary>
             输入参数
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.IsSelected">
+            <summary>
+            当前节点是否选中
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.Parent">
+            <summary>
+            父节点
+            </summary>
+        </member>
+        <member name="P:WPFToolkit.MVVM.MenuItemVM.IsExpanded">
+            <summary>
+            设置是否展开该节点
+            如果是展开，那么该操作会对上级节点进行递归展开
             </summary>
         </member>
         <member name="T:WPFToolkit.MVVM.MenuDefinition">
@@ -2477,12 +2403,12 @@
             表示内容控件生命周期钩子对象
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.IContentHook.Initialize">
+        <member name="M:WPFToolkit.MVVM.IContentHook.OnInitialize">
             <summary>
             第一次初始化会调用
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.IContentHook.Release">
+        <member name="M:WPFToolkit.MVVM.IContentHook.OnRelease">
             <summary>
             释放ContentHost的资源
             </summary>
@@ -2499,7 +2425,7 @@
         </member>
         <member name="T:WPFToolkit.MVVM.AbstractMenuVM`1">
             <summary>
-            菜单ViewModel
+            树形结构的菜单ViewModel
             </summary>
         </member>
         <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.currentContent">
@@ -2517,9 +2443,16 @@
             当前的内容是否正在初始化
             </summary>
         </member>
+        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.Context">
+            <summary>
+            保存菜单的上下文信息
+            </summary>
+        </member>
         <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.SelectedMenu">
             <summary>
             当前选中的菜单
+            该属性是只读的，考虑到菜单有可能是树形结构，TreeView没有SelectedItem属性，无法直接绑定
+            当MenuItemVM.IsSelected改变的时候，修改这个值
             </summary>
         </member>
         <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.MenuItems">
@@ -2536,6 +2469,26 @@
         <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.CurrentContent">
             <summary>
             当前显示的界面
+            </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.SwitchContent(`0)">
+            <summary>
+            切换指定的菜单
+            </summary>
+            <param name="menuItem">要切换的菜单</param>
+            <returns>如果菜单没有对应的页面，那么返回null。否则返回对应的页面实例</returns>
+        </member>
+        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.TryGetItem(System.String,`0@)">
+            <summary>
+            根据Id获取指定的节点
+            </summary>
+            <param name="menuId">要获取的节点的Id</param>
+            <param name="menuItem"></param>
+            <returns></returns>
+        </member>
+        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.ExpandAll">
+            <summary>
+            展开所有子节点
             </summary>
         </member>
         <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadSubMenus(`0,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
@@ -2650,11 +2603,6 @@
         <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.IsVisible">
             <summary>
             控制该节点是否显示
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.MVVM.TreeNodeViewModel.Level">
-            <summary>
-            节点的等级
             </summary>
         </member>
         <member name="M:WPFToolkit.MVVM.TreeNodeViewModel.#ctor(WPFToolkit.MVVM.TreeViewModelContext,System.Object)">
@@ -2883,70 +2831,6 @@
             <param name="source"></param>
             <returns></returns>
         </member>
-        <member name="T:WPFToolkit.YControls.YDivider">
-            <summary>
-            分割线控件
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YDivider.Color">
-            <summary>
-            分割线的颜色
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YDivider.Orientation">
-            <summary>
-            分割线的方向
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YDivider.Thickness">
-            <summary>
-            分割线的粗细
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.YControls.YPressedEffects">
-            <summary>
-            定义当按钮被按下的时候的效果
-            </summary>
-        </member>
-        <member name="F:WPFToolkit.YControls.YPressedEffects.BackgroundEffect">
-            <summary>
-            当鼠标移动到按钮上的时候显示一个浅颜色的背景
-            当鼠标按下的时候显示一个深颜色的背景
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundHover">
-            <summary>
-            指定当鼠标移动到按钮上显示的背景颜色
-            </summary>
-        </member>
-        <member name="P:WPFToolkit.YControls.YImageButton.BackgroundPressed">
-            <summary>
-            指定当鼠标按下的时候显示的背景颜色
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.ColorTextConverter">
-            <summary>
-            颜色结构体转文本
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.NullableVisiblityConverter">
-            <summary>
-            布尔值到空值的转换
-            如果传进来的值为空，那么返回Collapsed，否则返回Visible
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter">
-            <summary>
-            True转成Visible
-            False转成Collapsed
-            </summary>
-        </member>
-        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter2">
-            <summary>
-            True转成Collapsed
-            False转成Visible
-            </summary>
-        </member>
         <member name="M:WPFToolkit.DragDrop.IDragSource.StartDrag(WPFToolkit.DragDrop.DragInfo)">
             <summary>
             开始处理拖拽：
@@ -2972,6 +2856,24 @@
             处理Drop事件
             </summary>
             <param name="dropInfo"></param>
+        </member>
+        <member name="T:WPFToolkit.Converters.NullableVisiblityConverter">
+            <summary>
+            布尔值到空值的转换
+            如果传进来的值为空，那么返回Collapsed，否则返回Visible
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter">
+            <summary>
+            True转成Visible
+            False转成Collapsed
+            </summary>
+        </member>
+        <member name="T:WPFToolkit.Converters.BooleanVisibilityConverter2">
+            <summary>
+            True转成Collapsed
+            False转成Visible
+            </summary>
         </member>
         <member name="T:WPFToolkit.MarkupExtensions.EnumItemsSource">
             <summary>
@@ -3067,11 +2969,6 @@
               查找 System.Byte[] 类型的本地化资源。
             </summary>
         </member>
-        <member name="T:WPFToolkit.ThemeManager">
-            <summary>
-            动态换肤工具
-            </summary>
-        </member>
         <member name="T:WPFToolkit.Windows.SplashScreenWindow">
             <summary>
             SplashScreenWindow.xaml 的交互逻辑
@@ -3083,36 +2980,6 @@
         <member name="M:WPFToolkit.Windows.SplashScreenWindow.InitializeComponent">
             <summary>
             InitializeComponent
-            </summary>
-        </member>
-        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
-            <summary>
-            GeneratedInternalTypeHelper
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
-            <summary>
-            CreateInstance
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            GetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
-            <summary>
-            SetPropertyValue
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
-            <summary>
-            CreateDelegate
-            </summary>
-        </member>
-        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
-            <summary>
-            AddEventHandler
             </summary>
         </member>
     </members>

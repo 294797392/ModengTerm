@@ -24,10 +24,20 @@ namespace ModengTerm.ViewModels.Terminals
 
         public override void OnInitialize()
         {
-            base.OnInitialize();
-
             this.ServiceAgent = this.Parameters[KEY_SERVICE_AGENT] as ServiceAgent;
             this.Session = this.Parameters[KEY_XTERM_SESSION] as XTermSession;
+        }
+
+        public override void OnRelease()
+        {
+        }
+
+        public override void OnLoaded()
+        {
+        }
+
+        public override void OnUnload()
+        {
         }
     }
 }

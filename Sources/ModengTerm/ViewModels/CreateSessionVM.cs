@@ -54,7 +54,7 @@ namespace ModengTerm.ViewModels
         private string maxCliboardHistory;
 
         private SessionTypeVM selectedSessionType;
-        private OptionTreeVM optionTreeVM;
+        private OptionMenuVM optionTreeVM;
 
         private string mouseScrollDelta;
 
@@ -110,7 +110,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 当前选中的菜单节点
         /// </summary>
-        private TreeNodeViewModel selectedMenuNode;
+        private OptionMenuItemVM selectedMenuNode;
 
         #endregion
 
@@ -139,8 +139,8 @@ namespace ModengTerm.ViewModels
                         default:
                             {
                                 // 根据不同的会话类型，切换不同的配置选项树形列表
-                                TreeNodeViewModel selectedNode;
-                                if (this.OptionTreeVM.TryGetNode(value.MenuId, out selectedNode)) 
+                                OptionMenuItemVM selectedNode;
+                                if (this.OptionTreeVM.TryGetItem(value.MenuId, out selectedNode)) 
                                 {
                                     selectedNode.IsVisible = true;
                                     selectedNode.IsSelected = true;
@@ -324,7 +324,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 当前显示的配置树形列表ViewModel
         /// </summary>
-        public OptionTreeVM OptionTreeVM
+        public OptionMenuVM OptionTreeVM
         {
             get { return this.optionTreeVM; }
             private set
@@ -337,9 +337,9 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public OptionTreeVM TerminalOptionsTreeVM { get; private set; }
+        public OptionMenuVM TerminalOptionsTreeVM { get; private set; }
 
-        public OptionTreeVM SFTPOptionsTreeVM { get; private set; }
+        public OptionMenuVM SFTPOptionsTreeVM { get; private set; }
 
         /// <summary>
         /// 终端类型列表
@@ -747,10 +747,10 @@ namespace ModengTerm.ViewModels
             #region 加载参数树形列表
 
             // 加载参数树形列表
-            this.SFTPOptionsTreeVM = new OptionTreeVM();
-            this.TerminalOptionsTreeVM = new OptionTreeVM();
-            //this.LoadOptionsTree(this.SFTPOptionsTreeVM, appManifest.FTPOptionList);
-            this.LoadOptionsTree(this.TerminalOptionsTreeVM, appManifest.TerminalOptionMenu);
+            this.SFTPOptionsTreeVM = new OptionMenuVM();
+            this.TerminalOptionsTreeVM = new OptionMenuVM();
+            this.TerminalOptionsTreeVM.Initialize(appManifest.TerminalOptionMenu);
+            this.TerminalOptionsTreeVM.ExpandAll();
             this.OptionTreeVM = this.TerminalOptionsTreeVM;
 
             #endregion
@@ -762,8 +762,8 @@ namespace ModengTerm.ViewModels
             {
                 this.SessionTypeList.Add(new SessionTypeVM(session));
                 // 隐藏会话类型对应的菜单，等选中的时候再显示
-                TreeNodeViewModel treeNodeViewModel;
-                if (this.TerminalOptionsTreeVM.TryGetNode(session.MenuId, out treeNodeViewModel)) 
+                OptionMenuItemVM treeNodeViewModel;
+                if (this.TerminalOptionsTreeVM.TryGetItem(session.MenuId, out treeNodeViewModel)) 
                 {
                     treeNodeViewModel.IsVisible = false;
                 }
@@ -926,55 +926,6 @@ namespace ModengTerm.ViewModels
         #endregion
 
         #region 实例方法
-
-        private void LoadChildrenOptions(OptionTreeNodeVM parentNode, List<OptionDefinition> children)
-        {
-            if (children == null)
-            {
-                return;
-            }
-
-            foreach (OptionDefinition option in children)
-            {
-                OptionTreeNodeVM vm = new OptionTreeNodeVM(parentNode.Context, option)
-                {
-                    ID = option.ID,
-                    Name = option.Name,
-                    Entry = option.Entry,
-                    IsExpanded = true,
-                    Level = parentNode.Level + 1
-                };
-
-                parentNode.Add(vm);
-
-                this.LoadChildrenOptions(vm, option.Children);
-            }
-        }
-
-        private void LoadOptionsTree(OptionTreeVM treeVM, List<OptionDefinition> options)
-        {
-            foreach (OptionDefinition option in options)
-            {
-                OptionTreeNodeVM vm = new OptionTreeNodeVM(treeVM.Context, option)
-                {
-                    ID = option.ID,
-                    Name = option.Name,
-                    Entry = option.Entry,
-                    IsExpanded = true
-                };
-
-                treeVM.AddRootNode(vm);
-
-                this.LoadChildrenOptions(vm, option.Children);
-            }
-
-            // 默认选中第一个节点
-            TreeNodeViewModel firstNode = treeVM.Roots.FirstOrDefault();
-            if (firstNode != null)
-            {
-                firstNode.IsSelected = true;
-            }
-        }
 
         private string GetTerminalName(TerminalTypeEnum type)
         {

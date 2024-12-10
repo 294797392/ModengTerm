@@ -91,7 +91,6 @@ namespace ModengTerm.ViewModels
             this.ClassName = entryClass;
             this.VMClassName = vmClassEntry;
             this.PanelId = panelId;
-            this.Parameters = new Dictionary<string, object>();
         }
 
         #endregion

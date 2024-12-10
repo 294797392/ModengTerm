@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Compile Remove="ASCIITable.cs" />
+    <Compile Remove="Definitions\OptionDefinition.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1426,7 +1426,10 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 // 当前是隐藏状态，显示
                 panelVM.Visible = true;
-                panelVM.SelectedMenu = null;
+                if (panelVM.SelectedMenu != null) 
+                {
+                    panelVM.SelectedMenu.IsSelected = false;
+                }
                 panelVM.SwitchContent(contextMenu);
             }
         }

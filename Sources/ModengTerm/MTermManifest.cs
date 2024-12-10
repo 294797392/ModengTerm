@@ -3,6 +3,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm
 {
@@ -27,13 +28,13 @@ namespace ModengTerm
         public List<AppTheme> AppThemes { get; private set; }
 
         [JsonProperty("termOptionMenu")]
-        public List<OptionDefinition> TerminalOptionMenu { get; private set; }
+        public List<MenuDefinition> TerminalOptionMenu { get; private set; }
 
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
             this.AppThemes = new List<AppTheme>();
-            this.TerminalOptionMenu = new List<OptionDefinition>();
+            this.TerminalOptionMenu = new List<MenuDefinition>();
         }
     }
 }

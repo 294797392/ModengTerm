@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Base.Definitions
 {
-    public class OptionDefinition
+    public class OptionDefinition : MenuDefinition
     {
         /// <summary>
         /// 唯一标志符
@@ -33,7 +33,7 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("children")]
         public List<OptionDefinition> Children { get; set; }
 
-        public OptionDefinition() 
+        public OptionDefinition()
         {
         }
     }

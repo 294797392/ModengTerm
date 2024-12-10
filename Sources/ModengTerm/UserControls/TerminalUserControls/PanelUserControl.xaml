@@ -53,7 +53,6 @@
         <ContentControl Grid.Row="1" x:Name="ContentControl1"/>
 
         <ListBox Grid.Row="2" x:Name="ListBoxMenus" ItemsSource="{Binding Path=MenuItems}"
-                 SelectedItem="{Binding Path=SelectedMenu, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  SelectionChanged="ListBoxMenus_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>

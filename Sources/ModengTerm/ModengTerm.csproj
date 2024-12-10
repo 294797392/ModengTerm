@@ -34,6 +34,7 @@
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
     <Compile Remove="ViewModels\ContextMenuData.cs" />
+    <Compile Remove="ViewModels\GroupVM.cs" />
     <Compile Remove="ViewModels\Terminals\CommandLineVM.cs" />
     <Compile Remove="ViewModels\Terminals\PanelContent\QuickCommandManager.cs" />
     <Compile Remove="ViewModels\Terminals\ShellGlobalVM.cs" />

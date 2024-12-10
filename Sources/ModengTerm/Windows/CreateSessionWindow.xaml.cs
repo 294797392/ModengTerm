@@ -18,7 +18,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using XTerminal.Base.Enumerations; 
+using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Windows
 {
@@ -46,26 +46,26 @@ namespace ModengTerm.Windows
 
         #region 构造方法
 
-        public CreateSessionWindow(SessionGroupVM sessionGroup = null)
+        public CreateSessionWindow(SessionGroupVM selectedGroup = null)
         {
             InitializeComponent();
 
-            this.InitializeWindow(sessionGroup);
+            this.InitializeWindow(selectedGroup);
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeWindow(SessionGroupVM sessionGroup)
+        private void InitializeWindow(SessionGroupVM selectedGroup)
         {
             this.contentMap = new Dictionary<string, Control>();
 
             CreateSessionVM createSessionVM = new CreateSessionVM(MTermApp.Context.ServiceAgent);
             base.DataContext = createSessionVM;
-            if (sessionGroup != null) 
+            if (selectedGroup != null)
             {
-                createSessionVM.SessionGroups.SelectNode(sessionGroup.ID.ToString());
+                createSessionVM.SessionGroups.SelectNode(selectedGroup.ID.ToString());
             }
         }
 
@@ -95,34 +95,20 @@ namespace ModengTerm.Windows
 
         private void TreeViewOptions_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            OptionTreeNodeVM selectedOption = TreeViewOptions.SelectedItem as OptionTreeNodeVM;
+            OptionMenuItemVM selectedOption = TreeViewOptions.SelectedItem as OptionMenuItemVM;
             if (selectedOption == null)
             {
                 return;
             }
 
-            if (string.IsNullOrEmpty(selectedOption.Entry))
+            OptionMenuVM optionTreeVM = TreeViewOptions.DataContext as OptionMenuVM;
+            optionTreeVM.SwitchContent(selectedOption);
+            if (optionTreeVM.CurrentContent == null)
             {
                 return;
             }
 
-            Control control;
-            if (!this.contentMap.TryGetValue(selectedOption.Entry, out control))
-            {
-                try
-                {
-                    control = ConfigFactory<Control>.CreateInstance(selectedOption.Entry);
-
-                    this.contentMap[selectedOption.Entry] = control;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("创建页面实例异常", ex);
-                    return;
-                }
-            }
-
-            ContentControlContent.Content = control;
+            ContentControlContent.Content = optionTreeVM.CurrentContent;
         }
 
         #endregion

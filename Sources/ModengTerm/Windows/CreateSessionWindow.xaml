@@ -4,7 +4,6 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:local="clr-namespace:ModengTerm.Windows"
-                    xmlns:xtermconverter="clr-namespace:XTerminal"
                     xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
                     xmlns:toolkitcontrol="clr-namespace:WPFToolkit.Controls;assembly=WPFToolkit"
                     xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
@@ -25,7 +24,7 @@
             <local:SelectedGroupNameConverter x:Key="SelectedGroupNameConverter"/>
             <converter:SessionTreeNodeImageConverter x:Key="SessionTreeNodeImageConverter"/>
 
-            <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions" ItemsSource="{Binding Path=Children}">
+            <HierarchicalDataTemplate x:Key="HierarchicalDataTemplateOptions" ItemsSource="{Binding Path=MenuItems}">
                 <Grid>
                     <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
                 </Grid>
@@ -124,8 +123,9 @@
 
             <GroupBox Grid.Column="0" Header="分类">
                 <TreeView x:Name="TreeViewOptions" DataContext="{Binding Path=OptionTreeVM}"
+                          ItemsSource="{Binding Path=MenuItems}"
                           ItemTemplate="{StaticResource ResourceKey=HierarchicalDataTemplateOptions}"
-                          SelectedItemChanged="TreeViewOptions_SelectedItemChanged" ItemsSource="{Binding Path=Roots}"
+                          SelectedItemChanged="TreeViewOptions_SelectedItemChanged" 
                           ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemOption}"
                           Style="{StaticResource ResourceKey=StyleTreeView}"/>
             </GroupBox>
