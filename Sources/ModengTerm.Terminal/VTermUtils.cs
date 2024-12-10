@@ -186,18 +186,7 @@ namespace ModengTerm.Terminal
 
         public static VTKeys ConvertToVTKey(Key key)
         {
-            switch (key)
-            {
-                case Key.System:
-                    {
-                        return VTKeys.F10;
-                    }
-
-                default:
-                    {
-                        return (VTKeys)key;
-                    }
-            }
+            return (VTKeys)key;
         }
 
         public static VTPoint ToVTPoint(this Point wpfPoint)

@@ -17,6 +17,7 @@ namespace ModengTerm.Terminal.Watch
 
         /// <summary>
         /// 内核使用的cpu总时间
+        /// 所有核心加起来的时间
         /// </summary>
         public ulong KernelProcessorTime 
         {
@@ -32,6 +33,7 @@ namespace ModengTerm.Terminal.Watch
 
         /// <summary>
         /// 用户模式使用的cpu总时间
+        /// 所有核心加起来的时间
         /// </summary>
         public ulong UserProcessorTime 
         {
@@ -47,6 +49,7 @@ namespace ModengTerm.Terminal.Watch
 
         /// <summary>
         /// cpu总空闲时间
+        /// 所有核心加起来的时间
         /// </summary>
         public ulong IdleProcessorTime 
         {

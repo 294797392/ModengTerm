@@ -1444,7 +1444,7 @@ namespace ModengTerm.Terminal
 
                     default:
                         {
-                            logger.FatalFormat(string.Format("未实现DECSETPrivateMode, {0}", mode));
+                            logger.FatalFormat("未实现DECSETPrivateMode, {0}, {1}", mode, enable);
                             break;
                         }
                 }

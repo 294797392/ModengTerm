@@ -89,9 +89,10 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
-        #region 终端高级选项
+        #region 终端 - 高级
 
         private bool displayAtNewLine;
+        private bool autoWrapMode;
 
         #endregion
 
@@ -461,7 +462,7 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
-        #region 终端行为选项
+        #region 终端 - 行为
 
         public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
 
@@ -483,7 +484,7 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
-        #region 终端高级选项
+        #region 终端 - 高级
 
         public BindableCollection<RenderModeEnum> RenderModes { get; private set; }
 
@@ -499,6 +500,11 @@ namespace ModengTerm.ViewModels
                 }
             }
         }
+
+        /// <summary>
+        /// 默认是否启用自动换行
+        /// </summary>
+        public bool AutoWrapMode { get; set; }
 
         #endregion
 
