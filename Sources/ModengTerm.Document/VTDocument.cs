@@ -95,6 +95,8 @@ namespace ModengTerm.Document
 
         private VTHistory history;
 
+        private GraphicsInterface graphicsInterface;
+
         #endregion
 
         #region 属性
@@ -166,9 +168,9 @@ namespace ModengTerm.Document
         public bool IsEmpty { get { return FirstLine == null && LastLine == null; } }
 
         /// <summary>
-        /// 该文档的渲染器
+        /// 该文档的图形接口
         /// </summary>
-        public IDocument Renderer { get; internal set; }
+        public GraphicsInterface GraphicsInterface { get { return this.graphicsInterface; } }
 
         /// <summary>
         /// 当前应用的文本属性
@@ -218,11 +220,6 @@ namespace ModengTerm.Document
         public VTypeface Typeface { get { return options.Typeface; } }
 
         /// <summary>
-        /// 获取该文档的事件输入
-        /// </summary>
-        public VTEventInput EventInput { get; private set; }
-
-        /// <summary>
         /// 获取该文档的历史记录信息
         /// </summary>
         public VTHistory History { get { return this.history; } }
@@ -244,29 +241,31 @@ namespace ModengTerm.Document
 
         #region 构造方法
 
+        /// <summary>
+        /// 构造方法
+        /// </summary>
+        /// <param name="options">文档参数</param>
         public VTDocument(VTDocumentOptions options)
         {
             this.options = options;
-            Name = options.Name;
-            Renderer = options.Controller;
-            this.EventInput = new VTEventInput()
-            {
-                OnMouseDown = this.OnMouseDown,
-                OnMouseMove = this.OnMouseMove,
-                OnMouseUp = this.OnMouseUp,
-                OnMouseWheel = this.OnMouseWheel,
-                OnScrollChanged = this.OnScrollChanged,
-                OnLoaded = this.OnLoaded
-            };
-            cursorState = new VTCursorState();
-            startPointer = new VTextPointer();
-            startPointer.ColumnIndex = -1;
-            endPointer = new VTextPointer();
-            endPointer.ColumnIndex = -1;
-            scrollDelta = options.ScrollDelta;
-            AttributeState = new VTextAttributeState();
-            viewportRow = options.ViewportRow;
-            viewportColumn = options.ViewportColumn;
+            this.Name = options.Name;
+            this.graphicsInterface = options.GraphicsInterface;
+            this.graphicsInterface.GIMouseDown += GraphicsInterface_GIMouseDown;
+            this.graphicsInterface.GIMouseUp += GraphicsInterface_GIMouseUp;
+            this.graphicsInterface.GIMouseMove += GraphicsInterface_GIMouseMove;
+            this.graphicsInterface.GIMouseWheel += GraphicsInterface_GIMouseWheel;
+            this.graphicsInterface.GIScrollChanged += GraphicsInterface_GIScrollChanged;
+            this.graphicsInterface.GILoaded += GraphicsInterface_GILoaded;
+
+            this.cursorState = new VTCursorState();
+            this.startPointer = new VTextPointer();
+            this.startPointer.ColumnIndex = -1;
+            this.endPointer = new VTextPointer();
+            this.endPointer.ColumnIndex = -1;
+            this.scrollDelta = options.ScrollDelta;
+            this.AttributeState = new VTextAttributeState();
+            this.viewportRow = options.ViewportRow;
+            this.viewportColumn = options.ViewportColumn;
         }
 
         #endregion
@@ -451,7 +450,7 @@ namespace ModengTerm.Document
         /// <returns>如果进行了滚动，那么返回滚动数据，如果因为某种原因没进行滚动，那么返回空</returns>
         private VTScrollData ScrollIfCursorOutsideDocument(VTPoint mousePosition)
         {
-            VTSize displaySize = this.Renderer.DrawAreaSize;
+            VTSize displaySize = this.graphicsInterface.DrawAreaSize;
 
             // 要滚动到的目标行
             int scrollTarget = -1;
@@ -500,7 +499,7 @@ namespace ModengTerm.Document
             double mouseY = mousePosition.Y;
 
             VTDocument document = this;
-            VTSize displaySize = this.Renderer.DrawAreaSize;
+            VTSize displaySize = this.graphicsInterface.DrawAreaSize;
 
             #region 先计算鼠标位于哪一行上
 
@@ -642,7 +641,7 @@ namespace ModengTerm.Document
 
             this.history.Release();
 
-            Renderer.DeleteDrawingObjects();
+            graphicsInterface.DeleteDrawingObjects();
             FirstLine = null;
             LastLine = null;
             ActiveLine = null;
@@ -1283,7 +1282,7 @@ namespace ModengTerm.Document
 
             this.visible = visible;
 
-            this.Renderer.Visible = visible;
+            this.graphicsInterface.Visible = visible;
         }
 
         /// <summary>
@@ -1502,69 +1501,9 @@ namespace ModengTerm.Document
 
         #region 事件处理器
 
-        private void OnMouseDown(MouseData mouseData)
+        private void GraphicsInterface_GIMouseMove(GraphicsInterface graphicsInterface, MouseData mouseData)
         {
-            if (mouseData.ClickCount == 1)
-            {
-                if (!Selection.IsEmpty)
-                {
-                    // 点击的时候先清除选中区域
-                    Selection.Clear();
-                    Selection.RequestInvalidate();
-                    selectionState = false;
-                }
-
-                mouseData.CaptureAction = MouseData.CaptureActions.Capture;
-            }
-            else
-            {
-                // 双击就是选中单词
-                // 三击就是选中整行内容
-
-                int startIndex = 0, count = 0, logicalRow = 0;
-
-                VTextLine textLine = HitTestHelper.HitTestVTextLine(this, mouseData.Y, out logicalRow);
-                if (textLine == null)
-                {
-                    return;
-                }
-
-                switch (mouseData.ClickCount)
-                {
-                    case 2:
-                        {
-                            // 选中单词
-                            int characterIndex;
-                            int columnIndex;
-                            VTextRange characterRange;
-                            HitTestHelper.HitTestVTCharacter(textLine, mouseData.X, out characterIndex, out characterRange, out columnIndex);
-                            if (characterIndex == -1)
-                            {
-                                return;
-                            }
-                            VTUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
-                            this.Selection.SelectRange(textLine, logicalRow, startIndex, count);
-                            break;
-                        }
-
-                    case 3:
-                        {
-                            // 选中一整行
-                            this.Selection.SelectRow(textLine, logicalRow);
-                            break;
-                        }
-
-                    default:
-                        {
-                            return;
-                        }
-                }
-            }
-        }
-
-        private void OnMouseMove(MouseData mouseData)
-        {
-            if (!mouseData.IsMouseCaptured)
+            if (!this.graphicsInterface.GIMouseCaptured)
             {
                 return;
             }
@@ -1617,19 +1556,79 @@ namespace ModengTerm.Document
             }
         }
 
-        private void OnMouseUp(MouseData mouseData)
+        private void GraphicsInterface_GIMouseUp(GraphicsInterface graphicsInterface, MouseData mouseData)
         {
             selectionState = false;
-            mouseData.CaptureAction = MouseData.CaptureActions.ReleaseCapture;
+            this.graphicsInterface.GIRleaseMouseCapture();
         }
 
-        private void OnMouseWheel(bool upper)
+        private void GraphicsInterface_GIMouseDown(GraphicsInterface graphicsInterface, MouseData mouseData)
+        {
+            if (mouseData.ClickCount == 1)
+            {
+                if (!Selection.IsEmpty)
+                {
+                    // 点击的时候先清除选中区域
+                    Selection.Clear();
+                    Selection.RequestInvalidate();
+                    selectionState = false;
+                }
+
+                this.graphicsInterface.GICaptureMouse();
+            }
+            else
+            {
+                // 双击就是选中单词
+                // 三击就是选中整行内容
+
+                int startIndex = 0, count = 0, logicalRow = 0;
+
+                VTextLine textLine = HitTestHelper.HitTestVTextLine(this, mouseData.Y, out logicalRow);
+                if (textLine == null)
+                {
+                    return;
+                }
+
+                switch (mouseData.ClickCount)
+                {
+                    case 2:
+                        {
+                            // 选中单词
+                            int characterIndex;
+                            int columnIndex;
+                            VTextRange characterRange;
+                            HitTestHelper.HitTestVTCharacter(textLine, mouseData.X, out characterIndex, out characterRange, out columnIndex);
+                            if (characterIndex == -1)
+                            {
+                                return;
+                            }
+                            VTUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
+                            this.Selection.SelectRange(textLine, logicalRow, startIndex, count);
+                            break;
+                        }
+
+                    case 3:
+                        {
+                            // 选中一整行
+                            this.Selection.SelectRow(textLine, logicalRow);
+                            break;
+                        }
+
+                    default:
+                        {
+                            return;
+                        }
+                }
+            }
+        }
+
+        private void GraphicsInterface_GIMouseWheel(GraphicsInterface graphicsInterface, MouseWheelData wheelData)
         {
             int oldScroll = Scrollbar.Value;
             int scrollMax = Scrollbar.Maximum;
             int newScroll = 0; // 最终要滚动到的值
 
-            if (upper)
+            if (wheelData.Delta > 0)
             {
                 // 向上滚动
 
@@ -1686,9 +1685,9 @@ namespace ModengTerm.Document
             this.InvokeScrollChanged(scrollData);
         }
 
-        private void OnScrollChanged(ScrollChangedData changed)
+        private void GraphicsInterface_GIScrollChanged(GraphicsInterface arg1, ScrollChangedData scrollChangedData)
         {
-            VTScrollData scrollData = this.ScrollTo(changed.NewScroll);
+            VTScrollData scrollData = this.ScrollTo(scrollChangedData.NewScroll);
             if (scrollData == null)
             {
                 return;
@@ -1699,7 +1698,7 @@ namespace ModengTerm.Document
             this.InvokeScrollChanged(scrollData);
         }
 
-        private void OnLoaded()
+        private void GraphicsInterface_GILoaded(GraphicsInterface obj)
         {
             // 把光标加入到定时器里进行闪烁
             VTCursorTimer.Context.SetCursor(this.Cursor);

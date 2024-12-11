@@ -82,12 +82,12 @@ namespace ModengTerm.Document
         /// <summary>
         /// 该UI元素的类型
         /// </summary>
-        public abstract DocumentObjectTypes Type { get; }
+        public abstract GraphicsObjectTypes Type { get; }
 
         /// <summary>
         /// 对应的绘图对象
         /// </summary>
-        protected IDocumentObject DrawingObject { get; private set; }
+        protected GraphicsObject DrawingObject { get; private set; }
 
         #endregion
 
@@ -111,7 +111,7 @@ namespace ModengTerm.Document
         /// </summary>
         public void Initialize()
         {
-            IDocument documentController = this.ownerDocument.Renderer;
+            GraphicsInterface documentController = this.ownerDocument.GraphicsInterface;
 
             this.DrawingObject = documentController.CreateDrawingObject();
 
@@ -125,7 +125,7 @@ namespace ModengTerm.Document
         {
             this.OnRelease();
 
-            IDocument documentController = this.ownerDocument.Renderer;
+            GraphicsInterface documentController = this.ownerDocument.GraphicsInterface;
 
             documentController.DeleteDrawingObject(this.DrawingObject);
         }

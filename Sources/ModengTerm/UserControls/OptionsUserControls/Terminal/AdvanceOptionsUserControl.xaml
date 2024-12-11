@@ -44,7 +44,7 @@
         </ComboBox>
 
         <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="10,0,0,0"
-                  Content="在单独一行显示收到的数据" IsChecked="{Binding Path=DisplayAtNewLine, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
+                  Content="自由移动光标" IsChecked="{Binding Path=ClickToCursor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>
 
         <CheckBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="10,0,0,0"
                   Content="启用自动完成列表" IsChecked="{Binding Path=AutoCompletionList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxLocal}"/>

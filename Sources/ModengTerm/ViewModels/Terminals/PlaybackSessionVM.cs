@@ -30,9 +30,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public XTermSession Session { get; set; }
 
-        public IDocument AlternateDocument { get; set; }
+        public GraphicsInterface AlternateDocument { get; set; }
 
-        public IDocument MainDocument { get; set; }
+        public GraphicsInterface MainDocument { get; set; }
 
         /// <summary>
         /// 终端的宽度

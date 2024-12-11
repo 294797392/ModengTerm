@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.UnitTest.Drawing
 {
-    public class FakeDocument : IDocument
+    public class FakeGI : GraphicsInterface
     {
         public string Name { get; set; }
 
@@ -18,17 +18,17 @@ namespace ModengTerm.UnitTest.Drawing
 
         public VTSize DrawAreaSize { get; set; }
 
-        public FakeDocument()
+        public FakeGI()
         {
             Scrollbar = new FakeScrollbar();
         }
 
-        public IDocumentObject CreateDrawingObject()
+        public GraphicsObject CreateDrawingObject()
         {
-            return new FakeDocumentObject();
+            return new FakeGIObject();
         }
 
-        public void DeleteDrawingObject(IDocumentObject drawingObject)
+        public void DeleteDrawingObject(GraphicsObject drawingObject)
         {
         }
 

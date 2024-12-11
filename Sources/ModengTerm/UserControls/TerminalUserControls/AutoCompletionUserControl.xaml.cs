@@ -69,7 +69,7 @@ namespace ModengTerm.UserControls.Terminals
             VTDocument document = vt.ActiveDocument;
             VTCursor cursor = document.Cursor;
 
-            double drawAreaHeight = document.Renderer.DrawAreaSize.Height;
+            double drawAreaHeight = document.GraphicsInterface.DrawAreaSize.Height;
 
             // 光标下面还剩余多少高度
             double remainHeight = drawAreaHeight - cursor.Bottom;

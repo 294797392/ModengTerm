@@ -44,7 +44,7 @@ namespace ModengTerm.Document
 
         #region 属性
 
-        public override DocumentObjectTypes Type => DocumentObjectTypes.TextLine;
+        public override GraphicsObjectTypes Type => GraphicsObjectTypes.TextLine;
 
         /// <summary>
         /// 物理行号，从0开始

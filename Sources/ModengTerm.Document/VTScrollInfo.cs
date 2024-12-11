@@ -145,7 +145,7 @@ namespace ModengTerm.Document
 
         public void Initialize()
         {
-            this.scrollbar = ownerDocument.Renderer.Scrollbar;
+            this.scrollbar = ownerDocument.GraphicsInterface.Scrollbar;
             this.scrollbar.Maximum = 0;
             this.scrollbar.Value = 0;
             this.scrollbar.Visible = false; // 默认不显示滚动条

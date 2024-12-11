@@ -69,9 +69,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 用来高亮显示匹配结果的矩形
         /// </summary>
-        private IDocumentObject mainRectElement;
-        private IDocumentObject alternateRectElement;
-        private IDocumentObject activeRectElement;
+        private GraphicsObject mainRectElement;
+        private GraphicsObject alternateRectElement;
+        private GraphicsObject activeRectElement;
 
         /// <summary>
         /// 如果某一行内容没有变化，那么不需要重新搜索
@@ -399,16 +399,16 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 // 先释放之前搜索的终端资源
                 oldTerminal.MainDocument.Rendering -= this.MainDocument_Rendering;
-                oldTerminal.MainDocument.Renderer.DeleteDrawingObject(this.mainRectElement);
+                oldTerminal.MainDocument.GraphicsInterface.DeleteDrawingObject(this.mainRectElement);
                 oldTerminal.AlternateDocument.Rendering -= this.MainDocument_Rendering;
-                oldTerminal.AlternateDocument.Renderer.DeleteDrawingObject(this.alternateRectElement);
+                oldTerminal.AlternateDocument.GraphicsInterface.DeleteDrawingObject(this.alternateRectElement);
             }
 
             IVideoTerminal newTerminal = vt;
             newTerminal.MainDocument.Rendering += this.MainDocument_Rendering;
-            this.mainRectElement = newTerminal.MainDocument.Renderer.CreateDrawingObject();
+            this.mainRectElement = newTerminal.MainDocument.GraphicsInterface.CreateDrawingObject();
             newTerminal.AlternateDocument.Rendering += this.MainDocument_Rendering;
-            this.alternateRectElement = newTerminal.AlternateDocument.Renderer.CreateDrawingObject();
+            this.alternateRectElement = newTerminal.AlternateDocument.GraphicsInterface.CreateDrawingObject();
             if (newTerminal.IsAlternate)
             {
                 this.activeRectElement = this.alternateRectElement;
@@ -432,9 +432,9 @@ namespace ModengTerm.Terminal.ViewModels
         public void Release()
         {
             this.videoTerminal.MainDocument.Rendering -= MainDocument_Rendering;
-            this.videoTerminal.MainDocument.Renderer.DeleteDrawingObject(this.mainRectElement);
+            this.videoTerminal.MainDocument.GraphicsInterface.DeleteDrawingObject(this.mainRectElement);
             this.videoTerminal.AlternateDocument.Rendering -= MainDocument_Rendering;
-            this.videoTerminal.AlternateDocument.Renderer.DeleteDrawingObject(this.alternateRectElement);
+            this.videoTerminal.AlternateDocument.GraphicsInterface.DeleteDrawingObject(this.alternateRectElement);
             this.matchResult = null;
             this.Message = string.Empty;
         }

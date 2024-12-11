@@ -36,13 +36,6 @@ namespace ModengTerm.Terminal.Renderer
         public abstract void Release();
 
         /// <summary>
-        /// 当用户和主机之间的交互状态改变的时候触发
-        /// TODO：当UserInput速度很快的时候，还没来得及收到数据，连续两次触发UserInput
-        /// </summary>
-        /// <param name="istate">交互状态</param>
-        public abstract void OnInteractionStateChanged(InteractionStateEnum istate);
-
-        /// <summary>
         /// 渲染原始数据
         /// </summary>
         /// <param name="bytes">要渲染的原始数据缓冲区</param>

@@ -28,7 +28,7 @@ namespace ModengTerm.Document
 
         #region 属性
 
-        public override DocumentObjectTypes Type => DocumentObjectTypes.Selection;
+        public override GraphicsObjectTypes Type => GraphicsObjectTypes.Selection;
 
         /// <summary>
         /// 指示当前选中的内容是否为空
@@ -197,7 +197,7 @@ namespace ModengTerm.Document
 
             VTDocument document = this.OwnerDocument;
             double charWidth = document.Typeface.Width;
-            VTSize displaySize = document.Renderer.DrawAreaSize;
+            VTSize displaySize = document.GraphicsInterface.DrawAreaSize;
 
             // 单独处理选中的是同一行的情况
             if (startRow == endRow)

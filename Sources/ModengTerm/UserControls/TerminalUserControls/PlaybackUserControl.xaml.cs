@@ -51,93 +51,9 @@ namespace ModengTerm.UserControls.Terminals
 
         private void InitializeUserControl() { }
 
-        /// <summary>
-        /// 获取当前正在显示的文档的事件输入器
-        /// </summary>
-        /// <returns></returns>
-        private VTEventInput GetActiveEventInput()
-        {
-            return this.videoTerminal.ActiveDocument.EventInput;
-        }
-
-        private DocumentControl GetActiveDocument()
-        {
-            return this.videoTerminal.IsAlternate ?
-                DocumentAlternate : DocumentMain;
-        }
-
-        private MouseData GetMouseData(object sender, MouseButtonEventArgs e)
-        {
-            DocumentControl document = this.GetActiveDocument();
-            Point mousePosition = e.GetPosition(document);
-            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, e.ClickCount, (sender as FrameworkElement).IsMouseCaptured);
-
-            return mouseData;
-        }
-
-        private MouseData GetMouseData(object sender, MouseEventArgs e)
-        {
-            DocumentControl document = this.GetActiveDocument();
-            DrawingArea canvas = document.DrawArea;
-            Point mousePosition = e.GetPosition(canvas);
-            MouseData mouseData = new MouseData(mousePosition.X, mousePosition.Y, 0, (sender as FrameworkElement).IsMouseCaptured);
-
-            return mouseData;
-        }
-
-        private void HandleCaptureAction(object sender, MouseData mouseData)
-        {
-            switch (mouseData.CaptureAction)
-            {
-                case MouseData.CaptureActions.None:
-                    {
-                        break;
-                    }
-
-                case MouseData.CaptureActions.Capture:
-                    {
-                        (sender as FrameworkElement).CaptureMouse();
-                        break;
-                    }
-
-                case MouseData.CaptureActions.ReleaseCapture:
-                    {
-                        (sender as FrameworkElement).ReleaseMouseCapture();
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         #endregion
 
         #region 事件处理器
-
-        private void DrawArea_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            MouseData mouseData = this.GetMouseData(sender, e);
-            VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseMove(mouseData);
-            this.HandleCaptureAction(sender, mouseData);
-        }
-
-        private void DrawArea_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            MouseData mouseData = this.GetMouseData(sender, e);
-            VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseUp(mouseData);
-            this.HandleCaptureAction(sender, mouseData);
-        }
-
-        private void DrawArea_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            MouseData mouseData = this.GetMouseData(sender, e);
-            VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseDown(mouseData);
-            this.HandleCaptureAction(sender, mouseData);
-        }
 
         private void DrawArea_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -152,16 +68,6 @@ namespace ModengTerm.UserControls.Terminals
             System.Windows.Clipboard.SetText(paragraph.Content);
 
             this.videoTerminal.UnSelectAll();
-        }
-
-        protected override void OnMouseWheel(MouseWheelEventArgs e)
-        {
-            base.OnMouseWheel(e);
-
-            VTEventInput eventInput = this.GetActiveEventInput();
-            eventInput.OnMouseWheel(e.Delta > 0);
-
-            e.Handled = true;
         }
 
         #endregion
@@ -183,14 +89,8 @@ namespace ModengTerm.UserControls.Terminals
             double height = DocumentMain.DrawAreaSize.Height - padding * 2;
 
             DocumentAlternate.SetPadding(padding);
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown += DrawArea_PreviewMouseLeftButtonDown;
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp += DrawArea_PreviewMouseLeftButtonUp;
-            DocumentAlternate.DrawArea.PreviewMouseMove += DrawArea_PreviewMouseMove;
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
             DocumentMain.SetPadding(padding);
-            DocumentMain.DrawArea.PreviewMouseLeftButtonDown += DrawArea_PreviewMouseLeftButtonDown;
-            DocumentMain.DrawArea.PreviewMouseLeftButtonUp += DrawArea_PreviewMouseLeftButtonUp;
-            DocumentMain.DrawArea.PreviewMouseMove += DrawArea_PreviewMouseMove;
             DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
 
             PlaybackOptions playbackOptions = new PlaybackOptions()
@@ -212,13 +112,7 @@ namespace ModengTerm.UserControls.Terminals
         {
             this.playbackVM.Close();
 
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonDown -= DrawArea_PreviewMouseLeftButtonDown;
-            DocumentAlternate.DrawArea.PreviewMouseLeftButtonUp -= DrawArea_PreviewMouseLeftButtonUp;
-            DocumentAlternate.DrawArea.PreviewMouseMove -= DrawArea_PreviewMouseMove;
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;
-            DocumentMain.DrawArea.PreviewMouseLeftButtonDown -= DrawArea_PreviewMouseLeftButtonDown;
-            DocumentMain.DrawArea.PreviewMouseLeftButtonUp -= DrawArea_PreviewMouseLeftButtonUp;
-            DocumentMain.DrawArea.PreviewMouseMove -= DrawArea_PreviewMouseMove;
             DocumentMain.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;
         }
 

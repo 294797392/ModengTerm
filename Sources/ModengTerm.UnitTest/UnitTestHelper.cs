@@ -31,7 +31,7 @@ namespace ModengTerm.UnitTest
                     Width = 20,
                     Height = 20
                 },
-                Controller = new FakeDocument()
+                GraphicsInterface = new FakeGI()
             };
 
             VTDocument document = new VTDocument(options);
@@ -177,8 +177,8 @@ namespace ModengTerm.UnitTest
                 Width = 0,
                 Height = 0,
                 Session = session,
-                AlternateDocument = new FakeDocument(),
-                MainDocument = new FakeDocument()
+                AlternateDocument = new FakeGI(),
+                MainDocument = new FakeGI()
             };
 
             VideoTerminal terminal = new VideoTerminal();
@@ -211,8 +211,8 @@ namespace ModengTerm.UnitTest
                 Width = width,
                 Height = height,
                 Session = session,
-                AlternateDocument = new FakeDocument(),
-                MainDocument = new FakeDocument()
+                AlternateDocument = new FakeGI(),
+                MainDocument = new FakeGI()
             };
 
             VideoTerminal terminal = new VideoTerminal();

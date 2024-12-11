@@ -67,7 +67,7 @@ namespace ModengTerm.Document
 
         #region 属性
 
-        public override DocumentObjectTypes Type => DocumentObjectTypes.Cursor;
+        public override GraphicsObjectTypes Type => GraphicsObjectTypes.Cursor;
 
         /// <summary>
         /// 光标样式

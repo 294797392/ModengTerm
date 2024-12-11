@@ -150,8 +150,8 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public IDocument MainDocument { get; set; }
-        public IDocument AlternateDocument { get; set; }
+        public GraphicsInterface MainDocument { get; set; }
+        public GraphicsInterface AlternateDocument { get; set; }
 
         /// <summary>
         /// 获取或设置终端宽度
@@ -607,8 +607,6 @@ namespace ModengTerm.Terminal.ViewModels
                 logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
                 return;
             }
-
-            this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.UserInput);
         }
 
         /// <summary>
@@ -1014,8 +1012,6 @@ namespace ModengTerm.Terminal.ViewModels
             // 所以这里把Render放在UI线程处理
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                this.videoTerminal.OnInteractionStateChanged(InteractionStateEnum.Receive);
-
                 try
                 {
                     this.videoTerminal.ProcessData(bytes, size);

@@ -19,19 +19,6 @@ namespace ModengTerm.Terminal.Renderer
 
         private VTDocument document;
 
-        /// <summary>
-        /// 是否是第一次接收数据
-        /// </summary>
-        private bool firstReceive;
-        private bool lineFeed;
-
-        private bool renderAtNewLine;
-
-        /// <summary>
-        /// 是否渲染了一次
-        /// </summary>
-        private bool renderOnce;
-
         #endregion
 
         #region 属性
@@ -52,39 +39,10 @@ namespace ModengTerm.Terminal.Renderer
 
         public override void Initialize()
         {
-            this.renderAtNewLine = this.session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_AT_NEWLINE);
         }
 
         public override void Release()
         {
-        }
-
-        public override void OnInteractionStateChanged(InteractionStateEnum istate)
-        {
-            switch (istate)
-            {
-                case InteractionStateEnum.UserInput:
-                    {
-                        // 用户输入的之后，下一次收到的数据就是第一次接收的数据
-                        this.firstReceive = true;
-                        break;
-                    }
-
-                case InteractionStateEnum.Receive:
-                    {
-                        // 如果是第一次接收数据，那么就换行
-                        if (this.firstReceive)
-                        {
-                            this.firstReceive = false;
-                            this.lineFeed = true;
-                        }
-
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         public override void Render(byte[] bytes, int length)
@@ -92,26 +50,6 @@ namespace ModengTerm.Terminal.Renderer
             VTDocument document = this.document;
             int viewportColumn = document.ViewportColumn;
             int viewportRow = document.ViewportRow;
-
-            // 收到新的数据之后在新行显示
-            if (this.renderAtNewLine)
-            {
-                if (!this.renderOnce)
-                {
-                    // 渲染第一次的时候不换行
-                    this.renderOnce = true;
-                    this.lineFeed = false;
-                }
-                else
-                {
-                    if (this.lineFeed)
-                    {
-                        this.videoTerminal.CarriageReturn();
-                        this.videoTerminal.LineFeed();
-                        this.lineFeed = false;
-                    }
-                }
-            }
 
             for (int i = 0; i < length; i++)
             {

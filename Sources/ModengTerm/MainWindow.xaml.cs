@@ -199,12 +199,6 @@ namespace ModengTerm
                 {
                     FindWindowMgr.Show(shellSession);
                 }
-
-                IVideoTerminal vt = shellSession.VideoTerminal;
-                if (vt != null)
-                {
-                    vt.ActiveDocument.EventInput.OnLoaded();
-                }
             }
 
             if (selectedSession is OpenedSessionVM)

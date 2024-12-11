@@ -74,7 +74,7 @@
     <Page Remove="Themes\Themes.Ubuntu.Ambiance.xaml" />
     <Page Remove="Themes\Themes.XShell.xaml" />
     <Page Remove="UserControls\SFTPContentUserControl.xaml" />
-    <Page Remove="UserControls\TerminalUserControls\Rendering\Template.xaml" />
+    <Page Remove="UserControls\TerminalUserControls\GraphicsInterface\Template.xaml" />
     <Page Remove="UserControls\ViewportUserControl.xaml" />
     <Page Remove="Windows\Terminals\ParagraphsWindow.xaml" />
   </ItemGroup>

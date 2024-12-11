@@ -14,7 +14,7 @@ namespace ModengTerm.Document.Drawing
     /// 该接口保存UI对象的渲染数据，渲染数据由Document模型来生成
     /// 该接口只负责拿到数据后渲染并显示。这样可以最小化移植不同渲染引擎的工作量
     /// </summary>
-    public interface IDocumentObject
+    public interface GraphicsObject
     {
         /// <summary>
         /// 设置透明度

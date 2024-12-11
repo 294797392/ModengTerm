@@ -7,36 +7,36 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Drawing\Wallpaper\**" />
+    <Compile Remove="Graphics\Wallpaper\**" />
     <Compile Remove="Geometry\**" />
-    <EmbeddedResource Remove="Drawing\Wallpaper\**" />
+    <EmbeddedResource Remove="Graphics\Wallpaper\**" />
     <EmbeddedResource Remove="Geometry\**" />
-    <None Remove="Drawing\Wallpaper\**" />
+    <None Remove="Graphics\Wallpaper\**" />
     <None Remove="Geometry\**" />
-    <Page Remove="Drawing\Wallpaper\**" />
+    <Page Remove="Graphics\Wallpaper\**" />
     <Page Remove="Geometry\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Drawing\ContentArea.cs" />
-    <Compile Remove="Drawing\DrawingBookmark.cs" />
-    <Compile Remove="Drawing\DrawingCanvas.cs" />
-    <Compile Remove="Drawing\DrawingCursor.cs" />
-    <Compile Remove="Drawing\DrawingLine.cs" />
-    <Compile Remove="Drawing\DrawingMatchesLine.cs" />
-    <Compile Remove="Drawing\DrawingObject.cs" />
-    <Compile Remove="Drawing\DrawingObjectFactory.cs" />
-    <Compile Remove="Drawing\DrawingScrollbar.cs" />
-    <Compile Remove="Drawing\DrawingSelection.cs" />
-    <Compile Remove="Drawing\DrawingUtils.cs" />
-    <Compile Remove="Drawing\IDrawingBookmark.cs" />
-    <Compile Remove="Drawing\IDrawingCursor.cs" />
-    <Compile Remove="Drawing\IDrawingRectangle.cs" />
-    <Compile Remove="Drawing\IDrawingSelection.cs" />
-    <Compile Remove="Drawing\IDrawingTextBlock.cs" />
-    <Compile Remove="Drawing\IDrawingTextLine.cs" />
-    <Compile Remove="Drawing\IDrawingWallpaper.cs" />
-    <Compile Remove="Drawing\RenderingOptions.cs" />
+    <Compile Remove="Graphics\ContentArea.cs" />
+    <Compile Remove="Graphics\DrawingBookmark.cs" />
+    <Compile Remove="Graphics\DrawingCanvas.cs" />
+    <Compile Remove="Graphics\DrawingCursor.cs" />
+    <Compile Remove="Graphics\DrawingLine.cs" />
+    <Compile Remove="Graphics\DrawingMatchesLine.cs" />
+    <Compile Remove="Graphics\DrawingObject.cs" />
+    <Compile Remove="Graphics\DrawingObjectFactory.cs" />
+    <Compile Remove="Graphics\DrawingScrollbar.cs" />
+    <Compile Remove="Graphics\DrawingSelection.cs" />
+    <Compile Remove="Graphics\DrawingUtils.cs" />
+    <Compile Remove="Graphics\IDrawingBookmark.cs" />
+    <Compile Remove="Graphics\IDrawingCursor.cs" />
+    <Compile Remove="Graphics\IDrawingRectangle.cs" />
+    <Compile Remove="Graphics\IDrawingSelection.cs" />
+    <Compile Remove="Graphics\IDrawingTextBlock.cs" />
+    <Compile Remove="Graphics\IDrawingTextLine.cs" />
+    <Compile Remove="Graphics\IDrawingWallpaper.cs" />
+    <Compile Remove="Graphics\RenderingOptions.cs" />
     <Compile Remove="Enumerations\EffectTypeEnum.cs" />
     <Compile Remove="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Remove="VTBookmarkStates.cs" />
@@ -48,7 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Page Remove="Drawing\Template.xaml" />
+    <Page Remove="Graphics\Template.xaml" />
   </ItemGroup>
 
   <ItemGroup>

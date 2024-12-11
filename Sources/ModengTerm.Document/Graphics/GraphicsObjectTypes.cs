@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Document.Drawing
 {
-    public enum DocumentObjectTypes
+    public enum GraphicsObjectTypes
     {
         /// <summary>
         /// 光标

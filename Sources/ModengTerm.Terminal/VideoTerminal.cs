@@ -26,9 +26,9 @@ namespace ModengTerm.Terminal
 {
     public class VTOptions
     {
-        public IDocument AlternateDocument { get; set; }
+        public GraphicsInterface AlternateDocument { get; set; }
 
-        public IDocument MainDocument { get; set; }
+        public GraphicsInterface MainDocument { get; set; }
 
         /// <summary>
         /// 该终端所对应的Session
@@ -674,16 +674,6 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 当用户和HOST之间的交互状态改变的时候触发
-        /// 比如从用户输入 -> 终端响应
-        /// </summary>
-        /// <param name="istate"></param>
-        public void OnInteractionStateChanged(InteractionStateEnum istate)
-        {
-            this.renderer.OnInteractionStateChanged(istate);
-        }
-
-        /// <summary>
         /// 触发OnKeyboardInput事件
         /// </summary>
         /// <param name="kbdInput">事件参数</param>
@@ -729,12 +719,12 @@ namespace ModengTerm.Terminal
             }
         }
 
-        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, IDocument drawingDocument)
+        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, GraphicsInterface graphicsInterface)
         {
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY);
             double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);
 
-            VTypeface typeface = drawingDocument.GetTypeface(fontSize, fontFamily);
+            VTypeface typeface = graphicsInterface.GetTypeface(fontSize, fontFamily);
             typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
 
@@ -762,7 +752,7 @@ namespace ModengTerm.Terminal
                 ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
                 RollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK),
                 Typeface = typeface,
-                Controller = drawingDocument,
+                GraphicsInterface = graphicsInterface,
                 SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR),
             };
 

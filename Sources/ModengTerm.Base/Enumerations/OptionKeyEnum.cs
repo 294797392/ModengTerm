@@ -218,9 +218,9 @@ namespace ModengTerm.Base.Enumerations
         [EnumDataType(typeof(RenderModeEnum))]
         TERM_ADVANCE_RENDER_MODE = 3001,
         /// <summary>
-        /// 每次16进制输出在新行显示
+        /// 点击即可将光标移动到该位置
         /// </summary>
-        TERM_ADVANCE_RENDER_AT_NEWLINE = 3002,
+        TERM_ADVANCE_CLICK_TO_CURSOR = 3002,
 
         /// <summary>
         /// 是否启用自动完成

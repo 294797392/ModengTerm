@@ -16,9 +16,9 @@ namespace ModengTerm.Document
         public string Name { get; set; }
 
         /// <summary>
-        /// 文档数据模型对应的绘图模型
+        /// 文档的图形接口
         /// </summary>
-        public IDocument Controller { get; set; }
+        public GraphicsInterface GraphicsInterface { get; set; }
 
         /// <summary>
         /// 默认的可视区域行数

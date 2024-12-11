@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.UnitTest.Drawing
 {
-    public class FakeDocumentObject : IDocumentObject
+    public class FakeGIObject : GraphicsObject
     {
         public void Arrange(double x, double y)
         {

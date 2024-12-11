@@ -25,10 +25,6 @@ namespace ModengTerm.Terminal.Renderer
         {
         }
 
-        public override void OnInteractionStateChanged(InteractionStateEnum istate)
-        {
-        }
-
         public override void Release()
         {
         }

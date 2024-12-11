@@ -10,7 +10,7 @@ namespace ModengTerm.ViewModels.CreateSession.TerminalOptions
     {
         #region 实例变量
 
-        private bool displayAtNewLine;
+        private bool clickToCursor;
         private bool autoWrapMode;
         private bool autoCompletionList;
 
@@ -20,15 +20,18 @@ namespace ModengTerm.ViewModels.CreateSession.TerminalOptions
 
         public BindableCollection<RenderModeEnum> RenderModes { get; private set; }
 
-        public bool DisplayAtNewLine
+        /// <summary>
+        /// 点击即可将光标移动到该位置
+        /// </summary>
+        public bool ClickToCursor
         {
-            get { return displayAtNewLine; }
+            get { return clickToCursor; }
             set
             {
-                if (displayAtNewLine != value)
+                if (clickToCursor != value)
                 {
-                    displayAtNewLine = value;
-                    NotifyPropertyChanged("DisplayAtNewLine");
+                    clickToCursor = value;
+                    NotifyPropertyChanged("ClickToCursor");
                 }
             }
         }
@@ -95,7 +98,7 @@ namespace ModengTerm.ViewModels.CreateSession.TerminalOptions
         public override bool SaveOptions(XTermSession session)
         {
             session.SetOption(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, RenderModes.SelectedItem);
-            session.SetOption(OptionKeyEnum.TERM_ADVANCE_RENDER_AT_NEWLINE, this.displayAtNewLine);
+            session.SetOption(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, this.clickToCursor);
             session.SetOption(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, this.autoCompletionList);
             session.SetOption(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, this.autoWrapMode);
 
