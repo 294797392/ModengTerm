@@ -4,8 +4,8 @@ using ModengTerm.Terminal;
 namespace ModengTerm.UnitTest.TestCases
 {
     /// <summary>
-    /// 调用VideoTerminal或者VTDocument的公开接口
-    /// 对VideoTerminal各个功能做测试
+    /// 对VideoTerminal和VTDocument的函数做测试
+    /// 确保每个函数调用完之后结果是正确的
     /// </summary>
     public class TestVideoTerminalEngine
     {
@@ -238,7 +238,19 @@ namespace ModengTerm.UnitTest.TestCases
         /// </summary>
         /// <returns></returns>
         [UnitTest]
-        public bool WindowResize()
+        public bool VideoTerminal_WindowResize()
+        {
+            return false;
+        }
+
+        [UnitTest]
+        public bool VTDocument_SetCursorLogical() 
+        {
+            return false;
+        }
+
+        [UnitTest]
+        public bool VTDocument_SetCursorPhysical() 
         {
             return false;
         }
