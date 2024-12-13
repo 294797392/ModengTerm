@@ -21,14 +21,12 @@ using ModengTerm.Windows.SSH;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Animation;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
@@ -678,6 +676,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void InitializePanelList()
         {
+            // ContextMenu里如果ClassName不为空就说明有一个窗格需要显示
+
             foreach (ContextMenuVM contextMenu in this.ContextMenus)
             {
                 IEnumerable<ContextMenuVM> children = contextMenu.GetChildrenRecursive().Where(v => !string.IsNullOrEmpty(v.ClassName));
@@ -698,7 +698,7 @@ namespace ModengTerm.Terminal.ViewModels
                     child.Parameters[PanelContentVM.KEY_SERVICE_AGENT] = this.ServiceAgent;
                     child.Parameters[PanelContentVM.KEY_XTERM_SESSION] = this.Session;
                     child.OwnerPanel = panelVM;
-                    panelVM.MenuItems.Add(child);
+                    panelVM.AddMenuItem(child);
                 }
             }
         }
@@ -1422,11 +1422,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 // 当前是隐藏状态，显示
                 panelVM.Visible = true;
-                if (panelVM.SelectedMenu != null) 
-                {
-                    panelVM.SelectedMenu.IsSelected = false;
-                }
-                panelVM.SwitchContent(contextMenu);
+                contextMenu.IsSelected = true;
             }
         }
 

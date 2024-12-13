@@ -27,6 +27,12 @@ namespace ModengTerm
     /// </summary>
     public partial class MainWindow : Window
     {
+        #region 类变量
+
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("MainWindow");
+
+        #endregion
+
         #region 实例变量
 
         private OpenedSessionDataTemplateSelector templateSelector;
@@ -487,6 +493,23 @@ namespace ModengTerm
             ThemeManager.ApplyTheme(appTheme.Uri);
         }
 
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            // 此时说明焦点没有在终端上
+
+            // 让当前显示的终端获取焦点
+            ISessionContent content = ContentControlSession.Content as ISessionContent;
+            if (content == null) 
+            {
+                return;
+            }
+
+            if (!content.SetInputFocus()) 
+            {
+                logger.ErrorFormat("设置SessionContent焦点失败");
+            }
+        }
 
 
         #endregion

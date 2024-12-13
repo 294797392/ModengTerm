@@ -22,5 +22,11 @@ namespace ModengTerm
         int Open(OpenedSessionVM sessionVM);
 
         void Close();
+
+        /// <summary>
+        /// 把输入焦点设置到控件上
+        /// </summary>
+        /// <returns></returns>
+        bool SetInputFocus();
     }
 }

@@ -116,7 +116,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             {
                 double processorTime = (source.TotalProcessorTime - previousProcessorTime);
 
-                logger.ErrorFormat("{0}, userProcessorTime = {1}", processorTime, this.TotalProcessorTime);
+                //logger.ErrorFormat("{0}, userProcessorTime = {1}", processorTime, this.TotalProcessorTime);
 
                 target.CpuUsage = Math.Round(processorTime / this.TotalProcessorTime * 100, 2);
             }

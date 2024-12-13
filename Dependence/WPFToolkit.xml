@@ -2358,6 +2358,12 @@
             如果是展开，那么该操作会对上级节点进行递归展开
             </summary>
         </member>
+        <member name="M:WPFToolkit.MVVM.MenuItemVM.AddChild(WPFToolkit.MVVM.MenuItemVM)">
+            <summary>
+            新加一个子节点
+            </summary>
+            <param name="menuItem"></param>
+        </member>
         <member name="T:WPFToolkit.MVVM.MenuDefinition">
             <summary>
             定义配置文件里的菜单模型
@@ -2490,6 +2496,12 @@
             <summary>
             展开所有子节点
             </summary>
+        </member>
+        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.AddMenuItem(`0)">
+            <summary>
+            新加一个子节点
+            </summary>
+            <param name="menuItem"></param>
         </member>
         <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadSubMenus(`0,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
             <summary>

@@ -132,14 +132,14 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)
         {
+            // 1. 不继续传播到TextInput事件
+            // 2. 如果按了Tab或者方向键，焦点不会移动到其他控件上
+            e.Handled = true;
+
             if (e.Key == Key.ImeProcessed)
             {
                 return;
             }
-
-            // 1. 不继续传播到TextInput事件
-            // 2. 如果按了Tab或者方向键，焦点不会移动到其他控件上
-            e.Handled = true;
 
             VTKeys vtKey = VTermUtils.ConvertToVTKey(e.Key);
 
@@ -317,6 +317,11 @@ namespace ModengTerm.UserControls.TerminalUserControls
             this.videoTerminal.OnDocumentChanged -= VideoTerminal_DocumentChanged;
             this.videoTerminal.RequestChangeWindowSize -= VideoTerminal_RequestChangeWindowSize;
             this.videoTerminal = null;
+        }
+
+        public bool SetInputFocus() 
+        {
+            return GridDocument.Focus();
         }
 
         #endregion
