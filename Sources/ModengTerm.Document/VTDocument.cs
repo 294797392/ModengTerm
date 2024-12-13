@@ -5,6 +5,7 @@ using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Media.Animation;
 
 namespace ModengTerm.Document
 {
@@ -21,7 +22,7 @@ namespace ModengTerm.Document
 
         #endregion
 
-        #region 事件处理器
+        #region 公开事件
 
         /// <summary>
         /// 当滚动结束并渲染完毕之后触发
@@ -45,6 +46,11 @@ namespace ModengTerm.Document
         /// </summary>
         public event Action<VTDocument, VTRenderData> Rendering;
 
+        /// <summary>
+        /// 当按下鼠标的时候触发
+        /// </summary>
+        public event Action<VTDocument, MouseData> MouseDown;
+
         #endregion
 
         #region 实例变量
@@ -58,6 +64,9 @@ namespace ModengTerm.Document
         /// 当前鼠标是否处于Selection状态
         /// </summary>
         private bool selectionState;
+        private bool isMouseDown;
+
+        private VTCursor cursor;
 
         #endregion
 
@@ -92,7 +101,6 @@ namespace ModengTerm.Document
         private bool visible = true;
 
         private VTextLine activeLine;
-
         private VTHistory history;
 
         private GraphicsInterface graphicsInterface;
@@ -109,7 +117,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 记录光标信息
         /// </summary>
-        public VTCursor Cursor { get; private set; }
+        public VTCursor Cursor { get { return this.cursor; } }
 
         /// <summary>
         /// 记录文档的选中信息
@@ -249,6 +257,7 @@ namespace ModengTerm.Document
         {
             this.options = options;
             this.Name = options.Name;
+
             this.graphicsInterface = options.GraphicsInterface;
             this.graphicsInterface.GIMouseDown += GraphicsInterface_GIMouseDown;
             this.graphicsInterface.GIMouseUp += GraphicsInterface_GIMouseUp;
@@ -448,14 +457,17 @@ namespace ModengTerm.Document
         /// <param name="documentSize">文档的大小</param>
         /// <param name="scrollData">保存滚动数据</param>
         /// <returns>如果进行了滚动，那么返回滚动数据，如果因为某种原因没进行滚动，那么返回空</returns>
-        private VTScrollData ScrollIfCursorOutsideDocument(VTPoint mousePosition)
+        private VTScrollData ScrollIfCursorOutsideDocument(IMousePosition mousePosition)
         {
+            double mouseX = mousePosition.X;
+            double mouseY = mousePosition.Y;
+
             VTSize displaySize = this.graphicsInterface.DrawAreaSize;
 
             // 要滚动到的目标行
             int scrollTarget = -1;
 
-            if (mousePosition.Y < 0)
+            if (mouseY < 0)
             {
                 // 光标在容器上面
                 if (!ScrollAtTop)
@@ -464,7 +476,7 @@ namespace ModengTerm.Document
                     scrollTarget = Scrollbar.Value - 1;
                 }
             }
-            else if (mousePosition.Y > displaySize.Height)
+            else if (mouseY > displaySize.Height)
             {
                 // 光标在容器下面
                 if (!ScrollAtBottom)
@@ -482,93 +494,6 @@ namespace ModengTerm.Document
             return null;
         }
 
-        /// <summary>
-        /// 使用像素坐标对VTextLine做命中测试
-        /// </summary>
-        /// <param name="mousePosition">鼠标坐标</param>
-        /// <param name="documentSize">文档大小</param>
-        /// <param name="pointer">存储命中测试结果的变量</param>
-        /// <remarks>如果传递进来的鼠标位置在窗口外，那么会把鼠标限定在距离鼠标最近的Surface边缘处</remarks>
-        /// <returns>
-        /// 是否获取成功
-        /// 当光标不在某一行或者不在某个字符上的时候，就获取失败
-        /// </returns>
-        private bool GetTextPointer(VTPoint mousePosition, VTextPointer pointer)
-        {
-            double mouseX = mousePosition.X;
-            double mouseY = mousePosition.Y;
-
-            VTDocument document = this;
-            VTSize displaySize = this.graphicsInterface.DrawAreaSize;
-
-            #region 先计算鼠标位于哪一行上
-
-            VTextLine textLine = null;
-
-            // 逻辑索引，从0开始
-            int logicalRow = 0;
-
-            if (mouseY < 0)
-            {
-                // 光标在画布的上面，那么命中的行数就是第一行
-                textLine = document.FirstLine;
-            }
-            else if (mouseY > displaySize.Height)
-            {
-                // 光标在画布的下面，那么命中的行数是最后一行
-                textLine = document.LastLine;
-                logicalRow = this.viewportRow - 1;
-            }
-            else
-            {
-                // 光标在画布中，那么做命中测试
-                // 找到鼠标所在行
-                textLine = HitTestHelper.HitTestVTextLine(document, mouseY, out logicalRow);
-                if (textLine == null)
-                {
-                    // 这里说明鼠标没有在任何一行上
-                    //logger.WarnFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
-                    return false;
-                }
-            }
-
-            #endregion
-
-            #region 再计算鼠标悬浮于哪个字符上
-
-            int charIndexHit;
-            int columnIndexHit;
-            VTextRange textRange = VTextRange.Empty;
-
-            if (mouseX < 0)
-            {
-                // 鼠标在画布左边，那么悬浮的就是第一个字符
-                charIndexHit = 0;
-                columnIndexHit = 0;
-            }
-
-            if (mouseX > displaySize.Width)
-            {
-                // 鼠标在画布右边，那么悬浮的就是最后一个字符
-                charIndexHit = textLine.Characters.Count - 1;
-                columnIndexHit = this.viewportColumn - 1;
-            }
-            else
-            {
-                // 鼠标的水平方向在画布中间，那么做字符命中测试
-                HitTestHelper.HitTestVTCharacter(textLine, mouseX, out charIndexHit, out textRange, out columnIndexHit);
-            }
-
-            #endregion
-
-            // 命中成功再更新TextPointer，保证pointer不为空
-            pointer.PhysicsRow = logicalRow + this.Scrollbar.Value;
-            pointer.CharacterIndex = charIndexHit;
-            pointer.ColumnIndex = columnIndexHit;
-
-            return true;
-        }
-
         #endregion
 
         #region 公开接口
@@ -580,18 +505,18 @@ namespace ModengTerm.Document
             this.history.MaxHistory = this.options.RollbackMax + this.options.ViewportRow;
             this.history.Initialize();
 
-            Cursor = new VTCursor(this);
-            Cursor.OffsetX = 0;
-            Cursor.OffsetY = 0;
-            Cursor.Row = 0;
-            Cursor.Column = 0;
-            Cursor.Interval = (int)options.CursorSpeed;
-            Cursor.AllowBlink = true;
-            Cursor.IsVisible = true;
-            Cursor.Color = options.CursorColor;
-            Cursor.Style = options.CursorStyle;
-            Cursor.Typeface = options.Typeface;
-            Cursor.Initialize();
+            this.cursor = new VTCursor(this);
+            this.cursor.OffsetX = 0;
+            this.cursor.OffsetY = 0;
+            this.cursor.Row = 0;
+            this.cursor.Column = 0;
+            this.cursor.Interval = (int)options.CursorSpeed;
+            this.cursor.AllowBlink = true;
+            this.cursor.IsVisible = true;
+            this.cursor.Color = options.CursorColor;
+            this.cursor.Style = options.CursorStyle;
+            this.cursor.Typeface = options.Typeface;
+            this.cursor.Initialize();
 
             Selection = new VTextSelection(this);
             Selection.Color = options.SelectionColor;
@@ -625,7 +550,7 @@ namespace ModengTerm.Document
         /// </summary>
         public void Release()
         {
-            Cursor.Release();
+            this.cursor.Release();
             Selection.Release();
             Scrollbar.Release();
 
@@ -792,7 +717,7 @@ namespace ModengTerm.Document
         /// <param name="col"></param>
         public void PrintCharacter(VTCharacter character)
         {
-            this.ActiveLine.PrintCharacter(character, this.Cursor.Column);
+            this.PrintCharacter(character, this.cursor.Column);
         }
 
         /// <summary>
@@ -982,20 +907,15 @@ namespace ModengTerm.Document
         /// <param name="column">要设置的列</param>
         public void SetCursorLogical(int row, int column)
         {
-            if (Cursor.Row != row)
+            // 有可能ActiveLine变了，更新ActiveLine和PhysicsRow
+            this.cursor.Row = row;
+            VTextLine newActiveLine = this.FirstLine.FindNext(row);
+            if (this.activeLine != newActiveLine) 
             {
-                Cursor.Row = row;
-
-                this.Cursor.PhysicsRow = this.Scrollbar.Value + row;
+                this.activeLine = newActiveLine;
             }
-
-            // 有可能ActiveLine变了，更新ActiveLine
-            this.ActiveLine = this.FirstLine.FindNext(row);
-
-            if (Cursor.Column != column)
-            {
-                Cursor.Column = column;
-            }
+            this.cursor.PhysicsRow = this.Scrollbar.Value + row;
+            this.cursor.Column = column;
         }
 
         /// <summary>
@@ -1006,10 +926,10 @@ namespace ModengTerm.Document
         public void SetCursorPhysical(int row)
         {
             // 物理行号没变化，逻辑行号或者ActiveLine会变化（当光标在可视区域内，滚动滚动条）
-            if (this.Cursor.PhysicsRow == row)
+            if (this.cursor.PhysicsRow == row)
             {
                 int logicalRow = row - this.Scrollbar.Value;
-                this.Cursor.Row = logicalRow;
+                this.cursor.Row = logicalRow;
                 this.ActiveLine = this.FirstLine.FindNext(logicalRow);
                 return;
             }
@@ -1022,11 +942,11 @@ namespace ModengTerm.Document
             else
             {
                 int logicalRow = row - this.Scrollbar.Value;
-                this.Cursor.Row = logicalRow;
+                this.cursor.Row = logicalRow;
                 this.ActiveLine = this.FirstLine.FindNext(logicalRow);
             }
 
-            this.Cursor.PhysicsRow = row;
+            this.cursor.PhysicsRow = row;
         }
 
         /// <summary>
@@ -1165,6 +1085,22 @@ namespace ModengTerm.Document
             }
 
             return ScrollToHistory(scrollTo);
+        }
+
+        /// <summary>
+        /// 往下滚动一行
+        /// </summary>
+        public void ScrollDown()
+        {
+            this.ScrollTo(this.Scrollbar.Value + 1);
+        }
+
+        /// <summary>
+        /// 往上滚动一行
+        /// </summary>
+        public void ScrollUp()
+        {
+            this.ScrollTo(this.Scrollbar.Value - 1);
         }
 
         /// <summary>
@@ -1468,7 +1404,7 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 把Viewport里的指定区域里的数据更新到History里
-        /// 只更指定区域里的数据
+        /// 只更指定区域里的数据，包含marginTop和marginBottom两行
         /// </summary>
         /// <param name="marginTop">要更新的区域的MarginTop</param>
         /// <param name="marginBottom">要更新的区域的MarginBottom</param>
@@ -1497,73 +1433,162 @@ namespace ModengTerm.Document
             }
         }
 
+        /// <summary>
+        /// 使用像素坐标对VTextLine做命中测试
+        /// </summary>
+        /// <param name="mousePosition">鼠标坐标</param>
+        /// <param name="pointer">存储命中测试结果的变量</param>
+        /// <remarks>如果传递进来的鼠标位置在窗口外，那么会把鼠标限定在距离鼠标最近的Surface边缘处</remarks>
+        /// <returns>
+        /// 是否获取成功
+        /// 当光标不在任何一行上的时候，就获取失败
+        /// </returns>
+        public bool HitTest(IMousePosition mousePosition, VTextPointer pointer)
+        {
+            double mouseX = mousePosition.X;
+            double mouseY = mousePosition.Y;
+
+            VTDocument document = this;
+            VTSize displaySize = this.graphicsInterface.DrawAreaSize;
+
+            #region 先计算鼠标位于哪一行上
+
+            VTextLine textLine = null;
+
+            // 逻辑索引，从0开始
+            int logicalRow = 0;
+
+            if (mouseY < 0)
+            {
+                // 光标在画布的上面，那么命中的行数就是第一行
+                textLine = document.FirstLine;
+            }
+            else if (mouseY > displaySize.Height)
+            {
+                // 光标在画布的下面，那么命中的行数是最后一行
+                textLine = document.LastLine;
+                logicalRow = this.viewportRow - 1;
+            }
+            else
+            {
+                // 光标在画布中，那么做命中测试
+                // 找到鼠标所在行
+                textLine = HitTestHelper.HitTestVTextLine(document, mouseY, out logicalRow);
+                if (textLine == null)
+                {
+                    // 这里说明鼠标没有在任何一行上
+                    //logger.WarnFormat("没有找到鼠标位置对应的行, cursorY = {0}", mouseY);
+                    return false;
+                }
+            }
+
+            #endregion
+
+            #region 再计算鼠标悬浮于哪个字符上
+
+            int charIndexHit;
+            int columnIndexHit;
+            VTextRange textRange = VTextRange.Empty;
+
+            if (mouseX < 0)
+            {
+                // 鼠标在画布左边，那么悬浮的就是第一个字符
+                charIndexHit = 0;
+                columnIndexHit = 0;
+            }
+            else if (mouseX > displaySize.Width)
+            {
+                // 鼠标在画布右边，那么悬浮的就是最后一个字符
+                charIndexHit = textLine.Characters.Count - 1;
+                columnIndexHit = this.viewportColumn - 1;
+            }
+            else
+            {
+                // 鼠标的水平方向在画布中间，那么做字符命中测试
+                HitTestHelper.HitTestVTCharacter(textLine, mouseX, out charIndexHit, out textRange, out columnIndexHit);
+            }
+
+            #endregion
+
+            // 命中成功再更新TextPointer，保证pointer不为空
+            pointer.PhysicsRow = logicalRow + this.Scrollbar.Value;
+            pointer.CharacterIndex = charIndexHit;
+            pointer.ColumnIndex = columnIndexHit;
+
+            return true;
+        }
+
         #endregion
 
         #region 事件处理器
 
         private void GraphicsInterface_GIMouseMove(GraphicsInterface graphicsInterface, MouseData mouseData)
         {
-            if (!this.graphicsInterface.GIMouseCaptured)
+            if (this.isMouseDown)
             {
-                return;
-            }
-
-            // 整体思路是算出来StartTextPointer和EndTextPointer之间的几何图形
-            // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
-
-            if (!selectionState)
-            {
-                // 此时说明开始选中操作
-                selectionState = true;
-                Selection.Clear();
-            }
-
-            VTPoint mouseLocation = new VTPoint(mouseData.X, mouseData.Y);
-
-            // 如果还没有测量起始字符，那么测量起始字符
-            if (startPointer.ColumnIndex == -1)
-            {
-                if (!GetTextPointer(mouseLocation, startPointer))
+                if (!this.graphicsInterface.GIMouseCaptured)
                 {
-                    // 没有命中起始字符，那么直接返回啥都不做
-                    //logger.DebugFormat("没命中起始字符");
+                    this.graphicsInterface.GICaptureMouse();
+                }
+
+                // 整体思路是算出来StartTextPointer和EndTextPointer之间的几何图形
+                // 然后渲染几何图形，SelectionRange本质上就是一堆矩形
+
+                if (!selectionState)
+                {
+                    // 此时说明开始选中操作
+                    selectionState = true;
+                    Selection.Clear();
+                }
+
+                // 如果还没有测量起始字符，那么测量起始字符
+                if (startPointer.ColumnIndex == -1)
+                {
+                    if (!HitTest(mouseData, startPointer))
+                    {
+                        // 没有命中起始字符，那么直接返回啥都不做
+                        //logger.DebugFormat("没命中起始字符");
+                        return;
+                    }
+                }
+
+                // 首先检测鼠标是否在Surface边界框的外面
+                // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
+                VTScrollData scrollData = ScrollIfCursorOutsideDocument(mouseData);
+
+                // 更新当前鼠标的命中信息，保存在endPointer里
+                if (!HitTest(mouseData, endPointer))
+                {
+                    // 命中失败，不更新
                     return;
                 }
-            }
 
-            // 首先检测鼠标是否在Surface边界框的外面
-            // 如果在Surface的外面并且行数超出了Surface可以显示的最多行数，那么根据鼠标方向进行滚动，每次滚动一行
-            VTScrollData scrollData = ScrollIfCursorOutsideDocument(mouseLocation);
-
-            // 更新当前鼠标的命中信息，保存在endPointer里
-            if (!GetTextPointer(mouseLocation, endPointer))
-            {
-                // 命中失败，不更新
-                return;
-            }
-
-            // 此时说明文档被滚动了，需要全部渲染。显示滚动后的数据
-            if (scrollData != null)
-            {
-                this.RequestInvalidate();
-                this.InvokeScrollChanged(scrollData);
-            }
-            else
-            {
-                // 此时只需要渲染选中区域
-                this.Selection.UpdateGeometry();
-                this.Selection.RequestInvalidate();
+                // 此时说明文档被滚动了，需要全部渲染。显示滚动后的数据
+                if (scrollData != null)
+                {
+                    this.RequestInvalidate();
+                    this.InvokeScrollChanged(scrollData);
+                }
+                else
+                {
+                    // 此时只需要渲染选中区域
+                    this.Selection.UpdateGeometry();
+                    this.Selection.RequestInvalidate();
+                }
             }
         }
 
         private void GraphicsInterface_GIMouseUp(GraphicsInterface graphicsInterface, MouseData mouseData)
         {
-            selectionState = false;
+            this.isMouseDown = false;
+            this.selectionState = false;
             this.graphicsInterface.GIRleaseMouseCapture();
         }
 
         private void GraphicsInterface_GIMouseDown(GraphicsInterface graphicsInterface, MouseData mouseData)
         {
+            this.MouseDown?.Invoke(this, mouseData);
+
             if (mouseData.ClickCount == 1)
             {
                 if (!Selection.IsEmpty)
@@ -1574,7 +1599,7 @@ namespace ModengTerm.Document
                     selectionState = false;
                 }
 
-                this.graphicsInterface.GICaptureMouse();
+                this.isMouseDown = true;
             }
             else
             {

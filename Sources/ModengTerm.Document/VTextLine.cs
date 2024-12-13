@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Documents;
@@ -119,8 +120,12 @@ namespace ModengTerm.Document
         /// <summary>
         /// 获取该文本行相对于渲染区域的位置信息
         /// 在渲染完之后更新
+        /// TODO：删除，因为每次都会new VTRect，使用Top，Bottom，Left，Right代替
         /// </summary>
         public VTRect Bounds { get { return new VTRect(OffsetX, OffsetY, Width, Height); } }
+
+        public double Top { get { return this.OffsetY; } }
+        public double Bottom { get { return this.OffsetY + this.Height; } }
 
         /// <summary>
         /// 文本样式

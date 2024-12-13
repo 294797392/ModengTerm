@@ -30,11 +30,8 @@ namespace ModengTerm.Document
 
             while (current != null)
             {
-                // 当前行的边界框信息
-                VTRect lineBounds = current.Bounds;
-
                 // 判断鼠标的Y坐标是否在边界框内
-                if (lineBounds.Top <= cursorY && lineBounds.Bottom >= cursorY)
+                if (current.Top <= cursorY && current.Bottom >= cursorY)
                 {
                     // 此时说明找到了鼠标所在行
                     return current;
@@ -49,7 +46,6 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 根据X坐标找到该坐标下的字符的边界框信息
-        /// 因为字符与字符之间有间隙，如果在测量的时候cursorX刚好在两个字符的间隙里，那么此时返回false
         /// </summary>
         /// <param name="textLine">要做字符命中测试的行</param>
         /// <param name="cursorX">要做命中测试的X偏移量</param>

@@ -704,8 +704,7 @@ namespace ModengTerm.UnitTest.TestCases
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
 
-            List<string> textLines = UnitTestHelper.BuildTextLines(9);
-            UnitTestHelper.DrawTextLines(terminal, textLines);
+            invoker.PrintLines(9);
 
             /* 从第2行开始删除，删除2行，然后比对可视区域内容 */
 

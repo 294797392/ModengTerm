@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ModengTerm.UnitTest.Drawing
 {
@@ -16,12 +17,25 @@ namespace ModengTerm.UnitTest.Drawing
 
         public bool Visible { get; set; }
 
-        public VTSize DrawAreaSize { get; set; }
+        public VTSize DrawAreaSize 
+        {
+            get;set;
+        }
+
+        public bool GIMouseCaptured => false;
 
         public FakeGI()
         {
             Scrollbar = new FakeScrollbar();
+            this.DrawAreaSize = new VTSize(1000, 1000);
         }
+
+        public event Action<GraphicsInterface, MouseData> GIMouseDown;
+        public event Action<GraphicsInterface, MouseData> GIMouseUp;
+        public event Action<GraphicsInterface, MouseData> GIMouseMove;
+        public event Action<GraphicsInterface, MouseWheelData> GIMouseWheel;
+        public event Action<GraphicsInterface> GILoaded;
+        public event Action<GraphicsInterface, ScrollChangedData> GIScrollChanged;
 
         public GraphicsObject CreateDrawingObject()
         {
@@ -43,6 +57,20 @@ namespace ModengTerm.UnitTest.Drawing
 
         public void SetPadding(double padding)
         {
+        }
+
+        public bool GICaptureMouse()
+        {
+            return false;
+        }
+
+        public void GIRleaseMouseCapture()
+        {
+        }
+
+        public void RaiseMouseDown(MouseData mouseData) 
+        {
+            this.GIMouseDown?.Invoke(this, mouseData);
         }
     }
 }

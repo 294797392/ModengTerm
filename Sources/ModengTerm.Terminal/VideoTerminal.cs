@@ -1,5 +1,4 @@
-﻿using DotNEToolkit;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -7,19 +6,11 @@ using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
-using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection.Metadata;
 using System.Text;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Terminal
@@ -203,6 +194,9 @@ namespace ModengTerm.Terminal
 
         private BellPlayer bellPlayer;
 
+        private bool clickToCursor;
+        private VTextPointer textPointer;
+
         #endregion
 
         #region 属性
@@ -341,12 +335,9 @@ namespace ModengTerm.Terminal
             #endregion
 
             this.bellPlayer = VTermApp.Context.Factory.LookupModule<BellPlayer>();
-
-            // DECAWM
-            this.autoWrapMode = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true);
+            this.textPointer = new VTextPointer();
 
             // 初始化变量
-
             isRunning = true;
 
             sessionTransport = options.SessionTransport;
@@ -358,6 +349,8 @@ namespace ModengTerm.Terminal
             colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE);
             foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
             backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            this.autoWrapMode = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true); // DECAWM
+            this.clickToCursor = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, false);
 
             #region 初始化数据解析器
 
@@ -383,6 +376,7 @@ namespace ModengTerm.Terminal
 
             VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
             this.mainDocument = new VTDocument(mainOptions);
+            this.mainDocument.MouseDown += MainDocument_MouseDown;
             this.mainDocument.Initialize();
             this.mainDocument.History.Add(this.mainDocument.FirstLine.History);
 
@@ -641,7 +635,11 @@ namespace ModengTerm.Terminal
             // 执行动作之前先把光标滚动到可视区域内
             if (!this.IsAlternate)
             {
-                this.ScrollToBottom(document);
+                VTCursor cursor = document.Cursor;
+                if (document.OutsideViewport(cursor.PhysicsRow))
+                {
+                    document.ScrollTo(cursor.PhysicsRow);
+                }
             }
 
             //Stopwatch stopwatch = new Stopwatch();
@@ -753,7 +751,7 @@ namespace ModengTerm.Terminal
                 RollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK),
                 Typeface = typeface,
                 GraphicsInterface = graphicsInterface,
-                SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR),
+                SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR)
             };
 
             return documentOptions;
@@ -2213,8 +2211,8 @@ namespace ModengTerm.Terminal
         // 换行和反向换行
         internal void LineFeed()
         {
-            int oldRow = this.CursorRow;
-            int oldCol = this.CursorCol;
+            int oldCursorRow = this.CursorRow;
+            int oldCursorCol = this.CursorCol;
 
             // LF
             // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
@@ -2227,6 +2225,7 @@ namespace ModengTerm.Terminal
             VTDocument document = this.activeDocument;
             VTScrollInfo scrollInfo = document.Scrollbar;
             VTCursor cursor = document.Cursor;
+            VTHistory history = document.History;
 
             // 可滚动区域的第一行和最后一行
             int scrollRegionTop = document.ScrollMarginTop;
@@ -2234,10 +2233,7 @@ namespace ModengTerm.Terminal
             VTextLine head = document.FirstLine.FindNext(scrollRegionTop);
             VTextLine last = document.LastLine.FindPrevious(scrollRegionBottom);
             bool hasScrollMargin = last != document.LastLine;
-
-            VTHistory history = document.History;
-
-            int oldPhysicsRow = document.Cursor.PhysicsRow;
+            int oldPhysicsRow = cursor.PhysicsRow;
 
             // 光标所在行是可滚动区域的最后一行
             // 也表示即将滚动
@@ -2276,47 +2272,70 @@ namespace ModengTerm.Terminal
                     }
                     else
                     {
-                        if (scrollInfo.Maximum < document.RollbackMax)
+                        // 滚动到底了并且没有ScrollMargin
+
+                        // 如果滚动条没滚动到底，说明下面的行可以继续使用
+                        if (!scrollInfo.ScrollAtBottom)
                         {
-                            int scrollMax = scrollInfo.Maximum + 1;
-                            // 更新滚动条的值
-                            // 滚动条滚动到底
-                            // 计算滚动条可以滚动的最大值
-                            scrollInfo.Maximum = scrollMax;
-                            scrollInfo.Value = scrollMax;
-
-                            // 设置光标所在物理行号并更新ActiveLine
-                            document.SetCursorPhysical(oldPhysicsRow + 1);
-
-                            VTextLine newActiveLine = document.ActiveLine;
-
-                            // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
-                            // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
+                            scrollInfo.Value += 1;
+                            document.SetCursorLogical(oldCursorRow, oldCursorCol);
                             VTHistoryLine historyLine;
-                            if (!history.TryGetHistory(cursor.PhysicsRow, out historyLine))
+                            if (history.TryGetHistory(cursor.PhysicsRow, out historyLine))
                             {
-                                // 为新的ActiveLine创建一个新的VTHistoryLine
-                                historyLine = new VTHistoryLine();
-                                newActiveLine.SetHistory(historyLine);
-                                history.Add(historyLine);
+                                document.LastLine.SetHistory(historyLine);
                             }
                             else
                             {
-                                // newActiveLine和HistoryLine可能不匹配
-                                // 所以在这里强制重新更新一下光标所在行的历史记录
-                                newActiveLine.SetHistory(historyLine);
+                                // 不知道这是什么情况...
+                                logger.FatalFormat("LineFeed FatalError");
                             }
                         }
                         else
                         {
-                            // 历史记录已经超出了设定的行数了
-                            // 此时最后一行的物理行号不变，需要更新ActiveLine
-                            document.SetCursorPhysical(document.Cursor.PhysicsRow);
+                            if (scrollInfo.Maximum < document.RollbackMax)
+                            {
+                                // 历史记录没有超出设定的行数
 
-                            VTextLine newActiveLine = document.ActiveLine;
-                            VTHistoryLine historyLine = new VTHistoryLine();
-                            newActiveLine.SetHistory(historyLine);
-                            history.Add(historyLine);
+                                int scrollMax = scrollInfo.Maximum + 1;
+                                // 更新滚动条的值
+                                // 滚动条滚动到底
+                                // 计算滚动条可以滚动的最大值
+                                scrollInfo.Maximum = scrollMax;
+                                scrollInfo.Value = scrollMax;
+
+                                // 设置光标所在物理行号并更新ActiveLine
+                                document.SetCursorPhysical(oldPhysicsRow + 1);
+
+                                VTextLine newActiveLine = document.ActiveLine;
+
+                                // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
+                                // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
+                                VTHistoryLine historyLine;
+                                if (!history.TryGetHistory(cursor.PhysicsRow, out historyLine))
+                                {
+                                    // 为新的ActiveLine创建一个新的VTHistoryLine
+                                    historyLine = new VTHistoryLine();
+                                    newActiveLine.SetHistory(historyLine);
+                                    history.Add(historyLine);
+                                }
+                                else
+                                {
+                                    // newActiveLine和HistoryLine可能不匹配
+                                    // 所以在这里强制重新更新一下光标所在行的历史记录
+                                    newActiveLine.SetHistory(historyLine);
+                                }
+                            }
+                            else
+                            {
+                                // 历史记录已经超出了设定的行数了
+                                // 此时最后一行的物理行号不变，需要更新ActiveLine
+                                document.SetCursorPhysical(document.Cursor.PhysicsRow);
+
+                                VTextLine newActiveLine = document.ActiveLine;
+                                VTHistoryLine historyLine = new VTHistoryLine();
+                                newActiveLine.SetHistory(historyLine);
+                                history.Add(historyLine);
+                            }
                         }
                     }
                 }
@@ -2362,14 +2381,14 @@ namespace ModengTerm.Terminal
             int newRow = this.CursorRow;
             int newCol = this.CursorCol;
 
-            VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
+            VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldCursorRow, oldCursorCol, newRow, newCol);
         }
 
         private void RI_ReverseLineFeed()
         {
             int oldRow = this.CursorRow;
             int oldCol = this.CursorCol;
-            
+
             // 和LineFeed相反，把光标所在行向上移动一行
             // 在用man命令的时候往上滚动会触发这个指令
             // 反向换行 – 执行\n的反向操作，将光标所在行向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
@@ -3002,6 +3021,37 @@ namespace ModengTerm.Terminal
         #endregion
 
         #region 事件处理器
+
+        private void MainDocument_MouseDown(VTDocument document, MouseData mouseData)
+        {
+            if (this.clickToCursor)
+            {
+                VTScrollInfo scrollInfo = document.Scrollbar;
+                VTCursor cursor = document.Cursor;
+                VTHistory history = document.History;
+
+                if (document.HitTest(mouseData, this.textPointer))
+                {
+                    int physicsRow = this.textPointer.PhysicsRow;
+                    int row = physicsRow - scrollInfo.Value;
+                    int col = this.textPointer.ColumnIndex;
+                    document.SetCursorLogical(row, col);
+                    cursor.Reposition();
+
+                    if (physicsRow > history.Lines - 1)
+                    {
+                        // 缺少的历史行数
+                        int adds = physicsRow - (history.Lines - 1);
+                        VTextLine textLine = document.ActiveLine.FindPrevious(adds - 1);
+                        for (int i = 0; i < adds; i++)
+                        {
+                            history.Add(textLine.History);
+                            textLine = textLine.NextLine;
+                        }
+                    }
+                }
+            }
+        }
 
         #endregion
     }

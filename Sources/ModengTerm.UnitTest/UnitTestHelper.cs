@@ -129,6 +129,43 @@ namespace ModengTerm.UnitTest
             return true;
         }
 
+        /// <summary>
+        /// 文档的可视区域和历史记录做比对
+        /// </summary>
+        /// <param name="history">要比对的历史记录</param>
+        /// <param name="startHistoryRow">从历史记录的第几行开始比对</param>
+        /// <param name="startLine">要比对的第一行VTextLine</param>
+        /// <param name="compareRows">最多比对多少行</param>
+        /// <returns></returns>
+        public static bool CompareHistory(VTHistory history, int startHistoryRow, VTextLine startLine, int compareRows)
+        {
+            int leftRows = compareRows;
+            int historyRow = startHistoryRow;
+            VTextLine current = startLine;
+
+            while (leftRows > 0) 
+            {
+                VTHistoryLine historyLine;
+                if (!history.TryGetHistory(historyRow, out historyLine)) 
+                {
+                    logger.Error("{F6AB3D10-DF14-42FB-A8D1-F0AA04463C26}");
+                    return false;
+                }
+
+                if (historyLine != current.History)
+                {
+                    logger.Error("{F1022064-A12D-42CC-983C-1C499916AFE2}");
+                    return false;
+                }
+
+                current = current.NextLine;
+                historyRow++;
+                leftRows--;
+            }
+
+            return true;
+        }
+
         public static bool CompareList(List<string> textLines1, List<string> textLines2)
         {
             if (textLines1.Count != textLines2.Count)
@@ -183,6 +220,7 @@ namespace ModengTerm.UnitTest
 
             VideoTerminal terminal = new VideoTerminal();
             terminal.Initialize(options);
+
             return terminal;
         }
 

@@ -1,6 +1,9 @@
-﻿using ModengTerm.Terminal;
+﻿using ModengTerm.Document;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
+using ModengTerm.UnitTest.Drawing;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace ModengTerm.UnitTest
@@ -19,12 +22,22 @@ namespace ModengTerm.UnitTest
             this.videoTerminal = videoTerminal;
         }
 
-        private void ProcessCtlseq(string ctlseq) 
+        private void ProcessCtlseq(string ctlseq)
         {
             byte[] bytes = ctlseq.Select(v => Convert.ToByte(v)).ToArray();
             this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
+        /// <summary>
+        /// 每行打印一个数字，从1开始
+        /// </summary>
+        /// <param name="rows">一共要打印多少行</param>
+        /// <returns></returns>
+        public void PrintLines(int rows)
+        {
+            List<string> textLines = UnitTestHelper.BuildTextLines(rows);
+            UnitTestHelper.DrawTextLines(this.videoTerminal, textLines);
+        }
 
         public void Print(char c)
         {
@@ -113,7 +126,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(v.ToString()));
             bytes.Add((byte)'J');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count); 
+            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
         public void EL_EraseLine(VTEraseType eraseType)
@@ -150,6 +163,12 @@ namespace ModengTerm.UnitTest
         public void CRLF()
         {
             byte[] bytes = new byte[] { (byte)'\r', (byte)'\n' };
+            this.videoTerminal.ProcessData(bytes, bytes.Length);
+        }
+
+        public void LF_FF_VT()
+        {
+            byte[] bytes = new byte[] { (byte)'\n' };
             this.videoTerminal.ProcessData(bytes, bytes.Length);
         }
 
@@ -231,7 +250,7 @@ namespace ModengTerm.UnitTest
             this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public void CHA_CursorHorizontalAbsolute(int col) 
+        public void CHA_CursorHorizontalAbsolute(int col)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
@@ -241,7 +260,7 @@ namespace ModengTerm.UnitTest
             this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
         }
 
-        public void VPA_VerticalLinePositionAbsolute(int row) 
+        public void VPA_VerticalLinePositionAbsolute(int row)
         {
             List<byte> bytes = new List<byte>();
             bytes.Add(ESC);
@@ -255,6 +274,16 @@ namespace ModengTerm.UnitTest
         {
             string ctlseq = "\x1b[48;5;10;38;5;16m";
             this.ProcessCtlseq(ctlseq);
+        }
+
+        public void SimulateMouseDown(int rowIndex)
+        {
+            int row = rowIndex + 1;
+
+            VTDocument document = this.videoTerminal.MainDocument;
+            double mouseY = document.Typeface.Height * row - 3;
+            FakeGI gi = document.GraphicsInterface as FakeGI;
+            gi.RaiseMouseDown(new MouseData() { ClickCount = 1, X = 10, Y = mouseY });
         }
     }
 }

@@ -12,7 +12,14 @@ namespace ModengTerm.Document
         public int Delta { get; set; }
     }
 
-    public class MouseData
+    public interface IMousePosition
+    {
+        double X { get; set; }
+
+        double Y { get; set; }
+    }
+
+    public class MouseData : IMousePosition
     {
         /// <summary>
         /// 鼠标的X坐标
