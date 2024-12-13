@@ -73,7 +73,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ListBoxMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ContextMenuVM selectedItem = ListBoxMenus.SelectedItem as ContextMenuVM;
+            PanelItemVM selectedItem = ListBoxMenus.SelectedItem as PanelItemVM;
             if (selectedItem == null) 
             {
                 return;
@@ -87,7 +87,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
             ContentControl1.Content = this.PanelVM.CurrentContent;
             TextBlockTitle.Text = selectedItem.Name;
-            this.PanelVM.SelectionChangedDelegate(this.PanelVM, e.RemovedItems.Count > 0 ? e.RemovedItems[0] as ContextMenuVM : null, e.AddedItems[0] as ContextMenuVM);
+            this.PanelVM.SelectionChangedDelegate(this.PanelVM, e.RemovedItems.Count > 0 ? e.RemovedItems[0] as PanelItemVM : null, e.AddedItems[0] as PanelItemVM);
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)

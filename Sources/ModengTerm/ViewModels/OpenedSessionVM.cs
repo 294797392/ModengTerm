@@ -3,7 +3,10 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents.DocumentStructures;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
@@ -13,6 +16,19 @@ namespace ModengTerm.ViewModels
     /// </summary>
     public abstract class OpenedSessionVM : SessionItemVM
     {
+        private class MenuItem
+        {
+            public string ParentID { get; private set; }
+
+            public ContextMenuDefinition MenuDefinition { get; private set; }
+
+            public MenuItem(string parentID, ContextMenuDefinition menuDefinition)
+            {
+                this.ParentID = parentID;
+                this.MenuDefinition = menuDefinition;
+            }
+        }
+
         #region 公开事件
 
         /// <summary>
@@ -74,10 +90,14 @@ namespace ModengTerm.ViewModels
         public ServiceAgent ServiceAgent { get; set; }
 
         /// <summary>
-        /// 该会话的上下文菜单
-        /// 标题菜单和右键菜单（如果有的话）
+        /// 该会话的右键菜单
         /// </summary>
         public BindableCollection<ContextMenuVM> ContextMenus { get; private set; }
+
+        /// <summary>
+        /// 该会话的标题菜单
+        /// </summary>
+        public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
 
         #endregion
 
@@ -95,7 +115,13 @@ namespace ModengTerm.ViewModels
         public int Open()
         {
             this.ContextMenus = new BindableCollection<ContextMenuVM>();
-            this.ContextMenus.AddRange(this.OnCreateContextMenu());
+            this.TitleMenus = new BindableCollection<ContextMenuVM>();
+
+            List<ContextMenuDefinition> menuDefinitions = this.OnCreateContextMenu();
+            List<MenuItem> titleMenuItems = menuDefinitions.Select(v => new MenuItem(v.TitleParentID, v)).ToList();
+            this.InitializeMenuVM(titleMenuItems, this.TitleMenus);
+            List<MenuItem> contextMenuItems = menuDefinitions.Select(v => new MenuItem(v.ContextParentID, v)).ToList();
+            this.InitializeMenuVM(contextMenuItems, this.ContextMenus);
 
             return this.OnOpen();
         }
@@ -126,11 +152,48 @@ namespace ModengTerm.ViewModels
         /// 创建该会话的上下文菜单
         /// </summary>
         /// <returns></returns>
-        protected abstract List<ContextMenuVM> OnCreateContextMenu();
+        protected abstract List<ContextMenuDefinition> OnCreateContextMenu();
 
         #endregion
 
         #region 实例方法
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="map">ParentID -> ContextMenuDefinition</param>
+        /// <param name="menus"></param>
+        private void InitializeMenuVM(List<MenuItem> menuItems, BindableCollection<ContextMenuVM> menus)
+        {
+            Dictionary<string, ContextMenuVM> menuCaches = new Dictionary<string, ContextMenuVM>();
+
+            foreach (ContextMenuDefinition menuDefinition in menuItems.Select(v => v.MenuDefinition))
+            {
+                ContextMenuVM contextMenuVM = new ContextMenuVM(menuDefinition);
+                menuCaches.Add(menuDefinition.ID, contextMenuVM);
+            }
+
+            foreach (MenuItem menuItem in menuItems)
+            {
+                string menuId = menuItem.MenuDefinition.ID;
+
+                ContextMenuVM contextMenuVM = menuCaches[menuId];
+
+                string parentID = menuItem.ParentID;
+
+                if (string.IsNullOrWhiteSpace(parentID))
+                {
+                    // 根节点
+                    menus.Add(contextMenuVM);
+                }
+                else
+                {
+                    // 子节点
+                    ContextMenuVM parentVM = menuCaches[parentID];
+                    parentVM.Children.Add(contextMenuVM);
+                }
+            }
+        }
 
         protected void NotifyStatusChanged(SessionStatusEnum status)
         {

@@ -154,7 +154,7 @@ namespace ModengTerm
         private void OpenedSessionsVM_OnSessionOpened(OpenedSessionsVM arg1, OpenedSessionVM openedSession)
         {
             this.mainWindowVM.TitleMenus.Clear();
-            this.mainWindowVM.TitleMenus.AddRange(openedSession.ContextMenus);
+            this.mainWindowVM.TitleMenus.AddRange(openedSession.TitleMenus);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -210,9 +210,9 @@ namespace ModengTerm
             if (selectedSession is OpenedSessionVM)
             {
                 OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
-                if (openedSessionVM.ContextMenus != null)
+                if (openedSessionVM.TitleMenus != null)
                 {
-                    this.mainWindowVM.TitleMenus.AddRange(openedSessionVM.ContextMenus);
+                    this.mainWindowVM.TitleMenus.AddRange(openedSessionVM.TitleMenus);
                 }
             }
         }

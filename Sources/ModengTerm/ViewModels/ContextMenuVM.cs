@@ -1,12 +1,76 @@
 ﻿using ModengTerm.ViewModels.Terminals;
-using System;
 using System.Collections.Generic;
-using System.Security.RightsManagement;
-using System.Windows.Documents;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
 {
+    public class ContextMenuDefinition
+    {
+        /// <summary>
+        /// 菜单ID
+        /// </summary>
+        public string ID { get; set; }
+
+        /// <summary>
+        /// 父菜单的ID
+        /// 如果为空表示没有父菜单
+        /// </summary>
+        public string TitleParentID { get; set; }
+
+        /// <summary>
+        /// 右键菜单的ParentID
+        /// </summary>
+        public string ContextParentID { get; set; }
+
+        public string Name { get; set; }
+
+        public string ClassName { get; set; }
+
+        public string VMClassName { get; set; }
+
+        public ContextMenuDelegate Callback { get; set; }
+
+        /// <summary>
+        /// 如果这个菜单需要显示界面，PanelID指定界面显示在哪个Panel里
+        /// </summary>
+        public string PanelID { get; set; }
+
+        public ContextMenuDefinition(string id, string name)
+        {
+            this.ID = id;
+            this.Name = name;
+        }
+
+        public ContextMenuDefinition(string id, string titleParentID, string contextParentID, string name)
+        {
+            this.ID = id;
+            this.TitleParentID = titleParentID;
+            this.ContextParentID = contextParentID;
+            this.Name = name;
+        }
+
+        public ContextMenuDefinition(string id, string titleParentID, string contextParentID, string name, ContextMenuDelegate callback)
+        {
+            this.ID = id;
+            this.TitleParentID = titleParentID;
+            this.ContextParentID = contextParentID;
+            this.Name = name;
+            this.Callback = callback;
+        }
+
+        public ContextMenuDefinition(string id, string titleParentID, string contextParentID, string name, string className, string vmClassName, string panelID, ContextMenuDelegate callback)
+        {
+            this.ID = id;
+            this.TitleParentID = titleParentID;
+            this.ContextParentID = contextParentID;
+            this.Name = name;
+            this.ClassName = className;
+            this.VMClassName = vmClassName;
+            this.Callback = callback;
+            this.PanelID = panelID;
+        }
+    }
+
     /// <summary>
     /// 当点击Shell会话菜单的时候触发的回调
     /// </summary>
@@ -16,7 +80,7 @@ namespace ModengTerm.ViewModels
     /// 标题栏菜单ViewModel
     /// 同时也是侧边栏窗格的ViewModel
     /// </summary>
-    public class ContextMenuVM : MenuItemVM
+    public class ContextMenuVM : ItemViewModel
     {
         #region 实例变量
 
@@ -30,7 +94,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 子菜单列表
         /// </summary>
-        public BindableCollection<ContextMenuVM> Children { get; set; }
+        public BindableCollection<ContextMenuVM> Children { get; private set; }
 
         /// <summary>
         /// 是否可以勾选
@@ -53,10 +117,9 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public string PanelId { get; private set; }
 
-        /// <summary>
-        /// 作为侧边栏窗格的ViewModel，它所属的侧边栏窗格容器
-        /// </summary>
-        public PanelVM OwnerPanel { get; set; }
+        public string ClassName { get; set; }
+
+        public string VMClassName { get; set; }
 
         #endregion
 
@@ -64,33 +127,18 @@ namespace ModengTerm.ViewModels
 
         public ContextMenuVM()
         {
+            this.Children = new BindableCollection<ContextMenuVM>();
         }
 
-        public ContextMenuVM(string name)
+        public ContextMenuVM(ContextMenuDefinition definition)
         {
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = name;
-        }
-
-        public ContextMenuVM(string name, ContextMenuDelegate execute)
-        {
-            this.ID = Guid.NewGuid().ToString();
-            this.Name = name;
-            this.executeDelegate = execute;
-        }
-
-        public ContextMenuVM(string name, ContextMenuDelegate execute, bool canChecked) :
-            this(name, execute)
-        {
-            this.canChecked = canChecked;
-        }
-
-        public ContextMenuVM(string name, ContextMenuDelegate execute, string entryClass, string vmClassEntry, string panelId) :
-            this(name, execute, true)
-        {
-            this.ClassName = entryClass;
-            this.VMClassName = vmClassEntry;
-            this.PanelId = panelId;
+            this.ID = definition.ID;
+            this.Name = definition.Name;
+            this.ClassName = definition.ClassName;
+            this.VMClassName = definition.VMClassName;
+            this.PanelId = definition.PanelID;
+            this.executeDelegate = definition.Callback;
+            this.Children = new BindableCollection<ContextMenuVM>();
         }
 
         #endregion
@@ -116,6 +164,9 @@ namespace ModengTerm.ViewModels
 
         #region 公开接口
 
+        /// <summary>
+        /// 当点击菜单的时候执行
+        /// </summary>
         public void Execute()
         {
             if (this.executeDelegate == null)

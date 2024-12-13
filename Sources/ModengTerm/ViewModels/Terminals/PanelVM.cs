@@ -8,30 +8,12 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals
 {
-    public enum PanelContentTypeEnum
+    public class PanelItemVM : MenuItemVM
     {
-        /// <summary>
-        /// 资源管理器
-        /// </summary>
-        ResourceManager,
-
-        /// <summary>
-        /// 快捷命令输入窗格
-        /// </summary>
-        QuickCommand,
-
-        /// <summary>
-        /// 进程管理
-        /// </summary>
-        ProcessManager,
-
-        /// <summary>
-        /// 系统监控
-        /// </summary>
-        SystemWatch
+        public PanelVM OwnerPanel { get; set; }
     }
 
-    public class PanelVM : AbstractMenuVM<ContextMenuVM>
+    public class PanelVM : AbstractMenuVM<PanelItemVM>
     {
         /// <summary>
         /// 用户手动关闭的时候触发
@@ -41,7 +23,7 @@ namespace ModengTerm.ViewModels.Terminals
         /// <summary>
         /// 用户手动切换内容的时候触发
         /// </summary>
-        public Action<PanelVM, ContextMenuVM, ContextMenuVM> SelectionChangedDelegate { get; set; }
+        public Action<PanelVM, PanelItemVM, PanelItemVM> SelectionChangedDelegate { get; set; }
 
         #region 实例变量
 

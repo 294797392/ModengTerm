@@ -407,73 +407,38 @@ namespace ModengTerm.Terminal.ViewModels
             this.isRunning = false;
         }
 
-        protected override List<ContextMenuVM> OnCreateContextMenu()
+        protected override List<ContextMenuDefinition> OnCreateContextMenu()
         {
-            return new List<ContextMenuVM>()
+            return new List<ContextMenuDefinition>()
             {
-                new ContextMenuVM("清屏", this.ContextMenuClearScreen_Click),
-                new ContextMenuVM("编辑")
-                {
-                    Children = new BindableCollection<ContextMenuVM>()
-                    {
-                        new ContextMenuVM("查找", this.ContextMenuFind_Click),
-                        new ContextMenuVM("复制", this.ContextMenuCopySelection_Click),
-                        new ContextMenuVM("保存")
-                        {
-                            Children = new BindableCollection<ContextMenuVM>()
-                            {
-                                new ContextMenuVM("选中内容", this.ContextMenuSaveSelection_Click),
-                                new ContextMenuVM("当前屏幕内容", this.ContextMenuSaveViewport_Click),
-                                new ContextMenuVM("所有内容", this.ContextMenuSaveAllDocument_Click)
-                            }
-                        },
-                        new ContextMenuVM("添加到快捷命令列表", this.ContextMenuAddToQuickCommands_Click),
-                    },
-                },
+                new ContextMenuDefinition("2","编辑"),
+                new ContextMenuDefinition("3","2"," ","查找", this.ContextMenuFind_Click),
+                new ContextMenuDefinition("4","2"," ","复制", this.ContextMenuCopySelection_Click),
+                new ContextMenuDefinition("5","2"," ","保存"),
+                new ContextMenuDefinition("6","5","5","选中内容", this.ContextMenuSaveSelection_Click),
+                new ContextMenuDefinition("7","5","5","当前屏幕内容", this.ContextMenuSaveViewport_Click),
+                new ContextMenuDefinition("8","5","5","所有内容", this.ContextMenuSaveAllDocument_Click),
+                new ContextMenuDefinition("9","2"," ","添加到快捷命令列表", this.ContextMenuAddToQuickCommands_Click),
+                new ContextMenuDefinition("100","2"," ","清屏", this.ContextMenuClearScreen_Click),
 
-                new ContextMenuVM("查看")
-                {
-                    Children = new BindableCollection<ContextMenuVM>()
-                    {
-                        new ContextMenuVM("系统监控", this.ContextMenuVisiblePanelContent_Click, "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm", "panel1"),
-                        new ContextMenuVM("快捷命令", this.ContextMenuVisiblePanelContent_Click, "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", string.Empty, "panel1"),
-                        new ContextMenuVM("输入栏", this.ContextMenuSwitchInputPanelVisible_Click)
-                    }
-                },
+                new ContextMenuDefinition("10","查看"),
+                new ContextMenuDefinition("11","10","10","系统监控", "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm","panel1", this.ContextMenuVisiblePanelContent_Click),
+                new ContextMenuDefinition("12","10","10","快捷命令", "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", string.Empty, "panel1", this.ContextMenuVisiblePanelContent_Click),
+                new ContextMenuDefinition("13","10","10","输入栏", this.ContextMenuSwitchInputPanelVisible_Click),
 
-                new ContextMenuVM("配置")
-                {
-                    Children = new BindableCollection<ContextMenuVM>()
-                    {
-                        new ContextMenuVM("端口转发", this.ContextMenuOpenPortForwardWindow_Click),
-                        new ContextMenuVM("同步输入", this.ContextMenuOpenSyncInputConfigurationWindow_Click),
-                        new ContextMenuVM("快捷命令", this.ContextMenuCreateQuickCommand_Click)
-                    }
-                },
+                new ContextMenuDefinition("14","配置"),
+                new ContextMenuDefinition("15","14","14","端口转发", this.ContextMenuOpenPortForwardWindow_Click),
+                new ContextMenuDefinition("16","14","14","同步输入", this.ContextMenuOpenSyncInputConfigurationWindow_Click),
+                new ContextMenuDefinition("17","14","14","快捷命令", this.ContextMenuCreateQuickCommand_Click),
 
-                new ContextMenuVM("工具")
-                {
-                    Children = new BindableCollection<ContextMenuVM>()
-                    {
-                        new ContextMenuVM("日志")
-                        {
-                            Children = new BindableCollection<ContextMenuVM>()
-                            {
-                                new ContextMenuVM("开始", this.ContextMenuStartLogger_Click),
-                                new ContextMenuVM("停止", this.ContextMenuStopLogger_Click)
-                            }
-                        },
-                        new ContextMenuVM("录制")
-                        {
-                            Children = new BindableCollection<ContextMenuVM>()
-                            {
-                                new ContextMenuVM("开始", this.ContextMenuStartRecord_Click),
-                                new ContextMenuVM("停止", this.ContextMenuStopRecord_Click),
-                                new ContextMenuVM("打开回放", this.ContextMenuOpenRecord_Click)
-                            }
-                        }
-                    }
-                },
+                new ContextMenuDefinition("18","工具"),
+                new ContextMenuDefinition("19","18"," ","日志"),
+                new ContextMenuDefinition("20","19","19","开始", this.ContextMenuStartLogger_Click),
+                new ContextMenuDefinition("21","19","19","停止", this.ContextMenuStopLogger_Click),
+                new ContextMenuDefinition("22","18"," ", "录制"),
+                new ContextMenuDefinition("23","22","22","开始", this.ContextMenuStartRecord_Click),
+                new ContextMenuDefinition("24","22","22","停止", this.ContextMenuStopRecord_Click),
+                new ContextMenuDefinition("25","18"," ","打开回放", this.ContextMenuOpenRecord_Click)
             };
         }
 
@@ -676,30 +641,47 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void InitializePanelList()
         {
-            // ContextMenu里如果ClassName不为空就说明有一个窗格需要显示
+            // ContextMenu里如果PanelID不为空就说明有一个窗格需要显示
 
-            foreach (ContextMenuVM contextMenu in this.ContextMenus)
+            List<ContextMenuDefinition> contextMenus = this.OnCreateContextMenu();
+
+            foreach (ContextMenuDefinition contextMenu in contextMenus)
             {
-                IEnumerable<ContextMenuVM> children = contextMenu.GetChildrenRecursive().Where(v => !string.IsNullOrEmpty(v.ClassName));
-
-                foreach (ContextMenuVM child in children)
+                if (string.IsNullOrEmpty(contextMenu.PanelID))
                 {
-                    PanelVM panelVM = this.Panels.FirstOrDefault(v => v.ID.ToString() == child.PanelId);
-                    if (panelVM == null)
-                    {
-                        panelVM = new PanelVM();
-                        panelVM.ID = child.PanelId;
-                        panelVM.Name = child.Name;
-                        panelVM.CloseDelegate = this.PerformPanelClosed;
-                        panelVM.SelectionChangedDelegate = this.PerformPanelSelectionChanged;
-                        this.Panels.Add(panelVM);
-                    }
-
-                    child.Parameters[PanelContentVM.KEY_SERVICE_AGENT] = this.ServiceAgent;
-                    child.Parameters[PanelContentVM.KEY_XTERM_SESSION] = this.Session;
-                    child.OwnerPanel = panelVM;
-                    panelVM.AddMenuItem(child);
+                    continue;
                 }
+
+                if (string.IsNullOrEmpty(contextMenu.ClassName))
+                {
+                    logger.ErrorFormat("ContextMenu关联了PanelID，但是ClassName为空");
+                    continue;
+                }
+
+                PanelVM panelVM = this.Panels.FirstOrDefault(v => v.ID.ToString() == contextMenu.PanelID);
+                if (panelVM == null)
+                {
+                    panelVM = new PanelVM();
+                    panelVM.ID = contextMenu.PanelID;
+                    panelVM.Name = contextMenu.Name;
+                    panelVM.CloseDelegate = this.PerformPanelClosed;
+                    panelVM.SelectionChangedDelegate = this.PerformPanelSelectionChanged;
+                    this.Panels.Add(panelVM);
+                }
+
+                PanelItemVM panelItemVM = new PanelItemVM()
+                {
+                    ID = contextMenu.ID,
+                    Name = contextMenu.Name,
+                    OwnerPanel = panelVM,
+                    VMClassName = contextMenu.VMClassName,
+                    ClassName = contextMenu.ClassName,
+                };
+
+                panelItemVM.Parameters[PanelContentVM.KEY_SERVICE_AGENT] = this.ServiceAgent;
+                panelItemVM.Parameters[PanelContentVM.KEY_XTERM_SESSION] = this.Session;
+                panelItemVM.OwnerPanel = panelVM;
+                panelVM.AddMenuItem(panelItemVM);
             }
         }
 
@@ -751,9 +733,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         /// <param name="contextMenu"></param>
         /// <param name="added">如果为true，那么表示加入监控列表，否则从监控列表里移除</param>
-        private void ModifyWatchList(ContextMenuVM contextMenu, bool added)
+        private void ModifyWatchList(PanelItemVM contextMenu, bool added)
         {
-            if (contextMenu == null) 
+            if (contextMenu == null)
             {
                 return;
             }
@@ -777,13 +759,13 @@ namespace ModengTerm.Terminal.ViewModels
             else
             {
 
-                lock(this.watchListLock)
+                lock (this.watchListLock)
                 {
                     this.watchList.Remove(watch);
                     this.watchListChanged = true;
                 }
 
-                if (this.watchList.Count == 0) 
+                if (this.watchList.Count == 0)
                 {
                     this.EnableWatcher(false);
                 }
@@ -966,14 +948,14 @@ namespace ModengTerm.Terminal.ViewModels
             this.ModifyWatchList(panelVM.SelectedMenu, false);
         }
 
-        private void PerformPanelSelectionChanged(PanelVM panelVM, ContextMenuVM removed, ContextMenuVM added)
+        private void PerformPanelSelectionChanged(PanelVM panelVM, PanelItemVM removed, PanelItemVM added)
         {
             if (removed != null)
             {
                 this.ModifyWatchList(removed, false);
             }
 
-            if(added != null)
+            if (added != null)
             {
                 this.ModifyWatchList(added, true);
             }
@@ -1396,15 +1378,15 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender)
         {
-            PanelVM panelVM = sender.OwnerPanel;
-            ContextMenuVM contextMenu = sender;
+            PanelVM panelVM = this.Panels.FirstOrDefault(v => v.ID.ToString() == sender.PanelId);
+            PanelItemVM panelItemVM = panelVM.MenuItems.FirstOrDefault(v => v.ID.ToString() == sender.ID.ToString());
 
             // 当前状态
             bool visible = false;
 
             if (panelVM.Visible)
             {
-                if (panelVM.SelectedMenu == contextMenu)
+                if (panelVM.SelectedMenu == panelItemVM)
                 {
                     visible = true;
                 }
@@ -1422,7 +1404,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 // 当前是隐藏状态，显示
                 panelVM.Visible = true;
-                contextMenu.IsSelected = true;
+                panelItemVM.IsSelected = true;
             }
         }
 
