@@ -34,6 +34,8 @@ namespace ModengTerm.Terminal.Parsing
             }
         }
 
+        public int Length { get { return this.bytes.Count; } }
+
         public VTID() 
         {
             this.bytes = new List<byte>();

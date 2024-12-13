@@ -14,11 +14,13 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 父菜单的ID
         /// 如果为空表示没有父菜单
+        /// 如果为-1表示在标题上不显示该菜单
         /// </summary>
         public string TitleParentID { get; set; }
 
         /// <summary>
         /// 右键菜单的ParentID
+        /// 如果为-1表示不显示右键菜单
         /// </summary>
         public string ContextParentID { get; set; }
 

@@ -129,8 +129,9 @@
         /// <summary>
         /// CSI状态解析完毕，开始执行CSI对应的动作
         /// </summary>
+        /// <param name="vtid"></param>
         /// <param name="finalByte">Final Byte</param>
-        private void ActionCSIDispatch(int finalByte, List<int> parameters)
+        private void ActionCSIDispatch(VTID vtid, byte finalByte, List<int> parameters)
         {
             CsiActionCodes code = (CsiActionCodes)finalByte;
 
@@ -156,6 +157,15 @@
                     {
                         this.WriteCode("DECSET_PrivateModeSet");
                         this.OnCSIActions?.Invoke(this, code, parameters);
+
+                        //if (vtid.Length > 0 && vtid[0] == '?')
+                        //{
+                        //}
+                        //else
+                        //{
+                        //    this.WriteCode("SM_SetMode");
+                        //    this.OnCSIActions?.Invoke(this, code, parameters);
+                        //}
                         break;
                     }
 

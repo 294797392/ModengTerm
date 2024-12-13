@@ -206,9 +206,9 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
         }
 
-        protected override void OnMouseDown(MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            base.OnMouseDown(e);
+            base.OnMouseLeftButtonDown(e);
 
             Point position = e.GetPosition(this.drawArea);
             this.mouseDownData.X = position.X;
@@ -218,9 +218,9 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             this.GIMouseDown?.Invoke(this, this.mouseDownData);
         }
 
-        protected override void OnMouseUp(MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
-            base.OnMouseUp(e);
+            base.OnMouseLeftButtonUp(e);
 
             Point position = e.GetPosition(this.drawArea);
             this.mouseUpData.X = position.X;

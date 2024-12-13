@@ -411,7 +411,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             return new List<ContextMenuDefinition>()
             {
-                new ContextMenuDefinition("2","编辑"),
+                new ContextMenuDefinition("2"," ","-1","编辑"),
                 new ContextMenuDefinition("3","2"," ","查找", this.ContextMenuFind_Click),
                 new ContextMenuDefinition("4","2"," ","复制", this.ContextMenuCopySelection_Click),
                 new ContextMenuDefinition("5","2"," ","保存"),
@@ -431,7 +431,7 @@ namespace ModengTerm.Terminal.ViewModels
                 new ContextMenuDefinition("16","14","14","同步输入", this.ContextMenuOpenSyncInputConfigurationWindow_Click),
                 new ContextMenuDefinition("17","14","14","快捷命令", this.ContextMenuCreateQuickCommand_Click),
 
-                new ContextMenuDefinition("18","工具"),
+                new ContextMenuDefinition("18"," ", "-1","工具"),
                 new ContextMenuDefinition("19","18"," ","日志"),
                 new ContextMenuDefinition("20","19","19","开始", this.ContextMenuStartLogger_Click),
                 new ContextMenuDefinition("21","19","19","停止", this.ContextMenuStopLogger_Click),

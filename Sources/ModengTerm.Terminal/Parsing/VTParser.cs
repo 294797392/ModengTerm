@@ -91,7 +91,7 @@ namespace ModengTerm.Terminal.Parsing
         private StringBuilder oscString;
 
         /// <summary>
-        /// 用来存储csi或者esc intermediate参数的类
+        /// 存储CSI非Param的参数
         /// </summary>
         private VTID vtid;
         private List<int> parameters;
@@ -427,7 +427,7 @@ namespace ModengTerm.Terminal.Parsing
 
         private void ActionCSIDispatch(byte ch)
         {
-            this.ActionCSIDispatch(ch, this.parameters);
+            this.ActionCSIDispatch(this.vtid, ch, this.parameters);
         }
 
         /// <summary>

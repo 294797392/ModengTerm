@@ -1421,18 +1421,9 @@ namespace ModengTerm.Terminal
                             break;
                         }
 
-                    case (DECPrivateMode)20:
-                    case (DECPrivateMode)42:
-                    case (DECPrivateMode)45:
-                    case (DECPrivateMode)4:
-                        {
-                            logger.FatalFormat("未实现DECPrivateMode {0}", mode);
-                            break;
-                        }
-
                     default:
                         {
-                            logger.FatalFormat("未实现DECSETPrivateMode, {0}, {1}", mode, enable);
+                            logger.FatalFormat("未实现DECPrivateMode, {0}, {1}", mode, enable);
                             break;
                         }
                 }

@@ -176,10 +176,14 @@ namespace ModengTerm.ViewModels
             foreach (MenuItem menuItem in menuItems)
             {
                 string menuId = menuItem.MenuDefinition.ID;
+                string parentID = menuItem.ParentID;
+
+                if (parentID == "-1")
+                {
+                    continue;
+                }
 
                 ContextMenuVM contextMenuVM = menuCaches[menuId];
-
-                string parentID = menuItem.ParentID;
 
                 if (string.IsNullOrWhiteSpace(parentID))
                 {
