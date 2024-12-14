@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -34,9 +35,7 @@ namespace ModengTerm.Terminal.Parsing
             }
         }
 
-        public int Length { get { return this.bytes.Count; } }
-
-        public VTID() 
+        public VTID()
         {
             this.bytes = new List<byte>();
         }
@@ -44,12 +43,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <summary>
         /// 存储一个intermediate字符
         /// </summary>
-        public void AddIntermediate(byte ch)
-        {
-            this.bytes.Add(ch);
-        }
-
-        public void Finalize(byte ch)
+        public void Add(byte ch)
         {
             this.bytes.Add(ch);
         }
@@ -71,6 +65,36 @@ namespace ModengTerm.Terminal.Parsing
         public void Clear()
         {
             this.bytes.Clear();
+        }
+
+        public ulong Value()
+        {
+            if (this.bytes.Count == 1)
+            {
+                return this.bytes[0];
+            }
+
+            ulong result = 0;
+            int shift = 8;
+
+            for (int i = 0; i < this.bytes.Count; i++)
+            {
+                result = (result << shift) + this.bytes[i];
+            }
+
+            return result;
+        }
+
+        public override string ToString()
+        {
+            string str = string.Empty;
+
+            foreach (byte c in this.bytes)
+            {
+                str += (char)c;
+            }
+
+            return str;
         }
     }
 }

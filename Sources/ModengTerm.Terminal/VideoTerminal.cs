@@ -1490,6 +1490,21 @@ namespace ModengTerm.Terminal
             }
         }
 
+        private void PerformModes(List<int> parameters, bool enable)
+        {
+            foreach (int mode in parameters)
+            {
+                switch ((Modes)mode)
+                {
+                    default:
+                        {
+                            logger.ErrorFormat("未实现Modes, {0}, {1}", mode, enable);
+                            break;
+                        }
+                }
+            }
+        }
+
         /// <summary>
         /// 指定要使用的字符集
         /// https://learn.microsoft.com/zh-cn/windows/console/console-virtual-terminal-sequences
@@ -2119,6 +2134,18 @@ namespace ModengTerm.Terminal
                             this.PrintCharacter(this.lastPrintChar);
                         }
 
+                        break;
+                    }
+
+                case CsiActionCodes.SM_SetMode:
+                    {
+                        this.PerformModes(parameters, true);
+                        break;
+                    }
+
+                case CsiActionCodes.RM_ResetMode:
+                    {
+                        this.PerformModes(parameters, false);
                         break;
                     }
 

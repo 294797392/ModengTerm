@@ -131,9 +131,9 @@
         /// </summary>
         /// <param name="vtid"></param>
         /// <param name="finalByte">Final Byte</param>
-        private void ActionCSIDispatch(VTID vtid, byte finalByte, List<int> parameters)
+        private void ActionCSIDispatch(VTID vtid, List<int> parameters)
         {
-            CsiActionCodes code = (CsiActionCodes)finalByte;
+            CsiActionCodes code = (CsiActionCodes)vtid.Value();
 
             switch (code)
             {
@@ -157,15 +157,20 @@
                     {
                         this.WriteCode("DECSET_PrivateModeSet");
                         this.OnCSIActions?.Invoke(this, code, parameters);
+                        break;
+                    }
 
-                        //if (vtid.Length > 0 && vtid[0] == '?')
-                        //{
-                        //}
-                        //else
-                        //{
-                        //    this.WriteCode("SM_SetMode");
-                        //    this.OnCSIActions?.Invoke(this, code, parameters);
-                        //}
+                case CsiActionCodes.SM_SetMode:
+                    {
+                        this.WriteCode("SM_SetMode");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
+                        break;
+                    }
+
+                case CsiActionCodes.RM_ResetMode:
+                    {
+                        this.WriteCode("RM_ResetMode");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
                         break;
                     }
 
@@ -452,17 +457,10 @@
                         break;
                     }
 
-                case (CsiActionCodes)'~':
-                    {
-                        this.WriteCode("UnPerformed_CSI126_");
-                        logger.ErrorFormat("不需要实现的CSIAction, ~");
-                        break;
-                    }
-
                 default:
                     {
-                        this.WriteCode(string.Format("UnkownCSIAction_{0}", finalByte));
-                        logger.FatalFormat("未实现CSIAction, {0}", (char)finalByte);
+                        this.WriteCode(string.Format("UnimplementedCSIAction_{0}", code));
+                        logger.FatalFormat("未实现CSIAction, {0}, {1}", code, vtid.ToString());
                         break;
                     }
             }
@@ -480,7 +478,7 @@
         /// <param name="ch">Final Byte</param>
         private void ActionEscDispatch(byte ch)
         {
-            this.vtid.Finalize(ch);
+            this.vtid.Add(ch);
 
             EscActionCodes code = (EscActionCodes)ch;
 

@@ -427,7 +427,8 @@ namespace ModengTerm.Terminal.Parsing
 
         private void ActionCSIDispatch(byte ch)
         {
-            this.ActionCSIDispatch(this.vtid, ch, this.parameters);
+            this.vtid.Add(ch);
+            this.ActionCSIDispatch(this.vtid, this.parameters);
         }
 
         /// <summary>
@@ -453,7 +454,7 @@ namespace ModengTerm.Terminal.Parsing
         /// <param name="ch"></param>
         private void ActionCollect(byte ch)
         {
-            this.vtid.AddIntermediate(ch);
+            this.vtid.Add(ch);
         }
 
         /// <summary>

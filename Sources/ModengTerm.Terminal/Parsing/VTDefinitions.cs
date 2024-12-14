@@ -88,7 +88,7 @@ namespace ModengTerm.Terminal.Parsing
     /// </summary>
     /// <param name="ch"></param>
     /// <returns></returns>
-    internal delegate bool DCSStringHandlerDlg(byte ch);
+    public delegate bool DCSStringHandlerDlg(byte ch);
 
     /// <summary>
     /// EraseLine的类型
@@ -138,7 +138,7 @@ namespace ModengTerm.Terminal.Parsing
     /// <summary>
     /// 定义CSI命令
     /// </summary>
-    public enum CsiActionCodes
+    public enum CsiActionCodes : ulong
     {
         ICH_InsertCharacter = '@',
         CUU_CursorUp = 'A',
@@ -184,13 +184,13 @@ namespace ModengTerm.Terminal.Parsing
         /// <summary>
         /// 设置DECPrivateMode
         /// </summary>
-        DECSET_PrivateModeSet = 'h',
+        DECSET_PrivateModeSet = 0x3F68, // "?h",
 
         /// <summary>
         /// 重置DECPrivateModde
         /// DEC Reset
         /// </summary>
-        DECRST_PrivateModeReset = 'l',
+        DECRST_PrivateModeReset = 0x3F6C, // "?l",
 
         /// <summary>
         /// 执行SGR操作
@@ -221,6 +221,10 @@ namespace ModengTerm.Terminal.Parsing
         DTTERM_WindowManipulation = 't', // NOTE: Overlaps with DECSLPP. Fix when/if implemented.
         ANSISYSRC_CursorRestore = 'u',
         DECREQTPARM_RequestTerminalParameters = 'x',
+
+        SM_SetMode = 'h',
+        RM_ResetMode = 'l',
+
         //DECSCUSR_SetCursorStyle = ' q',
         //DECSTR_SoftReset = '!p',
         //XT_PushSgrAlias = '#p',
@@ -233,7 +237,7 @@ namespace ModengTerm.Terminal.Parsing
     /// <summary>
     /// CSI参数下DECSET命令的DECPrivateMode类型
     /// </summary>
-    internal enum DECPrivateMode
+    public enum DECPrivateMode
     {
         /// <summary>
         /// 设置光标键操作模式为ApplicationMode或者NormalMode
@@ -303,6 +307,17 @@ namespace ModengTerm.Terminal.Parsing
     }
 
     /// <summary>
+    /// CSI SetMode和ResetMode的参数
+    /// </summary>
+    public enum Modes
+    {
+        KAM_KeyboardActionMode = 2,
+        IRM_InsertReplaceMode = 4,
+        SRM_SendReceiveMode = 12,
+        LNM_LineFeedNewLineMode = 20
+    }
+
+    /// <summary>
     /// 定义8位转义字符命令
     /// </summary>
     public enum EscActionCodes
@@ -345,7 +360,7 @@ namespace ModengTerm.Terminal.Parsing
         DECID_IdentifyDevice = 'Z',
         ST_StringTerminator = '\\',
         RIS_ResetToInitialState = 'c',
-        
+
         /// <summary>
         /// Lock Shift G2
         /// GL使用G2字符集
@@ -383,7 +398,7 @@ namespace ModengTerm.Terminal.Parsing
     /// 定义在VT52模式下的终端指令
     /// VT52模式通过CSI指令开启
     /// </summary>
-    internal enum VT52ActionCodes
+    public enum VT52ActionCodes
     {
         CursorUp = 'A',
         CursorDown = 'B',
