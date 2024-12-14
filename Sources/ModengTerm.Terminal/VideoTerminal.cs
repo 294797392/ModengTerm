@@ -1763,10 +1763,20 @@ namespace ModengTerm.Terminal
 
                 case ASCIITable.TAB:
                     {
-                        // tab键
-                        VTDebug.Context.WriteInteractive("ForwardTab", string.Empty);
-                        int tabSize = 4;
-                        activeDocument.SetCursorLogical(CursorRow, CursorCol + tabSize);
+                        /* 
+                         * tab键，移动到下一个制表位，一个制表位默认8个字符 
+                         * 注意不是每次向前移动8个字符，而是移动到下一个制表位
+                         */
+
+                        VTCursor cursor = this.activeDocument.Cursor;
+                        int tabSize = 8;
+                        int newCol = 0;
+                        int oldCol = cursor.Column;
+
+                        int nextTabPos = (int)Math.Floor((double)oldCol / tabSize) + 1;
+                        newCol = nextTabPos * tabSize;
+                        VTDebug.Context.WriteInteractive("ForwardTab", "{0},{1}", oldCol, newCol);
+                        activeDocument.SetCursorLogical(CursorRow, newCol);
                         break;
                     }
 

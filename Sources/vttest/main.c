@@ -89,6 +89,12 @@ static void VPA_VerticalLinePositionAbsolute(char n)
 	putseq(seq);
 }
 
+static void ForwardTab() 
+{
+	char seq[1] = { 0x09 };
+	putseq(seq);
+}
+
 
 
 void TestVideoTerminalAction_DECSTBM_SetScrollingRegion_RI_ReserveLine()
@@ -124,13 +130,13 @@ void TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute()
 	VPA_VerticalLinePositionAbsolute('5');
 }
 
-
-
-
-
 int main()
 {
-	TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute();
+	printf("         ");
+	ForwardTab();
+	printf("1");
+
+	//TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute();
 
 	char read[1024];
 	fgets(read, sizeof(read), stdin);
