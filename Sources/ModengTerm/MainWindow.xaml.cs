@@ -139,9 +139,6 @@ namespace ModengTerm
 
         #endregion
 
-        #region 公开接口
-        #endregion
-
         #region 事件处理器
 
 
@@ -363,81 +360,6 @@ namespace ModengTerm
             base.Close();
         }
 
-
-        ///// <summary>
-        ///// 输入中文的时候会触发该事件
-        ///// </summary>
-        ///// <param name="e"></param>
-        //protected override void OnPreviewTextInput(TextCompositionEventArgs e)
-        //{
-        //    base.OnPreviewTextInput(e);
-
-        //    InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
-        //    if (selectedSession == null)
-        //    {
-        //        return;
-        //    }
-
-        //    this.userInput.CapsLock = Console.CapsLock;
-        //    this.userInput.Key = VTKeys.GenericText;
-        //    this.userInput.Text = e.Text;
-        //    this.userInput.Modifiers = VTModifierKeys.None;
-
-        //    this.SendUserInput(selectedSession, this.userInput);
-
-        //    e.Handled = true;
-        //}
-
-        ///// <summary>
-        ///// 从键盘上按下按键的时候会触发
-        ///// </summary>
-        ///// <param name="e"></param>
-        //protected override void OnPreviewKeyDown(KeyEventArgs e)
-        //{
-        //    base.OnPreviewKeyDown(e);
-
-        //    InputSessionVM selectedSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
-        //    if (selectedSession == null)
-        //    {
-        //        return;
-        //    }
-
-        //    if (e.Key == Key.ImeProcessed)
-        //    {
-        //        // 这些字符交给输入法处理了
-        //    }
-        //    else
-        //    {
-        //        switch (e.Key)
-        //        {
-        //            case Key.Tab:
-        //            case Key.Up:
-        //            case Key.Down:
-        //            case Key.Left:
-        //            case Key.Right:
-        //            case Key.Space:
-        //                {
-        //                    // 防止焦点移动到其他控件上了
-        //                    e.Handled = true;
-        //                    break;
-        //                }
-        //        }
-
-        //        if (e.Key != Key.ImeProcessed)
-        //        {
-        //            e.Handled = true;
-        //        }
-
-        //        VTKeys vtKey = TermUtils.ConvertToVTKey(e.Key);
-        //        this.userInput.CapsLock = Console.CapsLock;
-        //        this.userInput.Key = vtKey;
-        //        this.userInput.Text = null;
-        //        this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
-        //        this.SendUserInput(selectedSession, this.userInput);
-        //    }
-
-        //    e.Handled = true;
-        //}
 
         private void Border_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

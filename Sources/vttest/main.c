@@ -132,9 +132,8 @@ void TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute()
 
 int main()
 {
-	printf("         ");
-	ForwardTab();
-	printf("1");
+	char seq[5] = { 0x1b, '[','2','5','l' };
+	putseq(seq);
 
 	//TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute();
 

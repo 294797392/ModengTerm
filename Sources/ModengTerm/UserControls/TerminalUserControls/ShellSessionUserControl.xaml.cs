@@ -241,7 +241,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
             window.Width += deltaX;
             window.Height += deltaY;
 
-            logger.DebugFormat("RequestChangeWindowSize, deltaX = {0}, deltaY = {1}", deltaX, deltaY);
+            if (window.WindowState != WindowState.Normal) 
+            {
+                window.WindowState = WindowState.Normal;
+            }
+
+            logger.InfoFormat("RequestChangeWindowSize, deltaX = {0}, deltaY = {1}, width = {2}, height = {3}", deltaX, deltaY, window.Width, window.Height);
         }
 
 
