@@ -61,6 +61,7 @@
     <Compile Remove="VTBookmark.cs" />
     <Compile Remove="VTColor.cs" />
     <Compile Remove="VTKeys.cs" />
+    <Compile Remove="VTModifierKeys.cs" />
     <Compile Remove="VTScreen.cs" />
     <Compile Remove="VTUtils.cs" />
     <Compile Remove="Watch\IDiskInfo.cs" />

@@ -141,7 +141,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 return;
             }
 
-            VTKeys vtKey = VTermUtils.ConvertToVTKey(e.Key);
+            VTKeys vtKey = DrawingUtils.ConvertToVTKey(e.Key);
 
             // 如果启用了自动完成功能，那么先把按键事件传递给自动完成功能
             if (this.autoCompleteVM.Enabled)
@@ -154,7 +154,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
             this.userInput.CapsLock = Console.CapsLock;
             this.userInput.Key = vtKey;
-            this.userInput.Modifiers = (VTModifierKeys)e.KeyboardDevice.Modifiers;
+            this.userInput.Modifiers = DrawingUtils.ConvertToVTModifierKeys(e.KeyboardDevice.Modifiers);
             this.userInput.FromIMEInput = false;
             this.shellSession.SendInput(this.userInput);
         }

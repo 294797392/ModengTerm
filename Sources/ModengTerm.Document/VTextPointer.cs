@@ -12,9 +12,14 @@ namespace ModengTerm.Document
     public class VTextPointer
     {
         /// <summary>
-        /// 所命中的行的物理行数
+        /// 所命中的行的物理行号
         /// </summary>
         public int PhysicsRow { get; set; }
+
+        /// <summary>
+        /// 所命中的行的逻辑行号
+        /// </summary>
+        public int LogicalRow { get; set; }
 
         /// <summary>
         /// 命中的字符的索引，从0开始

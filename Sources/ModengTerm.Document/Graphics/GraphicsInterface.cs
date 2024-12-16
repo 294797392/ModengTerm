@@ -60,6 +60,11 @@ namespace ModengTerm.Document.Drawing
         void SetPadding(double padding);
 
         /// <summary>
+        /// 获取当前按下的修饰键
+        /// </summary>
+        VTModifierKeys PressedModifierKey { get; }
+
+        /// <summary>
         /// 创建一个绘图对象
         /// </summary>
         /// <param name="type">要创建的绘图对象的类型</param>

@@ -68,7 +68,7 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
 
         public bool Visible
         {
-            get { return this.Visibility == Visibility.Visible;}
+            get { return this.Visibility == Visibility.Visible; }
             set
             {
                 bool visible = this.Visibility == Visibility.Visible;
@@ -90,6 +90,8 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
         {
             get { return this.IsMouseCaptured; }
         }
+
+        public VTModifierKeys PressedModifierKey { get { return DrawingUtils.ConvertToVTModifierKeys(Keyboard.Modifiers); } }
 
         #endregion
 
@@ -120,13 +122,37 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             return newvalue;
         }
 
+        private VTMouseButton MouseButton2VTMouseButton(MouseButton mouseButton)
+        {
+            switch (mouseButton)
+            {
+                case MouseButton.Left:
+                    {
+                        return VTMouseButton.LeftButton;
+                    }
+
+                case MouseButton.Right:
+                    {
+                        return VTMouseButton.RightButton;
+                    }
+
+                case MouseButton.Middle:
+                    {
+                        return VTMouseButton.MiddleButton;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #region GraphicsInterface
 
         public void SetPadding(double padding)
         {
-            if (this.padding == padding) 
+            if (this.padding == padding)
             {
                 return;
             }
@@ -185,7 +211,7 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
         /// <summary>
         /// 释放捕获鼠标
         /// </summary>
-        public void GIRleaseMouseCapture() 
+        public void GIRleaseMouseCapture()
         {
             this.ReleaseMouseCapture();
         }
@@ -206,26 +232,28 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
         }
 
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            base.OnMouseLeftButtonDown(e);
+            base.OnMouseDown(e);
 
             Point position = e.GetPosition(this.drawArea);
             this.mouseDownData.X = position.X;
             this.mouseDownData.Y = position.Y;
             this.mouseDownData.ClickCount = e.ClickCount;
+            this.mouseDownData.Button = MouseButton2VTMouseButton(e.ChangedButton);
 
             this.GIMouseDown?.Invoke(this, this.mouseDownData);
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        protected override void OnMouseUp(MouseButtonEventArgs e)
         {
-            base.OnMouseLeftButtonUp(e);
+            base.OnMouseUp(e);
 
             Point position = e.GetPosition(this.drawArea);
             this.mouseUpData.X = position.X;
             this.mouseUpData.Y = position.Y;
             this.mouseUpData.ClickCount = e.ClickCount;
+            this.mouseDownData.Button = MouseButton2VTMouseButton(e.ChangedButton);
 
             this.GIMouseUp?.Invoke(this, this.mouseUpData);
         }

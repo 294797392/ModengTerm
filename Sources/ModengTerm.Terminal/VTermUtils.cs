@@ -184,10 +184,6 @@ namespace ModengTerm.Terminal
             }
         }
 
-        public static VTKeys ConvertToVTKey(Key key)
-        {
-            return (VTKeys)key;
-        }
 
         public static VTPoint ToVTPoint(this Point wpfPoint)
         {

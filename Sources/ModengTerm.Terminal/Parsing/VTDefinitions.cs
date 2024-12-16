@@ -270,6 +270,26 @@ namespace ModengTerm.Terminal.Parsing
         /// </summary>
         DECTCEM_TextCursorEnableMode = 25,
         XTERM_EnableDECCOLMSupport = 40,
+
+        /// <summary>
+        /// Send Mouse X & Y on button press and
+        /// release.  See the section Mouse Tracking.  This is the X11
+        /// xterm mouse protocol.
+        /// 
+        /// xterm sends CSI M CbCxCy
+        /// The low two bits of Cb encode button information:
+        ///  0=MB1 pressed,
+        ///  1=MB2 pressed,
+        ///  2=MB3 pressed, and
+        ///  3=release.
+        /// The next three bits encode the modifiers which were down when the
+        /// button was pressed and are added together:
+        ///  4=Shift,
+        ///  8=Meta, and
+        ///  16=Control.
+        /// Cx and Cy are the x and y coordinates of the mouse event, encoded as
+        /// in X10 mode.
+        /// </summary>
         VT200_MOUSE_MODE = 1000,
         BUTTON_EVENT_MOUSE_MODE = 1002,
         FOCUS_EVENT_MODE = 1004,

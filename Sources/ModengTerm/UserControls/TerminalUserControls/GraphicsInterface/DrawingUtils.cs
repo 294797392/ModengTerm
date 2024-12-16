@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ModengTerm.UserControls.TerminalUserControls.Rendering
@@ -87,6 +88,32 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             return pen;
         }
 
+        public static VTKeys ConvertToVTKey(Key key)
+        {
+            return (VTKeys)key;
+        }
+
+        public static VTModifierKeys ConvertToVTModifierKeys(ModifierKeys modifierKeys)
+        {
+            if (modifierKeys == ModifierKeys.None) 
+            {
+                return VTModifierKeys.None;
+            }
+            else if (modifierKeys.HasFlag(ModifierKeys.Alt))
+            {
+                return VTModifierKeys.MetaAlt;
+            }
+            else if (modifierKeys.HasFlag(ModifierKeys.Control))
+            {
+                return VTModifierKeys.Control;
+            }
+            else if (modifierKeys.HasFlag(ModifierKeys.Shift))
+            {
+                return VTModifierKeys.Shift;
+            }
+
+            return VTModifierKeys.None;
+        }
 
         public static Color GetColor(string rgbKey) 
         {

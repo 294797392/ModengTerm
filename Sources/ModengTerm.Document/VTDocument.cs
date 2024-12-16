@@ -50,6 +50,7 @@ namespace ModengTerm.Document
         /// 当按下鼠标的时候触发
         /// </summary>
         public event Action<VTDocument, MouseData> MouseDown;
+        public event Action<VTDocument, MouseData> MouseUp;
 
         #endregion
 
@@ -1512,6 +1513,7 @@ namespace ModengTerm.Document
 
             // 命中成功再更新TextPointer，保证pointer不为空
             pointer.PhysicsRow = logicalRow + this.Scrollbar.Value;
+            pointer.LogicalRow = logicalRow;
             pointer.CharacterIndex = charIndexHit;
             pointer.ColumnIndex = columnIndexHit;
 
@@ -1580,6 +1582,13 @@ namespace ModengTerm.Document
 
         private void GraphicsInterface_GIMouseUp(GraphicsInterface graphicsInterface, MouseData mouseData)
         {
+            this.MouseUp?.Invoke(this, mouseData);
+
+            if (mouseData.Button != VTMouseButton.LeftButton) 
+            {
+                return;
+            }
+
             this.isMouseDown = false;
             this.selectionState = false;
             this.graphicsInterface.GIRleaseMouseCapture();
@@ -1588,6 +1597,11 @@ namespace ModengTerm.Document
         private void GraphicsInterface_GIMouseDown(GraphicsInterface graphicsInterface, MouseData mouseData)
         {
             this.MouseDown?.Invoke(this, mouseData);
+
+            if (mouseData.Button != VTMouseButton.LeftButton)
+            {
+                return;
+            }
 
             if (mouseData.ClickCount == 1)
             {

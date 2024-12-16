@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit.DirectSound;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -10,7 +11,9 @@ using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
+using System.Reflection.Metadata;
 using System.Text;
+using System.Windows.Media.Animation;
 using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Terminal
@@ -55,6 +58,7 @@ namespace ModengTerm.Terminal
 
         private static readonly byte[] OS_OperatingStatusData = new byte[4] { 0x1b, (byte)'[', (byte)'0', (byte)'n' };
         private static readonly byte[] DA_DeviceAttributesData = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
+        private static readonly string VT200_MOUSE_MODE_DATA = "\u001b[M{0}{1}{2}";
 
         #endregion
 
@@ -178,6 +182,8 @@ namespace ModengTerm.Terminal
         /// </summary>
         private bool autoWrapMode;
         private bool xtermBracketedPasteMode;
+        private bool isVT200MouseMode;
+
         private bool acceptC1Control;
 
         private char lastPrintChar;
@@ -377,12 +383,15 @@ namespace ModengTerm.Terminal
             VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
             this.mainDocument = new VTDocument(mainOptions);
             this.mainDocument.MouseDown += MainDocument_MouseDown;
+            this.mainDocument.MouseUp += MainDocument_MouseUp;
             this.mainDocument.Initialize();
             this.mainDocument.History.Add(this.mainDocument.FirstLine.History);
 
             VTDocumentOptions alternateOptions = this.CreateDocumentOptions("AlternateDocument", sessionInfo, options.AlternateDocument);
             alternateOptions.RollbackMax = 0;
             this.alternateDocument = new VTDocument(alternateOptions);
+            this.alternateDocument.MouseDown += MainDocument_MouseDown;
+            this.alternateDocument.MouseUp += MainDocument_MouseUp;
             this.alternateDocument.Initialize();
             this.alternateDocument.SetVisible(false);
 
@@ -441,7 +450,11 @@ namespace ModengTerm.Terminal
 
             this.renderer.Release();
 
+            this.mainDocument.MouseDown -= MainDocument_MouseDown;
+            this.mainDocument.MouseUp -= MainDocument_MouseUp;
             this.mainDocument.Release();
+            this.alternateDocument.MouseDown -= MainDocument_MouseDown;
+            this.alternateDocument.MouseUp -= MainDocument_MouseUp;
             this.alternateDocument.Release();
         }
 
@@ -1421,6 +1434,12 @@ namespace ModengTerm.Terminal
                             break;
                         }
 
+                    case DECPrivateMode.VT200_MOUSE_MODE:
+                        {
+                            this.isVT200MouseMode = enable;
+                            break;
+                        }
+
                     default:
                         {
                             logger.FatalFormat("未实现DECPrivateMode, {0}, {1}", mode, enable);
@@ -1724,6 +1743,62 @@ namespace ModengTerm.Terminal
 
             // 更新光标所在行
             document.SetCursorLogical(cursor.Row, cursor.Column);
+        }
+
+        private void HandleVT200MouseMode(VTDocument document, MouseData mouseData, bool release)
+        {
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
+            if (!document.HitTest(mouseData, this.textPointer))
+            {
+                return;
+            }
+
+            GraphicsInterface gi = document.GraphicsInterface;
+            int lowTwoBits = release ? 3 : (int)mouseData.Button;
+            int nextThreeBits = (int)gi.PressedModifierKey;
+            int cb = ((nextThreeBits << 2) + lowTwoBits) + 32;
+            int cx = this.textPointer.ColumnIndex + 1 + 32;
+            int cy = this.textPointer.LogicalRow + 1 + 32;
+
+            string seq = string.Format(VT200_MOUSE_MODE_DATA, (char)cb, (char)cx, (char)cy);
+            byte[] bytes = Encoding.ASCII.GetBytes(seq);
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("发送VT200_MOUSE_MODE数据失败, {0}", code);
+            }
+        }
+
+        private void HandleClickToCursor(VTDocument document, MouseData mouseData)
+        {
+            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTCursor cursor = document.Cursor;
+            VTHistory history = document.History;
+
+            if (document.HitTest(mouseData, this.textPointer))
+            {
+                int physicsRow = this.textPointer.PhysicsRow;
+                int row = physicsRow - scrollInfo.Value;
+                int col = this.textPointer.ColumnIndex;
+                document.SetCursorLogical(row, col);
+                cursor.Reposition();
+
+                if (physicsRow > history.Lines - 1)
+                {
+                    // 缺少的历史行数
+                    int adds = physicsRow - (history.Lines - 1);
+                    VTextLine textLine = document.ActiveLine.FindPrevious(adds - 1);
+                    for (int i = 0; i < adds; i++)
+                    {
+                        history.Add(textLine.History);
+                        textLine = textLine.NextLine;
+                    }
+                }
+            }
         }
 
         #endregion
@@ -3052,32 +3127,25 @@ namespace ModengTerm.Terminal
 
         private void MainDocument_MouseDown(VTDocument document, MouseData mouseData)
         {
-            if (this.clickToCursor)
+            if (mouseData.Button == VTMouseButton.LeftButton)
             {
-                VTScrollInfo scrollInfo = document.Scrollbar;
-                VTCursor cursor = document.Cursor;
-                VTHistory history = document.History;
-
-                if (document.HitTest(mouseData, this.textPointer))
+                if (this.clickToCursor)
                 {
-                    int physicsRow = this.textPointer.PhysicsRow;
-                    int row = physicsRow - scrollInfo.Value;
-                    int col = this.textPointer.ColumnIndex;
-                    document.SetCursorLogical(row, col);
-                    cursor.Reposition();
-
-                    if (physicsRow > history.Lines - 1)
-                    {
-                        // 缺少的历史行数
-                        int adds = physicsRow - (history.Lines - 1);
-                        VTextLine textLine = document.ActiveLine.FindPrevious(adds - 1);
-                        for (int i = 0; i < adds; i++)
-                        {
-                            history.Add(textLine.History);
-                            textLine = textLine.NextLine;
-                        }
-                    }
+                    this.HandleClickToCursor(document, mouseData);
                 }
+            }
+
+            if (this.isVT200MouseMode)
+            {
+                this.HandleVT200MouseMode(document, mouseData, false);
+            }
+        }
+
+        private void MainDocument_MouseUp(VTDocument document, MouseData mouseData)
+        {
+            if (this.isVT200MouseMode)
+            {
+                this.HandleVT200MouseMode(document, mouseData, true);
             }
         }
 
