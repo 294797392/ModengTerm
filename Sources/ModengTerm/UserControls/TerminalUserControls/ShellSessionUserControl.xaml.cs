@@ -30,7 +30,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private ShellSessionVM shellSession;
         private AutoCompletionVM autoCompleteVM;
-        private IVideoTerminal videoTerminal;
+        private VideoTerminal videoTerminal;
         private VTKeyboardInput userInput;
 
         #endregion
@@ -178,6 +178,16 @@ namespace ModengTerm.UserControls.TerminalUserControls
             Keyboard.Focus(GridDocument);
         }
 
+        private void GridDocument_LostFocus(object sender, RoutedEventArgs e)
+        {
+            this.videoTerminal.FocusChanged(false);
+        }
+
+        private void GridDocument_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.videoTerminal.FocusChanged(true);
+        }
+
 
 
         private void ButtonOptions_Checked(object sender, RoutedEventArgs e)
@@ -299,7 +309,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
             this.autoCompleteVM = this.shellSession.AutoCompletionVM;
 
-            this.videoTerminal = this.shellSession.VideoTerminal;
+            this.videoTerminal = this.shellSession.VideoTerminal as VideoTerminal;
             this.videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
             this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
 

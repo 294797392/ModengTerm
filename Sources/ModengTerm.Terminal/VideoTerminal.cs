@@ -57,6 +57,8 @@ namespace ModengTerm.Terminal
         private static readonly string DA_DeviceAttributesData = "\u001b[?1;0c";
         private static readonly string DA2_SecondaryDeviceAttributes = "\u001b[>0;10;1c";
         private static readonly string VT200_MOUSE_MODE_DATA = "\u001b[M{0}{1}{2}";
+        private static readonly string FOCUSIN_DATA = "\u001b[I";
+        private static readonly string FOCUSOUT_DATA = "\u001b[O";
 
         #endregion
 
@@ -181,6 +183,7 @@ namespace ModengTerm.Terminal
         private bool autoWrapMode;
         private bool xtermBracketedPasteMode;
         private bool isVT200MouseMode;
+        private bool isFocusEventMode;
 
         private bool acceptC1Control;
 
@@ -689,6 +692,17 @@ namespace ModengTerm.Terminal
         public void RaiseKeyboardInput(VTKeyboardInput kbdInput)
         {
             this.OnKeyboardInput?.Invoke(this, kbdInput);
+        }
+
+        /// <summary>
+        /// 当焦点状态改变的时候触发
+        /// </summary>
+        public void FocusChanged(bool focused)
+        {
+            if (this.isFocusEventMode)
+            {
+                this.HandleFocusEventMode(focused);
+            }
         }
 
         #endregion
@@ -1438,6 +1452,12 @@ namespace ModengTerm.Terminal
                             break;
                         }
 
+                    case DECPrivateMode.FOCUS_EVENT_MODE:
+                        {
+                            this.isFocusEventMode = enable;
+                            break;
+                        }
+
                     default:
                         {
                             logger.FatalFormat("未实现DECPrivateMode, {0}, {1}", mode, enable);
@@ -1499,6 +1519,13 @@ namespace ModengTerm.Terminal
                         break;
                     }
 
+                case WindowManipulationType.RestoreIconAndWindow:
+                case WindowManipulationType.SaveIconAndWindow:
+                    {
+                        // 没啥用，不实现
+                        break;
+                    }
+
                 default:
                     {
                         logger.FatalFormat("未处理的WindowManipulationType, {0}", type);
@@ -1513,6 +1540,12 @@ namespace ModengTerm.Terminal
             {
                 switch ((Modes)mode)
                 {
+                    case (Modes)25:
+                        {
+                            // 不知道啥意思, terminal也没实现，文档里也找不到对应的说明
+                            break;
+                        }
+
                     default:
                         {
                             logger.ErrorFormat("未实现Modes, {0}, {1}", mode, enable);
@@ -1796,6 +1829,20 @@ namespace ModengTerm.Terminal
                         textLine = textLine.NextLine;
                     }
                 }
+            }
+        }
+
+        private void HandleFocusEventMode(bool focused)
+        {
+            if (focused)
+            {
+                byte[] bytes = FOCUSIN_DATA.Select(v => Convert.ToByte(v)).ToArray();
+                this.sessionTransport.Write(bytes);
+            }
+            else
+            {
+                byte[] bytes = FOCUSOUT_DATA.Select(v => Convert.ToByte(v)).ToArray();
+                this.sessionTransport.Write(bytes);
             }
         }
 

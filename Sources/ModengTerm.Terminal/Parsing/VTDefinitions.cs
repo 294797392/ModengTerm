@@ -133,6 +133,9 @@ namespace ModengTerm.Terminal.Parsing
         /// 将文本区域调整为给定的字符高度和宽度。省略的参数将重用当前的高度或宽度。零参数使用显示器的高度或宽度。
         /// </summary>
         ResizeWindowInCharacters = 8,
+
+        SaveIconAndWindow = 22,
+        RestoreIconAndWindow = 23,
     }
 
     /// <summary>
@@ -292,6 +295,10 @@ namespace ModengTerm.Terminal.Parsing
         /// </summary>
         VT200_MOUSE_MODE = 1000,
         BUTTON_EVENT_MOUSE_MODE = 1002,
+
+        /// <summary>
+        /// FocusIn 和 FocusOut 可以与任何鼠标事件结合使用，因为它们使用的是不同的协议。当启用时，这会使 xterm 在终端获得焦点时发送 CSI I，在终端失去焦点时发送 CSI O
+        /// </summary>
         FOCUS_EVENT_MODE = 1004,
         ANY_EVENT_MOUSE_MODE = 1003,
 

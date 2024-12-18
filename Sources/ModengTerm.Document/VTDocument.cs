@@ -1739,7 +1739,7 @@ namespace ModengTerm.Document
         private void GraphicsInterface_GILoaded(GraphicsInterface obj)
         {
             // 把光标加入到定时器里进行闪烁
-            VTCursorTimer.Context.SetCursor(this.Cursor);
+            VTCursorTimer.Context.SetCursor(this.cursor);
         }
 
         #endregion

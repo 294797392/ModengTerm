@@ -95,6 +95,20 @@ static void ForwardTab()
 	putseq(seq);
 }
 
+static void RM_ResetMode(char n)
+{
+	char seq[4] = { 0x1b, '[', n, 'l' };
+	putseq(seq);
+}
+
+static void SM_SetMode() 
+{
+	char seq[5] = { 0x1b, '[', '2','5', 'h' };
+	putseq(seq);
+}
+
+
+
 
 
 void TestVideoTerminalAction_DECSTBM_SetScrollingRegion_RI_ReserveLine()
@@ -132,10 +146,8 @@ void TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute()
 
 int main()
 {
-	char seq[5] = { 0x1b, '[','2','5','l' };
-	putseq(seq);
+	SM_SetMode();
 
-	//TestVideoTerminalAction_VPA_VerticalLinePositionAbsolute();
 
 	char read[1024];
 	fgets(read, sizeof(read), stdin);

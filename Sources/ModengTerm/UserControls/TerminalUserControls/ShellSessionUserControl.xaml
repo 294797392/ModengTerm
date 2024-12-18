@@ -64,7 +64,8 @@
             </Grid>
 
             <Grid Grid.Column="1" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
-                  MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown">
+                  MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown"
+                  LostFocus="GridDocument_LostFocus" GotFocus="GridDocument_GotFocus">
                 <Grid.ContextMenu>
                     <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
                                  Visibility="{Binding Path=ContextMenuVisibility}" Style="{StaticResource ResourceKey=StyleContextMenu}">
