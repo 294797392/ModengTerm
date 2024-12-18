@@ -27,7 +27,8 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 响应DA_DeviceAttributes事件
         /// </summary>
-        DA_DeviceAttributes
+        DA_DeviceAttributes,
+        DA2_SecondaryDeviceAttributes
     }
 
     /// <summary>

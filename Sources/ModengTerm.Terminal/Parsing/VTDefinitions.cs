@@ -169,7 +169,7 @@ namespace ModengTerm.Terminal.Parsing
         REP_RepeatCharacter = 'b',
 
         DA_DeviceAttributes = 'c',
-        //DA2_SecondaryDeviceAttributes = '>c',
+        DA2_SecondaryDeviceAttributes = 0x3E63, // ">c"
         //DA3_TertiaryDeviceAttributes = '=c',
         VPA_VerticalLinePositionAbsolute = 'd',
         VPR_VerticalPositionRelative = 'e',

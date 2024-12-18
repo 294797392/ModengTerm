@@ -5,7 +5,6 @@ using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Windows.Media.Animation;
 
 namespace ModengTerm.Document
 {

@@ -1,5 +1,4 @@
-﻿using DotNEToolkit.DirectSound;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -11,9 +10,7 @@ using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
-using System.Reflection.Metadata;
 using System.Text;
-using System.Windows.Media.Animation;
 using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Terminal
@@ -57,7 +54,8 @@ namespace ModengTerm.Terminal
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VideoTerminal");
 
         private static readonly byte[] OS_OperatingStatusData = new byte[4] { 0x1b, (byte)'[', (byte)'0', (byte)'n' };
-        private static readonly byte[] DA_DeviceAttributesData = new byte[7] { 0x1b, (byte)'[', (byte)'?', (byte)'1', (byte)':', (byte)'0', (byte)'c' };
+        private static readonly string DA_DeviceAttributesData = "\u001b[?1;0c";
+        private static readonly string DA2_SecondaryDeviceAttributes = "\u001b[>0;10;1c";
         private static readonly string VT200_MOUSE_MODE_DATA = "\u001b[M{0}{1}{2}";
 
         #endregion
@@ -2142,8 +2140,18 @@ namespace ModengTerm.Terminal
                 case CsiActionCodes.DA_DeviceAttributes:
                     {
                         VTDebug.Context.WriteInteractive("DA_DeviceAttributes", string.Empty);
-                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DA_DeviceAttributes, DA_DeviceAttributesData);
-                        sessionTransport.Write(DA_DeviceAttributesData);
+                        byte[] bytes = DA_DeviceAttributesData.Select(v => Convert.ToByte(v)).ToArray();
+                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DA_DeviceAttributes, bytes);
+                        sessionTransport.Write(bytes);
+                        break;
+                    }
+
+                case CsiActionCodes.DA2_SecondaryDeviceAttributes:
+                    {
+                        VTDebug.Context.WriteInteractive("DA2_SecondaryDeviceAttributes", string.Empty);
+                        byte[] bytes = DA2_SecondaryDeviceAttributes.Select(v => Convert.ToByte(v)).ToArray();
+                        VTDebug.Context.WriteInteractive(VTSendTypeEnum.DA2_SecondaryDeviceAttributes, bytes);
+                        this.sessionTransport.Write(bytes);
                         break;
                     }
 

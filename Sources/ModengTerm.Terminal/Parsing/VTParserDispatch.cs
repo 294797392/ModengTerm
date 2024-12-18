@@ -382,6 +382,38 @@
                         break;
                     }
 
+                case CsiActionCodes.DA2_SecondaryDeviceAttributes:
+                    {
+                        /*****************************************************************
+                            Send Device Attributes (Secondary DA).
+                                        Ps = 0  or omitted ⇒  request the terminal's identification
+                                      code.  The response depends on the decTerminalID resource
+                                      setting.  It should apply only to VT220 and up, but xterm
+                                      extends this to VT100.
+                                        ⇒  CSI  > Pp ; Pv ; Pc c
+                                      where Pp denotes the terminal type
+                                        Pp = 0  ⇒  "VT100".
+                                        Pp = 1  ⇒  "VT220".
+                                        Pp = 2  ⇒  "VT240" or "VT241".
+                                        Pp = 1 8  ⇒  "VT330".
+                                        Pp = 1 9  ⇒  "VT340".
+                                        Pp = 2 4  ⇒  "VT320".
+                                        Pp = 3 2  ⇒  "VT382".
+                                        Pp = 4 1  ⇒  "VT420".
+                                        Pp = 6 1  ⇒  "VT510".
+                                        Pp = 6 4  ⇒  "VT520".
+                                        Pp = 6 5  ⇒  "VT525".
+                        and Pv is the firmware version (for xterm, this was originally
+                        the XFree86 patch number, starting with 95).  In a DEC
+                        terminal, Pc indicates the ROM cartridge registration number
+                        and is always zero.                     
+                        ********************************************************************/
+
+                        this.WriteCode("DA2_SecondaryDeviceAttributes");
+                        this.OnCSIActions?.Invoke(this, code, parameters);
+                        break;
+                    }
+
                 case CsiActionCodes.IL_InsertLine:
                     {
                         // 将 <n> 行插入光标位置的缓冲区。 光标所在的行及其下方的行将向下移动。
