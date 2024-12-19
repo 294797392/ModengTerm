@@ -1,5 +1,4 @@
-﻿using DotNEToolkit.DirectSound;
-using ModengTerm.Document;
+﻿using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 

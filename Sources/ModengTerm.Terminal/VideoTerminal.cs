@@ -1,5 +1,4 @@
-﻿using DotNEToolkit;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -633,6 +632,17 @@ namespace ModengTerm.Terminal
         {
             VTDocument oldDocument = this.activeDocument;
             int oldScroll = oldDocument.Scrollbar.Value;
+
+            // 执行动作之前先把光标滚动到可视区域内
+            // 不然没法打印字符
+            if (oldDocument == this.mainDocument)
+            {
+                VTCursor cursor = oldDocument.Cursor;
+                if (oldDocument.OutsideViewport(cursor.PhysicsRow))
+                {
+                    oldDocument.ScrollTo(cursor.PhysicsRow);
+                }
+            }
 
             this.renderer.Render(bytes, size);
 
@@ -2278,16 +2288,6 @@ namespace ModengTerm.Terminal
             VTDocument document = this.activeDocument;
             VTCursor cursor = document.Cursor;
             int vpcols = document.ViewportColumn;
-
-            // 有些命令（top）会动态更新主缓冲区
-            // 执行动作之前先把光标滚动到可视区域内
-            if (document == this.mainDocument)
-            {
-                if (document.OutsideViewport(cursor.PhysicsRow))
-                {
-                    document.ScrollTo(cursor.PhysicsRow);
-                }
-            }
 
             // 创建并打印新的字符
             VTCharacter character = this.CreateCharacter(ch, document.AttributeState);

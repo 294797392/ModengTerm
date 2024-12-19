@@ -432,7 +432,7 @@ namespace ModengTerm
                 return;
             }
 
-            if (!content.HasInputFocus())
+            if (content.HasInputFocus())
             {
                 return;
             }
