@@ -17,7 +17,7 @@
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="900" Height="700" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded" WindowStyle="None"
-        KeyDown="Window_KeyDown" WindowState="Maximized"
+        WindowState="Maximized"
         SourceInitialized="Window_SourceInitialized">
 
     <!--WindowState="Maximized"-->

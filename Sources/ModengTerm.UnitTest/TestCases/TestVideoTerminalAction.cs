@@ -1,4 +1,5 @@
-﻿using ModengTerm.Document;
+﻿using DotNEToolkit.DirectSound;
+using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 
@@ -206,7 +207,7 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
-        private bool RI_ReverseLineFeed1() 
+        private bool RI_ReverseLineFeed1()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
             TerminalInvoker invoker = new TerminalInvoker(terminal);
@@ -261,22 +262,7 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
-        private VTextLine FindLogicalRow(VTDocument document, int logicalRow)
-        {
-            VTextLine current = document.FirstLine;
-
-            for (int i = 0; i < logicalRow; i++)
-            {
-                current = current.NextLine;
-            }
-
-            return current;
-        }
-
-        #region 针对于每个指令做单元测试
-
-        [UnitTest]
-        public bool Print()
+        private bool Print1()
         {
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
             TerminalInvoker invoker = new TerminalInvoker(terminal);
@@ -300,6 +286,77 @@ namespace ModengTerm.UnitTest.TestCases
             }
 
             #endregion
+
+            return true;
+        }
+
+        /// <summary>
+        /// 光标在可视区域外然后打印
+        /// </summary>
+        /// <returns></returns>
+        private bool Print2()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.MainDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.PrintLines(20);
+            
+            invoker.CUP_CursorPosition(1, 1);
+            document.ScrollTo(0);
+            invoker.Print('A');
+            if (document.ActiveLine != document.FirstLine)
+            {
+                logger.Error("{F6852F1A-6C07-49B9-914B-67491429E256}");
+                return false;
+            }
+            List<string> textLines = new List<string>() { "A2", "13", "14", "15", "16", "17", "18", "19", "20" };
+            if (!UnitTestHelper.CompareDocument(document, textLines))
+            {
+                logger.Error("{B615FDCA-4F88-467B-9641-9ACD73C7E0C4}");
+                return false;
+            }
+
+            invoker.CUP_CursorPosition(5, 1);
+            document.ScrollTo(0);
+            invoker.Print('B');
+            if (document.ActiveLine != this.FindLogicalRow(document, 4))
+            {
+                logger.Error("{C2ACE997-4EED-4998-8544-7187D8E895EA}");
+                return false;
+            }
+            List<string> textLines2 = new List<string>() { "A2", "13", "14", "15", "B6", "17", "18", "19", "20" };
+            if (!UnitTestHelper.CompareDocument(document, textLines2))
+            {
+                logger.Error("{02143E1C-90A5-46A8-A3FF-EA4C3AA6D4EA}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private VTextLine FindLogicalRow(VTDocument document, int logicalRow)
+        {
+            VTextLine current = document.FirstLine;
+
+            for (int i = 0; i < logicalRow; i++)
+            {
+                current = current.NextLine;
+            }
+
+            return current;
+        }
+
+        #region 针对于每个指令做单元测试
+
+        [UnitTest]
+        public bool Print()
+        {
+            if (!this.Print1() || !this.Print2())
+            {
+                return false;
+            }
 
             return true;
         }

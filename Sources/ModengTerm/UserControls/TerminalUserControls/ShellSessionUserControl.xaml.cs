@@ -339,6 +339,11 @@ namespace ModengTerm.UserControls.TerminalUserControls
             return GridDocument.Focus();
         }
 
+        public bool HasInputFocus() 
+        {
+            return GridDocument.IsFocused;
+        }
+
         #endregion
     }
 }

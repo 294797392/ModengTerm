@@ -418,18 +418,26 @@ namespace ModengTerm
         }
 
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
+            base.OnPreviewKeyDown(e);
+
             // 此时说明焦点没有在终端上
 
             // 让当前显示的终端获取焦点
             ISessionContent content = ContentControlSession.Content as ISessionContent;
-            if (content == null) 
+            if (content == null)
             {
                 return;
             }
 
-            if (!content.SetInputFocus()) 
+            if (!content.HasInputFocus())
+            {
+                return;
+            }
+
+            if (!content.SetInputFocus())
             {
                 logger.ErrorFormat("设置SessionContent焦点失败");
             }

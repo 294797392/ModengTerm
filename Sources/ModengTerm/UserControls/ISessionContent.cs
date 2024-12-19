@@ -28,5 +28,11 @@ namespace ModengTerm
         /// </summary>
         /// <returns></returns>
         bool SetInputFocus();
+
+        /// <summary>
+        /// 获取是否有输入焦点
+        /// </summary>
+        /// <returns></returns>
+        bool HasInputFocus();
     }
 }

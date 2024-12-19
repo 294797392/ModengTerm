@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -117,11 +118,6 @@ namespace ModengTerm.Terminal
         /// 当前正在使用的文档模型
         /// </summary>
         private VTDocument activeDocument;
-
-        /// <summary>
-        /// UI线程上下文
-        /// </summary>
-        internal SynchronizationContext uiSyncContext;
 
         #region Mouse
 
@@ -314,8 +310,6 @@ namespace ModengTerm.Terminal
         public void Initialize(VTOptions options)
         {
             XTermSession sessionInfo = options.Session;
-
-            uiSyncContext = SynchronizationContext.Current;
 
             vtOptions = options;
 
@@ -637,46 +631,26 @@ namespace ModengTerm.Terminal
         /// <param name="size">要渲染的数据长度</param>
         public void ProcessData(byte[] bytes, int size)
         {
-            VTDocument document = this.activeDocument;
-            int oldScroll = document.Scrollbar.Value;
+            VTDocument oldDocument = this.activeDocument;
+            int oldScroll = oldDocument.Scrollbar.Value;
 
-            // 有些命令（top）会动态更新主缓冲区
-            // 执行动作之前先把光标滚动到可视区域内
-            if (!this.IsAlternate)
-            {
-                VTCursor cursor = document.Cursor;
-                if (document.OutsideViewport(cursor.PhysicsRow))
-                {
-                    document.ScrollTo(cursor.PhysicsRow);
-                }
-            }
-
-            //Stopwatch stopwatch = new Stopwatch();
-
-            //stopwatch.Start();
             this.renderer.Render(bytes, size);
-            //stopwatch.Stop();
-            //if (stopwatch.ElapsedMilliseconds > 10)
-            //{
-            //    logger.ErrorFormat("Render耗时 ; {0}ms", stopwatch.ElapsedMilliseconds);
-            //    File.WriteAllBytes("1", bytes.Take(size).ToArray());
-            //}
 
             // 全部数据都处理完了之后，只渲染一次
-            //stopwatch.Restart();
-            document.RequestInvalidate();
-            //stopwatch.Stop();
-            //if (stopwatch.ElapsedMilliseconds > 10)
-            //{
-            //    logger.ErrorFormat("Draw耗时 ; {0}ms", stopwatch.ElapsedMilliseconds);
-            //}
+            // 处理控制序列的时候可能会动态切换当前活动的缓冲区
+            // 所以这里要重新渲染当前活动的缓冲区
+            VTDocument newDocument = this.activeDocument;
+            newDocument.RequestInvalidate();
 
-            int newScroll = document.Scrollbar.Value;
-            if (newScroll != oldScroll)
+            if (oldDocument == newDocument)
             {
-                // 计算ScrollData
-                VTScrollData scrollData = this.GetScrollData(document, oldScroll, newScroll);
-                document.InvokeScrollChanged(scrollData);
+                int newScroll = oldDocument.Scrollbar.Value;
+                if (newScroll != oldScroll)
+                {
+                    // 计算ScrollData
+                    VTScrollData scrollData = this.GetScrollData(oldDocument, oldScroll, newScroll);
+                    oldDocument.InvokeScrollChanged(scrollData);
+                }
             }
         }
 
@@ -1363,15 +1337,14 @@ namespace ModengTerm.Terminal
                                 // 使用备用缓冲区
                                 VTDebug.Context.WriteInteractive("UseAlternateScreenBuffer", string.Empty);
 
-                                uiSyncContext.Send(new SendOrPostCallback((o) =>
-                                {
-                                    mainDocument.SetVisible(false);
-                                    alternateDocument.SetVisible(true);
-                                }), null);
+                                this.mainDocument.SetVisible(false);
+                                this.alternateDocument.SetVisible(true);
 
-                                activeDocument = alternateDocument;
+                                this.activeDocument = this.alternateDocument;
 
-                                this.OnDocumentChanged?.Invoke(this, mainDocument, alternateDocument);
+                                //this.OnDocumentChanged?.Invoke(this, this.mainDocument, this.alternateDocument);
+
+                                logger.InfoFormat("UseAlternateScreenBuffer");
                             }
                             else
                             {
@@ -1379,21 +1352,20 @@ namespace ModengTerm.Terminal
 
                                 VTDebug.Context.WriteInteractive("UseMainScreenBuffer", string.Empty);
 
-                                uiSyncContext.Send(new SendOrPostCallback((o) =>
-                                {
-                                    mainDocument.SetVisible(true);
-                                    alternateDocument.SetVisible(false);
-                                }), null);
+                                this.mainDocument.SetVisible(true);
+                                this.alternateDocument.SetVisible(false);
 
-                                alternateDocument.SetScrollMargin(0, 0);
-                                alternateDocument.EraseAll();
-                                alternateDocument.SetCursorLogical(0, 0);
-                                alternateDocument.ClearAttribute();
-                                alternateDocument.Selection.Clear();
+                                this.alternateDocument.SetScrollMargin(0, 0);
+                                this.alternateDocument.EraseAll();
+                                this.alternateDocument.SetCursorLogical(0, 0);
+                                this.alternateDocument.ClearAttribute();
+                                this.alternateDocument.Selection.Clear();
 
-                                activeDocument = mainDocument;
+                                this.activeDocument = this.mainDocument;
 
-                                this.OnDocumentChanged?.Invoke(this, alternateDocument, mainDocument);
+                                //this.OnDocumentChanged?.Invoke(this, this.alternateDocument, this.mainDocument);
+
+                                logger.InfoFormat("UseMainScreenBuffer, {0}", this.activeDocument.Name);
                             }
                             break;
                         }
@@ -2306,6 +2278,16 @@ namespace ModengTerm.Terminal
             VTDocument document = this.activeDocument;
             VTCursor cursor = document.Cursor;
             int vpcols = document.ViewportColumn;
+
+            // 有些命令（top）会动态更新主缓冲区
+            // 执行动作之前先把光标滚动到可视区域内
+            if (document == this.mainDocument)
+            {
+                if (document.OutsideViewport(cursor.PhysicsRow))
+                {
+                    document.ScrollTo(cursor.PhysicsRow);
+                }
+            }
 
             // 创建并打印新的字符
             VTCharacter character = this.CreateCharacter(ch, document.AttributeState);

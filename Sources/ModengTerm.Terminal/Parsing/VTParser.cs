@@ -1085,25 +1085,6 @@ namespace ModengTerm.Terminal.Parsing
 
         #endregion
 
-        //private void NotifyActionEvent(VTActions vtAction, object param = null)
-        //{
-        //    if (this.ActionEvent != null)
-        //    {
-        //        VTDebug.Context.Writevttest(vtAction, this.sequenceBytes);
-
-        //        try
-        //        {
-        //            this.ActionEvent(this, vtAction, param);
-        //        }
-        //        catch (Exception ex) 
-        //        {
-        //            logger.Error(ex);
-        //        }
-
-        //        this.sequenceBytes.Clear();
-        //    }
-        //}
-
         #endregion
 
         #region 事件处理器

@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
+using ModengTerm.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
