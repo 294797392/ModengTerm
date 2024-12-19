@@ -285,5 +285,13 @@ namespace ModengTerm.UnitTest
             FakeGI gi = document.GraphicsInterface as FakeGI;
             gi.RaiseMouseDown(new MouseData() { ClickCount = 1, X = 10, Y = mouseY });
         }
+
+        public void ASB_AlternateScreenBuffer(bool enable) 
+        {
+            char state = enable ? 'h' : 'l';
+
+            string ctlseq = "\x1b[?1049" + state;
+            this.ProcessCtlseq(ctlseq);
+        }
     }
 }

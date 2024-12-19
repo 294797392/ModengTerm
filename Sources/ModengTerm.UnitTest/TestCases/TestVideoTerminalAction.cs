@@ -169,6 +169,98 @@ namespace ModengTerm.UnitTest.TestCases
             return true;
         }
 
+        private bool LineFeed_Alternate()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.AlternateDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.ASB_AlternateScreenBuffer(true);
+
+
+            invoker.PrintLines(9);
+            List<string> textLines = new List<string>() { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            if (!UnitTestHelper.CompareDocument2(document, textLines))
+            {
+                logger.Error("{F67BAA89-58BE-48A0-B086-393A481BE1A6}");
+                return false;
+            }
+
+            // 滚动备用缓冲区然后比对
+            invoker.CRLF();
+            invoker.Print('1');
+            List<string> textLines2 = new List<string>() { "2", "3", "4", "5", "6", "7", "8", "9", "1" };
+            if (!UnitTestHelper.CompareDocument2(document, textLines2))
+            {
+                logger.Error("{979F0CF9-71FD-4DF1-A102-18CBA7C64F33}");
+                return false;
+            }
+
+            if (document.ActiveLine != document.LastLine)
+            {
+                logger.Error("{F773EBEE-549A-4BDE-9CCE-7A8F5BA86BFB}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool RI_ReverseLineFeed1() 
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.MainDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.PrintLines(9);
+            List<string> textLines = new List<string>() { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            if (!UnitTestHelper.CompareDocument2(document, textLines))
+            {
+                logger.Error("{2649A51D-FC9F-4BCA-B8BC-4893546BE60A}");
+                return false;
+            }
+
+            // 光标在第一行，往上滚动一行
+            invoker.CUP_CursorPosition(1, 1);
+            invoker.RI_ReverseLineFeed();
+            List<string> textLines2 = new List<string>() { "", "1", "2", "3", "4", "5", "6", "7", "8" };
+            if (!UnitTestHelper.CompareDocument2(document, textLines2))
+            {
+                logger.Error("{3FD14C12-9D24-4310-994F-43DE3AD15679}");
+                return false;
+            }
+
+            if (document.ActiveLine != document.FirstLine)
+            {
+                logger.Error("{D047574A-0C0A-47A5-BE21-A9678E45C0E4}");
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool RI_ReverseLineFeed2()
+        {
+            VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
+            TerminalInvoker invoker = new TerminalInvoker(terminal);
+            VTDocument document = terminal.MainDocument;
+            VTCursor cursor = document.Cursor;
+
+            invoker.PrintLines(9);
+
+            // 光标在第一行，往上滚动一行
+            invoker.RI_ReverseLineFeed();
+
+            if (document.ActiveLine != document.LastLine.PreviousLine)
+            {
+                logger.Error("{D5F22F26-5C07-4E72-AA02-1EEDBF4F3705}");
+                return false;
+            }
+
+            return true;
+        }
+
         private VTextLine FindLogicalRow(VTDocument document, int logicalRow)
         {
             VTextLine current = document.FirstLine;
@@ -660,6 +752,27 @@ namespace ModengTerm.UnitTest.TestCases
             if (cursor.PhysicsRow != textLines.Count - 1)
             {
                 logger.Error("{B9039CA2-364E-4D0B-A8E2-227D07ECDD79}");
+                return false;
+            }
+
+            if (!this.LineFeed_Alternate())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        [UnitTest]
+        public bool RI_ReverseLineFeed()
+        {
+            if (!this.RI_ReverseLineFeed1())
+            {
+                return false;
+            }
+
+            if (!this.RI_ReverseLineFeed2())
+            {
                 return false;
             }
 

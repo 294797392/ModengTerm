@@ -257,11 +257,6 @@ namespace ModengTerm.Terminal
         /// </summary>
         public VTDocument MainDocument { get { return this.mainDocument; } }
 
-        /// <summary>
-        /// UI线程上下文对象
-        /// </summary>
-        public SynchronizationContext UISyncContext { get { return uiSyncContext; } }
-
         public VTLogger Logger { get; set; }
 
         /// <summary>
@@ -1543,6 +1538,7 @@ namespace ModengTerm.Terminal
                     case (Modes)25:
                         {
                             // 不知道啥意思, terminal也没实现，文档里也找不到对应的说明
+                            VTDebug.Context.WriteInteractive("SwitchMode", "{0},{1}", mode, enable);
                             break;
                         }
 
@@ -2261,6 +2257,7 @@ namespace ModengTerm.Terminal
                 case CsiActionCodes.ECH_EraseCharacters:
                     {
                         int count = VTParameter.GetParameter(parameters, 0, 1);
+                        VTDebug.Context.WriteInteractive("ECH_EraseCharacters", "{0}", count);
                         this.ECH_EraseCharacters(count);
                         break;
                     }
@@ -2268,7 +2265,7 @@ namespace ModengTerm.Terminal
                 case CsiActionCodes.REP_RepeatCharacter:
                     {
                         int n = VTParameter.GetParameter(parameters, 0, -1);
-
+                        VTDebug.Context.WriteInteractive("REP_RepeatCharacter", "{0},{1}", this.lastPrintChar, n);
                         for (int i = 0; i < n; i++)
                         {
                             this.PrintCharacter(this.lastPrintChar);
@@ -2409,6 +2406,7 @@ namespace ModengTerm.Terminal
                 {
                     // 备用缓冲区重置被移动的行
                     head.DeleteAll();
+                    document.SetCursorPhysical(oldPhysicsRow);
                 }
                 else
                 {
@@ -2544,9 +2542,6 @@ namespace ModengTerm.Terminal
 
         private void RI_ReverseLineFeed()
         {
-            int oldRow = this.CursorRow;
-            int oldCol = this.CursorCol;
-
             // 和LineFeed相反，把光标所在行向上移动一行
             // 在用man命令的时候往上滚动会触发这个指令
             // 反向换行 – 执行\n的反向操作，将光标所在行向上移动一行，维护水平位置，如有必要，滚动缓冲区 *
@@ -2557,6 +2552,9 @@ namespace ModengTerm.Terminal
             VTCursor cursor = document.Cursor;
             int scrollRegionTop = document.ScrollMarginTop;
             int scrollRegionBottom = document.ScrollMarginBottom;
+            int oldCursorRow = cursor.Row;
+            int oldCursorCol = cursor.Column;
+            int oldCursorPhysicsRow = cursor.PhysicsRow;
 
             // 可滚动区域的第一行和最后一行
             VTextLine scrollRegionTopLine = document.FirstLine.FindNext(scrollRegionTop);
@@ -2574,6 +2572,8 @@ namespace ModengTerm.Terminal
                 scrollRegionBottomLine.DeleteAll();
 
                 document.UpdateViewportHistory(scrollRegionTop, scrollRegionBottom);
+
+                document.SetCursorPhysical(oldCursorPhysicsRow);
             }
             else
             {
@@ -2585,7 +2585,7 @@ namespace ModengTerm.Terminal
             int newRow = this.CursorRow;
             int newCol = this.CursorCol;
 
-            VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
+            VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", "{0},{1},{2},{3}", oldCursorRow, oldCursorCol, newRow, newCol);
         }
 
         public void EraseDisplay(VTEraseType eraseType)
@@ -2689,7 +2689,7 @@ namespace ModengTerm.Terminal
         {
             // TODO：优化填充算法
 
-            VTDebug.Context.WriteInteractive("EraseLine", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
+            VTDebug.Context.WriteInteractive("EL_EraseLine", "{0},{1},{2}", CursorRow, CursorCol, eraseType);
 
             switch (eraseType)
             {
@@ -2697,7 +2697,7 @@ namespace ModengTerm.Terminal
                     {
                         for (int i = 0; i < this.ViewportColumn; i++)
                         {
-                            VTCharacter character = this.CreateCharacter(' ', activeDocument.AttributeState);
+                            VTCharacter character = VTCharacter.CreateEmpty();
                             this.activeDocument.PrintCharacter(character, i);
                         }
 
@@ -2708,7 +2708,7 @@ namespace ModengTerm.Terminal
                     {
                         for (int i = 0; i <= this.CursorCol; i++)
                         {
-                            VTCharacter character = this.CreateCharacter(' ', activeDocument.AttributeState);
+                            VTCharacter character = VTCharacter.CreateEmpty();
                             this.activeDocument.PrintCharacter(character, i);
                         }
 
@@ -2719,7 +2719,7 @@ namespace ModengTerm.Terminal
                     {
                         for (int i = this.CursorCol; i < this.ViewportColumn; i++)
                         {
-                            VTCharacter character = this.CreateCharacter(' ', activeDocument.AttributeState);
+                            VTCharacter character = VTCharacter.CreateEmpty();
                             this.activeDocument.PrintCharacter(character, i);
                         }
 

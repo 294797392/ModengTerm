@@ -81,11 +81,10 @@ namespace ModengTerm.Document
         }
 
         /// <summary>
-        /// 从缓冲池里创建一个空的字符
-        /// TODO：考虑重命名为CreateSpace或者CreateBlank
+        /// 从缓冲池里创建一个空白的字符
         /// </summary>
         /// <returns></returns>
-        public static VTCharacter CreateNull()
+        public static VTCharacter CreateEmpty()
         {
             return Create(' ', 1, null);
         }

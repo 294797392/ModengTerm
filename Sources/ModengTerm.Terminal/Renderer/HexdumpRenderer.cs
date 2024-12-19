@@ -84,7 +84,7 @@ namespace ModengTerm.Terminal.Renderer
                 string hexstr = value.ToString("X2");
 
                 document.SetCursorLogical(printRow, printColumn);
-                VTCharacter character1 = VTCharacter.CreateNull();
+                VTCharacter character1 = VTCharacter.CreateEmpty();
                 document.PrintCharacter(character1);
 
                 document.SetCursorLogical(printRow, printColumn + 1);

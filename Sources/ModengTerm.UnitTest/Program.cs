@@ -88,10 +88,16 @@ namespace ModengTerm.UnitTest
 
         static void Main(string[] args)
         {
+            SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
+
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DotNEToolkit.Log4net.InitializeLog4net();
 
             VTermApp.Context.Initialize("vtermapp.json");
+
+            logger.InfoFormat("--- TestVTDocumentInterface ---");
+
+            RunTestCase(typeof(TestVTDocumentInterface));
 
             logger.InfoFormat("--- TestVideoTerminalEngine ---");
 

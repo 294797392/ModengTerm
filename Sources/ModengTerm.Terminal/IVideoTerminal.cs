@@ -89,11 +89,6 @@ namespace ModengTerm.Terminal
         bool IsAlternate { get; }
 
         /// <summary>
-        /// 获取UI线程上下文
-        /// </summary>
-        SynchronizationContext UISyncContext { get; }
-
-        /// <summary>
         /// 保存日志记录器
         /// </summary>
         VTLogger Logger { get; set; }

@@ -871,7 +871,7 @@ namespace ModengTerm.Document
                 int characterIndex = textLine.FindCharacterIndex(column);
 
                 // 创建新的字符
-                VTCharacter character = VTCharacter.CreateNull();
+                VTCharacter character = VTCharacter.CreateEmpty();
 
                 // 插入到光标处
                 ActiveLine.InsertCharacter(characterIndex, character);

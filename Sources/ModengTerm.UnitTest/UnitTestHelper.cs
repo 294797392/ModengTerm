@@ -39,6 +39,40 @@ namespace ModengTerm.UnitTest
             return document;
         }
 
+        /// <summary>
+        /// 只比对文档，不比对历史记录
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="textLines"></param>
+        /// <returns></returns>
+        public static bool CompareDocument2(VTDocument document, List<string> textLines)
+        {
+            VTextLine current = document.FirstLine;
+
+            foreach (string textLine in textLines)
+            {
+                string line1 = VTUtils.CreatePlainText(current.Characters);
+                string line2 = textLine;
+
+                if (line1 != line2)
+                {
+                    logger.Error("{3EB3D6EF-029D-42C7-8C17-E18F86EFEDAC}");
+                    return false;
+                }
+
+                current = current.NextLine;
+            }
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// 比对文档和历史记录
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="textLines"></param>
+        /// <returns></returns>
         public static bool CompareDocument(VTDocument document, List<string> textLines)
         {
             VTextLine current = document.FirstLine;

@@ -1,4 +1,6 @@
-﻿using ModengTerm.Base;
+﻿using log4net.Core;
+using log4net.Repository.Hierarchy;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -433,6 +435,25 @@ namespace ModengTerm
             }
         }
 
+        private void MenuItemLog_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+
+            bool isChecked = menuItem.IsChecked;
+            string loggerName = menuItem.Tag.ToString();
+
+            Hierarchy hierarchy = log4net.LogManager.GetRepository() as Hierarchy;
+            Logger logger = hierarchy.Exists(loggerName) as Logger;
+
+            if (isChecked)
+            {
+                logger.Level = Level.All;
+            }
+            else
+            {
+                logger.Level = Level.Off;
+            }
+        }
 
         #endregion
 

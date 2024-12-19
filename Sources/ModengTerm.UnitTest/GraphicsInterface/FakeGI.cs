@@ -24,6 +24,8 @@ namespace ModengTerm.UnitTest.Drawing
 
         public bool GIMouseCaptured => false;
 
+        public VTModifierKeys PressedModifierKey => VTModifierKeys.None;
+
         public FakeGI()
         {
             Scrollbar = new FakeScrollbar();

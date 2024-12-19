@@ -274,7 +274,7 @@ namespace ModengTerm.Document
                 int count = column - this.columns;
                 for (int i = 0; i < count; i++)
                 {
-                    this.Characters.Add(VTCharacter.CreateNull());
+                    this.Characters.Add(VTCharacter.CreateEmpty());
                 }
                 this.columns += count;
 
@@ -319,7 +319,7 @@ namespace ModengTerm.Document
 
             for (int i = 0; i < eraseCols; i++)
             {
-                VTCharacter character = VTCharacter.CreateNull();
+                VTCharacter character = VTCharacter.CreateEmpty();
 
                 this.Characters.Add(character);
             }
@@ -340,7 +340,7 @@ namespace ModengTerm.Document
 
             for (int i = 0; i < totalColumns; i++)
             {
-                VTCharacter character = VTCharacter.CreateNull();
+                VTCharacter character = VTCharacter.CreateEmpty();
 
                 this.Characters.Add(character);
             }
