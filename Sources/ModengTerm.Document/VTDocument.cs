@@ -4,6 +4,7 @@ using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ModengTerm.Document
@@ -242,6 +243,25 @@ namespace ModengTerm.Document
             get
             {
                 return this.options.RollbackMax;
+            }
+        }
+
+        /// <summary>
+        /// 可视区域的第一行物理行号
+        /// </summary>
+        public int FirstPhysicsRow
+        {
+            get { return this.Scrollbar.Value; }
+        }
+
+        /// <summary>
+        /// 可视区域最后一行的物理行号
+        /// </summary>
+        public int LastPhysicsRow
+        {
+            get
+            {
+                return this.Scrollbar.Value + this.viewportRow - 1;
             }
         }
 
@@ -910,7 +930,7 @@ namespace ModengTerm.Document
             // 有可能ActiveLine变了，更新ActiveLine和PhysicsRow
             this.cursor.Row = row;
             VTextLine newActiveLine = this.FirstLine.FindNext(row);
-            if (this.activeLine != newActiveLine) 
+            if (this.activeLine != newActiveLine)
             {
                 this.activeLine = newActiveLine;
             }
@@ -956,10 +976,8 @@ namespace ModengTerm.Document
         /// <returns></returns>
         public bool OutsideViewport(int physicsRow)
         {
-            VTScrollInfo scrollInfo = this.Scrollbar;
-
-            if (physicsRow >= scrollInfo.FirstPhysicsRow &&
-                physicsRow <= scrollInfo.LastPhysicsRow)
+            if (physicsRow >= this.FirstPhysicsRow &&
+                physicsRow <= this.LastPhysicsRow)
             {
                 // 此时说明光标在可视区域内
                 return false;
@@ -975,17 +993,15 @@ namespace ModengTerm.Document
         /// <returns></returns>
         public VTextLine FindLine(int physicsRow)
         {
-            VTScrollInfo scrollInfo = this.Scrollbar;
-
-            if (physicsRow < scrollInfo.FirstPhysicsRow || physicsRow > scrollInfo.LastPhysicsRow)
+            if (this.OutsideViewport(physicsRow))
             {
                 return null;
             }
 
-            // 要找的行在当前显示的行之中
+            // 要找的行在可视区域中
 
             // 往前找几行
-            int nrows = physicsRow - scrollInfo.FirstPhysicsRow;
+            int nrows = physicsRow - this.FirstPhysicsRow;
 
             // TODO：使用索引查找提高速度
             return this.FirstLine.FindNext(nrows);
@@ -1308,58 +1324,81 @@ namespace ModengTerm.Document
             int startColumn = options.StartColumn;
             int endColumn = options.EndColumn;
 
+            List<List<VTCharacter>> charactersList = new List<List<VTCharacter>>();
+
+            // 为了兼容AlternateDocument, 如果要创建的内容都在可视区域里，那么用可视区域里的数据
+            // 因为AlternateDocument不会保存历史记录
+            int topPhysicsRow = this.Scrollbar.Value;
+            int bottomPhysicsRow = this.Scrollbar.Value + this.viewportRow - 1;
+
+            if (firstPhysicsRow >= topPhysicsRow && lastPhysicsRow <= bottomPhysicsRow)
+            {
+                // 选中内容在可视区域内
+                int n = lastPhysicsRow - firstPhysicsRow + 1;
+                VTextLine current = this.FindLine(firstPhysicsRow);
+                for (int i = 0; i < n; i++)
+                {
+                    charactersList.Add(current.Characters);
+
+                    current = current.NextLine;
+                }
+            }
+            else
+            {
+                IEnumerable<VTHistoryLine> historyLines;
+                if (!this.history.TryGetHistories(firstPhysicsRow, lastPhysicsRow, out historyLines))
+                {
+                    return VTParagraph.Empty;
+                }
+
+                charactersList.AddRange(historyLines.Select(v => v.Characters));
+            }
+
             CreateLineDelegate createLine = VTUtils.GetCreateLineDelegate(formatType);
             StringBuilder builder = new StringBuilder();
 
-            for (int i = firstPhysicsRow; i <= lastPhysicsRow; i++)
+            for (int i = 0; i < charactersList.Count; i++)
             {
-                VTHistoryLine historyLine;
-                if (!this.history.TryGetHistory(i, out historyLine))
+                List<VTCharacter> characters = charactersList[i];
+
+                // 第一个字符的索引
+                int startIndex = 0;
+                // 字符数量
+                int count = 0;
+
+                if (i == 0 && charactersList.Count == 1)
                 {
-                    // 不存在该行，说明当前行没有被渲染过
+                    // 优先处理只选中了一行的情况
+                    startIndex = VTUtils.GetCharacterIndex(characters, startColumn);
+                    int endIndex = VTUtils.GetCharacterIndex(characters, endColumn);
+                    count = endIndex - startIndex + 1;
+                }
+                else if (i == 0)
+                {
+                    // 第一行
+                    startIndex = VTUtils.GetCharacterIndex(characters, startColumn);
+                    count = characters.Count - startIndex;
+                }
+                else if (i == charactersList.Count - 1)
+                {
+                    // 最后一行
+                    startIndex = 0;
+                    count = VTUtils.GetCharacterIndex(characters, endColumn) + 1;
                 }
                 else
                 {
-                    // 第一个字符的索引
-                    int startIndex = 0;
-                    // 字符数量
-                    int count = 0;
-
-                    if (i == firstPhysicsRow && i == lastPhysicsRow)
-                    {
-                        // 优先处理只选中了一行的情况
-                        startIndex = VTUtils.GetCharacterIndex(historyLine.Characters, startColumn);
-                        int endIndex = VTUtils.GetCharacterIndex(historyLine.Characters, endColumn);
-                        count = endIndex - startIndex + 1;
-                    }
-                    else if (i == firstPhysicsRow)
-                    {
-                        // 第一行
-                        startIndex = VTUtils.GetCharacterIndex(historyLine.Characters, startColumn);
-                        count = historyLine.Characters.Count - startIndex;
-                    }
-                    else if (i == lastPhysicsRow)
-                    {
-                        // 最后一行
-                        startIndex = 0;
-                        count = VTUtils.GetCharacterIndex(historyLine.Characters, endColumn) + 1;
-                    }
-                    else
-                    {
-                        startIndex = 0;
-                        count = historyLine.Characters.Count;
-                    }
-
-                    // VTUtils.GetCharacterIndex有可能返回-1，在回放的时候复制会有这个问题，暂时没找到原因
-                    if (startIndex == -1)
-                    {
-                        continue;
-                    }
-
-                    createLine(historyLine.Characters, builder, startIndex, count, i == lastPhysicsRow);
+                    startIndex = 0;
+                    count = characters.Count;
                 }
-            }
 
+                // VTUtils.GetCharacterIndex有可能返回-1，在回放的时候复制会有这个问题，暂时没找到原因
+                if (startIndex == -1)
+                {
+                    continue;
+                }
+
+                createLine(characters, builder, startIndex, count, i == lastPhysicsRow);
+            }
 
             //if (fileType == ParagraphFormatEnum.HTML)
             //{
@@ -1583,7 +1622,7 @@ namespace ModengTerm.Document
         {
             this.MouseUp?.Invoke(this, mouseData);
 
-            if (mouseData.Button != VTMouseButton.LeftButton) 
+            if (mouseData.Button != VTMouseButton.LeftButton)
             {
                 return;
             }

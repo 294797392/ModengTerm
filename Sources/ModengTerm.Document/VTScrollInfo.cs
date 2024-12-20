@@ -33,16 +33,6 @@ namespace ModengTerm.Document
         #region 属性
 
         /// <summary>
-        /// 获取当前显示的第一行的物理行号
-        /// </summary>
-        public int FirstPhysicsRow { get { return this.Value; } }
-
-        /// <summary>
-        /// 获取当前显示的最后一行的物理行号
-        /// </summary>
-        public int LastPhysicsRow { get { return this.Value + this.ownerDocument.ViewportRow - 1; } }
-
-        /// <summary>
         /// 可以滚动到的最大值
         /// 也就是滚动条滚动到底的时候，滚动条的值
         /// 也就是滚动条滚动到底的时候，文档里的第一行的PhysicsRow

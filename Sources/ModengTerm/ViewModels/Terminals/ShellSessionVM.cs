@@ -438,7 +438,9 @@ namespace ModengTerm.Terminal.ViewModels
                 new ContextMenuDefinition("22","18"," ", "录制"),
                 new ContextMenuDefinition("23","22","22","开始", this.ContextMenuStartRecord_Click),
                 new ContextMenuDefinition("24","22","22","停止", this.ContextMenuStopRecord_Click),
-                new ContextMenuDefinition("25","18"," ","打开回放", this.ContextMenuOpenRecord_Click)
+                new ContextMenuDefinition("25","18"," ","打开回放", this.ContextMenuOpenRecord_Click),
+                new ContextMenuDefinition("26","18", "", "传输"),
+                new ContextMenuDefinition("27","26","26","使用XModem发送", this.ContextMenuXModemSend_Click)
             };
         }
 
@@ -1406,6 +1408,54 @@ namespace ModengTerm.Terminal.ViewModels
                 panelVM.Visible = true;
                 panelItemVM.IsSelected = true;
             }
+        }
+
+        public static class XModemConstants
+        {
+            public const byte SOH = 0x01;  // Start of Header
+            public const byte EOT = 0x04;  // End of Transmission
+            public const byte ACK = 0x06;  // Acknowledge
+            public const byte NAK = 0x15;  // Negative Acknowledge
+            public const byte CAN = 0x18;  // Cancel
+            public const int PacketSize = 128; // Standard XModem packet size
+        }
+
+        private void ContextMenuXModemSend_Click(ContextMenuVM sender)
+        {
+            byte packetNumber = 1;
+            byte[] buffer = Enumerable.Repeat<byte>(0x1A, 129).ToArray();
+
+            buffer[0] = (byte)'1';
+            buffer[1] = (byte)'2';
+            buffer[2] = (byte)'3';
+
+            byte[] packet = CreatePacket(packetNumber, buffer, buffer.Length);
+            Task.Factory.StartNew(() =>
+            {
+                this.sessionTransport.Write(packet);
+
+                Thread.Sleep(2000);
+
+                this.sessionTransport.Write(new byte[] { XModemConstants.EOT });
+            });
+        }
+
+        private byte[] CreatePacket(byte number, byte[] data, int length)
+        {
+            byte[] packet = new byte[length + 3]; // SOH + Number + Complement + Data + Checksum
+            packet[0] = XModemConstants.SOH;
+            packet[1] = number;
+            packet[2] = (byte)(256 - number); // Complement
+            Array.Copy(data, 0, packet, 3, length);
+
+            int checksum = 0;
+            for (int i = 3; i < packet.Length - 1; i++)
+            {
+                checksum += packet[i];
+            }
+            packet[packet.Length - 1] = (byte)(checksum % 256);
+
+            return packet;
         }
 
         #endregion

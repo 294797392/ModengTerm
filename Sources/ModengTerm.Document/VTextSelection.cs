@@ -156,14 +156,13 @@ namespace ModengTerm.Document
         public void SelectViewport()
         {
             VTDocument document = this.OwnerDocument;
-            VTScrollInfo scrollInfo = document.Scrollbar;
 
-            this.StartPointer.PhysicsRow = scrollInfo.FirstPhysicsRow;
+            this.StartPointer.PhysicsRow = this.OwnerDocument.FirstPhysicsRow;
             this.StartPointer.CharacterIndex = 0;
             this.StartPointer.ColumnIndex = 0;
 
-            this.EndPointer.PhysicsRow = scrollInfo.LastPhysicsRow;
-            this.EndPointer.CharacterIndex = scrollInfo.LastPhysicsRow;
+            this.EndPointer.PhysicsRow = this.OwnerDocument.LastPhysicsRow;
+            this.EndPointer.CharacterIndex = this.OwnerDocument.LastPhysicsRow;
             this.EndPointer.ColumnIndex = document.ViewportColumn - 1;
 
             // 立即显示选中区域
