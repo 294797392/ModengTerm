@@ -45,7 +45,7 @@ namespace ModengTerm.Terminal.Modem
         /// </returns>
         protected int Read(byte[] buffer, int size)
         {
-
+            throw new NotImplementedException();
         }
 
         #endregion

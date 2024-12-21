@@ -630,56 +630,56 @@ namespace ModengTerm.Terminal
         /// <param name="size">要渲染的数据长度</param>
         public void ProcessData(byte[] bytes, int size)
         {
-            foreach (byte c in bytes)
-            {
-                switch (c)
-                {
-                    case 0x01:
-                        {
-                            logger.Error("SOH");
-                            break;
-                        }
+            //foreach (byte c in bytes)
+            //{
+            //    switch (c)
+            //    {
+            //        case 0x01:
+            //            {
+            //                logger.Error("SOH");
+            //                break;
+            //            }
 
-                    case 0x02:
-                        {
-                            logger.Error("STX");
-                            break;
-                        }
+            //        case 0x02:
+            //            {
+            //                logger.Error("STX");
+            //                break;
+            //            }
 
-                    case 0x04:
-                        {
-                            logger.Error("EOT");
-                            break;
-                        }
+            //        case 0x04:
+            //            {
+            //                logger.Error("EOT");
+            //                break;
+            //            }
 
-                    case 0x06:
-                        {
-                            logger.Error("ACK");
-                            break;
-                        }
+            //        case 0x06:
+            //            {
+            //                logger.Error("ACK");
+            //                break;
+            //            }
 
-                    case 0x15:
-                        {
-                            logger.Error("NAK");
-                            break;
-                        }
+            //        case 0x15:
+            //            {
+            //                logger.Error("NAK");
+            //                break;
+            //            }
 
-                    case 0x18:
-                        {
-                            logger.Error("CAN");
-                            break;
-                        }
+            //        case 0x18:
+            //            {
+            //                logger.Error("CAN");
+            //                break;
+            //            }
 
-                    case 0x43:
-                        {
-                            logger.Error("CRC16");
-                            break;
-                        }
+            //        case 0x43:
+            //            {
+            //                logger.Error("CRC16");
+            //                break;
+            //            }
 
-                    default:
-                        break;
-                }
-            }
+            //        default:
+            //            break;
+            //    }
+            //}
 
             VTDocument oldDocument = this.activeDocument;
             int oldScroll = oldDocument.Scrollbar.Value;
