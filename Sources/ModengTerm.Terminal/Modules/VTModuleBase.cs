@@ -79,7 +79,7 @@ namespace ModengTerm.Terminal.Modules
         /// </summary>
         /// <param name="buffer"></param>
         /// <param name="size"></param>
-        protected int Write(byte[] bytes)
+        protected int SendToHost(byte[] bytes)
         {
             return this.transport.Write(bytes);
         }

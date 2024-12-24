@@ -1,61 +1,15 @@
-﻿using DotNEToolkit;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Terminal.Modules;
-using System;
-using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
 using System.IO;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Modem
 {
     /// <summary>
+    /// https://wiki.synchro.net/ref:ymodem
     /// <SOH><blk #><255-blk #><--128 data bytes--><cksum>
     /// </summary>
     public class XModem : ModemBase
     {
-        private static class CRC16
-        {
-            private static readonly ushort[] crcTable = new ushort[256];
-
-            static CRC16()
-            {
-                // 初始化 CRC 表，使用 CRC-16/CCITT 多项式 (0x1021)
-                ushort polynomial = 0x1021;
-                for (int i = 0; i < 256; i++)
-                {
-                    ushort crc = (ushort)i;
-                    for (int j = 0; j < 8; j++)
-                    {
-                        if ((crc & 0x8000) != 0)
-                        {
-                            crc = (ushort)((crc << 1) ^ polynomial);
-                        }
-                        else
-                        {
-                            crc <<= 1;
-                        }
-                    }
-                    crcTable[i] = crc;
-                }
-            }
-
-            public static ushort Compute(byte[] data, int offset, int size)
-            {
-                ushort crc = 0xFFFF; // 初始值
-
-                for (int i = offset; i < offset + size; i++)
-                {
-                    byte b = data[i];
-                    crc = (ushort)((crc << 8) ^ crcTable[((crc >> 8) ^ b) & 0xFF]);
-                }
-                return crc;
-            }
-        }
-
         #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("XModem");
@@ -73,12 +27,22 @@ namespace ModengTerm.Terminal.Modem
         #region 实例变量
 
         private SynchronizedStream stream;
+
+        /// <summary>
+        /// 是否使用xmodel1k协议
+        /// xmodem1k协议数据包大小是1024
+        /// </summary>
         private bool xmodem1k = false;
 
         /// <summary>
         /// 当数据包传输失败，重传次数
         /// </summary>
-        private int retry = 3;
+        private int retry = 10;
+
+        /// <summary>
+        /// 如果数据包不足1024或者128字节，指定填充字符
+        /// </summary>
+        private byte padchar = (byte)'\0';
 
         #endregion
 
@@ -109,10 +73,12 @@ namespace ModengTerm.Terminal.Modem
         {
             SynchronizedStream _stream = this.stream;
 
-            if (_stream == null) 
+            if (_stream == null)
             {
                 return;
             }
+
+            //logger.InfoFormat("DataReceived, {0}, {1}", bytes[0], size);
 
             _stream.Write(bytes, size);
         }
@@ -139,6 +105,8 @@ namespace ModengTerm.Terminal.Modem
                 return ResponseCode.FAILED;
             }
 
+            #region 使用第一个字节判断数据校验方式        
+
             bool checksum = false;
 
             if (onebyte[0] == 'C')
@@ -153,60 +121,55 @@ namespace ModengTerm.Terminal.Modem
             }
             else
             {
-                logger.ErrorFormat("unkown start byte, {0}", onebyte[0]);
+                logger.ErrorFormat("xmodem unhandled start byte, {0}", onebyte[0]);
                 return ResponseCode.FAILED;
             }
+
+            logger.InfoFormat("xmodem start byte:{0}", onebyte[0]);
+
+            #endregion
 
             int datasize = this.xmodem1k ? 1024 : 128;
             byte[] buffer = new byte[datasize];
             byte packetnum = 1;
-            bool eof = false;
+            bool end = false;
+
             while (true)
             {
                 // data
                 n = stream.Read(buffer, 0, datasize);
                 if (n == 0)
                 {
-                    eof = true;
+                    end = true;
                 }
                 else
                 {
-                    #region 如果数据不足128或者1024，那么使用0x1A填充
-
-                    if (n < datasize)
-                    {
-                        // 数据不足，用0x1A填充
-                        int npad = datasize - n;
-                        byte[] padding = Enumerable.Repeat<byte>(0x1A, npad).ToArray();
-                        Buffer.BlockCopy(padding, 0, buffer, n, npad);
-                        eof = true;
-                    }
-
-                    #endregion
+                    end = n < datasize;
 
                     #region 传输数据包
 
                     bool success = false;
+                    byte[] packet = ModemUtils.CreatePacket(buffer, n, this.padchar, packetnum, checksum);
 
                     for (int i = 0; i < this.retry; i++)
                     {
-                        int code = this.WritePacket(buffer, packetnum, this.xmodem1k, checksum);
-                        if (code != ResponseCode.SUCCESS)
+                        if ((n = this.SendToHost(packet)) != ResponseCode.SUCCESS)
                         {
-                            logger.ErrorFormat("XModemWritePacket失败, {0}", code);
-                            return ResponseCode.FAILED;
+                            logger.ErrorFormat("XModemWritePacket失败, {0}", n);
+                            return n;
                         }
 
-                        n = this.stream.Read(onebyte, 0, onebyte.Length);
-                        if (n <= 0)
+                        if ((n = this.stream.Read(onebyte, 0, onebyte.Length)) <= 0)
                         {
                             logger.ErrorFormat("read packet ack failed, {0}", n);
                             return ResponseCode.FAILED;
                         }
 
-                        if (onebyte[0] == ACK)
+                        byte b = onebyte[0];
+
+                        if (b == ACK)
                         {
-                            logger.InfoFormat("xmodem transfer success, {0}", packetnum);
+                            logger.InfoFormat("xmodem ACK signal, {0}", packetnum);
 
                             // ACK表示传输成功，递增包序号
                             if (packetnum == 255)
@@ -219,60 +182,63 @@ namespace ModengTerm.Terminal.Modem
                             }
 
                             success = true;
-
                             break;
                         }
-                        else if (onebyte[0] == NAK)
+                        else if (b == NAK)
                         {
                             // 重传，包序号不变
-                            logger.InfoFormat("xmodem nak signal");
+                            logger.InfoFormat("xmodem NAK signal");
                         }
-                        else if (onebyte[0] == CAN)
+                        else if (b == 'C')
                         {
-                            logger.InfoFormat("xmodem cancel signal");
+                            // 重传
+                            logger.InfoFormat("xmodem C siganl");
+                        }
+                        else if (b == CAN)
+                        {
+                            logger.InfoFormat("xmodem CAN signal");
+                            return ResponseCode.OPERATION_CANCEL;
                         }
                         else
                         {
                             // ...
-                            logger.ErrorFormat("xmodem unhandl signal, {0}", onebyte[0]);
+                            logger.ErrorFormat("xmodem unhandle signal, {0}", onebyte[0]);
                             return ResponseCode.FAILED;
                         }
                     }
 
                     if (!success)
                     {
-                        logger.ErrorFormat("传输XModem数据包失败");
+                        logger.ErrorFormat("send xmodem packet failed");
                         return ResponseCode.FAILED;
                     }
 
                     #endregion
                 }
 
-                if (eof)
+                if (end)
                 {
-                    n = this.Write(new byte[1] { EOT });
-                    if (n != ResponseCode.SUCCESS)
+                    if ((n = this.SendToHost(new byte[1] { EOT })) != ResponseCode.SUCCESS)
                     {
                         logger.ErrorFormat("xmodem EOT failed, {0}", n);
                         return ResponseCode.FAILED;
                     }
 
-                    n = this.stream.Read(onebyte, 0, onebyte.Length);
-                    if (n == 0) 
+                    if ((n = this.stream.Read(onebyte, 0, onebyte.Length)) == 0)
                     {
                         logger.ErrorFormat("xmodem read ack failed");
                         return ResponseCode.FAILED;
                     }
 
-                    if (onebyte[0] == ACK)
+                    if (onebyte[0] != ACK)
                     {
-                        logger.InfoFormat("xmodem success");
-                        return ResponseCode.SUCCESS;
+                        logger.ErrorFormat("xmodem eot response failed, {0}", onebyte[0]);
+                        return ResponseCode.FAILED;
                     }
 
-                    logger.ErrorFormat("xmodem eot response failed, {0}", onebyte[0]);
+                    logger.InfoFormat("xmodem success");
 
-                    return ResponseCode.FAILED;
+                    return ResponseCode.SUCCESS;
                 }
             }
         }
@@ -285,53 +251,6 @@ namespace ModengTerm.Terminal.Modem
         #endregion
 
         #region 实例方法
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data">要传输的数据</param>
-        /// <param name="packetnum">包序号</param>
-        /// <param name="xmodem1k">是否使用XModem1k协议</param>
-        /// <param name="checksum">是否使用checksum做完整性校验</param>
-        /// <param name="eof">是否到达了文件末尾</param>
-        /// <returns></returns>
-        private int WritePacket(byte[] data, byte packetnum, bool xmodem1k, bool checksum)
-        {
-            // 计算一个数据包的总大小
-            int datasize = data.Length;
-            int pktsize = checksum ? 3 + datasize + 1 : 3 + datasize + 2;
-
-            byte[] packet = new byte[pktsize];
-
-            // header
-            packet[0] = xmodem1k ? STX : SOH;
-            packet[1] = packetnum; // TODO：包序号255怎么办？从0开始？
-            packet[2] = (byte)(255 - packetnum);
-
-            // data
-            Buffer.BlockCopy(data, 0, packet, 3, datasize);
-
-            // checksum或者crc16
-            if (checksum)
-            {
-                // 用checksum校验
-                byte cksum = 0;
-                for (int i = 3; i < packet.Length - 1; i++)
-                {
-                    cksum += packet[i];
-                }
-                packet[packet.Length - 1] = cksum;
-            }
-            else
-            {
-                // 用crc16校验
-                ushort crc = CRC16.Compute(packet, 3, datasize);
-                packet[packet.Length - 2] = (byte)(crc & 0xFF);
-                packet[packet.Length - 1] = (byte)(crc >> 8);
-            }
-
-            return base.Write(packet);
-        }
 
         #endregion
     }

@@ -23,6 +23,11 @@ namespace ModengTerm.Terminal.Modem
 
         #region 受保护方法
 
+        protected void XModemSend() 
+        {
+
+        }
+
         #endregion
 
         #region 抽象方法

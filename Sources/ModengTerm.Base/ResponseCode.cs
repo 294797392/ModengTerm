@@ -12,6 +12,7 @@ namespace ModengTerm.Base
         public const int TIMEOUT = 1;
         public const int NOT_SUPPORTED = 2;
         public const int PRIVATE_KEY_NOT_FOUND = 3;
+        public const int OPERATION_CANCEL = 4;
 
         public static string GetMessage(int code)
         {
@@ -22,6 +23,7 @@ namespace ModengTerm.Base
                 case ResponseCode.TIMEOUT: return "超时";
                 case ResponseCode.NOT_SUPPORTED: return "不支持的操作";
                 case ResponseCode.PRIVATE_KEY_NOT_FOUND: return "密钥不存在";
+                case ResponseCode.OPERATION_CANCEL: return "操作被取消";
 
                 default:
                     return "未知错误";

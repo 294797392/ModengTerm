@@ -993,11 +993,6 @@ namespace ModengTerm.Terminal.ViewModels
         {
             VTDebug.Context.WriteRawRead(bytes, size);
 
-            if (this.xmodem.Status == Modules.VTModuleStatus.Started)
-            {
-                this.xmodem.OnDataReceived(bytes, size);
-            }
-
             // 窗口持续改变大小的时候可能导致Render和SizeChanged事件一起运行，产生多线程修改VTDocument的bug
             // 所以这里把Render放在UI线程处理
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -1013,6 +1008,7 @@ namespace ModengTerm.Terminal.ViewModels
             });
 
             this.HandleRecord(bytes, size);
+            this.xmodem.OnDataReceived(bytes, size);
         }
 
         private void SessionTransport_StatusChanged(object client, SessionStatusEnum status)
@@ -1416,15 +1412,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public static class XModemConstants
-        {
-            public const byte SOH = 0x01;  // Start of Header
-            public const byte EOT = 0x04;  // End of Transmission
-            public const byte ACK = 0x06;  // Acknowledge
-            public const byte NAK = 0x15;  // Negative Acknowledge
-            public const byte CAN = 0x18;  // Cancel
-            public const int PacketSize = 128; // Standard XModem packet size
-        }
         XModem xmodem = new XModem();
 
         private void ContextMenuXModemSend_Click(ContextMenuVM sender)
