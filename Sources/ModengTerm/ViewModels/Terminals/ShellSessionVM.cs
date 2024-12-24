@@ -10,6 +10,7 @@ using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
+using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.Watch;
 using ModengTerm.Terminal.Windows;
@@ -992,6 +993,11 @@ namespace ModengTerm.Terminal.ViewModels
         {
             VTDebug.Context.WriteRawRead(bytes, size);
 
+            if (this.xmodem.Status == Modules.VTModuleStatus.Started)
+            {
+                this.xmodem.OnDataReceived(bytes, size);
+            }
+
             // 窗口持续改变大小的时候可能导致Render和SizeChanged事件一起运行，产生多线程修改VTDocument的bug
             // 所以这里把Render放在UI线程处理
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -1419,43 +1425,28 @@ namespace ModengTerm.Terminal.ViewModels
             public const byte CAN = 0x18;  // Cancel
             public const int PacketSize = 128; // Standard XModem packet size
         }
+        XModem xmodem = new XModem();
 
         private void ContextMenuXModemSend_Click(ContextMenuVM sender)
         {
-            byte packetNumber = 1;
-            byte[] buffer = Enumerable.Repeat<byte>(0x1A, 129).ToArray();
-
-            buffer[0] = (byte)'1';
-            buffer[1] = (byte)'2';
-            buffer[2] = (byte)'3';
-
-            byte[] packet = CreatePacket(packetNumber, buffer, buffer.Length);
             Task.Factory.StartNew(() =>
             {
-                this.sessionTransport.Write(packet);
+                FileStream stream = File.Open("1", FileMode.Open);
 
-                Thread.Sleep(2000);
+                xmodem.SessionTransport = this.sessionTransport;
+                try
+                {
+                    xmodem.Start();
 
-                this.sessionTransport.Write(new byte[] { XModemConstants.EOT });
+                    xmodem.Send(stream);
+
+                    logger.InfoFormat("传输结束");
+                }
+                catch (Exception ex) 
+                {
+                    logger.Error("传输异常", ex);
+                }
             });
-        }
-
-        private byte[] CreatePacket(byte number, byte[] data, int length)
-        {
-            byte[] packet = new byte[length + 3]; // SOH + Number + Complement + Data + Checksum
-            packet[0] = XModemConstants.SOH;
-            packet[1] = number;
-            packet[2] = (byte)(256 - number); // Complement
-            Array.Copy(data, 0, packet, 3, length);
-
-            int checksum = 0;
-            for (int i = 3; i < packet.Length - 1; i++)
-            {
-                checksum += packet[i];
-            }
-            packet[packet.Length - 1] = (byte)(checksum % 256);
-
-            return packet;
         }
 
         #endregion
