@@ -1,12 +1,6 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
-using ModengTerm.Terminal.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Renderer
 {
@@ -18,6 +12,8 @@ namespace ModengTerm.Terminal.Renderer
         #region 实例变量
 
         private VTDocument document;
+        private VTextAttributeState writeTextAttr;
+        private VTextAttributeState readTextAttr;
 
         #endregion
 
@@ -35,17 +31,35 @@ namespace ModengTerm.Terminal.Renderer
 
         #endregion
 
-        #region ShellRenderer
+        #region VTermRenderer
 
         public override void Initialize()
         {
+            string sendColor = this.session.GetOption<string>(OptionKeyEnum.TERM_ADVANCE_SEND_COLOR, OptionDefaultValues.TERM_ADVANCE_SEND_COLOR);
+            this.writeTextAttr = this.CreateForegroundAttribute(sendColor);
+            string recvColor = this.session.GetOption<string>(OptionKeyEnum.TERM_ADVANCE_RECV_COLOR, OptionDefaultValues.TERM_ADVANCE_RECV_COLOR);
+            this.readTextAttr = this.CreateForegroundAttribute(recvColor);
         }
 
         public override void Release()
         {
         }
 
-        public override void Render(byte[] bytes, int length)
+        public override void RenderRead(byte[] bytes, int length)
+        {
+            this.RenderHex(bytes, length, this.readTextAttr);
+        }
+
+        public override void RenderWrite(byte[] bytes)
+        {
+            this.RenderHex(bytes, bytes.Length, this.writeTextAttr);
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void RenderHex(byte[] bytes, int length, VTextAttributeState textAttr) 
         {
             VTDocument document = this.document;
             int viewportColumn = document.ViewportColumn;
@@ -88,11 +102,11 @@ namespace ModengTerm.Terminal.Renderer
                 document.PrintCharacter(character1);
 
                 document.SetCursorLogical(printRow, printColumn + 1);
-                VTCharacter character2 = VTCharacter.Create(hexstr[0], 1);
+                VTCharacter character2 = VTCharacter.Create(hexstr[0], 1, textAttr);
                 document.PrintCharacter(character2);
 
                 document.SetCursorLogical(printRow, printColumn + 2);
-                VTCharacter character3 = VTCharacter.Create(hexstr[1], 1);
+                VTCharacter character3 = VTCharacter.Create(hexstr[1], 1, textAttr);
                 document.PrintCharacter(character3);
 
                 document.SetCursorLogical(printRow, printColumn + 3);

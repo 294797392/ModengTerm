@@ -25,7 +25,7 @@ namespace ModengTerm.UnitTest
         private void ProcessCtlseq(string ctlseq)
         {
             byte[] bytes = ctlseq.Select(v => Convert.ToByte(v)).ToArray();
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace ModengTerm.UnitTest
 
         public void Print(char c)
         {
-            this.videoTerminal.ProcessData(new byte[] { (byte)c }, 1);
+            this.videoTerminal.ProcessRead(new byte[] { (byte)c }, 1);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace ModengTerm.UnitTest
             result.AddRange(Encoding.ASCII.GetBytes(col.ToString()));
             result.Add((byte)'H');
 
-            this.videoTerminal.ProcessData(result.ToArray(), result.Count);
+            this.videoTerminal.ProcessRead(result.ToArray(), result.Count);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace ModengTerm.UnitTest
         public void CUP_CursorPosition()
         {
             byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'H' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace ModengTerm.UnitTest
         public void CUF_CursorForward()
         {
             byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'C' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace ModengTerm.UnitTest
         public void CUU_CursorUp()
         {
             byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'A' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace ModengTerm.UnitTest
         public void CUD_CursorDown()
         {
             byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'B' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace ModengTerm.UnitTest
         public void CUB_CursorBackward()
         {
             byte[] bytes = new byte[] { ESC, (byte)'[', (byte)'D' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         public void ED_EraseDisplay(VTEraseType eraseType)
@@ -126,7 +126,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(v.ToString()));
             bytes.Add((byte)'J');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void EL_EraseLine(VTEraseType eraseType)
@@ -137,7 +137,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(v.ToString()));
             bytes.Add((byte)'K');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void DCH_DeleteCharacter(int n)
@@ -147,7 +147,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'P');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void ICH_InsertCharacter(int n)
@@ -157,25 +157,25 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'@');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void CRLF()
         {
             byte[] bytes = new byte[] { (byte)'\r', (byte)'\n' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         public void LF_FF_VT()
         {
             byte[] bytes = new byte[] { (byte)'\n' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         public void RI_ReverseLineFeed()
         {
             byte[] bytes = new byte[] { ESC, (byte)'M' };
-            this.videoTerminal.ProcessData(bytes, bytes.Length);
+            this.videoTerminal.ProcessRead(bytes, bytes.Length);
         }
 
         public void DECSTBM_SetScrollingRegion(int topMargin, int bottomMargin)
@@ -187,7 +187,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)';');
             bytes.AddRange(Encoding.ASCII.GetBytes(bottomMargin.ToString()));
             bytes.Add((byte)'r');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void DL_DeleteLine(int n)
@@ -197,7 +197,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'M');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void IL_InsertLine(int n)
@@ -207,7 +207,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'L');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void ECH_EraseCharacters(int n)
@@ -217,7 +217,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'X');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void SD_ScrollDown(int n)
@@ -227,7 +227,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'T');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void SU_ScrollUp(int n)
@@ -237,7 +237,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'S');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void REP_RepeatCharacter(int n)
@@ -247,7 +247,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(n.ToString()));
             bytes.Add((byte)'b');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void CHA_CursorHorizontalAbsolute(int col)
@@ -257,7 +257,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(col.ToString()));
             bytes.Add((byte)'G');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void VPA_VerticalLinePositionAbsolute(int row)
@@ -267,7 +267,7 @@ namespace ModengTerm.UnitTest
             bytes.Add((byte)'[');
             bytes.AddRange(Encoding.ASCII.GetBytes(row.ToString()));
             bytes.Add((byte)'d');
-            this.videoTerminal.ProcessData(bytes.ToArray(), bytes.Count);
+            this.videoTerminal.ProcessRead(bytes.ToArray(), bytes.Count);
         }
 
         public void SGR()

@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Renci.SshNet.Messages.Connection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -41,6 +43,33 @@ namespace ModengTerm.Terminal.Modem
 
                 return crc;  // 返回最终的 CRC 值
             }
+
+            public static byte[] CalculateCRC(byte[] data, int offset, int length)
+            {
+                ushort crc = 0x0000;  // 初始值为 0x0000
+
+                for (int j = offset; j < length; j++)
+                {
+                    byte b = data[j];
+
+                    crc ^= (ushort)(b << 8);  // 将字节左移 8 位并与当前 CRC 异或
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        if ((crc & 0x8000) != 0)
+                        {
+                            crc = (ushort)((crc << 1) ^ Polynomial);
+                        }
+                        else
+                        {
+                            crc <<= 1;
+                        }
+                    }
+                }
+
+                return BitConverter.GetBytes(crc);  // 返回最终的 CRC 值
+            }
+
         }
 
         private const byte SOH = 0x01;  // Start of Header
@@ -105,6 +134,21 @@ namespace ModengTerm.Terminal.Modem
             }
 
             return packet;
+        }
+
+        public static byte Checksum(byte[] datablock)
+        {
+            byte cksum = 0;
+            for (int i = 3; i < datablock.Length - 1; i++)
+            {
+                cksum += datablock[i];
+            }
+            return cksum;
+        }
+
+        public static byte[] CalculateCRC(byte[] datablock)
+        {
+            return XModemCRC.CalculateCRC(datablock, 3, datablock.Length - 2);
         }
     }
 }

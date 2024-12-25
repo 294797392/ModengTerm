@@ -26,12 +26,6 @@ namespace ModengTerm.Base.DataModels
         public int Type { get; set; }
 
         /// <summary>
-        /// 是否自动换行
-        /// </summary>
-        [JsonProperty("crlf")]
-        public bool AutoCRLF { get; set; }
-
-        /// <summary>
         /// 该命令关联的会话Id
         /// </summary>
         [JsonProperty("sessionId")]

@@ -268,7 +268,7 @@ namespace ModengTerm
             switch (commandType)
             {
                 case CommandTypeEnum.PureText: return "纯文本";
-                case CommandTypeEnum.HexData: return "十六进制数据（如有多个数值，请使用空格分开）";
+                case CommandTypeEnum.HexData: return "十六进制数据";
                 default: throw new NotImplementedException();
             }
         }

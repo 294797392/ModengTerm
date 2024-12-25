@@ -199,6 +199,11 @@ namespace ModengTerm.Terminal
         private bool clickToCursor;
         private VTextPointer textPointer;
 
+        /// <summary>
+        /// 是否渲染输入的数据
+        /// </summary>
+        private bool renderWrite;
+
         #endregion
 
         #region 属性
@@ -346,6 +351,7 @@ namespace ModengTerm.Terminal
             backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             this.autoWrapMode = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true); // DECAWM
             this.clickToCursor = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, false);
+            this.renderWrite = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_WRITE, OptionDefaultValues.TERM_ADVANCE_RENDER_WRITE);
 
             #region 初始化数据解析器
 
@@ -628,7 +634,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <param name="bytes">要渲染的数据</param>
         /// <param name="size">要渲染的数据长度</param>
-        public void ProcessData(byte[] bytes, int size)
+        public void ProcessRead(byte[] bytes, int size)
         {
             VTDocument oldDocument = this.activeDocument;
             int oldScroll = oldDocument.Scrollbar.Value;
@@ -644,7 +650,7 @@ namespace ModengTerm.Terminal
                 }
             }
 
-            this.renderer.Render(bytes, size);
+            this.renderer.RenderRead(bytes, size);
 
             // 全部数据都处理完了之后，只渲染一次
             // 处理控制序列的时候可能会动态切换当前活动的缓冲区
@@ -661,6 +667,30 @@ namespace ModengTerm.Terminal
                     VTScrollData scrollData = this.GetScrollData(oldDocument, oldScroll, newScroll);
                     oldDocument.InvokeScrollChanged(scrollData);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 处理要写入的数据
+        /// </summary>
+        public void ProcessWrite(byte[] bytes)
+        {
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
+            if (this.renderWrite)
+            {
+                this.renderer.RenderWrite(bytes);
+                this.activeDocument.RequestInvalidate();
+            }
+
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
+                return;
             }
         }
 

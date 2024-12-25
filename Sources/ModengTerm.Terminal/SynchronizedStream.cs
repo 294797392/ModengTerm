@@ -24,11 +24,6 @@ namespace ModengTerm.Terminal
 
         #region 属性
 
-        /// <summary>
-        /// 读取超时时间
-        /// </summary>
-        public int ReadTimeout { get; set; }
-
         #endregion
 
         #region 公开接口
@@ -83,16 +78,21 @@ namespace ModengTerm.Terminal
         /// <param name="buffer">存储收到的数据的缓冲区</param>
         /// <param name="size">要接收的数据长度</param>
         /// <returns>接收到的数据长度</returns>
-        public int Read(byte[] buffer, int offset, int count)
+        public int Read(byte[] buffer, int offset, int count, int timeout)
         {
             lock (_sync)
             {
                 while (_readHead == _readTail && !_disposed)
                 {
-                    if (!Monitor.Wait(_sync, this.ReadTimeout))
+                    if (!Monitor.Wait(_sync, timeout))
                     {
                         return 0;
                     }
+                }
+
+                if (_disposed) 
+                {
+                    return -1;
                 }
 
                 var bytesRead = Math.Min(count, _readTail - _readHead);

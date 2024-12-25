@@ -38,7 +38,7 @@ namespace ModengTerm.UnitTest.TestCases
             }
 
             // 此时光标在右下角，先换行
-            terminal.ProcessData(new byte[] { (byte)'\r', (byte)'\n' }, 2);
+            terminal.ProcessRead(new byte[] { (byte)'\r', (byte)'\n' }, 2);
 
             List<string> textLines1 = UnitTestHelper.BuildTextLines(10);
             UnitTestHelper.DrawTextLines(terminal, textLines1);

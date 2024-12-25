@@ -232,6 +232,14 @@ namespace ModengTerm.Base.Enumerations
         /// </summary>
         TERM_ADVANCE_AUTO_WRAP_MODE = 3004,
 
+        TERM_ADVANCE_SEND_COLOR = 3005,
+        TERM_ADVANCE_RECV_COLOR = 3006,
+
+        /// <summary>
+        /// 渲染发送的数据
+        /// </summary>
+        TERM_ADVANCE_RENDER_WRITE = 3007,
+
         #endregion
 
         #region RawTcp 4001 - 4500
@@ -245,6 +253,35 @@ namespace ModengTerm.Base.Enumerations
         #region 会话 - 系统监控 4501 - 5000
 
         WATCH_FREQUENCY = 4501,
+
+        #endregion
+
+        #region 终端 - XYZModem 5001 - 5500
+
+        /// <summary>
+        /// 数据包重传次数
+        /// </summary>
+        MODEM_RETRY_TIMES = 10,
+
+        /// <summary>
+        /// 是否使用xmodel1k传输（每次传输的数据大小是1024字节）
+        /// </summary>
+        XMODEM_XMODEM1K = 5001,
+
+        /// <summary>
+        /// 指定XModem使用CRC校验，而不是检验和
+        /// </summary>
+        XMODEM_RECV_CRC = 5002,
+
+        /// <summary>
+        /// 接收的时候使用的填充字符
+        /// </summary>
+        XMODEM_RECV_PADCHAR = 5003,
+
+        /// <summary>
+        /// 接收的时候是否忽略填充字符
+        /// </summary>
+        XMODEM_RECV_IGNORE_PADCHAR = 5004,
 
         #endregion
 

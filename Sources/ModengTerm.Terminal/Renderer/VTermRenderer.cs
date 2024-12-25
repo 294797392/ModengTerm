@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Document;
 using ModengTerm.Terminal.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -36,10 +37,28 @@ namespace ModengTerm.Terminal.Renderer
         public abstract void Release();
 
         /// <summary>
-        /// 渲染原始数据
+        /// 渲染从服务器读取的数据
         /// </summary>
         /// <param name="bytes">要渲染的原始数据缓冲区</param>
         /// <param name="length">要渲染的原始数据长度</param>
-        public abstract void Render(byte[] bytes, int length);
+        public abstract void RenderRead(byte[] bytes, int length);
+
+        /// <summary>
+        /// 渲染要写入到服务器的数据
+        /// </summary>
+        /// <param name="bytes"></param>
+        public abstract void RenderWrite(byte[] bytes);
+
+
+        protected VTextAttributeState CreateForegroundAttribute(string rgbKey)
+        {
+            VTextAttributeState textAttr = new VTextAttributeState()
+            {
+                Value = (int)VTextAttributes.Foreground,
+                Foreground = VTColor.CreateFromRgbKey(rgbKey)
+            };
+
+            return textAttr;
+        }
     }
 }

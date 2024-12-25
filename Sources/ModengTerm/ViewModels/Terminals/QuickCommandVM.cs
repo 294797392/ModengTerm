@@ -54,11 +54,6 @@ namespace ModengTerm.ViewModels.Terminals
         }
 
         /// <summary>
-        /// 是否自动输入回车键
-        /// </summary>
-        public bool AutoCRLF { get; set; }
-
-        /// <summary>
         /// 快捷命令所关联的会话
         /// </summary>
         public string SessionId 
@@ -85,7 +80,6 @@ namespace ModengTerm.ViewModels.Terminals
             this.Description = command.Description;
             this.Command = command.Command;
             this.Type = (CommandTypeEnum)command.Type;
-            this.AutoCRLF = command.AutoCRLF;
             this.SessionId = command.SessionId;
         }
 
@@ -97,7 +91,6 @@ namespace ModengTerm.ViewModels.Terminals
                 Command = this.Command,
                 Name = this.Name,
                 Type = (int)this.Type,
-                AutoCRLF = this.AutoCRLF,
                 SessionId = this.SessionId
             };
         }

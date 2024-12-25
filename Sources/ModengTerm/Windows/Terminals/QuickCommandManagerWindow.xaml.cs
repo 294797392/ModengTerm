@@ -130,7 +130,7 @@ namespace ModengTerm.Windows.Terminals
             if (e.RemovedItems.Count > 0)
             {
                 QuickCommandVM command = e.RemovedItems[0] as QuickCommandVM;
-                if (!this.newCommands.Contains(command)) 
+                if (!this.newCommands.Contains(command))
                 {
                     this.updateCommands.Add(command);
                 }
@@ -139,12 +139,15 @@ namespace ModengTerm.Windows.Terminals
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
+            string name = string.IsNullOrWhiteSpace(TextBoxName.Text) ? "新建命令" : TextBoxName.Text;
+
             QuickCommandVM command = new QuickCommandVM()
             {
                 ID = Guid.NewGuid().ToString(),
-                Name = "新建命令",
-                Type = (int)CommandTypeEnum.PureText,
-                SessionId = this.shellSession.ID.ToString()
+                Name = name,
+                Type = (CommandTypeEnum)ComboBoxCommandTypes.SelectedItem,
+                SessionId = this.shellSession.ID.ToString(),
+                Command = TextBoxCommand.Text
             };
 
             this.shellCommands.Add(command);
@@ -155,7 +158,7 @@ namespace ModengTerm.Windows.Terminals
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
         {
             QuickCommandVM command = ListBoxShellCommands.SelectedItem as QuickCommandVM;
-            if (command == null) 
+            if (command == null)
             {
                 return;
             }
@@ -181,7 +184,7 @@ namespace ModengTerm.Windows.Terminals
         private void ButtonMoveUp_Click(object sender, RoutedEventArgs e)
         {
             QuickCommandVM shcmd = ListBoxShellCommands.SelectedItem as QuickCommandVM;
-            if (shcmd == null) 
+            if (shcmd == null)
             {
                 return;
             }

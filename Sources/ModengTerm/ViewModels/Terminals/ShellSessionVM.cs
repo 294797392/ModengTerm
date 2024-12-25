@@ -92,6 +92,8 @@ namespace ModengTerm.Terminal.ViewModels
         private bool watchListChanged;
         private object watchListLock = new object();
 
+        private ModemBase modem;
+
         #endregion
 
         #region 属性
@@ -441,7 +443,8 @@ namespace ModengTerm.Terminal.ViewModels
                 new ContextMenuDefinition("24","22","22","停止", this.ContextMenuStopRecord_Click),
                 new ContextMenuDefinition("25","18"," ","打开回放", this.ContextMenuOpenRecord_Click),
                 new ContextMenuDefinition("26","18", "", "传输"),
-                new ContextMenuDefinition("27","26","26","使用XModem发送", this.ContextMenuXModemSend_Click)
+                new ContextMenuDefinition("27","26","26","使用XModem发送", this.ContextMenuXModemSend_Click),
+                //new ContextMenuDefinition("28","26","26","使用XModem接收", this.ContextMenuXModemReceive_Click)
             };
         }
 
@@ -559,20 +562,9 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="bytes"></param>
         private void PerformSend(byte[] bytes)
         {
-            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
-            {
-                return;
-            }
-
             VTDebug.Context.WriteInteractive(VTSendTypeEnum.UserInput, bytes);
 
-            // 这里输入的都是键盘按键
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
-                return;
-            }
+            this.videoTerminal.ProcessWrite(bytes);
         }
 
         /// <summary>
@@ -773,6 +765,59 @@ namespace ModengTerm.Terminal.ViewModels
                     this.EnableWatcher(false);
                 }
             }
+        }
+
+        private void ModemTransfer(SendReceive sr, ModemTypeEnum modemType)
+        {
+            string filePath = string.Empty;
+
+            switch (sr)
+            {
+                case SendReceive.Send:
+                    {
+                        OpenFileDialog openFileDialog = new OpenFileDialog();
+                        if (!((bool)openFileDialog.ShowDialog()))
+                        {
+                            return;
+                        }
+
+                        filePath = openFileDialog.FileName;
+
+                        break;
+                    }
+
+                case SendReceive.Receive:
+                    {
+                        SaveFileDialog saveFileDialog = new SaveFileDialog();
+                        if (!(bool)saveFileDialog.ShowDialog())
+                        {
+                            return;
+                        }
+
+                        filePath = saveFileDialog.FileName;
+
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            ModemTransferVM viewModel = new ModemTransferVM()
+            {
+                SendReceive = sr,
+                Type = modemType,
+                Session = this.Session,
+                FilePath = filePath,
+                Transport = this.sessionTransport
+            };
+
+            viewModel.StartAsync();
+
+            //ModemWindow modemWindow = new ModemWindow();
+            //modemWindow.Owner = Application.Current.MainWindow;
+            //modemWindow.DataContext = viewModel;
+            //modemWindow.Show();
         }
 
         #endregion
@@ -989,9 +1034,9 @@ namespace ModengTerm.Terminal.ViewModels
         {
         }
 
-        private void SessionTransport_DataReceived(SessionTransport client, byte[] bytes, int size)
+        private void SessionTransport_DataReceived(SessionTransport client, byte[] buffer, int size)
         {
-            VTDebug.Context.WriteRawRead(bytes, size);
+            VTDebug.Context.WriteRawRead(buffer, size);
 
             // 窗口持续改变大小的时候可能导致Render和SizeChanged事件一起运行，产生多线程修改VTDocument的bug
             // 所以这里把Render放在UI线程处理
@@ -999,7 +1044,7 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 try
                 {
-                    this.videoTerminal.ProcessData(bytes, size);
+                    this.videoTerminal.ProcessRead(buffer, size);
                 }
                 catch (Exception ex)
                 {
@@ -1007,8 +1052,7 @@ namespace ModengTerm.Terminal.ViewModels
                 }
             });
 
-            this.HandleRecord(bytes, size);
-            this.xmodem.OnDataReceived(bytes, size);
+            this.HandleRecord(buffer, size);
         }
 
         private void SessionTransport_StatusChanged(object client, SessionStatusEnum status)
@@ -1344,7 +1388,6 @@ namespace ModengTerm.Terminal.ViewModels
             ShellCommand shellCommand = new ShellCommand()
             {
                 ID = Guid.NewGuid().ToString(),
-                AutoCRLF = false,
                 SessionId = this.Session.ID,
                 Name = string.Format("未命名_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss)),
                 Type = (int)CommandTypeEnum.PureText,
@@ -1412,28 +1455,14 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        XModem xmodem = new XModem();
-
         private void ContextMenuXModemSend_Click(ContextMenuVM sender)
         {
-            Task.Factory.StartNew(() =>
-            {
-                FileStream stream = File.Open("1", FileMode.Open);
+            this.ModemTransfer(SendReceive.Send, ModemTypeEnum.XModem);
+        }
 
-                xmodem.SessionTransport = this.sessionTransport;
-                try
-                {
-                    xmodem.Start();
-
-                    xmodem.Send(stream);
-
-                    logger.InfoFormat("传输结束");
-                }
-                catch (Exception ex) 
-                {
-                    logger.Error("传输异常", ex);
-                }
-            });
+        private void ContextMenuXModemReceive_Click(ContextMenuVM sender)
+        {
+            this.ModemTransfer(SendReceive.Receive, ModemTypeEnum.XModem);
         }
 
         #endregion

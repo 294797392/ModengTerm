@@ -486,11 +486,6 @@ namespace ModengTerm
                 case CommandTypeEnum.PureText:
                     {
                         string command = shellCommand.Command;
-                        if (shellCommand.AutoCRLF)
-                        {
-                            command = string.Format("{0}\r\n", command);
-                        }
-
                         inputSession.SendText(command);
                         break;
                     }

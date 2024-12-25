@@ -166,5 +166,15 @@ namespace ModengTerm.Base
 
         public const double DefaultMainWindowWidth = 900;
         public const double DefaultMainWindowHeight = 700;
+
+        #region 终端 - XYZModem
+
+        public const int MODEM_RETRY_TIMES = 10;
+        public const bool XMODEM_XMODEM1K = false;
+        public const bool XMODEM_RECV_CRC = false;
+        public const byte XMODEM_RECV_PADCHAR = 0x1A;
+        public const bool XMODEM_RECV_IGNORE_PADCHAR = true;
+
+        #endregion
     }
 }

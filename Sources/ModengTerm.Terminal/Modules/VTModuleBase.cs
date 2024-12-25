@@ -18,7 +18,7 @@ namespace ModengTerm.Terminal.Modules
     {
         #region 实例变量
 
-        private SessionTransport transport;
+        protected SessionTransport transport;
 
         #endregion
 
@@ -58,6 +58,8 @@ namespace ModengTerm.Terminal.Modules
             this.transport.DataReceived += Transport_DataReceived;
 
             this.OnStart();
+
+            this.Status = VTModuleStatus.Started;
         }
 
         /// <summary>
@@ -68,21 +70,13 @@ namespace ModengTerm.Terminal.Modules
             this.transport.DataReceived -= this.Transport_DataReceived;
 
             this.OnStop();
+
+            this.Status = VTModuleStatus.Stopped;
         }
 
         #endregion
 
         #region 受保护方法
-
-        /// <summary>
-        /// 向远程主机写入数据
-        /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="size"></param>
-        protected int SendToHost(byte[] bytes)
-        {
-            return this.transport.Write(bytes);
-        }
 
         #endregion
 

@@ -75,7 +75,7 @@ namespace ModengTerm.UnitTest
                 Stopwatch stopwatch = Stopwatch.StartNew();
                 for (int i = 0; i < testTimes; i++)
                 {
-                    terminal.ProcessData(bytes, bytes.Length);
+                    terminal.ProcessRead(bytes, bytes.Length);
                 }
                 stopwatch.Stop();
 

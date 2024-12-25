@@ -135,14 +135,14 @@ namespace ModengTerm.ViewModels
                                 OptionMenuItemVM selectedNode;
                                 if (this.OptionTreeVM.TryGetItem(value.MenuId, out selectedNode)) 
                                 {
-                                    selectedNode.IsVisible = true;
-                                    selectedNode.IsSelected = true;
-
                                     if (this.selectedMenuNode != null)
                                     {
                                         this.selectedMenuNode.IsVisible = false;
+                                        this.selectedMenuNode.IsSelected = false;
                                     }
 
+                                    selectedNode.IsVisible = true;
+                                    selectedNode.IsSelected = true;
                                     this.selectedMenuNode = selectedNode;
                                 }
 

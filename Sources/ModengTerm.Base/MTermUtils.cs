@@ -87,7 +87,7 @@ namespace ModengTerm.Base
             }
 
             // 先删除所有的0x（如果有的话）
-            string lowerHex = hex.ToLower().Replace("0x", string.Empty).Replace(" ", string.Empty);
+            string lowerHex = hex.ToLower().Replace("0x", string.Empty).Replace(" ", string.Empty).Replace("\r", string.Empty).Replace("\n", string.Empty);
 
             // 十六进制字符串的长度必须是2的倍数，2个字符等于1个字节
             if (lowerHex.Length % 2 != 0)

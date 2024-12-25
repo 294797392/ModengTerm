@@ -29,10 +29,14 @@ namespace ModengTerm.Terminal.Renderer
         {
         }
 
-        public override void Render(byte[] bytes, int length)
+        public override void RenderRead(byte[] bytes, int length)
         {
             // 使用解析器处理数据，然后解析器回调到VideoTerminal，VideoTerminal再进行处理
             this.Parser.ProcessCharacters(bytes, length);
+        }
+
+        public override void RenderWrite(byte[] bytes)
+        {
         }
     }
 }

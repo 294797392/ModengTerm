@@ -116,10 +116,8 @@
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="命令：" VerticalAlignment="Top" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                 <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextBoxCommand" VerticalContentAlignment="Top" 
                          Text="{Binding Path=Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True"
                          Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
-
-                <CheckBox Grid.Row="3" Grid.Column="1" Content="自动换行" Margin="0,0,5,0" HorizontalAlignment="Right" VerticalAlignment="Center"
-                          IsChecked="{Binding Path=AutoCRLF, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
             </Grid>
         </GroupBox>

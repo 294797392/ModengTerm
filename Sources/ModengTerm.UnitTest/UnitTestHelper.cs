@@ -314,13 +314,13 @@ namespace ModengTerm.UnitTest
                 rawData.Add((byte)'\n');
             }
 
-            terminal.ProcessData(rawData.ToArray(), rawData.Count - 2); // 去掉最后的CRLF
+            terminal.ProcessRead(rawData.ToArray(), rawData.Count - 2); // 去掉最后的CRLF
         }
 
         public static void DrawTextLine(VideoTerminal terminal, string textLine)
         {
             byte[] rawData = Encoding.UTF8.GetBytes(textLine);
-            terminal.ProcessData(rawData, rawData.Length);
+            terminal.ProcessRead(rawData, rawData.Length);
         }
 
         /// <summary>
