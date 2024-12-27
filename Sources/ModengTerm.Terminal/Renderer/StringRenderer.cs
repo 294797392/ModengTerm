@@ -9,7 +9,7 @@ namespace ModengTerm.Terminal.Renderer
     /// 将收到的数据按照可打印字符渲染（包含中文）
     /// 会处理换行逻辑
     /// </summary>
-    public class TextRenderer : VTermRenderer
+    public class StringRenderer : VTermRenderer
     {
         #region 实例变量
 
@@ -21,7 +21,7 @@ namespace ModengTerm.Terminal.Renderer
 
         #region 构造方法
 
-        public TextRenderer(VideoTerminal vt) : 
+        public StringRenderer(VideoTerminal vt) : 
             base(vt)
         {
             this.document = vt.MainDocument;
@@ -63,6 +63,7 @@ namespace ModengTerm.Terminal.Renderer
             int viewportColumn = document.ViewportColumn;
             int viewportRow = document.ViewportRow;
 
+            // TODO：做成可配置的编码方式
             string text = Encoding.UTF8.GetString(bytes, 0, length);
 
             foreach (char ch in text)

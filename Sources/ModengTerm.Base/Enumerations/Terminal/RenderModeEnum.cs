@@ -12,13 +12,18 @@ namespace ModengTerm.Base.Enumerations.Terminal
     public enum RenderModeEnum
     {
         /// <summary>
-        /// 默认渲染为终端数据
+        /// 按照终端控制序列解码并渲染
         /// </summary>
         Default,
 
         /// <summary>
-        /// 渲染为类似于hexdump的16进制数据
+        /// 解码为16进制渲染
         /// </summary>
-        Hexdump
+        Hexdump,
+
+        /// <summary>
+        /// 解码为字符串渲染
+        /// </summary>
+        String
     }
 }

@@ -17,7 +17,7 @@ namespace ModengTerm.Terminal.Modem
     {
         #region 事件
 
-        public event Action<ModemBase, double> ProgressChanged;
+        public event Action<ModemBase, double, int> ProgressChanged;
 
         #endregion
 
@@ -42,9 +42,9 @@ namespace ModengTerm.Terminal.Modem
 
         #region 受保护方法
 
-        protected void NotifyProgressChanged(double progress) 
+        protected void NotifyProgressChanged(double progress, int code) 
         {
-            this.ProgressChanged?.Invoke(this, progress);
+            this.ProgressChanged?.Invoke(this, progress, code);
         }
 
         #endregion
@@ -55,13 +55,13 @@ namespace ModengTerm.Terminal.Modem
         /// 从本地主机发送文件到远程主机
         /// </summary>
         /// <returns></returns>
-        public abstract int Send(Stream stream);
+        public abstract int Send(List<string> filePaths);
 
         /// <summary>
         /// 远程主机发送文件到本地主机
         /// </summary>
         /// <returns></returns>
-        public abstract int Receive(Stream stream);
+        public abstract int Receive(List<string> filePaths);
 
         #endregion
     }

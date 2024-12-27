@@ -5,8 +5,10 @@ using ModengTerm.Terminal;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
@@ -19,16 +21,14 @@ namespace ModengTerm.ViewModels.Terminals
         ZModem
     }
 
-    public enum SendReceive
-    {
-        Send,
-
-        Receive,
-    }
-
     public class ModemTransferVM : ViewModelBase, IHostStream
     {
         #region 事件
+
+        /// <summary>
+        /// 当传输结束的时候触发
+        /// </summary>
+        public event Action<ModemTransferVM, double, int> ProgressChanged;
 
         #endregion
 
@@ -62,7 +62,7 @@ namespace ModengTerm.ViewModels.Terminals
         /// <summary>
         /// 文件路径
         /// </summary>
-        public string FilePath { get; set; }
+        public List<string> FilePaths { get; set; }
 
         public double Progress
         {
@@ -83,26 +83,14 @@ namespace ModengTerm.ViewModels.Terminals
 
         public int StartAsync()
         {
-            FileStream stream = null;
-            try
-            {
-                stream = this.OpenFile();
-            }
-            catch (Exception ex)
-            {
-                MessageBoxUtils.Info("打开文件失败, 请检查文件是否被占用");
-                logger.Error("打开文件异常", ex);
-                return ResponseCode.FAILED;
-            }
-
             this.readTimeout = 50000;
+            this.synchronizedStream = new SynchronizedStream();
+            this.Transport.DataReceived += Transport_DataReceived;
 
             ModemBase modem = this.CreateModem();
             modem.ProgressChanged += Modem_ProgressChanged;
             modem.HostStream = this;
             modem.Session = this.Session;
-            this.synchronizedStream = new SynchronizedStream();
-            this.Transport.DataReceived += Transport_DataReceived;
 
             Task.Factory.StartNew(() =>
             {
@@ -112,13 +100,13 @@ namespace ModengTerm.ViewModels.Terminals
                     {
                         case SendReceive.Send:
                             {
-                                modem.Send(stream);
+                                modem.Send(this.FilePaths);
                                 break;
                             }
 
                         case SendReceive.Receive:
                             {
-                                modem.Receive(stream);
+                                modem.Receive(this.FilePaths);
                                 break;
                             }
 
@@ -129,14 +117,13 @@ namespace ModengTerm.ViewModels.Terminals
                 catch (Exception ex)
                 {
                     logger.Error("文件传输异常", ex);
+                    this.ProgressChanged?.Invoke(this, -1, ResponseCode.EXCEPTION);
                 }
                 finally
                 {
                     modem.ProgressChanged -= Modem_ProgressChanged;
                     this.Transport.DataReceived -= Transport_DataReceived;
                     this.synchronizedStream.Close();
-                    stream.Close();
-                    stream.Dispose();
                 }
             });
 
@@ -156,25 +143,7 @@ namespace ModengTerm.ViewModels.Terminals
             switch (this.Type)
             {
                 case ModemTypeEnum.XModem: return new XModem();
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        private FileStream OpenFile()
-        {
-            switch (this.SendReceive)
-            {
-                case SendReceive.Send:
-                    {
-                        return File.OpenRead(this.FilePath);
-                    }
-
-                case SendReceive.Receive:
-                    {
-                        return new FileStream(this.FilePath, FileMode.Create, FileAccess.ReadWrite);
-                    }
-
+                case ModemTypeEnum.YModem: return new YModem();
                 default:
                     throw new NotImplementedException();
             }
@@ -218,9 +187,11 @@ namespace ModengTerm.ViewModels.Terminals
             this.synchronizedStream.Write(buffer, size);
         }
 
-        private void Modem_ProgressChanged(ModemBase modem, double progress)
+        private void Modem_ProgressChanged(ModemBase modem, double progress, int code)
         {
             this.Progress = progress;
+
+            this.ProgressChanged?.Invoke(this, progress, code);
         }
 
         #endregion

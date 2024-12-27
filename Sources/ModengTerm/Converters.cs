@@ -294,6 +294,7 @@ namespace ModengTerm
             {
                 case RenderModeEnum.Default: return "默认";
                 case RenderModeEnum.Hexdump: return "十六进制";
+                case RenderModeEnum.String: return "字符串";
                 default:
                     throw new NotImplementedException();
             }

@@ -1,4 +1,5 @@
-﻿using ModengTerm.ViewModels.Terminals;
+﻿using ModengTerm.Base.Enumerations;
+using ModengTerm.ViewModels.Terminals;
 using System.Collections.Generic;
 using WPFToolkit.MVVM;
 
@@ -36,6 +37,11 @@ namespace ModengTerm.ViewModels
         /// 如果这个菜单需要显示界面，PanelID指定界面显示在哪个Panel里
         /// </summary>
         public string PanelID { get; set; }
+
+        /// <summary>
+        /// 不支持的会话类型
+        /// </summary>
+        public List<SessionTypeEnum> UnsupportedTypes { get; set; }
 
         public ContextMenuDefinition(string id, string name)
         {

@@ -1046,24 +1046,17 @@ namespace ModengTerm.Terminal
             {
                 case RenderModeEnum.Default:
                     {
-                        switch ((SessionTypeEnum)this.Session.Type)
-                        {
-                            case SessionTypeEnum.Tcp:
-                                {
-                                    // RawTcp默认使用文本显示
-                                    return new TextRenderer(this);
-                                }
-
-                            default:
-                                {
-                                    return new VideoTerminalRenderer(this) { Parser = this.vtParser };
-                                }
-                        }
+                        return new VideoTerminalRenderer(this) { Parser = this.vtParser };
                     }
 
                 case RenderModeEnum.Hexdump:
                     {
                         return new HexdumpRenderer(this);
+                    }
+
+                case RenderModeEnum.String:
+                    {
+                        return new StringRenderer(this);
                     }
 
                 default:

@@ -1,6 +1,7 @@
 ﻿using Renci.SshNet.Messages.Connection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -71,6 +72,8 @@ namespace ModengTerm.Terminal.Modem
             }
 
         }
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("");
 
         private const byte SOH = 0x01;  // Start of Header
         private const byte EOT = 0x04;  // End of Transmission
@@ -149,6 +152,33 @@ namespace ModengTerm.Terminal.Modem
         public static byte[] CalculateCRC(byte[] datablock)
         {
             return XModemCRC.CalculateCRC(datablock, 3, datablock.Length - 2);
+        }
+
+        public static FileStream OpenFile(string filePath, SendReceive sr) 
+        {
+            try
+            {
+                switch (sr)
+                {
+                    case SendReceive.Send:
+                        {
+                            return File.OpenRead(filePath);
+                        }
+
+                    case SendReceive.Receive:
+                        {
+                            return new FileStream(filePath, FileMode.Create, FileAccess.ReadWrite);
+                        }
+
+                    default:
+                        throw new NotImplementedException();
+                }
+            }
+            catch (Exception ex) 
+            {
+                logger.Error("打开文件异常", ex);
+                return null;
+            }
         }
     }
 }

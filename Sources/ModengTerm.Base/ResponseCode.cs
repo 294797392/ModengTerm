@@ -13,6 +13,7 @@ namespace ModengTerm.Base
         public const int NOT_SUPPORTED = 2;
         public const int PRIVATE_KEY_NOT_FOUND = 3;
         public const int OPERATION_CANCEL = 4;
+        public const int EXCEPTION = 5;
 
         public static string GetMessage(int code)
         {

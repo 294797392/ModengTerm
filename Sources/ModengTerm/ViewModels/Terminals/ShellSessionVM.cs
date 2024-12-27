@@ -92,7 +92,7 @@ namespace ModengTerm.Terminal.ViewModels
         private bool watchListChanged;
         private object watchListLock = new object();
 
-        private ModemBase modem;
+        private bool modemRunning;
 
         #endregion
 
@@ -414,25 +414,31 @@ namespace ModengTerm.Terminal.ViewModels
         {
             return new List<ContextMenuDefinition>()
             {
-                new ContextMenuDefinition("2"," ","-1","编辑"),
-                new ContextMenuDefinition("3","2"," ","查找", this.ContextMenuFind_Click),
-                new ContextMenuDefinition("4","2"," ","复制", this.ContextMenuCopySelection_Click),
-                new ContextMenuDefinition("5","2"," ","保存"),
-                new ContextMenuDefinition("6","5","5","选中内容", this.ContextMenuSaveSelection_Click),
-                new ContextMenuDefinition("7","5","5","当前屏幕内容", this.ContextMenuSaveViewport_Click),
-                new ContextMenuDefinition("8","5","5","所有内容", this.ContextMenuSaveAllDocument_Click),
-                new ContextMenuDefinition("9","2"," ","添加到快捷命令列表", this.ContextMenuAddToQuickCommands_Click),
-                new ContextMenuDefinition("100","2"," ","清屏", this.ContextMenuClearScreen_Click),
+                new ContextMenuDefinition("2", " ", "-1", "编辑"),
+                new ContextMenuDefinition("3", "2", " ", "查找", this.ContextMenuFind_Click),
+                new ContextMenuDefinition("4", "2", " ", "复制", this.ContextMenuCopySelection_Click),
+                new ContextMenuDefinition("5", "2", " ", "保存"),
+                new ContextMenuDefinition("6", "5", "5", "选中内容", this.ContextMenuSaveSelection_Click),
+                new ContextMenuDefinition("7", "5", "5", "当前屏幕内容", this.ContextMenuSaveViewport_Click),
+                new ContextMenuDefinition("8", "5", "5", "所有内容", this.ContextMenuSaveAllDocument_Click),
+                new ContextMenuDefinition("9", "2", " ", "添加到快捷命令列表", this.ContextMenuAddToQuickCommands_Click),
+                new ContextMenuDefinition("100", "2", " ", "清屏", this.ContextMenuClearScreen_Click),
 
-                new ContextMenuDefinition("10","查看"),
-                new ContextMenuDefinition("11","10","10","系统监控", "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm","panel1", this.ContextMenuVisiblePanelContent_Click),
-                new ContextMenuDefinition("12","10","10","快捷命令", "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", string.Empty, "panel1", this.ContextMenuVisiblePanelContent_Click),
-                new ContextMenuDefinition("13","10","10","输入栏", this.ContextMenuSwitchInputPanelVisible_Click),
+                new ContextMenuDefinition("10", "查看"),
+                new ContextMenuDefinition("11", "10", "10", "系统监控", "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm", "panel1", this.ContextMenuVisiblePanelContent_Click)
+                {
+                    UnsupportedTypes = new List<SessionTypeEnum>(){ SessionTypeEnum.SerialPort, SessionTypeEnum.Tcp }
+                },
+                new ContextMenuDefinition("12", "10", "10", "快捷命令", "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", string.Empty, "panel1", this.ContextMenuVisiblePanelContent_Click),
+                new ContextMenuDefinition("13", "10", "10", "输入栏", this.ContextMenuSwitchInputPanelVisible_Click),
 
-                new ContextMenuDefinition("14","配置"),
-                new ContextMenuDefinition("15","14","14","端口转发", this.ContextMenuOpenPortForwardWindow_Click),
-                new ContextMenuDefinition("16","14","14","同步输入", this.ContextMenuOpenSyncInputConfigurationWindow_Click),
-                new ContextMenuDefinition("17","14","14","快捷命令", this.ContextMenuCreateQuickCommand_Click),
+                new ContextMenuDefinition("14", "配置"),
+                new ContextMenuDefinition("15", "14", "14", "端口转发", this.ContextMenuOpenPortForwardWindow_Click)
+                {
+                    UnsupportedTypes = new List<SessionTypeEnum>(){ SessionTypeEnum.SerialPort, SessionTypeEnum.Tcp, SessionTypeEnum.AdbShell, SessionTypeEnum.Localhost }
+                },
+                new ContextMenuDefinition("16", "14", "14", "同步输入", this.ContextMenuOpenSyncInputConfigurationWindow_Click),
+                new ContextMenuDefinition("17", "14", "14", "快捷命令", this.ContextMenuCreateQuickCommand_Click),
 
                 new ContextMenuDefinition("18"," ", "-1","工具"),
                 new ContextMenuDefinition("19","18"," ","日志"),
@@ -444,7 +450,8 @@ namespace ModengTerm.Terminal.ViewModels
                 new ContextMenuDefinition("25","18"," ","打开回放", this.ContextMenuOpenRecord_Click),
                 new ContextMenuDefinition("26","18", "", "传输"),
                 new ContextMenuDefinition("27","26","26","使用XModem发送", this.ContextMenuXModemSend_Click),
-                //new ContextMenuDefinition("28","26","26","使用XModem接收", this.ContextMenuXModemReceive_Click)
+                new ContextMenuDefinition("28","26","26","使用XModem接收", this.ContextMenuXModemReceive_Click),
+                new ContextMenuDefinition("29","26","26","使用YModem接收", this.ContextMenuYModemSend_Click),
             };
         }
 
@@ -767,34 +774,54 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void ModemTransfer(SendReceive sr, ModemTypeEnum modemType)
+        /// <summary>
+        /// 开始运行Modem传输
+        /// </summary>
+        /// <param name="sr"></param>
+        /// <param name="modemType"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void StartModem(SendReceive sr, ModemTypeEnum modemType)
         {
-            string filePath = string.Empty;
+            List<string> filePaths = new List<string>();
 
             switch (sr)
             {
                 case SendReceive.Send:
                     {
                         OpenFileDialog openFileDialog = new OpenFileDialog();
+                        openFileDialog.Multiselect = modemType != ModemTypeEnum.XModem;
                         if (!((bool)openFileDialog.ShowDialog()))
                         {
                             return;
                         }
 
-                        filePath = openFileDialog.FileName;
+                        filePaths.AddRange(openFileDialog.FileNames);
 
                         break;
                     }
 
                 case SendReceive.Receive:
                     {
-                        SaveFileDialog saveFileDialog = new SaveFileDialog();
-                        if (!(bool)saveFileDialog.ShowDialog())
+                        if (modemType == ModemTypeEnum.XModem)
                         {
-                            return;
-                        }
+                            SaveFileDialog saveFileDialog = new SaveFileDialog();
+                            if (!(bool)saveFileDialog.ShowDialog())
+                            {
+                                return;
+                            }
 
-                        filePath = saveFileDialog.FileName;
+                            filePaths.Add(saveFileDialog.FileName);
+                        }
+                        else
+                        {
+                            System.Windows.Forms.FolderBrowserDialog folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+                            if (folderBrowserDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                            {
+                                return;
+                            }
+
+                            filePaths.Add(folderBrowserDialog.SelectedPath);
+                        }
 
                         break;
                     }
@@ -803,15 +830,17 @@ namespace ModengTerm.Terminal.ViewModels
                     throw new NotImplementedException();
             }
 
+            this.modemRunning = true;
+
             ModemTransferVM viewModel = new ModemTransferVM()
             {
                 SendReceive = sr,
                 Type = modemType,
                 Session = this.Session,
-                FilePath = filePath,
+                FilePaths = filePaths,
                 Transport = this.sessionTransport
             };
-
+            viewModel.ProgressChanged += ViewModel_ProgressChanged;
             viewModel.StartAsync();
 
             //ModemWindow modemWindow = new ModemWindow();
@@ -950,6 +979,16 @@ namespace ModengTerm.Terminal.ViewModels
 
         #region 事件处理器
 
+        private void ViewModel_ProgressChanged(ModemTransferVM sender, double progress, int code)
+        {
+            if (progress < 0 || progress >= 100)
+            {
+                // 传输结束
+                sender.ProgressChanged -= this.ViewModel_ProgressChanged;
+                this.modemRunning = false;
+            }
+        }
+
         private void WatchThreadProc()
         {
             WatchFrequencyEnum frequency = this.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, MTermConsts.DefaultWatchFrequency);
@@ -1037,6 +1076,12 @@ namespace ModengTerm.Terminal.ViewModels
         private void SessionTransport_DataReceived(SessionTransport client, byte[] buffer, int size)
         {
             VTDebug.Context.WriteRawRead(buffer, size);
+
+            // 如果正在运行Modem传输，那么不处理数据
+            if (this.modemRunning)
+            {
+                return;
+            }
 
             // 窗口持续改变大小的时候可能导致Render和SizeChanged事件一起运行，产生多线程修改VTDocument的bug
             // 所以这里把Render放在UI线程处理
@@ -1457,12 +1502,17 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void ContextMenuXModemSend_Click(ContextMenuVM sender)
         {
-            this.ModemTransfer(SendReceive.Send, ModemTypeEnum.XModem);
+            this.StartModem(SendReceive.Send, ModemTypeEnum.XModem);
         }
 
         private void ContextMenuXModemReceive_Click(ContextMenuVM sender)
         {
-            this.ModemTransfer(SendReceive.Receive, ModemTypeEnum.XModem);
+            this.StartModem(SendReceive.Receive, ModemTypeEnum.XModem);
+        }
+
+        private void ContextMenuYModemSend_Click(ContextMenuVM sender)
+        {
+            this.StartModem(SendReceive.Send, ModemTypeEnum.YModem);
         }
 
         #endregion

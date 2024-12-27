@@ -53,13 +53,206 @@ namespace ModengTerm.Terminal.Modem
         #region ModemBase
 
         /// <summary>
+        /// 1. 用户执行sx
+        /// 2. 点击XModel接收文件按钮
+        /// 3. 运行Receive
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
+        public override int Receive(List<string> filePaths)
+        {
+            FileStream stream = ModemUtils.OpenFile(filePaths[0], SendReceive.Receive);
+            if (stream == null) 
+            {
+                return ResponseCode.FAILED;
+            }
+
+            bool xmodem1k = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_XMODEM1K, MTermConsts.XMODEM_XMODEM1K);
+            int retry = this.Session.GetOption<int>(OptionKeyEnum.MODEM_RETRY_TIMES, MTermConsts.MODEM_RETRY_TIMES);
+            bool crc = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_CRC, MTermConsts.XMODEM_RECV_CRC);
+            byte padchar = this.Session.GetOption<byte>(OptionKeyEnum.XMODEM_RECV_PADCHAR, MTermConsts.XMODEM_RECV_PADCHAR);
+            bool ignorePadChar = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_IGNORE_PADCHAR, MTermConsts.XMODEM_RECV_IGNORE_PADCHAR);
+            byte[] onebyte = new byte[1];
+            int rc = 0;
+
+            byte firstbyte = 0;
+            if ((rc = this.Handshake(out firstbyte)) != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("xmodem接收握手失败, {0}", rc);
+                return rc;
+            }
+
+            while (true)
+            {
+                #region 判断接下来的处理方式
+
+                int packetsize = 0;
+
+                if (firstbyte == SOH)
+                {
+                    // 128字节数据
+                    packetsize = 128;
+                }
+                else if (firstbyte == STX)
+                {
+                    // 1024字节数据
+                    packetsize = 1024;
+                }
+                else if (firstbyte == EOT)
+                {
+                    // 文件发送结束
+                    logger.InfoFormat("xmodel发送成功");
+
+                    // 在发送ACK之前触发完成事件，这样不会导致ShellSessionVM.ProcessData丢失数据
+                    this.NotifyProgressChanged(100, ResponseCode.SUCCESS);
+                    return this.HostStream.Send(new byte[] { ACK });
+                }
+                else
+                {
+                    // 未知数据
+                    logger.ErrorFormat("xmodem接收到未知数据, {0}", firstbyte);
+                    return ResponseCode.FAILED;
+                }
+
+                #endregion
+
+                #region 接收数据包
+
+                // 该帧一共多少字节
+                int blocksize = 3 + packetsize + (crc ? 2 : 1);
+
+                // 一旦开始接收一个数据块，接收方会对每个字符和校验和设置 1 秒的超时。这意味着如果在 1 秒内没有接收到下一个字符或校验和，接收方将认为发生了超时。
+                byte[] datablock = new byte[blocksize];
+                datablock[0] = firstbyte;
+
+                for (int i = 1; i < datablock.Length; i++)
+                {
+                    rc = this.HostStream.Receive(datablock, i, 1, 1000);
+                    if (rc == 0)
+                    {
+                        // 接收超时，直接取消
+                        logger.ErrorFormat("xmodem接收数据包超时，发送CAN信号");
+                        this.HostStream.Send(new byte[] { CAN });
+                        return ResponseCode.FAILED;
+                    }
+                    else if (rc < 0)
+                    {
+                        // 接收失败
+                        logger.ErrorFormat("xmodem接收数据包失败");
+                        return ResponseCode.FAILED;
+                    }
+                    else
+                    {
+                        // 接收成功
+                    }
+                }
+
+                #endregion
+
+                #region 处理数据包
+
+                bool error = false;
+
+                // 1. 判断检验和
+                if (crc)
+                {
+                    byte[] crcdata = ModemUtils.CalculateCRC(datablock);
+                    if (datablock[datablock.Length - 1] != crcdata[0] || datablock[datablock.Length - 2] != crcdata[1])
+                    {
+                        error = true;
+                    }
+                }
+                else
+                {
+                    byte chksum = ModemUtils.Checksum(datablock);
+                    if (chksum != datablock[datablock.Length - 1])
+                    {
+                        error = true;
+                    }
+                }
+
+                if (error)
+                {
+                    // 发送重传信号
+                    logger.InfoFormat("xmodem校验和错误, 重传");
+                    this.HostStream.Send(new byte[] { NAK });
+                }
+                else
+                {
+                    // 2. 判断填充字符
+                    byte packetnum = datablock[1];
+                    int dataoffset = 3;
+                    int datasize = packetsize;
+
+                    if (ignorePadChar)
+                    {
+                        // 忽略填充字符
+                    }
+                    else
+                    {
+                        // 查找填充字符
+                        // TODO：优化不要每次都查找padchar，在收到EOT的时候判断上一次的padchar位置
+                        int len = crc ? 2 : 1;
+                        for (int i = 3; i < datablock.Length - len; i++)
+                        {
+                            if (datablock[i] == padchar)
+                            {
+                                datasize = i - 2;
+                                dataoffset = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    // 3. 写入文件
+                    stream.Write(datablock, dataoffset, datasize);
+                    logger.InfoFormat("xmodem receive, packetnum = {0}", packetnum);
+
+                    // 4. 发送ACK
+                    this.HostStream.Send(new byte[] { ACK });
+                }
+
+                #endregion
+
+                #region 接收下一个数据包的头部
+
+                rc = this.HostStream.Receive(onebyte, 1000);
+                if (rc == 0)
+                {
+                    logger.ErrorFormat("xmodem接收数据包超时，发送CAN信号");
+                    this.HostStream.Send(new byte[] { CAN });
+                    return ResponseCode.FAILED;
+                }
+                else if (rc < 0)
+                {
+                    // 接收失败
+                    logger.ErrorFormat("xmodem接收数据包失败");
+                    return ResponseCode.FAILED;
+                }
+                else
+                {
+                    // 接收成功
+                    firstbyte = onebyte[0];
+                }
+
+                #endregion
+            }
+        }
+
+        /// <summary>
         /// 1. 用户执行rx
         /// 2. 点击XModel发送文件按钮
         /// 3. 运行Send
         /// </summary>
         /// <returns></returns>
-        public override int Send(Stream stream)
+        public override int Send(List<string> filePaths)
         {
+            FileStream stream = ModemUtils.OpenFile(filePaths[0], SendReceive.Send);
+            if (stream == null) 
+            {
+                return ResponseCode.FAILED;
+            }
+
             this.xmodem1k = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_XMODEM1K, MTermConsts.XMODEM_XMODEM1K);
             this.retry = this.Session.GetOption<int>(OptionKeyEnum.MODEM_RETRY_TIMES, MTermConsts.MODEM_RETRY_TIMES);
 
@@ -69,7 +262,7 @@ namespace ModengTerm.Terminal.Modem
 
             if (n <= 0)
             {
-                logger.ErrorFormat("onebyte read failed, {0}", n);
+                logger.ErrorFormat("startbyte read failed, {0}", n);
                 return ResponseCode.FAILED;
             }
 
@@ -186,197 +379,33 @@ namespace ModengTerm.Terminal.Modem
 
                 if (end)
                 {
-                    if ((n = this.HostStream.Send(new byte[1] { EOT })) != ResponseCode.SUCCESS)
-                    {
-                        logger.ErrorFormat("xmodem EOT failed, {0}", n);
-                        return ResponseCode.FAILED;
-                    }
-
-                    if ((n = this.HostStream.Receive(onebyte)) == 0)
-                    {
-                        logger.ErrorFormat("xmodem read ack failed");
-                        return ResponseCode.FAILED;
-                    }
-
-                    if (onebyte[0] != ACK)
-                    {
-                        logger.ErrorFormat("xmodem eot response failed, {0}", onebyte[0]);
-                        return ResponseCode.FAILED;
-                    }
-
-                    logger.InfoFormat("xmodem success");
-
-                    return ResponseCode.SUCCESS;
+                    break;
                 }
             }
-        }
 
-        /// <summary>
-        /// 1. 点击XModel接收文件按钮
-        /// 2. 用户执行sx
-        /// 3. 运行Receive
-        /// </summary>
-        /// <param name="stream"></param>
-        /// <returns></returns>
-        public override int Receive(Stream stream)
-        {
-            bool xmodem1k = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_XMODEM1K, MTermConsts.XMODEM_XMODEM1K);
-            int retry = this.Session.GetOption<int>(OptionKeyEnum.MODEM_RETRY_TIMES, MTermConsts.MODEM_RETRY_TIMES);
-            bool crc = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_CRC, MTermConsts.XMODEM_RECV_CRC);
-            byte padchar = this.Session.GetOption<byte>(OptionKeyEnum.XMODEM_RECV_PADCHAR, MTermConsts.XMODEM_RECV_PADCHAR);
-            bool ignorePadChar = this.Session.GetOption<bool>(OptionKeyEnum.XMODEM_RECV_IGNORE_PADCHAR, MTermConsts.XMODEM_RECV_IGNORE_PADCHAR);
-            byte[] onebyte = new byte[1];
-            int rc = 0;
-
-            byte firstbyte = 0;
-            if ((rc = this.Handshake(out firstbyte)) != ResponseCode.SUCCESS)
+            if ((n = this.HostStream.Send(new byte[1] { EOT })) != ResponseCode.SUCCESS)
             {
-                logger.ErrorFormat("xmodem接收握手失败, {0}", rc);
-                return rc;
+                logger.ErrorFormat("xmodem EOT failed, {0}", n);
+                return ResponseCode.FAILED;
             }
 
-            while (true)
+            if ((n = this.HostStream.Receive(onebyte)) == 0)
             {
-                #region 判断接下来的处理方式
-
-                int packetsize = 0;
-
-                if (firstbyte == SOH)
-                {
-                    // 128字节数据
-                    packetsize = 128;
-                }
-                else if (firstbyte == STX)
-                {
-                    // 1024字节数据
-                    packetsize = 1024;
-                }
-                else if (firstbyte == EOT)
-                {
-                    // 文件发送结束
-                    logger.InfoFormat("xmodel发送成功");
-                    return this.HostStream.Send(new byte[] { ACK });
-                }
-                else
-                {
-                    // 未知数据
-                    logger.ErrorFormat("xmodem接收到未知数据, {0}", firstbyte);
-                    return ResponseCode.FAILED;
-                }
-
-                #endregion
-
-                #region 接收数据包
-
-                // 该帧一共多少字节
-                int blocksize = 3 + packetsize + (crc ? 2 : 1);
-
-                // 一旦开始接收一个数据块，接收方会对每个字符和校验和设置 1 秒的超时。这意味着如果在 1 秒内没有接收到下一个字符或校验和，接收方将认为发生了超时。
-                byte[] datablock = new byte[blocksize];
-                datablock[0] = firstbyte;
-
-                for (int i = 1; i < datablock.Length; i++)
-                {
-                    rc = this.HostStream.Receive(datablock, i, 1, 1000);
-                    if (rc == 0)
-                    {
-                        // 接收超时，直接取消
-                        logger.ErrorFormat("xmodem接收数据包超时，发送CAN信号");
-                        this.HostStream.Send(new byte[] { CAN });
-                        return ResponseCode.FAILED;
-                    }
-                    else if (rc < 0)
-                    {
-                        // 接收失败
-                        logger.ErrorFormat("xmodem接收数据包失败");
-                        return ResponseCode.FAILED;
-                    }
-                    else
-                    {
-                        // 接收成功
-                    }
-                }
-
-                #endregion
-
-                #region 处理数据包
-
-                // 1. 判断检验和
-                if (crc)
-                {
-                    byte[] crcdata = ModemUtils.CalculateCRC(datablock);
-                    if (datablock[datablock.Length - 1] != crcdata[0] || datablock[datablock.Length - 2] != crcdata[1])
-                    {
-                        logger.ErrorFormat("xmodem接收crc错误");
-                        this.HostStream.Send(new byte[] { CAN });
-                        return ResponseCode.FAILED;
-                    }
-                }
-                else
-                {
-                    byte chksum = ModemUtils.Checksum(datablock);
-                    if (chksum != datablock[datablock.Length - 1])
-                    {
-                        logger.ErrorFormat("xmodem接收checksum错误");
-                        this.HostStream.Send(new byte[] { CAN });
-                        return ResponseCode.FAILED;
-                    }
-                }
-
-                // 2. 判断填充字符
-                byte packetnum = datablock[1];
-                int dataoffset = 3;
-                int datasize = packetsize;
-
-                if (ignorePadChar)
-                {
-                    // 忽略填充字符
-                }
-                else
-                {
-                    // 查找填充字符
-                    // TODO：优化不要每次都查找padchar，在收到EOT的时候判断上一次的padchar位置
-                    int len = crc ? 2 : 1;
-                    for (int i = 3; i < datablock.Length - len; i++)
-                    {
-                        if (datablock[i] == padchar)
-                        {
-                            datasize = i - 2;
-                            dataoffset = i;
-                            break;
-                        }
-                    }
-                }
-
-                // 3. 写入文件
-                stream.Write(datablock, dataoffset, datasize);
-                logger.InfoFormat("xmodem receive, packetnum = {0}", packetnum);
-
-                #endregion
-
-                #region 接收下一个数据包的头部
-
-                rc = this.HostStream.Receive(onebyte, 1000);
-                if (rc == 0)
-                {
-                    logger.ErrorFormat("xmodem接收数据包超时，发送CAN信号");
-                    this.HostStream.Send(new byte[] { CAN });
-                    return ResponseCode.FAILED;
-                }
-                else if (rc < 0)
-                {
-                    // 接收失败
-                    logger.ErrorFormat("xmodem接收数据包失败");
-                    return ResponseCode.FAILED;
-                }
-                else
-                {
-                    // 接收成功
-                    firstbyte = onebyte[0];
-                }
-
-                #endregion
+                logger.ErrorFormat("xmodem read ack failed");
+                return ResponseCode.FAILED;
             }
+
+            if (onebyte[0] != ACK)
+            {
+                logger.ErrorFormat("xmodem eot response failed, {0}", onebyte[0]);
+                return ResponseCode.FAILED;
+            }
+
+            logger.InfoFormat("xmodem success");
+
+            this.NotifyProgressChanged(100, ResponseCode.SUCCESS);
+
+            return ResponseCode.SUCCESS;
         }
 
         #endregion
@@ -421,7 +450,7 @@ namespace ModengTerm.Terminal.Modem
                 {
                     b = onebyte[0];
 
-                    if (b != STX || b != SOH)
+                    if (b != STX && b != SOH)
                     {
                         logger.ErrorFormat("xmodem接收到未知握手信号, {0}", b);
                         continue;
