@@ -347,7 +347,7 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.AutoCompletionVM = new AutoCompletionVM();
             this.AutoCompletionVM.Initialize(this);
-            this.AutoCompletionVM.Enabled = this.Session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
+            this.AutoCompletionVM.Enabled = this.Session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_COMPLETION_ENABLED, OptionDefaultValues.TERM_ADVANCE_AUTO_COMPLETION_ENABLED);
 
             #endregion
 
