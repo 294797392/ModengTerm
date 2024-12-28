@@ -99,6 +99,8 @@ namespace ModengTerm.ViewModels
 
         #region 属性
 
+        public ContextMenuDefinition Definition { get; private set; }
+
         /// <summary>
         /// 子菜单列表
         /// </summary>
@@ -133,11 +135,6 @@ namespace ModengTerm.ViewModels
 
         #region 构造方法
 
-        public ContextMenuVM()
-        {
-            this.Children = new BindableCollection<ContextMenuVM>();
-        }
-
         public ContextMenuVM(ContextMenuDefinition definition)
         {
             this.ID = definition.ID;
@@ -147,6 +144,7 @@ namespace ModengTerm.ViewModels
             this.PanelId = definition.PanelID;
             this.executeDelegate = definition.Callback;
             this.Children = new BindableCollection<ContextMenuVM>();
+            this.Definition = definition;
         }
 
         #endregion

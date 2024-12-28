@@ -22,6 +22,7 @@ using ModengTerm.Windows.SSH;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -645,7 +646,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             // ContextMenu里如果PanelID不为空就说明有一个窗格需要显示
 
-            List<ContextMenuDefinition> contextMenus = this.OnCreateContextMenu();
+            List<ContextMenuDefinition> contextMenus = this.ContextMenus.Select(v => v.Definition).ToList();
 
             foreach (ContextMenuDefinition contextMenu in contextMenus)
             {

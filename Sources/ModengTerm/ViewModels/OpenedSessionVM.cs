@@ -165,6 +165,7 @@ namespace ModengTerm.ViewModels
         /// <param name="menus"></param>
         private void InitializeMenuVM(List<MenuItem> menuItems, BindableCollection<ContextMenuVM> menus)
         {
+            // MenuId -> ContetMenuVM
             Dictionary<string, ContextMenuVM> menuCaches = new Dictionary<string, ContextMenuVM>();
 
             foreach (ContextMenuDefinition menuDefinition in menuItems.Select(v => v.MenuDefinition))
@@ -175,12 +176,21 @@ namespace ModengTerm.ViewModels
 
             foreach (MenuItem menuItem in menuItems)
             {
-                string menuId = menuItem.MenuDefinition.ID;
+                ContextMenuDefinition definition = menuItem.MenuDefinition;
+                string menuId = definition.ID;
                 string parentID = menuItem.ParentID;
 
                 if (parentID == "-1")
                 {
                     continue;
+                }
+
+                if (definition.UnsupportedTypes != null)
+                {
+                    if (menuItem.MenuDefinition.UnsupportedTypes.Contains((SessionTypeEnum)this.Session.Type))
+                    {
+                        continue;
+                    }
                 }
 
                 ContextMenuVM contextMenuVM = menuCaches[menuId];
