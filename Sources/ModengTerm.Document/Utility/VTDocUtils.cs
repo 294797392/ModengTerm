@@ -16,7 +16,7 @@ namespace ModengTerm.Document.Utility
     /// <summary>
     /// 提供终端的工具函数
     /// </summary>
-    public static class VTUtils
+    public static class VTDocUtils
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTUtils");
 
@@ -37,13 +37,13 @@ namespace ModengTerm.Document.Utility
         private static readonly List<VTextAttributes> AllTextAttributes = Enum.GetValues(typeof(VTextAttributes)).Cast<VTextAttributes>().ToList();
         private static readonly Dictionary<string, GifMetadata> GifMetadataMap = new Dictionary<string, GifMetadata>();
 
-        static VTUtils()
+        static VTDocUtils()
         {
         }
 
         internal static void CreatePlainText(List<VTCharacter> characters, StringBuilder builder, int startIndex, int count, bool lastLine)
         {
-            string text = VTUtils.CreatePlainText(characters, startIndex, count);
+            string text = VTDocUtils.CreatePlainText(characters, startIndex, count);
             //if (filter != null)
             //{
             //    if (!filter.Filter(text))
@@ -70,7 +70,7 @@ namespace ModengTerm.Document.Utility
                 return;
             }
 
-            string text = VTUtils.CreatePlainText(characters, startIndex, count);
+            string text = VTDocUtils.CreatePlainText(characters, startIndex, count);
             //if (filter != null)
             //{
             //    if (!filter.Filter(text))
@@ -85,21 +85,21 @@ namespace ModengTerm.Document.Utility
 
                 builder.Append("<span style='");
 
-                if (VTUtils.GetTextAttribute(VTextAttributes.Background, character.Attribute))
+                if (VTDocUtils.GetTextAttribute(VTextAttributes.Background, character.Attribute))
                 {
                     VTColor vtc = character.Background;
                     string color = vtc.Html;
                     builder.AppendFormat("background-color:{0};", color);
                 }
 
-                if (VTUtils.GetTextAttribute(VTextAttributes.Foreground, character.Attribute))
+                if (VTDocUtils.GetTextAttribute(VTextAttributes.Foreground, character.Attribute))
                 {
                     VTColor vtc = character.Foreground;
                     string color = vtc.Html;
                     builder.AppendFormat("color:{0};", color);
                 }
 
-                if (VTUtils.GetTextAttribute(VTextAttributes.Underline, character.Attribute))
+                if (VTDocUtils.GetTextAttribute(VTextAttributes.Underline, character.Attribute))
                 {
                     builder.Append("text-decoration:underline;");
                 }
@@ -216,7 +216,7 @@ namespace ModengTerm.Document.Utility
                 {
                     VTextAttribute attribute = formattedText.Attributes.FirstOrDefault(v => v.Attribute == textAttribute && !v.Closed);
 
-                    if (VTUtils.GetTextAttribute(textAttribute, character.Attribute))
+                    if (VTDocUtils.GetTextAttribute(textAttribute, character.Attribute))
                     {
                         object parameter = GetAttributeParameter(textAttribute, character);
 
@@ -275,7 +275,7 @@ namespace ModengTerm.Document.Utility
 
         public static VTFormattedText CreateFormattedText(List<VTCharacter> characters)
         {
-            return VTUtils.CreateFormattedText(characters, 0, characters.Count);
+            return VTDocUtils.CreateFormattedText(characters, 0, characters.Count);
         }
 
         /// <summary>
@@ -500,7 +500,7 @@ namespace ModengTerm.Document.Utility
         {
             result = null;
 
-            string text = VTUtils.CreatePlainText(characters);
+            string text = VTDocUtils.CreatePlainText(characters);
             if (string.IsNullOrEmpty(text))
             {
                 return;

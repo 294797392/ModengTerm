@@ -107,7 +107,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             target.PID = source.PID;
             target.Name = source.Name;
             target.TotalProcessorTime = source.TotalProcessorTime;
-            if (MTermUtils.UpdateReadable(target.Memory, source.MemoryUsage))
+            if (VTBaseUtils.UpdateReadable(target.Memory, source.MemoryUsage))
             {
                 target.DisplayMemory = target.Memory.ToString();
             }

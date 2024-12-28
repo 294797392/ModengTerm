@@ -120,7 +120,7 @@ namespace ModengTerm.Base
 
         public override string ToString()
         {
-            return string.Format("{0}{1}", this.value, MTermUtils.Unit2Suffix(this.Unit));
+            return string.Format("{0}{1}", this.value, VTBaseUtils.Unit2Suffix(this.Unit));
         }
     }
 
@@ -192,7 +192,7 @@ namespace ModengTerm.Base
 
         public override string ToString()
         {
-            return string.Format("{0}{1}", this.value, MTermUtils.Unit2Suffix(this.Unit));
+            return string.Format("{0}{1}", this.value, VTBaseUtils.Unit2Suffix(this.Unit));
         }
     }
 }

@@ -51,7 +51,7 @@ namespace ModengTerm.UnitTest
 
             foreach (string textLine in textLines)
             {
-                string line1 = VTUtils.CreatePlainText(current.Characters);
+                string line1 = VTDocUtils.CreatePlainText(current.Characters);
                 string line2 = textLine;
 
                 if (line1 != line2)
@@ -79,7 +79,7 @@ namespace ModengTerm.UnitTest
 
             foreach (string textLine in textLines)
             {
-                string line1 = VTUtils.CreatePlainText(current.Characters);
+                string line1 = VTDocUtils.CreatePlainText(current.Characters);
                 string line2 = textLine;
 
                 if (line1 != line2)
@@ -94,7 +94,7 @@ namespace ModengTerm.UnitTest
             // 如果还有剩下的，都必须是空
             while (current != null)
             {
-                string line = VTUtils.CreatePlainText(current.Characters);
+                string line = VTDocUtils.CreatePlainText(current.Characters);
                 if (!string.IsNullOrEmpty(line))
                 {
                     logger.Error("CompareDocument, {7B8AC313-7892-4561-AF43-B17BD0838E47}");
@@ -150,7 +150,7 @@ namespace ModengTerm.UnitTest
                     return false;
                 }
 
-                string textLine1 = VTUtils.CreatePlainText(historyLine.Characters);
+                string textLine1 = VTDocUtils.CreatePlainText(historyLine.Characters);
                 string textLine2 = textLines[i];
 
                 if (textLine1 != textLine2)
@@ -411,7 +411,7 @@ namespace ModengTerm.UnitTest
 
             while (textLine != null)
             {
-                string line = VTUtils.CreatePlainText(textLine.Characters);
+                string line = VTDocUtils.CreatePlainText(textLine.Characters);
 
                 textLines.Add(line);
 

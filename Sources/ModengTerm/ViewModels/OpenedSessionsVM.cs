@@ -111,7 +111,7 @@ namespace ModengTerm.ViewModels
         public void CloseSession(OpenedSessionVM session)
         {
             ISessionContent content = session.Content as ISessionContent;
-            if (MTermUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
+            if (VTBaseUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
             {
                 UserControl userControl = content as UserControl;
             }

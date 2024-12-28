@@ -3,6 +3,7 @@ using ModengTerm;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Controls;
 using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.CreateSession;
 using ModengTerm.ViewModels.Session;
 using System;
 using System.Collections.Generic;

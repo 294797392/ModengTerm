@@ -126,7 +126,7 @@ namespace ModengTerm
             defaultSession.SetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, cmdPath);
 
             // 如果是Win10或者更高版本的操作系统，那么使用PseudoConsoleAPI
-            if (MTermUtils.IsWin10())
+            if (VTBaseUtils.IsWin10())
             {
                 defaultSession.SetOption<CmdDriverEnum>(OptionKeyEnum.CMD_DRIVER, CmdDriverEnum.Win10PseudoConsoleApi);
             }
@@ -493,7 +493,7 @@ namespace ModengTerm
                 case CommandTypeEnum.HexData:
                     {
                         byte[] bytes;
-                        if (!MTermUtils.TryParseHexString(shellCommand.Command, out bytes))
+                        if (!VTBaseUtils.TryParseHexString(shellCommand.Command, out bytes))
                         {
                             MTMessageBox.Info("发送失败, 十六进制数据格式错误");
                             return;

@@ -1015,7 +1015,7 @@ namespace ModengTerm.Document
         /// <param name="parameter">该状态对应的参数</param>
         public void SetAttribute(VTextAttributes attribute, bool enabled, object color)
         {
-            VTUtils.SetTextAttribute(attribute, enabled, ref AttributeState.Value);
+            VTDocUtils.SetTextAttribute(attribute, enabled, ref AttributeState.Value);
 
             switch (attribute)
             {
@@ -1354,7 +1354,7 @@ namespace ModengTerm.Document
                 charactersList.AddRange(historyLines.Select(v => v.Characters));
             }
 
-            CreateLineDelegate createLine = VTUtils.GetCreateLineDelegate(formatType);
+            CreateLineDelegate createLine = VTDocUtils.GetCreateLineDelegate(formatType);
             StringBuilder builder = new StringBuilder();
 
             for (int i = 0; i < charactersList.Count; i++)
@@ -1369,21 +1369,21 @@ namespace ModengTerm.Document
                 if (i == 0 && charactersList.Count == 1)
                 {
                     // 优先处理只选中了一行的情况
-                    startIndex = VTUtils.GetCharacterIndex(characters, startColumn);
-                    int endIndex = VTUtils.GetCharacterIndex(characters, endColumn);
+                    startIndex = VTDocUtils.GetCharacterIndex(characters, startColumn);
+                    int endIndex = VTDocUtils.GetCharacterIndex(characters, endColumn);
                     count = endIndex - startIndex + 1;
                 }
                 else if (i == 0)
                 {
                     // 第一行
-                    startIndex = VTUtils.GetCharacterIndex(characters, startColumn);
+                    startIndex = VTDocUtils.GetCharacterIndex(characters, startColumn);
                     count = characters.Count - startIndex;
                 }
                 else if (i == charactersList.Count - 1)
                 {
                     // 最后一行
                     startIndex = 0;
-                    count = VTUtils.GetCharacterIndex(characters, endColumn) + 1;
+                    count = VTDocUtils.GetCharacterIndex(characters, endColumn) + 1;
                 }
                 else
                 {
@@ -1679,7 +1679,7 @@ namespace ModengTerm.Document
                             {
                                 return;
                             }
-                            VTUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
+                            VTDocUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
                             this.Selection.SelectRange(textLine, logicalRow, startIndex, count);
                             break;
                         }

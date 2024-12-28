@@ -154,14 +154,14 @@ namespace ModengTerm.ViewModels.Terminals
             List<VTCharacter> characters = textLine.Characters;
 
             int startIndex, count;
-            VTUtils.GetSegement(characters, col - 1, out startIndex, out count);
+            VTDocUtils.GetSegement(characters, col - 1, out startIndex, out count);
             if (count == 0)
             {
                 this.Close();
                 return;
             }
 
-            string text = VTUtils.CreatePlainText(characters, startIndex, count);
+            string text = VTDocUtils.CreatePlainText(characters, startIndex, count);
             if (string.IsNullOrEmpty(text))
             {
                 this.Close();
@@ -257,7 +257,7 @@ namespace ModengTerm.ViewModels.Terminals
         private void Terminal_OnLineFeed(IVideoTerminal arg1, bool isAlternate, int oldPhysicsRow, VTHistoryLine historyLine)
         {
             string[] strings;
-            VTUtils.Split(historyLine.Characters, Splitters, out strings);
+            VTDocUtils.Split(historyLine.Characters, Splitters, out strings);
 
             if (strings == null || strings.Length == 0)
             {

@@ -444,7 +444,7 @@ namespace ModengTerm.Document
         public void SetHistory(VTHistoryLine historyLine)
         {
             this.History = historyLine;
-            this.columns = VTUtils.GetColumns(this.Characters);
+            this.columns = VTDocUtils.GetColumns(this.Characters);
             this.SetDirtyFlags(VTDirtyFlags.RenderDirty, true);
         }
 
@@ -619,7 +619,7 @@ namespace ModengTerm.Document
 
         protected override void OnRender()
         {
-            VTFormattedText formattedText = VTUtils.CreateFormattedText(this.Characters);
+            VTFormattedText formattedText = VTDocUtils.CreateFormattedText(this.Characters);
             formattedText.Style = this.Typeface;
 
             this.formattedText = formattedText;

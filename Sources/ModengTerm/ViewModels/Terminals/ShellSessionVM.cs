@@ -993,7 +993,7 @@ namespace ModengTerm.Terminal.ViewModels
         private void WatchThreadProc()
         {
             WatchFrequencyEnum frequency = this.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, MTermConsts.DefaultWatchFrequency);
-            int updateInterval = MTermUtils.GetWatchInterval(frequency);
+            int updateInterval = VTBaseUtils.GetWatchInterval(frequency);
             List<WatchObject> watchList = new List<WatchObject>();
             AbstractWatcher watcher = WatcherFactory.Create(this.sessionTransport);
             watcher.Initialize();

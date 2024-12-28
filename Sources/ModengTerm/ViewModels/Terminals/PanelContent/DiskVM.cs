@@ -91,8 +91,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             bool sizeChanged = false;
 
-            sizeChanged = MTermUtils.UpdateReadable(target.TotalSpace, source.TotalSpace);
-            sizeChanged = MTermUtils.UpdateReadable(target.FreeSpace, source.FreeSpace);
+            sizeChanged = VTBaseUtils.UpdateReadable(target.TotalSpace, source.TotalSpace);
+            sizeChanged = VTBaseUtils.UpdateReadable(target.FreeSpace, source.FreeSpace);
 
             if (sizeChanged)
             {

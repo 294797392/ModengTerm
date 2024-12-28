@@ -164,10 +164,10 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             #endregion
 
-            MTermUtils.UpdateReadable(this.AvailableMemory, systemInfo.AvailableMemory);
-            MTermUtils.UpdateReadable(this.TotalMemory, systemInfo.TotalMemory);
+            VTBaseUtils.UpdateReadable(this.AvailableMemory, systemInfo.AvailableMemory);
+            VTBaseUtils.UpdateReadable(this.TotalMemory, systemInfo.TotalMemory);
             ulong used = systemInfo.TotalMemory.Value - systemInfo.AvailableMemory.Value;
-            MTermUtils.UpdateReadable(this.UsedMemory, this.TotalMemory.Unit, used, systemInfo.TotalMemory.Unit);
+            VTBaseUtils.UpdateReadable(this.UsedMemory, this.TotalMemory.Unit, used, systemInfo.TotalMemory.Unit);
             this.MemoryPercent = Math.Round((double)used / systemInfo.TotalMemory.Value * 100, 2);
             this.DisplayMemoryUsage = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
 

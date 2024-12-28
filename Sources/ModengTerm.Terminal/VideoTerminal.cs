@@ -603,7 +603,7 @@ namespace ModengTerm.Terminal
 
             int oldRow = this.ViewportRow, oldCol = this.ViewportColumn;
             int newRow = 0, newCol = 0;
-            VTUtils.CalculateAutoFitSize(newSize, this.activeDocument.Typeface, out newRow, out newCol);
+            VTDocUtils.CalculateAutoFitSize(newSize, this.activeDocument.Typeface, out newRow, out newCol);
 
             if (newRow == oldRow && newCol == oldCol)
             {
@@ -769,7 +769,7 @@ namespace ModengTerm.Terminal
             {
                 /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
                 /// 如果SizeMode等于AutoFit，那么动态计算行和列
-                VTUtils.CalculateAutoFitSize(displaySize, typeface, out viewportRow, out viewportColumn);
+                VTDocUtils.CalculateAutoFitSize(displaySize, typeface, out viewportRow, out viewportColumn);
             }
 
             VTDocumentOptions documentOptions = new VTDocumentOptions()
@@ -2794,8 +2794,8 @@ namespace ModengTerm.Terminal
 
         private void CursorMovePosition(int row, int col)
         {
-            row = MTermUtils.Clamp(row, 0, this.ViewportRow - 1);
-            col = MTermUtils.Clamp(col, 0, this.ViewportColumn - 1);
+            row = VTBaseUtils.Clamp(row, 0, this.ViewportRow - 1);
+            col = VTBaseUtils.Clamp(col, 0, this.ViewportColumn - 1);
 
             this.activeDocument.SetCursorLogical(row, col);
         }

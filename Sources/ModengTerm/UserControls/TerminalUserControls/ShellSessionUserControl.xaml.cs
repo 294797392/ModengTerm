@@ -212,7 +212,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             if (MenuItemHexInput.IsChecked)
             {
                 byte[] bytes;
-                if (!MTermUtils.TryParseHexString(text, out bytes))
+                if (!VTBaseUtils.TryParseHexString(text, out bytes))
                 {
                     MTMessageBox.Info("请输入正确的十六进制数据");
                     return;

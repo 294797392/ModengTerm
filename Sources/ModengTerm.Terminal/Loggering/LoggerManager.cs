@@ -73,7 +73,7 @@ namespace ModengTerm.Terminal.Loggering
             {
                 Filter = filter,
                 Builder = new StringBuilder(),
-                CreateLine = VTUtils.GetCreateLineDelegate(options.FileType),
+                CreateLine = VTDocUtils.GetCreateLineDelegate(options.FileType),
                 FilePath = options.FilePath,
                 FileType = options.FileType,
                 IsPaused = false

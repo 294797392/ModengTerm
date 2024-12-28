@@ -147,8 +147,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                     ulong received = target.BytesReceived - previousBytesReceived;
                     double downspeedBytes = received / seconds;
                     UnitType downunit;
-                    int downspeed = (int)MTermUtils.ConvertToHumanReadableUnit(downspeedBytes, out downunit, 1);
-                    target.DownloadSpeed = string.Format("{0}{1}/s", downspeed, MTermUtils.Unit2Suffix(downunit));
+                    int downspeed = (int)VTBaseUtils.ConvertToHumanReadableUnit(downspeedBytes, out downunit, 1);
+                    target.DownloadSpeed = string.Format("{0}{1}/s", downspeed, VTBaseUtils.Unit2Suffix(downunit));
                 }
 
                 if (target.BytesSent != previousBytesSent)
@@ -156,8 +156,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                     ulong sent = target.BytesSent - previousBytesSent;
                     double upspeedBytes = sent / seconds;
                     UnitType upunit;
-                    int upspeed = (int)MTermUtils.ConvertToHumanReadableUnit(upspeedBytes, out upunit, 1);
-                    target.UploadSpeed = string.Format("{0}{1}/s", upspeed, MTermUtils.Unit2Suffix(upunit));
+                    int upspeed = (int)VTBaseUtils.ConvertToHumanReadableUnit(upspeedBytes, out upunit, 1);
+                    target.UploadSpeed = string.Format("{0}{1}/s", upspeed, VTBaseUtils.Unit2Suffix(upunit));
                 }
             }
         }

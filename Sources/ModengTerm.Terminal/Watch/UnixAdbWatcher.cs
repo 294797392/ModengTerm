@@ -269,7 +269,7 @@ namespace ModengTerm.Terminal.Watch
             if (!this.cmd2FileName.TryGetValue(command, out fileNames))
             {
                 string tempFileName = string.Format("modengterm_watch_{0}", command);
-                tempFileName = MTermUtils.TrimInvalidFileNameChars(tempFileName);
+                tempFileName = VTBaseUtils.TrimInvalidFileNameChars(tempFileName);
 
                 fileNames = new FileNames()
                 {

@@ -27,6 +27,9 @@ namespace ModengTerm
         [JsonProperty("themes")]
         public List<AppTheme> AppThemes { get; private set; }
 
+        /// <summary>
+        /// 终端类型的参数树形列表
+        /// </summary>
         [JsonProperty("termOptionMenu")]
         public List<MenuDefinition> TerminalOptionMenu { get; private set; }
 

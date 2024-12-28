@@ -40,7 +40,7 @@ namespace ModengTerm.Windows.SSH
         private void InitializeWindow(PortForward portForward = null)
         {
             BindableCollection<PortForwardTypeEnum> portForwardTypes = new BindableCollection<PortForwardTypeEnum>();
-            portForwardTypes.AddRange(MTermUtils.GetEnumValues<PortForwardTypeEnum>());
+            portForwardTypes.AddRange(VTBaseUtils.GetEnumValues<PortForwardTypeEnum>());
             ComboBoxTypes.ItemsSource = portForwardTypes;
             ComboBoxTypes.SelectedIndex = 0;
 

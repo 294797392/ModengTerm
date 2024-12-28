@@ -256,7 +256,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <returns></returns>
         private List<VTMatches> FindMatches(string keyword, VTextLine textLine)
         {
-            string text = VTUtils.CreatePlainText(textLine.Characters);
+            string text = VTDocUtils.CreatePlainText(textLine.Characters);
 
             if (this.Regexp)
             {

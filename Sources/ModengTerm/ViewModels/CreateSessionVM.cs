@@ -13,6 +13,7 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.UserControls.TerminalUserControls.Rendering;
 using ModengTerm.ViewModels.CreateSession;
 using ModengTerm.ViewModels.Session;
+using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -133,7 +134,7 @@ namespace ModengTerm.ViewModels
                             {
                                 // 根据不同的会话类型，切换不同的配置选项树形列表
                                 OptionMenuItemVM selectedNode;
-                                if (this.OptionTreeVM.TryGetItem(value.MenuId, out selectedNode)) 
+                                if (this.OptionTreeVM.TryGetItem(value.MenuId, out selectedNode))
                                 {
                                     if (this.selectedMenuNode != null)
                                     {
@@ -595,12 +596,12 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<string> PortList { get; private set; }
 
-        public string SelectedPort 
+        public string SelectedPort
         {
             get { return this.selectedPort; }
             set
             {
-                if (this.selectedPort != value) 
+                if (this.selectedPort != value)
                 {
                     this.selectedPort = value;
                     this.NotifyPropertyChanged("SelectedPort");
@@ -716,7 +717,7 @@ namespace ModengTerm.ViewModels
                 this.SessionTypeList.Add(new SessionTypeVM(session));
                 // 隐藏会话类型对应的菜单，等选中的时候再显示
                 OptionMenuItemVM treeNodeViewModel;
-                if (this.TerminalOptionsTreeVM.TryGetItem(session.MenuId, out treeNodeViewModel)) 
+                if (this.TerminalOptionsTreeVM.TryGetItem(session.MenuId, out treeNodeViewModel))
                 {
                     treeNodeViewModel.IsVisible = false;
                 }
@@ -732,7 +733,7 @@ namespace ModengTerm.ViewModels
             #region 会话 - 系统监控
 
             this.WatchFrequencies = new BindableCollection<WatchFrequencyEnum>();
-            this.WatchFrequencies.AddRange(MTermUtils.GetEnumValues<WatchFrequencyEnum>());
+            this.WatchFrequencies.AddRange(VTBaseUtils.GetEnumValues<WatchFrequencyEnum>());
             this.WatchFrequencies.SelectedItem = WatchFrequencyEnum.Normal;
 
             #endregion
@@ -742,9 +743,9 @@ namespace ModengTerm.ViewModels
             this.StartupPath = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             this.StartupDirectory = AppDomain.CurrentDomain.BaseDirectory;
             this.CmdDrivers = new BindableCollection<CmdDriverEnum>();
-            this.CmdDrivers.AddRange(MTermUtils.GetEnumValues<CmdDriverEnum>());
+            this.CmdDrivers.AddRange(VTBaseUtils.GetEnumValues<CmdDriverEnum>());
             // 如果是Win10或更高版本那么默认选择PseudoConsoleApi
-            if (MTermUtils.IsWin10())
+            if (VTBaseUtils.IsWin10())
             {
                 this.CmdDrivers.SelectedItem = CmdDriverEnum.Win10PseudoConsoleApi;
             }
@@ -762,7 +763,7 @@ namespace ModengTerm.ViewModels
             this.TerminalRows = MTermConsts.TerminalRows.ToString();
             this.TerminalColumns = MTermConsts.TerminalColumns.ToString();
             this.TerminalTypeList = new BindableCollection<TerminalTypeEnum>();
-            this.TerminalTypeList.AddRange(MTermUtils.GetEnumValues<TerminalTypeEnum>());
+            this.TerminalTypeList.AddRange(VTBaseUtils.GetEnumValues<TerminalTypeEnum>());
             this.TerminalTypeList.SelectedItem = MTermConsts.DefaultTerminalType;
             this.MaxScrollback = MTermConsts.DefaultTerminalScrollback.ToString();
             this.MaxClipboardHistory = MTermConsts.DefaultMaxClipboardHistory.ToString();
@@ -772,7 +773,7 @@ namespace ModengTerm.ViewModels
             #region 行为
 
             this.BehaviorRightClicks = new BindableCollection<BehaviorRightClicks>();
-            this.BehaviorRightClicks.AddRange(MTermUtils.GetEnumValues<BehaviorRightClicks>());
+            this.BehaviorRightClicks.AddRange(VTBaseUtils.GetEnumValues<BehaviorRightClicks>());
             this.BehaviorRightClicks.SelectedItem = Base.Enumerations.BehaviorRightClicks.ContextMenu;
 
             #endregion
@@ -788,7 +789,7 @@ namespace ModengTerm.ViewModels
             #region SSH
 
             this.SSHAuthTypeList = new BindableCollection<SSHAuthTypeEnum>();
-            this.SSHAuthTypeList.AddRange(MTermUtils.GetEnumValues<SSHAuthTypeEnum>());
+            this.SSHAuthTypeList.AddRange(VTBaseUtils.GetEnumValues<SSHAuthTypeEnum>());
             this.SSHAuthTypeList.SelectedItem = this.SSHAuthTypeList.FirstOrDefault();
             this.SSHServerPort = MTermConsts.DefaultSSHPort.ToString();
 
@@ -809,15 +810,15 @@ namespace ModengTerm.ViewModels
             this.DataBitsList.SelectedItem = this.DataBitsList.LastOrDefault(); // LastOrDfault是8
 
             this.StopBitsList = new BindableCollection<StopBits>();
-            this.StopBitsList.AddRange(MTermUtils.GetEnumValues<StopBits>());
+            this.StopBitsList.AddRange(VTBaseUtils.GetEnumValues<StopBits>());
             this.StopBitsList.SelectedItem = StopBits.One;
 
             this.ParityList = new BindableCollection<Parity>();
-            this.ParityList.AddRange(MTermUtils.GetEnumValues<Parity>());
+            this.ParityList.AddRange(VTBaseUtils.GetEnumValues<Parity>());
             this.ParityList.SelectedItem = Parity.None;
 
             this.HandshakeList = new BindableCollection<Handshake>();
-            this.HandshakeList.AddRange(MTermUtils.GetEnumValues<Handshake>());
+            this.HandshakeList.AddRange(VTBaseUtils.GetEnumValues<Handshake>());
             this.HandshakeList.SelectedItem = Handshake.None;
 
             #endregion
@@ -825,14 +826,14 @@ namespace ModengTerm.ViewModels
             #region Tcp
 
             this.RawTcpTypes = new BindableCollection<RawTcpTypeEnum>();
-            this.RawTcpTypes.AddRange(MTermUtils.GetEnumValues<RawTcpTypeEnum>());
+            this.RawTcpTypes.AddRange(VTBaseUtils.GetEnumValues<RawTcpTypeEnum>());
 
             #endregion
 
             #region AdbShell
 
             this.AdbLoginTypes = new BindableCollection<AdbLoginTypeEnum>();
-            this.AdbLoginTypes.AddRange(MTermUtils.GetEnumValues<AdbLoginTypeEnum>());
+            this.AdbLoginTypes.AddRange(VTBaseUtils.GetEnumValues<AdbLoginTypeEnum>());
             this.AdbPath = "adb.exe";
             this.AdbLoginTimeout = MTermConsts.DefaultAdbLoginTimeout.ToString();
 
@@ -853,10 +854,10 @@ namespace ModengTerm.ViewModels
             this.FontSizeList.AddRange(terminalManifest.FontSizeList);
 
             this.CursorSpeeds = new BindableCollection<VTCursorSpeeds>();
-            this.CursorSpeeds.AddRange(MTermUtils.GetEnumValues<VTCursorSpeeds>());
+            this.CursorSpeeds.AddRange(VTBaseUtils.GetEnumValues<VTCursorSpeeds>());
 
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
-            this.CursorStyles.AddRange(MTermUtils.GetEnumValues<VTCursorStyles>());
+            this.CursorStyles.AddRange(VTBaseUtils.GetEnumValues<VTCursorStyles>());
 
             this.SwitchTheme(selectedTheme);
 
@@ -1149,7 +1150,7 @@ namespace ModengTerm.ViewModels
                 }
             }
 
-            if (!MTermUtils.IsValidNetworkPort(this.RawTcpPort))
+            if (!VTBaseUtils.IsValidNetworkPort(this.RawTcpPort))
             {
                 MTMessageBox.Info("请输入正确的端口号");
                 return false;
@@ -1162,7 +1163,7 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
-        private bool GetAdbShellOptions(XTermSession session) 
+        private bool GetAdbShellOptions(XTermSession session)
         {
             int timeout;
             if (!int.TryParse(this.AdbLoginTimeout, out timeout))
@@ -1310,6 +1311,51 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
+        private bool SaveAllOptions(XTermSession session)
+        {
+            List<OptionMenuItemVM> menuItems = this.optionTreeVM.Context.AllItems.Cast<OptionMenuItemVM>().ToList();
+
+            foreach (OptionMenuItemVM menuItem in menuItems)
+            {
+                // 这个菜单里的参数不需要保存
+                List<int> targetTypes = menuItem.GetTargetTypes();
+                if (!targetTypes.Contains(session.Type))
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(menuItem.VMClassName))
+                {
+                    continue;
+                }
+
+                // 如果有没保存的参数，那么先创建ViewModel的实例保存
+                OptionContentVM optionContentVM = menuItem.ContentVM as OptionContentVM;
+                if (optionContentVM == null)
+                {
+                    try
+                    {
+                        optionContentVM = ConfigFactory<OptionContentVM>.CreateInstance(menuItem.VMClassName);
+                    }
+                    catch (Exception ex)
+                    {
+                        MTMessageBox.Error("保存失败");
+                        logger.Error("创建OptionVM实例异常", ex);
+                        return false;
+                    }
+
+                    optionContentVM.OnInitialize();
+                }
+
+                if (!optionContentVM.SaveOptions(session)) 
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         #endregion
 
         #region 事件处理器
@@ -1357,13 +1403,9 @@ namespace ModengTerm.ViewModels
                 GroupId = groupId
             };
 
-            List<OptionContentVM> contentVMs = this.optionTreeVM.Context.AllItems.Where(v => v.IsVisible).Select(v => v.ContentVM).OfType<OptionContentVM>().ToList();
-            foreach (OptionContentVM contentVM in contentVMs)
+            if (!this.SaveAllOptions(session))
             {
-                if (!contentVM.SaveOptions(session))
-                {
-                    return null;
-                }
+                return null;
             }
 
             if (!this.CollectOptions(session))

@@ -277,7 +277,7 @@ namespace ModengTerm.UnitTest.TestCases
             invoker.CUP_CursorPosition(1, 5);
             invoker.Print('A');
 
-            string firstLine = VTUtils.CreatePlainText(mainDocument.FirstLine.Characters);
+            string firstLine = VTDocUtils.CreatePlainText(mainDocument.FirstLine.Characters);
             if (firstLine != "    A")
             {
                 logger.ErrorFormat("15595312-F6A2-72B7-5901-1DBE0768BEDA");
@@ -566,7 +566,7 @@ namespace ModengTerm.UnitTest.TestCases
             invoker.CUP_CursorPosition(1, col);
             invoker.ED_EraseDisplay(Terminal.Parsing.VTEraseType.FromBeginning);
 
-            string line1 = VTUtils.CreatePlainText(document.FirstLine.Characters);
+            string line1 = VTDocUtils.CreatePlainText(document.FirstLine.Characters);
             string line2 = string.Join(string.Empty, Enumerable.Repeat<string>(" ", col));
             if (line1 != line2)
             {
@@ -1030,7 +1030,7 @@ namespace ModengTerm.UnitTest.TestCases
             invoker.Print('B');
             invoker.REP_RepeatCharacter(3);
 
-            string textLine1 = VTUtils.CreatePlainText(document.FirstLine.Characters);
+            string textLine1 = VTDocUtils.CreatePlainText(document.FirstLine.Characters);
             string textLine2 = "AAAABBBB";
             if (textLine1 != textLine2)
             {

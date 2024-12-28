@@ -12,7 +12,7 @@ using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Base
 {
-    public static class MTermUtils
+    public static class VTBaseUtils
     {
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("MTermUtils");
 
