@@ -452,7 +452,7 @@ namespace ModengTerm.Terminal.ViewModels
                 new ContextMenuDefinition("26","18", "", "传输"),
                 new ContextMenuDefinition("27","26","26","使用XModem发送", this.ContextMenuXModemSend_Click),
                 new ContextMenuDefinition("28","26","26","使用XModem接收", this.ContextMenuXModemReceive_Click),
-                new ContextMenuDefinition("29","26","26","使用YModem接收", this.ContextMenuYModemSend_Click),
+                //new ContextMenuDefinition("29","26","26","使用YModem接收", this.ContextMenuYModemSend_Click),
             };
         }
 
