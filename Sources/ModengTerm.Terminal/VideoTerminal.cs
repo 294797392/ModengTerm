@@ -1040,7 +1040,7 @@ namespace ModengTerm.Terminal
         {
             XTermSession session = this.vtOptions.Session;
 
-            RenderModeEnum renderMode = session.GetOption<RenderModeEnum>(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE);
+            RenderModeEnum renderMode = session.GetOption<RenderModeEnum>(OptionKeyEnum.TERM_ADVANCE_RENDER_MODE, RenderModeEnum.Default);
 
             switch (renderMode)
             {
