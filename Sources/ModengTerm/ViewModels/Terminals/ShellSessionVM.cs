@@ -646,7 +646,8 @@ namespace ModengTerm.Terminal.ViewModels
         {
             // ContextMenu里如果PanelID不为空就说明有一个窗格需要显示
 
-            List<ContextMenuDefinition> contextMenus = this.ContextMenus.Select(v => v.Definition).ToList();
+            // 直接使用ContextMenus，不需要过滤了
+            List<ContextMenuDefinition> contextMenus = this.contextMenus.Select(v => v.Definition).ToList();
 
             foreach (ContextMenuDefinition contextMenu in contextMenus)
             {

@@ -17,6 +17,7 @@ namespace ModengTerm.ViewModels.CreateSession
 
         /// <summary>
         /// 获取哪些会话类型使用这个选项
+        /// 如果没有指定TargetTypes，那么默认支持所有类型的会话
         /// </summary>
         public List<int> GetTargetTypes()
         {

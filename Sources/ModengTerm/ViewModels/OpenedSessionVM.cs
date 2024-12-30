@@ -43,6 +43,11 @@ namespace ModengTerm.ViewModels
         private SessionStatusEnum status;
         private DependencyObject content;
 
+        /// <summary>
+        /// 保存当前显示的所有菜单列表
+        /// </summary>
+        protected List<ContextMenuVM> contextMenus;
+
         #endregion
 
         #region 属性
@@ -165,6 +170,14 @@ namespace ModengTerm.ViewModels
         /// <param name="menus"></param>
         private void InitializeMenuVM(List<MenuItem> menuItems, BindableCollection<ContextMenuVM> menus)
         {
+            bool firstInit = false;
+
+            if (this.contextMenus == null) 
+            {
+                firstInit = true;
+                this.contextMenus = new List<ContextMenuVM>();
+            }
+
             // MenuId -> ContetMenuVM
             Dictionary<string, ContextMenuVM> menuCaches = new Dictionary<string, ContextMenuVM>();
 
@@ -205,6 +218,11 @@ namespace ModengTerm.ViewModels
                     // 子节点
                     ContextMenuVM parentVM = menuCaches[parentID];
                     parentVM.Children.Add(contextMenuVM);
+                }
+
+                if (firstInit) 
+                {
+                    this.contextMenus.Add(contextMenuVM);
                 }
             }
         }
