@@ -1054,11 +1054,6 @@ namespace ModengTerm.Terminal
                         return new HexdumpRenderer(this);
                     }
 
-                case RenderModeEnum.String:
-                    {
-                        return new StringRenderer(this);
-                    }
-
                 default:
                     {
                         throw new NotImplementedException();

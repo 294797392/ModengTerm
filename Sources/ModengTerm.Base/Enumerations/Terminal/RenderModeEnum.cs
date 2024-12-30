@@ -19,11 +19,6 @@ namespace ModengTerm.Base.Enumerations.Terminal
         /// <summary>
         /// 解码为16进制渲染
         /// </summary>
-        Hexdump,
-
-        /// <summary>
-        /// 解码为字符串渲染
-        /// </summary>
-        String
+        Hexdump
     }
 }
