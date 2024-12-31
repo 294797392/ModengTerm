@@ -89,6 +89,11 @@ namespace ModengTerm.Terminal.Watch
             return this.systemInfo;
         }
 
+        public override byte[] ReadFile(string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region 实例方法

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public class WatchFileVM : WatchObject
+    public class WatchFile : WatchObject
     {
         public override void OnInitialize()
         {

@@ -2,6 +2,7 @@
 using ModengTerm.Terminal.Session;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,12 @@ namespace ModengTerm.Terminal.Watch
         public abstract void Release();
 
         public abstract SystemInfo GetSystemInfo();
+
+        /// <summary>
+        /// 读取文件新增的内容
+        /// </summary>
+        /// <returns></returns>
+        public abstract byte[] ReadFile(string filePath);
 
         /// <summary>
         /// 把source集合拷贝到target集合里
