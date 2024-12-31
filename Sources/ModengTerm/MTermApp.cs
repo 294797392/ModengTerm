@@ -1,27 +1,16 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
-using ModengTerm.Themes;
-using ModengTerm.UserControls.OptionsUserControl;
-using ModengTerm.UserControls.OptionsUserControl.RawTcp;
-using ModengTerm.UserControls.OptionsUserControl.SSH;
-using ModengTerm.UserControls.OptionsUserControl.Terminal;
-using ModengTerm.UserControls.OptionsUserControls.AdbShell;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Session;
-using Renci.SshNet;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Threading;
 using WPFToolkit.MVVM;
-using XTerminal.UserControls.OptionsUserControl;
 
 namespace ModengTerm
 {

@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
+using ModengTerm.Terminal.DataModels;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using WPFToolkit.MVVM;
@@ -33,11 +34,32 @@ namespace ModengTerm
         [JsonProperty("termOptionMenu")]
         public List<MenuDefinition> TerminalOptionMenu { get; private set; }
 
+        /// <summary>
+        /// XTerminal支持的文字大小列表
+        /// </summary>
+        [JsonProperty("fontSize")]
+        public List<FontSizeDefinition> FontSizeList { get; private set; }
+
+        /// <summary>
+        /// 支持的文字样式列表
+        /// </summary>
+        [JsonProperty("fontFamily")]
+        public List<FontFamilyDefinition> FontFamilyList { get; private set; }
+
+        /// <summary>
+        /// 主题列表
+        /// </summary>
+        [JsonProperty("defaultThemes")]
+        public List<ThemePackage> DefaultThemes { get; private set; }
+
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
             this.AppThemes = new List<AppTheme>();
             this.TerminalOptionMenu = new List<MenuDefinition>();
+            this.FontSizeList = new List<FontSizeDefinition>();
+            this.FontFamilyList = new List<FontFamilyDefinition>();
+            this.DefaultThemes = new List<ThemePackage>();
         }
     }
 }

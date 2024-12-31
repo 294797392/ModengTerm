@@ -11,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Base
 {

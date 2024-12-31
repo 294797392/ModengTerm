@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace ModengTerm.UserControls.TerminalUserControls.Rendering
 {
@@ -286,5 +288,20 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
 
         //    return bitmapImage;
         //}
+
+
+        /// <summary>
+        /// 完整的图片字节数组转ImageSource
+        /// </summary>
+        /// <returns></returns>
+        public static BitmapSource ImageBytes2ImageSource(byte[] imageBytes)
+        {
+            BitmapImage bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = new MemoryStream(imageBytes);
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+            return bitmapImage;
+        }
     }
 }

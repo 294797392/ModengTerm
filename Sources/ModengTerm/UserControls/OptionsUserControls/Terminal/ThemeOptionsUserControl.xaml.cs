@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Win32;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
-namespace XTerminal.UserControls.OptionsUserControl
+namespace ModengTerm.UserControls.OptionsUserControls.Terminal
 {
     /// <summary>
     /// ThemeOptionsUserControl.xaml 的交互逻辑
@@ -24,12 +13,26 @@ namespace XTerminal.UserControls.OptionsUserControl
         {
             InitializeComponent();
 
-
             this.InitializeUserControl();
         }
 
         private void InitializeUserControl()
         {
+        }
+
+        private void ButtonBrowseBackgroundImage_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Multiselect = false;
+            openFileDialog.Filter = "图片文件|*.jpg;*.png;*.jpeg;*.bmp|All files(*.*)|*.*";
+            if ((bool)openFileDialog.ShowDialog()) 
+            {
+                string fullPath = openFileDialog.FileName;
+                string fileName = System.IO.Path.GetFileName(fullPath);
+
+                TextBoxBackgroundImage.Text = fileName;
+                TextBoxBackgroundImage.Tag = fullPath;
+            }
         }
     }
 }

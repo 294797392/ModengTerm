@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="XTerminal.UserControls.OptionsUserControl.ThemeOptionsUserControl"
+﻿<UserControl x:Class="ModengTerm.UserControls.OptionsUserControls.Terminal.ThemeOptionsUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -22,7 +22,6 @@
 
             <converter:VTCursorStyle2StringConverter x:Key="VTCursorStyle2StringConverter"/>
             <converter:VTCursorSpeed2StringConverter x:Key="VTCursorSpeed2StringConverter"/>
-            <converter:WallpaperType2StringConverter x:Key="WallpaperType2StringConverter"/>
             <converter:ColorDefinition2BrushConverter x:Key="ColorDefinition2BrushConverter"/>
             <converter:LivePaperBrushConverter x:Key="LivePaperBrushConverter"/>
             <converter:EffectType2StringConverter x:Key="EffectType2StringConverter"/>
@@ -66,7 +65,9 @@
                                             BackgroundColor="{Binding ElementName=ColorPickerBackground, Path=SelectedColor}"
                                             PreviewFontFamily="{Binding ElementName=ComboBoxFontFamily, Path=SelectedItem.Value}"
                                             PreviewFontSize="{Binding ElementName=ComboBoxFontSize, Path=SelectedItem.Value}"
-                                            PreviewFontColor="{Binding ElementName=ColorPickerForeground, Path=SelectedColor}"/>
+                                            PreviewFontColor="{Binding ElementName=ColorPickerForeground, Path=SelectedColor}"
+                                            PreviewBackgroundImage="{Binding Path=BackImageUri}"
+                                            PreviewBackgroundImageOpacity="{Binding Path=BackImageOpacity}"/>
         </GroupBox>
 
         <Grid Grid.Row="2">
@@ -121,8 +122,15 @@
                     <TextBlock Grid.Row="3" Grid.Column="0" Text="背景色：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
                     <xceedtoolkit:ColorPicker Grid.Row="3" Grid.Column="1" x:Name="ColorPickerBackground" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Text="滚动条：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-                    <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="1" x:Name="ColorPickerScrollbar" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="背景图：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="TextBoxBackgroundImage" Text="{Binding Path=BackImageName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Tag="{Binding Path=BackImageUri, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Margin="3,0,80,0" Height="25" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+                    <Button Grid.Row="4" Grid.Column="1" Content="浏览" Height="25" HorizontalAlignment="Right" Click="ButtonBrowseBackgroundImage_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="透明度：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <Slider Grid.Row="5" Grid.Column="1" x:Name="SliderBackgroundOpacity" Value="{Binding Path=BackImageOpacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Minimum="0" Maximum="1" TickFrequency="0.1"/>
+
+                    <!--<TextBlock Grid.Row="4" Grid.Column="0" Text="滚动条：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                    <xceedtoolkit:ColorPicker Grid.Row="4" Grid.Column="1" x:Name="ColorPickerScrollbar" SelectedColor="{Binding Path=BackColor, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleColorPickerOptions}"/>-->
 
                 </Grid>
             </GroupBox>

@@ -26,22 +26,16 @@ namespace ModengTerm.Terminal.DataModels
         public VTColorTable ColorTable { get; private set; }
 
         /// <summary>
-        /// 背景类型
+        /// 背景图片URI
         /// </summary>
-        [JsonProperty("backgroundType")]
-        public int BackgroundType { get; set; }
+        [JsonProperty("backImageUri")]
+        public string BackImageUri { get; set; }
 
         /// <summary>
-        /// 背景颜色值或者是背景图片Uri
+        /// 背景图片透明度
         /// </summary>
-        [JsonProperty("backgroundUri")]
-        public string BackgroundUri { get; set; }
-
-        /// <summary>
-        /// 背景特效
-        /// </summary>
-        [JsonProperty("backgroundEffect")]
-        public int BackgroundEffect { get; set; }
+        [JsonProperty("backImageOpacity")]
+        public double BackImageOpacity { get; set; }
 
         /// <summary>
         /// 背景主颜色
@@ -55,6 +49,12 @@ namespace ModengTerm.Terminal.DataModels
         /// </summary>
         [JsonProperty("fontColor")]
         public string FontColor { get; set; }
+
+        /// <summary>
+        /// 字体大小
+        /// </summary>
+        [JsonProperty("fontSize")]
+        public int FontSize { get; set; }
 
         [JsonProperty("highlightFontColor")]
         public string HighlightFontColor { get; set; }

@@ -160,30 +160,6 @@ namespace ModengTerm.Terminal
             return dir;
         }
 
-        /// <summary>
-        /// 获取终端的清单文件
-        /// </summary>
-        /// <returns></returns>
-        public static TerminalManifest GetManifest()
-        {
-            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "manifest.json");
-
-            if (!File.Exists(filePath))
-            {
-                return new TerminalManifest();
-            }
-
-            try
-            {
-                return JSONHelper.ParseFile<TerminalManifest>(filePath);
-            }
-            catch (Exception ex)
-            {
-                logger.ErrorFormat("加载终端清单文件异常, {0}, {1}", ex, filePath);
-                return new TerminalManifest();
-            }
-        }
-
 
         public static VTPoint ToVTPoint(this Point wpfPoint)
         {

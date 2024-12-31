@@ -15,6 +15,8 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
     /// </summary>
     public partial class ThemePreviewUserControl : UserControl
     {
+        #region 类变量
+
         private static readonly List<VTColorIndex> BrightColors = new List<VTColorIndex>() 
         {
             VTColorIndex.BrightBlack, VTColorIndex.BrightBlue, VTColorIndex.BrightCyan, VTColorIndex.BrightGreen, 
@@ -27,6 +29,10 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
             VTColorIndex.DarkMagenta, VTColorIndex.DarkRed, VTColorIndex.DarkWhite, VTColorIndex.DarkYellow
         };
 
+        #endregion
+
+        #region Inner Class
+
         private class ColorItem
         {
             public string Name { get; set; }
@@ -35,6 +41,10 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
 
             public string Character { get; set; }
         }
+
+        #endregion
+
+        #region 依赖属性
 
         public ThemePackage Theme
         {
@@ -102,15 +112,31 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
 
 
 
+        public ImageSource PreviewBackgroundImage
+        {
+            get { return (ImageSource)GetValue(PreviewBackgroundImageProperty); }
+            set { SetValue(PreviewBackgroundImageProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for PreviewBackgroundImage.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PreviewBackgroundImageProperty =
+            DependencyProperty.Register("PreviewBackgroundImage", typeof(ImageSource), typeof(ThemePreviewUserControl), new PropertyMetadata(null, PreviewBackgroundImagePropertyChangedCallback));
 
 
+        public double PreviewBackgroundImageOpacity
+        {
+            get { return (double)GetValue(PreviewBackgroundImageOpacityProperty); }
+            set { SetValue(PreviewBackgroundImageOpacityProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for PreviewBackgroundImageOpacity.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PreviewBackgroundImageOpacityProperty =
+            DependencyProperty.Register("PreviewBackgroundImageOpacity", typeof(double), typeof(ThemePreviewUserControl), new PropertyMetadata(0.0D, PreviewBackgroundImageOpacityPropertyChangedCallback));
 
 
+        #endregion
 
-
-
-
-
+        #region 构造方法
 
         public ThemePreviewUserControl()
         {
@@ -119,12 +145,14 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
             this.InitializeUserControl();
         }
 
+        #endregion
+
+        #region 实例方法
+
         private void InitializeUserControl()
         {
 
         }
-
-
 
         private BindableCollection<ColorItem> InitializeColorList(ThemePackage theme, List<VTColorIndex> colorIndexs)
         {
@@ -151,6 +179,10 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
             return colorList;
         }
 
+        #endregion
+
+        #region 依赖属性回调
+
         private void OnThemePropertyChanged(ThemePackage oldValue, ThemePackage newValue)
         {
             if (newValue != null) 
@@ -165,8 +197,6 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
             ThemePreviewUserControl me = d as ThemePreviewUserControl;
             me.OnThemePropertyChanged(e.OldValue as ThemePackage, e.NewValue as ThemePackage);
         }
-
-
 
 
         private void OnBackgroundColorPropertyChanged(object oldValue, object newValue)
@@ -229,5 +259,37 @@ namespace ModengTerm.UserControls.OptionsUserControl.Terminal
             me.OnPreviewFontFamilyPropertyChanged(e.OldValue, e.NewValue);
         }
 
+
+
+        private void OnPreviewBackgroundImagePropertyChanged(object oldValue, object newValue)
+        {
+            if (newValue != null)
+            {
+                ImageBackground.Source = (ImageSource)newValue;
+            }
+        }
+
+        private static void PreviewBackgroundImagePropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ThemePreviewUserControl me = d as ThemePreviewUserControl;
+            me.OnPreviewBackgroundImagePropertyChanged(e.OldValue, e.NewValue);
+        }
+
+
+        private void OnPreviewBackgroundImageOpacityPropertyChanged(object oldValue, object newValue)
+        {
+            if (newValue != null)
+            {
+                ImageBackground.Opacity = (double)newValue;
+            }
+        }
+
+        private static void PreviewBackgroundImageOpacityPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            ThemePreviewUserControl me = d as ThemePreviewUserControl;
+            me.OnPreviewBackgroundImageOpacityPropertyChanged(e.OldValue, e.NewValue);
+        }
+
+        #endregion
     }
 }

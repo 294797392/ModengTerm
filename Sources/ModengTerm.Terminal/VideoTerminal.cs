@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
@@ -11,7 +12,6 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Text;
-using XTerminal.Base.Definitions;
 
 namespace ModengTerm.Terminal
 {

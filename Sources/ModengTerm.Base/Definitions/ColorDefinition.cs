@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XTerminal.Base.Definitions
+namespace ModengTerm.Base.Definitions
 {
     public class ColorDefinition
     {

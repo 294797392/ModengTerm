@@ -71,10 +71,8 @@ namespace ModengTerm.Base.Enumerations
         THEME_ID = 107,
         TEHEM_COLOR_TABLE = 108,
 
-        THEME_BACKGROUND_TYPE = 110,
-        THEME_BACKGROUND_URI = 111,
         THEME_BACKGROUND_COLOR = 112,
-        THEME_BACKGROUND_EFFECT = 113,
+        //THEME_BACKGROUND_EFFECT = 113,
 
         /// <summary>
         /// 查找高亮前景色
@@ -86,6 +84,15 @@ namespace ModengTerm.Base.Enumerations
         THEME_FIND_HIGHLIGHT_BACKCOLOR = 115,
 
         THEME_SELECTION_COLOR = 116,
+
+        /// <summary>
+        /// 背景图片透明度
+        /// </summary>
+        THEME_BACKGROUND_IMAGE_OPACITY = 117,
+        /// <summary>
+        /// base64格式保存的图片数据
+        /// </summary>
+        THEME_BACKGROUND_IMAGE_DATA = 118,
 
 
         /// <summary>

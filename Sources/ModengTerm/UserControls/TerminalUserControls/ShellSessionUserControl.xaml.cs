@@ -285,6 +285,22 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
+            string base64Image = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, OptionDefaultValues.THEME_BACKGROUND_IMAGE_DATA);
+            if (!string.IsNullOrEmpty(base64Image))
+            {
+                try
+                {
+                    byte[] imageBytes = Convert.FromBase64String(base64Image);
+                    ImageSource imageSource = DrawingUtils.ImageBytes2ImageSource(imageBytes);
+                    ImageBackground.Source = imageSource;
+                }
+                catch (Exception ex) 
+                {
+                    logger.Error("加载背景图片异常", ex);
+                }
+
+                ImageBackground.Opacity = this.Session.GetOption<double>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, OptionDefaultValues.THEME_BACKGROUND_IMAGE_OPACITY);
+            }
 
             // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
             // 因为在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会马上变化

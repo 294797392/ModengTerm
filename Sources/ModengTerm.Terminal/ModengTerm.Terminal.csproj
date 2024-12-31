@@ -53,6 +53,8 @@
     <Compile Remove="DataModels\SyncSlave.cs" />
     <Compile Remove="DataModels\ThemeManifest.cs" />
     <Compile Remove="DataModels\VTCharacterSM.cs" />
+    <Compile Remove="DataModels\Wallpaper.cs" />
+    <Compile Remove="Enumerations\WallpaperTypeEnum.cs" />
     <Compile Remove="ITerminalAgent.cs" />
     <Compile Remove="Parsing\VTActions.cs" />
     <Compile Remove="Parsing\VTColors.cs" />
@@ -122,9 +124,6 @@
 
   <ItemGroup>
     <None Update="vtermapp.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="manifest.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

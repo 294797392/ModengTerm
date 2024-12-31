@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
@@ -16,7 +17,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using WPFToolkit.MVVM;
-using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm
@@ -86,31 +86,6 @@ namespace ModengTerm
                 case VTCursorSpeeds.HighSpeed: return "快";
                 case VTCursorSpeeds.LowSpeed: return "慢";
                 case VTCursorSpeeds.NormalSpeed: return "普通";
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class WallpaperType2StringConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (!EnumConverterUtils.CheckValue(value))
-            {
-                return "未知";
-            }
-
-            switch ((WallpaperTypeEnum)value)
-            {
-                //case WallpaperTypeEnum.Live: return "动态背景";
-                case WallpaperTypeEnum.Color: return "纯色";
-                case WallpaperTypeEnum.Image: return "图片";
                 default:
                     throw new NotImplementedException();
             }

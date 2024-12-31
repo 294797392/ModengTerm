@@ -78,6 +78,7 @@
                 </Grid.ContextMenu>
 
                 <Border x:Name="BorderBackground"/>
+                <Image x:Name="ImageBackground" Stretch="Fill"/>
 
                 <renderer:DocumentControl x:Name="DocumentAlternate"/>
                 <renderer:DocumentControl x:Name="DocumentMain"/>

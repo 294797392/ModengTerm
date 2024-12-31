@@ -89,6 +89,8 @@
 
         <Border Grid.Column="0" Grid.ColumnSpan="999" x:Name="BorderBackground"/>
 
+        <Image Grid.Column="0" Grid.ColumnSpan="999" x:Name="ImageBackground" Stretch="Fill"/>
+
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="5"/>

@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using XTerminal.Base.Definitions;
 using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Base
@@ -90,5 +89,9 @@ namespace ModengTerm.Base
         //public static readonly VTCursorSpeeds THEME_CURSOR_SPEED = VTCursorSpeeds.NormalSpeed;
         //public static readonly int TERM_MAX_ROLLBACK = 99999;
         //public static readonly string THEME_SELECTION_COLOR = "";
+
+
+        public static readonly string THEME_BACKGROUND_IMAGE_DATA = string.Empty;
+        public static readonly double THEME_BACKGROUND_IMAGE_OPACITY = 1;
     }
 }
