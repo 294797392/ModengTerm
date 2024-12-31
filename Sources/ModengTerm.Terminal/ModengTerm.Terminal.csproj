@@ -23,6 +23,7 @@
     <Compile Remove="Modules\**" />
     <Compile Remove="Rendering\**" />
     <Compile Remove="TestCase\**" />
+    <Compile Remove="Wallpapers\**" />
     <Compile Remove="Watchers\**" />
     <EmbeddedResource Remove="AutoCompletions\**" />
     <EmbeddedResource Remove="Document\**" />
@@ -30,6 +31,7 @@
     <EmbeddedResource Remove="Modules\**" />
     <EmbeddedResource Remove="Rendering\**" />
     <EmbeddedResource Remove="TestCase\**" />
+    <EmbeddedResource Remove="Wallpapers\**" />
     <EmbeddedResource Remove="Watchers\**" />
     <None Remove="AutoCompletions\**" />
     <None Remove="Document\**" />
@@ -37,6 +39,7 @@
     <None Remove="Modules\**" />
     <None Remove="Rendering\**" />
     <None Remove="TestCase\**" />
+    <None Remove="Wallpapers\**" />
     <None Remove="Watchers\**" />
     <Page Remove="AutoCompletions\**" />
     <Page Remove="Document\**" />
@@ -44,6 +47,7 @@
     <Page Remove="Modules\**" />
     <Page Remove="Rendering\**" />
     <Page Remove="TestCase\**" />
+    <Page Remove="Wallpapers\**" />
     <Page Remove="Watchers\**" />
   </ItemGroup>
 
@@ -75,19 +79,6 @@
 
   <ItemGroup>
     <None Remove="testcase.json" />
-    <None Remove="Wallpapers\img1.jpg" />
-    <None Remove="Wallpapers\img2.png" />
-    <None Remove="Wallpapers\img3.png" />
-    <None Remove="Wallpapers\img4.jpg" />
-    <None Remove="Wallpapers\Live_1.gif" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Wallpapers\img1.jpg" />
-    <EmbeddedResource Include="Wallpapers\img2.png" />
-    <EmbeddedResource Include="Wallpapers\img3.png" />
-    <EmbeddedResource Include="Wallpapers\img4.jpg" />
-    <EmbeddedResource Include="Wallpapers\Live_1.gif" />
   </ItemGroup>
 
   <ItemGroup>

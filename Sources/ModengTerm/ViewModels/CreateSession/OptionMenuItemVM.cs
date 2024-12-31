@@ -9,8 +9,6 @@ namespace ModengTerm.ViewModels.CreateSession
 {
     public class OptionMenuItemVM : MenuItemVM
     {
-        private static readonly List<int> AllSessionTypes = VTBaseUtils.GetEnumValues<SessionTypeEnum>().Select(v => (int)v).ToList();
-
         public OptionMenuItemVM()
         {
         }
@@ -19,10 +17,10 @@ namespace ModengTerm.ViewModels.CreateSession
         /// 获取哪些会话类型使用这个选项
         /// 如果没有指定TargetTypes，那么默认支持所有类型的会话
         /// </summary>
-        public List<int> GetTargetTypes()
+        public List<SessionTypeEnum> GetSupportedSessionTypes()
         {
             // 默认支持所有会话类型
-            return this.Parameters.GetValue<List<int>>("sessionTypes", AllSessionTypes);
+            return this.Parameters.GetValue<List<int>>("sessionTypes", new List<int>()).Cast<SessionTypeEnum>().ToList();
         }
     }
 }

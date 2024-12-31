@@ -14,7 +14,7 @@ namespace ModengTerm.ViewModels
 
         /// <summary>
         /// 父菜单的ID
-        /// 如果为空表示没有父菜单
+        /// 如果为空表示没有父菜单，直接显示到根节点
         /// 如果为-1表示在标题上不显示该菜单
         /// </summary>
         public string TitleParentID { get; set; }
@@ -39,9 +39,10 @@ namespace ModengTerm.ViewModels
         public string PanelID { get; set; }
 
         /// <summary>
-        /// 不支持的会话类型
+        /// 支持的会话类型
+        /// 如果数量是0，那么表示支持所有会话类型
         /// </summary>
-        public List<SessionTypeEnum> UnsupportedTypes { get; set; }
+        public List<SessionTypeEnum> SupportedSessionTypes { get; set; } = new List<SessionTypeEnum>();
 
         public ContextMenuDefinition(string id, string name)
         {

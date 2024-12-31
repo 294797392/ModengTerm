@@ -152,6 +152,24 @@ namespace ModengTerm.Terminal.Session
 
             #endregion
 
+            //Task.Factory.StartNew(() => 
+            //{
+            //    SshCommand sshCommand = this.sshClient.CreateCommand("tail -f ~/1");
+
+            //    Stream stream = sshCommand.OutputStream;
+
+            //    sshCommand.ExecuteAsync();
+
+            //    while (true) 
+            //    {
+            //        byte[] buffer = new byte[1024];
+            //        int n = stream.Read(buffer, 0, buffer.Length);
+            //        byte[] buffer1 = new byte[n];
+            //        Buffer.BlockCopy(buffer, 0, buffer1, 0, buffer1.Length);
+            //        Console.WriteLine(Encoding.ASCII.GetString(buffer1));
+            //    }
+            //});
+
             return ResponseCode.SUCCESS;
         }
 

@@ -172,7 +172,7 @@ namespace ModengTerm.ViewModels
         {
             bool firstInit = false;
 
-            if (this.contextMenus == null) 
+            if (this.contextMenus == null)
             {
                 firstInit = true;
                 this.contextMenus = new List<ContextMenuVM>();
@@ -198,9 +198,9 @@ namespace ModengTerm.ViewModels
                     continue;
                 }
 
-                if (definition.UnsupportedTypes != null)
+                if (definition.SupportedSessionTypes.Count > 0)
                 {
-                    if (menuItem.MenuDefinition.UnsupportedTypes.Contains((SessionTypeEnum)this.Session.Type))
+                    if (!definition.SupportedSessionTypes.Contains((SessionTypeEnum)this.Session.Type))
                     {
                         continue;
                     }
@@ -220,7 +220,7 @@ namespace ModengTerm.ViewModels
                     parentVM.Children.Add(contextMenuVM);
                 }
 
-                if (firstInit) 
+                if (firstInit)
                 {
                     this.contextMenus.Add(contextMenuVM);
                 }

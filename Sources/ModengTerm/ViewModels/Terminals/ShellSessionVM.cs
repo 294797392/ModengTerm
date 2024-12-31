@@ -426,17 +426,13 @@ namespace ModengTerm.Terminal.ViewModels
                 new ContextMenuDefinition("100", "2", " ", "清屏", this.ContextMenuClearScreen_Click),
 
                 new ContextMenuDefinition("10", "查看"),
-                new ContextMenuDefinition("11", "10", "10", "系统监控", "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm", "panel1", this.ContextMenuVisiblePanelContent_Click)
-                {
-                    UnsupportedTypes = new List<SessionTypeEnum>(){ SessionTypeEnum.SerialPort, SessionTypeEnum.Tcp }
-                },
                 new ContextMenuDefinition("12", "10", "10", "快捷命令", "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", string.Empty, "panel1", this.ContextMenuVisiblePanelContent_Click),
                 new ContextMenuDefinition("13", "10", "10", "输入栏", this.ContextMenuSwitchInputPanelVisible_Click),
 
                 new ContextMenuDefinition("14", "配置"),
                 new ContextMenuDefinition("15", "14", "14", "端口转发", this.ContextMenuOpenPortForwardWindow_Click)
                 {
-                    UnsupportedTypes = new List<SessionTypeEnum>(){ SessionTypeEnum.SerialPort, SessionTypeEnum.Tcp, SessionTypeEnum.AdbShell, SessionTypeEnum.Localhost }
+                    SupportedSessionTypes = new List<SessionTypeEnum>(){ SessionTypeEnum.SSH }
                 },
                 new ContextMenuDefinition("16", "14", "14", "同步输入", this.ContextMenuOpenSyncInputConfigurationWindow_Click),
                 new ContextMenuDefinition("17", "14", "14", "快捷命令", this.ContextMenuCreateQuickCommand_Click),
@@ -449,6 +445,14 @@ namespace ModengTerm.Terminal.ViewModels
                 new ContextMenuDefinition("23","22","22","开始", this.ContextMenuStartRecord_Click),
                 new ContextMenuDefinition("24","22","22","停止", this.ContextMenuStopRecord_Click),
                 new ContextMenuDefinition("25","18"," ","打开回放", this.ContextMenuOpenRecord_Click),
+                new ContextMenuDefinition("50","18"," ", "系统监控", "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm", "panel1", this.ContextMenuVisiblePanelContent_Click)
+                {
+                    SupportedSessionTypes = new List<SessionTypeEnum>() { SessionTypeEnum.SSH, SessionTypeEnum.AdbShell, SessionTypeEnum.Localhost }
+                },
+                //new ContextMenuDefinition("51","18"," ", "文件监控", "ModengTerm.UserControls.TerminalUserControls.WatchFileUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchFileVM, ModengTerm", "panel1", this.ContextMenuVisiblePanelContent_Click)
+                //{
+                //    SupportedSessionTypes = new List<SessionTypeEnum>() { SessionTypeEnum.SSH, SessionTypeEnum.AdbShell }
+                //},
                 new ContextMenuDefinition("26","18", "", "传输"),
                 new ContextMenuDefinition("27","26","26","使用XModem发送", this.ContextMenuXModemSend_Click),
                 new ContextMenuDefinition("28","26","26","使用XModem接收", this.ContextMenuXModemReceive_Click),

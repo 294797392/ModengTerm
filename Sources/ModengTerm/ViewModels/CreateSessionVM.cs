@@ -1088,11 +1088,14 @@ namespace ModengTerm.ViewModels
 
             foreach (OptionMenuItemVM menuItem in menuItems)
             {
-                // 这个菜单里的参数不需要保存
-                List<int> targetTypes = menuItem.GetTargetTypes();
-                if (!targetTypes.Contains(session.Type))
+                // 如果数量是0，那么表示支持所有会话类型
+                List<int> supportedSessionTypes = menuItem.Parameters.GetValue<List<int>>("sessionTypes", new List<int>());
+                if (supportedSessionTypes.Count > 0)
                 {
-                    continue;
+                    if (!supportedSessionTypes.Contains(session.Type))
+                    {
+                        continue;
+                    }
                 }
 
                 if (string.IsNullOrEmpty(menuItem.VMClassName))
