@@ -32,6 +32,7 @@ By incorporating these features, ModengTerm aims to provide a robust, flexible, 
 
 ### MainWindow
 ![Image](images/main_window.PNG)  
+![Image](images/main_window2.PNG)  
 
 ### SessionList
 ![Image](images/session_list.PNG)  

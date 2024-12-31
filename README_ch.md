@@ -33,6 +33,7 @@ ModengTerm 的所有核心模块，包括解析器、终端引擎和渲染引擎
 
 ### 主界面
 ![Image](images/main_window.PNG)  
+![Image](images/main_window2.PNG)  
 
 ### 会话列表
 ![Image](images/session_list.PNG)  
