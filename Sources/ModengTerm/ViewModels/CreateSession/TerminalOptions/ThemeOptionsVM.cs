@@ -183,10 +183,6 @@ namespace ModengTerm.ViewModels.CreateSession.TerminalOptions
         {
             MTermManifest manifest = MTermApp.Context.Manifest;
 
-            this.ThemeList = new BindableCollection<ThemePackage>();
-            this.ThemeList.AddRange(manifest.DefaultThemes);
-            this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
-
             this.FontFamilyList = new BindableCollection<FontFamilyDefinition>();
             this.FontFamilyList.AddRange(manifest.FontFamilyList);
 
@@ -198,11 +194,15 @@ namespace ModengTerm.ViewModels.CreateSession.TerminalOptions
 
             this.CursorStyles = new BindableCollection<VTCursorStyles>();
             this.CursorStyles.AddRange(VTBaseUtils.GetEnumValues<VTCursorStyles>());
+
+            this.ThemeList = new BindableCollection<ThemePackage>();
+            this.ThemeList.AddRange(manifest.DefaultThemes);
+            this.ThemeList.SelectionChanged += ThemeList_SelectionChanged;
+            this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
         }
 
         public override void OnLoaded()
         {
-            this.ThemeList.SelectedItem = this.ThemeList.FirstOrDefault();
         }
 
         public override void OnUnload()
@@ -243,9 +243,12 @@ namespace ModengTerm.ViewModels.CreateSession.TerminalOptions
             session.SetOption<int>(OptionKeyEnum.THEME_FONT_SIZE, this.FontSizeList.SelectedItem.Value);
 
             // 背景颜色和图片
-            byte[] imageBytes = File.ReadAllBytes(this.backImageUri);
-            string imageBase64 = Convert.ToBase64String(imageBytes);
-            session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, imageBase64);
+            if (!string.IsNullOrEmpty(this.backImageUri))
+            {
+                byte[] imageBytes = File.ReadAllBytes(this.backImageUri);
+                string imageBase64 = Convert.ToBase64String(imageBytes);
+                session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, imageBase64);
+            }
             session.SetOption<double>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, this.backImageOpacity);
             session.SetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR, DrawingUtils.GetRgbKey(this.BackColor));
 
