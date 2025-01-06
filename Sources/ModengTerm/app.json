@@ -65,7 +65,7 @@
                         {
                             "id": "5919A665-EB86-437F-A227-124783A410F6",
                             "name": "端口转发",
-                            "entry": "ModengTerm.UserControls.OptionsUserControl.SSH.PortForwardOptionsUserControl, ModengTerm"
+                            "className": "ModengTerm.UserControls.OptionsUserControl.SSH.PortForwardOptionsUserControl, ModengTerm"
                         }
                     ]
                 },

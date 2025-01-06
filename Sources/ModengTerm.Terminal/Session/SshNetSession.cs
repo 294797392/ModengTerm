@@ -151,7 +151,7 @@ namespace ModengTerm.Terminal.Session
             }
 
             #endregion
-
+            
             //Task.Factory.StartNew(() => 
             //{
             //    SshCommand sshCommand = this.sshClient.CreateCommand("tail -f ~/1");

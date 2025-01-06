@@ -7,17 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
-{
-    public class WatchFile : WatchObject
+{   
+    public class WatchFile : PanelContentVM
     {
         public override void OnInitialize()
         {
             base.OnInitialize();
-        }
-
-        public override void OnLoaded()
-        {
-            base.OnLoaded();
         }
 
         public override void OnRelease()
@@ -25,14 +20,14 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             base.OnRelease();
         }
 
+        public override void OnLoaded()
+        {
+            base.OnLoaded();
+        }
+
         public override void OnUnload()
         {
             base.OnUnload();
-        }
-
-        public override void Watch(AbstractWatcher watcher)
-        {
-            throw new NotImplementedException();
         }
     }
 }

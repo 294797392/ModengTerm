@@ -14,7 +14,7 @@
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/OptionsDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
                 <Setter Property="Height" Value="30"/>
                 <Setter Property="Width" Value="70"/>
                 <Setter Property="Margin" Value="3"/>
@@ -39,7 +39,7 @@
 
         <DataGrid Grid.Row="1" x:Name="DataGridPortForwards" DataContext="{Binding Path=PortForwards}" ItemsSource="{Binding}"
                   SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True">
+                  AutoGenerateColumns="False" CanUserAddRows="False" IsReadOnly="True" Style="{StaticResource ResourceKey=StyleDataGrid}">
             <DataGrid.Columns>
 
                 <DataGridTemplateColumn Header="类型" Width="1*">
