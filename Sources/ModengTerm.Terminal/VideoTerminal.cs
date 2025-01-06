@@ -873,7 +873,7 @@ namespace ModengTerm.Terminal
         private void MainDocumentResize(VTDocument document, int newRow, int newCol)
         {
             // 调整大小前先把光标滚动到可视区域
-            // 因为重新调整大小之后，HOST会重新打印所有内容
+            // 因为重新调整大小之后，HOST会重新打印鼠标所在行
             this.ScrollToBottom(document);
 
             int oldRow = document.ViewportRow;
@@ -937,8 +937,6 @@ namespace ModengTerm.Terminal
                         break;
                     }
             }
-
-            document.DeleteViewoprt();
         }
 
         private void AlternateDocumentResize(VTDocument document, int newRow, int newCol)
