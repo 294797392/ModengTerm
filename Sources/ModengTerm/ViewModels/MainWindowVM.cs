@@ -1,6 +1,9 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.DataModels;
+using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,9 +37,16 @@ namespace ModengTerm.ViewModels
         public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
 
         /// <summary>
+        /// 窗口顶部的全局菜单，所有的会话都有的菜单
+        /// </summary>
+        public BindableCollection<ContextMenuVM> GlobalTitleMenus { get; private set; }
+
+        /// <summary>
         /// 所有主题列表
         /// </summary>
         public BindableCollection<AppThemeVM> Themes { get; private set; }
+
+        public Dictionary<PanelAlignEnum, PanelVM> Panels { get; private set; }
 
         #endregion
 
@@ -62,6 +72,11 @@ namespace ModengTerm.ViewModels
             this.Themes = new BindableCollection<AppThemeVM>();
             this.Themes.AddRange(MTermApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
             this.Themes.SelectedItem = this.Themes[0];//.FirstOrDefault();
+
+            this.GlobalTitleMenus = new BindableCollection<ContextMenuVM>();
+            List<MenuItemRelation> globalMenuItemRelations = MTermApp.Context.Manifest.GlobalTitleMenus.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
+            this.GlobalTitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(globalMenuItemRelations));
+            this.Panels = VTClientUtils.CreatePanels(MTermApp.Context.Manifest.GlobalTitleMenus);
         }
 
         #endregion
@@ -105,6 +120,16 @@ namespace ModengTerm.ViewModels
             this.RecentlyOpenedSession.Remove(recentlySession);
 
             this.serviceAgent.DeleteRecentSession(recentlySession.ID.ToString());
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
+        {
+            PanelVM panelVM = this.Panels[sender.PanelAlign];
+            panelVM.ChangeVisible(sender.ID.ToString());
         }
 
         #endregion

@@ -23,13 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="DataModels\**" />
-    <EmbeddedResource Remove="DataModels\**" />
-    <None Remove="DataModels\**" />
-    <Page Remove="DataModels\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />

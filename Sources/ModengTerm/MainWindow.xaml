@@ -10,6 +10,7 @@
         xmlns:converters="clr-namespace:ModengTerm"
         xmlns:terminaluc="clr-namespace:ModengTerm.UserControls.Terminals"
         xmlns:termenum="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
+        xmlns:termuc2="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
         xmlns:mcmd="clr-namespace:ModengTerm"
         xmlns:local="clr-namespace:ModengTerm"
         xmlns:vm="clr-namespace:ModengTerm.ViewModels"
@@ -31,6 +32,7 @@
 
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static mcmd:MCommands.SendCommand}" Executed="SendCommand_Executed"/>
+        <CommandBinding Command="{x:Static mcmd:MCommands.OpenSessionCommand}" Executed="OpenSessionCommand_Executed"/>
     </Window.CommandBindings>
 
     <Window.Resources>
@@ -211,6 +213,8 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Border Grid.Row="0" Grid.RowSpan="9999" Background="{DynamicResource ResourceKey=RES50003E}"/>
+
         <!-- 顶部菜单 -->
         <Grid Grid.Row="0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
             <Grid.ColumnDefinitions>
@@ -241,6 +245,14 @@
                             </MenuItem.ItemTemplate>
                         </MenuItem>
                     </MenuItem>
+                </Menu>
+
+                <Menu ItemsSource="{Binding Path=GlobalTitleMenus}" MenuItem.Click="MenuItemGlobalTitleMenu_Click">
+                    <Menu.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </HierarchicalDataTemplate>
+                    </Menu.ItemTemplate>
                 </Menu>
 
                 <Menu ItemsSource="{Binding Path=TitleMenus}" MenuItem.Click="MenuItem_Click">
@@ -325,35 +337,52 @@
 
         </Grid>
 
-        <!-- 终端显示区域 -->
         <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <Border Grid.Row="0" Grid.RowSpan="9999" Background="{DynamicResource ResourceKey=RES50003E}"/>
+            <!-- 左边窗格 -->
+            <Grid Grid.Column="0">
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}" Width="250" Margin="0,5,5,3"/>
+            </Grid>
 
-            <!-- 打开的终端列表Tab页 -->
-            <Grid Grid.Row="0">
+            <!-- 终端显示区域 -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <ScrollViewer x:Name="ScrollViewerOpenedSession" Margin="3,5,3,0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
-                    <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
+                <!-- 打开的终端列表Tab页 -->
+                <Grid Grid.Row="0">
+
+                    <ScrollViewer x:Name="ScrollViewerOpenedSession" Margin="3,5,3,0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                        <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
                              SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                    </ListBox>
-                </ScrollViewer>
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                    </ScrollViewer>
 
-                <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="{DynamicResource ResourceKey=RES50025E}" Height="2" IsHitTestVisible="False"/>
+                    <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="{DynamicResource ResourceKey=RES50025E}" Height="2" IsHitTestVisible="False"/>
+
+                </Grid>
+
+                <!-- 终端展示页面 -->
+                <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
 
             </Grid>
 
-            <!-- 终端展示页面 -->
-            <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
+            <!-- 右边窗格 -->
+            <Grid Grid.Column="2">
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}" Width="250" Margin="5,5,0,3"/>
+            </Grid>
 
         </Grid>
 

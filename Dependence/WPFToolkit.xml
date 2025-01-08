@@ -2317,11 +2317,6 @@
             ViewModel的完整类名
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.MenuItemVM.IsInitialized">
-            <summary>
-            该菜单是否初始化完了
-            </summary>
-        </member>
         <member name="P:WPFToolkit.MVVM.MenuItemVM.Content">
             <summary>
             该菜单所要显示的内容
@@ -2477,7 +2472,7 @@
             当前显示的界面
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.SwitchContent(`0)">
+        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadContent(`0)">
             <summary>
             切换指定的菜单
             </summary>

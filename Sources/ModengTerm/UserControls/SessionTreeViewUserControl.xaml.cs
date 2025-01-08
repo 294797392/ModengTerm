@@ -21,6 +21,8 @@ namespace ModengTerm.UserControls
     /// </summary>
     public partial class SessionTreeViewUserControl : UserControl
     {
+        public event Action<SessionTreeViewUserControl, object> TreeViewMouseDoubleClick;
+
         public SessionTreeVM ViewModel
         {
             get { return TreeViewSessionList.DataContext as SessionTreeVM; }
@@ -43,6 +45,11 @@ namespace ModengTerm.UserControls
         private void InitializeUserControl()
         {
 
+        }
+
+        private void TreeViewSessionList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            this.TreeViewMouseDoubleClick?.Invoke(this, TreeViewSessionList.SelectedItem);
         }
     }
 }

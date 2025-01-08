@@ -217,9 +217,9 @@
     <SolidColorBrush x:Key="RES501010E" Color="#D9E1FA"/><!-- TabItem默认前景 -->
     <SolidColorBrush x:Key="RES501011E" Color="Black"/><!-- TabItem悬浮前景 -->
     <SolidColorBrush x:Key="RES501012E" Color="Black"/><!-- TabItem选中前景 -->
-    <SolidColorBrush x:Key="RES501013E" Color="#A0ACD2"/><!-- 关闭按钮背景 -->
-    <SolidColorBrush x:Key="RES501014E" Color="#C0CAE9"/><!-- 关闭按钮悬浮背景 -->
-    <SolidColorBrush x:Key="RES501015E" Color="#C0CAE9"/><!-- 关闭按钮按下背景 -->
+    <SolidColorBrush x:Key="RES501013E" Color="White"/><!-- 关闭按钮SVG颜色 -->
+    <SolidColorBrush x:Key="RES501014E" Color="White" Opacity="0.2"/><!-- 关闭按钮悬浮背景 -->
+    <SolidColorBrush x:Key="RES501015E" Color="White" Opacity="0.3"/><!-- 关闭按钮按下背景 -->
 
     <!-- SystemWatchUserControl 505001 - 510000 -->
     <SolidColorBrush x:Key="RES505001E" Color="#D9E1FA"/><!-- 网络接口列表边框 -->

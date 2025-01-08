@@ -1,8 +1,9 @@
 ﻿using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.Terminals;
+using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls.TerminalUserControls
 {
@@ -38,9 +39,26 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 实例方法
 
-        private void InitializeUserControl() 
+        private void InitializeUserControl()
         {
             base.Visibility = Visibility.Collapsed;
+        }
+
+        private void ProcessContentUnload()
+        {
+            PanelItemVM panelItemVM = ListBoxMenus.SelectedItem as PanelItemVM;
+            if (panelItemVM == null)
+            {
+                return;
+            }
+
+            if (!(panelItemVM.ContentVM is MenuContentVM))
+            {
+                return;
+            }
+
+            MenuContentVM menuContentVM = panelItemVM.ContentVM as MenuContentVM;
+            menuContentVM.OnUnload();
         }
 
         #endregion
@@ -51,7 +69,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             ListBoxMenus.DataContext = newValue;
 
-            Binding binding = new Binding() 
+            Binding binding = new Binding()
             {
                 Source = newValue,
                 Path = new PropertyPath("Visible"),
@@ -74,12 +92,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void ListBoxMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             PanelItemVM selectedItem = ListBoxMenus.SelectedItem as PanelItemVM;
-            if (selectedItem == null) 
+            if (selectedItem == null)
             {
                 return;
             }
 
-            DependencyObject dependencyObject = this.PanelVM.SwitchContent(selectedItem);
+            DependencyObject dependencyObject = this.PanelVM.LoadContent(selectedItem);
             if (dependencyObject == null)
             {
                 return;
@@ -87,7 +105,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
             ContentControl1.Content = this.PanelVM.CurrentContent;
             TextBlockTitle.Text = selectedItem.Name;
-            this.PanelVM.SelectionChangedDelegate(this.PanelVM, e.RemovedItems.Count > 0 ? e.RemovedItems[0] as PanelItemVM : null, e.AddedItems[0] as PanelItemVM);
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
@@ -95,7 +112,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
             if (this.PanelVM != null)
             {
                 this.PanelVM.Visible = false;
-                this.PanelVM.CloseDelegate(this.PanelVM);
+
+                // 点击关闭按钮手动触发Unload事件
+                this.ProcessContentUnload();
             }
             else
             {

@@ -43,6 +43,7 @@
 
         <TreeView x:Name="TreeViewSessionList" ItemTemplate="{StaticResource ResourceKey=HierarchicalDataTemplateLocal}"
                   ItemContainerStyle="{StaticResource ResourceKey=StyleTreeViewItemLocal}" ItemsSource="{Binding Path=Roots}"
+                  MouseDoubleClick="TreeViewSessionList_MouseDoubleClick"
                   Style="{StaticResource ResourceKey=StyleTreeView}">
 
         </TreeView>

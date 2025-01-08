@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
@@ -12,22 +13,17 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
-using ModengTerm.Terminal.Watch;
 using ModengTerm.Terminal.Windows;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
-using ModengTerm.ViewModels.Terminals.PanelContent;
 using ModengTerm.Windows;
 using ModengTerm.Windows.SSH;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
@@ -85,13 +81,6 @@ namespace ModengTerm.Terminal.ViewModels
         private AutoCompletionVM autoCompletionVM;
 
         private bool inputPanelVisible;
-
-        private Task watchTask;
-        private ManualResetEvent watchEvent;
-        private bool isWatch;
-        private List<WatchObject> watchList; // 当前被激活的监控列表
-        private bool watchListChanged;
-        private object watchListLock = new object();
 
         private bool modemRunning;
 
@@ -246,8 +235,9 @@ namespace ModengTerm.Terminal.ViewModels
 
         /// <summary>
         /// 窗格列表
+        /// 窗格位置 -> 窗格列表
         /// </summary>
-        public BindableCollection<PanelVM> Panels { get; private set; }
+        public Dictionary<PanelAlignEnum, PanelVM> Panels { get; private set; }
 
         /// <summary>
         /// 是否显示输入栏
@@ -264,6 +254,8 @@ namespace ModengTerm.Terminal.ViewModels
                 }
             }
         }
+
+        public SessionTransport Transport { get { return this.sessionTransport; } }
 
         #endregion
 
@@ -282,9 +274,12 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.logMgr = MTermApp.Context.LoggerManager;
 
-            this.watchList = new List<WatchObject>();
             this.HistoryCommands = new BindableCollection<string>();
-            this.Panels = new BindableCollection<PanelVM>();
+
+            Dictionary<string, object> panelParameters = new Dictionary<string, object>();
+            panelParameters[PanelContentVM.KEY_SERVICE_AGENT] = this.ServiceAgent;
+            panelParameters[PanelContentVM.KEY_OPENED_SESSION] = this;
+            this.Panels = VTClientUtils.CreatePanels(this.contextMenus, panelParameters);
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
@@ -298,12 +293,6 @@ namespace ModengTerm.Terminal.ViewModels
             #region 初始化快捷命令
 
             this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new QuickCommandVM(v)));
-
-            #endregion
-
-            #region 初始化ToolPanel
-
-            this.InitializePanelList();
 
             #endregion
 
@@ -378,6 +367,26 @@ namespace ModengTerm.Terminal.ViewModels
                 return;
             }
 
+            #region 释放PanelContent
+
+            foreach (KeyValuePair<PanelAlignEnum, PanelVM> kv in this.Panels)
+            {
+                List<MenuItemVM> menuItems = kv.Value.Context.AllItems;
+
+                foreach (MenuItemVM menuItem in menuItems)
+                {
+                    PanelContentVM panelContentVM = menuItem.ContentVM as PanelContentVM;
+                    if (panelContentVM != null)
+                    {
+                        panelContentVM.OnRelease();
+                    }
+                }
+            }
+
+            this.Panels.Clear();
+
+            #endregion
+
             this.AutoCompletionVM.Release();
 
             // 停止对终端的日志记录
@@ -400,64 +409,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.clipboard.Release();
             this.SyncInputSessions.Clear();
 
-            if (this.watchTask != null)
-            {
-                this.isWatch = false;
-                this.watchEvent.Set();
-                this.watchEvent.Close();
-                this.watchTask = null;
-            }
-
             this.isRunning = false;
-        }
-
-        protected override List<ContextMenuDefinition> OnCreateContextMenu()
-        {
-            return new List<ContextMenuDefinition>()
-            {
-                new ContextMenuDefinition("2", " ", "-1", "编辑"),
-                new ContextMenuDefinition("3", "2", " ", "查找", this.ContextMenuFind_Click),
-                new ContextMenuDefinition("4", "2", " ", "复制", this.ContextMenuCopySelection_Click),
-                new ContextMenuDefinition("5", "2", " ", "保存"),
-                new ContextMenuDefinition("6", "5", "5", "选中内容", this.ContextMenuSaveSelection_Click),
-                new ContextMenuDefinition("7", "5", "5", "当前屏幕内容", this.ContextMenuSaveViewport_Click),
-                new ContextMenuDefinition("8", "5", "5", "所有内容", this.ContextMenuSaveAllDocument_Click),
-                new ContextMenuDefinition("9", "2", " ", "添加到快捷命令列表", this.ContextMenuAddToQuickCommands_Click),
-                new ContextMenuDefinition("100", "2", " ", "清屏", this.ContextMenuClearScreen_Click),
-
-                new ContextMenuDefinition("10", "查看"),
-                new ContextMenuDefinition("12", "10", "10", "快捷命令", "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm", string.Empty, "panel1", this.ContextMenuVisiblePanelContent_Click),
-                new ContextMenuDefinition("13", "10", "10", "输入栏", this.ContextMenuSwitchInputPanelVisible_Click),
-
-                new ContextMenuDefinition("14", "配置"),
-                new ContextMenuDefinition("15", "14", "14", "端口转发", this.ContextMenuOpenPortForwardWindow_Click)
-                {
-                    SupportedSessionTypes = new List<SessionTypeEnum>(){ SessionTypeEnum.SSH }
-                },
-                new ContextMenuDefinition("16", "14", "14", "同步输入", this.ContextMenuOpenSyncInputConfigurationWindow_Click),
-                new ContextMenuDefinition("17", "14", "14", "快捷命令", this.ContextMenuCreateQuickCommand_Click),
-
-                new ContextMenuDefinition("18"," ", "-1","工具"),
-                new ContextMenuDefinition("19","18"," ","日志"),
-                new ContextMenuDefinition("20","19","19","开始", this.ContextMenuStartLogger_Click),
-                new ContextMenuDefinition("21","19","19","停止", this.ContextMenuStopLogger_Click),
-                new ContextMenuDefinition("22","18"," ", "录制"),
-                new ContextMenuDefinition("23","22","22","开始", this.ContextMenuStartRecord_Click),
-                new ContextMenuDefinition("24","22","22","停止", this.ContextMenuStopRecord_Click),
-                new ContextMenuDefinition("25","18"," ","打开回放", this.ContextMenuOpenRecord_Click),
-                new ContextMenuDefinition("50","18"," ", "系统监控", "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm", "panel1", this.ContextMenuVisiblePanelContent_Click)
-                {
-                    SupportedSessionTypes = new List<SessionTypeEnum>() { SessionTypeEnum.SSH, SessionTypeEnum.AdbShell, SessionTypeEnum.Localhost }
-                },
-                //new ContextMenuDefinition("51","18"," ", "文件监控", "ModengTerm.UserControls.TerminalUserControls.WatchFileUserControl, ModengTerm", "ModengTerm.ViewModels.Terminals.PanelContent.WatchFileVM, ModengTerm", "panel1", this.ContextMenuVisiblePanelContent_Click)
-                //{
-                //    SupportedSessionTypes = new List<SessionTypeEnum>() { SessionTypeEnum.SSH, SessionTypeEnum.AdbShell }
-                //},
-                new ContextMenuDefinition("26","18", "", "传输"),
-                new ContextMenuDefinition("27","26","26","使用XModem发送", this.ContextMenuXModemSend_Click),
-                new ContextMenuDefinition("28","26","26","使用XModem接收", this.ContextMenuXModemReceive_Click),
-                //new ContextMenuDefinition("29","26","26","使用YModem接收", this.ContextMenuYModemSend_Click),
-            };
         }
 
         #endregion
@@ -643,56 +595,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        /// <summary>
-        /// 初始化PanelVM
-        /// </summary>
-        private void InitializePanelList()
-        {
-            // ContextMenu里如果PanelID不为空就说明有一个窗格需要显示
-
-            // 直接使用ContextMenus，不需要过滤了
-            List<ContextMenuDefinition> contextMenus = this.contextMenus.Select(v => v.Definition).ToList();
-
-            foreach (ContextMenuDefinition contextMenu in contextMenus)
-            {
-                if (string.IsNullOrEmpty(contextMenu.PanelID))
-                {
-                    continue;
-                }
-
-                if (string.IsNullOrEmpty(contextMenu.ClassName))
-                {
-                    logger.ErrorFormat("ContextMenu关联了PanelID，但是ClassName为空");
-                    continue;
-                }
-
-                PanelVM panelVM = this.Panels.FirstOrDefault(v => v.ID.ToString() == contextMenu.PanelID);
-                if (panelVM == null)
-                {
-                    panelVM = new PanelVM();
-                    panelVM.ID = contextMenu.PanelID;
-                    panelVM.Name = contextMenu.Name;
-                    panelVM.CloseDelegate = this.PerformPanelClosed;
-                    panelVM.SelectionChangedDelegate = this.PerformPanelSelectionChanged;
-                    this.Panels.Add(panelVM);
-                }
-
-                PanelItemVM panelItemVM = new PanelItemVM()
-                {
-                    ID = contextMenu.ID,
-                    Name = contextMenu.Name,
-                    OwnerPanel = panelVM,
-                    VMClassName = contextMenu.VMClassName,
-                    ClassName = contextMenu.ClassName,
-                };
-
-                panelItemVM.Parameters[PanelContentVM.KEY_SERVICE_AGENT] = this.ServiceAgent;
-                panelItemVM.Parameters[PanelContentVM.KEY_XTERM_SESSION] = this.Session;
-                panelItemVM.OwnerPanel = panelVM;
-                panelVM.AddMenuItem(panelItemVM);
-            }
-        }
-
         private void StopRecord()
         {
             if (this.recordStatus == RecordStatusEnum.Stop)
@@ -710,74 +612,6 @@ namespace ModengTerm.Terminal.ViewModels
         private void StopLogger()
         {
             this.logMgr.Stop(this.videoTerminal);
-        }
-
-        /// <summary>
-        /// 启用或禁用Watcher
-        /// </summary>
-        /// <param name="enable">启用或禁用</param>
-        private void EnableWatcher(bool enable)
-        {
-            if (enable)
-            {
-                if (this.watchTask == null)
-                {
-                    this.watchEvent = new ManualResetEvent(false);
-                    this.watchTask = Task.Factory.StartNew(this.WatchThreadProc);
-                    this.isWatch = true;
-                }
-
-                this.watchEvent.Set();
-            }
-            else
-            {
-                this.watchEvent.Reset();
-            }
-        }
-
-        /// <summary>
-        /// 把一个WatchVM添加到监控列表里
-        /// 或者把WatchVM从监控列表里移除
-        /// </summary>
-        /// <param name="contextMenu"></param>
-        /// <param name="added">如果为true，那么表示加入监控列表，否则从监控列表里移除</param>
-        private void ModifyWatchList(PanelItemVM contextMenu, bool added)
-        {
-            if (contextMenu == null)
-            {
-                return;
-            }
-
-            WatchObject watch = contextMenu.ContentVM as WatchObject;
-            if (watch == null)
-            {
-                return;
-            }
-
-            if (added)
-            {
-                lock (this.watchListLock)
-                {
-                    this.watchList.Add(watch);
-                    this.watchListChanged = true;
-                }
-
-                this.EnableWatcher(true);
-            }
-            else
-            {
-
-                lock (this.watchListLock)
-                {
-                    this.watchList.Remove(watch);
-                    this.watchListChanged = true;
-                }
-
-                if (this.watchList.Count == 0)
-                {
-                    this.EnableWatcher(false);
-                }
-            }
         }
 
         /// <summary>
@@ -995,65 +829,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void WatchThreadProc()
-        {
-            WatchFrequencyEnum frequency = this.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, MTermConsts.DefaultWatchFrequency);
-            int updateInterval = VTBaseUtils.GetWatchInterval(frequency);
-            List<WatchObject> watchList = new List<WatchObject>();
-            AbstractWatcher watcher = WatcherFactory.Create(this.sessionTransport);
-            watcher.Initialize();
-
-            while (this.isWatch)
-            {
-                try
-                {
-                    this.watchEvent.WaitOne();
-
-                    if (this.watchListChanged)
-                    {
-                        watchList.Clear();
-
-                        lock (this.watchListLock)
-                        {
-                            watchList.AddRange(this.watchList);
-                            this.watchListChanged = false;
-                        }
-                    }
-
-                    foreach (WatchObject watch in watchList)
-                    {
-                        watch.Watch(watcher);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("WatchThread异常", ex);
-                }
-
-                Thread.Sleep(updateInterval);
-            }
-
-            watcher.Release();
-        }
-
-        private void PerformPanelClosed(PanelVM panelVM)
-        {
-            this.ModifyWatchList(panelVM.SelectedMenu, false);
-        }
-
-        private void PerformPanelSelectionChanged(PanelVM panelVM, PanelItemVM removed, PanelItemVM added)
-        {
-            if (removed != null)
-            {
-                this.ModifyWatchList(removed, false);
-            }
-
-            if (added != null)
-            {
-                this.ModifyWatchList(added, true);
-            }
-        }
-
         private void VideoTerminal_ViewportChanged(IVideoTerminal vt, int newRow, int newColumn)
         {
             this.ViewportRow = newRow;
@@ -1146,7 +921,7 @@ namespace ModengTerm.Terminal.ViewModels
             base.NotifyStatusChanged(status);
         }
 
-        public void ContextMenuStartLogger_Click(ContextMenuVM sender)
+        public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             LoggerOptionsWindow window = new LoggerOptionsWindow(this);
             window.Owner = Window.GetWindow(this.Content);
@@ -1156,7 +931,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        public void ContextMenuStopLogger_Click(ContextMenuVM sender)
+        public void ContextMenuStopLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.StopLogger();
         }
@@ -1174,7 +949,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 拷贝当前选中的内容到剪切板
         /// </summary>
-        private void ContextMenuCopySelection_Click(ContextMenuVM sender)
+        private void ContextMenuCopySelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.CopySelection();
         }
@@ -1255,7 +1030,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 开始录像
         /// </summary>
-        public void ContextMenuStartRecord_Click(ContextMenuVM sender)
+        public void ContextMenuStartRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             if (this.recordStatus == RecordStatusEnum.Recording)
             {
@@ -1301,7 +1076,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 停止录像
         /// </summary>
-        private void ContextMenuStopRecord_Click(ContextMenuVM sender)
+        private void ContextMenuStopRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.StopRecord();
         }
@@ -1356,7 +1131,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 打开录像
         /// </summary>
-        public void ContextMenuOpenRecord_Click(ContextMenuVM sender)
+        public void ContextMenuOpenRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             OpenRecordWindow openRecordWindow = new OpenRecordWindow(this.Session);
             openRecordWindow.Owner = Window.GetWindow(this.Content);
@@ -1366,22 +1141,22 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 查找
         /// </summary>
-        public void ContextMenuFind_Click(ContextMenuVM sender)
+        public void ContextMenuFind_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             FindWindowMgr.Show(this);
         }
 
-        public void ContextMenuSaveViewport_Click(ContextMenuVM sender)
+        public void ContextMenuSaveViewport_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.SaveToFile(ParagraphTypeEnum.Viewport);
         }
 
-        public void ContextMenuSaveSelection_Click(ContextMenuVM sender)
+        public void ContextMenuSaveSelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.SaveToFile(ParagraphTypeEnum.Selected);
         }
 
-        public void ContextMenuSaveAllDocument_Click(ContextMenuVM sender)
+        public void ContextMenuSaveAllDocument_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.SaveToFile(ParagraphTypeEnum.AllDocument);
         }
@@ -1412,7 +1187,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void ContextMenuOpenPortForwardWindow_Click(ContextMenuVM sender)
+        private void ContextMenuOpenPortForwardWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             if (this.Session.Type != (int)SessionTypeEnum.SSH)
             {
@@ -1428,7 +1203,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 把当前选中的内容添加到快捷输入列表里
         /// </summary>
-        private void ContextMenuAddToQuickCommands_Click(ContextMenuVM sender)
+        private void ContextMenuAddToQuickCommands_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             VTParagraph selectedParagraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
             if (selectedParagraph.IsEmpty)
@@ -1456,12 +1231,12 @@ namespace ModengTerm.Terminal.ViewModels
             this.ShellCommands.Add(qcvm);
         }
 
-        private void ContextMenuSwitchInputPanelVisible_Click(ContextMenuVM sender)
+        private void ContextMenuSwitchInputPanelVisible_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.InputPanelVisible = !this.InputPanelVisible;
         }
 
-        private void ContextMenuClearScreen_Click(ContextMenuVM sender)
+        private void ContextMenuClearScreen_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             VTDocument document = this.videoTerminal.ActiveDocument;
             document.DeleteViewoprt();
@@ -1469,54 +1244,28 @@ namespace ModengTerm.Terminal.ViewModels
             document.RequestInvalidate();
         }
 
-        private void ContextMenuCreateQuickCommand_Click(ContextMenuVM sender)
+        private void ContextMenuCreateQuickCommand_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.OpenCreateShellCommandWindow();
         }
 
-        private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender)
+        private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            PanelVM panelVM = this.Panels.FirstOrDefault(v => v.ID.ToString() == sender.PanelId);
-            PanelItemVM panelItemVM = panelVM.MenuItems.FirstOrDefault(v => v.ID.ToString() == sender.ID.ToString());
-
-            // 当前状态
-            bool visible = false;
-
-            if (panelVM.Visible)
-            {
-                if (panelVM.SelectedMenu == panelItemVM)
-                {
-                    visible = true;
-                }
-            }
-
-            if (visible)
-            {
-                // 当前是显示状态，隐藏
-                panelVM.Visible = false;
-
-                // 如果当前显示的界面是Watch，那么从列表里移除
-                this.ModifyWatchList(panelVM.SelectedMenu, false);
-            }
-            else
-            {
-                // 当前是隐藏状态，显示
-                panelVM.Visible = true;
-                panelItemVM.IsSelected = true;
-            }
+            PanelVM panelVM = this.Panels[sender.PanelAlign];
+            panelVM.ChangeVisible(sender.ID.ToString());
         }
 
-        private void ContextMenuXModemSend_Click(ContextMenuVM sender)
+        private void ContextMenuXModemSend_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.StartModem(SendReceive.Send, ModemTypeEnum.XModem);
         }
 
-        private void ContextMenuXModemReceive_Click(ContextMenuVM sender)
+        private void ContextMenuXModemReceive_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.StartModem(SendReceive.Receive, ModemTypeEnum.XModem);
         }
 
-        private void ContextMenuYModemSend_Click(ContextMenuVM sender)
+        private void ContextMenuYModemSend_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.StartModem(SendReceive.Send, ModemTypeEnum.YModem);
         }

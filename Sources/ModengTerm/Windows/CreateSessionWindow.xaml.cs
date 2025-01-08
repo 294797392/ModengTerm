@@ -103,7 +103,7 @@ namespace ModengTerm.Windows
             }
 
             OptionMenuVM optionTreeVM = TreeViewOptions.DataContext as OptionMenuVM;
-            optionTreeVM.SwitchContent(selectedOption);
+            optionTreeVM.LoadContent(selectedOption);
             if (optionTreeVM.CurrentContent == null)
             {
                 return;

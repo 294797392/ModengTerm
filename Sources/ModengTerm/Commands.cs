@@ -14,13 +14,18 @@ namespace ModengTerm
         /// </summary>
         public static RoutedUICommand SendCommand { get; private set; }
 
-
         public static RoutedUICommand PanelVisiblityCommand { get; private set; }
+
+        /// <summary>
+        /// 打开会话命令
+        /// </summary>
+        public static RoutedUICommand OpenSessionCommand { get; private set; }
 
         static MCommands()
         {
             SendCommand = new RoutedUICommand();
             PanelVisiblityCommand = new RoutedUICommand();
+            OpenSessionCommand = new RoutedUICommand();
         }
     }
 }

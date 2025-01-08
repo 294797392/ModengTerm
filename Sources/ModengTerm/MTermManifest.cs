@@ -2,6 +2,7 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Terminal.DataModels;
+using ModengTerm.ViewModels;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using WPFToolkit.MVVM;
@@ -21,6 +22,18 @@ namespace ModengTerm
         /// </summary>
         [JsonProperty("defaultSession")]
         public XTermSession DefaultSession { get; set; }
+
+        /// <summary>
+        /// 终端类型的会话的标题菜单和右键菜单
+        /// </summary>
+        [JsonProperty("termMenus")]
+        public List<ContextMenuDefinition> TerminalMenus { get; private set; }
+
+        /// <summary>
+        /// 全局标题菜单
+        /// </summary>
+        [JsonProperty("globalTitleMenus")]
+        public List<ContextMenuDefinition> GlobalTitleMenus { get; private set; }
 
         /// <summary>
         /// 窗口主题列表
@@ -55,6 +68,8 @@ namespace ModengTerm
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
+            this.TerminalMenus = new List<ContextMenuDefinition>();
+            this.GlobalTitleMenus = new List<ContextMenuDefinition>();
             this.AppThemes = new List<AppTheme>();
             this.TerminalOptionMenu = new List<MenuDefinition>();
             this.FontSizeList = new List<FontSizeDefinition>();

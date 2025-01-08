@@ -1,100 +1,30 @@
-﻿using ModengTerm.Base.Enumerations;
-using ModengTerm.ViewModels.Terminals;
+﻿using DotNEToolkit;
+using log4net.Repository.Hierarchy;
+using ModengTerm.Base;
+using ModengTerm.Base.Definitions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
 {
-    public class ContextMenuDefinition
-    {
-        /// <summary>
-        /// 菜单ID
-        /// </summary>
-        public string ID { get; set; }
-
-        /// <summary>
-        /// 父菜单的ID
-        /// 如果为空表示没有父菜单，直接显示到根节点
-        /// 如果为-1表示在标题上不显示该菜单
-        /// </summary>
-        public string TitleParentID { get; set; }
-
-        /// <summary>
-        /// 右键菜单的ParentID
-        /// 如果为-1表示不显示右键菜单
-        /// </summary>
-        public string ContextParentID { get; set; }
-
-        public string Name { get; set; }
-
-        public string ClassName { get; set; }
-
-        public string VMClassName { get; set; }
-
-        public ContextMenuDelegate Callback { get; set; }
-
-        /// <summary>
-        /// 如果这个菜单需要显示界面，PanelID指定界面显示在哪个Panel里
-        /// </summary>
-        public string PanelID { get; set; }
-
-        /// <summary>
-        /// 支持的会话类型
-        /// 如果数量是0，那么表示支持所有会话类型
-        /// </summary>
-        public List<SessionTypeEnum> SupportedSessionTypes { get; set; } = new List<SessionTypeEnum>();
-
-        public ContextMenuDefinition(string id, string name)
-        {
-            this.ID = id;
-            this.Name = name;
-        }
-
-        public ContextMenuDefinition(string id, string titleParentID, string contextParentID, string name)
-        {
-            this.ID = id;
-            this.TitleParentID = titleParentID;
-            this.ContextParentID = contextParentID;
-            this.Name = name;
-        }
-
-        public ContextMenuDefinition(string id, string titleParentID, string contextParentID, string name, ContextMenuDelegate callback)
-        {
-            this.ID = id;
-            this.TitleParentID = titleParentID;
-            this.ContextParentID = contextParentID;
-            this.Name = name;
-            this.Callback = callback;
-        }
-
-        public ContextMenuDefinition(string id, string titleParentID, string contextParentID, string name, string className, string vmClassName, string panelID, ContextMenuDelegate callback)
-        {
-            this.ID = id;
-            this.TitleParentID = titleParentID;
-            this.ContextParentID = contextParentID;
-            this.Name = name;
-            this.ClassName = className;
-            this.VMClassName = vmClassName;
-            this.Callback = callback;
-            this.PanelID = panelID;
-        }
-    }
-
-    /// <summary>
-    /// 当点击Shell会话菜单的时候触发的回调
-    /// </summary>
-    public delegate void ContextMenuDelegate(ContextMenuVM sender);
-
     /// <summary>
     /// 标题栏菜单ViewModel
     /// 同时也是侧边栏窗格的ViewModel
     /// </summary>
     public class ContextMenuVM : ItemViewModel
     {
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ContextMenuVM");
+
+        #endregion
+
         #region 实例变量
 
         private bool canChecked;
-        private ContextMenuDelegate executeDelegate;
 
         #endregion
 
@@ -126,11 +56,11 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 作为侧边栏窗格的ViewModel，它所属的侧边栏窗格容器Id
         /// </summary>
-        public string PanelId { get; private set; }
+        public PanelAlignEnum PanelAlign { get; private set; }
 
-        public string ClassName { get; set; }
+        public string PanelEntry { get; set; }
 
-        public string VMClassName { get; set; }
+        public string PanelVMEntry { get; set; }
 
         #endregion
 
@@ -140,10 +70,9 @@ namespace ModengTerm.ViewModels
         {
             this.ID = definition.ID;
             this.Name = definition.Name;
-            this.ClassName = definition.ClassName;
-            this.VMClassName = definition.VMClassName;
-            this.PanelId = definition.PanelID;
-            this.executeDelegate = definition.Callback;
+            this.PanelEntry = definition.PanelEntry;
+            this.PanelVMEntry = definition.PanelVMEntry;
+            this.PanelAlign = (PanelAlignEnum)definition.PanelAlign;
             this.Children = new BindableCollection<ContextMenuVM>();
             this.Definition = definition;
         }
@@ -152,66 +81,101 @@ namespace ModengTerm.ViewModels
 
         #region 实例方法
 
-        private void AddSubItems(List<ContextMenuVM> container, ContextMenuVM parent)
-        {
-            container.AddRange(parent.Children);
-
-            foreach (ContextMenuVM child in parent.Children)
-            {
-                if (child.Children == null)
-                {
-                    continue;
-                }
-
-                this.AddSubItems(container, child);
-            }
-        }
-
         #endregion
 
         #region 公开接口
 
-        /// <summary>
-        /// 当点击菜单的时候执行
-        /// </summary>
-        public void Execute()
+        #endregion
+    }
+
+    public static class ContextMenuHelper
+    {
+        private class ClickHandler
         {
-            if (this.executeDelegate == null)
+            public object Object { get; private set; }
+
+            public List<MethodInfo> Methods { get; private set; }
+
+            public ClickHandler(object _object, List<MethodInfo> methods)
             {
+                this.Object = _object;
+                this.Methods = methods;
+            }
+        }
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ContextMenuHelper");
+        private static Dictionary<string, ClickHandler> menuItemClickHandlers = new Dictionary<string, ClickHandler>();
+
+        public static void Execute(ContextMenuVM contextMenu, OpenedSessionVM openedSessionVM, object invokeObject)
+        {
+            ContextMenuDefinition menuDefinition = contextMenu.Definition;
+
+            object targetObject = invokeObject;
+            List<MethodInfo> methods = null;
+
+            if (!string.IsNullOrEmpty(menuDefinition.HandlerEntry) && !string.IsNullOrEmpty(menuDefinition.MethodName))
+            {
+                // 先创建点击事件处理器实例
+                ClickHandler clickHandler;
+                if (!menuItemClickHandlers.TryGetValue(menuDefinition.HandlerEntry, out clickHandler))
+                {
+                    try
+                    {
+                        object handlerObject = ConfigFactory<object>.CreateInstance(menuDefinition.HandlerEntry);
+                        methods = handlerObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic).ToList();
+                        menuItemClickHandlers[menuDefinition.HandlerEntry] = new ClickHandler(handlerObject, methods);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("创建菜单点击事件处理器异常", ex);
+                        return;
+                    }
+                }
+
+                methods = clickHandler.Methods;
+
+                targetObject = clickHandler.Object;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(menuDefinition.MethodName))
+                {
+                    return;
+                }
+
+                string typeName = invokeObject.GetType().ToString();
+                ClickHandler clickHandler;
+                if (!menuItemClickHandlers.TryGetValue(typeName, out clickHandler))
+                {
+                    methods = invokeObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic).ToList();
+                    clickHandler = new ClickHandler(null, methods);
+                    menuItemClickHandlers[typeName] = clickHandler;
+                }
+
+                methods = clickHandler.Methods;
+            }
+
+            MethodInfo clickMethod = methods.FirstOrDefault(v => v.Name == menuDefinition.MethodName);
+            if (clickMethod == null)
+            {
+                logger.ErrorFormat("调用点击事件失败, 没找到指定的方法:{0}, entry:{1}", menuDefinition.MethodName, menuDefinition.HandlerEntry);
                 return;
             }
 
-            this.executeDelegate(this);
-        }
-
-        /// <summary>
-        /// 递归获取所有子级元素
-        /// </summary>
-        /// <returns></returns>
-        public List<ContextMenuVM> GetChildrenRecursive()
-        {
-            if (this.Children == null)
+            object[] parameters = new object[]
             {
-                return new List<ContextMenuVM>();
-            }
+                contextMenu, openedSessionVM
+            };
 
-            List<ContextMenuVM> subItems = new List<ContextMenuVM>();
-
-            subItems.AddRange(this.Children);
-
-            foreach (ContextMenuVM rootItem in this.Children)
+            try
             {
-                if (rootItem.Children == null)
-                {
-                    continue;
-                }
-
-                this.AddSubItems(subItems, rootItem);
+                clickMethod.Invoke(targetObject, parameters);
             }
-
-            return subItems;
+            catch (Exception ex)
+            {
+                MTMessageBox.Error("执行失败");
+                logger.Error("执行点击事件异常", ex);
+            }
         }
-
-        #endregion
     }
 }

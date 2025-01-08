@@ -54,39 +54,60 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <!-- 左侧窗格 -->
             <Grid Grid.Column="0">
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}" Width="300" Margin="0,0,5,0"/>
             </Grid>
 
-            <Grid Grid.Column="1" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
-                  MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown"
-                  LostFocus="GridDocument_LostFocus" GotFocus="GridDocument_GotFocus">
-                <Grid.ContextMenu>
-                    <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 上面窗格 -->
+                <Grid Grid.Row="0">
+                    <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[0]}" Height="300" Margin="0,0,0,5"/>
+                </Grid>
+
+                <!-- 显示终端内容区域 -->
+                <Grid Grid.Row="1" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
+                      MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown"
+                      LostFocus="GridDocument_LostFocus" GotFocus="GridDocument_GotFocus">
+                    <Grid.ContextMenu>
+                        <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
                                  Visibility="{Binding Path=ContextMenuVisibility}" Style="{StaticResource ResourceKey=StyleContextMenu}">
-                        <ContextMenu.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                <TextBlock Text="{Binding Path=Name}"/>
-                            </HierarchicalDataTemplate>
-                        </ContextMenu.ItemTemplate>
-                    </ContextMenu>
-                </Grid.ContextMenu>
+                            <ContextMenu.ItemTemplate>
+                                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                                    <TextBlock Text="{Binding Path=Name}"/>
+                                </HierarchicalDataTemplate>
+                            </ContextMenu.ItemTemplate>
+                        </ContextMenu>
+                    </Grid.ContextMenu>
 
-                <Border x:Name="BorderBackground"/>
-                <Image x:Name="ImageBackground" Stretch="Fill"/>
+                    <Border x:Name="BorderBackground"/>
+                    <Image x:Name="ImageBackground" Stretch="Fill"/>
 
-                <renderer:DocumentControl x:Name="DocumentAlternate"/>
-                <renderer:DocumentControl x:Name="DocumentMain"/>
+                    <renderer:DocumentControl x:Name="DocumentAlternate"/>
+                    <renderer:DocumentControl x:Name="DocumentMain"/>
+                </Grid>
+
+                <!-- 下面窗格 -->
+                <Grid Grid.Row="2">
+                    <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[1]}" Height="300" Margin="0,5,0,0"/>
+                </Grid>
+
             </Grid>
 
             <!-- 右侧窗格 -->
             <Grid Grid.Column="2">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[0]}" Width="300" Margin="5,0,0,0"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}" Width="300" Margin="5,0,0,0"/>
             </Grid>
 
         </Grid>

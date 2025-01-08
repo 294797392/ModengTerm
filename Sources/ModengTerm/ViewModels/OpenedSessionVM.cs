@@ -1,12 +1,12 @@
 ﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents.DocumentStructures;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
@@ -16,19 +16,6 @@ namespace ModengTerm.ViewModels
     /// </summary>
     public abstract class OpenedSessionVM : SessionItemVM
     {
-        private class MenuItem
-        {
-            public string ParentID { get; private set; }
-
-            public ContextMenuDefinition MenuDefinition { get; private set; }
-
-            public MenuItem(string parentID, ContextMenuDefinition menuDefinition)
-            {
-                this.ParentID = parentID;
-                this.MenuDefinition = menuDefinition;
-            }
-        }
-
         #region 公开事件
 
         /// <summary>
@@ -46,7 +33,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 保存当前显示的所有菜单列表
         /// </summary>
-        protected List<ContextMenuVM> contextMenus;
+        protected List<ContextMenuDefinition> contextMenus;
 
         #endregion
 
@@ -122,11 +109,14 @@ namespace ModengTerm.ViewModels
             this.ContextMenus = new BindableCollection<ContextMenuVM>();
             this.TitleMenus = new BindableCollection<ContextMenuVM>();
 
-            List<ContextMenuDefinition> menuDefinitions = this.OnCreateContextMenu();
-            List<MenuItem> titleMenuItems = menuDefinitions.Select(v => new MenuItem(v.TitleParentID, v)).ToList();
-            this.InitializeMenuVM(titleMenuItems, this.TitleMenus);
-            List<MenuItem> contextMenuItems = menuDefinitions.Select(v => new MenuItem(v.ContextParentID, v)).ToList();
-            this.InitializeMenuVM(contextMenuItems, this.ContextMenus);
+            SessionDefinition sessionDefinition = MTermApp.Context.Manifest.SessionList.FirstOrDefault(v => v.Type == this.Session.Type);
+            List<ContextMenuDefinition> menuDefinitions = this.GetContextMenuDefinition();
+            List<MenuItemRelation> titleMenuItems = menuDefinitions.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
+            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuItems));
+            List<MenuItemRelation> contextMenuItems = menuDefinitions.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
+            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuItems));
+
+            this.contextMenus = menuDefinitions;
 
             return this.OnOpen();
         }
@@ -153,78 +143,47 @@ namespace ModengTerm.ViewModels
         protected abstract int OnOpen();
         protected abstract void OnClose();
 
-        /// <summary>
-        /// 创建该会话的上下文菜单
-        /// </summary>
-        /// <returns></returns>
-        protected abstract List<ContextMenuDefinition> OnCreateContextMenu();
-
         #endregion
 
         #region 实例方法
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="map">ParentID -> ContextMenuDefinition</param>
-        /// <param name="menus"></param>
-        private void InitializeMenuVM(List<MenuItem> menuItems, BindableCollection<ContextMenuVM> menus)
+        private List<ContextMenuDefinition> GetContextMenuDefinition()
         {
-            bool firstInit = false;
+            List<ContextMenuDefinition> menuDefinitions = new List<ContextMenuDefinition>();
 
-            if (this.contextMenus == null)
+            switch ((SessionTypeEnum)this.Session.Type)
             {
-                firstInit = true;
-                this.contextMenus = new List<ContextMenuVM>();
-            }
-
-            // MenuId -> ContetMenuVM
-            Dictionary<string, ContextMenuVM> menuCaches = new Dictionary<string, ContextMenuVM>();
-
-            foreach (ContextMenuDefinition menuDefinition in menuItems.Select(v => v.MenuDefinition))
-            {
-                ContextMenuVM contextMenuVM = new ContextMenuVM(menuDefinition);
-                menuCaches.Add(menuDefinition.ID, contextMenuVM);
-            }
-
-            foreach (MenuItem menuItem in menuItems)
-            {
-                ContextMenuDefinition definition = menuItem.MenuDefinition;
-                string menuId = definition.ID;
-                string parentID = menuItem.ParentID;
-
-                if (parentID == "-1")
-                {
-                    continue;
-                }
-
-                if (definition.SupportedSessionTypes.Count > 0)
-                {
-                    if (!definition.SupportedSessionTypes.Contains((SessionTypeEnum)this.Session.Type))
+                case SessionTypeEnum.SerialPort:
+                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.AdbShell:
+                case SessionTypeEnum.SSH:
                     {
-                        continue;
+                        menuDefinitions.AddRange(MTermApp.Context.Manifest.TerminalMenus);
+                        break;
                     }
-                }
 
-                ContextMenuVM contextMenuVM = menuCaches[menuId];
+                default:
+                    throw new NotImplementedException();
+            }
 
-                if (string.IsNullOrWhiteSpace(parentID))
+            List<ContextMenuDefinition> results = new List<ContextMenuDefinition>();
+
+            foreach (ContextMenuDefinition menuDefinition in menuDefinitions)
+            {
+                if (menuDefinition.SessionTypes.Count == 0)
                 {
-                    // 根节点
-                    menus.Add(contextMenuVM);
+                    results.Add(menuDefinition);
                 }
                 else
                 {
-                    // 子节点
-                    ContextMenuVM parentVM = menuCaches[parentID];
-                    parentVM.Children.Add(contextMenuVM);
-                }
-
-                if (firstInit)
-                {
-                    this.contextMenus.Add(contextMenuVM);
+                    if (menuDefinition.SessionTypes.Contains(this.Session.Type))
+                    {
+                        results.Add(menuDefinition);
+                    }
                 }
             }
+
+            return results;
         }
 
         protected void NotifyStatusChanged(SessionStatusEnum status)

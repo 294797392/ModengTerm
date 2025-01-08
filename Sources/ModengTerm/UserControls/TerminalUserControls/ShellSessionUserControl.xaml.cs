@@ -116,18 +116,13 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            ContextMenuVM functionMenu = menuItem.DataContext as ContextMenuVM;
-            if (functionMenu == null)
+            ContextMenuVM menuVM = menuItem.DataContext as ContextMenuVM;
+            if (menuVM == null)
             {
                 return;
             }
 
-            if (functionMenu.Execute == null)
-            {
-                return;
-            }
-
-            functionMenu.Execute();
+            ContextMenuHelper.Execute(menuVM, this.DataContext as ShellSessionVM, this.DataContext as ShellSessionVM);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)

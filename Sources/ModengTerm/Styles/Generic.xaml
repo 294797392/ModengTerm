@@ -406,13 +406,13 @@
 
                             <Grid Margin="{Binding RelativeSource={RelativeSource AncestorType={x:Type TreeViewItem}}, Converter={StaticResource ResourceKey=TreeViewItemIndentConverter}}">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="20" MaxWidth="20"/>
+                                    <ColumnDefinition Width="20" x:Name="ColumnDefinition1"/>
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
                                 <ToggleButton Grid.Column="0" Width="8" Height="8" x:Name="Expander" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                                  ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
-                                                  Style="{StaticResource ExpandCollapseToggleStyle}" />
+                                              ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}"
+                                              Style="{StaticResource ExpandCollapseToggleStyle}" />
 
                                 <ContentPresenter Grid.Column="1" x:Name="PART_Header" ContentSource="Header" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
@@ -421,7 +421,7 @@
 
                         </Border>
 
-                        <ItemsPresenter Grid.Row="1" x:Name="ItemsHost" Visibility="Collapsed" />
+                        <ItemsPresenter Grid.Row="1" x:Name="ItemsHost" Visibility="Collapsed"/>
 
                     </Grid>
 
@@ -438,7 +438,7 @@
                             <Setter Property="Visibility" Value="Visible" TargetName="ItemsHost"/>
                         </Trigger>
                         <Trigger Property="HasItems" Value="false">
-                            <Setter TargetName="Expander" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="Expander" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                     </ControlTemplate.Triggers>
 

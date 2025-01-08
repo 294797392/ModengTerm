@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
-{   
+{
     public class WatchFile : PanelContentVM
     {
         public override void OnInitialize()

@@ -27,5 +27,9 @@ namespace ModengTerm.Base.Definitions
         /// </summary>
         [JsonProperty("menuId")]
         public string MenuId { get; set; }
+
+        public SessionDefinition() 
+        {
+        }
     }
 }

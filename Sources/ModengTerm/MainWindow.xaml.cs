@@ -1,4 +1,5 @@
-﻿using log4net.Core;
+﻿using DotNEToolkit;
+using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
@@ -11,10 +12,13 @@ using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Themes;
 using ModengTerm.UserControls;
 using ModengTerm.ViewModels;
+using ModengTerm.ViewModels.Session;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -330,9 +334,17 @@ namespace ModengTerm
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            contextMenu.Execute();
+            OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
+            ContextMenuHelper.Execute(contextMenu, openedSessionVM, openedSessionVM);
         }
 
+        private void MenuItemGlobalTitleMenu_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
+            OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
+            ContextMenuHelper.Execute(contextMenu, openedSessionVM, this.mainWindowVM);
+        }
 
 
         private void ButtonSwitchTheme_Click(object sender, RoutedEventArgs e)
@@ -506,6 +518,17 @@ namespace ModengTerm
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        private void OpenSessionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            XTermSessionVM sessionVM = e.Parameter as XTermSessionVM;
+            if (sessionVM == null)
+            {
+                return;
+            }
+
+            this.OpenSession(sessionVM.Session);
         }
 
         #endregion

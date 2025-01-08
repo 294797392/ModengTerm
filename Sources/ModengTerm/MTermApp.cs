@@ -45,9 +45,9 @@ namespace ModengTerm
         public MainWindowVM MainWindowVM { get; private set; }
 
         /// <summary>
-        /// 会话树形列表
+        /// 资源管理器树形列表
         /// </summary>
-        public SessionTreeVM SessionTreeVM { get; private set; }
+        public SessionTreeVM ResourceManagerTreeVM { get; private set; }
 
         #endregion
 
@@ -64,7 +64,9 @@ namespace ModengTerm
             VTermApp.Context.ServiceAgent = this.ServiceAgent;
             VTermApp.Context.Initialize("vtermapp.json");
 
-            this.SessionTreeVM = new SessionTreeVM();
+            this.ResourceManagerTreeVM = this.CreateSessionTreeVM(false, true);
+            this.ResourceManagerTreeVM.Roots[0].Name = "会话列表";
+            this.ResourceManagerTreeVM.ExpandAll();
 
             // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
             this.MainWindowVM = new MainWindowVM();

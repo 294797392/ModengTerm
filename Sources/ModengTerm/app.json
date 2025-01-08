@@ -46,6 +46,242 @@
         }
     ],
 
+    "termMenus": [
+        {
+            "id": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+            "titleParentId": "",
+            "contextParentId": "-1",
+            "name": "编辑"
+        },
+        {
+            "id": "E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C",
+            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+            "contextParentId": "",
+            "name": "查找",
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuFind_Click"
+        },
+        {
+            "id": "1F84B329-3E67-41A7-A43D-1E6A4993CACC",
+            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+            "contextParentId": "",
+            "name": "复制",
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuCopySelection_Click"
+        },
+        {
+            "id": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
+            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+            "contextParentId": "",
+            "name": "保存"
+        },
+        {
+            "id": "731EE044-7EC6-4559-B64C-58CD8E1A275E",
+            "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
+            "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
+            "name": "选中内容",
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuSaveSelection_Click"
+        },
+        {
+            "id": "02AC3BE3-6E5D-405D-8CE6-EC52AE74F5DE",
+            "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
+            "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
+            "name": "当前屏幕内容",
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuSaveViewport_Click"
+        },
+        {
+            "id": "3182B1ED-11B5-4896-BB1D-F9D301C0E6FF",
+            "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
+            "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
+            "name": "所有内容",
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuSaveAllDocument_Click"
+        },
+        {
+            "id": "D0A94B89-0DAC-4920-B55F-3AA1DC4C28A2",
+            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+            "contextParentId": "",
+            "name": "添加到快捷命令",
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuSaveAllDocument_Click"
+        },
+        {
+            "id": "A9DDE47E-5A1A-4C5C-8A75-43D224E94842",
+            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+            "contextParentId": "",
+            "name": "清屏",
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuClearScreen_Click"
+        },
+
+        {
+            "id": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+            "titleParentId": "",
+            "contextParentId": "-1",
+            "name": "查看"
+        },
+        {
+            "id": "2B6115F3-3A9D-4C2B-9B3F-787445608F11",
+            "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+            "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+            "name": "快捷命令",
+            "panelEntry": "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm",
+            "panelAlign": 3,
+            "handlerEntry": "",
+            "clickMethod": "ContextMenuVisiblePanelContent_Click"
+        },
+        {
+            "id": "2B09F519-6434-4926-8570-1CEEF55401EC",
+            "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+            "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+            "name": "输入栏",
+            "clickMethod": "ContextMenuSwitchInputPanelVisible_Click"
+        },
+
+        {
+            "id": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+            "titleParentId": "",
+            "contextParentId": "-1",
+            "name": "配置"
+        },
+        {
+            "id": "9B3689FE-8119-44A0-B557-8F20C4C278CA",
+            "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+            "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+            "name": "端口转发",
+            "clickMethod": "ContextMenuOpenPortForwardWindow_Click",
+            "sessionTypes": [ 1 ]
+        },
+        {
+            "id": "80C81CCB-69F7-46D1-85E5-114BD87D31B7",
+            "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+            "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+            "name": "同步输入",
+            "clickMethod": "ContextMenuOpenSyncInputConfigurationWindow_Click"
+        },
+        {
+            "id": "912F51A5-1978-4104-BDE8-E4F7C6B8F0C7",
+            "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+            "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+            "name": "快捷命令",
+            "clickMethod": "ContextMenuCreateQuickCommand_Click"
+        },
+
+        {
+            "id": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+            "titleParentId": "",
+            "contextParentId": "-1",
+            "name": "工具"
+        },
+        {
+            "id": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+            "contextParentId": "",
+            "name": "日志"
+        },
+        {
+            "id": "0115D21E-C588-4284-AD4E-C9C5B648CB1E",
+            "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+            "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+            "name": "开始",
+            "clickMethod": "ContextMenuStartLogger_Click"
+        },
+        {
+            "id": "6DC4D9A0-2F0E-4303-BF83-7D72F3264CF2",
+            "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+            "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+            "name": "停止",
+            "clickMethod": "ContextMenuStopLogger_Click"
+        },
+        {
+            "id": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+            "contextParentId": "",
+            "name": "录制"
+        },
+        {
+            "id": "FF30F373-669A-4DD1-BC7E-0F8C1752F571",
+            "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+            "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+            "name": "开始",
+            "clickMethod": "ContextMenuStartRecord_Click"
+        },
+        {
+            "id": "F6FDC8C6-35C4-490E-8F01-CCB34B3C6EFA",
+            "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+            "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+            "name": "停止",
+            "clickMethod": "ContextMenuStopRecord_Click"
+        },
+        {
+            "id": "26741446-CB47-4C72-BE80-39F841D0760B",
+            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+            "contextParentId": "",
+            "name": "打开回放",
+            "clickMethod": "ContextMenuOpenRecord_Click"
+        },
+        {
+            "id": "9559A8B6-A2A1-409B-A19A-0CD57FE975BF",
+            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+            "contextParentId": "",
+            "name": "系统监控",
+            "clickMethod": "ContextMenuVisiblePanelContent_Click",
+            "panelEntry": "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm",
+            "panelVMEntry": "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm",
+            "panelAlign": 3,
+            "sessionTypes": [ 0, 1, 5 ]
+        },
+
+        {
+            "id": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+            "contextParentId": "",
+            "name": "传输"
+        },
+        {
+            "id": "75E08588-BD10-414F-A95C-7E3F471E0335",
+            "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+            "contextParentId": "",
+            "name": "使用XModem发送",
+            "clickMethod": "ContextMenuXModemSend_Click"
+        },
+        {
+            "id": "8F1834E0-FBFA-4BF4-B07E-47850A0AB758",
+            "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+            "contextParentId": "",
+            "name": "使用XModem接收",
+            "clickMethod": "ContextMenuXModemReceive_Click"
+        }
+    ],
+
+    "globalTitleMenus": [
+        {
+            "id": "BE15995A-3FE3-47B8-BA05-9EBE449C09A6",
+            "titleParentId": "",
+            "name": "视图"
+        },
+        {
+            "id": "C847B8FE-8AB3-47AD-A08D-A3D1061D4F1E",
+            "titleParentId": "BE15995A-3FE3-47B8-BA05-9EBE449C09A6",
+            "name": "资源管理器",
+            "panelEntry": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
+            "panelVMEntry": "ModengTerm.ViewModels.PanelContent.ResourceManagerVM, ModengTerm",
+            "panelAlign": 2,
+            "clickMethod": "ContextMenuVisiblePanelContent_Click"
+        },
+        {
+            "id": "541EC83E-3E4C-42FF-AC04-151A72F5DC2B",
+            "titleParentId": "BE15995A-3FE3-47B8-BA05-9EBE449C09A6",
+            "name": "资源管理器2",
+            "panelEntry": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
+            "panelVMEntry": "ModengTerm.ViewModels.PanelContent.ResourceManagerVM, ModengTerm",
+            "panelAlign": 2,
+            "clickMethod": "ContextMenuVisiblePanelContent_Click"
+        }
+    ],
+
     "termOptionMenu": [
         {
             "id": "20C693D5-0186-4CCF-A019-D95E6A05BDDD",
