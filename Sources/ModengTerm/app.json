@@ -57,6 +57,7 @@
             "id": "E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C",
             "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
             "contextParentId": "",
+            "contextOrdinal": 1,
             "name": "查找",
             "clickMethod": "ContextMenuFind_Click"
         },
@@ -64,6 +65,7 @@
             "id": "1F84B329-3E67-41A7-A43D-1E6A4993CACC",
             "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
             "contextParentId": "",
+            "contextOrdinal": 2,
             "name": "复制",
             "clickMethod": "ContextMenuCopySelection_Click"
         },
@@ -71,6 +73,7 @@
             "id": "3BCCED0A-2E2B-46A8-9A38-9177A3C96AFF",
             "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
             "contextParentId": "",
+            "contextOrdinal": 3,
             "name": "粘贴",
             "clickMethod": "ContextMenuPaste_Click"
         },
@@ -78,6 +81,7 @@
             "id": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
             "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
             "contextParentId": "",
+            "contextOrdinal": 4,
             "name": "保存"
         },
         {
@@ -231,6 +235,7 @@
             "id": "9559A8B6-A2A1-409B-A19A-0CD57FE975BF",
             "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
             "contextParentId": "",
+            "contextOrdinal": 5,
             "name": "系统监控",
             "clickMethod": "ContextMenuVisiblePanelContent_Click",
             "panelEntry": "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm",
@@ -242,7 +247,7 @@
         {
             "id": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
             "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "contextParentId": "",
+            "contextParentId": "-1",
             "name": "传输"
         },
         {

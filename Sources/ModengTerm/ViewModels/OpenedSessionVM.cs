@@ -153,7 +153,7 @@ namespace ModengTerm.ViewModels
                 case SessionTypeEnum.AdbShell:
                 case SessionTypeEnum.SSH:
                     {
-                        menuDefinitions.AddRange(MTermApp.Context.Manifest.TerminalMenus);
+                        menuDefinitions.AddRange(MTermApp.Context.Manifest.TerminalMenus.OrderBy(v => v.ContextOrdinal));
                         break;
                     }
 

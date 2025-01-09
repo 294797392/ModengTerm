@@ -34,6 +34,12 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("contextParentId")]
         public string ContextParentID { get; set; }
 
+        /// <summary>
+        /// 指定右键菜单的序号
+        /// </summary>
+        [JsonProperty("contextOrdinal")]
+        public int ContextOrdinal { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -74,6 +80,7 @@ namespace ModengTerm.Base.Definitions
         public ContextMenuDefinition()
         {
             this.SessionTypes = new List<int>();
+            this.ContextOrdinal = 99999;
         }
     }
 }
