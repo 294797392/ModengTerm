@@ -2353,7 +2353,7 @@
             如果是展开，那么该操作会对上级节点进行递归展开
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.MenuItemVM.AddChild(WPFToolkit.MVVM.MenuItemVM)">
+        <member name="M:WPFToolkit.MVVM.MenuItemVM.AddMenuItem(WPFToolkit.MVVM.MenuItemVM)">
             <summary>
             新加一个子节点
             </summary>
@@ -2987,6 +2987,36 @@
         <member name="M:WPFToolkit.Windows.SplashScreenWindow.InitializeComponent">
             <summary>
             InitializeComponent
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
             </summary>
         </member>
     </members>

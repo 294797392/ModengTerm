@@ -1,15 +1,9 @@
-﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,8 +45,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public override void OnRelease()
         {
-            this.isWatch = false;
-            this.watchEvent.Reset();
+            this.StopWatch();
+
+            this.watchEvent.Close();
 
             base.OnRelease();
         }
@@ -61,13 +56,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         {
             base.OnLoaded();
 
-            if (this.watchTask == null)
-            {
-                this.isWatch = true;
-                this.watchTask = Task.Factory.StartNew(this.WatchTaskProc);
-            }
-
-            this.watchEvent.Set();
+            this.StartWatch();
         }
 
         public override void OnUnload()
@@ -75,6 +64,61 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.watchEvent.Reset();
 
             base.OnUnload();
+        }
+
+        public override void OnStatusChanged(SessionStatusEnum status)
+        {
+            switch (status)
+            {
+                case SessionStatusEnum.Connected:
+                    {
+                        this.StartWatch();
+                        break;
+                    }
+
+                case SessionStatusEnum.Disconnected:
+                    {
+                        this.StopWatch();
+                        break;
+                    }
+
+                default:
+                    {
+                        break;
+                    }
+            }
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void StartWatch()
+        {
+            if (!this.IsLoaded)
+            {
+                return;
+            }
+
+            if (this.SessionStatus != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
+            if (this.isWatch)
+            {
+                return;
+            }
+
+            this.isWatch = true;
+            this.watchTask = Task.Factory.StartNew(this.WatchTaskProc);
+            this.watchEvent.Set();
+        }
+
+        private void StopWatch()
+        {
+            this.isWatch = false;
+            this.watchEvent.Set();
         }
 
         #endregion

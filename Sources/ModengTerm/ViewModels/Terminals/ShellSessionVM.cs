@@ -886,6 +886,8 @@ namespace ModengTerm.Terminal.ViewModels
         {
             logger.InfoFormat("会话状态发生改变, {0}", status);
 
+            byte[] bytesDisplay = null;
+
             try
             {
                 switch (status)
@@ -897,31 +899,19 @@ namespace ModengTerm.Terminal.ViewModels
 
                     case SessionStatusEnum.Connecting:
                         {
-                            byte[] bytes = this.readEncoding.GetBytes("连接主机中...\r\n");
-                            App.Current.Dispatcher.Invoke(() =>
-                            {
-                                this.videoTerminal.ProcessRead(bytes, bytes.Length);
-                            });
+                            bytesDisplay = this.readEncoding.GetBytes("连接主机中...\r\n");
                             break;
                         }
 
                     case SessionStatusEnum.ConnectError:
                         {
-                            byte[] bytes = this.readEncoding.GetBytes("与主机连接失败...\r\n");
-                            App.Current.Dispatcher.Invoke(() => 
-                            {
-                                this.videoTerminal.ProcessRead(bytes, bytes.Length);
-                            });
+                            bytesDisplay = this.readEncoding.GetBytes("与主机连接失败...\r\n");
                             break;
                         }
 
                     case SessionStatusEnum.Disconnected:
                         {
-                            byte[] bytes = this.readEncoding.GetBytes("与主机断开连接...\r\n");
-                            App.Current.Dispatcher.Invoke(() => 
-                            {
-                                this.videoTerminal.ProcessRead(bytes, bytes.Length);
-                            });
+                            bytesDisplay = this.readEncoding.GetBytes("与主机断开连接...\r\n");
                             break;
                         }
 
@@ -935,6 +925,24 @@ namespace ModengTerm.Terminal.ViewModels
             }
 
             base.Status = status;
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                if (bytesDisplay != null)
+                {
+                    this.videoTerminal.ProcessRead(bytesDisplay, bytesDisplay.Length);
+                }
+
+                foreach (PanelVM panelVM in this.Panels.Values)
+                {
+                    IEnumerable<SessionPanelContentVM> panelContents = panelVM.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).OfType<SessionPanelContentVM>();
+
+                    foreach (SessionPanelContentVM panelContent in panelContents)
+                    {
+                        panelContent.OnStatusChanged(status);
+                    }
+                }
+            });
         }
 
         public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)

@@ -71,6 +71,11 @@ namespace ModengTerm
 
             foreach (ContextMenuDefinition menuDefinition in menuDefinitions)
             {
+                if (string.IsNullOrEmpty(menuDefinition.PanelEntry))
+                {
+                    continue;
+                }
+
                 PanelVM panelVM = panels[(PanelAlignEnum)menuDefinition.PanelAlign];
 
                 PanelItemVM panelItemVM = new PanelItemVM()

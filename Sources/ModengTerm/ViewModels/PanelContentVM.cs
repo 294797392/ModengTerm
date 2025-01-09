@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Base.Enumerations;
+using System;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
@@ -8,6 +9,16 @@ namespace ModengTerm.ViewModels
     /// </summary>
     public abstract class PanelContentVM : MenuContentVM
     {
+        private bool isLoaded;
+
+        /// <summary>
+        /// 获取该界面当前是否是显示状态
+        /// </summary>
+        public bool IsLoaded
+        {
+            get { return this.isLoaded; }
+        }
+
         public override void OnInitialize()
         {
         }
@@ -18,10 +29,12 @@ namespace ModengTerm.ViewModels
 
         public override void OnLoaded()
         {
+            this.isLoaded = true;
         }
 
         public override void OnUnload()
         {
+            this.isLoaded = false;
         }
     }
 
@@ -36,7 +49,16 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
+        #region 实例变量
+
+        #endregion
+
         #region 属性
+
+        /// <summary>
+        /// 获取当前会话的连接状态
+        /// </summary>
+        protected SessionStatusEnum SessionStatus { get { return this.OpenedSession.Status; } }
 
         protected OpenedSessionVM OpenedSession { get; set; }
 
@@ -57,7 +79,7 @@ namespace ModengTerm.ViewModels
         /// 会话状态改变的时候触发
         /// </summary>
         /// <param name="status"></param>
-        //public abstract void OnStatusChanged(SessionStatusEnum status);
+        public abstract void OnStatusChanged(SessionStatusEnum status);
     }
 
     /// <summary>
