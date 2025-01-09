@@ -48,7 +48,7 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// 输出编码格式
         /// </summary>
-        SSH_WRITE_ENCODING = 5,
+        TERM_WRITE_ENCODING = 5,
         SSH_WRITE_BUFFER_SIZE = 6,
         SSH_READ_BUFFER_SIZE = 7,
 

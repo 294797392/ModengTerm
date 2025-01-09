@@ -42,6 +42,8 @@ namespace ModengTerm.Terminal.Session
         private int row;
         private int col;
 
+        private SessionStatusEnum status;
+        
         #endregion
 
         #region 属性
@@ -56,7 +58,10 @@ namespace ModengTerm.Terminal.Session
         /// <summary>
         /// 获取当前Session的连接状态
         /// </summary>
-        public SessionStatusEnum Status { get; private set; }
+        public SessionStatusEnum Status
+        {
+            get { return this.status; }
+        }
 
         #endregion
 
@@ -220,12 +225,13 @@ namespace ModengTerm.Terminal.Session
 
         private void NotifyStatusChanged(SessionStatusEnum status)
         {
-            if (this.Status == status)
+            if (this.status == status)
             {
                 return;
             }
 
-            this.Status = status;
+            this.status = status;
+
             if (this.StatusChanged != null)
             {
                 this.StatusChanged(this, status);

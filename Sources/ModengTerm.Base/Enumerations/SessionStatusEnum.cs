@@ -11,6 +11,11 @@ namespace ModengTerm.Base.Enumerations
     public enum SessionStatusEnum
     {
         /// <summary>
+        /// 连接已断开
+        /// </summary>
+        Disconnected,
+
+        /// <summary>
         /// 连接中
         /// </summary>
         Connecting,
@@ -24,10 +29,5 @@ namespace ModengTerm.Base.Enumerations
         /// 连接失败
         /// </summary>
         ConnectError,
-
-        /// <summary>
-        /// 连接已断开
-        /// </summary>
-        Disconnected,
     }
 }

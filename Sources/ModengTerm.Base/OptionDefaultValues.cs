@@ -74,8 +74,8 @@ namespace ModengTerm.Base
 
         //public static readonly string THEME_BACKGROUND_COLOR = "";
         //public static readonly int SSH_THEME_DOCUMENT_PADDING = 5;
-        //public static readonly string SSH_WRITE_ENCODING = "UTF-8";
-        //public static readonly string TERM_READ_ENCODING = "UTF-8";
+        public static readonly string TERM_WRITE_ENCODING = "UTF-8";
+        public static readonly string TERM_READ_ENCODING = "UTF-8";
 
         //public static readonly int MOUSE_SCROLL_DELTA = 1;
         //public static readonly int TERM_MAX_CLIPBOARD_HISTORY = 1000;

@@ -23,4 +23,8 @@
     </Reference>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy $(SolutionDir)..\Dependence\log4net.xml $(TargetDir) /y" />
+  </Target>
+
 </Project>

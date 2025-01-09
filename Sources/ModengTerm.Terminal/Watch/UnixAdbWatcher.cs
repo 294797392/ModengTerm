@@ -69,7 +69,7 @@ namespace ModengTerm.Terminal.Watch
             this.userName = session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME, string.Empty);
             this.userNamePrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME_PROMPT, string.Empty);
             this.loginType = session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE, AdbLoginTypeEnum.None);
-            this.writeEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding));
+            this.writeEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding));
             this.readEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, MTermConsts.DefaultReadEncoding));
             this.watchTimeout = session.GetOption<int>(OptionKeyEnum.ADBSH_ADVANCE_WATCH_TIMEOUT, MTermConsts.DefaultAdbWatchTimeout);
             this.tempDir = session.GetOption<string>(OptionKeyEnum.ADBSH_ADVANCE_TEMP_DIR, MTermConsts.DefaultAdbTempDir);

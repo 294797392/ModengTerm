@@ -874,7 +874,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
             session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
             session.SetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.AutoFit);
-            session.SetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
+            session.SetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
             session.SetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);

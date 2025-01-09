@@ -54,6 +54,7 @@ namespace ModengTerm.Terminal.ViewModels
         private VideoTerminal videoTerminal;
 
         private Encoding writeEncoding;
+        private Encoding readEncoding;
 
         private RecordStatusEnum recordStatus;
 
@@ -283,7 +284,8 @@ namespace ModengTerm.Terminal.ViewModels
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
             this.RecordStatus = RecordStatusEnum.Stop;
-            this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING));
+            this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING));
+            this.readEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING));
             this.clipboard = new VTClipboard()
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
@@ -895,16 +897,31 @@ namespace ModengTerm.Terminal.ViewModels
 
                     case SessionStatusEnum.Connecting:
                         {
+                            byte[] bytes = this.readEncoding.GetBytes("连接主机中...\r\n");
+                            App.Current.Dispatcher.Invoke(() =>
+                            {
+                                this.videoTerminal.ProcessRead(bytes, bytes.Length);
+                            });
                             break;
                         }
 
                     case SessionStatusEnum.ConnectError:
                         {
+                            byte[] bytes = this.readEncoding.GetBytes("与主机连接失败...\r\n");
+                            App.Current.Dispatcher.Invoke(() => 
+                            {
+                                this.videoTerminal.ProcessRead(bytes, bytes.Length);
+                            });
                             break;
                         }
 
                     case SessionStatusEnum.Disconnected:
                         {
+                            byte[] bytes = this.readEncoding.GetBytes("与主机断开连接...\r\n");
+                            App.Current.Dispatcher.Invoke(() => 
+                            {
+                                this.videoTerminal.ProcessRead(bytes, bytes.Length);
+                            });
                             break;
                         }
 
@@ -917,7 +934,7 @@ namespace ModengTerm.Terminal.ViewModels
                 logger.Error("SessionTransport_StatusChanged异常", ex);
             }
 
-            base.NotifyStatusChanged(status);
+            base.Status = status;
         }
 
         public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)

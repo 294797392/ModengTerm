@@ -101,6 +101,8 @@ namespace ModengTerm.Terminal
 
         #region 实例变量
 
+        private string name;
+
         private SessionTransport sessionTransport;
 
         /// <summary>
@@ -136,6 +138,7 @@ namespace ModengTerm.Terminal
         /// 输入编码方式
         /// </summary>
         private Encoding writeEncoding;
+        private Encoding readEncoding;
 
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
@@ -226,7 +229,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 会话名字
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get { return this.name; } }
 
         /// <summary>
         /// 获取当前光标所在行
@@ -338,17 +341,15 @@ namespace ModengTerm.Terminal
             this.textPointer = new VTextPointer();
 
             // 初始化变量
-            isRunning = true;
-
-            sessionTransport = options.SessionTransport;
-
-            Name = sessionInfo.Name;
-
-            writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.SSH_WRITE_ENCODING));
-            scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
-            colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE);
-            foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
-            backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            this.name = sessionInfo.Name;
+            this.isRunning = true;
+            this.sessionTransport = options.SessionTransport;
+            this.writeEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING));
+            this.readEncoding = Encoding.GetEncoding(sessionInfo.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING));
+            this.scrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA);
+            this.colorTable = sessionInfo.GetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE);
+            this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
+            this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             this.autoWrapMode = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true); // DECAWM
             this.clickToCursor = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, false);
             this.renderWrite = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_WRITE, OptionDefaultValues.TERM_ADVANCE_RENDER_WRITE);
@@ -711,6 +712,178 @@ namespace ModengTerm.Terminal
             if (this.isFocusEventMode)
             {
                 this.HandleFocusEventMode(focused);
+            }
+        }
+
+        // 换行和反向换行
+        public void LineFeed()
+        {
+            int oldCursorRow = this.CursorRow;
+            int oldCursorCol = this.CursorCol;
+
+            // LF
+            // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
+
+            // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
+            // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
+            // 换行逻辑是把第一行拿到最后一行，要考虑到scrollMargin
+
+            // 要换行的文档
+            VTDocument document = this.activeDocument;
+            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTCursor cursor = document.Cursor;
+            VTHistory history = document.History;
+
+            // 可滚动区域的第一行和最后一行
+            int scrollRegionTop = document.ScrollMarginTop;
+            int scrollRegionBottom = document.ScrollMarginBottom;
+            VTextLine head = document.FirstLine.FindNext(scrollRegionTop);
+            VTextLine last = document.LastLine.FindPrevious(scrollRegionBottom);
+            bool hasScrollMargin = last != document.LastLine;
+            int oldPhysicsRow = cursor.PhysicsRow;
+
+            // 光标所在行是可滚动区域的最后一行
+            // 也表示即将滚动
+            if (last == ActiveLine)
+            {
+                // 没换行之前的光标所在行，该行数据被打印完了
+                VTextLine oldActiveLine = document.ActiveLine;
+
+                document.SwapLine(head, last);
+
+                // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
+                logger.DebugFormat("LineFeed，光标在可滚动区域最后一行，向下滚动一行");
+
+                if (this.IsAlternate)
+                {
+                    // 备用缓冲区重置被移动的行
+                    head.DeleteAll();
+                    document.SetCursorPhysical(oldPhysicsRow);
+                }
+                else
+                {
+                    // 换行之后记录历史行
+                    // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
+                    // MainScrrenBuffer和AlternateScrrenBuffer里的行分别记录
+                    // AlternateScreenBuffer是用来给man，vim等程序使用的
+                    // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
+
+                    // 在主缓冲区换行并且主缓冲区有ScorllMargin
+                    // 如果有滚动边距，保持总行数不变
+                    if (hasScrollMargin)
+                    {
+                        document.SetCursorPhysical(oldPhysicsRow);
+                        document.ActiveLine.DeleteAll();
+
+                        // 更新历史记录
+                        document.UpdateViewportHistory(scrollRegionTop, scrollRegionBottom);
+                    }
+                    else
+                    {
+                        // 滚动到底了并且没有ScrollMargin
+
+                        // 如果滚动条没滚动到底，说明下面的行可以继续使用
+                        if (!scrollInfo.ScrollAtBottom)
+                        {
+                            scrollInfo.Value += 1;
+                            document.SetCursorLogical(oldCursorRow, oldCursorCol);
+                            VTHistoryLine historyLine;
+                            if (history.TryGetHistory(cursor.PhysicsRow, out historyLine))
+                            {
+                                document.LastLine.SetHistory(historyLine);
+                            }
+                            else
+                            {
+                                // 不知道这是什么情况...
+                                logger.FatalFormat("LineFeed FatalError");
+                            }
+                        }
+                        else
+                        {
+                            if (scrollInfo.Maximum < document.RollbackMax)
+                            {
+                                // 历史记录没有超出设定的行数
+
+                                int scrollMax = scrollInfo.Maximum + 1;
+                                // 更新滚动条的值
+                                // 滚动条滚动到底
+                                // 计算滚动条可以滚动的最大值
+                                scrollInfo.Maximum = scrollMax;
+                                scrollInfo.Value = scrollMax;
+
+                                // 设置光标所在物理行号并更新ActiveLine
+                                document.SetCursorPhysical(oldPhysicsRow + 1);
+
+                                VTextLine newActiveLine = document.ActiveLine;
+
+                                // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
+                                // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
+                                VTHistoryLine historyLine;
+                                if (!history.TryGetHistory(cursor.PhysicsRow, out historyLine))
+                                {
+                                    // 为新的ActiveLine创建一个新的VTHistoryLine
+                                    historyLine = new VTHistoryLine();
+                                    newActiveLine.SetHistory(historyLine);
+                                    history.Add(historyLine);
+                                }
+                                else
+                                {
+                                    // newActiveLine和HistoryLine可能不匹配
+                                    // 所以在这里强制重新更新一下光标所在行的历史记录
+                                    newActiveLine.SetHistory(historyLine);
+                                }
+                            }
+                            else
+                            {
+                                // 历史记录已经超出了设定的行数了
+                                // 此时最后一行的物理行号不变，需要更新ActiveLine
+                                document.SetCursorPhysical(document.Cursor.PhysicsRow);
+
+                                VTextLine newActiveLine = document.ActiveLine;
+                                VTHistoryLine historyLine = new VTHistoryLine();
+                                newActiveLine.SetHistory(historyLine);
+                                history.Add(historyLine);
+                            }
+                        }
+                    }
+                }
+
+                // 触发行被完全打印的事件
+                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
+            }
+            else
+            {
+                // 没换行之前的光标所在行，该行数据被打印完了
+                VTextLine oldActiveLine = document.ActiveLine;
+
+                // 光标不在可滚动区域的最后一行，说明可以直接移动光标
+                logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
+                document.SetCursorLogical(document.Cursor.Row + 1, document.Cursor.Column);
+
+                int newPhysicsRow = document.Cursor.PhysicsRow;
+
+                // 光标移动到该行的时候再加入历史记录
+                if (!this.IsAlternate)
+                {
+                    VTextLine newActiveLine = document.ActiveLine;
+
+                    // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
+                    // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
+                    VTHistoryLine historyLine;
+                    if (!history.TryGetHistory(newPhysicsRow, out historyLine))
+                    {
+                        history.Add(newActiveLine.History);
+                    }
+                    else
+                    {
+                        // newActiveLine和HistoryLine可能不匹配，因为在缩小窗口的时候VTextLine直接被删除了
+                        // 所以在这里强制重新更新一下光标所在行的历史记录
+                        newActiveLine.SetHistory(historyLine);
+                    }
+                }
+
+                // 触发行被完全打印的事件
+                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
             }
         }
 
@@ -1855,6 +2028,8 @@ namespace ModengTerm.Terminal
 
         private void VtParser_OnC0Actions(VTParser arg1, ASCIITable ascii)
         {
+            VTDocument document = this.activeDocument;
+
             switch (ascii)
             {
                 case ASCIITable.BEL:
@@ -1912,8 +2087,16 @@ namespace ModengTerm.Terminal
                 case ASCIITable.FF:
                 case ASCIITable.VT:
                     {
+                        int oldRow = document.Cursor.Row;
+                        int oldCol = document.Cursor.Column;
+
                         // 这三个都是LF
                         this.LineFeed();
+
+                        int newRow = document.Cursor.Row;
+                        int newCol = document.Cursor.Column;
+
+                        VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
                         break;
                     }
 
@@ -2361,183 +2544,6 @@ namespace ModengTerm.Terminal
             VTDebug.Context.WriteInteractive("CarriageReturn", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }
 
-        // 换行和反向换行
-        internal void LineFeed()
-        {
-            int oldCursorRow = this.CursorRow;
-            int oldCursorCol = this.CursorCol;
-
-            // LF
-            // 滚动边距会影响到LF（DECSTBM_SetScrollingRegion），在实现的时候要考虑到滚动边距
-
-            // 想像一下有一个打印机往一张纸上打字，当打印机想移动到下一行打字的时候，它会发出一个LineFeed指令，让纸往上移动一行
-            // LineFeed，字面意思就是把纸上的下一行喂给打印机使用
-            // 换行逻辑是把第一行拿到最后一行，要考虑到scrollMargin
-
-            // 要换行的文档
-            VTDocument document = this.activeDocument;
-            VTScrollInfo scrollInfo = document.Scrollbar;
-            VTCursor cursor = document.Cursor;
-            VTHistory history = document.History;
-
-            // 可滚动区域的第一行和最后一行
-            int scrollRegionTop = document.ScrollMarginTop;
-            int scrollRegionBottom = document.ScrollMarginBottom;
-            VTextLine head = document.FirstLine.FindNext(scrollRegionTop);
-            VTextLine last = document.LastLine.FindPrevious(scrollRegionBottom);
-            bool hasScrollMargin = last != document.LastLine;
-            int oldPhysicsRow = cursor.PhysicsRow;
-
-            // 光标所在行是可滚动区域的最后一行
-            // 也表示即将滚动
-            if (last == ActiveLine)
-            {
-                // 没换行之前的光标所在行，该行数据被打印完了
-                VTextLine oldActiveLine = document.ActiveLine;
-
-                document.SwapLine(head, last);
-
-                // 光标在滚动区域的最后一行，那么把滚动区域的第一行拿到滚动区域最后一行的下面
-                logger.DebugFormat("LineFeed，光标在可滚动区域最后一行，向下滚动一行");
-
-                if (this.IsAlternate)
-                {
-                    // 备用缓冲区重置被移动的行
-                    head.DeleteAll();
-                    document.SetCursorPhysical(oldPhysicsRow);
-                }
-                else
-                {
-                    // 换行之后记录历史行
-                    // 注意用户可以输入Backspace键或者上下左右光标键来修改最新行的内容，所以最新一行的内容是实时变化的，目前的解决方案是在渲染整个文档的时候去更新最后一个历史行的数据
-                    // MainScrrenBuffer和AlternateScrrenBuffer里的行分别记录
-                    // AlternateScreenBuffer是用来给man，vim等程序使用的
-                    // 暂时只记录主缓冲区里的数据，备用缓冲区需要考虑下是否需要记录和怎么记录，因为VIM，Man等程序用的是备用缓冲区，用户是可以实时编辑缓冲区里的数据的
-
-                    // 在主缓冲区换行并且主缓冲区有ScorllMargin
-                    // 如果有滚动边距，保持总行数不变
-                    if (hasScrollMargin)
-                    {
-                        document.SetCursorPhysical(oldPhysicsRow);
-                        document.ActiveLine.DeleteAll();
-
-                        // 更新历史记录
-                        document.UpdateViewportHistory(scrollRegionTop, scrollRegionBottom);
-                    }
-                    else
-                    {
-                        // 滚动到底了并且没有ScrollMargin
-
-                        // 如果滚动条没滚动到底，说明下面的行可以继续使用
-                        if (!scrollInfo.ScrollAtBottom)
-                        {
-                            scrollInfo.Value += 1;
-                            document.SetCursorLogical(oldCursorRow, oldCursorCol);
-                            VTHistoryLine historyLine;
-                            if (history.TryGetHistory(cursor.PhysicsRow, out historyLine))
-                            {
-                                document.LastLine.SetHistory(historyLine);
-                            }
-                            else
-                            {
-                                // 不知道这是什么情况...
-                                logger.FatalFormat("LineFeed FatalError");
-                            }
-                        }
-                        else
-                        {
-                            if (scrollInfo.Maximum < document.RollbackMax)
-                            {
-                                // 历史记录没有超出设定的行数
-
-                                int scrollMax = scrollInfo.Maximum + 1;
-                                // 更新滚动条的值
-                                // 滚动条滚动到底
-                                // 计算滚动条可以滚动的最大值
-                                scrollInfo.Maximum = scrollMax;
-                                scrollInfo.Value = scrollMax;
-
-                                // 设置光标所在物理行号并更新ActiveLine
-                                document.SetCursorPhysical(oldPhysicsRow + 1);
-
-                                VTextLine newActiveLine = document.ActiveLine;
-
-                                // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
-                                // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
-                                VTHistoryLine historyLine;
-                                if (!history.TryGetHistory(cursor.PhysicsRow, out historyLine))
-                                {
-                                    // 为新的ActiveLine创建一个新的VTHistoryLine
-                                    historyLine = new VTHistoryLine();
-                                    newActiveLine.SetHistory(historyLine);
-                                    history.Add(historyLine);
-                                }
-                                else
-                                {
-                                    // newActiveLine和HistoryLine可能不匹配
-                                    // 所以在这里强制重新更新一下光标所在行的历史记录
-                                    newActiveLine.SetHistory(historyLine);
-                                }
-                            }
-                            else
-                            {
-                                // 历史记录已经超出了设定的行数了
-                                // 此时最后一行的物理行号不变，需要更新ActiveLine
-                                document.SetCursorPhysical(document.Cursor.PhysicsRow);
-
-                                VTextLine newActiveLine = document.ActiveLine;
-                                VTHistoryLine historyLine = new VTHistoryLine();
-                                newActiveLine.SetHistory(historyLine);
-                                history.Add(historyLine);
-                            }
-                        }
-                    }
-                }
-
-                // 触发行被完全打印的事件
-                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
-            }
-            else
-            {
-                // 没换行之前的光标所在行，该行数据被打印完了
-                VTextLine oldActiveLine = document.ActiveLine;
-
-                // 光标不在可滚动区域的最后一行，说明可以直接移动光标
-                logger.DebugFormat("LineFeed，光标在滚动区域内，直接移动光标到下一行");
-                document.SetCursorLogical(document.Cursor.Row + 1, document.Cursor.Column);
-
-                int newPhysicsRow = document.Cursor.PhysicsRow;
-
-                // 光标移动到该行的时候再加入历史记录
-                if (!this.IsAlternate)
-                {
-                    VTextLine newActiveLine = document.ActiveLine;
-
-                    // 有一些程序会在主缓冲区更新内容(top)，所以要判断该行是否已经被加入到了历史记录里
-                    // 如果加入到了历史记录，那么就更新；如果没加入历史记录再加入历史记录
-                    VTHistoryLine historyLine;
-                    if (!history.TryGetHistory(newPhysicsRow, out historyLine))
-                    {
-                        history.Add(newActiveLine.History);
-                    }
-                    else
-                    {
-                        // newActiveLine和HistoryLine可能不匹配，因为在缩小窗口的时候VTextLine直接被删除了
-                        // 所以在这里强制重新更新一下光标所在行的历史记录
-                        newActiveLine.SetHistory(historyLine);
-                    }
-                }
-
-                // 触发行被完全打印的事件
-                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
-            }
-
-            int newRow = this.CursorRow;
-            int newCol = this.CursorCol;
-
-            VTDebug.Context.WriteInteractive("LineFeed", "{0},{1},{2},{3}", oldCursorRow, oldCursorCol, newRow, newCol);
-        }
-
         private void RI_ReverseLineFeed()
         {
             // 和LineFeed相反，把光标所在行向上移动一行
@@ -2586,7 +2592,7 @@ namespace ModengTerm.Terminal
             VTDebug.Context.WriteInteractive("RI_ReverseLineFeed", "{0},{1},{2},{3}", oldCursorRow, oldCursorCol, newRow, newCol);
         }
 
-        public void EraseDisplay(VTEraseType eraseType)
+        private void EraseDisplay(VTEraseType eraseType)
         {
             int oldRow = this.CursorRow;
             int oldCol = this.CursorCol;
@@ -2683,7 +2689,7 @@ namespace ModengTerm.Terminal
             VTDebug.Context.WriteInteractive("EraseDisplay", "{0},{1},{2},{3},{4}", oldRow, oldCol, newRow, newCol, eraseType);
         }
 
-        public void EL_EraseLine(VTEraseType eraseType)
+        private void EL_EraseLine(VTEraseType eraseType)
         {
             // TODO：优化填充算法
 
@@ -2729,7 +2735,7 @@ namespace ModengTerm.Terminal
             }
         }
 
-        public void ECH_EraseCharacters(int count)
+        private void ECH_EraseCharacters(int count)
         {
             // TODO：优化算法
             VTextAttributeState attributeState = this.activeDocument.AttributeState;
@@ -2745,7 +2751,7 @@ namespace ModengTerm.Terminal
         }
 
         // 设备状态
-        public void DSR_DeviceStatusReport(StatusType statusType)
+        private void DSR_DeviceStatusReport(StatusType statusType)
         {
             switch (statusType)
             {

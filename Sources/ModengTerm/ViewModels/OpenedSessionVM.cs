@@ -18,11 +18,6 @@ namespace ModengTerm.ViewModels
     {
         #region 公开事件
 
-        /// <summary>
-        /// 会话状态改变的时候触发
-        /// </summary>
-        public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
-
         #endregion
 
         #region 实例变量
@@ -66,7 +61,7 @@ namespace ModengTerm.ViewModels
         public SessionStatusEnum Status
         {
             get { return this.status; }
-            private set
+            protected set
             {
                 if (this.status != value)
                 {
@@ -184,21 +179,6 @@ namespace ModengTerm.ViewModels
             }
 
             return results;
-        }
-
-        protected void NotifyStatusChanged(SessionStatusEnum status)
-        {
-            if (this.status == status)
-            {
-                return;
-            }
-
-            this.Status = status;
-
-            if (this.StatusChanged != null)
-            {
-                this.StatusChanged(this, status);
-            }
         }
 
         #endregion

@@ -60,7 +60,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 会话名字
         /// </summary>
-        string Name { get; set; }
+        string Name { get; }
 
         /// <summary>
         /// 获取是否存在选中区域
