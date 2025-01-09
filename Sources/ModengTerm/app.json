@@ -114,7 +114,7 @@
             "contextParentId": "",
             "name": "添加到快捷命令",
             "handlerEntry": "",
-            "clickMethod": "ContextMenuSaveAllDocument_Click"
+            "clickMethod": "ContextMenuAddToQuickCommands_Click"
         },
         {
             "id": "A9DDE47E-5A1A-4C5C-8A75-43D224E94842",

@@ -41,8 +41,8 @@
     <SolidColorBrush x:Key="RES3105" Color="White"/><!-- 默认背景 -->
     
     <!-- ComboBoxItem 3151 - 3200 -->
-    <SolidColorBrush x:Key="RES3151" Color="#E9F0FF"/><!-- 鼠标悬浮边框 -->
-    <SolidColorBrush x:Key="RES3152" Color="#E9F0FF"/><!-- 鼠标悬浮背景 -->
+    <SolidColorBrush x:Key="RES3151" Color="#E9F0FF"/><!-- 悬浮边框 -->
+    <SolidColorBrush x:Key="RES3152" Color="#E9F0FF"/><!-- 悬浮背景 -->
     <SolidColorBrush x:Key="RES3153" Color="#203D77"/><!-- 获取焦点边框 -->
     <SolidColorBrush x:Key="RES3154" Color="Transparent"/><!-- 默认边框 -->
     <SolidColorBrush x:Key="RES3155" Color="Transparent"/><!-- 默认背景 -->
@@ -240,16 +240,20 @@
     <SolidColorBrush x:Key="RES60002" Color="#40508D"/><!-- 状态栏背景色 -->
     <SolidColorBrush x:Key="RES60003" Color="White"/><!-- 状态栏前景色 -->
 
-    
-    
+    <!-- QuickCommandUserControl 65001 - 66000 -->
+    <SolidColorBrush x:Key="RES65001E" Color="#8591A2"/><!-- 默认边框 -->
+    <SolidColorBrush x:Key="RES65002E" Color="#203D77"/><!-- 悬浮边框 -->
+
+
     <!-- 四种连接状态图标 -->
     <BitmapImage x:Key="5520" UriSource="pack://application:,,,/ModengTerm;component/Images/ok.png"/>
     <BitmapImage x:Key="5521" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>
     <BitmapImage x:Key="5522" UriSource="pack://application:,,,/ModengTerm;component/Images/connect.png"/>
     <BitmapImage x:Key="5523" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>
 
-    <!-- 终端ToolWindow 6001 - 6500 -->
-    <SolidColorBrush x:Key="6001" Color="#ededed"/><!-- 分割线颜色 -->
-    
-    
+    <!-- 终端PanelItem 66001 - 67000 -->
+    <SolidColorBrush x:Key="RES66001E" Color="#CCD5F0"/><!-- 背景 -->
+    <SolidColorBrush x:Key="RES66002E" Color="#ECF4FF"/><!-- 按钮悬浮背景 -->
+    <SolidColorBrush x:Key="RES66003E" Color="#ECF4FF" Opacity="0.7"/><!-- 按钮按下背景 -->
+
 </ResourceDictionary>

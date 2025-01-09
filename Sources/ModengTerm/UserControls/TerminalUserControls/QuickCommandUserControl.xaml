@@ -21,39 +21,51 @@
         </Grid.RowDefinitions>
 
         <Grid>
+            <Border Background="{DynamicResource ResourceKey=RES66001E}"/>
             <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
-                <mcontrols:MdButton ToolTip="新建" SVGPath="{StaticResource ResourceKey=SVGIcon5}"   
+                <mcontrols:MdButton ToolTip="编辑" SVGPath="{StaticResource ResourceKey=SVG13E}"   
                                     Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
             </StackPanel>
-
         </Grid>
 
         <ListBox x:Name="ListBoxCommands" Grid.Row="1" ItemsSource="{Binding Path=ShellCommands}" 
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  SelectionChanged="ListBoxCommands_SelectionChanged">
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
+                    <Grid x:Name="Grid1">
+                        <TextBlock x:Name="TextBlock1" Text="{Binding Path=Name}" VerticalAlignment="Center"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
 
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel IsItemsHost="True"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
             <ListBox.Style>
                 <Style TargetType="{x:Type ListBox}" BasedOn="{StaticResource ResourceKey=StyleListBox}">
-                    <Setter Property="BorderBrush" Value="{x:Null}"/>
-                    <Setter Property="BorderThickness" Value="0"/>
-                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="Margin" Value="0,3,0,0"/>
                 </Style>
             </ListBox.Style>
 
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItem}">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES65002E}"/>
+                        </Trigger>
+                    </Style.Triggers>
                     <Setter Property="Height" Value="30"/>
-                    <Setter Property="Margin" Value="3"/>
-                    <Setter Property="Padding" Value="5,0,5,0"/>
-                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                    <Setter Property="MinWidth" Value="50"/>
+                    <Setter Property="Margin" Value="5,5,0,0"/>
+                    <Setter Property="Padding" Value="10,0,10,0"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES65001E}"/>
+                    <Setter Property="BorderThickness" Value="1"/>
                 </Style>
             </ListBox.ItemContainerStyle>
 

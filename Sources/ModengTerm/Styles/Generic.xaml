@@ -288,7 +288,7 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES9006E}"/>
             </Trigger>
         </Style.Triggers>
-        <Setter Property="Margin" Value="0,5,0,5"/>
+        <Setter Property="Margin" Value="0,0,0,0"/>
         <Setter Property="BorderBrush" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="5"/>
@@ -321,8 +321,7 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 Background="{TemplateBinding Background}"/>
 
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-                                      CanContentScroll="False">
+                        <ScrollViewer CanContentScroll="False">
                             <ItemsPresenter Margin="{TemplateBinding Padding}"/>
                         </ScrollViewer>
                     </Grid>
@@ -1220,6 +1219,8 @@
                         <Border x:Name="BorderMouseOver" Background="{TemplateBinding MouseOverBrush}" BorderBrush="{TemplateBinding MouseOverBorder}" BorderThickness="{TemplateBinding BorderThickness}" Visibility="Collapsed"/>
                         <Border x:Name="BorderMouseDown" Background="{TemplateBinding MouseDownBrush}" BorderThickness="{TemplateBinding BorderThickness}" Visibility="Collapsed"/>
 
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
+
                         <Border x:Name="Bd" Margin="{TemplateBinding SVGMargin}">
                             <Border.Background>
                                 <DrawingBrush Stretch="Uniform">
@@ -1234,8 +1235,6 @@
                             </Border.Background>
                         </Border>
 
-                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
-
                         <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
 
@@ -1244,35 +1243,9 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Visibility" Value="Visible" TargetName="BorderMouseOver"/>
-                            <!--<Setter Property="Background" TargetName="Bd">
-                                <Setter.Value>
-                                    <DrawingBrush Stretch="Uniform">
-                                        <DrawingBrush.Drawing>
-                                            <GeometryDrawing Brush="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGMouseOverColor}">
-                                                <GeometryDrawing.Geometry>
-                                                    <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
-                                                </GeometryDrawing.Geometry>
-                                            </GeometryDrawing>
-                                        </DrawingBrush.Drawing>
-                                    </DrawingBrush>
-                                </Setter.Value>
-                            </Setter>-->
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter Property="Visibility" Value="Visible" TargetName="BorderMouseDown"/>
-                            <!--<Setter Property="Background" TargetName="Bd">
-                                <Setter.Value>
-                                    <DrawingBrush Stretch="Uniform">
-                                        <DrawingBrush.Drawing>
-                                            <GeometryDrawing Brush="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGMouseOverColor}">
-                                                <GeometryDrawing.Geometry>
-                                                    <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
-                                                </GeometryDrawing.Geometry>
-                                            </GeometryDrawing>
-                                        </DrawingBrush.Drawing>
-                                    </DrawingBrush>
-                                </Setter.Value>
-                            </Setter>-->
                         </Trigger>
                     </ControlTemplate.Triggers>
 
@@ -1328,9 +1301,17 @@
     </Style>
 
     <Style x:Key="StyleMdButtonTool" TargetType="{x:Type mcontrol:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES66002E}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{DynamicResource ResourceKey=RES66003E}"/>
+            </Trigger>
+        </Style.Triggers>
         <Setter Property="OverridesDefaultStyle" Value="True"/>
-        <Setter Property="Width" Value="20"/>
-        <Setter Property="Height" Value="20"/>
+        <Setter Property="Width" Value="24"/>
+        <Setter Property="Height" Value="24"/>
         <Setter Property="Margin" Value="0,0,5,0"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -1339,6 +1320,7 @@
         <Setter Property="SVGMargin" Value="5"/>
         <Setter Property="SVGColor" Value="#474747"/>
         <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Background" Value="Transparent"/>
         <!--<Setter Property="BorderBrush" Value="Silver"/>-->
     </Style>
 

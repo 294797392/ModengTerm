@@ -64,6 +64,12 @@
                         </Style>
                     </ListBox.Style>
 
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource ResourceKey=StyleListBoxItem}">
+                            <Setter Property="Margin" Value="2"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center"/>
@@ -105,7 +111,8 @@
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="类型：" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>
                 <ComboBox Grid.Row="1" Grid.Column="2" x:Name="ComboBoxCommandTypes" Height="25" Margin="3,0,3,0"
-                          SelectedItem="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleComboBox}">
+                          SelectedItem="{Binding Path=Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ComboBoxCommandTypes_SelectionChanged"
+                          Style="{StaticResource ResourceKey=StyleComboBox}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource ResourceKey=ShellCommandTypeConverter}}"/>
@@ -118,6 +125,8 @@
                          Text="{Binding Path=Command, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          AcceptsReturn="True"
                          Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TextBlockTips" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center" Text="如果需要输入换行符，请在文本框内直接按回车" Foreground="Red"/>
 
             </Grid>
         </GroupBox>

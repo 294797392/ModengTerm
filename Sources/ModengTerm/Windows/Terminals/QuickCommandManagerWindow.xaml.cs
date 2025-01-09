@@ -7,6 +7,7 @@ using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -63,7 +64,6 @@ namespace ModengTerm.Windows.Terminals
             this.deleteCommands = new List<QuickCommandVM>();
 
             ComboBoxCommandTypes.ItemsSource = Enum.GetValues(typeof(CommandTypeEnum));
-            ComboBoxCommandTypes.SelectedIndex = 0;
 
             List<ShellCommand> commands = this.serviceAgent.GetShellCommands(this.shellSession.ID.ToString());
             this.shellCommands = new BindableCollection<QuickCommandVM>();
@@ -139,13 +139,20 @@ namespace ModengTerm.Windows.Terminals
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
+            CommandTypeEnum commandType = CommandTypeEnum.PureText;
+
+            if (ComboBoxCommandTypes.SelectedItem != null) 
+            {
+                commandType = (CommandTypeEnum)ComboBoxCommandTypes.SelectedItem;
+            }
+
             string name = string.IsNullOrWhiteSpace(TextBoxName.Text) ? "新建命令" : TextBoxName.Text;
 
             QuickCommandVM command = new QuickCommandVM()
             {
                 ID = Guid.NewGuid().ToString(),
                 Name = name,
-                Type = (CommandTypeEnum)ComboBoxCommandTypes.SelectedItem,
+                Type = commandType,
                 SessionId = this.shellSession.ID.ToString(),
                 Command = TextBoxCommand.Text
             };
@@ -201,6 +208,31 @@ namespace ModengTerm.Windows.Terminals
             }
 
             this.shellCommands.MoveDown(shcmd);
+        }
+
+        private void ComboBoxCommandTypes_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (ComboBoxCommandTypes.SelectedItem == null)
+            {
+                return;
+            }
+
+            CommandTypeEnum commandType = (CommandTypeEnum)ComboBoxCommandTypes.SelectedItem;
+
+            switch (commandType) 
+            {
+                case CommandTypeEnum.PureText:
+                    {
+                        TextBlockTips.Visibility = Visibility.Visible;
+                        break;
+                    }
+
+                default:
+                    {
+                        TextBlockTips.Visibility = Visibility.Collapsed;
+                        break;
+                    }
+            }
         }
 
         #endregion
