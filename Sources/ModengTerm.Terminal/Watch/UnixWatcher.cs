@@ -1,8 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal.Session;
-using System.IO;
-using System.Reflection;
 
 namespace ModengTerm.Terminal.Watch
 {
@@ -16,7 +14,8 @@ namespace ModengTerm.Terminal.Watch
         private static readonly List<int> CPU_KERNEL_TIME_INDEX = new List<int>() { 3, 5, 6, 7, 8 };
         private static readonly List<int> CPU_IDLE_TIME_INDEX = new List<int>() { 4 };
 
-        private static string FetchNetworkInterfaces = "interfaces=$(ifconfig | grep -o '^[a-zA-Z0-9]\\+:' | tr -d ':');for interface in $interfaces; do ip_address=$(ifconfig \"$interface\" | grep -o 'inet [0-9.]\\+' | awk '{print $2}');receive_bytes=$(ifconfig \"$interface\" | grep 'RX packets' | awk '{print $5}');transmit_bytes=$(ifconfig \"$interface\" | grep 'TX packets' | awk '{print $5}');echo $interface,$ip_address,$receive_bytes,$transmit_bytes;done;";
+        private static readonly string FetchNetworkInterfaces = "interfaces=$(ifconfig | grep -o '^[a-zA-Z0-9]\\+:' | tr -d ':');for interface in $interfaces; do ip_address=$(ifconfig \"$interface\" | grep -o 'inet [0-9.]\\+' | awk '{print $2}');receive_bytes=$(ifconfig \"$interface\" | grep 'RX packets' | awk '{print $5}');transmit_bytes=$(ifconfig \"$interface\" | grep 'TX packets' | awk '{print $5}');echo $interface,$ip_address,$receive_bytes,$transmit_bytes;done;";
+        private static readonly string FetchProcess = "for pid in $(ls -d /proc/[0-9]* 2>/dev/null); do pid=${pid##*/};name=$(grep '^Name:' \"/proc/$pid/status\" | awk '{print $2}');rss=$(grep '^VmRSS:' \"/proc/$pid/status\" | awk '{print $2}');stat=($(awk '{print $14, $15}' \"/proc/$pid/stat\"));utime=${stat[0]};ktime=${stat[1]};echo $pid,$name,$rss,$utime,$ktime;done;";
 
         #endregion
 
@@ -27,6 +26,7 @@ namespace ModengTerm.Terminal.Watch
         protected XTermSession session;
         private UnixDiskCopy diskCopy;
         private UnixNetDeviceCopy netDeviceCopy;
+        private UnixProcessCopy processCopy;
 
         #endregion
 
@@ -148,7 +148,7 @@ namespace ModengTerm.Terminal.Watch
             }
 
             IEnumerable<string> lines = df.Split('\n', StringSplitOptions.RemoveEmptyEntries).Skip(1);
-            if (lines == null || lines.Count() == 0)
+            if (lines == null)
             {
                 return;
             }
@@ -164,12 +164,28 @@ namespace ModengTerm.Terminal.Watch
             }
 
             IEnumerable<string> lines = netdev.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            if (lines == null || lines.Count() == 0)
+            if (lines == null)
             {
                 return;
             }
 
             this.Copy<string, VTNetDevice>(this.systemInfo.NetDevices, lines, this.netDeviceCopy);
+        }
+
+        private void handle_process(string process) 
+        {
+            if (string.IsNullOrEmpty(process))
+            {
+                return;
+            }
+
+            IEnumerable<string> lines = process.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (lines == null)
+            {
+                return;
+            }
+
+            this.Copy<string, VTProcess>(this.systemInfo.Processes, lines, this.processCopy);
         }
 
         #endregion
@@ -181,6 +197,7 @@ namespace ModengTerm.Terminal.Watch
             this.systemInfo = new SystemInfo();
             this.diskCopy = new UnixDiskCopy();
             this.netDeviceCopy = new UnixNetDeviceCopy();
+            this.processCopy = new UnixProcessCopy();
         }
 
         public override void Release()
@@ -231,6 +248,13 @@ namespace ModengTerm.Terminal.Watch
 
             string netdev = this.Execute(FetchNetworkInterfaces);
             this.handle_netdev(netdev);
+
+            #endregion
+
+            #region 读取进程信息
+
+            string process = this.Execute(FetchProcess);
+            this.handle_process(process);
 
             #endregion
 

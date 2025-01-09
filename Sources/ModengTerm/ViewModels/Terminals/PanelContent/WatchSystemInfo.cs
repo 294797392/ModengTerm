@@ -180,7 +180,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             // 更新进程信息
             this.processCopy.TotalProcessorTime = totalProcessorTime;
-            this.Copy<ProcessVM, ProcessInfo>(systemInfo.Processes, this.Processes, this.processCopy);
+            this.Copy<ProcessVM, VTProcess>(systemInfo.Processes, this.Processes, this.processCopy);
             // 按照CPU使用率对进程列表排序
             List<ProcessVM> orderedProcs = this.Processes.OrderByDescending(v => v.CpuUsage).ToList();
             App.Current.Dispatcher.Invoke(() =>

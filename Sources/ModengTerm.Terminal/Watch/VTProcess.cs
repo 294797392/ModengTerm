@@ -7,12 +7,13 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Watch
 {
-    public class ProcessInfo
+    public class VTProcess
     {
         private int pid;
         private string name;
@@ -72,6 +73,7 @@ namespace ModengTerm.Terminal.Watch
 
         /// <summary>
         /// Cpu总使用时间
+        /// 用户时间+内核时间
         /// </summary>
         public long TotalProcessorTime
         {
@@ -100,21 +102,21 @@ namespace ModengTerm.Terminal.Watch
             }
         }
 
-        public ProcessInfo()
+        public VTProcess()
         {
             this.CanRead = true;
             this.MemoryUsage = new UnitValue64();
         }
     }
 
-    public class Win32ProcessCopy : ObjectCopy<ProcessInfo, Process>
+    public class Win32ProcessCopy : ObjectCopy<VTProcess, Process>
     {
-        public override bool Compare(ProcessInfo target, Process source)
+        public override bool Compare(VTProcess target, Process source)
         {
             return source.Id == target.PID && source.ProcessName == target.Name;
         }
 
-        public override void CopyTo(ProcessInfo target, Process source)
+        public override void CopyTo(VTProcess target, Process source)
         {
             target.PID = source.Id;
             target.MemoryUsage.Value = (ulong)source.WorkingSet64;
@@ -156,14 +158,37 @@ namespace ModengTerm.Terminal.Watch
         }
     }
 
-    //public class UnixProcessCopy : ObjectCopy<ProcessInfo, string>
-    //{
-    //    public override bool Compare(ProcessInfo target, string source)
-    //    {
-    //    }
+    public class UnixProcessCopy : ObjectCopy<VTProcess, string>
+    {
+        public override bool Compare(VTProcess target, string source)
+        {
+            return source.StartsWith(target.PID.ToString());
+        }
 
-    //    public override void CopyTo(ProcessInfo target, string source)
-    //    {
-    //    }
-    //}
+        public override void CopyTo(VTProcess target, string source)
+        {
+            string[] items = source.Split(',');
+
+            int pid;
+            if (int.TryParse(items[0], out pid))
+            {
+                target.PID = pid;
+            }
+
+            target.Name = items[1];
+
+            ulong rss;
+            if (ulong.TryParse(items[2], out rss))
+            {
+                target.MemoryUsage.Value = rss;
+                target.MemoryUsage.Unit = UnitType.KB;
+            }
+
+            long utime = 0, ktime = 0;
+            long.TryParse(items[3], out utime);
+            long.TryParse(items[4], out ktime);
+
+            target.TotalProcessorTime = utime + ktime;
+        }
+    }
 }

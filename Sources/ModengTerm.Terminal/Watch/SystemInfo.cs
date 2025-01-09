@@ -87,7 +87,7 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// 所有进程列表
         /// </summary>
-        public ChangedItems<ProcessInfo> Processes { get; private set; }
+        public ChangedItems<VTProcess> Processes { get; private set; }
 
         public SystemInfo()
         {
@@ -95,7 +95,7 @@ namespace ModengTerm.Terminal.Watch
             this.AvailableMemory = new UnitValue64();
             this.DiskItems = new ChangedItems<VTDrive>();
             this.NetDevices = new ChangedItems<VTNetDevice>();
-            this.Processes = new ChangedItems<ProcessInfo>();
+            this.Processes = new ChangedItems<VTProcess>();
         }
     }
 }

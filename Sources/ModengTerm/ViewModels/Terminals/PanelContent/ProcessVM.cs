@@ -86,7 +86,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         }
     }
 
-    public class ProcessVMCopy : ObjectCopy<ProcessVM, ProcessInfo>
+    public class ProcessVMCopy : ObjectCopy<ProcessVM, VTProcess>
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("");
 
@@ -95,12 +95,12 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public ulong TotalProcessorTime { get; set; }
 
-        public override bool Compare(ProcessVM target, ProcessInfo source)
+        public override bool Compare(ProcessVM target, VTProcess source)
         {
             return target.PID == source.PID;
         }
 
-        public override void CopyTo(ProcessVM target, ProcessInfo source)
+        public override void CopyTo(ProcessVM target, VTProcess source)
         {
             long previousProcessorTime = target.TotalProcessorTime;
 

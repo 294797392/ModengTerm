@@ -84,7 +84,7 @@ namespace ModengTerm.Terminal.Watch
 
             // 更新进程信息
             Process[] newProcs = Process.GetProcesses();
-            this.Copy<Process, ProcessInfo>(this.systemInfo.Processes, newProcs, Win32ProcessCopy);
+            this.Copy<Process, VTProcess>(this.systemInfo.Processes, newProcs, Win32ProcessCopy);
 
             return this.systemInfo;
         }
