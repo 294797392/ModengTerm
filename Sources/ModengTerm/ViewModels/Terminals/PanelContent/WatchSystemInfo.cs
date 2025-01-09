@@ -144,6 +144,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             ulong totalProcessorTime = 0;
 
+            // 确保至少读取了一次CPU占用信息
             if (this.prevKernelProcessorTime > 0)
             {
                 ulong idleTime = systemInfo.IdleProcessorTime - this.prevIdleProcessorTime;
@@ -172,10 +173,10 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.DisplayMemoryUsage = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
 
             // 更新磁盘信息
-            this.Copy<DiskVM, DiskInfo>(systemInfo.DiskItems, this.Disks, this.diskCopy);
+            this.Copy<DiskVM, VTDrive>(systemInfo.DiskItems, this.Disks, this.diskCopy);
 
             // 更新网络接口信息
-            this.Copy<NetworkInterfaceVM, NetInterfaceInfo>(systemInfo.NetworkInterfaces, this.NetworkInterfaces, this.ifaceCopy);
+            this.Copy<NetworkInterfaceVM, VTNetDevice>(systemInfo.NetDevices, this.NetworkInterfaces, this.ifaceCopy);
 
             // 更新进程信息
             this.processCopy.TotalProcessorTime = totalProcessorTime;

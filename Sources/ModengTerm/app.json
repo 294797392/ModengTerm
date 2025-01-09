@@ -58,7 +58,6 @@
             "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
             "contextParentId": "",
             "name": "查找",
-            "handlerEntry": "",
             "clickMethod": "ContextMenuFind_Click"
         },
         {
@@ -66,8 +65,14 @@
             "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
             "contextParentId": "",
             "name": "复制",
-            "handlerEntry": "",
             "clickMethod": "ContextMenuCopySelection_Click"
+        },
+        {
+            "id": "3BCCED0A-2E2B-46A8-9A38-9177A3C96AFF",
+            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+            "contextParentId": "",
+            "name": "粘贴",
+            "clickMethod": "ContextMenuPaste_Click"
         },
         {
             "id": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
@@ -266,15 +271,6 @@
             "id": "C847B8FE-8AB3-47AD-A08D-A3D1061D4F1E",
             "titleParentId": "BE15995A-3FE3-47B8-BA05-9EBE449C09A6",
             "name": "资源管理器",
-            "panelEntry": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
-            "panelVMEntry": "ModengTerm.ViewModels.PanelContent.ResourceManagerVM, ModengTerm",
-            "panelAlign": 2,
-            "clickMethod": "ContextMenuVisiblePanelContent_Click"
-        },
-        {
-            "id": "541EC83E-3E4C-42FF-AC04-151A72F5DC2B",
-            "titleParentId": "BE15995A-3FE3-47B8-BA05-9EBE449C09A6",
-            "name": "资源管理器2",
             "panelEntry": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
             "panelVMEntry": "ModengTerm.ViewModels.PanelContent.ResourceManagerVM, ModengTerm",
             "panelAlign": 2,

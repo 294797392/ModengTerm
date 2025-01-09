@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
+﻿using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Watch
 {
-    public class NetInterfaceInfo
+    public class VTNetDevice
     {
         private string id;
         private string name;
@@ -86,9 +81,9 @@ namespace ModengTerm.Terminal.Watch
         }
     }
 
-    public class Win32NetworkInterfaceCopy : ObjectCopy<NetInterfaceInfo, NetworkInterface>
+    public class Win32NetDeviceCopy : ObjectCopy<VTNetDevice, NetworkInterface>
     {
-        private string GetIPAddress(NetworkInterface @interface) 
+        private string GetIPAddress(NetworkInterface @interface)
         {
             IPInterfaceProperties properties = @interface.GetIPProperties();
 
@@ -102,12 +97,12 @@ namespace ModengTerm.Terminal.Watch
             return unicastIPAddress.Address.ToString();
         }
 
-        public override bool Compare(NetInterfaceInfo target, NetworkInterface source)
+        public override bool Compare(VTNetDevice target, NetworkInterface source)
         {
             return source.Id == target.ID;
         }
 
-        public override void CopyTo(NetInterfaceInfo target, NetworkInterface source)
+        public override void CopyTo(VTNetDevice target, NetworkInterface source)
         {
             target.ID = source.Id;
             target.Name = source.Description;
@@ -116,6 +111,33 @@ namespace ModengTerm.Terminal.Watch
             target.BytesSent = (ulong)statistics.BytesSent;
             target.BytesReceived = (ulong)statistics.BytesReceived;
             target.IPAddress = this.GetIPAddress(source);
+        }
+    }
+
+    public class UnixNetDeviceCopy : ObjectCopy<VTNetDevice, string>
+    {
+        public override bool Compare(VTNetDevice target, string source)
+        {
+            return source.StartsWith(target.ID);
+        }
+
+        public override void CopyTo(VTNetDevice target, string source)
+        {
+            string[] items = source.Split(',');
+
+            target.ID = items[0];
+            target.Name = items[0];
+            target.IPAddress = items[1];
+            ulong bytesReceived, bytesSent;
+            if (ulong.TryParse(items[2], out bytesReceived)) 
+            {
+                target.BytesReceived = bytesReceived;
+            }
+
+            if (ulong.TryParse(items[3], out bytesSent))
+            {
+                target.BytesSent = bytesSent;
+            }
         }
     }
 }

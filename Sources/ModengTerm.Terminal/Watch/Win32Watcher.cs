@@ -19,7 +19,7 @@ namespace ModengTerm.Terminal.Watch
         #region 实例变量
 
         public Win32DiskCopy Win32DiskSync = new Win32DiskCopy();
-        public Win32NetworkInterfaceCopy Win32NetworkInterfaceCopy = new Win32NetworkInterfaceCopy();
+        public Win32NetDeviceCopy Win32NetworkInterfaceCopy = new Win32NetDeviceCopy();
         public Win32ProcessCopy Win32ProcessCopy = new Win32ProcessCopy();
         private SystemInfo systemInfo;
         private int memstatSize;
@@ -76,11 +76,11 @@ namespace ModengTerm.Terminal.Watch
 
             // 更新磁盘信息
             DriveInfo[] newDisks = DriveInfo.GetDrives();
-            this.Copy<DriveInfo, DiskInfo>(this.systemInfo.DiskItems, newDisks, Win32DiskSync);
+            this.Copy<DriveInfo, VTDrive>(this.systemInfo.DiskItems, newDisks, Win32DiskSync);
 
             // 更新网络接口信息
             NetworkInterface[] newIfaces = NetworkInterface.GetAllNetworkInterfaces();
-            this.Copy<NetworkInterface, NetInterfaceInfo>(this.systemInfo.NetworkInterfaces, newIfaces, Win32NetworkInterfaceCopy);
+            this.Copy<NetworkInterface, VTNetDevice>(this.systemInfo.NetDevices, newIfaces, Win32NetworkInterfaceCopy);
 
             // 更新进程信息
             Process[] newProcs = Process.GetProcesses();

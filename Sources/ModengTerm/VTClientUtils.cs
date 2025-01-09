@@ -5,8 +5,6 @@ using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Controls;
-using WPFToolkit.MVVM;
 
 namespace ModengTerm
 {

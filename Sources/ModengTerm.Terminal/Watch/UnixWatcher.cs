@@ -1,14 +1,8 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal.Session;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Printing;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls.Ribbon;
+using System.IO;
+using System.Reflection;
 
 namespace ModengTerm.Terminal.Watch
 {
@@ -22,6 +16,8 @@ namespace ModengTerm.Terminal.Watch
         private static readonly List<int> CPU_KERNEL_TIME_INDEX = new List<int>() { 3, 5, 6, 7, 8 };
         private static readonly List<int> CPU_IDLE_TIME_INDEX = new List<int>() { 4 };
 
+        private static string FetchNetworkInterfaces = "interfaces=$(ifconfig | grep -o '^[a-zA-Z0-9]\\+:' | tr -d ':');for interface in $interfaces; do ip_address=$(ifconfig \"$interface\" | grep -o 'inet [0-9.]\\+' | awk '{print $2}');receive_bytes=$(ifconfig \"$interface\" | grep 'RX packets' | awk '{print $5}');transmit_bytes=$(ifconfig \"$interface\" | grep 'TX packets' | awk '{print $5}');echo $interface,$ip_address,$receive_bytes,$transmit_bytes;done;";
+
         #endregion
 
         #region 实例变量
@@ -30,6 +26,7 @@ namespace ModengTerm.Terminal.Watch
         private SystemInfo systemInfo;
         protected XTermSession session;
         private UnixDiskCopy diskCopy;
+        private UnixNetDeviceCopy netDeviceCopy;
 
         #endregion
 
@@ -156,7 +153,23 @@ namespace ModengTerm.Terminal.Watch
                 return;
             }
 
-            this.Copy<string, DiskInfo>(this.systemInfo.DiskItems, lines, this.diskCopy);
+            this.Copy<string, VTDrive>(this.systemInfo.DiskItems, lines, this.diskCopy);
+        }
+
+        private void handle_netdev(string netdev)
+        {
+            if (string.IsNullOrEmpty(netdev))
+            {
+                return;
+            }
+
+            IEnumerable<string> lines = netdev.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            if (lines == null || lines.Count() == 0)
+            {
+                return;
+            }
+
+            this.Copy<string, VTNetDevice>(this.systemInfo.NetDevices, lines, this.netDeviceCopy);
         }
 
         #endregion
@@ -167,6 +180,7 @@ namespace ModengTerm.Terminal.Watch
         {
             this.systemInfo = new SystemInfo();
             this.diskCopy = new UnixDiskCopy();
+            this.netDeviceCopy = new UnixNetDeviceCopy();
         }
 
         public override void Release()
@@ -210,6 +224,13 @@ namespace ModengTerm.Terminal.Watch
 
             string df = this.Execute("df");
             this.handle_df(df);
+
+            #endregion
+
+            #region 读取网络接口信息
+
+            string netdev = this.Execute(FetchNetworkInterfaces);
+            this.handle_netdev(netdev);
 
             #endregion
 

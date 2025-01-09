@@ -277,8 +277,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.HistoryCommands = new BindableCollection<string>();
 
             Dictionary<string, object> panelParameters = new Dictionary<string, object>();
-            panelParameters[PanelContentVM.KEY_SERVICE_AGENT] = this.ServiceAgent;
-            panelParameters[PanelContentVM.KEY_OPENED_SESSION] = this;
+            panelParameters[SessionPanelContentVM.KEY_OPENED_SESSION] = this;
             this.Panels = VTClientUtils.CreatePanels(this.contextMenus, panelParameters);
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
@@ -954,7 +953,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.CopySelection();
         }
 
-        private void Paste()
+        private void ContextMenuPaste_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             string text = System.Windows.Clipboard.GetText();
             this.SendText(text);

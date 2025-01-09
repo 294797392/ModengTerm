@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.Watch
 {
-    public class DiskInfo
+    public class VTDrive
     {
         private string name;
         private UnitValue64 totalSpace;
@@ -75,16 +75,16 @@ namespace ModengTerm.Terminal.Watch
             }
         }
 
-        public DiskInfo()
+        public VTDrive()
         {
             this.TotalSpace = new UnitValue64();
             this.FreeSpace = new UnitValue64();
         }
     }
 
-    public class Win32DiskCopy : ObjectCopy<DiskInfo, DriveInfo>
+    public class Win32DiskCopy : ObjectCopy<VTDrive, DriveInfo>
     {
-        public override void CopyTo(DiskInfo diskInfo, DriveInfo driveInfo)
+        public override void CopyTo(VTDrive diskInfo, DriveInfo driveInfo)
         {
             diskInfo.Name = driveInfo.Name;
             diskInfo.TotalSpace.Value = (ulong)driveInfo.TotalSize;
@@ -94,17 +94,17 @@ namespace ModengTerm.Terminal.Watch
             diskInfo.Format = driveInfo.DriveFormat;
         }
 
-        public override bool Compare(DiskInfo diskInfo, DriveInfo osDisk)
+        public override bool Compare(VTDrive diskInfo, DriveInfo osDisk)
         {
             return diskInfo.Name == osDisk.Name;
         }
     }
 
-    public class UnixDiskCopy : ObjectCopy<DiskInfo, string>
+    public class UnixDiskCopy : ObjectCopy<VTDrive, string>
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("UnixDiskCopy");
 
-        public override bool Compare(DiskInfo target, string source)
+        public override bool Compare(VTDrive target, string source)
         {
             int slen = source.Length;
             int sidx = slen - 1;
@@ -136,7 +136,7 @@ namespace ModengTerm.Terminal.Watch
             return true;
         }
 
-        public override void CopyTo(DiskInfo target, string source)
+        public override void CopyTo(VTDrive target, string source)
         {
             string[] strs = source.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (strs.Length < 5)

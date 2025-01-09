@@ -81,6 +81,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             }
         }
 
+        /// <summary>
+        /// 总发送字节数
+        /// </summary>
         public ulong BytesSent
         {
             get { return this.bytesSent; }
@@ -94,6 +97,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             }
         }
 
+        /// <summary>
+        /// 总接收字节数
+        /// </summary>
         public ulong BytesReceived
         {
             get { return this.bytesReceived; }
@@ -120,14 +126,14 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         #endregion
     }
 
-    public class NetworkInterfaceVMCopy : ObjectCopy<NetworkInterfaceVM, NetInterfaceInfo>
+    public class NetworkInterfaceVMCopy : ObjectCopy<NetworkInterfaceVM, VTNetDevice>
     {
-        public override bool Compare(NetworkInterfaceVM target, NetInterfaceInfo source)
+        public override bool Compare(NetworkInterfaceVM target, VTNetDevice source)
         {
             return target.IfaceId == source.ID;
         }
 
-        public override void CopyTo(NetworkInterfaceVM target, NetInterfaceInfo source)
+        public override void CopyTo(NetworkInterfaceVM target, VTNetDevice source)
         {
             ulong previousBytesSent = target.BytesSent;
             ulong previousBytesReceived = target.BytesReceived;

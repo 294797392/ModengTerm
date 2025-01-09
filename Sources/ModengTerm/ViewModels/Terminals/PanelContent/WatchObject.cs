@@ -18,7 +18,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
     /// <summary>
     /// 表示一个监控对象
     /// </summary>
-    public abstract class WatchObject : PanelContentVM
+    public abstract class WatchObject : SessionPanelContentVM
     {
         #region 类变量
 
@@ -32,7 +32,6 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         private bool isWatch;
         private ManualResetEvent watchEvent;
         private ShellSessionVM shellSession;
-        private ServiceAgent serviceAgent;
 
         #endregion
 
@@ -46,8 +45,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         {
             base.OnInitialize();
 
-            this.shellSession = this.Parameters[PanelContentVM.KEY_OPENED_SESSION] as ShellSessionVM;
-            this.serviceAgent = this.Parameters[PanelContentVM.KEY_SERVICE_AGENT] as ServiceAgent;
+            this.shellSession = base.OpenedSession as ShellSessionVM;
             this.watchEvent = new ManualResetEvent(false);
         }
 

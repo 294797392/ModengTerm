@@ -77,12 +77,12 @@ namespace ModengTerm.Terminal.Watch
         /// <summary>
         /// 所有磁盘列表
         /// </summary>
-        public ChangedItems<DiskInfo> DiskItems { get; private set; }
+        public ChangedItems<VTDrive> DiskItems { get; private set; }
 
         /// <summary>
         /// 网路接口列表
         /// </summary>
-        public ChangedItems<NetInterfaceInfo> NetworkInterfaces { get; private set; }
+        public ChangedItems<VTNetDevice> NetDevices { get; private set; }
 
         /// <summary>
         /// 所有进程列表
@@ -93,8 +93,8 @@ namespace ModengTerm.Terminal.Watch
         {
             this.TotalMemory = new UnitValue64();
             this.AvailableMemory = new UnitValue64();
-            this.DiskItems = new ChangedItems<DiskInfo>();
-            this.NetworkInterfaces = new ChangedItems<NetInterfaceInfo>();
+            this.DiskItems = new ChangedItems<VTDrive>();
+            this.NetDevices = new ChangedItems<VTNetDevice>();
             this.Processes = new ChangedItems<ProcessInfo>();
         }
     }

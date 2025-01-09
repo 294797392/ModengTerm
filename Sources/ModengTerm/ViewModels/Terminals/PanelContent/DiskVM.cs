@@ -76,14 +76,14 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         #endregion
     }
 
-    public class DiskVMCopy : ObjectCopy<DiskVM, DiskInfo>
+    public class DiskVMCopy : ObjectCopy<DiskVM, VTDrive>
     {
-        public override bool Compare(DiskVM target, DiskInfo source)
+        public override bool Compare(DiskVM target, VTDrive source)
         {
             return target.Name == source.Name;
         }
 
-        public override void CopyTo(DiskVM target, DiskInfo source)
+        public override void CopyTo(DiskVM target, VTDrive source)
         {
             target.ID = source.Name;
             target.Name = source.Name;
