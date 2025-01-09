@@ -361,6 +361,7 @@ namespace ModengTerm.Terminal
             this.vtParser.OnESCActions += VtParser_OnESCActions;
             this.vtParser.OnCSIActions += VtParser_OnCSIActions;
             this.vtParser.OnPrint += VtParser_OnPrint;
+            this.vtParser.Encoding = this.readEncoding;
             this.vtParser.Initialize();
 
             #endregion
@@ -2017,13 +2018,16 @@ namespace ModengTerm.Terminal
 
         #region VTParser事件
 
-        private void VtParser_OnPrint(VTParser arg1, char ch)
+        private void VtParser_OnPrint(VTParser arg1, string text)
         {
-            char chPrint = this.TranslateCharacter(ch);
+            foreach (char ch in text)
+            {
+                char chPrint = this.TranslateCharacter(ch);
 
-            VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
+                VTDebug.Context.WriteInteractive("Print", "{0},{1},{2}", CursorRow, CursorCol, chPrint);
 
-            this.PrintCharacter(chPrint);
+                this.PrintCharacter(chPrint);
+            }
         }
 
         private void VtParser_OnC0Actions(VTParser arg1, ASCIITable ascii)

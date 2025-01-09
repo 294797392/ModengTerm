@@ -117,9 +117,19 @@ namespace ModengTerm.Terminal.Parsing
 
         private List<byte> sequenceBytes;
 
+        /// <summary>
+        /// 待显示的还未显示的字符字节数组
+        /// </summary>
+        private List<byte> pendingPrint;
+
         #endregion
 
         #region 属性
+
+        /// <summary>
+        /// 解析数据使用的编码格式
+        /// </summary>
+        public Encoding Encoding { get; set; }
 
         #endregion
 
@@ -145,6 +155,7 @@ namespace ModengTerm.Terminal.Parsing
             this.state = VTStates.Ground;   // 状态机默认设置为基态
 
             this.sequenceBytes = new List<byte>();
+            this.pendingPrint = new List<byte>();
         }
 
         public void Release()
@@ -287,6 +298,8 @@ namespace ModengTerm.Terminal.Parsing
                     }
                 }
             }
+
+            this.PrintPending();
         }
 
         #endregion
@@ -532,25 +545,28 @@ namespace ModengTerm.Terminal.Parsing
             else if (VTParserUtils.IsPrintable(ch))
             {
                 // 其他字符直接打印
-                this.ActionPrint(Convert.ToChar(ch));
+                this.ActionPrint(ch);
             }
             else
             {
-                // 不是可见字符，当多字节字符处理，用UTF8编码
-                // UTF8参考：https://www.cnblogs.com/fnlingnzb-learner/p/6163205.html
-                if (this.unicodeText.Count == 0)
-                {
-                    bool bit6 = DotNEToolkit.Utility.ByteUtils.GetBit(ch, 5);
-                    this.unicodeText.Capacity = bit6 ? 3 : 2;
-                }
+                // 不是可见字符，当多字节字符处理，继续打印
+                this.ActionPrint(ch);
 
-                this.unicodeText.Add(ch);
-                if (this.unicodeText.Count == this.unicodeText.Capacity)
-                {
-                    string text = Encoding.UTF8.GetString(this.unicodeText.ToArray());
-                    this.ActionPrint(text[0]);
-                    this.unicodeText.Clear();
-                }
+                //// 不是可见字符，当多字节字符处理，用UTF8编码
+                //// UTF8参考：https://www.cnblogs.com/fnlingnzb-learner/p/6163205.html
+                //if (this.unicodeText.Count == 0)
+                //{
+                //    bool bit6 = DotNEToolkit.Utility.ByteUtils.GetBit(ch, 5);
+                //    this.unicodeText.Capacity = bit6 ? 3 : 2;
+                //}
+
+                //this.unicodeText.Add(ch);
+                //if (this.unicodeText.Count == this.unicodeText.Capacity)
+                //{
+                //    string text = this.Encoding.GetString(this.unicodeText.ToArray());
+                //    this.ActionPrint(text[0]);
+                //    this.unicodeText.Clear();
+                //}
             }
         }
 

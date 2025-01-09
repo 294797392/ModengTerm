@@ -15,7 +15,7 @@
 
         public event Action<VTParser, ASCIITable> OnC0Actions;
         public event Action<VTParser, EscActionCodes, VTID> OnESCActions;
-        public event Action<VTParser, char> OnPrint;
+        public event Action<VTParser, string> OnPrint;
         public event Action<VTParser, CsiActionCodes, List<int>> OnCSIActions;
 
         #endregion
@@ -38,10 +38,11 @@
 
         #region 公开接口
 
-        private void ActionPrint(char ch)
+        private void ActionPrint(byte ch)
         {
             this.WriteCode("Print");
-            this.OnPrint?.Invoke(this, ch);
+
+            this.pendingPrint.Add(ch);
         }
 
         /// <summary>
@@ -50,6 +51,8 @@
         /// <param name="ch"></param>
         private void ActionExecute(byte ch)
         {
+            this.PrintPending();
+
             switch ((ASCIITable)ch)
             {
                 case ASCIITable.NUL:
@@ -119,7 +122,7 @@
 
                 default:
                     {
-                        this.ActionPrint(Convert.ToChar(ch));
+                        this.ActionPrint(ch);
                         break;
                         //throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ch));
                     }
@@ -133,6 +136,8 @@
         /// <param name="finalByte">Final Byte</param>
         private void ActionCSIDispatch(VTID vtid, List<int> parameters)
         {
+            this.PrintPending();
+
             CsiActionCodes code = (CsiActionCodes)vtid.Value();
 
             switch (code)
@@ -510,6 +515,8 @@
         /// <param name="ch">Final Byte</param>
         private void ActionEscDispatch(byte ch)
         {
+            this.PrintPending();
+
             this.vtid.Add(ch);
 
             EscActionCodes code = (EscActionCodes)ch;
@@ -622,6 +629,8 @@
         /// <param name="parameters"></param>
         private void ActionVt52EscDispatch(byte ch, List<int> parameters)
         {
+            this.PrintPending();
+
             VT52ActionCodes code = (VT52ActionCodes)ch;
 
             switch (code)
@@ -638,6 +647,20 @@
         #endregion
 
         #region 实例方法
+
+        private void PrintPending() 
+        {
+            if (this.pendingPrint.Count == 0) 
+            {
+                return;
+            }
+
+            string text = this.Encoding.GetString(this.pendingPrint.ToArray());
+
+            this.OnPrint(this, text);
+
+            this.pendingPrint.Clear();
+        }
 
         private void WriteCode(string action)
         {
