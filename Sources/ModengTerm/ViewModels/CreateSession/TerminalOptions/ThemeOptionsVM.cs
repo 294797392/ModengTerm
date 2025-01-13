@@ -291,9 +291,9 @@ namespace ModengTerm.ViewModels.CreateSession.TerminalOptions
             this.FontFamilyList.SelectedItem = this.FontFamilyList.FirstOrDefault();
             this.FontSizeList.SelectedItem = this.FontSizeList.FirstOrDefault(v => v.Value == theme.FontSize);
 
-            this.CursorSpeeds.SelectedItem = MTermConsts.DefaultCursorBlinkSpeed;
+            this.CursorSpeeds.SelectedItem = VTBaseConsts.DefaultCursorBlinkSpeed;
 
-            this.CursorStyles.SelectedItem = MTermConsts.DefaultCursorStyle;
+            this.CursorStyles.SelectedItem = VTBaseConsts.DefaultCursorStyle;
 
             this.CursorColor = DrawingUtils.GetColor(theme.CursorColor);
             this.FontColor = DrawingUtils.GetColor(theme.FontColor);

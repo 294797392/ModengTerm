@@ -181,7 +181,7 @@ namespace ModengTerm.Terminal
         public static bool StartAdbServer(XTermSession session) 
         {
             string exePath = session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH);
-            int timeout = session.GetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, MTermConsts.DefaultAdbStartServerTimeout);
+            int timeout = session.GetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, VTBaseConsts.DefaultAdbStartServerTimeout);
 
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {

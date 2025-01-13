@@ -34,15 +34,6 @@
             "icon": "",
             "type": 4,
             "menuId": "B940611E-C437-4E3B-A490-15F3E4C7E197"
-        },
-
-        {
-            "id": "4",
-            "name": "AdbShell",
-            "description": "",
-            "icon": "",
-            "type": 5,
-            "menuId": "EBDDC4E2-BEE9-4E01-B8E1-CA8B7D80A573"
         }
     ],
 
@@ -317,9 +308,10 @@
                     "className": "ModengTerm.UserControls.OptionsUserControl.RawTcp.RawTcpOptionsUserControl, ModengTerm"
                 },
                 {
-                    "id": "EBDDC4E2-BEE9-4E01-B8E1-CA8B7D80A573",
-                    "name": "AdbShell",
-                    "className": "ModengTerm.UserControls.OptionsUserControls.AdbShell.AdbShellOptionsUserControl, ModengTerm"
+                    "id": "6B71F68F-E5C0-4E9C-8E5D-CB1DD80E1DD6",
+                    "name": "登录脚本",
+                    "className": "ModengTerm.UserControls.OptionsUserControls.LoginScriptOptionsUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.ViewModels.CreateSession.SessionOptions.LoginScriptOptionVM, ModengTerm"
                 },
                 {
                     "id": "B1B81B97-5656-4F38-B8FE-FE869790F7B3",

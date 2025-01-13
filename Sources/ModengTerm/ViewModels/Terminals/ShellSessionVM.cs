@@ -8,6 +8,7 @@ using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Loggering;
@@ -84,6 +85,8 @@ namespace ModengTerm.Terminal.ViewModels
         private bool inputPanelVisible;
 
         private bool modemRunning;
+
+        private List<ScriptItem> scriptItems;
 
         #endregion
 
@@ -275,6 +278,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
             this.logMgr = MTermApp.Context.LoggerManager;
 
+            this.scriptItems = this.Session.GetOption<List<ScriptItem>>(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             this.HistoryCommands = new BindableCollection<string>();
 
             Dictionary<string, object> panelParameters = new Dictionary<string, object>();
@@ -596,6 +600,58 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        private void HandleScript()
+        {
+            if (this.scriptItems.Count == 0)
+            {
+                return;
+            }
+
+            VTDocument document = this.videoTerminal.ActiveDocument;
+            int cursorPhysicsRow = document.Cursor.PhysicsRow;
+
+            VTHistoryLine historyLine;
+            if (!document.History.TryGetHistory(cursorPhysicsRow, out historyLine))
+            {
+                logger.ErrorFormat("执行script失败, 没有找到光标所在历史记录, {0}", cursorPhysicsRow);
+                return;
+            }
+
+            string text = VTDocUtils.CreatePlainText(historyLine.Characters);
+
+            ScriptItem scriptItem = this.scriptItems[0];
+
+            if (!text.Contains(scriptItem.Expect))
+            {
+                return;
+            }
+
+            string terminator = string.Empty;
+
+            switch ((LineTerminators)scriptItem.Terminator)
+            {
+                case LineTerminators.None: break;
+                case LineTerminators.LF: terminator = "\n"; break;
+                case LineTerminators.CR: terminator = "\r"; break;
+                case LineTerminators.CRLF: terminator = "\r\n"; break;
+                default: throw new NotImplementedException();
+            }
+
+            string send = string.Format("{0}{1}", scriptItem.Send, terminator);
+
+            // 这里不同步向其他会话发送，单独发送到本会话
+            byte[] bytes = this.writeEncoding.GetBytes(send);
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("执行script失败, 发送数据失败, {0}", code);
+            }
+            else
+            {
+                this.scriptItems.RemoveAt(0);
+            }
+        }
+
         private void StopRecord()
         {
             if (this.recordStatus == RecordStatusEnum.Stop)
@@ -880,6 +936,8 @@ namespace ModengTerm.Terminal.ViewModels
             });
 
             this.HandleRecord(buffer, size);
+
+            this.HandleScript();
         }
 
         private void SessionTransport_StatusChanged(object client, SessionStatusEnum status)

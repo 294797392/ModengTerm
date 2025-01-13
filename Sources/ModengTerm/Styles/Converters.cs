@@ -24,7 +24,7 @@ namespace ModengTerm.Styles
                 return 0;
             }
 
-            return new Thickness(treeNodeViewModel.Level * MTermConsts.TreeViewItemIndent, 0, 0, 0);
+            return new Thickness(treeNodeViewModel.Level * VTBaseConsts.TreeViewItemIndent, 0, 0, 0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -63,16 +63,16 @@ namespace ModengTerm.Terminal.Watch
             this.cmd2FileName = new Dictionary<string, FileNames>();
 
             this.shellPrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT, string.Empty);
-            this.adbPath = session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH, MTermConsts.DefaultAdbPath);
+            this.adbPath = session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH, VTBaseConsts.DefaultAdbPath);
             this.password = session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD, string.Empty);
             this.passwordPrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD_PROMPT, string.Empty);
             this.userName = session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME, string.Empty);
             this.userNamePrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME_PROMPT, string.Empty);
             this.loginType = session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE, AdbLoginTypeEnum.None);
-            this.writeEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding));
-            this.readEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, MTermConsts.DefaultReadEncoding));
-            this.watchTimeout = session.GetOption<int>(OptionKeyEnum.ADBSH_ADVANCE_WATCH_TIMEOUT, MTermConsts.DefaultAdbWatchTimeout);
-            this.tempDir = session.GetOption<string>(OptionKeyEnum.ADBSH_ADVANCE_TEMP_DIR, MTermConsts.DefaultAdbTempDir);
+            this.writeEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, VTBaseConsts.DefaultWriteEncoding));
+            this.readEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, VTBaseConsts.DefaultReadEncoding));
+            this.watchTimeout = session.GetOption<int>(OptionKeyEnum.ADBSH_ADVANCE_WATCH_TIMEOUT, VTBaseConsts.DefaultAdbWatchTimeout);
+            this.tempDir = session.GetOption<string>(OptionKeyEnum.ADBSH_ADVANCE_TEMP_DIR, VTBaseConsts.DefaultAdbTempDir);
             this.tempDir = this.tempDir.TrimEnd('/');
         }
 

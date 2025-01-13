@@ -127,7 +127,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         private void WatchTaskProc()
         {
-            WatchFrequencyEnum frequency = this.shellSession.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, MTermConsts.DefaultWatchFrequency);
+            WatchFrequencyEnum frequency = this.shellSession.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, VTBaseConsts.DefaultWatchFrequency);
             int updateInterval = VTBaseUtils.GetWatchInterval(frequency);
             List<WatchObject> watchList = new List<WatchObject>();
             AbstractWatcher watcher = WatcherFactory.Create(this.shellSession.Transport);

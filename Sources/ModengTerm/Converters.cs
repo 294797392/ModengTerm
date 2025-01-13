@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
@@ -577,6 +578,34 @@ namespace ModengTerm
                 case WatchFrequencyEnum.Normal: return "正常";
                 case WatchFrequencyEnum.Low: return "低";
                 case WatchFrequencyEnum.High: return "高";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class LineTerminator2TextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (!(value is LineTerminators))
+            {
+                return string.Empty;
+            }
+
+            LineTerminators lineTerminators = (LineTerminators)value;
+
+            switch (lineTerminators)
+            {
+                case LineTerminators.None: return "None";
+                case LineTerminators.CR: return "CR(\\r)";
+                case LineTerminators.LF: return "LF(\\n)";
+                case LineTerminators.CRLF: return "CRLF(\\r\\n)";
                 default:
                     throw new NotImplementedException();
             }

@@ -17,7 +17,7 @@ namespace ModengTerm.Base
     /// <summary>
     /// XTerminal使用的默认值
     /// </summary>
-    public static class MTermConsts
+    public static class VTBaseConsts
     {
         /// <summary>
         /// 显示为“根节点”
@@ -28,6 +28,8 @@ namespace ModengTerm.Base
             ID = string.Empty,
             Name = "根节点"
         };
+
+        public static readonly List<LineTerminators> LineTerminators = VTBaseUtils.GetEnumValues<LineTerminators>();
 
         #region 光标闪烁时间
 

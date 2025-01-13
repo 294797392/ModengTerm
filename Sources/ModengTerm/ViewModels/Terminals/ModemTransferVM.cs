@@ -1,16 +1,12 @@
-﻿using log4net.Filter;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using WPFToolkit.MVVM;
-using WPFToolkit.Utility;
 
 namespace ModengTerm.ViewModels.Terminals
 {

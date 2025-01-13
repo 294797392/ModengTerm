@@ -113,7 +113,7 @@ namespace ModengTerm
 
             if (includeRootNode) 
             {
-                rootNode = new SessionGroupVM(context, 0, MTermConsts.RootGroup);
+                rootNode = new SessionGroupVM(context, 0, VTBaseConsts.RootGroup);
                 sessionTreeVM.AddRootNode(rootNode);
             }
 

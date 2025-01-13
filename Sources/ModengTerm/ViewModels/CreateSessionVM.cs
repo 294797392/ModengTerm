@@ -639,13 +639,13 @@ namespace ModengTerm.ViewModels
 
             #region 终端
 
-            this.TerminalRows = MTermConsts.TerminalRows.ToString();
-            this.TerminalColumns = MTermConsts.TerminalColumns.ToString();
+            this.TerminalRows = VTBaseConsts.TerminalRows.ToString();
+            this.TerminalColumns = VTBaseConsts.TerminalColumns.ToString();
             this.TerminalTypeList = new BindableCollection<TerminalTypeEnum>();
             this.TerminalTypeList.AddRange(VTBaseUtils.GetEnumValues<TerminalTypeEnum>());
-            this.TerminalTypeList.SelectedItem = MTermConsts.DefaultTerminalType;
-            this.MaxScrollback = MTermConsts.DefaultTerminalScrollback.ToString();
-            this.MaxClipboardHistory = MTermConsts.DefaultMaxClipboardHistory.ToString();
+            this.TerminalTypeList.SelectedItem = VTBaseConsts.DefaultTerminalType;
+            this.MaxScrollback = VTBaseConsts.DefaultTerminalScrollback.ToString();
+            this.MaxClipboardHistory = VTBaseConsts.DefaultMaxClipboardHistory.ToString();
 
             #endregion
 
@@ -670,7 +670,7 @@ namespace ModengTerm.ViewModels
             this.SSHAuthTypeList = new BindableCollection<SSHAuthTypeEnum>();
             this.SSHAuthTypeList.AddRange(VTBaseUtils.GetEnumValues<SSHAuthTypeEnum>());
             this.SSHAuthTypeList.SelectedItem = this.SSHAuthTypeList.FirstOrDefault();
-            this.SSHServerPort = MTermConsts.DefaultSSHPort.ToString();
+            this.SSHServerPort = VTBaseConsts.DefaultSSHPort.ToString();
 
             #endregion
 
@@ -681,11 +681,11 @@ namespace ModengTerm.ViewModels
             this.PortList.SelectedItem = this.PortList.FirstOrDefault();
 
             this.BaudRateList = new BindableCollection<string>();
-            this.BaudRateList.AddRange(MTermConsts.DefaultSerialPortBaudRates);
+            this.BaudRateList.AddRange(VTBaseConsts.DefaultSerialPortBaudRates);
             this.BaudRateList.SelectedItem = this.BaudRateList.FirstOrDefault();
 
             this.DataBitsList = new BindableCollection<int>();
-            this.DataBitsList.AddRange(MTermConsts.DefaultSerialPortDataBits);
+            this.DataBitsList.AddRange(VTBaseConsts.DefaultSerialPortDataBits);
             this.DataBitsList.SelectedItem = this.DataBitsList.LastOrDefault(); // LastOrDfault是8
 
             this.StopBitsList = new BindableCollection<StopBits>();
@@ -714,14 +714,14 @@ namespace ModengTerm.ViewModels
             this.AdbLoginTypes = new BindableCollection<AdbLoginTypeEnum>();
             this.AdbLoginTypes.AddRange(VTBaseUtils.GetEnumValues<AdbLoginTypeEnum>());
             this.AdbPath = "adb.exe";
-            this.AdbLoginTimeout = MTermConsts.DefaultAdbLoginTimeout.ToString();
+            this.AdbLoginTimeout = VTBaseConsts.DefaultAdbLoginTimeout.ToString();
 
             #endregion
 
-            this.MouseScrollDelta = MTermConsts.DefaultScrollDelta.ToString();
+            this.MouseScrollDelta = VTBaseConsts.DefaultScrollDelta.ToString();
 
-            this.SFTPServerInitialDirectory = MTermConsts.SFTPServerInitialDirectory;
-            this.SFTPClientInitialDirectory = MTermConsts.SFTPClientInitialDirectory;
+            this.SFTPServerInitialDirectory = VTBaseConsts.SFTPServerInitialDirectory;
+            this.SFTPClientInitialDirectory = VTBaseConsts.SFTPClientInitialDirectory;
         }
 
         #endregion
@@ -751,7 +751,7 @@ namespace ModengTerm.ViewModels
 
             int port;
             if (!int.TryParse(this.sshPort, out port) ||
-                port < MTermConsts.MIN_PORT || port > MTermConsts.MAX_PORT)
+                port < VTBaseConsts.MIN_PORT || port > VTBaseConsts.MAX_PORT)
             {
                 MessageBoxUtils.Info("请输入正确的端口号");
                 return false;
@@ -874,11 +874,11 @@ namespace ModengTerm.ViewModels
             session.SetOption<int>(OptionKeyEnum.SSH_TERM_COL, column);
             session.SetOption<string>(OptionKeyEnum.SSH_TERM_TYPE, this.GetTerminalName(terminalType));
             session.SetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE, TerminalSizeModeEnum.AutoFit);
-            session.SetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, MTermConsts.DefaultWriteEncoding);
-            session.SetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE, MTermConsts.DefaultReadBufferSize);
+            session.SetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, VTBaseConsts.DefaultWriteEncoding);
+            session.SetOption<int>(OptionKeyEnum.SSH_READ_BUFFER_SIZE, VTBaseConsts.DefaultReadBufferSize);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK, scrollback);
             session.SetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY, maxCliboardHistory);
-            session.SetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, MTermConsts.DefaultContentMargin);
+            session.SetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING, VTBaseConsts.DefaultContentMargin);
             session.SetOption<bool>(OptionKeyEnum.SSH_BOOKMARK_VISIBLE, this.BookmarkVisible);
             session.SetOption<bool>(OptionKeyEnum.TERM_DISABLE_BELL, this.DisableBell);
 
@@ -890,7 +890,7 @@ namespace ModengTerm.ViewModels
             int scrollDelta;
             if (!int.TryParse(this.MouseScrollDelta, out scrollDelta))
             {
-                scrollDelta = MTermConsts.DefaultScrollDelta;
+                scrollDelta = VTBaseConsts.DefaultScrollDelta;
             }
 
             session.SetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, scrollDelta);
@@ -903,14 +903,14 @@ namespace ModengTerm.ViewModels
             string serverInitialDir = this.SFTPServerInitialDirectory;
             if (string.IsNullOrEmpty(serverInitialDir))
             {
-                serverInitialDir = MTermConsts.SFTPServerInitialDirectory;
+                serverInitialDir = VTBaseConsts.SFTPServerInitialDirectory;
             }
 
             string clientInitialDir = this.SFTPClientInitialDirectory;
             if (string.IsNullOrEmpty(clientInitialDir) ||
                 !Directory.Exists(clientInitialDir))
             {
-                clientInitialDir = MTermConsts.SFTPClientInitialDirectory;
+                clientInitialDir = VTBaseConsts.SFTPClientInitialDirectory;
             }
 
             session.SetOption<string>(OptionKeyEnum.SFTP_SERVER_INITIAL_DIRECTORY, serverInitialDir);
@@ -990,7 +990,7 @@ namespace ModengTerm.ViewModels
             session.SetOption<string>(OptionKeyEnum.ADBSH_PASSWORD_PROMPT, this.AdbPasswordPrompt);
             session.SetOption<int>(OptionKeyEnum.ADBSH_LOGIN_TIMEOUT, timeout);
             session.SetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT, this.AdbShellPrompt);
-            session.SetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, MTermConsts.DefaultAdbStartServerTimeout);
+            session.SetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, VTBaseConsts.DefaultAdbStartServerTimeout);
 
             return true;
         }
@@ -1153,7 +1153,7 @@ namespace ModengTerm.ViewModels
 
             string groupId = string.Empty;
             if (this.SessionGroups.Context.SelectedItem != null &&
-                this.SessionGroups.Context.SelectedItem.Data != MTermConsts.RootGroup)
+                this.SessionGroups.Context.SelectedItem.Data != VTBaseConsts.RootGroup)
             {
                 groupId = SessionGroups.Context.SelectedItem.ID.ToString();
             }

@@ -99,7 +99,7 @@ namespace ModengTerm.ViewModels
 
             // 保存的最近打开会话超出了最大个数
             // 删除最早保存的会话
-            if (this.RecentlyOpenedSession.Count > MTermConsts.MaxRecentSessions)
+            if (this.RecentlyOpenedSession.Count > VTBaseConsts.MaxRecentSessions)
             {
                 RecentlySessionVM oldestSession = this.RecentlyOpenedSession[0];
                 this.RecentlyOpenedSession.RemoveAt(0);

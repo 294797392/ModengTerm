@@ -292,6 +292,12 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
+        #region 终端 - 登录脚本 5501 - 6000
+
+        LOGIN_SCRIPT_ITEMS = 5501,
+
+        #endregion
+
         #region SFTP 10000 - 11000
 
         SFTP_SERVER_ADDRESS = 10000,

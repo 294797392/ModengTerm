@@ -1,0 +1,99 @@
+﻿<UserControl x:Class="ModengTerm.UserControls.OptionsUserControls.LoginScriptOptionsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ModengTerm.UserControls.OptionsUserControls.Terminal"
+             xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
+             xmlns:termbase="clr-namespace:ModengTerm.Base;assembly=ModengTerm.Base"
+             xmlns:termconv="clr-namespace:ModengTerm"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+
+        <ResourceDictionary>
+
+            <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
+            <termconv:LineTerminator2TextConverter x:Key="LineTerminator2TextConverter"/>
+
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
+                <Setter Property="Margin" Value="5,0,5,5"/>
+                <Setter Property="Height" Value="30"/>
+            </Style>
+
+            <Style x:Key="StyleTextBlockLocal" TargetType="{x:Type TextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=StyleTextBox}">
+                <Setter Property="Height" Value="25"/>
+                <!--<Setter Property="Visibility" Value="{Binding Path=CanEdit, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>-->
+            </Style>
+
+        </ResourceDictionary>
+
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="90"/>
+        </Grid.ColumnDefinitions>
+
+        <DataGrid Grid.Column="0" x:Name="DataGridScriptItems" DataContext="{Binding Path=ScriptItems}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Margin="10,0,0,0" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="DataGridScriptItems_SelectionChanged"
+                  RowHeight="35" Style="{StaticResource ResourceKey=StyleDataGrid}">
+            <DataGrid.Columns>
+
+                <DataGridTemplateColumn Header="提示符" Width="1*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <!--<TextBlock Text="{Binding Path=Expect}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>-->
+                                <TextBox Text="{Binding Path=Expect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="输入" Width="1*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <!--<TextBlock Text="{Binding Path=Send}" Style="{StaticResource ResourceKey=StyleTextBlockLocal}"/>-->
+                                <TextBox Text="{Binding Path=Send, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="换行符" Width="1*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <ComboBox Height="25" SelectedItem="{Binding Path=Terminator, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          ItemsSource="{x:Static termbase:VTBaseConsts.LineTerminators}" Style="{StaticResource ResourceKey=StyleComboBox}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Converter={StaticResource ResourceKey=LineTerminator2TextConverter}}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <Button Content="添加" Click="ButtonAdd_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Content="删除" Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Content="上移" Click="ButtonMoveUp_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <Button Content="下移" Click="ButtonMoveDown_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        </StackPanel>
+
+    </Grid>
+</UserControl>
