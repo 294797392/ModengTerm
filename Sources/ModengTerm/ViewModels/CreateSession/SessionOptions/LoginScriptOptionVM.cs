@@ -1,68 +1,14 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.RightsManagement;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.CreateSession.SessionOptions
 {
-    public class ScriptItemVM : ViewModelBase
-    {
-        private string expect;
-        private string send;
-        private LineTerminators terminator;
-
-        public string Expect
-        {
-            get { return this.expect; }
-            set
-            {
-                if (this.expect != value)
-                {
-                    this.expect = value;
-                    this.NotifyPropertyChanged("Expect");
-                }
-            }
-        }
-
-        public string Send
-        {
-            get { return this.send; }
-            set
-            {
-                if (this.send != value)
-                {
-                    this.send = value;
-                    this.NotifyPropertyChanged("Send");
-                }
-            }
-        }
-
-        public LineTerminators Terminator
-        {
-            get { return this.terminator; }
-            set
-            {
-                if (this.terminator != value)
-                {
-                    this.terminator = value;
-                    this.NotifyPropertyChanged("Terminator");
-                }
-            }
-        }
-
-        public ScriptItemVM() { }
-
-        public ScriptItemVM(ScriptItem scriptItem) 
-        {
-            this.ID = scriptItem.ID;
-            this.Expect = scriptItem.Expect;
-            this.Send = scriptItem.Send;
-            this.Terminator = (LineTerminators)scriptItem.Terminator;
-        }
-    }
-
     public class LoginScriptOptionVM : OptionContentVM
     {
         public BindableCollection<ScriptItemVM> ScriptItems { get; private set; }
@@ -76,7 +22,25 @@ namespace ModengTerm.ViewModels.CreateSession.SessionOptions
         public override bool SaveOptions(XTermSession session)
         {
             List<ScriptItem> scriptItems = new List<ScriptItem>();
-            scriptItems.AddRange(this.ScriptItems.Select(v => new ScriptItem() { ID = v.ID.ToString(), Expect = v.Expect, Send = v.Send, Terminator = (int)v.Terminator }));
+
+            foreach (ScriptItemVM sivm in this.ScriptItems)
+            {
+                if (string.IsNullOrEmpty(sivm.Expect) && string.IsNullOrEmpty(sivm.Send) && sivm.Terminator == LineTerminators.None)
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(sivm.Expect))
+                {
+                    MTMessageBox.Info("请输入提示符");
+                    return false;
+                }
+
+                ScriptItem scriptItem = sivm.ToScriptItem();
+
+                scriptItems.Add(scriptItem);
+            }
+
             session.SetOption<List<ScriptItem>>(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, scriptItems);
 
             return true;

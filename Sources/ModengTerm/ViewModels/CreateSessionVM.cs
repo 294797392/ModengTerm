@@ -369,15 +369,6 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        #region 会话 - 系统监控
-
-        /// <summary>
-        /// 更新频率列表
-        /// </summary>
-        public BindableCollection<WatchFrequencyEnum> WatchFrequencies { get; private set; }
-
-        #endregion
-
         #region 命令行
 
         public string StartupPath
@@ -606,14 +597,6 @@ namespace ModengTerm.ViewModels
 
             this.SessionGroups = MTermApp.Context.CreateSessionTreeVM(true, true);
             this.SessionGroups.ExpandAll();
-
-            #endregion
-
-            #region 会话 - 系统监控
-
-            this.WatchFrequencies = new BindableCollection<WatchFrequencyEnum>();
-            this.WatchFrequencies.AddRange(VTBaseUtils.GetEnumValues<WatchFrequencyEnum>());
-            this.WatchFrequencies.SelectedItem = WatchFrequencyEnum.Normal;
 
             #endregion
 
@@ -994,13 +977,6 @@ namespace ModengTerm.ViewModels
 
             return true;
         }
-
-        private bool GetSystemWatchOptions(XTermSession session)
-        {
-            session.SetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, this.WatchFrequencies.SelectedItem);
-            return true;
-        }
-
 
 
         private bool CollectOptions(XTermSession session)

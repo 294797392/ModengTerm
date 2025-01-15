@@ -93,5 +93,11 @@ namespace ModengTerm.Base
 
         public static readonly string THEME_BACKGROUND_IMAGE_DATA = string.Empty;
         public static readonly double THEME_BACKGROUND_IMAGE_OPACITY = 1;
+
+        public static readonly WatchFrequencyEnum WATCH_FREQUENCY = WatchFrequencyEnum.Normal;
+        public static readonly bool WATCH_ADB_ENABLED = false;
+        public static readonly string WATCH_ADB_PATH = "adb.exe";
+        public static readonly int WATCH_ADB_LOGIN_TIMEOUT = 10000;
+        public static readonly string WATCH_ADB_PROMPT = string.Empty;
     }
 }

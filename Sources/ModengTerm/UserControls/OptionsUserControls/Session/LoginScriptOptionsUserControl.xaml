@@ -42,7 +42,7 @@
         </Grid.ColumnDefinitions>
 
         <DataGrid Grid.Column="0" x:Name="DataGridScriptItems" DataContext="{Binding Path=ScriptItems}" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Margin="10,0,0,0" AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="DataGridScriptItems_SelectionChanged"
+                  AutoGenerateColumns="False" IsReadOnly="True" SelectionChanged="DataGridScriptItems_SelectionChanged"
                   RowHeight="35" Style="{StaticResource ResourceKey=StyleDataGrid}">
             <DataGrid.Columns>
 

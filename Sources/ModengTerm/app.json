@@ -316,7 +316,8 @@
                 {
                     "id": "B1B81B97-5656-4F38-B8FE-FE869790F7B3",
                     "name": "系统监控",
-                    "className": "ModengTerm.UserControls.OptionsUserControls.SystemWatchOptionsUserControl, ModengTerm"
+                    "className": "ModengTerm.UserControls.OptionsUserControls.SystemWatchOptionsUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.ViewModels.CreateSession.SessionOptions.SystemWatchOptionVM, ModengTerm"
                 }
             ]
         },

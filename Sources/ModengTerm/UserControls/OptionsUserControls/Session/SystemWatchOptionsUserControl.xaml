@@ -16,20 +16,21 @@
 
             <converters:WatchFrequencyTextConverter x:Key="WatchFrequencyTextConverter"/>
 
+            <Style x:Key="StyleTextBoxLocal" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=StyleTextBoxValue}"></Style>
+            
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition Height="35"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
             <RowDefinition Height="35"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80"/>
+            <ColumnDefinition Width="70"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -43,6 +44,33 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
+
+        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="999" Header="Adb监控">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="启用Adb监控" VerticalAlignment="Center" Margin="10,0,0,0"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Adb路径：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=AdbPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="提示符：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=AdbPrompt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="超时时间：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Path=AdbLoginTimeout, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
+
+            </Grid>
+        </GroupBox>
 
     </Grid>
 

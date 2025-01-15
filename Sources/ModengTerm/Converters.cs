@@ -603,9 +603,9 @@ namespace ModengTerm
             switch (lineTerminators)
             {
                 case LineTerminators.None: return "None";
-                case LineTerminators.CR: return "CR(\\r)";
-                case LineTerminators.LF: return "LF(\\n)";
-                case LineTerminators.CRLF: return "CRLF(\\r\\n)";
+                case LineTerminators.CR: return "CR";
+                case LineTerminators.LF: return "LF";
+                case LineTerminators.CRLF: return "CRLF";
                 default:
                     throw new NotImplementedException();
             }

@@ -260,6 +260,11 @@ namespace ModengTerm.Base.Enumerations
         #region 会话 - 系统监控 4501 - 5000
 
         WATCH_FREQUENCY = 4501,
+        WATCH_ADB_ENABLED = 4502,
+        WATCH_ADB_PASSWORDS = 4503,
+        WATCH_ADB_PROMPT = 4504,
+        WATCH_ADB_LOGIN_TIMEOUT = 4505,
+        WATCH_ADB_PATH = 4506,
 
         #endregion
 
