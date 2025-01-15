@@ -65,6 +65,7 @@
     <Compile Remove="Parsing\VTDispatchHandler.cs" />
     <Compile Remove="Parsing\VTParserEventDlg.cs" />
     <Compile Remove="PrimaryScreen.cs" />
+    <Compile Remove="Session\AdbShellSession.cs" />
     <Compile Remove="Session\PlaybackSession.cs" />
     <Compile Remove="Triggers\Trigger.cs" />
     <Compile Remove="Triggers\TriggerAction.cs" />

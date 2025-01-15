@@ -45,7 +45,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="999" Header="Adb监控">
+        <GroupBox Visibility="Collapsed" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="999" Header="Adb监控">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35"/>

@@ -485,39 +485,6 @@ namespace ModengTerm.Terminal.ViewModels
                         break;
                     }
 
-                case SessionTypeEnum.AdbShell:
-                    {
-                        AdbLoginTypeEnum loginType = this.Session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE);
-                        switch (loginType)
-                        {
-                            case AdbLoginTypeEnum.UserNamePassword:
-                                {
-                                    string userName = this.Session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME);
-                                    string password = this.Session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD);
-                                    uri = string.Format("adb://{0}", userName);
-                                    break;
-                                }
-
-                            case AdbLoginTypeEnum.Password:
-                                {
-                                    string password = this.Session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD);
-                                    uri = string.Format("adb://{0}", password);
-                                    break;
-                                }
-
-                            case AdbLoginTypeEnum.None:
-                                {
-                                    uri = string.Format("adb");
-                                    break;
-                                }
-
-                            default:
-                                throw new NotImplementedException();
-                        }
-
-                        break;
-                    }
-
                 default:
                     throw new NotImplementedException();
             }

@@ -5,6 +5,7 @@ using ModengTerm.Terminal.Session;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Windows.Markup;
 
 namespace ModengTerm.Terminal.Watch
@@ -39,12 +40,7 @@ namespace ModengTerm.Terminal.Watch
 
         private string shellPrompt;
         private string adbPath;
-        private string password;
-        private string passwordPrompt;
-        private string userName;
-        private string userNamePrompt;
         private int watchTimeout;
-        private AdbLoginTypeEnum loginType;
         private Process readProcess; // 用来读取文件的进程
         private Stream readStream;
         private Stream writeStream;
@@ -52,6 +48,7 @@ namespace ModengTerm.Terminal.Watch
         private Encoding readEncoding;
         private string tempDir;
         private Dictionary<string, FileNames> cmd2FileName;
+        private List<ScriptItem> userNaemPasswords;
 
         #endregion
 
@@ -62,17 +59,13 @@ namespace ModengTerm.Terminal.Watch
         {
             this.cmd2FileName = new Dictionary<string, FileNames>();
 
-            this.shellPrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT, string.Empty);
-            this.adbPath = session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH, VTBaseConsts.DefaultAdbPath);
-            this.password = session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD, string.Empty);
-            this.passwordPrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD_PROMPT, string.Empty);
-            this.userName = session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME, string.Empty);
-            this.userNamePrompt = session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME_PROMPT, string.Empty);
-            this.loginType = session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE, AdbLoginTypeEnum.None);
+            this.shellPrompt = session.GetOption<string>(OptionKeyEnum.WATCH_ADB_PROMPT, OptionDefaultValues.WATCH_ADB_PROMPT);
+            this.adbPath = session.GetOption<string>(OptionKeyEnum.WATCH_ADB_PATH, OptionDefaultValues.WATCH_ADB_PATH);
+            this.userNaemPasswords = session.GetOption<List<ScriptItem>>(OptionKeyEnum.WATCH_ADB_PASSWORDS, OptionDefaultValues.WATCH_ADB_PASSWORDS);
             this.writeEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, VTBaseConsts.DefaultWriteEncoding));
             this.readEncoding = Encoding.GetEncoding(session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, VTBaseConsts.DefaultReadEncoding));
-            this.watchTimeout = session.GetOption<int>(OptionKeyEnum.ADBSH_ADVANCE_WATCH_TIMEOUT, VTBaseConsts.DefaultAdbWatchTimeout);
-            this.tempDir = session.GetOption<string>(OptionKeyEnum.ADBSH_ADVANCE_TEMP_DIR, VTBaseConsts.DefaultAdbTempDir);
+            this.watchTimeout = session.GetOption<int>(OptionKeyEnum.WATCH_ADB_LOGIN_TIMEOUT, OptionDefaultValues.WATCH_ADB_LOGIN_TIMEOUT);
+            this.tempDir = session.GetOption<string>(OptionKeyEnum.WATCH_ADB_TEMP_DIR, OptionDefaultValues.WATCH_ADB_TEMP_DIR);
             this.tempDir = this.tempDir.TrimEnd('/');
         }
 
@@ -82,48 +75,36 @@ namespace ModengTerm.Terminal.Watch
 
         private bool UserLogin()
         {
-            AdbLoginTypeEnum loginType = this.session.GetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE);
-
-            switch (loginType)
+            foreach (ScriptItem userNamePassword in this.userNaemPasswords)
             {
-                case AdbLoginTypeEnum.None: return true;
-                case AdbLoginTypeEnum.UserNamePassword:
-                case AdbLoginTypeEnum.Password:
-                    {
-                        int timeout = this.session.GetOption<int>(OptionKeyEnum.ADBSH_LOGIN_TIMEOUT);
+                string terminator = string.Empty;
 
-                        // 如果需要用户名和密码登录，那么先输入用户名
-                        if (loginType == AdbLoginTypeEnum.UserNamePassword)
-                        {
-                            string userName = this.session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME);
-                            string userNamePrompt = this.session.GetOption<string>(OptionKeyEnum.ADBSH_USERNAME_PROMPT);
-                            if (!this.HandlePrompt(userNamePrompt, userName + "\r\n", readStream, writeStream, timeout))
-                            {
-                                return false;
-                            }
-                        }
+                switch ((LineTerminators)userNamePassword.Terminator)
+                {
+                    case LineTerminators.None: break;
+                    case LineTerminators.LF: terminator = "\n"; break;
+                    case LineTerminators.CR: terminator = "\r"; break;
+                    case LineTerminators.CRLF: terminator = "\r\n"; break;
+                    default: throw new NotImplementedException();
+                }
 
-                        // 输入密码
-                        string password = this.session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD);
-                        string passwordPrompt = this.session.GetOption<string>(OptionKeyEnum.ADBSH_PASSWORD_PROMPT);
-                        if (!this.HandlePrompt(passwordPrompt, password + "\r\n", readStream, writeStream, timeout))
-                        {
-                            return false;
-                        }
+                string send = string.Format("{0}{1}", userNamePassword.Send, terminator);
 
-                        // 下次读取到shPrompt的时候就说明登录成功
-                        string shPrompt = this.session.GetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT);
-                        if (!ReadUntil(readStream, shPrompt, timeout))
-                        {
-                            return false;
-                        }
-
-                        return true;
-                    }
-
-                default:
-                    throw new NotImplementedException();
+                if (!this.HandlePrompt(userNamePassword.Expect, send, readStream, writeStream, this.watchTimeout)) 
+                {
+                    logger.ErrorFormat("adb启动失败, 登录失败, {0}", userNamePassword.Expect);
+                    return false;
+                }
             }
+
+            // 下次读取到shPrompt的时候就说明登录成功
+            if (!ReadUntil(readStream, this.shellPrompt, this.watchTimeout))
+            {
+                logger.ErrorFormat("adb启动失败, 读取提示符失败, {0}", this.shellPrompt);
+                return false;
+            }
+
+            return true;
         }
 
         private bool ReadUntil(Stream streamReader, string until, int timeout)
@@ -195,7 +176,7 @@ namespace ModengTerm.Terminal.Watch
                 return false;
             }
 
-            string exePath = this.session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH);
+            string exePath = this.session.GetOption<string>(OptionKeyEnum.WATCH_ADB_PATH, OptionDefaultValues.WATCH_ADB_PATH);
 
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {

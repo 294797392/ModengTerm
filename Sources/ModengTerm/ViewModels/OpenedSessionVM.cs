@@ -150,7 +150,6 @@ namespace ModengTerm.ViewModels
             {
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.Localhost:
-                case SessionTypeEnum.AdbShell:
                 case SessionTypeEnum.SSH:
                     {
                         menuDefinitions.AddRange(MTermApp.Context.Manifest.TerminalMenus.OrderBy(v => v.ContextOrdinal));

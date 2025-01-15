@@ -37,7 +37,6 @@ namespace ModengTerm.Terminal.Session
                         }
                     }
                 case SessionTypeEnum.SerialPort: return new SerialPortSession(options);
-                case SessionTypeEnum.AdbShell: return new AdbShellSession(options);
                 default:
                     throw new NotImplementedException();
             }

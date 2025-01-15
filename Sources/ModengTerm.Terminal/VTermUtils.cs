@@ -1,21 +1,11 @@
-﻿using DotNEToolkit;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
-using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Parsing;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
 
 namespace ModengTerm.Terminal
 {
@@ -180,8 +170,8 @@ namespace ModengTerm.Terminal
         /// <returns></returns>
         public static bool StartAdbServer(XTermSession session) 
         {
-            string exePath = session.GetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH);
-            int timeout = session.GetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, VTBaseConsts.DefaultAdbStartServerTimeout);
+            string exePath = session.GetOption<string>(OptionKeyEnum.WATCH_ADB_PATH);
+            int timeout = session.GetOption<int>(OptionKeyEnum.WATCH_ADB_LOGIN_TIMEOUT, OptionDefaultValues.WATCH_ADB_LOGIN_TIMEOUT);
 
             ProcessStartInfo startInfo = new ProcessStartInfo()
             {

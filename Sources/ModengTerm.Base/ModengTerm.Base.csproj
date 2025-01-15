@@ -29,6 +29,7 @@
   <ItemGroup>
     <Compile Remove="ASCIITable.cs" />
     <Compile Remove="Definitions\OptionDefinition.cs" />
+    <Compile Remove="Enumerations\AdbLoginTypeEnum.cs" />
   </ItemGroup>
 
   <ItemGroup>

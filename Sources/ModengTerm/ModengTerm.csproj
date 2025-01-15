@@ -23,6 +23,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />

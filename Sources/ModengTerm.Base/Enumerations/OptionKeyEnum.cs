@@ -189,31 +189,7 @@ namespace ModengTerm.Base.Enumerations
 
         #endregion
 
-        #region AdbShell 2801 - 3000
-
-        ADBSH_ADB_PATH = 2801,
-        ADBSH_USERNAME_PROMPT = 2802,
-        ADBSH_PASSWORD_PROMPT = 2803,
-        ADBSH_SH_PROMPT = 2804,
-        ADBSH_USERNAME = 2805,
-        ADBSH_PASSWORD = 2806,
-        /// <summary>
-        /// 登录超时时间
-        /// </summary>
-        ADBSH_LOGIN_TIMEOUT = 2808,
-        ADBSH_LOGIN_TYPE = 2809,
-        /// <summary>
-        /// 启动Adb守护进程的超时时间
-        /// </summary>
-        ADBSH_START_SVR_TIMEOUT = 2810,
-        /// <summary>
-        /// ADB系统信息监控超时时间
-        /// </summary>
-        ADBSH_ADVANCE_WATCH_TIMEOUT = 2811,
-        /// <summary>
-        /// 存储读取到的临时文件的目录
-        /// </summary>
-        ADBSH_ADVANCE_TEMP_DIR = 2812,
+        #region 预留 2801 - 3000
 
         #endregion
 
@@ -265,6 +241,7 @@ namespace ModengTerm.Base.Enumerations
         WATCH_ADB_PROMPT = 4504,
         WATCH_ADB_LOGIN_TIMEOUT = 4505,
         WATCH_ADB_PATH = 4506,
+        WATCH_ADB_TEMP_DIR = 4507,
 
         #endregion
 

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using XTerminal.Base.Enumerations;
+using ModengTerm.Base.DataModels;
 
 namespace ModengTerm.Base
 {
@@ -17,12 +18,6 @@ namespace ModengTerm.Base
     /// </summary>
     public static class OptionDefaultValues
     {
-        /// <summary>
-        /// 默认Adb登录超时时间，单位毫秒
-        /// </summary>
-        public const int ADBSH_LOGIN_TIMEOUT = 5000;
-        public const string ADBSH_ADB_PATH = "adb.exe";
-        public const AdbLoginTypeEnum ADBSH_LOGIN_TYPE = AdbLoginTypeEnum.UserNamePassword;
         public const int SSH_TERM_ROW = 24;
         public const int SSH_TERM_COL = 80;
         public static readonly int SSH_READ_BUFFER_SIZE = 16384;
@@ -99,5 +94,7 @@ namespace ModengTerm.Base
         public static readonly string WATCH_ADB_PATH = "adb.exe";
         public static readonly int WATCH_ADB_LOGIN_TIMEOUT = 10000;
         public static readonly string WATCH_ADB_PROMPT = string.Empty;
+        public static readonly List<ScriptItem> WATCH_ADB_PASSWORDS = new List<ScriptItem>();
+        public static readonly string WATCH_ADB_TEMP_DIR = "/tmp";
     }
 }

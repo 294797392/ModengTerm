@@ -539,20 +539,6 @@ namespace ModengTerm.ViewModels
 
         #endregion
 
-        #region AdbShell
-
-        public BindableCollection<AdbLoginTypeEnum> AdbLoginTypes { get; private set; }
-
-        public string AdbUserName { get; set; }
-        public string AdbUserNamePrompt { get; set; }
-        public string AdbPassword { get; set; }
-        public string AdbPasswordPrompt { get; set; }
-        public string AdbShellPrompt { get; set; }
-        public string AdbPath { get; set; }
-        public string AdbLoginTimeout { get; set; }
-
-        #endregion
-
         #endregion
 
         #region 构造方法
@@ -689,15 +675,6 @@ namespace ModengTerm.ViewModels
 
             this.RawTcpTypes = new BindableCollection<RawTcpTypeEnum>();
             this.RawTcpTypes.AddRange(VTBaseUtils.GetEnumValues<RawTcpTypeEnum>());
-
-            #endregion
-
-            #region AdbShell
-
-            this.AdbLoginTypes = new BindableCollection<AdbLoginTypeEnum>();
-            this.AdbLoginTypes.AddRange(VTBaseUtils.GetEnumValues<AdbLoginTypeEnum>());
-            this.AdbPath = "adb.exe";
-            this.AdbLoginTimeout = VTBaseConsts.DefaultAdbLoginTimeout.ToString();
 
             #endregion
 
@@ -956,29 +933,6 @@ namespace ModengTerm.ViewModels
             return true;
         }
 
-        private bool GetAdbShellOptions(XTermSession session)
-        {
-            int timeout;
-            if (!int.TryParse(this.AdbLoginTimeout, out timeout))
-            {
-                MTMessageBox.Info("请输入正确的超时时间");
-                return false;
-            }
-
-            session.SetOption<string>(OptionKeyEnum.ADBSH_ADB_PATH, this.AdbPath);
-            session.SetOption<AdbLoginTypeEnum>(OptionKeyEnum.ADBSH_LOGIN_TYPE, this.AdbLoginTypes.SelectedItem);
-            session.SetOption<string>(OptionKeyEnum.ADBSH_USERNAME, this.AdbUserName);
-            session.SetOption<string>(OptionKeyEnum.ADBSH_USERNAME_PROMPT, this.AdbUserNamePrompt);
-            session.SetOption<string>(OptionKeyEnum.ADBSH_PASSWORD, this.AdbPassword);
-            session.SetOption<string>(OptionKeyEnum.ADBSH_PASSWORD_PROMPT, this.AdbPasswordPrompt);
-            session.SetOption<int>(OptionKeyEnum.ADBSH_LOGIN_TIMEOUT, timeout);
-            session.SetOption<string>(OptionKeyEnum.ADBSH_SH_PROMPT, this.AdbShellPrompt);
-            session.SetOption<int>(OptionKeyEnum.ADBSH_START_SVR_TIMEOUT, VTBaseConsts.DefaultAdbStartServerTimeout);
-
-            return true;
-        }
-
-
         private bool CollectOptions(XTermSession session)
         {
             SessionTypeVM sessionType = this.SelectedSessionType;
@@ -1029,15 +983,6 @@ namespace ModengTerm.ViewModels
                 case SessionTypeEnum.Tcp:
                     {
                         if (!this.GetTcpOptions(session))
-                        {
-                            return false;
-                        }
-                        break;
-                    }
-
-                case SessionTypeEnum.AdbShell:
-                    {
-                        if (!this.GetAdbShellOptions(session))
                         {
                             return false;
                         }
