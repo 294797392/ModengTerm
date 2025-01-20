@@ -75,7 +75,7 @@
     <Compile Remove="VTModifierKeys.cs" />
     <Compile Remove="VTScreen.cs" />
     <Compile Remove="VTUtils.cs" />
-    <Compile Remove="Watch\IDiskInfo.cs" />
+    <Compile Remove="SystemWatch\IDiskInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

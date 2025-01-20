@@ -4,9 +4,68 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
+             xmlns:termctrl="clr-namespace:ModengTerm.Controls"
+             xmlns:termctrl2="clr-namespace:ModengTerm.UserControls.TerminalUserControls.Rendering"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="文件列表">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="35"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+
+                <ComboBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="999" x:Name="ComboBoxFileList" Margin="2,0,2,0" 
+                          IsEditable="True" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Text="{Binding Path=FilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleComboBox}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <Button Grid.Row="1" Grid.Column="0" Content="添加" Click="ButtonAddFile_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Grid.Row="1" Grid.Column="1" Content="删除" Click="ButtonDeleteFile_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Grid.Row="1" Grid.Column="2" Content="暂停" Click="ButtonPauseFile_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Grid.Row="1" Grid.Column="3" Content="清空" Click="ButtonClear_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+
+            </Grid>
+        </GroupBox>
+
+        <CheckBox Grid.Row="1" Content="自动滚动" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0"/>
+
+        <GroupBox Grid.Row="2" Header="实时监控">
+            <termctrl2:DocumentControl x:Name="DocumentControl1"/>
+        </GroupBox>
+
+        <!--<Grid Visibility="Collapsed">
+            <Border Background="{DynamicResource ResourceKey=RES66001E}"/>
+            <StackPanel HorizontalAlignment="Left" Orientation="Horizontal" Margin="5,0,0,0">
+                <termctrl:MdButton ToolTip="编辑" SVGPath="{StaticResource ResourceKey=SVG13E}"   
+                                    Click="ButtonCreate_Click" Style="{StaticResource ResourceKey=StyleMdButtonTool}"/>
+            </StackPanel>
+        </Grid>-->
+
     </Grid>
 </UserControl>

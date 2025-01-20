@@ -39,8 +39,6 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         {
             base.OnInitialize();
 
-            this.shellSession = base.OpenedSession as ShellSessionVM;
-            this.watchEvent = new ManualResetEvent(false);
         }
 
         public override void OnRelease()
@@ -55,8 +53,6 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         public override void OnLoaded()
         {
             base.OnLoaded();
-
-            this.StartWatch();
         }
 
         public override void OnUnload()
@@ -66,27 +62,9 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             base.OnUnload();
         }
 
-        public override void OnStatusChanged(SessionStatusEnum status)
+        public override void OnReady()
         {
-            switch (status)
-            {
-                case SessionStatusEnum.Connected:
-                    {
-                        this.StartWatch();
-                        break;
-                    }
-
-                case SessionStatusEnum.Disconnected:
-                    {
-                        this.StopWatch();
-                        break;
-                    }
-
-                default:
-                    {
-                        break;
-                    }
-            }
+            this.StartWatch();
         }
 
         #endregion
@@ -95,16 +73,6 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         private void StartWatch()
         {
-            if (!this.IsLoaded)
-            {
-                return;
-            }
-
-            if (this.SessionStatus != SessionStatusEnum.Connected)
-            {
-                return;
-            }
-
             if (this.isWatch)
             {
                 return;
@@ -144,12 +112,14 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 catch (Exception ex)
                 {
                     logger.Error("WatchThread异常", ex);
+                    break;
                 }
 
                 Thread.Sleep(updateInterval);
             }
 
             watcher.Release();
+            this.isWatch = false;
         }
 
         #endregion

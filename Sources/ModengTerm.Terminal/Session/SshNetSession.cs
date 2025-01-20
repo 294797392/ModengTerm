@@ -109,6 +109,8 @@ namespace ModengTerm.Terminal.Session
             int serverPort = this.session.GetOption<int>(OptionKeyEnum.SSH_PORT);
             ConnectionInfo connectionInfo = new ConnectionInfo(serverAddress, serverPort, userName, authentication);
             this.sshClient = new SshClient(connectionInfo);
+            this.sshClient.HostKeyReceived += SshClient_HostKeyReceived;
+            this.sshClient.ServerIdentificationReceived += SshClient_ServerIdentificationReceived;
             this.sshClient.KeepAliveInterval = TimeSpan.FromSeconds(20);
             this.sshClient.Connect();
 
@@ -171,6 +173,15 @@ namespace ModengTerm.Terminal.Session
             //});
 
             return ResponseCode.SUCCESS;
+        }
+
+        private void SshClient_ServerIdentificationReceived(object? sender, SshIdentificationEventArgs e)
+        {
+        }
+
+        private void SshClient_HostKeyReceived(object? sender, HostKeyEventArgs e)
+        {
+            e.CanTrust = true;
         }
 
         public override void Close()

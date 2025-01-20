@@ -51,6 +51,8 @@ namespace ModengTerm.ViewModels
 
         #region 实例变量
 
+        private bool readyOnce;
+
         #endregion
 
         #region 属性
@@ -73,13 +75,79 @@ namespace ModengTerm.ViewModels
             this.OpenedSession = this.Parameters[KEY_OPENED_SESSION] as OpenedSessionVM;
         }
 
+        public override void OnLoaded()
+        {
+            base.OnLoaded();
+
+            this.RaiseOnReady();
+        }
+
+        public override void OnUnload()
+        {
+            base.OnUnload();
+        }
+
+        public override void OnRelease()
+        {
+            base.OnRelease();
+        }
+
         #endregion
+
+        #region 实例方法
+
+        private void RaiseOnReady() 
+        {
+            if (this.readyOnce)
+            {
+                return;
+            }
+
+            if (!this.IsLoaded)
+            {
+                return;
+            }
+
+            if (this.SessionStatus != SessionStatusEnum.Connected) 
+            {
+                return;
+            }
+
+            this.OnReady();
+
+            this.readyOnce = true;
+        }
+
+        #endregion
+
+        #region 抽象方法
 
         /// <summary>
         /// 会话状态改变的时候触发
         /// </summary>
         /// <param name="status"></param>
-        public abstract void OnStatusChanged(SessionStatusEnum status);
+        public virtual void OnStatusChanged(SessionStatusEnum status)
+        {
+            switch (status)
+            {
+                case SessionStatusEnum.Connected:
+                    {
+                        this.RaiseOnReady();
+                        break;
+                    }
+
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 当连接成功并且显示的时候触发
+        /// 只会触发一次
+        /// </summary>
+        public abstract void OnReady();
+
+        #endregion
     }
 
     /// <summary>

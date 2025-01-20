@@ -435,7 +435,11 @@ namespace ModengTerm
         {
             base.OnPreviewKeyDown(e);
 
-            // 此时说明焦点没有在终端上
+            // 如果此时是TextBox在输入，那么不做处理，事件继续交给TextBox
+            if (e.OriginalSource is TextBox)
+            {
+                return;
+            }
 
             // 让当前显示的终端获取焦点
             ISessionContent content = ContentControlSession.Content as ISessionContent;
@@ -449,6 +453,7 @@ namespace ModengTerm
                 return;
             }
 
+            // 此时说明焦点没有在终端上
             if (!content.SetInputFocus())
             {
                 logger.ErrorFormat("设置SessionContent焦点失败");

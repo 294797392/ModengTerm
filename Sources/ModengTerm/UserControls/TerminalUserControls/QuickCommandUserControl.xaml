@@ -8,8 +8,7 @@
              xmlns:mterm="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="200"
-             DataContextChanged="UserControl_DataContextChanged"
-             DataContext="{Binding Source={x:Static mterm:MTermApp.Context}, Path=MainWindowVM.OpenedSessionsVM.SelectedSession}">
+             DataContextChanged="UserControl_DataContextChanged">
 
     <UserControl.Resources>
     </UserControl.Resources>

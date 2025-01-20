@@ -6,12 +6,12 @@
         xmlns:local="clr-namespace:ModengTerm.Windows.SSH"
         xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
         mc:Ignorable="d"
-        Title="密钥管理" Height="450" Width="800"
+        Title="密钥管理" Height="450" Width="350"
         WindowStartupLocation="CenterOwner" Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>
 
-        <Style x:Key="SytleButtonLocal" TargetType="{x:Type Button}">
+        <Style x:Key="SytleButtonLocal" TargetType="{x:Type Button}" BasedOn="{StaticResource ResourceKey=StyleButton}">
             <Setter Property="Width" Value="70"/>
             <Setter Property="Margin" Value="3"/>
         </Style>
@@ -30,8 +30,17 @@
             <Button Content="删除" Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=SytleButtonLocal}"/>
         </StackPanel>
 
-        <DataGrid Grid.Row="1" x:Name="DataGridPrivateKeys" ItemsSource="{Binding}" AutoGenerateColumns="False"
-                  IsReadOnly="True" MouseDoubleClick="DataGridPrivateKeys_MouseDoubleClick">
+        <ListBox x:Name="DataGridPrivateKeys" Grid.Row="1" ItemsSource="{Binding}" 
+                 Margin="3,0,3,3" Style="{StaticResource ResourceKey=StyleListBox}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=Name}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        
+        <!--<DataGrid Grid.Row="1" x:Name="DataGridPrivateKeys" ItemsSource="{Binding}" AutoGenerateColumns="False"
+                  IsReadOnly="True" MouseDoubleClick="DataGridPrivateKeys_MouseDoubleClick" Style="{StaticResource ResourceKey=StyleDataGrid}">
 
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="名称" Width="*">
@@ -43,7 +52,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
             
-        </DataGrid>
+        </DataGrid>-->
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="确定" Click="ButtonOK_Click" Style="{StaticResource ResourceKey=SytleButtonLocal}"/>

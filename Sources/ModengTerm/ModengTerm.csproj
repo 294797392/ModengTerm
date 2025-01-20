@@ -37,6 +37,7 @@
     <Compile Remove="ViewModels\GroupVM.cs" />
     <Compile Remove="ViewModels\Terminals\CommandLineVM.cs" />
     <Compile Remove="ViewModels\Terminals\PanelContent\QuickCommandManager.cs" />
+    <Compile Remove="ViewModels\Terminals\PanelContent\WatchObject.cs" />
     <Compile Remove="ViewModels\Terminals\ShellGlobalVM.cs" />
     <Compile Remove="ViewModels\Terminals\SyncMasterVM.cs" />
     <Compile Remove="ViewModels\ThemeVM.cs" />

@@ -1,13 +1,17 @@
 ﻿using ModengTerm.Base;
+using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
 using WPFToolkit.MVVM;
+using ModengTerm.Base.Enumerations;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public class WatchSystemInfo : WatchObject
+    public class WatchSystemInfo : SessionPanelContentVM
     {
         #region 类变量
 
@@ -16,6 +20,11 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         #endregion
 
         #region 实例变量
+
+        private Task watchTask;
+        private bool isWatch;
+        private ManualResetEvent watchEvent;
+        private ShellSessionVM shellSession;
 
         private double cpuPercent;
         private double memoryPercent;
@@ -113,7 +122,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         #endregion
 
-        #region WatchObject
+        #region SessionPanelContentVM
 
         public override void OnInitialize()
         {
@@ -129,14 +138,60 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.diskCopy = new DiskVMCopy();
             this.ifaceCopy = new NetworkInterfaceVMCopy();
             this.processCopy = new ProcessVMCopy();
+
+            this.shellSession = base.OpenedSession as ShellSessionVM;
+            this.watchEvent = new ManualResetEvent(false);
         }
 
         public override void OnRelease()
         {
+            this.StopWatch();
+
+            this.watchEvent.Close();
+
             base.OnRelease();
         }
 
-        public override void Watch(AbstractWatcher watcher)
+        public override void OnLoaded()
+        {
+            base.OnLoaded();
+        }
+
+        public override void OnUnload()
+        {
+            this.watchEvent.Reset();
+
+            base.OnUnload();
+        }
+
+        public override void OnReady()
+        {
+            this.StartWatch();
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void StartWatch()
+        {
+            if (this.isWatch)
+            {
+                return;
+            }
+
+            this.isWatch = true;
+            this.watchTask = Task.Factory.StartNew(this.WatchTaskProc);
+            this.watchEvent.Set();
+        }
+
+        private void StopWatch()
+        {
+            this.isWatch = false;
+            this.watchEvent.Set();
+        }
+
+        private void Watch(AbstractWatcher watcher)
         {
             SystemInfo systemInfo = watcher.GetSystemInfo();
 
@@ -153,7 +208,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 ulong totalTime = idleTime + kernelTime + userTime;
                 totalProcessorTime = kernelTime + userTime;
                 this.CpuPercent = Math.Round((double)totalProcessorTime / totalTime * 100, 2);
-                if (this.cpuPercent > 100) 
+                if (this.cpuPercent > 100)
                 {
                     logger.FatalFormat("3. {0}, totalProcessorTime = {1}, totalTime = {2}, kernelTime = {3}, userTime = {4}, idleTime = {4}, prevIdleProcessorTime = {5}", this.CpuPercent, totalProcessorTime, totalTime, kernelTime, userTime, idleTime, this.prevIdleProcessorTime);
                 }
@@ -189,10 +244,6 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 this.Processes.AddRange(orderedProcs);
             });
         }
-
-        #endregion
-
-        #region 实例方法
 
         private void Copy<Target, TSource>(ChangedItems<TSource> copyTo, IList<Target> copyFrom, ObjectCopy<Target, TSource> copy)
             where Target : class, new()
@@ -261,6 +312,38 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             // 所有数据都刷新完了，重置计时器
             copy.Stopwatch.Restart();
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        private void WatchTaskProc()
+        {
+            WatchFrequencyEnum frequency = this.shellSession.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, VTBaseConsts.DefaultWatchFrequency);
+            int updateInterval = VTBaseUtils.GetWatchInterval(frequency);
+            AbstractWatcher watcher = WatcherFactory.Create(this.shellSession.Transport);
+            watcher.Initialize();
+
+            while (this.isWatch)
+            {
+                try
+                {
+                    this.watchEvent.WaitOne();
+
+                    this.Watch(watcher);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("WatchThread异常", ex);
+                    break;
+                }
+
+                Thread.Sleep(updateInterval);
+            }
+
+            watcher.Release();
+            this.isWatch = false;
         }
 
         #endregion
