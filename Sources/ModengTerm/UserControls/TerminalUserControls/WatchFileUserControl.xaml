@@ -56,7 +56,9 @@
         <CheckBox Grid.Row="1" Content="自动滚动" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0"/>
 
         <GroupBox Grid.Row="2" Header="实时监控">
-            <termctrl2:DocumentControl x:Name="DocumentControl1"/>
+            <Grid x:Name="GridDocuments">
+                
+            </Grid>
         </GroupBox>
 
         <!--<Grid Visibility="Collapsed">
