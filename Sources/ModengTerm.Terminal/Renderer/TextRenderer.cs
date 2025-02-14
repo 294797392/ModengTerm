@@ -9,19 +9,20 @@ namespace ModengTerm.Terminal.Renderer
     /// 将收到的数据按照可打印字符渲染（包含中文）
     /// 会处理换行逻辑
     /// </summary>
-    public class StringRenderer : VTermRenderer
+    public class TextRenderer : VTermRenderer
     {
         #region 实例变量
 
         private VTDocument document;
         private VTextAttributeState writeTextAttr;
         private VTextAttributeState readTextAttr;
+        private Encoding encoding;
 
         #endregion
 
         #region 构造方法
 
-        public StringRenderer(VideoTerminal vt) : 
+        public TextRenderer(VideoTerminal vt) : 
             base(vt)
         {
             this.document = vt.MainDocument;
@@ -37,6 +38,8 @@ namespace ModengTerm.Terminal.Renderer
             this.writeTextAttr = this.CreateForegroundAttribute(sendColor);
             string recvColor = this.session.GetOption<string>(OptionKeyEnum.TERM_ADVANCE_RECV_COLOR, OptionDefaultValues.TERM_ADVANCE_RECV_COLOR);
             this.readTextAttr = this.CreateForegroundAttribute(recvColor);
+            string encodeName = this.session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING);
+            this.encoding = Encoding.GetEncoding(encodeName);
         }
 
         public override void Release()
@@ -63,8 +66,7 @@ namespace ModengTerm.Terminal.Renderer
             int viewportColumn = document.ViewportColumn;
             int viewportRow = document.ViewportRow;
 
-            // TODO：做成可配置的编码方式
-            string text = Encoding.UTF8.GetString(bytes, 0, length);
+            string text = this.encoding.GetString(bytes, 0, length);
 
             foreach (char ch in text)
             {

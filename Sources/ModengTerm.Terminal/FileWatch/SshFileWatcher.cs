@@ -1,14 +1,6 @@
-﻿using DotNEToolkit;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Terminal.Session;
 using Renci.SshNet;
-using Renci.SshNet.Common;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Terminal.FileWatch
 {

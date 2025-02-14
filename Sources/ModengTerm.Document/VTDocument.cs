@@ -1558,17 +1558,17 @@ namespace ModengTerm.Document
             return true;
         }
 
-        public void AppendText(string text) 
-        {
-            for (int i = 0; i < text.Length; i++)
-            {
-                char c = text[i];
+        //public void AppendText(string text) 
+        //{
+        //    for (int i = 0; i < text.Length; i++)
+        //    {
+        //        char c = text[i];
 
-                VTCharacter character = VTCharacter.Create(c, 1);
+        //        VTCharacter character = VTCharacter.Create(c, 1);
 
-                this.PrintCharacter(c);
-            }
-        }
+        //        this.PrintCharacter(c);
+        //    }
+        //}
 
         #endregion
 

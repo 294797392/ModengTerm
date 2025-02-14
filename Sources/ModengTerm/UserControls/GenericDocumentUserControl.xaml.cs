@@ -1,18 +1,11 @@
-﻿using ModengTerm.Document;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
+using ModengTerm.Terminal;
+using ModengTerm.Terminal.Renderer;
+using ModengTerm.UserControls.TerminalUserControls.Rendering;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ModengTerm.UserControls
 {
@@ -29,6 +22,7 @@ namespace ModengTerm.UserControls
 
         #region 实例变量
 
+        private TextRenderer stringRenderer;
         private VTDocument document;
 
         #endregion
@@ -44,17 +38,28 @@ namespace ModengTerm.UserControls
 
         #region 公开接口
 
-        public void Initialize()
+        public void Initialize(XTermSession session)
         {
-            VTDocumentOptions documentOptions = new VTDocumentOptions()
-            {
-            };
+            string background = session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            double padding = session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
+            double width = DocumentControl.ActualWidth - padding * 2;
+            double height = DocumentControl.ActualHeight - padding * 2;
 
+            DocumentControl.SetPadding(padding);
+            DocumentControl.Background = DrawingUtils.GetBrush(background);
+
+            VTDocumentOptions documentOptions = VTermUtils.CreateDocumentOptions(Guid.NewGuid().ToString(), width, height, session, DocumentControl);
             this.document = new VTDocument(documentOptions);
             this.document.Initialize();
+
+            this.stringRenderer = new TextRenderer()
         }
 
-        public void AppendText(string text) 
+        public void Release()
+        {
+        }
+
+        public void DrawText(string text)
         {
         }
 

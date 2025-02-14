@@ -6,18 +6,14 @@ namespace ModengTerm.ViewModels
 {
     /// <summary>
     /// 所有PanelContent的基类
+    /// TODO：尝试把PanelContentVM改造成插件
     /// </summary>
     public abstract class PanelContentVM : MenuContentVM
     {
-        private bool isLoaded;
-
         /// <summary>
         /// 获取该界面当前是否是显示状态
         /// </summary>
-        public bool IsLoaded
-        {
-            get { return this.isLoaded; }
-        }
+        protected bool isLoaded;
 
         public override void OnInitialize()
         {
@@ -103,7 +99,7 @@ namespace ModengTerm.ViewModels
                 return;
             }
 
-            if (!this.IsLoaded)
+            if (!this.isLoaded)
             {
                 return;
             }
@@ -142,7 +138,9 @@ namespace ModengTerm.ViewModels
         }
 
         /// <summary>
-        /// 当连接成功并且显示的时候触发
+        /// 当以下两个条件全部成立的时候触发：
+        /// 1. 会话状态是连接成功
+        /// 2. 页面当前是显示状态
         /// 只会触发一次
         /// </summary>
         public abstract void OnReady();

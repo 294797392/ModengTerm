@@ -377,14 +377,14 @@ namespace ModengTerm.Terminal
 
             #region 初始化文档模型
 
-            VTDocumentOptions mainOptions = this.CreateDocumentOptions("MainDocument", sessionInfo, options.MainDocument);
+            VTDocumentOptions mainOptions = VTermUtils.CreateDocumentOptions("MainDocument", this.vtOptions.Width, this.vtOptions.Height, sessionInfo, options.MainDocument);
             this.mainDocument = new VTDocument(mainOptions);
             this.mainDocument.MouseDown += MainDocument_MouseDown;
             this.mainDocument.MouseUp += MainDocument_MouseUp;
             this.mainDocument.Initialize();
             this.mainDocument.History.Add(this.mainDocument.FirstLine.History);
 
-            VTDocumentOptions alternateOptions = this.CreateDocumentOptions("AlternateDocument", sessionInfo, options.AlternateDocument);
+            VTDocumentOptions alternateOptions = VTermUtils.CreateDocumentOptions("AlternateDocument", this.vtOptions.Width, this.vtOptions.Height, sessionInfo, options.AlternateDocument);
             alternateOptions.RollbackMax = 0;
             this.alternateDocument = new VTDocument(alternateOptions);
             this.alternateDocument.MouseDown += MainDocument_MouseDown;
@@ -923,46 +923,6 @@ namespace ModengTerm.Terminal
                 // 说明是ASCII码可见字符
                 return VTCharacter.Create(Convert.ToChar(ch), 1, attributeState);
             }
-        }
-
-        private VTDocumentOptions CreateDocumentOptions(string name, XTermSession sessionInfo, GraphicsInterface graphicsInterface)
-        {
-            string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY);
-            double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);
-
-            VTypeface typeface = graphicsInterface.GetTypeface(fontSize, fontFamily);
-            typeface.BackgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
-            typeface.ForegroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
-
-            VTSize displaySize = new VTSize(this.vtOptions.Width, this.vtOptions.Height);
-            TerminalSizeModeEnum sizeMode = sessionInfo.GetOption<TerminalSizeModeEnum>(OptionKeyEnum.SSH_TERM_SIZE_MODE);
-
-            int viewportRow = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_ROW);
-            int viewportColumn = sessionInfo.GetOption<int>(OptionKeyEnum.SSH_TERM_COL);
-            if (sizeMode == TerminalSizeModeEnum.AutoFit)
-            {
-                /// 如果SizeMode等于Fixed，那么就使用DefaultViewportRow和DefaultViewportColumn
-                /// 如果SizeMode等于AutoFit，那么动态计算行和列
-                VTDocUtils.CalculateAutoFitSize(displaySize, typeface, out viewportRow, out viewportColumn);
-            }
-
-            VTDocumentOptions documentOptions = new VTDocumentOptions()
-            {
-                Name = name,
-                ViewportRow = viewportRow,
-                ViewportColumn = viewportColumn,
-                AutoWrapMode = false,
-                CursorStyle = sessionInfo.GetOption<VTCursorStyles>(OptionKeyEnum.THEME_CURSOR_STYLE),
-                CursorColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR),
-                CursorSpeed = sessionInfo.GetOption<VTCursorSpeeds>(OptionKeyEnum.THEME_CURSOR_SPEED),
-                ScrollDelta = sessionInfo.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA),
-                RollbackMax = sessionInfo.GetOption<int>(OptionKeyEnum.TERM_MAX_ROLLBACK),
-                Typeface = typeface,
-                GraphicsInterface = graphicsInterface,
-                SelectionColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_SELECTION_COLOR)
-            };
-
-            return documentOptions;
         }
 
         /// <summary>

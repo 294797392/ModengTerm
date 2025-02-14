@@ -1,12 +1,13 @@
-﻿using ModengTerm.Base.Enumerations;
-using ModengTerm.Terminal;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.FileWatch;
-using ModengTerm.Terminal.Session;
+using ModengTerm.UserControls;
 using ModengTerm.UserControls.TerminalUserControls;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
@@ -24,9 +25,24 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         #region Inner Class
 
-        public class FileStatusVM : ItemViewModel
+        public class FileItemVM : ItemViewModel
         {
+            #region 类变量
+
+            private static log4net.ILog logger = log4net.LogManager.GetLogger("FileItemVM");
+
+            #endregion
+
+            #region 实例变量
+
+            private XTermSession session;
+            private FileWatcher watcher;
             private string filePath;
+            private Encoding encoding;
+
+            #endregion
+
+            #region 属性
 
             public string FilePath
             {
@@ -41,11 +57,73 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 }
             }
 
-            public VideoTerminal VideoTerminal { get; set; }
+            public GenericDocumentUserControl GenericDocumentUserControl { get; set; }
 
-            public DocumentControl DocumentControl { get; set; }
+            #endregion
 
-            public FileWatcher Watcher { get; set; }
+            #region 构造方法
+
+            public FileItemVM(XTermSession session) 
+            {
+                this.session = session;
+            }
+
+            #endregion
+
+            #region 公开接口
+
+            public void Initialize()
+            {
+                string encodingName = this.session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING);
+                this.encoding = Encoding.GetEncoding(encodingName);
+
+                switch ((SessionTypeEnum)this.session.Type)
+                {
+                    case SessionTypeEnum.SSH:
+                        {
+                            this.watcher = new SshFileWatcher();
+                            break;
+                        }
+
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                this.watcher.Initialize(this.filePath);
+                this.GenericDocumentUserControl.Initialize(this.session);
+            }
+
+            public void Release()
+            {
+                this.watcher.Release();
+                this.GenericDocumentUserControl.Release();
+            }
+
+            public int Read(byte[] buffer, int offset, int size)
+            {
+                if (this.watcher.Avaliable == 0)
+                {
+                    return 0;
+                }
+
+                try
+                {
+                    return this.watcher.Read(buffer, offset, size);
+                }
+                catch (Exception ex) 
+                {
+                    logger.Error("读取文件异常", ex);
+                    return -1;
+                }
+            }
+
+            public void DrawText(byte[] bytes, int size) 
+            {
+                string text = this.encoding.GetString(bytes, 0, size);
+                this.GenericDocumentUserControl.DrawText(text);
+            }
+
+            #endregion
         }
 
         #endregion
@@ -67,7 +145,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// <summary>
         /// 当前正在监控的文件列表
         /// </summary>
-        public BindableCollection<FileStatusVM> FileList { get; private set; }
+        public BindableCollection<FileItemVM> FileList { get; private set; }
 
         /// <summary>
         /// 是否自动滚动
@@ -110,9 +188,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             base.OnInitialize();
 
             this.fileListLock = new object();
-            this.FileList = new BindableCollection<FileStatusVM>();
+            this.FileList = new BindableCollection<FileItemVM>();
             this.watchEvent = new ManualResetEvent(false);
-            this.isRunning = true;
             WatchFileUserControl watchFileUserControl = this.Content as WatchFileUserControl;
             this.grid = watchFileUserControl.GridDocuments;
         }
@@ -143,43 +220,18 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         #region 实例方法
 
-        private FileWatcher CreateFileWatcher()
+        private FileItemVM CreateFileItem(string filePath)
         {
-            switch ((SessionTypeEnum)this.OpenedSession.Session.Type)
-            {
-                case SessionTypeEnum.SSH: return new SshFileWatcher();
-                default: throw new NotImplementedException();
-            }
-        }
-
-        private FileStatusVM CreateFileStatusVM(string filePath)
-        {
-            DocumentControl documentControl = new DocumentControl();
-
-            VTOptions vtOptions = new VTOptions()
-            {
-                AlternateDocument = documentControl,
-                MainDocument = documentControl,
-                //Session = options.Session,
-                Width = this.grid.ActualWidth,
-                Height = this.grid.ActualHeight,
-                SessionTransport = new SessionTransport()
-            };
-            VideoTerminal videoTerminal = new VideoTerminal();
-            videoTerminal.Initialize(vtOptions);
-
-            FileStatusVM fileStatusVM = new FileStatusVM()
+            FileItemVM fileItem = new FileItemVM(this.OpenedSession.Session)
             {
                 ID = Guid.NewGuid().ToString(),
                 FilePath = filePath,
-                Watcher = this.CreateFileWatcher(),
-                VideoTerminal = videoTerminal,
-                DocumentControl = documentControl
+                GenericDocumentUserControl = new GenericDocumentUserControl()
             };
 
-            this.grid.Children.Add(documentControl);
+            this.grid.Children.Add(fileItem.GenericDocumentUserControl);
 
-            return fileStatusVM;
+            return fileItem;
         }
 
         #endregion
@@ -188,30 +240,29 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public void AddFile()
         {
-            string filePath = this.FilePath;
-
-            if (string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(this.filePath))
             {
                 return;
             }
 
-            FileStatusVM fileStatusVM = this.FileList.FirstOrDefault(v => v.FilePath == filePath);
-            if (fileStatusVM != null)
+            FileItemVM fileItem = this.FileList.FirstOrDefault(v => v.FilePath == this.filePath);
+            if (fileItem != null)
             {
                 return;
             }
 
-            fileStatusVM = this.CreateFileStatusVM(filePath);
-            fileStatusVM.Watcher.Initialize(filePath);
+            fileItem = this.CreateFileItem(this.filePath);
+            fileItem.Initialize();
 
             lock (this.fileListLock)
             {
-                this.FileList.Add(fileStatusVM);
+                this.FileList.Add(fileItem);
                 this.fileListChanged = true;
             }
 
-            if (this.FileList.Count == 1)
+            if (this.FileList.Count == 1 && !this.isRunning)
             {
+                this.isRunning = true;
                 Task.Factory.StartNew(this.WatchFileThreadProc);
             }
             else
@@ -224,19 +275,19 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public void DeleteFile()
         {
-            FileStatusVM selectedFile = this.FileList.SelectedItem;
-            if (selectedFile == null)
+            FileItemVM fileItem = this.FileList.SelectedItem;
+            if (fileItem == null)
             {
                 return;
             }
 
             lock (this.fileListLock)
             {
-                this.FileList.Remove(selectedFile);
+                this.FileList.Remove(fileItem);
                 this.fileListChanged = true;
             }
 
-            selectedFile.Watcher.Release();
+            fileItem.Release();
 
             if (this.FileList.Count == 0)
             {
@@ -253,7 +304,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         private void WatchFileThreadProc()
         {
-            List<FileStatusVM> fileList = new List<FileStatusVM>();
+            List<FileItemVM> fileList = new List<FileItemVM>();
             byte[] buffer = new byte[16384];
 
             while (this.isRunning)
@@ -270,29 +321,17 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                     }
                 }
 
-                foreach (FileStatusVM fileStatus in fileList)
+                foreach (FileItemVM fileItem in fileList)
                 {
-                    FileWatcher watcher = fileStatus.Watcher;
-
-                    int n = 0;
-
-                    try
-                    {
-                        n = watcher.Read(buffer, 0, buffer.Length);
-                        //lines = watcher.ReadLine();
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("读取文件内容异常", ex);
-                        continue;
-                    }
-
+                    int n = fileItem.Read(buffer, 0, buffer.Length);
+                    
                     if (n <= 0)
                     {
                         continue;
                     }
 
                     // 显示文件内容
+                    fileItem.DrawText(buffer, n);
                 }
 
                 Thread.Sleep(1000);
