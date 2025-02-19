@@ -51,8 +51,6 @@ namespace ModengTerm.UserControls
             VTDocumentOptions documentOptions = VTermUtils.CreateDocumentOptions(Guid.NewGuid().ToString(), width, height, session, DocumentControl);
             this.document = new VTDocument(documentOptions);
             this.document.Initialize();
-
-            this.stringRenderer = new TextRenderer()
         }
 
         public void Release()

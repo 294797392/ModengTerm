@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using XTerminal.Base.Enumerations;
 using ModengTerm.Base.DataModels;
+using System.IO;
 
 namespace ModengTerm.Base
 {
@@ -31,7 +32,7 @@ namespace ModengTerm.Base
         public static readonly string SSH_ADDR = string.Empty;
         //public static readonly List<PortForward> SSH_PORT_FORWARDS = new List<PortForward>();
 
-        //public static readonly string CMD_STARTUP_PATH = Path.Combine(Environment.SystemDirectory, "cmd.exe");
+        public static readonly string CMD_STARTUP_PATH = Path.Combine(Environment.SystemDirectory, "cmd.exe");
         //public static readonly string CMD_STARTUP_DIR = AppDomain.CurrentDomain.BaseDirectory;
         //public static readonly string CMD_STARTUP_ARGUMENT = string.Empty;
         //public static CmdDriverEnum CMD_DRIVER()

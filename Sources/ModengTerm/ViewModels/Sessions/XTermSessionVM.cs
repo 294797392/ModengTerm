@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.ViewModels.Sessions;
 using System;
@@ -89,7 +90,7 @@ namespace ModengTerm.ViewModels.Session
 
                 case SessionTypeEnum.Localhost:
                     {
-                        URI = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
+                        URI = session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH, OptionDefaultValues.CMD_STARTUP_PATH);
                         break;
                     }
 
