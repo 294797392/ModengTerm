@@ -13,12 +13,12 @@ namespace ModengTerm.Terminal.Renderer
     /// <summary>
     /// 定义一个用来解析并渲染终端数据的渲染器
     /// </summary>
-    public abstract class VTermRenderer
+    public abstract class RendererBase
     {
         protected VideoTerminal videoTerminal;
         protected XTermSession session;
 
-        public VTermRenderer(VideoTerminal vt)
+        public RendererBase(VideoTerminal vt)
         {
             this.videoTerminal = vt;
             this.session = vt.Session;

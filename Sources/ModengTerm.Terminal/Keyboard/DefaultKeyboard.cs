@@ -1,30 +1,17 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.Terminal.Parsing;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using XTerminal.Base;
 
-namespace ModengTerm.Terminal
+namespace ModengTerm.Terminal.Keyboard
 {
     /// <summary>
-    /// 把不同模式下的键盘按键转换成要发送给终端的字节序列
-    /// 
-    /// The VT100 is an upward and downward software compatible terminal; that is, previous DIGITAL video terminals have DIGITAL private standards for control sequences. The American National Standards Institute (ANSI) has since standardized escape and control sequences in terminals in documents X3.41-1974 and X3.64-1977.
-    /// NOTE: The ANSI standards allow the manufacturer flexibility in implementing each function.This manual describes how the VT100 will respond to the implemented ANSI control function.
-    /// The VT100 is compatible with both the previous DIGITAL standard and ANSI standards. Customers may use existing DIGITAL software designed around the VT52 or new VT100 software.The VT100 has a "VT52 compatible" mode in which the VT100 responds to control sequences like a VT52. In this mode, most of the new VT100 features cannot be used.
-    /// Throughout this section of the manual, references will be made to "VT52 mode" or "ANSI mode". These two terms are used to indicate the VT100's software compatibility. All new software should be designed around the VT100 "ANSI mode". Future DIGITAL video terminals will not necessarily be committed to VT52 compatibility.
-    /// 
-    /// VT100兼容旧的VT52模式下的控制序列和ANSI控制序列，所以VT100有两种模式，一种是VT52控制序列模式，一种是ANSI控制序列模式
-    /// 
+    /// 键盘按键转成发送给SSH服务的数据
     /// 参考：
     /// terminalInput.cpp
     /// VT100 User Guide/Chapter 3 - Programmer Information/The Keyboard
     /// </summary>
-    public class VTKeyboard
+    public class DefaultKeyboard : KeyboardBase
     {
         #region 类变量
 
@@ -266,23 +253,16 @@ namespace ModengTerm.Terminal
 
         #region 属性
 
-        /// <summary>
-        /// 翻译使用的编码方式
-        /// 默认值是XTermConsts.DefaultInputEncoding
-        /// </summary>
-        public Encoding Encoding { get; set; }
-
         #endregion
 
         #region 构造方法
 
-        public VTKeyboard()
+        public DefaultKeyboard()
         {
-            this.upperCaseCharacter = new byte[1];
-            this.SetAnsiMode(true);
-            this.SetKeypadMode(false);
-            this.SetCursorKeyMode(false);
-            this.Encoding = Encoding.GetEncoding(VTBaseConsts.DefaultWriteEncoding);
+            upperCaseCharacter = new byte[1];
+            SetAnsiMode(true);
+            SetKeypadMode(false);
+            SetCursorKeyMode(false);
         }
 
         #endregion
@@ -299,23 +279,23 @@ namespace ModengTerm.Terminal
         /// 光标键就是上下左右键
         /// </summary>
         /// <param name="isApplicationMode"></param>
-        public void SetKeypadMode(bool isApplicationMode)
+        public override void SetKeypadMode(bool isApplicationMode)
         {
-            this.isKeypadApplicationMode = isApplicationMode;
+            isKeypadApplicationMode = isApplicationMode;
         }
 
         /// <summary>
         /// 设置当前终端解析数据流的模式
         /// </summary>
         /// <param name="isAnsiMode"></param>
-        public void SetAnsiMode(bool isAnsiMode)
+        public override void SetAnsiMode(bool isAnsiMode)
         {
-            this.isVt52Mode = !isAnsiMode;
+            isVt52Mode = !isAnsiMode;
         }
 
-        public void SetCursorKeyMode(bool isApplicationMode)
+        public override void SetCursorKeyMode(bool isApplicationMode)
         {
-            this.isCursorKeyApplicationMode = isApplicationMode;
+            isCursorKeyApplicationMode = isApplicationMode;
         }
 
         /// <summary>
@@ -323,11 +303,11 @@ namespace ModengTerm.Terminal
         /// 代码参考terminal - terminalInput.cpp
         /// </summary>
         /// <returns></returns>
-        public byte[] TranslateInput(VTKeyboardInput userInput)
+        public override byte[] TranslateInput(VTKeyboardInput userInput)
         {
             byte[] bytes = null;
 
-            if (this.isVt52Mode)
+            if (isVt52Mode)
             {
                 throw new NotImplementedException();
             }
@@ -344,7 +324,7 @@ namespace ModengTerm.Terminal
                 }
                 else
                 {
-                    if (this.isCursorKeyApplicationMode)
+                    if (isCursorKeyApplicationMode)
                     {
                         if (CursorKeyApplicationMode.TryGetValue(userInput.Key, out bytes))
                         {
@@ -364,7 +344,7 @@ namespace ModengTerm.Terminal
 
                 #region 尝试映射Keypad
 
-                if (this.isKeypadApplicationMode)
+                if (isKeypadApplicationMode)
                 {
                     if (KeypadApplicationMode.TryGetValue(userInput.Key, out bytes))
                     {
@@ -411,7 +391,7 @@ namespace ModengTerm.Terminal
                 }
 
                 // 处理按住Control键的情况
-                if (userInput.Modifiers.HasFlag(VTModifierKeys.Control)) 
+                if (userInput.Modifiers.HasFlag(VTModifierKeys.Control))
                 {
                     if (ANSIKeyControlPressed.TryGetValue(userInput.Key, out bytes))
                     {

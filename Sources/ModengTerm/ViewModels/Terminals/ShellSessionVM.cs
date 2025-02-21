@@ -11,6 +11,7 @@ using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
@@ -737,7 +738,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
             else
             {
-                VTKeyboard keyboard = this.videoTerminal.Keyboard;
+                KeyboardBase keyboard = this.videoTerminal.Keyboard;
 
                 bytes = keyboard.TranslateInput(kbdInput);
             }

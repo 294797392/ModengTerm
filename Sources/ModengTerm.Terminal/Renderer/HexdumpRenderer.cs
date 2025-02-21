@@ -7,7 +7,7 @@ namespace ModengTerm.Terminal.Renderer
     /// <summary>
     /// 将收到的数据渲染为hexdump形式的格式
     /// </summary>
-    public class HexdumpRenderer : VTermRenderer
+    public class HexdumpRenderer : RendererBase
     {
         #region 实例变量
 

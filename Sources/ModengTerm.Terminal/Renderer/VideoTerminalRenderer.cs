@@ -12,7 +12,7 @@ namespace ModengTerm.Terminal.Renderer
     /// <summary>
     /// 渲染为终端界面
     /// </summary>
-    public class VideoTerminalRenderer : VTermRenderer
+    public class VideoTerminalRenderer : RendererBase
     {
         public VTParser Parser { get; set; }
 
@@ -37,6 +37,7 @@ namespace ModengTerm.Terminal.Renderer
 
         public override void RenderWrite(byte[] bytes)
         {
+            this.Parser.ProcessCharacters(bytes, bytes.Length);
         }
     }
 }

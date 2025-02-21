@@ -7,6 +7,7 @@ using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Utility;
+using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
@@ -143,7 +144,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 根据当前电脑键盘的按键状态，转换成标准的ANSI控制序列
         /// </summary>
-        private VTKeyboard keyboard;
+        private KeyboardBase keyboard;
 
         /// <summary>
         /// 终端颜色表
@@ -195,7 +196,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 数据渲染器
         /// </summary>
-        private VTermRenderer renderer;
+        private RendererBase renderer;
 
         private BellPlayer bellPlayer;
 
@@ -265,7 +266,7 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 电脑按键和发送的数据的映射关系
         /// </summary>
-        public VTKeyboard Keyboard { get { return keyboard; } }
+        public KeyboardBase Keyboard { get { return keyboard; } }
 
         /// <summary>
         /// 当前显示的是否是备用缓冲区
@@ -368,10 +369,9 @@ namespace ModengTerm.Terminal
 
             #region 初始化键盘
 
-            keyboard = new VTKeyboard();
-            keyboard.Encoding = writeEncoding;
-            keyboard.SetAnsiMode(true);
-            keyboard.SetKeypadMode(false);
+            this.keyboard = KeyboardFactory.Create((SessionTypeEnum)this.Session.Type);
+            this.keyboard.SetAnsiMode(true);
+            this.keyboard.SetKeypadMode(false);
 
             #endregion
 
@@ -1168,7 +1168,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private VTermRenderer CreateRenderer()
+        private RendererBase CreateRenderer()
         {
             XTermSession session = this.vtOptions.Session;
 
