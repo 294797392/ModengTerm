@@ -99,7 +99,7 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50"/>
@@ -126,7 +126,8 @@
                          AcceptsReturn="True"
                          Style="{StaticResource ResourceKey=StyleTextBoxLocal}"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TextBlockTips" Visibility="Collapsed" HorizontalAlignment="Right" VerticalAlignment="Center" Text="如果需要输入换行符，请在文本框内直接按回车" Foreground="Red"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="TextBlockTips" Visibility="Collapsed" Margin="0,0,80,0" HorizontalAlignment="Right" VerticalAlignment="Center" Text="如果需要输入换行符，请在文本框内直接按回车" Foreground="Red"/>
+                <Button Grid.Row="3" Grid.Column="1" Content="发送" HorizontalAlignment="Right" Click="ButtonSend_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
             </Grid>
         </GroupBox>

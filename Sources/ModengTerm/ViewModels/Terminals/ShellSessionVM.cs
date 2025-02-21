@@ -816,16 +816,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        /// <summary>
-        /// 打开同步输入配置窗口
-        /// </summary>
-        public void ContextMenuOpenSyncInputConfigurationWindow_Click(ContextMenuVM sender)
-        {
-            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(this);
-            sendAllConfigurationWindow.Owner = App.Current.MainWindow;
-            sendAllConfigurationWindow.ShowDialog();
-        }
-
         public void CopySelection()
         {
             VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
@@ -1008,6 +998,16 @@ namespace ModengTerm.Terminal.ViewModels
         {
             string text = System.Windows.Clipboard.GetText();
             this.SendText(text);
+        }
+
+        /// <summary>
+        /// 打开同步输入配置窗口
+        /// </summary>
+        public void ContextMenuOpenSyncInputConfigurationWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
+        {
+            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(this);
+            sendAllConfigurationWindow.Owner = App.Current.MainWindow;
+            sendAllConfigurationWindow.ShowDialog();
         }
 
         private void SelectAll()

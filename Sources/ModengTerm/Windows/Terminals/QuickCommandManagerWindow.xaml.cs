@@ -235,7 +235,18 @@ namespace ModengTerm.Windows.Terminals
             }
         }
 
+        private void ButtonSend_Click(object sender, RoutedEventArgs e)
+        {
+            QuickCommandVM command = ListBoxShellCommands.SelectedItem as QuickCommandVM;
+            if (command == null) 
+            {
+                return;
+            }
+
+            // InputElement设置为Onwer，Owner和MainWindow有父子关系，那么就可以触发路由事件
+            MCommands.SendCommand.Execute(command, this.Owner);
+        }
+
         #endregion
     }
 }
-
