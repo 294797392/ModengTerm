@@ -15,9 +15,9 @@ namespace ModengTerm.DataModels
         /// </summary>
         public string ParentID { get; private set; }
 
-        public ContextMenuDefinition MenuDefinition { get; private set; }
+        public MenuItemDefinition MenuDefinition { get; private set; }
 
-        public MenuItemRelation(string parentID, ContextMenuDefinition menuDefinition)
+        public MenuItemRelation(string parentID, MenuItemDefinition menuDefinition)
         {
             this.ParentID = parentID;
             this.MenuDefinition = menuDefinition;

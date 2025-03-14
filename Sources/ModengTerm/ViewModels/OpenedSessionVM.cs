@@ -28,7 +28,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 保存当前显示的所有菜单列表
         /// </summary>
-        protected List<ContextMenuDefinition> contextMenus;
+        protected List<MenuItemDefinition> contextMenus;
 
         #endregion
 
@@ -105,7 +105,7 @@ namespace ModengTerm.ViewModels
             this.TitleMenus = new BindableCollection<ContextMenuVM>();
 
             SessionDefinition sessionDefinition = MTermApp.Context.Manifest.SessionList.FirstOrDefault(v => v.Type == this.Session.Type);
-            List<ContextMenuDefinition> menuDefinitions = this.GetContextMenuDefinition();
+            List<MenuItemDefinition> menuDefinitions = this.GetContextMenuDefinition();
             List<MenuItemRelation> titleMenuItems = menuDefinitions.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
             this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuItems));
             List<MenuItemRelation> contextMenuItems = menuDefinitions.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
@@ -142,9 +142,9 @@ namespace ModengTerm.ViewModels
 
         #region 实例方法
 
-        private List<ContextMenuDefinition> GetContextMenuDefinition()
+        private List<MenuItemDefinition> GetContextMenuDefinition()
         {
-            List<ContextMenuDefinition> menuDefinitions = new List<ContextMenuDefinition>();
+            List<MenuItemDefinition> menuDefinitions = new List<MenuItemDefinition>();
 
             switch ((SessionTypeEnum)this.Session.Type)
             {
@@ -152,7 +152,7 @@ namespace ModengTerm.ViewModels
                 case SessionTypeEnum.Localhost:
                 case SessionTypeEnum.SSH:
                     {
-                        menuDefinitions.AddRange(MTermApp.Context.Manifest.TerminalMenus.OrderBy(v => v.ContextOrdinal));
+                        menuDefinitions.AddRange(MTermApp.Context.Manifest.TerminalMenus.OrderBy(v => v.Ordinal));
                         break;
                     }
 
@@ -160,9 +160,9 @@ namespace ModengTerm.ViewModels
                     throw new NotImplementedException();
             }
 
-            List<ContextMenuDefinition> results = new List<ContextMenuDefinition>();
+            List<MenuItemDefinition> results = new List<MenuItemDefinition>();
 
-            foreach (ContextMenuDefinition menuDefinition in menuDefinitions)
+            foreach (MenuItemDefinition menuDefinition in menuDefinitions)
             {
                 if (menuDefinition.SessionTypes.Count == 0)
                 {

@@ -19,7 +19,7 @@ namespace ModengTerm
             // MenuId -> ContetMenuVM
             Dictionary<string, ContextMenuVM> menuCaches = new Dictionary<string, ContextMenuVM>();
 
-            foreach (ContextMenuDefinition menuDefinition in menuItems.Select(v => v.MenuDefinition))
+            foreach (MenuItemDefinition menuDefinition in menuItems.Select(v => v.MenuDefinition))
             {
                 ContextMenuVM contextMenuVM = new ContextMenuVM(menuDefinition);
                 menuCaches.Add(menuDefinition.ID, contextMenuVM);
@@ -27,7 +27,7 @@ namespace ModengTerm
 
             foreach (MenuItemRelation menuItem in menuItems)
             {
-                ContextMenuDefinition definition = menuItem.MenuDefinition;
+                MenuItemDefinition definition = menuItem.MenuDefinition;
                 string menuId = definition.ID;
                 string parentID = menuItem.ParentID;
 
@@ -57,9 +57,11 @@ namespace ModengTerm
             return results;
         }
 
-        public static Dictionary<PanelAlignEnum, PanelVM> CreatePanels(List<ContextMenuDefinition> menuDefinitions, Dictionary<string, object> parameters = null)
+        public static Dictionary<PanelAlignEnum, PanelVM> CreatePanels(List<MenuItemDefinition> menuDefinitions, Dictionary<string, object> parameters = null)
         {
             Dictionary<PanelAlignEnum, PanelVM> panels = new Dictionary<PanelAlignEnum, PanelVM>();
+
+            #region 初始化上下左右四个方向的Panel
 
             List<PanelAlignEnum> panelAligns = VTBaseUtils.GetEnumValues<PanelAlignEnum>();
             foreach (PanelAlignEnum panelAlign in panelAligns)
@@ -69,7 +71,11 @@ namespace ModengTerm
                 panels[panelAlign] = panelVM;
             }
 
-            foreach (ContextMenuDefinition menuDefinition in menuDefinitions)
+            #endregion
+
+            #region 根据MenuItem生成Panel
+
+            foreach (MenuItemDefinition menuDefinition in menuDefinitions)
             {
                 if (string.IsNullOrEmpty(menuDefinition.PanelEntry))
                 {
@@ -96,6 +102,8 @@ namespace ModengTerm
 
                 panelVM.AddMenuItem(panelItemVM);
             }
+
+            #endregion
 
             return panels;
         }

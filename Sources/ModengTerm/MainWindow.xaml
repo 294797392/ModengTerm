@@ -245,14 +245,9 @@
                             </MenuItem.ItemTemplate>
                         </MenuItem>
                     </MenuItem>
-                </Menu>
-
-                <Menu ItemsSource="{Binding Path=GlobalTitleMenus}" MenuItem.Click="MenuItemGlobalTitleMenu_Click">
-                    <Menu.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                            <TextBlock Text="{Binding Path=Name}"/>
-                        </HierarchicalDataTemplate>
-                    </Menu.ItemTemplate>
+                    <MenuItem Header="视图">
+                        <MenuItem Header="资源管理器" />
+                    </MenuItem>
                 </Menu>
 
                 <Menu ItemsSource="{Binding Path=TitleMenus}" MenuItem.Click="MenuItem_Click">
@@ -346,7 +341,7 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}" Width="250" Margin="0,5,5,3"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}"/>
             </Grid>
 
             <!-- 终端显示区域 -->
@@ -381,7 +376,7 @@
 
             <!-- 右边窗格 -->
             <Grid Grid.Column="2">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}" Width="250" Margin="5,5,0,3"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}"/>
             </Grid>
 
         </Grid>

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace ModengTerm.Terminal
 {
     /// <summary>
-    /// 拷贝Ssh.Net的代码
+    /// 支持多线程同时读写同一个缓冲区
     /// </summary>
     public class SynchronizedStream
     {

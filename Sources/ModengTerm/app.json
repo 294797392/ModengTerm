@@ -270,23 +270,6 @@
         }
     ],
 
-    "globalTitleMenus": [
-        {
-            "id": "BE15995A-3FE3-47B8-BA05-9EBE449C09A6",
-            "titleParentId": "",
-            "name": "视图"
-        },
-        {
-            "id": "C847B8FE-8AB3-47AD-A08D-A3D1061D4F1E",
-            "titleParentId": "BE15995A-3FE3-47B8-BA05-9EBE449C09A6",
-            "name": "资源管理器",
-            "panelEntry": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
-            "panelVMEntry": "ModengTerm.ViewModels.PanelContent.ResourceManagerVM, ModengTerm",
-            "panelAlign": 2,
-            "clickMethod": "ContextMenuVisiblePanelContent_Click"
-        }
-    ],
-
     "termOptionMenu": [
         {
             "id": "20C693D5-0186-4CCF-A019-D95E6A05BDDD",
@@ -535,7 +518,35 @@
         //}
     ],
 
-
+    "panels": [
+        {
+            "id": "F4265C3C-44AF-4E27-BDCD-A7788812B11C",
+            "dock": 2,
+            "items": [
+                {
+                    "id": "BF1AD31C-0E00-495D-9C19-7687D708B71F",
+                    "name": "资源管理器",
+                    "icon": "pack://application:,,,/ModengTerm;component/Images/panel_item/resource_mgr.png",
+                    "className": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.ViewModels.ResourceManagerVM, ModengTerm"
+                },
+                {
+                    "id": "BF1AD31C-0E00-495D-9C19-7687D708B71F",
+                    "name": "资源管理器",
+                    "icon": "pack://application:,,,/ModengTerm;component/Images/panel_item/resource_mgr.png",
+                    "className": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.ViewModels.ResourceManagerVM, ModengTerm"
+                },
+                {
+                    "id": "BF1AD31C-0E00-495D-9C19-7687D708B71F",
+                    "name": "资源管理器",
+                    "icon": "pack://application:,,,/ModengTerm;component/Images/panel_item/resource_mgr.png",
+                    "className": "ModengTerm.UserControls.ResourceManagerUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.ViewModels.ResourceManagerVM, ModengTerm"
+                }
+            ]
+        }
+    ],
 
 
 

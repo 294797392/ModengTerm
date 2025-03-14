@@ -338,14 +338,6 @@ namespace ModengTerm
             ContextMenuHelper.Execute(contextMenu, openedSessionVM, openedSessionVM);
         }
 
-        private void MenuItemGlobalTitleMenu_Click(object sender, RoutedEventArgs e)
-        {
-            MenuItem menuItem = e.OriginalSource as MenuItem;
-            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
-            ContextMenuHelper.Execute(contextMenu, openedSessionVM, this.mainWindowVM);
-        }
-
 
         private void ButtonSwitchTheme_Click(object sender, RoutedEventArgs e)
         {

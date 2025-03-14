@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModengTerm.Base.Definitions
 {
+    /// <summary>
+    /// 指定Panel的方向
+    /// </summary>
     public enum PanelAlignEnum
     {
         Top,
@@ -11,7 +14,7 @@ namespace ModengTerm.Base.Definitions
         Right
     }
 
-    public class ContextMenuDefinition
+    public class MenuItemDefinition
     {
         /// <summary>
         /// 菜单ID
@@ -20,7 +23,7 @@ namespace ModengTerm.Base.Definitions
         public string ID { get; set; }
 
         /// <summary>
-        /// 父菜单的ID
+        /// 标题菜单的ParentID
         /// 如果为空表示没有父菜单，直接显示到根节点
         /// 如果为-1表示在标题上不显示该菜单
         /// </summary>
@@ -38,7 +41,7 @@ namespace ModengTerm.Base.Definitions
         /// 指定右键菜单的序号
         /// </summary>
         [JsonProperty("contextOrdinal")]
-        public int ContextOrdinal { get; set; }
+        public int Ordinal { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
@@ -77,10 +80,10 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("sessionTypes")]
         public List<int> SessionTypes { get; private set; }
 
-        public ContextMenuDefinition()
+        public MenuItemDefinition()
         {
             this.SessionTypes = new List<int>();
-            this.ContextOrdinal = 99999;
+            this.Ordinal = 99999;
         }
     }
 }

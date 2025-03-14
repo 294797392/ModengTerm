@@ -41,7 +41,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void InitializeUserControl()
         {
-            base.Visibility = Visibility.Collapsed;
+            //base.Visibility = Visibility.Collapsed;
+            base.Visibility = Visibility.Visible;
         }
 
         private void ProcessContentUnload()
@@ -69,14 +70,14 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             ListBoxMenus.DataContext = newValue;
 
-            Binding binding = new Binding()
-            {
-                Source = newValue,
-                Path = new PropertyPath("Visible"),
-                FallbackValue = Visibility.Collapsed,
-                Converter = this.FindResource("BooleanVisibilityConverter") as IValueConverter
-            };
-            this.SetBinding(VisibilityProperty, binding);
+            //Binding binding = new Binding()
+            //{
+            //    Source = newValue,
+            //    Path = new PropertyPath("Visible"),
+            //    FallbackValue = Visibility.Collapsed,
+            //    Converter = this.FindResource("BooleanVisibilityConverter") as IValueConverter
+            //};
+            //this.SetBinding(VisibilityProperty, binding);
         }
 
         private static void PanelVMPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)

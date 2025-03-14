@@ -63,8 +63,10 @@
     <None Remove="Images\goback.png" />
     <None Remove="Images\group.png" />
     <None Remove="Images\ok.png" />
+    <None Remove="Images\panel_item\resource_mgr.png" />
     <None Remove="Images\portForward.png" />
     <None Remove="Images\QQGroup.png" />
+    <None Remove="Images\resource_mgr.png" />
     <None Remove="Images\serialport.png" />
     <None Remove="Images\ssh.png" />
     <None Remove="Images\tcp.png" />
@@ -129,6 +131,7 @@
     <Resource Include="Images\goback.png" />
     <Resource Include="Images\group.png" />
     <Resource Include="Images\ok.png" />
+    <Resource Include="Images\panel_item\resource_mgr.png" />
     <Resource Include="Images\portForward.png" />
     <Resource Include="Images\QQGroup.png" />
     <Resource Include="Images\serialport.png" />

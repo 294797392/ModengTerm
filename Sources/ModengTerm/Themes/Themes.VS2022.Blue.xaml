@@ -251,7 +251,7 @@
     <BitmapImage x:Key="5522" UriSource="pack://application:,,,/ModengTerm;component/Images/connect.png"/>
     <BitmapImage x:Key="5523" UriSource="pack://application:,,,/ModengTerm;component/Images/fail.png"/>
 
-    <!-- 终端PanelItem 66001 - 67000 -->
+    <!-- PanelItem 66001 - 67000 -->
     <SolidColorBrush x:Key="RES66001E" Color="#CCD5F0"/><!-- 背景 -->
     <SolidColorBrush x:Key="RES66002E" Color="#ECF4FF"/><!-- 按钮悬浮背景 -->
     <SolidColorBrush x:Key="RES66003E" Color="#ECF4FF" Opacity="0.7"/><!-- 按钮按下背景 -->

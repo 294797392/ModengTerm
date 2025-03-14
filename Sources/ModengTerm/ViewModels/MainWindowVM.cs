@@ -2,7 +2,6 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.DataModels;
 using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -32,14 +31,9 @@ namespace ModengTerm.ViewModels
         public OpenedSessionsVM OpenedSessionsVM { get; private set; }
 
         /// <summary>
-        /// 窗口顶部的菜单列表
+        /// 窗口顶部的所有菜单列表
         /// </summary>
         public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
-
-        /// <summary>
-        /// 窗口顶部的全局菜单，所有的会话都有的菜单
-        /// </summary>
-        public BindableCollection<ContextMenuVM> GlobalTitleMenus { get; private set; }
 
         /// <summary>
         /// 所有主题列表
@@ -73,10 +67,7 @@ namespace ModengTerm.ViewModels
             this.Themes.AddRange(MTermApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
             this.Themes.SelectedItem = this.Themes[0];//.FirstOrDefault();
 
-            this.GlobalTitleMenus = new BindableCollection<ContextMenuVM>();
-            List<MenuItemRelation> globalMenuItemRelations = MTermApp.Context.Manifest.GlobalTitleMenus.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
-            this.GlobalTitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(globalMenuItemRelations));
-            this.Panels = VTClientUtils.CreatePanels(MTermApp.Context.Manifest.GlobalTitleMenus);
+            this.InitializePanels();
         }
 
         #endregion
@@ -120,6 +111,37 @@ namespace ModengTerm.ViewModels
             this.RecentlyOpenedSession.Remove(recentlySession);
 
             this.serviceAgent.DeleteRecentSession(recentlySession.ID.ToString());
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void InitializePanels()
+        {
+            this.Panels = new Dictionary<PanelAlignEnum, PanelVM>();
+
+            foreach (PanelDefinition panel in MTermApp.Context.Manifest.Panels)
+            {
+                PanelVM panelVM = new PanelVM();
+                panelVM.ID = panel.ID;
+                panelVM.Name = panel.Name;
+                panelVM.Dock = (PanelAlignEnum)panel.Dock;
+
+                foreach (PanelItemDefinition panelItem in panel.Items)
+                {
+                    PanelItemVM panelItemVM = new PanelItemVM();
+                    panelItemVM.ID = panelItem.ID;
+                    panelItemVM.Name = panelItem.Name;
+                    panelItemVM.IconURI = panelItem.Icon;
+                    panelItemVM.ClassName = panelItem.ClassName;
+                    panelItemVM.VMClassName = panelItem.VMClassName;
+
+                    panelVM.MenuItems.Add(panelItemVM);
+                }
+
+                this.Panels[panelVM.Dock] = panelVM;
+            }
         }
 
         #endregion

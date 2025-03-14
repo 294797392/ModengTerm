@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.ViewModels.PanelContent
+namespace ModengTerm.ViewModels
 {
     public class ResourceManagerVM : PanelContentVM
     {
@@ -16,7 +16,7 @@ namespace ModengTerm.ViewModels.PanelContent
         {
             base.OnInitialize();
 
-            this.ResourceManagerTree = MTermApp.Context.ResourceManagerTreeVM;
+            ResourceManagerTree = MTermApp.Context.ResourceManagerTreeVM;
             //Console.WriteLine(string.Format("{0}, OnInitialize", this.Name));
         }
 

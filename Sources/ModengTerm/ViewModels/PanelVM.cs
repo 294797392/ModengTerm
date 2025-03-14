@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using ModengTerm.Base.Definitions;
+using System.Linq;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
@@ -12,6 +13,7 @@ namespace ModengTerm.ViewModels
         #region 实例变量
 
         private bool visible;
+        private PanelAlignEnum dock;
 
         #endregion
 
@@ -29,6 +31,19 @@ namespace ModengTerm.ViewModels
                 {
                     visible = value;
                     NotifyPropertyChanged("Visible");
+                }
+            }
+        }
+
+        public PanelAlignEnum Dock
+        {
+            get { return this.dock; }
+            set
+            {
+                if (this.dock != value)
+                {
+                    this.dock = value;
+                    this.NotifyPropertyChanged("Dock");
                 }
             }
         }

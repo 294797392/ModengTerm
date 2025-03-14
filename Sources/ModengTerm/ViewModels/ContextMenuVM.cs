@@ -29,7 +29,7 @@ namespace ModengTerm.ViewModels
 
         #region 属性
 
-        public ContextMenuDefinition Definition { get; private set; }
+        public MenuItemDefinition Definition { get; private set; }
 
         /// <summary>
         /// 子菜单列表
@@ -65,7 +65,7 @@ namespace ModengTerm.ViewModels
 
         #region 构造方法
 
-        public ContextMenuVM(ContextMenuDefinition definition)
+        public ContextMenuVM(MenuItemDefinition definition)
         {
             this.ID = definition.ID;
             this.Name = definition.Name;
@@ -107,7 +107,7 @@ namespace ModengTerm.ViewModels
 
         public static void Execute(ContextMenuVM contextMenu, OpenedSessionVM openedSessionVM, object invokeObject)
         {
-            ContextMenuDefinition menuDefinition = contextMenu.Definition;
+            MenuItemDefinition menuDefinition = contextMenu.Definition;
 
             object targetObject = invokeObject;
             List<MethodInfo> methods = null;
