@@ -283,7 +283,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.HistoryCommands = new BindableCollection<string>();
 
             Dictionary<string, object> panelParameters = new Dictionary<string, object>();
-            panelParameters[SessionPanelContentVM.KEY_OPENED_SESSION] = this;
+            panelParameters[PanelContentVM.KEY_OPENED_SESSION] = this;
             this.Panels = VTClientUtils.CreatePanels(this.contextMenus, panelParameters);
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
@@ -947,16 +947,6 @@ namespace ModengTerm.Terminal.ViewModels
                 if (bytesDisplay != null)
                 {
                     this.videoTerminal.ProcessRead(bytesDisplay, bytesDisplay.Length);
-                }
-
-                foreach (PanelVM panelVM in this.Panels.Values)
-                {
-                    IEnumerable<SessionPanelContentVM> panelContents = panelVM.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).OfType<SessionPanelContentVM>();
-
-                    foreach (SessionPanelContentVM panelContent in panelContents)
-                    {
-                        panelContent.OnStatusChanged(status);
-                    }
                 }
             });
         }

@@ -4,16 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
-             xmlns:termctrl="clr-namespace:ModengTerm.Controls"
+             xmlns:mcs="clr-namespace:ModengTerm.Controls"
              xmlns:termconv="clr-namespace:ModengTerm"
              xmlns:toolkitconv="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <!--<Border HorizontalAlignment="Right" Background="White" Width="1"/>-->
-
     <UserControl.Resources>
-        <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type termctrl:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
+        <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type mcs:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501014E}"/>
@@ -23,15 +21,16 @@
                 </Trigger>
             </Style.Triggers>
             <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES501013E}"/>
+            <Setter Property="SVGMargin" Value="7"/>
             <Setter Property="OverridesDefaultStyle" Value="True"/>
-            <Setter Property="Width" Value="20"/>
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Margin" Value="0,0,5,0"/>
+            <Setter Property="Width" Value="25"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Margin" Value="0,0,3,0"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
-            <Setter Property="SVGMargin" Value="5"/>
             <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
         </Style>
     </UserControl.Resources>
 
@@ -40,27 +39,9 @@
         <ListBox x:Name="ListBoxMenus" ItemsSource="{Binding Path=MenuItems}"
                  DockPanel.Dock="Left" SelectionChanged="ListBoxMenus_SelectionChanged">
 
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Border Grid.Column="0" Background="{DynamicResource ResourceKey=RES501006E}" BorderThickness="0"/>
-
-                        <Image Grid.Column="1" Source="{Binding Path=IconURI}" Width="18" Height="18" 
-                               ToolTip="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Grid>
-                    
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-
             <ListBox.Style>
                 <Style TargetType="{x:Type ListBox}">
-                    <Setter Property="Background" Value="{x:Null}"/>
+                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501016E}"/>
                     <Setter Property="BorderBrush" Value="{x:Null}"/>
                     <Setter Property="BorderThickness" Value="0"/>
                     <Setter Property="Template">
@@ -69,8 +50,8 @@
                                 <Grid>
 
                                     <Border BorderBrush="{TemplateBinding BorderBrush}"
-                                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                                            Background="{TemplateBinding Background}"/>
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            Background="{TemplateBinding Background}"/>
 
                                     <ItemsPresenter Grid.Column="0" Margin="{TemplateBinding Padding}"/>
 
@@ -83,11 +64,22 @@
 
             <ListBox.ItemContainerStyle>
                 <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="Width" Value="30"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501007E}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501005E}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                    <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
+                    <Setter Property="Width" Value="40"/>
                     <Setter Property="Height" Value="30"/>
                     <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Setter Property="BorderThickness" Value="0,0,0,0"/>
-                    <Setter Property="BorderBrush" Value="{x:Null}"/>
+                    <Setter Property="BorderThickness" Value="4,0,0,0"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501006E}"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                    <Setter Property="ToolTip" Value="{Binding Path=Name}"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type ListBoxItem}">
@@ -108,9 +100,38 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
 
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+
+                    <Border x:Name="Border1" Background="Transparent">
+                        <Border x:Name="Bd" Width="20" Height="20">
+                            <Border.Background>
+                                <DrawingBrush Stretch="Uniform">
+                                    <DrawingBrush.Drawing>
+                                        <GeometryDrawing x:Name="Gd1" Brush="{DynamicResource ResourceKey=RES501017E}">
+                                            <GeometryDrawing.Geometry>
+                                                <PathGeometry Figures="{Binding Path=IconURI}"/>
+                                            </GeometryDrawing.Geometry>
+                                        </GeometryDrawing>
+                                    </DrawingBrush.Drawing>
+                                </DrawingBrush>
+                            </Border.Background>
+                        </Border>
+                    </Border>
+
+                    <!--<DataTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Brush" Value="White" TargetName="Gd1"/>
+                        </Trigger>
+                    </DataTemplate.Triggers>-->
+                    
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
         </ListBox>
 
-        <Grid x:Name="GridContent" DockPanel.Dock="Right" Visibility="Collapsed">
+        <Grid x:Name="GridContent" DockPanel.Dock="Right" Visibility="Collapsed"
+              MinWidth="200">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="*"/>
@@ -119,7 +140,7 @@
             <Grid Grid.Row="0">
                 <Border x:Name="BorderTitle" Background="{DynamicResource ResourceKey=RES501002E}" BorderThickness="0"/>
                 <TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource ResourceKey=RES501008E}"/>
-                <termctrl:MdButton x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0"
+                <mcs:MdButton x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Center"
                                SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonClose_Click"
                                Style="{StaticResource ResourceKey=StyleMdButtonLocal}"/>
 

@@ -1,5 +1,4 @@
-﻿using DotNEToolkit;
-using log4net.Core;
+﻿using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
@@ -16,9 +15,7 @@ using ModengTerm.ViewModels.Session;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;

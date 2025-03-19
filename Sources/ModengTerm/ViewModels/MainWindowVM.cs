@@ -137,7 +137,7 @@ namespace ModengTerm.ViewModels
                     panelItemVM.ClassName = panelItem.ClassName;
                     panelItemVM.VMClassName = panelItem.VMClassName;
 
-                    panelVM.MenuItems.Add(panelItemVM);
+                    panelVM.AddMenuItem(panelItemVM);
                 }
 
                 this.Panels[panelVM.Dock] = panelVM;

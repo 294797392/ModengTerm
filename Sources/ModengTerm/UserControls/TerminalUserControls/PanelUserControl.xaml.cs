@@ -1,8 +1,6 @@
 ﻿using ModengTerm.ViewModels;
-using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls.TerminalUserControls
@@ -12,6 +10,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
     /// </summary>
     public partial class PanelUserControl : UserControl
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("PanelUserControl");
+
         #region 依赖属性
 
         public PanelVM PanelVM
@@ -41,18 +41,10 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void InitializeUserControl()
         {
-            //base.Visibility = Visibility.Collapsed;
-            base.Visibility = Visibility.Visible;
         }
 
-        private void ProcessContentUnload()
+        private void ProcessContentUnload(PanelItemVM panelItemVM)
         {
-            PanelItemVM panelItemVM = ListBoxMenus.SelectedItem as PanelItemVM;
-            if (panelItemVM == null)
-            {
-                return;
-            }
-
             if (!(panelItemVM.ContentVM is MenuContentVM))
             {
                 return;
@@ -69,15 +61,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void OnPanelVMPropertyChanged(PanelVM oldValue, PanelVM newValue)
         {
             ListBoxMenus.DataContext = newValue;
-
-            //Binding binding = new Binding()
-            //{
-            //    Source = newValue,
-            //    Path = new PropertyPath("Visible"),
-            //    FallbackValue = Visibility.Collapsed,
-            //    Converter = this.FindResource("BooleanVisibilityConverter") as IValueConverter
-            //};
-            //this.SetBinding(VisibilityProperty, binding);
         }
 
         private static void PanelVMPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -101,25 +84,42 @@ namespace ModengTerm.UserControls.TerminalUserControls
             DependencyObject dependencyObject = this.PanelVM.LoadContent(selectedItem);
             if (dependencyObject == null)
             {
+                logger.ErrorFormat("加载页面失败, 页面为空, {0}", selectedItem.Name);
                 return;
             }
 
-            ContentControl1.Content = this.PanelVM.CurrentContent;
+            ContentControl1.Content = dependencyObject;
             TextBlockTitle.Text = selectedItem.Name;
+            GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Visible);
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            if (this.PanelVM != null)
-            {
-                this.PanelVM.Visible = false;
+            PanelItemVM panelItemVM = ListBoxMenus.SelectedItem as PanelItemVM;
 
-                // 点击关闭按钮手动触发Unload事件
-                this.ProcessContentUnload();
-            }
-            else
+            ListBoxMenus.SelectedItem = null;
+            GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Collapsed);
+
+            // 点击关闭按钮手动触发Unload事件
+            this.ProcessContentUnload(panelItemVM);
+        }
+
+        private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            PanelItemVM selected = ListBoxMenus.SelectedItem as PanelItemVM;
+
+            PanelItemVM clicked = (sender as ListBoxItem).DataContext as PanelItemVM;
+
+            if (clicked == selected)
             {
-                base.Visibility = Visibility.Collapsed;
+                // 收回
+                GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Collapsed);
+                ListBoxMenus.SelectedItem = null;
+
+                this.ProcessContentUnload(clicked);
+
+                // 在执行点击动作之前阻止执行点击动作，就不会再次执行点击的动作了
+                e.Handled = true;
             }
         }
 

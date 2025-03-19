@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
-        xmlns:mtermcontrols="clr-namespace:ModengTerm.Controls"
+        xmlns:mcs="clr-namespace:ModengTerm.Controls"
         xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
         xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
         xmlns:converters="clr-namespace:ModengTerm"
@@ -22,8 +22,7 @@
         SourceInitialized="Window_SourceInitialized">
 
     <!--WindowState="Maximized"-->
-    
-    
+
     <!-- 看不到窗口的拖动标，并且窗口四周有阴影更好看 -->
     <WindowChrome.WindowChrome>
         <WindowChrome ResizeBorderThickness="5" GlassFrameThickness="1" NonClientFrameEdges="None"
@@ -58,12 +57,12 @@
                     <TextBlock Grid.Column="2" Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"
                                TextOptions.TextFormattingMode="Display"/>
 
-                    <mtermcontrols:MdButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2" ToolTip="关闭"
-                                            Tag="{Binding}" Visibility="{Binding Path=IsSelected, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}" Width="20" Height="20"
-                                            SVGColor="{DynamicResource ResourceKey=RES50013E}" SVGMouseOverColor="{DynamicResource ResourceKey=RES50014E}" SVGMouseDownColor="{DynamicResource ResourceKey=RES50015E}"
-                                            Background="{DynamicResource ResourceKey=RES50016E}" MouseOverBrush="{DynamicResource ResourceKey=RES50017E}" MouseDownBrush="{DynamicResource ResourceKey=RES50018E}"
-                                            SVGPath="M512 466.944l233.472-233.472a31.744 31.744 0 0 1 45.056 45.056L557.056 512l233.472 233.472a31.744 31.744 0 0 1-45.056 45.056L512 557.056l-233.472 233.472a31.744 31.744 0 0 1-45.056-45.056L466.944 512 233.472 278.528a31.744 31.744 0 0 1 45.056-45.056z"
-                                            Click="ButtonCloseSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
+                    <mcs:MdButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2" ToolTip="关闭"
+                                  Tag="{Binding}" Visibility="{Binding Path=IsSelected, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}" Width="20" Height="20"
+                                  SVGColor="{DynamicResource ResourceKey=RES50013E}" SVGMouseOverColor="{DynamicResource ResourceKey=RES50014E}" SVGMouseDownColor="{DynamicResource ResourceKey=RES50015E}"
+                                  Background="{DynamicResource ResourceKey=RES50016E}" MouseOverBrush="{DynamicResource ResourceKey=RES50017E}" MouseDownBrush="{DynamicResource ResourceKey=RES50018E}"
+                                  SVGPath="M512 466.944l233.472-233.472a31.744 31.744 0 0 1 45.056 45.056L557.056 512l233.472 233.472a31.744 31.744 0 0 1-45.056 45.056L512 557.056l-233.472 233.472a31.744 31.744 0 0 1-45.056-45.056L466.944 512 233.472 278.528a31.744 31.744 0 0 1 45.056-45.056z"
+                                  Click="ButtonCloseSession_Click" Style="{StaticResource ResourceKey=StyleMdButton}"/>
                 </Grid>
 
                 <DataTemplate.Triggers>
@@ -75,7 +74,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="DataTemplateOpenSession">
-                <mtermcontrols:MdButton Content="+" FontWeight="Bold" FontSize="16" Margin="3"
+                <mcs:MdButton Content="+" FontWeight="Bold" FontSize="16" Margin="3"
                                         Background="{DynamicResource ResourceKey=RES50019E}"
                                         MouseOverBrush="{DynamicResource ResourceKey=RES50020E}" 
                                         MouseDownBrush="{DynamicResource ResourceKey=RES50021E}"
@@ -93,13 +92,13 @@
                     </Trigger>
                 </Style.Triggers>
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="BorderThickness" Value="0,0,1,0"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES50005E}"/>
                 <Setter Property="Background" Value="{DynamicResource ResourceKey=RES50004E}"/>
                 <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES50006E}"/>
                 <Setter Property="VerticalAlignment" Value="Bottom"/>
                 <Setter Property="Height" Value="29"/>
-                <Setter Property="Margin" Value="1,0,0,0"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="Padding" Value="0"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -137,7 +136,7 @@
                 <Setter Property="BorderBrush" Value="{x:Null}"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="HorizontalAlignment" Value="Left"/>
-                <Setter Property="Margin" Value="0,0,5,0"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ListBox}">
@@ -155,7 +154,7 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mtermcontrols:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
+            <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mcs:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
                 <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES50024E}"/>
                 <Setter Property="SVGMouseDownColor" Value="{DynamicResource ResourceKey=RES50024E}"/>
                 <Setter Property="SVGMouseOverColor" Value="{DynamicResource ResourceKey=RES50024E}"/>
@@ -197,13 +196,13 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            
+
             <Style x:Key="StyleListBoxAppTheme" TargetType="{x:Type ListBox}">
                 <Setter Property="BorderBrush" Value="{x:Null}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="ItemContainerStyle" Value="{StaticResource ResourceKey=StyleListBoxItemAppTheme}"/>
             </Style>
-            
+
         </ResourceDictionary>
     </Window.Resources>
 
@@ -268,7 +267,7 @@
                 </Menu>
             </StackPanel>
 
-            <mtermcontrols:MdButton Grid.Column="2" x:Name="ButtonSwitchTheme" SVGMargin="5" SVGPath="{StaticResource ResourceKey=SVG12E}" Click="ButtonSwitchTheme_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcs:MdButton Grid.Column="2" x:Name="ButtonSwitchTheme" SVGMargin="5" SVGPath="{StaticResource ResourceKey=SVG12E}" Click="ButtonSwitchTheme_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
             <Popup x:Name="PopupThemes" PopupAnimation="None" AllowsTransparency="True" StaysOpen="False"
                    Placement="Bottom" PlacementTarget="{Binding ElementName=ButtonSwitchTheme}">
                 <Border Background="{DynamicResource ResourceKey=RES50054E}" BorderBrush="{DynamicResource ResourceKey=RES50055E}"
@@ -324,15 +323,15 @@
                 </Border>
             </Popup>
 
-            <mtermcontrols:MdButton Grid.Column="3" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcs:MdButton Grid.Column="3" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mtermcontrols:MdButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcs:MdButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mtermcontrols:MdButton Grid.Column="5" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcs:MdButton Grid.Column="5" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
         </Grid>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="0,5,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -341,7 +340,7 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}" Margin="0,0,3,0"/>
             </Grid>
 
             <!-- 终端显示区域 -->
@@ -352,31 +351,28 @@
                 </Grid.RowDefinitions>
 
                 <!-- 打开的终端列表Tab页 -->
-                <Grid Grid.Row="0">
-
-                    <ScrollViewer x:Name="ScrollViewerOpenedSession" Margin="3,5,3,0" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
-                        <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
+                <ScrollViewer Grid.Row="0" x:Name="ScrollViewerOpenedSession" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                    <ListBox x:Name="ListBoxOpenedSession" ItemsSource="{Binding Path=SessionList}" SelectedItem="{Binding Path=SelectedSession}"
                              SelectionChanged="ListBoxOpenedSession_SelectionChanged" Style="{StaticResource ResourceKey=StyleListBoxSessionList}">
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-                        </ListBox>
-                    </ScrollViewer>
-
-                    <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Background="{DynamicResource ResourceKey=RES50025E}" Height="2" IsHitTestVisible="False"/>
-
-                </Grid>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel IsItemsHost="True" Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </ScrollViewer>
 
                 <!-- 终端展示页面 -->
                 <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
+
+                <!-- 终端显示区域的Border -->
+                <Border Grid.Row="1" BorderThickness="2,2,0,0" BorderBrush="{DynamicResource ResourceKey=RES50025E}" IsHitTestVisible="False"/>
 
             </Grid>
 
             <!-- 右边窗格 -->
             <Grid Grid.Column="2">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}" Margin="3,0,0,0"/>
             </Grid>
 
         </Grid>

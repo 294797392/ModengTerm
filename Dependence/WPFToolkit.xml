@@ -2434,11 +2434,6 @@
             当前选中的页面
             </summary>
         </member>
-        <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.previouseSelectedMenu">
-            <summary>
-            上次选中的菜单
-            </summary>
-        </member>
         <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.isContentLoading">
             <summary>
             当前的内容是否正在初始化
@@ -2474,7 +2469,7 @@
         </member>
         <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadContent(`0)">
             <summary>
-            切换指定的菜单
+            加载指定的界面，会执行相关的生命周期函数
             </summary>
             <param name="menuItem">要切换的菜单</param>
             <returns>如果菜单没有对应的页面，那么返回null。否则返回对应的页面实例</returns>
