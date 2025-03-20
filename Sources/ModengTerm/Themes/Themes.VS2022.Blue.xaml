@@ -190,15 +190,14 @@
     <SolidColorBrush x:Key="RES50022E" Color="#F8F9FF"/><!-- 右上角按钮悬浮背景色 -->
     <SolidColorBrush x:Key="RES50023E" Color="#FFFFFF"/><!-- 右上角按钮按下背景色 -->
     <SolidColorBrush x:Key="RES50024E" Color="Black"/><!-- 右上角按钮SVG图标颜色 -->
-    <SolidColorBrush x:Key="RES50025E" Color="#F5CC84"/><!-- TabItem底边框 -->
+    <!--<SolidColorBrush x:Key="RES50025E" Color="#5D6B99"/>--><!-- 终端显示区域左边框 -->
     <SolidColorBrush x:Key="RES50050E" Color="#BBC6F1"/><!-- 主题选择悬浮背景 -->
     <SolidColorBrush x:Key="RES50051E" Color="Transparent"/><!-- 主题选择悬浮边框 -->
     <SolidColorBrush x:Key="RES50052E" Color="#BBC6F1"/><!-- 主题选择选中背景 -->
     <SolidColorBrush x:Key="RES50053E" Color="Transparent"/><!-- 主题选择选中边框 -->
     <SolidColorBrush x:Key="RES50054E" Color="#F7F9FE"/><!-- 主题选择背景 -->
     <SolidColorBrush x:Key="RES50055E" Color="#203D77"/><!-- 主题选择边框 -->
-
-
+    <SolidColorBrush x:Key="RES50056E" Color="#CCD5F0"/><!-- Panel背景 -->
 
     <!-- UserControl 500001 - 800000 -->
 
@@ -206,22 +205,22 @@
 
     <!-- PanelUserControl 501001 - 505000 -->
     <SolidColorBrush x:Key="RES501001E" Color="#F7F9FE"/><!-- 背景 -->
-    <SolidColorBrush x:Key="RES501002E" Color="#40568D"/><!-- 标题背景 -->
+    <SolidColorBrush x:Key="RES501002E" Color="#F7F9FE"/><!-- 标题背景 -->
     <SolidColorBrush x:Key="RES501003E" Color="#F5CC84"/><!-- 标题选中左边框颜色 -->
     <SolidColorBrush x:Key="RES501004E" Color="#CCD5F0"/><!-- 工具栏背景 -->
-    <SolidColorBrush x:Key="RES501005E" Color="#CCD5F0"/><!-- TabItem选中背景 -->
-    <SolidColorBrush x:Key="RES501006E" Color="Transparent"/><!-- TabItem默认背景 -->
-    <SolidColorBrush x:Key="RES501007E" Color="#3E527B"/><!-- TabItem悬浮背景 -->
-    <SolidColorBrush x:Key="RES501008E" Color="White"/><!-- 标题前景色 -->
-    <SolidColorBrush x:Key="RES501009E" Color="Black"/><!-- 标题选中前景色 -->
-    <SolidColorBrush x:Key="RES501010E" Color="#D9E1FA"/><!-- TabItem默认前景 -->
-    <SolidColorBrush x:Key="RES501011E" Color="Black"/><!-- TabItem悬浮前景 -->
-    <SolidColorBrush x:Key="RES501012E" Color="Black"/><!-- TabItem选中前景 -->
-    <SolidColorBrush x:Key="RES501013E" Color="White"/><!-- 关闭按钮SVG颜色 -->
-    <SolidColorBrush x:Key="RES501014E" Color="White" Opacity="0.2"/><!-- 关闭按钮悬浮背景 -->
-    <SolidColorBrush x:Key="RES501015E" Color="White" Opacity="0.3"/><!-- 关闭按钮按下背景 -->
-    <SolidColorBrush x:Key="RES501016E" Color="Transparent"/><!-- 侧边栏背景 -->
-    <SolidColorBrush x:Key="RES501017E" Color="White"/><!-- TabItem图标默认颜色 -->
+    <SolidColorBrush x:Key="RES501005E" Color="Transparent"/><!-- TabItem默认边框 -->
+    <SolidColorBrush x:Key="RES501006E" Color="#1E1E1E"/><!-- TabItem选中边框 -->
+    <SolidColorBrush x:Key="RES501007E" Color="Transparent"/><!-- TabItem悬浮边框 -->
+    <SolidColorBrush x:Key="RES501008E" Color="#616161"/><!-- 标题前景色 -->
+    <!--<SolidColorBrush x:Key="RES501009E" Color="Black"/>--><!-- 标题选中前景色 -->
+    <SolidColorBrush x:Key="RES501010E" Color="#868C9C"/><!-- TabItem默认前景 -->
+    <SolidColorBrush x:Key="RES501011E" Color="#1E1E1E"/><!-- TabItem悬浮前景 -->
+    <SolidColorBrush x:Key="RES501012E" Color="#1E1E1E"/><!-- TabItem选中前景 -->
+    <SolidColorBrush x:Key="RES501013E" Color="#ACADB0"/><!-- 关闭按钮默认前景 -->
+    <SolidColorBrush x:Key="RES501014E" Color="#E2E4E7"/><!-- 关闭按钮悬浮背景 -->
+    <SolidColorBrush x:Key="RES501015E" Color="#DADCDF"/><!-- 关闭按钮按下背景 -->
+    <SolidColorBrush x:Key="RES501016E" Color="#5D6B99"/><!-- 默认边框 -->
+    <SolidColorBrush x:Key="RES501017E" Color="#616161"/><!-- 关闭按钮按下前景 -->
 
     <!-- SystemWatchUserControl 505001 - 510000 -->
     <SolidColorBrush x:Key="RES505001E" Color="#D9E1FA"/><!-- 网络接口列表边框 -->

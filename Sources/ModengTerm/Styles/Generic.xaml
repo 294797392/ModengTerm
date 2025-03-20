@@ -25,7 +25,6 @@
 
                     <ControlTemplate.Resources>
 
-
                         <Style x:Key="StyleScrollBar" TargetType="{x:Type ScrollBar}">
                             <Style.Resources>
                                 <!-- 拖动标样式 -->
@@ -186,7 +185,7 @@
                         </Style>
 
                     </ControlTemplate.Resources>
-                    
+
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -393,7 +392,7 @@
                         </Style>
 
                     </ControlTemplate.Resources>
-                    
+
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition MinHeight="25" Height="Auto" />
@@ -1200,11 +1199,6 @@
         </Setter>
     </Style>
 
-
-
-
-
-
     <Style x:Key="StyleMdButton" TargetType="{x:Type mcontrol:MdButton}">
         <Setter Property="OverridesDefaultStyle" Value="True"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -1215,24 +1209,54 @@
 
                     <Grid>
 
-                        <Border x:Name="BorderBackground" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"/>
-                        <Border x:Name="BorderMouseOver" Background="{TemplateBinding MouseOverBrush}" BorderBrush="{TemplateBinding MouseOverBorder}" BorderThickness="{TemplateBinding BorderThickness}" Visibility="Collapsed"/>
-                        <Border x:Name="BorderMouseDown" Background="{TemplateBinding MouseDownBrush}" BorderThickness="{TemplateBinding BorderThickness}" Visibility="Collapsed"/>
-
                         <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
 
-                        <Border x:Name="Bd" Margin="{TemplateBinding SVGMargin}">
-                            <Border.Background>
-                                <DrawingBrush Stretch="Uniform">
-                                    <DrawingBrush.Drawing>
-                                        <GeometryDrawing Brush="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGColor}">
-                                            <GeometryDrawing.Geometry>
-                                                <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
-                                            </GeometryDrawing.Geometry>
-                                        </GeometryDrawing>
-                                    </DrawingBrush.Drawing>
-                                </DrawingBrush>
-                            </Border.Background>
+                        <Border x:Name="BorderBackground" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                            <Border Margin="{TemplateBinding SVGMargin}">
+                                <Border.Background>
+                                    <DrawingBrush Stretch="Uniform">
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing Brush="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGColor}">
+                                                <GeometryDrawing.Geometry>
+                                                    <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Border.Background>
+                            </Border>
+                        </Border>
+
+                        <Border x:Name="BorderMouseOver" Background="{TemplateBinding MouseOverBrush}" BorderBrush="{TemplateBinding MouseOverBorder}" BorderThickness="{TemplateBinding BorderThickness}" Visibility="Collapsed">
+                            <Border Margin="{TemplateBinding SVGMargin}">
+                                <Border.Background>
+                                    <DrawingBrush Stretch="Uniform">
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing Brush="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGMouseOverColor}">
+                                                <GeometryDrawing.Geometry>
+                                                    <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Border.Background>
+                            </Border>
+                        </Border>
+
+                        <Border x:Name="BorderMouseDown" Background="{TemplateBinding MouseDownBrush}" BorderThickness="{TemplateBinding BorderThickness}" Visibility="Collapsed">
+                            <Border Margin="{TemplateBinding SVGMargin}">
+                                <Border.Background>
+                                    <DrawingBrush Stretch="Uniform">
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing Brush="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGMouseDownColor}">
+                                                <GeometryDrawing.Geometry>
+                                                    <PathGeometry Figures="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=SVGPath}"/>
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Border.Background>
+                            </Border>
                         </Border>
 
                         <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"

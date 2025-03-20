@@ -21,6 +21,7 @@
                 </Trigger>
             </Style.Triggers>
             <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES501013E}"/>
+            <Setter Property="SVGMouseDownColor" Value="{DynamicResource ResourceKey=RES501017E}"/>
             <Setter Property="SVGMargin" Value="7"/>
             <Setter Property="OverridesDefaultStyle" Value="True"/>
             <Setter Property="Width" Value="25"/>
@@ -41,9 +42,9 @@
 
             <ListBox.Style>
                 <Style TargetType="{x:Type ListBox}">
-                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501016E}"/>
-                    <Setter Property="BorderBrush" Value="{x:Null}"/>
-                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Background" Value="{x:Null}"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501016E}"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,0"/>
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type ListBox}">
@@ -69,15 +70,15 @@
                             <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501007E}"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501005E}"/>
+                            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501006E}"/>
                         </Trigger>
                     </Style.Triggers>
                     <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
-                    <Setter Property="Width" Value="40"/>
-                    <Setter Property="Height" Value="30"/>
+                    <Setter Property="Width" Value="45"/>
+                    <Setter Property="Height" Value="35"/>
                     <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                    <Setter Property="BorderThickness" Value="4,0,0,0"/>
-                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501006E}"/>
+                    <Setter Property="BorderThickness" Value="2,0,0,0"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501005E}"/>
                     <Setter Property="Cursor" Value="Hand"/>
                     <Setter Property="ToolTip" Value="{Binding Path=Name}"/>
                     <Setter Property="Template">
@@ -108,7 +109,7 @@
                             <Border.Background>
                                 <DrawingBrush Stretch="Uniform">
                                     <DrawingBrush.Drawing>
-                                        <GeometryDrawing x:Name="Gd1" Brush="{DynamicResource ResourceKey=RES501017E}">
+                                        <GeometryDrawing Brush="{DynamicResource ResourceKey=RES501010E}">
                                             <GeometryDrawing.Geometry>
                                                 <PathGeometry Figures="{Binding Path=IconURI}"/>
                                             </GeometryDrawing.Geometry>
@@ -119,21 +120,48 @@
                         </Border>
                     </Border>
 
-                    <!--<DataTemplate.Triggers>
+                    <DataTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Brush" Value="White" TargetName="Gd1"/>
+                            <Setter Property="Background" TargetName="Bd">
+                                <Setter.Value>
+                                    <DrawingBrush Stretch="Uniform">
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing Brush="{DynamicResource ResourceKey=RES501011E}">
+                                                <GeometryDrawing.Geometry>
+                                                    <PathGeometry Figures="{Binding Path=IconURI}"/>
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
-                    </DataTemplate.Triggers>-->
-                    
+
+                        <DataTrigger Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" Value="True">
+                            <Setter Property="Background" TargetName="Bd">
+                                <Setter.Value>
+                                    <DrawingBrush Stretch="Uniform">
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing Brush="{DynamicResource ResourceKey=RES501011E}">
+                                                <GeometryDrawing.Geometry>
+                                                    <PathGeometry Figures="{Binding Path=IconURI}"/>
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+
                 </DataTemplate>
             </ListBox.ItemTemplate>
 
         </ListBox>
 
-        <Grid x:Name="GridContent" DockPanel.Dock="Right" Visibility="Collapsed"
-              MinWidth="200">
+        <Grid x:Name="GridContent" DockPanel.Dock="Right" Visibility="Collapsed" MinWidth="200">
             <Grid.RowDefinitions>
-                <RowDefinition Height="30"/>
+                <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -141,13 +169,15 @@
                 <Border x:Name="BorderTitle" Background="{DynamicResource ResourceKey=RES501002E}" BorderThickness="0"/>
                 <TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource ResourceKey=RES501008E}"/>
                 <mcs:MdButton x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Center"
-                               SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonClose_Click"
-                               Style="{StaticResource ResourceKey=StyleMdButtonLocal}"/>
+                              SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonClose_Click"
+                              Style="{StaticResource ResourceKey=StyleMdButtonLocal}"/>
 
             </Grid>
 
             <Border Grid.Row="1" Background="{DynamicResource ResourceKey=RES501001E}"/>
-            <ContentControl Grid.Row="1" x:Name="ContentControl1"/>
+            <ContentControl Grid.Row="1" x:Name="ContentControl1" Background="{x:Null}"/>
+
+            <Border Grid.Row="0" Grid.RowSpan="999" BorderThickness="0,0,1,0" BorderBrush="{DynamicResource ResourceKey=RES501016E}"/>
 
         </Grid>
 

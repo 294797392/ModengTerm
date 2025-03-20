@@ -239,12 +239,6 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 窗格列表
-        /// 窗格位置 -> 窗格列表
-        /// </summary>
-        public Dictionary<PanelAlignEnum, PanelVM> Panels { get; private set; }
-
-        /// <summary>
         /// 是否显示输入栏
         /// </summary>
         public bool InputPanelVisible
@@ -284,7 +278,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             Dictionary<string, object> panelParameters = new Dictionary<string, object>();
             panelParameters[PanelContentVM.KEY_OPENED_SESSION] = this;
-            this.Panels = VTClientUtils.CreatePanels(this.contextMenus, panelParameters);
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
@@ -372,26 +365,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 return;
             }
-
-            #region 释放PanelContent
-
-            foreach (KeyValuePair<PanelAlignEnum, PanelVM> kv in this.Panels)
-            {
-                List<MenuItemVM> menuItems = kv.Value.Context.AllItems;
-
-                foreach (MenuItemVM menuItem in menuItems)
-                {
-                    PanelContentVM panelContentVM = menuItem.ContentVM as PanelContentVM;
-                    if (panelContentVM != null)
-                    {
-                        panelContentVM.OnRelease();
-                    }
-                }
-            }
-
-            this.Panels.Clear();
-
-            #endregion
 
             this.AutoCompletionVM.Release();
 
@@ -1291,8 +1264,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            PanelVM panelVM = this.Panels[sender.PanelAlign];
-            panelVM.ChangeVisible(sender.ID.ToString());
+            throw new NotImplementedException();
         }
 
         private void ContextMenuXModemSend_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)

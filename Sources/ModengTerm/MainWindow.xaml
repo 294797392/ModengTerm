@@ -88,7 +88,7 @@
                         <Setter Property="Background" Value="{DynamicResource ResourceKey=RES50007E}"/>
                         <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES50008E}"/>
                         <Setter Property="FontWeight" Value="Bold"/>
-                        <Setter Property="Height" Value="30"/>
+                        <!--<Setter Property="Height" Value="30"/>-->
                     </Trigger>
                 </Style.Triggers>
                 <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
@@ -97,7 +97,7 @@
                 <Setter Property="Background" Value="{DynamicResource ResourceKey=RES50004E}"/>
                 <Setter Property="Foreground" Value="{DynamicResource ResourceKey=RES50006E}"/>
                 <Setter Property="VerticalAlignment" Value="Bottom"/>
-                <Setter Property="Height" Value="29"/>
+                <Setter Property="Height" Value="35"/>
                 <Setter Property="Margin" Value="0,0,0,0"/>
                 <Setter Property="Padding" Value="0"/>
                 <Setter Property="Template">
@@ -164,10 +164,6 @@
                 <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=RES50023E}"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Focusable" Value="False"/>
-            </Style>
-
-            <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
-                <Setter Property="Margin" Value="3"/>
             </Style>
 
             <Style x:Key="StyleListBoxItemAppTheme" TargetType="{x:Type ListBoxItem}">
@@ -331,7 +327,7 @@
 
         </Grid>
 
-        <Grid Grid.Row="1" Margin="0,5,0,0">
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -340,7 +336,8 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}" Margin="0,0,3,0"/>
+                <Border Background="{DynamicResource ResourceKey=RES50056E}"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}"/>
             </Grid>
 
             <!-- 终端显示区域 -->
@@ -365,15 +362,13 @@
                 <!-- 终端展示页面 -->
                 <ContentControl Grid.Row="1" x:Name="ContentControlSession"/>
 
-                <!-- 终端显示区域的Border -->
-                <Border Grid.Row="1" BorderThickness="2,2,0,0" BorderBrush="{DynamicResource ResourceKey=RES50025E}" IsHitTestVisible="False"/>
-
             </Grid>
 
             <!-- 右边窗格 -->
-            <Grid Grid.Column="2">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}" Margin="3,0,0,0"/>
-            </Grid>
+            <!--<Grid Grid.Column="2">
+                <Border Background="{DynamicResource ResourceKey=RES50056E}"/>
+                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}"/>
+            </Grid>-->
 
         </Grid>
 

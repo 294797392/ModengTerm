@@ -56,56 +56,5 @@ namespace ModengTerm
 
             return results;
         }
-
-        public static Dictionary<PanelAlignEnum, PanelVM> CreatePanels(List<MenuItemDefinition> menuDefinitions, Dictionary<string, object> parameters = null)
-        {
-            Dictionary<PanelAlignEnum, PanelVM> panels = new Dictionary<PanelAlignEnum, PanelVM>();
-
-            #region 初始化上下左右四个方向的Panel
-
-            List<PanelAlignEnum> panelAligns = VTBaseUtils.GetEnumValues<PanelAlignEnum>();
-            foreach (PanelAlignEnum panelAlign in panelAligns)
-            {
-                PanelVM panelVM = new PanelVM();
-                panelVM.ID = Guid.NewGuid().ToString();
-                panels[panelAlign] = panelVM;
-            }
-
-            #endregion
-
-            #region 根据MenuItem生成Panel
-
-            foreach (MenuItemDefinition menuDefinition in menuDefinitions)
-            {
-                if (string.IsNullOrEmpty(menuDefinition.PanelEntry))
-                {
-                    continue;
-                }
-
-                PanelVM panelVM = panels[(PanelAlignEnum)menuDefinition.PanelAlign];
-
-                PanelItemVM panelItemVM = new PanelItemVM()
-                {
-                    ID = menuDefinition.ID,
-                    Name = menuDefinition.Name,
-                    VMClassName = menuDefinition.PanelVMEntry,
-                    ClassName = menuDefinition.PanelEntry
-                };
-
-                if (parameters != null)
-                {
-                    foreach (KeyValuePair<string, object> kv in parameters)
-                    {
-                        panelItemVM.Parameters[kv.Key] = kv.Value;
-                    }
-                }
-
-                panelVM.AddMenuItem(panelItemVM);
-            }
-
-            #endregion
-
-            return panels;
-        }
     }
 }

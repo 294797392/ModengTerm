@@ -6,20 +6,9 @@ namespace ModengTerm.ViewModels
 {
     public class PanelItemVM : MenuItemVM
     {
-        //private string svgPath;
-
-        //public string SVGPath
-        //{
-        //    get { return this.svgPath; }
-        //    set
-        //    {
-        //        if (this.svgPath != value)
-        //        {
-        //            this.svgPath = value;
-        //            this.NotifyPropertyChanged("SVGPath");
-        //        }
-        //    }
-        //}
+        public PanelItemVM() 
+        {
+        }
     }
 
     public class PanelVM : AbstractMenuVM<PanelItemVM>
