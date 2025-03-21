@@ -518,11 +518,11 @@
         //}
     ],
 
-    "panels": [
+    "sidePanels": [
         {
             "id": "F4265C3C-44AF-4E27-BDCD-A7788812B11C",
             "dock": 2,
-            "items": [
+            "windows": [
                 {
                     "id": "BF1AD31C-0E00-495D-9C19-7687D708B71F",
                     "name": "资源管理器",

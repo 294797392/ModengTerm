@@ -11,7 +11,7 @@ using ModengTerm.Base.Enumerations;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public class WatchSystemInfo : PanelContentVM
+    public class WatchSystemInfo : WindowContentVM
     {
         #region 类变量
 

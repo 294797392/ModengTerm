@@ -277,7 +277,7 @@ namespace ModengTerm.Terminal.ViewModels
             this.HistoryCommands = new BindableCollection<string>();
 
             Dictionary<string, object> panelParameters = new Dictionary<string, object>();
-            panelParameters[PanelContentVM.KEY_OPENED_SESSION] = this;
+            panelParameters[WindowContentVM.KEY_OPENED_SESSION] = this;
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 

@@ -15,7 +15,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public class WatchFileVM : PanelContentVM
+    public class WatchFileVM : WindowContentVM
     {
         #region 类变量
 

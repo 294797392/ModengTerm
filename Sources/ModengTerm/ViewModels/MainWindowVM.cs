@@ -2,7 +2,6 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +39,7 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<AppThemeVM> Themes { get; private set; }
 
-        public Dictionary<PanelAlignEnum, PanelVM> Panels { get; private set; }
+        public Dictionary<SideWindowDock, SidePanelVM> Panels { get; private set; }
 
         #endregion
 
@@ -67,7 +66,7 @@ namespace ModengTerm.ViewModels
             this.Themes.AddRange(MTermApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
             this.Themes.SelectedItem = this.Themes[0];//.FirstOrDefault();
 
-            this.InitializePanels();
+            this.InitializeSidePanels();
         }
 
         #endregion
@@ -117,20 +116,20 @@ namespace ModengTerm.ViewModels
 
         #region 实例方法
 
-        private void InitializePanels()
+        private void InitializeSidePanels()
         {
-            this.Panels = new Dictionary<PanelAlignEnum, PanelVM>();
+            this.Panels = new Dictionary<SideWindowDock, SidePanelVM>();
 
-            foreach (PanelDefinition panel in MTermApp.Context.Manifest.Panels)
+            foreach (SidePanelDefinition panel in MTermApp.Context.Manifest.SidePanels)
             {
-                PanelVM panelVM = new PanelVM();
+                SidePanelVM panelVM = new SidePanelVM();
                 panelVM.ID = panel.ID;
                 panelVM.Name = panel.Name;
-                panelVM.Dock = (PanelAlignEnum)panel.Dock;
+                panelVM.Dock = (SideWindowDock)panel.Dock;
 
-                foreach (PanelItemDefinition panelItem in panel.Items)
+                foreach (SidePanelItemDefinition panelItem in panel.Windows)
                 {
-                    PanelItemVM panelItemVM = new PanelItemVM();
+                    SidePanelItemVM panelItemVM = new SidePanelItemVM();
                     panelItemVM.ID = panelItem.ID;
                     panelItemVM.Name = panelItem.Name;
                     panelItemVM.IconURI = panelItem.Icon;
@@ -147,12 +146,6 @@ namespace ModengTerm.ViewModels
         #endregion
 
         #region 事件处理器
-
-        private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            PanelVM panelVM = this.Panels[sender.PanelAlign];
-            panelVM.ChangeVisible(sender.ID.ToString());
-        }
 
         #endregion
     }

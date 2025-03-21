@@ -6,7 +6,7 @@ namespace ModengTerm.Base.Definitions
     /// <summary>
     /// 指定Panel的方向
     /// </summary>
-    public enum PanelAlignEnum
+    public enum SideWindowDock
     {
         Top,
         Bottom,
@@ -66,13 +66,6 @@ namespace ModengTerm.Base.Definitions
         /// </summary>
         [JsonProperty("clickMethod")]
         public string MethodName { get; set; }
-
-        /// <summary>
-        /// 如果这个菜单需要显示界面，PanelID指定界面显示在哪个Panel里
-        /// </summary>
-        [JsonProperty("panelAlign")]
-        [EnumDataType(typeof(PanelAlignEnum))]
-        public int PanelAlign { get; set; }
 
         /// <summary>
         /// 该菜单所支持的会话类型

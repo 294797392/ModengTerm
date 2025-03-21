@@ -52,11 +52,6 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        /// <summary>
-        /// 作为侧边栏窗格的ViewModel，它所属的侧边栏窗格容器Id
-        /// </summary>
-        public PanelAlignEnum PanelAlign { get; private set; }
-
         public string PanelEntry { get; set; }
 
         public string PanelVMEntry { get; set; }
@@ -71,7 +66,6 @@ namespace ModengTerm.ViewModels
             this.Name = definition.Name;
             this.PanelEntry = definition.PanelEntry;
             this.PanelVMEntry = definition.PanelVMEntry;
-            this.PanelAlign = (PanelAlignEnum)definition.PanelAlign;
             this.Children = new BindableCollection<ContextMenuVM>();
             this.Definition = definition;
         }

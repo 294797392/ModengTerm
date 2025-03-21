@@ -59,10 +59,10 @@ namespace ModengTerm
         public List<ThemePackage> DefaultThemes { get; private set; }
 
         /// <summary>
-        /// 所有的容器列表
+        /// 所有的侧边窗口
         /// </summary>
-        [JsonProperty("panels")]
-        public List<PanelDefinition> Panels { get; private set; }
+        [JsonProperty("sidePanels")]
+        public List<SidePanelDefinition> SidePanels { get; private set; }
 
         public MTermManifest()
         {
@@ -73,7 +73,7 @@ namespace ModengTerm
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
             this.DefaultThemes = new List<ThemePackage>();
-            this.Panels = new List<PanelDefinition>();
+            this.SidePanels = new List<SidePanelDefinition>();
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.ViewModels
 {
-    public class ResourceManagerVM : PanelContentVM
+    public class ResourceManagerVM : WindowContentVM
     {
         public SessionTreeVM ResourceManagerTree { get; private set; }
 

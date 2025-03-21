@@ -4,34 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModengTerm.Base.Definitions
 {
-    public class PanelDefinition
-    {
-        [JsonProperty("id")]
-        public string ID { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// 容器贴哪个边
-        /// </summary>
-        [EnumDataType(typeof(PanelAlignEnum))]
-        [JsonProperty("dock")]
-        public int Dock { get; set; }
-
-        /// <summary>
-        /// 容器下的所有页面
-        /// </summary>
-        [JsonProperty("items")]
-        public List<PanelItemDefinition> Items { get; set; }
-
-        public PanelDefinition() 
-        {
-            this.Items = new List<PanelItemDefinition>();
-        }
-    }
-
-    public class PanelItemDefinition
+    public class SidePanelItemDefinition
     {
         [JsonProperty("id")]
         public string ID { get; set; }
@@ -63,9 +36,36 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("sessionTypes")]
         public List<int> SessionTypes { get; set; }
 
-        public PanelItemDefinition() 
+        public SidePanelItemDefinition() 
         {
             this.SessionTypes = VTBaseUtils.GetEnumValues<SessionTypeEnum>().Select(v => (int)v).ToList();
+        }
+    }
+
+    public class SidePanelDefinition
+    {
+        [JsonProperty("id")]
+        public string ID { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 容器贴哪个边
+        /// </summary>
+        [EnumDataType(typeof(SideWindowDock))]
+        [JsonProperty("dock")]
+        public int Dock { get; set; }
+
+        /// <summary>
+        /// 侧边容器里的窗口列表
+        /// </summary>
+        [JsonProperty("windows")]
+        public List<SidePanelItemDefinition> Windows { get; set; }
+
+        public SidePanelDefinition()
+        {
+            this.Windows = new List<SidePanelItemDefinition>();
         }
     }
 }

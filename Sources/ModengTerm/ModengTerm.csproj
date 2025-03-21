@@ -23,9 +23,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Addons\**" />
     <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <EmbeddedResource Remove="Addons\**" />
     <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <None Remove="Addons\**" />
     <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <Page Remove="Addons\**" />
     <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
   </ItemGroup>
 
