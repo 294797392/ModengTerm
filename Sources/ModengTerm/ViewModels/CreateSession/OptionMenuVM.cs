@@ -7,7 +7,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.CreateSession
 {
-    public class OptionMenuVM : AbstractMenuVM<OptionMenuItemVM>
+    public class OptionMenuVM : MenuVM
     {
 
     }

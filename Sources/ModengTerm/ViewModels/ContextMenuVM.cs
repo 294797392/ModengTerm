@@ -11,7 +11,6 @@ namespace ModengTerm.ViewModels
 {
     /// <summary>
     /// 标题栏菜单ViewModel
-    /// 同时也是侧边栏窗格的ViewModel
     /// </summary>
     public class ContextMenuVM : ItemViewModel
     {
@@ -52,10 +51,6 @@ namespace ModengTerm.ViewModels
             }
         }
 
-        public string PanelEntry { get; set; }
-
-        public string PanelVMEntry { get; set; }
-
         #endregion
 
         #region 构造方法
@@ -64,8 +59,6 @@ namespace ModengTerm.ViewModels
         {
             this.ID = definition.ID;
             this.Name = definition.Name;
-            this.PanelEntry = definition.PanelEntry;
-            this.PanelVMEntry = definition.PanelVMEntry;
             this.Children = new BindableCollection<ContextMenuVM>();
             this.Definition = definition;
         }

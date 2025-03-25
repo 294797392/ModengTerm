@@ -1,17 +1,12 @@
 ﻿using ModengTerm.Base.Enumerations;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.Base.Definitions
 {
-    public class SidePanelItemDefinition
+    public class PanelItemDefinition : MenuDefinition
     {
-        [JsonProperty("id")]
-        public string ID { get; set; }
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
         /// <summary>
         /// 图标
         /// </summary>
@@ -36,13 +31,13 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("sessionTypes")]
         public List<int> SessionTypes { get; set; }
 
-        public SidePanelItemDefinition() 
+        public PanelItemDefinition()
         {
             this.SessionTypes = VTBaseUtils.GetEnumValues<SessionTypeEnum>().Select(v => (int)v).ToList();
         }
     }
 
-    public class SidePanelDefinition
+    public class PanelDefinition
     {
         [JsonProperty("id")]
         public string ID { get; set; }
@@ -60,12 +55,12 @@ namespace ModengTerm.Base.Definitions
         /// <summary>
         /// 侧边容器里的窗口列表
         /// </summary>
-        [JsonProperty("windows")]
-        public List<SidePanelItemDefinition> Windows { get; set; }
+        [JsonProperty("items")]
+        public List<PanelItemDefinition> Items { get; set; }
 
-        public SidePanelDefinition()
+        public PanelDefinition()
         {
-            this.Windows = new List<SidePanelItemDefinition>();
+            this.Items = new List<PanelItemDefinition>();
         }
     }
 }

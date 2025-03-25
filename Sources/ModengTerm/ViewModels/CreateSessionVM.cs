@@ -88,7 +88,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 当前选中的菜单节点
         /// </summary>
-        private OptionMenuItemVM selectedMenuNode;
+        private MenuItemVM selectedMenuNode;
 
         #endregion
 
@@ -117,7 +117,7 @@ namespace ModengTerm.ViewModels
                         default:
                             {
                                 // 根据不同的会话类型，切换不同的配置选项树形列表
-                                OptionMenuItemVM selectedNode;
+                                MenuItemVM selectedNode;
                                 if (this.OptionTreeVM.TryGetItem(value.MenuId, out selectedNode))
                                 {
                                     if (this.selectedMenuNode != null)
@@ -572,7 +572,7 @@ namespace ModengTerm.ViewModels
             {
                 this.SessionTypeList.Add(new SessionTypeVM(session));
                 // 隐藏会话类型对应的菜单，等选中的时候再显示
-                OptionMenuItemVM treeNodeViewModel;
+                MenuItemVM treeNodeViewModel;
                 if (this.TerminalOptionsTreeVM.TryGetItem(session.MenuId, out treeNodeViewModel))
                 {
                     treeNodeViewModel.IsVisible = false;

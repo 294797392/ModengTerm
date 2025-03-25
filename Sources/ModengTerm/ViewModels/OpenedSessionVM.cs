@@ -25,11 +25,6 @@ namespace ModengTerm.ViewModels
         private SessionStatusEnum status;
         private DependencyObject content;
 
-        /// <summary>
-        /// 保存当前显示的所有菜单列表
-        /// </summary>
-        protected List<MenuItemDefinition> contextMenus;
-
         #endregion
 
         #region 属性
@@ -86,6 +81,11 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
 
+        /// <summary>
+        /// 侧边栏窗口
+        /// </summary>
+        public PanelVM Panel { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -104,14 +104,17 @@ namespace ModengTerm.ViewModels
             this.ContextMenus = new BindableCollection<ContextMenuVM>();
             this.TitleMenus = new BindableCollection<ContextMenuVM>();
 
-            SessionDefinition sessionDefinition = MTermApp.Context.Manifest.SessionList.FirstOrDefault(v => v.Type == this.Session.Type);
-            List<MenuItemDefinition> menuDefinitions = this.GetContextMenuDefinition();
-            List<MenuItemRelation> titleMenuItems = menuDefinitions.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
-            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuItems));
-            List<MenuItemRelation> contextMenuItems = menuDefinitions.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
-            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuItems));
+            List<MenuItemDefinition> menuDefinitions = this.FilterMenuItems();
+            List<MenuItemRelation> titleMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
+            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuRelations));
+            List<MenuItemRelation> contextMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
+            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuRelations));
 
-            this.contextMenus = menuDefinitions;
+            Dictionary<string, object> parameters = new Dictionary<string, object>()
+            {
+                { "Session", this }
+            };
+            this.Panel = VTClientUtils.PanelDefinition2PanelVM(MTermApp.Context.Manifest.SessionPanel, parameters, this.Session.Type);
 
             return this.OnOpen();
         }
@@ -142,7 +145,12 @@ namespace ModengTerm.ViewModels
 
         #region 实例方法
 
-        private List<MenuItemDefinition> GetContextMenuDefinition()
+        /// <summary>
+        /// 过滤只关联这个会话的菜单
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private List<MenuItemDefinition> FilterMenuItems()
         {
             List<MenuItemDefinition> menuDefinitions = new List<MenuItemDefinition>();
 

@@ -61,8 +61,14 @@ namespace ModengTerm
         /// <summary>
         /// 所有的侧边窗口
         /// </summary>
-        [JsonProperty("sidePanels")]
-        public List<SidePanelDefinition> SidePanels { get; private set; }
+        [JsonProperty("panels")]
+        public List<PanelDefinition> Panels { get; private set; }
+
+        /// <summary>
+        /// 和会话关联的侧边窗口
+        /// </summary>
+        [JsonProperty("sessionPanel")]
+        public PanelDefinition SessionPanel { get; private set; }
 
         public MTermManifest()
         {
@@ -73,7 +79,8 @@ namespace ModengTerm
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
             this.DefaultThemes = new List<ThemePackage>();
-            this.SidePanels = new List<SidePanelDefinition>();
+            this.Panels = new List<PanelDefinition>();
+            this.SessionPanel = new PanelDefinition();
         }
     }
 }

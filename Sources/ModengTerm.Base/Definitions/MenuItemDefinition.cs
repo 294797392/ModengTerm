@@ -46,18 +46,6 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        /// <summary>
-        /// 指定要显示的界面入口类
-        /// </summary>
-        [JsonProperty("panelEntry")]
-        public string PanelEntry { get; set; }
-
-        /// <summary>
-        /// 指定要显示的界面对应的ViewModel入口类
-        /// </summary>
-        [JsonProperty("panelVMEntry")]
-        public string PanelVMEntry { get; set; }
-
         [JsonProperty("handlerEntry")]
         public string HandlerEntry { get; set; }
 

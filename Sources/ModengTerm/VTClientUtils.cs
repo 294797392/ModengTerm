@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.DataModels;
 using ModengTerm.ViewModels;
 using System;
@@ -55,6 +56,50 @@ namespace ModengTerm
             }
 
             return results;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="panel"></param>
+        /// <param name="parameters">要传递到PanelContentVM里的参数</param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        public static PanelVM PanelDefinition2PanelVM(PanelDefinition panel, Dictionary<string, object> parameters = null, int? matchType = null)
+        {
+            PanelVM panelVM = new PanelVM();
+            panelVM.ID = panel.ID;
+            panelVM.Name = panel.Name;
+            panelVM.Dock = (SideWindowDock)panel.Dock;
+
+            foreach (PanelItemDefinition panelItem in panel.Items)
+            {
+                // 过滤会话类型
+                if (panelItem.SessionTypes.Count > 0 && matchType != null)
+                {
+                    if (!panelItem.SessionTypes.Contains(matchType.Value))
+                    {
+                        continue;
+                    }
+                }
+
+                PanelItemVM panelItemVM = new PanelItemVM(panelItem);
+                panelItemVM.ID = panelItem.ID;
+                panelItemVM.Name = panelItem.Name;
+                panelItemVM.IconURI = panelItem.Icon;
+                panelItemVM.ClassName = panelItem.ClassName;
+                panelItemVM.VMClassName = panelItem.VMClassName;
+                if (parameters != null)
+                {
+                    foreach (KeyValuePair<string, object> kv in parameters)
+                    {
+                        panelItemVM.Parameters[kv.Key] = kv.Value;
+                    }
+                }
+                panelVM.AddMenuItem(panelItemVM);
+            }
+
+            return panelVM;
         }
     }
 }

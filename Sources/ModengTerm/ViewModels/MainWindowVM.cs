@@ -39,7 +39,7 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<AppThemeVM> Themes { get; private set; }
 
-        public Dictionary<SideWindowDock, SidePanelVM> Panels { get; private set; }
+        public Dictionary<SideWindowDock, PanelVM> Panels { get; private set; }
 
         #endregion
 
@@ -66,7 +66,7 @@ namespace ModengTerm.ViewModels
             this.Themes.AddRange(MTermApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
             this.Themes.SelectedItem = this.Themes[0];//.FirstOrDefault();
 
-            this.InitializeSidePanels();
+            this.InitializePanels();
         }
 
         #endregion
@@ -116,29 +116,13 @@ namespace ModengTerm.ViewModels
 
         #region 实例方法
 
-        private void InitializeSidePanels()
+        private void InitializePanels()
         {
-            this.Panels = new Dictionary<SideWindowDock, SidePanelVM>();
+            this.Panels = new Dictionary<SideWindowDock, PanelVM>();
 
-            foreach (SidePanelDefinition panel in MTermApp.Context.Manifest.SidePanels)
+            foreach (PanelDefinition panel in MTermApp.Context.Manifest.Panels)
             {
-                SidePanelVM panelVM = new SidePanelVM();
-                panelVM.ID = panel.ID;
-                panelVM.Name = panel.Name;
-                panelVM.Dock = (SideWindowDock)panel.Dock;
-
-                foreach (SidePanelItemDefinition panelItem in panel.Windows)
-                {
-                    SidePanelItemVM panelItemVM = new SidePanelItemVM();
-                    panelItemVM.ID = panelItem.ID;
-                    panelItemVM.Name = panelItem.Name;
-                    panelItemVM.IconURI = panelItem.Icon;
-                    panelItemVM.ClassName = panelItem.ClassName;
-                    panelItemVM.VMClassName = panelItem.VMClassName;
-
-                    panelVM.AddMenuItem(panelItemVM);
-                }
-
+                PanelVM panelVM = VTClientUtils.PanelDefinition2PanelVM(panel);
                 this.Panels[panelVM.Dock] = panelVM;
             }
         }

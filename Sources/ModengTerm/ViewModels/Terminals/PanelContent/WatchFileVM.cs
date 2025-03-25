@@ -15,7 +15,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public class WatchFileVM : WindowContentVM
+    public class WatchFileVM : PanelContentVM
     {
         #region 类变量
 
@@ -211,10 +211,10 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             base.OnUnload();
         }
 
-        public override void OnReady()
-        {
+        //public override void OnReady()
+        //{
 
-        }
+        //}
 
         #endregion
 
@@ -222,16 +222,17 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         private FileItemVM CreateFileItem(string filePath)
         {
-            FileItemVM fileItem = new FileItemVM(this.OpenedSession.Session)
-            {
-                ID = Guid.NewGuid().ToString(),
-                FilePath = filePath,
-                GenericDocumentUserControl = new GenericDocumentUserControl()
-            };
+            //FileItemVM fileItem = new FileItemVM(this.OpenedSession.Session)
+            //{
+            //    ID = Guid.NewGuid().ToString(),
+            //    FilePath = filePath,
+            //    GenericDocumentUserControl = new GenericDocumentUserControl()
+            //};
 
-            this.grid.Children.Add(fileItem.GenericDocumentUserControl);
+            //this.grid.Children.Add(fileItem.GenericDocumentUserControl);
 
-            return fileItem;
+            //return fileItem;
+            throw new NotImplementedException();
         }
 
         #endregion

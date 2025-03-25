@@ -11,7 +11,7 @@ using ModengTerm.Base.Enumerations;
 
 namespace ModengTerm.ViewModels.Terminals.PanelContent
 {
-    public class WatchSystemInfo : WindowContentVM
+    public class WatchSystemInfo : SessionPanelContentVM
     {
         #region 类变量
 
@@ -139,7 +139,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             this.ifaceCopy = new NetworkInterfaceVMCopy();
             this.processCopy = new ProcessVMCopy();
 
-            this.shellSession = base.OpenedSession as ShellSessionVM;
+            //this.shellSession = base.OpenedSession as ShellSessionVM;
             this.watchEvent = new ManualResetEvent(false);
         }
 
@@ -164,10 +164,10 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             base.OnUnload();
         }
 
-        public override void OnReady()
-        {
-            this.StartWatch();
-        }
+        //public override void OnReady()
+        //{
+        //    this.StartWatch();
+        //}
 
         #endregion
 

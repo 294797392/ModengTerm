@@ -197,17 +197,16 @@
     <SolidColorBrush x:Key="RES50053E" Color="Transparent"/><!-- 主题选择选中边框 -->
     <SolidColorBrush x:Key="RES50054E" Color="#F7F9FE"/><!-- 主题选择背景 -->
     <SolidColorBrush x:Key="RES50055E" Color="#203D77"/><!-- 主题选择边框 -->
-    <SolidColorBrush x:Key="RES50056E" Color="#CCD5F0"/><!-- Panel背景 -->
 
     <!-- UserControl 500001 - 800000 -->
 
     <!-- OpenSessionWindow 500001 - 501001 -->
 
     <!-- PanelUserControl 501001 - 505000 -->
-    <SolidColorBrush x:Key="RES501001E" Color="#F7F9FE"/><!-- 背景 -->
+    <SolidColorBrush x:Key="RES501001E" Color="#F7F9FE"/><!-- 内容背景 -->
     <SolidColorBrush x:Key="RES501002E" Color="#F7F9FE"/><!-- 标题背景 -->
-    <SolidColorBrush x:Key="RES501003E" Color="#F5CC84"/><!-- 标题选中左边框颜色 -->
-    <SolidColorBrush x:Key="RES501004E" Color="#CCD5F0"/><!-- 工具栏背景 -->
+    <SolidColorBrush x:Key="RES501003E" Color="#CCD5F0"/><!-- 边栏背景 -->
+    <!--<SolidColorBrush x:Key="RES501004E" Color="#CCD5F0"/>--><!-- 工具栏背景 -->
     <SolidColorBrush x:Key="RES501005E" Color="Transparent"/><!-- TabItem默认边框 -->
     <SolidColorBrush x:Key="RES501006E" Color="#1E1E1E"/><!-- TabItem选中边框 -->
     <SolidColorBrush x:Key="RES501007E" Color="Transparent"/><!-- TabItem悬浮边框 -->

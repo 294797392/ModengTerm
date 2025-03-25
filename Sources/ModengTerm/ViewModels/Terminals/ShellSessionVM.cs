@@ -276,8 +276,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.scriptItems = this.Session.GetOption<List<ScriptItem>>(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             this.HistoryCommands = new BindableCollection<string>();
 
-            Dictionary<string, object> panelParameters = new Dictionary<string, object>();
-            panelParameters[WindowContentVM.KEY_OPENED_SESSION] = this;
             this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 

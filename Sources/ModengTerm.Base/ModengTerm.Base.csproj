@@ -30,6 +30,7 @@
     <Compile Remove="ASCIITable.cs" />
     <Compile Remove="Definitions\OptionDefinition.cs" />
     <Compile Remove="Enumerations\AdbLoginTypeEnum.cs" />
+    <Compile Remove="ICloneable.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +51,9 @@
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="WPFToolkit">
+      <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
 

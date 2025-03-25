@@ -336,7 +336,6 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <Border Background="{DynamicResource ResourceKey=RES50056E}"/>
                 <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}"/>
             </Grid>
 

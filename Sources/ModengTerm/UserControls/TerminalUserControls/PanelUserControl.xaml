@@ -11,6 +11,36 @@
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
+        <Style x:Key="StyleListBoxItemSessionPanel" TargetType="{x:Type ListBoxItem}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501007E}"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501006E}"/>
+                </Trigger>
+            </Style.Triggers>
+            <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <Setter Property="BorderThickness" Value="0,0,2,0"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501005E}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="ToolTip" Value="{Binding Path=Name}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" 
+                                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="0,0,0,0"/>
+                            <ContentPresenter Margin="{TemplateBinding Padding}"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
         <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type mcs:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -35,14 +65,14 @@
         </Style>
     </UserControl.Resources>
 
-    <DockPanel LastChildFill="True">
+    <DockPanel x:Name="DockPanel1" LastChildFill="True">
 
-        <ListBox x:Name="ListBoxMenus" ItemsSource="{Binding Path=MenuItems}"
+        <ListBox Grid.Column="0" x:Name="ListBoxMenus" ItemsSource="{Binding Path=MenuItems}"
                  DockPanel.Dock="Left" SelectionChanged="ListBoxMenus_SelectionChanged">
 
             <ListBox.Style>
                 <Style TargetType="{x:Type ListBox}">
-                    <Setter Property="Background" Value="{x:Null}"/>
+                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501003E}"/>
                     <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES501016E}"/>
                     <Setter Property="BorderThickness" Value="0,0,1,0"/>
                     <Setter Property="Template">
@@ -74,7 +104,7 @@
                         </Trigger>
                     </Style.Triggers>
                     <EventSetter Event="PreviewMouseLeftButtonDown" Handler="ListBoxItem_PreviewMouseLeftButtonDown"/>
-                    <Setter Property="Width" Value="45"/>
+                    <Setter Property="Width" Value="40"/>
                     <Setter Property="Height" Value="35"/>
                     <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     <Setter Property="BorderThickness" Value="2,0,0,0"/>
@@ -159,7 +189,7 @@
 
         </ListBox>
 
-        <Grid x:Name="GridContent" DockPanel.Dock="Right" Visibility="Collapsed" MinWidth="200">
+        <Grid Grid.Column="1" x:Name="GridContent" DockPanel.Dock="Right" Visibility="Collapsed" MinWidth="250">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>

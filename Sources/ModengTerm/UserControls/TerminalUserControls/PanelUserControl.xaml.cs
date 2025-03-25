@@ -12,17 +12,45 @@ namespace ModengTerm.UserControls.TerminalUserControls
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("PanelUserControl");
 
+        private Dock dock = Dock.Left;
+
+        public Dock Dock
+        {
+            get { return this.dock; }
+            set
+            {
+                if (this.dock != value)
+                {
+                    this.dock = value;
+
+                    switch (value)
+                    {
+                        case Dock.Right:
+                            {
+                                DockPanel.SetDock(ListBoxMenus, Dock.Right);
+                                DockPanel.SetDock(GridContent, Dock.Left);
+                                ListBoxMenus.ItemContainerStyle = this.FindResource("StyleListBoxItemSessionPanel") as Style;
+                                break;
+                            }
+
+                        default:
+                            throw new System.NotImplementedException();
+                    }
+                }
+            }
+        }
+
         #region 依赖属性
 
-        public SidePanelVM PanelVM
+        public PanelVM PanelVM
         {
-            get { return (SidePanelVM)GetValue(PanelVMProperty); }
+            get { return (PanelVM)GetValue(PanelVMProperty); }
             set { SetValue(PanelVMProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for PanelVM.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PanelVMProperty =
-            DependencyProperty.Register("PanelVM", typeof(SidePanelVM), typeof(PanelUserControl), new PropertyMetadata(null, PanelVMPropertyChangedCallback));
+            DependencyProperty.Register("PanelVM", typeof(PanelVM), typeof(PanelUserControl), new PropertyMetadata(null, PanelVMPropertyChangedCallback));
 
         #endregion
 
@@ -43,7 +71,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
         }
 
-        private void ProcessContentUnload(SidePanelItemVM panelItemVM)
+        private void ProcessContentUnload(PanelItemVM panelItemVM)
         {
             if (!(panelItemVM.ContentVM is MenuContentVM))
             {
@@ -58,7 +86,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 依赖属性回调
 
-        private void OnPanelVMPropertyChanged(SidePanelVM oldValue, SidePanelVM newValue)
+        private void OnPanelVMPropertyChanged(PanelVM oldValue, PanelVM newValue)
         {
             ListBoxMenus.DataContext = newValue;
         }
@@ -66,7 +94,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private static void PanelVMPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             PanelUserControl me = d as PanelUserControl;
-            me.OnPanelVMPropertyChanged(e.OldValue as SidePanelVM, e.NewValue as SidePanelVM);
+            me.OnPanelVMPropertyChanged(e.OldValue as PanelVM, e.NewValue as PanelVM);
         }
 
         #endregion
@@ -75,9 +103,10 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ListBoxMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            SidePanelItemVM selectedItem = ListBoxMenus.SelectedItem as SidePanelItemVM;
+            PanelItemVM selectedItem = ListBoxMenus.SelectedItem as PanelItemVM;
             if (selectedItem == null)
             {
+                this.PanelVM.CurrentContent = null;
                 return;
             }
 
@@ -95,7 +124,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            SidePanelItemVM panelItemVM = ListBoxMenus.SelectedItem as SidePanelItemVM;
+            PanelItemVM panelItemVM = ListBoxMenus.SelectedItem as PanelItemVM;
 
             ListBoxMenus.SelectedItem = null;
             GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Collapsed);
@@ -106,9 +135,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            SidePanelItemVM selected = ListBoxMenus.SelectedItem as SidePanelItemVM;
+            PanelItemVM selected = ListBoxMenus.SelectedItem as PanelItemVM;
 
-            SidePanelItemVM clicked = (sender as ListBoxItem).DataContext as SidePanelItemVM;
+            PanelItemVM clicked = (sender as ListBoxItem).DataContext as PanelItemVM;
 
             if (clicked == selected)
             {

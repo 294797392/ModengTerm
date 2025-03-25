@@ -28,7 +28,7 @@ namespace ModengTerm.Addons
         /// </summary>
         protected SideWindow CreateSideWindow(SideWindowMetadata swm)
         {
-
+            throw new NotImplementedException();
         }
 
         /// <summary>

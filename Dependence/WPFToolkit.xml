@@ -2335,6 +2335,7 @@
         <member name="P:WPFToolkit.MVVM.MenuItemVM.Parameters">
             <summary>
             输入参数
+            该参数会传递到MenuContentVM里
             </summary>
         </member>
         <member name="P:WPFToolkit.MVVM.MenuItemVM.IsSelected">
@@ -2424,57 +2425,57 @@
             每次从界面上移除之前都会触发
             </summary>
         </member>
-        <member name="T:WPFToolkit.MVVM.AbstractMenuVM`1">
+        <member name="T:WPFToolkit.MVVM.MenuVM">
             <summary>
             树形结构的菜单ViewModel
             </summary>
         </member>
-        <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.currentContent">
+        <member name="F:WPFToolkit.MVVM.MenuVM.currentContent">
             <summary>
             当前选中的页面
             </summary>
         </member>
-        <member name="F:WPFToolkit.MVVM.AbstractMenuVM`1.isContentLoading">
+        <member name="F:WPFToolkit.MVVM.MenuVM.isContentLoading">
             <summary>
             当前的内容是否正在初始化
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.Context">
+        <member name="P:WPFToolkit.MVVM.MenuVM.Context">
             <summary>
             保存菜单的上下文信息
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.SelectedMenu">
+        <member name="P:WPFToolkit.MVVM.MenuVM.SelectedMenu">
             <summary>
             当前选中的菜单
             该属性是只读的，考虑到菜单有可能是树形结构，TreeView没有SelectedItem属性，无法直接绑定
             当MenuItemVM.IsSelected改变的时候，修改这个值
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.MenuItems">
+        <member name="P:WPFToolkit.MVVM.MenuVM.MenuItems">
             <summary>
             所有的菜单列表
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.IsContentLoading">
+        <member name="P:WPFToolkit.MVVM.MenuVM.IsContentLoading">
             <summary>
             当前的内容是否正在初始化
             界面上可以通过这个值给用户显示一个“加载中”的界面
             </summary>
         </member>
-        <member name="P:WPFToolkit.MVVM.AbstractMenuVM`1.CurrentContent">
+        <member name="P:WPFToolkit.MVVM.MenuVM.CurrentContent">
             <summary>
             当前显示的界面
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadContent(`0)">
+        <member name="M:WPFToolkit.MVVM.MenuVM.LoadContent(WPFToolkit.MVVM.MenuItemVM)">
             <summary>
             加载指定的界面，会执行相关的生命周期函数
             </summary>
             <param name="menuItem">要切换的菜单</param>
             <returns>如果菜单没有对应的页面，那么返回null。否则返回对应的页面实例</returns>
         </member>
-        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.TryGetItem(System.String,`0@)">
+        <member name="M:WPFToolkit.MVVM.MenuVM.TryGetItem(System.String,WPFToolkit.MVVM.MenuItemVM@)">
             <summary>
             根据Id获取指定的节点
             </summary>
@@ -2482,18 +2483,18 @@
             <param name="menuItem"></param>
             <returns></returns>
         </member>
-        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.ExpandAll">
+        <member name="M:WPFToolkit.MVVM.MenuVM.ExpandAll">
             <summary>
             展开所有子节点
             </summary>
         </member>
-        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.AddMenuItem(`0)">
+        <member name="M:WPFToolkit.MVVM.MenuVM.AddMenuItem(WPFToolkit.MVVM.MenuItemVM)">
             <summary>
             新加一个子节点
             </summary>
             <param name="menuItem"></param>
         </member>
-        <member name="M:WPFToolkit.MVVM.AbstractMenuVM`1.LoadSubMenus(`0,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
+        <member name="M:WPFToolkit.MVVM.MenuVM.LoadSubMenus(WPFToolkit.MVVM.MenuItemVM,System.Collections.Generic.List{WPFToolkit.MVVM.MenuDefinition})">
             <summary>
             递归加载子菜单
             </summary>
