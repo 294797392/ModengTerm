@@ -911,15 +911,15 @@ namespace ModengTerm.Terminal.ViewModels
                 logger.Error("SessionTransport_StatusChanged异常", ex);
             }
 
-            base.Status = status;
-
-            App.Current.Dispatcher.Invoke(() =>
+            if (bytesDisplay != null)
             {
-                if (bytesDisplay != null)
+                App.Current.Dispatcher.Invoke(() =>
                 {
                     this.videoTerminal.ProcessRead(bytesDisplay, bytesDisplay.Length);
-                }
-            });
+                });
+            }
+
+            this.RaiseStatusChanged(status);
         }
 
         public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)

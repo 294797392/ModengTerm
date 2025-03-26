@@ -61,7 +61,7 @@ namespace ModengTerm.ViewModels
         public SessionStatusEnum Status
         {
             get { return this.status; }
-            protected set
+            private set
             {
                 if (this.status != value)
                 {
@@ -132,27 +132,25 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 当显示到界面上之后触发
         /// </summary>
-        public void Load() { }
+        public void OnLoaded()
+        {
+            SessionPanelContentVM panelContent = this.GetActivePanelContent();
+            if (panelContent != null)
+            {
+                panelContent.OnLoaded();
+            }
+        }
 
         /// <summary>
         /// 当从界面上移除之后触发
         /// </summary>
-        public void Unload() { }
-
-        public SessionPanelContentVM GetSelectedPanelContent()
+        public void OnUnload()
         {
-            if (this.Panel == null) 
+            SessionPanelContentVM panelContent = this.GetActivePanelContent();
+            if (panelContent != null)
             {
-                return null;
+                panelContent.OnUnload();
             }
-
-            MenuItemVM selectedItem = this.Panel.SelectedMenu;
-            if (selectedItem == null) 
-            {
-                return null;
-            }
-
-            return selectedItem.ContentVM as SessionPanelContentVM;
         }
 
         #endregion
@@ -161,6 +159,25 @@ namespace ModengTerm.ViewModels
 
         protected abstract int OnOpen();
         protected abstract void OnClose();
+
+        #endregion
+
+        #region 受保护方法
+
+        protected void RaiseStatusChanged(SessionStatusEnum status)
+        {
+            if (this.status == status)
+            {
+                return;
+            }
+
+            this.Status = status;
+
+            if (this.StatusChanged != null)
+            {
+                this.StatusChanged(this, status);
+            }
+        }
 
         #endregion
 
@@ -207,6 +224,26 @@ namespace ModengTerm.ViewModels
             }
 
             return results;
+        }
+
+        /// <summary>
+        /// 获取当前显示的PanelContent
+        /// </summary>
+        /// <returns></returns>
+        private SessionPanelContentVM GetActivePanelContent()
+        {
+            if (this.Panel == null)
+            {
+                return null;
+            }
+
+            MenuItemVM selectedItem = this.Panel.SelectedMenu;
+            if (selectedItem == null)
+            {
+                return null;
+            }
+
+            return selectedItem.ContentVM as SessionPanelContentVM;
         }
 
         #endregion

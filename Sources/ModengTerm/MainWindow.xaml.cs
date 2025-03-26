@@ -21,7 +21,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
 namespace ModengTerm
@@ -217,26 +216,18 @@ namespace ModengTerm
                 }
             }
 
-            #region 触发PanelContent的OnLoaded或OnUnload事件
+            #region 触发OpenedSessionVM的OnLoaded或OnUnload事件
 
             if (e.RemovedItems.Count > 0) 
             {
                 OpenedSessionVM removedSession = e.RemovedItems[0] as OpenedSessionVM;
-                SessionPanelContentVM panelContentVM = removedSession.GetSelectedPanelContent();
-                if (panelContentVM != null) 
-                {
-                    panelContentVM.OnUnload();
-                }
+                removedSession.OnUnload();
             }
 
             if (e.AddedItems.Count > 0)
             {
                 OpenedSessionVM addedSession = e.AddedItems[0] as OpenedSessionVM;
-                SessionPanelContentVM panelContentVM = addedSession.GetSelectedPanelContent();
-                if (panelContentVM != null) 
-                {
-                    panelContentVM.OnLoaded();
-                }
+                addedSession.OnLoaded();
             }
 
             #endregion
