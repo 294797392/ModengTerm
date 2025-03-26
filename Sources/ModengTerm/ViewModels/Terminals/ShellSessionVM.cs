@@ -875,40 +875,33 @@ namespace ModengTerm.Terminal.ViewModels
 
             byte[] bytesDisplay = null;
 
-            try
+            switch (status)
             {
-                switch (status)
-                {
-                    case SessionStatusEnum.Connected:
-                        {
-                            break;
-                        }
+                case SessionStatusEnum.Connected:
+                    {
+                        break;
+                    }
 
-                    case SessionStatusEnum.Connecting:
-                        {
-                            bytesDisplay = this.readEncoding.GetBytes("连接主机中...\r\n");
-                            break;
-                        }
+                case SessionStatusEnum.Connecting:
+                    {
+                        bytesDisplay = this.readEncoding.GetBytes("连接主机中...\r\n");
+                        break;
+                    }
 
-                    case SessionStatusEnum.ConnectError:
-                        {
-                            bytesDisplay = this.readEncoding.GetBytes("与主机连接失败...\r\n");
-                            break;
-                        }
+                case SessionStatusEnum.ConnectError:
+                    {
+                        bytesDisplay = this.readEncoding.GetBytes("与主机连接失败...\r\n");
+                        break;
+                    }
 
-                    case SessionStatusEnum.Disconnected:
-                        {
-                            bytesDisplay = this.readEncoding.GetBytes("与主机断开连接...\r\n");
-                            break;
-                        }
+                case SessionStatusEnum.Disconnected:
+                    {
+                        bytesDisplay = this.readEncoding.GetBytes("与主机断开连接...\r\n");
+                        break;
+                    }
 
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("SessionTransport_StatusChanged异常", ex);
+                default:
+                    throw new NotImplementedException();
             }
 
             if (bytesDisplay != null)
