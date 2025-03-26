@@ -631,7 +631,7 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 渲染数据
+        /// 处理从服务器读取到的数据
         /// 该方法必须在UI线程调用
         /// </summary>
         /// <param name="bytes">要渲染的数据</param>
@@ -673,7 +673,7 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 处理要写入的数据
+        /// 处理要发送到服务器的数据
         /// </summary>
         public void ProcessWrite(byte[] bytes)
         {

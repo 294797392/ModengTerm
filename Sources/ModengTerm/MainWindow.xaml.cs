@@ -21,6 +21,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
 namespace ModengTerm
@@ -215,6 +216,30 @@ namespace ModengTerm
                     this.mainWindowVM.TitleMenus.AddRange(openedSessionVM.TitleMenus);
                 }
             }
+
+            #region 触发PanelContent的OnLoaded或OnUnload事件
+
+            if (e.RemovedItems.Count > 0) 
+            {
+                OpenedSessionVM removedSession = e.RemovedItems[0] as OpenedSessionVM;
+                SessionPanelContentVM panelContentVM = removedSession.GetSelectedPanelContent();
+                if (panelContentVM != null) 
+                {
+                    panelContentVM.OnUnload();
+                }
+            }
+
+            if (e.AddedItems.Count > 0)
+            {
+                OpenedSessionVM addedSession = e.AddedItems[0] as OpenedSessionVM;
+                SessionPanelContentVM panelContentVM = addedSession.GetSelectedPanelContent();
+                if (panelContentVM != null) 
+                {
+                    panelContentVM.OnLoaded();
+                }
+            }
+
+            #endregion
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)

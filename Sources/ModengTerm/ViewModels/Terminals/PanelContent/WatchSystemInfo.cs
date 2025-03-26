@@ -164,10 +164,10 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             base.OnUnload();
         }
 
-        //public override void OnReady()
-        //{
-        //    this.StartWatch();
-        //}
+        public override void OnReady()
+        {
+            this.StartWatch();
+        }
 
         #endregion
 

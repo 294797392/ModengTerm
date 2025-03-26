@@ -18,6 +18,11 @@ namespace ModengTerm.ViewModels
     {
         #region 公开事件
 
+        /// <summary>
+        /// 当连接状态改变时触发
+        /// </summary>
+        public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
+
         #endregion
 
         #region 实例变量
@@ -133,6 +138,22 @@ namespace ModengTerm.ViewModels
         /// 当从界面上移除之后触发
         /// </summary>
         public void Unload() { }
+
+        public SessionPanelContentVM GetSelectedPanelContent()
+        {
+            if (this.Panel == null) 
+            {
+                return null;
+            }
+
+            MenuItemVM selectedItem = this.Panel.SelectedMenu;
+            if (selectedItem == null) 
+            {
+                return null;
+            }
+
+            return selectedItem.ContentVM as SessionPanelContentVM;
+        }
 
         #endregion
 
