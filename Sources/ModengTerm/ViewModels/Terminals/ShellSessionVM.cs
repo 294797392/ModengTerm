@@ -486,7 +486,7 @@ namespace ModengTerm.Terminal.ViewModels
                 ShellSessionVM shellSession = syncInput.ShellSessionVM;
                 if (shellSession == null)
                 {
-                    shellSession = MTermApp.Context.MainWindowVM.OpenedSessionsVM.ShellSessions.FirstOrDefault(v => v.ID == syncInput.ID);
+                    shellSession = MTermApp.Context.MainWindowVM.ShellSessions.FirstOrDefault(v => v.ID == syncInput.ID);
                     syncInput.ShellSessionVM = shellSession;
                 }
 
@@ -1170,7 +1170,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void SendToAll()
         {
-            foreach (ShellSessionVM shellSession in MTermApp.Context.MainWindowVM.OpenedSessionsVM.ShellSessions)
+            foreach (ShellSessionVM shellSession in MTermApp.Context.MainWindowVM.ShellSessions)
             {
                 if (shellSession == this)
                 {

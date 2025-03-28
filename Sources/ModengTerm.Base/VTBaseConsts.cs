@@ -152,7 +152,6 @@ namespace ModengTerm.Base
         public const int WatchIntervalNormal = 2000;
         public const int WatchIntervalHigh = 1000;
         public const int WatchIntervalLow = 3000;
-        public const WatchFrequencyEnum DefaultWatchFrequency = WatchFrequencyEnum.Normal;
 
         public const double DefaultMainWindowWidth = 900;
         public const double DefaultMainWindowHeight = 700;

@@ -85,8 +85,8 @@ namespace ModengTerm.UserControls.Terminals
             // 在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会实时变化
             // 根据Padding手动计算终端宽度和高度
             double padding = session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
-            double width = DocumentMain.DrawAreaSize.Width - padding * 2;
-            double height = DocumentMain.DrawAreaSize.Height - padding * 2;
+            double width = DocumentMain.ActualWidth - padding * 2;
+            double height = DocumentMain.ActualHeight - padding * 2;
 
             DocumentAlternate.SetPadding(padding);
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;

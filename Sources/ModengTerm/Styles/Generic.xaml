@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
-    xmlns:mrendering="clr-namespace:ModengTerm.UserControls.TerminalUserControls.Rendering"
+    xmlns:mdoc="clr-namespace:ModengTerm.UserControls.TerminalUserControls.Rendering"
     xmlns:mcontrol="clr-namespace:ModengTerm.Controls"
     xmlns:converters="clr-namespace:ModengTerm.Styles">
 
@@ -17,11 +17,11 @@
     <!-- 通用控件 -->
     <!-- 动态引用Themes里的资源来实现动态换肤功能 -->
 
-    <Style x:Key="StyleDocumentControl" TargetType="{x:Type mrendering:DocumentControl}">
+    <Style x:Key="StyleDocumentControl" TargetType="{x:Type mdoc:DocumentControl}">
         <Setter Property="Template">
             <Setter.Value>
 
-                <ControlTemplate TargetType="{x:Type mrendering:DocumentControl}">
+                <ControlTemplate TargetType="{x:Type mdoc:DocumentControl}">
 
                     <ControlTemplate.Resources>
 
@@ -189,15 +189,14 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="0"/>
                             <ColumnDefinition Width="8"/>
                             <ColumnDefinition Width="3"/>
                         </Grid.ColumnDefinitions>
 
-                        <mrendering:DrawingArea Grid.Column="0" x:Name="PART_DrawingArea" Background="Transparent"
+                        <mdoc:DrawingArea Grid.Column="0" x:Name="PART_DrawingArea" Background="Transparent"
                                                 Margin="{TemplateBinding Padding}"/>
 
-                        <ScrollBar Grid.Column="2" x:Name="PART_Scrollbar" Visibility="Collapsed"
+                        <ScrollBar Grid.Column="1" x:Name="PART_Scrollbar" Visibility="Collapsed"
                                    Style="{StaticResource ResourceKey=StyleScrollBar}"/>
 
                     </Grid>

@@ -13,6 +13,8 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Text;
+using System.Windows.Data;
+using System.Windows.Media;
 
 namespace ModengTerm.Terminal
 {

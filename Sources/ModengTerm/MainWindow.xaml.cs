@@ -10,13 +10,18 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Themes;
 using ModengTerm.UserControls;
+using ModengTerm.UserControls.TerminalUserControls;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Session;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
+using Renci.SshNet;
 using System;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -42,7 +47,6 @@ namespace ModengTerm
         private OpenedSessionItemContainerStyleSelector itemContainerStyleSelector;
         private VTKeyboardInput userInput;
         private MainWindowVM mainWindowVM;
-        private OpenedSessionsVM openedSessionsVM;
         private ServiceAgent serviceAgent;
         private DefaultMainUserControl defaultMainUserControl;
 
@@ -79,9 +83,6 @@ namespace ModengTerm
             this.itemContainerStyleSelector.StyleOpenSession = this.FindResource("StyleListBoxItemOpenSession") as Style;
             ListBoxOpenedSession.ItemContainerStyleSelector = this.itemContainerStyleSelector;
 
-            this.openedSessionsVM = this.mainWindowVM.OpenedSessionsVM;
-            this.openedSessionsVM.OnSessionOpened += OpenedSessionsVM_OnSessionOpened;
-            ListBoxOpenedSession.DataContext = this.openedSessionsVM;
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
@@ -104,9 +105,28 @@ namespace ModengTerm
         /// <param name="addToRecent">是否加入到最新打开的会话列表里</param>
         private void OpenSession(XTermSession session, bool addToRecent = true)
         {
-            ISessionContent content = this.openedSessionsVM.OpenSession(session);
+            ISessionContent content = SessionContentFactory.Create(session);
             ContentControlSession.Content = content;
+
+            OpenedSessionVM viewModel = OpenedSessionVMFactory.Create(session);
+            viewModel.ID = session.ID;
+            viewModel.Name = session.Name;
+            viewModel.Description = session.Description;
+            viewModel.Content = content as DependencyObject;
+            viewModel.ServiceAgent = MTermApp.Context.ServiceAgent;
+
+            // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
+            int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);
+            this.mainWindowVM.SessionList.Insert(index, viewModel);
+            this.mainWindowVM.SelectedSession = viewModel;
+
             ScrollViewerOpenedSession.ScrollToRightEnd();
+
+            int code = content.Open(viewModel);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("打开会话失败, {0}", code);
+            }
 
             // 增加到最近打开列表里
             if (addToRecent)
@@ -140,10 +160,21 @@ namespace ModengTerm
             this.OpenSession(defaultSession, false);
         }
 
+        private void CloseSession(OpenedSessionVM session)
+        {
+            ISessionContent content = session.Content as ISessionContent;
+            if (VTBaseUtils.IsTerminal((SessionTypeEnum)content.Session.Type))
+            {
+                UserControl userControl = content as UserControl;
+            }
+            content.Close();
+
+            this.mainWindowVM.SessionList.Remove(session);
+        }
+
         #endregion
 
         #region 事件处理器
-
 
         /// <summary>
         /// 当会话被打开之后触发
@@ -151,19 +182,18 @@ namespace ModengTerm
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="openedSession">被打开的会话</param>
-        private void OpenedSessionsVM_OnSessionOpened(OpenedSessionsVM arg1, OpenedSessionVM openedSession)
-        {
-            this.mainWindowVM.TitleMenus.Clear();
-            this.mainWindowVM.TitleMenus.AddRange(openedSession.TitleMenus);
-        }
+        //private void OpenedSessionsVM_OnSessionOpened(OpenedSessionsVM arg1, OpenedSessionVM openedSession)
+        //{
+        //    this.mainWindowVM.TitleMenus.Clear();
+        //    this.mainWindowVM.TitleMenus.AddRange(openedSession.TitleMenus);
+        //}
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_ContentRendered(object sender, EventArgs e)
         {
-            //this.CreateSession();
-
             // 直接打开Windows命令行，可以更快速的进入工作状态
             // TODO：做成可选项，可以直接打开命令行，也能打开会话列表
 
+            // 在Loaded事件里执行OpenDefaultSession会导致高度计算不正确的问题，ContentRendered事件在Loaded事件触发之后触发
             this.OpenDefaultSession();
         }
 
@@ -218,7 +248,7 @@ namespace ModengTerm
 
             #region 触发OpenedSessionVM的OnLoaded或OnUnload事件
 
-            if (e.RemovedItems.Count > 0) 
+            if (e.RemovedItems.Count > 0)
             {
                 OpenedSessionVM removedSession = e.RemovedItems[0] as OpenedSessionVM;
                 removedSession.OnUnload();
@@ -257,18 +287,18 @@ namespace ModengTerm
             FrameworkElement frameworkElement = sender as FrameworkElement;
             OpenedSessionVM openedSessionVM = frameworkElement.DataContext as OpenedSessionVM;
 
-            this.openedSessionsVM.CloseSession(openedSessionVM);
+            this.CloseSession(openedSessionVM);
 
-            this.openedSessionsVM.SelectedSession = this.openedSessionsVM.SessionList.OfType<OpenedSessionVM>().FirstOrDefault();
+            this.mainWindowVM.SelectedSession = this.mainWindowVM.SessionList.OfType<OpenedSessionVM>().FirstOrDefault();
 
-            if (this.openedSessionsVM.SelectedSession == null)
+            if (this.mainWindowVM.SelectedSession == null)
             {
                 ContentControlSession.Content = null;
                 ListBoxOpenedSession.SelectedItem = null;
             }
 
-            if (this.openedSessionsVM.SessionList.Count == 1 &&
-                this.openedSessionsVM.SessionList[0] is OpenSessionVM)
+            if (this.mainWindowVM.SessionList.Count == 1 &&
+                this.mainWindowVM.SessionList[0] is OpenSessionVM)
             {
                 if (this.defaultMainUserControl == null)
                 {

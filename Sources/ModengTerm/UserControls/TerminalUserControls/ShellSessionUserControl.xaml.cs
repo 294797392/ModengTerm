@@ -18,11 +18,17 @@ namespace ModengTerm.UserControls.TerminalUserControls
     /// <summary>
     /// TerminalContentUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TerminalContentUserControl : UserControl, ISessionContent
+    public partial class ShellSessionUserControl : UserControl, ISessionContent
     {
         #region 类变量
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("TerminalUserControl");
+
+        #endregion
+
+        #region 公开事件
+
+        public event Action<ISessionContent> Ready;
 
         #endregion
 
@@ -37,17 +43,13 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 属性
 
-        public OpenedSessionVM OpenedSessionVM { get { return shellSession; } }
-        
         public XTermSession Session { get; set; }
-
-        public IVideoTerminal VideoTerminal { get; set; }
 
         #endregion
 
         #region 构造方法
 
-        public TerminalContentUserControl()
+        public ShellSessionUserControl()
         {
             InitializeComponent();
 
@@ -175,12 +177,18 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void GridDocument_LostFocus(object sender, RoutedEventArgs e)
         {
-            this.videoTerminal.FocusChanged(false);
+            if (this.videoTerminal != null)
+            {
+                this.videoTerminal.FocusChanged(false);
+            }
         }
 
         private void GridDocument_GotFocus(object sender, RoutedEventArgs e)
         {
-            this.videoTerminal.FocusChanged(true);
+            if (this.videoTerminal != null)
+            {
+                this.videoTerminal.FocusChanged(true);
+            }
         }
 
 
@@ -246,7 +254,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             window.Width += deltaX;
             window.Height += deltaY;
 
-            if (window.WindowState != WindowState.Normal) 
+            if (window.WindowState != WindowState.Normal)
             {
                 window.WindowState = WindowState.Normal;
             }
@@ -278,6 +286,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         public int Open(OpenedSessionVM sessionVM)
         {
+            // 背景不放在Dispatcher里渲染，不然会出现背景闪烁一下的现象
             string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
             string base64Image = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_DATA, OptionDefaultValues.THEME_BACKGROUND_IMAGE_DATA);
@@ -289,7 +298,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                     ImageSource imageSource = DrawingUtils.ImageBytes2ImageSource(imageBytes);
                     ImageBackground.Source = imageSource;
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     logger.Error("加载背景图片异常", ex);
                 }
@@ -297,12 +306,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 ImageBackground.Opacity = this.Session.GetOption<double>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, OptionDefaultValues.THEME_BACKGROUND_IMAGE_OPACITY);
             }
 
-            // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
-            // 因为在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会马上变化
-            // 根据Padding手动计算终端宽度和高度
             double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
-            double width = DocumentMain.DrawAreaSize.Width - padding * 2;
-            double height = DocumentMain.DrawAreaSize.Height - padding * 2;
 
             DocumentAlternate.SetPadding(padding);
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
@@ -310,6 +314,13 @@ namespace ModengTerm.UserControls.TerminalUserControls
             DocumentMain.SetPadding(padding);
             DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
             DocumentMain.DrawArea.SizeChanged += DrawArea_SizeChanged;
+
+            // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
+            // 因为在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会马上变化
+            // 根据Padding手动计算终端宽度和高度
+            double width = DocumentMain.DrawArea.ActualWidth;
+            double height = DocumentMain.DrawArea.ActualHeight;
+            logger.InfoFormat("width = {0}, height = {1}", DocumentMain.DrawArea.ActualWidth, DocumentMain.DrawArea.ActualHeight);
 
             this.shellSession = sessionVM as ShellSessionVM;
             this.shellSession.MainDocument = DocumentMain;
@@ -328,6 +339,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
             AutoCompletionUserControl.Margin = new Thickness(padding);
             AutoCompletionUserControl.DataContext = this.shellSession.AutoCompletionVM;
 
+            base.DataContext = this.shellSession;
+
             return ResponseCode.SUCCESS;
         }
 
@@ -345,12 +358,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
             this.videoTerminal = null;
         }
 
-        public bool SetInputFocus() 
+        public bool SetInputFocus()
         {
             return GridDocument.Focus();
         }
 
-        public bool HasInputFocus() 
+        public bool HasInputFocus()
         {
             return GridDocument.IsFocused;
         }

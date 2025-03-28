@@ -28,9 +28,9 @@ namespace ModengTerm.Windows.Terminals
         #region 实例变量
 
         private ShellSessionVM shellSession;
-        private OpenedSessionsVM openedSessions;
         private BindableCollection<SyncInputSessionVM> syncSlaves;
         private BindableCollection<SyncInputSessionVM> selectedSlaves;
+        private MainWindowVM mainWindowVM;
 
         #endregion
 
@@ -50,11 +50,11 @@ namespace ModengTerm.Windows.Terminals
         private void InitializeWindow(ShellSessionVM shellSession)
         {
             this.shellSession = shellSession;
-            this.openedSessions = MTermApp.Context.MainWindowVM.OpenedSessionsVM;
+            this.mainWindowVM = MTermApp.Context.MainWindowVM;
             this.syncSlaves = new BindableCollection<SyncInputSessionVM>();
             this.selectedSlaves = new BindableCollection<SyncInputSessionVM>();
 
-            foreach (ShellSessionVM session in this.openedSessions.ShellSessions)
+            foreach (ShellSessionVM session in this.mainWindowVM.ShellSessions)
             {
                 if (session == shellSession)
                 {

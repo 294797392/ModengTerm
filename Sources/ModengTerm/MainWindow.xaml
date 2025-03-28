@@ -17,9 +17,8 @@
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="900" Height="700" WindowStartupLocation="CenterScreen"
-        Loaded="Window_Loaded" WindowStyle="None"
-        WindowState="Maximized"
-        SourceInitialized="Window_SourceInitialized">
+        WindowStyle="None" WindowState="Maximized"
+        SourceInitialized="Window_SourceInitialized" ContentRendered="Window_ContentRendered">
 
     <!--WindowState="Maximized"-->
 

@@ -1,7 +1,10 @@
-﻿using ModengTerm.Base;
+﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +14,17 @@ namespace ModengTerm.ViewModels
 {
     public class MainWindowVM : ViewModelBase
     {
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("MainWindowVM");
+
+        /// <summary>
+        /// 最后一个打开会话的按钮
+        /// </summary>
+        public static readonly OpenSessionVM OpenSessionVM = new OpenSessionVM();
+
+        #endregion
+
         #region 实例变量
 
         private ServiceAgent serviceAgent;
@@ -27,7 +41,25 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 打开的所有会话列表
         /// </summary>
-        public OpenedSessionsVM OpenedSessionsVM { get; private set; }
+        public BindableCollection<SessionItemVM> SessionList { get; private set; }
+
+        /// <summary>
+        /// 打开的所有类型是Shell的会话列表
+        /// </summary>
+        public IEnumerable<ShellSessionVM> ShellSessions { get { return this.SessionList.OfType<ShellSessionVM>(); } }
+
+        /// <summary>
+        /// 选中的会话
+        /// </summary>
+        public SessionItemVM SelectedSession
+        {
+            get { return this.SessionList.SelectedItem; }
+            set
+            {
+                this.SessionList.SelectedItem = value;
+                this.NotifyPropertyChanged("SelectedSession");
+            }
+        }
 
         /// <summary>
         /// 窗口顶部的所有菜单列表
@@ -49,7 +81,8 @@ namespace ModengTerm.ViewModels
         {
             this.serviceAgent = MTermApp.Context.ServiceAgent;
 
-            this.OpenedSessionsVM = new OpenedSessionsVM();
+            this.SessionList = new BindableCollection<SessionItemVM>();
+            this.SessionList.Add(OpenSessionVM);
 
             List<XTermSession> sessions = this.serviceAgent.GetSessions();
             this.RecentlyOpenedSession = new BindableCollection<RecentlySessionVM>();

@@ -16,7 +16,7 @@ namespace ModengTerm
                 case SessionTypeEnum.Localhost:
                 case SessionTypeEnum.SSH:
                     {
-                        return new TerminalContentUserControl();
+                        return new ShellSessionUserControl() { Session = session };
                     }
 
                 default:

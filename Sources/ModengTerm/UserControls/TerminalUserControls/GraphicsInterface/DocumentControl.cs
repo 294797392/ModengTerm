@@ -2,6 +2,7 @@
 using ModengTerm.Document.Drawing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
@@ -158,7 +159,7 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             }
 
             this.padding = padding;
-            base.Padding = new Thickness(padding);
+            base.SetCurrentValue(DocumentControl.PaddingProperty, new Thickness(padding));
         }
 
         public GraphicsObject CreateDrawingObject()
@@ -225,11 +226,17 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             base.OnApplyTemplate();
 
             this.drawArea = base.Template.FindName("PART_DrawingArea", this) as DrawingArea;
+            this.drawArea.SizeChanged += DrawArea_SizeChanged;
             this.scrollbar = base.Template.FindName("PART_Scrollbar", this) as ScrollBar;
             this.scrollbar.PreviewMouseLeftButtonDown += Scrollbar_PreviewMouseLeftButtonDown;
             this.scrollbar.PreviewMouseLeftButtonUp += Scrollbar_PreviewMouseLeftButtonUp;
             this.scrollbar.PreviewMouseMove += Scrollbar_PreviewMouseMove;
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
+        }
+
+        private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            logger.InfoFormat("drawAreaWidth = {0}, drawAreaHeight = {1}", this.drawArea.ActualWidth, this.drawArea.ActualHeight);
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
