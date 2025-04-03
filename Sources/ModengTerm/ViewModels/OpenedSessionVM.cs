@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
@@ -17,14 +18,6 @@ namespace ModengTerm.ViewModels
     public abstract class OpenedSessionVM : SessionItemVM
     {
         #region 公开事件
-
-        /// <summary>
-        /// 当连接状态改变时触发
-        /// OpenedSessionVM：会话
-        /// SessionStatusEnum：旧的状态
-        /// SessionStatusEnum：新的状态
-        /// </summary>
-        public event Action<OpenedSessionVM, SessionStatusEnum, SessionStatusEnum> StatusChanged;
 
         #endregion
 
@@ -118,18 +111,17 @@ namespace ModengTerm.ViewModels
 
         public int Open()
         {
-            Dictionary<string, object> parameters = new Dictionary<string, object>()
-            {
-                { "Session", this }
-            };
-            this.Panel = VTClientUtils.PanelDefinition2PanelVM(MTermApp.Context.Manifest.SessionPanel, parameters, this.Session.Type);
-
+            // 给所有的插件页面使用的通用属性赋值
+            this.Panel = VTClientUtils.PanelDefinition2PanelVM(MTermApp.Context.Manifest.SessionPanel, this.Session.Type);
+            this.AddRemovePanelItemEvent(true);
             return this.OnOpen();
         }
 
         public void Close()
         {
             this.OnClose();
+
+            this.AddRemovePanelItemEvent(false);
         }
 
         /// <summary>
@@ -167,6 +159,11 @@ namespace ModengTerm.ViewModels
 
         #region 受保护方法
 
+        /// <summary>
+        /// 由子类调用，通知父类会话状态改变
+        /// 该方法在UI线程运行
+        /// </summary>
+        /// <param name="status"></param>
         protected void RaiseStatusChanged(SessionStatusEnum status)
         {
             if (this.status == status)
@@ -174,12 +171,14 @@ namespace ModengTerm.ViewModels
                 return;
             }
 
-            if (this.StatusChanged != null)
-            {
-                this.StatusChanged(this, this.status, status);
-            }
-
             this.Status = status;
+
+            // 通知所有PanelContent，会话状态改变了
+            IEnumerable<SessionPanelContentVM> panelContents = this.Panel.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();
+            foreach (SessionPanelContentVM panelContent in panelContents)
+            {
+                panelContent.OnSessionStatusChanged(status);
+            }
         }
 
         #endregion
@@ -247,6 +246,42 @@ namespace ModengTerm.ViewModels
             }
 
             return selectedItem.ContentVM as SessionPanelContentVM;
+        }
+
+        /// <summary>
+        /// 注册或反注册PanelItem的事件
+        /// </summary>
+        /// <param name="add"></param>
+        private void AddRemovePanelItemEvent(bool add)
+        {
+            foreach (MenuItemVM menuItem in this.Panel.MenuItems)
+            {
+                if (add)
+                {
+                    menuItem.ContentInitializing += PanelItem_ContentInitializing;
+                }
+                else
+                {
+                    menuItem.ContentInitializing -= PanelItem_ContentInitializing;
+                }
+            }
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        /// <summary>
+        /// 在PanelContentVM初始化之前触发
+        /// </summary>
+        /// <param name="menuItemVM"></param>
+        /// <param name="viewModel"></param>
+        private void PanelItem_ContentInitializing(MenuItemVM menuItemVM, ViewModelBase viewModel, DependencyObject view)
+        {
+            SessionPanelContentVM sessionPanelContentVM = viewModel as SessionPanelContentVM;
+            sessionPanelContentVM.Session = this.Session;
+            sessionPanelContentVM.OpenedSessionVM = this;
+            sessionPanelContentVM.ServiceAgent = this.ServiceAgent;
         }
 
         #endregion

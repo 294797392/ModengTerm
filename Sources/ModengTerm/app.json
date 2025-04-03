@@ -537,8 +537,15 @@
                 "id": "1",
                 "name": "系统监控",
                 "icon": "M0 0h1024v853.312H0V0z m85.312 85.312V768h853.376V85.312H85.312z m85.376 853.376h682.624V1024H170.688v-85.312z m480.32-423.424L449.536 358.848 339.84 515.2H170.688V429.888h124.8l135.68-193.408 249.024 193.408h173.12v85.376h-202.304z",
-                "className": "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm",
-                "vmClassName": "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm"
+                "className": "ModengTerm.Addons.SystemMonitor.SystemWatchUserControl, ModengTerm",
+                "vmClassName": "ModengTerm.Addons.SystemMonitor.WatchSystemInfo, ModengTerm"
+            },
+            {
+                "id": "2",
+                "name": "快速输入",
+                "icon": "M736.4608 161.44384l115.85536 115.85536a40.96 40.96 0 0 1 0 57.91744L427.08992 760.44288c-6.06208 6.0416-13.86496 10.0352-22.3232 11.38688-107.47904 17.48992-165.888 21.6064-175.16544 12.32896-9.27744-9.29792-5.16096-67.6864 12.32896-175.18592 1.35168-8.43776 5.3248-16.24064 11.38688-22.30272L678.54336 161.44384a40.96 40.96 0 0 1 57.91744 0z m-142.9504 128.45056L275.0464 608.3584a10.0352 10.0352 0 0 0-2.80576 5.55008c-8.6016 52.92032-13.9264 93.55264-15.89248 121.6512-0.57344 8.25344-0.86016 15.31904-0.86016 21.0944v1.59744h1.59744c4.62848 0 10.05568-0.18432 16.2816-0.55296l4.8128-0.3072c28.09856-1.98656 68.73088-7.2704 121.7536-15.91296a9.91232 9.91232 0 0 0 5.40672-2.74432l311.0912-311.0912-122.94144-137.74848z m106.74176-106.72128l-84.992 84.95104 122.96192 137.728 92.3648-92.3648a10.24 10.24 0 0 0 0-14.45888L714.752 183.17312a10.24 10.24 0 0 0-14.47936 0z",
+                "className": "ModengTerm.Addons.QuickInput.QuickInputUserControl, ModengTerm",
+                "vmClassName": "ModengTerm.Addons.QuickInput.QuickInputVM, ModengTerm"
             }
         ]
     },

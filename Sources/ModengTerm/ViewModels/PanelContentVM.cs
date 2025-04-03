@@ -1,9 +1,6 @@
-﻿using ModengTerm.Base.Enumerations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Enumerations;
+using ModengTerm.Base.ServiceAgents;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
@@ -75,6 +72,21 @@ namespace ModengTerm.ViewModels
 
         #region 属性
 
+        /// <summary>
+        /// 获取该窗口所关联的原始Session数据
+        /// </summary>
+        public XTermSession Session { get; set; }
+
+        /// <summary>
+        /// 获取该窗口所关联的会话
+        /// </summary>
+        public OpenedSessionVM OpenedSessionVM { get; set; }
+
+        /// <summary>
+        /// 获取访问服务的代理
+        /// </summary>
+        public ServiceAgent ServiceAgent { get; set; }
+
         #endregion
 
         #region MenuContentVM
@@ -84,6 +96,8 @@ namespace ModengTerm.ViewModels
         public override void OnInitialize()
         {
             this.ID = ++id;
+
+            this.sessionStatus = this.OpenedSessionVM.Status;
         }
 
         public override void OnLoaded()
@@ -137,6 +151,7 @@ namespace ModengTerm.ViewModels
         #region 抽象方法
 
         /// <summary>
+        /// 问题点：没点击菜单的时候，实例还没被创建，如何触发
         /// 会话状态改变的时候触发
         /// </summary>
         /// <param name="status"></param>

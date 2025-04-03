@@ -65,7 +65,7 @@ namespace ModengTerm
         /// <param name="parameters">要传递到PanelContentVM里的参数</param>
         /// <param name="matchType"></param>
         /// <returns></returns>
-        public static PanelVM PanelDefinition2PanelVM(PanelDefinition panel, Dictionary<string, object> parameters = null, int? matchType = null)
+        public static PanelVM PanelDefinition2PanelVM(PanelDefinition panel, int? matchType = null)
         {
             PanelVM panelVM = new PanelVM();
             panelVM.ID = panel.ID;
@@ -89,13 +89,6 @@ namespace ModengTerm
                 panelItemVM.IconURI = panelItem.Icon;
                 panelItemVM.ClassName = panelItem.ClassName;
                 panelItemVM.VMClassName = panelItem.VMClassName;
-                if (parameters != null)
-                {
-                    foreach (KeyValuePair<string, object> kv in parameters)
-                    {
-                        panelItemVM.Parameters[kv.Key] = kv.Value;
-                    }
-                }
                 panelVM.AddMenuItem(panelItemVM);
             }
 

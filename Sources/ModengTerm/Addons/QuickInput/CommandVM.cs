@@ -7,12 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels.Terminals
+namespace ModengTerm.Addons.QuickInput
 {
     /// <summary>
     /// 快捷命令ViewModel
     /// </summary>
-    public class QuickCommandVM : ItemViewModel
+    public class CommandVM : ItemViewModel
     {
         private string command;
         private CommandTypeEnum type;
@@ -25,14 +25,14 @@ namespace ModengTerm.ViewModels.Terminals
         {
             get
             {
-                return this.command;
+                return command;
             }
             set
             {
-                if (this.command != value)
+                if (command != value)
                 {
-                    this.command = value;
-                    this.NotifyPropertyChanged("Command");
+                    command = value;
+                    NotifyPropertyChanged("Command");
                 }
             }
         }
@@ -41,14 +41,14 @@ namespace ModengTerm.ViewModels.Terminals
         {
             get
             {
-                return this.type;
+                return type;
             }
             set
             {
-                if (this.type != value)
+                if (type != value)
                 {
-                    this.type = value;
-                    this.NotifyPropertyChanged("Type");
+                    type = value;
+                    NotifyPropertyChanged("Type");
                 }
             }
         }
@@ -56,42 +56,42 @@ namespace ModengTerm.ViewModels.Terminals
         /// <summary>
         /// 快捷命令所关联的会话
         /// </summary>
-        public string SessionId 
+        public string SessionId
         {
-            get { return this.sessionId; }
+            get { return sessionId; }
             set
             {
-                if (this.sessionId != value)
+                if (sessionId != value)
                 {
-                    this.sessionId = value;
-                    this.NotifyPropertyChanged("SessionId");
+                    sessionId = value;
+                    NotifyPropertyChanged("SessionId");
                 }
             }
         }
 
-        public QuickCommandVM()
+        public CommandVM()
         {
         }
 
-        public QuickCommandVM(ShellCommand command)
+        public CommandVM(ShellCommand command)
         {
-            this.ID = command.ID;
-            this.Name = command.Name;
-            this.Description = command.Description;
-            this.Command = command.Command;
-            this.Type = (CommandTypeEnum)command.Type;
-            this.SessionId = command.SessionId;
+            ID = command.ID;
+            Name = command.Name;
+            Description = command.Description;
+            Command = command.Command;
+            Type = (CommandTypeEnum)command.Type;
+            SessionId = command.SessionId;
         }
 
         public ShellCommand GetShellCommand()
         {
             return new ShellCommand()
             {
-                ID = this.ID.ToString(),
-                Command = this.Command,
-                Name = this.Name,
-                Type = (int)this.Type,
-                SessionId = this.SessionId
+                ID = ID.ToString(),
+                Command = Command,
+                Name = Name,
+                Type = (int)Type,
+                SessionId = SessionId
             };
         }
     }

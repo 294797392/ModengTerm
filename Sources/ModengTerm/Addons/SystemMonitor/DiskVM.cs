@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels.Terminals.PanelContent
+namespace ModengTerm.Addons.SystemMonitor
 {
     /// <summary>
     /// 磁盘驱动器ViewModel
@@ -40,25 +40,25 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public string Format
         {
-            get { return this.format; }
+            get { return format; }
             set
             {
-                if (this.format != value)
+                if (format != value)
                 {
-                    this.format = value;
+                    format = value;
                 }
             }
         }
 
         public string FreeRatio
         {
-            get { return this.freeRatio; }
+            get { return freeRatio; }
             set
             {
-                if (this.freeRatio != value)
+                if (freeRatio != value)
                 {
-                    this.freeRatio = value;
-                    this.NotifyPropertyChanged("FreeRatio");
+                    freeRatio = value;
+                    NotifyPropertyChanged("FreeRatio");
                 }
             }
         }
@@ -69,8 +69,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public DiskVM()
         {
-            this.TotalSpace = new UnitValueDouble();
-            this.FreeSpace = new UnitValueDouble();
+            TotalSpace = new UnitValueDouble();
+            FreeSpace = new UnitValueDouble();
         }
 
         #endregion

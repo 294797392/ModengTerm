@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ModengTerm.UserControls.TerminalUserControls
+namespace ModengTerm.Addons.SystemMonitor
 {
     /// <summary>
     /// SystemWatchUserControl.xaml 的交互逻辑

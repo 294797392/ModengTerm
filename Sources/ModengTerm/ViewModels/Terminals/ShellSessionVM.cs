@@ -2,9 +2,7 @@
 using Microsoft.Win32;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
 using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
@@ -28,7 +26,6 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using WPFToolkit.MVVM;
-using WPFToolkit.Utility;
 
 namespace ModengTerm.Terminal.ViewModels
 {
@@ -58,8 +55,6 @@ namespace ModengTerm.Terminal.ViewModels
         private Encoding writeEncoding;
         private Encoding readEncoding;
 
-        private RecordStatusEnum recordStatus;
-
         /// <summary>
         /// 是否正在运行
         /// </summary>
@@ -70,6 +65,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private VTClipboard clipboard;
 
+        private RecordStatusEnum recordStatus;
         private PlaybackStatusEnum playbackStatus;
         private PlaybackStream playbackStream;
 
@@ -197,11 +193,6 @@ namespace ModengTerm.Terminal.ViewModels
         public BindableCollection<string> HistoryCommands { get; private set; }
 
         /// <summary>
-        /// 该会话的所有快捷命令
-        /// </summary>
-        public BindableCollection<QuickCommandVM> ShellCommands { get; private set; }
-
-        /// <summary>
         /// 要同步输入的会话列表
         /// </summary>
         public BindableCollection<SyncInputSessionVM> SyncInputSessions { get; private set; }
@@ -276,7 +267,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.scriptItems = this.Session.GetOption<List<ScriptItem>>(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             this.HistoryCommands = new BindableCollection<string>();
 
-            this.ShellCommands = new BindableCollection<QuickCommandVM>();
             this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
             this.RecordStatus = RecordStatusEnum.Stop;
@@ -286,12 +276,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 MaximumHistory = this.Session.GetOption<int>(OptionKeyEnum.TERM_MAX_CLIPBOARD_HISTORY)
             };
-
-            #region 初始化快捷命令
-
-            this.ShellCommands.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new QuickCommandVM(v)));
-
-            #endregion
 
             #region 初始化上下文菜单
 
@@ -392,40 +376,6 @@ namespace ModengTerm.Terminal.ViewModels
         #endregion
 
         #region 实例方法
-
-        private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
-        {
-            switch (filterIndex)
-            {
-                case 1: return ParagraphFormatEnum.PlainText;
-                case 2: return ParagraphFormatEnum.HTML;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        private void SaveToFile(ParagraphTypeEnum paragraphType)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
-            saveFileDialog.FileName = string.Format("{0}_{1}", this.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
-            if ((bool)saveFileDialog.ShowDialog())
-            {
-                ParagraphFormatEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
-
-                try
-                {
-                    VTParagraph paragraph = this.videoTerminal.CreateParagraph(paragraphType, fileType);
-                    File.WriteAllText(saveFileDialog.FileName, paragraph.Content);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("保存日志异常", ex);
-                    MessageBoxUtils.Error("保存失败");
-                }
-            }
-        }
 
         private string InitializeURI()
         {
@@ -589,20 +539,6 @@ namespace ModengTerm.Terminal.ViewModels
             {
                 this.scriptItems.RemoveAt(0);
             }
-        }
-
-        private void StopRecord()
-        {
-            if (this.recordStatus == RecordStatusEnum.Stop)
-            {
-                return;
-            }
-
-            // TODO：此时文件可能正在被写入，playbackStream里做了异常处理，所以直接这么写
-            // 需要优化
-            this.playbackStream.Close();
-
-            this.RecordStatus = RecordStatusEnum.Stop;
         }
 
         private void StopLogger()
@@ -770,23 +706,8 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 打开快捷命令编辑窗口
+        /// 复制当前选中的内容
         /// </summary>
-        public void OpenCreateShellCommandWindow()
-        {
-            CreateShellCommandWindow window = new CreateShellCommandWindow(this);
-            window.Owner = App.Current.MainWindow;
-            if ((bool)window.ShowDialog())
-            {
-                // 重新读取所有快捷命令刷新界面
-
-                List<ShellCommand> shellCommands = MTermApp.Context.ServiceAgent.GetShellCommands(this.ID.ToString());
-
-                this.ShellCommands.Clear();
-                this.ShellCommands.AddRange(shellCommands.Select(v => new QuickCommandVM(v)));
-            }
-        }
-
         public void CopySelection()
         {
             VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
@@ -799,6 +720,83 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 把数据设置到Windows剪贴板里
             System.Windows.Clipboard.SetText(paragraph.Content);
+        }
+
+        /// <summary>
+        /// 开始录像
+        /// </summary>
+        /// <param name="fileName">录像名称</param>
+        public void StartRecord(string fileName)
+        {
+            if (this.recordStatus == RecordStatusEnum.Recording)
+            {
+                logger.WarnFormat("StartRecord: 当前正在录像中");
+                return;
+            }
+
+            Playback playbackFile = new Playback()
+            {
+                ID = Guid.NewGuid().ToString(),
+                Name = fileName,
+                Session = this.Session
+            };
+
+            // 先打开录像文件
+            this.playbackStream = new PlaybackStream();
+            int code = this.playbackStream.OpenWrite(playbackFile);
+            if (code != ResponseCode.SUCCESS)
+            {
+                MTMessageBox.Error("打开录像文件失败, {0}", ResponseCode.GetMessage(code));
+                return;
+            }
+
+            // 然后保存录像记录
+            code = this.ServiceAgent.AddPlayback(playbackFile);
+            if (code != ResponseCode.SUCCESS)
+            {
+                MTMessageBox.Error("录制失败, 保存录制记录失败, {0}", ResponseCode.GetMessage(code));
+                this.playbackStream.Close();
+                return;
+            }
+
+            this.RecordStatus = RecordStatusEnum.Recording;
+        }
+
+        /// <summary>
+        /// 停止录像
+        /// </summary>
+        public void StopRecord()
+        {
+            if (this.recordStatus == RecordStatusEnum.Stop)
+            {
+                return;
+            }
+
+            // TODO：此时文件可能正在被写入，playbackStream里做了异常处理，所以直接这么写
+            // 需要优化
+            this.playbackStream.Close();
+
+            this.RecordStatus = RecordStatusEnum.Stop;
+        }
+
+        /// <summary>
+        /// 保存指定数据到文件
+        /// </summary>
+        /// <param name="paragraphType"></param>
+        /// <param name="format"></param>
+        /// <param name="filePath"></param>
+        public void SaveToFile(ParagraphTypeEnum paragraphType, ParagraphFormatEnum format, string filePath)
+        {
+            try
+            {
+                VTParagraph paragraph = this.videoTerminal.CreateParagraph(paragraphType, format);
+                File.WriteAllText(filePath, paragraph.Content);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("保存日志异常", ex);
+                MTMessageBox.Error("保存失败");
+            }
         }
 
         #endregion
@@ -904,15 +902,15 @@ namespace ModengTerm.Terminal.ViewModels
                     throw new NotImplementedException();
             }
 
-            if (bytesDisplay != null)
+            App.Current.Dispatcher.Invoke(() =>
             {
-                App.Current.Dispatcher.Invoke(() =>
+                this.RaiseStatusChanged(status);
+
+                if (bytesDisplay != null)
                 {
                     this.videoTerminal.ProcessRead(bytesDisplay, bytesDisplay.Length);
-                });
-            }
-
-            this.RaiseStatusChanged(status);
+                }
+            });
         }
 
         public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
@@ -1080,20 +1078,53 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        #endregion
+    }
 
+    public class ShellSessionContextMenuHandler
+    {
+        #region 实例方法
+
+        private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
+        {
+            switch (filterIndex)
+            {
+                case 1: return ParagraphFormatEnum.PlainText;
+                case 2: return ParagraphFormatEnum.HTML;
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void SaveToFile(ParagraphTypeEnum paragraphType, ShellSessionVM shellSession)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
+            saveFileDialog.FileName = string.Format("{0}_{1}", shellSession.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            if (!(bool)saveFileDialog.ShowDialog())
+            {
+                return;
+            }
+
+            ParagraphFormatEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
+            shellSession.SaveToFile(paragraphType, fileType, saveFileDialog.FileName);
+        }
+
+        #endregion
 
         /// <summary>
         /// 拷贝当前选中的内容到剪切板
         /// </summary>
         private void ContextMenuCopySelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.CopySelection();
+            shellSessionVM.CopySelection();
         }
 
         private void ContextMenuPaste_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             string text = System.Windows.Clipboard.GetText();
-            this.SendText(text);
+            shellSessionVM.SendText(text);
         }
 
         /// <summary>
@@ -1101,7 +1132,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void ContextMenuOpenSyncInputConfigurationWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(this);
+            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(shellSessionVM);
             sendAllConfigurationWindow.Owner = App.Current.MainWindow;
             sendAllConfigurationWindow.ShowDialog();
         }
@@ -1111,45 +1142,23 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void ContextMenuStartRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            if (this.recordStatus == RecordStatusEnum.Recording)
+            if (shellSessionVM.RecordStatus == RecordStatusEnum.Recording)
             {
+                MTMessageBox.Info("正在录制中");
                 return;
             }
 
             RecordOptionsVM recordOptionsVM = new RecordOptionsVM();
 
             RecordOptionsWindow recordOptionsWindow = new RecordOptionsWindow();
-            recordOptionsWindow.Owner = Window.GetWindow(this.Content);
+            recordOptionsWindow.Owner = Window.GetWindow(shellSessionVM.Content);
             recordOptionsWindow.DataContext = recordOptionsVM;
-            if ((bool)recordOptionsWindow.ShowDialog())
+            if (!(bool)recordOptionsWindow.ShowDialog())
             {
-                Playback playbackFile = new Playback()
-                {
-                    ID = Guid.NewGuid().ToString(),
-                    Name = recordOptionsVM.FileName,
-                    Session = this.Session
-                };
-
-                // 先打开录像文件
-                this.playbackStream = new PlaybackStream();
-                int code = this.playbackStream.OpenWrite(playbackFile);
-                if (code != ResponseCode.SUCCESS)
-                {
-                    MTMessageBox.Error("打开录像文件失败, {0}", ResponseCode.GetMessage(code));
-                    return;
-                }
-
-                // 然后保存录像记录
-                code = this.ServiceAgent.AddPlayback(playbackFile);
-                if (code != ResponseCode.SUCCESS)
-                {
-                    MTMessageBox.Error("录制失败, 保存录制记录失败, {0}", ResponseCode.GetMessage(code));
-                    this.playbackStream.Close();
-                    return;
-                }
-
-                this.RecordStatus = RecordStatusEnum.Recording;
+                return;
             }
+
+            shellSessionVM.StartRecord(recordOptionsVM.FileName);
         }
 
         /// <summary>
@@ -1157,7 +1166,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void ContextMenuStopRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.StopRecord();
+            shellSessionVM.StopRecord();
         }
 
         /// <summary>
@@ -1165,8 +1174,8 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void ContextMenuOpenRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            OpenRecordWindow openRecordWindow = new OpenRecordWindow(this.Session);
-            openRecordWindow.Owner = Window.GetWindow(this.Content);
+            OpenRecordWindow openRecordWindow = new OpenRecordWindow(shellSessionVM.Session);
+            openRecordWindow.Owner = Window.GetWindow(shellSessionVM.Content);
             openRecordWindow.Show();
         }
 
@@ -1175,33 +1184,27 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public void ContextMenuFind_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            FindWindowMgr.Show(this);
+            FindWindowMgr.Show(shellSessionVM);
         }
 
         public void ContextMenuSaveViewport_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.SaveToFile(ParagraphTypeEnum.Viewport);
+            this.SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
         }
 
         public void ContextMenuSaveSelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.SaveToFile(ParagraphTypeEnum.Selected);
+            this.SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
         }
 
         public void ContextMenuSaveAllDocument_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.SaveToFile(ParagraphTypeEnum.AllDocument);
+            this.SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
         }
 
         private void ContextMenuOpenPortForwardWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            if (this.Session.Type != (int)SessionTypeEnum.SSH)
-            {
-                MTMessageBox.Info("该会话没有转发信息");
-                return;
-            }
-
-            PortForwardStatusWindow portForwardStatusWindow = new PortForwardStatusWindow(this);
+            PortForwardStatusWindow portForwardStatusWindow = new PortForwardStatusWindow(shellSessionVM);
             portForwardStatusWindow.Owner = App.Current.MainWindow;
             portForwardStatusWindow.Show();
         }
@@ -1211,40 +1214,37 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void ContextMenuAddToQuickCommands_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            VTParagraph selectedParagraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
-            if (selectedParagraph.IsEmpty)
-            {
-                return;
-            }
+            throw new NotImplementedException();
 
-            ShellCommand shellCommand = new ShellCommand()
-            {
-                ID = Guid.NewGuid().ToString(),
-                SessionId = this.Session.ID,
-                Name = string.Format("未命名_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss)),
-                Type = (int)CommandTypeEnum.PureText,
-                Command = selectedParagraph.Content
-            };
+            //VTParagraph selectedParagraph = shellSessionVM.VideoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
+            //if (selectedParagraph.IsEmpty)
+            //{
+            //    return;
+            //}
 
-            int code = this.ServiceAgent.AddShellCommand(shellCommand);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MTMessageBox.Info("新建快捷命令失败, {0}", code);
-                return;
-            }
+            //ShellCommand shellCommand = new ShellCommand()
+            //{
+            //    ID = Guid.NewGuid().ToString(),
+            //    SessionId = shellSessionVM.Session.ID,
+            //    Name = string.Format("未命名_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss)),
+            //    Type = (int)CommandTypeEnum.PureText,
+            //    Command = selectedParagraph.Content
+            //};
 
-            QuickCommandVM qcvm = new QuickCommandVM(shellCommand);
-            this.ShellCommands.Add(qcvm);
-        }
+            //int code = shellSessionVM.ServiceAgent.AddShellCommand(shellCommand);
+            //if (code != ResponseCode.SUCCESS)
+            //{
+            //    MTMessageBox.Info("新建快捷命令失败, {0}", code);
+            //    return;
+            //}
 
-        private void ContextMenuSwitchInputPanelVisible_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            this.InputPanelVisible = !this.InputPanelVisible;
+            //QuickCommandVM qcvm = new QuickCommandVM(shellCommand);
+            //this.ShellCommands.Add(qcvm);
         }
 
         private void ContextMenuClearScreen_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            VTDocument document = this.videoTerminal.ActiveDocument;
+            VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;
             document.DeleteViewoprt();
             document.SetCursorLogical(0, 0);
             document.RequestInvalidate();
@@ -1252,34 +1252,26 @@ namespace ModengTerm.Terminal.ViewModels
 
         private void ContextMenuCreateQuickCommand_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.OpenCreateShellCommandWindow();
-        }
-
-        private void ContextMenuVisiblePanelContent_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
             throw new NotImplementedException();
+            //this.OpenCreateShellCommandWindow();
         }
 
         private void ContextMenuXModemSend_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.StartModem(SendReceive.Send, ModemTypeEnum.XModem);
+            throw new NotImplementedException();
+            //this.StartModem(SendReceive.Send, ModemTypeEnum.XModem);
         }
 
         private void ContextMenuXModemReceive_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.StartModem(SendReceive.Receive, ModemTypeEnum.XModem);
+            throw new NotImplementedException();
+            //this.StartModem(SendReceive.Receive, ModemTypeEnum.XModem);
         }
 
         private void ContextMenuYModemSend_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
-            this.StartModem(SendReceive.Send, ModemTypeEnum.YModem);
+            throw new NotImplementedException();
+            //this.StartModem(SendReceive.Send, ModemTypeEnum.YModem);
         }
-
-        #endregion
-    }
-
-    public class ShellSessionContextMenuHandler
-    {
-        public void 
     }
 }

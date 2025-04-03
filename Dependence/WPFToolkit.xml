@@ -1972,37 +1972,10 @@
             继承该类后，可以获取到在配置文件里设置的参数
             </summary>
         </member>
-        <member name="F:WPFToolkit.MVVM.MenuContentVM.parameters">
-            <summary>
-            该菜单在配置文件里的parameters数据
-            </summary>
-        </member>
         <member name="P:WPFToolkit.MVVM.MenuContentVM.Content">
             <summary>
             获取该菜单对应的内容控件
             </summary>
-        </member>
-        <member name="P:WPFToolkit.MVVM.MenuContentVM.Parameters">
-            <summary>
-            获取该菜单内容的所有参数
-            </summary>
-        </member>
-        <member name="M:WPFToolkit.MVVM.MenuContentVM.GetParameter``1(System.String)">
-            <summary>
-            读取该模块的输入参数，如果参数不存在则报异常
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="key"></param>
-            <returns></returns>
-        </member>
-        <member name="M:WPFToolkit.MVVM.MenuContentVM.GetParameter``1(System.String,``0)">
-            <summary>
-            读取该模块的输入参数，如果参数不存在则返回defaultValue
-            </summary>
-            <typeparam name="T"></typeparam>
-            <param name="key"></param>
-            <param name="defaultValue"></param>
-            <returns></returns>
         </member>
         <member name="M:WPFToolkit.MVVM.MenuContentVM.OnInitialize">
             <summary>
@@ -2307,6 +2280,11 @@
             树形结构的菜单节点
             </summary>
         </member>
+        <member name="E:WPFToolkit.MVVM.MenuItemVM.ContentInitializing">
+            <summary>
+            在ContentVM初始化之前调用
+            </summary>
+        </member>
         <member name="P:WPFToolkit.MVVM.MenuItemVM.ClassName">
             <summary>
             界面入口点
@@ -2425,7 +2403,7 @@
             每次从界面上移除之前都会触发
             </summary>
         </member>
-        <member name="T:WPFToolkit.MVVM.CreateMenuItemVM">
+        <member name="T:WPFToolkit.MVVM.MenuItemFactory">
             <summary>
             创建MenuItemVM实例的委托
             </summary>

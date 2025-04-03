@@ -4,6 +4,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.FileWatch;
 using ModengTerm.UserControls;
 using ModengTerm.UserControls.TerminalUserControls;
+using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels.Terminals.PanelContent
+namespace ModengTerm.Addons.SystemMonitor
 {
     public class WatchFileVM : PanelContentVM
     {
@@ -46,13 +47,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             public string FilePath
             {
-                get { return this.filePath; }
+                get { return filePath; }
                 set
                 {
-                    if (this.filePath != value)
+                    if (filePath != value)
                     {
-                        this.filePath = value;
-                        this.NotifyPropertyChanged("FilePath");
+                        filePath = value;
+                        NotifyPropertyChanged("FilePath");
                     }
                 }
             }
@@ -63,7 +64,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             #region 构造方法
 
-            public FileItemVM(XTermSession session) 
+            public FileItemVM(XTermSession session)
             {
                 this.session = session;
             }
@@ -74,14 +75,14 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             public void Initialize()
             {
-                string encodingName = this.session.GetOption<string>(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING);
-                this.encoding = Encoding.GetEncoding(encodingName);
+                string encodingName = session.GetOption(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING);
+                encoding = Encoding.GetEncoding(encodingName);
 
-                switch ((SessionTypeEnum)this.session.Type)
+                switch ((SessionTypeEnum)session.Type)
                 {
                     case SessionTypeEnum.SSH:
                         {
-                            this.watcher = new SshFileWatcher();
+                            watcher = new SshFileWatcher();
                             break;
                         }
 
@@ -89,38 +90,38 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                         throw new NotImplementedException();
                 }
 
-                this.watcher.Initialize(this.filePath);
-                this.GenericDocumentUserControl.Initialize(this.session);
+                watcher.Initialize(filePath);
+                GenericDocumentUserControl.Initialize(session);
             }
 
             public void Release()
             {
-                this.watcher.Release();
-                this.GenericDocumentUserControl.Release();
+                watcher.Release();
+                GenericDocumentUserControl.Release();
             }
 
             public int Read(byte[] buffer, int offset, int size)
             {
-                if (this.watcher.Avaliable == 0)
+                if (watcher.Avaliable == 0)
                 {
                     return 0;
                 }
 
                 try
                 {
-                    return this.watcher.Read(buffer, offset, size);
+                    return watcher.Read(buffer, offset, size);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     logger.Error("读取文件异常", ex);
                     return -1;
                 }
             }
 
-            public void DrawText(byte[] bytes, int size) 
+            public void DrawText(byte[] bytes, int size)
             {
-                string text = this.encoding.GetString(bytes, 0, size);
-                this.GenericDocumentUserControl.DrawText(text);
+                string text = encoding.GetString(bytes, 0, size);
+                GenericDocumentUserControl.DrawText(text);
             }
 
             #endregion
@@ -152,13 +153,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public bool AutoScroll
         {
-            get { return this.autoScroll; }
+            get { return autoScroll; }
             set
             {
-                if (value != this.autoScroll)
+                if (value != autoScroll)
                 {
-                    this.autoScroll = value;
-                    this.NotifyPropertyChanged("AutoScroll");
+                    autoScroll = value;
+                    NotifyPropertyChanged("AutoScroll");
                 }
             }
         }
@@ -168,13 +169,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public string FilePath
         {
-            get { return this.filePath; }
+            get { return filePath; }
             set
             {
-                if (value != this.filePath)
+                if (value != filePath)
                 {
-                    this.filePath = value;
-                    this.NotifyPropertyChanged("FilePath");
+                    filePath = value;
+                    NotifyPropertyChanged("FilePath");
                 }
             }
         }
@@ -187,18 +188,18 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         {
             base.OnInitialize();
 
-            this.fileListLock = new object();
-            this.FileList = new BindableCollection<FileItemVM>();
-            this.watchEvent = new ManualResetEvent(false);
-            WatchFileUserControl watchFileUserControl = this.Content as WatchFileUserControl;
-            this.grid = watchFileUserControl.GridDocuments;
+            fileListLock = new object();
+            FileList = new BindableCollection<FileItemVM>();
+            watchEvent = new ManualResetEvent(false);
+            WatchFileUserControl watchFileUserControl = Content as WatchFileUserControl;
+            grid = watchFileUserControl.GridDocuments;
         }
 
         public override void OnRelease()
         {
             base.OnRelease();
 
-            this.isRunning = false;
+            isRunning = false;
         }
 
         public override void OnLoaded()
@@ -241,58 +242,58 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public void AddFile()
         {
-            if (string.IsNullOrEmpty(this.filePath))
+            if (string.IsNullOrEmpty(filePath))
             {
                 return;
             }
 
-            FileItemVM fileItem = this.FileList.FirstOrDefault(v => v.FilePath == this.filePath);
+            FileItemVM fileItem = FileList.FirstOrDefault(v => v.FilePath == filePath);
             if (fileItem != null)
             {
                 return;
             }
 
-            fileItem = this.CreateFileItem(this.filePath);
+            fileItem = CreateFileItem(filePath);
             fileItem.Initialize();
 
-            lock (this.fileListLock)
+            lock (fileListLock)
             {
-                this.FileList.Add(fileItem);
-                this.fileListChanged = true;
+                FileList.Add(fileItem);
+                fileListChanged = true;
             }
 
-            if (this.FileList.Count == 1 && !this.isRunning)
+            if (FileList.Count == 1 && !isRunning)
             {
-                this.isRunning = true;
-                Task.Factory.StartNew(this.WatchFileThreadProc);
+                isRunning = true;
+                Task.Factory.StartNew(WatchFileThreadProc);
             }
             else
             {
 
             }
 
-            this.watchEvent.Set();
+            watchEvent.Set();
         }
 
         public void DeleteFile()
         {
-            FileItemVM fileItem = this.FileList.SelectedItem;
+            FileItemVM fileItem = FileList.SelectedItem;
             if (fileItem == null)
             {
                 return;
             }
 
-            lock (this.fileListLock)
+            lock (fileListLock)
             {
-                this.FileList.Remove(fileItem);
-                this.fileListChanged = true;
+                FileList.Remove(fileItem);
+                fileListChanged = true;
             }
 
             fileItem.Release();
 
-            if (this.FileList.Count == 0)
+            if (FileList.Count == 0)
             {
-                this.watchEvent.Reset();
+                watchEvent.Reset();
             }
             else
             {
@@ -308,24 +309,24 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             List<FileItemVM> fileList = new List<FileItemVM>();
             byte[] buffer = new byte[16384];
 
-            while (this.isRunning)
+            while (isRunning)
             {
-                this.watchEvent.WaitOne();
+                watchEvent.WaitOne();
 
-                if (this.fileListChanged)
+                if (fileListChanged)
                 {
-                    lock (this.fileListLock)
+                    lock (fileListLock)
                     {
                         fileList.Clear();
-                        fileList.AddRange(this.FileList);
-                        this.fileListChanged = false;
+                        fileList.AddRange(FileList);
+                        fileListChanged = false;
                     }
                 }
 
                 foreach (FileItemVM fileItem in fileList)
                 {
                     int n = fileItem.Read(buffer, 0, buffer.Length);
-                    
+
                     if (n <= 0)
                     {
                         continue;

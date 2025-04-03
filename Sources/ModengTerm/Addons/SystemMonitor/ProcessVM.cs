@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels.Terminals.PanelContent
+namespace ModengTerm.Addons.SystemMonitor
 {
     public class ProcessVM : ItemViewModel
     {
@@ -17,72 +17,72 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public int PID
         {
-            get { return this.pid; }
+            get { return pid; }
             set
             {
-                if (this.pid != value)
+                if (pid != value)
                 {
-                    this.pid = value;
-                    this.NotifyPropertyChanged("PID");
+                    pid = value;
+                    NotifyPropertyChanged("PID");
                 }
             }
         }
 
         public UnitValueDouble Memory
         {
-            get { return this.memory; }
+            get { return memory; }
             set
             {
-                if (this.memory != value)
+                if (memory != value)
                 {
-                    this.memory = value;
-                    this.NotifyPropertyChanged("Memory");
+                    memory = value;
+                    NotifyPropertyChanged("Memory");
                 }
             }
         }
 
         public string DisplayMemory
         {
-            get { return this.displayMemory; }
+            get { return displayMemory; }
             set
             {
-                if (this.displayMemory != value)
+                if (displayMemory != value)
                 {
-                    this.displayMemory = value;
-                    this.NotifyPropertyChanged("DisplayMemory");
+                    displayMemory = value;
+                    NotifyPropertyChanged("DisplayMemory");
                 }
             }
         }
 
         public long TotalProcessorTime
         {
-            get { return this.totalProcessorTime; }
+            get { return totalProcessorTime; }
             set
             {
-                if (this.totalProcessorTime != value)
+                if (totalProcessorTime != value)
                 {
-                    this.totalProcessorTime = value;
+                    totalProcessorTime = value;
                 }
             }
         }
 
         public double CpuUsage
         {
-            get { return this.cpuUsage; }
+            get { return cpuUsage; }
             set
             {
-                if (this.cpuUsage != value)
+                if (cpuUsage != value)
                 {
-                    this.cpuUsage = value;
+                    cpuUsage = value;
                 }
             }
         }
 
         public ProcessVM()
         {
-            this.Memory = new UnitValueDouble();
-            this.CpuUsage = 0;
-            this.displayCpuUsage = "0";
+            Memory = new UnitValueDouble();
+            CpuUsage = 0;
+            displayCpuUsage = "0";
         }
     }
 
@@ -112,13 +112,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
                 target.DisplayMemory = target.Memory.ToString();
             }
 
-            if (this.Elapsed.TotalMilliseconds > 0 && this.TotalProcessorTime > 0)
+            if (Elapsed.TotalMilliseconds > 0 && TotalProcessorTime > 0)
             {
-                double processorTime = (source.TotalProcessorTime - previousProcessorTime);
+                double processorTime = source.TotalProcessorTime - previousProcessorTime;
 
                 //logger.ErrorFormat("{0}, userProcessorTime = {1}", processorTime, this.TotalProcessorTime);
 
-                target.CpuUsage = Math.Round(processorTime / this.TotalProcessorTime * 100, 2);
+                target.CpuUsage = Math.Round(processorTime / TotalProcessorTime * 100, 2);
             }
         }
     }

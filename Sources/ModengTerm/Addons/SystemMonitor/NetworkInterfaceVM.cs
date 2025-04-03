@@ -3,7 +3,7 @@ using ModengTerm.Enumerations;
 using ModengTerm.Terminal.Watch;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels.Terminals.PanelContent
+namespace ModengTerm.Addons.SystemMonitor
 {
     public class NetworkInterfaceVM : ItemViewModel
     {
@@ -22,13 +22,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public string IfaceId
         {
-            get { return this.ifaceId; }
+            get { return ifaceId; }
             set
             {
-                if (this.ifaceId != value)
+                if (ifaceId != value)
                 {
-                    this.ifaceId = value;
-                    this.NotifyPropertyChanged("IfaceId");
+                    ifaceId = value;
+                    NotifyPropertyChanged("IfaceId");
                 }
             }
         }
@@ -38,13 +38,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public string UploadSpeed
         {
-            get { return this.uploadSpeed; }
+            get { return uploadSpeed; }
             set
             {
-                if (this.uploadSpeed != value)
+                if (uploadSpeed != value)
                 {
-                    this.uploadSpeed = value;
-                    this.NotifyPropertyChanged("UploadSpeed");
+                    uploadSpeed = value;
+                    NotifyPropertyChanged("UploadSpeed");
                 }
             }
         }
@@ -54,13 +54,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public string DownloadSpeed
         {
-            get { return this.downloadSpeed; }
+            get { return downloadSpeed; }
             set
             {
-                if (this.downloadSpeed != value)
+                if (downloadSpeed != value)
                 {
-                    this.downloadSpeed = value;
-                    this.NotifyPropertyChanged("DownloadSpeed");
+                    downloadSpeed = value;
+                    NotifyPropertyChanged("DownloadSpeed");
                 }
             }
         }
@@ -70,13 +70,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public string IPAddress
         {
-            get { return this.ipaddr; }
+            get { return ipaddr; }
             set
             {
-                if (this.ipaddr != value)
+                if (ipaddr != value)
                 {
-                    this.ipaddr = value;
-                    this.NotifyPropertyChanged("IPAddress");
+                    ipaddr = value;
+                    NotifyPropertyChanged("IPAddress");
                 }
             }
         }
@@ -86,13 +86,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public ulong BytesSent
         {
-            get { return this.bytesSent; }
+            get { return bytesSent; }
             set
             {
-                if (this.bytesSent != value)
+                if (bytesSent != value)
                 {
-                    this.bytesSent = value;
-                    this.NotifyPropertyChanged("BytesSent");
+                    bytesSent = value;
+                    NotifyPropertyChanged("BytesSent");
                 }
             }
         }
@@ -102,13 +102,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public ulong BytesReceived
         {
-            get { return this.bytesReceived; }
+            get { return bytesReceived; }
             set
             {
-                if (this.bytesReceived != value)
+                if (bytesReceived != value)
                 {
-                    this.bytesReceived = value;
-                    this.NotifyPropertyChanged("BytesReceived");
+                    bytesReceived = value;
+                    NotifyPropertyChanged("BytesReceived");
                 }
             }
         }
@@ -119,8 +119,8 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public NetworkInterfaceVM()
         {
-            this.UploadSpeed = "0kb/s";
-            this.DownloadSpeed = "0kb/s";
+            UploadSpeed = "0kb/s";
+            DownloadSpeed = "0kb/s";
         }
 
         #endregion
@@ -144,7 +144,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             target.BytesSent = source.BytesSent;
             target.BytesReceived = source.BytesReceived;
 
-            double seconds = this.Elapsed.TotalSeconds;
+            double seconds = Elapsed.TotalSeconds;
             if (seconds > 0)
             {
                 if (target.BytesReceived != previousBytesReceived)

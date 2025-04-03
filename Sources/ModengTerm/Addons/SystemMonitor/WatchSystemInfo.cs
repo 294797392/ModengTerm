@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using WPFToolkit.MVVM;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.ViewModels;
 
-namespace ModengTerm.ViewModels.Terminals.PanelContent
+namespace ModengTerm.Addons.SystemMonitor
 {
     public class WatchSystemInfo : SessionPanelContentVM
     {
@@ -50,13 +51,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public double CpuPercent
         {
-            get { return this.cpuPercent; }
+            get { return cpuPercent; }
             set
             {
-                if (this.cpuPercent != value)
+                if (cpuPercent != value)
                 {
-                    this.cpuPercent = value;
-                    this.NotifyPropertyChanged("CpuPercent");
+                    cpuPercent = value;
+                    NotifyPropertyChanged("CpuPercent");
                 }
             }
         }
@@ -66,13 +67,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         /// </summary>
         public double MemoryPercent
         {
-            get { return this.memoryPercent; }
+            get { return memoryPercent; }
             set
             {
-                if (this.memoryPercent != value)
+                if (memoryPercent != value)
                 {
-                    this.memoryPercent = value;
-                    this.NotifyPropertyChanged("MemoryPercent");
+                    memoryPercent = value;
+                    NotifyPropertyChanged("MemoryPercent");
                 }
             }
         }
@@ -94,13 +95,13 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public string DisplayMemoryUsage
         {
-            get { return this.displayMemoryUsage; }
+            get { return displayMemoryUsage; }
             set
             {
-                if ((this.displayMemoryUsage != value))
+                if (displayMemoryUsage != value)
                 {
-                    this.displayMemoryUsage = value;
-                    this.NotifyPropertyChanged("DisplayMemoryUsage");
+                    displayMemoryUsage = value;
+                    NotifyPropertyChanged("DisplayMemoryUsage");
                 }
             }
         }
@@ -128,26 +129,26 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
         {
             base.OnInitialize();
 
-            this.Disks = new BindableCollection<DiskVM>();
-            this.NetworkInterfaces = new BindableCollection<NetworkInterfaceVM>();
-            this.TotalMemory = new UnitValueDouble();
-            this.UsedMemory = new UnitValueDouble();
-            this.AvailableMemory = new UnitValueDouble();
-            this.Processes = new BindableCollection<ProcessVM>();
+            Disks = new BindableCollection<DiskVM>();
+            NetworkInterfaces = new BindableCollection<NetworkInterfaceVM>();
+            TotalMemory = new UnitValueDouble();
+            UsedMemory = new UnitValueDouble();
+            AvailableMemory = new UnitValueDouble();
+            Processes = new BindableCollection<ProcessVM>();
 
-            this.diskCopy = new DiskVMCopy();
-            this.ifaceCopy = new NetworkInterfaceVMCopy();
-            this.processCopy = new ProcessVMCopy();
+            diskCopy = new DiskVMCopy();
+            ifaceCopy = new NetworkInterfaceVMCopy();
+            processCopy = new ProcessVMCopy();
 
             //this.shellSession = base.OpenedSession as ShellSessionVM;
-            this.watchEvent = new ManualResetEvent(false);
+            watchEvent = new ManualResetEvent(false);
         }
 
         public override void OnRelease()
         {
-            this.StopWatch();
+            StopWatch();
 
-            this.watchEvent.Close();
+            watchEvent.Close();
 
             base.OnRelease();
         }
@@ -159,14 +160,14 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         public override void OnUnload()
         {
-            this.watchEvent.Reset();
+            watchEvent.Reset();
 
             base.OnUnload();
         }
 
         public override void OnReady()
         {
-            this.StartWatch();
+            StartWatch();
         }
 
         #endregion
@@ -175,20 +176,20 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         private void StartWatch()
         {
-            if (this.isWatch)
+            if (isWatch)
             {
                 return;
             }
 
-            this.isWatch = true;
-            this.watchTask = Task.Factory.StartNew(this.WatchTaskProc);
-            this.watchEvent.Set();
+            isWatch = true;
+            watchTask = Task.Factory.StartNew(WatchTaskProc);
+            watchEvent.Set();
         }
 
         private void StopWatch()
         {
-            this.isWatch = false;
-            this.watchEvent.Set();
+            isWatch = false;
+            watchEvent.Set();
         }
 
         private void Watch(AbstractWatcher watcher)
@@ -200,48 +201,48 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             ulong totalProcessorTime = 0;
 
             // 确保至少读取了一次CPU占用信息
-            if (this.prevKernelProcessorTime > 0)
+            if (prevKernelProcessorTime > 0)
             {
-                ulong idleTime = systemInfo.IdleProcessorTime - this.prevIdleProcessorTime;
-                ulong kernelTime = systemInfo.KernelProcessorTime - this.prevKernelProcessorTime;
-                ulong userTime = systemInfo.UserProcessorTime - this.prevUserProcessorTime;
+                ulong idleTime = systemInfo.IdleProcessorTime - prevIdleProcessorTime;
+                ulong kernelTime = systemInfo.KernelProcessorTime - prevKernelProcessorTime;
+                ulong userTime = systemInfo.UserProcessorTime - prevUserProcessorTime;
                 ulong totalTime = idleTime + kernelTime + userTime;
                 totalProcessorTime = kernelTime + userTime;
-                this.CpuPercent = Math.Round((double)totalProcessorTime / totalTime * 100, 2);
-                if (this.cpuPercent > 100)
+                CpuPercent = Math.Round((double)totalProcessorTime / totalTime * 100, 2);
+                if (cpuPercent > 100)
                 {
-                    logger.FatalFormat("3. {0}, totalProcessorTime = {1}, totalTime = {2}, kernelTime = {3}, userTime = {4}, idleTime = {4}, prevIdleProcessorTime = {5}", this.CpuPercent, totalProcessorTime, totalTime, kernelTime, userTime, idleTime, this.prevIdleProcessorTime);
+                    logger.FatalFormat("3. {0}, totalProcessorTime = {1}, totalTime = {2}, kernelTime = {3}, userTime = {4}, idleTime = {4}, prevIdleProcessorTime = {5}", CpuPercent, totalProcessorTime, totalTime, kernelTime, userTime, idleTime, prevIdleProcessorTime);
                 }
             }
 
-            this.prevIdleProcessorTime = systemInfo.IdleProcessorTime;
-            this.prevKernelProcessorTime = systemInfo.KernelProcessorTime;
-            this.prevUserProcessorTime = systemInfo.UserProcessorTime;
+            prevIdleProcessorTime = systemInfo.IdleProcessorTime;
+            prevKernelProcessorTime = systemInfo.KernelProcessorTime;
+            prevUserProcessorTime = systemInfo.UserProcessorTime;
 
             #endregion
 
-            VTBaseUtils.UpdateReadable(this.AvailableMemory, systemInfo.AvailableMemory);
-            VTBaseUtils.UpdateReadable(this.TotalMemory, systemInfo.TotalMemory);
+            VTBaseUtils.UpdateReadable(AvailableMemory, systemInfo.AvailableMemory);
+            VTBaseUtils.UpdateReadable(TotalMemory, systemInfo.TotalMemory);
             ulong used = systemInfo.TotalMemory.Value - systemInfo.AvailableMemory.Value;
-            VTBaseUtils.UpdateReadable(this.UsedMemory, this.TotalMemory.Unit, used, systemInfo.TotalMemory.Unit);
-            this.MemoryPercent = Math.Round((double)used / systemInfo.TotalMemory.Value * 100, 2);
-            this.DisplayMemoryUsage = string.Format("{0}/{1}", this.UsedMemory, this.TotalMemory);
+            VTBaseUtils.UpdateReadable(UsedMemory, TotalMemory.Unit, used, systemInfo.TotalMemory.Unit);
+            MemoryPercent = Math.Round((double)used / systemInfo.TotalMemory.Value * 100, 2);
+            DisplayMemoryUsage = string.Format("{0}/{1}", UsedMemory, TotalMemory);
 
             // 更新磁盘信息
-            this.Copy<DiskVM, VTDrive>(systemInfo.DiskItems, this.Disks, this.diskCopy);
+            Copy(systemInfo.DiskItems, Disks, diskCopy);
 
             // 更新网络接口信息
-            this.Copy<NetworkInterfaceVM, VTNetDevice>(systemInfo.NetDevices, this.NetworkInterfaces, this.ifaceCopy);
+            Copy(systemInfo.NetDevices, NetworkInterfaces, ifaceCopy);
 
             // 更新进程信息
-            this.processCopy.TotalProcessorTime = totalProcessorTime;
-            this.Copy<ProcessVM, VTProcess>(systemInfo.Processes, this.Processes, this.processCopy);
+            processCopy.TotalProcessorTime = totalProcessorTime;
+            Copy(systemInfo.Processes, Processes, processCopy);
             // 按照CPU使用率对进程列表排序
-            List<ProcessVM> orderedProcs = this.Processes.OrderByDescending(v => v.CpuUsage).ToList();
-            App.Current.Dispatcher.Invoke(() =>
+            List<ProcessVM> orderedProcs = Processes.OrderByDescending(v => v.CpuUsage).ToList();
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                this.Processes.Clear();
-                this.Processes.AddRange(orderedProcs);
+                Processes.Clear();
+                Processes.AddRange(orderedProcs);
             });
         }
 
@@ -255,7 +256,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             if (addItems.Count > 0)
             {
-                App.Current.Dispatcher.Invoke(() =>
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     foreach (TSource add in addItems)
                     {
@@ -268,7 +269,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
             if (removeItems.Count > 0)
             {
-                App.Current.Dispatcher.Invoke(() =>
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
                     foreach (TSource remove in removeItems)
                     {
@@ -320,18 +321,18 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
 
         private void WatchTaskProc()
         {
-            WatchFrequencyEnum frequency = this.shellSession.Session.GetOption<WatchFrequencyEnum>(OptionKeyEnum.WATCH_FREQUENCY, OptionDefaultValues.WATCH_FREQUENCY);
+            WatchFrequencyEnum frequency = shellSession.Session.GetOption(OptionKeyEnum.WATCH_FREQUENCY, OptionDefaultValues.WATCH_FREQUENCY);
             int updateInterval = VTBaseUtils.GetWatchInterval(frequency);
-            AbstractWatcher watcher = WatcherFactory.Create(this.shellSession.Transport);
+            AbstractWatcher watcher = WatcherFactory.Create(shellSession.Transport);
             watcher.Initialize();
 
-            while (this.isWatch)
+            while (isWatch)
             {
                 try
                 {
-                    this.watchEvent.WaitOne();
+                    watchEvent.WaitOne();
 
-                    this.Watch(watcher);
+                    Watch(watcher);
                 }
                 catch (Exception ex)
                 {
@@ -343,7 +344,7 @@ namespace ModengTerm.ViewModels.Terminals.PanelContent
             }
 
             watcher.Release();
-            this.isWatch = false;
+            isWatch = false;
         }
 
         #endregion

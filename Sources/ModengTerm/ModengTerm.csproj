@@ -23,17 +23,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Addons\**" />
     <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
-    <EmbeddedResource Remove="Addons\**" />
     <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
-    <None Remove="Addons\**" />
     <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
-    <Page Remove="Addons\**" />
     <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Addons\AddonBase.cs" />
+    <Compile Remove="Addons\AddonMetadataAttribute.cs" />
+    <Compile Remove="Addons\ModengAPI.cs" />
+    <Compile Remove="Addons\SideWindow.cs" />
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
@@ -41,9 +41,6 @@
     <Compile Remove="ViewModels\GroupVM.cs" />
     <Compile Remove="ViewModels\OpenedSessionsVM.cs" />
     <Compile Remove="ViewModels\Terminals\CommandLineVM.cs" />
-    <Compile Remove="ViewModels\Terminals\PanelContent\QuickCommandManager.cs" />
-    <Compile Remove="ViewModels\Terminals\PanelContent\VTPanelContentVM.cs" />
-    <Compile Remove="ViewModels\Terminals\PanelContent\WatchObject.cs" />
     <Compile Remove="ViewModels\Terminals\ShellGlobalVM.cs" />
     <Compile Remove="ViewModels\Terminals\SyncMasterVM.cs" />
     <Compile Remove="ViewModels\ThemeVM.cs" />

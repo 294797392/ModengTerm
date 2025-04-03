@@ -1,5 +1,6 @@
 ﻿using log4net.Core;
 using log4net.Repository.Hierarchy;
+using ModengTerm.Addons.QuickInput;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -10,18 +11,13 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Themes;
 using ModengTerm.UserControls;
-using ModengTerm.UserControls.TerminalUserControls;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Session;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
-using Renci.SshNet;
 using System;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -506,7 +502,7 @@ namespace ModengTerm
 
         private void SendCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            QuickCommandVM shellCommand = e.Parameter as QuickCommandVM;
+            CommandVM shellCommand = e.Parameter as CommandVM;
             if (shellCommand == null)
             {
                 return;

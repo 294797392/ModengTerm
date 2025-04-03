@@ -226,7 +226,7 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             base.OnApplyTemplate();
 
             this.drawArea = base.Template.FindName("PART_DrawingArea", this) as DrawingArea;
-            this.drawArea.SizeChanged += DrawArea_SizeChanged;
+            //this.drawArea.SizeChanged += DrawArea_SizeChanged;
             this.scrollbar = base.Template.FindName("PART_Scrollbar", this) as ScrollBar;
             this.scrollbar.PreviewMouseLeftButtonDown += Scrollbar_PreviewMouseLeftButtonDown;
             this.scrollbar.PreviewMouseLeftButtonUp += Scrollbar_PreviewMouseLeftButtonUp;

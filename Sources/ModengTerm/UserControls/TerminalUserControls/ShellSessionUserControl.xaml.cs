@@ -77,6 +77,11 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            if (this.videoTerminal == null) 
+            {
+                return;
+            }
+
             this.videoTerminal.Resize(e.NewSize.ToVTSize());
         }
 
