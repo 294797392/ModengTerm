@@ -75,30 +75,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 事件处理器
 
-        private void DrawArea_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
-            if (brc == BehaviorRightClicks.FastCopyPaste)
-            {
-                if (!this.videoTerminal.HasSelection)
-                {
-                    // 粘贴剪贴板里的内容
-                    string text = Clipboard.GetText();
-                    if (string.IsNullOrEmpty(text))
-                    {
-                        return;
-                    }
-
-                    this.shellSession.SendText(text);
-                }
-                else
-                {
-                    this.shellSession.CopySelection();
-                    this.videoTerminal.UnSelectAll();
-                }
-            }
-        }
-
         private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             this.videoTerminal.Resize(e.NewSize.ToVTSize());
@@ -173,6 +149,30 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             // 获取焦点，才能收到OnKeyDown和OnTextInput回调
             Keyboard.Focus(GridDocument);
+
+            if (e.ChangedButton == MouseButton.Right)             
+            {
+                BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
+                if (brc == BehaviorRightClicks.FastCopyPaste)
+                {
+                    if (!this.videoTerminal.HasSelection)
+                    {
+                        // 粘贴剪贴板里的内容
+                        string text = Clipboard.GetText();
+                        if (string.IsNullOrEmpty(text))
+                        {
+                            return;
+                        }
+
+                        this.shellSession.SendText(text);
+                    }
+                    else
+                    {
+                        this.shellSession.CopySelection();
+                        this.videoTerminal.UnSelectAll();
+                    }
+                }
+            }
         }
 
         private void GridDocument_LostFocus(object sender, RoutedEventArgs e)
@@ -306,49 +306,48 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 ImageBackground.Opacity = this.Session.GetOption<double>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, OptionDefaultValues.THEME_BACKGROUND_IMAGE_OPACITY);
             }
 
-            double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
+            // DispatcherPriority.Loaded保证DrawArea不为空
+            base.Dispatcher.BeginInvoke(new Action(() => 
+            {
+                double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
+                DocumentAlternate.SetPadding(padding);
+                DocumentAlternate.DrawArea.SizeChanged += DrawArea_SizeChanged;
+                DocumentMain.SetPadding(padding);
+                DocumentMain.DrawArea.SizeChanged += DrawArea_SizeChanged;
 
-            DocumentAlternate.SetPadding(padding);
-            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
-            DocumentAlternate.DrawArea.SizeChanged += DrawArea_SizeChanged;
-            DocumentMain.SetPadding(padding);
-            DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
-            DocumentMain.DrawArea.SizeChanged += DrawArea_SizeChanged;
+                // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
+                // 手动计算终端宽度和高度
+                double width = GridDocument.ActualWidth - padding * 2 - 11 - 30;  // 11是滚动条的宽度，30是右边栏的宽度
+                double height = GridDocument.ActualHeight - padding * 2;
+                //logger.InfoFormat("width = {0}, height = {1}", width, height);
 
-            // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
-            // 因为在设置完Padding之后，DrawAreaSize的宽度和高度有可能不会马上变化
-            // 根据Padding手动计算终端宽度和高度
-            double width = DocumentMain.DrawArea.ActualWidth;
-            double height = DocumentMain.DrawArea.ActualHeight;
-            logger.InfoFormat("width = {0}, height = {1}", DocumentMain.DrawArea.ActualWidth, DocumentMain.DrawArea.ActualHeight);
+                this.shellSession = sessionVM as ShellSessionVM;
+                this.shellSession.MainDocument = DocumentMain;
+                this.shellSession.AlternateDocument = DocumentAlternate;
+                this.shellSession.Width = width;
+                this.shellSession.Height = height;
+                this.shellSession.Open();
 
-            this.shellSession = sessionVM as ShellSessionVM;
-            this.shellSession.MainDocument = DocumentMain;
-            this.shellSession.AlternateDocument = DocumentAlternate;
-            this.shellSession.Width = width;
-            this.shellSession.Height = height;
-            this.shellSession.Open();
+                this.autoCompleteVM = this.shellSession.AutoCompletionVM;
 
-            this.autoCompleteVM = this.shellSession.AutoCompletionVM;
+                this.videoTerminal = this.shellSession.VideoTerminal as VideoTerminal;
+                this.videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
+                this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
 
-            this.videoTerminal = this.shellSession.VideoTerminal as VideoTerminal;
-            this.videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
-            this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
+                // 自动完成列表和文本行对齐
+                AutoCompletionUserControl.Margin = new Thickness(padding);
+                AutoCompletionUserControl.DataContext = this.shellSession.AutoCompletionVM;
 
-            // 自动完成列表和文本行对齐
-            AutoCompletionUserControl.Margin = new Thickness(padding);
-            AutoCompletionUserControl.DataContext = this.shellSession.AutoCompletionVM;
+                base.DataContext = this.shellSession;
 
-            base.DataContext = this.shellSession;
+            }), System.Windows.Threading.DispatcherPriority.Loaded);
 
             return ResponseCode.SUCCESS;
         }
 
         public void Close()
         {
-            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;
             DocumentAlternate.DrawArea.SizeChanged -= DrawArea_SizeChanged;
-            DocumentMain.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;
             DocumentMain.DrawArea.SizeChanged -= DrawArea_SizeChanged;
 
             this.shellSession.Close();

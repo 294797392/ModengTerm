@@ -176,18 +176,6 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        /// <summary>
-        /// 当会话被打开之后触发
-        /// 会话在OnLoad事件里打开
-        /// </summary>
-        /// <param name="arg1"></param>
-        /// <param name="openedSession">被打开的会话</param>
-        //private void OpenedSessionsVM_OnSessionOpened(OpenedSessionsVM arg1, OpenedSessionVM openedSession)
-        //{
-        //    this.mainWindowVM.TitleMenus.Clear();
-        //    this.mainWindowVM.TitleMenus.AddRange(openedSession.TitleMenus);
-        //}
-
         private void Window_ContentRendered(object sender, EventArgs e)
         {
             // 直接打开Windows命令行，可以更快速的进入工作状态
@@ -224,6 +212,12 @@ namespace ModengTerm
             {
                 OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
                 ContentControlSession.Content = openedSessionVM.Content;
+
+                if (openedSessionVM.TitleMenus != null)
+                {
+                    this.mainWindowVM.TitleMenus.Clear();
+                    this.mainWindowVM.TitleMenus.AddRange(openedSessionVM.TitleMenus);
+                }
             }
 
             // 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话
@@ -234,15 +228,6 @@ namespace ModengTerm
                 if (FindWindowMgr.WindowShown)
                 {
                     FindWindowMgr.Show(shellSession);
-                }
-            }
-
-            if (selectedSession is OpenedSessionVM)
-            {
-                OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
-                if (openedSessionVM.TitleMenus != null)
-                {
-                    this.mainWindowVM.TitleMenus.AddRange(openedSessionVM.TitleMenus);
                 }
             }
 

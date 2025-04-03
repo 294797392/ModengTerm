@@ -557,8 +557,8 @@ namespace ModengTerm.ViewModels
             #region 加载参数树形列表
 
             // 加载参数树形列表
-            this.SFTPOptionsTreeVM = new OptionMenuVM();
-            this.TerminalOptionsTreeVM = new OptionMenuVM();
+            this.SFTPOptionsTreeVM = new OptionMenuVM(this.CreateMenuItemVM);
+            this.TerminalOptionsTreeVM = new OptionMenuVM(this.CreateMenuItemVM);
             this.TerminalOptionsTreeVM.Initialize(appManifest.TerminalOptionMenu);
             this.TerminalOptionsTreeVM.ExpandAll();
             this.OptionTreeVM = this.TerminalOptionsTreeVM;
@@ -687,6 +687,11 @@ namespace ModengTerm.ViewModels
         #endregion
 
         #region 实例方法
+
+        private MenuItemVM CreateMenuItemVM(MenuDefinition menuDefinition)
+        {
+            return new OptionMenuItemVM(menuDefinition);
+        }
 
         private string GetTerminalName(TerminalTypeEnum type)
         {

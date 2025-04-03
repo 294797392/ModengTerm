@@ -234,11 +234,6 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
             this.Scrollbar = new VTScrollbarImpl(this.scrollbar);
         }
 
-        private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            logger.InfoFormat("drawAreaWidth = {0}, drawAreaHeight = {1}", this.drawArea.ActualWidth, this.drawArea.ActualHeight);
-        }
-
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
@@ -312,6 +307,11 @@ namespace ModengTerm.UserControls.TerminalUserControls.Rendering
         private void DocumentControl_Loaded(object sender, RoutedEventArgs e)
         {
             this.GILoaded?.Invoke(this);
+        }
+
+        private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            logger.InfoFormat("drawAreaWidth = {0}, drawAreaHeight = {1}", this.drawArea.ActualWidth, this.drawArea.ActualHeight);
         }
 
         #endregion

@@ -9,6 +9,10 @@ namespace ModengTerm.ViewModels.CreateSession
 {
     public class OptionMenuVM : MenuVM
     {
+        public OptionMenuVM(CreateMenuItemVM createMenuItemVM) :
+            base(createMenuItemVM)
+        {
 
+        }
     }
 }

@@ -2425,6 +2425,12 @@
             每次从界面上移除之前都会触发
             </summary>
         </member>
+        <member name="T:WPFToolkit.MVVM.CreateMenuItemVM">
+            <summary>
+            创建MenuItemVM实例的委托
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:WPFToolkit.MVVM.MenuVM">
             <summary>
             树形结构的菜单ViewModel

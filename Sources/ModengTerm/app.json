@@ -126,11 +126,7 @@
             "id": "2B6115F3-3A9D-4C2B-9B3F-787445608F11",
             "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
             "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-            "name": "快捷命令",
-            "panelEntry": "ModengTerm.UserControls.Terminals.ShellCommandUserControl, ModengTerm",
-            "panelAlign": 3,
-            "handlerEntry": "",
-            "clickMethod": "ContextMenuVisiblePanelContent_Click"
+            "name": "快捷命令"
         },
         {
             "id": "2B09F519-6434-4926-8570-1CEEF55401EC",

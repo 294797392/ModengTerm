@@ -8,24 +8,6 @@ namespace ModengTerm.Base.Definitions
     public class PanelItemDefinition : MenuDefinition
     {
         /// <summary>
-        /// 图标
-        /// </summary>
-        [JsonProperty("icon")]
-        public string Icon { get; set; }
-
-        /// <summary>
-        /// 界面的类名
-        /// </summary>
-        [JsonProperty("className")]
-        public string ClassName { get; set; }
-
-        /// <summary>
-        /// ViewModel的类名
-        /// </summary>
-        [JsonProperty("vmClassName")]
-        public string VMClassName { get; set; }
-
-        /// <summary>
         /// 支持的会话类型
         /// </summary>
         [JsonProperty("sessionTypes")]
@@ -33,20 +15,27 @@ namespace ModengTerm.Base.Definitions
 
         public PanelItemDefinition()
         {
-            this.SessionTypes = VTBaseUtils.GetEnumValues<SessionTypeEnum>().Select(v => (int)v).ToList();
+            this.SessionTypes = new List<int>();
         }
     }
 
     public class PanelDefinition
     {
+        /// <summary>
+        /// 唯一编号
+        /// </summary>
         [JsonProperty("id")]
         public string ID { get; set; }
 
+        /// <summary>
+        /// 窗口名称
+        /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
 
         /// <summary>
         /// 容器贴哪个边
+        /// 暂时用不到
         /// </summary>
         [EnumDataType(typeof(SideWindowDock))]
         [JsonProperty("dock")]

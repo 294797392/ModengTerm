@@ -20,8 +20,11 @@ namespace ModengTerm.ViewModels
 
         /// <summary>
         /// 当连接状态改变时触发
+        /// OpenedSessionVM：会话
+        /// SessionStatusEnum：旧的状态
+        /// SessionStatusEnum：新的状态
         /// </summary>
-        public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
+        public event Action<OpenedSessionVM, SessionStatusEnum, SessionStatusEnum> StatusChanged;
 
         #endregion
 
@@ -98,6 +101,15 @@ namespace ModengTerm.ViewModels
         public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
+
+            // 在构造函数里实例化TitleMenus, 保证ListBoxOpenedSession_SelectionChanged触发的时候，TitleMenus不为空
+            this.ContextMenus = new BindableCollection<ContextMenuVM>();
+            this.TitleMenus = new BindableCollection<ContextMenuVM>();
+            List<MenuItemDefinition> menuDefinitions = this.FilterMenuItems();
+            List<MenuItemRelation> titleMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
+            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuRelations));
+            List<MenuItemRelation> contextMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
+            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuRelations));
         }
 
         #endregion
@@ -106,15 +118,6 @@ namespace ModengTerm.ViewModels
 
         public int Open()
         {
-            this.ContextMenus = new BindableCollection<ContextMenuVM>();
-            this.TitleMenus = new BindableCollection<ContextMenuVM>();
-
-            List<MenuItemDefinition> menuDefinitions = this.FilterMenuItems();
-            List<MenuItemRelation> titleMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
-            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuRelations));
-            List<MenuItemRelation> contextMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
-            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuRelations));
-
             Dictionary<string, object> parameters = new Dictionary<string, object>()
             {
                 { "Session", this }
@@ -171,12 +174,12 @@ namespace ModengTerm.ViewModels
                 return;
             }
 
-            this.Status = status;
-
             if (this.StatusChanged != null)
             {
-                this.StatusChanged(this, status);
+                this.StatusChanged(this, this.status, status);
             }
+
+            this.Status = status;
         }
 
         #endregion
