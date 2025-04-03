@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
+using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;

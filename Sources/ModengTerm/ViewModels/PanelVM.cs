@@ -101,7 +101,7 @@ namespace ModengTerm.ViewModels
             // 当前状态
             bool visible = false;
 
-            if (Visible)
+            if (this.Visible)
             {
                 if (SelectedMenu == panelItemVM)
                 {
@@ -112,13 +112,13 @@ namespace ModengTerm.ViewModels
             if (visible)
             {
                 // 当前是显示状态，隐藏
-                Visible = false;
+                this.Visible = false;
                 ProcessLoaded(false, panelItemVM);
             }
             else
             {
                 // 当前是隐藏状态，显示
-                Visible = true;
+                this.Visible = true;
 
                 if (!panelItemVM.IsSelected)
                 {

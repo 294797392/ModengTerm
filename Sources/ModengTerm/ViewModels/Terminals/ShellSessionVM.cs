@@ -940,30 +940,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.logMgr.Resume(this.videoTerminal);
         }
 
-        /// <summary>
-        /// 拷贝当前选中的内容到剪切板
-        /// </summary>
-        private void ContextMenuCopySelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            this.CopySelection();
-        }
-
-        private void ContextMenuPaste_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            string text = System.Windows.Clipboard.GetText();
-            this.SendText(text);
-        }
-
-        /// <summary>
-        /// 打开同步输入配置窗口
-        /// </summary>
-        public void ContextMenuOpenSyncInputConfigurationWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(this);
-            sendAllConfigurationWindow.Owner = App.Current.MainWindow;
-            sendAllConfigurationWindow.ShowDialog();
-        }
-
         private void SelectAll()
         {
             this.videoTerminal.SelectAll();
@@ -1032,6 +1008,105 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
+        /// 暂停录像
+        /// </summary>
+        private void PauseRecord()
+        {
+            if (this.recordStatus == RecordStatusEnum.Pause)
+            {
+                return;
+            }
+
+            this.RecordStatus = RecordStatusEnum.Pause;
+        }
+
+        /// <summary>
+        /// 继续录像
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        private void ResumeRecord()
+        {
+            if (this.recordStatus == RecordStatusEnum.Recording)
+            {
+                return;
+            }
+
+            switch (this.recordStatus)
+            {
+                case RecordStatusEnum.Stop:
+                    {
+                        break;
+                    }
+
+                case RecordStatusEnum.Recording:
+                    {
+                        break;
+                    }
+
+                case RecordStatusEnum.Pause:
+                    {
+                        this.RecordStatus = RecordStatusEnum.Recording;
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// 发送到所有窗口
+        /// </summary>
+        private void SendToAll()
+        {
+            foreach (ShellSessionVM shellSession in MTermApp.Context.MainWindowVM.ShellSessions)
+            {
+                if (shellSession == this)
+                {
+                    continue;
+                }
+
+                SyncInputSessionVM syncInput = this.SyncInputSessions.FirstOrDefault(v => v.ID == shellSession.ID);
+                if (syncInput == null)
+                {
+                    syncInput = new SyncInputSessionVM()
+                    {
+                        ID = shellSession.ID,
+                        Name = shellSession.Name,
+                        Description = shellSession.Description
+                    };
+                    this.SyncInputSessions.Add(syncInput);
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// 拷贝当前选中的内容到剪切板
+        /// </summary>
+        private void ContextMenuCopySelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
+        {
+            this.CopySelection();
+        }
+
+        private void ContextMenuPaste_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
+        {
+            string text = System.Windows.Clipboard.GetText();
+            this.SendText(text);
+        }
+
+        /// <summary>
+        /// 打开同步输入配置窗口
+        /// </summary>
+        public void ContextMenuOpenSyncInputConfigurationWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
+        {
+            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(this);
+            sendAllConfigurationWindow.Owner = App.Current.MainWindow;
+            sendAllConfigurationWindow.ShowDialog();
+        }
+
+        /// <summary>
         /// 开始录像
         /// </summary>
         public void ContextMenuStartRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
@@ -1086,53 +1161,6 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
-        /// 暂停录像
-        /// </summary>
-        private void PauseRecord()
-        {
-            if (this.recordStatus == RecordStatusEnum.Pause)
-            {
-                return;
-            }
-
-            this.RecordStatus = RecordStatusEnum.Pause;
-        }
-
-        /// <summary>
-        /// 继续录像
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        private void ResumeRecord()
-        {
-            if (this.recordStatus == RecordStatusEnum.Recording)
-            {
-                return;
-            }
-
-            switch (this.recordStatus)
-            {
-                case RecordStatusEnum.Stop:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Recording:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Pause:
-                    {
-                        this.RecordStatus = RecordStatusEnum.Recording;
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
         /// 打开录像
         /// </summary>
         public void ContextMenuOpenRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
@@ -1163,32 +1191,6 @@ namespace ModengTerm.Terminal.ViewModels
         public void ContextMenuSaveAllDocument_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             this.SaveToFile(ParagraphTypeEnum.AllDocument);
-        }
-
-        /// <summary>
-        /// 发送到所有窗口
-        /// </summary>
-        private void SendToAll()
-        {
-            foreach (ShellSessionVM shellSession in MTermApp.Context.MainWindowVM.ShellSessions)
-            {
-                if (shellSession == this)
-                {
-                    continue;
-                }
-
-                SyncInputSessionVM syncInput = this.SyncInputSessions.FirstOrDefault(v => v.ID == shellSession.ID);
-                if (syncInput == null)
-                {
-                    syncInput = new SyncInputSessionVM()
-                    {
-                        ID = shellSession.ID,
-                        Name = shellSession.Name,
-                        Description = shellSession.Description
-                    };
-                    this.SyncInputSessions.Add(syncInput);
-                }
-            }
         }
 
         private void ContextMenuOpenPortForwardWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
@@ -1274,5 +1276,10 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         #endregion
+    }
+
+    public class ShellSessionContextMenuHandler
+    {
+        public void 
     }
 }
