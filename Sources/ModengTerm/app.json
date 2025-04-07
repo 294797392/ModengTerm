@@ -50,6 +50,7 @@
             "contextParentId": "",
             "contextOrdinal": 1,
             "name": "查找",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuFind_Click"
         },
         {
@@ -58,6 +59,7 @@
             "contextParentId": "",
             "contextOrdinal": 2,
             "name": "复制",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuCopySelection_Click"
         },
         {
@@ -66,6 +68,7 @@
             "contextParentId": "",
             "contextOrdinal": 3,
             "name": "粘贴",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuPaste_Click"
         },
         {
@@ -80,7 +83,7 @@
             "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
             "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
             "name": "选中内容",
-            "handlerEntry": "",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuSaveSelection_Click"
         },
         {
@@ -88,7 +91,7 @@
             "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
             "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
             "name": "当前屏幕内容",
-            "handlerEntry": "",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuSaveViewport_Click"
         },
         {
@@ -96,23 +99,23 @@
             "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
             "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
             "name": "所有内容",
-            "handlerEntry": "",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuSaveAllDocument_Click"
         },
-        {
-            "id": "D0A94B89-0DAC-4920-B55F-3AA1DC4C28A2",
-            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-            "contextParentId": "",
-            "name": "添加到快捷命令",
-            "handlerEntry": "",
-            "clickMethod": "ContextMenuAddToQuickCommands_Click"
-        },
+        //{
+        //    "id": "D0A94B89-0DAC-4920-B55F-3AA1DC4C28A2",
+        //    "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+        //    "contextParentId": "",
+        //    "name": "添加到快捷命令",
+        //    "handlerEntry": "",
+        //    "clickMethod": "ContextMenuAddToQuickCommands_Click"
+        //},
         {
             "id": "A9DDE47E-5A1A-4C5C-8A75-43D224E94842",
             "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
             "contextParentId": "",
             "name": "清屏",
-            "handlerEntry": "",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuClearScreen_Click"
         },
 
@@ -130,13 +133,13 @@
             "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
             "clickMethod": "SwitchQuickInputViewHandler"
         },
-        {
-            "id": "2B09F519-6434-4926-8570-1CEEF55401EC",
-            "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-            "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-            "name": "输入栏",
-            "clickMethod": "ContextMenuSwitchInputPanelVisible_Click"
-        },
+        //{
+        //    "id": "2B09F519-6434-4926-8570-1CEEF55401EC",
+        //    "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+        //    "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+        //    "name": "输入栏",
+        //    "clickMethod": "ContextMenuSwitchInputPanelVisible_Click"
+        //},
 
         {
             "id": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
@@ -149,6 +152,7 @@
             "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
             "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
             "name": "端口转发",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuOpenPortForwardWindow_Click",
             "sessionTypes": [ 1 ]
         },
@@ -157,15 +161,17 @@
             "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
             "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
             "name": "同步输入",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuOpenSyncInputConfigurationWindow_Click"
         },
-        {
-            "id": "912F51A5-1978-4104-BDE8-E4F7C6B8F0C7",
-            "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "name": "快捷命令",
-            "clickMethod": "ContextMenuCreateQuickCommand_Click"
-        },
+        //{
+        //    "id": "912F51A5-1978-4104-BDE8-E4F7C6B8F0C7",
+        //    "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+        //    "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+        //    "name": "快捷命令",
+        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+        //    "clickMethod": "ContextMenuCreateQuickCommand_Click"
+        //},
 
         {
             "id": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
@@ -184,6 +190,7 @@
             "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
             "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
             "name": "开始",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuStartLogger_Click"
         },
         {
@@ -191,6 +198,7 @@
             "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
             "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
             "name": "停止",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuStopLogger_Click"
         },
         {
@@ -204,6 +212,7 @@
             "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
             "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
             "name": "开始",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuStartRecord_Click"
         },
         {
@@ -211,6 +220,7 @@
             "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
             "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
             "name": "停止",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuStopRecord_Click"
         },
         {
@@ -218,20 +228,19 @@
             "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
             "contextParentId": "",
             "name": "打开回放",
+            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
             "clickMethod": "ContextMenuOpenRecord_Click"
         },
-        {
-            "id": "9559A8B6-A2A1-409B-A19A-0CD57FE975BF",
-            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "contextParentId": "",
-            "contextOrdinal": 5,
-            "name": "系统监控",
-            "clickMethod": "ContextMenuVisiblePanelContent_Click",
-            "panelEntry": "ModengTerm.UserControls.TerminalUserControls.SystemWatchUserControl, ModengTerm",
-            "panelVMEntry": "ModengTerm.ViewModels.Terminals.PanelContent.WatchSystemInfo, ModengTerm",
-            "panelAlign": 3,
-            "sessionTypes": [ 0, 1 ]
-        },
+        //{
+        //    "id": "9559A8B6-A2A1-409B-A19A-0CD57FE975BF",
+        //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+        //    "contextParentId": "",
+        //    "contextOrdinal": 5,
+        //    "name": "系统监控",
+        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+        //    "clickMethod": "ContextMenuVisiblePanelContent_Click",
+        //    "sessionTypes": [ 0, 1 ]
+        //},
         //{
         //    "id": "B1534904-1E5A-4259-B9A6-B0D9C88D5B93",
         //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
@@ -246,26 +255,28 @@
         //},
 
 
-        {
-            "id": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
-            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "contextParentId": "-1",
-            "name": "传输"
-        },
-        {
-            "id": "75E08588-BD10-414F-A95C-7E3F471E0335",
-            "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
-            "contextParentId": "",
-            "name": "使用XModem发送",
-            "clickMethod": "ContextMenuXModemSend_Click"
-        },
-        {
-            "id": "8F1834E0-FBFA-4BF4-B07E-47850A0AB758",
-            "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
-            "contextParentId": "",
-            "name": "使用XModem接收",
-            "clickMethod": "ContextMenuXModemReceive_Click"
-        }
+        //{
+        //    "id": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+        //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+        //    "contextParentId": "-1",
+        //    "name": "传输"
+        //},
+        //{
+        //    "id": "75E08588-BD10-414F-A95C-7E3F471E0335",
+        //    "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+        //    "contextParentId": "",
+        //    "name": "使用XModem发送",
+        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+        //    "clickMethod": "ContextMenuXModemSend_Click"
+        //},
+        //{
+        //    "id": "8F1834E0-FBFA-4BF4-B07E-47850A0AB758",
+        //    "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+        //    "contextParentId": "",
+        //    "name": "使用XModem接收",
+        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+        //    "clickMethod": "ContextMenuXModemReceive_Click"
+        //}
     ],
 
     "termOptionMenu": [

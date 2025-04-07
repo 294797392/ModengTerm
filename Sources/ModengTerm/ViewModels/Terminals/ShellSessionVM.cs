@@ -75,8 +75,6 @@ namespace ModengTerm.Terminal.ViewModels
 
         private Visibility contextMenuVisibility;
 
-        private LoggerManager logMgr;
-
         private AutoCompletionVM autoCompletionVM;
 
         private bool inputPanelVisible;
@@ -84,6 +82,8 @@ namespace ModengTerm.Terminal.ViewModels
         private bool modemRunning;
 
         private List<ScriptItem> scriptItems;
+
+        private LoggerManager logMgr;
 
         #endregion
 
@@ -541,11 +541,6 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
-        private void StopLogger()
-        {
-            this.logMgr.Stop(this.videoTerminal);
-        }
-
         /// <summary>
         /// 开始运行Modem传输
         /// </summary>
@@ -799,6 +794,16 @@ namespace ModengTerm.Terminal.ViewModels
             }
         }
 
+        public void StartLogger(IVideoTerminal videoTerminal, LoggerOptions loggerOptions)
+        {
+            this.logMgr.Start(videoTerminal, loggerOptions);
+        }
+
+        public void StopLogger()
+        {
+            this.logMgr.Stop(this.videoTerminal);
+        }
+
         #endregion
 
         #region 事件处理器
@@ -911,21 +916,6 @@ namespace ModengTerm.Terminal.ViewModels
                     this.videoTerminal.ProcessRead(bytesDisplay, bytesDisplay.Length);
                 }
             });
-        }
-
-        public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            LoggerOptionsWindow window = new LoggerOptionsWindow(this);
-            window.Owner = Window.GetWindow(this.Content);
-            if ((bool)window.ShowDialog())
-            {
-                this.logMgr.Start(this.videoTerminal, window.Options);
-            }
-        }
-
-        public void ContextMenuStopLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            this.StopLogger();
         }
 
         public void PauseLogger()
@@ -1081,8 +1071,12 @@ namespace ModengTerm.Terminal.ViewModels
         #endregion
     }
 
-    public class ShellSessionContextMenuHandler
+    public class ShellSessionContextMenu
     {
+        public ShellSessionContextMenu()
+        {
+        }
+
         #region 实例方法
 
         private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
@@ -1112,6 +1106,21 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         #endregion
+
+        public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
+        {
+            LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
+            window.Owner = System.Windows.Window.GetWindow(shellSessionVM.Content);
+            if ((bool)window.ShowDialog())
+            {
+                shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
+            }
+        }
+
+        public void ContextMenuStopLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
+        {
+            shellSessionVM.StopLogger();
+        }
 
         /// <summary>
         /// 拷贝当前选中的内容到剪切板

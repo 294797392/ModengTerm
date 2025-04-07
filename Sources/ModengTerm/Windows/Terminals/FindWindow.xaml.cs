@@ -73,7 +73,6 @@ namespace ModengTerm.Windows
 
         private static void FindWindow_Closed(object? sender, EventArgs e)
         {
-            FindWindow findWindow = sender as FindWindow;
             findWindow.Closed -= FindWindow_Closed;
 
             FindVM findVM = findWindow.DataContext as FindVM;

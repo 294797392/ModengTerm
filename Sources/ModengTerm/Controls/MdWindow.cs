@@ -89,10 +89,20 @@ namespace ModengTerm.Controls
         {
             base.OnKeyDown(e);
 
-            if (e.Key == Key.Escape) 
+            if (e.Key == Key.Escape)
             {
                 e.Handled = true;
-                base.DialogResult = false;
+                base.Close();
+
+                //// 如果是模态窗口才可以设置DialogResult
+                //if (System.Windows.Interop.ComponentDispatcher.IsThreadModal)
+                //{
+                //    base.DialogResult = false;
+                //}
+                //else
+                //{
+                //    base.Close();
+                //}
             }
         }
     }
