@@ -27,8 +27,10 @@ namespace ModengTerm.UserControls.TerminalUserControls
                     {
                         case Dock.Right:
                             {
-                                DockPanel.SetDock(ListBoxMenus, Dock.Right);
-                                DockPanel.SetDock(GridContent, Dock.Left);
+                                Grid.SetColumn(ListBoxMenus, 1);
+                                Grid.SetColumn(GridContent, 0);
+                                ColumnDefinition1.Width = new GridLength();
+                                ColumnDefinition2.Width = new GridLength(0, GridUnitType.Auto);
                                 ListBoxMenus.ItemContainerStyle = this.FindResource("StyleListBoxItemSessionPanel") as Style;
                                 break;
                             }

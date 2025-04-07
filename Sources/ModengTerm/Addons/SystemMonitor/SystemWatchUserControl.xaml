@@ -85,8 +85,7 @@
         <!-- 磁盘信息 -->
         <Grid Grid.Row="2" MinHeight="100" MaxHeight="250" Margin="0,5,0,0">
             <DataGrid DataContext="{Binding Path=Disks}" ItemsSource="{Binding}" RowHeight="25"
-                      ColumnHeaderHeight="25"
-                      Margin="5,0,5,0" Style="{StaticResource ResourceKey=StyleDataGrid}">
+                      ColumnHeaderHeight="25" Margin="5,0,5,0" Style="{StaticResource ResourceKey=StyleDataGrid}">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource ResourceKey=StyleDataGridColumnHeader}">
@@ -195,7 +194,8 @@
                     <DataGridTemplateColumn Header="PID" Width="Auto" CanUserSort="True" SortMemberPath="PID">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=PID}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding Path=PID}" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                           ToolTip="{Binding Path=PID}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -203,7 +203,8 @@
                     <DataGridTemplateColumn Header="名称" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,5,0"/>
+                                <TextBlock Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,5,0"
+                                           ToolTip="{Binding Path=Name}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -211,7 +212,8 @@
                     <DataGridTemplateColumn Header="内存" Width="70" CanUserSort="True" SortMemberPath="Memory">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=DisplayMemory}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding Path=DisplayMemory}" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                           ToolTip="{Binding Path=DisplayMemory}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -219,7 +221,8 @@
                     <DataGridTemplateColumn Header="CPU" Width="50" CanUserSort="True" SortMemberPath="CpuUsage">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Path=CpuUsage}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                <TextBlock Text="{Binding Path=CpuUsage}" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                           ToolTip="{Binding Path=CpuUsage}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

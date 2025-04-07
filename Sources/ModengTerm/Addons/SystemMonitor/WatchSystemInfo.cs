@@ -140,7 +140,7 @@ namespace ModengTerm.Addons.SystemMonitor
             ifaceCopy = new NetworkInterfaceVMCopy();
             processCopy = new ProcessVMCopy();
 
-            //this.shellSession = base.OpenedSession as ShellSessionVM;
+            this.shellSession = base.OpenedSessionVM as ShellSessionVM;
             watchEvent = new ManualResetEvent(false);
         }
 
@@ -321,7 +321,7 @@ namespace ModengTerm.Addons.SystemMonitor
 
         private void WatchTaskProc()
         {
-            WatchFrequencyEnum frequency = shellSession.Session.GetOption(OptionKeyEnum.WATCH_FREQUENCY, OptionDefaultValues.WATCH_FREQUENCY);
+            WatchFrequencyEnum frequency = this.Session.GetOption(OptionKeyEnum.WATCH_FREQUENCY, OptionDefaultValues.WATCH_FREQUENCY);
             int updateInterval = VTBaseUtils.GetWatchInterval(frequency);
             AbstractWatcher watcher = WatcherFactory.Create(shellSession.Transport);
             watcher.Initialize();

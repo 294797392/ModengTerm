@@ -40,7 +40,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
         <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type mcs:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -65,10 +65,14 @@
         </Style>
     </UserControl.Resources>
 
-    <DockPanel x:Name="DockPanel1" LastChildFill="True">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" x:Name="ColumnDefinition1"/>
+            <ColumnDefinition Width="*" x:Name="ColumnDefinition2"/>
+        </Grid.ColumnDefinitions>
 
         <ListBox Grid.Column="0" x:Name="ListBoxMenus" ItemsSource="{Binding Path=MenuItems}"
-                 DockPanel.Dock="Left" SelectionChanged="ListBoxMenus_SelectionChanged">
+                 SelectionChanged="ListBoxMenus_SelectionChanged">
 
             <ListBox.Style>
                 <Style TargetType="{x:Type ListBox}">
@@ -189,7 +193,7 @@
 
         </ListBox>
 
-        <Grid Grid.Column="1" x:Name="GridContent" DockPanel.Dock="Right" Visibility="Collapsed" MinWidth="250">
+        <Grid Grid.Column="1" x:Name="GridContent" Visibility="Collapsed" Width="300">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>
@@ -211,6 +215,6 @@
 
         </Grid>
 
-    </DockPanel>
-
+    </Grid>
+    
 </UserControl>
