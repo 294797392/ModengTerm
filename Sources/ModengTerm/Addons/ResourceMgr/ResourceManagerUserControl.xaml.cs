@@ -1,4 +1,5 @@
-﻿using ModengTerm.ViewModels;
+﻿using ModengTerm.UserControls;
+using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Session;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.UserControls
+namespace ModengTerm.Addons.ResourceMgr
 {
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑

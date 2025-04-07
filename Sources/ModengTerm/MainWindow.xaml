@@ -255,8 +255,8 @@
                 <Menu>
                     <MenuItem Header="帮助">
                         <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
-                        <MenuItem Header="记录代码日志" IsCheckable="True" Tag="code" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>
-                        <MenuItem Header="记录交互日志" IsCheckable="True" Tag="interactive" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>
+                        <!--<MenuItem Header="记录代码日志" IsCheckable="True" Tag="code" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>
+                        <MenuItem Header="记录交互日志" IsCheckable="True" Tag="interactive" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>-->
                         <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->
                     </MenuItem>
                 </Menu>
