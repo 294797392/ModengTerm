@@ -80,7 +80,7 @@
                 <renderer:DocumentControl x:Name="DocumentMain"/>
             </Grid>
 
-            <termuc2:PanelUserControl Grid.Column="1" PanelVM="{Binding Path=Panel}" Dock="Right"/>
+            <termuc2:PanelUserControl Grid.Column="1" DataContext="{Binding Path=Panel}" Dock="Right"/>
 
         </Grid>
 

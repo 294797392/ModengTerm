@@ -44,15 +44,15 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 依赖属性
 
-        public PanelVM PanelVM
-        {
-            get { return (PanelVM)GetValue(PanelVMProperty); }
-            set { SetValue(PanelVMProperty, value); }
-        }
+        //public PanelVM PanelVM
+        //{
+        //    get { return (PanelVM)GetValue(PanelVMProperty); }
+        //    set { SetValue(PanelVMProperty, value); }
+        //}
 
-        // Using a DependencyProperty as the backing store for PanelVM.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty PanelVMProperty =
-            DependencyProperty.Register("PanelVM", typeof(PanelVM), typeof(PanelUserControl), new PropertyMetadata(null, PanelVMPropertyChangedCallback));
+        //// Using a DependencyProperty as the backing store for PanelVM.  This enables animation, styling, binding, etc...
+        //public static readonly DependencyProperty PanelVMProperty =
+        //    DependencyProperty.Register("PanelVM", typeof(PanelVM), typeof(PanelUserControl), new PropertyMetadata(null, PanelVMPropertyChangedCallback));
 
         #endregion
 
@@ -88,16 +88,16 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 依赖属性回调
 
-        private void OnPanelVMPropertyChanged(PanelVM oldValue, PanelVM newValue)
-        {
-            ListBoxMenus.DataContext = newValue;
-        }
+        //private void OnPanelVMPropertyChanged(PanelVM oldValue, PanelVM newValue)
+        //{
+        //    ListBoxMenus.DataContext = newValue;
+        //}
 
-        private static void PanelVMPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            PanelUserControl me = d as PanelUserControl;
-            me.OnPanelVMPropertyChanged(e.OldValue as PanelVM, e.NewValue as PanelVM);
-        }
+        //private static void PanelVMPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    PanelUserControl me = d as PanelUserControl;
+        //    me.OnPanelVMPropertyChanged(e.OldValue as PanelVM, e.NewValue as PanelVM);
+        //}
 
         #endregion
 
@@ -105,14 +105,21 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ListBoxMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PanelItemVM selectedItem = ListBoxMenus.SelectedItem as PanelItemVM;
-            if (selectedItem == null)
+            if (base.DataContext == null) 
             {
-                this.PanelVM.CurrentContent = null;
                 return;
             }
 
-            DependencyObject dependencyObject = this.PanelVM.LoadContent(selectedItem);
+            PanelVM panelVM = base.DataContext as PanelVM;
+
+            PanelItemVM selectedItem = ListBoxMenus.SelectedItem as PanelItemVM;
+            if (selectedItem == null)
+            {
+                panelVM.CurrentContent = null;
+                return;
+            }
+
+            DependencyObject dependencyObject = panelVM.LoadContent(selectedItem);
             if (dependencyObject == null)
             {
                 logger.ErrorFormat("加载页面失败, 页面为空, {0}", selectedItem.Name);

@@ -335,7 +335,7 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[2]}"/>
+                <termuc2:PanelUserControl DataContext="{Binding Path=Panels[2]}"/>
             </Grid>
 
             <!-- 终端显示区域 -->

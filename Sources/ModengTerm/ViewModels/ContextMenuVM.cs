@@ -93,56 +93,37 @@ namespace ModengTerm.ViewModels
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ContextMenuHelper");
         private static Dictionary<string, ClickHandler> menuItemClickHandlers = new Dictionary<string, ClickHandler>();
 
-        public static void Execute(ContextMenuVM contextMenu, OpenedSessionVM openedSessionVM, object invokeObject)
+        public static void Execute(ContextMenuVM contextMenu, OpenedSessionVM openedSessionVM)
         {
             MenuItemDefinition menuDefinition = contextMenu.Definition;
 
-            object targetObject = invokeObject;
-            List<MethodInfo> methods = null;
-
-            if (!string.IsNullOrEmpty(menuDefinition.HandlerEntry) && !string.IsNullOrEmpty(menuDefinition.MethodName))
+            if (string.IsNullOrEmpty(menuDefinition.HandlerEntry) || string.IsNullOrEmpty(menuDefinition.MethodName))
             {
-                // 先创建点击事件处理器实例
-                ClickHandler clickHandler;
-                if (!menuItemClickHandlers.TryGetValue(menuDefinition.HandlerEntry, out clickHandler))
-                {
-                    try
-                    {
-                        object handlerObject = ConfigFactory<object>.CreateInstance(menuDefinition.HandlerEntry);
-                        methods = handlerObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic).ToList();
-                        menuItemClickHandlers[menuDefinition.HandlerEntry] = new ClickHandler(handlerObject, methods);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("创建菜单点击事件处理器异常", ex);
-                        return;
-                    }
-                }
-
-                methods = clickHandler.Methods;
-
-                targetObject = clickHandler.Object;
+                logger.ErrorFormat("{0}缺少参数", menuDefinition.Name);
+                return;
             }
-            else
+
+            // 先创建点击事件处理器实例
+            ClickHandler clickHandler;
+            if (!menuItemClickHandlers.TryGetValue(menuDefinition.HandlerEntry, out clickHandler))
             {
-                if (string.IsNullOrEmpty(menuDefinition.MethodName))
+                try
                 {
+                    object handlerObject = ConfigFactory<object>.CreateInstance(menuDefinition.HandlerEntry);
+                    List<MethodInfo> methods = handlerObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic).ToList();
+                    clickHandler = new ClickHandler(handlerObject, methods);
+                    menuItemClickHandlers[menuDefinition.HandlerEntry] = clickHandler;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("创建菜单点击事件处理器异常", ex);
                     return;
                 }
-
-                string typeName = invokeObject.GetType().ToString();
-                ClickHandler clickHandler;
-                if (!menuItemClickHandlers.TryGetValue(typeName, out clickHandler))
-                {
-                    methods = invokeObject.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic).ToList();
-                    clickHandler = new ClickHandler(null, methods);
-                    menuItemClickHandlers[typeName] = clickHandler;
-                }
-
-                methods = clickHandler.Methods;
             }
 
-            MethodInfo clickMethod = methods.FirstOrDefault(v => v.Name == menuDefinition.MethodName);
+            object targetObject = clickHandler.Object;
+
+            MethodInfo clickMethod = clickHandler.Methods.FirstOrDefault(v => v.Name == menuDefinition.MethodName);
             if (clickMethod == null)
             {
                 logger.ErrorFormat("调用点击事件失败, 没找到指定的方法:{0}, entry:{1}", menuDefinition.MethodName, menuDefinition.HandlerEntry);

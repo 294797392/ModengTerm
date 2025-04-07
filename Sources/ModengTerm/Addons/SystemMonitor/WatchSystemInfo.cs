@@ -156,6 +156,8 @@ namespace ModengTerm.Addons.SystemMonitor
         public override void OnLoaded()
         {
             base.OnLoaded();
+
+            this.watchEvent.Set();
         }
 
         public override void OnUnload()

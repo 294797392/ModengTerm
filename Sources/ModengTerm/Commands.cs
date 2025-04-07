@@ -14,7 +14,10 @@ namespace ModengTerm
         /// </summary>
         public static RoutedUICommand SendCommand { get; private set; }
 
-        public static RoutedUICommand PanelVisiblityCommand { get; private set; }
+        /// <summary>
+        /// 改变PanelItem的显示/隐藏状态
+        /// </summary>
+        public static RoutedUICommand ChangePanelItemVisibleCommand { get; private set; }
 
         /// <summary>
         /// 打开会话命令
@@ -24,7 +27,7 @@ namespace ModengTerm
         static MCommands()
         {
             SendCommand = new RoutedUICommand();
-            PanelVisiblityCommand = new RoutedUICommand();
+            ChangePanelItemVisibleCommand = new RoutedUICommand();
             OpenSessionCommand = new RoutedUICommand();
         }
     }

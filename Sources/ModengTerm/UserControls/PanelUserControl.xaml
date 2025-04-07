@@ -63,6 +63,9 @@
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Background" Value="Transparent"/>
         </Style>
+
+        <toolkitconv:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
+
     </UserControl.Resources>
 
     <Grid>
@@ -193,7 +196,7 @@
 
         </ListBox>
 
-        <Grid Grid.Column="1" x:Name="GridContent" Visibility="Collapsed" Width="300">
+        <Grid Grid.Column="1" x:Name="GridContent" Width="300" Visibility="{Binding Path=Visible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"/>
                 <RowDefinition Height="*"/>

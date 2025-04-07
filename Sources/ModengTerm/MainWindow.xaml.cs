@@ -22,6 +22,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
 namespace ModengTerm
@@ -359,7 +360,7 @@ namespace ModengTerm
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
-            ContextMenuHelper.Execute(contextMenu, openedSessionVM, openedSessionVM);
+            ContextMenuHelper.Execute(contextMenu, openedSessionVM);
         }
 
 
@@ -546,6 +547,7 @@ namespace ModengTerm
             XTermSessionVM sessionVM = e.Parameter as XTermSessionVM;
             if (sessionVM == null)
             {
+                logger.ErrorFormat("OpenSessionCommand缺少参数");
                 return;
             }
 

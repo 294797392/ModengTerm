@@ -47,6 +47,10 @@ namespace ModengTerm.Addons.ResourceMgr
 
         #region IContentHook
 
+        private void CreateDefaultValue() 
+        {
+        }
+
         public void OnInitialize()
         {
             this.resourceManagerTreeVM = MTermApp.Context.ResourceManagerTreeVM;
