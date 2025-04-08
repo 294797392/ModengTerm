@@ -6,8 +6,5 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addons
 {
-    public class AddonMetadataAttribute : Attribute
-    {
-        public AddonMetadataAttribute() { }
-    }
+    public delegate void AddonEventHandler(AddonEventTypes evt, params object[] param);
 }

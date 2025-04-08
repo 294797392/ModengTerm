@@ -8,7 +8,7 @@ namespace ModengTerm.Base.ServiceAgents
     /// 1. 管理分组和Session信息
     /// 2. 用户数据管理，用户登录
     /// </summary>
-    public abstract class ServiceAgent //: ITerminalAgent
+    public abstract class ServiceAgent
     {
         public int Initialize()
         {

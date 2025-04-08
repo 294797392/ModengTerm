@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addons
 {
-    public class SideWindowMetadata
+    public enum AddonEventTypes
     {
-        
-    }
 
-    public class SideWindow
-    {
     }
 }

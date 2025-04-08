@@ -1,8 +1,11 @@
-﻿using log4net.Core;
+﻿using DotNEToolkit;
+using log4net.Core;
 using log4net.Repository.Hierarchy;
+using ModengTerm.Addons.Find;
 using ModengTerm.Addons.QuickInput;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
@@ -16,13 +19,13 @@ using ModengTerm.ViewModels.Session;
 using ModengTerm.ViewModels.Terminals;
 using ModengTerm.Windows;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using WPFToolkit.MVVM;
 using WPFToolkit.Utility;
 
 namespace ModengTerm
@@ -83,6 +86,62 @@ namespace ModengTerm
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
+        private PanelDefinition CreatePanelDefinition(XTermSession session)
+        {
+            PanelDefinition panelDefinition = JSONHelper.CloneObject<PanelDefinition>(MTermApp.Context.Manifest.SessionPanel);
+
+            // 会话关联的窗口里包含插件窗口
+            foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
+            {
+                foreach (PanelItemDefinition panelItem in addon.PanelItems)
+                {
+                    if (panelItem.SessionTypes.Count > 0)
+                    {
+                        if (!panelItem.SessionTypes.Contains(session.Type)) 
+                        {
+                            continue;
+                        }
+                    }
+
+                    panelDefinition.Items.Add(panelItem);
+                }
+            }
+
+            return panelDefinition;
+        }
+
+        private List<MenuItemDefinition> CreateMenuItemDefinitions(XTermSession session) 
+        {
+            List<MenuItemDefinition> srcMenuItems = new List<MenuItemDefinition>();
+            srcMenuItems.AddRange(MTermApp.Context.Manifest.TerminalMenus);
+
+            // 会话菜单里包含插件菜单
+            foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
+            {
+                srcMenuItems.AddRange(addon.MenuItems);
+            }
+
+            List<MenuItemDefinition> results = new List<MenuItemDefinition>();
+
+            // 过滤只关联这个会话的菜单
+            foreach (MenuItemDefinition menuDefinition in srcMenuItems)
+            {
+                if (menuDefinition.SessionTypes.Count == 0)
+                {
+                    results.Add(menuDefinition);
+                }
+                else
+                {
+                    if (menuDefinition.SessionTypes.Contains(session.Type))
+                    {
+                        results.Add(menuDefinition);
+                    }
+                }
+            }
+
+            return results.OrderBy(v => v.Ordinal).ToList();
+        }
+
         private void ShowSessionListWindow()
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
@@ -105,21 +164,24 @@ namespace ModengTerm
             ISessionContent content = SessionContentFactory.Create(session);
             ContentControlSession.Content = content;
 
-            OpenedSessionVM viewModel = OpenedSessionVMFactory.Create(session);
-            viewModel.ID = session.ID;
-            viewModel.Name = session.Name;
-            viewModel.Description = session.Description;
-            viewModel.Content = content as DependencyObject;
-            viewModel.ServiceAgent = MTermApp.Context.ServiceAgent;
+            OpenedSessionVM openedSessionVM = OpenedSessionVMFactory.Create(session);
+            openedSessionVM.ID = session.ID;
+            openedSessionVM.Name = session.Name;
+            openedSessionVM.Description = session.Description;
+            openedSessionVM.Content = content as DependencyObject;
+            openedSessionVM.ServiceAgent = MTermApp.Context.ServiceAgent;
+            openedSessionVM.PanelDefinition = this.CreatePanelDefinition(session);
+            openedSessionVM.MenuItems = this.CreateMenuItemDefinitions(session);
+            openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
             int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);
-            this.mainWindowVM.SessionList.Insert(index, viewModel);
-            this.mainWindowVM.SelectedSession = viewModel;
+            this.mainWindowVM.SessionList.Insert(index, openedSessionVM);
+            this.mainWindowVM.SelectedSession = openedSessionVM;
 
             ScrollViewerOpenedSession.ScrollToRightEnd();
 
-            int code = content.Open(viewModel);
+            int code = content.Open(openedSessionVM);
             if (code != ResponseCode.SUCCESS)
             {
                 logger.ErrorFormat("打开会话失败, {0}", code);

@@ -71,7 +71,7 @@ namespace ModengTerm.Base.ServiceAgents
         {
             try
             {
-                return JSONDatabase.Select<XTermSession>(v => v.ID == sessionId);
+                return JSONDatabase.SelectAll<XTermSession>(v => v.ID == sessionId).FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -343,7 +343,7 @@ namespace ModengTerm.Base.ServiceAgents
         {
             try
             {
-                return JSONDatabase.Select<PrivateKey>(v => v.ID == id);
+                return JSONDatabase.SelectAll<PrivateKey>(v => v.ID == id).FirstOrDefault();
             }
             catch (Exception ex)
             {

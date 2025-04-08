@@ -1,13 +1,17 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Session;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Threading;
 using WPFToolkit.MVVM;
@@ -49,11 +53,16 @@ namespace ModengTerm
         /// </summary>
         public SessionTreeVM ResourceManagerTreeVM { get; private set; }
 
+        /// <summary>
+        /// 所有插件实例
+        /// </summary>
+        private List<AddonBase> Addons { get; set; }
+
         #endregion
 
         #region ModularApp
 
-        protected override int OnInitialize()
+        protected override int OnInitialized()
         {
             this.ServiceAgent = new LocalServiceAgent();
             this.ServiceAgent.Initialize();
@@ -70,6 +79,8 @@ namespace ModengTerm
 
             // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
             this.MainWindowVM = new MainWindowVM();
+
+            this.InitializeAddons();
 
             return ResponseCode.SUCCESS;
         }
@@ -95,6 +106,28 @@ namespace ModengTerm
             }
         }
 
+        private void InitializeAddons()
+        {
+            this.Addons = new List<AddonBase>();
+
+            foreach (AddonDefinition definition in this.Manifest.Addons)
+            {
+                AddonBase addonBase = null;
+                try
+                {
+                    addonBase = ConfigFactory<AddonBase>.CreateInstance(definition.ClassEntry);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("创建插件实例异常", ex);
+                    continue;
+                }
+
+                addonBase.Definition = definition;
+                this.Addons.Add(addonBase);
+            }
+        }
+
         #endregion
 
         #region 公开接口
@@ -103,7 +136,7 @@ namespace ModengTerm
         /// 创建一个会话树形列表
         /// </summary>
         /// <param name="onlyGroup">树形列表里是否只有分组</param>
-        /// <param name="includeRootNode">是否包含无分组节点</param>
+        /// <param name="includeRootNode">是否包含根节点分组（Root）</param>
         public SessionTreeVM CreateSessionTreeVM(bool onlyGroup = false, bool includeRootNode = false)
         {
             SessionTreeVM sessionTreeVM = new SessionTreeVM();
@@ -111,7 +144,7 @@ namespace ModengTerm
 
             SessionGroupVM rootNode = null;
 
-            if (includeRootNode) 
+            if (includeRootNode)
             {
                 rootNode = new SessionGroupVM(context, 0, VTBaseConsts.RootGroup);
                 sessionTreeVM.AddRootNode(rootNode);
@@ -171,6 +204,11 @@ namespace ModengTerm
             }
 
             return sessionTreeVM;
+        }
+
+        public void RaiseAddonEvent(AddonEventTypes evt, object evp)
+        {
+
         }
 
         #endregion

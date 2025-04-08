@@ -5,8 +5,8 @@ using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
+using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Terminal.ViewModels
+namespace ModengTerm.Addons.Find
 {
     /// <summary>
     /// 搜索ViewModel
@@ -88,13 +88,13 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public string Message
         {
-            get { return this.message; }
+            get { return message; }
             set
             {
-                if (this.message != value)
+                if (message != value)
                 {
-                    this.message = value;
-                    this.NotifyPropertyChanged("Message");
+                    message = value;
+                    NotifyPropertyChanged("Message");
                 }
             }
         }
@@ -104,14 +104,14 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public bool CaseSensitive
         {
-            get { return this.caseSensitive; }
+            get { return caseSensitive; }
             set
             {
-                if (this.caseSensitive != value)
+                if (caseSensitive != value)
                 {
-                    this.caseSensitive = value;
-                    this.NotifyPropertyChanged("CaseSensitive");
-                    this.OnCaseSensitiveChanged();
+                    caseSensitive = value;
+                    NotifyPropertyChanged("CaseSensitive");
+                    OnCaseSensitiveChanged();
                 }
             }
         }
@@ -121,13 +121,13 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public bool Regexp
         {
-            get { return this.regexp; }
+            get { return regexp; }
             set
             {
-                if (this.regexp != value)
+                if (regexp != value)
                 {
-                    this.regexp = value;
-                    this.NotifyPropertyChanged("Regexp");
+                    regexp = value;
+                    NotifyPropertyChanged("Regexp");
                 }
             }
         }
@@ -137,14 +137,14 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public string Keyword
         {
-            get { return this.keyword; }
+            get { return keyword; }
             set
             {
-                if (this.keyword != value)
+                if (keyword != value)
                 {
-                    this.keyword = value;
-                    this.NotifyPropertyChanged("Keyword");
-                    this.OnKeywordChanged(value);
+                    keyword = value;
+                    NotifyPropertyChanged("Keyword");
+                    OnKeywordChanged(value);
                 }
             }
         }
@@ -154,13 +154,13 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public bool FindAll
         {
-            get { return this.findAll; }
+            get { return findAll; }
             set
             {
-                if (this.findAll != value)
+                if (findAll != value)
                 {
-                    this.findAll = value;
-                    this.NotifyPropertyChanged("FindAll");
+                    findAll = value;
+                    NotifyPropertyChanged("FindAll");
                 }
             }
         }
@@ -181,13 +181,13 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public bool UpFind
         {
-            get { return this.upFind; }
+            get { return upFind; }
             set
             {
-                if (this.upFind != value)
+                if (upFind != value)
                 {
-                    this.upFind = value;
-                    this.NotifyPropertyChanged("UpFind");
+                    upFind = value;
+                    NotifyPropertyChanged("UpFind");
                 }
             }
         }
@@ -197,13 +197,13 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         public bool DownFind
         {
-            get { return this.downFind; }
+            get { return downFind; }
             set
             {
-                if (this.downFind != value)
+                if (downFind != value)
                 {
-                    this.downFind = value;
-                    this.NotifyPropertyChanged("DownFind");
+                    downFind = value;
+                    NotifyPropertyChanged("DownFind");
                 }
             }
         }
@@ -214,7 +214,7 @@ namespace ModengTerm.Terminal.ViewModels
 
         public FindVM()
         {
-            this.textLineVersions = new Dictionary<VTextLine, int>();
+            textLineVersions = new Dictionary<VTextLine, int>();
         }
 
         #endregion
@@ -230,21 +230,21 @@ namespace ModengTerm.Terminal.ViewModels
         {
             if (string.IsNullOrEmpty(keyword))
             {
-                this.matchResult = null;
-                this.activeRectElement.Clear();
+                matchResult = null;
+                activeRectElement.Clear();
                 return false;
             }
 
-            List<VTMatches> matches = this.FindMatches(keyword);
+            List<VTMatches> matches = FindMatches(keyword);
             if (matches.Count == 0)
             {
-                this.activeRectElement.Clear();
+                activeRectElement.Clear();
                 return false;
             }
 
-            this.HighlightMatches(matches);
+            HighlightMatches(matches);
 
-            this.matchResult = matches;
+            matchResult = matches;
 
             return true;
         }
@@ -258,9 +258,9 @@ namespace ModengTerm.Terminal.ViewModels
         {
             string text = VTDocUtils.CreatePlainText(textLine.Characters);
 
-            if (this.Regexp)
+            if (Regexp)
             {
-                RegexOptions regexOptions = this.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+                RegexOptions regexOptions = CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
 
                 // 用正则表达式搜索
                 Match match = Regex.Match(text, keyword, regexOptions);
@@ -282,7 +282,7 @@ namespace ModengTerm.Terminal.ViewModels
             }
             else
             {
-                StringComparison stringComparison = this.CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+                StringComparison stringComparison = CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
 
                 // 直接文本匹配
                 // 注意一行文本里可能会有多个地方匹配，要把所有匹配的地方都找到
@@ -325,13 +325,13 @@ namespace ModengTerm.Terminal.ViewModels
         {
             List<VTMatches> result = new List<VTMatches>();
 
-            VTDocument activeDocument = this.videoTerminal.ActiveDocument;
+            VTDocument activeDocument = videoTerminal.ActiveDocument;
 
             VTextLine current = activeDocument.FirstLine;
 
             while (current != null)
             {
-                List<VTMatches> matches = this.FindMatches(keyword, current);
+                List<VTMatches> matches = FindMatches(keyword, current);
                 if (matches != null)
                 {
                     result.AddRange(matches);
@@ -360,7 +360,7 @@ namespace ModengTerm.Terminal.ViewModels
                 rectangles.Add(new VTRect(textRange.Left, textRange.Top, textRange.Width, textRange.Height));
             }
 
-            this.activeRectElement.DrawRectangles(rectangles, null, this.HighlightBackground);
+            activeRectElement.DrawRectangles(rectangles, null, HighlightBackground);
         }
 
         /// <summary>
@@ -368,7 +368,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void OnKeywordChanged(string keyword)
         {
-            this.PerformFind(keyword);
+            PerformFind(keyword);
         }
 
         /// <summary>
@@ -376,7 +376,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// </summary>
         private void OnCaseSensitiveChanged()
         {
-            this.PerformFind(this.Keyword);
+            PerformFind(Keyword);
         }
 
         #endregion
@@ -389,54 +389,54 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="vt"></param>
         public void SetVideoTerminal(IVideoTerminal vt)
         {
-            if (this.videoTerminal == vt)
+            if (videoTerminal == vt)
             {
                 return;
             }
 
-            IVideoTerminal oldTerminal = this.videoTerminal;
+            IVideoTerminal oldTerminal = videoTerminal;
             if (oldTerminal != null)
             {
                 // 先释放之前搜索的终端资源
-                oldTerminal.MainDocument.Rendering -= this.MainDocument_Rendering;
-                oldTerminal.MainDocument.GraphicsInterface.DeleteDrawingObject(this.mainRectElement);
-                oldTerminal.AlternateDocument.Rendering -= this.MainDocument_Rendering;
-                oldTerminal.AlternateDocument.GraphicsInterface.DeleteDrawingObject(this.alternateRectElement);
+                oldTerminal.MainDocument.Rendering -= MainDocument_Rendering;
+                oldTerminal.MainDocument.GraphicsInterface.DeleteDrawingObject(mainRectElement);
+                oldTerminal.AlternateDocument.Rendering -= MainDocument_Rendering;
+                oldTerminal.AlternateDocument.GraphicsInterface.DeleteDrawingObject(alternateRectElement);
             }
 
             IVideoTerminal newTerminal = vt;
-            newTerminal.MainDocument.Rendering += this.MainDocument_Rendering;
-            this.mainRectElement = newTerminal.MainDocument.GraphicsInterface.CreateDrawingObject();
-            newTerminal.AlternateDocument.Rendering += this.MainDocument_Rendering;
-            this.alternateRectElement = newTerminal.AlternateDocument.GraphicsInterface.CreateDrawingObject();
+            newTerminal.MainDocument.Rendering += MainDocument_Rendering;
+            mainRectElement = newTerminal.MainDocument.GraphicsInterface.CreateDrawingObject();
+            newTerminal.AlternateDocument.Rendering += MainDocument_Rendering;
+            alternateRectElement = newTerminal.AlternateDocument.GraphicsInterface.CreateDrawingObject();
             if (newTerminal.IsAlternate)
             {
-                this.activeRectElement = this.alternateRectElement;
+                activeRectElement = alternateRectElement;
             }
             else
             {
-                this.activeRectElement = this.mainRectElement;
+                activeRectElement = mainRectElement;
             }
 
             // 更新渲染计数缓存
-            this.textLineVersions.Clear();
+            textLineVersions.Clear();
 
-            this.videoTerminal = vt;
+            videoTerminal = vt;
 
-            if (!string.IsNullOrEmpty(this.keyword))
+            if (!string.IsNullOrEmpty(keyword))
             {
-                this.PerformFind(this.keyword);
+                PerformFind(keyword);
             }
         }
 
         public void Release()
         {
-            this.videoTerminal.MainDocument.Rendering -= MainDocument_Rendering;
-            this.videoTerminal.MainDocument.GraphicsInterface.DeleteDrawingObject(this.mainRectElement);
-            this.videoTerminal.AlternateDocument.Rendering -= MainDocument_Rendering;
-            this.videoTerminal.AlternateDocument.GraphicsInterface.DeleteDrawingObject(this.alternateRectElement);
-            this.matchResult = null;
-            this.Message = string.Empty;
+            videoTerminal.MainDocument.Rendering -= MainDocument_Rendering;
+            videoTerminal.MainDocument.GraphicsInterface.DeleteDrawingObject(mainRectElement);
+            videoTerminal.AlternateDocument.Rendering -= MainDocument_Rendering;
+            videoTerminal.AlternateDocument.GraphicsInterface.DeleteDrawingObject(alternateRectElement);
+            matchResult = null;
+            Message = string.Empty;
         }
 
         #endregion
@@ -450,7 +450,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="arg2"></param>
         private void MainDocument_Rendering(VTDocument document, VTRenderData renderData)
         {
-            this.PerformFind(this.keyword);
+            PerformFind(keyword);
         }
 
         /// <summary>
@@ -460,7 +460,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <exception cref="NotImplementedException"></exception>
         private void MainDocument_DiscardLine(VTDocument obj)
         {
-            this.PerformFind(this.keyword);
+            PerformFind(keyword);
         }
 
         #endregion

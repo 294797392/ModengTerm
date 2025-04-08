@@ -31,6 +31,21 @@ namespace ModengTerm.ViewModels
         #region 属性
 
         /// <summary>
+        /// 访问服务的代理
+        /// </summary>
+        public ServiceAgent ServiceAgent { get; set; }
+
+        /// <summary>
+        /// 该会话的侧边栏窗口
+        /// </summary>
+        public PanelDefinition PanelDefinition { get; set; }
+
+        /// <summary>
+        /// 该会话的菜单列表
+        /// </summary>
+        public List<MenuItemDefinition> MenuItems { get; set; }
+
+        /// <summary>
         /// 界面上的控件
         /// </summary>
         public DependencyObject Content
@@ -66,12 +81,6 @@ namespace ModengTerm.ViewModels
                 }
             }
         }
-
-        /// <summary>
-        /// 访问服务的代理
-        /// </summary>
-        public ServiceAgent ServiceAgent { get; set; }
-
         /// <summary>
         /// 该会话的右键菜单
         /// </summary>
@@ -94,25 +103,30 @@ namespace ModengTerm.ViewModels
         public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
-
-            // 在构造函数里实例化TitleMenus, 保证ListBoxOpenedSession_SelectionChanged触发的时候，TitleMenus不为空
-            this.ContextMenus = new BindableCollection<ContextMenuVM>();
-            this.TitleMenus = new BindableCollection<ContextMenuVM>();
-            List<MenuItemDefinition> menuDefinitions = this.FilterMenuItems();
-            List<MenuItemRelation> titleMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
-            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuRelations));
-            List<MenuItemRelation> contextMenuRelations = menuDefinitions.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
-            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuRelations));
         }
 
         #endregion
 
         #region 公开接口
 
+        /// <summary>
+        /// 在所有数据都准备好之后，Open之前调用
+        /// </summary>
+        public void Initialize() 
+        {
+            // 在Initialize里实例化TitleMenus, 保证ListBoxOpenedSession_SelectionChanged触发的时候，TitleMenus不为空
+            this.ContextMenus = new BindableCollection<ContextMenuVM>();
+            this.TitleMenus = new BindableCollection<ContextMenuVM>();
+            List<MenuItemRelation> titleMenuRelations = this.MenuItems.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
+            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuRelations));
+            List<MenuItemRelation> contextMenuRelations = this.MenuItems.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
+            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuRelations));
+        }
+
         public int Open()
         {
             // 给所有的插件页面使用的通用属性赋值
-            this.Panel = VTClientUtils.PanelDefinition2PanelVM(MTermApp.Context.Manifest.SessionPanel, this.Session.Type);
+            this.Panel = VTClientUtils.PanelDefinition2PanelVM(this.PanelDefinition);
             this.AddRemovePanelItemEvent(true);
             return this.OnOpen();
         }
@@ -184,49 +198,6 @@ namespace ModengTerm.ViewModels
         #endregion
 
         #region 实例方法
-
-        /// <summary>
-        /// 过滤只关联这个会话的菜单
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        private List<MenuItemDefinition> FilterMenuItems()
-        {
-            List<MenuItemDefinition> menuDefinitions = new List<MenuItemDefinition>();
-
-            switch ((SessionTypeEnum)this.Session.Type)
-            {
-                case SessionTypeEnum.SerialPort:
-                case SessionTypeEnum.Localhost:
-                case SessionTypeEnum.SSH:
-                    {
-                        menuDefinitions.AddRange(MTermApp.Context.Manifest.TerminalMenus.OrderBy(v => v.Ordinal));
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            List<MenuItemDefinition> results = new List<MenuItemDefinition>();
-
-            foreach (MenuItemDefinition menuDefinition in menuDefinitions)
-            {
-                if (menuDefinition.SessionTypes.Count == 0)
-                {
-                    results.Add(menuDefinition);
-                }
-                else
-                {
-                    if (menuDefinition.SessionTypes.Contains(this.Session.Type))
-                    {
-                        results.Add(menuDefinition);
-                    }
-                }
-            }
-
-            return results;
-        }
 
         /// <summary>
         /// 获取当前显示的PanelContent

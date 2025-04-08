@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Addons.Find;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Document;
@@ -20,7 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using XTerminal;
 
-namespace ModengTerm.Windows
+namespace ModengTerm.Addons.Find
 {
     /// <summary>
     /// 搜索窗口只能显示一个，用这个类来管理搜索窗口的生命周期

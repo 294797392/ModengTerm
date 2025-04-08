@@ -70,6 +70,12 @@ namespace ModengTerm
         [JsonProperty("sessionPanel")]
         public PanelDefinition SessionPanel { get; private set; }
 
+        /// <summary>
+        /// 插件列表
+        /// </summary>
+        [JsonProperty("addons")]
+        public List<AddonDefinition> Addons { get; private set; }
+
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
@@ -81,6 +87,7 @@ namespace ModengTerm
             this.DefaultThemes = new List<ThemePackage>();
             this.Panels = new List<PanelDefinition>();
             this.SessionPanel = new PanelDefinition();
+            this.Addons = new List<AddonDefinition>();
         }
     }
 }

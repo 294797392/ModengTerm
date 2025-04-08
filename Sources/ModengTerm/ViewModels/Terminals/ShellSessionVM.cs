@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using Microsoft.Win32;
+using ModengTerm.Addons.Find;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -1186,14 +1187,6 @@ namespace ModengTerm.Terminal.ViewModels
             OpenRecordWindow openRecordWindow = new OpenRecordWindow(shellSessionVM.Session);
             openRecordWindow.Owner = Window.GetWindow(shellSessionVM.Content);
             openRecordWindow.Show();
-        }
-
-        /// <summary>
-        /// 查找
-        /// </summary>
-        public void ContextMenuFind_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            FindWindowMgr.Show(shellSessionVM);
         }
 
         public void ContextMenuSaveViewport_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)

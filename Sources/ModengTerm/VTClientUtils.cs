@@ -65,7 +65,7 @@ namespace ModengTerm
         /// <param name="parameters">要传递到PanelContentVM里的参数</param>
         /// <param name="matchType"></param>
         /// <returns></returns>
-        public static PanelVM PanelDefinition2PanelVM(PanelDefinition panel, int? matchType = null)
+        public static PanelVM PanelDefinition2PanelVM(PanelDefinition panel)
         {
             PanelVM panelVM = new PanelVM();
             panelVM.ID = panel.ID;
@@ -74,15 +74,6 @@ namespace ModengTerm
 
             foreach (PanelItemDefinition panelItem in panel.Items)
             {
-                // 过滤会话类型
-                if (panelItem.SessionTypes.Count > 0 && matchType != null)
-                {
-                    if (!panelItem.SessionTypes.Contains(matchType.Value))
-                    {
-                        continue;
-                    }
-                }
-
                 PanelItemVM panelItemVM = new PanelItemVM(panelItem);
                 panelItemVM.ID = panelItem.ID;
                 panelItemVM.Name = panelItem.Name;

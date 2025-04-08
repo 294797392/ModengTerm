@@ -23,7 +23,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         public ServiceAgent ServiceAgent { get; set; }
 
-        protected override int OnInitialize()
+        protected override int OnInitialized()
         {
             return ResponseCode.SUCCESS;
         }

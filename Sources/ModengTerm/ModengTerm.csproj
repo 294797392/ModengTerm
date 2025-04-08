@@ -30,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Addons\AddonBase.cs" />
     <Compile Remove="Addons\AddonMetadataAttribute.cs" />
     <Compile Remove="Addons\ModengAPI.cs" />
     <Compile Remove="Addons\SideWindow.cs" />

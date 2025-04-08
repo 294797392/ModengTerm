@@ -1,14 +1,22 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base.Definitions;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
 
 namespace ModengTerm.Addons
 {
-    [AddonMetadata]
     public abstract class AddonBase
     {
         #region 实例变量
+
+        private List<AddonEventTypes> registerEvents;
+
+        #endregion
+
+        #region 属性
+
+        internal AddonDefinition Definition { get; set; }
 
         #endregion
 
@@ -16,6 +24,8 @@ namespace ModengTerm.Addons
 
         internal void Initialize()
         {
+            this.registerEvents = new List<AddonEventTypes>();
+
             this.OnInitialize();
         }
 
@@ -26,14 +36,14 @@ namespace ModengTerm.Addons
             // Release
         }
 
-        /// <summary>
-        /// 获取所有的Panel
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        internal List<object> GetSideWindows()
+        internal void RaiseEvent(AddonEventTypes ev)
         {
-            throw new NotImplementedException();
+            if (!this.registerEvents.Contains(ev))
+            {
+                return;
+            }
+
+            this.OnEvent(ev);
         }
 
         /// <summary>
@@ -57,10 +67,32 @@ namespace ModengTerm.Addons
 
         #endregion
 
+        #region 受保护方法
+
+        protected void RegisterEvent(AddonEventTypes ev)
+        {
+            if (this.registerEvents.Contains(ev))
+            {
+                return;
+            }
+
+            this.registerEvents.Add(ev);
+        }
+
+        #endregion
+
         #region 抽象方法
 
         protected abstract void OnInitialize();
         protected abstract void OnRelease();
+
+        /// <summary>
+        /// 当插件有事件触发的时候调用
+        /// </summary>
+        /// <param name="ev"></param>
+        protected abstract void OnEvent(AddonEventTypes ev);
+
+
         protected abstract void OnSelectedSessionChanged(OpenedSessionVM oldSession, OpenedSessionVM newSession);
         protected abstract void OnSessionStatusChanged(OpenedSessionVM session, SessionStatusEnum oldStatus, SessionStatusEnum newStatus);
 
