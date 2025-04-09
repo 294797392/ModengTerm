@@ -19,6 +19,11 @@ namespace ModengTerm.ViewModels
     {
         #region 公开事件
 
+        /// <summary>
+        /// 连接状态改变的时候触发
+        /// </summary>
+        public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
+
         #endregion
 
         #region 实例变量

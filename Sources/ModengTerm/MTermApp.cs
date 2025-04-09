@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using WPFToolkit.MVVM;
 
@@ -124,6 +125,8 @@ namespace ModengTerm
                 }
 
                 addonBase.Definition = definition;
+                addonBase.Initialize();
+
                 this.Addons.Add(addonBase);
             }
         }
@@ -206,9 +209,17 @@ namespace ModengTerm
             return sessionTreeVM;
         }
 
-        public void RaiseAddonEvent(AddonEventTypes evt, object evp)
+        /// <summary>
+        /// 通知插件事件触发
+        /// </summary>
+        /// <param name="evt">事件类型</param>
+        /// <param name="evp">事件参数列表</param>
+        public void RaiseAddonEvent(AddonEventTypes evt, params object[] evp)
         {
-
+            foreach (AddonBase addon in this.Addons)
+            {
+                addon.RaiseEvent(evt, evp);
+            }
         }
 
         #endregion

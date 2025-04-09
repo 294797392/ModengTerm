@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.Definitions;
+﻿using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.ViewModels;
 using System;
@@ -34,35 +35,18 @@ namespace ModengTerm.Addons
             this.OnRelease();
 
             // Release
+            this.registerEvents.Clear();
         }
 
-        internal void RaiseEvent(AddonEventTypes ev)
+        internal void RaiseEvent(AddonEventTypes evt, params object[] evp)
         {
-            if (!this.registerEvents.Contains(ev))
+            if (!this.registerEvents.Contains(evt))
             {
+                // 没注册事件
                 return;
             }
 
-            this.OnEvent(ev);
-        }
-
-        /// <summary>
-        /// 当选中的会话改变的时候触发
-        /// </summary>
-        /// <param name="session"></param>
-        internal void SelectedSessionChanged(OpenedSessionVM oldSession, OpenedSessionVM newSession)
-        {
-
-        }
-
-        /// <summary>
-        /// 当某个会话状态改变的时候触发
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="oldStatus"></param>
-        /// <param name="newState"></param>
-        internal void SessionStatusChanged(OpenedSessionVM session, SessionStatusEnum oldStatus, SessionStatusEnum newState)
-        {
+            this.OnEvent(evt, evp);
         }
 
         #endregion
@@ -90,11 +74,7 @@ namespace ModengTerm.Addons
         /// 当插件有事件触发的时候调用
         /// </summary>
         /// <param name="ev"></param>
-        protected abstract void OnEvent(AddonEventTypes ev);
-
-
-        protected abstract void OnSelectedSessionChanged(OpenedSessionVM oldSession, OpenedSessionVM newSession);
-        protected abstract void OnSessionStatusChanged(OpenedSessionVM session, SessionStatusEnum oldStatus, SessionStatusEnum newStatus);
+        protected abstract void OnEvent(AddonEventTypes ev, params object[] param);
 
         #endregion
     }

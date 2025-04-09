@@ -279,32 +279,25 @@ namespace ModengTerm
                 }
             }
 
-            // 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话
-            if (selectedSession is ShellSessionVM)
-            {
-                ShellSessionVM shellSession = selectedSession as ShellSessionVM;
-
-                if (FindWindowMgr.WindowShown)
-                {
-                    FindWindowMgr.Show(shellSession);
-                }
-            }
-
             #region 触发OpenedSessionVM的OnLoaded或OnUnload事件
+
+            OpenedSessionVM removedSession = null, addedSession = null;
 
             if (e.RemovedItems.Count > 0)
             {
-                OpenedSessionVM removedSession = e.RemovedItems[0] as OpenedSessionVM;
+                removedSession = e.RemovedItems[0] as OpenedSessionVM;
                 removedSession.OnUnload();
             }
 
             if (e.AddedItems.Count > 0)
             {
-                OpenedSessionVM addedSession = e.AddedItems[0] as OpenedSessionVM;
+                addedSession = e.AddedItems[0] as OpenedSessionVM;
                 addedSession.OnLoaded();
             }
 
             #endregion
+
+            MTermApp.Context.RaiseAddonEvent(Addons.AddonEventTypes.SelectedSessionChanged, removedSession, addedSession);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
