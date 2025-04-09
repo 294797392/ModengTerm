@@ -805,6 +805,15 @@ namespace ModengTerm.Terminal.ViewModels
             this.logMgr.Stop(this.videoTerminal);
         }
 
+        /// <summary>
+        /// 把剪贴板里的数据粘贴到终端
+        /// </summary>
+        public void Paste() 
+        {
+            string text = System.Windows.Clipboard.GetText();
+            this.SendText(text);
+        }
+
         #endregion
 
         #region 事件处理器
@@ -1078,36 +1087,6 @@ namespace ModengTerm.Terminal.ViewModels
         {
         }
 
-        #region 实例方法
-
-        private ParagraphFormatEnum FilterIndex2FileType(int filterIndex)
-        {
-            switch (filterIndex)
-            {
-                case 1: return ParagraphFormatEnum.PlainText;
-                case 2: return ParagraphFormatEnum.HTML;
-
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        private void SaveToFile(ParagraphTypeEnum paragraphType, ShellSessionVM shellSession)
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
-            saveFileDialog.FileName = string.Format("{0}_{1}", shellSession.Session.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
-            if (!(bool)saveFileDialog.ShowDialog())
-            {
-                return;
-            }
-
-            ParagraphFormatEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
-            shellSession.SaveToFile(paragraphType, fileType, saveFileDialog.FileName);
-        }
-
-        #endregion
-
         public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
@@ -1129,12 +1108,6 @@ namespace ModengTerm.Terminal.ViewModels
         private void ContextMenuCopySelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             shellSessionVM.CopySelection();
-        }
-
-        private void ContextMenuPaste_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            string text = System.Windows.Clipboard.GetText();
-            shellSessionVM.SendText(text);
         }
 
         /// <summary>
@@ -1189,21 +1162,6 @@ namespace ModengTerm.Terminal.ViewModels
             openRecordWindow.Show();
         }
 
-        public void ContextMenuSaveViewport_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            this.SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
-        }
-
-        public void ContextMenuSaveSelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            this.SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
-        }
-
-        public void ContextMenuSaveAllDocument_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            this.SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
-        }
-
         private void ContextMenuOpenPortForwardWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
         {
             PortForwardStatusWindow portForwardStatusWindow = new PortForwardStatusWindow(shellSessionVM);
@@ -1242,14 +1200,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             //QuickCommandVM qcvm = new QuickCommandVM(shellCommand);
             //this.ShellCommands.Add(qcvm);
-        }
-
-        private void ContextMenuClearScreen_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;
-            document.DeleteViewoprt();
-            document.SetCursorLogical(0, 0);
-            document.RequestInvalidate();
         }
 
         private void ContextMenuCreateQuickCommand_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)

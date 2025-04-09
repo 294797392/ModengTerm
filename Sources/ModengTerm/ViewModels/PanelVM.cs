@@ -113,6 +113,7 @@ namespace ModengTerm.ViewModels
             {
                 // 当前是显示状态，隐藏
                 this.Visible = false;
+                this.SelectedMenu.IsSelected = false;
                 ProcessLoaded(false, panelItemVM);
             }
             else

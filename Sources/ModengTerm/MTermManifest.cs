@@ -23,10 +23,10 @@ namespace ModengTerm
         public XTermSession DefaultSession { get; set; }
 
         /// <summary>
-        /// 终端类型的会话的标题菜单和右键菜单
+        /// 默认顶部根菜单
         /// </summary>
-        [JsonProperty("termMenus")]
-        public List<MenuItemDefinition> TerminalMenus { get; private set; }
+        [JsonProperty("toolbarMenus")]
+        public List<MenuItemDefinition> ToolbarMenus { get; private set; }
 
         /// <summary>
         /// 窗口主题列表
@@ -79,7 +79,7 @@ namespace ModengTerm
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
-            this.TerminalMenus = new List<MenuItemDefinition>();
+            this.ToolbarMenus = new List<MenuItemDefinition>();
             this.AppThemes = new List<AppTheme>();
             this.TerminalOptionMenu = new List<MenuDefinition>();
             this.FontSizeList = new List<FontSizeDefinition>();

@@ -1,23 +1,36 @@
-﻿using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
-using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base.Definitions;
+using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModels;
-using System;
 using System.Collections.Generic;
 
 namespace ModengTerm.Addons
 {
+    public delegate void CommandHandlerDelegate();
+
     public abstract class AddonBase
     {
         #region 实例变量
 
         private List<AddonEventTypes> registerEvents;
+        private Dictionary<string, CommandHandlerDelegate> registerCommands;
 
         #endregion
 
         #region 属性
 
+        internal string ID { get { return this.Definition.ID; } }
+
         internal AddonDefinition Definition { get; set; }
+
+        /// <summary>
+        /// MainWindow接口
+        /// </summary>
+        public MainWindowVM MainWindow { get; set; }
+
+        /// <summary>
+        /// 访问服务的代理
+        /// </summary>
+        public ServiceAgent ServiceAgent { get; set; }
 
         #endregion
 
@@ -26,6 +39,7 @@ namespace ModengTerm.Addons
         internal void Initialize()
         {
             this.registerEvents = new List<AddonEventTypes>();
+            this.registerCommands = new Dictionary<string, CommandHandlerDelegate>();
 
             this.OnInitialize();
         }
@@ -36,6 +50,7 @@ namespace ModengTerm.Addons
 
             // Release
             this.registerEvents.Clear();
+            this.registerCommands.Clear();
         }
 
         internal void RaiseEvent(AddonEventTypes evt, params object[] evp)
@@ -47,6 +62,17 @@ namespace ModengTerm.Addons
             }
 
             this.OnEvent(evt, evp);
+        }
+
+        internal void RaiseCommand(string command)
+        {
+            CommandHandlerDelegate handler;
+            if (!this.registerCommands.TryGetValue(command, out handler)) 
+            {
+                return;
+            }
+
+            handler();
         }
 
         #endregion
@@ -61,6 +87,16 @@ namespace ModengTerm.Addons
             }
 
             this.registerEvents.Add(ev);
+        }
+
+        protected void RegisterCommand(string command, CommandHandlerDelegate handler) 
+        {
+            if (this.registerCommands.ContainsKey(command))
+            {
+                return;
+            }
+
+            this.registerCommands[command] = handler;
         }
 
         #endregion

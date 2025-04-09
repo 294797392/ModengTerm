@@ -110,38 +110,6 @@ namespace ModengTerm
             return panelDefinition;
         }
 
-        private List<MenuItemDefinition> CreateMenuItemDefinitions(XTermSession session) 
-        {
-            List<MenuItemDefinition> srcMenuItems = new List<MenuItemDefinition>();
-            srcMenuItems.AddRange(MTermApp.Context.Manifest.TerminalMenus);
-
-            // 会话菜单里包含插件菜单
-            foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
-            {
-                srcMenuItems.AddRange(addon.MenuItems);
-            }
-
-            List<MenuItemDefinition> results = new List<MenuItemDefinition>();
-
-            // 过滤只关联这个会话的菜单
-            foreach (MenuItemDefinition menuDefinition in srcMenuItems)
-            {
-                if (menuDefinition.SessionTypes.Count == 0)
-                {
-                    results.Add(menuDefinition);
-                }
-                else
-                {
-                    if (menuDefinition.SessionTypes.Contains(session.Type))
-                    {
-                        results.Add(menuDefinition);
-                    }
-                }
-            }
-
-            return results.OrderBy(v => v.Ordinal).ToList();
-        }
-
         private void ShowSessionListWindow()
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
@@ -171,7 +139,6 @@ namespace ModengTerm
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.ServiceAgent = MTermApp.Context.ServiceAgent;
             openedSessionVM.PanelDefinition = this.CreatePanelDefinition(session);
-            openedSessionVM.MenuItems = this.CreateMenuItemDefinitions(session);
             openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
@@ -246,8 +213,6 @@ namespace ModengTerm
 
         private void ListBoxOpenedSession_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            this.mainWindowVM.TitleMenus.Clear();
-
             SessionItemVM selectedSession = ListBoxOpenedSession.SelectedItem as SessionItemVM;
             if (selectedSession == null)
             {
@@ -271,12 +236,6 @@ namespace ModengTerm
             {
                 OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
                 ContentControlSession.Content = openedSessionVM.Content;
-
-                if (openedSessionVM.TitleMenus != null)
-                {
-                    this.mainWindowVM.TitleMenus.Clear();
-                    this.mainWindowVM.TitleMenus.AddRange(openedSessionVM.TitleMenus);
-                }
             }
 
             #region 触发OpenedSessionVM的OnLoaded或OnUnload事件
@@ -415,7 +374,7 @@ namespace ModengTerm
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
-            ContextMenuHelper.Execute(contextMenu, openedSessionVM);
+            MTermApp.Context.RaiseAddonCommand(contextMenu.AddonId, contextMenu.Command);
         }
 
 

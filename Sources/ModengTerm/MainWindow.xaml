@@ -225,7 +225,7 @@
             <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,3,0,0">
-                <Menu>
+                <!--<Menu>
                     <MenuItem Header="会话">
                         <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
                         <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
@@ -242,23 +242,28 @@
                     <MenuItem Header="视图">
                         <MenuItem Header="资源管理器" />
                     </MenuItem>
-                </Menu>
-
+                    <MenuItem Header="编辑"></MenuItem>
+                    <MenuItem Header="配置"></MenuItem>
+                    <MenuItem Header="工具"></MenuItem>
+                    <MenuItem Header="帮助">
+                        <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
+                        --><!--<MenuItem Header="记录代码日志" IsCheckable="True" Tag="code" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>
+                        <MenuItem Header="记录交互日志" IsCheckable="True" Tag="interactive" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>-->
+                        <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>--><!--
+                    </MenuItem>
+                </Menu>-->
+                
                 <Menu ItemsSource="{Binding Path=TitleMenus}" MenuItem.Click="MenuItem_Click">
+                    <Menu.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ResourceKey=StyleMenuItem}">
+                            <Setter Property="Visibility" Value="{Binding Path=IsVisible, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
+                        </Style>
+                    </Menu.ItemContainerStyle>
                     <Menu.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
                             <TextBlock Text="{Binding Path=Name}"/>
                         </HierarchicalDataTemplate>
                     </Menu.ItemTemplate>
-                </Menu>
-
-                <Menu>
-                    <MenuItem Header="帮助">
-                        <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
-                        <!--<MenuItem Header="记录代码日志" IsCheckable="True" Tag="code" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>
-                        <MenuItem Header="记录交互日志" IsCheckable="True" Tag="interactive" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>-->
-                        <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>-->
-                    </MenuItem>
                 </Menu>
             </StackPanel>
 

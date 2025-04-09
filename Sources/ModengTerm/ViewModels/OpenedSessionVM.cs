@@ -46,11 +46,6 @@ namespace ModengTerm.ViewModels
         public PanelDefinition PanelDefinition { get; set; }
 
         /// <summary>
-        /// 该会话的菜单列表
-        /// </summary>
-        public List<MenuItemDefinition> MenuItems { get; set; }
-
-        /// <summary>
         /// 界面上的控件
         /// </summary>
         public DependencyObject Content
@@ -86,15 +81,6 @@ namespace ModengTerm.ViewModels
                 }
             }
         }
-        /// <summary>
-        /// 该会话的右键菜单
-        /// </summary>
-        public BindableCollection<ContextMenuVM> ContextMenus { get; private set; }
-
-        /// <summary>
-        /// 该会话的标题菜单
-        /// </summary>
-        public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
 
         /// <summary>
         /// 侧边栏窗口
@@ -119,13 +105,6 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public void Initialize() 
         {
-            // 在Initialize里实例化TitleMenus, 保证ListBoxOpenedSession_SelectionChanged触发的时候，TitleMenus不为空
-            this.ContextMenus = new BindableCollection<ContextMenuVM>();
-            this.TitleMenus = new BindableCollection<ContextMenuVM>();
-            List<MenuItemRelation> titleMenuRelations = this.MenuItems.Select(v => new MenuItemRelation(v.TitleParentID, v)).ToList();
-            this.TitleMenus.AddRange(VTClientUtils.CreateContextMenuVM(titleMenuRelations));
-            List<MenuItemRelation> contextMenuRelations = this.MenuItems.Select(v => new MenuItemRelation(v.ContextParentID, v)).ToList();
-            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVM(contextMenuRelations));
         }
 
         public int Open()

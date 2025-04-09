@@ -105,7 +105,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 return;
             }
 
-            ContextMenuHelper.Execute(menuVM, this.DataContext as ShellSessionVM);
+            //ContextMenuHelper.Execute(menuVM, this.DataContext as ShellSessionVM);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)

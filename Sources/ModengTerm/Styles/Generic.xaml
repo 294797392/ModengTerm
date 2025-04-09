@@ -682,7 +682,7 @@
     </Style>
 
     <!-- MenuItem控件的样式写成全局的，不然有些MenuItem会不生效... -->
-    <Style TargetType="{x:Type MenuItem}">
+    <Style x:Key="StyleMenuItem" TargetType="{x:Type MenuItem}">
         <Style.Resources>
 
             <Geometry x:Key="DownArrow">M 0,0 L 3.5,4 L 7,0 Z</Geometry>
@@ -991,6 +991,9 @@
                 <Setter Property="Template" Value="{StaticResource SubmenuHeaderTemplateKey}"/>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ResourceKey=StyleMenuItem}">
     </Style>
 
     <Style TargetType="{x:Type Menu}">

@@ -125,6 +125,8 @@ namespace ModengTerm
                 }
 
                 addonBase.Definition = definition;
+                addonBase.MainWindow = this.MainWindowVM;
+                addonBase.ServiceAgent = this.ServiceAgent;
                 addonBase.Initialize();
 
                 this.Addons.Add(addonBase);
@@ -220,6 +222,22 @@ namespace ModengTerm
             {
                 addon.RaiseEvent(evt, evp);
             }
+        }
+
+        /// <summary>
+        /// 通知插件有命令触发
+        /// </summary>
+        /// <param name="addonId">插件Id</param>
+        /// <param name="command">命令Id</param>
+        public void RaiseAddonCommand(string addonId, string command)
+        {
+            AddonBase addon = this.Addons.FirstOrDefault(v => v.ID == addonId);
+            if (addon == null) 
+            {
+                return;
+            }
+
+            addon.RaiseCommand(command);
         }
 
         #endregion

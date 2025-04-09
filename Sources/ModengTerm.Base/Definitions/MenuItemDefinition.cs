@@ -23,37 +23,16 @@ namespace ModengTerm.Base.Definitions
         public string ID { get; set; }
 
         /// <summary>
-        /// 标题菜单的ParentID
-        /// 如果为空表示没有父菜单，直接显示到根节点
-        /// 如果为-1表示在标题上不显示该菜单
+        /// 菜单名字
         /// </summary>
-        [JsonProperty("titleParentId")]
-        public string TitleParentID { get; set; }
-
-        /// <summary>
-        /// 右键菜单的ParentID
-        /// 如果为-1表示不显示右键菜单
-        /// </summary>
-        [JsonProperty("contextParentId")]
-        public string ContextParentID { get; set; }
-
-        /// <summary>
-        /// 指定右键菜单的序号
-        /// </summary>
-        [JsonProperty("contextOrdinal")]
-        public int Ordinal { get; set; }
-
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("handlerEntry")]
-        public string HandlerEntry { get; set; }
-
         /// <summary>
-        /// 当点击菜单的时候回调函数
+        /// 点击菜单所触发的命令
         /// </summary>
-        [JsonProperty("clickMethod")]
-        public string MethodName { get; set; }
+        [JsonProperty("command")]
+        public string Command { get; set; }
 
         /// <summary>
         /// 该菜单所支持的会话类型
@@ -61,10 +40,29 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("sessionTypes")]
         public List<int> SessionTypes { get; private set; }
 
+        /// <summary>
+        /// 子菜单
+        /// </summary>
+        [JsonProperty("child")]
+        public List<MenuItemDefinition> Children { get; private set; }
+
+        /// <summary>
+        /// 根菜单的Id
+        /// 空表示自己就是根菜单
+        /// </summary>
+        [JsonProperty("pid")]
+        public string ParentId { get; set; }
+
+        /// <summary>
+        /// 菜单所对应的插件Id
+        /// </summary>
+        [JsonIgnore]
+        public string AddonId { get; set; }
+
         public MenuItemDefinition()
         {
             this.SessionTypes = new List<int>();
-            this.Ordinal = 99999;
+            this.Children = new List<MenuItemDefinition>();
         }
     }
 }

@@ -37,237 +37,31 @@
         }
     ],
 
-    "termMenus": [
+    "toolbarMenus": [
+        {
+            "id": "70DCA138-F1E2-4F98-A545-CCC2008F1E0A",
+            "name": "会话"
+        },
+        {
+            "id": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
+            "name": "视图"
+        },
         {
             "id": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-            "titleParentId": "",
-            "contextParentId": "-1",
             "name": "编辑"
         },
         {
-            "id": "1F84B329-3E67-41A7-A43D-1E6A4993CACC",
-            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-            "contextParentId": "",
-            "contextOrdinal": 2,
-            "name": "复制",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuCopySelection_Click"
-        },
-        {
-            "id": "3BCCED0A-2E2B-46A8-9A38-9177A3C96AFF",
-            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-            "contextParentId": "",
-            "contextOrdinal": 3,
-            "name": "粘贴",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuPaste_Click"
-        },
-        {
-            "id": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
-            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-            "contextParentId": "",
-            "contextOrdinal": 4,
-            "name": "保存"
-        },
-        {
-            "id": "731EE044-7EC6-4559-B64C-58CD8E1A275E",
-            "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
-            "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
-            "name": "选中内容",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuSaveSelection_Click"
-        },
-        {
-            "id": "02AC3BE3-6E5D-405D-8CE6-EC52AE74F5DE",
-            "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
-            "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
-            "name": "当前屏幕内容",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuSaveViewport_Click"
-        },
-        {
-            "id": "3182B1ED-11B5-4896-BB1D-F9D301C0E6FF",
-            "titleParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
-            "contextParentId": "EE537F25-B33C-44B4-82AA-4887B62DD9EA",
-            "name": "所有内容",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuSaveAllDocument_Click"
-        },
-        //{
-        //    "id": "D0A94B89-0DAC-4920-B55F-3AA1DC4C28A2",
-        //    "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-        //    "contextParentId": "",
-        //    "name": "添加到快捷命令",
-        //    "handlerEntry": "",
-        //    "clickMethod": "ContextMenuAddToQuickCommands_Click"
-        //},
-        {
-            "id": "A9DDE47E-5A1A-4C5C-8A75-43D224E94842",
-            "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-            "contextParentId": "",
-            "name": "清屏",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuClearScreen_Click"
-        },
-
-        {
-            "id": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-            "titleParentId": "",
-            "contextParentId": "-1",
-            "name": "查看"
-        },
-        {
-            "id": "2B6115F3-3A9D-4C2B-9B3F-787445608F11",
-            "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-            "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-            "name": "快捷命令",
-            "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-            "clickMethod": "SwitchQuickInputViewHandler"
-        },
-        //{
-        //    "id": "2B09F519-6434-4926-8570-1CEEF55401EC",
-        //    "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-        //    "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-        //    "name": "输入栏",
-        //    "clickMethod": "ContextMenuSwitchInputPanelVisible_Click"
-        //},
-
-        {
             "id": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "titleParentId": "",
-            "contextParentId": "-1",
             "name": "配置"
         },
         {
-            "id": "9B3689FE-8119-44A0-B557-8F20C4C278CA",
-            "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "name": "端口转发",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuOpenPortForwardWindow_Click",
-            "sessionTypes": [ 1 ]
-        },
-        {
-            "id": "80C81CCB-69F7-46D1-85E5-114BD87D31B7",
-            "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-            "name": "同步输入",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuOpenSyncInputConfigurationWindow_Click"
-        },
-        //{
-        //    "id": "912F51A5-1978-4104-BDE8-E4F7C6B8F0C7",
-        //    "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-        //    "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-        //    "name": "快捷命令",
-        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-        //    "clickMethod": "ContextMenuCreateQuickCommand_Click"
-        //},
-
-        {
             "id": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "titleParentId": "",
-            "contextParentId": "-1",
             "name": "工具"
         },
         {
-            "id": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "contextParentId": "",
-            "name": "日志"
-        },
-        {
-            "id": "0115D21E-C588-4284-AD4E-C9C5B648CB1E",
-            "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-            "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-            "name": "开始",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuStartLogger_Click"
-        },
-        {
-            "id": "6DC4D9A0-2F0E-4303-BF83-7D72F3264CF2",
-            "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-            "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-            "name": "停止",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuStopLogger_Click"
-        },
-        {
-            "id": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "contextParentId": "",
-            "name": "录制"
-        },
-        {
-            "id": "FF30F373-669A-4DD1-BC7E-0F8C1752F571",
-            "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-            "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-            "name": "开始",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuStartRecord_Click"
-        },
-        {
-            "id": "F6FDC8C6-35C4-490E-8F01-CCB34B3C6EFA",
-            "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-            "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-            "name": "停止",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuStopRecord_Click"
-        },
-        {
-            "id": "26741446-CB47-4C72-BE80-39F841D0760B",
-            "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-            "contextParentId": "",
-            "name": "打开回放",
-            "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-            "clickMethod": "ContextMenuOpenRecord_Click"
+            "id": "A592C670-3B36-495D-89CE-364691D9DFDA",
+            "name": "帮助"
         }
-        //{
-        //    "id": "9559A8B6-A2A1-409B-A19A-0CD57FE975BF",
-        //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-        //    "contextParentId": "",
-        //    "contextOrdinal": 5,
-        //    "name": "系统监控",
-        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-        //    "clickMethod": "ContextMenuVisiblePanelContent_Click",
-        //    "sessionTypes": [ 0, 1 ]
-        //},
-        //{
-        //    "id": "B1534904-1E5A-4259-B9A6-B0D9C88D5B93",
-        //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-        //    "contextParentId": "",
-        //    "contextOrdinal": 6,
-        //    "name": "文件监控",
-        //    "clickMethod": "ContextMenuVisiblePanelContent_Click",
-        //    "panelEntry": "ModengTerm.UserControls.TerminalUserControls.WatchFileUserControl, ModengTerm",
-        //    "panelVMEntry": "ModengTerm.ViewModels.Terminals.PanelContent.WatchFileVM, ModengTerm",
-        //    "panelAlign": 3,
-        //    "sessionTypes": [ 0, 1 ]
-        //},
-
-
-        //{
-        //    "id": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
-        //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-        //    "contextParentId": "-1",
-        //    "name": "传输"
-        //},
-        //{
-        //    "id": "75E08588-BD10-414F-A95C-7E3F471E0335",
-        //    "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
-        //    "contextParentId": "",
-        //    "name": "使用XModem发送",
-        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-        //    "clickMethod": "ContextMenuXModemSend_Click"
-        //},
-        //{
-        //    "id": "8F1834E0-FBFA-4BF4-B07E-47850A0AB758",
-        //    "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
-        //    "contextParentId": "",
-        //    "name": "使用XModem接收",
-        //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-        //    "clickMethod": "ContextMenuXModemReceive_Click"
-        //}
     ],
 
     "termOptionMenu": [
@@ -556,18 +350,76 @@
 
     "addons": [
         {
-            "id": "",
-            "name": "查找",
+            "id": "D8217672-16EB-4298-91C9-6F6676EBCC1F",
+            "name": "搜索插件",
             "classEntry": "ModengTerm.Addons.Find.FindAddon, ModengTerm",
-            "menuItems": [
+            "toolbarMenus": [
                 {
                     "id": "E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C",
-                    "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-                    "contextParentId": "",
-                    "contextOrdinal": 1,
                     "name": "查找",
-                    "handlerEntry": "ModengTerm.Addons.Find.FindAddon, ModengTerm",
-                    "clickMethod": "MenuItemOpenFindWindow_Click"
+                    "command": "Find",
+                    "pid": "50ED6E4E-4252-4D92-99DD-E72AC646FACB"
+                }
+            ]
+        },
+        {
+            "id": "655BBEB6-26FD-4BCF-850A-3298E762E232",
+            "name": "通用编辑功能",
+            "classEntry": "ModengTerm.Addons.GenericEdit.GenericEditAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "67A1392E-951B-48F7-BF46-0E0706C7EF9E",
+                    "name": "复制",
+                    "pid": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+                    "command": "GenericEditAddon.CopySelection"
+                },
+                {
+                    "id": "76B20C0E-B365-4886-8669-F750F4CF923A",
+                    "name": "粘贴",
+                    "pid": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+                    "command": "GenericEditAddon.Paste"
+                },
+                {
+                    "id": "22B4D809-B9A3-4D8F-BC6A-B9CE62008677",
+                    "name": "保存",
+                    "pid": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+                    "child": [
+                        {
+                            "id": "51AA89D7-0433-4F89-804B-25C5591B76A3",
+                            "name": "选中内容",
+                            "command": "GenericEditAddon.SaveSelection"
+                        },
+                        {
+                            "id": "649B4DAB-4860-43BC-B633-FC80F0F57A37",
+                            "name": "当前视图内容",
+                            "command": "GenericEditAddon.SaveViewport"
+                        },
+                        {
+                            "id": "CF58AAA2-4CFD-4F94-864D-0BAC70BEB1CB",
+                            "name": "所有内容",
+                            "command": "GenericEditAddon.SaveAll"
+                        }
+                    ]
+                },
+                {
+                    "id": "86C62FDB-4014-4ABA-BFDD-8AA365DF62EA",
+                    "name": "清屏",
+                    "pid": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+                    "command": "GenericEditAddon.ClearScreen"
+                }
+            ]
+        },
+
+        {
+            "id": "E4E83F91-80A5-4F05-BDF8-F8D0D12D2FC0",
+            "name": "快捷输入",
+            "classEntry": "ModengTerm.Addons.QuickInput.QuickInputAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "AD6A95B1-ED61-42D7-96DF-3A55778110AE",
+                    "name": "快捷命令",
+                    "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
+                    "command": "QuickInputAddon.ShowQuickInputView"
                 }
             ]
         }
@@ -714,3 +566,182 @@
         }
     ]
 }
+
+
+
+
+//"menuItems": [
+//    {
+//        "id": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+//        "titleParentId": "",
+//        "contextParentId": "-1",
+//        "name": "编辑"
+//    },
+//    //{
+//    //    "id": "D0A94B89-0DAC-4920-B55F-3AA1DC4C28A2",
+//    //    "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
+//    //    "contextParentId": "",
+//    //    "name": "添加到快捷命令",
+//    //    "handlerEntry": "",
+//    //    "clickMethod": "ContextMenuAddToQuickCommands_Click"
+//    //},
+
+//    {
+//        "id": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+//        "titleParentId": "",
+//        "contextParentId": "-1",
+//        "name": "查看"
+//    },
+//    {
+//        "id": "2B6115F3-3A9D-4C2B-9B3F-787445608F11",
+//        "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+//        "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+//        "name": "快捷命令",
+//        "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+//        "clickMethod": "SwitchQuickInputViewHandler"
+//    },
+//    //{
+//    //    "id": "2B09F519-6434-4926-8570-1CEEF55401EC",
+//    //    "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+//    //    "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
+//    //    "name": "输入栏",
+//    //    "clickMethod": "ContextMenuSwitchInputPanelVisible_Click"
+//    //},
+
+//    {
+//        "id": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+//        "titleParentId": "",
+//        "contextParentId": "-1",
+//        "name": "配置"
+//    },
+//    {
+//        "id": "9B3689FE-8119-44A0-B557-8F20C4C278CA",
+//        "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+//        "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+//        "name": "端口转发",
+//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
+//        "clickMethod": "ContextMenuOpenPortForwardWindow_Click",
+//        "sessionTypes": [ 1 ]
+//    },
+//    {
+//        "id": "80C81CCB-69F7-46D1-85E5-114BD87D31B7",
+//        "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+//        "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+//        "name": "同步输入",
+//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
+//        "clickMethod": "ContextMenuOpenSyncInputConfigurationWindow_Click"
+//    },
+//    //{
+//    //    "id": "912F51A5-1978-4104-BDE8-E4F7C6B8F0C7",
+//    //    "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+//    //    "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
+//    //    "name": "快捷命令",
+//    //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+//    //    "clickMethod": "ContextMenuCreateQuickCommand_Click"
+//    //},
+
+//    {
+//        "id": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+//        "titleParentId": "",
+//        "contextParentId": "-1",
+//        "name": "工具"
+//    },
+//    {
+//        "id": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+//        "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+//        "contextParentId": "",
+//        "name": "日志"
+//    },
+//    {
+//        "id": "0115D21E-C588-4284-AD4E-C9C5B648CB1E",
+//        "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+//        "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+//        "name": "开始",
+//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
+//        "clickMethod": "ContextMenuStartLogger_Click"
+//    },
+//    {
+//        "id": "6DC4D9A0-2F0E-4303-BF83-7D72F3264CF2",
+//        "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+//        "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
+//        "name": "停止",
+//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
+//        "clickMethod": "ContextMenuStopLogger_Click"
+//    },
+//    {
+//        "id": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+//        "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+//        "contextParentId": "",
+//        "name": "录制"
+//    },
+//    {
+//        "id": "FF30F373-669A-4DD1-BC7E-0F8C1752F571",
+//        "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+//        "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+//        "name": "开始",
+//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
+//        "clickMethod": "ContextMenuStartRecord_Click"
+//    },
+//    {
+//        "id": "F6FDC8C6-35C4-490E-8F01-CCB34B3C6EFA",
+//        "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+//        "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
+//        "name": "停止",
+//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
+//        "clickMethod": "ContextMenuStopRecord_Click"
+//    },
+//    {
+//        "id": "26741446-CB47-4C72-BE80-39F841D0760B",
+//        "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+//        "contextParentId": "",
+//        "name": "打开回放",
+//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
+//        "clickMethod": "ContextMenuOpenRecord_Click"
+//    }
+//    //{
+//    //    "id": "9559A8B6-A2A1-409B-A19A-0CD57FE975BF",
+//    //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+//    //    "contextParentId": "",
+//    //    "contextOrdinal": 5,
+//    //    "name": "系统监控",
+//    //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+//    //    "clickMethod": "ContextMenuVisiblePanelContent_Click",
+//    //    "sessionTypes": [ 0, 1 ]
+//    //},
+//    //{
+//    //    "id": "B1534904-1E5A-4259-B9A6-B0D9C88D5B93",
+//    //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+//    //    "contextParentId": "",
+//    //    "contextOrdinal": 6,
+//    //    "name": "文件监控",
+//    //    "clickMethod": "ContextMenuVisiblePanelContent_Click",
+//    //    "panelEntry": "ModengTerm.UserControls.TerminalUserControls.WatchFileUserControl, ModengTerm",
+//    //    "panelVMEntry": "ModengTerm.ViewModels.Terminals.PanelContent.WatchFileVM, ModengTerm",
+//    //    "panelAlign": 3,
+//    //    "sessionTypes": [ 0, 1 ]
+//    //},
+
+
+//    //{
+//    //    "id": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+//    //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+//    //    "contextParentId": "-1",
+//    //    "name": "传输"
+//    //},
+//    //{
+//    //    "id": "75E08588-BD10-414F-A95C-7E3F471E0335",
+//    //    "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+//    //    "contextParentId": "",
+//    //    "name": "使用XModem发送",
+//    //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+//    //    "clickMethod": "ContextMenuXModemSend_Click"
+//    //},
+//    //{
+//    //    "id": "8F1834E0-FBFA-4BF4-B07E-47850A0AB758",
+//    //    "titleParentId": "76D84415-85EC-4C5B-AA90-742D246FC6F3",
+//    //    "contextParentId": "",
+//    //    "name": "使用XModem接收",
+//    //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
+//    //    "clickMethod": "ContextMenuXModemReceive_Click"
+//    //}
+//],
