@@ -43,13 +43,7 @@ namespace ModengTerm.Base.Definitions
         public List<MenuItemDefinition> ContextMenus { get; private set; }
 
         /// <summary>
-        /// 和Session关联的PanelItem
-        /// </summary>
-        [JsonProperty("sessionPanelItems")]
-        public List<PanelItemDefinition> SessionPanelItems { get; private set; }
-
-        /// <summary>
-        /// 全局PanelItem
+        /// PanelItem
         /// </summary>
         [JsonProperty("panelItems")]
         public List<PanelItemDefinition> PanelItems { get; private set; }
@@ -58,7 +52,6 @@ namespace ModengTerm.Base.Definitions
         {
             this.ToolbarMenus = new List<MenuItemDefinition>();
             this.ContextMenus = new List<MenuItemDefinition>();
-            this.SessionPanelItems = new List<PanelItemDefinition>();
             this.PanelItems = new List<PanelItemDefinition>();
         }
     }

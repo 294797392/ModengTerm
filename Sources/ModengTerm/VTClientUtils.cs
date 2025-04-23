@@ -26,7 +26,6 @@ namespace ModengTerm
             PanelVM panelVM = new PanelVM();
             panelVM.ID = panel.ID;
             panelVM.Name = panel.Name;
-            panelVM.Dock = (SideWindowDock)panel.Dock;
 
             foreach (PanelItemDefinition panelItem in panel.Items)
             {

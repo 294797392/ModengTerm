@@ -59,18 +59,6 @@ namespace ModengTerm
         public List<ThemePackage> DefaultThemes { get; private set; }
 
         /// <summary>
-        /// 所有的侧边窗口
-        /// </summary>
-        [JsonProperty("panels")]
-        public List<PanelDefinition> Panels { get; private set; }
-
-        /// <summary>
-        /// 和会话关联的侧边窗口
-        /// </summary>
-        [JsonProperty("sessionPanel")]
-        public PanelDefinition SessionPanel { get; private set; }
-
-        /// <summary>
         /// 插件列表
         /// </summary>
         [JsonProperty("addons")]
@@ -85,8 +73,6 @@ namespace ModengTerm
             this.FontSizeList = new List<FontSizeDefinition>();
             this.FontFamilyList = new List<FontFamilyDefinition>();
             this.DefaultThemes = new List<ThemePackage>();
-            this.Panels = new List<PanelDefinition>();
-            this.SessionPanel = new PanelDefinition();
             this.Addons = new List<AddonDefinition>();
         }
     }

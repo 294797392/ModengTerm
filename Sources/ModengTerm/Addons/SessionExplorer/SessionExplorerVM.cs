@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Addons.ResourceMgr
+namespace ModengTerm.Addons.SessionExplorer
 {
-    public class ResourceManagerVM : PanelContentVM
+    public class SessionExplorerVM : PanelContentVM
     {
         public SessionTreeVM ResourceManagerTree { get; private set; }
 

@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
+using ModengTerm.Addons;
 using ModengTerm.Addons.Find;
 using ModengTerm.Addons.QuickInput;
 using ModengTerm.Base;
@@ -86,15 +87,20 @@ namespace ModengTerm
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
-        private PanelDefinition CreatePanelDefinition(XTermSession session)
+        private List<PanelItemDefinition> CreateSessionPanelItems(XTermSession session)
         {
-            PanelDefinition panelDefinition = JSONHelper.CloneObject<PanelDefinition>(MTermApp.Context.Manifest.SessionPanel);
+            List<PanelItemDefinition> panelItems = new List<PanelItemDefinition>();
 
             // 会话关联的窗口里包含插件窗口
             foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
             {
                 foreach (PanelItemDefinition panelItem in addon.PanelItems)
                 {
+                    if (panelItem.Owner != (int)PanelItemOwner.Session)
+                    {
+                        continue;
+                    }
+
                     if (panelItem.SessionTypes.Count > 0)
                     {
                         if (!panelItem.SessionTypes.Contains(session.Type)) 
@@ -103,11 +109,11 @@ namespace ModengTerm
                         }
                     }
 
-                    panelDefinition.Items.Add(panelItem);
+                    panelItems.Add(panelItem);
                 }
             }
 
-            return panelDefinition;
+            return panelItems;
         }
 
         private void ShowSessionListWindow()
@@ -138,7 +144,7 @@ namespace ModengTerm
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.ServiceAgent = MTermApp.Context.ServiceAgent;
-            openedSessionVM.PanelDefinition = this.CreatePanelDefinition(session);
+            openedSessionVM.PanelItems = this.CreateSessionPanelItems(session);
             openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
@@ -245,13 +251,19 @@ namespace ModengTerm
             if (e.RemovedItems.Count > 0)
             {
                 removedSession = e.RemovedItems[0] as OpenedSessionVM;
-                removedSession.OnUnload();
+                if (removedSession != null)
+                {
+                    removedSession.OnUnload();
+                }
             }
 
             if (e.AddedItems.Count > 0)
             {
                 addedSession = e.AddedItems[0] as OpenedSessionVM;
-                addedSession.OnLoaded();
+                if (addedSession != null)
+                {
+                    addedSession.OnLoaded();
+                }
             }
 
             #endregion
@@ -342,13 +354,6 @@ namespace ModengTerm
             GroupManagerWindow window = new GroupManagerWindow();
             window.Owner = this;
             window.ShowDialog();
-        }
-
-        private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
-        {
-            AboutWindow aboutWindow = new AboutWindow();
-            aboutWindow.Owner = this;
-            aboutWindow.ShowDialog();
         }
 
         private void MenuItemOpenRecentSessions_Click(object sender, RoutedEventArgs e)

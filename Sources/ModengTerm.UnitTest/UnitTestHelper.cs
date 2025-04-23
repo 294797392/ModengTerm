@@ -1,5 +1,6 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
@@ -7,7 +8,6 @@ using ModengTerm.Terminal;
 using ModengTerm.UnitTest.Drawing;
 using System.Text;
 using System.Windows.Media.Media3D;
-using XTerminal.Base.Definitions;
 
 namespace ModengTerm.UnitTest
 {

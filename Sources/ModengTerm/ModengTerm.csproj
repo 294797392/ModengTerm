@@ -30,8 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Addons\AddonBase.cs" />
     <Compile Remove="Addons\AddonEventHandler.cs" />
+    <Compile Remove="Addons\AddonEventTypes.cs" />
     <Compile Remove="Addons\AddonMetadataAttribute.cs" />
+    <Compile Remove="Addons\ClientStub.cs" />
     <Compile Remove="Addons\SideWindow.cs" />
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
@@ -94,6 +97,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Addon\ModengTerm.Addon.csproj" />
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
   </ItemGroup>
@@ -151,6 +155,10 @@
     <Page Update="UserControls\TerminalUserControls\ShellSessionUserControl.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Addons\SessionManager\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

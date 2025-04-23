@@ -43,7 +43,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 该会话的侧边栏窗口
         /// </summary>
-        public PanelDefinition PanelDefinition { get; set; }
+        public List<PanelItemDefinition> PanelItems { get; set; }
 
         /// <summary>
         /// 界面上的控件
@@ -110,7 +110,9 @@ namespace ModengTerm.ViewModels
         public int Open()
         {
             // 给所有的插件页面使用的通用属性赋值
-            this.Panel = VTClientUtils.PanelDefinition2PanelVM(this.PanelDefinition);
+            PanelDefinition panelDefinition = new PanelDefinition();
+            panelDefinition.Items.AddRange(this.PanelItems);
+            this.Panel = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
             this.AddRemovePanelItemEvent(true);
             return this.OnOpen();
         }

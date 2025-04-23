@@ -312,43 +312,29 @@
         //}
     ],
 
-    "panels": [
+    "addons": [
         {
-            "id": "F4265C3C-44AF-4E27-BDCD-A7788812B11C",
-            "dock": 2,
-            "items": [
+            "id": "8723EAA8-0CC1-4A29-B3CD-AA5F07F100AA",
+            "name": "资源管理器",
+            "classEntry": "ModengTerm.Addons.SessionExplorer.SessionExplorerAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "4DDE1378-4E81-4FE5-B3DA-0E124C4DFD03",
+                    "name": "资源管理器",
+                    "command": "SessionExplorerAddon.OpenExplorerWindow",
+                    "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D"
+                }
+            ],
+            "panelItems": [
                 {
                     "id": "BF1AD31C-0E00-495D-9C19-7687D708B71F",
                     "name": "资源管理器",
                     "icon": "M850.304 375.04v-45.248c0-47.488-38.4-100.544-89.216-100.544H536.192l-6.72-12.48a62.976 62.976 0 0 0-56.32-33.92H226.688A84.672 84.672 0 0 0 143.04 268.8v467.776a84.608 84.608 0 0 0 83.648 85.824h578.56a84.608 84.608 0 0 0 83.584-85.824V449.6c0-27.136-14.72-54.208-38.4-74.56h-0.128z m-64.384-22.656H601.6l-30.72-58.752h190.976c10.24 0 24.896 19.2 24.896 36.16v22.592h-0.832z m38.4 96v286.976a21.12 21.12 0 0 1-19.2 21.504H226.56a20.48 20.48 0 0 1-19.2-21.504V267.648a21.12 21.12 0 0 1 19.2-21.44h245.248l81.344 153.6c5.76 10.24 16.512 16.64 28.288 16.96h209.92c12.48 0 32.96 20.352 32.96 31.616z",
-                    "className": "ModengTerm.Addons.ResourceMgr.ResourceManagerUserControl, ModengTerm",
-                    "vmClassName": "ModengTerm.Addons.ResourceMgr.ResourceManagerVM, ModengTerm"
+                    "className": "ModengTerm.Addons.SessionExplorer.SessionExplorerUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.Addons.SessionExplorer.SessionExplorerVM, ModengTerm"
                 }
             ]
-        }
-    ],
-
-    "sessionPanel": {
-        "id": "0ECF6AF1-0A7B-416C-9772-0149C5D33B08",
-        "items": [
-            {
-                "id": "A86C3967-8CDC-4D0E-8CB6-010364CFCC23",
-                "name": "系统监控",
-                "icon": "M0 0h1024v853.312H0V0z m85.312 85.312V768h853.376V85.312H85.312z m85.376 853.376h682.624V1024H170.688v-85.312z m480.32-423.424L449.536 358.848 339.84 515.2H170.688V429.888h124.8l135.68-193.408 249.024 193.408h173.12v85.376h-202.304z",
-                "className": "ModengTerm.Addons.SystemMonitor.SystemWatchUserControl, ModengTerm",
-                "vmClassName": "ModengTerm.Addons.SystemMonitor.WatchSystemInfo, ModengTerm"
-            },
-            {
-                "id": "0C1F6D60-F6ED-4D01-B5B6-1812EA55286A",
-                "name": "快速输入",
-                "icon": "M736.4608 161.44384l115.85536 115.85536a40.96 40.96 0 0 1 0 57.91744L427.08992 760.44288c-6.06208 6.0416-13.86496 10.0352-22.3232 11.38688-107.47904 17.48992-165.888 21.6064-175.16544 12.32896-9.27744-9.29792-5.16096-67.6864 12.32896-175.18592 1.35168-8.43776 5.3248-16.24064 11.38688-22.30272L678.54336 161.44384a40.96 40.96 0 0 1 57.91744 0z m-142.9504 128.45056L275.0464 608.3584a10.0352 10.0352 0 0 0-2.80576 5.55008c-8.6016 52.92032-13.9264 93.55264-15.89248 121.6512-0.57344 8.25344-0.86016 15.31904-0.86016 21.0944v1.59744h1.59744c4.62848 0 10.05568-0.18432 16.2816-0.55296l4.8128-0.3072c28.09856-1.98656 68.73088-7.2704 121.7536-15.91296a9.91232 9.91232 0 0 0 5.40672-2.74432l311.0912-311.0912-122.94144-137.74848z m106.74176-106.72128l-84.992 84.95104 122.96192 137.728 92.3648-92.3648a10.24 10.24 0 0 0 0-14.45888L714.752 183.17312a10.24 10.24 0 0 0-14.47936 0z",
-                "className": "ModengTerm.Addons.QuickInput.QuickInputUserControl, ModengTerm",
-                "vmClassName": "ModengTerm.Addons.QuickInput.QuickInputVM, ModengTerm"
-            }
-        ]
-    },
-
-    "addons": [
+        },
         {
             "id": "D8217672-16EB-4298-91C9-6F6676EBCC1F",
             "name": "搜索插件",
@@ -365,7 +351,7 @@
         {
             "id": "655BBEB6-26FD-4BCF-850A-3298E762E232",
             "name": "通用编辑功能",
-            "classEntry": "ModengTerm.Addons.GenericEdit.GenericEditAddon, ModengTerm",
+            "classEntry": "ModengTerm.Addons.Edit.GenericEditAddon, ModengTerm",
             "toolbarMenus": [
                 {
                     "id": "67A1392E-951B-48F7-BF46-0E0706C7EF9E",
@@ -409,7 +395,6 @@
                 }
             ]
         },
-
         {
             "id": "E4E83F91-80A5-4F05-BDF8-F8D0D12D2FC0",
             "name": "快捷输入",
@@ -419,10 +404,123 @@
                     "id": "AD6A95B1-ED61-42D7-96DF-3A55778110AE",
                     "name": "快捷命令",
                     "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
-                    "command": "QuickInputAddon.ShowQuickInputView"
+                    "command": "QuickInputAddon.ShowQuickInputPanel"
+                }
+            ],
+            "panelItems": [
+                {
+                    "id": "0C1F6D60-F6ED-4D01-B5B6-1812EA55286A",
+                    "name": "快速输入",
+                    "owner": 1,
+                    "icon": "M736.4608 161.44384l115.85536 115.85536a40.96 40.96 0 0 1 0 57.91744L427.08992 760.44288c-6.06208 6.0416-13.86496 10.0352-22.3232 11.38688-107.47904 17.48992-165.888 21.6064-175.16544 12.32896-9.27744-9.29792-5.16096-67.6864 12.32896-175.18592 1.35168-8.43776 5.3248-16.24064 11.38688-22.30272L678.54336 161.44384a40.96 40.96 0 0 1 57.91744 0z m-142.9504 128.45056L275.0464 608.3584a10.0352 10.0352 0 0 0-2.80576 5.55008c-8.6016 52.92032-13.9264 93.55264-15.89248 121.6512-0.57344 8.25344-0.86016 15.31904-0.86016 21.0944v1.59744h1.59744c4.62848 0 10.05568-0.18432 16.2816-0.55296l4.8128-0.3072c28.09856-1.98656 68.73088-7.2704 121.7536-15.91296a9.91232 9.91232 0 0 0 5.40672-2.74432l311.0912-311.0912-122.94144-137.74848z m106.74176-106.72128l-84.992 84.95104 122.96192 137.728 92.3648-92.3648a10.24 10.24 0 0 0 0-14.45888L714.752 183.17312a10.24 10.24 0 0 0-14.47936 0z",
+                    "className": "ModengTerm.Addons.QuickInput.QuickInputUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.Addons.QuickInput.QuickInputVM, ModengTerm"
+                }
+            ]
+        },
+        {
+            "id": "8FB10D30-714A-4502-AC8C-9477BBD7152C",
+            "name": "系统监控",
+            "classEntry": "ModengTerm.Addons.SystemMonitor.SystemMonitorAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "5925209D-E768-4812-B484-18D9894F4AB0",
+                    "name": "系统监控",
+                    "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
+                    "command": "SystemMonitorAddon.ShowSystemMonitorPanel"
+                }
+            ],
+            "panelItems": [
+                {
+                    "id": "A86C3967-8CDC-4D0E-8CB6-010364CFCC23",
+                    "name": "系统监控",
+                    "owner": 1,
+                    "icon": "M0 0h1024v853.312H0V0z m85.312 85.312V768h853.376V85.312H85.312z m85.376 853.376h682.624V1024H170.688v-85.312z m480.32-423.424L449.536 358.848 339.84 515.2H170.688V429.888h124.8l135.68-193.408 249.024 193.408h173.12v85.376h-202.304z",
+                    "className": "ModengTerm.Addons.SystemMonitor.SystemWatchUserControl, ModengTerm",
+                    "vmClassName": "ModengTerm.Addons.SystemMonitor.WatchSystemInfo, ModengTerm"
+                }
+            ]
+        },
+        {
+            "id": "95C4E0E4-68B7-4643-9A41-3548F62FD615",
+            "name": "同步输入",
+            "classEntry": "ModengTerm.Addons.BroadcastInput.BroadcastInputAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C",
+                    "name": "同步输入",
+                    "command": "BroadcastInputAddon.OpenBroadcastInputWindow",
+                    "pid": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9"
+                }
+            ]
+        },
+        {
+            "id": "E1894EA6-1EAB-4322-BE23-979456AD652D",
+            "name": "日志",
+            "classEntry": "ModengTerm.Addons.Logger.LoggerAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "C21E8509-2076-43A2-98EC-34FC3E28E5E1",
+                    "name": "记录日志",
+                    "pid": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+                    "child": [
+                        {
+                            "id": "5F71D123-54D2-4468-B064-B42D85892578",
+                            "name": "开始",
+                            "command": "LoggerAddon.StartLogger"
+                        },
+                        {
+                            "id": "33B9F0EA-1049-42A6-A160-5CD55A98C6A2",
+                            "name": "停止",
+                            "command": "LoggerAddon.StopLogger"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "ADD375D1-1BF7-4354-A946-B04F3F4041EE",
+            "name": "录制",
+            "classEntry": "ModengTerm.Addons.Record.RecordAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "8FE934FF-239F-4F99-82C1-196423D2C3B3",
+                    "name": "录制",
+                    "pid": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+                    "child": [
+                        {
+                            "id": "7BE4A619-3658-4557-9C39-9AFB8FBFFF9D",
+                            "name": "开始",
+                            "command": "RecordAddon.StartRecord"
+                        },
+                        {
+                            "id": "97672452-A0AA-43B2-A777-100BF8D2E6D8",
+                            "name": "停止",
+                            "command": "RecordAddon.StopRecord"
+                        },
+                        {
+                            "id": "DE9676C4-AA97-4E7A-A1F6-942973C54B75",
+                            "name": "打开回放",
+                            "command": "RecordAddon.OpenRecord"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "6B9269E6-F033-40AC-9B8E-2549C57C364D",
+            "name": "关于",
+            "classEntry": "ModengTerm.Addons.About.AboutAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "15E48290-A77A-4EC8-A9A9-24E839658199",
+                    "name": "关于",
+                    "command": "AboutAddon.OpenAboutWindow",
+                    "pid": "A592C670-3B36-495D-89CE-364691D9DFDA"
                 }
             ]
         }
+
     ],
 
 
@@ -571,12 +669,6 @@
 
 
 //"menuItems": [
-//    {
-//        "id": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
-//        "titleParentId": "",
-//        "contextParentId": "-1",
-//        "name": "编辑"
-//    },
 //    //{
 //    //    "id": "D0A94B89-0DAC-4920-B55F-3AA1DC4C28A2",
 //    //    "titleParentId": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
@@ -586,20 +678,6 @@
 //    //    "clickMethod": "ContextMenuAddToQuickCommands_Click"
 //    //},
 
-//    {
-//        "id": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-//        "titleParentId": "",
-//        "contextParentId": "-1",
-//        "name": "查看"
-//    },
-//    {
-//        "id": "2B6115F3-3A9D-4C2B-9B3F-787445608F11",
-//        "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-//        "contextParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
-//        "name": "快捷命令",
-//        "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-//        "clickMethod": "SwitchQuickInputViewHandler"
-//    },
 //    //{
 //    //    "id": "2B09F519-6434-4926-8570-1CEEF55401EC",
 //    //    "titleParentId": "0C334EC6-D63F-4D38-829F-A0730DB84554",
@@ -609,12 +687,6 @@
 //    //},
 
 //    {
-//        "id": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-//        "titleParentId": "",
-//        "contextParentId": "-1",
-//        "name": "配置"
-//    },
-//    {
 //        "id": "9B3689FE-8119-44A0-B557-8F20C4C278CA",
 //        "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
 //        "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
@@ -623,91 +695,6 @@
 //        "clickMethod": "ContextMenuOpenPortForwardWindow_Click",
 //        "sessionTypes": [ 1 ]
 //    },
-//    {
-//        "id": "80C81CCB-69F7-46D1-85E5-114BD87D31B7",
-//        "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-//        "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-//        "name": "同步输入",
-//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-//        "clickMethod": "ContextMenuOpenSyncInputConfigurationWindow_Click"
-//    },
-//    //{
-//    //    "id": "912F51A5-1978-4104-BDE8-E4F7C6B8F0C7",
-//    //    "titleParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-//    //    "contextParentId": "BF0E0737-CE95-403E-ABD2-2768FFBE11B9",
-//    //    "name": "快捷命令",
-//    //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-//    //    "clickMethod": "ContextMenuCreateQuickCommand_Click"
-//    //},
-
-//    {
-//        "id": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-//        "titleParentId": "",
-//        "contextParentId": "-1",
-//        "name": "工具"
-//    },
-//    {
-//        "id": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-//        "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-//        "contextParentId": "",
-//        "name": "日志"
-//    },
-//    {
-//        "id": "0115D21E-C588-4284-AD4E-C9C5B648CB1E",
-//        "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-//        "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-//        "name": "开始",
-//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-//        "clickMethod": "ContextMenuStartLogger_Click"
-//    },
-//    {
-//        "id": "6DC4D9A0-2F0E-4303-BF83-7D72F3264CF2",
-//        "titleParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-//        "contextParentId": "1545F308-4CC2-4BFF-B838-7EFD3270419F",
-//        "name": "停止",
-//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-//        "clickMethod": "ContextMenuStopLogger_Click"
-//    },
-//    {
-//        "id": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-//        "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-//        "contextParentId": "",
-//        "name": "录制"
-//    },
-//    {
-//        "id": "FF30F373-669A-4DD1-BC7E-0F8C1752F571",
-//        "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-//        "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-//        "name": "开始",
-//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-//        "clickMethod": "ContextMenuStartRecord_Click"
-//    },
-//    {
-//        "id": "F6FDC8C6-35C4-490E-8F01-CCB34B3C6EFA",
-//        "titleParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-//        "contextParentId": "B232F3FB-7024-4648-8186-334ECA7C4DD4",
-//        "name": "停止",
-//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-//        "clickMethod": "ContextMenuStopRecord_Click"
-//    },
-//    {
-//        "id": "26741446-CB47-4C72-BE80-39F841D0760B",
-//        "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-//        "contextParentId": "",
-//        "name": "打开回放",
-//        "handlerEntry": "ModengTerm.Terminal.ViewModels.ShellSessionContextMenu, ModengTerm",
-//        "clickMethod": "ContextMenuOpenRecord_Click"
-//    }
-//    //{
-//    //    "id": "9559A8B6-A2A1-409B-A19A-0CD57FE975BF",
-//    //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-//    //    "contextParentId": "",
-//    //    "contextOrdinal": 5,
-//    //    "name": "系统监控",
-//    //    "handlerEntry": "ModengTerm.Addons.QuickInput.QuickInputMenuItem, ModengTerm",
-//    //    "clickMethod": "ContextMenuVisiblePanelContent_Click",
-//    //    "sessionTypes": [ 0, 1 ]
-//    //},
 //    //{
 //    //    "id": "B1534904-1E5A-4259-B9A6-B0D9C88D5B93",
 //    //    "titleParentId": "000C1900-DC7E-4710-B8B1-46CE00E35E33",

@@ -17,12 +17,12 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Addons.ResourceMgr
+namespace ModengTerm.Addons.SessionExplorer
 {
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class ResourceManagerUserControl : UserControl
+    public partial class SessionExplorerUserControl : UserControl
     {
         #region 类变量
 
@@ -38,7 +38,7 @@ namespace ModengTerm.Addons.ResourceMgr
 
         #region 构造方法
 
-        public ResourceManagerUserControl()
+        public SessionExplorerUserControl()
         {
             InitializeComponent();
         }

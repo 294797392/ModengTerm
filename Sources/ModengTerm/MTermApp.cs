@@ -57,7 +57,7 @@ namespace ModengTerm
         /// <summary>
         /// 所有插件实例
         /// </summary>
-        private List<AddonBase> Addons { get; set; }
+        public List<AddonBase> Addons { get; private set; }
 
         #endregion
 
@@ -81,7 +81,7 @@ namespace ModengTerm
             // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
             this.MainWindowVM = new MainWindowVM();
 
-            this.InitializeAddons();
+            this.LoadAddons();
 
             return ResponseCode.SUCCESS;
         }
@@ -107,7 +107,10 @@ namespace ModengTerm
             }
         }
 
-        private void InitializeAddons()
+        /// <summary>
+        /// 加载所有插件
+        /// </summary>
+        private void LoadAddons()
         {
             this.Addons = new List<AddonBase>();
 
@@ -117,17 +120,14 @@ namespace ModengTerm
                 try
                 {
                     addonBase = ConfigFactory<AddonBase>.CreateInstance(definition.ClassEntry);
+                    addonBase.Initialize();
+                    addonBase.Definition = definition;
                 }
                 catch (Exception ex)
                 {
                     logger.Error("创建插件实例异常", ex);
                     continue;
                 }
-
-                addonBase.Definition = definition;
-                addonBase.MainWindow = this.MainWindowVM;
-                addonBase.ServiceAgent = this.ServiceAgent;
-                addonBase.Initialize();
 
                 this.Addons.Add(addonBase);
             }

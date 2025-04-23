@@ -24,8 +24,8 @@
 
     <!-- 看不到窗口的拖动标，并且窗口四周有阴影更好看 -->
     <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="5" GlassFrameThickness="1" NonClientFrameEdges="None"
-                      CaptionHeight="0"/>
+        <WindowChrome ResizeBorderThickness="5" GlassFrameThickness="1" NonClientFrameEdges="Bottom"
+                      CaptionHeight="30" />
     </WindowChrome.WindowChrome>
 
     <Window.CommandBindings>
@@ -163,6 +163,7 @@
                 <Setter Property="MouseDownBrush" Value="{DynamicResource ResourceKey=RES50023E}"/>
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Focusable" Value="False"/>
+                <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
             </Style>
 
             <Style x:Key="StyleListBoxItemAppTheme" TargetType="{x:Type ListBoxItem}">
@@ -210,7 +211,7 @@
         <Border Grid.Row="0" Grid.RowSpan="9999" Background="{DynamicResource ResourceKey=RES50003E}"/>
 
         <!-- 顶部菜单 -->
-        <Grid Grid.Row="0" MouseLeftButtonDown="Border_MouseLeftButtonDown">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30"/>
                 <ColumnDefinition Width="*"/>
@@ -224,35 +225,7 @@
 
             <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,3,0,0">
-                <!--<Menu>
-                    <MenuItem Header="会话">
-                        <MenuItem Header="新建会话" Click="MenuItemCreateSession_Click"/>
-                        <MenuItem Header="打开会话" Click="MenuItemOpenSession_Click"/>
-                        <MenuItem Header="分组管理" Click="MenuItemGroupManager_Click"/>
-                        <MenuItem Header="最新打开的会话" ItemsSource="{Binding Path=RecentlyOpenedSession}"
-                                  MenuItem.Click="MenuItemOpenRecentSessions_Click">
-                            <MenuItem.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Path=Name}"/>
-                                </DataTemplate>
-                            </MenuItem.ItemTemplate>
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Header="视图">
-                        <MenuItem Header="资源管理器" />
-                    </MenuItem>
-                    <MenuItem Header="编辑"></MenuItem>
-                    <MenuItem Header="配置"></MenuItem>
-                    <MenuItem Header="工具"></MenuItem>
-                    <MenuItem Header="帮助">
-                        <MenuItem Header="关于" Click="MenuItemAbout_Click"/>
-                        --><!--<MenuItem Header="记录代码日志" IsCheckable="True" Tag="code" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>
-                        <MenuItem Header="记录交互日志" IsCheckable="True" Tag="interactive" Checked="MenuItemLog_CheckedChanged" Unchecked="MenuItemLog_CheckedChanged"/>-->
-                        <!--<MenuItem Header="调试窗口" Click="MenuItemDebugWindow_Click"/>--><!--
-                    </MenuItem>
-                </Menu>-->
-                
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,3,0,0" WindowChrome.IsHitTestVisibleInChrome="True">
                 <Menu ItemsSource="{Binding Path=TitleMenus}" MenuItem.Click="MenuItem_Click">
                     <Menu.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource ResourceKey=StyleMenuItem}">
@@ -267,7 +240,7 @@
                 </Menu>
             </StackPanel>
 
-            <mcs:MdButton Grid.Column="2" x:Name="ButtonSwitchTheme" SVGMargin="5" SVGPath="{StaticResource ResourceKey=SVG12E}" Click="ButtonSwitchTheme_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcs:MdButton Grid.Column="2" x:Name="ButtonSwitchTheme" WindowChrome.IsHitTestVisibleInChrome="True" SVGMargin="5" SVGPath="{StaticResource ResourceKey=SVG12E}" Click="ButtonSwitchTheme_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
             <Popup x:Name="PopupThemes" PopupAnimation="None" AllowsTransparency="True" StaysOpen="False"
                    Placement="Bottom" PlacementTarget="{Binding ElementName=ButtonSwitchTheme}">
                 <Border Background="{DynamicResource ResourceKey=RES50054E}" BorderBrush="{DynamicResource ResourceKey=RES50055E}"
@@ -340,7 +313,7 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelUserControl DataContext="{Binding Path=Panels[2]}"/>
+                <termuc2:PanelUserControl DataContext="{Binding Path=Panel}"/>
             </Grid>
 
             <!-- 终端显示区域 -->

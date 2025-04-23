@@ -3,17 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModengTerm.Base.Definitions
 {
-    /// <summary>
-    /// 指定Panel的方向
-    /// </summary>
-    public enum SideWindowDock
-    {
-        Top,
-        Bottom,
-        Left,
-        Right
-    }
-
     public class MenuItemDefinition
     {
         /// <summary>

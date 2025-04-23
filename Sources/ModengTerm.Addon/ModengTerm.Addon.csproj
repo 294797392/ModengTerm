@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ClientStubs\**" />
+    <EmbeddedResource Remove="ClientStubs\**" />
+    <None Remove="ClientStubs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DotNEToolkit">
+      <HintPath>..\..\Dependence\DotNEToolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\..\Dependence\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\Dependence\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

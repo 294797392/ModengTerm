@@ -1,5 +1,4 @@
-﻿using ModengTerm.Addons.QuickInput;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;

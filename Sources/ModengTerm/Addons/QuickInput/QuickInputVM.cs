@@ -18,10 +18,10 @@ namespace ModengTerm.Addons.QuickInput
 
         #region 公开接口
 
-        public void ReloadCommandList() 
+        public void ReloadCommandList()
         {
-            this.CommandList.Clear();
-            this.CommandList.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new CommandVM(v)));
+            CommandList.Clear();
+            CommandList.AddRange(ServiceAgent.GetShellCommands(Session.ID).Select(v => new CommandVM(v)));
         }
 
         #endregion
@@ -32,13 +32,13 @@ namespace ModengTerm.Addons.QuickInput
         {
             base.OnInitialize();
 
-            this.CommandList = new BindableCollection<CommandVM>();
-            this.CommandList.AddRange(this.ServiceAgent.GetShellCommands(this.Session.ID).Select(v => new CommandVM(v)));
+            CommandList = new BindableCollection<CommandVM>();
+            CommandList.AddRange(ServiceAgent.GetShellCommands(Session.ID).Select(v => new CommandVM(v)));
         }
 
         public override void OnRelease()
         {
-            this.CommandList.Clear();
+            CommandList.Clear();
 
             base.OnRelease();
         }

@@ -1,10 +1,22 @@
-﻿using ModengTerm.Base.Enumerations;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.Base.Definitions
 {
+    public enum PanelItemOwner
+    {
+        /// <summary>
+        /// PanelItem属于主窗口
+        /// </summary>
+        Window,
+
+        /// <summary>
+        /// PanelItem属于会话
+        /// </summary>
+        Session
+    }
+
     public class PanelItemDefinition : MenuDefinition
     {
         /// <summary>
@@ -12,6 +24,13 @@ namespace ModengTerm.Base.Definitions
         /// </summary>
         [JsonProperty("sessionTypes")]
         public List<int> SessionTypes { get; set; }
+
+        /// <summary>
+        /// PanelItem属于
+        /// </summary>
+        [EnumDataType(typeof(PanelItemOwner))]
+        [JsonProperty("owner")]
+        public int Owner { get; set; }
 
         public PanelItemDefinition()
         {
@@ -32,14 +51,6 @@ namespace ModengTerm.Base.Definitions
         /// </summary>
         [JsonProperty("name")]
         public string Name { get; set; }
-
-        /// <summary>
-        /// 容器贴哪个边
-        /// 暂时用不到
-        /// </summary>
-        [EnumDataType(typeof(SideWindowDock))]
-        [JsonProperty("dock")]
-        public int Dock { get; set; }
 
         /// <summary>
         /// 侧边容器里的窗口列表

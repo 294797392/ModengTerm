@@ -1,18 +1,17 @@
-﻿using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Addons.QuickInput
+namespace ModengTerm.Addons.SystemMonitor
 {
-    public class QuickInputAddon : AddonBase
+    public class SystemMonitorAddon : AddonBase
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("QuickInputAddon.ShowQuickInputPanel", ExecuteShowQuickInputPanelCommand);
+            RegisterCommand("SystemMonitorAddon.ShowSystemMonitorPanel", ExecuteShowSystemMonitorPanelCommand);
         }
 
         protected override void OnRelease()
@@ -21,12 +20,13 @@ namespace ModengTerm.Addons.QuickInput
 
         protected override void OnEvent(AddonEventTypes ev, params object[] param)
         {
+
         }
 
-        private void ExecuteShowQuickInputPanelCommand()
+        private void ExecuteShowSystemMonitorPanelCommand()
         {
             //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //shellSessionVM.Panel.ChangeVisible("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
+            //shellSessionVM.Panel.ChangeVisible("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
         }
     }
 }

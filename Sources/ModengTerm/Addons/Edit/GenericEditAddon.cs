@@ -9,18 +9,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Addons.GenericEdit
+namespace ModengTerm.Addons.Edit
 {
     public class GenericEditAddon : AddonBase
     {
         protected override void OnInitialize()
         {
-            this.RegisterCommand("GenericEditAddon.Paste", this.ExecutePastCommand);
-            this.RegisterCommand("GenericEditAddon.CopySelection", this.ExecuteCopyCommand);
-            this.RegisterCommand("GenericEditAddon.SaveSelection", this.ExecuteSaveSelectionCommand);
-            this.RegisterCommand("GenericEditAddon.SaveViewport", this.ExecuteSaveViewportCommand);
-            this.RegisterCommand("GenericEditAddon.SaveAll", this.ExecuteSaveAllCommand);
-            this.RegisterCommand("GenericEditAddon.ClearScreen", this.ExecuteClearScreen);
+            RegisterCommand("GenericEditAddon.Paste", ExecutePastCommand);
+            RegisterCommand("GenericEditAddon.CopySelection", ExecuteCopyCommand);
+            RegisterCommand("GenericEditAddon.SaveSelection", ExecuteSaveSelectionCommand);
+            RegisterCommand("GenericEditAddon.SaveViewport", ExecuteSaveViewportCommand);
+            RegisterCommand("GenericEditAddon.SaveAll", ExecuteSaveAllCommand);
+            RegisterCommand("GenericEditAddon.ClearScreen", ExecuteClearScreen);
         }
 
         protected override void OnRelease()
@@ -33,41 +33,41 @@ namespace ModengTerm.Addons.GenericEdit
 
         private void ExecutePastCommand()
         {
-            ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            shellSessionVM.Paste();
+            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
+            //shellSessionVM.Paste();
         }
 
         private void ExecuteCopyCommand()
         {
-            ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            shellSessionVM.CopySelection();
+            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
+            //shellSessionVM.CopySelection();
         }
 
         private void ExecuteSaveSelectionCommand()
         {
-            ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            this.SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
+            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
+            //SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
         }
 
         private void ExecuteSaveViewportCommand()
         {
-            ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            this.SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
+            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
+            //SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
         }
 
         private void ExecuteSaveAllCommand()
         {
-            ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            this.SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
+            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
+            //SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
         }
 
-        private void ExecuteClearScreen() 
+        private void ExecuteClearScreen()
         {
-            ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;
-            document.DeleteViewoprt();
-            document.SetCursorLogical(0, 0);
-            document.RequestInvalidate();
+            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
+            //VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;
+            //document.DeleteViewoprt();
+            //document.SetCursorLogical(0, 0);
+            //document.RequestInvalidate();
         }
 
         #region 实例方法
@@ -94,7 +94,7 @@ namespace ModengTerm.Addons.GenericEdit
                 return;
             }
 
-            ParagraphFormatEnum fileType = this.FilterIndex2FileType(saveFileDialog.FilterIndex);
+            ParagraphFormatEnum fileType = FilterIndex2FileType(saveFileDialog.FilterIndex);
             shellSession.SaveToFile(paragraphType, fileType, saveFileDialog.FileName);
         }
 

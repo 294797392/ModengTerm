@@ -19,7 +19,6 @@ namespace ModengTerm.ViewModels
         #region 实例变量
 
         private bool visible;
-        private SideWindowDock dock;
 
         #endregion
 
@@ -37,19 +36,6 @@ namespace ModengTerm.ViewModels
                 {
                     visible = value;
                     NotifyPropertyChanged("Visible");
-                }
-            }
-        }
-
-        public SideWindowDock Dock
-        {
-            get { return this.dock; }
-            set
-            {
-                if (this.dock != value)
-                {
-                    this.dock = value;
-                    this.NotifyPropertyChanged("Dock");
                 }
             }
         }
@@ -96,14 +82,18 @@ namespace ModengTerm.ViewModels
 
         public void ChangeVisible(string panelItemId)
         {
-            PanelItemVM panelItemVM = MenuItems.FirstOrDefault(v => v.ID.ToString() == panelItemId) as PanelItemVM;
+            PanelItemVM panelItemVM = this.MenuItems.FirstOrDefault(v => v.ID.ToString() == panelItemId) as PanelItemVM;
+            if (panelItemVM == null) 
+            {
+                return;
+            }
 
             // 当前状态
             bool visible = false;
 
             if (this.Visible)
             {
-                if (SelectedMenu == panelItemVM)
+                if (this.SelectedMenu == panelItemVM)
                 {
                     visible = true;
                 }
@@ -114,7 +104,7 @@ namespace ModengTerm.ViewModels
                 // 当前是显示状态，隐藏
                 this.Visible = false;
                 this.SelectedMenu.IsSelected = false;
-                ProcessLoaded(false, panelItemVM);
+                this.ProcessLoaded(false, panelItemVM);
             }
             else
             {
@@ -128,7 +118,7 @@ namespace ModengTerm.ViewModels
                 }
                 else
                 {
-                    ProcessLoaded(true, panelItemVM);
+                    this.ProcessLoaded(true, panelItemVM);
                 }
             }
         }

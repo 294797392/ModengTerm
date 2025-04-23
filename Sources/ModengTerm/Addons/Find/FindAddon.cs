@@ -12,8 +12,8 @@ namespace ModengTerm.Addons.Find
     {
         protected override void OnInitialize()
         {
-            this.RegisterEvent(AddonEventTypes.SelectedSessionChanged);
-            this.RegisterCommand("E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C", this.OpenFindWindowCommandHandler);
+            RegisterEvent(AddonEventTypes.SelectedSessionChanged);
+            RegisterCommand("E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C", OpenFindWindowCommandHandler);
         }
 
         protected override void OnRelease()
@@ -52,13 +52,13 @@ namespace ModengTerm.Addons.Find
 
         private void OpenFindWindowCommandHandler()
         {
-            ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            if (shellSessionVM == null) 
-            {
-                return;
-            }
+            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
+            //if (shellSessionVM == null)
+            //{
+            //    return;
+            //}
 
-            FindWindowMgr.Show(shellSessionVM);
+            //FindWindowMgr.Show(shellSessionVM);
         }
     }
 }

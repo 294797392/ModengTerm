@@ -1,29 +1,17 @@
-﻿using ModengTerm.Base;
-using ModengTerm.Controls;
+﻿using ModengTerm.Controls;
 using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Windows.Terminals
+namespace ModengTerm.Addons.BroadcastInput
 {
     /// <summary>
     /// SendAllConfigurationWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class SendAllConfigurationWindow : MdWindow
+    public partial class BroadcastInputManagerWindow : MdWindow
     {
         #region 实例变量
 
@@ -36,7 +24,7 @@ namespace ModengTerm.Windows.Terminals
 
         #region 构造方法
 
-        public SendAllConfigurationWindow(ShellSessionVM shellSession)
+        public BroadcastInputManagerWindow(ShellSessionVM shellSession)
         {
             InitializeComponent();
 

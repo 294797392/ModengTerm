@@ -7,6 +7,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.DataModels;
 using ModengTerm.Terminal.ViewModels;
+using Renci.SshNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,7 +79,7 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<AppThemeVM> Themes { get; private set; }
 
-        public Dictionary<SideWindowDock, PanelVM> Panels { get; private set; }
+        public PanelVM Panel { get; private set; }
 
         #endregion
 
@@ -160,13 +161,25 @@ namespace ModengTerm.ViewModels
 
         private void InitializePanels()
         {
-            this.Panels = new Dictionary<SideWindowDock, PanelVM>();
+            List<PanelItemDefinition> panelItems = new List<PanelItemDefinition>();
 
-            foreach (PanelDefinition panel in MTermApp.Context.Manifest.Panels)
+            // 会话关联的窗口里包含插件窗口
+            foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
             {
-                PanelVM panelVM = VTClientUtils.PanelDefinition2PanelVM(panel);
-                this.Panels[panelVM.Dock] = panelVM;
+                foreach (PanelItemDefinition panelItem in addon.PanelItems)
+                {
+                    if (panelItem.Owner != (int)PanelItemOwner.Window)
+                    {
+                        continue;
+                    }
+
+                    panelItems.Add(panelItem);
+                }
             }
+
+            PanelDefinition panelDefinition = new PanelDefinition();
+            panelDefinition.Items.AddRange(panelItems);
+            this.Panel = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
         }
 
         private List<ContextMenuVM> InitializeToolbarMenus()

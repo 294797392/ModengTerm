@@ -1,6 +1,4 @@
-﻿using DotNEToolkit;
-using Microsoft.Win32;
-using ModengTerm.Addons.Find;
+﻿using Microsoft.Win32;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -1085,81 +1083,6 @@ namespace ModengTerm.Terminal.ViewModels
     {
         public ShellSessionContextMenu()
         {
-        }
-
-        public void ContextMenuStartLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
-            window.Owner = System.Windows.Window.GetWindow(shellSessionVM.Content);
-            if ((bool)window.ShowDialog())
-            {
-                shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
-            }
-        }
-
-        public void ContextMenuStopLogger_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            shellSessionVM.StopLogger();
-        }
-
-        /// <summary>
-        /// 拷贝当前选中的内容到剪切板
-        /// </summary>
-        private void ContextMenuCopySelection_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            shellSessionVM.CopySelection();
-        }
-
-        /// <summary>
-        /// 打开同步输入配置窗口
-        /// </summary>
-        public void ContextMenuOpenSyncInputConfigurationWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            SendAllConfigurationWindow sendAllConfigurationWindow = new SendAllConfigurationWindow(shellSessionVM);
-            sendAllConfigurationWindow.Owner = App.Current.MainWindow;
-            sendAllConfigurationWindow.ShowDialog();
-        }
-
-        /// <summary>
-        /// 开始录像
-        /// </summary>
-        public void ContextMenuStartRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            if (shellSessionVM.RecordStatus == RecordStatusEnum.Recording)
-            {
-                MTMessageBox.Info("正在录制中");
-                return;
-            }
-
-            RecordOptionsVM recordOptionsVM = new RecordOptionsVM();
-
-            RecordOptionsWindow recordOptionsWindow = new RecordOptionsWindow();
-            recordOptionsWindow.Owner = Window.GetWindow(shellSessionVM.Content);
-            recordOptionsWindow.DataContext = recordOptionsVM;
-            if (!(bool)recordOptionsWindow.ShowDialog())
-            {
-                return;
-            }
-
-            shellSessionVM.StartRecord(recordOptionsVM.FileName);
-        }
-
-        /// <summary>
-        /// 停止录像
-        /// </summary>
-        private void ContextMenuStopRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            shellSessionVM.StopRecord();
-        }
-
-        /// <summary>
-        /// 打开录像
-        /// </summary>
-        public void ContextMenuOpenRecord_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
-        {
-            OpenRecordWindow openRecordWindow = new OpenRecordWindow(shellSessionVM.Session);
-            openRecordWindow.Owner = Window.GetWindow(shellSessionVM.Content);
-            openRecordWindow.Show();
         }
 
         private void ContextMenuOpenPortForwardWindow_Click(ContextMenuVM sender, ShellSessionVM shellSessionVM)
