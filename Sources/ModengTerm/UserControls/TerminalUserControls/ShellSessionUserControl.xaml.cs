@@ -99,13 +99,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
-            ContextMenuVM menuVM = menuItem.DataContext as ContextMenuVM;
-            if (menuVM == null)
-            {
-                return;
-            }
-
-            //ContextMenuHelper.Execute(menuVM, this.DataContext as ShellSessionVM);
+            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
+            OpenedSessionVM openedSessionVM = this.shellSession;
+            MTermApp.Context.RaiseAddonCommand(contextMenu.AddonId, contextMenu.Command);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)

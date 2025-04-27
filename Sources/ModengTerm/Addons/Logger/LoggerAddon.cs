@@ -26,19 +26,19 @@ namespace ModengTerm.Addons.Logger
 
         private void ExecuteStartLoggerCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
-            //window.Owner = System.Windows.Window.GetWindow(shellSessionVM.Content);
-            //if ((bool)window.ShowDialog())
-            //{
-            //    shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
-            //}
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
+            window.Owner = System.Windows.Window.GetWindow(shellSessionVM.Content);
+            if ((bool)window.ShowDialog())
+            {
+                shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
+            }
         }
 
         private void ExecuteStopLoggerCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //shellSessionVM.StopLogger();
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            shellSessionVM.StopLogger();
         }
     }
 }

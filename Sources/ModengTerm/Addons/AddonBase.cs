@@ -1,7 +1,8 @@
-﻿using ModengTerm.Base.Definitions;
+﻿using DotNEToolkit;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.ViewModels;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace ModengTerm.Addons
 {
@@ -18,25 +19,15 @@ namespace ModengTerm.Addons
 
         #region 属性
 
-        internal string ID { get { return this.Definition.ID; } }
+        public string ID { get { return this.Definition.ID; } }
 
-        internal AddonDefinition Definition { get; set; }
-
-        /// <summary>
-        /// MainWindow接口
-        /// </summary>
-        public MainWindowVM MainWindow { get; set; }
-
-        /// <summary>
-        /// 访问服务的代理
-        /// </summary>
-        public ServiceAgent ServiceAgent { get; set; }
+        public AddonDefinition Definition { get; set; }
 
         #endregion
 
         #region Internal
 
-        internal void Initialize()
+        public void Initialize()
         {
             this.registerEvents = new List<AddonEventTypes>();
             this.registerCommands = new Dictionary<string, CommandHandlerDelegate>();
@@ -44,7 +35,7 @@ namespace ModengTerm.Addons
             this.OnInitialize();
         }
 
-        internal void Release()
+        public void Release()
         {
             this.OnRelease();
 
@@ -53,7 +44,7 @@ namespace ModengTerm.Addons
             this.registerCommands.Clear();
         }
 
-        internal void RaiseEvent(AddonEventTypes evt, params object[] evp)
+        public void RaiseEvent(AddonEventTypes evt, params object[] evp)
         {
             if (!this.registerEvents.Contains(evt))
             {
@@ -64,7 +55,7 @@ namespace ModengTerm.Addons
             this.OnEvent(evt, evp);
         }
 
-        internal void RaiseCommand(string command)
+        public void RaiseCommand(string command)
         {
             CommandHandlerDelegate handler;
             if (!this.registerCommands.TryGetValue(command, out handler)) 

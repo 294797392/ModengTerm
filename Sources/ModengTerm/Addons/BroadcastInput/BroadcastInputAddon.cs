@@ -1,10 +1,12 @@
 ﻿using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModels;
 using ModengTerm.Windows.Terminals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ModengTerm.Addons.BroadcastInput
 {
@@ -25,10 +27,10 @@ namespace ModengTerm.Addons.BroadcastInput
 
         private void ExecuteOpenBroadcastInputWindowCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //BroadcastInputManagerWindow multiInputManagerWindow = new BroadcastInputManagerWindow(shellSessionVM);
-            //multiInputManagerWindow.Owner = System.Windows.Application.Current.MainWindow;
-            //multiInputManagerWindow.ShowDialog();
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(shellSessionVM);
+            window.Owner = System.Windows.Application.Current.MainWindow;
+            window.ShowDialog();
         }
     }
 }

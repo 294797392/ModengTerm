@@ -25,8 +25,7 @@ namespace ModengTerm.Addons.SystemMonitor
 
         private void ExecuteShowSystemMonitorPanelCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //shellSessionVM.Panel.ChangeVisible("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
+            MTermApp.Context.MainWindowVM.Panel.ChangeVisible("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
         }
     }
 }

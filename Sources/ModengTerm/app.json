@@ -393,6 +393,44 @@
                     "pid": "50ED6E4E-4252-4D92-99DD-E72AC646FACB",
                     "command": "GenericEditAddon.ClearScreen"
                 }
+            ],
+            "contextMenus": [
+                {
+                    "id": "67A1392E-951B-48F7-BF46-0E0706C7EF9E",
+                    "name": "复制",
+                    "command": "GenericEditAddon.CopySelection"
+                },
+                {
+                    "id": "76B20C0E-B365-4886-8669-F750F4CF923A",
+                    "name": "粘贴",
+                    "command": "GenericEditAddon.Paste"
+                },
+                {
+                    "id": "22B4D809-B9A3-4D8F-BC6A-B9CE62008677",
+                    "name": "保存",
+                    "child": [
+                        {
+                            "id": "51AA89D7-0433-4F89-804B-25C5591B76A3",
+                            "name": "选中内容",
+                            "command": "GenericEditAddon.SaveSelection"
+                        },
+                        {
+                            "id": "649B4DAB-4860-43BC-B633-FC80F0F57A37",
+                            "name": "当前视图内容",
+                            "command": "GenericEditAddon.SaveViewport"
+                        },
+                        {
+                            "id": "CF58AAA2-4CFD-4F94-864D-0BAC70BEB1CB",
+                            "name": "所有内容",
+                            "command": "GenericEditAddon.SaveAll"
+                        }
+                    ]
+                },
+                {
+                    "id": "86C62FDB-4014-4ABA-BFDD-8AA365DF62EA",
+                    "name": "清屏",
+                    "command": "GenericEditAddon.ClearScreen"
+                }
             ]
         },
         {
@@ -520,7 +558,6 @@
                 }
             ]
         }
-
     ],
 
 

@@ -52,13 +52,13 @@ namespace ModengTerm.Addons.Find
 
         private void OpenFindWindowCommandHandler()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //if (shellSessionVM == null)
-            //{
-            //    return;
-            //}
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            if (shellSessionVM == null)
+            {
+                return;
+            }
 
-            //FindWindowMgr.Show(shellSessionVM);
+            FindWindowMgr.Show(shellSessionVM);
         }
     }
 }

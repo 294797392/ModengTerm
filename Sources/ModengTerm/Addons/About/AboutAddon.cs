@@ -21,10 +21,9 @@ namespace ModengTerm.Addons.About
 
         private void ExecuteOpenAboutWindowCommand()
         {
-            //ShellSessionVM shellSessionVM = this.MainWindow.SelectedSession as ShellSessionVM;
-            //AboutWindow aboutWindow = new AboutWindow();
-            //aboutWindow.Owner = Window.GetWindow(shellSessionVM.Content);
-            //aboutWindow.ShowDialog();
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.Owner = Application.Current.MainWindow;
+            aboutWindow.ShowDialog();
         }
     }
 }

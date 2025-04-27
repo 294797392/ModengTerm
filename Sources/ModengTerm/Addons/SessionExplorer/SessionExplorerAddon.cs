@@ -24,7 +24,7 @@ namespace ModengTerm.Addons.SessionExplorer
 
         private void OpenExplorerWindow()
         {
-            //MainWindow.Panel.ChangeVisible("BF1AD31C-0E00-495D-9C19-7687D708B71F");
+            MTermApp.Context.MainWindowVM.Panel.ChangeVisible("BF1AD31C-0E00-495D-9C19-7687D708B71F");
         }
     }
 }

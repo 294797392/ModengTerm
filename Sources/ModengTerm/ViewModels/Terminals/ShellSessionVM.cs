@@ -171,6 +171,11 @@ namespace ModengTerm.Terminal.ViewModels
         }
 
         /// <summary>
+        /// 会话的右键菜单
+        /// </summary>
+        public BindableCollection<ContextMenuVM> ContextMenus { get; private set; }
+
+        /// <summary>
         /// 控制右键菜单的显示和隐藏
         /// </summary>
         public Visibility ContextMenuVisibility
@@ -277,6 +282,9 @@ namespace ModengTerm.Terminal.ViewModels
             };
 
             #region 初始化上下文菜单
+
+            this.ContextMenus = new BindableCollection<ContextMenuVM>();
+            this.ContextMenus.AddRange(VTClientUtils.CreateContextMenuVMs(false));
 
             BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
             if (brc == BehaviorRightClicks.ContextMenu)

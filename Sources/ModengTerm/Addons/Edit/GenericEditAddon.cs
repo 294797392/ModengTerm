@@ -33,41 +33,41 @@ namespace ModengTerm.Addons.Edit
 
         private void ExecutePastCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //shellSessionVM.Paste();
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            shellSessionVM.Paste();
         }
 
         private void ExecuteCopyCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //shellSessionVM.CopySelection();
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            shellSessionVM.CopySelection();
         }
 
         private void ExecuteSaveSelectionCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
         }
 
         private void ExecuteSaveViewportCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
         }
 
         private void ExecuteSaveAllCommand()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
         }
 
         private void ExecuteClearScreen()
         {
-            //ShellSessionVM shellSessionVM = MainWindow.SelectedSession as ShellSessionVM;
-            //VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;
-            //document.DeleteViewoprt();
-            //document.SetCursorLogical(0, 0);
-            //document.RequestInvalidate();
+            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;
+            document.DeleteViewoprt();
+            document.SetCursorLogical(0, 0);
+            document.RequestInvalidate();
         }
 
         #region 实例方法

@@ -30,9 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Addons\AddonBase.cs" />
     <Compile Remove="Addons\AddonEventHandler.cs" />
-    <Compile Remove="Addons\AddonEventTypes.cs" />
     <Compile Remove="Addons\AddonMetadataAttribute.cs" />
     <Compile Remove="Addons\ClientStub.cs" />
     <Compile Remove="Addons\SideWindow.cs" />
@@ -97,7 +95,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ModengTerm.Addon\ModengTerm.Addon.csproj" />
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
   </ItemGroup>
