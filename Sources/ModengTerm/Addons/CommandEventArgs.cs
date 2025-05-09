@@ -24,6 +24,11 @@ namespace ModengTerm.Addons
         public Window CommandWindow { get; set; }
 
         /// <summary>
+        /// 窗口控制器
+        /// </summary>
+        public WindowController WindowController { get; private set; }
+
+        /// <summary>
         /// 执行命令的插件
         /// </summary>
         public string AddonId { get; set; }
@@ -32,5 +37,10 @@ namespace ModengTerm.Addons
         /// 要执行的命令
         /// </summary>
         public string Command { get; set; }
+
+        public CommandEventArgs() 
+        {
+            this.WindowController = new WindowController();
+        }
     }
 }

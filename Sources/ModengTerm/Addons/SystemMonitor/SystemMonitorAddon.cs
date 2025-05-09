@@ -11,7 +11,7 @@ namespace ModengTerm.Addons.SystemMonitor
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("SystemMonitorAddon.ShowSystemMonitorPanel", ExecuteShowSystemMonitorPanelCommand);
+            this.RegisterCommand("SystemMonitorAddon.ShowSystemMonitorPanel", ExecuteShowSystemMonitorPanelCommand);
         }
 
         protected override void OnRelease()
@@ -25,7 +25,7 @@ namespace ModengTerm.Addons.SystemMonitor
 
         private void ExecuteShowSystemMonitorPanelCommand(CommandEventArgs e)
         {
-            MTermApp.Context.MainWindowVM.Panel.ChangeVisible("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
+            e.WindowController.VisiblePanel("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
         }
     }
 }
