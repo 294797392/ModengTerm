@@ -34,13 +34,13 @@ namespace ModengTerm.Base.Definitions
         /// 插件所拥有的菜单
         /// </summary>
         [JsonProperty("toolbarMenus")]
-        public List<MenuItemDefinition> ToolbarMenus { get; private set; }
+        public List<AddonMenuDefinition> ToolbarMenus { get; private set; }
 
         /// <summary>
         /// 右键菜单
         /// </summary>
         [JsonProperty("contextMenus")]
-        public List<MenuItemDefinition> ContextMenus { get; private set; }
+        public List<AddonMenuDefinition> ContextMenus { get; private set; }
 
         /// <summary>
         /// PanelItem
@@ -50,8 +50,8 @@ namespace ModengTerm.Base.Definitions
 
         public AddonDefinition()
         {
-            this.ToolbarMenus = new List<MenuItemDefinition>();
-            this.ContextMenus = new List<MenuItemDefinition>();
+            this.ToolbarMenus = new List<AddonMenuDefinition>();
+            this.ContextMenus = new List<AddonMenuDefinition>();
             this.PanelItems = new List<PanelItemDefinition>();
         }
     }

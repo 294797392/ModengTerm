@@ -3,7 +3,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ModengTerm.Base.Definitions
 {
-    public class MenuItemDefinition
+    /// <summary>
+    /// 定义一个插件菜单
+    /// </summary>
+    public class AddonMenuDefinition
     {
         /// <summary>
         /// 菜单ID
@@ -33,7 +36,7 @@ namespace ModengTerm.Base.Definitions
         /// 子菜单
         /// </summary>
         [JsonProperty("child")]
-        public List<MenuItemDefinition> Children { get; private set; }
+        public List<AddonMenuDefinition> Children { get; private set; }
 
         /// <summary>
         /// 根菜单的Id
@@ -48,10 +51,10 @@ namespace ModengTerm.Base.Definitions
         [JsonIgnore]
         public string AddonId { get; set; }
 
-        public MenuItemDefinition()
+        public AddonMenuDefinition()
         {
             this.SessionTypes = new List<int>();
-            this.Children = new List<MenuItemDefinition>();
+            this.Children = new List<AddonMenuDefinition>();
         }
     }
 }

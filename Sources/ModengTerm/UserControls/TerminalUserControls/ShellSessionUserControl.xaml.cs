@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addons;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
@@ -100,8 +101,11 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            OpenedSessionVM openedSessionVM = this.shellSession;
-            MTermApp.Context.RaiseAddonCommand(contextMenu.AddonId, contextMenu.Command);
+            CommandEventArgs.Instance.AddonId = contextMenu.AddonId;
+            CommandEventArgs.Instance.Command = contextMenu.Command;
+            CommandEventArgs.Instance.OpenedSession = this.shellSession;
+            CommandEventArgs.Instance.CommandWindow = Window.GetWindow(this);
+            MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)

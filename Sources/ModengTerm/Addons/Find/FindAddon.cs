@@ -50,9 +50,9 @@ namespace ModengTerm.Addons.Find
             }
         }
 
-        private void OpenFindWindowCommandHandler()
+        private void OpenFindWindowCommandHandler(CommandEventArgs context)
         {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             if (shellSessionVM == null)
             {
                 return;

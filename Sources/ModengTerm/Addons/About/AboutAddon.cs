@@ -19,7 +19,7 @@ namespace ModengTerm.Addons.About
         {
         }
 
-        private void ExecuteOpenAboutWindowCommand()
+        private void ExecuteOpenAboutWindowCommand(CommandEventArgs context)
         {
             AboutWindow aboutWindow = new AboutWindow();
             aboutWindow.Owner = Application.Current.MainWindow;

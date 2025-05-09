@@ -14,7 +14,7 @@ namespace ModengTerm.Addons.BroadcastInput
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", ExecuteOpenBroadcastInputWindowCommand);
+            this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", ExecuteOpenBroadcastInputWindowCommand);
         }
 
         protected override void OnRelease()
@@ -25,11 +25,11 @@ namespace ModengTerm.Addons.BroadcastInput
         {
         }
 
-        private void ExecuteOpenBroadcastInputWindowCommand()
+        private void ExecuteOpenBroadcastInputWindowCommand(CommandEventArgs context)
         {
             ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
             BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(shellSessionVM);
-            window.Owner = System.Windows.Application.Current.MainWindow;
+            window.Owner = context.CommandWindow;
             window.ShowDialog();
         }
     }

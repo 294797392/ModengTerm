@@ -229,15 +229,15 @@ namespace ModengTerm
         /// </summary>
         /// <param name="addonId">插件Id</param>
         /// <param name="command">命令Id</param>
-        public void RaiseAddonCommand(string addonId, string command)
+        public void RaiseAddonCommand(CommandEventArgs context)
         {
-            AddonBase addon = this.Addons.FirstOrDefault(v => v.ID == addonId);
-            if (addon == null) 
+            AddonBase addon = this.Addons.FirstOrDefault(v => v.ID == context.AddonId);
+            if (addon == null)
             {
                 return;
             }
 
-            addon.RaiseCommand(command);
+            addon.RaiseCommand(context);
         }
 
         #endregion

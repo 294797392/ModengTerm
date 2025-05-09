@@ -1,12 +1,9 @@
-﻿using DotNEToolkit;
-using ModengTerm.Base.Definitions;
-using ModengTerm.Base.ServiceAgents;
+﻿using ModengTerm.Base.Definitions;
 using System.Collections.Generic;
-using System.Windows;
 
 namespace ModengTerm.Addons
 {
-    public delegate void CommandHandlerDelegate();
+    public delegate void CommandHandlerDelegate(CommandEventArgs context);
 
     public abstract class AddonBase
     {
@@ -55,15 +52,15 @@ namespace ModengTerm.Addons
             this.OnEvent(evt, evp);
         }
 
-        public void RaiseCommand(string command)
+        public void RaiseCommand(CommandEventArgs context)
         {
             CommandHandlerDelegate handler;
-            if (!this.registerCommands.TryGetValue(command, out handler)) 
+            if (!this.registerCommands.TryGetValue(context.Command, out handler))
             {
                 return;
             }
 
-            handler();
+            handler(context);
         }
 
         #endregion

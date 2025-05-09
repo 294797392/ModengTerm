@@ -23,9 +23,9 @@ namespace ModengTerm.Addons.QuickInput
         {
         }
 
-        private void ExecuteShowQuickInputPanelCommand()
+        private void ExecuteShowQuickInputPanelCommand(CommandEventArgs context)
         {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             shellSessionVM.Panel.ChangeVisible("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
         }
     }

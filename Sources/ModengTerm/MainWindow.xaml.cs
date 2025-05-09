@@ -379,7 +379,11 @@ namespace ModengTerm
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
-            MTermApp.Context.RaiseAddonCommand(contextMenu.AddonId, contextMenu.Command);
+            CommandEventArgs.Instance.OpenedSession = openedSessionVM;
+            CommandEventArgs.Instance.CommandWindow = this;
+            CommandEventArgs.Instance.AddonId = contextMenu.AddonId;
+            CommandEventArgs.Instance.Command = contextMenu.Command;
+            MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
         }
 
 

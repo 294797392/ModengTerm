@@ -24,20 +24,20 @@ namespace ModengTerm.Addons.Logger
         {
         }
 
-        private void ExecuteStartLoggerCommand()
+        private void ExecuteStartLoggerCommand(CommandEventArgs context)
         {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
-            window.Owner = System.Windows.Window.GetWindow(shellSessionVM.Content);
+            window.Owner = context.CommandWindow;
             if ((bool)window.ShowDialog())
             {
                 shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
             }
         }
 
-        private void ExecuteStopLoggerCommand()
+        private void ExecuteStopLoggerCommand(CommandEventArgs context)
         {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             shellSessionVM.StopLogger();
         }
     }

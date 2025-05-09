@@ -26,7 +26,7 @@ namespace ModengTerm
         /// 默认顶部根菜单
         /// </summary>
         [JsonProperty("toolbarMenus")]
-        public List<MenuItemDefinition> ToolbarMenus { get; private set; }
+        public List<AddonMenuDefinition> ToolbarMenus { get; private set; }
 
         /// <summary>
         /// 窗口主题列表
@@ -67,7 +67,7 @@ namespace ModengTerm
         public MTermManifest()
         {
             this.SessionList = new List<SessionDefinition>();
-            this.ToolbarMenus = new List<MenuItemDefinition>();
+            this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.AppThemes = new List<AppTheme>();
             this.TerminalOptionMenu = new List<MenuDefinition>();
             this.FontSizeList = new List<FontSizeDefinition>();

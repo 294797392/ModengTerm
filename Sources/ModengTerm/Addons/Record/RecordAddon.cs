@@ -29,7 +29,7 @@ namespace ModengTerm.Addons.Record
         {
         }
 
-        private void ExecuteStartRecordCommand()
+        private void ExecuteStartRecordCommand(CommandEventArgs context)
         {
             ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
 
@@ -52,13 +52,13 @@ namespace ModengTerm.Addons.Record
             shellSessionVM.StartRecord(recordOptionsVM.FileName);
         }
 
-        private void ExecuteStopRecordCommand()
+        private void ExecuteStopRecordCommand(CommandEventArgs context)
         {
             ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
             shellSessionVM.StopRecord();
         }
 
-        private void ExecuteOpenRecordCommand()
+        private void ExecuteOpenRecordCommand(CommandEventArgs context)
         {
             ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
             OpenRecordWindow openRecordWindow = new OpenRecordWindow(shellSessionVM.Session);
