@@ -3,7 +3,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Renderer;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
+using ModengTerm.UserControls.TerminalUserControls;
 using System;
 using System.Windows.Controls;
 

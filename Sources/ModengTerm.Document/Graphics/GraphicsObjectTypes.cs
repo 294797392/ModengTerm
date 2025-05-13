@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Document.Drawing
+namespace ModengTerm.Document.Graphics
 {
     public enum GraphicsObjectTypes
     {

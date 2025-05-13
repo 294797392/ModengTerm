@@ -5,7 +5,6 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.ViewModels;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
 using ModengTerm.ViewModels;
 using ModengTerm.ViewModels.Terminals;
 using System;

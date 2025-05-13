@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
-namespace ModengTerm.UserControls.TerminalUserControls.Rendering
+namespace ModengTerm.UserControls.TerminalUserControls
 {
     public class VTScrollbarImpl : VTScrollbar
     {

@@ -1,7 +1,6 @@
 ﻿using ModengTerm.Addons.SystemMonitor;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Session;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
 using System.Windows;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;

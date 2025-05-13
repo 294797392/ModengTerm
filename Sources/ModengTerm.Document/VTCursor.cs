@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Drawing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +10,7 @@ using System.Windows;
 using System.Windows.Media.Converters;
 using System.Windows.Controls.Primitives;
 using System.Reflection.Metadata;
+using ModengTerm.Document.Graphics;
 
 namespace ModengTerm.Document
 {

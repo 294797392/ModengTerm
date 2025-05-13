@@ -5,7 +5,7 @@ using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Session;
 using ModengTerm.Terminal.ViewModels;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
+using ModengTerm.UserControls.TerminalUserControls;
 using System;
 using System.Collections.Generic;
 using System.Linq;

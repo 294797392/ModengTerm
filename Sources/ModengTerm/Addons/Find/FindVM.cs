@@ -1,9 +1,9 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Document;
-using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.EventData;
+using ModengTerm.Document.Graphics;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;

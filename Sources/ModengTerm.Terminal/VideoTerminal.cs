@@ -4,8 +4,8 @@ using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Document;
-using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Graphics;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Loggering;
@@ -209,6 +209,9 @@ namespace ModengTerm.Terminal
         /// 是否渲染输入的数据
         /// </summary>
         private bool renderWrite;
+
+        private double pixelHeight;
+        private double pixelWidth;
 
         #endregion
 
@@ -605,6 +608,11 @@ namespace ModengTerm.Terminal
                 return;
             }
 
+            if (this.pixelHeight == newSize.Height && this.pixelWidth == newSize.Width)
+            {
+                return;
+            }
+
             int oldRow = this.ViewportRow, oldCol = this.ViewportColumn;
             int newRow = 0, newCol = 0;
             VTDocUtils.CalculateAutoFitSize(newSize, this.activeDocument.Typeface, out newRow, out newCol);
@@ -614,6 +622,9 @@ namespace ModengTerm.Terminal
                 // 变化之后的行和列和现在的行和列一样，什么都不做
                 return;
             }
+
+            this.pixelHeight = newSize.Height;
+            this.pixelWidth = newSize.Width;
 
             logger.InfoFormat("Resize, newRow = {0}, newCol = {1}, oldRow = {2}, oldCol = {3}", newRow, newCol, oldRow, oldCol);
 

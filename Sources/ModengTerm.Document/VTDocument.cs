@@ -1,6 +1,6 @@
-﻿using ModengTerm.Document.Drawing;
-using ModengTerm.Document.Enumerations;
+﻿using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.EventData;
+using ModengTerm.Document.Graphics;
 using ModengTerm.Document.Utility;
 using System;
 using System.Collections.Generic;

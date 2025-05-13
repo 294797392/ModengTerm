@@ -10,7 +10,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace ModengTerm.UserControls.TerminalUserControls.Rendering
+namespace ModengTerm.UserControls.TerminalUserControls
 {
     /// <summary>
     /// 渲染文档的区域

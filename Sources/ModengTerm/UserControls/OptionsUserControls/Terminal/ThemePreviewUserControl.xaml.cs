@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Parsing;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
+using ModengTerm.UserControls.TerminalUserControls;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;

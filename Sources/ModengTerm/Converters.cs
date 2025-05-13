@@ -7,7 +7,7 @@ using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
+using ModengTerm.UserControls.TerminalUserControls;
 using ModengTerm.ViewModels.Session;
 using ModengTerm.ViewModels.Sessions;
 using System;

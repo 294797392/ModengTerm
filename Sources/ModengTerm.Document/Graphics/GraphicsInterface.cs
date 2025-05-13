@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace ModengTerm.Document.Drawing
+namespace ModengTerm.Document.Graphics
 {
     /// <summary>
     /// 文档渲染对象

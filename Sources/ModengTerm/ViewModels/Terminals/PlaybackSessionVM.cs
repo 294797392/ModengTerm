@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Graphics;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Session;

@@ -2,7 +2,7 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
-using ModengTerm.UserControls.TerminalUserControls.Rendering;
+using ModengTerm.UserControls.TerminalUserControls;
 using System.Windows.Media;
 using WPFToolkit.MVVM;
 

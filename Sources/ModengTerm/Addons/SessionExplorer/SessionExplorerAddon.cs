@@ -11,7 +11,7 @@ namespace ModengTerm.Addons.SessionExplorer
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("SessionExplorerAddon.OpenExplorerWindow", OpenExplorerWindow);
+            this.RegisterCommand("SessionExplorerAddon.OpenExplorerWindow", OpenExplorerWindow);
         }
 
         protected override void OnRelease()

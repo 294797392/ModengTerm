@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Diagnostics;
 
-namespace ModengTerm.Document.Drawing
+namespace ModengTerm.Document.Graphics
 {
     /// <summary>
     /// 文档里的一个对象实例

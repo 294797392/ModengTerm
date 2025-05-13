@@ -7,7 +7,7 @@
              xmlns:modengterm="clr-namespace:ModengTerm"
              xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
              xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
-             xmlns:renderer="clr-namespace:ModengTerm.UserControls.TerminalUserControls.Rendering"
+             xmlns:muct="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
              xmlns:termuc="clr-namespace:ModengTerm.UserControls.Terminals"
              xmlns:termuc2="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
              xmlns:termctrl="clr-namespace:ModengTerm.Controls"
@@ -76,8 +76,8 @@
                 <Border x:Name="BorderBackground"/>
                 <Image x:Name="ImageBackground" Stretch="Fill"/>
 
-                <renderer:DocumentControl x:Name="DocumentAlternate"/>
-                <renderer:DocumentControl x:Name="DocumentMain"/>
+                <muct:DocumentControl x:Name="DocumentAlternate"/>
+                <muct:DocumentControl x:Name="DocumentMain"/>
             </Grid>
 
             <termuc2:PanelUserControl Grid.Column="1" DataContext="{Binding Path=Panel}" Dock="Right"/>

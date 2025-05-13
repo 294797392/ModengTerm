@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Document;
-using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
@@ -11,7 +11,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace ModengTerm.UserControls.TerminalUserControls.Rendering
+namespace ModengTerm.UserControls.TerminalUserControls
 {
     /// <summary>
     /// 文档控件

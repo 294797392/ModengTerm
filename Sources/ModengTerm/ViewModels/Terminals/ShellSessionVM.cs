@@ -3,8 +3,8 @@ using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
-using ModengTerm.Document.Drawing;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Graphics;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
@@ -814,7 +814,7 @@ namespace ModengTerm.Terminal.ViewModels
         /// <summary>
         /// 把剪贴板里的数据粘贴到终端
         /// </summary>
-        public void Paste() 
+        public void Paste()
         {
             string text = System.Windows.Clipboard.GetText();
             this.SendText(text);
@@ -859,7 +859,7 @@ namespace ModengTerm.Terminal.ViewModels
         {
         }
 
-        private void SessionTransport_DataReceived(SessionTransport client, byte[] buffer, int size)
+        private void SessionTransport_DataReceived(SessionTransport transport, byte[] buffer, int size)
         {
             VTDebug.Context.WriteRawRead(buffer, size);
 
@@ -876,6 +876,10 @@ namespace ModengTerm.Terminal.ViewModels
                 try
                 {
                     this.videoTerminal.ProcessRead(buffer, size);
+
+                    // 解决刚打开会话之后，获取不到实际窗口大小导致终端行和列不正确的问题
+                    GraphicsInterface visibleGraphics = this.MainDocument.Visible ? this.MainDocument : this.AlternateDocument;
+                    this.videoTerminal.Resize(visibleGraphics.DrawAreaSize);
                 }
                 catch (Exception ex)
                 {

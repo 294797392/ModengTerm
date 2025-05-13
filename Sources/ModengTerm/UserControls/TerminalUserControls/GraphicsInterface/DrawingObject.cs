@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Document;
-using ModengTerm.Document.Drawing;
+using ModengTerm.Document.Graphics;
 using ModengTerm.Terminal;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-namespace ModengTerm.UserControls.TerminalUserControls.Rendering
+namespace ModengTerm.UserControls.TerminalUserControls
 {
     /// <summary>
     /// 表示文档上的一个可视化对象（光标，文本块，文本行...）
