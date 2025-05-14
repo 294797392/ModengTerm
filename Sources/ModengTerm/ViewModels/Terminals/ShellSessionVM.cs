@@ -878,8 +878,8 @@ namespace ModengTerm.Terminal.ViewModels
                     this.videoTerminal.ProcessRead(buffer, size);
 
                     // 解决刚打开会话之后，获取不到实际窗口大小导致终端行和列不正确的问题
-                    GraphicsInterface visibleGraphics = this.MainDocument.Visible ? this.MainDocument : this.AlternateDocument;
-                    this.videoTerminal.Resize(visibleGraphics.DrawAreaSize);
+                    VTSize graphicsSize = this.videoTerminal.ActiveDocument.GraphicsInterface.DrawAreaSize;
+                    this.videoTerminal.Resize(graphicsSize);
                 }
                 catch (Exception ex)
                 {

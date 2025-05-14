@@ -610,8 +610,12 @@ namespace ModengTerm.Terminal
 
             if (this.pixelHeight == newSize.Height && this.pixelWidth == newSize.Width)
             {
+                logger.InfoFormat(Guid.NewGuid().ToString());
                 return;
             }
+
+            this.pixelHeight = newSize.Height;
+            this.pixelWidth = newSize.Width;
 
             int oldRow = this.ViewportRow, oldCol = this.ViewportColumn;
             int newRow = 0, newCol = 0;
@@ -622,11 +626,6 @@ namespace ModengTerm.Terminal
                 // 变化之后的行和列和现在的行和列一样，什么都不做
                 return;
             }
-
-            this.pixelHeight = newSize.Height;
-            this.pixelWidth = newSize.Width;
-
-            logger.InfoFormat("Resize, newRow = {0}, newCol = {1}, oldRow = {2}, oldCol = {3}", newRow, newCol, oldRow, oldCol);
 
             // 对Document执行Resize
             // 目前的实现在ubuntu下没问题，但是在Windows10操作系统上运行Windows命令行里的vim程序会有问题，可能是Windows下的vim程序兼容性导致的？暂时先这样
