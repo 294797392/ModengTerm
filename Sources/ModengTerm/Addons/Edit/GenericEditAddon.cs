@@ -4,66 +4,64 @@ using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Addons.Edit
 {
-    public class GenericEditAddon : AddonBase
+    public class EditAddonObject : AddonObject    
+    {
+        
+    }
+
+    public class GenericEditAddon : AddonModule
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("GenericEditAddon.Paste", ExecutePastCommand);
-            RegisterCommand("GenericEditAddon.CopySelection", ExecuteCopyCommand);
-            RegisterCommand("GenericEditAddon.SaveSelection", ExecuteSaveSelectionCommand);
-            RegisterCommand("GenericEditAddon.SaveViewport", ExecuteSaveViewportCommand);
-            RegisterCommand("GenericEditAddon.SaveAll", ExecuteSaveAllCommand);
-            RegisterCommand("GenericEditAddon.ClearScreen", ExecuteClearScreen);
+            this.RegisterCommand("GenericEditAddon.Paste", Paste);
+            this.RegisterCommand("GenericEditAddon.CopySelection", CopySelection);
+            this.RegisterCommand("GenericEditAddon.SaveSelection", SaveSelection);
+            this.RegisterCommand("GenericEditAddon.SaveViewport", SaveViewport);
+            this.RegisterCommand("GenericEditAddon.SaveAll", SaveAll);
+            this.RegisterCommand("GenericEditAddon.ClearScreen", ClearScreen);
         }
 
         protected override void OnRelease()
         {
         }
 
-        protected override void OnEvent(AddonEventTypes ev, params object[] param)
+        private void Paste(CommandEventArgs e)
         {
+            ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
+            string text = System.Windows.Clipboard.GetText();
+            shellSessionVM.SendText(text);
         }
 
-        private void ExecutePastCommand(CommandEventArgs context)
+        private void CopySelection(CommandEventArgs e)
         {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
-            shellSessionVM.Paste();
-        }
-
-        private void ExecuteCopyCommand(CommandEventArgs context)
-        {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             shellSessionVM.CopySelection();
         }
 
-        private void ExecuteSaveSelectionCommand(CommandEventArgs context)
+        private void SaveSelection(CommandEventArgs e)
         {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
         }
 
-        private void ExecuteSaveViewportCommand(CommandEventArgs context)
+        private void SaveViewport(CommandEventArgs e)
         {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
         }
 
-        private void ExecuteSaveAllCommand(CommandEventArgs context)
+        private void SaveAll(CommandEventArgs e)
         {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
         }
 
-        private void ExecuteClearScreen(CommandEventArgs context)
+        private void ClearScreen(CommandEventArgs e)
         {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;
             document.DeleteViewoprt();
             document.SetCursorLogical(0, 0);

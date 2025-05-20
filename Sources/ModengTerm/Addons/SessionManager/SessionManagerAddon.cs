@@ -11,12 +11,8 @@ using WPFToolkit.Utility;
 
 namespace ModengTerm.Addons.SessionManager
 {
-    public class SessionManagerAddon : AddonBase
+    public class SessionManagerAddon : AddonModule
     {
-        protected override void OnEvent(AddonEventTypes evt, params object[] evp)
-        {
-        }
-
         protected override void OnInitialize()
         {
             this.RegisterCommand("SessionManagerAddon.OpenSession", this.OpenSession);

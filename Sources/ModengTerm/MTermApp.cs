@@ -57,7 +57,7 @@ namespace ModengTerm
         /// <summary>
         /// 所有插件实例
         /// </summary>
-        public List<AddonBase> Addons { get; private set; }
+        public List<AddonModule> Addons { get; private set; }
 
         #endregion
 
@@ -112,14 +112,14 @@ namespace ModengTerm
         /// </summary>
         private void LoadAddons()
         {
-            this.Addons = new List<AddonBase>();
+            this.Addons = new List<AddonModule>();
 
             foreach (AddonDefinition definition in this.Manifest.Addons)
             {
-                AddonBase addonBase = null;
+                AddonModule addonBase = null;
                 try
                 {
-                    addonBase = ConfigFactory<AddonBase>.CreateInstance(definition.ClassEntry);
+                    addonBase = ConfigFactory<AddonModule>.CreateInstance(definition.ClassEntry);
                     addonBase.Initialize();
                     addonBase.Definition = definition;
                 }
@@ -212,32 +212,31 @@ namespace ModengTerm
         }
 
         /// <summary>
-        /// 通知插件事件触发
-        /// </summary>
-        /// <param name="evt">事件类型</param>
-        /// <param name="evp">事件参数列表</param>
-        public void RaiseAddonEvent(AddonEventTypes evt, params object[] evp)
-        {
-            foreach (AddonBase addon in this.Addons)
-            {
-                addon.RaiseEvent(evt, evp);
-            }
-        }
-
-        /// <summary>
         /// 通知插件有命令触发
         /// </summary>
         /// <param name="addonId">插件Id</param>
         /// <param name="command">命令Id</param>
-        public void RaiseAddonCommand(CommandEventArgs context)
+        public void RaiseAddonCommand(CommandEventArgs e)
         {
-            AddonBase addon = this.Addons.FirstOrDefault(v => v.ID == context.AddonId);
+            if (e.AddonId == CommandEventArgs.BroadcastAddonId)
+            {
+                // 广播命令
+
+                foreach (AddonModule addon1 in this.Addons)
+                {
+                    addon1.RaiseCommand(e);
+                }
+
+                return;
+            }
+
+            AddonModule addon = this.Addons.FirstOrDefault(v => v.ID == e.AddonId);
             if (addon == null)
             {
                 return;
             }
 
-            addon.RaiseCommand(context);
+            addon.RaiseCommand(e);
         }
 
         #endregion

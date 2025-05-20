@@ -12,20 +12,16 @@ using System.Windows;
 
 namespace ModengTerm.Addons.Record
 {
-    public class RecordAddon : AddonBase
+    public class RecordAddon : AddonModule
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("RecordAddon.StartRecord", ExecuteStartRecordCommand);
-            RegisterCommand("RecordAddon.StopRecord", ExecuteStopRecordCommand);
-            RegisterCommand("RecordAddon.OpenRecord", ExecuteOpenRecordCommand);
+            this.RegisterCommand("RecordAddon.StartRecord", ExecuteStartRecordCommand);
+            this.RegisterCommand("RecordAddon.StopRecord", ExecuteStopRecordCommand);
+            this.RegisterCommand("RecordAddon.OpenRecord", ExecuteOpenRecordCommand);
         }
 
         protected override void OnRelease()
-        {
-        }
-
-        protected override void OnEvent(AddonEventTypes ev, params object[] param)
         {
         }
 

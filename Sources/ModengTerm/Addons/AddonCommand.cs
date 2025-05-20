@@ -16,6 +16,8 @@ namespace ModengTerm.Addons
         /// 当分组发生改变的时候出发
         /// </summary>
         public const string CMD_GROUP_CHANGED = "app.cmd.group_changed";
+
+        public const string CMD_SELECTED_SESSION_CHANGED = "app.cmd.selected_session_changed";
     }
 
     /// <summary>

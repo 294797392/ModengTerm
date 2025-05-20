@@ -4,18 +4,14 @@ using System.Windows;
 
 namespace ModengTerm.Addons.About
 {
-    public class AboutAddon : AddonBase
+    public class AboutAddon : AddonModule
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("AboutAddon.OpenAboutWindow", ExecuteOpenAboutWindowCommand);
+            this.RegisterCommand("AboutAddon.OpenAboutWindow", ExecuteOpenAboutWindowCommand);
         }
 
         protected override void OnRelease()
-        {
-        }
-
-        protected override void OnEvent(AddonEventTypes evt, params object[] evp)
         {
         }
 

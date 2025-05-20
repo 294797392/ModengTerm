@@ -268,7 +268,10 @@ namespace ModengTerm
 
             #endregion
 
-            MTermApp.Context.RaiseAddonEvent(Addons.AddonEventTypes.SelectedSessionChanged, removedSession, addedSession);
+            CommandEventArgs.Instance.OpenedSession = selectedSession as OpenedSessionVM;
+            CommandEventArgs.Instance.AddonId = CommandEventArgs.BroadcastAddonId;
+            CommandEventArgs.Instance.Command = ModengTerm.Addons.SystemCommands.CMD_SELECTED_SESSION_CHANGED;
+            MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)

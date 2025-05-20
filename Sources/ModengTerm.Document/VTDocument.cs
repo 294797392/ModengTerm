@@ -921,10 +921,9 @@ namespace ModengTerm.Document
 
         /// <summary>
         /// 设置光标在当前视图中逻辑位置和activeLine
-        /// row和column从0开始计数，0表示第一行或者第一列
         /// </summary>
-        /// <param name="row">要设置的行</param>
-        /// <param name="column">要设置的列</param>
+        /// <param name="row">要设置的行,0表示第一行</param>
+        /// <param name="column">要设置的列,0表示第一列</param>
         public void SetCursorLogical(int row, int column)
         {
             // 有可能ActiveLine变了，更新ActiveLine和PhysicsRow

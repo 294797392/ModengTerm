@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addons.SessionExplorer
 {
-    public class SessionExplorerAddon : AddonBase
+    public class SessionExplorerAddon : AddonModule
     {
         protected override void OnInitialize()
         {
@@ -15,10 +15,6 @@ namespace ModengTerm.Addons.SessionExplorer
         }
 
         protected override void OnRelease()
-        {
-        }
-
-        protected override void OnEvent(AddonEventTypes ev, params object[] param)
         {
         }
 

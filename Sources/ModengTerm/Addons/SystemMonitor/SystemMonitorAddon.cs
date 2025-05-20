@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addons.SystemMonitor
 {
-    public class SystemMonitorAddon : AddonBase
+    public class SystemMonitorAddon : AddonModule
     {
         protected override void OnInitialize()
         {
@@ -16,11 +16,6 @@ namespace ModengTerm.Addons.SystemMonitor
 
         protected override void OnRelease()
         {
-        }
-
-        protected override void OnEvent(AddonEventTypes ev, params object[] param)
-        {
-
         }
 
         private void ExecuteShowSystemMonitorPanelCommand(CommandEventArgs e)

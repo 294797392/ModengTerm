@@ -8,18 +8,14 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addons.QuickInput
 {
-    public class QuickInputAddon : AddonBase
+    public class QuickInputAddon : AddonModule
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("QuickInputAddon.ShowQuickInputPanel", ExecuteShowQuickInputPanelCommand);
+            this.RegisterCommand("QuickInputAddon.ShowQuickInputPanel", ExecuteShowQuickInputPanelCommand);
         }
 
         protected override void OnRelease()
-        {
-        }
-
-        protected override void OnEvent(AddonEventTypes ev, params object[] param)
         {
         }
 

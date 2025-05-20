@@ -808,15 +808,6 @@ namespace ModengTerm.Terminal.ViewModels
             this.logMgr.Stop(this.videoTerminal);
         }
 
-        /// <summary>
-        /// 把剪贴板里的数据粘贴到终端
-        /// </summary>
-        public void Paste()
-        {
-            string text = System.Windows.Clipboard.GetText();
-            this.SendText(text);
-        }
-
         #endregion
 
         #region 事件处理器

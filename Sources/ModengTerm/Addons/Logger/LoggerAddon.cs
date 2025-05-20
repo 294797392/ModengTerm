@@ -8,19 +8,15 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addons.Logger
 {
-    public class LoggerAddon : AddonBase
+    public class LoggerAddon : AddonModule
     {
         protected override void OnInitialize()
         {
-            RegisterCommand("LoggerAddon.StartLogger", ExecuteStartLoggerCommand);
-            RegisterCommand("LoggerAddon.StopLogger", ExecuteStopLoggerCommand);
+            this.RegisterCommand("LoggerAddon.StartLogger", ExecuteStartLoggerCommand);
+            this.RegisterCommand("LoggerAddon.StopLogger", ExecuteStopLoggerCommand);
         }
 
         protected override void OnRelease()
-        {
-        }
-
-        protected override void OnEvent(AddonEventTypes ev, params object[] param)
         {
         }
 

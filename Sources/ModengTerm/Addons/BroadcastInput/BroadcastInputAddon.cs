@@ -10,26 +10,22 @@ using System.Windows;
 
 namespace ModengTerm.Addons.BroadcastInput
 {
-    public class BroadcastInputAddon : AddonBase
+    public class BroadcastInputAddon : AddonModule
     {
         protected override void OnInitialize()
         {
-            this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", ExecuteOpenBroadcastInputWindowCommand);
+            this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnRelease()
         {
         }
 
-        protected override void OnEvent(AddonEventTypes ev, params object[] param)
+        private void OpenBroadcastInputWindow(CommandEventArgs e)
         {
-        }
-
-        private void ExecuteOpenBroadcastInputWindowCommand(CommandEventArgs context)
-        {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(shellSessionVM);
-            window.Owner = context.MainWindow;
+            window.Owner = e.MainWindow;
             window.ShowDialog();
         }
     }
