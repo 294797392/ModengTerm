@@ -29,7 +29,7 @@ namespace ModengTerm.Addons.BroadcastInput
         {
             ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
             BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(shellSessionVM);
-            window.Owner = context.CommandWindow;
+            window.Owner = context.MainWindow;
             window.ShowDialog();
         }
     }

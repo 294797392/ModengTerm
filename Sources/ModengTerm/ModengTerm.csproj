@@ -154,10 +154,6 @@
     </Page>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Addons\SessionManager\" />
-  </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy $(SolutionDir)..\Dependence\log4net.xml $(TargetDir) /y&#xD;&#xA;xcopy $(SolutionDir)..\Dependence\adb\* $(TargetDir) /y" />
   </Target>

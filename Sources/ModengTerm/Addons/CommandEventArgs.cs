@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -14,19 +15,21 @@ namespace ModengTerm.Addons
         public static readonly CommandEventArgs Instance = new CommandEventArgs();
 
         /// <summary>
+        /// 发送命令的窗口
+        /// </summary>
+        public Window MainWindow { get { return Application.Current.MainWindow; } }
+
+        /// <summary>
+        /// 提供控制应用程序的通用接口
+        /// </summary>
+        public ApplicationManager Manager { get; private set; }
+
+        public ServiceAgent ServiceAgent { get { return MTermApp.Context.ServiceAgent; } }
+
+        /// <summary>
         /// 当前选中的会话
         /// </summary>
         public OpenedSessionVM OpenedSession { get; set; }
-
-        /// <summary>
-        /// 发送命令的窗口
-        /// </summary>
-        public Window CommandWindow { get; set; }
-
-        /// <summary>
-        /// 窗口控制器
-        /// </summary>
-        public WindowController WindowController { get; private set; }
 
         /// <summary>
         /// 执行命令的插件
@@ -40,7 +43,7 @@ namespace ModengTerm.Addons
 
         public CommandEventArgs() 
         {
-            this.WindowController = new WindowController();
+            this.Manager = new ApplicationManager();
         }
     }
 }

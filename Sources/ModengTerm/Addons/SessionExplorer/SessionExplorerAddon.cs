@@ -24,7 +24,7 @@ namespace ModengTerm.Addons.SessionExplorer
 
         private void OpenExplorerWindow(CommandEventArgs e)
         {
-            e.WindowController.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
+            e.Manager.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
         }
     }
 }

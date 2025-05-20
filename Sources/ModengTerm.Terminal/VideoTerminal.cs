@@ -610,7 +610,6 @@ namespace ModengTerm.Terminal
 
             if (this.pixelHeight == newSize.Height && this.pixelWidth == newSize.Width)
             {
-                logger.InfoFormat(Guid.NewGuid().ToString());
                 return;
             }
 

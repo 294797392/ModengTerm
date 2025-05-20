@@ -320,42 +320,6 @@ namespace ModengTerm
 
 
 
-        private void MenuItemOpenSession_Click(object sender, RoutedEventArgs e)
-        {
-            this.ShowSessionListWindow();
-        }
-
-        private void MenuItemCreateSession_Click(object sender, RoutedEventArgs e)
-        {
-            CreateSessionWindow window = new CreateSessionWindow();
-            window.Owner = this;
-            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            if (!(bool)window.ShowDialog())
-            {
-                return;
-            }
-
-            XTermSession session = window.Session;
-
-            // 在数据库里新建会话
-            int code = MTermApp.Context.ServiceAgent.AddSession(session);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
-                return;
-            }
-
-            // 打开会话
-            this.OpenSession(session, false);
-        }
-
-        private void MenuItemGroupManager_Click(object sender, RoutedEventArgs e)
-        {
-            GroupManagerWindow window = new GroupManagerWindow();
-            window.Owner = this;
-            window.ShowDialog();
-        }
-
         private void MenuItemOpenRecentSessions_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
@@ -380,7 +344,6 @@ namespace ModengTerm
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
             CommandEventArgs.Instance.OpenedSession = openedSessionVM;
-            CommandEventArgs.Instance.CommandWindow = this;
             CommandEventArgs.Instance.AddonId = contextMenu.AddonId;
             CommandEventArgs.Instance.Command = contextMenu.Command;
             MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
@@ -567,14 +530,14 @@ namespace ModengTerm
 
         private void OpenSessionCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            XTermSessionVM sessionVM = e.Parameter as XTermSessionVM;
-            if (sessionVM == null)
+            XTermSession session = e.Parameter as XTermSession;
+            if (session == null)
             {
                 logger.ErrorFormat("OpenSessionCommand缺少参数");
                 return;
             }
 
-            this.OpenSession(sessionVM.Session);
+            this.OpenSession(session);
         }
 
         #endregion

@@ -92,7 +92,9 @@ namespace ModengTerm.Addons.SessionExplorer
                 return;
             }
 
-            MCommands.OpenSessionCommand.Execute(sessionNode, this);
+            XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
+
+            MCommands.OpenSessionCommand.Execute(sessionVM.Session, this);
         }
 
         #endregion

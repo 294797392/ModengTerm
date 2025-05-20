@@ -557,6 +557,31 @@
                     "pid": "A592C670-3B36-495D-89CE-364691D9DFDA"
                 }
             ]
+        },
+        {
+            "id": "019B34BD-6F86-46DE-A309-307B28E45EB7",
+            "name": "会话管理",
+            "classEntry": "ModengTerm.Addons.SessionManager.SessionManagerAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "4440C395-C95B-4899-84A4-2B4ED750B4AC",
+                    "name": "打开会话",
+                    "command": "SessionManagerAddon.OpenSession",
+                    "pid": "70DCA138-F1E2-4F98-A545-CCC2008F1E0A"
+                },
+                {
+                    "id": "5D4B5A6E-EBA0-47FE-93A9-ECDF4391E49A",
+                    "name": "新建会话",
+                    "command": "SessionManagerAddon.CreateSession",
+                    "pid": "70DCA138-F1E2-4F98-A545-CCC2008F1E0A"
+                },
+                {
+                    "id": "5B7EB232-FC4E-4579-979E-7E23494B9DD1",
+                    "name": "分组管理",
+                    "command": "SessionManagerAddon.GroupManager",
+                    "pid": "70DCA138-F1E2-4F98-A545-CCC2008F1E0A"
+                }
+            ]
         }
     ],
 

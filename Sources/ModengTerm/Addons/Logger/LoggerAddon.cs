@@ -28,7 +28,7 @@ namespace ModengTerm.Addons.Logger
         {
             ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
-            window.Owner = context.CommandWindow;
+            window.Owner = context.MainWindow;
             if ((bool)window.ShowDialog())
             {
                 shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
