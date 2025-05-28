@@ -10,13 +10,13 @@ namespace ModengTerm.Addons.Logger
 {
     public class LoggerAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("LoggerAddon.StartLogger", ExecuteStartLoggerCommand);
             this.RegisterCommand("LoggerAddon.StopLogger", ExecuteStopLoggerCommand);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 

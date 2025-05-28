@@ -73,7 +73,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
         }
 
-        private void ProcessContentUnload(PanelItemVM panelItemVM)
+        private void ProcessContentUnload(PanelVM panelItemVM)
         {
             if (!(panelItemVM.ContentVM is MenuContentVM))
             {
@@ -110,9 +110,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 return;
             }
 
-            PanelVM panelVM = base.DataContext as PanelVM;
+            PanelContainerVM panelVM = base.DataContext as PanelContainerVM;
 
-            PanelItemVM selectedItem = ListBoxMenus.SelectedItem as PanelItemVM;
+            PanelVM selectedItem = ListBoxMenus.SelectedItem as PanelVM;
             if (selectedItem == null)
             {
                 panelVM.CurrentContent = null;
@@ -133,7 +133,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            PanelItemVM panelItemVM = ListBoxMenus.SelectedItem as PanelItemVM;
+            PanelVM panelItemVM = ListBoxMenus.SelectedItem as PanelVM;
 
             ListBoxMenus.SelectedItem = null;
             GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Collapsed);
@@ -144,9 +144,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            PanelItemVM selected = ListBoxMenus.SelectedItem as PanelItemVM;
+            PanelVM selected = ListBoxMenus.SelectedItem as PanelVM;
 
-            PanelItemVM clicked = (sender as ListBoxItem).DataContext as PanelItemVM;
+            PanelVM clicked = (sender as ListBoxItem).DataContext as PanelVM;
 
             if (clicked == selected)
             {

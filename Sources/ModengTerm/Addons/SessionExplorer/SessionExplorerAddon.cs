@@ -9,18 +9,18 @@ namespace ModengTerm.Addons.SessionExplorer
 {
     public class SessionExplorerAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("SessionExplorerAddon.OpenExplorerWindow", OpenExplorerWindow);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 
         private void OpenExplorerWindow(CommandEventArgs e)
         {
-            e.Manager.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
+            this.Shell.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
         }
     }
 }

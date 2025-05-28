@@ -4,17 +4,13 @@ using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal.ViewModels;
 using System;
+using WPFToolkit.MVVM;
 
 namespace ModengTerm.Addons.Edit
 {
-    public class EditAddonObject : AddonObject    
-    {
-        
-    }
-
     public class GenericEditAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("GenericEditAddon.Paste", Paste);
             this.RegisterCommand("GenericEditAddon.CopySelection", CopySelection);
@@ -24,7 +20,7 @@ namespace ModengTerm.Addons.Edit
             this.RegisterCommand("GenericEditAddon.ClearScreen", ClearScreen);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 

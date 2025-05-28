@@ -13,14 +13,14 @@ namespace ModengTerm.Addons.SessionManager
 {
     public class SessionManagerAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("SessionManagerAddon.OpenSession", this.OpenSession);
             this.RegisterCommand("SessionManagerAddon.CreateSession", this.CreateSession);
             this.RegisterCommand("SessionManagerAddon.GroupManager", this.GroupManager);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 
@@ -32,7 +32,7 @@ namespace ModengTerm.Addons.SessionManager
             if ((bool)sessionListWindow.ShowDialog())
             {
                 XTermSession session = sessionListWindow.SelectedSession;
-                e.Manager.OpenSession(session);
+                this.Shell.OpenSession(session);
             }
         }
 
@@ -57,7 +57,7 @@ namespace ModengTerm.Addons.SessionManager
             }
 
             // 打开会话
-            e.Manager.OpenSession(session);
+            this.Shell.OpenSession(session);
         }
 
         private void GroupManager(CommandEventArgs e)

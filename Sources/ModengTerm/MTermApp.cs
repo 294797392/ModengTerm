@@ -55,7 +55,7 @@ namespace ModengTerm
         public SessionTreeVM ResourceManagerTreeVM { get; private set; }
 
         /// <summary>
-        /// 所有插件实例
+        /// 激活的所有插件
         /// </summary>
         public List<AddonModule> Addons { get; private set; }
 
@@ -71,6 +71,8 @@ namespace ModengTerm
             this.LoggerManager = new LoggerManager();
             this.LoggerManager.Initialize();
 
+            this.Addons = new List<AddonModule>();
+
             VTermApp.Context.ServiceAgent = this.ServiceAgent;
             VTermApp.Context.Initialize("vtermapp.json");
 
@@ -81,7 +83,11 @@ namespace ModengTerm
             // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
             this.MainWindowVM = new MainWindowVM();
 
-            this.LoadAddons();
+            ActiveContext context = new ActiveContext()
+            {
+                Event = ActiveEvent.Startup,
+            };
+            this.ActiveAddons(context);
 
             return ResponseCode.SUCCESS;
         }
@@ -104,32 +110,6 @@ namespace ModengTerm
                 SessionGroupVM groupVM = new SessionGroupVM(parentGroup.Context, parentGroup.Level + 1, child);
                 parentGroup.Add(groupVM);
                 this.LoadSessionGroupNode(groupVM, groups);
-            }
-        }
-
-        /// <summary>
-        /// 加载所有插件
-        /// </summary>
-        private void LoadAddons()
-        {
-            this.Addons = new List<AddonModule>();
-
-            foreach (AddonDefinition definition in this.Manifest.Addons)
-            {
-                AddonModule addonBase = null;
-                try
-                {
-                    addonBase = ConfigFactory<AddonModule>.CreateInstance(definition.ClassEntry);
-                    addonBase.Initialize();
-                    addonBase.Definition = definition;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("创建插件实例异常", ex);
-                    continue;
-                }
-
-                this.Addons.Add(addonBase);
             }
         }
 
@@ -237,6 +217,33 @@ namespace ModengTerm
             }
 
             addon.RaiseCommand(e);
+        }
+
+        /// <summary>
+        /// 加载Startup事件触发的插件
+        /// </summary>
+        public void ActiveAddons(ActiveContext context)
+        {
+            List<AddonDefinition> addonDefinitions = this.Manifest.Addons.Where(v => v.Actives.Contains(ActiveEvent.Startup)).ToList();
+
+            foreach (AddonDefinition addonDefinition in addonDefinitions)
+            {
+                AddonModule addonModule = null;
+
+                try
+                {
+                    addonModule = ConfigFactory<AddonModule>.CreateInstance(addonDefinition.ClassEntry);
+                    addonModule.Active(context);
+                    addonModule.Definition = addonDefinition;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("创建插件实例异常", ex);
+                    continue;
+                }
+
+                this.Addons.Add(addonModule);
+            }
         }
 
         #endregion

@@ -1,7 +1,6 @@
-﻿using ModengTerm.Controls;
-using ModengTerm.Terminal.ViewModels;
-using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.Terminals;
+﻿using ModengTerm.Base;
+using ModengTerm.Controls;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using WPFToolkit.MVVM;
@@ -15,57 +14,57 @@ namespace ModengTerm.Addons.BroadcastInput
     {
         #region 实例变量
 
-        private ShellSessionVM shellSession;
-        private BindableCollection<SyncInputSessionVM> syncSlaves;
-        private BindableCollection<SyncInputSessionVM> selectedSlaves;
-        private MainWindowVM mainWindowVM;
+        private BindableCollection<BroadcastSessionVM> broadcastSessions;
+
+        #endregion
+
+        #region 实例变量
+
+        /// <summary>
+        /// 被删除的广播会话
+        /// </summary>
+        private List<BroadcastSessionVM> removeList;
+
+        /// <summary>
+        /// 新增加的广播会话
+        /// </summary>
+        private List<BroadcastSessionVM> addList;
+
+        #endregion
+
+        #region 属性
+
+        public AddonObjectStorage ObjectStorage { get; set; }
+
+        public string SessionId { get; set; }
 
         #endregion
 
         #region 构造方法
 
-        public BroadcastInputManagerWindow(ShellSessionVM shellSession)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="broadcastSessions"></param>
+        /// <param name="shellSessions">当前打开的所有终端类型的会话</param>
+        public BroadcastInputManagerWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellSession> shellSessions)
         {
             InitializeComponent();
 
-            this.InitializeWindow(shellSession);
+            this.InitializeWindow(broadcastSessions, shellSessions);
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeWindow(ShellSessionVM shellSession)
+        private void InitializeWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellSession> shellSessions)
         {
-            this.shellSession = shellSession;
-            this.mainWindowVM = MTermApp.Context.MainWindowVM;
-            this.syncSlaves = new BindableCollection<SyncInputSessionVM>();
-            this.selectedSlaves = new BindableCollection<SyncInputSessionVM>();
+            this.broadcastSessions = new BindableCollection<BroadcastSessionVM>();
+            this.broadcastSessions.AddRange(broadcastSessions);
 
-            foreach (ShellSessionVM session in this.mainWindowVM.ShellSessions)
-            {
-                if (session == shellSession)
-                {
-                    continue;
-                }
-
-                SyncInputSessionVM slave = new SyncInputSessionVM()
-                {
-                    ID = session.ID,
-                    Name = session.Name,
-                    Description = session.Description,
-                };
-
-                this.syncSlaves.Add(slave);
-
-                if (shellSession.SyncInputSessions.FirstOrDefault(v => v.ID == session.ID) != null)
-                {
-                    this.selectedSlaves.Add(slave);
-                }
-            }
-
-            ListBoxSlaveList.DataContext = this.syncSlaves;
-            ListBoxSelectedSlaves.DataContext = this.selectedSlaves;
+            ListBoxShellSessionList.DataContext = shellSessions;
+            ListBoxBroadcastSessions.DataContext = this.broadcastSessions;
         }
 
         #endregion
@@ -74,10 +73,20 @@ namespace ModengTerm.Addons.BroadcastInput
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            this.shellSession.SyncInputSessions.Clear();
-            foreach (SyncInputSessionVM syncSlave in this.selectedSlaves)
+            List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.Session.Id }).ToList();
+            int code = this.ObjectStorage.AddObjects<BroadcastSession>(this.SessionId, addList);
+            if (code != ResponseCode.SUCCESS)
             {
-                this.shellSession.SyncInputSessions.Add(syncSlave);
+                MTMessageBox.Error("新建广播会话失败, {0}", code);
+                return;
+            }
+
+            IEnumerable<string> removeList = this.removeList.Select(v => v.Session.Id);
+            code = this.ObjectStorage.DeleteObjects(this.SessionId, removeList);
+            if (code != ResponseCode.SUCCESS) 
+            {
+                MTMessageBox.Error("删除广播会话失败, {0}", code);
+                return;
             }
 
             base.DialogResult = true;
@@ -90,34 +99,55 @@ namespace ModengTerm.Addons.BroadcastInput
 
         private void ButtonAddSlave_Click(object sender, RoutedEventArgs e)
         {
-            SyncInputSessionVM selectedSlave = ListBoxSlaveList.SelectedItem as SyncInputSessionVM;
-            if (selectedSlave == null) 
+            BroadcastSessionVM broadcastSession = ListBoxShellSessionList.SelectedItem as BroadcastSessionVM;
+            if (broadcastSession == null)
             {
                 return;
             }
 
-            if (this.selectedSlaves.Contains(selectedSlave))
+            if (this.broadcastSessions.Contains(broadcastSession))
             {
                 return;
             }
 
-            this.selectedSlaves.Add(selectedSlave);
+            if (this.removeList.Contains(broadcastSession))
+            {
+                this.removeList.Remove(broadcastSession);
+            }
+
+            this.addList.Add(broadcastSession);
+            this.broadcastSessions.Add(broadcastSession);
         }
 
         private void ButtonRemoveSlave_Click(object sender, RoutedEventArgs e)
         {
-            SyncInputSessionVM selectedSlave = ListBoxSelectedSlaves.SelectedItem as SyncInputSessionVM;
-            if (selectedSlave == null)
+            BroadcastSessionVM broadcastSession = ListBoxShellSessionList.SelectedItem as BroadcastSessionVM;
+            if (broadcastSession == null)
             {
                 return;
             }
 
-            this.selectedSlaves.Remove(selectedSlave);
+            if (!this.broadcastSessions.Contains(broadcastSession))
+            {
+                return;
+            }
+
+            if (this.addList.Contains(broadcastSession))
+            {
+                this.addList.Remove(broadcastSession);
+            }
+
+            this.removeList.Add(broadcastSession);
+            this.broadcastSessions.Remove(broadcastSession);
         }
 
         private void MenuItemClearSelected_Click(object sender, RoutedEventArgs e)
         {
-            this.selectedSlaves.Clear();
+            this.removeList.Clear();
+            this.addList.Clear();
+
+            this.removeList.AddRange(this.broadcastSessions);
+            this.broadcastSessions.Clear();
         }
 
         #endregion

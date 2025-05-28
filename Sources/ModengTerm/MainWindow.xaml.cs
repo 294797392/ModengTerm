@@ -94,16 +94,11 @@ namespace ModengTerm
             // 会话关联的窗口里包含插件窗口
             foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
             {
-                foreach (PanelItemDefinition panelItem in addon.PanelItems)
+                foreach (PanelItemDefinition panelItem in addon.SessionPanels)
                 {
-                    if (panelItem.Owner != (int)PanelItemOwner.Session)
-                    {
-                        continue;
-                    }
-
                     if (panelItem.SessionTypes.Count > 0)
                     {
-                        if (!panelItem.SessionTypes.Contains(session.Type)) 
+                        if (!panelItem.SessionTypes.Contains(session.Type))
                         {
                             continue;
                         }
@@ -165,6 +160,24 @@ namespace ModengTerm
             {
                 this.mainWindowVM.AddToRecentSession(session);
             }
+
+            // 激活插件
+            ActiveEvent activeEvent = ActiveEvent.SshSessionOpened;
+            switch ((SessionTypeEnum)session.Type)
+            {
+                case SessionTypeEnum.SerialPort: activeEvent = ActiveEvent.SerialPortSessionOpened; break;
+                case SessionTypeEnum.Tcp: activeEvent = ActiveEvent.TcpSessionOpened; break;
+                case SessionTypeEnum.Localhost: activeEvent = ActiveEvent.LocalSessionOpened; break;
+                case SessionTypeEnum.SSH: activeEvent = ActiveEvent.SshSessionOpened; break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            ActiveContext context = new ActiveContext()
+            {
+                Event = activeEvent,
+            };
+            MTermApp.Context.ActiveAddons(context);
         }
 
         private void OpenDefaultSession()
@@ -270,7 +283,7 @@ namespace ModengTerm
 
             CommandEventArgs.Instance.OpenedSession = selectedSession as OpenedSessionVM;
             CommandEventArgs.Instance.AddonId = CommandEventArgs.BroadcastAddonId;
-            CommandEventArgs.Instance.Command = ModengTerm.Addons.SystemCommands.CMD_SELECTED_SESSION_CHANGED;
+            CommandEventArgs.Instance.Command = ModengTerm.Addons.GlobalCommands.CMD_SELECTED_SESSION_CHANGED;
             MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
         }
 

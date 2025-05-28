@@ -74,7 +74,15 @@ namespace ModengTerm.ViewModels
         /// </summary>
         public BindableCollection<AppThemeVM> Themes { get; private set; }
 
-        public PanelVM Panel { get; private set; }
+        /// <summary>
+        /// 面板容器
+        /// </summary>
+        public PanelContainerVM LeftPanelContainer { get; private set; }
+
+        /// <summary>
+        /// 右侧容器
+        /// </summary>
+        public PanelContainerVM RightPanelContainer { get; private set; }
 
         #endregion
 
@@ -155,25 +163,20 @@ namespace ModengTerm.ViewModels
 
         private void InitializePanels()
         {
-            List<PanelItemDefinition> panelItems = new List<PanelItemDefinition>();
+            //List<PanelItemDefinition> panelItems = new List<PanelItemDefinition>();
 
-            // 会话关联的窗口里包含插件窗口
-            foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
-            {
-                foreach (PanelItemDefinition panelItem in addon.PanelItems)
-                {
-                    if (panelItem.Owner != (int)PanelItemOwner.Window)
-                    {
-                        continue;
-                    }
+            //// 会话关联的窗口里包含插件窗口
+            //foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
+            //{
+            //    foreach (PanelItemDefinition panelItem in addon.SessionPanels)
+            //    {
+            //        panelItems.Add(panelItem);
+            //    }
+            //}
 
-                    panelItems.Add(panelItem);
-                }
-            }
-
-            PanelDefinition panelDefinition = new PanelDefinition();
-            panelDefinition.Items.AddRange(panelItems);
-            this.Panel = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
+            //PanelDefinition panelDefinition = new PanelDefinition();
+            //panelDefinition.Items.AddRange(panelItems);
+            //this.LeftPanelContainer = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
         }
 
         #endregion

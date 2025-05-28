@@ -10,12 +10,12 @@ namespace ModengTerm.Addons.QuickInput
 {
     public class QuickInputAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("QuickInputAddon.ShowQuickInputPanel", ExecuteShowQuickInputPanelCommand);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 

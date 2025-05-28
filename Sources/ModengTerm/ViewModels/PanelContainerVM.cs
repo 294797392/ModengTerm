@@ -6,15 +6,15 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModels
 {
-    public class PanelItemVM : MenuItemVM
+    public class PanelVM : MenuItemVM
     {
-        public PanelItemVM(MenuDefinition menuDefinition) :
+        public PanelVM(MenuDefinition menuDefinition) :
             base(menuDefinition)
         {
         }
     }
 
-    public class PanelVM : MenuVM
+    public class PanelContainerVM : MenuVM
     {
         #region 实例变量
 
@@ -44,7 +44,7 @@ namespace ModengTerm.ViewModels
 
         #region 构造方法
 
-        public PanelVM()
+        public PanelContainerVM()
         {
         }
 
@@ -52,7 +52,7 @@ namespace ModengTerm.ViewModels
 
         #region 实例方法
 
-        private void ProcessLoaded(bool loaded, PanelItemVM panelItemVM)
+        private void ProcessLoaded(bool loaded, PanelVM panelItemVM)
         {
             if (panelItemVM.ContentVM == null)
             {
@@ -82,7 +82,7 @@ namespace ModengTerm.ViewModels
 
         public void ChangeVisible(string panelItemId)
         {
-            PanelItemVM panelItemVM = this.MenuItems.FirstOrDefault(v => v.ID.ToString() == panelItemId) as PanelItemVM;
+            PanelVM panelItemVM = this.MenuItems.FirstOrDefault(v => v.ID.ToString() == panelItemId) as PanelVM;
             if (panelItemVM == null) 
             {
                 return;

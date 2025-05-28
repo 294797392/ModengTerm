@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ModengTerm.Addons.BroadcastInput;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -194,11 +195,6 @@ namespace ModengTerm.Terminal.ViewModels
         public BindableCollection<string> HistoryCommands { get; private set; }
 
         /// <summary>
-        /// 要同步输入的会话列表
-        /// </summary>
-        public BindableCollection<SyncInputSessionVM> SyncInputSessions { get; private set; }
-
-        /// <summary>
         /// 自动完成功能ViewModel
         /// </summary>
         public AutoCompletionVM AutoCompletionVM
@@ -267,8 +263,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             this.scriptItems = this.Session.GetOption<List<ScriptItem>>(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             this.HistoryCommands = new BindableCollection<string>();
-
-            this.SyncInputSessions = new BindableCollection<SyncInputSessionVM>();
 
             this.RecordStatus = RecordStatusEnum.Stop;
             this.writeEncoding = Encoding.GetEncoding(this.Session.GetOption<string>(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING));
@@ -372,7 +366,6 @@ namespace ModengTerm.Terminal.ViewModels
 
             // 释放剪贴板
             this.clipboard.Release();
-            this.SyncInputSessions.Clear();
 
             this.isRunning = false;
         }
@@ -435,20 +428,22 @@ namespace ModengTerm.Terminal.ViewModels
         /// <param name="bytes">要发送的数据</param>
         private void SendSyncInput(byte[] bytes)
         {
-            foreach (SyncInputSessionVM syncInput in this.SyncInputSessions)
-            {
-                ShellSessionVM shellSession = syncInput.ShellSessionVM;
-                if (shellSession == null)
-                {
-                    shellSession = MTermApp.Context.MainWindowVM.ShellSessions.FirstOrDefault(v => v.ID == syncInput.ID);
-                    syncInput.ShellSessionVM = shellSession;
-                }
+            // TODO：删除
 
-                if (shellSession != null && shellSession.Status == SessionStatusEnum.Connected)
-                {
-                    shellSession.PerformSend(bytes);
-                }
-            }
+            //foreach (BroadcastSessionVM syncInput in this.SyncInputSessions)
+            //{
+            //    ShellSessionVM shellSession = syncInput.ShellSessionVM;
+            //    if (shellSession == null)
+            //    {
+            //        shellSession = MTermApp.Context.MainWindowVM.ShellSessions.FirstOrDefault(v => v.ID == syncInput.ID);
+            //        syncInput.ShellSessionVM = shellSession;
+            //    }
+
+            //    if (shellSession != null && shellSession.Status == SessionStatusEnum.Connected)
+            //    {
+            //        shellSession.PerformSend(bytes);
+            //    }
+            //}
         }
 
         /// <summary>
@@ -1047,32 +1042,6 @@ namespace ModengTerm.Terminal.ViewModels
 
                 default:
                     throw new NotImplementedException();
-            }
-        }
-
-        /// <summary>
-        /// 发送到所有窗口
-        /// </summary>
-        private void SendToAll()
-        {
-            foreach (ShellSessionVM shellSession in MTermApp.Context.MainWindowVM.ShellSessions)
-            {
-                if (shellSession == this)
-                {
-                    continue;
-                }
-
-                SyncInputSessionVM syncInput = this.SyncInputSessions.FirstOrDefault(v => v.ID == shellSession.ID);
-                if (syncInput == null)
-                {
-                    syncInput = new SyncInputSessionVM()
-                    {
-                        ID = shellSession.ID,
-                        Name = shellSession.Name,
-                        Description = shellSession.Description
-                    };
-                    this.SyncInputSessions.Add(syncInput);
-                }
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Addons;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
@@ -15,7 +16,7 @@ namespace ModengTerm.ViewModels
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
-    public abstract class OpenedSessionVM : SessionItemVM
+    public abstract class OpenedSessionVM : SessionItemVM//, IAddonSession
     {
         #region 公开事件
 
@@ -85,7 +86,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 侧边栏窗口
         /// </summary>
-        public PanelVM Panel { get; private set; }
+        public PanelContainerVM Panel { get; private set; }
 
         #endregion
 
@@ -103,16 +104,16 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 在所有数据都准备好之后，Open之前调用
         /// </summary>
-        public void Initialize() 
+        public void Initialize()
         {
         }
 
         public int Open()
         {
-            // 给所有的插件页面使用的通用属性赋值
-            PanelDefinition panelDefinition = new PanelDefinition();
-            panelDefinition.Items.AddRange(this.PanelItems);
-            this.Panel = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
+            //// 给所有的插件页面使用的通用属性赋值
+            //PanelDefinition panelDefinition = new PanelDefinition();
+            //panelDefinition.Items.AddRange(this.PanelItems);
+            //this.Panel = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
             this.AddRemovePanelItemEvent(true);
             return this.OnOpen();
         }

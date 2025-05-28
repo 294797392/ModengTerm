@@ -9,18 +9,18 @@ namespace ModengTerm.Addons.SystemMonitor
 {
     public class SystemMonitorAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("SystemMonitorAddon.ShowSystemMonitorPanel", ExecuteShowSystemMonitorPanelCommand);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 
         private void ExecuteShowSystemMonitorPanelCommand(CommandEventArgs e)
         {
-            e.Manager.VisiblePanel("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
+            this.Shell.VisiblePanel("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
         }
     }
 }

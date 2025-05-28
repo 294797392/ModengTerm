@@ -58,7 +58,7 @@
             </Grid.ColumnDefinitions>
 
             <GroupBox Grid.Column="0" Header="选择会话" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
-                <ListBox x:Name="ListBoxSlaveList" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                <ListBox x:Name="ListBoxShellSessionList" ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource ResourceKey=StyleListBoxLocal}">
                     
                 </ListBox>
@@ -70,7 +70,7 @@
             </StackPanel>
             
             <GroupBox Grid.Column="2" Header="要同步发送的会话" Style="{StaticResource ResourceKey=StyleGroupBoxLocal}">
-                <ListBox x:Name="ListBoxSelectedSlaves" DataContext="{Binding ElementName=ListBoxOpenedSessions, Path=SelectedItem.Slaves}"
+                <ListBox x:Name="ListBoxBroadcastSessions" DataContext="{Binding ElementName=ListBoxOpenedSessions, Path=SelectedItem.Slaves}"
                          ItemsSource="{Binding}" SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource ResourceKey=StyleListBoxLocal}">
                     <ListBox.ContextMenu>

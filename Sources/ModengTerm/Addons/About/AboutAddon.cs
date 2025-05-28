@@ -6,12 +6,12 @@ namespace ModengTerm.Addons.About
 {
     public class AboutAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("AboutAddon.OpenAboutWindow", ExecuteOpenAboutWindowCommand);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 

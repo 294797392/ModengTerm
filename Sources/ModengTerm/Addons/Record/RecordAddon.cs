@@ -14,14 +14,14 @@ namespace ModengTerm.Addons.Record
 {
     public class RecordAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
             this.RegisterCommand("RecordAddon.StartRecord", ExecuteStartRecordCommand);
             this.RegisterCommand("RecordAddon.StopRecord", ExecuteStopRecordCommand);
             this.RegisterCommand("RecordAddon.OpenRecord", ExecuteOpenRecordCommand);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 

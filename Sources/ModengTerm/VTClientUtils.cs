@@ -13,7 +13,6 @@ namespace ModengTerm
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTClientUtils");
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -21,24 +20,23 @@ namespace ModengTerm
         /// <param name="parameters">要传递到PanelContentVM里的参数</param>
         /// <param name="matchType"></param>
         /// <returns></returns>
-        public static PanelVM PanelDefinition2PanelVM(PanelDefinition panel)
+        public static PanelContainerVM CreatePanelContainerVM(List<PanelItemDefinition> panelItemDefinitions)
         {
-            PanelVM panelVM = new PanelVM();
-            panelVM.ID = panel.ID;
-            panelVM.Name = panel.Name;
+            PanelContainerVM container = new PanelContainerVM();
 
-            foreach (PanelItemDefinition panelItem in panel.Items)
+            foreach (PanelItemDefinition definition in panelItemDefinitions)
             {
-                PanelItemVM panelItemVM = new PanelItemVM(panelItem);
-                panelItemVM.ID = panelItem.ID;
-                panelItemVM.Name = panelItem.Name;
-                panelItemVM.IconURI = panelItem.Icon;
-                panelItemVM.ClassName = panelItem.ClassName;
-                panelItemVM.VMClassName = panelItem.VMClassName;
-                panelVM.AddMenuItem(panelItemVM);
+                PanelVM panelItemVM = new PanelVM(definition);
+                panelItemVM.ID = definition.ID;
+                panelItemVM.Name = definition.Name;
+                panelItemVM.IconURI = definition.Icon;
+                panelItemVM.ClassName = definition.ClassName;
+                panelItemVM.VMClassName = definition.VMClassName;
+
+                container.AddMenuItem(panelItemVM);
             }
 
-            return panelVM;
+            return container;
         }
 
         public static List<ContextMenuVM> CreateContextMenuVMs(bool toolbarMenu)

@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModels.Terminals
+namespace ModengTerm.Addons.BroadcastInput
 {
-    public class SyncInputSessionVM : ViewModelBase
+    public class BroadcastSessionVM : ViewModelBase
     {
-        public ShellSessionVM ShellSessionVM { get; set; }
+        public IShellSession Session { get; set; }
     }
 }

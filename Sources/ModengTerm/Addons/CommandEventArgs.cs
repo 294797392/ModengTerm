@@ -1,11 +1,6 @@
 ﻿using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Terminal.ViewModels;
 using ModengTerm.ViewModels;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace ModengTerm.Addons
@@ -16,14 +11,15 @@ namespace ModengTerm.Addons
         public static readonly string BroadcastAddonId = string.Empty;
 
         /// <summary>
+        /// 事件参数
+        /// 不同的事件拥有不同类型的参数
+        /// </summary>
+        public object Argument { get; set; }
+
+        /// <summary>
         /// 发送命令的窗口
         /// </summary>
         public Window MainWindow { get { return Application.Current.MainWindow; } }
-
-        /// <summary>
-        /// 提供控制应用程序的通用接口
-        /// </summary>
-        public ApplicationManager Manager { get; private set; }
 
         /// <summary>
         /// 访问服务的代理
@@ -51,7 +47,6 @@ namespace ModengTerm.Addons
 
         public CommandEventArgs() 
         {
-            this.Manager = new ApplicationManager();
         }
     }
 }

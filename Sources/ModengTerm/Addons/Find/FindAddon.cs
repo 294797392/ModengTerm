@@ -10,13 +10,13 @@ namespace ModengTerm.Addons.Find
 {
     public class FindAddon : AddonModule
     {
-        protected override void OnInitialize()
+        protected override void OnActive(ActiveContext e)
         {
-            this.RegisterCommand(SystemCommands.CMD_SELECTED_SESSION_CHANGED, this.SelectedSessionChanged);
+            this.RegisterCommand(GlobalCommands.CMD_SELECTED_SESSION_CHANGED, this.SelectedSessionChanged);
             this.RegisterCommand("E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C", OpenFindWindowCommandHandler);
         }
 
-        protected override void OnRelease()
+        protected override void OnDeactive()
         {
         }
 
