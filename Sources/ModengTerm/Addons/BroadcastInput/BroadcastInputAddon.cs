@@ -15,11 +15,9 @@ namespace ModengTerm.Addons.BroadcastInput
 
         #region AddonModule
 
-        protected override void OnActive(ActiveContext e)
+        protected override void OnActive(ActiveContext context)
         {
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
-            this.RegisterCommand(ShellSessionCommands.CMD_USER_INPUT, this.OnUserInput);
-            this.RegisterCommand(GlobalCommands.CMD_SHELL_SESSION_OPENED, this.OnShellSessionOpened);
         }
 
         protected override void OnDeactive()
@@ -60,7 +58,7 @@ namespace ModengTerm.Addons.BroadcastInput
 
         #region 事件处理器
 
-        private void OpenBroadcastInputWindow(CommandEventArgs e)
+        private void OpenBroadcastInputWindow(CommandArgs e)
         {
             IAddonSession session = this.Shell.GetCurrentSession();
             List<IShellSession> shellSessions = this.Shell.GetSessions<IShellSession>();
@@ -80,7 +78,7 @@ namespace ModengTerm.Addons.BroadcastInput
         /// 当用户输入之后触发
         /// </summary>
         /// <param name="e"></param>
-        private void OnUserInput(CommandEventArgs e)
+        private void OnUserInput(CommandArgs e)
         {
             foreach (BroadcastSessionVM broadcastSession in this.broadcastSessions)
             {
@@ -97,7 +95,7 @@ namespace ModengTerm.Addons.BroadcastInput
             }
         }
 
-        private void OnShellSessionOpened(CommandEventArgs e)
+        private void OnShellSessionOpened(CommandArgs e)
         {
             this.LoadBroadcastList();
         }

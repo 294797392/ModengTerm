@@ -20,7 +20,7 @@ namespace ModengTerm.Addons.Logger
         {
         }
 
-        private void ExecuteStartLoggerCommand(CommandEventArgs context)
+        private void ExecuteStartLoggerCommand(CommandArgs context)
         {
             ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
@@ -31,7 +31,7 @@ namespace ModengTerm.Addons.Logger
             }
         }
 
-        private void ExecuteStopLoggerCommand(CommandEventArgs context)
+        private void ExecuteStopLoggerCommand(CommandArgs context)
         {
             ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             shellSessionVM.StopLogger();

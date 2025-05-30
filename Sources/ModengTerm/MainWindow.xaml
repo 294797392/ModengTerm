@@ -313,7 +313,7 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelUserControl DataContext="{Binding Path=Panel}"/>
+                <termuc2:PanelUserControl DataContext="{Binding Path=PanelContainer}"/>
             </Grid>
 
             <!-- 终端显示区域 -->
@@ -341,10 +341,9 @@
             </Grid>
 
             <!-- 右边窗格 -->
-            <!--<Grid Grid.Column="2">
-                <Border Background="{DynamicResource ResourceKey=RES50056E}"/>
-                <termuc2:PanelUserControl PanelVM="{Binding Path=Panels[3]}"/>
-            </Grid>-->
+            <Grid Grid.Column="2">
+                <termuc2:PanelUserControl x:Name="PanelUserControlSession" Dock="Right"/>
+            </Grid>
 
         </Grid>
 

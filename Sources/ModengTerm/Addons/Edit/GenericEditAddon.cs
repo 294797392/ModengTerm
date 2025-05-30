@@ -24,38 +24,38 @@ namespace ModengTerm.Addons.Edit
         {
         }
 
-        private void Paste(CommandEventArgs e)
+        private void Paste(CommandArgs e)
         {
             ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             string text = System.Windows.Clipboard.GetText();
             shellSessionVM.SendText(text);
         }
 
-        private void CopySelection(CommandEventArgs e)
+        private void CopySelection(CommandArgs e)
         {
             ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             shellSessionVM.CopySelection();
         }
 
-        private void SaveSelection(CommandEventArgs e)
+        private void SaveSelection(CommandArgs e)
         {
             ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             SaveToFile(ParagraphTypeEnum.Selected, shellSessionVM);
         }
 
-        private void SaveViewport(CommandEventArgs e)
+        private void SaveViewport(CommandArgs e)
         {
             ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             SaveToFile(ParagraphTypeEnum.Viewport, shellSessionVM);
         }
 
-        private void SaveAll(CommandEventArgs e)
+        private void SaveAll(CommandArgs e)
         {
             ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             SaveToFile(ParagraphTypeEnum.AllDocument, shellSessionVM);
         }
 
-        private void ClearScreen(CommandEventArgs e)
+        private void ClearScreen(CommandArgs e)
         {
             ShellSessionVM shellSessionVM = e.OpenedSession as ShellSessionVM;
             VTDocument document = shellSessionVM.VideoTerminal.ActiveDocument;

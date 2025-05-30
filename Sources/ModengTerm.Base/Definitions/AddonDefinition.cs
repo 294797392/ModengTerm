@@ -9,26 +9,6 @@ using System.Windows.Media.Animation;
 namespace ModengTerm.Base.Definitions
 {
     /// <summary>
-    /// 定义可以激活插件的所有事件
-    /// </summary>
-    public enum ActiveEvent
-    {
-        /// <summary>
-        /// 应用程序初始化之后触发
-        /// </summary>
-        Startup,
-
-        /// <summary>
-        /// 打开会话之后触发
-        /// SessionOpenedArgument
-        /// </summary>
-        SshSessionOpened,
-        LocalSessionOpened,
-        SerialPortSessionOpened,
-        TcpSessionOpened
-    }
-
-    /// <summary>
     /// 定义一个插件的所有内容
     /// </summary>
     public class AddonDefinition
@@ -50,11 +30,6 @@ namespace ModengTerm.Base.Definitions
         /// </summary>
         [JsonProperty("classEntry")]
         public string ClassEntry { get; set; }
-
-        /// <summary>
-        /// 初始化插件的事件
-        /// </summary>
-        public List<ActiveEvent> Actives { get; set; }
 
         /// <summary>
         /// 顶部菜单

@@ -57,7 +57,7 @@ namespace ModengTerm
         /// <summary>
         /// 激活的所有插件
         /// </summary>
-        public List<AddonModule> Addons { get; private set; }
+        public List<AddonContext> AddonContexts { get; private set; }
 
         #endregion
 
@@ -71,7 +71,8 @@ namespace ModengTerm
             this.LoggerManager = new LoggerManager();
             this.LoggerManager.Initialize();
 
-            this.Addons = new List<AddonModule>();
+            this.AddonContexts = new List<AddonContext>();
+            this.InitializeAddonList();
 
             VTermApp.Context.ServiceAgent = this.ServiceAgent;
             VTermApp.Context.Initialize("vtermapp.json");
@@ -82,12 +83,6 @@ namespace ModengTerm
 
             // 在最后初始化ViewModel，因为ViewModel里可能会用到ServiceAgent
             this.MainWindowVM = new MainWindowVM();
-
-            ActiveContext context = new ActiveContext()
-            {
-                Event = ActiveEvent.Startup,
-            };
-            this.ActiveAddons(context);
 
             return ResponseCode.SUCCESS;
         }
@@ -196,59 +191,43 @@ namespace ModengTerm
         /// </summary>
         /// <param name="addonId">插件Id</param>
         /// <param name="command">命令Id</param>
-        public void RaiseAddonCommand(CommandEventArgs e)
+        public void RaiseAddonCommand(CommandArgs e)
         {
-            if (e.AddonId == CommandEventArgs.BroadcastAddonId)
+            if (string.IsNullOrEmpty(e.AddonId))
             {
-                // 广播命令
-
-                foreach (AddonModule addon1 in this.Addons)
+                foreach (AddonContext context in this.AddonContexts)
                 {
-                    addon1.RaiseCommand(e);
+                    context.RaiseCommand(e);
                 }
-
-                return;
             }
-
-            AddonModule addon = this.Addons.FirstOrDefault(v => v.ID == e.AddonId);
-            if (addon == null)
+            else
             {
-                return;
-            }
-
-            addon.RaiseCommand(e);
-        }
-
-        /// <summary>
-        /// 加载Startup事件触发的插件
-        /// </summary>
-        public void ActiveAddons(ActiveContext context)
-        {
-            List<AddonDefinition> addonDefinitions = this.Manifest.Addons.Where(v => v.Actives.Contains(ActiveEvent.Startup)).ToList();
-
-            foreach (AddonDefinition addonDefinition in addonDefinitions)
-            {
-                AddonModule addonModule = null;
-
-                try
+                AddonContext context = this.AddonContexts.FirstOrDefault(v => v.Id == e.AddonId);
+                if (context == null) 
                 {
-                    addonModule = ConfigFactory<AddonModule>.CreateInstance(addonDefinition.ClassEntry);
-                    addonModule.Active(context);
-                    addonModule.Definition = addonDefinition;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("创建插件实例异常", ex);
-                    continue;
+                    logger.ErrorFormat("没有找到对应的插件, {0}", e.AddonId);
+                    return;
                 }
 
-                this.Addons.Add(addonModule);
+                context.RaiseCommand(e);
             }
         }
 
         #endregion
 
         #region 实例方法
+
+        private void InitializeAddonList() 
+        {
+            foreach (AddonDefinition definition in this.Manifest.Addons)
+            {
+                AddonContext context = new AddonContext(definition);
+
+                context.Active();
+
+                this.AddonContexts.Add(context);
+            }
+        }
 
         //private void ProcessFrame(int elapsed, IFramedElement element)
         //{

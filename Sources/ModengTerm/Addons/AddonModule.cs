@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ModengTerm.Addons
 {
-    public delegate void CommandHandlerDelegate(CommandEventArgs e);
+    public delegate void CommandHandlerDelegate(CommandArgs e);
 
     /// <summary>
     /// 插件生命周期管理
@@ -61,15 +61,15 @@ namespace ModengTerm.Addons
             this.registerCommands.Clear();
         }
 
-        public void RaiseCommand(CommandEventArgs context)
+        public void RaiseCommand(CommandArgs e)
         {
             CommandHandlerDelegate handler;
-            if (!this.registerCommands.TryGetValue(context.Command, out handler))
+            if (!this.registerCommands.TryGetValue(e.Command, out handler))
             {
                 return;
             }
 
-            handler(context);
+            handler(e);
         }
 
         #endregion
@@ -108,21 +108,6 @@ namespace ModengTerm.Addons
         #endregion
 
         #region 实例方法
-
-        private void InitializeGlobalPanels() 
-        {
-            foreach (PanelItemDefinition definition in this.Definition.GlobalPanels)
-            {
-                PanelVM panelVM = new PanelVM(definition);
-                panelVM.ID = definition.ID;
-                panelVM.Name = definition.Name;
-                panelVM.IconURI = definition.Icon;
-                panelVM.ClassName = definition.ClassName;
-                panelVM.VMClassName = definition.VMClassName;
-
-                this.Shell.AddPanel(panelVM);
-            }
-        }
 
         #endregion
     }

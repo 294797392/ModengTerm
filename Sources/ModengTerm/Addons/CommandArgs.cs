@@ -5,10 +5,9 @@ using System.Windows;
 
 namespace ModengTerm.Addons
 {
-    public class CommandEventArgs
+    public class CommandArgs
     {
-        public static readonly CommandEventArgs Instance = new CommandEventArgs();
-        public static readonly string BroadcastAddonId = string.Empty;
+        public static readonly CommandArgs Instance = new CommandArgs();
 
         /// <summary>
         /// 事件参数
@@ -35,17 +34,17 @@ namespace ModengTerm.Addons
         public OpenedSessionVM OpenedSession { get; set; }
 
         /// <summary>
-        /// 执行命令的插件
-        /// 如果是广播命令，则为string.Empty
-        /// </summary>
-        public string AddonId { get; set; }
-
-        /// <summary>
         /// 要执行的命令
         /// </summary>
         public string Command { get; set; }
 
-        public CommandEventArgs() 
+        /// <summary>
+        /// 触发命令的插件Id
+        /// 如果为空，则说明是AddonCommand
+        /// </summary>
+        public string AddonId { get; set; }
+
+        public CommandArgs() 
         {
         }
     }

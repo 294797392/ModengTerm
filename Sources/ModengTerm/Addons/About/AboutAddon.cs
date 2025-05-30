@@ -6,7 +6,7 @@ namespace ModengTerm.Addons.About
 {
     public class AboutAddon : AddonModule
     {
-        protected override void OnActive(ActiveContext e)
+        protected override void OnActive(ActiveContext context)
         {
             this.RegisterCommand("AboutAddon.OpenAboutWindow", ExecuteOpenAboutWindowCommand);
         }
@@ -15,7 +15,7 @@ namespace ModengTerm.Addons.About
         {
         }
 
-        private void ExecuteOpenAboutWindowCommand(CommandEventArgs context)
+        private void ExecuteOpenAboutWindowCommand(CommandArgs context)
         {
             AboutWindow aboutWindow = new AboutWindow();
             aboutWindow.Owner = Application.Current.MainWindow;

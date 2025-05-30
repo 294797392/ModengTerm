@@ -24,7 +24,7 @@ namespace ModengTerm.Addons.SessionManager
         {
         }
 
-        private void OpenSession(CommandEventArgs e)
+        private void OpenSession(CommandArgs e)
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
             sessionListWindow.Owner = e.MainWindow;
@@ -36,7 +36,7 @@ namespace ModengTerm.Addons.SessionManager
             }
         }
 
-        private void CreateSession(CommandEventArgs e)
+        private void CreateSession(CommandArgs e)
         {
             CreateSessionWindow window = new CreateSessionWindow();
             window.Owner = e.MainWindow;
@@ -60,7 +60,7 @@ namespace ModengTerm.Addons.SessionManager
             this.Shell.OpenSession(session);
         }
 
-        private void GroupManager(CommandEventArgs e)
+        private void GroupManager(CommandArgs e)
         {
             GroupManagerWindow window = new GroupManagerWindow();
             window.Owner = e.MainWindow;

@@ -100,10 +100,10 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            CommandEventArgs.Instance.AddonId = contextMenu.AddonId;
-            CommandEventArgs.Instance.Command = contextMenu.Command;
-            CommandEventArgs.Instance.OpenedSession = this.shellSession;
-            MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
+            CommandArgs.Instance.AddonId = contextMenu.AddonId;
+            CommandArgs.Instance.Command = contextMenu.Command;
+            CommandArgs.Instance.OpenedSession = this.shellSession;
+            MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)

@@ -53,35 +53,25 @@
         </Grid.RowDefinitions>
 
         <!-- 显示终端内容区域 -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Grid Grid.Column="0" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
+        <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
                   MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown"
                   LostFocus="GridDocument_LostFocus" GotFocus="GridDocument_GotFocus">
-                <Grid.ContextMenu>
-                    <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
+            <Grid.ContextMenu>
+                <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
                                  Visibility="{Binding Path=ContextMenuVisibility}" Style="{StaticResource ResourceKey=StyleContextMenu}">
-                        <ContextMenu.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                                <TextBlock Text="{Binding Path=Name}"/>
-                            </HierarchicalDataTemplate>
-                        </ContextMenu.ItemTemplate>
-                    </ContextMenu>
-                </Grid.ContextMenu>
+                    <ContextMenu.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                            <TextBlock Text="{Binding Path=Name}"/>
+                        </HierarchicalDataTemplate>
+                    </ContextMenu.ItemTemplate>
+                </ContextMenu>
+            </Grid.ContextMenu>
 
-                <Border x:Name="BorderBackground"/>
-                <Image x:Name="ImageBackground" Stretch="Fill"/>
+            <Border x:Name="BorderBackground"/>
+            <Image x:Name="ImageBackground" Stretch="Fill"/>
 
-                <muct:DocumentControl x:Name="DocumentAlternate"/>
-                <muct:DocumentControl x:Name="DocumentMain"/>
-            </Grid>
-
-            <termuc2:PanelUserControl Grid.Column="1" DataContext="{Binding Path=Panel}" Dock="Right"/>
-
+            <muct:DocumentControl x:Name="DocumentAlternate"/>
+            <muct:DocumentControl x:Name="DocumentMain"/>
         </Grid>
 
         <!-- 输入栏 -->

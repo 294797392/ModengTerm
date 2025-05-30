@@ -87,30 +87,6 @@ namespace ModengTerm
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
         }
 
-        private List<PanelItemDefinition> CreateSessionPanelItems(XTermSession session)
-        {
-            List<PanelItemDefinition> panelItems = new List<PanelItemDefinition>();
-
-            // 会话关联的窗口里包含插件窗口
-            foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
-            {
-                foreach (PanelItemDefinition panelItem in addon.SessionPanels)
-                {
-                    if (panelItem.SessionTypes.Count > 0)
-                    {
-                        if (!panelItem.SessionTypes.Contains(session.Type))
-                        {
-                            continue;
-                        }
-                    }
-
-                    panelItems.Add(panelItem);
-                }
-            }
-
-            return panelItems;
-        }
-
         private void ShowSessionListWindow()
         {
             SessionListWindow sessionListWindow = new SessionListWindow();
@@ -139,7 +115,6 @@ namespace ModengTerm
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.ServiceAgent = MTermApp.Context.ServiceAgent;
-            openedSessionVM.PanelItems = this.CreateSessionPanelItems(session);
             openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
@@ -160,24 +135,6 @@ namespace ModengTerm
             {
                 this.mainWindowVM.AddToRecentSession(session);
             }
-
-            // 激活插件
-            ActiveEvent activeEvent = ActiveEvent.SshSessionOpened;
-            switch ((SessionTypeEnum)session.Type)
-            {
-                case SessionTypeEnum.SerialPort: activeEvent = ActiveEvent.SerialPortSessionOpened; break;
-                case SessionTypeEnum.Tcp: activeEvent = ActiveEvent.TcpSessionOpened; break;
-                case SessionTypeEnum.Localhost: activeEvent = ActiveEvent.LocalSessionOpened; break;
-                case SessionTypeEnum.SSH: activeEvent = ActiveEvent.SshSessionOpened; break;
-                default:
-                    throw new NotImplementedException();
-            }
-
-            ActiveContext context = new ActiveContext()
-            {
-                Event = activeEvent,
-            };
-            MTermApp.Context.ActiveAddons(context);
         }
 
         private void OpenDefaultSession()
@@ -250,11 +207,15 @@ namespace ModengTerm
                     // 如果当前没有任何一个打开的Session，那么重置选中状态，以便于下次可以继续触发SelectionChanged事件
                     ListBoxOpenedSession.SelectedItem = null;
                 }
+
+                PanelUserControlSession.DataContext = null;
             }
             else
             {
                 OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
                 ContentControlSession.Content = openedSessionVM.Content;
+
+                PanelUserControlSession.DataContext = openedSessionVM.PanelContainer;
             }
 
             #region 触发OpenedSessionVM的OnLoaded或OnUnload事件
@@ -281,10 +242,10 @@ namespace ModengTerm
 
             #endregion
 
-            CommandEventArgs.Instance.OpenedSession = selectedSession as OpenedSessionVM;
-            CommandEventArgs.Instance.AddonId = CommandEventArgs.BroadcastAddonId;
-            CommandEventArgs.Instance.Command = ModengTerm.Addons.GlobalCommands.CMD_SELECTED_SESSION_CHANGED;
-            MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
+            CommandArgs.Instance.OpenedSession = selectedSession as OpenedSessionVM;
+            CommandArgs.Instance.AddonId = string.Empty;
+            CommandArgs.Instance.Command = AddonCommands.CMD_SELECTED_SESSION_CHANGED;
+            MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -359,10 +320,10 @@ namespace ModengTerm
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
-            CommandEventArgs.Instance.OpenedSession = openedSessionVM;
-            CommandEventArgs.Instance.AddonId = contextMenu.AddonId;
-            CommandEventArgs.Instance.Command = contextMenu.Command;
-            MTermApp.Context.RaiseAddonCommand(CommandEventArgs.Instance);
+            CommandArgs.Instance.OpenedSession = openedSessionVM;
+            CommandArgs.Instance.AddonId = contextMenu.AddonId;
+            CommandArgs.Instance.Command = contextMenu.Command;
+            MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
         }
 
 

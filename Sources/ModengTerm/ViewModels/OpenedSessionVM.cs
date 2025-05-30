@@ -42,11 +42,6 @@ namespace ModengTerm.ViewModels
         public ServiceAgent ServiceAgent { get; set; }
 
         /// <summary>
-        /// 该会话的侧边栏窗口
-        /// </summary>
-        public List<PanelItemDefinition> PanelItems { get; set; }
-
-        /// <summary>
         /// 界面上的控件
         /// </summary>
         public DependencyObject Content
@@ -86,7 +81,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 侧边栏窗口
         /// </summary>
-        public PanelContainerVM Panel { get; private set; }
+        public PanelContainerVM PanelContainer { get; private set; }
 
         #endregion
 
@@ -102,19 +97,17 @@ namespace ModengTerm.ViewModels
         #region 公开接口
 
         /// <summary>
-        /// 在所有数据都准备好之后，Open之前调用
+        /// 在所有属性都赋值之后，Open之前调用
         /// </summary>
         public void Initialize()
         {
+            this.InitializePanels();
+            this.AddRemovePanelItemEvent(true);
         }
 
         public int Open()
         {
-            //// 给所有的插件页面使用的通用属性赋值
-            //PanelDefinition panelDefinition = new PanelDefinition();
-            //panelDefinition.Items.AddRange(this.PanelItems);
-            //this.Panel = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
-            this.AddRemovePanelItemEvent(true);
+            // 创建面板容器
             return this.OnOpen();
         }
 
@@ -175,7 +168,7 @@ namespace ModengTerm.ViewModels
             this.Status = status;
 
             // 通知所有PanelContent，会话状态改变了
-            IEnumerable<SessionPanelContentVM> panelContents = this.Panel.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();
+            IEnumerable<SessionPanelContentVM> panelContents = this.PanelContainer.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();
             foreach (SessionPanelContentVM panelContent in panelContents)
             {
                 panelContent.OnSessionStatusChanged(status);
@@ -192,12 +185,12 @@ namespace ModengTerm.ViewModels
         /// <returns></returns>
         private SessionPanelContentVM GetActivePanelContent()
         {
-            if (this.Panel == null)
+            if (this.PanelContainer == null)
             {
                 return null;
             }
 
-            MenuItemVM selectedItem = this.Panel.SelectedMenu;
+            MenuItemVM selectedItem = this.PanelContainer.SelectedMenu;
             if (selectedItem == null)
             {
                 return null;
@@ -212,10 +205,11 @@ namespace ModengTerm.ViewModels
         /// <param name="add"></param>
         private void AddRemovePanelItemEvent(bool add)
         {
-            foreach (MenuItemVM menuItem in this.Panel.MenuItems)
+            foreach (MenuItemVM menuItem in this.PanelContainer.MenuItems)
             {
                 if (add)
                 {
+                    // 注册这个事件的目的是为了把OpenedSessionVM的实例传递给SessionPanelContentVM
                     menuItem.ContentInitializing += PanelItem_ContentInitializing;
                 }
                 else
@@ -223,6 +217,37 @@ namespace ModengTerm.ViewModels
                     menuItem.ContentInitializing -= PanelItem_ContentInitializing;
                 }
             }
+        }
+
+        private void InitializePanels()
+        {
+            // 加载所有插件要显示的面板
+            List<AddonContext> contexts = MTermApp.Context.AddonContexts;
+
+            List<PanelItemDefinition> panels = new List<PanelItemDefinition>();
+
+            foreach (AddonContext context in contexts)
+            {
+                AddonDefinition definition = context.Definition;
+
+                foreach (PanelItemDefinition panelDefinition in definition.SessionPanels)
+                {
+                    if (panelDefinition.SessionTypes.Count == 0)
+                    {
+                        // 如果没有过滤，那么就都可以加载
+                        panels.Add(panelDefinition);
+                    }
+                    else
+                    {
+                        if (panelDefinition.SessionTypes.Contains(this.Session.Type))
+                        {
+                            panels.Add(panelDefinition);
+                        }
+                    }
+                }
+            }
+
+            this.PanelContainer = VTClientUtils.CreatePanelContainerVM(panels);
         }
 
         #endregion

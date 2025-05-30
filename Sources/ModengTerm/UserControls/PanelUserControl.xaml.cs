@@ -1,6 +1,7 @@
 ﻿using ModengTerm.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interactivity;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls.TerminalUserControls
@@ -42,20 +43,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
         }
 
-        #region 依赖属性
-
-        //public PanelVM PanelVM
-        //{
-        //    get { return (PanelVM)GetValue(PanelVMProperty); }
-        //    set { SetValue(PanelVMProperty, value); }
-        //}
-
-        //// Using a DependencyProperty as the backing store for PanelVM.  This enables animation, styling, binding, etc...
-        //public static readonly DependencyProperty PanelVMProperty =
-        //    DependencyProperty.Register("PanelVM", typeof(PanelVM), typeof(PanelUserControl), new PropertyMetadata(null, PanelVMPropertyChangedCallback));
-
-        #endregion
-
         #region 构造方法
 
         public PanelUserControl()
@@ -86,21 +73,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #endregion
 
-        #region 依赖属性回调
-
-        //private void OnPanelVMPropertyChanged(PanelVM oldValue, PanelVM newValue)
-        //{
-        //    ListBoxMenus.DataContext = newValue;
-        //}
-
-        //private static void PanelVMPropertyChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    PanelUserControl me = d as PanelUserControl;
-        //    me.OnPanelVMPropertyChanged(e.OldValue as PanelVM, e.NewValue as PanelVM);
-        //}
-
-        #endregion
-
         #region 事件处理器
 
         private void ListBoxMenus_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -115,6 +87,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             PanelVM selectedItem = ListBoxMenus.SelectedItem as PanelVM;
             if (selectedItem == null)
             {
+                GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
                 panelVM.CurrentContent = null;
                 return;
             }
@@ -128,7 +101,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
             ContentControl1.Content = dependencyObject;
             TextBlockTitle.Text = selectedItem.Name;
-            GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Visible);
+
+            GridContent.SetValue(Grid.VisibilityProperty, Visibility.Visible);
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
@@ -136,7 +110,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             PanelVM panelItemVM = ListBoxMenus.SelectedItem as PanelVM;
 
             ListBoxMenus.SelectedItem = null;
-            GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Collapsed);
+            GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
 
             // 点击关闭按钮手动触发Unload事件
             this.ProcessContentUnload(panelItemVM);
@@ -151,7 +125,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             if (clicked == selected)
             {
                 // 收回
-                GridContent.SetCurrentValue(Grid.VisibilityProperty, Visibility.Collapsed);
+                GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
                 ListBoxMenus.SelectedItem = null;
 
                 this.ProcessContentUnload(clicked);

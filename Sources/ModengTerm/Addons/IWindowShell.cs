@@ -39,7 +39,7 @@ namespace ModengTerm.Addons
         /// <param name="panelId">要显示或隐藏的PanelId</param>
         public void VisiblePanel(string panelId)
         {
-            MTermApp.Context.MainWindowVM.LeftPanelContainer.ChangeVisible(panelId);
+            MTermApp.Context.MainWindowVM.PanelContainer.ChangeVisible(panelId);
         }
 
         /// <summary>

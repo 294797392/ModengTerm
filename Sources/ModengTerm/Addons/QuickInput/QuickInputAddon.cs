@@ -19,10 +19,10 @@ namespace ModengTerm.Addons.QuickInput
         {
         }
 
-        private void ExecuteShowQuickInputPanelCommand(CommandEventArgs context)
+        private void ExecuteShowQuickInputPanelCommand(CommandArgs context)
         {
             ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
-            shellSessionVM.Panel.ChangeVisible("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
+            shellSessionVM.PanelContainer.ChangeVisible("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
         }
     }
 }

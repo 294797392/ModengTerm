@@ -325,7 +325,7 @@
                     "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D"
                 }
             ],
-            "panelItems": [
+            "globalPanels": [
                 {
                     "id": "BF1AD31C-0E00-495D-9C19-7687D708B71F",
                     "name": "资源管理器",
@@ -445,7 +445,7 @@
                     "command": "QuickInputAddon.ShowQuickInputPanel"
                 }
             ],
-            "panelItems": [
+            "sessionPanels": [
                 {
                     "id": "0C1F6D60-F6ED-4D01-B5B6-1812EA55286A",
                     "name": "快速输入",
@@ -468,7 +468,7 @@
                     "command": "SystemMonitorAddon.ShowSystemMonitorPanel"
                 }
             ],
-            "panelItems": [
+            "sessionPanels": [
                 {
                     "id": "A86C3967-8CDC-4D0E-8CB6-010364CFCC23",
                     "name": "系统监控",
@@ -481,7 +481,7 @@
         },
         {
             "id": "95C4E0E4-68B7-4643-9A41-3548F62FD615",
-            "name": "同步输入",
+            "name": "广播输入",
             "classEntry": "ModengTerm.Addons.BroadcastInput.BroadcastInputAddon, ModengTerm",
             "toolbarMenus": [
                 {

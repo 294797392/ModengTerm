@@ -12,7 +12,7 @@ namespace ModengTerm.Addons.Find
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.RegisterCommand(GlobalCommands.CMD_SELECTED_SESSION_CHANGED, this.SelectedSessionChanged);
+            this.RegisterCommand(AddonCommands.CMD_SELECTED_SESSION_CHANGED, this.SelectedSessionChanged);
             this.RegisterCommand("E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C", OpenFindWindowCommandHandler);
         }
 
@@ -20,7 +20,7 @@ namespace ModengTerm.Addons.Find
         {
         }
 
-        private void SelectedSessionChanged(CommandEventArgs e)
+        private void SelectedSessionChanged(CommandArgs e)
         {
             // 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话
 
@@ -35,7 +35,7 @@ namespace ModengTerm.Addons.Find
             }
         }
 
-        private void OpenFindWindowCommandHandler(CommandEventArgs context)
+        private void OpenFindWindowCommandHandler(CommandArgs context)
         {
             ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             if (shellSessionVM == null)

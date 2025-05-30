@@ -77,12 +77,7 @@ namespace ModengTerm.ViewModels
         /// <summary>
         /// 面板容器
         /// </summary>
-        public PanelContainerVM LeftPanelContainer { get; private set; }
-
-        /// <summary>
-        /// 右侧容器
-        /// </summary>
-        public PanelContainerVM RightPanelContainer { get; private set; }
+        public PanelContainerVM PanelContainer { get; private set; }
 
         #endregion
 
@@ -163,20 +158,19 @@ namespace ModengTerm.ViewModels
 
         private void InitializePanels()
         {
-            //List<PanelItemDefinition> panelItems = new List<PanelItemDefinition>();
+            // 加载所有插件要显示的面板
+            List<AddonContext> contexts = MTermApp.Context.AddonContexts;
 
-            //// 会话关联的窗口里包含插件窗口
-            //foreach (AddonDefinition addon in MTermApp.Context.Manifest.Addons)
-            //{
-            //    foreach (PanelItemDefinition panelItem in addon.SessionPanels)
-            //    {
-            //        panelItems.Add(panelItem);
-            //    }
-            //}
+            List<PanelItemDefinition> panels = new List<PanelItemDefinition>();
 
-            //PanelDefinition panelDefinition = new PanelDefinition();
-            //panelDefinition.Items.AddRange(panelItems);
-            //this.LeftPanelContainer = VTClientUtils.PanelDefinition2PanelVM(panelDefinition);
+            foreach (AddonContext context in contexts)
+            {
+                AddonDefinition definition = context.Definition;
+
+                panels.AddRange(definition.GlobalPanels);
+            }
+
+            this.PanelContainer = VTClientUtils.CreatePanelContainerVM(panels);
         }
 
         #endregion

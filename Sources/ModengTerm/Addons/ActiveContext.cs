@@ -12,20 +12,6 @@ namespace ModengTerm.Addons
     /// </summary>
     public class ActiveContext
     {
-        /// <summary>
-        /// 激活该插件的事件
-        /// </summary>
-        public ActiveEvent Event { get; set; }
-
-        /// <summary>
-        /// 事件所带的参数
-        /// 不同的ActiveEvent所携带的参数也不同
-        /// </summary>
-        public ActiveArgument Argument { get; set; }
-    }
-
-    public abstract class ActiveArgument
-    {
-
+        public static readonly ActiveContext Default = new ActiveContext();
     }
 }
