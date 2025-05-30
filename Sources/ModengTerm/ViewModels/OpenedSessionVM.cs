@@ -16,7 +16,7 @@ namespace ModengTerm.ViewModels
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
-    public abstract class OpenedSessionVM : SessionItemVM//, IAddonSession
+    public abstract class OpenedSessionVM : SessionItemVM, IAddonSession
     {
         #region 公开事件
 
@@ -35,6 +35,8 @@ namespace ModengTerm.ViewModels
         #endregion
 
         #region 属性
+
+        public string Id { get; private set; }
 
         /// <summary>
         /// 访问服务的代理
@@ -90,6 +92,7 @@ namespace ModengTerm.ViewModels
         public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
+            this.Id = session.ID;
         }
 
         #endregion
@@ -140,6 +143,15 @@ namespace ModengTerm.ViewModels
             {
                 panelContent.OnUnload();
             }
+        }
+
+        #endregion
+
+        #region IAddonSession
+
+        public void VisiblePanel(string panelId) 
+        {
+            this.PanelContainer.ChangeVisible(panelId);
         }
 
         #endregion

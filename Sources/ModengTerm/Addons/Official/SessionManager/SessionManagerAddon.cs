@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Windows;
 using System;
@@ -31,8 +32,9 @@ namespace ModengTerm.Addons.SessionManager
             sessionListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if ((bool)sessionListWindow.ShowDialog())
             {
+                AbstractShell shell = ShellFactory.GetShell();
                 XTermSession session = sessionListWindow.SelectedSession;
-                this.Shell.OpenSession(session);
+                shell.OpenSession(session);
             }
         }
 
@@ -57,7 +59,8 @@ namespace ModengTerm.Addons.SessionManager
             }
 
             // 打开会话
-            this.Shell.OpenSession(session);
+            AbstractShell shell = ShellFactory.GetShell();
+            shell.OpenSession(session);
         }
 
         private void GroupManager(CommandArgs e)

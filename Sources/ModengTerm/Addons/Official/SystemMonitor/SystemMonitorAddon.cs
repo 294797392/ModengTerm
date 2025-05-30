@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,8 @@ namespace ModengTerm.Addons.SystemMonitor
 
         private void ExecuteShowSystemMonitorPanelCommand(CommandArgs e)
         {
-            this.Shell.VisiblePanel("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
+            AbstractShell shell = ShellFactory.GetShell();
+            shell.VisiblePanel("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
         }
     }
 }

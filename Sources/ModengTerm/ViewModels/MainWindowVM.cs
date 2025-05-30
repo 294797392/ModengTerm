@@ -59,8 +59,11 @@ namespace ModengTerm.ViewModels
             get { return this.SessionList.SelectedItem; }
             set
             {
-                this.SessionList.SelectedItem = value;
-                this.NotifyPropertyChanged("SelectedSession");
+                if (this.SessionList.SelectedItem != value)
+                {
+                    this.SessionList.SelectedItem = value;
+                    this.NotifyPropertyChanged("SelectedSession");
+                }
             }
         }
 

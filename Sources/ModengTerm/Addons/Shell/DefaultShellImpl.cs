@@ -10,59 +10,42 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace ModengTerm.Addons
+namespace ModengTerm.Addons.Shell
 {
-    /// <summary>
-    /// 封装对界面的操作
-    /// </summary>
-    public class IWindowShell
+    public class DefaultShellImpl : AbstractShell
     {
         private Window window;
 
-        public IWindowShell()
+        public DefaultShellImpl()
         {
-            this.window = Application.Current.MainWindow;
+            window = Application.Current.MainWindow;
         }
 
         /// <summary>
         /// 打开会话
         /// </summary>
         /// <param name="session"></param>
-        public void OpenSession(XTermSession session)
+        public override void OpenSession(XTermSession session)
         {
-            MCommands.OpenSessionCommand.Execute(session, this.window);
+            MCommands.OpenSessionCommand.Execute(session, window);
         }
 
         /// <summary>
         /// 显示或隐藏Panel
         /// </summary>
         /// <param name="panelId">要显示或隐藏的PanelId</param>
-        public void VisiblePanel(string panelId)
+        public override void VisiblePanel(string panelId)
         {
             MTermApp.Context.MainWindowVM.PanelContainer.ChangeVisible(panelId);
-        }
-
-        /// <summary>
-        /// 新增一个Panel
-        /// </summary>
-        /// <param name="panelDefinition"></param>
-        public void AddPanel(PanelVM panel)
-        {
-
-        }
-
-        public void RemovePanel(string panelId)
-        {
-
         }
 
         /// <summary>
         /// 获取当前显示的会话
         /// </summary>
         /// <returns></returns>
-        public IAddonSession GetCurrentSession()
+        public override IAddonSession GetCurrentSession()
         {
-            throw new NotImplementedException();
+            return MTermApp.Context.MainWindowVM.SelectedSession as IAddonSession;
         }
 
         /// <summary>
@@ -70,9 +53,9 @@ namespace ModengTerm.Addons
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public List<T> GetSessions<T>() where T : IAddonSession
+        public override List<T> GetSessions<T>()
         {
-            throw new NotImplementedException();
+            return MTermApp.Context.MainWindowVM.SessionList.OfType<T>().ToList();
         }
     }
 }

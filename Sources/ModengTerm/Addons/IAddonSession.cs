@@ -17,17 +17,19 @@ namespace ModengTerm.Addons
         /// <summary>
         /// 会话Id
         /// </summary>
-        string Id { get; set; }
+        string Id { get; }
 
         /// <summary>
         /// 会话名字
         /// </summary>
-        string Name { get; set; }
+        string Name { get; }
 
         /// <summary>
         /// 会话状态
         /// </summary>
         SessionStatusEnum Status { get; }
+
+        void VisiblePanel(string panelId);
     }
 
     public interface IShellSession : IAddonSession

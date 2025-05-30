@@ -34,11 +34,6 @@ namespace ModengTerm.Addons
 
         public AddonObjectStorage ObjectStorage { get; set; }
 
-        /// <summary>
-        /// 提供控制主窗口的接口
-        /// </summary>
-        public IWindowShell Shell { get; private set; }
-
         #endregion
 
         #region Internal

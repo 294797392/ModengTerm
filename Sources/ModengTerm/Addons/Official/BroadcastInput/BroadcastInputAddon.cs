@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Base.Enumerations;
 using System.Collections.Generic;
 using System.Linq;
 using WPFToolkit.MVVM;
@@ -18,6 +19,7 @@ namespace ModengTerm.Addons.BroadcastInput
         protected override void OnActive(ActiveContext context)
         {
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
+            this.RegisterCommand(AddonCommands.TERM_SESSION_OPENED, this.OnShellSessionOpened);
         }
 
         protected override void OnDeactive()
@@ -32,9 +34,10 @@ namespace ModengTerm.Addons.BroadcastInput
         {
             this.broadcastSessions.Clear();
 
-            IAddonSession session = this.Shell.GetCurrentSession();
+            AbstractShell shell = ShellFactory.GetShell();
+            IAddonSession session = shell.GetCurrentSession();
             List<BroadcastSession> broadcastSessions = this.ObjectStorage.GetObjects<BroadcastSession>(session.Id);
-            List<IShellSession> shellSessions = this.Shell.GetSessions<IShellSession>();
+            List<IShellSession> shellSessions = shell.GetSessions<IShellSession>();
 
             foreach (IShellSession shellSession in shellSessions)
             {
@@ -60,8 +63,9 @@ namespace ModengTerm.Addons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            IAddonSession session = this.Shell.GetCurrentSession();
-            List<IShellSession> shellSessions = this.Shell.GetSessions<IShellSession>();
+            AbstractShell shell = ShellFactory.GetShell();
+            IAddonSession session = shell.GetCurrentSession();
+            List<IShellSession> shellSessions = shell.GetSessions<IShellSession>();
             List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
 
             BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, shellSessions);

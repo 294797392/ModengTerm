@@ -19,15 +19,15 @@ namespace ModengTerm.Addons
         public const string CMD_GROUP_CHANGED = "CMD_GROUP_CHANGED";
         public const string CMD_SELECTED_SESSION_CHANGED = "CMD_SELECTED_SESSION_CHANGED";
         public const string CMD_SESSION_DELETED = "CMD_SESSION_DELETED";
-        /// <summary>
-        /// 当打开Shell会话之后触发
-        /// </summary>
-        public const string CMD_SHELL_SESSION_OPENED = "CMD_SHELL_SESSION_OPENED";
 
         #endregion
 
         #region 终端相关的命令
 
+        /// <summary>
+        /// 当打开终端类型的会话之后触发
+        /// </summary>
+        public const string TERM_SESSION_OPENED = "TERM_SESSION_OPENED";
         /// <summary>
         /// 每次渲染结束出发
         /// </summary>
