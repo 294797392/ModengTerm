@@ -4,7 +4,7 @@ using ModengTerm.Controls;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Session;
-using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;

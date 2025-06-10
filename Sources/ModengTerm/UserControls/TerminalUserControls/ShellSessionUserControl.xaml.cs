@@ -4,9 +4,8 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
-using ModengTerm.Terminal.ViewModels;
-using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.Terminals;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -98,11 +97,13 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem menuItem = e.OriginalSource as MenuItem;
-            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            CommandArgs.Instance.AddonId = contextMenu.AddonId;
-            CommandArgs.Instance.Command = contextMenu.Command;
-            MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
+            throw new RefactorImplementedException();
+
+            //MenuItem menuItem = e.OriginalSource as MenuItem;
+            //ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
+            //CommandArgs.Instance.AddonId = contextMenu.AddonId;
+            //CommandArgs.Instance.Command = contextMenu.Command;
+            //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)

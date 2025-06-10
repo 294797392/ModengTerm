@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Terminal.Windows;
+using ModengTerm.ViewModel.Terminal;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -27,39 +27,43 @@ namespace ModengTerm.Addons.Record
 
         private void ExecuteStartRecordCommand(CommandArgs context)
         {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            throw new RefactorImplementedException();
 
-            if (shellSessionVM.RecordStatus == RecordStatusEnum.Recording)
-            {
-                MTMessageBox.Info("正在录制中");
-                return;
-            }
+            //ShellSessionVM shellSessionVM = VTApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
 
-            RecordOptionsVM recordOptionsVM = new RecordOptionsVM();
+            //if (shellSessionVM.RecordStatus == RecordStatusEnum.Recording)
+            //{
+            //    MTMessageBox.Info("正在录制中");
+            //    return;
+            //}
 
-            RecordOptionsWindow recordOptionsWindow = new RecordOptionsWindow();
-            recordOptionsWindow.Owner = Window.GetWindow(shellSessionVM.Content);
-            recordOptionsWindow.DataContext = recordOptionsVM;
-            if (!(bool)recordOptionsWindow.ShowDialog())
-            {
-                return;
-            }
+            //RecordOptionsVM recordOptionsVM = new RecordOptionsVM();
 
-            shellSessionVM.StartRecord(recordOptionsVM.FileName);
+            //RecordOptionsWindow recordOptionsWindow = new RecordOptionsWindow();
+            //recordOptionsWindow.Owner = Window.GetWindow(shellSessionVM.Content);
+            //recordOptionsWindow.DataContext = recordOptionsVM;
+            //if (!(bool)recordOptionsWindow.ShowDialog())
+            //{
+            //    return;
+            //}
+
+            //shellSessionVM.StartRecord(recordOptionsVM.FileName);
         }
 
         private void ExecuteStopRecordCommand(CommandArgs context)
         {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
-            shellSessionVM.StopRecord();
+            throw new RefactorImplementedException();
+            //ShellSessionVM shellSessionVM = VTApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            //shellSessionVM.StopRecord();
         }
 
         private void ExecuteOpenRecordCommand(CommandArgs context)
         {
-            ShellSessionVM shellSessionVM = MTermApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
-            OpenRecordWindow openRecordWindow = new OpenRecordWindow(shellSessionVM.Session);
-            openRecordWindow.Owner = Window.GetWindow(shellSessionVM.Content);
-            openRecordWindow.Show();
+            throw new RefactorImplementedException();
+            //ShellSessionVM shellSessionVM = VTApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
+            //OpenRecordWindow openRecordWindow = new OpenRecordWindow(shellSessionVM.Session);
+            //openRecordWindow.Owner = Window.GetWindow(shellSessionVM.Content);
+            //openRecordWindow.Show();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using DotNEToolkit;
+using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -152,6 +154,23 @@ namespace ModengTerm.Base
             srcFileName = srcFileName.Replace(" ", "_");
 
             return srcFileName;
+        }
+
+        public static VTManifest GetManifest() 
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.json");
+            return JSONHelper.ParseFile<VTManifest>(path);
+        }
+
+        public static System.Windows.Media.Color RgbKey2Color(string rgbKey)
+        {
+            VTColor vtColor = VTColor.CreateFromRgbKey(rgbKey);
+            return System.Windows.Media.Color.FromRgb(vtColor.R, vtColor.G, vtColor.B);
+        }
+
+        public static string Color2RgbKey(System.Windows.Media.Color color)
+        {
+            return string.Format("{0},{1},{2},{3}", color.R, color.G, color.B, color.A);
         }
 
         #region UnitValue

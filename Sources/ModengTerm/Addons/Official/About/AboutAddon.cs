@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Terminal;
-using ModengTerm.Terminal.ViewModels;
 using System.Windows;
 
 namespace ModengTerm.Addons.About

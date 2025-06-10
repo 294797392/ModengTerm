@@ -2,7 +2,8 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
-using ModengTerm.ViewModels.Session;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,8 +42,8 @@ namespace ModengTerm.Windows
 
         private void InitializeWindow(string selectedGroupId)
         {
-            this.serviceAgent = MTermApp.Context.ServiceAgent;
-            this.sessionTreeVM = MTermApp.Context.CreateSessionTreeVM(false, true);
+            this.serviceAgent = VTApp.Context.ServiceAgent;
+            this.sessionTreeVM = VMUtils.CreateSessionTreeVM(this.serviceAgent, false, true);
             SessionTreeViewUserControl.ViewModel = this.sessionTreeVM;
             this.sessionTreeVM.ExpandAll();
 

@@ -1,0 +1,177 @@
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
+using ModengTerm.Base.Definitions;
+using ModengTerm.Base.ServiceAgents;
+using ModengTerm.ViewModel.Terminal;
+using WPFToolkit.MVVM;
+
+namespace ModengTerm.ViewModel
+{
+    public class MainWindowVM : ViewModelBase
+    {
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("MainWindowVM");
+
+        /// <summary>
+        /// 最后一个打开会话的按钮
+        /// </summary>
+        public static readonly OpenSessionVM OpenSessionVM = new OpenSessionVM();
+
+        #endregion
+
+        #region 实例变量
+
+        private ServiceAgent serviceAgent;
+
+        #endregion
+
+        #region 属性
+
+        /// <summary>
+        /// 最近打开的会话列表
+        /// </summary>
+        public BindableCollection<RecentlySessionVM> RecentlyOpenedSession { get; private set; }
+
+        /// <summary>
+        /// 打开的所有会话列表
+        /// </summary>
+        public BindableCollection<SessionItemVM> SessionList { get; private set; }
+
+        /// <summary>
+        /// 打开的所有类型是Shell的会话列表
+        /// </summary>
+        public IEnumerable<ShellSessionVM> ShellSessions { get { return SessionList.OfType<ShellSessionVM>(); } }
+
+        /// <summary>
+        /// 选中的会话
+        /// </summary>
+        public SessionItemVM SelectedSession
+        {
+            get { return SessionList.SelectedItem; }
+            set
+            {
+                if (SessionList.SelectedItem != value)
+                {
+                    SessionList.SelectedItem = value;
+                    this.NotifyPropertyChanged("SelectedSession");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 窗口顶部的所有菜单列表
+        /// </summary>
+        public BindableCollection<ContextMenuVM> TitleMenus { get; private set; }
+
+        /// <summary>
+        /// 所有主题列表
+        /// </summary>
+        public BindableCollection<AppThemeVM> Themes { get; private set; }
+
+        /// <summary>
+        /// 面板容器
+        /// </summary>
+        public PanelContainerVM PanelContainer { get; private set; }
+
+        #endregion
+
+        #region 构造方法
+
+        public MainWindowVM()
+        {
+            serviceAgent = VTApp.Context.ServiceAgent;
+
+            SessionList = new BindableCollection<SessionItemVM>();
+            SessionList.Add(OpenSessionVM);
+
+            List<XTermSession> sessions = serviceAgent.GetSessions();
+            RecentlyOpenedSession = new BindableCollection<RecentlySessionVM>();
+            List<RecentlySession> recentSessions = serviceAgent.GetRecentSessions();
+            foreach (RecentlySession recentSession in recentSessions)
+            {
+                RecentlySessionVM recentlySessionVM = new RecentlySessionVM(recentSession);
+                RecentlyOpenedSession.Add(recentlySessionVM);
+            }
+
+            TitleMenus = new BindableCollection<ContextMenuVM>();
+            TitleMenus.AddRange(VMUtils.CreateContextMenuVMs(true));
+
+            Themes = new BindableCollection<AppThemeVM>();
+            Themes.AddRange(VTApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
+            Themes.SelectedItem = Themes[0];//.FirstOrDefault();
+
+            InitializePanels();
+        }
+
+        #endregion
+
+        #region 公开接口
+
+        /// <summary>
+        /// 把一个会话加入到最近打开的会话列表里
+        /// 如果最近的会话列表数量比设定的最大值多，那么会移除最早打开的一个会话
+        /// </summary>
+        /// <param name="session"></param>
+        public void AddToRecentSession(XTermSession session)
+        {
+            RecentlySession recentlySession = new RecentlySession()
+            {
+                ID = Guid.NewGuid().ToString(),
+                SessionId = session.ID,
+                SessionName = session.Name,
+            };
+
+            // 保存的最近打开会话超出了最大个数
+            // 删除最早保存的会话
+            if (RecentlyOpenedSession.Count > VTBaseConsts.MaxRecentSessions)
+            {
+                RecentlySessionVM oldestSession = RecentlyOpenedSession[0];
+                RecentlyOpenedSession.RemoveAt(0);
+                serviceAgent.DeleteRecentSession(oldestSession.ID.ToString());
+            }
+
+            RecentlyOpenedSession.Add(new RecentlySessionVM(recentlySession));
+
+            serviceAgent.AddRecentSession(recentlySession);
+        }
+
+        /// <summary>
+        /// 从最近打开的会话列表里删除一个会话
+        /// </summary>
+        /// <param name="recentlySession"></param>
+        public void DeleteRecentSession(RecentlySessionVM recentlySession)
+        {
+            RecentlyOpenedSession.Remove(recentlySession);
+
+            serviceAgent.DeleteRecentSession(recentlySession.ID.ToString());
+        }
+
+        #endregion
+
+        #region 实例方法
+
+        private void InitializePanels()
+        {
+            //// 加载所有插件要显示的面板
+            //List<AddonContext> contexts = VTApp.Context.AddonContexts;
+
+            //List<PanelItemDefinition> panels = new List<PanelItemDefinition>();
+
+            //foreach (AddonContext context in contexts)
+            //{
+            //    AddonDefinition definition = context.Definition;
+
+            //    panels.AddRange(definition.GlobalPanels);
+            //}
+
+            //PanelContainer = VTClientUtils.CreatePanelContainerVM(panels);
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        #endregion
+    }
+}

@@ -3,7 +3,6 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.ViewModels;
 using ModengTerm.UserControls.Terminals;
 using System;
 using System.Collections.Generic;
@@ -56,7 +55,7 @@ namespace ModengTerm.Terminal.Windows
 
         private void InitializeWindow(XTermSession session)
         {
-            this.serviceAgent = MTermApp.Context.ServiceAgent;
+            this.serviceAgent = VTApp.Context.ServiceAgent;
 
             List<Playback> playbackList = this.serviceAgent.GetPlaybacks(session.ID);
             this.playbacks = new BindableCollection<Playback>();

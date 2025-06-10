@@ -1,5 +1,4 @@
-﻿using ModengTerm.ViewModels.Session;
-using ModengTerm.ViewModels.Sessions;
+﻿using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows.Controls;

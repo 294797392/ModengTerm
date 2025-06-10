@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;

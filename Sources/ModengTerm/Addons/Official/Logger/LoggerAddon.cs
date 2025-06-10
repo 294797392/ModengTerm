@@ -1,4 +1,4 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.Base;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ namespace ModengTerm.Addons.Logger
 
         private void ExecuteStartLoggerCommand(CommandArgs context)
         {
+            throw new RefactorImplementedException();
             //ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             //LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
             //window.Owner = context.MainWindow;
@@ -33,6 +34,7 @@ namespace ModengTerm.Addons.Logger
 
         private void ExecuteStopLoggerCommand(CommandArgs context)
         {
+            throw new RefactorImplementedException();
             //ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
             //shellSessionVM.StopLogger();
         }

@@ -1,4 +1,5 @@
-﻿using ModengTerm.Document;
+﻿using ModengTerm.Base.DataModels.Terminal;
+using ModengTerm.Document;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.UserControls.TerminalUserControls;

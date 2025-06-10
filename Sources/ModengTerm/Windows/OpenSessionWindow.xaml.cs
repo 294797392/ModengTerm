@@ -4,8 +4,8 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
 using ModengTerm.UserControls.SessionListUserControls;
-using ModengTerm.ViewModels.Session;
-using ModengTerm.ViewModels.Sessions;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -92,8 +92,8 @@ namespace ModengTerm.Windows
 
         private void InitializeWindow()
         {
-            this.serviceAgent = MTermApp.Context.ServiceAgent;
-            this.sessionTreeVM = MTermApp.Context.CreateSessionTreeVM();
+            this.serviceAgent = VTApp.Context.ServiceAgent;
+            this.sessionTreeVM = VMUtils.CreateSessionTreeVM(this.serviceAgent);
             this.viewList = new Dictionary<SessionListViewEnum, SessionListView>();
             this.SwitchView(SessionListViewEnum.DataGrid);
         }
@@ -173,7 +173,7 @@ namespace ModengTerm.Windows
             XTermSession session = window.Session;
 
             // 在数据库里新建会话
-            int code = MTermApp.Context.ServiceAgent.AddSession(session);
+            int code = VTApp.Context.ServiceAgent.AddSession(session);
             if (code != ResponseCode.SUCCESS)
             {
                 MTMessageBox.Error("新建会话失败, {0}, {1}", code, ResponseCode.GetMessage(code));

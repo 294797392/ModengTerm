@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Base.Addon;
 using ModengTerm.Base.Enumerations;
 using System.Collections.Generic;
 using System.Linq;

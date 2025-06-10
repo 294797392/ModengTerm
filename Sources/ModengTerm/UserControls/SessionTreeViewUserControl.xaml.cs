@@ -1,4 +1,4 @@
-﻿using ModengTerm.ViewModels.Session;
+﻿using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;

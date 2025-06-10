@@ -4,7 +4,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Terminal.FileWatch;
 using ModengTerm.UserControls;
 using ModengTerm.UserControls.TerminalUserControls;
-using ModengTerm.ViewModels;
+using ModengTerm.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

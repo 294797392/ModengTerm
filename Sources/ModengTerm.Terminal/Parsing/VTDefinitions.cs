@@ -453,27 +453,6 @@ namespace ModengTerm.Terminal.Parsing
         MEM_MemoryChecksum = 16777279,
     }
 
-    public enum VTColorIndex
-    {
-        BrightBlack,
-        BrightRed,
-        BrightGreen,
-        BrightYellow,
-        BrightBlue,
-        BrightMagenta,
-        BrightCyan,
-        BrightWhite,
-
-        DarkBlack,
-        DarkRed,
-        DarkGreen,
-        DarkYellow,
-        DarkBlue,
-        DarkMagenta,
-        DarkCyan,
-        DarkWhite
-    }
-
     public enum CodingSystem
     {
         ISO2022 = '@',

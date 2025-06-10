@@ -38,16 +38,6 @@
     <Compile Remove="Controls\MdToolPanel.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
-    <Compile Remove="ViewModels\ContextMenuData.cs" />
-    <Compile Remove="ViewModels\GroupVM.cs" />
-    <Compile Remove="ViewModels\OpenedSessionsVM.cs" />
-    <Compile Remove="ViewModels\Terminals\CommandLineVM.cs" />
-    <Compile Remove="ViewModels\Terminals\ShellGlobalVM.cs" />
-    <Compile Remove="ViewModels\Terminals\SyncMasterVM.cs" />
-    <Compile Remove="ViewModels\ThemeVM.cs" />
-    <Compile Remove="ViewModels\VTMenuGroupVM.cs" />
-    <Compile Remove="ViewModels\VTMenuItemVM.cs" />
-    <Compile Remove="ViewModels\VTMenuListVM.cs" />
     <Compile Remove="Windows\Terminals\ParagraphsWindow.xaml.cs" />
   </ItemGroup>
 
@@ -98,6 +88,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
+    <ProjectReference Include="..\ModengTerm.ViewModel\ModengTerm.ViewModel.csproj" />
   </ItemGroup>
 
   <ItemGroup>

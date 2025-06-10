@@ -2,9 +2,8 @@
 using ModengTerm;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Controls;
-using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.CreateSession;
-using ModengTerm.ViewModels.Session;
+using ModengTerm.ViewModel.Session;
+using ModengTerm.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,6 +19,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using XTerminal.Base.Enumerations;
+using ModengTerm.ViewModel.CreateSession;
+using ModengTerm.Base;
 
 namespace ModengTerm.Windows
 {
@@ -62,7 +63,7 @@ namespace ModengTerm.Windows
         {
             this.contentMap = new Dictionary<string, Control>();
 
-            CreateSessionVM createSessionVM = new CreateSessionVM(MTermApp.Context.ServiceAgent);
+            CreateSessionVM createSessionVM = new CreateSessionVM(VTApp.Context.ServiceAgent);
             base.DataContext = createSessionVM;
             if (selectedGroup != null)
             {

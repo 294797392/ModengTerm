@@ -1,0 +1,56 @@
+﻿using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
+using ModengTerm.Document.Enumerations;
+
+namespace ModengTerm.Base.Addon
+{
+    /// <summary>
+    /// Shell对象
+    /// 封装对会话的Shell操作
+    /// </summary>
+    public interface IShellObject
+    {
+        /// <summary>
+        /// 会话Id
+        /// </summary>
+        string Id { get; }
+
+        /// <summary>
+        /// 会话名字
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// 会话状态
+        /// </summary>
+        SessionStatusEnum Status { get; }
+
+        void VisiblePanel(string panelId);
+    }
+
+    /// <summary>
+    /// 公开终端类型的Shell接口
+    /// </summary>
+    public interface ITerminalShell : IShellObject
+    {
+        void Send(byte[] bytes);
+        void Send(string text);
+
+        VTParagraph GetParagraph(VTParagraphOptions options);
+
+        /// <summary>
+        /// 保存指定内容到文件
+        /// </summary>
+        /// <param name="paragraphType"></param>
+        /// <param name="format"></param>
+        /// <param name="filePath"></param>
+        void SaveToFile(ParagraphTypeEnum paragraphType, ParagraphFormatEnum format, string filePath);
+
+        /// <summary>
+        /// 拷贝选中的内容到剪切板
+        /// </summary>
+        void CopySelection();
+
+        void ClearScreen();
+    }
+}

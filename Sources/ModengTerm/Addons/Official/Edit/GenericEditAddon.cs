@@ -1,11 +1,8 @@
 ﻿using DotNEToolkit;
 using Microsoft.Win32;
-using ModengTerm.Addons.Shell;
-using ModengTerm.Document;
+using ModengTerm.Base.Addon;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.ViewModels;
 using System;
-using WPFToolkit.MVVM;
 
 namespace ModengTerm.Addons.Edit
 {

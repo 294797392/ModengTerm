@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addons.Shell;
 using ModengTerm.Base;
+using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Windows;
 using System;

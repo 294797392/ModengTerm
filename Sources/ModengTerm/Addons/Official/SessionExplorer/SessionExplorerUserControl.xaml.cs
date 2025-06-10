@@ -1,6 +1,7 @@
-﻿using ModengTerm.UserControls;
-using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.Session;
+﻿using ModengTerm.Base;
+using ModengTerm.UserControls;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,8 +54,9 @@ namespace ModengTerm.Addons.SessionExplorer
 
         public void OnInitialize()
         {
-            this.resourceManagerTreeVM = MTermApp.Context.ResourceManagerTreeVM;
-            SessionTreeViewUserControl.ViewModel = this.resourceManagerTreeVM;
+            throw new RefactorImplementedException();
+            //this.resourceManagerTreeVM = VTApp.Context.ResourceManagerTreeVM;
+            //SessionTreeViewUserControl.ViewModel = this.resourceManagerTreeVM;
         }
 
         public void OnRelease()
@@ -87,7 +89,7 @@ namespace ModengTerm.Addons.SessionExplorer
                 return;
             }
 
-            if (sessionNode.NodeType != ViewModels.Sessions.SessionTreeNodeTypeEnum.Session)
+            if (sessionNode.NodeType != SessionTreeNodeTypeEnum.Session)
             {
                 return;
             }

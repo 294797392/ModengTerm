@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Addons.Shell;
 using ModengTerm.Base.Definitions;
-using ModengTerm.ViewModels;
+using ModengTerm.ViewModel;
 using System;
 using System.Collections.Generic;
 

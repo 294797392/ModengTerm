@@ -1,4 +1,4 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.ViewModel.Terminal;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;

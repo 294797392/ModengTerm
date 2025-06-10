@@ -1,5 +1,5 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.ViewModels.CreateSession.SessionOptions;
+using ModengTerm.ViewModel.CreateSession.SessionOptions;
 using System;
 using System.Windows;
 using System.Windows.Controls;

@@ -54,7 +54,7 @@ namespace ModengTerm.Windows.SSH
         private void InitializeWindow()
         {
             this.privateKeys = new BindableCollection<PrivateKey>();
-            this.serviceAgent = MTermApp.Context.ServiceAgent;
+            this.serviceAgent = VTApp.Context.ServiceAgent;
 
             this.privateKeys.AddRange(this.serviceAgent.GetAllPrivateKey());
             DataGridPrivateKeys.DataContext = this.privateKeys;

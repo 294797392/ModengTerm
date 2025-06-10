@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Terminal.Watch;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using WPFToolkit.MVVM;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.ViewModels;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Terminal;
 
 namespace ModengTerm.Addons.SystemMonitor
 {

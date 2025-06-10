@@ -13,7 +13,7 @@
         xmlns:termuc2="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
         xmlns:mcmd="clr-namespace:ModengTerm"
         xmlns:local="clr-namespace:ModengTerm"
-        xmlns:vm="clr-namespace:ModengTerm.ViewModels"
+        xmlns:vm="clr-namespace:ModengTerm.ViewModel"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="900" Height="700" WindowStartupLocation="CenterScreen"

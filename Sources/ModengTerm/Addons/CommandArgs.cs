@@ -1,5 +1,6 @@
-﻿using ModengTerm.Base.ServiceAgents;
-using ModengTerm.ViewModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.ServiceAgents;
+using ModengTerm.ViewModel;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -23,7 +24,7 @@ namespace ModengTerm.Addons
         /// <summary>
         /// 访问服务的代理
         /// </summary>
-        public ServiceAgent ServiceAgent { get { return MTermApp.Context.ServiceAgent; } }
+        public ServiceAgent ServiceAgent { get { return VTApp.Context.ServiceAgent; } }
 
         /// <summary>
         /// 要执行的命令

@@ -3,7 +3,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
-using ModengTerm.Terminal.ViewModels;
+using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -55,7 +55,7 @@ namespace ModengTerm.Addons.QuickInput
 
         private void InitializeWindow(ShellSessionVM shellSession)
         {
-            this.serviceAgent = MTermApp.Context.ServiceAgent;
+            this.serviceAgent = VTApp.Context.ServiceAgent;
             this.shellSession = shellSession;
 
             this.updateCommands = new List<CommandVM>();

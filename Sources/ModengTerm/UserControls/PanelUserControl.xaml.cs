@@ -1,4 +1,4 @@
-﻿using ModengTerm.ViewModels;
+﻿using ModengTerm.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;

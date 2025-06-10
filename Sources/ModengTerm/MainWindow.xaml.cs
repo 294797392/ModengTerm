@@ -12,12 +12,10 @@ using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
-using ModengTerm.Terminal.ViewModels;
 using ModengTerm.Themes;
 using ModengTerm.UserControls;
-using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.Session;
-using ModengTerm.ViewModels.Terminals;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Terminal;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -68,9 +66,10 @@ namespace ModengTerm
 
         private void InitializeWindow()
         {
-            this.serviceAgent = MTermApp.Context.ServiceAgent;
+            this.serviceAgent = VTApp.Context.ServiceAgent;
 
-            this.mainWindowVM = MTermApp.Context.MainWindowVM;
+            throw new RefactorImplementedException();
+            //this.mainWindowVM = VTApp.Context.MainWindowVM;
             base.DataContext = this.mainWindowVM;
 
             this.userInput = new VTKeyboardInput();
@@ -114,7 +113,7 @@ namespace ModengTerm
             openedSessionVM.Name = session.Name;
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
-            openedSessionVM.ServiceAgent = MTermApp.Context.ServiceAgent;
+            openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
             openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
@@ -139,7 +138,7 @@ namespace ModengTerm
 
         private void OpenDefaultSession()
         {
-            XTermSession defaultSession = MTermApp.Context.Manifest.DefaultSession;
+            XTermSession defaultSession = VTApp.Context.Manifest.DefaultSession;
             if (defaultSession == null)
             {
                 return;
@@ -244,7 +243,8 @@ namespace ModengTerm
 
             CommandArgs.Instance.AddonId = string.Empty;
             CommandArgs.Instance.Command = AddonCommands.CMD_SELECTED_SESSION_CHANGED;
-            MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
+            throw new RefactorImplementedException();
+            //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -316,11 +316,12 @@ namespace ModengTerm
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem menuItem = e.OriginalSource as MenuItem;
-            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            CommandArgs.Instance.AddonId = contextMenu.AddonId;
-            CommandArgs.Instance.Command = contextMenu.Command;
-            MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
+            throw new RefactorImplementedException();
+            //MenuItem menuItem = e.OriginalSource as MenuItem;
+            //ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
+            //CommandArgs.Instance.AddonId = contextMenu.AddonId;
+            //CommandArgs.Instance.Command = contextMenu.Command;
+            //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
         }
 
 

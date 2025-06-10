@@ -1,6 +1,6 @@
 ﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Base.Addon;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

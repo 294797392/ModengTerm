@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit.Media.Video;
-using ModengTerm.ViewModels;
-using ModengTerm.ViewModels.Session;
+using ModengTerm.Base;
+using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,8 @@ namespace ModengTerm.Addons.SessionExplorer
         {
             base.OnInitialize();
 
-            ResourceManagerTree = MTermApp.Context.ResourceManagerTreeVM;
+            throw new RefactorImplementedException();
+            //ResourceManagerTree = VTApp.Context.ResourceManagerTreeVM;
             //Console.WriteLine(string.Format("{0}, OnInitialize", this.Name));
         }
 
