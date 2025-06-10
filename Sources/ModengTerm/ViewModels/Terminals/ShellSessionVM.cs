@@ -803,6 +803,14 @@ namespace ModengTerm.Terminal.ViewModels
             this.logMgr.Stop(this.videoTerminal);
         }
 
+        public void ClearScreen() 
+        {
+            VTDocument document = this.VideoTerminal.ActiveDocument;
+            document.DeleteViewoprt();
+            document.SetCursorLogical(0, 0);
+            document.RequestInvalidate();
+        }
+
         #endregion
 
         #region 事件处理器

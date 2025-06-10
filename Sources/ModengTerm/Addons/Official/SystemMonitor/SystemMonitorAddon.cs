@@ -21,7 +21,7 @@ namespace ModengTerm.Addons.SystemMonitor
 
         private void ExecuteShowSystemMonitorPanelCommand(CommandArgs e)
         {
-            AbstractShell shell = ShellFactory.GetShell();
+            IShellService shell = ShellFactory.GetService();
             shell.VisiblePanel("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
         }
     }

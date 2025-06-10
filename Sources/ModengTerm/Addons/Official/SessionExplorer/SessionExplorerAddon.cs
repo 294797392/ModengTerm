@@ -21,7 +21,7 @@ namespace ModengTerm.Addons.SessionExplorer
 
         private void OpenExplorerWindow(CommandArgs e)
         {
-            AbstractShell shell = ShellFactory.GetShell();
+            IShellService shell = ShellFactory.GetService();
             shell.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
         }
     }

@@ -12,48 +12,32 @@ using System.Windows;
 
 namespace ModengTerm.Addons.Shell
 {
-    public class DefaultShellImpl : AbstractShell
+    public class ShellServiceImpl : IShellService
     {
         private Window window;
 
-        public DefaultShellImpl()
+        public ShellServiceImpl()
         {
             window = Application.Current.MainWindow;
         }
 
-        /// <summary>
-        /// 打开会话
-        /// </summary>
-        /// <param name="session"></param>
         public override void OpenSession(XTermSession session)
         {
             MCommands.OpenSessionCommand.Execute(session, window);
         }
 
-        /// <summary>
-        /// 显示或隐藏Panel
-        /// </summary>
-        /// <param name="panelId">要显示或隐藏的PanelId</param>
         public override void VisiblePanel(string panelId)
         {
             MTermApp.Context.MainWindowVM.PanelContainer.ChangeVisible(panelId);
         }
 
-        /// <summary>
-        /// 获取当前显示的会话
-        /// </summary>
-        /// <returns></returns>
-        public override IAddonSession GetCurrentSession()
+        public override T GetActiveShell<T>()
         {
-            return MTermApp.Context.MainWindowVM.SelectedSession as IAddonSession;
+            throw new NotImplementedException();
+            //return MTermApp.Context.MainWindowVM.SelectedSession;
         }
 
-        /// <summary>
-        /// 获取指定的会话列表
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public override List<T> GetSessions<T>()
+        public override List<T> GetShellObjects<T>()
         {
             return MTermApp.Context.MainWindowVM.SessionList.OfType<T>().ToList();
         }

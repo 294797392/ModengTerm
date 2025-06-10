@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.ViewModels;
+﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Terminal.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,6 @@ namespace ModengTerm.Addons.BroadcastInput
 {
     public class BroadcastSessionVM : ViewModelBase
     {
-        public IShellSession Session { get; set; }
+        public ITerminalShell Session { get; set; }
     }
 }

@@ -242,7 +242,6 @@ namespace ModengTerm
 
             #endregion
 
-            CommandArgs.Instance.OpenedSession = selectedSession as OpenedSessionVM;
             CommandArgs.Instance.AddonId = string.Empty;
             CommandArgs.Instance.Command = AddonCommands.CMD_SELECTED_SESSION_CHANGED;
             MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
@@ -319,8 +318,6 @@ namespace ModengTerm
         {
             MenuItem menuItem = e.OriginalSource as MenuItem;
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            OpenedSessionVM openedSessionVM = ListBoxOpenedSession.SelectedItem as OpenedSessionVM;
-            CommandArgs.Instance.OpenedSession = openedSessionVM;
             CommandArgs.Instance.AddonId = contextMenu.AddonId;
             CommandArgs.Instance.Command = contextMenu.Command;
             MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);

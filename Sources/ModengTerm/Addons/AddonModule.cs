@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.Definitions;
+﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModels;
 using System;
 using System.Collections.Generic;

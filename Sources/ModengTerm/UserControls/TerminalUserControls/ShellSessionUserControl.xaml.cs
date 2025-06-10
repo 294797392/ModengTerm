@@ -102,7 +102,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             CommandArgs.Instance.AddonId = contextMenu.AddonId;
             CommandArgs.Instance.Command = contextMenu.Command;
-            CommandArgs.Instance.OpenedSession = this.shellSession;
             MTermApp.Context.RaiseAddonCommand(CommandArgs.Instance);
         }
 

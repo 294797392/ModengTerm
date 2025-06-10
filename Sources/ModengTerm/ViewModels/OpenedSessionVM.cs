@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addons;
+using ModengTerm.Addons.Shell;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
@@ -16,7 +17,7 @@ namespace ModengTerm.ViewModels
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
-    public abstract class OpenedSessionVM : SessionItemVM, IAddonSession
+    public abstract class OpenedSessionVM : SessionItemVM, IShellObject
     {
         #region 公开事件
 

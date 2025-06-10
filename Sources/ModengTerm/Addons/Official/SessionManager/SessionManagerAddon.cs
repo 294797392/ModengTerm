@@ -32,7 +32,7 @@ namespace ModengTerm.Addons.SessionManager
             sessionListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             if ((bool)sessionListWindow.ShowDialog())
             {
-                AbstractShell shell = ShellFactory.GetShell();
+                IShellService shell = ShellFactory.GetService();
                 XTermSession session = sessionListWindow.SelectedSession;
                 shell.OpenSession(session);
             }
@@ -59,7 +59,7 @@ namespace ModengTerm.Addons.SessionManager
             }
 
             // 打开会话
-            AbstractShell shell = ShellFactory.GetShell();
+            IShellService shell = ShellFactory.GetService();
             shell.OpenSession(session);
         }
 

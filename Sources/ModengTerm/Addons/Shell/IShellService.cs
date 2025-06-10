@@ -10,7 +10,7 @@ namespace ModengTerm.Addons.Shell
     /// <summary>
     /// 提供和界面进行交互的接口
     /// </summary>
-    public abstract class AbstractShell
+    public abstract class IShellService
     {
         /// <summary>
         /// 打开会话
@@ -25,16 +25,16 @@ namespace ModengTerm.Addons.Shell
         public abstract void VisiblePanel(string panelId);
 
         /// <summary>
-        /// 获取当前显示的会话
+        /// 获取当前激活的Shell
         /// </summary>
         /// <returns></returns>
-        public abstract IAddonSession GetCurrentSession();
+        public abstract T GetActiveShell<T>() where T : IShellObject;
 
         /// <summary>
-        /// 获取指定的会话列表
+        /// 获取指定类型的所有会话Shell对象
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public abstract List<T> GetSessions<T>() where T : IAddonSession;
+        public abstract List<T> GetShellObjects<T>() where T : IShellObject;
     }
 }

@@ -22,9 +22,8 @@ namespace ModengTerm.Addons.QuickInput
 
         private void ShowQuickInputPanel(CommandArgs e)
         {
-            AbstractShell shell = ShellFactory.GetShell();
-            IAddonSession session = shell.GetCurrentSession();
-            session.VisiblePanel("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
+            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            shell.VisiblePanel("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
         }
     }
 }

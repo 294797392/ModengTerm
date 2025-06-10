@@ -22,19 +22,19 @@ namespace ModengTerm.Addons.Logger
 
         private void ExecuteStartLoggerCommand(CommandArgs context)
         {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
-            LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
-            window.Owner = context.MainWindow;
-            if ((bool)window.ShowDialog())
-            {
-                shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
-            }
+            //ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
+            //LoggerOptionsWindow window = new LoggerOptionsWindow(shellSessionVM);
+            //window.Owner = context.MainWindow;
+            //if ((bool)window.ShowDialog())
+            //{
+            //    shellSessionVM.StartLogger(shellSessionVM.VideoTerminal, window.Options);
+            //}
         }
 
         private void ExecuteStopLoggerCommand(CommandArgs context)
         {
-            ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
-            shellSessionVM.StopLogger();
+            //ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
+            //shellSessionVM.StopLogger();
         }
     }
 }

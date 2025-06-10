@@ -26,14 +26,6 @@ namespace ModengTerm.Addons
         public ServiceAgent ServiceAgent { get { return MTermApp.Context.ServiceAgent; } }
 
         /// <summary>
-        /// 当前选中的会话
-        /// TODO：删除OpenedSession
-        /// 插件不可以直接访问ViewModel，防止在不熟悉ViewModel运行流程的情况下对ViewModel做了一些不正确的操作
-        /// 提供专门的接口供插件调用
-        /// </summary>
-        public OpenedSessionVM OpenedSession { get; set; }
-
-        /// <summary>
         /// 要执行的命令
         /// </summary>
         public string Command { get; set; }
