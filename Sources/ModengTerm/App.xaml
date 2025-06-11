@@ -12,6 +12,7 @@
                 <!--<ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Themes/Themes.VS2022.Blue.xaml"/>-->
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/SVGIcons.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/ModengTerm;component/Styles/Generic.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/ModengTerm.Controls;component/ModengTerm.Controls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="{x:Type Control}">

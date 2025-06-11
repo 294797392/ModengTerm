@@ -229,31 +229,6 @@ namespace ModengTerm
         }
     }
 
-    public class ShellCommandTypeConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (!(value is CommandTypeEnum))
-            {
-                return string.Empty;
-            }
-
-            CommandTypeEnum commandType = (CommandTypeEnum)value;
-
-            switch (commandType)
-            {
-                case CommandTypeEnum.PureText: return "纯文本";
-                case CommandTypeEnum.HexData: return "十六进制数据";
-                default: throw new NotImplementedException();
-            }
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class RenderModeTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

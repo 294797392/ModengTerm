@@ -1,11 +1,11 @@
-﻿<mcontrols:MdWindow x:Class="ModengTerm.Windows.GroupManagerWindow"
+﻿<mcsext:MdWindow x:Class="ModengTerm.Windows.GroupManagerWindow"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:local="clr-namespace:ModengTerm.Windows"
                     xmlns:uc="clr-namespace:ModengTerm.UserControls"
-                    xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
+                    xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
                     mc:Ignorable="d"
                     Title="分组管理" Height="600" Width="500"
                     WindowStartupLocation="CenterOwner" CanResize="False"
@@ -62,5 +62,5 @@
         </StackPanel>
 
     </Grid>
-</mcontrols:MdWindow>
+</mcsext:MdWindow>
 

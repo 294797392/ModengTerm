@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:xtermuc="clr-namespace:XTerminal.UserControls"
-        xmlns:mcs="clr-namespace:ModengTerm.Controls"
+        xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
         xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
         xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
         xmlns:converters="clr-namespace:ModengTerm"
@@ -13,7 +13,7 @@
         xmlns:termuc2="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
         xmlns:mcmd="clr-namespace:ModengTerm"
         xmlns:local="clr-namespace:ModengTerm"
-        xmlns:vm="clr-namespace:ModengTerm.ViewModel"
+        xmlns:vm="clr-namespace:ModengTerm.ViewModel;assembly=ModengTerm.ViewModel"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText1}"
         Width="900" Height="700" WindowStartupLocation="CenterScreen"
@@ -56,7 +56,7 @@
                     <TextBlock Grid.Column="2" Text="{Binding Path=Name}" VerticalAlignment="Center" HorizontalAlignment="Left"
                                TextOptions.TextFormattingMode="Display"/>
 
-                    <mcs:MdButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2" ToolTip="关闭"
+                    <mcsext:MdButton Grid.Column="3" x:Name="ButtonClose" SVGMargin="5" CornerRadius="2" ToolTip="关闭"
                                   Tag="{Binding}" Visibility="{Binding Path=IsSelected, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}" Width="20" Height="20"
                                   SVGColor="{DynamicResource ResourceKey=RES50013E}" SVGMouseOverColor="{DynamicResource ResourceKey=RES50014E}" SVGMouseDownColor="{DynamicResource ResourceKey=RES50015E}"
                                   Background="{DynamicResource ResourceKey=RES50016E}" MouseOverBrush="{DynamicResource ResourceKey=RES50017E}" MouseDownBrush="{DynamicResource ResourceKey=RES50018E}"
@@ -73,7 +73,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="DataTemplateOpenSession">
-                <mcs:MdButton Content="+" FontWeight="Bold" FontSize="16" Margin="3"
+                <mcsext:MdButton Content="+" FontWeight="Bold" FontSize="16" Margin="3"
                                         Background="{DynamicResource ResourceKey=RES50019E}"
                                         MouseOverBrush="{DynamicResource ResourceKey=RES50020E}" 
                                         MouseDownBrush="{DynamicResource ResourceKey=RES50021E}"
@@ -153,7 +153,7 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mcs:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
+            <Style x:Key="StyleMTermButtonTitle" TargetType="{x:Type mcsext:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
                 <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES50024E}"/>
                 <Setter Property="SVGMouseDownColor" Value="{DynamicResource ResourceKey=RES50024E}"/>
                 <Setter Property="SVGMouseOverColor" Value="{DynamicResource ResourceKey=RES50024E}"/>
@@ -240,7 +240,7 @@
                 </Menu>
             </StackPanel>
 
-            <mcs:MdButton Grid.Column="2" x:Name="ButtonSwitchTheme" WindowChrome.IsHitTestVisibleInChrome="True" SVGMargin="5" SVGPath="{StaticResource ResourceKey=SVG12E}" Click="ButtonSwitchTheme_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcsext:MdButton Grid.Column="2" x:Name="ButtonSwitchTheme" WindowChrome.IsHitTestVisibleInChrome="True" SVGMargin="5" SVGPath="{StaticResource ResourceKey=SVG12E}" Click="ButtonSwitchTheme_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
             <Popup x:Name="PopupThemes" PopupAnimation="None" AllowsTransparency="True" StaysOpen="False"
                    Placement="Bottom" PlacementTarget="{Binding ElementName=ButtonSwitchTheme}">
                 <Border Background="{DynamicResource ResourceKey=RES50054E}" BorderBrush="{DynamicResource ResourceKey=RES50055E}"
@@ -296,11 +296,11 @@
                 </Border>
             </Popup>
 
-            <mcs:MdButton Grid.Column="3" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcsext:MdButton Grid.Column="3" SVGPath="{StaticResource ResourceKey=SVGIcon10}" Click="ButtonMinmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mcs:MdButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcsext:MdButton Grid.Column="4" SVGPath="{StaticResource ResourceKey=SVGIcon11}" Click="ButtonMaxmizedWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
-            <mcs:MdButton Grid.Column="5" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
+            <mcsext:MdButton Grid.Column="5" SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseWindow_Click" Style="{StaticResource ResourceKey=StyleMTermButtonTitle}"/>
 
         </Grid>
 

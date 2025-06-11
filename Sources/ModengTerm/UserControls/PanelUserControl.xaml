@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
-             xmlns:mcs="clr-namespace:ModengTerm.Controls"
+             xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
              xmlns:termconv="clr-namespace:ModengTerm"
              xmlns:toolkitconv="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              mc:Ignorable="d" 
@@ -41,7 +41,7 @@
             </Setter>
         </Style>
 
-        <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type mcs:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
+        <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type mcsext:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="{DynamicResource ResourceKey=RES501014E}"/>
@@ -205,7 +205,7 @@
             <Grid Grid.Row="0">
                 <Border x:Name="BorderTitle" Background="{DynamicResource ResourceKey=RES501002E}" BorderThickness="0"/>
                 <TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="{DynamicResource ResourceKey=RES501008E}"/>
-                <mcs:MdButton x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Center"
+                <mcsext:MdButton x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Center"
                               SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonClose_Click"
                               Style="{StaticResource ResourceKey=StyleMdButtonLocal}"/>
 

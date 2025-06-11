@@ -1,7 +1,6 @@
 ﻿using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
-using ModengTerm.Document.Drawing;
 using ModengTerm.Terminal;
 using ModengTerm.UnitTest.Drawing;
 using System.Windows.Media.Animation;

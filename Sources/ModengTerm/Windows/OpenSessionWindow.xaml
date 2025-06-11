@@ -1,10 +1,10 @@
-﻿<mcs:MdWindow x:Class="ModengTerm.Windows.SessionListWindow"
+﻿<mcsext:MdWindow x:Class="ModengTerm.Windows.SessionListWindow"
               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
               xmlns:converter="clr-namespace:ModengTerm"
-              xmlns:mcs="clr-namespace:ModengTerm.Controls"
+              xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
               mc:Ignorable="d"
               Title="{DynamicResource ResourceKey=UIText2}" Height="450" Width="800" 
               WindowStartupLocation="CenterScreen" CanResize="False"
@@ -16,7 +16,7 @@
                 <!--<ResourceDictionary Source="UserControls/SessionPropertiesDictionary.xaml"/>-->
             </ResourceDictionary.MergedDictionaries>
 
-            <Style x:Key="StyleButtonLocal" TargetType="{x:Type mcs:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdImageButton}">
+            <Style x:Key="StyleButtonLocal" TargetType="{x:Type mcsext:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdImageButton}">
                 <Setter Property="Width" Value="90"/>
                 <Setter Property="Margin" Value="5"/>
             </Style>
@@ -50,10 +50,10 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <mcs:MdButton Grid.Column="0" Content="新建会话" ImageSource="{DynamicResource ResourceKey=5051}" Click="ButtonCreateSession_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
-            <mcs:MdButton Grid.Column="1" Content="新建分组" Click="ButtonCreateGroup_Click" ImageSource="{DynamicResource ResourceKey=5052}" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
-            <mcs:MdButton Grid.Column="2" Content="删除" Width="70" ImageSource="{DynamicResource ResourceKey=5053}" Click="ButtonDeleteSession_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
-            <mcs:MdButton Grid.Column="3" Content="切换视图" ImageSource="{DynamicResource ResourceKey=5054}" Click="ButtonSwitchView_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <mcsext:MdButton Grid.Column="0" Content="新建会话" ImageSource="{DynamicResource ResourceKey=5051}" Click="ButtonCreateSession_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <mcsext:MdButton Grid.Column="1" Content="新建分组" Click="ButtonCreateGroup_Click" ImageSource="{DynamicResource ResourceKey=5052}" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <mcsext:MdButton Grid.Column="2" Content="删除" Width="70" ImageSource="{DynamicResource ResourceKey=5053}" Click="ButtonDeleteSession_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+            <mcsext:MdButton Grid.Column="3" Content="切换视图" ImageSource="{DynamicResource ResourceKey=5054}" Click="ButtonSwitchView_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
         </Grid>
 
@@ -67,4 +67,4 @@
 
     </Grid>
 
-</mcs:MdWindow>
+</mcsext:MdWindow>

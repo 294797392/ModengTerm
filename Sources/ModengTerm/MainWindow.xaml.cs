@@ -1,9 +1,6 @@
 ﻿using DotNEToolkit;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
-using ModengTerm.Addons;
-using ModengTerm.Addons.Find;
-using ModengTerm.Addons.QuickInput;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
@@ -241,10 +238,10 @@ namespace ModengTerm
 
             #endregion
 
-            CommandArgs.Instance.AddonId = string.Empty;
-            CommandArgs.Instance.Command = AddonCommands.CMD_SELECTED_SESSION_CHANGED;
-            throw new RefactorImplementedException();
+            //CommandArgs.Instance.AddonId = string.Empty;
+            //CommandArgs.Instance.Command = AddonCommands.CMD_SELECTED_SESSION_CHANGED;
             //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
+            throw new RefactorImplementedException();
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -464,43 +461,45 @@ namespace ModengTerm
 
         private void SendCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            CommandVM shellCommand = e.Parameter as CommandVM;
-            if (shellCommand == null)
-            {
-                return;
-            }
+            throw new RefactorImplementedException();
 
-            InputSessionVM inputSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
-            if (inputSession == null)
-            {
-                return;
-            }
+            //CommandVM shellCommand = e.Parameter as CommandVM;
+            //if (shellCommand == null)
+            //{
+            //    return;
+            //}
 
-            switch (shellCommand.Type)
-            {
-                case CommandTypeEnum.PureText:
-                    {
-                        string command = shellCommand.Command;
-                        inputSession.SendText(command);
-                        break;
-                    }
+            //InputSessionVM inputSession = ListBoxOpenedSession.SelectedItem as InputSessionVM;
+            //if (inputSession == null)
+            //{
+            //    return;
+            //}
 
-                case CommandTypeEnum.HexData:
-                    {
-                        byte[] bytes;
-                        if (!VTBaseUtils.TryParseHexString(shellCommand.Command, out bytes))
-                        {
-                            MTMessageBox.Info("发送失败, 十六进制数据格式错误");
-                            return;
-                        }
+            //switch (shellCommand.Type)
+            //{
+            //    case CommandTypeEnum.PureText:
+            //        {
+            //            string command = shellCommand.Command;
+            //            inputSession.SendText(command);
+            //            break;
+            //        }
 
-                        inputSession.SendRawData(bytes);
-                        break;
-                    }
+            //    case CommandTypeEnum.HexData:
+            //        {
+            //            byte[] bytes;
+            //            if (!VTBaseUtils.TryParseHexString(shellCommand.Command, out bytes))
+            //            {
+            //                MTMessageBox.Info("发送失败, 十六进制数据格式错误");
+            //                return;
+            //            }
 
-                default:
-                    throw new NotImplementedException();
-            }
+            //            inputSession.SendRawData(bytes);
+            //            break;
+            //        }
+
+            //    default:
+            //        throw new NotImplementedException();
+            //}
         }
 
         private void OpenSessionCommand_Executed(object sender, ExecutedRoutedEventArgs e)

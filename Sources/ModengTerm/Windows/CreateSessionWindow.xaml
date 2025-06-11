@@ -1,4 +1,4 @@
-﻿<mcontrols:MdWindow x:Class="ModengTerm.Windows.CreateSessionWindow"
+﻿<mcsext:MdWindow x:Class="ModengTerm.Windows.CreateSessionWindow"
                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,7 +6,7 @@
                     xmlns:local="clr-namespace:ModengTerm.Windows"
                     xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
                     xmlns:toolkitcontrol="clr-namespace:WPFToolkit.Controls;assembly=WPFToolkit"
-                    xmlns:mcontrols="clr-namespace:ModengTerm.Controls"
+                    xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
                     xmlns:converter="clr-namespace:ModengTerm"
                     mc:Ignorable="d"
                     Title="{DynamicResource ResourceKey=UIText100}" 
@@ -141,4 +141,4 @@
         </StackPanel>
 
     </Grid>
-</mcontrols:MdWindow>
+</mcsext:MdWindow>

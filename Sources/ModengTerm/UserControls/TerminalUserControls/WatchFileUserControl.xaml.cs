@@ -1,5 +1,4 @@
-﻿using ModengTerm.Addons.SystemMonitor;
-using ModengTerm.Terminal;
+﻿using ModengTerm.Terminal;
 using ModengTerm.Terminal.Session;
 using System.Windows;
 using System.Windows.Automation.Peers;
@@ -12,7 +11,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
     /// </summary>
     public partial class WatchFileUserControl : UserControl
     {
-        private WatchFileVM ViewModel { get { return this.DataContext as WatchFileVM; } }
+        //private WatchFileVM ViewModel { get { return this.DataContext as WatchFileVM; } }
 
         public WatchFileUserControl()
         {

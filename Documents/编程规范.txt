@@ -1,6 +1,0 @@
-# xaml命名空间
-
-mcs:ModengTerm.Controls
-
-
-
