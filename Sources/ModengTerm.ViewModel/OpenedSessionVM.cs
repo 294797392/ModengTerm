@@ -1,4 +1,6 @@
-﻿using ModengTerm.Base.Addon;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.Addon;
+using ModengTerm.Base.Addon.ViewModel;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
@@ -23,6 +25,8 @@ namespace ModengTerm.ViewModel
         /// 连接状态改变的时候触发
         /// </summary>
         public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
+
+        public event Action<OpenedSessionVM, EventCode, EventArgs> Notify;
 
         #endregion
 
@@ -274,7 +278,6 @@ namespace ModengTerm.ViewModel
         {
             SessionPanelContentVM sessionPanelContentVM = viewModel as SessionPanelContentVM;
             sessionPanelContentVM.Session = Session;
-            sessionPanelContentVM.OpenedSessionVM = this;
             sessionPanelContentVM.ServiceAgent = ServiceAgent;
         }
 

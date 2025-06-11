@@ -1,4 +1,5 @@
-﻿using ModengTerm.ViewModel;
+﻿using ModengTerm.Base.Addon.ViewModel;
+using ModengTerm.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interactivity;

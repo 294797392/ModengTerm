@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Addon.ViewModel
+namespace ModengTerm.Base.Addon.ViewModel
 {
     public class PanelVM : MenuItemVM
     {

@@ -4,7 +4,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Addon.ViewModel
+namespace ModengTerm.Base.Addon.ViewModel
 {
     /// <summary>
     /// 所有PanelContent的基类

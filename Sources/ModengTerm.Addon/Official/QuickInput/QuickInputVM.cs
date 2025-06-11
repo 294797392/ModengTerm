@@ -1,4 +1,4 @@
-﻿using ModengTerm.Addon.ViewModel;
+﻿using ModengTerm.Base.Addon.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
