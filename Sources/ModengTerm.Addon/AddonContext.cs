@@ -1,4 +1,5 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,11 @@ namespace ModengTerm.Addons
         public void RaiseCommand(CommandArgs e)
         {
             this.instance.RaiseCommand(e);
+        }
+
+        public void RaiseEvent(EventName code, EventArgs args) 
+        {
+            this.instance.RaiseEvent(code, args);
         }
 
         public void Active() 

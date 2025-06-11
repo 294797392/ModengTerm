@@ -75,7 +75,7 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 面板容器
         /// </summary>
-        public PanelContainerVM PanelContainer { get; private set; }
+        public PanelContainer PanelContainer { get; private set; }
 
         #endregion
 

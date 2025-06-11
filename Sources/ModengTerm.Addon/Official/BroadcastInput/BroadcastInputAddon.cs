@@ -21,8 +21,9 @@ namespace ModengTerm.Addon.Official.BroadcastInput
 
         protected override void OnActive(ActiveContext context)
         {
-            this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
-            this.RegisterCommand(AddonCommands.TERM_SESSION_OPENED, this.OnShellSessionOpened);
+            throw new RefactorImplementedException();
+            //this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
+            //this.RegisterCommand(AddonCommands.TERM_SESSION_OPENED, this.OnShellSessionOpened);
         }
 
         protected override void OnDeactive()

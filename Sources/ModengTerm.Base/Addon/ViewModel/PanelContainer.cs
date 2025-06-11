@@ -14,7 +14,7 @@ namespace ModengTerm.Base.Addon.ViewModel
         }
     }
 
-    public class PanelContainerVM : MenuVM
+    public class PanelContainer : MenuVM
     {
         #region 实例变量
 
@@ -44,7 +44,7 @@ namespace ModengTerm.Base.Addon.ViewModel
 
         #region 构造方法
 
-        public PanelContainerVM()
+        public PanelContainer()
         {
         }
 

@@ -112,9 +112,9 @@ namespace ModengTerm.ViewModel
         /// <param name="parameters">要传递到PanelContentVM里的参数</param>
         /// <param name="matchType"></param>
         /// <returns></returns>
-        public static PanelContainerVM CreatePanelContainerVM(List<PanelItemDefinition> panelItemDefinitions)
+        public static PanelContainer CreatePanelContainerVM(List<PanelItemDefinition> panelItemDefinitions)
         {
-            PanelContainerVM container = new PanelContainerVM();
+            PanelContainer container = new PanelContainer();
 
             foreach (PanelItemDefinition definition in panelItemDefinitions)
             {

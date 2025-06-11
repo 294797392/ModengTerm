@@ -83,7 +83,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 return;
             }
 
-            PanelContainerVM panelVM = base.DataContext as PanelContainerVM;
+            PanelContainer panelVM = base.DataContext as PanelContainer;
 
             PanelVM selectedItem = ListBoxMenus.SelectedItem as PanelVM;
             if (selectedItem == null)

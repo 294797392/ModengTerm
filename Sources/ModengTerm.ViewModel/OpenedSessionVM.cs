@@ -2,14 +2,9 @@
 using ModengTerm.Base.Addon;
 using ModengTerm.Base.Addon.ViewModel;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel
@@ -21,12 +16,7 @@ namespace ModengTerm.ViewModel
     {
         #region 公开事件
 
-        /// <summary>
-        /// 连接状态改变的时候触发
-        /// </summary>
-        public event Action<OpenedSessionVM, SessionStatusEnum> StatusChanged;
-
-        public event Action<OpenedSessionVM, EventCode, EventArgs> Notify;
+        public event Action<OpenedSessionVM, EventType, EventArgs> Notify;
 
         #endregion
 
@@ -34,6 +24,8 @@ namespace ModengTerm.ViewModel
 
         private SessionStatusEnum status;
         private DependencyObject content;
+
+        private StatusChangedEventArgs statusChangedEventArgs;
 
         #endregion
 
@@ -86,7 +78,7 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 侧边栏窗口
         /// </summary>
-        public PanelContainerVM PanelContainer { get; private set; }
+        public PanelContainer PanelContainer { get; private set; }
 
         #endregion
 
@@ -94,8 +86,9 @@ namespace ModengTerm.ViewModel
 
         public OpenedSessionVM(XTermSession session)
         {
-            Session = session;
-            Id = session.ID;
+            this.Session = session;
+            this.Id = session.ID;
+            this.statusChangedEventArgs = new StatusChangedEventArgs();
         }
 
         #endregion
@@ -150,7 +143,7 @@ namespace ModengTerm.ViewModel
 
         #endregion
 
-        #region IAddonSession
+        #region IPanel
 
         public void VisiblePanel(string panelId)
         {
@@ -180,7 +173,14 @@ namespace ModengTerm.ViewModel
                 return;
             }
 
-            Status = status;
+            SessionStatusEnum oldStatus = this.status;
+            SessionStatusEnum newStatus = status;
+
+            this.Status = status;
+
+            this.statusChangedEventArgs.OldStatus = oldStatus;
+            this.statusChangedEventArgs.NewStatus = newStatus;
+            this.Notify?.Invoke(this, EventType.SESSION_STATUS_CHANGED, this.statusChangedEventArgs);
 
             // 通知所有PanelContent，会话状态改变了
             IEnumerable<SessionPanelContentVM> panelContents = PanelContainer.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();

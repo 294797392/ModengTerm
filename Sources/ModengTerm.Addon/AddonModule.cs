@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addons.Shell;
+using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,8 @@ using System.Collections.Generic;
 namespace ModengTerm.Addons
 {
     public delegate void CommandHandlerDelegate(CommandArgs e);
+
+    public delegate void AddonEventHandler(EventType evType, EventArgs args);
 
     /// <summary>
     /// 插件生命周期管理
@@ -24,6 +27,8 @@ namespace ModengTerm.Addons
 
         private Dictionary<string, CommandHandlerDelegate> registerCommands;
 
+        private Dictionary<EventType, AddonEventHandler> registeredEvent;
+
         #endregion
 
         #region 属性
@@ -33,6 +38,10 @@ namespace ModengTerm.Addons
         public AddonDefinition Definition { get; set; }
 
         public AddonObjectStorage ObjectStorage { get; set; }
+
+        public Dictionary<string, CommandHandlerDelegate> RegisteredCommand { get { return this.registerCommands; } }
+
+        public Dictionary<EventType, AddonEventHandler> RegisteredEvent { get { return this.registeredEvent; } }
 
         #endregion
 
@@ -44,6 +53,7 @@ namespace ModengTerm.Addons
         public void Active(ActiveContext context)
         {
             this.registerCommands = new Dictionary<string, CommandHandlerDelegate>();
+            this.registeredEvent = new Dictionary<EventType, AddonEventHandler>();
 
             this.OnActive(context);
         }
@@ -71,6 +81,11 @@ namespace ModengTerm.Addons
 
         #region 受保护方法
 
+        /// <summary>
+        /// 监听某个命令
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="handler"></param>
         protected void RegisterCommand(string command, CommandHandlerDelegate handler)
         {
             if (this.registerCommands.ContainsKey(command))
@@ -79,6 +94,21 @@ namespace ModengTerm.Addons
             }
 
             this.registerCommands[command] = handler;
+        }
+
+        /// <summary>
+        /// 监听某个事件
+        /// </summary>
+        /// <param name="evType"></param>
+        /// <param name="handler"></param>
+        protected void RegisterEvent(EventType evType, AddonEventHandler handler)
+        {
+            if (this.registeredEvent.ContainsKey(evType))
+            {
+                return;
+            }
+
+            this.registeredEvent[evType] = handler;
         }
 
         protected string GetObjectId()

@@ -156,11 +156,11 @@ namespace ModengTerm.Base
             return srcFileName;
         }
 
-        public static VTManifest GetManifest() 
-        {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.json");
-            return JSONHelper.ParseFile<VTManifest>(path);
-        }
+        //public static VTManifest GetManifest() 
+        //{
+        //    string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "app.json");
+        //    return JSONHelper.ParseFile<VTManifest>(path);
+        //}
 
         public static System.Windows.Media.Color RgbKey2Color(string rgbKey)
         {

@@ -178,7 +178,7 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
 
         public override void OnInitialize()
         {
-            VTManifest manifest = VTBaseUtils.GetManifest();
+            VTManifest manifest = VTApp.Context.Manifest;
 
             this.manifest = manifest;
 

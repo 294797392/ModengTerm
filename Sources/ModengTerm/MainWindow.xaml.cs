@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
+using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
@@ -45,6 +46,7 @@ namespace ModengTerm
         private MainWindowVM mainWindowVM;
         private ServiceAgent serviceAgent;
         private DefaultMainUserControl defaultMainUserControl;
+        private List<AddonModule> addons;
 
         #endregion
 
@@ -110,6 +112,7 @@ namespace ModengTerm
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
+            openedSessionVM.Notify += this.OpenedSessionVM_Notify;
             openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
@@ -169,9 +172,76 @@ namespace ModengTerm
             this.mainWindowVM.SessionList.Remove(session);
         }
 
+        /// <summary>
+        /// 初始化插件列表
+        /// </summary>
+        private void InitializeAddon()
+        {
+            List<AddonModule> addons = new List<AddonModule>();
+
+            #region 创建插件实例
+
+            foreach (AddonDefinition definition in VTApp.Context.Manifest.Addons)
+            {
+                AddonModule addon = null;
+
+                try
+                {
+                    addon = ConfigFactory<AddonModule>.CreateInstance(definition.ClassEntry);
+                    addon.Definition = definition;
+                    addon.Active(ActiveContext.Default);
+
+                    addons.Add(addon);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("创建插件实例异常", ex);
+                    continue;
+                }
+            }
+
+            #endregion
+
+            #region 创建Panel类型的插件
+
+            foreach (AddonModule addon in addons)
+            {
+                if (addon.Definition.GlobalPanels.Count == 0)
+                {
+                    continue;
+                }
+
+                //this.mainWindowVM.PanelContainer VMUtils.CreatePanelContainerVM(addon.Definition.GlobalPanels);
+            }
+
+            #endregion
+
+            this.addons = addons;
+        }
+
         #endregion
 
         #region 事件处理器
+
+        /// <summary>
+        /// 会话触发的所有事件
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="code"></param>
+        /// <param name="e"></param>
+        private void OpenedSessionVM_Notify(OpenedSessionVM session, EventType evType, EventArgs args)
+        {
+            foreach (AddonModule addon in this.addons)
+            {
+                AddonEventHandler eventHandler;
+                if (!addon.RegisteredEvent.TryGetValue(evType, out eventHandler))
+                {
+                    continue;
+                }
+
+                eventHandler(evType, args);
+            }
+        }
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {

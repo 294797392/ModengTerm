@@ -547,7 +547,7 @@ namespace ModengTerm.ViewModel
         {
             this.serviceAgent = serviceAgent;
 
-            this.appManifest = VTBaseUtils.GetManifest();
+            this.appManifest = VTApp.Context.Manifest;
 
             //this.Name = string.Format("新建会话_{0}", DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
             this.Name = "新建会话";
