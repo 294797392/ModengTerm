@@ -10,7 +10,7 @@
         xmlns:converters="clr-namespace:ModengTerm"
         xmlns:terminaluc="clr-namespace:ModengTerm.UserControls.Terminals"
         xmlns:termenum="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
-        xmlns:termuc2="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
+        xmlns:termuc2="clr-namespace:ModengTerm.UserControls"
         xmlns:mcmd="clr-namespace:ModengTerm"
         xmlns:local="clr-namespace:ModengTerm"
         xmlns:vm="clr-namespace:ModengTerm.ViewModel;assembly=ModengTerm.ViewModel"
@@ -318,7 +318,7 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelUserControl DataContext="{Binding Path=PanelContainer}"/>
+                <termuc2:PanelContainerUserControl DataContext="{Binding Path=PanelContainer}"/>
             </Grid>
 
             <!-- 终端显示区域 -->
@@ -347,7 +347,7 @@
 
             <!-- 右边窗格 -->
             <Grid Grid.Column="2">
-                <termuc2:PanelUserControl x:Name="PanelUserControlSession" Dock="Right"/>
+                <termuc2:PanelContainerUserControl x:Name="PanelUserControlSession" Dock="Right"/>
             </Grid>
 
         </Grid>

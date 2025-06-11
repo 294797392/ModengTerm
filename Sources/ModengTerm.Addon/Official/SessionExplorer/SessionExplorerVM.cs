@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addon.Official.SessionExplorer
 {
-    public class SessionExplorerVM : PanelContentVM
+    public class SessionExplorerVM : WindowPanel
     {
         //public SessionTreeVM ResourceManagerTree { get; private set; }
 

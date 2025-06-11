@@ -47,17 +47,17 @@ namespace ModengTerm.Base.Definitions
         /// PanelItem
         /// </summary>
         [JsonProperty("sessionPanels")]
-        public List<PanelItemDefinition> SessionPanels { get; private set; }
+        public List<PanelDefinition> SessionPanels { get; private set; }
 
-        [JsonProperty("globalPanels")]
-        public List<PanelItemDefinition> GlobalPanels { get; private set; }
+        [JsonProperty("windowPanels")]
+        public List<PanelDefinition> GlobalPanels { get; private set; }
 
         public AddonDefinition()
         {
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.ContextMenus = new List<AddonMenuDefinition>();
-            this.SessionPanels = new List<PanelItemDefinition>();
-            this.GlobalPanels = new List<PanelItemDefinition>();
+            this.SessionPanels = new List<PanelDefinition>();
+            this.GlobalPanels = new List<PanelDefinition>();
         }
     }
 }

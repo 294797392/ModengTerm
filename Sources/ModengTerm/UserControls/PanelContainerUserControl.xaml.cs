@@ -1,20 +1,32 @@
-﻿using ModengTerm.Base.Addon.ViewModel;
-using ModengTerm.ViewModel;
+﻿using DotNEToolkit;
+using ModengTerm.Base.Addon.ViewModel;
+using ModengTerm.Base.Definitions;
+using System;
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
-using System.Windows.Interactivity;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.UserControls.TerminalUserControls
+namespace ModengTerm.UserControls
 {
     /// <summary>
-    /// ToolPanelUserControl.xaml 的交互逻辑
+    /// PanelContainerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class PanelUserControl : UserControl
+    public partial class PanelContainerUserControl : UserControl
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("PanelUserControl");
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("PanelContainerUserControl");
+
+        #endregion
+
+        #region 实例变量
 
         private Dock dock = Dock.Left;
+
+        #endregion
+
+        #region 属性
 
         public Dock Dock
         {
@@ -44,9 +56,11 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
         }
 
+        #endregion
+
         #region 构造方法
 
-        public PanelUserControl()
+        public PanelContainerUserControl()
         {
             InitializeComponent();
 
@@ -61,15 +75,38 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
         }
 
-        private void ProcessContentUnload(PanelVM panelItemVM)
+        private void ProcessContentUnload(PanelBase panel)
         {
-            if (!(panelItemVM.ContentVM is MenuContentVM))
+            panel.OnUnload();
+        }
+
+        private FrameworkElement LoadContent(PanelBase panel)
+        {
+            PanelDefinition definition = panel.Definition;
+            FrameworkElement content = panel.Content;
+
+            // 开始加载本次选中的菜单界面
+            if (content == null)
             {
-                return;
+                try
+                {
+                    content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
+
+                    panel.OnInitialize();
+                    panel.Content = content;
+
+                    content.DataContext = panel;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("创建菜单内容控件异常", ex);
+                    return null;
+                }
             }
 
-            MenuContentVM menuContentVM = panelItemVM.ContentVM as MenuContentVM;
-            menuContentVM.OnUnload();
+            panel.OnLoaded();
+
+            return content;
         }
 
         #endregion
@@ -83,17 +120,22 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 return;
             }
 
-            PanelContainer panelVM = base.DataContext as PanelContainer;
+            PanelContainer panelContainer = base.DataContext as PanelContainer;
 
-            PanelVM selectedItem = ListBoxMenus.SelectedItem as PanelVM;
+            PanelBase selectedItem = ListBoxMenus.SelectedItem as PanelBase;
             if (selectedItem == null)
             {
                 GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
-                panelVM.CurrentContent = null;
+                ContentControl1.Content = null;
                 return;
             }
 
-            DependencyObject dependencyObject = panelVM.LoadContent(selectedItem);
+            if (e.RemovedItems.Count > 0) 
+            {
+                this.ProcessContentUnload(e.RemovedItems[0] as PanelBase);
+            }
+
+            DependencyObject dependencyObject = this.LoadContent(selectedItem);
             if (dependencyObject == null)
             {
                 logger.ErrorFormat("加载页面失败, 页面为空, {0}", selectedItem.Name);
@@ -108,20 +150,21 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            PanelVM panelItemVM = ListBoxMenus.SelectedItem as PanelVM;
+            PanelBase selectedPanel = ListBoxMenus.SelectedItem as PanelBase;
 
             ListBoxMenus.SelectedItem = null;
+            ContentControl1.Content = null;
             GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
 
             // 点击关闭按钮手动触发Unload事件
-            this.ProcessContentUnload(panelItemVM);
+            this.ProcessContentUnload(selectedPanel);
         }
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            PanelVM selected = ListBoxMenus.SelectedItem as PanelVM;
+            PanelBase selected = ListBoxMenus.SelectedItem as PanelBase;
 
-            PanelVM clicked = (sender as ListBoxItem).DataContext as PanelVM;
+            PanelBase clicked = (sender as ListBoxItem).DataContext as PanelBase;
 
             if (clicked == selected)
             {

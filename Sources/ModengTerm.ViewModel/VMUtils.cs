@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using DotNEToolkit;
+using ModengTerm.Base;
 using ModengTerm.Base.Addon.ViewModel;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
@@ -100,35 +101,33 @@ namespace ModengTerm.ViewModel
             }
         }
 
-
-
-
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="panel"></param>
-        /// <param name="parameters">要传递到PanelContentVM里的参数</param>
-        /// <param name="matchType"></param>
-        /// <returns></returns>
-        public static PanelContainer CreatePanelContainerVM(List<PanelItemDefinition> panelItemDefinitions)
+        public static List<PanelBase> CreatePanels(List<PanelDefinition> panelDefinitions)
         {
-            PanelContainer container = new PanelContainer();
+            List<PanelBase> panels = new List<PanelBase>();
 
-            foreach (PanelItemDefinition definition in panelItemDefinitions)
+            foreach (PanelDefinition definition in panelDefinitions)
             {
-                PanelVM panelItemVM = new PanelVM(definition);
-                panelItemVM.ID = definition.ID;
-                panelItemVM.Name = definition.Name;
-                panelItemVM.IconURI = definition.Icon;
-                panelItemVM.ClassName = definition.ClassName;
-                panelItemVM.VMClassName = definition.VMClassName;
+                PanelBase panel = null;
 
-                container.AddMenuItem(panelItemVM);
+                try
+                {
+                    panel = ConfigFactory<PanelBase>.CreateInstance(definition.VMClassName);
+                }
+                catch (Exception ex)
+                {
+                    logger.ErrorFormat("创建Panel实例异常, {0}, {1}", definition.VMClassName, ex);
+                    continue;
+                }
+
+                panel.Definition = definition;
+                panel.ID = definition.ID;
+                panel.Name = definition.Name;
+                panel.IconURI = definition.Icon;
+
+                panels.Add(panel);
             }
 
-            return container;
+            return panels;
         }
 
         public static List<ContextMenuVM> CreateContextMenuVMs(bool toolbarMenu)

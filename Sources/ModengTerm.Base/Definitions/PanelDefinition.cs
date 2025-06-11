@@ -3,7 +3,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.Base.Definitions
 {
-    public class PanelItemDefinition : MenuDefinition
+    public class PanelDefinition : MenuDefinition
     {
         /// <summary>
         /// 支持的会话类型
@@ -11,7 +11,7 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("sessionTypes")]
         public List<int> SessionTypes { get; set; }
 
-        public PanelItemDefinition()
+        public PanelDefinition()
         {
             this.SessionTypes = new List<int>();
         }

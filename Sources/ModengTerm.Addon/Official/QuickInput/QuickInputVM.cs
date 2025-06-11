@@ -8,7 +8,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.Addon.Official.QuickInput
 {
-    public class QuickInputVM : SessionPanelContentVM
+    public class QuickInputVM : SessionPanel
     {
         #region 属性
 
@@ -26,7 +26,7 @@ namespace ModengTerm.Addon.Official.QuickInput
 
         #endregion
 
-        #region SessionPanelContentVM
+        #region SessionPanel
 
         public override void OnInitialize()
         {

@@ -122,7 +122,7 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnLoaded()
         {
-            SessionPanelContentVM panelContent = GetActivePanelContent();
+            SessionPanel panelContent = GetActivePanelContent();
             if (panelContent != null)
             {
                 panelContent.OnLoaded();
@@ -134,7 +134,7 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnUnload()
         {
-            SessionPanelContentVM panelContent = GetActivePanelContent();
+            SessionPanel panelContent = GetActivePanelContent();
             if (panelContent != null)
             {
                 panelContent.OnUnload();
@@ -182,12 +182,13 @@ namespace ModengTerm.ViewModel
             this.statusChangedEventArgs.NewStatus = newStatus;
             this.Notify?.Invoke(this, EventType.SESSION_STATUS_CHANGED, this.statusChangedEventArgs);
 
-            // 通知所有PanelContent，会话状态改变了
-            IEnumerable<SessionPanelContentVM> panelContents = PanelContainer.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();
-            foreach (SessionPanelContentVM panelContent in panelContents)
-            {
-                panelContent.OnSessionStatusChanged(status);
-            }
+            throw new RefactorImplementedException();
+            //// 通知所有PanelContent，会话状态改变了
+            //IEnumerable<SessionPanelContentVM> panelContents = PanelContainer.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();
+            //foreach (SessionPanelContentVM panelContent in panelContents)
+            //{
+            //    panelContent.OnSessionStatusChanged(status);
+            //}
         }
 
         #endregion
@@ -198,20 +199,21 @@ namespace ModengTerm.ViewModel
         /// 获取当前显示的PanelContent
         /// </summary>
         /// <returns></returns>
-        private SessionPanelContentVM GetActivePanelContent()
+        private SessionPanel GetActivePanelContent()
         {
-            if (PanelContainer == null)
-            {
-                return null;
-            }
+            throw new RefactorImplementedException();
+            //if (PanelContainer == null)
+            //{
+            //    return null;
+            //}
 
-            MenuItemVM selectedItem = PanelContainer.SelectedMenu;
-            if (selectedItem == null)
-            {
-                return null;
-            }
+            //MenuItemVM selectedItem = PanelContainer.SelectedMenu;
+            //if (selectedItem == null)
+            //{
+            //    return null;
+            //}
 
-            return selectedItem.ContentVM as SessionPanelContentVM;
+            //return selectedItem.ContentVM as SessionPanelContentVM;
         }
 
         /// <summary>
@@ -220,18 +222,20 @@ namespace ModengTerm.ViewModel
         /// <param name="add"></param>
         private void AddRemovePanelItemEvent(bool add)
         {
-            foreach (MenuItemVM menuItem in PanelContainer.MenuItems)
-            {
-                if (add)
-                {
-                    // 注册这个事件的目的是为了把OpenedSessionVM的实例传递给SessionPanelContentVM
-                    menuItem.ContentInitializing += PanelItem_ContentInitializing;
-                }
-                else
-                {
-                    menuItem.ContentInitializing -= PanelItem_ContentInitializing;
-                }
-            }
+            throw new RefactorImplementedException();
+
+            //foreach (MenuItemVM menuItem in PanelContainer.MenuItems)
+            //{
+            //    if (add)
+            //    {
+            //        // 注册这个事件的目的是为了把OpenedSessionVM的实例传递给SessionPanelContentVM
+            //        menuItem.ContentInitializing += PanelItem_ContentInitializing;
+            //    }
+            //    else
+            //    {
+            //        menuItem.ContentInitializing -= PanelItem_ContentInitializing;
+            //    }
+            //}
         }
 
         private void InitializePanels()
@@ -276,9 +280,10 @@ namespace ModengTerm.ViewModel
         /// <param name="viewModel"></param>
         private void PanelItem_ContentInitializing(MenuItemVM menuItemVM, ViewModelBase viewModel, DependencyObject view)
         {
-            SessionPanelContentVM sessionPanelContentVM = viewModel as SessionPanelContentVM;
-            sessionPanelContentVM.Session = Session;
-            sessionPanelContentVM.ServiceAgent = ServiceAgent;
+            throw new RefactorImplementedException();
+            //SessionPanel sessionPanelContentVM = viewModel as SessionPanel;
+            //sessionPanelContentVM.Session = Session;
+            //sessionPanelContentVM.ServiceAgent = ServiceAgent;
         }
 
         #endregion

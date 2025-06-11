@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="ModengTerm.UserControls.TerminalUserControls.PanelUserControl"
+﻿<UserControl x:Class="ModengTerm.UserControls.PanelContainerUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -74,7 +74,7 @@
             <ColumnDefinition Width="*" x:Name="ColumnDefinition2"/>
         </Grid.ColumnDefinitions>
 
-        <ListBox Grid.Column="0" x:Name="ListBoxMenus" ItemsSource="{Binding Path=MenuItems}"
+        <ListBox Grid.Column="0" x:Name="ListBoxMenus" ItemsSource="{Binding Path=Panels}"
                  SelectionChanged="ListBoxMenus_SelectionChanged">
 
             <ListBox.Style>

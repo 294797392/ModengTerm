@@ -2,19 +2,12 @@
 using ModengTerm.Base.Enumerations;
 using System;
 using System.Linq;
+using System.Windows.Automation;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.Base.Addon.ViewModel
 {
-    public class PanelVM : MenuItemVM
-    {
-        public PanelVM(MenuDefinition menuDefinition) :
-            base(menuDefinition)
-        {
-        }
-    }
-
-    public class PanelContainer : MenuVM
+    public class PanelContainer : ViewModelBase
     {
         #region 实例变量
 
@@ -40,39 +33,35 @@ namespace ModengTerm.Base.Addon.ViewModel
             }
         }
 
+        public BindableCollection<PanelBase> Panels { get; private set; }
+
         #endregion
 
         #region 构造方法
 
         public PanelContainer()
         {
+            this.Panels = new BindableCollection<PanelBase>();
         }
 
         #endregion
 
         #region 实例方法
 
-        private void ProcessLoaded(bool loaded, PanelVM panelItemVM)
+        private void ProcessLoaded(bool loaded, PanelBase panel)
         {
-            if (panelItemVM.ContentVM == null)
+            if (panel.Content == null)
             {
                 return;
             }
-
-            if (!(panelItemVM.ContentVM is MenuContentVM))
-            {
-                return;
-            }
-
-            MenuContentVM menuContentVM = panelItemVM.ContentVM as MenuContentVM;
 
             if (loaded)
             {
-                menuContentVM.OnLoaded();
+                panel.OnLoaded();
             }
             else
             {
-                menuContentVM.OnUnload();
+                panel.OnUnload();
             }
         }
 
@@ -80,10 +69,10 @@ namespace ModengTerm.Base.Addon.ViewModel
 
         #region 公开接口
 
-        public void ChangeVisible(string panelItemId)
+        public void ChangeVisible(string panelId)
         {
-            PanelVM panelItemVM = this.MenuItems.FirstOrDefault(v => v.ID.ToString() == panelItemId) as PanelVM;
-            if (panelItemVM == null)
+            PanelBase panel = this.Panels.FirstOrDefault(v => v.ID.ToString() == panelId) as PanelBase;
+            if (panel == null)
             {
                 return;
             }
@@ -91,9 +80,9 @@ namespace ModengTerm.Base.Addon.ViewModel
             // 当前状态
             bool visible = false;
 
-            if (Visible)
+            if (this.Visible)
             {
-                if (this.SelectedMenu == panelItemVM)
+                if (panel.IsSelected)
                 {
                     visible = true;
                 }
@@ -102,23 +91,23 @@ namespace ModengTerm.Base.Addon.ViewModel
             if (visible)
             {
                 // 当前是显示状态，隐藏
-                Visible = false;
-                this.SelectedMenu.IsSelected = false;
-                ProcessLoaded(false, panelItemVM);
+                this.Visible = false;
+                this.Panels.SelectedItem.IsSelected = false;
+                ProcessLoaded(false, this.Panels.SelectedItem);
             }
             else
             {
                 // 当前是隐藏状态，显示
                 Visible = true;
 
-                if (!panelItemVM.IsSelected)
+                if (!panel.IsSelected)
                 {
                     // 选中之后会自动触发Loaded事件
-                    panelItemVM.IsSelected = true;
+                    panel.IsSelected = true;
                 }
                 else
                 {
-                    ProcessLoaded(true, panelItemVM);
+                    ProcessLoaded(true, panel);
                 }
             }
         }
