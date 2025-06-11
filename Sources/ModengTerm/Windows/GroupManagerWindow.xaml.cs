@@ -43,7 +43,7 @@ namespace ModengTerm.Windows
         private void InitializeWindow(string selectedGroupId)
         {
             this.serviceAgent = VTApp.Context.ServiceAgent;
-            this.sessionTreeVM = VMUtils.CreateSessionTreeVM(this.serviceAgent, false, true);
+            this.sessionTreeVM = VMUtils.CreateSessionTreeVM(false, true);
             SessionTreeViewUserControl.ViewModel = this.sessionTreeVM;
             this.sessionTreeVM.ExpandAll();
 

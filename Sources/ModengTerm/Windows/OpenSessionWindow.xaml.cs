@@ -93,7 +93,7 @@ namespace ModengTerm.Windows
         private void InitializeWindow()
         {
             this.serviceAgent = VTApp.Context.ServiceAgent;
-            this.sessionTreeVM = VMUtils.CreateSessionTreeVM(this.serviceAgent);
+            this.sessionTreeVM = VMUtils.CreateSessionTreeVM();
             this.viewList = new Dictionary<SessionListViewEnum, SessionListView>();
             this.SwitchView(SessionListViewEnum.DataGrid);
         }

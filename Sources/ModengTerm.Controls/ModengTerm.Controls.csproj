@@ -7,4 +7,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WPFToolkit">
+      <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

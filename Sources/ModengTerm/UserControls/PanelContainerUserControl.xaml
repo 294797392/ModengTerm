@@ -75,6 +75,7 @@
         </Grid.ColumnDefinitions>
 
         <ListBox Grid.Column="0" x:Name="ListBoxMenus" ItemsSource="{Binding Path=Panels}"
+                 SelectedItem="{Binding Path=SelectedItem, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  SelectionChanged="ListBoxMenus_SelectionChanged">
 
             <ListBox.Style>

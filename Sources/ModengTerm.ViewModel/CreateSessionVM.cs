@@ -579,7 +579,7 @@ namespace ModengTerm.ViewModel
             // 选择第一个会话
             SelectedSessionType = SessionTypeList.FirstOrDefault();
 
-            SessionGroups = VMUtils.CreateSessionTreeVM(this.serviceAgent, true, true);
+            SessionGroups = VMUtils.CreateSessionTreeVM(true, true);
             SessionGroups.ExpandAll();
 
             #endregion

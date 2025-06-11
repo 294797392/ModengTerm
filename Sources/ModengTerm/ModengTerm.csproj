@@ -147,6 +147,12 @@
     <Folder Include="Controls\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="OfficialAddons\SessionExplorer\SessionExplorerUserControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy $(SolutionDir)..\Dependence\log4net.xml $(TargetDir) /y&#xD;&#xA;xcopy $(SolutionDir)..\Dependence\adb\* $(TargetDir) /y" />
   </Target>

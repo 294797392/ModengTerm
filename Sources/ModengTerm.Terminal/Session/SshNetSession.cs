@@ -28,7 +28,6 @@ namespace ModengTerm.Terminal.Session
         private SshClient sshClient;
         private ShellStream stream;
         private List<PortForwardState> portForwardStates;
-        private ServiceAgent serviceAgent;
 
         #endregion
 
@@ -43,7 +42,6 @@ namespace ModengTerm.Terminal.Session
         public SshNetSession(XTermSession options) :
             base(options)
         {
-            this.serviceAgent = VTermApp.Context.ServiceAgent;
         }
 
         #endregion
@@ -81,7 +79,7 @@ namespace ModengTerm.Terminal.Session
 
                 case SSHAuthTypeEnum.PrivateKey:
                     {
-                        PrivateKey privateKey = this.serviceAgent.GetPrivateKey(privateKeyId);
+                        PrivateKey privateKey = VTApp.Context.ServiceAgent.GetPrivateKey(privateKeyId);
                         if (privateKey == null) 
                         {
                             logger.ErrorFormat("登录失败, 密钥不存在");

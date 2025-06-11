@@ -9,13 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Official\SystemMonitor\**" />
-    <EmbeddedResource Remove="Official\SystemMonitor\**" />
-    <None Remove="Official\SystemMonitor\**" />
-    <Page Remove="Official\SystemMonitor\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="AddonContext.cs" />
   </ItemGroup>
 
@@ -38,12 +31,6 @@
     <Reference Include="WPFToolkit">
       <HintPath>..\..\Dependence\WPFToolkit.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Official\SessionExplorer\SessionExplorerUserControl.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
 
 </Project>

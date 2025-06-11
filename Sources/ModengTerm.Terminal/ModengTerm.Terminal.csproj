@@ -115,9 +115,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="vtermapp.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="ShellScripts\FetchNetworkInterfaces.sh">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
@@ -127,6 +124,6 @@
     <Folder Include="Session\ConPTY\" />
   </ItemGroup>
 
-  <ProjectExtensions><VisualStudio><UserProperties manifest_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+  <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
 
 </Project>

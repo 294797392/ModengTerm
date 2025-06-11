@@ -12,6 +12,7 @@ namespace ModengTerm.Base.Addon.ViewModel
         #region 实例变量
 
         private bool visible;
+        private PanelBase selectedItem;
 
         #endregion
 
@@ -34,6 +35,19 @@ namespace ModengTerm.Base.Addon.ViewModel
         }
 
         public BindableCollection<PanelBase> Panels { get; private set; }
+
+        public PanelBase SelectedItem
+        {
+            get { return this.selectedItem; }
+            set
+            {
+                if (this.selectedItem != value)
+                {
+                    this.selectedItem = value;
+                    this.NotifyPropertyChanged("SelectedItem");
+                }
+            }
+        }
 
         #endregion
 

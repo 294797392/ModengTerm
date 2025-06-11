@@ -101,9 +101,6 @@ namespace ModengTerm.Base.Addon.ViewModel
         public override void OnInitialize()
         {
             ID = ++id;
-
-            throw new RefactorImplementedException();
-            //sessionStatus = OpenedSessionVM.Status;
         }
 
         public override void OnLoaded()

@@ -42,9 +42,6 @@ namespace ModengTerm.Base
             this.ServiceAgent = new LocalServiceAgent();
             this.ServiceAgent.Initialize();
 
-            //this.ResourceManagerTreeVM = this.CreateSessionTreeVM(false, true);
-            //this.ResourceManagerTreeVM.Roots[0].Name = "会话列表";
-            //this.ResourceManagerTreeVM.ExpandAll();
 
             return ResponseCode.SUCCESS;
         }
@@ -91,18 +88,6 @@ namespace ModengTerm.Base
         #endregion
 
         #region 实例方法
-
-        private void InitializeAddonList() 
-        {
-            //foreach (AddonDefinition definition in this.Manifest.Addons)
-            //{
-            //    AddonContext context = new AddonContext(definition);
-
-            //    context.Active();
-
-            //    this.AddonContexts.Add(context);
-            //}
-        }
 
         //private void ProcessFrame(int elapsed, IFramedElement element)
         //{

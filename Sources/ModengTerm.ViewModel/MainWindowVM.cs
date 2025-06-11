@@ -85,26 +85,26 @@ namespace ModengTerm.ViewModel
         {
             serviceAgent = VTApp.Context.ServiceAgent;
 
-            SessionList = new BindableCollection<SessionItemVM>();
-            SessionList.Add(OpenSessionVM);
+            this.PanelContainer = new PanelContainer();
+
+            this.SessionList = new BindableCollection<SessionItemVM>();
+            this.SessionList.Add(OpenSessionVM);
 
             List<XTermSession> sessions = serviceAgent.GetSessions();
-            RecentlyOpenedSession = new BindableCollection<RecentlySessionVM>();
+            this.RecentlyOpenedSession = new BindableCollection<RecentlySessionVM>();
             List<RecentlySession> recentSessions = serviceAgent.GetRecentSessions();
             foreach (RecentlySession recentSession in recentSessions)
             {
                 RecentlySessionVM recentlySessionVM = new RecentlySessionVM(recentSession);
-                RecentlyOpenedSession.Add(recentlySessionVM);
+                this.RecentlyOpenedSession.Add(recentlySessionVM);
             }
 
-            TitleMenus = new BindableCollection<ContextMenuVM>();
-            TitleMenus.AddRange(VMUtils.CreateContextMenuVMs(true));
+            this.TitleMenus = new BindableCollection<ContextMenuVM>();
+            this.TitleMenus.AddRange(VMUtils.CreateContextMenuVMs(true));
 
-            Themes = new BindableCollection<AppThemeVM>();
-            Themes.AddRange(VTApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
-            Themes.SelectedItem = Themes[0];//.FirstOrDefault();
-
-            InitializePanels();
+            this.Themes = new BindableCollection<AppThemeVM>();
+            this.Themes.AddRange(VTApp.Context.Manifest.AppThemes.Select(v => new AppThemeVM(v)));
+            this.Themes.SelectedItem = this.Themes[0];//.FirstOrDefault();
         }
 
         #endregion
@@ -166,24 +166,6 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 实例方法
-
-        private void InitializePanels()
-        {
-            throw new RefactorImplementedException();
-            //// 加载所有插件要显示的面板
-            //List<AddonContext> contexts = VTApp.Context.AddonContexts;
-
-            //List<PanelItemDefinition> panels = new List<PanelItemDefinition>();
-
-            //foreach (AddonContext context in contexts)
-            //{
-            //    AddonDefinition definition = context.Definition;
-
-            //    panels.AddRange(definition.GlobalPanels);
-            //}
-
-            //this.PanelContainer = VTClientUtils.CreatePanelContainerVM(panels);
-        }
 
         #endregion
 

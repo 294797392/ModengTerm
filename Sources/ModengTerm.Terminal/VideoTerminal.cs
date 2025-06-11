@@ -4,6 +4,7 @@ using ModengTerm.Base.DataModels.Terminal;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
+using ModengTerm.Base.Modules;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Graphics;
@@ -344,7 +345,7 @@ namespace ModengTerm.Terminal
 
             #endregion
 
-            this.bellPlayer = VTermApp.Context.Factory.LookupModule<BellPlayer>();
+            this.bellPlayer = VTApp.Context.Factory.LookupModule<BellPlayer>();
             this.textPointer = new VTextPointer();
 
             // 初始化变量

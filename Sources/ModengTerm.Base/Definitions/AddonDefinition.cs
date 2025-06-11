@@ -50,14 +50,14 @@ namespace ModengTerm.Base.Definitions
         public List<PanelDefinition> SessionPanels { get; private set; }
 
         [JsonProperty("windowPanels")]
-        public List<PanelDefinition> GlobalPanels { get; private set; }
+        public List<PanelDefinition> WindowPanels { get; private set; }
 
         public AddonDefinition()
         {
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.ContextMenus = new List<AddonMenuDefinition>();
             this.SessionPanels = new List<PanelDefinition>();
-            this.GlobalPanels = new List<PanelDefinition>();
+            this.WindowPanels = new List<PanelDefinition>();
         }
     }
 }

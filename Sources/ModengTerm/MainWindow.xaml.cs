@@ -3,6 +3,7 @@ using log4net.Core;
 using log4net.Repository.Hierarchy;
 using ModengTerm.Addons;
 using ModengTerm.Base;
+using ModengTerm.Base.Addon.ViewModel;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
@@ -82,6 +83,8 @@ namespace ModengTerm
             ListBoxOpenedSession.ItemContainerStyleSelector = this.itemContainerStyleSelector;
 
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
+
+            this.InitializeAddon();
         }
 
         private void ShowSessionListWindow()
@@ -206,12 +209,14 @@ namespace ModengTerm
 
             foreach (AddonModule addon in addons)
             {
-                if (addon.Definition.GlobalPanels.Count == 0)
+                if (addon.Definition.WindowPanels.Count == 0)
                 {
                     continue;
                 }
 
-                //this.mainWindowVM.PanelContainer VMUtils.CreatePanelContainerVM(addon.Definition.GlobalPanels);
+                List<PanelBase> panels = VMUtils.CreatePanels(addon.Definition.WindowPanels);
+
+                this.mainWindowVM.PanelContainer.Panels.AddRange(panels);
             }
 
             #endregion
@@ -310,7 +315,7 @@ namespace ModengTerm
             //CommandArgs.Instance.AddonId = string.Empty;
             //CommandArgs.Instance.Command = AddonCommands.CMD_SELECTED_SESSION_CHANGED;
             //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
-            throw new RefactorImplementedException();
+            //throw new RefactorImplementedException();
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)

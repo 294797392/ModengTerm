@@ -101,7 +101,6 @@ namespace ModengTerm.ViewModel
         public void Initialize()
         {
             InitializePanels();
-            AddRemovePanelItemEvent(true);
         }
 
         public int Open()
@@ -113,8 +112,6 @@ namespace ModengTerm.ViewModel
         public void Close()
         {
             OnClose();
-
-            AddRemovePanelItemEvent(false);
         }
 
         /// <summary>
@@ -122,10 +119,10 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnLoaded()
         {
-            SessionPanel panelContent = GetActivePanelContent();
-            if (panelContent != null)
+            SessionPanel panel = this.GetActivePanel();
+            if (panel != null)
             {
-                panelContent.OnLoaded();
+                panel.OnLoaded();
             }
         }
 
@@ -134,10 +131,10 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnUnload()
         {
-            SessionPanel panelContent = GetActivePanelContent();
-            if (panelContent != null)
+            SessionPanel panel = this.GetActivePanel();
+            if (panel != null)
             {
-                panelContent.OnUnload();
+                panel.OnUnload();
             }
         }
 
@@ -180,9 +177,9 @@ namespace ModengTerm.ViewModel
 
             this.statusChangedEventArgs.OldStatus = oldStatus;
             this.statusChangedEventArgs.NewStatus = newStatus;
-            this.Notify?.Invoke(this, EventType.SESSION_STATUS_CHANGED, this.statusChangedEventArgs);
+            this.Notify?.Invoke(this, EventType.COMMON_SESSION_STATUS_CHANGED, this.statusChangedEventArgs);
 
-            throw new RefactorImplementedException();
+            //throw new RefactorImplementedException();
             //// 通知所有PanelContent，会话状态改变了
             //IEnumerable<SessionPanelContentVM> panelContents = PanelContainer.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();
             //foreach (SessionPanelContentVM panelContent in panelContents)
@@ -199,43 +196,14 @@ namespace ModengTerm.ViewModel
         /// 获取当前显示的PanelContent
         /// </summary>
         /// <returns></returns>
-        private SessionPanel GetActivePanelContent()
+        private SessionPanel GetActivePanel()
         {
-            throw new RefactorImplementedException();
-            //if (PanelContainer == null)
-            //{
-            //    return null;
-            //}
+            if (this.PanelContainer == null)
+            {
+                return null;
+            }
 
-            //MenuItemVM selectedItem = PanelContainer.SelectedMenu;
-            //if (selectedItem == null)
-            //{
-            //    return null;
-            //}
-
-            //return selectedItem.ContentVM as SessionPanelContentVM;
-        }
-
-        /// <summary>
-        /// 注册或反注册PanelItem的事件
-        /// </summary>
-        /// <param name="add"></param>
-        private void AddRemovePanelItemEvent(bool add)
-        {
-            throw new RefactorImplementedException();
-
-            //foreach (MenuItemVM menuItem in PanelContainer.MenuItems)
-            //{
-            //    if (add)
-            //    {
-            //        // 注册这个事件的目的是为了把OpenedSessionVM的实例传递给SessionPanelContentVM
-            //        menuItem.ContentInitializing += PanelItem_ContentInitializing;
-            //    }
-            //    else
-            //    {
-            //        menuItem.ContentInitializing -= PanelItem_ContentInitializing;
-            //    }
-            //}
+            return this.PanelContainer.SelectedItem as SessionPanel;
         }
 
         private void InitializePanels()

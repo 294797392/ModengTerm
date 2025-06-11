@@ -19,8 +19,10 @@ namespace ModengTerm.ViewModel
         /// </summary>
         /// <param name="onlyGroup">树形列表里是否只有分组</param>
         /// <param name="includeRootNode">是否包含根节点分组（Root）</param>
-        public static SessionTreeVM CreateSessionTreeVM(ServiceAgent serviceAgent, bool onlyGroup = false, bool includeRootNode = false)
+        public static SessionTreeVM CreateSessionTreeVM(bool onlyGroup = false, bool includeRootNode = false)
         {
+            ServiceAgent serviceAgent = VTApp.Context.ServiceAgent;
+
             SessionTreeVM sessionTreeVM = new SessionTreeVM();
             TreeViewModelContext context = sessionTreeVM.Context;
 

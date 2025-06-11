@@ -13,7 +13,11 @@ namespace ModengTerm.Base
     public enum EventType
     {
         // 0 - 100 通用
-        SESSION_STATUS_CHANGED = 0
+        COMMON_SESSION_STATUS_CHANGED = 0,
+        COMMON_SELECTED_SESSION_CHANGED = 1,
+        
+        // Shell会话 101 - 200
+        SHELL_SESSION_OPENED = 101,
 
         //#region 所有会话类型的通用命令
 
