@@ -9,13 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Official\SystemMonitor\WatchFileVM.cs" />
+    <Compile Remove="Official\SystemMonitor\**" />
+    <EmbeddedResource Remove="Official\SystemMonitor\**" />
+    <None Remove="Official\SystemMonitor\**" />
+    <Page Remove="Official\SystemMonitor\**" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Controls\ModengTerm.Controls.csproj" />
-    <ProjectReference Include="..\ModengTerm.ViewModel\ModengTerm.ViewModel.csproj" />
+    <ProjectReference Include="..\ModengTerm.Terminal\ModengTerm.Terminal.csproj" />
   </ItemGroup>
 
   <ItemGroup>

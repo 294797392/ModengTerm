@@ -8,7 +8,7 @@ namespace ModengTerm.Base.Addon
     /// Shell对象
     /// 封装对会话的Shell操作
     /// </summary>
-    public interface IShellObject
+    public interface IPanel
     {
         /// <summary>
         /// 会话Id
@@ -31,7 +31,7 @@ namespace ModengTerm.Base.Addon
     /// <summary>
     /// 公开终端类型的Shell接口
     /// </summary>
-    public interface ITerminalShell : IShellObject
+    public interface IShellPanel : IPanel
     {
         void Send(byte[] bytes);
         void Send(string text);
@@ -52,5 +52,10 @@ namespace ModengTerm.Base.Addon
         void CopySelection();
 
         void ClearScreen();
+    }
+
+    public interface ISftpPanel : IPanel
+    {
+        
     }
 }

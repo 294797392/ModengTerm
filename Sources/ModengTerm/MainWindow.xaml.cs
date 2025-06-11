@@ -65,8 +65,7 @@ namespace ModengTerm
         {
             this.serviceAgent = VTApp.Context.ServiceAgent;
 
-            throw new RefactorImplementedException();
-            //this.mainWindowVM = VTApp.Context.MainWindowVM;
+            this.mainWindowVM = MainWindowVM.GetInstance();
             base.DataContext = this.mainWindowVM;
 
             this.userInput = new VTKeyboardInput();

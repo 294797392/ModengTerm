@@ -23,7 +23,7 @@ namespace ModengTerm.Addon.Official.QuickInput
 
         private void ShowQuickInputPanel(CommandArgs e)
         {
-            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
             shell.VisiblePanel("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
         }
     }

@@ -64,6 +64,7 @@ namespace ModengTerm.Base
         [JsonProperty("addons")]
         public List<AddonDefinition> Addons { get; private set; }
 
+
         public VTManifest()
         {
             this.SessionList = new List<SessionDefinition>();

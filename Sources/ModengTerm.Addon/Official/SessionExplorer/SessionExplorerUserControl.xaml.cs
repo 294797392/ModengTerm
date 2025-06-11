@@ -1,6 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.ViewModel;
-using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +30,7 @@ namespace ModengTerm.Addon.Official.SessionExplorer
 
         #region 实例变量
 
-        private SessionTreeVM resourceManagerTreeVM;
+        //private SessionTreeVM resourceManagerTreeVM;
 
         #endregion
 

@@ -1,9 +1,10 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModel
+namespace ModengTerm.Addon.ViewModel
 {
     /// <summary>
     /// 所有PanelContent的基类
@@ -78,11 +79,6 @@ namespace ModengTerm.ViewModel
         public XTermSession Session { get; set; }
 
         /// <summary>
-        /// 获取该窗口所关联的会话
-        /// </summary>
-        public OpenedSessionVM OpenedSessionVM { get; set; }
-
-        /// <summary>
         /// 获取访问服务的代理
         /// </summary>
         public ServiceAgent ServiceAgent { get; set; }
@@ -95,14 +91,15 @@ namespace ModengTerm.ViewModel
 
         public override void OnInitialize()
         {
-            this.ID = ++id;
+            ID = ++id;
 
-            sessionStatus = OpenedSessionVM.Status;
+            throw new RefactorImplementedException();
+            //sessionStatus = OpenedSessionVM.Status;
         }
 
         public override void OnLoaded()
         {
-            logger.InfoFormat("{0} OnLoaded", this.ID);
+            logger.InfoFormat("{0} OnLoaded", ID);
 
             isLoaded = true;
 
@@ -111,7 +108,7 @@ namespace ModengTerm.ViewModel
 
         public override void OnUnload()
         {
-            logger.InfoFormat("{0} OnUnload", this.ID);
+            logger.InfoFormat("{0} OnUnload", ID);
 
             isLoaded = false;
         }

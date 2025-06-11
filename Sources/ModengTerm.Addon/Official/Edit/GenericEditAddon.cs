@@ -25,38 +25,38 @@ namespace ModengTerm.Addon.Official.Edit
 
         private void Paste(CommandArgs e)
         {
-            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
             string text = System.Windows.Clipboard.GetText();
             shell.Send(text);
         }
 
         private void CopySelection(CommandArgs e)
         {
-            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
             shell.CopySelection();
         }
 
         private void SaveSelection(CommandArgs e)
         {
-            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
             SaveToFile(ParagraphTypeEnum.Selected, shell);
         }
 
         private void SaveViewport(CommandArgs e)
         {
-            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
             SaveToFile(ParagraphTypeEnum.Viewport, shell);
         }
 
         private void SaveAll(CommandArgs e)
         {
-            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
             SaveToFile(ParagraphTypeEnum.AllDocument, shell);
         }
 
         private void ClearScreen(CommandArgs e)
         {
-            ITerminalShell shell = ShellFactory.GetActiveShell<ITerminalShell>();
+            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
             shell.ClearScreen();
         }
 
@@ -74,7 +74,7 @@ namespace ModengTerm.Addon.Official.Edit
             }
         }
 
-        private void SaveToFile(ParagraphTypeEnum paragraphType, ITerminalShell shell)
+        private void SaveToFile(ParagraphTypeEnum paragraphType, IShellPanel shell)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";

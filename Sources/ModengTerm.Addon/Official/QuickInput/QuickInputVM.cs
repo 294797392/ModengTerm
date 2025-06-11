@@ -1,9 +1,9 @@
-﻿using System;
+﻿using ModengTerm.Addon.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ModengTerm.ViewModel;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.Addon.Official.QuickInput

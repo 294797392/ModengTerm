@@ -13,11 +13,11 @@ using System.Windows;
 
 namespace ModengTerm.Addons.Shell
 {
-    public class ShellServiceImpl : IShellService
+    public class WindowImpl : IWindow
     {
         private Window window;
 
-        public ShellServiceImpl()
+        public WindowImpl()
         {
             window = Application.Current.MainWindow;
         }
@@ -34,13 +34,13 @@ namespace ModengTerm.Addons.Shell
             //VTApp.Context.MainWindowVM.PanelContainer.ChangeVisible(panelId);
         }
 
-        public override T GetActiveShell<T>()
+        public override T GetActivePanel<T>()
         {
             throw new NotImplementedException();
             //return MTermApp.Context.MainWindowVM.SelectedSession;
         }
 
-        public override List<T> GetShellObjects<T>()
+        public override List<IPanel> GetAllPanels()
         {
             throw new RefactorImplementedException();
             //return VTApp.Context.MainWindowVM.SessionList.OfType<T>().ToList();

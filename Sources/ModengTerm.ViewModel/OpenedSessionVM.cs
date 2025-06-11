@@ -15,7 +15,7 @@ namespace ModengTerm.ViewModel
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
-    public abstract class OpenedSessionVM : SessionItemVM, IShellObject
+    public abstract class OpenedSessionVM : SessionItemVM, IPanel
     {
         #region 公开事件
 

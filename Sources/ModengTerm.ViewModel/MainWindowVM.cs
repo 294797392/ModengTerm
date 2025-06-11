@@ -18,6 +18,8 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public static readonly OpenSessionVM OpenSessionVM = new OpenSessionVM();
 
+        private static MainWindowVM instance;
+
         #endregion
 
         #region 实例变量
@@ -78,7 +80,7 @@ namespace ModengTerm.ViewModel
 
         #region 构造方法
 
-        public MainWindowVM()
+        private MainWindowVM()
         {
             serviceAgent = VTApp.Context.ServiceAgent;
 
@@ -147,12 +149,26 @@ namespace ModengTerm.ViewModel
             serviceAgent.DeleteRecentSession(recentlySession.ID.ToString());
         }
 
+        /// <summary>
+        /// 获取MainWindowVM的实例
+        /// </summary>
+        /// <returns></returns>
+        public static MainWindowVM GetInstance() 
+        {
+            if (instance == null) 
+            {
+                instance = new MainWindowVM();
+            }
+            return instance;
+        }
+
         #endregion
 
         #region 实例方法
 
         private void InitializePanels()
         {
+            throw new RefactorImplementedException();
             //// 加载所有插件要显示的面板
             //List<AddonContext> contexts = VTApp.Context.AddonContexts;
 
@@ -165,7 +181,7 @@ namespace ModengTerm.ViewModel
             //    panels.AddRange(definition.GlobalPanels);
             //}
 
-            //PanelContainer = VTClientUtils.CreatePanelContainerVM(panels);
+            //this.PanelContainer = VTClientUtils.CreatePanelContainerVM(panels);
         }
 
         #endregion

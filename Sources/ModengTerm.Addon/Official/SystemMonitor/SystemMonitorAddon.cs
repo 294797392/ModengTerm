@@ -22,7 +22,7 @@ namespace ModengTerm.Addon.Official.SystemMonitor
 
         private void ExecuteShowSystemMonitorPanelCommand(CommandArgs e)
         {
-            IShellService shell = ShellFactory.GetService();
+            IWindow shell = ShellFactory.GetWindow();
             shell.VisiblePanel("A86C3967-8CDC-4D0E-8CB6-010364CFCC23");
         }
     }

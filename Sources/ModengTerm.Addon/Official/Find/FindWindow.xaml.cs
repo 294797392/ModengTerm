@@ -1,9 +1,9 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Base;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
-using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,36 +38,38 @@ namespace ModengTerm.Addon.Official.Find
         /// 如果已经显示了搜索窗口，那么使用传入的shellSession立即进行一次搜索
         /// </summary>
         /// <param name="shellSession">要搜索的会话ViewModel</param>
-        public static void Show(ShellSessionVM shellSession)
+        public static void Show()
         {
-            XTermSession session = shellSession.Session;
-            IVideoTerminal vt = shellSession.VideoTerminal;
+            throw new RefactorImplementedException();
 
-            string highlightBackground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR);
-            string highlightForeground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR);
+            //XTermSession session = shellSession.Session;
+            //IVideoTerminal vt = shellSession.VideoTerminal;
 
-            FindVM findVM = null;
+            //string highlightBackground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            //string highlightForeground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR);
 
-            if (findWindow == null)
-            {
-                findVM = new FindVM()
-                {
-                    HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
-                    HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
-                };
+            //FindVM findVM = null;
 
-                findWindow = new FindWindow(findVM);
-                findWindow.Owner = Application.Current.MainWindow;
-                findWindow.Closed += FindWindow_Closed;
-                findWindow.Show();
-            }
-            else
-            {
-                // 已经显示了搜索窗口
-                findVM = findWindow.DataContext as FindVM;
-            }
+            //if (findWindow == null)
+            //{
+            //    findVM = new FindVM()
+            //    {
+            //        HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
+            //        HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
+            //    };
 
-            findVM.SetVideoTerminal(vt);
+            //    findWindow = new FindWindow(findVM);
+            //    findWindow.Owner = Application.Current.MainWindow;
+            //    findWindow.Closed += FindWindow_Closed;
+            //    findWindow.Show();
+            //}
+            //else
+            //{
+            //    // 已经显示了搜索窗口
+            //    findVM = findWindow.DataContext as FindVM;
+            //}
+
+            //findVM.SetVideoTerminal(vt);
         }
 
         private static void FindWindow_Closed(object? sender, EventArgs e)

@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.Terminal.Watch;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.Addon.Official.SystemMonitor

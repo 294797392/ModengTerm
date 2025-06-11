@@ -50,7 +50,7 @@ namespace ModengTerm.Addon.Official.BroadcastInput
         /// </summary>
         /// <param name="broadcastSessions"></param>
         /// <param name="shellSessions">当前打开的所有终端类型的会话</param>
-        public BroadcastInputManagerWindow(List<BroadcastSessionVM> broadcastSessions, List<ITerminalShell> shellSessions)
+        public BroadcastInputManagerWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellPanel> shellSessions)
         {
             InitializeComponent();
 
@@ -61,7 +61,7 @@ namespace ModengTerm.Addon.Official.BroadcastInput
 
         #region 实例方法
 
-        private void InitializeWindow(List<BroadcastSessionVM> broadcastSessions, List<ITerminalShell> shellSessions)
+        private void InitializeWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellPanel> shellSessions)
         {
             this.broadcastSessions = new BindableCollection<BroadcastSessionVM>();
             this.broadcastSessions.AddRange(broadcastSessions);

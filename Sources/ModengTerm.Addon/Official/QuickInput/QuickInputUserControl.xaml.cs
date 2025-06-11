@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Base;
-using ModengTerm.ViewModel.Terminal;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -45,15 +44,17 @@ namespace ModengTerm.Addon.Official.QuickInput
 
         private void ButtonCreate_Click(object sender, RoutedEventArgs e)
         {
-            ShellSessionVM shellSessionVM = this.quickInputVM.OpenedSessionVM as ShellSessionVM;
+            throw new RefactorImplementedException();
 
-            CommandManagerWindow window = new CommandManagerWindow(shellSessionVM);
-            window.Owner = Application.Current.MainWindow;
-            if ((bool)window.ShowDialog())
-            {
-                // 刷新命令列表
-                this.quickInputVM.ReloadCommandList();
-            }
+            //ShellSessionVM shellSessionVM = this.quickInputVM.OpenedSessionVM as ShellSessionVM;
+
+            //CommandManagerWindow window = new CommandManagerWindow(shellSessionVM);
+            //window.Owner = Application.Current.MainWindow;
+            //if ((bool)window.ShowDialog())
+            //{
+            //    // 刷新命令列表
+            //    this.quickInputVM.ReloadCommandList();
+            //}
         }
 
         private void ListBoxCommands_SelectionChanged(object sender, SelectionChangedEventArgs e)

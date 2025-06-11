@@ -3,7 +3,6 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
-using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,7 +25,6 @@ namespace ModengTerm.Addon.Official.QuickInput
         private List<CommandVM> deleteCommands; // 被删除的命令列表
         private BindableCollection<CommandVM> shellCommands;
         private ServiceAgent serviceAgent;
-        private ShellSessionVM shellSession;
 
         #endregion
 
@@ -42,32 +40,33 @@ namespace ModengTerm.Addon.Official.QuickInput
 
         #region 构造方法
 
-        public CommandManagerWindow(ShellSessionVM shellSession)
+        public CommandManagerWindow()
         {
             InitializeComponent();
 
-            this.InitializeWindow(shellSession);
+            this.InitializeWindow();
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeWindow(ShellSessionVM shellSession)
+        private void InitializeWindow()
         {
             this.serviceAgent = VTApp.Context.ServiceAgent;
-            this.shellSession = shellSession;
+            throw new RefactorImplementedException();
+            //this.shellSession = shellSession;
 
-            this.updateCommands = new List<CommandVM>();
-            this.newCommands = new List<CommandVM>();
-            this.deleteCommands = new List<CommandVM>();
+            //this.updateCommands = new List<CommandVM>();
+            //this.newCommands = new List<CommandVM>();
+            //this.deleteCommands = new List<CommandVM>();
 
-            ComboBoxCommandTypes.ItemsSource = Enum.GetValues(typeof(CommandTypeEnum));
+            //ComboBoxCommandTypes.ItemsSource = Enum.GetValues(typeof(CommandTypeEnum));
 
-            List<ShellCommand> commands = this.serviceAgent.GetShellCommands(this.shellSession.ID.ToString());
-            this.shellCommands = new BindableCollection<CommandVM>();
-            this.shellCommands.AddRange(commands.Select(v => new CommandVM(v)));
-            ListBoxShellCommands.DataContext = this.shellCommands;
+            //List<ShellCommand> commands = this.serviceAgent.GetShellCommands(this.shellSession.ID.ToString());
+            //this.shellCommands = new BindableCollection<CommandVM>();
+            //this.shellCommands.AddRange(commands.Select(v => new CommandVM(v)));
+            //ListBoxShellCommands.DataContext = this.shellCommands;
         }
 
         #endregion
@@ -147,12 +146,13 @@ namespace ModengTerm.Addon.Official.QuickInput
 
             string name = string.IsNullOrWhiteSpace(TextBoxName.Text) ? "新建命令" : TextBoxName.Text;
 
+            throw new RefactorImplementedException();
             CommandVM command = new CommandVM()
             {
                 ID = Guid.NewGuid().ToString(),
                 Name = name,
                 Type = commandType,
-                SessionId = this.shellSession.ID.ToString(),
+                //SessionId = this.shellSession.ID.ToString(),
                 Command = TextBoxCommand.Text
             };
 

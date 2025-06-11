@@ -1,7 +1,6 @@
 ﻿using DotNEToolkit.Media.Video;
+using ModengTerm.Addon.ViewModel;
 using ModengTerm.Base;
-using ModengTerm.ViewModel;
-using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ namespace ModengTerm.Addon.Official.SessionExplorer
 {
     public class SessionExplorerVM : PanelContentVM
     {
-        public SessionTreeVM ResourceManagerTree { get; private set; }
+        //public SessionTreeVM ResourceManagerTree { get; private set; }
 
         public override void OnInitialize()
         {

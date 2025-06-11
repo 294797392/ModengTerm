@@ -1,7 +1,5 @@
 ﻿using ModengTerm.Addons;
 using ModengTerm.Base;
-using ModengTerm.Terminal.Enumerations;
-using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
 using System.Linq;

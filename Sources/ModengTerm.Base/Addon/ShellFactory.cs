@@ -8,9 +8,9 @@ namespace ModengTerm.Base.Addon
 {
     public static class ShellFactory
     {
-        private static IShellService shell;
+        private static IWindow shell;
 
-        public static IShellService GetService()
+        public static IWindow GetWindow()
         {
             if (shell == null)
             {
@@ -24,18 +24,18 @@ namespace ModengTerm.Base.Addon
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static T GetActiveShell<T>() where T : IShellObject
+        public static T GetActivePanel<T>() where T : IPanel
         {
-            IShellService service = GetService();
+            IWindow service = GetWindow();
 
-            return service.GetActiveShell<T>();
+            return service.GetActivePanel<T>();
         }
 
-        public static List<T> GetAllShells<T>() where T : IShellObject
+        public static List<IPanel> GetAllPanels()
         {
-            IShellService shell = GetService();
+            IWindow window = GetWindow();
 
-            return shell.GetShellObjects<T>();
+            return window.GetAllPanels();
         }
     }
 }

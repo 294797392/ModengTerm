@@ -11,6 +11,6 @@ namespace ModengTerm.Addon.Official.BroadcastInput
 {
     public class BroadcastSessionVM : ViewModelBase
     {
-        public ITerminalShell Session { get; set; }
+        public IShellPanel Session { get; set; }
     }
 }

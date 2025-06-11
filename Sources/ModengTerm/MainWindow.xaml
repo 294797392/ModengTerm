@@ -225,6 +225,11 @@
 
             <Image Grid.Column="0" Source="{DynamicResource ResourceKey=1}" Width="20" Height="20"/>
 
+            <!--
+            群里有人反馈无法通过拖拽标题栏缩放窗口，解决方法：
+            在要拖拽的区域添加WindowChrome.IsHitTestVisibleInChrome="True"属性
+            即使使用了WindowChrome，也可以通过拖拽标题栏缩放窗口：
+            -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,3,0,0" WindowChrome.IsHitTestVisibleInChrome="True">
                 <Menu ItemsSource="{Binding Path=TitleMenus}" MenuItem.Click="MenuItem_Click">
                     <Menu.ItemContainerStyle>
