@@ -1,7 +1,6 @@
-﻿using ModengTerm.Addons;
-using ModengTerm.Addons.Shell;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
 using ModengTerm.Base;
-using ModengTerm.Base.Addon;
 using ModengTerm.Controls;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +36,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         #region 属性
 
-        public AddonObjectStorage ObjectStorage { get; set; }
+        public StorageService ObjectStorage { get; set; }
 
         public string SessionId { get; set; }
 

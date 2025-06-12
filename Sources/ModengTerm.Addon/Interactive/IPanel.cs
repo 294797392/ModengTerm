@@ -2,11 +2,10 @@
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 
-namespace ModengTerm.Base.Addon
+namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// Shell对象
-    /// 封装对会话的Shell操作
+    /// 表示被打开的一个会话界面
     /// </summary>
     public interface IPanel
     {
@@ -29,7 +28,7 @@ namespace ModengTerm.Base.Addon
     }
 
     /// <summary>
-    /// 公开终端类型的Shell接口
+    /// 表示打开的终端类型的会话界面
     /// </summary>
     public interface IShellPanel : IPanel
     {
@@ -54,8 +53,11 @@ namespace ModengTerm.Base.Addon
         void ClearScreen();
     }
 
+    /// <summary>
+    /// 表示打开的Sftp类型的会话界面
+    /// </summary>
     public interface ISftpPanel : IPanel
     {
-        
+
     }
 }

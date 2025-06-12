@@ -1,6 +1,6 @@
-﻿using ModengTerm.Addons;
-using ModengTerm.Addons.Shell;
-using ModengTerm.Base.Addon;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,8 +22,9 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         private void OpenExplorerWindow(CommandArgs e)
         {
-            IWindow shell = ShellFactory.GetWindow();
-            shell.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IWindow window = factory.GetWindow();
+            window.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
         }
     }
 }

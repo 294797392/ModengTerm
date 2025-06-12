@@ -1,9 +1,11 @@
-﻿using ModengTerm;
+﻿using DotNEToolkit.DataAccess;
+using ModengTerm;
 using ModengTerm.Base;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -28,6 +30,15 @@ namespace ModengTerm
 
         public App()
         {
+            //DBManager dBManager = new DBManager("D://123.db", ProviderType.Sqlite);
+            //if (dBManager.TestConnection())
+            //{
+            //    Console.WriteLine();
+            //}
+            //else
+            //{
+            //    Console.WriteLine();
+            //}
         }
 
         private static void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

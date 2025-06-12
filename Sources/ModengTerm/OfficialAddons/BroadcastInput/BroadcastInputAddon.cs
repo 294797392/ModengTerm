@@ -1,7 +1,7 @@
-﻿using ModengTerm.Addons;
-using ModengTerm.Addons.Shell;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
 using ModengTerm.Base;
-using ModengTerm.Base.Addon;
 using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -38,7 +38,9 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             this.broadcastSessions.Clear();
 
-            IShellPanel terminalShell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+
+            IShellPanel terminalShell = factory.GetActivePanel<IShellPanel>();
             List<BroadcastSession> broadcastSessions = this.ObjectStorage.GetObjects<BroadcastSession>(terminalShell.Id);
             throw new RefactorImplementedException();
             //List<IShellPanel> terminalShells = ShellFactory.GetAllPanels<IShellPanel>();

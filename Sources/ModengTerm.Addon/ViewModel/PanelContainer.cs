@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Automation;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Base.Addon.ViewModel
+namespace ModengTerm.Addon.ViewModel
 {
     public class PanelContainer : ViewModelBase
     {

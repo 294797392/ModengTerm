@@ -1,9 +1,9 @@
 ﻿using DotNEToolkit;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
+using ModengTerm.Addon.ViewModel;
 using ModengTerm.Addons;
 using ModengTerm.Base;
-using ModengTerm.Base.Addon.ViewModel;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;

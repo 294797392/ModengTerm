@@ -1,4 +1,7 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
+using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,29 +76,31 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #region 事件处理器
 
-        //private void SessionTreeViewUserControl_TreeViewMouseDoubleClick(SessionTreeViewUserControl arg1, object selectedItem)
-        //{
-        //    if (selectedItem == null) 
-        //    {
-        //        return;
-        //    }
+        private void SessionTreeViewUserControl_TreeViewMouseDoubleClick(UserControls.SessionTreeViewUserControl arg1, SessionTreeNodeVM selectedItem)
+        {
+            if (selectedItem == null)
+            {
+                return;
+            }
 
-        //    SessionTreeNodeVM sessionNode = selectedItem as SessionTreeNodeVM;
-        //    if (sessionNode == null) 
-        //    {
-        //        return;
-        //    }
+            SessionTreeNodeVM sessionNode = selectedItem as SessionTreeNodeVM;
+            if (sessionNode == null)
+            {
+                return;
+            }
 
-        //    if (sessionNode.NodeType != SessionTreeNodeTypeEnum.Session)
-        //    {
-        //        return;
-        //    }
+            if (sessionNode.NodeType != SessionTreeNodeTypeEnum.Session)
+            {
+                return;
+            }
 
-        //    XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
+            XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
-        //    throw new RefactorImplementedException();
-        //    //MCommands.OpenSessionCommand.Execute(sessionVM.Session, this);
-        //}
+            // 打开会话
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IWindow window = factory.GetWindow();
+            window.OpenSession(sessionVM.Session);
+        }
 
         #endregion
     }

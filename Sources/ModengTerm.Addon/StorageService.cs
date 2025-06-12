@@ -8,7 +8,10 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addons
 {
-    public abstract class AddonObjectStorage
+    /// <summary>
+    /// 对插件提供存储数据的服务
+    /// </summary>
+    public abstract class StorageService
     {
         public abstract int AddObject<T>(string sessionId, T obj);
 

@@ -1,5 +1,5 @@
-﻿using ModengTerm.Base;
-using ModengTerm.Base.Addon.ViewModel;
+﻿using ModengTerm.Addon.ViewModel;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;

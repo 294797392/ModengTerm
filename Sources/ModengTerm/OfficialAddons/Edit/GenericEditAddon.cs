@@ -1,7 +1,8 @@
 ﻿using DotNEToolkit;
 using Microsoft.Win32;
+using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
-using ModengTerm.Base.Addon;
 using ModengTerm.Document.Enumerations;
 using System;
 
@@ -25,38 +26,44 @@ namespace ModengTerm.OfficialAddons.Edit
 
         private void Paste(CommandArgs e)
         {
-            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
             string text = System.Windows.Clipboard.GetText();
             shell.Send(text);
         }
 
         private void CopySelection(CommandArgs e)
         {
-            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
             shell.CopySelection();
         }
 
         private void SaveSelection(CommandArgs e)
         {
-            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
             SaveToFile(ParagraphTypeEnum.Selected, shell);
         }
 
         private void SaveViewport(CommandArgs e)
         {
-            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
             SaveToFile(ParagraphTypeEnum.Viewport, shell);
         }
 
         private void SaveAll(CommandArgs e)
         {
-            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
             SaveToFile(ParagraphTypeEnum.AllDocument, shell);
         }
 
         private void ClearScreen(CommandArgs e)
         {
-            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
             shell.ClearScreen();
         }
 

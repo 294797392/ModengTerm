@@ -1,5 +1,4 @@
-﻿using ModengTerm.Addons.Shell;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
@@ -37,7 +36,7 @@ namespace ModengTerm.Addons
 
         public AddonDefinition Definition { get; set; }
 
-        public AddonObjectStorage ObjectStorage { get; set; }
+        public StorageService ObjectStorage { get; set; }
 
         public Dictionary<string, CommandHandlerDelegate> RegisteredCommand { get { return this.registerCommands; } }
 

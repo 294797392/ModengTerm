@@ -1,6 +1,6 @@
 ﻿using DotNEToolkit.Media.Video;
+using ModengTerm.Addon.ViewModel;
 using ModengTerm.Base;
-using ModengTerm.Base.Addon.ViewModel;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Session;
 using System;

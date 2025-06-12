@@ -1,7 +1,5 @@
 ﻿using ModengTerm.Addons;
-using ModengTerm.Addons.Shell;
 using ModengTerm.Base;
-using ModengTerm.Base.Addon;
 using ModengTerm.Base.DataModels;
 using System;
 using System.Collections.Generic;

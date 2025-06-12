@@ -1,5 +1,5 @@
 ﻿using DotNEToolkit;
-using ModengTerm.Base.Addon.ViewModel;
+using ModengTerm.Addon.ViewModel;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Windows;

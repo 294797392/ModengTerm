@@ -1,6 +1,6 @@
-﻿using ModengTerm.Addons;
-using ModengTerm.Addons.Shell;
-using ModengTerm.Base.Addon;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
 using ModengTerm.Document.Enumerations;
 using System;
 using System.Collections.Generic;
@@ -23,7 +23,8 @@ namespace ModengTerm.OfficialAddons.QuickInput
 
         private void ShowQuickInputPanel(CommandArgs e)
         {
-            IShellPanel shell = ShellFactory.GetActivePanel<IShellPanel>();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
             shell.VisiblePanel("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
         }
     }

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Base.Addon
+namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 提供和界面进行交互的接口
+    /// 表示应用程序的窗口
     /// </summary>
     public abstract class IWindow
     {
