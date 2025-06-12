@@ -1,4 +1,5 @@
-﻿using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Controls;
@@ -36,10 +37,6 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         #region 属性
 
-        public StorageService ObjectStorage { get; set; }
-
-        public string SessionId { get; set; }
-
         #endregion
 
         #region 构造方法
@@ -75,16 +72,19 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            StorageService storageSvc = factory.GetStorageService();
+
             List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.Session.Id }).ToList();
-            int code = this.ObjectStorage.AddObjects<BroadcastSession>(this.SessionId, addList);
+            int code = storageSvc.AddObjects<BroadcastSession>(addList);
             if (code != ResponseCode.SUCCESS)
             {
                 MTMessageBox.Error("新建广播会话失败, {0}", code);
                 return;
             }
 
-            IEnumerable<string> removeList = this.removeList.Select(v => v.Session.Id);
-            code = this.ObjectStorage.DeleteObjects(this.SessionId, removeList);
+            List<string> removeList = this.removeList.Select(v => v.Session.Id).ToList();
+            code = storageSvc.DeleteObjects(removeList);
             if (code != ResponseCode.SUCCESS) 
             {
                 MTMessageBox.Error("删除广播会话失败, {0}", code);

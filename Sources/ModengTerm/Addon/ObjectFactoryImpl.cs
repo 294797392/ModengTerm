@@ -11,10 +11,10 @@ namespace ModengTerm.Addon
     public class ObjectFactoryImpl : ObjectFactory
     {
         private IWindow windowImpl = new WindowImpl();
-        private StorageService storageSvcImpl = new JsonDbStorageService();
+        private StorageService storageSvcImpl = new SqliteStorageService();
 
 
-        public override StorageService GetStorage()
+        public override StorageService GetStorageService()
         {
             return storageSvcImpl;
         }

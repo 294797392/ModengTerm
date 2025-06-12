@@ -9,6 +9,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Media;
@@ -30,15 +31,6 @@ namespace ModengTerm
 
         public App()
         {
-            //DBManager dBManager = new DBManager("D://123.db", ProviderType.Sqlite);
-            //if (dBManager.TestConnection())
-            //{
-            //    Console.WriteLine();
-            //}
-            //else
-            //{
-            //    Console.WriteLine();
-            //}
         }
 
         private static void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

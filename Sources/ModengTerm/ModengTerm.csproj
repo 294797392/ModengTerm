@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="database.db" />
     <None Remove="Images\adb.png" />
     <None Remove="Images\app.png" />
     <None Remove="Images\close.png" />
@@ -73,6 +74,10 @@
 
   <ItemGroup>
     <Content Include="icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="database.db" />
   </ItemGroup>
 
   <ItemGroup>

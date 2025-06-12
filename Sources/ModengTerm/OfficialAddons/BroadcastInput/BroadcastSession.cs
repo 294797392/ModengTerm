@@ -1,4 +1,6 @@
 ﻿using DotNEToolkit.DataModels;
+using ModengTerm.Addons;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +9,12 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.OfficialAddons.BroadcastInput
 {
-    public class BroadcastSession : ModelBase
+    public class BroadcastSession : StorageObject
     {
-        public string SessionId { get; set; }
+        /// <summary>
+        /// 要广播到的会话Id
+        /// </summary>
+        [JsonProperty("bcsid")]
+        public string BroadcastSessionId { get; set; }
     }
 }

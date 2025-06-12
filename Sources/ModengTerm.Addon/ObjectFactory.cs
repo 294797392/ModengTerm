@@ -28,7 +28,7 @@ namespace ModengTerm.Addon
         /// 获取数据存储服务
         /// </summary>
         /// <returns></returns>
-        public abstract StorageService GetStorage();
+        public abstract StorageService GetStorageService();
 
         /// <summary>
         /// 获取当前激活的ShellObject

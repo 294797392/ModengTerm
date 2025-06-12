@@ -1,47 +1,85 @@
 ﻿using DotNEToolkit.DataModels;
+using ModengTerm.Base;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Automation.Provider;
 
 namespace ModengTerm.Addons
 {
+    public abstract class StorageObject
+    {
+        /// <summary>
+        /// 对象的唯一Id
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// 如果该对象不和任何一个Session关联，写空
+        /// </summary>
+        public string SessionId { get; set; }
+    }
+
     /// <summary>
     /// 对插件提供存储数据的服务
     /// </summary>
     public abstract class StorageService
     {
-        public abstract int AddObject<T>(string sessionId, T obj);
+        public abstract int AddObject<T>(T obj) where T : StorageObject;
 
-        public abstract int AddObjects<T>(string sessionId, IEnumerable<T> objs);
+        public int AddObjects<T>(List<T> objects) where T : StorageObject
+        {
+            foreach (T obj in objects)
+            {
+                this.AddObject(obj);
+            }
 
-        public abstract List<T> GetObjects<T>(string sessionId);
-
-        public abstract int DeleteObject(string sessionId, string objectId);
-
-        public abstract int DeleteObjects(string sessionId, IEnumerable<string> objectIds);
-
-        public abstract int UpdateObject<T>(string sessionId, T obj);
-
-
-
-        public abstract int AddObject<T>(T obj);
-
-        public abstract List<T> GetObjects<T>();
-
-        public abstract int DeleteObject<T>(T obj);
-
-        public abstract int UpdateObject<T>(T obj);
-
-
+            return ResponseCode.SUCCESS;
+        }
 
         /// <summary>
-        /// 删除所有和会话关联的对象
+        /// 获取所有会话里指定类型的所有对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public abstract List<T> GetObjects<T>() where T : StorageObject;
+
+        /// <summary>
+        /// 获取指定会话里指定类型的所有对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
+        public abstract List<T> GetObjects<T>(string sessionId) where T : StorageObject;
+
+        /// <summary>
+        /// 删除指定对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public abstract int DeleteObject(string objectId);
+
+        public int DeleteObjects(List<string> objectIds)
+        {
+            foreach (string objectId in objectIds)
+            {
+                this.DeleteObject(objectId);
+            }
+
+            return ResponseCode.SUCCESS;
+        }
+
+        /// <summary>
+        /// 删除指定会话里指定类型的对象
         /// </summary>
         /// <param name="sessionId"></param>
         /// <returns></returns>
-        public abstract int DeleteObjects(string sessionId);
+        public abstract int DeleteObjects<T>(string sessionId) where T : StorageObject;
+
+        public abstract int UpdateObject<T>(T obj) where T : StorageObject;
     }
 }

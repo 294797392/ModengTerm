@@ -16,7 +16,7 @@ namespace ModengTerm.Base
 {
     public static class VTBaseUtils
     {
-        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("MTermUtils");
+        private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("VTBaseUtils");
 
         public static List<T> GetEnumValues<T>() where T : Enum
         {
