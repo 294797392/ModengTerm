@@ -1,34 +1,20 @@
-﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Addon.Extensions;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Definitions;
-using ModengTerm.Base.Enumerations;
-using ModengTerm.Base.ServiceAgents;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Addon.Interactive
+namespace ModengTerm.ViewModel
 {
-    /// <summary>
-    /// 指定SidePanel要显示的位置
-    /// </summary>
-    public enum SidePanelDocks
-    {
-        /// <summary>
-        /// 显示在左边
-        /// </summary>
-        Left,
-
-        /// <summary>
-        /// 显示在右边
-        /// </summary>
-        Right
-    }
-
     /// <summary>
     /// 提供扩展侧边栏的接口
     /// </summary>
-    public abstract class SidePanel : ViewModelBase
+    public class SidePanel : ViewModelBase, IHostSidePanel
     {
         #region 实例变量
 
@@ -69,49 +55,78 @@ namespace ModengTerm.Addon.Interactive
             }
         }
 
+        /// <summary>
+        /// 界面
+        /// </summary>
         public FrameworkElement Content { get; set; }
+
+        /// <summary>
+        /// 扩展的对象
+        /// </summary>
+        public SidePanelExtension ExtensionObject { get; set; }
+
+        public bool IsOpened
+        {
+            get { return this.IsSelected; }
+        }
 
         #endregion
 
         #region 公开接口
 
-        public void Initialize() 
+        public void Initialize()
         {
-            this.OnInitialize();
+            this.ExtensionObject.OnInitialize();
         }
 
         /// <summary>
         /// 在显示之后触发
         /// </summary>
-        public void Loaded() 
+        public void Loaded()
         {
-            this.OnUnload();
+            this.ExtensionObject.OnLoaded();
         }
 
         /// <summary>
         /// 在从界面移出之前触发
         /// </summary>
-        public void Unloaded() 
+        public void Unloaded()
         {
-            this.OnUnload();
+            this.ExtensionObject.OnUnload();
         }
 
-        public void Release() 
+        public void Release()
         {
-            this.OnRelease();
+            this.ExtensionObject.OnRelease();
         }
 
-        #endregion
+        /// <summary>
+        /// 打开侧边栏
+        /// </summary>
+        public void Open()
+        {
+            this.IsSelected = true;
+        }
 
-        #region 抽象方法
+        /// <summary>
+        /// 关闭侧边栏
+        /// </summary>
+        public void Close()
+        {
+            this.IsSelected = false;
+        }
 
-        protected abstract void OnInitialize();
-
-        protected abstract void OnLoaded();
-
-        protected abstract void OnUnload();
-
-        protected abstract void OnRelease();
+        public void SwitchStatus() 
+        {
+            if (this.IsOpened)
+            {
+                this.Close();
+            }
+            else
+            {
+                this.Open();
+            }
+        }
 
         #endregion
     }

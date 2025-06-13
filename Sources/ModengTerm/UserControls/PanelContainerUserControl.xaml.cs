@@ -1,8 +1,10 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Addon.Extensions;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModel;
 using System;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -78,6 +80,23 @@ namespace ModengTerm.UserControls
         {
             PanelDefinition definition = panel.Definition;
             FrameworkElement content = panel.Content;
+            SidePanelExtension extensionObject = panel.ExtensionObject;
+
+            // 先创建扩展对象
+            if (extensionObject == null)
+            {
+                try
+                {
+                    extensionObject = ConfigFactory<SidePanelExtension>.CreateInstance(definition.VMClassName);
+                    panel.ExtensionObject = extensionObject;
+                    extensionObject.Name = panel.Name;
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("创建扩展SidePanel对象异常", ex);
+                    return null;
+                }
+            }
 
             // 开始加载本次选中的菜单界面
             if (content == null)
@@ -89,7 +108,7 @@ namespace ModengTerm.UserControls
                     panel.Initialize();
                     panel.Content = content;
 
-                    content.DataContext = panel;
+                    content.DataContext = extensionObject;
                 }
                 catch (Exception ex)
                 {

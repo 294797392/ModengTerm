@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Addon.Extensions;
+using ModengTerm.Base.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,12 +32,8 @@ namespace ModengTerm.Addon.Interactive
         /// <returns></returns>
         List<IHostTab> GetAllTabs();
 
-        void AddSidePanel(SidePanel panel);
+        void AddSidePanel(IHostSidePanel panel);
 
-        void RemoveSidePanel(SidePanel panel);
-
-        void OpenSidePanel(SidePanel panel);
-
-        void CloseSidePanel(SidePanel panel);
+        void RemoveSidePanel(IHostSidePanel panel);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
+using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace ModengTerm.Addon
     public abstract class HostFactory
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ObjectFactory");
-        private const string FactoryImpl = "ModengTerm.Addon.ObjectFactoryImpl, ModengTerm";
+        private const string FactoryImpl = "ModengTerm.Addon.HostFactoryImpl, ModengTerm";
         private static HostFactory factory;
 
         /// <summary>
@@ -29,6 +30,27 @@ namespace ModengTerm.Addon
         /// </summary>
         /// <returns></returns>
         public abstract StorageService GetStorageService();
+
+        /// <summary>
+        /// 创建一个侧边栏实例
+        /// </summary>
+        /// <param name="definition"></param>
+        /// <returns></returns>
+        public abstract IHostSidePanel CreateSidePanel(PanelDefinition definition);
+
+        public List<IHostSidePanel> CreateSidePanels(List<PanelDefinition> definitions)
+        {
+            List<IHostSidePanel> sidePanels = new List<IHostSidePanel>();
+
+            foreach (PanelDefinition definition in definitions)
+            {
+                IHostSidePanel sidePanel = this.CreateSidePanel(definition);
+                sidePanels.Add(sidePanel);
+            }
+
+            return sidePanels;
+        }
+
 
         /// <summary>
         /// 获取当前激活的Tab页

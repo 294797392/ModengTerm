@@ -43,21 +43,14 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("contextMenus")]
         public List<AddonMenuDefinition> ContextMenus { get; private set; }
 
-        /// <summary>
-        /// PanelItem
-        /// </summary>
-        [JsonProperty("sessionPanels")]
-        public List<PanelDefinition> SessionPanels { get; private set; }
-
-        [JsonProperty("windowPanels")]
-        public List<PanelDefinition> WindowPanels { get; private set; }
+        [JsonProperty("sidePanels")]
+        public List<PanelDefinition> SidePanels { get; private set; }
 
         public AddonDefinition()
         {
             this.ToolbarMenus = new List<AddonMenuDefinition>();
             this.ContextMenus = new List<AddonMenuDefinition>();
-            this.SessionPanels = new List<PanelDefinition>();
-            this.WindowPanels = new List<PanelDefinition>();
+            this.SidePanels = new List<PanelDefinition>();
         }
     }
 }

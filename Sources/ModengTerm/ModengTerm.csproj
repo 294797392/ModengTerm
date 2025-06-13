@@ -162,7 +162,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="OfficialAddons\SessionExplorer\SessionExplorerUserControl.xaml.cs">
+    <Compile Update="OfficialAddons\SessionExplorer\SessionExplorerPanel.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

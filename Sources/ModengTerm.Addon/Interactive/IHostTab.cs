@@ -5,7 +5,7 @@ using ModengTerm.Document.Enumerations;
 namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 向应用程序公开打开的会话窗口的功能
+    /// 向应用程序公开控制打开的会话窗口的接口
     /// </summary>
     public interface IHostTab
     {
@@ -23,8 +23,6 @@ namespace ModengTerm.Addon.Interactive
         /// 会话状态
         /// </summary>
         SessionStatusEnum Status { get; }
-
-        void VisiblePanel(string panelId);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Terminal;
@@ -73,7 +74,7 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 面板容器
         /// </summary>
-        public PanelContainer PanelContainer { get; private set; }
+        public Dictionary<SidePanelDocks, PanelContainer> PanelContainers { get; private set; }
 
         #endregion
 
@@ -83,7 +84,14 @@ namespace ModengTerm.ViewModel
         {
             serviceAgent = VTApp.Context.ServiceAgent;
 
-            this.PanelContainer = new PanelContainer();
+            this.PanelContainers = new Dictionary<SidePanelDocks, PanelContainer>();
+            List<SidePanelDocks> docks = VTBaseUtils.GetEnumValues<SidePanelDocks>();
+            foreach (SidePanelDocks dock in docks)
+            {
+                PanelContainer container = new PanelContainer();
+                container.Dock = dock;
+                this.PanelContainers[dock] = container;
+            }
 
             this.SessionList = new BindableCollection<SessionItemVM>();
             this.SessionList.Add(OpenSessionVM);

@@ -165,22 +165,6 @@ namespace ModengTerm
 
             #endregion
 
-            #region 创建Panel类型的插件
-
-            foreach (AddonModule addon in addons)
-            {
-                if (addon.Definition.WindowPanels.Count == 0)
-                {
-                    continue;
-                }
-
-                List<SidePanel> panels = VMUtils.CreatePanels(addon.Definition.WindowPanels);
-
-                this.mainWindowVM.PanelContainer.Panels.AddRange(panels);
-            }
-
-            #endregion
-
             this.addons = addons;
         }
 
@@ -270,15 +254,11 @@ namespace ModengTerm
                     // 如果当前没有任何一个打开的Session，那么重置选中状态，以便于下次可以继续触发SelectionChanged事件
                     ListBoxOpenedSession.SelectedItem = null;
                 }
-
-                PanelUserControlSession.DataContext = null;
             }
             else
             {
                 OpenedSessionVM openedSessionVM = selectedSession as OpenedSessionVM;
                 ContentControlSession.Content = openedSessionVM.Content;
-
-                PanelUserControlSession.DataContext = openedSessionVM.PanelContainer;
             }
 
             #region 触发OpenedSessionVM的OnLoaded或OnUnload事件
@@ -577,7 +557,7 @@ namespace ModengTerm
         /// <param name="panelId">要显示或隐藏的PanelId</param>
         public void VisiblePanel(string panelId)
         {
-            this.mainWindowVM.PanelContainer.VisiblePanel(panelId);
+            //this.mainWindowVM.PanelContainer.VisiblePanel(panelId);
         }
 
         /// <summary>
@@ -603,17 +583,17 @@ namespace ModengTerm
             return this.mainWindowVM.SessionList.OfType<IHostTab>().ToList();
         }
 
-        public void AddSidePanel(SidePanel panel)
-        { }
+        public void AddSidePanel(IHostSidePanel panel)
+        {
+            PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
+            container.Panels.Add(panel as SidePanel);
+        }
 
-        public void RemoveSidePanel(SidePanel panel)
-        { }
-
-        public void OpenSidePanel(SidePanel panel)
-        { }
-
-        public void CloseSidePanel(SidePanel panel)
-        { }
+        public void RemoveSidePanel(IHostSidePanel panel)
+        {
+            PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
+            container.Panels.Remove(panel as SidePanel);
+        }
 
         #endregion
 

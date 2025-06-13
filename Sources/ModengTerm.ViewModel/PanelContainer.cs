@@ -34,6 +34,8 @@ namespace ModengTerm.ViewModel
             }
         }
 
+        public SidePanelDocks Dock { get; set; }
+
         #endregion
 
         #region 构造方法

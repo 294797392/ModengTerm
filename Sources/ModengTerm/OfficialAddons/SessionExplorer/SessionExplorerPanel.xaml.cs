@@ -23,7 +23,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionExplorerUserControl : UserControl
+    public partial class SessionExplorerPanel : UserControl
     {
         #region 类变量
 
@@ -39,7 +39,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #region 构造方法
 
-        public SessionExplorerUserControl()
+        public SessionExplorerPanel()
         {
             InitializeComponent();
         }

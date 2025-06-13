@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
 using System;
@@ -29,6 +30,12 @@ namespace ModengTerm.Addons
 
         private Dictionary<HostEvent, AddonEventHandler> registeredEvent;
 
+        private List<IHostSidePanel> sidePanels;
+
+        protected HostFactory factory;
+        protected IHostWindow hostWindow;
+        private StorageService storageService;
+
         #endregion
 
         #region 属性
@@ -43,15 +50,19 @@ namespace ModengTerm.Addons
 
         #endregion
 
-        #region Internal
+        #region 公开接口
 
         /// <summary>
         /// 初始化插件
         /// </summary>
         public void Active(ActiveContext context)
         {
+            this.factory = HostFactory.GetFactory();
             this.registerCommands = new Dictionary<string, AddonCommandHandler>();
             this.registeredEvent = new Dictionary<HostEvent, AddonEventHandler>();
+            this.sidePanels = this.factory.CreateSidePanels(this.Definition.SidePanels);
+            this.hostWindow = this.factory.GetHostWindow();
+            this.storageService = this.factory.GetStorageService();
 
             this.OnActive(context);
         }
@@ -107,6 +118,11 @@ namespace ModengTerm.Addons
             }
 
             this.registeredEvent[evType] = handler;
+        }
+
+        protected IHostSidePanel GetSidePanel(string id)
+        {
+            return this.sidePanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
         protected string GetObjectId()

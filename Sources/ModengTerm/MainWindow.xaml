@@ -318,7 +318,7 @@
 
             <!-- 左边窗格 -->
             <Grid Grid.Column="0">
-                <termuc2:PanelContainerUserControl DataContext="{Binding Path=PanelContainer}"/>
+                <termuc2:PanelContainerUserControl DataContext="{Binding Path=PanelContainers[0]}"/>
             </Grid>
 
             <!-- 终端显示区域 -->
@@ -347,7 +347,7 @@
 
             <!-- 右边窗格 -->
             <Grid Grid.Column="2">
-                <termuc2:PanelContainerUserControl x:Name="PanelUserControlSession" Dock="Right"/>
+                <termuc2:PanelContainerUserControl Dock="Right" DataContext="{Binding Path=PanelContainers[1]}"/>
             </Grid>
 
         </Grid>

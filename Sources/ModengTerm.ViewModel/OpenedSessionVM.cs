@@ -75,11 +75,6 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        /// <summary>
-        /// 侧边栏窗口
-        /// </summary>
-        public PanelContainer PanelContainer { get; private set; }
-
         #endregion
 
         #region 构造方法
@@ -119,12 +114,6 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnLoaded()
         {
-            throw new RefactorImplementedException();
-            //SessionPanel panel = this.GetActivePanel();
-            //if (panel != null)
-            //{
-            //    panel.OnLoaded();
-            //}
         }
 
         /// <summary>
@@ -132,22 +121,11 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnUnload()
         {
-            throw new RefactorImplementedException();
-            //SessionPanel panel = this.GetActivePanel();
-            //if (panel != null)
-            //{
-            //    panel.OnUnload();
-            //}
         }
 
         #endregion
 
-        #region IPanel
-
-        public void VisiblePanel(string panelId)
-        {
-            PanelContainer.VisiblePanel(panelId);
-        }
+        #region IHostTab
 
         #endregion
 

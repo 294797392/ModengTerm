@@ -103,35 +103,6 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        public static List<SidePanel> CreatePanels(List<PanelDefinition> panelDefinitions)
-        {
-            List<SidePanel> panels = new List<SidePanel>();
-
-            foreach (PanelDefinition definition in panelDefinitions)
-            {
-                SidePanel panel = null;
-
-                try
-                {
-                    panel = ConfigFactory<SidePanel>.CreateInstance(definition.VMClassName);
-                }
-                catch (Exception ex)
-                {
-                    logger.ErrorFormat("创建Panel实例异常, {0}, {1}", definition.VMClassName, ex);
-                    continue;
-                }
-
-                panel.Definition = definition;
-                panel.ID = definition.ID;
-                panel.Name = definition.Name;
-                panel.IconURI = definition.Icon;
-
-                panels.Add(panel);
-            }
-
-            return panels;
-        }
-
         public static List<ContextMenuVM> CreateContextMenuVMs(bool toolbarMenu)
         {
             List<AddonMenuDefinition> menuItems = new List<AddonMenuDefinition>();
