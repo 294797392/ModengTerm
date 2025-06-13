@@ -20,21 +20,23 @@ namespace ModengTerm.Addon.Interactive
         void OpenSession(XTermSession session, bool addToRecent = false);
 
         /// <summary>
-        /// 显示或隐藏Panel
-        /// </summary>
-        /// <param name="panelId">要显示或隐藏的PanelId</param>
-        void VisiblePanel(string panelId);
-
-        /// <summary>
         /// 获取当前激活的Shell
         /// </summary>
         /// <returns></returns>
-        T GetActivePanel<T>() where T : IHostPanel;
+        T GetActiveTab<T>() where T : IHostTab;
 
         /// <summary>
         /// 获取指定类型的所有会话Shell对象
         /// </summary>
         /// <returns></returns>
-        List<IHostPanel> GetAllPanels();
+        List<IHostTab> GetAllTabs();
+
+        void AddSidePanel(SidePanel panel);
+
+        void RemoveSidePanel(SidePanel panel);
+
+        void OpenSidePanel(SidePanel panel);
+
+        void CloseSidePanel(SidePanel panel);
     }
 }

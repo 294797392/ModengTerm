@@ -23,9 +23,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="OfficialAddons\QuickInput\**" />
     <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <EmbeddedResource Remove="OfficialAddons\QuickInput\**" />
     <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <None Remove="OfficialAddons\QuickInput\**" />
     <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
+    <Page Remove="OfficialAddons\QuickInput\**" />
     <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
   </ItemGroup>
 

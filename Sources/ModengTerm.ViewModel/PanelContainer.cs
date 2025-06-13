@@ -1,34 +1,35 @@
-﻿using ModengTerm.Base.Definitions;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using System;
 using System.Linq;
 using System.Windows.Automation;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Addon.ViewModel
+namespace ModengTerm.ViewModel
 {
     public class PanelContainer : ViewModelBase
     {
         #region 实例变量
 
         private bool visible;
-        private IHostPanel selectedItem;
+        private SidePanel selectedItem;
 
         #endregion
 
         #region 属性
 
-        public BindableCollection<IHostPanel> Panels { get; private set; }
+        public BindableCollection<SidePanel> Panels { get; private set; }
 
-        public IHostPanel SelectedItem
+        public SidePanel SelectedItem
         {
-            get { return this.selectedItem; }
+            get { return selectedItem; }
             set
             {
-                if (this.selectedItem != value)
+                if (selectedItem != value)
                 {
-                    this.selectedItem = value;
-                    this.NotifyPropertyChanged("SelectedItem");
+                    selectedItem = value;
+                    NotifyPropertyChanged("SelectedItem");
                 }
             }
         }
@@ -39,7 +40,7 @@ namespace ModengTerm.Addon.ViewModel
 
         public PanelContainer()
         {
-            this.Panels = new BindableCollection<IHostPanel>();
+            Panels = new BindableCollection<SidePanel>();
         }
 
         #endregion
@@ -52,7 +53,7 @@ namespace ModengTerm.Addon.ViewModel
 
         public void VisiblePanel(string panelId)
         {
-            IHostPanel panel = this.Panels.FirstOrDefault(v => v.ID.ToString() == panelId);
+            SidePanel panel = Panels.FirstOrDefault(v => v.ID == panelId);
             if (panel == null)
             {
                 return;
@@ -61,7 +62,7 @@ namespace ModengTerm.Addon.ViewModel
             // 当前状态
             bool visible = false;
 
-            if (panel.IsSelected) 
+            if (panel.IsSelected)
             {
                 visible = true;
             }

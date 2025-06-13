@@ -13,6 +13,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     {
         protected override void OnActive(ActiveContext e)
         {
+            this.RegisterEvent(HostEvent.HOST_APP_INITIALIZED, this.OnAppInitialized);
             this.RegisterCommand("SessionExplorerAddon.OpenExplorerWindow", OpenExplorerWindow);
         }
 
@@ -22,9 +23,16 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         private void OpenExplorerWindow(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
+            HostFactory factory = HostFactory.GetFactory();
             IHostWindow window = factory.GetHostWindow();
-            window.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
+            //window.VisiblePanel("BF1AD31C-0E00-495D-9C19-7687D708B71F");
+        }
+
+        private void OnAppInitialized(HostEvent ev, HostEventArgs evArgs)
+        {
+            HostFactory factory = HostFactory.GetFactory();
+            IHostWindow window = factory.GetHostWindow();
+            //window.AddSidePanel();
         }
     }
 }

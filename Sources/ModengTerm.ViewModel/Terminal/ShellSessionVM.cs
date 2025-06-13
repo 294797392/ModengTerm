@@ -22,7 +22,7 @@ using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace ModengTerm.ViewModel.Terminal
 {
-    public class ShellSessionVM : OpenedSessionVM, IShellPanel
+    public class ShellSessionVM : OpenedSessionVM, IShellTab
     {
         #region 类变量
 

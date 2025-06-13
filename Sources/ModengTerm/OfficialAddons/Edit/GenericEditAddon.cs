@@ -26,44 +26,44 @@ namespace ModengTerm.OfficialAddons.Edit
 
         private void Paste(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
+            HostFactory factory = HostFactory.GetFactory();
+            IShellTab shell = factory.GetActiveTab<IShellTab>();
             string text = System.Windows.Clipboard.GetText();
             shell.Send(text);
         }
 
         private void CopySelection(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
+            HostFactory factory = HostFactory.GetFactory();
+            IShellTab shell = factory.GetActiveTab<IShellTab>();
             shell.CopySelection();
         }
 
         private void SaveSelection(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
+            HostFactory factory = HostFactory.GetFactory();
+            IShellTab shell = factory.GetActiveTab<IShellTab>();
             SaveToFile(ParagraphTypeEnum.Selected, shell);
         }
 
         private void SaveViewport(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
+            HostFactory factory = HostFactory.GetFactory();
+            IShellTab shell = factory.GetActiveTab<IShellTab>();
             SaveToFile(ParagraphTypeEnum.Viewport, shell);
         }
 
         private void SaveAll(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
+            HostFactory factory = HostFactory.GetFactory();
+            IShellTab shell = factory.GetActiveTab<IShellTab>();
             SaveToFile(ParagraphTypeEnum.AllDocument, shell);
         }
 
         private void ClearScreen(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
+            HostFactory factory = HostFactory.GetFactory();
+            IShellTab shell = factory.GetActiveTab<IShellTab>();
             shell.ClearScreen();
         }
 
@@ -81,7 +81,7 @@ namespace ModengTerm.OfficialAddons.Edit
             }
         }
 
-        private void SaveToFile(ParagraphTypeEnum paragraphType, IShellPanel shell)
+        private void SaveToFile(ParagraphTypeEnum paragraphType, IShellTab shell)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";

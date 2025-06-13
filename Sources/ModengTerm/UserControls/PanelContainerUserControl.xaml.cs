@@ -1,11 +1,10 @@
 ﻿using DotNEToolkit;
-using ModengTerm.Addon.ViewModel;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Definitions;
+using ModengTerm.ViewModel;
 using System;
 using System.Windows;
-using System.Windows.Automation;
 using System.Windows.Controls;
-using WPFToolkit.MVVM;
 
 namespace ModengTerm.UserControls
 {
@@ -75,7 +74,7 @@ namespace ModengTerm.UserControls
         {
         }
 
-        private FrameworkElement LoadContent(Addon.ViewModel.Panel panel)
+        private FrameworkElement LoadContent(SidePanel panel)
         {
             PanelDefinition definition = panel.Definition;
             FrameworkElement content = panel.Content;
@@ -87,7 +86,7 @@ namespace ModengTerm.UserControls
                 {
                     content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
 
-                    panel.OnInitialize();
+                    panel.Initialize();
                     panel.Content = content;
 
                     content.DataContext = panel;
@@ -115,13 +114,13 @@ namespace ModengTerm.UserControls
 
             if (e.RemovedItems.Count > 0)
             {
-                Addon.ViewModel.Panel panel = e.RemovedItems[0] as Addon.ViewModel.Panel;
-                panel.OnUnload();
+                SidePanel panel = e.RemovedItems[0] as SidePanel;
+                panel.Unloaded();
             }
 
             PanelContainer panelContainer = base.DataContext as PanelContainer;
 
-            Addon.ViewModel.Panel selectedItem = ListBoxMenus.SelectedItem as Addon.ViewModel.Panel;
+            SidePanel selectedItem = ListBoxMenus.SelectedItem as SidePanel;
             if (selectedItem == null)
             {
                 GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
@@ -143,30 +142,30 @@ namespace ModengTerm.UserControls
 
             if (e.AddedItems.Count > 0) 
             {
-                Addon.ViewModel.Panel panel = e.AddedItems[0] as Addon.ViewModel.Panel;
-                panel.OnLoaded();
+                SidePanel panel = e.AddedItems[0] as SidePanel;
+                panel.Loaded();
             }
         }
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            Addon.ViewModel.Panel selected = ListBoxMenus.SelectedItem as Addon.ViewModel.Panel;
+            SidePanel selected = ListBoxMenus.SelectedItem as SidePanel;
 
-            Addon.ViewModel.Panel clicked = (sender as ListBoxItem).DataContext as Addon.ViewModel.Panel;
+            SidePanel clicked = (sender as ListBoxItem).DataContext as SidePanel;
 
             if (clicked == selected)
             {
                 // 触发SelectionChanged事件，SelectionChanged事件里隐藏和触发OnUnload事件
                 ListBoxMenus.SelectedItem = null;
 
-                // 不触发SelectionChanged事件
+                // 不继续触发SelectionChanged事件
                 e.Handled = true;
             }
         }
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            Addon.ViewModel.Panel selectedPanel = ListBoxMenus.SelectedItem as Addon.ViewModel.Panel;
+            SidePanel selectedPanel = ListBoxMenus.SelectedItem as SidePanel;
 
             ListBoxMenus.SelectedItem = null;
             ContentControl1.Content = null;

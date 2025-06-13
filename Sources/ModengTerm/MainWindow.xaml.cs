@@ -83,6 +83,7 @@ namespace ModengTerm
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
 
             this.InitializeAddon();
+            this.RaiseAddonEvent(HostEvent.HOST_APP_INITIALIZED);
         }
 
         private void ShowSessionListWindow()
@@ -173,7 +174,7 @@ namespace ModengTerm
                     continue;
                 }
 
-                List<Addon.ViewModel.Panel> panels = VMUtils.CreatePanels(addon.Definition.WindowPanels);
+                List<SidePanel> panels = VMUtils.CreatePanels(addon.Definition.WindowPanels);
 
                 this.mainWindowVM.PanelContainer.Panels.AddRange(panels);
             }
@@ -183,7 +184,7 @@ namespace ModengTerm
             this.addons = addons;
         }
 
-        private void RaiseAddonEvent(HostEvent evType, HostEventArgs evArgs)
+        private void RaiseAddonEvent(HostEvent evType, HostEventArgs evArgs = null)
         {
             foreach (AddonModule addon in this.addons)
             {
@@ -197,17 +198,17 @@ namespace ModengTerm
             }
         }
 
-        private void RaiseAddonCommand(CommandArgs cmdArgs) 
+        private void RaiseAddonCommand(CommandArgs cmdArgs)
         {
             AddonModule addon = this.addons.FirstOrDefault(v => v.ID == cmdArgs.AddonId);
-            if (addon == null) 
+            if (addon == null)
             {
                 logger.ErrorFormat("查找插件失败, {0}", cmdArgs.AddonId);
                 return;
             }
 
             AddonCommandHandler handler;
-            if (!addon.RegisteredCommand.TryGetValue(cmdArgs.Command, out handler)) 
+            if (!addon.RegisteredCommand.TryGetValue(cmdArgs.Command, out handler))
             {
                 logger.WarnFormat("插件未注册命令, {0}, {1}", addon.ID, cmdArgs.Command);
                 return;
@@ -583,7 +584,7 @@ namespace ModengTerm
         /// 获取当前激活的Shell
         /// </summary>
         /// <returns></returns>
-        public T GetActivePanel<T>() where T : IHostPanel
+        public T GetActiveTab<T>() where T : IHostTab
         {
             if (ListBoxOpenedSession.SelectedItem is T)
             {
@@ -597,10 +598,22 @@ namespace ModengTerm
         /// 获取指定类型的所有会话Shell对象
         /// </summary>
         /// <returns></returns>
-        public List<IHostPanel> GetAllPanels()
+        public List<IHostTab> GetAllTabs()
         {
-            return this.mainWindowVM.SessionList.OfType<IHostPanel>().ToList();
+            return this.mainWindowVM.SessionList.OfType<IHostTab>().ToList();
         }
+
+        public void AddSidePanel(SidePanel panel)
+        { }
+
+        public void RemoveSidePanel(SidePanel panel)
+        { }
+
+        public void OpenSidePanel(SidePanel panel)
+        { }
+
+        public void CloseSidePanel(SidePanel panel)
+        { }
 
         #endregion
 

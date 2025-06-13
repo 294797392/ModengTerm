@@ -97,7 +97,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
             // 打开会话
-            ObjectFactory factory = ObjectFactory.GetFactory();
+            HostFactory factory = HostFactory.GetFactory();
             IHostWindow window = factory.GetHostWindow();
             window.OpenSession(sessionVM.Session);
         }

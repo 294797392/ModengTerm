@@ -12,11 +12,11 @@ namespace ModengTerm.Addon
     /// <summary>
     /// 提供创建插件可以使用的对象的功能
     /// </summary>
-    public abstract class ObjectFactory
+    public abstract class HostFactory
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ObjectFactory");
         private const string FactoryImpl = "ModengTerm.Addon.ObjectFactoryImpl, ModengTerm";
-        private static ObjectFactory factory;
+        private static HostFactory factory;
 
         /// <summary>
         /// 获取窗口实例
@@ -31,36 +31,40 @@ namespace ModengTerm.Addon
         public abstract StorageService GetStorageService();
 
         /// <summary>
-        /// 获取当前激活的ShellObject
+        /// 获取当前激活的Tab页
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetActivePanel<T>() where T : IHostPanel
+        public T GetActiveTab<T>() where T : IHostTab
         {
             IHostWindow window = this.GetHostWindow();
 
-            return window.GetActivePanel<T>();
+            return window.GetActiveTab<T>();
         }
 
-        public List<IHostPanel> GetAllPanels()
+        public List<IHostTab> GetAllTabs()
         {
             IHostWindow window = this.GetHostWindow();
 
-            return window.GetAllPanels();
+            return window.GetAllTabs();
         }
 
-        public List<T> GetAllPanels<T>() where T : IHostPanel
+        public List<T> GetAllTabs<T>() where T : IHostTab
         {
-            return this.GetAllPanels().OfType<T>().ToList();
+            return this.GetAllTabs().OfType<T>().ToList();
         }
 
-        public static ObjectFactory GetFactory() 
+        /// <summary>
+        /// 获取工厂实例
+        /// </summary>
+        /// <returns></returns>
+        public static HostFactory GetFactory() 
         {
             if (factory == null)
             {
                 try
                 {
-                    factory = ConfigFactory<ObjectFactory>.CreateInstance(FactoryImpl);
+                    factory = ConfigFactory<HostFactory>.CreateInstance(FactoryImpl);
                 }
                 catch (Exception ex)
                 {

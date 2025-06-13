@@ -17,6 +17,11 @@ namespace ModengTerm.Addon
         HOST_SELECTED_SESSION_CHANGED = 1,
         HOST_SESSION_OPENED = 2,
 
+        /// <summary>
+        /// 当应用程序启动之后触发
+        /// </summary>
+        HOST_APP_INITIALIZED = 3,
+
         // Shell会话事件 101 - 200
         //SHELL_SESSION_OPENED = 101,
 

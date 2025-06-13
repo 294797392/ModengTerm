@@ -1,6 +1,5 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
-using ModengTerm.Addon.ViewModel;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -13,7 +12,7 @@ namespace ModengTerm.ViewModel
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
-    public abstract class OpenedSessionVM : SessionItemVM, IHostPanel
+    public abstract class OpenedSessionVM : SessionItemVM, IHostTab
     {
         #region 公开事件
 
@@ -120,11 +119,12 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnLoaded()
         {
-            SessionPanel panel = this.GetActivePanel();
-            if (panel != null)
-            {
-                panel.OnLoaded();
-            }
+            throw new RefactorImplementedException();
+            //SessionPanel panel = this.GetActivePanel();
+            //if (panel != null)
+            //{
+            //    panel.OnLoaded();
+            //}
         }
 
         /// <summary>
@@ -132,11 +132,12 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void OnUnload()
         {
-            SessionPanel panel = this.GetActivePanel();
-            if (panel != null)
-            {
-                panel.OnUnload();
-            }
+            throw new RefactorImplementedException();
+            //SessionPanel panel = this.GetActivePanel();
+            //if (panel != null)
+            //{
+            //    panel.OnUnload();
+            //}
         }
 
         #endregion
@@ -193,19 +194,19 @@ namespace ModengTerm.ViewModel
 
         #region 实例方法
 
-        /// <summary>
-        /// 获取当前显示的PanelContent
-        /// </summary>
-        /// <returns></returns>
-        private SessionPanel GetActivePanel()
-        {
-            if (this.PanelContainer == null)
-            {
-                return null;
-            }
+        ///// <summary>
+        ///// 获取当前显示的PanelContent
+        ///// </summary>
+        ///// <returns></returns>
+        //private SessionPanel GetActivePanel()
+        //{
+        //    if (this.PanelContainer == null)
+        //    {
+        //        return null;
+        //    }
 
-            return this.PanelContainer.SelectedItem as SessionPanel;
-        }
+        //    return this.PanelContainer.SelectedItem as SessionPanel;
+        //}
 
         private void InitializePanels()
         {

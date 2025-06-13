@@ -1,7 +1,5 @@
-﻿using ModengTerm.Addon.ViewModel;
-using ModengTerm.Base;
+﻿using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
-using ModengTerm.Base.Definitions;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.ViewModel.Terminal;
 using WPFToolkit.MVVM;
@@ -154,9 +152,9 @@ namespace ModengTerm.ViewModel
         /// 获取MainWindowVM的实例
         /// </summary>
         /// <returns></returns>
-        public static MainWindowVM GetInstance() 
+        public static MainWindowVM GetInstance()
         {
-            if (instance == null) 
+            if (instance == null)
             {
                 instance = new MainWindowVM();
             }

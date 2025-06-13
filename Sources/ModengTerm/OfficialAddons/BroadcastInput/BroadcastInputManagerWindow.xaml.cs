@@ -46,7 +46,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         /// </summary>
         /// <param name="broadcastSessions"></param>
         /// <param name="shellSessions">当前打开的所有终端类型的会话</param>
-        public BroadcastInputManagerWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellPanel> shellSessions)
+        public BroadcastInputManagerWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellTab> shellSessions)
         {
             InitializeComponent();
 
@@ -57,7 +57,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         #region 实例方法
 
-        private void InitializeWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellPanel> shellSessions)
+        private void InitializeWindow(List<BroadcastSessionVM> broadcastSessions, List<IShellTab> shellSessions)
         {
             this.broadcastSessions = new BindableCollection<BroadcastSessionVM>();
             this.broadcastSessions.AddRange(broadcastSessions);
@@ -72,7 +72,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
+            HostFactory factory = HostFactory.GetFactory();
             StorageService storageSvc = factory.GetStorageService();
 
             List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.BroadcasePanel.Id }).ToList();

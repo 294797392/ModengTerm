@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace ModengTerm.Addon
 {
-    public class ObjectFactoryImpl : ObjectFactory
+    public class HostFactoryImpl : HostFactory
     {
         private StorageService storageSvcImpl = new SqliteStorageService();
 

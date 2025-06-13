@@ -1,5 +1,5 @@
 ﻿using DotNEToolkit;
-using ModengTerm.Addon.ViewModel;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
@@ -103,17 +103,17 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        public static List<Addon.ViewModel.Panel> CreatePanels(List<PanelDefinition> panelDefinitions)
+        public static List<SidePanel> CreatePanels(List<PanelDefinition> panelDefinitions)
         {
-            List<Addon.ViewModel.Panel> panels = new List<Addon.ViewModel.Panel>();
+            List<SidePanel> panels = new List<SidePanel>();
 
             foreach (PanelDefinition definition in panelDefinitions)
             {
-                Addon.ViewModel.Panel panel = null;
+                SidePanel panel = null;
 
                 try
                 {
-                    panel = ConfigFactory<Addon.ViewModel.Panel>.CreateInstance(definition.VMClassName);
+                    panel = ConfigFactory<SidePanel>.CreateInstance(definition.VMClassName);
                 }
                 catch (Exception ex)
                 {

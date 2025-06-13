@@ -7,7 +7,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 向应用程序公开打开的会话窗口的功能
     /// </summary>
-    public interface IHostPanel
+    public interface IHostTab
     {
         /// <summary>
         /// 会话Id
@@ -30,7 +30,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 表示打开的终端类型的会话界面
     /// </summary>
-    public interface IShellPanel : IHostPanel
+    public interface IShellTab : IHostTab
     {
         void Send(byte[] bytes);
         void Send(string text);
@@ -56,7 +56,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 表示打开的Sftp类型的会话界面
     /// </summary>
-    public interface ISftpPanel : IHostPanel
+    public interface ISftpTab : IHostTab
     {
 
     }

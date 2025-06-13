@@ -41,14 +41,14 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             this.broadcastSessions.Clear();
 
-            ObjectFactory factory = ObjectFactory.GetFactory();
+            HostFactory factory = HostFactory.GetFactory();
             StorageService storageSvc = factory.GetStorageService();
-            IShellPanel activePanel = factory.GetActivePanel<IShellPanel>();
-            List<IShellPanel> allPanels = factory.GetAllPanels<IShellPanel>();
+            IShellTab activePanel = factory.GetActiveTab<IShellTab>();
+            List<IShellTab> allPanels = factory.GetAllTabs<IShellTab>();
 
             List<BroadcastSession> broadcastSessions = storageSvc.GetObjects<BroadcastSession>(activePanel.Id);
 
-            foreach (IShellPanel panel in allPanels)
+            foreach (IShellTab panel in allPanels)
             {
                 if (panel == activePanel)
                 {
@@ -72,9 +72,9 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel activePanel = factory.GetActivePanel<IShellPanel>();
-            List<IShellPanel> allPanels = factory.GetAllPanels<IShellPanel>();
+            HostFactory factory = HostFactory.GetFactory();
+            IShellTab activePanel = factory.GetActiveTab<IShellTab>();
+            List<IShellTab> allPanels = factory.GetAllTabs<IShellTab>();
             List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
 
             BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, allPanels);
@@ -93,7 +93,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             foreach (BroadcastSessionVM broadcastSession in this.broadcastSessions)
             {
-                IShellPanel broadcastPanel = broadcastSession.BroadcasePanel;
+                IShellTab broadcastPanel = broadcastSession.BroadcasePanel;
 
                 if (broadcastPanel.Status != SessionStatusEnum.Connected)
                 {
