@@ -25,9 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.UnitTest", "Mode
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.ViewModel", "ModengTerm.ViewModel\ModengTerm.ViewModel.csproj", "{16BEE26E-0FC8-4AAD-88AC-00C47CE1D7E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.Addon", "ModengTerm.Addon\ModengTerm.Addon.csproj", "{D3F03F6D-F822-481D-A09C-73A7A8A087E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Addon", "ModengTerm.Addon\ModengTerm.Addon.csproj", "{D3F03F6D-F822-481D-A09C-73A7A8A087E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModengTerm.Controls", "ModengTerm.Controls\ModengTerm.Controls.csproj", "{17471BEE-F0A3-414E-AE88-C9580CAF8369}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModengTerm.Controls", "ModengTerm.Controls\ModengTerm.Controls.csproj", "{17471BEE-F0A3-414E-AE88-C9580CAF8369}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

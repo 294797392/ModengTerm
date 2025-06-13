@@ -1,4 +1,4 @@
-﻿using Microsoft.Win32;
+﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -13,10 +13,7 @@ using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows;
 using WPFToolkit.MVVM;
@@ -25,7 +22,7 @@ using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace ModengTerm.ViewModel.Terminal
 {
-    public class ShellSessionVM : InputSessionVM
+    public class ShellSessionVM : OpenedSessionVM, IShellPanel
     {
         #region 类变量
 
@@ -622,7 +619,7 @@ namespace ModengTerm.ViewModel.Terminal
         /// 通过键盘输入发送数据
         /// </summary>
         /// <param name="kbdInput">用户输入信息</param>
-        public override void SendInput(VTKeyboardInput kbdInput)
+        public void SendInput(VTKeyboardInput kbdInput)
         {
             if (sessionTransport.Status != SessionStatusEnum.Connected)
             {
@@ -657,22 +654,22 @@ namespace ModengTerm.ViewModel.Terminal
             SendSyncInput(bytes);
         }
 
-        /// <summary>
-        /// 发送原始字节数据
-        /// </summary>
-        /// <param name="rawData"></param>
-        public override void SendRawData(byte[] rawData)
-        {
-            PerformSend(rawData);
+        ///// <summary>
+        ///// 发送原始字节数据
+        ///// </summary>
+        ///// <param name="rawData"></param>
+        //public override void SendRawData(byte[] rawData)
+        //{
+        //    PerformSend(rawData);
 
-            SendSyncInput(rawData);
-        }
+        //    SendSyncInput(rawData);
+        //}
 
         /// <summary>
         /// 发送纯文本数据
         /// </summary>
         /// <param name="text"></param>
-        public override void SendText(string text)
+        public void SendText(string text)
         {
             byte[] bytes = writeEncoding.GetBytes(text);
 
@@ -698,22 +695,6 @@ namespace ModengTerm.ViewModel.Terminal
             return Control(code, parameter, out result);
         }
 
-        /// <summary>
-        /// 复制当前选中的内容
-        /// </summary>
-        public void CopySelection()
-        {
-            VTParagraph paragraph = videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
-            if (paragraph.IsEmpty)
-            {
-                return;
-            }
-
-            clipboard.SetData(paragraph);
-
-            // 把数据设置到Windows剪贴板里
-            System.Windows.Clipboard.SetText(paragraph.Content);
-        }
 
         /// <summary>
         /// 开始录像
@@ -772,26 +753,6 @@ namespace ModengTerm.ViewModel.Terminal
             RecordStatus = RecordStatusEnum.Stop;
         }
 
-        /// <summary>
-        /// 保存指定数据到文件
-        /// </summary>
-        /// <param name="paragraphType"></param>
-        /// <param name="format"></param>
-        /// <param name="filePath"></param>
-        public void SaveToFile(ParagraphTypeEnum paragraphType, ParagraphFormatEnum format, string filePath)
-        {
-            try
-            {
-                VTParagraph paragraph = videoTerminal.CreateParagraph(paragraphType, format);
-                File.WriteAllText(filePath, paragraph.Content);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("保存日志异常", ex);
-                MTMessageBox.Error("保存失败");
-            }
-        }
-
         public void StartLogger(IVideoTerminal videoTerminal, LoggerOptions loggerOptions)
         {
             logMgr.Start(videoTerminal, loggerOptions);
@@ -800,14 +761,6 @@ namespace ModengTerm.ViewModel.Terminal
         public void StopLogger()
         {
             logMgr.Stop(videoTerminal);
-        }
-
-        public void ClearScreen()
-        {
-            VTDocument document = VideoTerminal.ActiveDocument;
-            document.DeleteViewoprt();
-            document.SetCursorLogical(0, 0);
-            document.RequestInvalidate();
         }
 
         #endregion
@@ -1050,6 +1003,66 @@ namespace ModengTerm.ViewModel.Terminal
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        #endregion
+
+        #region IShellPanel
+
+        public void Send(byte[] bytes)
+        { }
+
+        public void Send(string text)
+        { }
+
+        public VTParagraph GetParagraph(VTParagraphOptions options)
+        {
+            throw new RefactorImplementedException();
+        }
+
+        /// <summary>
+        /// 保存指定内容到文件
+        /// </summary>
+        /// <param name="paragraphType"></param>
+        /// <param name="format"></param>
+        /// <param name="filePath"></param>
+        public void SaveToFile(ParagraphTypeEnum paragraphType, ParagraphFormatEnum format, string filePath)
+        {
+            try
+            {
+                VTParagraph paragraph = videoTerminal.CreateParagraph(paragraphType, format);
+                File.WriteAllText(filePath, paragraph.Content);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("保存日志异常", ex);
+                MTMessageBox.Error("保存失败");
+            }
+        }
+
+        /// <summary>
+        /// 复制当前选中的内容
+        /// </summary>
+        public void CopySelection()
+        {
+            VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
+            if (paragraph.IsEmpty)
+            {
+                return;
+            }
+
+            clipboard.SetData(paragraph);
+
+            // 把数据设置到Windows剪贴板里
+            System.Windows.Clipboard.SetText(paragraph.Content);
+        }
+
+        public void ClearScreen()
+        {
+            VTDocument document = VideoTerminal.ActiveDocument;
+            document.DeleteViewoprt();
+            document.SetCursorLogical(0, 0);
+            document.RequestInvalidate();
         }
 
         #endregion

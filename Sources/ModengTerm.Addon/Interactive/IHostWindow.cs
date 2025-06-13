@@ -8,32 +8,33 @@ using System.Threading.Tasks;
 namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 表示应用程序的窗口
+    /// 向插件公开应用程序主窗口的功能
     /// </summary>
-    public abstract class IWindow
+    public interface IHostWindow
     {
         /// <summary>
         /// 打开会话
         /// </summary>
         /// <param name="session"></param>
-        public abstract void OpenSession(XTermSession session);
+        /// <param name="addToRecent">是否加入到最近打开的列表里</param>
+        void OpenSession(XTermSession session, bool addToRecent = false);
 
         /// <summary>
         /// 显示或隐藏Panel
         /// </summary>
         /// <param name="panelId">要显示或隐藏的PanelId</param>
-        public abstract void VisiblePanel(string panelId);
+        void VisiblePanel(string panelId);
 
         /// <summary>
         /// 获取当前激活的Shell
         /// </summary>
         /// <returns></returns>
-        public abstract T GetActivePanel<T>() where T : IPanel;
+        T GetActivePanel<T>() where T : IHostPanel;
 
         /// <summary>
         /// 获取指定类型的所有会话Shell对象
         /// </summary>
         /// <returns></returns>
-        public abstract List<IPanel> GetAllPanels();
+        List<IHostPanel> GetAllPanels();
     }
 }

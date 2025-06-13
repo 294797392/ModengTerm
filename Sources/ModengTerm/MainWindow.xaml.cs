@@ -1,20 +1,19 @@
 ﻿using DotNEToolkit;
 using log4net.Core;
 using log4net.Repository.Hierarchy;
-using ModengTerm.Addon.ViewModel;
+using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
 using ModengTerm.UserControls;
 using ModengTerm.ViewModel;
-using ModengTerm.ViewModel.Terminal;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
@@ -24,14 +23,13 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using WPFToolkit.Utility;
 
 namespace ModengTerm
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IHostWindow
     {
         #region 类变量
 
@@ -96,45 +94,6 @@ namespace ModengTerm
             {
                 XTermSession session = sessionListWindow.SelectedSession;
                 this.OpenSession(session);
-            }
-        }
-
-        /// <summary>
-        /// 执行打开会话动作
-        /// </summary>
-        /// <param name="session">要打开的会话</param>
-        /// <param name="addToRecent">是否加入到最新打开的会话列表里</param>
-        private void OpenSession(XTermSession session, bool addToRecent = true)
-        {
-            ISessionContent content = SessionContentFactory.Create(session);
-            ContentControlSession.Content = content;
-
-            OpenedSessionVM openedSessionVM = OpenedSessionVMFactory.Create(session);
-            openedSessionVM.ID = session.ID;
-            openedSessionVM.Name = session.Name;
-            openedSessionVM.Description = session.Description;
-            openedSessionVM.Content = content as DependencyObject;
-            openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
-            openedSessionVM.Notify += this.OpenedSessionVM_Notify;
-            openedSessionVM.Initialize();
-
-            // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
-            int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);
-            this.mainWindowVM.SessionList.Insert(index, openedSessionVM);
-            this.mainWindowVM.SelectedSession = openedSessionVM;
-
-            ScrollViewerOpenedSession.ScrollToRightEnd();
-
-            int code = content.Open(openedSessionVM);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("打开会话失败, {0}", code);
-            }
-
-            // 增加到最近打开列表里
-            if (addToRecent)
-            {
-                this.mainWindowVM.AddToRecentSession(session);
             }
         }
 
@@ -214,7 +173,7 @@ namespace ModengTerm
                     continue;
                 }
 
-                List<PanelBase> panels = VMUtils.CreatePanels(addon.Definition.WindowPanels);
+                List<Addon.ViewModel.Panel> panels = VMUtils.CreatePanels(addon.Definition.WindowPanels);
 
                 this.mainWindowVM.PanelContainer.Panels.AddRange(panels);
             }
@@ -222,6 +181,39 @@ namespace ModengTerm
             #endregion
 
             this.addons = addons;
+        }
+
+        private void RaiseAddonEvent(HostEvent evType, HostEventArgs evArgs)
+        {
+            foreach (AddonModule addon in this.addons)
+            {
+                AddonEventHandler handler;
+                if (!addon.RegisteredEvent.TryGetValue(evType, out handler))
+                {
+                    continue;
+                }
+
+                handler.Invoke(evType, evArgs);
+            }
+        }
+
+        private void RaiseAddonCommand(CommandArgs cmdArgs) 
+        {
+            AddonModule addon = this.addons.FirstOrDefault(v => v.ID == cmdArgs.AddonId);
+            if (addon == null) 
+            {
+                logger.ErrorFormat("查找插件失败, {0}", cmdArgs.AddonId);
+                return;
+            }
+
+            AddonCommandHandler handler;
+            if (!addon.RegisteredCommand.TryGetValue(cmdArgs.Command, out handler)) 
+            {
+                logger.WarnFormat("插件未注册命令, {0}, {1}", addon.ID, cmdArgs.Command);
+                return;
+            }
+
+            handler.Invoke(cmdArgs);
         }
 
         #endregion
@@ -234,17 +226,17 @@ namespace ModengTerm
         /// <param name="session"></param>
         /// <param name="code"></param>
         /// <param name="e"></param>
-        private void OpenedSessionVM_Notify(OpenedSessionVM session, EventType evType, EventArgs args)
+        private void OpenedSessionVM_Notify(OpenedSessionVM session, HostEvent evType, HostEventArgs evArgs)
         {
             foreach (AddonModule addon in this.addons)
             {
-                AddonEventHandler eventHandler;
-                if (!addon.RegisteredEvent.TryGetValue(evType, out eventHandler))
+                AddonEventHandler handler;
+                if (!addon.RegisteredEvent.TryGetValue(evType, out handler))
                 {
                     continue;
                 }
 
-                eventHandler(evType, args);
+                handler(evType, evArgs);
             }
         }
 
@@ -387,12 +379,11 @@ namespace ModengTerm
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
-            throw new RefactorImplementedException();
-            //MenuItem menuItem = e.OriginalSource as MenuItem;
-            //ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            //CommandArgs.Instance.AddonId = contextMenu.AddonId;
-            //CommandArgs.Instance.Command = contextMenu.Command;
-            //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
+            CommandArgs.Instance.AddonId = contextMenu.AddonId;
+            CommandArgs.Instance.Command = contextMenu.Command;
+            this.RaiseAddonCommand(CommandArgs.Instance);
         }
 
 
@@ -527,6 +518,88 @@ namespace ModengTerm
             {
                 logger.Level = Level.Off;
             }
+        }
+
+        #endregion
+
+        #region IHostWindow
+
+        /// <summary>
+        /// 执行打开会话动作
+        /// </summary>
+        /// <param name="session">要打开的会话</param>
+        /// <param name="addToRecent">是否加入到最新打开的会话列表里</param>
+        public void OpenSession(XTermSession session, bool addToRecent = true)
+        {
+            ISessionContent content = SessionContentFactory.Create(session);
+            ContentControlSession.Content = content;
+
+            OpenedSessionVM openedSessionVM = OpenedSessionVMFactory.Create(session);
+            openedSessionVM.ID = session.ID;
+            openedSessionVM.Name = session.Name;
+            openedSessionVM.Description = session.Description;
+            openedSessionVM.Content = content as DependencyObject;
+            openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
+            openedSessionVM.Notify += this.OpenedSessionVM_Notify;
+            openedSessionVM.Initialize();
+
+            // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
+            int index = this.mainWindowVM.SessionList.IndexOf(MainWindowVM.OpenSessionVM);
+            this.mainWindowVM.SessionList.Insert(index, openedSessionVM);
+            this.mainWindowVM.SelectedSession = openedSessionVM;
+
+            ScrollViewerOpenedSession.ScrollToRightEnd();
+
+            int code = content.Open(openedSessionVM);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("打开会话失败, {0}", code);
+            }
+
+            // 增加到最近打开列表里
+            if (addToRecent)
+            {
+                this.mainWindowVM.AddToRecentSession(session);
+            }
+
+            // 触发打开事件
+            SessionOpenedEventArgs evArgs = new SessionOpenedEventArgs()
+            {
+                Type = (SessionTypeEnum)session.Type
+            };
+            this.RaiseAddonEvent(HostEvent.HOST_SESSION_OPENED, evArgs);
+        }
+
+        /// <summary>
+        /// 显示或隐藏Panel
+        /// </summary>
+        /// <param name="panelId">要显示或隐藏的PanelId</param>
+        public void VisiblePanel(string panelId)
+        {
+            this.mainWindowVM.PanelContainer.VisiblePanel(panelId);
+        }
+
+        /// <summary>
+        /// 获取当前激活的Shell
+        /// </summary>
+        /// <returns></returns>
+        public T GetActivePanel<T>() where T : IHostPanel
+        {
+            if (ListBoxOpenedSession.SelectedItem is T)
+            {
+                return (T)ListBoxOpenedSession.SelectedItem;
+            }
+
+            return default(T);
+        }
+
+        /// <summary>
+        /// 获取指定类型的所有会话Shell对象
+        /// </summary>
+        /// <returns></returns>
+        public List<IHostPanel> GetAllPanels()
+        {
+            return this.mainWindowVM.SessionList.OfType<IHostPanel>().ToList();
         }
 
         #endregion

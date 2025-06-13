@@ -5,19 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Base
+namespace ModengTerm.Addon
 {
     /// <summary>
-    /// OpenedSessionVM触发的事件类型
+    /// 定义主应用程序触发的事件
     /// </summary>
-    public enum EventType
+    public enum HostEvent
     {
-        // 0 - 100 通用
-        COMMON_SESSION_STATUS_CHANGED = 0,
-        COMMON_SELECTED_SESSION_CHANGED = 1,
-        
-        // Shell会话 101 - 200
-        SHELL_SESSION_OPENED = 101,
+        // 所有HOST开头的事件类型，是通用事件类型。0 - 100 通用
+        HOST_SESSION_STATUS_CHANGED = 0,
+        HOST_SELECTED_SESSION_CHANGED = 1,
+        HOST_SESSION_OPENED = 2,
+
+        // Shell会话事件 101 - 200
+        //SHELL_SESSION_OPENED = 101,
 
         //#region 所有会话类型的通用命令
 
@@ -49,10 +50,23 @@ namespace ModengTerm.Base
         //#endregion
     }
 
-    public class StatusChangedEventArgs : EventArgs
+    public abstract class HostEventArgs
+    {
+
+    }
+
+    public class StatusChangedEventArgs : HostEventArgs
     {
         public SessionStatusEnum OldStatus { get; set; }
 
         public SessionStatusEnum NewStatus { get; set; }
+    }
+
+    public class SessionOpenedEventArgs : HostEventArgs
+    {
+        /// <summary>
+        /// 会话类型
+        /// </summary>
+        public SessionTypeEnum Type { get; set; }
     }
 }

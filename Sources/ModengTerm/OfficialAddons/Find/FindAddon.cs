@@ -1,4 +1,5 @@
-﻿using ModengTerm.Addons;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addons;
 using ModengTerm.Base;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace ModengTerm.OfficialAddons.Find
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.RegisterEvent(EventType.COMMON_SELECTED_SESSION_CHANGED, this.SelectedSessionChanged);
+            this.RegisterEvent(HostEvent.HOST_SELECTED_SESSION_CHANGED, this.SelectedSessionChanged);
             this.RegisterCommand("E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C", OpenFindWindowCommandHandler);
         }
 
@@ -20,7 +21,7 @@ namespace ModengTerm.OfficialAddons.Find
         {
         }
 
-        private void SelectedSessionChanged(EventType evType, EventArgs args)
+        private void SelectedSessionChanged(HostEvent evType, HostEventArgs evArgs)
         {
             throw new RefactorImplementedException();
             // 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话

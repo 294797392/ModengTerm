@@ -75,7 +75,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             ObjectFactory factory = ObjectFactory.GetFactory();
             StorageService storageSvc = factory.GetStorageService();
 
-            List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.Session.Id }).ToList();
+            List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.BroadcasePanel.Id }).ToList();
             int code = storageSvc.AddObjects<BroadcastSession>(addList);
             if (code != ResponseCode.SUCCESS)
             {
@@ -83,7 +83,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
                 return;
             }
 
-            List<string> removeList = this.removeList.Select(v => v.Session.Id).ToList();
+            List<string> removeList = this.removeList.Select(v => v.BroadcasePanel.Id).ToList();
             code = storageSvc.DeleteObjects(removeList);
             if (code != ResponseCode.SUCCESS) 
             {

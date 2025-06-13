@@ -223,7 +223,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
                     return;
                 }
 
-                shellSession.SendRawData(bytes);
+                throw new RefactorImplementedException();
+                //shellSession.SendRawData(bytes);
             }
             else
             {
@@ -232,7 +233,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
                     text = string.Format("{0}\r\n", text);
                 }
 
-                shellSession.SendText(text);
+                throw new RefactorImplementedException();
+                //shellSession.SendText(text);
             }
 
             shellSession.HistoryCommands.Add(text);

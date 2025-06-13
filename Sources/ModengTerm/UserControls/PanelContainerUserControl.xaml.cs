@@ -75,12 +75,7 @@ namespace ModengTerm.UserControls
         {
         }
 
-        private void ProcessContentUnload(PanelBase panel)
-        {
-            panel.OnUnload();
-        }
-
-        private FrameworkElement LoadContent(PanelBase panel)
+        private FrameworkElement LoadContent(Addon.ViewModel.Panel panel)
         {
             PanelDefinition definition = panel.Definition;
             FrameworkElement content = panel.Content;
@@ -104,8 +99,6 @@ namespace ModengTerm.UserControls
                 }
             }
 
-            panel.OnLoaded();
-
             return content;
         }
 
@@ -120,19 +113,20 @@ namespace ModengTerm.UserControls
                 return;
             }
 
+            if (e.RemovedItems.Count > 0)
+            {
+                Addon.ViewModel.Panel panel = e.RemovedItems[0] as Addon.ViewModel.Panel;
+                panel.OnUnload();
+            }
+
             PanelContainer panelContainer = base.DataContext as PanelContainer;
 
-            PanelBase selectedItem = ListBoxMenus.SelectedItem as PanelBase;
+            Addon.ViewModel.Panel selectedItem = ListBoxMenus.SelectedItem as Addon.ViewModel.Panel;
             if (selectedItem == null)
             {
                 GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
                 ContentControl1.Content = null;
                 return;
-            }
-
-            if (e.RemovedItems.Count > 0) 
-            {
-                this.ProcessContentUnload(e.RemovedItems[0] as PanelBase);
             }
 
             DependencyObject dependencyObject = this.LoadContent(selectedItem);
@@ -146,37 +140,37 @@ namespace ModengTerm.UserControls
             TextBlockTitle.Text = selectedItem.Name;
 
             GridContent.SetValue(Grid.VisibilityProperty, Visibility.Visible);
-        }
 
-        private void ButtonClose_Click(object sender, RoutedEventArgs e)
-        {
-            PanelBase selectedPanel = ListBoxMenus.SelectedItem as PanelBase;
-
-            ListBoxMenus.SelectedItem = null;
-            ContentControl1.Content = null;
-            GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
-
-            // 点击关闭按钮手动触发Unload事件
-            this.ProcessContentUnload(selectedPanel);
+            if (e.AddedItems.Count > 0) 
+            {
+                Addon.ViewModel.Panel panel = e.AddedItems[0] as Addon.ViewModel.Panel;
+                panel.OnLoaded();
+            }
         }
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            PanelBase selected = ListBoxMenus.SelectedItem as PanelBase;
+            Addon.ViewModel.Panel selected = ListBoxMenus.SelectedItem as Addon.ViewModel.Panel;
 
-            PanelBase clicked = (sender as ListBoxItem).DataContext as PanelBase;
+            Addon.ViewModel.Panel clicked = (sender as ListBoxItem).DataContext as Addon.ViewModel.Panel;
 
             if (clicked == selected)
             {
-                // 收回
-                GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
+                // 触发SelectionChanged事件，SelectionChanged事件里隐藏和触发OnUnload事件
                 ListBoxMenus.SelectedItem = null;
 
-                this.ProcessContentUnload(clicked);
-
-                // 在执行点击动作之前阻止执行点击动作，就不会再次执行点击的动作了
+                // 不触发SelectionChanged事件
                 e.Handled = true;
             }
+        }
+
+        private void ButtonClose_Click(object sender, RoutedEventArgs e)
+        {
+            Addon.ViewModel.Panel selectedPanel = ListBoxMenus.SelectedItem as Addon.ViewModel.Panel;
+
+            ListBoxMenus.SelectedItem = null;
+            ContentControl1.Content = null;
+            GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
         }
 
         #endregion

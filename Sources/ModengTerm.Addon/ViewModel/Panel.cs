@@ -10,10 +10,9 @@ using WPFToolkit.MVVM;
 namespace ModengTerm.Addon.ViewModel
 {
     /// <summary>
-    /// 所有PanelContent的基类
-    /// TODO：尝试把PanelContentVM改造成插件
+    /// 所有SidePanel的基类
     /// </summary>
-    public abstract class PanelBase : ViewModelBase
+    public abstract class Panel : ViewModelBase
     {
         #region 类变量
 
@@ -66,8 +65,14 @@ namespace ModengTerm.Addon.ViewModel
 
         public abstract void OnInitialize();
 
+        /// <summary>
+        /// 在显示之后触发
+        /// </summary>
         public abstract void OnLoaded();
 
+        /// <summary>
+        /// 在从界面移出之前触发
+        /// </summary>
         public abstract void OnUnload();
 
         public abstract void OnRelease();
@@ -83,7 +88,7 @@ namespace ModengTerm.Addon.ViewModel
         #endregion
     }
 
-    public abstract class WindowPanel : PanelBase
+    public abstract class WindowPanel : Panel
     {
         #region 类变量
 
@@ -91,28 +96,30 @@ namespace ModengTerm.Addon.ViewModel
 
         #endregion
 
+        private int order;
+
         private bool isLoaded;
         private bool readyOnce;
 
-        #region PanelBase
+        #region Panel
 
         static int id = 0;
 
         public override void OnInitialize()
         {
-            ID = ++id;
+            order = ++id;
         }
 
         public override void OnLoaded()
         {
-            logger.InfoFormat("{0} OnLoaded", ID);
+            logger.InfoFormat("{0} OnLoaded", order);
 
             isLoaded = true;
         }
 
         public override void OnUnload()
         {
-            logger.InfoFormat("{0} OnUnload", ID);
+            logger.InfoFormat("{0} OnUnload", order);
 
             isLoaded = false;
         }
@@ -122,10 +129,9 @@ namespace ModengTerm.Addon.ViewModel
         }
 
         #endregion
-
     }
 
-    public abstract class SessionPanel : PanelBase
+    public abstract class SessionPanel : Panel
     {
         #region 类变量
 
@@ -135,6 +141,7 @@ namespace ModengTerm.Addon.ViewModel
 
         #region 实例变量
 
+        private int order;
         private bool isLoaded;
         private bool readyOnce;
         private SessionStatusEnum sessionStatus;
@@ -155,13 +162,13 @@ namespace ModengTerm.Addon.ViewModel
 
         #endregion
 
-        #region PanelBase
+        #region Panel
 
         static int id = 0;
 
         public override void OnInitialize()
         {
-            ID = ++id;
+            order = ++id;
 
             throw new RefactorImplementedException();
             //sessionStatus = OpenedSessionVM.Status;
@@ -169,7 +176,7 @@ namespace ModengTerm.Addon.ViewModel
 
         public override void OnLoaded()
         {
-            logger.InfoFormat("{0} OnLoaded", ID);
+            logger.InfoFormat("{0} OnLoaded", order);
 
             isLoaded = true;
 
@@ -178,7 +185,7 @@ namespace ModengTerm.Addon.ViewModel
 
         public override void OnUnload()
         {
-            logger.InfoFormat("{0} OnUnload", ID);
+            logger.InfoFormat("{0} OnUnload", order);
 
             isLoaded = false;
         }

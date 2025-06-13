@@ -12,31 +12,15 @@ namespace ModengTerm.Addon.ViewModel
         #region 实例变量
 
         private bool visible;
-        private PanelBase selectedItem;
+        private Panel selectedItem;
 
         #endregion
 
         #region 属性
 
-        /// <summary>
-        /// 是否显示该窗口
-        /// </summary>
-        public bool Visible
-        {
-            get { return visible; }
-            set
-            {
-                if (visible != value)
-                {
-                    visible = value;
-                    NotifyPropertyChanged("Visible");
-                }
-            }
-        }
+        public BindableCollection<Panel> Panels { get; private set; }
 
-        public BindableCollection<PanelBase> Panels { get; private set; }
-
-        public PanelBase SelectedItem
+        public Panel SelectedItem
         {
             get { return this.selectedItem; }
             set
@@ -55,14 +39,14 @@ namespace ModengTerm.Addon.ViewModel
 
         public PanelContainer()
         {
-            this.Panels = new BindableCollection<PanelBase>();
+            this.Panels = new BindableCollection<Panel>();
         }
 
         #endregion
 
         #region 实例方法
 
-        private void ProcessLoaded(bool loaded, PanelBase panel)
+        private void ProcessLoaded(bool loaded, Panel panel)
         {
             if (panel.Content == null)
             {
@@ -83,9 +67,9 @@ namespace ModengTerm.Addon.ViewModel
 
         #region 公开接口
 
-        public void ChangeVisible(string panelId)
+        public void VisiblePanel(string panelId)
         {
-            PanelBase panel = this.Panels.FirstOrDefault(v => v.ID.ToString() == panelId) as PanelBase;
+            Panel panel = this.Panels.FirstOrDefault(v => v.ID.ToString() == panelId);
             if (panel == null)
             {
                 return;
@@ -94,35 +78,20 @@ namespace ModengTerm.Addon.ViewModel
             // 当前状态
             bool visible = false;
 
-            if (this.Visible)
+            if (panel.IsSelected) 
             {
-                if (panel.IsSelected)
-                {
-                    visible = true;
-                }
+                visible = true;
             }
 
             if (visible)
             {
                 // 当前是显示状态，隐藏
-                this.Visible = false;
-                this.Panels.SelectedItem.IsSelected = false;
-                ProcessLoaded(false, this.Panels.SelectedItem);
+                panel.IsSelected = false;
             }
             else
             {
                 // 当前是隐藏状态，显示
-                Visible = true;
-
-                if (!panel.IsSelected)
-                {
-                    // 选中之后会自动触发Loaded事件
-                    panel.IsSelected = true;
-                }
-                else
-                {
-                    ProcessLoaded(true, panel);
-                }
+                panel.IsSelected = true;
             }
         }
 

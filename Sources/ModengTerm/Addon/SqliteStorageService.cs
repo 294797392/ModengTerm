@@ -25,6 +25,7 @@ namespace ModengTerm.Addon
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("SqliteStorageService");
         private const string DbFileResourceName = "ModengTerm.database.db";
+        private const string ConnectionStringFormat = "Data Source={0};Version=3;";
 
         private DBManager dbManager;
 
@@ -32,7 +33,8 @@ namespace ModengTerm.Addon
         {
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data.db");
             this.EnsureDbFile(filePath);
-            this.dbManager = new DBManager(filePath, ProviderType.Sqlite);
+            string connectionString = string.Format(ConnectionStringFormat, filePath);
+            this.dbManager = new DBManager(connectionString, ProviderType.Sqlite);
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using ModengTerm.Base.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.OfficialAddons.BroadcastInput
@@ -22,7 +23,9 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         protected override void OnActive(ActiveContext context)
         {
-            this.RegisterEvent(EventType.SHELL_SESSION_OPENED, this.OnShellSessionOpened);
+            this.broadcastSessions = new BindableCollection<BroadcastSessionVM>();
+
+            this.RegisterEvent(HostEvent.HOST_SESSION_OPENED, this.OnShellSessionOpened);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
@@ -39,28 +42,28 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             this.broadcastSessions.Clear();
 
             ObjectFactory factory = ObjectFactory.GetFactory();
+            StorageService storageSvc = factory.GetStorageService();
+            IShellPanel activePanel = factory.GetActivePanel<IShellPanel>();
+            List<IShellPanel> allPanels = factory.GetAllPanels<IShellPanel>();
 
-            IShellPanel terminalShell = factory.GetActivePanel<IShellPanel>();
-            List<BroadcastSession> broadcastSessions = this.ObjectStorage.GetObjects<BroadcastSession>(terminalShell.Id);
-            throw new RefactorImplementedException();
-            //List<IShellPanel> terminalShells = ShellFactory.GetAllPanels<IShellPanel>();
+            List<BroadcastSession> broadcastSessions = storageSvc.GetObjects<BroadcastSession>(activePanel.Id);
 
-            //foreach (IShellPanel shell in terminalShells)
-            //{
-            //    if (shell == terminalShell)
-            //    {
-            //        continue;
-            //    }
+            foreach (IShellPanel panel in allPanels)
+            {
+                if (panel == activePanel)
+                {
+                    continue;
+                }
 
-            //    BroadcastSessionVM broadcastSession = new BroadcastSessionVM()
-            //    {
-            //        ID = shell.Id,
-            //        Name = shell.Name,
-            //        Session = shell,
-            //    };
+                BroadcastSessionVM broadcastSession = new BroadcastSessionVM()
+                {
+                    ID = panel.Id,
+                    Name = panel.Name,
+                    BroadcasePanel = panel
+                };
 
-            //    this.broadcastSessions.Add(broadcastSession);
-            //}
+                this.broadcastSessions.Add(broadcastSession);
+            }
         }
 
         #endregion
@@ -69,19 +72,17 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            throw new RefactorImplementedException();
-            //IShellPanel terminalShell = ShellFactory.GetActivePanel<IShellPanel>();
-            //List<IShellPanel> terminalShells = ShellFactory.GetAllPanels<IShellPanel>();
-            //List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
+            ObjectFactory factory = ObjectFactory.GetFactory();
+            IShellPanel activePanel = factory.GetActivePanel<IShellPanel>();
+            List<IShellPanel> allPanels = factory.GetAllPanels<IShellPanel>();
+            List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
 
-            //BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, terminalShells);
-            //window.ObjectStorage = this.ObjectStorage;
-            //window.SessionId = terminalShell.Id;
-            //window.Owner = e.MainWindow;
-            //if ((bool)window.ShowDialog())
-            //{
-            //    this.LoadBroadcastList();
-            //}
+            BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, allPanels);
+            window.Owner = Application.Current.MainWindow;
+            if ((bool)window.ShowDialog())
+            {
+                this.LoadBroadcastList();
+            }
         }
 
         /// <summary>
@@ -92,21 +93,36 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             foreach (BroadcastSessionVM broadcastSession in this.broadcastSessions)
             {
-                IShellPanel session = broadcastSession.Session;
+                IShellPanel broadcastPanel = broadcastSession.BroadcasePanel;
 
-                if (session.Status != SessionStatusEnum.Connected)
+                if (broadcastPanel.Status != SessionStatusEnum.Connected)
                 {
                     continue;
                 }
 
                 byte[] bytes = e.Argument as byte[];
 
-                session.Send(bytes);
+                broadcastPanel.Send(bytes);
             }
         }
 
-        private void OnShellSessionOpened(EventType evType, EventArgs args)
+        private void OnShellSessionOpened(HostEvent evType, HostEventArgs evArgs)
         {
+            SessionOpenedEventArgs soevArgs = evArgs as SessionOpenedEventArgs;
+
+            switch (soevArgs.Type)
+            {
+                case SessionTypeEnum.SFTP: return;
+                case SessionTypeEnum.SSH:
+                case SessionTypeEnum.Tcp:
+                case SessionTypeEnum.Localhost:
+                case SessionTypeEnum.SerialPort:
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+
             this.LoadBroadcastList();
         }
 

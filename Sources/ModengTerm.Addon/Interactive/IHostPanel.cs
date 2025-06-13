@@ -5,9 +5,9 @@ using ModengTerm.Document.Enumerations;
 namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 表示被打开的一个会话界面
+    /// 向应用程序公开打开的会话窗口的功能
     /// </summary>
-    public interface IPanel
+    public interface IHostPanel
     {
         /// <summary>
         /// 会话Id
@@ -30,7 +30,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 表示打开的终端类型的会话界面
     /// </summary>
-    public interface IShellPanel : IPanel
+    public interface IShellPanel : IHostPanel
     {
         void Send(byte[] bytes);
         void Send(string text);
@@ -56,7 +56,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 表示打开的Sftp类型的会话界面
     /// </summary>
-    public interface ISftpPanel : IPanel
+    public interface ISftpPanel : IHostPanel
     {
 
     }

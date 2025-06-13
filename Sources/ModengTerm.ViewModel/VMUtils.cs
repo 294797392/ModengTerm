@@ -103,17 +103,17 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        public static List<PanelBase> CreatePanels(List<PanelDefinition> panelDefinitions)
+        public static List<Addon.ViewModel.Panel> CreatePanels(List<PanelDefinition> panelDefinitions)
         {
-            List<PanelBase> panels = new List<PanelBase>();
+            List<Addon.ViewModel.Panel> panels = new List<Addon.ViewModel.Panel>();
 
             foreach (PanelDefinition definition in panelDefinitions)
             {
-                PanelBase panel = null;
+                Addon.ViewModel.Panel panel = null;
 
                 try
                 {
-                    panel = ConfigFactory<PanelBase>.CreateInstance(definition.VMClassName);
+                    panel = ConfigFactory<Addon.ViewModel.Panel>.CreateInstance(definition.VMClassName);
                 }
                 catch (Exception ex)
                 {

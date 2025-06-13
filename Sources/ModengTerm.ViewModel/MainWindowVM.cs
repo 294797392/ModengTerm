@@ -37,7 +37,7 @@ namespace ModengTerm.ViewModel
         public BindableCollection<RecentlySessionVM> RecentlyOpenedSession { get; private set; }
 
         /// <summary>
-        /// 打开的所有会话列表
+        /// 打开的所有会话列表，包含打开按钮
         /// </summary>
         public BindableCollection<SessionItemVM> SessionList { get; private set; }
 

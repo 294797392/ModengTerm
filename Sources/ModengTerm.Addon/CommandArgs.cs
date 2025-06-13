@@ -16,16 +16,6 @@ namespace ModengTerm.Addons
         public object Argument { get; set; }
 
         /// <summary>
-        /// 发送命令的窗口
-        /// </summary>
-        public Window MainWindow { get { return Application.Current.MainWindow; } }
-
-        /// <summary>
-        /// 访问服务的代理
-        /// </summary>
-        public ServiceAgent ServiceAgent { get { return VTApp.Context.ServiceAgent; } }
-
-        /// <summary>
         /// 要执行的命令
         /// </summary>
         public string Command { get; set; }
@@ -36,7 +26,7 @@ namespace ModengTerm.Addons
         /// </summary>
         public string AddonId { get; set; }
 
-        public CommandArgs() 
+        private CommandArgs() 
         {
         }
     }

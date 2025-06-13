@@ -1,4 +1,5 @@
-﻿using ModengTerm.Document.Enumerations;
+﻿using ModengTerm.Base;
+using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal;
 using System;
 using System.Windows;
@@ -66,7 +67,8 @@ namespace ModengTerm.ViewModel.Terminal
         {
             ParagraphVM paragraph = Sender2ParagraphVM(sender);
 
-            shellSession.SendText(paragraph.Content);
+            throw new RefactorImplementedException();
+            //shellSession.SendText(paragraph.Content);
         }
 
         /// <summary>

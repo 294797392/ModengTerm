@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <Compile Remove="ContextMenuData.cs" />
+    <Compile Remove="Terminal\InputSessionVM.cs" />
     <Compile Remove="ThemeVM.cs" />
   </ItemGroup>
 

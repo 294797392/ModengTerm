@@ -15,14 +15,14 @@ namespace ModengTerm.Addon
     public abstract class ObjectFactory
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ObjectFactory");
-        private const string FactoryImpl = "ModengTerm.Addon.FactoryImpl, ModengTerm";
+        private const string FactoryImpl = "ModengTerm.Addon.ObjectFactoryImpl, ModengTerm";
         private static ObjectFactory factory;
 
         /// <summary>
         /// 获取窗口实例
         /// </summary>
         /// <returns></returns>
-        public abstract IWindow GetWindow();
+        public abstract IHostWindow GetHostWindow();
 
         /// <summary>
         /// 获取数据存储服务
@@ -35,18 +35,23 @@ namespace ModengTerm.Addon
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetActivePanel<T>() where T : IPanel
+        public T GetActivePanel<T>() where T : IHostPanel
         {
-            IWindow window = this.GetWindow();
+            IHostWindow window = this.GetHostWindow();
 
             return window.GetActivePanel<T>();
         }
 
-        public List<IPanel> GetAllPanels()
+        public List<IHostPanel> GetAllPanels()
         {
-            IWindow window = this.GetWindow();
+            IHostWindow window = this.GetHostWindow();
 
             return window.GetAllPanels();
+        }
+
+        public List<T> GetAllPanels<T>() where T : IHostPanel
+        {
+            return this.GetAllPanels().OfType<T>().ToList();
         }
 
         public static ObjectFactory GetFactory() 

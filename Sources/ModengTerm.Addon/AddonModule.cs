@@ -1,13 +1,14 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon;
+using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
 
 namespace ModengTerm.Addons
 {
-    public delegate void CommandHandlerDelegate(CommandArgs e);
+    public delegate void AddonCommandHandler(CommandArgs e);
 
-    public delegate void AddonEventHandler(EventType evType, EventArgs args);
+    public delegate void AddonEventHandler(HostEvent evType, HostEventArgs evArgs);
 
     /// <summary>
     /// 插件生命周期管理
@@ -24,9 +25,9 @@ namespace ModengTerm.Addons
 
         #region 实例变量
 
-        private Dictionary<string, CommandHandlerDelegate> registerCommands;
+        private Dictionary<string, AddonCommandHandler> registerCommands;
 
-        private Dictionary<EventType, AddonEventHandler> registeredEvent;
+        private Dictionary<HostEvent, AddonEventHandler> registeredEvent;
 
         #endregion
 
@@ -36,11 +37,9 @@ namespace ModengTerm.Addons
 
         public AddonDefinition Definition { get; set; }
 
-        public StorageService ObjectStorage { get; set; }
+        public Dictionary<string, AddonCommandHandler> RegisteredCommand { get { return this.registerCommands; } }
 
-        public Dictionary<string, CommandHandlerDelegate> RegisteredCommand { get { return this.registerCommands; } }
-
-        public Dictionary<EventType, AddonEventHandler> RegisteredEvent { get { return this.registeredEvent; } }
+        public Dictionary<HostEvent, AddonEventHandler> RegisteredEvent { get { return this.registeredEvent; } }
 
         #endregion
 
@@ -51,8 +50,8 @@ namespace ModengTerm.Addons
         /// </summary>
         public void Active(ActiveContext context)
         {
-            this.registerCommands = new Dictionary<string, CommandHandlerDelegate>();
-            this.registeredEvent = new Dictionary<EventType, AddonEventHandler>();
+            this.registerCommands = new Dictionary<string, AddonCommandHandler>();
+            this.registeredEvent = new Dictionary<HostEvent, AddonEventHandler>();
 
             this.OnActive(context);
         }
@@ -67,7 +66,7 @@ namespace ModengTerm.Addons
 
         public void RaiseCommand(CommandArgs e)
         {
-            CommandHandlerDelegate handler;
+            AddonCommandHandler handler;
             if (!this.registerCommands.TryGetValue(e.Command, out handler))
             {
                 return;
@@ -85,7 +84,7 @@ namespace ModengTerm.Addons
         /// </summary>
         /// <param name="command"></param>
         /// <param name="handler"></param>
-        protected void RegisterCommand(string command, CommandHandlerDelegate handler)
+        protected void RegisterCommand(string command, AddonCommandHandler handler)
         {
             if (this.registerCommands.ContainsKey(command))
             {
@@ -100,7 +99,7 @@ namespace ModengTerm.Addons
         /// </summary>
         /// <param name="evType"></param>
         /// <param name="handler"></param>
-        protected void RegisterEvent(EventType evType, AddonEventHandler handler)
+        protected void RegisterEvent(HostEvent evType, AddonEventHandler handler)
         {
             if (this.registeredEvent.ContainsKey(evType))
             {

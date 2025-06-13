@@ -1,4 +1,5 @@
-﻿using ModengTerm.Document;
+﻿using ModengTerm.Base;
+using ModengTerm.Document;
 using ModengTerm.Document.EventData;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
@@ -385,7 +386,8 @@ namespace ModengTerm.ViewModel.Terminal
 
                         string textToSend = text.Substring(keyword.Length);
 
-                        shellSession.SendText(textToSend);
+                        throw new RefactorImplementedException();
+                        //shellSession.SendText(textToSend);
 
                         Close();
 

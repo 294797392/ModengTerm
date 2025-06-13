@@ -1,4 +1,5 @@
-﻿using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.ViewModel;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
@@ -12,11 +13,11 @@ namespace ModengTerm.ViewModel
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
-    public abstract class OpenedSessionVM : SessionItemVM, IPanel
+    public abstract class OpenedSessionVM : SessionItemVM, IHostPanel
     {
         #region 公开事件
 
-        public event Action<OpenedSessionVM, EventType, EventArgs> Notify;
+        public event Action<OpenedSessionVM, HostEvent, HostEventArgs> Notify;
 
         #endregion
 
@@ -144,7 +145,7 @@ namespace ModengTerm.ViewModel
 
         public void VisiblePanel(string panelId)
         {
-            PanelContainer.ChangeVisible(panelId);
+            PanelContainer.VisiblePanel(panelId);
         }
 
         #endregion
@@ -177,7 +178,7 @@ namespace ModengTerm.ViewModel
 
             this.statusChangedEventArgs.OldStatus = oldStatus;
             this.statusChangedEventArgs.NewStatus = newStatus;
-            this.Notify?.Invoke(this, EventType.COMMON_SESSION_STATUS_CHANGED, this.statusChangedEventArgs);
+            this.Notify?.Invoke(this, HostEvent.HOST_SESSION_STATUS_CHANGED, this.statusChangedEventArgs);
 
             //throw new RefactorImplementedException();
             //// 通知所有PanelContent，会话状态改变了
