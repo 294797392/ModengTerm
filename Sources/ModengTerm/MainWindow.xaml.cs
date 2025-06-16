@@ -14,6 +14,7 @@ using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
 using ModengTerm.UserControls;
 using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Panel;
 using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;

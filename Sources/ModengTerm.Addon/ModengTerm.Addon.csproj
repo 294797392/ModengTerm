@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <Compile Remove="AddonContext.cs" />
+    <Compile Remove="Interactive\IHostPanel.cs" />
     <Compile Remove="WindowImpl.cs" />
   </ItemGroup>
 

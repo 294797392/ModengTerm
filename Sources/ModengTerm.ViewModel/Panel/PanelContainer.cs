@@ -1,37 +1,40 @@
-﻿using ModengTerm.Base.Definitions;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using System;
 using System.Linq;
 using System.Windows.Automation;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Addon.ViewModel
+namespace ModengTerm.ViewModel.Panel
 {
     public class PanelContainer : ViewModelBase
     {
         #region 实例变量
 
         private bool visible;
-        private IHostPanel selectedItem;
+        private HostSidePanel selectedItem;
 
         #endregion
 
         #region 属性
 
-        public BindableCollection<IHostPanel> Panels { get; private set; }
+        public BindableCollection<HostSidePanel> Panels { get; private set; }
 
-        public IHostPanel SelectedItem
+        public HostSidePanel SelectedItem
         {
-            get { return this.selectedItem; }
+            get { return selectedItem; }
             set
             {
-                if (this.selectedItem != value)
+                if (selectedItem != value)
                 {
-                    this.selectedItem = value;
-                    this.NotifyPropertyChanged("SelectedItem");
+                    selectedItem = value;
+                    NotifyPropertyChanged("SelectedItem");
                 }
             }
         }
+
+        public SidePanelDocks Dock { get; set; }
 
         #endregion
 
@@ -39,7 +42,7 @@ namespace ModengTerm.Addon.ViewModel
 
         public PanelContainer()
         {
-            this.Panels = new BindableCollection<IHostPanel>();
+            Panels = new BindableCollection<HostSidePanel>();
         }
 
         #endregion
@@ -52,7 +55,7 @@ namespace ModengTerm.Addon.ViewModel
 
         public void VisiblePanel(string panelId)
         {
-            IHostPanel panel = this.Panels.FirstOrDefault(v => v.ID.ToString() == panelId);
+            HostSidePanel panel = Panels.FirstOrDefault(v => v.ID == panelId);
             if (panel == null)
             {
                 return;
@@ -61,7 +64,7 @@ namespace ModengTerm.Addon.ViewModel
             // 当前状态
             bool visible = false;
 
-            if (panel.IsSelected) 
+            if (panel.IsSelected)
             {
                 visible = true;
             }

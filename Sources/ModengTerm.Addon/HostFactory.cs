@@ -17,24 +17,8 @@ namespace ModengTerm.Addon
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("HostFactory");
 
-        /// <summary>
-        /// 创建一个侧边栏实例
-        /// </summary>
-        /// <param name="definition"></param>
-        /// <returns></returns>
-        public abstract IHostSidePanel CreateSidePanel(PanelDefinition definition);
+        public abstract List<IHostSidePanel> CreateSidePanels(List<PanelDefinition> definitions);
 
-        public List<IHostSidePanel> CreateSidePanels(List<PanelDefinition> definitions)
-        {
-            List<IHostSidePanel> sidePanels = new List<IHostSidePanel>();
-
-            foreach (PanelDefinition definition in definitions)
-            {
-                IHostSidePanel sidePanel = this.CreateSidePanel(definition);
-                sidePanels.Add(sidePanel);
-            }
-
-            return sidePanels;
-        }
+        public abstract List<IHostOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions);
     }
 }

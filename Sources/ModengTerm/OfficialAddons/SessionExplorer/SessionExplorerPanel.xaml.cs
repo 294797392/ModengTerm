@@ -1,6 +1,9 @@
 ﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Client;
+using ModengTerm.Addon.Extensions;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
+using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Session;
 using System;
 using System.Collections.Generic;
@@ -23,7 +26,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionExplorerPanel : UserControl
+    public partial class SessionExplorerPanel : UserControl, ISidePanel
     {
         #region 类变量
 
@@ -33,7 +36,8 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #region 实例变量
 
-        //private SessionTreeVM resourceManagerTreeVM;
+        private SessionTreeVM resourceManagerTreeVM;
+        private HostContext hostContext;
 
         #endregion
 
@@ -69,8 +73,39 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
             // 打开会话
-            throw new RefactorImplementedException();
-            //this.hostWindow.OpenSession(sessionVM.Session);
+            this.hostContext.HostWindow.OpenSession(sessionVM.Session);
+        }
+
+        #endregion
+
+        #region ISidePanel
+
+        public void OnInitialize(HostContext context)
+        {
+            this.hostContext = context;
+
+            this.resourceManagerTreeVM = VMUtils.CreateSessionTreeVM(false, true);
+            this.resourceManagerTreeVM.Roots[0].Name = "会话列表";
+            this.resourceManagerTreeVM.ExpandAll();
+
+            SessionTreeViewUserControl.DataContext = this.resourceManagerTreeVM;
+
+            logger.InfoFormat(string.Format("{0}, OnInitialize", this.Name));
+        }
+
+        public void OnRelease()
+        {
+            logger.InfoFormat(string.Format("{0}, OnRelease", this.Name));
+        }
+
+        public void OnLoaded()
+        {
+            logger.InfoFormat(string.Format("{0}, OnLoaded", this.Name));
+        }
+
+        public void OnUnload()
+        {
+            logger.InfoFormat(string.Format("{0}, OnUnload", this.Name));
         }
 
         #endregion

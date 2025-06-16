@@ -25,12 +25,6 @@ namespace ModengTerm.Base.Definitions
 
         //
         // 摘要:
-        //     ViewModel类名
-        [JsonProperty("vmClassName")]
-        public string VMClassName { get; set; }
-
-        //
-        // 摘要:
         //     图标
         [JsonProperty("icon")]
         public string Icon { get; set; }

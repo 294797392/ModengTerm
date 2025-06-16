@@ -103,15 +103,15 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void OnActiveTabChanged(HostEvent evType, HostEventArgs evArgs)
         {
-            throw new RefactorImplementedException();
+            //throw new RefactorImplementedException();
 
-            ActiveTabChangedEventArgs activeTabChanged = evArgs as ActiveTabChangedEventArgs;
+            //ActiveTabChangedEventArgs activeTabChanged = evArgs as ActiveTabChangedEventArgs;
 
-            // 选中的不是终端类型的Tab页面，隐藏搜索窗口
-            if (activeTabChanged.AddedTab == null || !VTBaseUtils.IsTerminal(activeTabChanged.AddedTab.Type))
-            {
-                return;
-            }
+            //// 选中的不是终端类型的Tab页面，隐藏搜索窗口
+            //if (activeTabChanged.AddedTab == null || !VTBaseUtils.IsTerminal(activeTabChanged.AddedTab.Type))
+            //{
+            //    return;
+            //}
 
             //// 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话
             //if (FindWindowMgr.WindowShown)

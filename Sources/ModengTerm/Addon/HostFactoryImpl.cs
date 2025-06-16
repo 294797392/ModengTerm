@@ -2,6 +2,8 @@
 using ModengTerm.Addons;
 using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Panel;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace ModengTerm.Addon
@@ -12,14 +14,26 @@ namespace ModengTerm.Addon
 
         private StorageService storageSvcImpl = new SqliteStorageService();
 
-        public override IHostSidePanel CreateSidePanel(PanelDefinition definition)
+        public override List<IHostOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions)
         {
-            HostSidePanel sidePanel = new HostSidePanel();
-            sidePanel.Definition = definition;
-            sidePanel.ID = definition.ID;
-            sidePanel.Name = definition.Name;
-            sidePanel.IconURI = definition.Icon;
-            return sidePanel;
+            throw new System.NotImplementedException();
+        }
+
+        public override List<IHostSidePanel> CreateSidePanels(List<PanelDefinition> definitions)
+        {
+            List<IHostSidePanel> sidePanels = new List<IHostSidePanel>();
+
+            foreach (PanelDefinition definition in definitions)
+            {
+                HostSidePanel sidePanel = new HostSidePanel();
+                sidePanel.Definition = definition;
+                sidePanel.ID = definition.ID;
+                sidePanel.Name = definition.Name;
+                sidePanel.IconURI = definition.Icon;
+                sidePanels.Add(sidePanel);
+            }
+
+            return sidePanels;
         }
     }
 }

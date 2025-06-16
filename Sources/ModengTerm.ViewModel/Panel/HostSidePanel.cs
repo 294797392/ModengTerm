@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.ViewModel
+namespace ModengTerm.ViewModel.Panel
 {
     /// <summary>
     /// 提供扩展侧边栏的接口
     /// </summary>
-    public class HostSidePanel : ViewModelBase, IHostSidePanel
+    public class HostSidePanel : HostPanel, IHostSidePanel
     {
         #region 实例变量
 
@@ -55,55 +55,16 @@ namespace ModengTerm.ViewModel
             }
         }
 
-        /// <summary>
-        /// 界面
-        /// </summary>
-        public FrameworkElement Content { get; set; }
-
-        /// <summary>
-        /// 扩展的对象
-        /// </summary>
-        public SidePanel ClientPanel { get; set; }
-
-        public bool IsOpened
-        {
-            get { return this.IsSelected; }
-        }
+        public override bool IsOpened => this.IsSelected;
 
         #endregion
 
-        #region 公开接口
-
-        public void Initialize()
-        {
-            this.ClientPanel.OnInitialize();
-        }
-
-        /// <summary>
-        /// 在显示之后触发
-        /// </summary>
-        public void Loaded()
-        {
-            this.ClientPanel.OnLoaded();
-        }
-
-        /// <summary>
-        /// 在从界面移出之前触发
-        /// </summary>
-        public void Unloaded()
-        {
-            this.ClientPanel.OnUnload();
-        }
-
-        public void Release()
-        {
-            this.ClientPanel.OnRelease();
-        }
+        #region HostPanelBase
 
         /// <summary>
         /// 打开侧边栏
         /// </summary>
-        public void Open()
+        public override void Open()
         {
             this.IsSelected = true;
         }
@@ -111,21 +72,9 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 关闭侧边栏
         /// </summary>
-        public void Close()
+        public override void Close()
         {
             this.IsSelected = false;
-        }
-
-        public void SwitchStatus() 
-        {
-            if (this.IsOpened)
-            {
-                this.Close();
-            }
-            else
-            {
-                this.Open();
-            }
         }
 
         #endregion

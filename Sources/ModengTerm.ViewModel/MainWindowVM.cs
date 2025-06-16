@@ -2,6 +2,7 @@
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.ViewModel.Panel;
 using ModengTerm.ViewModel.Terminal;
 using WPFToolkit.MVVM;
 

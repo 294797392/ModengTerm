@@ -1,8 +1,12 @@
 ﻿using DotNEToolkit;
+using ModengTerm.Addon;
+using ModengTerm.Addon.Client;
 using ModengTerm.Addon.Extensions;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Panel;
+using Renci.SshNet;
 using System;
 using System.Runtime.Serialization;
 using System.Windows;
@@ -80,23 +84,6 @@ namespace ModengTerm.UserControls
         {
             PanelDefinition definition = panel.Definition;
             FrameworkElement content = panel.Content;
-            SidePanel extensionObject = panel.ClientPanel;
-
-            // 先创建扩展对象
-            if (extensionObject == null)
-            {
-                try
-                {
-                    extensionObject = ConfigFactory<SidePanel>.CreateInstance(definition.VMClassName);
-                    panel.ClientPanel = extensionObject;
-                    extensionObject.Name = panel.Name;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("创建扩展SidePanel对象异常", ex);
-                    return null;
-                }
-            }
 
             // 开始加载本次选中的菜单界面
             if (content == null)
@@ -104,11 +91,19 @@ namespace ModengTerm.UserControls
                 try
                 {
                     content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
-
-                    panel.Initialize();
                     panel.Content = content;
+                    panel.ClientPanel = content as IPanelBase;
+                    if (panel.ClientPanel == null) 
+                    {
+                        throw new Exception("SidePanel必须实现ISidePanel");
+                    }
 
-                    content.DataContext = extensionObject;
+                    HostContext context = new HostContext() 
+                    {
+                        StorageService = new SqliteStorageService(),
+                        HostWindow = Application.Current.MainWindow as IHostWindow
+                    };
+                    panel.Initialize(context);
                 }
                 catch (Exception ex)
                 {

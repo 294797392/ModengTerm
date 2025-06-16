@@ -9,8 +9,7 @@
 
     <Grid>
 
-        <muc:SessionTreeViewUserControl x:Name="SessionTreeViewUserControl" DataContext="{Binding Path=ResourceManagerTree}"
-                                        TreeViewMouseDoubleClick="SessionTreeViewUserControl_TreeViewMouseDoubleClick"/>
+        <muc:SessionTreeViewUserControl x:Name="SessionTreeViewUserControl" TreeViewMouseDoubleClick="SessionTreeViewUserControl_TreeViewMouseDoubleClick"/>
 
     </Grid>
 </UserControl>
