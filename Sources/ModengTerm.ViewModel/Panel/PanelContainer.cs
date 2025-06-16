@@ -1,9 +1,4 @@
 ﻿using ModengTerm.Addon.Interactive;
-using ModengTerm.Base.Definitions;
-using ModengTerm.Base.Enumerations;
-using System;
-using System.Linq;
-using System.Windows.Automation;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel
@@ -13,15 +8,15 @@ namespace ModengTerm.ViewModel.Panel
         #region 实例变量
 
         private bool visible;
-        private HostSidePanel selectedItem;
+        private HostPanel selectedItem;
 
         #endregion
 
         #region 属性
 
-        public BindableCollection<HostSidePanel> Panels { get; private set; }
+        public BindableCollection<HostPanel> Panels { get; private set; }
 
-        public HostSidePanel SelectedItem
+        public HostPanel SelectedItem
         {
             get { return selectedItem; }
             set
@@ -42,7 +37,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public PanelContainer()
         {
-            Panels = new BindableCollection<HostSidePanel>();
+            Panels = new BindableCollection<HostPanel>();
         }
 
         #endregion
@@ -55,7 +50,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public void VisiblePanel(string panelId)
         {
-            HostSidePanel panel = Panels.FirstOrDefault(v => v.ID == panelId);
+            HostPanel panel = Panels.FirstOrDefault(v => v.ID == panelId);
             if (panel == null)
             {
                 return;
@@ -64,7 +59,7 @@ namespace ModengTerm.ViewModel.Panel
             // 当前状态
             bool visible = false;
 
-            if (panel.IsSelected)
+            if (panel.IsOpened)
             {
                 visible = true;
             }
@@ -72,12 +67,12 @@ namespace ModengTerm.ViewModel.Panel
             if (visible)
             {
                 // 当前是显示状态，隐藏
-                panel.IsSelected = false;
+                panel.IsOpened = false;
             }
             else
             {
                 // 当前是隐藏状态，显示
-                panel.IsSelected = true;
+                panel.IsOpened = true;
             }
         }
 

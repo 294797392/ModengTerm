@@ -337,7 +337,7 @@
                     "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D"
                 }
             ],
-            "sidePanels": [
+            "panels": [
                 {
                     "id": "ResourceManagerPanel",
                     "name": "资源管理器",

@@ -37,6 +37,10 @@ namespace ModengTerm.Addon.Interactive
         /// <param name="defaultValue">如果该选项不存在，指定默认值</param>
         /// <returns></returns>
         T GetOption<T>(OptionKeyEnum key, T defaultValue);
+
+        //void AddOverlayPanel(IHostPanel panel);
+
+        //void RemoveOverlayPanel(IHostPanel panel);
     }
 
     /// <summary>

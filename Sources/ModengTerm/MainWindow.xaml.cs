@@ -604,13 +604,13 @@ namespace ModengTerm
         public void AddSidePanel(IHostPanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Add(panel as HostSidePanel);
+            container.Panels.Add(panel as HostPanel);
         }
 
         public void RemoveSidePanel(IHostPanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Remove(panel as HostSidePanel);
+            container.Panels.Remove(panel as HostPanel);
         }
 
         #endregion

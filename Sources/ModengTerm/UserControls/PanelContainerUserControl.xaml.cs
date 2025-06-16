@@ -80,7 +80,7 @@ namespace ModengTerm.UserControls
         {
         }
 
-        private FrameworkElement LoadContent(HostSidePanel panel)
+        private FrameworkElement LoadContent(HostPanel panel)
         {
             PanelDefinition definition = panel.Definition;
             FrameworkElement content = panel.Content;
@@ -92,11 +92,6 @@ namespace ModengTerm.UserControls
                 {
                     content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
                     panel.Content = content;
-                    panel.ClientPanel = content as IAddonPanel;
-                    if (panel.ClientPanel == null) 
-                    {
-                        throw new Exception("SidePanel必须实现IAddonPanel");
-                    }
 
                     PanelContext context = new PanelContext() 
                     {
@@ -128,13 +123,13 @@ namespace ModengTerm.UserControls
 
             if (e.RemovedItems.Count > 0)
             {
-                HostSidePanel panel = e.RemovedItems[0] as HostSidePanel;
+                HostPanel panel = e.RemovedItems[0] as HostPanel;
                 panel.Unloaded();
             }
 
             PanelContainer panelContainer = base.DataContext as PanelContainer;
 
-            HostSidePanel selectedItem = ListBoxMenus.SelectedItem as HostSidePanel;
+            HostPanel selectedItem = ListBoxMenus.SelectedItem as HostPanel;
             if (selectedItem == null)
             {
                 GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
@@ -156,16 +151,16 @@ namespace ModengTerm.UserControls
 
             if (e.AddedItems.Count > 0) 
             {
-                HostSidePanel panel = e.AddedItems[0] as HostSidePanel;
+                HostPanel panel = e.AddedItems[0] as HostPanel;
                 panel.Loaded();
             }
         }
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            HostSidePanel selected = ListBoxMenus.SelectedItem as HostSidePanel;
+            HostPanel selected = ListBoxMenus.SelectedItem as HostPanel;
 
-            HostSidePanel clicked = (sender as ListBoxItem).DataContext as HostSidePanel;
+            HostPanel clicked = (sender as ListBoxItem).DataContext as HostPanel;
 
             if (clicked == selected)
             {
@@ -179,7 +174,7 @@ namespace ModengTerm.UserControls
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            HostSidePanel selectedPanel = ListBoxMenus.SelectedItem as HostSidePanel;
+            HostPanel selectedPanel = ListBoxMenus.SelectedItem as HostPanel;
 
             ListBoxMenus.SelectedItem = null;
             ContentControl1.Content = null;

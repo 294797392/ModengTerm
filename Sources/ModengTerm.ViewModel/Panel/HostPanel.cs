@@ -1,29 +1,82 @@
 ﻿using ModengTerm.Addon.Client;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
+using ModengTerm.Base.Definitions;
 using System.Windows;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel
 {
-    public abstract class HostPanel : ViewModelBase, IHostPanel
+    /// <summary>
+    /// 提供扩展面板的接口
+    /// </summary>
+    public class HostPanel : ViewModelBase, IHostPanel
     {
-        #region 属性
+        #region 实例变量
 
-        public IAddonPanel ClientPanel { get; set; }
-
-        /// <summary>
-        /// 界面
-        /// </summary>
-        public FrameworkElement Content { get; set; }
-
-        public abstract bool IsOpened { get; }
-
-        public SidePanelDocks Dock => SidePanelDocks.Left;
+        private bool isOpened;
+        private string iconURI;
 
         #endregion
 
-        #region 公开接口
+        #region 属性
+
+        public IAddonPanel ClientPanel { get { return this.Content as IAddonPanel; } }
+
+        public FrameworkElement Content { get; set; }
+
+        public SidePanelDocks Dock { get; set; }
+
+        public PanelDefinition Definition { get; set; }
+
+        /// <summary>
+        /// 该面板是否打开
+        /// </summary>
+        public bool IsOpened
+        {
+            get { return this.isOpened; }
+            set
+            {
+                if (this.isOpened != value)
+                {
+                    this.isOpened = value;
+                    this.NotifyPropertyChanged("IsOpened");
+                }
+            }
+        }
+
+        public string IconURI
+        {
+            get { return this.iconURI; }
+            set
+            {
+                if (this.iconURI != value)
+                {
+                    this.iconURI = value;
+                    this.NotifyPropertyChanged("IconURI");
+                }
+            }
+        }
+
+        #endregion
+
+        #region IHostPanel
+
+        /// <summary>
+        /// 打开侧边栏
+        /// </summary>
+        public void Open()
+        {
+            this.IsOpened = true;
+        }
+
+        /// <summary>
+        /// 关闭侧边栏
+        /// </summary>
+        public void Close()
+        {
+            this.IsOpened = false;
+        }
 
         public void Initialize(PanelContext context)
         {
@@ -53,7 +106,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public void SwitchStatus()
         {
-            if (this.IsOpened)
+            if (this.isOpened)
             {
                 this.Close();
             }
@@ -62,20 +115,6 @@ namespace ModengTerm.ViewModel.Panel
                 this.Open();
             }
         }
-
-        #endregion
-
-        #region 抽象方法
-
-        /// <summary>
-        /// 打开面板
-        /// </summary>
-        public abstract void Open();
-
-        /// <summary>
-        /// 关闭面板
-        /// </summary>
-        public abstract void Close();
 
         #endregion
     }

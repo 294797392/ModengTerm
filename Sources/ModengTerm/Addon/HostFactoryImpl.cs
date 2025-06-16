@@ -20,7 +20,7 @@ namespace ModengTerm.Addon
 
             foreach (PanelDefinition definition in definitions)
             {
-                HostSidePanel sidePanel = new HostSidePanel();
+                HostPanel sidePanel = new HostPanel();
                 sidePanel.Definition = definition;
                 sidePanel.ID = definition.ID;
                 sidePanel.Name = definition.Name;
