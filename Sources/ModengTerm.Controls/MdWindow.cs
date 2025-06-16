@@ -19,7 +19,7 @@ namespace ModengTerm.Controls
 
         /// <summary>
         /// 如果设置了ResizeMode = NoResize，那么WindowCrome就会自动隐藏，这样窗口四周就不会显示阴影了
-        /// CanResize代替ResizeMode，如果CanResize设置为False，那么WindowCrhome设置为IsHitTestVisible=false
+        /// CanResize代替ResizeMode，如果CanResize设置为False，那么WindowChrome设置为IsHitTestVisible=false
         /// </summary>
         public bool CanResize
         {

@@ -25,7 +25,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             this.broadcastSessions = new BindableCollection<BroadcastSessionVM>();
 
-            this.RegisterEvent(HostEvent.HOST_SESSION_OPENED, this.OnShellSessionOpened);
+            this.RegisterEvent(HostEvent.HOST_TAB_OPENED, this.OnTabOpened);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
@@ -106,11 +106,11 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             }
         }
 
-        private void OnShellSessionOpened(HostEvent evType, HostEventArgs evArgs)
+        private void OnTabOpened(HostEvent evType, HostEventArgs evArgs)
         {
-            SessionOpenedEventArgs soevArgs = evArgs as SessionOpenedEventArgs;
+            TabOpenedEventArgs tabOpened = evArgs as TabOpenedEventArgs;
 
-            switch (soevArgs.Type)
+            switch (tabOpened.Type)
             {
                 case SessionTypeEnum.SFTP: return;
                 case SessionTypeEnum.SSH:

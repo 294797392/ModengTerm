@@ -22,68 +22,6 @@ using XTerminal;
 namespace ModengTerm.OfficialAddons.Find
 {
     /// <summary>
-    /// 搜索窗口只能显示一个，用这个类来管理搜索窗口的生命周期
-    /// </summary>
-    public static class FindWindowMgr
-    {
-        private static FindWindow findWindow;
-
-        /// <summary>
-        /// 获取查找窗口是否显示
-        /// </summary>
-        public static bool WindowShown { get { return findWindow != null; } }
-
-        /// <summary>
-        /// 显示搜索窗口
-        /// 如果已经显示了搜索窗口，那么使用传入的shellSession立即进行一次搜索
-        /// </summary>
-        /// <param name="shellSession">要搜索的会话ViewModel</param>
-        public static void Show()
-        {
-            throw new RefactorImplementedException();
-
-            //XTermSession session = shellSession.Session;
-            //IVideoTerminal vt = shellSession.VideoTerminal;
-
-            //string highlightBackground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR);
-            //string highlightForeground = session.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR);
-
-            //FindVM findVM = null;
-
-            //if (findWindow == null)
-            //{
-            //    findVM = new FindVM()
-            //    {
-            //        HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
-            //        HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
-            //    };
-
-            //    findWindow = new FindWindow(findVM);
-            //    findWindow.Owner = Application.Current.MainWindow;
-            //    findWindow.Closed += FindWindow_Closed;
-            //    findWindow.Show();
-            //}
-            //else
-            //{
-            //    // 已经显示了搜索窗口
-            //    findVM = findWindow.DataContext as FindVM;
-            //}
-
-            //findVM.SetVideoTerminal(vt);
-        }
-
-        private static void FindWindow_Closed(object? sender, EventArgs e)
-        {
-            findWindow.Closed -= FindWindow_Closed;
-
-            FindVM findVM = findWindow.DataContext as FindVM;
-            findVM.Release();
-
-            findWindow = null;
-        }
-    }
-
-    /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
     public partial class FindWindow : MdWindow

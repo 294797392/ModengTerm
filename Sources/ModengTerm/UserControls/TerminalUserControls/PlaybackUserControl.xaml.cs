@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.DataModels;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;

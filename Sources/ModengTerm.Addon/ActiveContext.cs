@@ -1,4 +1,6 @@
-﻿using ModengTerm.Base.Definitions;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,15 @@ namespace ModengTerm.Addons
     /// </summary>
     public class ActiveContext
     {
-        public static readonly ActiveContext Default = new ActiveContext();
+        public HostFactory Factory { get; set; }
+
+        public IHostWindow HostWindow { get; set; }
+
+        /// <summary>
+        /// 存储服务
+        /// </summary>
+        public StorageService StorageService { get; set; }
+
+        public AddonDefinition Definition { get; set; }
     }
 }

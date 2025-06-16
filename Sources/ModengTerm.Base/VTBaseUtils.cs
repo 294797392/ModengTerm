@@ -36,10 +36,16 @@ namespace ModengTerm.Base
             return values;
         }
 
+        /// <summary>
+        /// 判断会话类型是否是终端类型
+        /// </summary>
+        /// <param name="sessionType"></param>
+        /// <returns></returns>
         public static bool IsTerminal(SessionTypeEnum sessionType)
         {
             switch (sessionType)
             {
+                case SessionTypeEnum.Tcp:
                 case SessionTypeEnum.SerialPort:
                 case SessionTypeEnum.SSH:
                 case SessionTypeEnum.Localhost:

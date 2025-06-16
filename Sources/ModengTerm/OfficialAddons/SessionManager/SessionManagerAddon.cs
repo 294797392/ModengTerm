@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
+using ModengTerm.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,50 +27,45 @@ namespace ModengTerm.OfficialAddons.SessionManager
 
         private void OpenSession(CommandArgs e)
         {
-            throw new RefactorImplementedException();
-            //SessionListWindow sessionListWindow = new SessionListWindow();
-            //sessionListWindow.Owner = e.MainWindow;
-            //sessionListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            //if ((bool)sessionListWindow.ShowDialog())
-            //{
-            //    IShellService shell = ShellFactory.GetService();
-            //    XTermSession session = sessionListWindow.SelectedSession;
-            //    shell.OpenSession(session);
-            //}
+            SessionListWindow sessionListWindow = new SessionListWindow();
+            sessionListWindow.Owner = Application.Current.MainWindow;
+            sessionListWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            if ((bool)sessionListWindow.ShowDialog())
+            {
+                XTermSession session = sessionListWindow.SelectedSession;
+                this.hostWindow.OpenSession(session);
+            }
         }
 
         private void CreateSession(CommandArgs e)
         {
-            throw new RefactorImplementedException();
-            //CreateSessionWindow window = new CreateSessionWindow();
-            //window.Owner = e.MainWindow;
-            //window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            //if (!(bool)window.ShowDialog())
-            //{
-            //    return;
-            //}
+            CreateSessionWindow window = new CreateSessionWindow();
+            window.Owner = Application.Current.MainWindow;
+            window.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            if (!(bool)window.ShowDialog())
+            {
+                return;
+            }
 
-            //XTermSession session = window.Session;
+            XTermSession session = window.Session;
 
-            //// 在数据库里新建会话
-            //int code = e.ServiceAgent.AddSession(session);
-            //if (code != ResponseCode.SUCCESS)
-            //{
-            //    MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
-            //    return;
-            //}
+            // 在数据库里新建会话
+            int code = VTApp.Context.ServiceAgent.AddSession(session);
+            if (code != ResponseCode.SUCCESS)
+            {
+                MessageBoxUtils.Error("新建会话失败, 错误码 = {0}", code);
+                return;
+            }
 
-            //// 打开会话
-            //IShellService shell = ShellFactory.GetService();
-            //shell.OpenSession(session);
+            // 打开会话
+            this.hostWindow.OpenSession(session);
         }
 
         private void GroupManager(CommandArgs e)
         {
-            throw new RefactorImplementedException();
-            //GroupManagerWindow window = new GroupManagerWindow();
-            //window.Owner = e.MainWindow;
-            //window.ShowDialog();
+            GroupManagerWindow window = new GroupManagerWindow();
+            window.Owner = Application.Current.MainWindow;
+            window.ShowDialog();
         }
     }
 }

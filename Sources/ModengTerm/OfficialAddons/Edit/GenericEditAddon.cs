@@ -26,43 +26,37 @@ namespace ModengTerm.OfficialAddons.Edit
 
         private void Paste(CommandArgs e)
         {
-            HostFactory factory = HostFactory.GetFactory();
-            IShellTab shell = factory.GetActiveTab<IShellTab>();
+            IShellTab shell = this.factory.GetActiveTab<IShellTab>();
             string text = System.Windows.Clipboard.GetText();
             shell.Send(text);
         }
 
         private void CopySelection(CommandArgs e)
         {
-            HostFactory factory = HostFactory.GetFactory();
             IShellTab shell = factory.GetActiveTab<IShellTab>();
             shell.CopySelection();
         }
 
         private void SaveSelection(CommandArgs e)
         {
-            HostFactory factory = HostFactory.GetFactory();
             IShellTab shell = factory.GetActiveTab<IShellTab>();
             SaveToFile(ParagraphTypeEnum.Selected, shell);
         }
 
         private void SaveViewport(CommandArgs e)
         {
-            HostFactory factory = HostFactory.GetFactory();
             IShellTab shell = factory.GetActiveTab<IShellTab>();
             SaveToFile(ParagraphTypeEnum.Viewport, shell);
         }
 
         private void SaveAll(CommandArgs e)
         {
-            HostFactory factory = HostFactory.GetFactory();
             IShellTab shell = factory.GetActiveTab<IShellTab>();
             SaveToFile(ParagraphTypeEnum.AllDocument, shell);
         }
 
         private void ClearScreen(CommandArgs e)
         {
-            HostFactory factory = HostFactory.GetFactory();
             IShellTab shell = factory.GetActiveTab<IShellTab>();
             shell.ClearScreen();
         }

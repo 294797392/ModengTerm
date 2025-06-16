@@ -1,10 +1,8 @@
 ﻿using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.Loggering;
-using ModengTerm.Terminal.Parsing;
 using System.Reflection;
 
-namespace ModengTerm.Terminal
+namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
     /// 提供终端的标准功能接口定义
@@ -33,11 +31,11 @@ namespace ModengTerm.Terminal
         /// </summary>
         event Action<IVideoTerminal, VTDocument, VTDocument> OnDocumentChanged;
 
-        /// <summary>
-        /// 当用户通过键盘输入数据的时候触发
-        /// 在用户输入之后，发送给主机之前触发
-        /// </summary>
-        event Action<IVideoTerminal, VTKeyboardInput> OnKeyboardInput;
+        ///// <summary>
+        ///// 当用户通过键盘输入数据的时候触发
+        ///// 在用户输入之后，发送给主机之前触发
+        ///// </summary>
+        //event Action<IVideoTerminal, VTKeyboardInput> OnKeyboardInput;
 
         /// <summary>
         /// 打印一个字符的时候触发
@@ -52,10 +50,10 @@ namespace ModengTerm.Terminal
         /// </summary>
         event Action<IVideoTerminal, double, double> RequestChangeWindowSize;
 
-        /// <summary>
-        /// 当处理完C0指令之后触发
-        /// </summary>
-        event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
+        ///// <summary>
+        ///// 当处理完C0指令之后触发
+        ///// </summary>
+        //event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
 
         /// <summary>
         /// 会话名字
@@ -88,10 +86,10 @@ namespace ModengTerm.Terminal
         /// </summary>
         bool IsAlternate { get; }
 
-        /// <summary>
-        /// 保存日志记录器
-        /// </summary>
-        VTLogger Logger { get; set; }
+        ///// <summary>
+        ///// 保存日志记录器
+        ///// </summary>
+        //VTLogger Logger { get; set; }
 
         /// <summary>
         /// 获取终端使用的字体信息

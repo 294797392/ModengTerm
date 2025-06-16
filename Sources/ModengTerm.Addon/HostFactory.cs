@@ -51,7 +51,6 @@ namespace ModengTerm.Addon
             return sidePanels;
         }
 
-
         /// <summary>
         /// 获取当前激活的Tab页
         /// </summary>

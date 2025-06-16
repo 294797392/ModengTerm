@@ -23,6 +23,11 @@ namespace ModengTerm.Addon.Interactive
         /// 会话状态
         /// </summary>
         SessionStatusEnum Status { get; }
+
+        /// <summary>
+        /// 会话类型
+        /// </summary>
+        SessionTypeEnum Type { get; }
     }
 
     /// <summary>

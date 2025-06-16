@@ -88,6 +88,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ModengTerm.Addon\ModengTerm.Addon.csproj" />
     <ProjectReference Include="..\ModengTerm.Base\ModengTerm.Base.csproj" />
     <ProjectReference Include="..\ModengTerm.Document\ModengTerm.Document.csproj" />
     <ProjectReference Include="..\Renci.SshNet\Renci.SshNet.csproj" />

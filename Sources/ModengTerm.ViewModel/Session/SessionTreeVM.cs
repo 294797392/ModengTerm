@@ -112,13 +112,12 @@ namespace ModengTerm.ViewModel.Session
                 return null;
             }
 
-            throw new RefactorImplementedException();
-            //int code = MTermApp.Context.ServiceAgent.DeleteSessionGroup(selectedGroup.ID.ToString());
-            //if (code != ResponseCode.SUCCESS)
-            //{
-            //    MTMessageBox.Info("删除分组失败, {0}", code);
-            //    return null;
-            //}
+            int code = VTApp.Context.ServiceAgent.DeleteSessionGroup(selectedGroup.ID.ToString());
+            if (code != ResponseCode.SUCCESS)
+            {
+                MTMessageBox.Info("删除分组失败, {0}", code);
+                return null;
+            }
 
             SessionGroupVM parentGroup = selectedGroup.Parent as SessionGroupVM;
             if (parentGroup != null)

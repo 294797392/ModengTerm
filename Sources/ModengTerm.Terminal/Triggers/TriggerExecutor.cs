@@ -1,4 +1,5 @@
-﻿using ModengTerm.Terminal.DataModels;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Terminal.DataModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

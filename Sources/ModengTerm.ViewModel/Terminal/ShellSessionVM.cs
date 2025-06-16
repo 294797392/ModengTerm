@@ -760,7 +760,8 @@ namespace ModengTerm.ViewModel.Terminal
 
         public void StopLogger()
         {
-            logMgr.Stop(videoTerminal);
+            //throw new RefactorImplementedException();
+            //logMgr.Stop(videoTerminal);
         }
 
         #endregion

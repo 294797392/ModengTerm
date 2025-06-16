@@ -151,8 +151,16 @@ namespace ModengTerm
                 try
                 {
                     addon = ConfigFactory<AddonModule>.CreateInstance(definition.ClassEntry);
-                    addon.Definition = definition;
-                    addon.Active(ActiveContext.Default);
+
+                    ActiveContext context = new ActiveContext() 
+                    {
+                        Definition = definition,
+                        StorageService = new SqliteStorageService(),
+                        Factory = new HostFactoryImpl(),
+                        HostWindow = this
+                    };
+
+                    addon.Active(context);
 
                     addons.Add(addon);
                 }
@@ -285,10 +293,13 @@ namespace ModengTerm
 
             #endregion
 
-            //CommandArgs.Instance.AddonId = string.Empty;
-            //CommandArgs.Instance.Command = AddonCommands.CMD_SELECTED_SESSION_CHANGED;
-            //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
-            //throw new RefactorImplementedException();
+            // 触发Tab选中改变事件
+            ActiveTabChangedEventArgs activeTabChanged = new ActiveTabChangedEventArgs()
+            {
+                AddedTab = e.AddedItems[0] as IHostTab,
+                RemovedTab = e.RemovedItems[0] as IHostTab
+            };
+            this.RaiseAddonEvent(HostEvent.HOST_ACTIVE_TAB_CHANGED, activeTabChanged);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -544,11 +555,12 @@ namespace ModengTerm
             }
 
             // 触发打开事件
-            SessionOpenedEventArgs evArgs = new SessionOpenedEventArgs()
+            TabOpenedEventArgs tabOpened = new TabOpenedEventArgs()
             {
-                Type = (SessionTypeEnum)session.Type
+                Type = (SessionTypeEnum)session.Type,
+                OpenedTab = openedSessionVM
             };
-            this.RaiseAddonEvent(HostEvent.HOST_SESSION_OPENED, evArgs);
+            this.RaiseAddonEvent(HostEvent.HOST_TAB_OPENED, tabOpened);
         }
 
         /// <summary>

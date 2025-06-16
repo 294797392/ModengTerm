@@ -75,6 +75,8 @@ namespace ModengTerm.ViewModel
             }
         }
 
+        public SessionTypeEnum Type { get { return (SessionTypeEnum)this.Session.Type; } }
+
         #endregion
 
         #region 构造方法

@@ -40,9 +40,7 @@ namespace ModengTerm.Addons
 
         #region 属性
 
-        public string ID { get { return this.Definition.ID; } }
-
-        public AddonDefinition Definition { get; set; }
+        public string ID { get; private set; }
 
         public Dictionary<string, AddonCommandHandler> RegisteredCommand { get { return this.registerCommands; } }
 
@@ -57,12 +55,13 @@ namespace ModengTerm.Addons
         /// </summary>
         public void Active(ActiveContext context)
         {
-            this.factory = HostFactory.GetFactory();
+            this.ID = context.Definition.ID;
+            this.factory = context.Factory;
             this.registerCommands = new Dictionary<string, AddonCommandHandler>();
             this.registeredEvent = new Dictionary<HostEvent, AddonEventHandler>();
-            this.sidePanels = this.factory.CreateSidePanels(this.Definition.SidePanels);
-            this.hostWindow = this.factory.GetHostWindow();
-            this.storageService = this.factory.GetStorageService();
+            this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
+            this.hostWindow = context.HostWindow;
+            this.storageService = context.StorageService;
 
             this.OnActive(context);
         }

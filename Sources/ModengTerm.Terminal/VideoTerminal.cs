@@ -1,7 +1,7 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.DataModels.Terminal;
-using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.Enumerations.Terminal;
 using ModengTerm.Base.Modules;
@@ -15,8 +15,6 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Text;
-using System.Windows.Data;
-using System.Windows.Media;
 
 namespace ModengTerm.Terminal
 {

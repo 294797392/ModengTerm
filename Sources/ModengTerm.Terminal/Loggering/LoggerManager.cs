@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
 using System.IO;
@@ -60,76 +61,80 @@ namespace ModengTerm.Terminal.Loggering
 
         public void Start(IVideoTerminal vt, LoggerOptions options)
         {
-            VTLogger logger = vt.Logger;
-            if (logger != null)
-            {
-                return;
-            }
+            throw new RefactorImplementedException();
+            //VTLogger logger = vt.Logger;
+            //if (logger != null)
+            //{
+            //    return;
+            //}
 
-            LoggerFilter filter = LoggerFilterFactory.Create(options.FilterType);
-            filter.FilterText = options.FilterText;
+            //LoggerFilter filter = LoggerFilterFactory.Create(options.FilterType);
+            //filter.FilterText = options.FilterText;
 
-            logger = new VTLogger()
-            {
-                Filter = filter,
-                Builder = new StringBuilder(),
-                CreateLine = VTDocUtils.GetCreateLineDelegate(options.FileType),
-                FilePath = options.FilePath,
-                FileType = options.FileType,
-                IsPaused = false
-            };
+            //logger = new VTLogger()
+            //{
+            //    Filter = filter,
+            //    Builder = new StringBuilder(),
+            //    CreateLine = VTDocUtils.GetCreateLineDelegate(options.FileType),
+            //    FilePath = options.FilePath,
+            //    FileType = options.FileType,
+            //    IsPaused = false
+            //};
 
-            vt.Logger = logger;
-            vt.OnLineFeed += this.VideoTerminal_LinePrinted;
+            //vt.Logger = logger;
+            //vt.OnLineFeed += this.VideoTerminal_LinePrinted;
 
-            lock (this.listLock)
-            {
-                this.loggerList.Add(logger);
-                this.listChanged = true;
-            }
+            //lock (this.listLock)
+            //{
+            //    this.loggerList.Add(logger);
+            //    this.listChanged = true;
+            //}
 
-            this.loggerEvent.Set();
+            //this.loggerEvent.Set();
         }
 
         public void Stop(IVideoTerminal vt)
         {
-            VTLogger logger = vt.Logger;
-            if (logger == null)
-            {
-                return;
-            }
+            throw new RefactorImplementedException();
+            //VTLogger logger = vt.Logger;
+            //if (logger == null)
+            //{
+            //    return;
+            //}
 
-            vt.Logger = null;
-            vt.OnLineFeed -= this.VideoTerminal_LinePrinted;
-            logger.Dispose();
+            //vt.Logger = null;
+            //vt.OnLineFeed -= this.VideoTerminal_LinePrinted;
+            //logger.Dispose();
 
-            lock (this.listLock)
-            {
-                this.loggerList.Remove(logger);
-                this.listChanged = true;
-            }
+            //lock (this.listLock)
+            //{
+            //    this.loggerList.Remove(logger);
+            //    this.listChanged = true;
+            //}
         }
 
         public void Pause(IVideoTerminal vt)
         {
-            VTLogger logger = vt.Logger as VTLogger;
-            if (logger == null)
-            {
-                return;
-            }
+            throw new RefactorImplementedException();
+            //VTLogger logger = vt.Logger as VTLogger;
+            //if (logger == null)
+            //{
+            //    return;
+            //}
 
-            logger.IsPaused = true;
+            //logger.IsPaused = true;
         }
 
         public void Resume(IVideoTerminal vt)
         {
-            VTLogger logger = vt.Logger as VTLogger;
-            if (logger == null)
-            {
-                return;
-            }
+            throw new RefactorImplementedException();
+            //VTLogger logger = vt.Logger as VTLogger;
+            //if (logger == null)
+            //{
+            //    return;
+            //}
 
-            logger.IsPaused = false;
+            //logger.IsPaused = false;
         }
 
         #endregion
@@ -145,23 +150,24 @@ namespace ModengTerm.Terminal.Loggering
         /// <param name="historyLine">被打印出来的行数据</param>
         private void VideoTerminal_LinePrinted(IVideoTerminal vt, bool isAlternate, int oldPhysicsRow, VTHistoryLine historyLine)
         {
-            if (isAlternate) 
-            {
-                return;
-            }
+            throw new RefactorImplementedException();
+            //if (isAlternate) 
+            //{
+            //    return;
+            //}
 
-            VTLogger logger = vt.Logger;
-            if (logger.IsPaused)
-            {
-                // 如果该日志记录器被暂停，那么什么都不记录
-                return;
-            }
+            //VTLogger logger = vt.Logger;
+            //if (logger.IsPaused)
+            //{
+            //    // 如果该日志记录器被暂停，那么什么都不记录
+            //    return;
+            //}
 
-            lock (logger.Builder)
-            {
-                // TODO：
-                logger.CreateLine(historyLine.Characters, logger.Builder, 0, historyLine.Characters.Count, false);
-            }
+            //lock (logger.Builder)
+            //{
+            //    // TODO：
+            //    logger.CreateLine(historyLine.Characters, logger.Builder, 0, historyLine.Characters.Count, false);
+            //}
         }
 
         private void WriteThreadProc()
