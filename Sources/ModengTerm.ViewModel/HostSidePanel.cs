@@ -14,7 +14,7 @@ namespace ModengTerm.ViewModel
     /// <summary>
     /// 提供扩展侧边栏的接口
     /// </summary>
-    public class SidePanel : ViewModelBase, IHostSidePanel
+    public class HostSidePanel : ViewModelBase, IHostSidePanel
     {
         #region 实例变量
 
@@ -63,7 +63,7 @@ namespace ModengTerm.ViewModel
         /// <summary>
         /// 扩展的对象
         /// </summary>
-        public SidePanelExtension ExtensionObject { get; set; }
+        public SidePanel ClientPanel { get; set; }
 
         public bool IsOpened
         {
@@ -76,7 +76,7 @@ namespace ModengTerm.ViewModel
 
         public void Initialize()
         {
-            this.ExtensionObject.OnInitialize();
+            this.ClientPanel.OnInitialize();
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void Loaded()
         {
-            this.ExtensionObject.OnLoaded();
+            this.ClientPanel.OnLoaded();
         }
 
         /// <summary>
@@ -92,12 +92,12 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void Unloaded()
         {
-            this.ExtensionObject.OnUnload();
+            this.ClientPanel.OnUnload();
         }
 
         public void Release()
         {
-            this.ExtensionObject.OnRelease();
+            this.ClientPanel.OnRelease();
         }
 
         /// <summary>

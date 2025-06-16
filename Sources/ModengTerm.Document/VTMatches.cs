@@ -9,7 +9,7 @@ namespace ModengTerm.Document
     /// <summary>
     /// 存储与搜索的关键字匹配的数据内容
     /// </summary>
-    public class VTMatches
+    public struct VTMatches
     {
         /// <summary>
         /// 关键字长度

@@ -34,7 +34,7 @@ namespace ModengTerm.Addons
 
         protected HostFactory factory;
         protected IHostWindow hostWindow;
-        private StorageService storageService;
+        protected StorageService storageService;
 
         #endregion
 

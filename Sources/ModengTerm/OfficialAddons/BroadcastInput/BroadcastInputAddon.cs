@@ -41,12 +41,10 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             this.broadcastSessions.Clear();
 
-            HostFactory factory = HostFactory.GetFactory();
-            StorageService storageSvc = factory.GetStorageService();
-            IShellTab activePanel = factory.GetActiveTab<IShellTab>();
-            List<IShellTab> allPanels = factory.GetAllTabs<IShellTab>();
+            IShellTab activePanel = this.hostWindow.GetActiveTab<IShellTab>();
+            List<IShellTab> allPanels = this.hostWindow.GetAllTabs<IShellTab>();
 
-            List<BroadcastSession> broadcastSessions = storageSvc.GetObjects<BroadcastSession>(activePanel.Id);
+            List<BroadcastSession> broadcastSessions = this.storageService.GetObjects<BroadcastSession>(activePanel.ID.ToString());
 
             foreach (IShellTab panel in allPanels)
             {
@@ -57,7 +55,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
                 BroadcastSessionVM broadcastSession = new BroadcastSessionVM()
                 {
-                    ID = panel.Id,
+                    ID = panel.ID.ToString(),
                     Name = panel.Name,
                     BroadcasePanel = panel
                 };
@@ -72,12 +70,12 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            HostFactory factory = HostFactory.GetFactory();
-            IShellTab activePanel = factory.GetActiveTab<IShellTab>();
-            List<IShellTab> allPanels = factory.GetAllTabs<IShellTab>();
+            IShellTab activePanel = this.hostWindow.GetActiveTab<IShellTab>();
+            List<IShellTab> allPanels = this.hostWindow.GetAllTabs<IShellTab>();
             List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
 
             BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, allPanels);
+            window.StorageService = this.storageService;
             window.Owner = Application.Current.MainWindow;
             if ((bool)window.ShowDialog())
             {

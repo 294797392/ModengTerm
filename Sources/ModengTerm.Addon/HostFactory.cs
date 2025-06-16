@@ -15,21 +15,7 @@ namespace ModengTerm.Addon
     /// </summary>
     public abstract class HostFactory
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("ObjectFactory");
-        private const string FactoryImpl = "ModengTerm.Addon.HostFactoryImpl, ModengTerm";
-        private static HostFactory factory;
-
-        /// <summary>
-        /// 获取窗口实例
-        /// </summary>
-        /// <returns></returns>
-        public abstract IHostWindow GetHostWindow();
-
-        /// <summary>
-        /// 获取数据存储服务
-        /// </summary>
-        /// <returns></returns>
-        public abstract StorageService GetStorageService();
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("HostFactory");
 
         /// <summary>
         /// 创建一个侧边栏实例
@@ -49,50 +35,6 @@ namespace ModengTerm.Addon
             }
 
             return sidePanels;
-        }
-
-        /// <summary>
-        /// 获取当前激活的Tab页
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T GetActiveTab<T>() where T : IHostTab
-        {
-            IHostWindow window = this.GetHostWindow();
-
-            return window.GetActiveTab<T>();
-        }
-
-        public List<IHostTab> GetAllTabs()
-        {
-            IHostWindow window = this.GetHostWindow();
-
-            return window.GetAllTabs();
-        }
-
-        public List<T> GetAllTabs<T>() where T : IHostTab
-        {
-            return this.GetAllTabs().OfType<T>().ToList();
-        }
-
-        /// <summary>
-        /// 获取工厂实例
-        /// </summary>
-        /// <returns></returns>
-        public static HostFactory GetFactory() 
-        {
-            if (factory == null)
-            {
-                try
-                {
-                    factory = ConfigFactory<HostFactory>.CreateInstance(FactoryImpl);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("创建Factory实例异常", ex);
-                }
-            }
-            return factory;
         }
     }
 }

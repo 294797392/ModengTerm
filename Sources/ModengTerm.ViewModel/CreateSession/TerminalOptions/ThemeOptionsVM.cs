@@ -257,7 +257,7 @@ namespace ModengTerm.ViewModel.CreateSession.TerminalOptions
             session.SetOption<string>(OptionKeyEnum.THEME_CURSOR_COLOR, VTBaseUtils.Color2RgbKey(CursorColor));
             session.SetOption<VTColorTable>(OptionKeyEnum.TEHEM_COLOR_TABLE, ThemeList.SelectedItem.ColorTable);
             session.SetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, VTBaseUtils.Color2RgbKey(HighlightBackColor));
-            session.SetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FONTCOLOR, VTBaseUtils.Color2RgbKey(highlightFontColor));
+            session.SetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FORECOLOR, VTBaseUtils.Color2RgbKey(highlightFontColor));
 
             session.SetOption<string>(OptionKeyEnum.THEME_BOOKMARK_COLOR, ThemeList.SelectedItem.BookmarkColor);
 

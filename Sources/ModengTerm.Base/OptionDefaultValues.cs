@@ -59,6 +59,15 @@ namespace ModengTerm.Base
         //public static readonly Parity SERIAL_PORT_PARITY = Parity.None;
         //public static readonly Handshake SERIAL_PORT_HANDSHAKE = Handshake.None;
 
+        /// <summary>
+        /// 查找高亮前景色
+        /// </summary>
+        public static string THEME_FIND_HIGHLIGHT_FORECOLOR = "";
+        /// <summary>
+        /// 查找高亮背景色
+        /// </summary>
+        public static string THEME_FIND_HIGHLIGHT_BACKCOLOR = "";
+
 
         public static readonly string TERM_ADVANCE_SEND_COLOR = "0,255,0,255";
         public static readonly string TERM_ADVANCE_RECV_COLOR = "255,0,0,255";

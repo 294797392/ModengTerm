@@ -9,7 +9,7 @@ namespace ModengTerm.Addon.Extensions
     /// <summary>
     /// 向插件公开扩展侧边栏的功能
     /// </summary>
-    public abstract class SidePanelExtension
+    public abstract class SidePanel
     {
         public string Name { get; set; }
 

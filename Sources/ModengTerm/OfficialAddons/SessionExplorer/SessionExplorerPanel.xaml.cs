@@ -46,34 +46,6 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #endregion
 
-        #region IContentHook
-
-        private void CreateDefaultValue() 
-        {
-        }
-
-        public void OnInitialize()
-        {
-            throw new RefactorImplementedException();
-            //this.resourceManagerTreeVM = VTApp.Context.ResourceManagerTreeVM;
-            //SessionTreeViewUserControl.ViewModel = this.resourceManagerTreeVM;
-        }
-
-        public void OnRelease()
-        {
-
-        }
-
-        public void OnLoaded()
-        {
-        }
-
-        public void OnUnload()
-        {
-        }
-
-        #endregion
-
         #region 事件处理器
 
         private void SessionTreeViewUserControl_TreeViewMouseDoubleClick(UserControls.SessionTreeViewUserControl arg1, SessionTreeNodeVM selectedItem)
@@ -97,9 +69,8 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
             // 打开会话
-            HostFactory factory = HostFactory.GetFactory();
-            IHostWindow window = factory.GetHostWindow();
-            window.OpenSession(sessionVM.Session);
+            throw new RefactorImplementedException();
+            //this.hostWindow.OpenSession(sessionVM.Session);
         }
 
         #endregion

@@ -6,7 +6,7 @@ using System;
 
 namespace ModengTerm.OfficialAddons.SessionExplorer
 {
-    public class SessionExplorerPanelVM : SidePanelExtension
+    public class SessionExplorerPanelVM : SidePanel
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("");
 

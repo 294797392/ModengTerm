@@ -355,7 +355,7 @@
                 {
                     "id": "E71680AF-F5D8-4F18-A0BF-BB60DD4DAA1C",
                     "name": "查找",
-                    "command": "Find",
+                    "command": "FindAddon.Find",
                     "pid": "50ED6E4E-4252-4D92-99DD-E72AC646FACB"
                 }
             ]

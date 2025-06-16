@@ -27,10 +27,17 @@ namespace ModengTerm.Addon.Interactive
         T GetActiveTab<T>() where T : IHostTab;
 
         /// <summary>
-        /// 获取指定类型的所有会话Shell对象
+        /// 获取所有类型的会话对象
         /// </summary>
         /// <returns></returns>
         List<IHostTab> GetAllTabs();
+
+        /// <summary>
+        /// 获取指定类型的所有会话对象
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        List<T> GetAllTabs<T>() where T : IHostTab;
 
         void AddSidePanel(IHostSidePanel panel);
 

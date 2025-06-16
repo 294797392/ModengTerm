@@ -77,7 +77,7 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// 查找高亮前景色
         /// </summary>
-        THEME_FIND_HIGHLIGHT_FONTCOLOR = 114,
+        THEME_FIND_HIGHLIGHT_FORECOLOR = 114,
         /// <summary>
         /// 查找高亮背景色
         /// </summary>

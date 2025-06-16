@@ -76,19 +76,19 @@ namespace ModengTerm.UserControls
         {
         }
 
-        private FrameworkElement LoadContent(SidePanel panel)
+        private FrameworkElement LoadContent(HostSidePanel panel)
         {
             PanelDefinition definition = panel.Definition;
             FrameworkElement content = panel.Content;
-            SidePanelExtension extensionObject = panel.ExtensionObject;
+            SidePanel extensionObject = panel.ClientPanel;
 
             // 先创建扩展对象
             if (extensionObject == null)
             {
                 try
                 {
-                    extensionObject = ConfigFactory<SidePanelExtension>.CreateInstance(definition.VMClassName);
-                    panel.ExtensionObject = extensionObject;
+                    extensionObject = ConfigFactory<SidePanel>.CreateInstance(definition.VMClassName);
+                    panel.ClientPanel = extensionObject;
                     extensionObject.Name = panel.Name;
                 }
                 catch (Exception ex)
@@ -133,13 +133,13 @@ namespace ModengTerm.UserControls
 
             if (e.RemovedItems.Count > 0)
             {
-                SidePanel panel = e.RemovedItems[0] as SidePanel;
+                HostSidePanel panel = e.RemovedItems[0] as HostSidePanel;
                 panel.Unloaded();
             }
 
             PanelContainer panelContainer = base.DataContext as PanelContainer;
 
-            SidePanel selectedItem = ListBoxMenus.SelectedItem as SidePanel;
+            HostSidePanel selectedItem = ListBoxMenus.SelectedItem as HostSidePanel;
             if (selectedItem == null)
             {
                 GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
@@ -161,16 +161,16 @@ namespace ModengTerm.UserControls
 
             if (e.AddedItems.Count > 0) 
             {
-                SidePanel panel = e.AddedItems[0] as SidePanel;
+                HostSidePanel panel = e.AddedItems[0] as HostSidePanel;
                 panel.Loaded();
             }
         }
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            SidePanel selected = ListBoxMenus.SelectedItem as SidePanel;
+            HostSidePanel selected = ListBoxMenus.SelectedItem as HostSidePanel;
 
-            SidePanel clicked = (sender as ListBoxItem).DataContext as SidePanel;
+            HostSidePanel clicked = (sender as ListBoxItem).DataContext as HostSidePanel;
 
             if (clicked == selected)
             {
@@ -184,7 +184,7 @@ namespace ModengTerm.UserControls
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            SidePanel selectedPanel = ListBoxMenus.SelectedItem as SidePanel;
+            HostSidePanel selectedPanel = ListBoxMenus.SelectedItem as HostSidePanel;
 
             ListBoxMenus.SelectedItem = null;
             ContentControl1.Content = null;

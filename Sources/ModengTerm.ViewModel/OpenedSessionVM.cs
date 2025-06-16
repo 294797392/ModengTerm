@@ -31,8 +31,6 @@ namespace ModengTerm.ViewModel
 
         #region 属性
 
-        public string Id { get; private set; }
-
         /// <summary>
         /// 访问服务的代理
         /// </summary>
@@ -84,7 +82,6 @@ namespace ModengTerm.ViewModel
         public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
-            this.Id = session.ID;
             this.statusChangedEventArgs = new StatusChangedEventArgs();
         }
 
@@ -128,6 +125,11 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region IHostTab
+
+        public T GetOption<T>(OptionKeyEnum key, T defaultValue)
+        {
+            return this.Session.GetOption<T>(key, defaultValue);
+        }
 
         #endregion
 

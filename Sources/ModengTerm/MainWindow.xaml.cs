@@ -152,7 +152,7 @@ namespace ModengTerm
                 {
                     addon = ConfigFactory<AddonModule>.CreateInstance(definition.ClassEntry);
 
-                    ActiveContext context = new ActiveContext() 
+                    ActiveContext context = new ActiveContext()
                     {
                         Definition = definition,
                         StorageService = new SqliteStorageService(),
@@ -296,8 +296,8 @@ namespace ModengTerm
             // 触发Tab选中改变事件
             ActiveTabChangedEventArgs activeTabChanged = new ActiveTabChangedEventArgs()
             {
-                AddedTab = e.AddedItems[0] as IHostTab,
-                RemovedTab = e.RemovedItems[0] as IHostTab
+                AddedTab = addedSession,
+                RemovedTab = removedSession
             };
             this.RaiseAddonEvent(HostEvent.HOST_ACTIVE_TAB_CHANGED, activeTabChanged);
         }
@@ -595,16 +595,21 @@ namespace ModengTerm
             return this.mainWindowVM.SessionList.OfType<IHostTab>().ToList();
         }
 
+        public List<T> GetAllTabs<T>() where T : IHostTab
+        {
+            return this.mainWindowVM.SessionList.OfType<T>().ToList();
+        }
+
         public void AddSidePanel(IHostSidePanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Add(panel as SidePanel);
+            container.Panels.Add(panel as HostSidePanel);
         }
 
         public void RemoveSidePanel(IHostSidePanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Remove(panel as SidePanel);
+            container.Panels.Remove(panel as HostSidePanel);
         }
 
         #endregion

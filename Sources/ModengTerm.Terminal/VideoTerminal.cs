@@ -15,6 +15,7 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ModengTerm.Terminal
 {
@@ -897,6 +898,29 @@ namespace ModengTerm.Terminal
                 // 触发行被完全打印的事件
                 this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
             }
+        }
+
+        public List<VTMatches> FindMatches(FindOptions options) 
+        {
+            List<VTMatches> result = new List<VTMatches>();
+
+            VTDocument activeDocument = this.activeDocument;
+
+            VTextLine current = activeDocument.FirstLine;
+
+            while (current != null)
+            {
+                List<VTMatches> matches = FindMatches(options, current);
+                if (matches != null)
+                {
+                    result.AddRange(matches);
+                }
+
+                current = current.NextLine;
+            }
+
+            return result;
+
         }
 
         #endregion
@@ -1982,6 +2006,77 @@ namespace ModengTerm.Terminal
             {
                 byte[] bytes = FOCUSOUT_DATA.Select(v => Convert.ToByte(v)).ToArray();
                 this.sessionTransport.Write(bytes);
+            }
+        }
+
+        /// <summary>
+        /// 匹配一行，如果有匹配成功则返回匹配后的数据
+        /// </summary>
+        /// <param name="textLine">要搜索的行</param>
+        /// <returns></returns>
+        private List<VTMatches> FindMatches(FindOptions options, VTextLine textLine)
+        {
+            bool Regexp = options.Regexp;
+            string keyword = options.Keyword;
+            bool CaseSensitive = options.CaseSensitive;
+
+            string text = VTDocUtils.CreatePlainText(textLine.Characters);
+
+            if (Regexp)
+            {
+                RegexOptions regexOptions = CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+
+                // 用正则表达式搜索
+                Match match = Regex.Match(text, keyword, regexOptions);
+                if (!match.Success)
+                {
+                    // 没有找到搜索结果
+                    return null;
+                }
+
+                List<VTMatches> vtMatches = new List<VTMatches>();
+
+                do
+                {
+                    vtMatches.Add(new VTMatches(textLine, match.Length, match.Index));
+                }
+                while ((match = match.NextMatch()) != null);
+
+                return vtMatches;
+            }
+            else
+            {
+                StringComparison stringComparison = CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+                // 直接文本匹配
+                // 注意一行文本里可能会有多个地方匹配，要把所有匹配的地方都找到
+
+                int startIndex = 0;
+
+                // 存储匹配的字符索引
+                int matchedIndex = 0;
+
+                if ((matchedIndex = text.IndexOf(keyword, 0, stringComparison)) == -1)
+                {
+                    // 没找到
+                    return null;
+                }
+
+                List<VTMatches> vtMatches = new List<VTMatches>();
+
+                vtMatches.Add(new VTMatches(textLine, keyword.Length, matchedIndex));
+
+                startIndex = matchedIndex + keyword.Length;
+
+                // 找到了继续找
+                while ((matchedIndex = text.IndexOf(keyword, startIndex, stringComparison)) >= 0)
+                {
+                    vtMatches.Add(new VTMatches(textLine, keyword.Length, matchedIndex));
+
+                    startIndex = matchedIndex + keyword.Length;
+                }
+
+                return vtMatches;
             }
         }
 

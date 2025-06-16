@@ -12,7 +12,7 @@ namespace ModengTerm.Addon.Interactive
         /// <summary>
         /// 会话Id
         /// </summary>
-        string Id { get; }
+        object ID { get; }
 
         /// <summary>
         /// 会话名字
@@ -28,6 +28,15 @@ namespace ModengTerm.Addon.Interactive
         /// 会话类型
         /// </summary>
         SessionTypeEnum Type { get; }
+
+        /// <summary>
+        /// 读取该会话的选项
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="optionKey">要读取的选项key</param>
+        /// <param name="defaultValue">如果该选项不存在，指定默认值</param>
+        /// <returns></returns>
+        T GetOption<T>(OptionKeyEnum key, T defaultValue);
     }
 
     /// <summary>
@@ -35,6 +44,11 @@ namespace ModengTerm.Addon.Interactive
     /// </summary>
     public interface IShellTab : IHostTab
     {
+        /// <summary>
+        /// 获取和VideoTerminal交互的接口
+        /// </summary>
+        IVideoTerminal VideoTerminal { get; }
+
         void Send(byte[] bytes);
         void Send(string text);
 

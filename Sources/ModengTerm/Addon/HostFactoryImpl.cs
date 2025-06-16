@@ -12,20 +12,9 @@ namespace ModengTerm.Addon
 
         private StorageService storageSvcImpl = new SqliteStorageService();
 
-        public override StorageService GetStorageService()
-        {
-            return storageSvcImpl;
-        }
-
-        public override IHostWindow GetHostWindow()
-        {
-            return Application.Current.MainWindow as IHostWindow;
-            //return windowImpl;
-        }
-
         public override IHostSidePanel CreateSidePanel(PanelDefinition definition)
         {
-            SidePanel sidePanel = new SidePanel();
+            HostSidePanel sidePanel = new HostSidePanel();
             sidePanel.Definition = definition;
             sidePanel.ID = definition.ID;
             sidePanel.Name = definition.Name;
