@@ -7,10 +7,25 @@ using System.Threading.Tasks;
 namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 悬浮于Tab页面的面板
+    /// 指定SidePanel要显示的位置
     /// </summary>
-    public interface IHostOverlayPanel
+    public enum SidePanelDocks
     {
+        /// <summary>
+        /// 显示在左边
+        /// </summary>
+        Left,
+
+        /// <summary>
+        /// 显示在右边
+        /// </summary>
+        Right
+    }
+
+    public interface IHostPanel
+    {
+        SidePanelDocks Dock { get; }
+
         object ID { get; }
 
         string Name { get; }

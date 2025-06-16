@@ -17,8 +17,6 @@ namespace ModengTerm.Addon
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("HostFactory");
 
-        public abstract List<IHostSidePanel> CreateSidePanels(List<PanelDefinition> definitions);
-
-        public abstract List<IHostOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions);
+        public abstract List<IHostPanel> CreatePanels(List<PanelDefinition> definitions);
     }
 }

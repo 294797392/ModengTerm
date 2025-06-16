@@ -601,13 +601,13 @@ namespace ModengTerm
             return this.mainWindowVM.SessionList.OfType<T>().ToList();
         }
 
-        public void AddSidePanel(IHostSidePanel panel)
+        public void AddSidePanel(IHostPanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
             container.Panels.Add(panel as HostSidePanel);
         }
 
-        public void RemoveSidePanel(IHostSidePanel panel)
+        public void RemoveSidePanel(IHostPanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
             container.Panels.Remove(panel as HostSidePanel);

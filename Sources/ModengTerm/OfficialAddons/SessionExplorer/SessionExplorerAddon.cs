@@ -18,14 +18,14 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         private void OpenExplorerWindow(CommandArgs e)
         {
-            IHostSidePanel sidePanel = this.GetSidePanel("ResourceManagerPanel");
-            sidePanel.SwitchStatus();
+            IHostPanel panel = this.GetPanel("ResourceManagerPanel");
+            panel.SwitchStatus();
         }
 
         private void OnAppInitialized(HostEvent evType, HostEventArgs evArgs)
         {
-            IHostSidePanel sidePanel = this.GetSidePanel("ResourceManagerPanel");
-            this.hostWindow.AddSidePanel(sidePanel);
+            IHostPanel panel = this.GetPanel("ResourceManagerPanel");
+            this.hostWindow.AddSidePanel(panel);
         }
     }
 }

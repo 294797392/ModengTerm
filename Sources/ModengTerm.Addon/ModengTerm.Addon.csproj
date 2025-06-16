@@ -17,7 +17,11 @@
 
   <ItemGroup>
     <Compile Remove="AddonContext.cs" />
-    <Compile Remove="Interactive\IHostPanel.cs" />
+    <Compile Remove="Interactive\IHostOverlayPanel.cs" />
+    <Compile Remove="Interactive\IHostSidePanel.cs" />
+    <Compile Remove="Panel\IOverlayPanel.cs" />
+    <Compile Remove="Panel\IPanelBase.cs" />
+    <Compile Remove="Panel\ISidePanel.cs" />
     <Compile Remove="WindowImpl.cs" />
   </ItemGroup>
 

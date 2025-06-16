@@ -1,7 +1,7 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Client;
-using ModengTerm.Addon.Extensions;
 using ModengTerm.Addon.Interactive;
+using ModengTerm.Addon.Panel;
 using ModengTerm.Base;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Session;
@@ -26,7 +26,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionExplorerPanel : UserControl, ISidePanel
+    public partial class SessionExplorerPanel : UserControl, IAddonPanel
     {
         #region 类变量
 
@@ -37,7 +37,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
         #region 实例变量
 
         private SessionTreeVM resourceManagerTreeVM;
-        private HostContext hostContext;
+        private PanelContext hostContext;
 
         #endregion
 
@@ -80,7 +80,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #region ISidePanel
 
-        public void OnInitialize(HostContext context)
+        public void OnInitialize(PanelContext context)
         {
             this.hostContext = context;
 

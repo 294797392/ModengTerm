@@ -1,8 +1,8 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Addon;
 using ModengTerm.Addon.Client;
-using ModengTerm.Addon.Extensions;
 using ModengTerm.Addon.Interactive;
+using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Panel;
@@ -92,13 +92,13 @@ namespace ModengTerm.UserControls
                 {
                     content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
                     panel.Content = content;
-                    panel.ClientPanel = content as IPanelBase;
+                    panel.ClientPanel = content as IAddonPanel;
                     if (panel.ClientPanel == null) 
                     {
-                        throw new Exception("SidePanel必须实现ISidePanel");
+                        throw new Exception("SidePanel必须实现IAddonPanel");
                     }
 
-                    HostContext context = new HostContext() 
+                    PanelContext context = new PanelContext() 
                     {
                         StorageService = new SqliteStorageService(),
                         HostWindow = Application.Current.MainWindow as IHostWindow

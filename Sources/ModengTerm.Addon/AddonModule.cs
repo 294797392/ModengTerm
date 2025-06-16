@@ -30,7 +30,7 @@ namespace ModengTerm.Addons
 
         private Dictionary<HostEvent, AddonEventHandler> registeredEvent;
 
-        private List<IHostSidePanel> sidePanels;
+        private List<IHostPanel> panels;
 
         protected HostFactory factory;
         protected IHostWindow hostWindow;
@@ -59,7 +59,9 @@ namespace ModengTerm.Addons
             this.factory = context.Factory;
             this.registerCommands = new Dictionary<string, AddonCommandHandler>();
             this.registeredEvent = new Dictionary<HostEvent, AddonEventHandler>();
-            this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
+
+            // 此时只是创建了HostPanel的实例，但是还没有真正加到界面上，调用AddSidePanel加到界面上
+            this.panels = this.factory.CreatePanels(context.Definition.Panels);
             this.hostWindow = context.HostWindow;
             this.storageService = context.StorageService;
 
@@ -119,9 +121,9 @@ namespace ModengTerm.Addons
             this.registeredEvent[evType] = handler;
         }
 
-        protected IHostSidePanel GetSidePanel(string id)
+        protected IHostPanel GetPanel(string id)
         {
-            return this.sidePanels.FirstOrDefault(v => v.ID.ToString() == id);
+            return this.panels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
         protected string GetObjectId()

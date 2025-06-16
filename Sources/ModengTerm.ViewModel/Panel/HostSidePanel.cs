@@ -1,5 +1,4 @@
-﻿using ModengTerm.Addon.Extensions;
-using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Definitions;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ namespace ModengTerm.ViewModel.Panel
     /// <summary>
     /// 提供扩展侧边栏的接口
     /// </summary>
-    public class HostSidePanel : HostPanel, IHostSidePanel
+    public class HostSidePanel : HostPanel
     {
         #region 实例变量
 

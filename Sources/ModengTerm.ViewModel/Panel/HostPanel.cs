@@ -1,15 +1,16 @@
 ﻿using ModengTerm.Addon.Client;
 using ModengTerm.Addon.Interactive;
+using ModengTerm.Addon.Panel;
 using System.Windows;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel
 {
-    public abstract class HostPanel : ViewModelBase
+    public abstract class HostPanel : ViewModelBase, IHostPanel
     {
         #region 属性
 
-        public IPanelBase ClientPanel { get; set; }
+        public IAddonPanel ClientPanel { get; set; }
 
         /// <summary>
         /// 界面
@@ -18,11 +19,13 @@ namespace ModengTerm.ViewModel.Panel
 
         public abstract bool IsOpened { get; }
 
+        public SidePanelDocks Dock => SidePanelDocks.Left;
+
         #endregion
 
         #region 公开接口
 
-        public void Initialize(HostContext context)
+        public void Initialize(PanelContext context)
         {
             this.ClientPanel.OnInitialize(context);
         }

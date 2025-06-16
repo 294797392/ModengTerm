@@ -11,7 +11,7 @@ namespace ModengTerm.Addon.Client
     /// <summary>
     /// 存储客户端的上下文信息
     /// </summary>
-    public class HostContext
+    public class PanelContext
     {
         public IHostWindow HostWindow { get; set; }
 

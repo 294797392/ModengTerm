@@ -14,14 +14,9 @@ namespace ModengTerm.Addon
 
         private StorageService storageSvcImpl = new SqliteStorageService();
 
-        public override List<IHostOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions)
+        public override List<IHostPanel> CreatePanels(List<PanelDefinition> definitions)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public override List<IHostSidePanel> CreateSidePanels(List<PanelDefinition> definitions)
-        {
-            List<IHostSidePanel> sidePanels = new List<IHostSidePanel>();
+            List<IHostPanel> panels = new List<IHostPanel>();
 
             foreach (PanelDefinition definition in definitions)
             {
@@ -30,10 +25,10 @@ namespace ModengTerm.Addon
                 sidePanel.ID = definition.ID;
                 sidePanel.Name = definition.Name;
                 sidePanel.IconURI = definition.Icon;
-                sidePanels.Add(sidePanel);
+                panels.Add(sidePanel);
             }
 
-            return sidePanels;
+            return panels;
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.ViewModel.Panel
 {
-    public class HostOverlayPanel : HostPanel, IHostOverlayPanel
+    public class HostOverlayPanel : HostPanel
     {
         public override bool IsOpened => throw new NotImplementedException();
 
