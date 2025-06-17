@@ -13,10 +13,5 @@ namespace ModengTerm
     public static class VTClientUtils
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTClientUtils");
-
-        public static HostFactory GetHostFactory() 
-        {
-            return new HostFactoryImpl();
-        }
     }
 }

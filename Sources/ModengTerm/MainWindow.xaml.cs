@@ -157,7 +157,7 @@ namespace ModengTerm
                     {
                         Definition = definition,
                         StorageService = new SqliteStorageService(),
-                        Factory = new HostFactoryImpl(),
+                        Factory = HostFactory.GetFactory(),
                         HostWindow = this
                     };
 

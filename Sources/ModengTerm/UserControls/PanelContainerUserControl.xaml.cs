@@ -91,7 +91,6 @@ namespace ModengTerm.UserControls
                 {
                     content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
                     panel.Content = content;
-                    panel.Callback.HostFactory = VTClientUtils.GetHostFactory();
                     panel.Initialize();
                 }
                 catch (Exception ex)

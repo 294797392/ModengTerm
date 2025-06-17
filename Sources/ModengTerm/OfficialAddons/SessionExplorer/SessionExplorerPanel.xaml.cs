@@ -56,15 +56,14 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
             // 打开会话
-            IHostWindow hostWindow = this.HostFactory.GetHostWindow();
+            HostFactory factory = HostFactory.GetFactory();
+            IHostWindow hostWindow = factory.GetHostWindow();
             hostWindow.OpenSession(sessionVM.Session);
         }
 
         #endregion
 
         #region ISidePanel
-
-        public HostFactory HostFactory { get; set; }
 
         public void OnInitialize()
         {

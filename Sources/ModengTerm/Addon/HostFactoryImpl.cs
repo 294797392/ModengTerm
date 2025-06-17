@@ -12,6 +12,12 @@ namespace ModengTerm.Addon
         private static log4net.ILog logger = log4net.LogManager.GetLogger("HostFactoryImpl");
 
         private StorageService storageSvcImpl = new SqliteStorageService();
+        private IHostEventRegistory eventRegistory = new EventRegistoryImpl();
+
+        public HostFactoryImpl()
+        {
+            
+        }
 
         public override StorageService GetStorageService()
         {
@@ -21,6 +27,11 @@ namespace ModengTerm.Addon
         public override IHostWindow GetHostWindow()
         {
             return Application.Current.MainWindow as IHostWindow;
+        }
+
+        public override IHostEventRegistory GetEventRegistory()
+        {
+            return eventRegistory;
         }
 
         public override List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions)

@@ -103,8 +103,6 @@ namespace ModengTerm.OfficialAddons.Find
 
         public IShellTab OwnerTab { get; set; }
 
-        public HostFactory HostFactory { get; set; }
-
         public void OnInitialize()
         {
         }

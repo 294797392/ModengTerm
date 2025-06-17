@@ -18,11 +18,6 @@ namespace ModengTerm.Addon.Panel
         string Name { get; set; }
 
         /// <summary>
-        /// Host传递给插件的HostFactory
-        /// </summary>
-        HostFactory HostFactory { get; set; }
-
-        /// <summary>
         /// 面板初始化的时候触发
         /// </summary>
         void OnInitialize();

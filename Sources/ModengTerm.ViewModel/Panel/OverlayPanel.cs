@@ -76,7 +76,6 @@ namespace ModengTerm.ViewModel.Panel
 
                 IOverlayPanelCallback callback = this.Callback as IOverlayPanelCallback;
                 callback.OwnerTab = this.OwnerTab;
-                callback.HostFactory = this.HostFactory;
                 this.Callback.OnInitialize();
             }
 
