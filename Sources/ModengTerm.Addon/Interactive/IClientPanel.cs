@@ -23,7 +23,7 @@ namespace ModengTerm.Addon.Interactive
         Right
     }
 
-    public interface IHostPanel
+    public interface IClientPanel
     {
         object ID { get; }
 
@@ -51,7 +51,7 @@ namespace ModengTerm.Addon.Interactive
         void SwitchStatus();
     }
 
-    public interface ISidePanel : IHostPanel
+    public interface ISidePanel : IClientPanel
     {
         /// <summary>
         /// Panel显示的位置
@@ -69,7 +69,7 @@ namespace ModengTerm.Addon.Interactive
         RightBottom,
     }
 
-    public interface IOverlayPanel : IHostPanel
+    public interface IOverlayPanel : IClientPanel
     {
         /// <summary>
         /// 悬浮面板的位置
@@ -79,6 +79,6 @@ namespace ModengTerm.Addon.Interactive
         /// <summary>
         /// 悬浮面板所属的Tab页面
         /// </summary>
-        IShellTab OwnerTab { get; set; }
+        IClientShellTab OwnerTab { get; set; }
     }
 }

@@ -9,8 +9,6 @@ namespace ModengTerm.Addons
 {
     public delegate void AddonCommandHandler(CommandArgs e);
 
-    public delegate void AddonEventHandler(HostEvent evType, HostEventArgs evArgs);
-
     /// <summary>
     /// 插件生命周期管理
     /// 插件事件管理
@@ -28,14 +26,13 @@ namespace ModengTerm.Addons
 
         private Dictionary<string, AddonCommandHandler> registerCommands;
 
-        private Dictionary<HostEvent, AddonEventHandler> registeredEvent;
-
         private List<ISidePanel> sidePanels;
         private List<IOverlayPanel> overlayPanels;
 
-        protected HostFactory factory;
-        protected IHostWindow hostWindow;
+        protected ClientFactory factory;
+        protected IClientWindow hostWindow;
         protected StorageService storageService;
+        protected IClientEventRegistory eventRegistory;
 
         #endregion
 
@@ -44,8 +41,6 @@ namespace ModengTerm.Addons
         public string ID { get; private set; }
 
         public Dictionary<string, AddonCommandHandler> RegisteredCommand { get { return this.registerCommands; } }
-
-        public Dictionary<HostEvent, AddonEventHandler> RegisteredEvent { get { return this.registeredEvent; } }
 
         #endregion
 
@@ -59,13 +54,13 @@ namespace ModengTerm.Addons
             this.ID = context.Definition.ID;
             this.factory = context.Factory;
             this.registerCommands = new Dictionary<string, AddonCommandHandler>();
-            this.registeredEvent = new Dictionary<HostEvent, AddonEventHandler>();
 
             // 此时只是创建了HostPanel的实例，但是还没有真正加到界面上，调用AddSidePanel加到界面上
             this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
             this.overlayPanels = this.factory.CreateOverlayPanels(context.Definition.OverlayPanels);
-            this.hostWindow = context.HostWindow;
-            this.storageService = context.StorageService;
+            this.hostWindow = this.factory.GetHostWindow();
+            this.storageService = this.factory.GetStorageService();
+            this.eventRegistory = this.factory.GetEventRegistory();
 
             this.OnActive(context);
         }
@@ -106,21 +101,6 @@ namespace ModengTerm.Addons
             }
 
             this.registerCommands[command] = handler;
-        }
-
-        /// <summary>
-        /// 监听某个事件
-        /// </summary>
-        /// <param name="evType"></param>
-        /// <param name="handler"></param>
-        protected void RegisterEvent(HostEvent evType, AddonEventHandler handler)
-        {
-            if (this.registeredEvent.ContainsKey(evType))
-            {
-                return;
-            }
-
-            this.registeredEvent[evType] = handler;
         }
 
         protected ISidePanel GetSidePanel(string id)

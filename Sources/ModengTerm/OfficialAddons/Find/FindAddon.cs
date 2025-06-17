@@ -91,19 +91,21 @@ namespace ModengTerm.OfficialAddons.Find
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.RegisterEvent(HostEvent.HOST_TAB_OPENED, this.OnTabOpened);
-            this.RegisterEvent(HostEvent.HOST_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
+            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
+            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
             this.RegisterCommand("FindAddon.Find", this.FindCommandExecuted);
         }
 
         protected override void OnDeactive()
         {
+            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
+            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
         }
 
-        private void OnTabOpened(HostEvent evType, HostEventArgs evArgs) 
+        private void OnTabOpened(ClientEvent evType, ClientEventArgs evArgs) 
         {
             TabOpenedEventArgs tabOpened = evArgs as TabOpenedEventArgs;
-            IShellTab shellTab = tabOpened.OpenedTab as IShellTab;
+            IClientShellTab shellTab = tabOpened.OpenedTab as IClientShellTab;
             if (shellTab == null) 
             {
                 return;
@@ -115,7 +117,7 @@ namespace ModengTerm.OfficialAddons.Find
             shellTab.AddOverlayPanel(overlayPanel);
         }
 
-        private void OnActiveTabChanged(HostEvent evType, HostEventArgs evArgs)
+        private void OnActiveTabChanged(ClientEvent evType, ClientEventArgs evArgs)
         {
             //throw new RefactorImplementedException();
 
@@ -145,7 +147,7 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void FindCommandExecuted(CommandArgs e)
         {
-            IShellTab shellTab = e.ActiveTab as IShellTab;
+            IClientShellTab shellTab = e.ActiveTab as IClientShellTab;
             if (shellTab == null) 
             {
                 return;

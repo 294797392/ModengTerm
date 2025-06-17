@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addon.Panel
 {
-    /// <summary>
-    /// 插件要实现的SidePanel接口
-    /// </summary>
-    public interface ISidePanelCallback : IPanelCallback
+    public interface IAddonOverlayPanel : IAddonPanel
     {
+        /// <summary>
+        /// OverlayPanel所属的Tab页面
+        /// </summary>
+        IClientShellTab OwnerTab { get; set; }
     }
 }

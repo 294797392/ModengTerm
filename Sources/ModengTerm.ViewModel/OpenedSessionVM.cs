@@ -12,11 +12,14 @@ namespace ModengTerm.ViewModel
     /// <summary>
     /// 表示一个被打开的会话
     /// </summary>
-    public abstract class OpenedSessionVM : SessionItemVM, IHostTab
+    public abstract class OpenedSessionVM : SessionItemVM, IClientTab
     {
         #region 公开事件
 
-        public event Action<OpenedSessionVM, HostEvent, HostEventArgs> Notify;
+        /// <summary>
+        /// 所有的会话事件都通过这个事件触发
+        /// </summary>
+        public event Action<OpenedSessionVM, ClientEvent, ClientEventArgs> Notify;
 
         #endregion
 
@@ -91,12 +94,20 @@ namespace ModengTerm.ViewModel
 
         /// <summary>
         /// 在所有属性都赋值之后，Open之前调用
+        /// 和构造函数相比有个不同的地方，Initialize调用的时候所有属性都赋值了，而构造函数调用的时候则没有
         /// </summary>
         public void Initialize()
         {
             // init
 
             this.OnInitialize();
+        }
+
+        public void Release()
+        {
+            this.OnRelease();
+
+            // release
         }
 
         public int Open()
@@ -138,6 +149,7 @@ namespace ModengTerm.ViewModel
         #region 抽象方法
 
         protected abstract void OnInitialize();
+        protected abstract void OnRelease();
         protected abstract int OnOpen();
         protected abstract void OnClose();
 
@@ -164,7 +176,7 @@ namespace ModengTerm.ViewModel
 
             this.statusChangedEventArgs.OldStatus = oldStatus;
             this.statusChangedEventArgs.NewStatus = newStatus;
-            this.Notify?.Invoke(this, HostEvent.HOST_SESSION_STATUS_CHANGED, this.statusChangedEventArgs);
+            this.Notify?.Invoke(this, ClientEvent.CLIENT_TAB_STATUS_CHANGED, this.statusChangedEventArgs);
 
             //throw new RefactorImplementedException();
             //// 通知所有PanelContent，会话状态改变了

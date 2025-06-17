@@ -10,7 +10,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 向插件公开应用程序主窗口的功能
     /// </summary>
-    public interface IHostWindow
+    public interface IClientWindow
     {
         /// <summary>
         /// 打开会话
@@ -23,20 +23,20 @@ namespace ModengTerm.Addon.Interactive
         /// 获取当前激活的Shell
         /// </summary>
         /// <returns></returns>
-        T GetActiveTab<T>() where T : IHostTab;
+        T GetActiveTab<T>() where T : IClientTab;
 
         /// <summary>
         /// 获取所有类型的会话对象
         /// </summary>
         /// <returns></returns>
-        List<IHostTab> GetAllTabs();
+        List<IClientTab> GetAllTabs();
 
         /// <summary>
         /// 获取指定类型的所有会话对象
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        List<T> GetAllTabs<T>() where T : IHostTab;
+        List<T> GetAllTabs<T>() where T : IClientTab;
 
         void AddSidePanel(ISidePanel panel);
 

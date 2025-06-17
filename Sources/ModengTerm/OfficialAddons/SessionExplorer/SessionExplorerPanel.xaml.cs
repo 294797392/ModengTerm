@@ -10,7 +10,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionExplorerPanel : UserControl, ISidePanelCallback
+    public partial class SessionExplorerPanel : UserControl, IAddonSidePanel
     {
         #region 类变量
 
@@ -56,8 +56,8 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
             // 打开会话
-            HostFactory factory = HostFactory.GetFactory();
-            IHostWindow hostWindow = factory.GetHostWindow();
+            ClientFactory factory = ClientFactory.GetFactory();
+            IClientWindow hostWindow = factory.GetHostWindow();
             hostWindow.OpenSession(sessionVM.Session);
         }
 

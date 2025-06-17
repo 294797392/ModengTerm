@@ -7,14 +7,14 @@ using System.Windows;
 
 namespace ModengTerm.Addon
 {
-    public class HostFactoryImpl : HostFactory
+    public class ClientFactoryImpl : ClientFactory
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("HostFactoryImpl");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientFactoryImpl");
 
         private StorageService storageSvcImpl = new SqliteStorageService();
-        private IHostEventRegistory eventRegistory = new EventRegistoryImpl();
+        private IClientEventRegistory eventRegistory = new ClientEventRegistoryImpl();
 
-        public HostFactoryImpl()
+        public ClientFactoryImpl()
         {
             
         }
@@ -24,12 +24,12 @@ namespace ModengTerm.Addon
             return storageSvcImpl;
         }
 
-        public override IHostWindow GetHostWindow()
+        public override IClientWindow GetHostWindow()
         {
-            return Application.Current.MainWindow as IHostWindow;
+            return Application.Current.MainWindow as IClientWindow;
         }
 
-        public override IHostEventRegistory GetEventRegistory()
+        public override IClientEventRegistory GetEventRegistory()
         {
             return eventRegistory;
         }

@@ -363,11 +363,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
             DocumentAlternate.DrawArea.SizeChanged -= DrawArea_SizeChanged;
             DocumentMain.DrawArea.SizeChanged -= DrawArea_SizeChanged;
 
-            this.shellSession.Close();
-
             this.videoTerminal.OnDocumentChanged -= VideoTerminal_DocumentChanged;
             this.videoTerminal.RequestChangeWindowSize -= VideoTerminal_RequestChangeWindowSize;
             this.videoTerminal = null;
+
+            this.shellSession.Close();
+            this.shellSession.Release();
         }
 
         public bool SetInputFocus()

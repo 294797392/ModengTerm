@@ -14,9 +14,9 @@ namespace ModengTerm.Addons
     /// </summary>
     public class ActiveContext
     {
-        public HostFactory Factory { get; set; }
+        public ClientFactory Factory { get; set; }
 
-        public IHostWindow HostWindow { get; set; }
+        public IClientWindow HostWindow { get; set; }
 
         /// <summary>
         /// 存储服务

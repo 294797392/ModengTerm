@@ -31,9 +31,9 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 公开属性
 
-        public IShellTab OwnerTab { get; set; }
+        public IClientShellTab OwnerTab { get; set; }
 
-        public HostFactory HostFactory { get; set; }
+        public ClientFactory HostFactory { get; set; }
 
         public OverlayPanelDocks Dock
         {
@@ -74,7 +74,7 @@ namespace ModengTerm.ViewModel.Panel
 
                 this.Content = frameworkElement;
 
-                IOverlayPanelCallback callback = this.Callback as IOverlayPanelCallback;
+                IAddonOverlayPanel callback = this.Callback as IAddonOverlayPanel;
                 callback.OwnerTab = this.OwnerTab;
                 this.Callback.OnInitialize();
             }

@@ -30,7 +30,7 @@ namespace ModengTerm.Addons
         /// <summary>
         /// 当前选中的Tab页
         /// </summary>
-        public IHostTab ActiveTab { get; set; }
+        public IClientTab ActiveTab { get; set; }
 
         private CommandArgs() 
         {

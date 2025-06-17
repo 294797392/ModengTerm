@@ -23,7 +23,7 @@ using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
 namespace ModengTerm.ViewModel.Terminal
 {
-    public class ShellSessionVM : OpenedSessionVM, IShellTab
+    public class ShellSessionVM : OpenedSessionVM, IClientShellTab
     {
         #region 类变量
 
@@ -261,6 +261,11 @@ namespace ModengTerm.ViewModel.Terminal
             this.OverlayPanels = new BindableCollection<OverlayPanel>();
         }
 
+        protected override void OnRelease()
+        {
+
+        }
+
         protected override int OnOpen()
         {
             //logMgr = MTermApp.Context.LoggerManager;
@@ -370,6 +375,15 @@ namespace ModengTerm.ViewModel.Terminal
 
             // 释放剪贴板
             clipboard.Release();
+
+            #region 释放OverlayPanel
+
+            foreach (OverlayPanel overlayPanel in this.OverlayPanels)
+            {
+                overlayPanel.Release();
+            }
+
+            #endregion
 
             isRunning = false;
         }

@@ -25,12 +25,13 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             this.broadcastSessions = new BindableCollection<BroadcastSessionVM>();
 
-            this.RegisterEvent(HostEvent.HOST_TAB_OPENED, this.OnTabOpened);
+            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnDeactive()
         {
+            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
         }
 
         #endregion
@@ -41,12 +42,12 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             this.broadcastSessions.Clear();
 
-            IShellTab activePanel = this.hostWindow.GetActiveTab<IShellTab>();
-            List<IShellTab> allPanels = this.hostWindow.GetAllTabs<IShellTab>();
+            IClientShellTab activePanel = this.hostWindow.GetActiveTab<IClientShellTab>();
+            List<IClientShellTab> allPanels = this.hostWindow.GetAllTabs<IClientShellTab>();
 
             List<BroadcastSession> broadcastSessions = this.storageService.GetObjects<BroadcastSession>(activePanel.ID.ToString());
 
-            foreach (IShellTab panel in allPanels)
+            foreach (IClientShellTab panel in allPanels)
             {
                 if (panel == activePanel)
                 {
@@ -70,11 +71,11 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            IShellTab activePanel = this.hostWindow.GetActiveTab<IShellTab>();
-            List<IShellTab> allPanels = this.hostWindow.GetAllTabs<IShellTab>();
+            IClientShellTab activeTab = this.hostWindow.GetActiveTab<IClientShellTab>();
+            List<IClientShellTab> allTabs = this.hostWindow.GetAllTabs<IClientShellTab>();
             List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
 
-            BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, allPanels);
+            BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, allTabs);
             window.StorageService = this.storageService;
             window.Owner = Application.Current.MainWindow;
             if ((bool)window.ShowDialog())
@@ -91,7 +92,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             foreach (BroadcastSessionVM broadcastSession in this.broadcastSessions)
             {
-                IShellTab broadcastPanel = broadcastSession.BroadcasePanel;
+                IClientShellTab broadcastPanel = broadcastSession.BroadcasePanel;
 
                 if (broadcastPanel.Status != SessionStatusEnum.Connected)
                 {
@@ -104,11 +105,11 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             }
         }
 
-        private void OnTabOpened(HostEvent evType, HostEventArgs evArgs)
+        private void OnTabOpened(ClientEvent evType, ClientEventArgs evArgs)
         {
             TabOpenedEventArgs tabOpened = evArgs as TabOpenedEventArgs;
 
-            switch (tabOpened.Type)
+            switch (tabOpened.SessionType)
             {
                 case SessionTypeEnum.SFTP: return;
                 case SessionTypeEnum.SSH:

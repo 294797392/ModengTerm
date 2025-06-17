@@ -7,7 +7,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 向应用程序公开控制打开的会话窗口的接口
     /// </summary>
-    public interface IHostTab
+    public interface IClientTab
     {
         /// <summary>
         /// 会话Id
@@ -42,7 +42,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 表示打开的终端类型的会话界面
     /// </summary>
-    public interface IShellTab : IHostTab
+    public interface IClientShellTab : IClientTab
     {
         /// <summary>
         /// 获取和VideoTerminal交互的接口
@@ -79,7 +79,7 @@ namespace ModengTerm.Addon.Interactive
     /// <summary>
     /// 表示打开的Sftp类型的会话界面
     /// </summary>
-    public interface ISftpTab : IHostTab
+    public interface IClientSftpTab : IClientTab
     {
 
     }

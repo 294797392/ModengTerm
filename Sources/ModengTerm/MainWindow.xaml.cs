@@ -30,7 +30,7 @@ namespace ModengTerm
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window, IHostWindow
+    public partial class MainWindow : Window, IClientWindow
     {
         #region 类变量
 
@@ -47,6 +47,8 @@ namespace ModengTerm
         private ServiceAgent serviceAgent;
         private DefaultMainUserControl defaultMainUserControl;
         private List<AddonModule> addons;
+        private ClientFactory factory;
+        private IClientEventRegistory eventRegistory;
 
         #endregion
 
@@ -66,6 +68,8 @@ namespace ModengTerm
         private void InitializeWindow()
         {
             this.serviceAgent = VTApp.Context.ServiceAgent;
+            this.factory = ClientFactory.GetFactory();
+            this.eventRegistory = this.factory.GetEventRegistory();
 
             this.mainWindowVM = MainWindowVM.GetInstance();
             base.DataContext = this.mainWindowVM;
@@ -84,7 +88,9 @@ namespace ModengTerm
             ListBoxOpenedSession.AddHandler(ListBox.MouseWheelEvent, new MouseWheelEventHandler(this.ListBoxOpenedSession_MouseWheel), true);
 
             this.InitializeAddon();
-            this.RaiseAddonEvent(HostEvent.HOST_APP_INITIALIZED);
+
+            ClientInitializedEventArgs clientInitialized = new ClientInitializedEventArgs();
+            this.eventRegistory.PublishEvent(clientInitialized);
         }
 
         private void ShowSessionListWindow()
@@ -133,6 +139,9 @@ namespace ModengTerm
             }
             content.Close();
 
+            // 取消该会话的所有订阅的事件
+            this.eventRegistory.UnsubscribeTabEvent(session);
+
             this.mainWindowVM.SessionList.Remove(session);
         }
 
@@ -157,7 +166,7 @@ namespace ModengTerm
                     {
                         Definition = definition,
                         StorageService = new SqliteStorageService(),
-                        Factory = HostFactory.GetFactory(),
+                        Factory = ClientFactory.GetFactory(),
                         HostWindow = this
                     };
 
@@ -175,20 +184,6 @@ namespace ModengTerm
             #endregion
 
             this.addons = addons;
-        }
-
-        private void RaiseAddonEvent(HostEvent evType, HostEventArgs evArgs = null)
-        {
-            foreach (AddonModule addon in this.addons)
-            {
-                AddonEventHandler handler;
-                if (!addon.RegisteredEvent.TryGetValue(evType, out handler))
-                {
-                    continue;
-                }
-
-                handler.Invoke(evType, evArgs);
-            }
         }
 
         private void RaiseAddonCommand(CommandArgs cmdArgs)
@@ -220,18 +215,9 @@ namespace ModengTerm
         /// <param name="session"></param>
         /// <param name="code"></param>
         /// <param name="e"></param>
-        private void OpenedSessionVM_Notify(OpenedSessionVM session, HostEvent evType, HostEventArgs evArgs)
+        private void OpenedSessionVM_EventNotify(OpenedSessionVM session, ClientEvent evType, ClientEventArgs evArgs)
         {
-            foreach (AddonModule addon in this.addons)
-            {
-                AddonEventHandler handler;
-                if (!addon.RegisteredEvent.TryGetValue(evType, out handler))
-                {
-                    continue;
-                }
-
-                handler(evType, evArgs);
-            }
+            this.eventRegistory.PublishEvent(evArgs);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -300,7 +286,7 @@ namespace ModengTerm
                 AddedTab = addedSession,
                 RemovedTab = removedSession
             };
-            this.RaiseAddonEvent(HostEvent.HOST_ACTIVE_TAB_CHANGED, activeTabChanged);
+            this.eventRegistory.PublishEvent(activeTabChanged);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -376,7 +362,7 @@ namespace ModengTerm
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             CommandArgs.Instance.AddonId = contextMenu.AddonId;
             CommandArgs.Instance.Command = contextMenu.Command;
-            CommandArgs.Instance.ActiveTab = ListBoxOpenedSession.SelectedItem as IHostTab;
+            CommandArgs.Instance.ActiveTab = ListBoxOpenedSession.SelectedItem as IClientTab;
             this.RaiseAddonCommand(CommandArgs.Instance);
         }
 
@@ -534,7 +520,7 @@ namespace ModengTerm
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
-            openedSessionVM.Notify += this.OpenedSessionVM_Notify;
+            openedSessionVM.Notify += this.OpenedSessionVM_EventNotify;
             openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单
@@ -559,26 +545,17 @@ namespace ModengTerm
             // 触发打开事件
             TabOpenedEventArgs tabOpened = new TabOpenedEventArgs()
             {
-                Type = (SessionTypeEnum)session.Type,
+                SessionType = (SessionTypeEnum)session.Type,
                 OpenedTab = openedSessionVM
             };
-            this.RaiseAddonEvent(HostEvent.HOST_TAB_OPENED, tabOpened);
-        }
-
-        /// <summary>
-        /// 显示或隐藏Panel
-        /// </summary>
-        /// <param name="panelId">要显示或隐藏的PanelId</param>
-        public void VisiblePanel(string panelId)
-        {
-            //this.mainWindowVM.PanelContainer.VisiblePanel(panelId);
+            this.eventRegistory.PublishEvent(tabOpened);
         }
 
         /// <summary>
         /// 获取当前激活的Shell
         /// </summary>
         /// <returns></returns>
-        public T GetActiveTab<T>() where T : IHostTab
+        public T GetActiveTab<T>() where T : IClientTab
         {
             if (ListBoxOpenedSession.SelectedItem is T)
             {
@@ -592,12 +569,12 @@ namespace ModengTerm
         /// 获取指定类型的所有会话Shell对象
         /// </summary>
         /// <returns></returns>
-        public List<IHostTab> GetAllTabs()
+        public List<IClientTab> GetAllTabs()
         {
-            return this.mainWindowVM.SessionList.OfType<IHostTab>().ToList();
+            return this.mainWindowVM.SessionList.OfType<IClientTab>().ToList();
         }
 
-        public List<T> GetAllTabs<T>() where T : IHostTab
+        public List<T> GetAllTabs<T>() where T : IClientTab
         {
             return this.mainWindowVM.SessionList.OfType<T>().ToList();
         }

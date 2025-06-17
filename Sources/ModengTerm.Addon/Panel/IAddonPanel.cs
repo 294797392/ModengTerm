@@ -10,13 +10,8 @@ namespace ModengTerm.Addon.Panel
     /// 1. 为插件提供回调功能
     /// 2. 为插件提供数据
     /// </summary>
-    public interface IPanelCallback
+    public interface IAddonPanel
     {
-        /// <summary>
-        /// 面板名称
-        /// </summary>
-        string Name { get; set; }
-
         /// <summary>
         /// 面板初始化的时候触发
         /// </summary>

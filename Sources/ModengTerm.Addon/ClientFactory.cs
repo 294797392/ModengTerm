@@ -13,30 +13,30 @@ namespace ModengTerm.Addon
     /// <summary>
     /// 提供创建插件可以使用的对象的功能
     /// </summary>
-    public abstract class HostFactory
+    public abstract class ClientFactory
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("HostFactory");
-        private const string ImplClass = "ModengTerm.Addon.HostFactoryImpl,ModengTerm";
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientFactory");
+        private const string ImplClass = "ModengTerm.Addon.ClientFactoryImpl,ModengTerm";
 
-        private static HostFactory instance;
+        private static ClientFactory instance;
 
         public abstract StorageService GetStorageService();
 
-        public abstract IHostWindow GetHostWindow();
+        public abstract IClientWindow GetHostWindow();
 
-        public abstract IHostEventRegistory GetEventRegistory();
+        public abstract IClientEventRegistory GetEventRegistory();
 
         public abstract List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions);
 
         public abstract List<IOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions);
 
-        public static HostFactory GetFactory() 
+        public static ClientFactory GetFactory() 
         {
             if (instance == null)
             {
                 try
                 {
-                    instance = ConfigFactory<HostFactory>.CreateInstance(ImplClass);
+                    instance = ConfigFactory<ClientFactory>.CreateInstance(ImplClass);
                 }
                 catch (Exception ex) 
                 {

@@ -26,38 +26,38 @@ namespace ModengTerm.OfficialAddons.Edit
 
         private void Paste(CommandArgs e)
         {
-            IShellTab shell = this.hostWindow.GetActiveTab<IShellTab>();
+            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
             string text = System.Windows.Clipboard.GetText();
             shell.Send(text);
         }
 
         private void CopySelection(CommandArgs e)
         {
-            IShellTab shell = this.hostWindow.GetActiveTab<IShellTab>();
+            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
             shell.CopySelection();
         }
 
         private void SaveSelection(CommandArgs e)
         {
-            IShellTab shell = this.hostWindow.GetActiveTab<IShellTab>();
+            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
             SaveToFile(ParagraphTypeEnum.Selected, shell);
         }
 
         private void SaveViewport(CommandArgs e)
         {
-            IShellTab shell = this.hostWindow.GetActiveTab<IShellTab>();
+            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
             SaveToFile(ParagraphTypeEnum.Viewport, shell);
         }
 
         private void SaveAll(CommandArgs e)
         {
-            IShellTab shell = this.hostWindow.GetActiveTab<IShellTab>();
+            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
             SaveToFile(ParagraphTypeEnum.AllDocument, shell);
         }
 
         private void ClearScreen(CommandArgs e)
         {
-            IShellTab shell = this.hostWindow.GetActiveTab<IShellTab>();
+            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
             shell.ClearScreen();
         }
 
@@ -75,7 +75,7 @@ namespace ModengTerm.OfficialAddons.Edit
             }
         }
 
-        private void SaveToFile(ParagraphTypeEnum paragraphType, IShellTab shell)
+        private void SaveToFile(ParagraphTypeEnum paragraphType, IClientShellTab shell)
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";

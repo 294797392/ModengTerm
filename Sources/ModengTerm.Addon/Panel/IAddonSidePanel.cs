@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Addon
+namespace ModengTerm.Addon.Panel
 {
-    public class EventRegistoryImpl : IHostEventRegistory
+    /// <summary>
+    /// 插件要实现的SidePanel接口
+    /// </summary>
+    public interface IAddonSidePanel : IAddonPanel
     {
-
     }
 }

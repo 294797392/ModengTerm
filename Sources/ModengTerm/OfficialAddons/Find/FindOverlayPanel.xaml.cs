@@ -26,20 +26,32 @@ namespace ModengTerm.OfficialAddons.Find
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindOverlayPanel : UserControl, IOverlayPanelCallback
+    public partial class FindOverlayPanel : UserControl, IAddonOverlayPanel
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FindOverlayPanel");
 
         private FindVM viewModel;
         private bool finding;
+        private ClientFactory factory;
+        private IClientEventRegistory eventRegistory;
+
+        #region 构造方法
 
         public FindOverlayPanel()
         {
             InitializeComponent();
+
+            this.InitializePanel();
         }
 
-        private void InitializeWindow()
+        #endregion
+
+        #region 实例方法
+
+        private void InitializePanel()
         {
+            this.factory = ClientFactory.GetFactory();
+            this.eventRegistory = this.factory.GetEventRegistory();
         }
 
         private void FindAsync(bool findOnce)
@@ -70,6 +82,8 @@ namespace ModengTerm.OfficialAddons.Find
             //});
         }
 
+        #endregion
+
         #region 事件处理器
 
         private void ButtonFind_Click(object sender, RoutedEventArgs e)
@@ -99,16 +113,18 @@ namespace ModengTerm.OfficialAddons.Find
 
         #endregion
 
-        #region IOverlayPanelCallback
+        #region IAddonOverlayPanel
 
-        public IShellTab OwnerTab { get; set; }
+        public IClientShellTab OwnerTab { get; set; }
 
         public void OnInitialize()
         {
+            this.eventRegistory.SubscribeTabEvent(this.OwnerTab, TabEvent.SHELL_RENDERED, this.OnShellRendered);
         }
 
         public void OnRelease()
         {
+            this.eventRegistory.UnsubscribeTabEvent(this.OwnerTab, TabEvent.SHELL_RENDERED, this.OnShellRendered);
         }
 
         public void OnLoaded()
@@ -118,6 +134,12 @@ namespace ModengTerm.OfficialAddons.Find
         public void OnUnload()
         {
         }
+
+        #endregion
+
+        #region TabEvent
+
+        private void OnShellRendered(TabEventArgs e) { }
 
         #endregion
     }

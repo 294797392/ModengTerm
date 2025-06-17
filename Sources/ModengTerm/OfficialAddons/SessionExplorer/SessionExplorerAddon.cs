@@ -8,12 +8,13 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.RegisterEvent(HostEvent.HOST_APP_INITIALIZED, this.OnAppInitialized);
+            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
             this.RegisterCommand("SessionExplorerAddon.OpenExplorerWindow", OpenExplorerWindow);
         }
 
         protected override void OnDeactive()
         {
+            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
         }
 
         private void OpenExplorerWindow(CommandArgs e)
@@ -22,7 +23,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             sidePanel.SwitchStatus();
         }
 
-        private void OnAppInitialized(HostEvent evType, HostEventArgs evArgs)
+        private void OnClientInitialized(ClientEvent evType, ClientEventArgs evArgs)
         {
             ISidePanel sidePanel = this.GetSidePanel("ResourceManagerPanel");
             this.hostWindow.AddSidePanel(sidePanel);

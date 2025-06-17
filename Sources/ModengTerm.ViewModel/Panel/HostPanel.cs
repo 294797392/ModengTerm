@@ -18,6 +18,7 @@ namespace ModengTerm.ViewModel.Panel
         private bool isOpened;
         private string iconURI;
         private FrameworkElement content;
+        private bool initialized;
 
         #endregion
 
@@ -25,7 +26,7 @@ namespace ModengTerm.ViewModel.Panel
 
         public PanelDefinition Definition { get; set; }
 
-        public IPanelCallback Callback { get { return this.Content as IPanelCallback; } }
+        public IAddonPanel Callback { get { return this.Content as IAddonPanel; } }
 
         public FrameworkElement Content
         {
@@ -85,6 +86,8 @@ namespace ModengTerm.ViewModel.Panel
 
         public void Initialize()
         {
+            this.initialized = true;
+
             this.Callback.OnInitialize();
         }
 
@@ -106,7 +109,14 @@ namespace ModengTerm.ViewModel.Panel
 
         public void Release()
         {
+            if (!this.initialized)
+            {
+                return;
+            }
+
             this.Callback.OnRelease();
+
+            this.initialized = false;
         }
 
         public void SwitchStatus()
