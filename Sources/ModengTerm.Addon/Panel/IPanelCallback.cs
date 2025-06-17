@@ -1,5 +1,4 @@
-﻿using ModengTerm.Addon.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +7,10 @@ using System.Threading.Tasks;
 namespace ModengTerm.Addon.Panel
 {
     /// <summary>
-    /// 自定义的插件面板需要实现这个接口
+    /// 1. 为插件提供回调功能
+    /// 2. 为插件提供数据
     /// </summary>
-    public interface IAddonPanel
+    public interface IPanelCallback
     {
         /// <summary>
         /// 面板名称
@@ -18,10 +18,14 @@ namespace ModengTerm.Addon.Panel
         string Name { get; set; }
 
         /// <summary>
+        /// Host传递给插件的HostFactory
+        /// </summary>
+        HostFactory HostFactory { get; set; }
+
+        /// <summary>
         /// 面板初始化的时候触发
         /// </summary>
-        /// <param name="context"></param>
-        void OnInitialize(PanelContext context);
+        void OnInitialize();
 
         /// <summary>
         /// 释放面板资源的时候触发

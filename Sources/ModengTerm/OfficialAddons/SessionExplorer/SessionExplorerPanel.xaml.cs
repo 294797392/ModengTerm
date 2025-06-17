@@ -1,32 +1,16 @@
 ﻿using ModengTerm.Addon;
-using ModengTerm.Addon.Client;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
-using ModengTerm.Base;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Session;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WPFToolkit.MVVM;
 
 namespace ModengTerm.OfficialAddons.SessionExplorer
 {
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionExplorerPanel : UserControl, IAddonPanel
+    public partial class SessionExplorerPanel : UserControl, ISidePanelCallback
     {
         #region 类变量
 
@@ -37,7 +21,6 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
         #region 实例变量
 
         private SessionTreeVM resourceManagerTreeVM;
-        private PanelContext hostContext;
 
         #endregion
 
@@ -73,17 +56,18 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             XTermSessionVM sessionVM = sessionNode as XTermSessionVM;
 
             // 打开会话
-            this.hostContext.HostWindow.OpenSession(sessionVM.Session);
+            IHostWindow hostWindow = this.HostFactory.GetHostWindow();
+            hostWindow.OpenSession(sessionVM.Session);
         }
 
         #endregion
 
         #region ISidePanel
 
-        public void OnInitialize(PanelContext context)
-        {
-            this.hostContext = context;
+        public HostFactory HostFactory { get; set; }
 
+        public void OnInitialize()
+        {
             this.resourceManagerTreeVM = VMUtils.CreateSessionTreeVM(false, true);
             this.resourceManagerTreeVM.Roots[0].Name = "会话列表";
             this.resourceManagerTreeVM.ExpandAll();

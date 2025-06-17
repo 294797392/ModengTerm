@@ -1,5 +1,4 @@
 ﻿using ModengTerm.Addon;
-using ModengTerm.Addon.Client;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
@@ -15,20 +14,9 @@ namespace ModengTerm
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("VTClientUtils");
 
-        private static PanelContext panelContext;
-
-        public static PanelContext GetPanelContext() 
+        public static HostFactory GetHostFactory() 
         {
-            if (panelContext == null) 
-            {
-                panelContext = new PanelContext()
-                {
-                    StorageService = new SqliteStorageService(),
-                    HostWindow = Application.Current.MainWindow as IHostWindow
-                };
-            }
-
-            return panelContext;
+            return new HostFactoryImpl();
         }
     }
 }

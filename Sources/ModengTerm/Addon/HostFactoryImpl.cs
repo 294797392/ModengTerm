@@ -3,6 +3,7 @@ using ModengTerm.Addons;
 using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModel.Panel;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace ModengTerm.Addon
 {
@@ -11,6 +12,16 @@ namespace ModengTerm.Addon
         private static log4net.ILog logger = log4net.LogManager.GetLogger("HostFactoryImpl");
 
         private StorageService storageSvcImpl = new SqliteStorageService();
+
+        public override StorageService GetStorageService()
+        {
+            return storageSvcImpl;
+        }
+
+        public override IHostWindow GetHostWindow()
+        {
+            return Application.Current.MainWindow as IHostWindow;
+        }
 
         public override List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions)
         {
@@ -35,12 +46,13 @@ namespace ModengTerm.Addon
 
             foreach (PanelDefinition definition in definitions)
             {
-                OverlayPanel sidePanel = new OverlayPanel(VTClientUtils.GetPanelContext());
-                sidePanel.Definition = definition;
-                sidePanel.ID = definition.ID;
-                sidePanel.Name = definition.Name;
-                sidePanel.IconURI = definition.Icon;
-                overlayPanels.Add(sidePanel);
+                OverlayPanel overlayPanel = new OverlayPanel();
+                overlayPanel.Definition = definition;
+                overlayPanel.ID = definition.ID;
+                overlayPanel.Name = definition.Name;
+                overlayPanel.IconURI = definition.Icon;
+                overlayPanel.HostFactory = this;
+                overlayPanels.Add(overlayPanel);
             }
 
             return overlayPanels;

@@ -1,6 +1,5 @@
 ﻿using DotNEToolkit;
 using ModengTerm.Addon;
-using ModengTerm.Addon.Client;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
@@ -92,7 +91,8 @@ namespace ModengTerm.UserControls
                 {
                     content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
                     panel.Content = content;
-                    panel.Initialize(VTClientUtils.GetPanelContext());
+                    panel.Callback.HostFactory = VTClientUtils.GetHostFactory();
+                    panel.Initialize();
                 }
                 catch (Exception ex)
                 {

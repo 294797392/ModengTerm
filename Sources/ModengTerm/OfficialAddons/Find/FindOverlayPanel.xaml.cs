@@ -1,4 +1,5 @@
-﻿using ModengTerm.Addon.Client;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
@@ -25,7 +26,7 @@ namespace ModengTerm.OfficialAddons.Find
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindOverlayPanel : UserControl, IAddonPanel
+    public partial class FindOverlayPanel : UserControl, IOverlayPanelCallback
     {
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FindOverlayPanel");
 
@@ -37,10 +38,8 @@ namespace ModengTerm.OfficialAddons.Find
             InitializeComponent();
         }
 
-        private void InitializeWindow(FindVM vm)
+        private void InitializeWindow()
         {
-            this.viewModel = vm;
-            base.DataContext = vm;
         }
 
         private void FindAsync(bool findOnce)
@@ -71,6 +70,8 @@ namespace ModengTerm.OfficialAddons.Find
             //});
         }
 
+        #region 事件处理器
+
         private void ButtonFind_Click(object sender, RoutedEventArgs e)
         {
             this.FindAsync(true);
@@ -91,9 +92,20 @@ namespace ModengTerm.OfficialAddons.Find
 
         }
 
-        #region IAddonPanel
+        private void TextBoxKeyword_TextChanged(object sender, TextChangedEventArgs e)
+        {
 
-        public void OnInitialize(PanelContext context)
+        }
+
+        #endregion
+
+        #region IOverlayPanelCallback
+
+        public IShellTab OwnerTab { get; set; }
+
+        public HostFactory HostFactory { get; set; }
+
+        public void OnInitialize()
         {
         }
 

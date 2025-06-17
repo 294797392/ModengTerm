@@ -52,7 +52,7 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Grid.Column="0" Text="查找：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Keyword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+        <TextBox Grid.Row="0" Grid.Column="1" x:Name="TextBoxKeyword" TextChanged="TextBoxKeyword_TextChanged" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="99" Orientation="Horizontal">
 

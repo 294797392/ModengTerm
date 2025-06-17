@@ -89,8 +89,6 @@ namespace ModengTerm.OfficialAddons.Find
 
     public class FindAddon : AddonModule
     {
-        private IOverlayPanel findOverlayPanel;
-
         protected override void OnActive(ActiveContext e)
         {
             this.RegisterEvent(HostEvent.HOST_TAB_OPENED, this.OnTabOpened);
@@ -113,9 +111,8 @@ namespace ModengTerm.OfficialAddons.Find
 
             IOverlayPanel overlayPanel = this.GetOverlayPanel("FindOverlayPanel");
             overlayPanel.Dock = OverlayPanelDocks.RightTop;
+            overlayPanel.OwnerTab = shellTab;
             shellTab.AddOverlayPanel(overlayPanel);
-
-            this.findOverlayPanel = overlayPanel;
         }
 
         private void OnActiveTabChanged(HostEvent evType, HostEventArgs evArgs)
@@ -154,7 +151,13 @@ namespace ModengTerm.OfficialAddons.Find
                 return;
             }
 
-            this.findOverlayPanel.SwitchStatus();
+            IOverlayPanel overlayPanel = shellTab.GetOverlayPanel("FindOverlayPanel");
+            if (overlayPanel == null) 
+            {
+                return;
+            }
+
+            overlayPanel.SwitchStatus();
         }
     }
 }

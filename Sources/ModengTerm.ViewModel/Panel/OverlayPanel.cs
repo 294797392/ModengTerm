@@ -1,5 +1,5 @@
 ﻿using DotNEToolkit;
-using ModengTerm.Addon.Client;
+using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
 using System;
@@ -26,11 +26,14 @@ namespace ModengTerm.ViewModel.Panel
         #region 实例变量
 
         private OverlayPanelDocks dock;
-        private PanelContext context;
 
         #endregion
 
         #region 公开属性
+
+        public IShellTab OwnerTab { get; set; }
+
+        public HostFactory HostFactory { get; set; }
 
         public OverlayPanelDocks Dock
         {
@@ -47,11 +50,10 @@ namespace ModengTerm.ViewModel.Panel
 
         #endregion
 
-        public OverlayPanel(PanelContext context)
-        {
-            this.context = context;
-        }
-        
+        #region 构造方法
+
+        #endregion
+
         #region HostPanel
 
         public override void Open()
@@ -64,26 +66,30 @@ namespace ModengTerm.ViewModel.Panel
                 {
                     frameworkElement = ConfigFactory<FrameworkElement>.CreateInstance(this.Definition.ClassName);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     logger.Error("加载OverlayPanel异常", ex);
                     return;
                 }
 
                 this.Content = frameworkElement;
-                this.ClientPanel.OnInitialize(this.context);
+
+                IOverlayPanelCallback callback = this.Callback as IOverlayPanelCallback;
+                callback.OwnerTab = this.OwnerTab;
+                callback.HostFactory = this.HostFactory;
+                this.Callback.OnInitialize();
             }
 
             this.IsOpened = true;
 
-            this.ClientPanel.OnLoaded();
+            this.Callback.OnLoaded();
         }
 
         public override void Close()
         {
             this.IsOpened = false;
 
-            this.ClientPanel.OnUnload();
+            this.Callback.OnUnload();
         }
 
         #endregion

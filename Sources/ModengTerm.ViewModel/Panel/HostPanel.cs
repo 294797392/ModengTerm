@@ -1,4 +1,4 @@
-﻿using ModengTerm.Addon.Client;
+﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
 using System;
@@ -25,14 +25,14 @@ namespace ModengTerm.ViewModel.Panel
 
         public PanelDefinition Definition { get; set; }
 
-        public IAddonPanel ClientPanel { get { return this.Content as IAddonPanel; } }
+        public IPanelCallback Callback { get { return this.Content as IPanelCallback; } }
 
-        public FrameworkElement Content 
+        public FrameworkElement Content
         {
             get { return this.content; }
             set
             {
-                if (this.content != value) 
+                if (this.content != value)
                 {
                     this.content = value;
                     this.NotifyPropertyChanged("Content");
@@ -83,9 +83,9 @@ namespace ModengTerm.ViewModel.Panel
         /// </summary>
         public abstract void Close();
 
-        public void Initialize(PanelContext context)
+        public void Initialize()
         {
-            this.ClientPanel.OnInitialize(context);
+            this.Callback.OnInitialize();
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace ModengTerm.ViewModel.Panel
         /// </summary>
         public void Loaded()
         {
-            this.ClientPanel.OnLoaded();
+            this.Callback.OnLoaded();
         }
 
         /// <summary>
@@ -101,12 +101,12 @@ namespace ModengTerm.ViewModel.Panel
         /// </summary>
         public void Unloaded()
         {
-            this.ClientPanel.OnUnload();
+            this.Callback.OnUnload();
         }
 
         public void Release()
         {
-            this.ClientPanel.OnRelease();
+            this.Callback.OnRelease();
         }
 
         public void SwitchStatus()

@@ -1,5 +1,4 @@
-﻿using ModengTerm.Addon.Client;
-using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
 using System.Windows;

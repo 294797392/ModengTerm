@@ -5,6 +5,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.ViewModel;
+using ModengTerm.ViewModel.Panel;
 using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Windows;
@@ -285,6 +286,13 @@ namespace ModengTerm.UserControls.TerminalUserControls
             this.autoCompleteVM.OnKeyDown(VTKeys.Enter);
         }
 
+        private void ButtonCloseOverlayPanel_Click(object sender, RoutedEventArgs e)
+        {
+            FrameworkElement frameworkElement = sender as FrameworkElement;
+            OverlayPanel overlayPanel = frameworkElement.DataContext as OverlayPanel;
+            overlayPanel.Close();
+        }
+
         #endregion
 
         #region ISessionContent
@@ -373,10 +381,5 @@ namespace ModengTerm.UserControls.TerminalUserControls
         }
 
         #endregion
-
-        private void ButtonCloseOverlayPanel_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }

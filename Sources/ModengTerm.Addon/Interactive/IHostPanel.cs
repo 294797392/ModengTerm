@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Addon.Panel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -74,5 +75,10 @@ namespace ModengTerm.Addon.Interactive
         /// 悬浮面板的位置
         /// </summary>
         OverlayPanelDocks Dock { get; set; }
+
+        /// <summary>
+        /// 悬浮面板所属的Tab页面
+        /// </summary>
+        IShellTab OwnerTab { get; set; }
     }
 }
