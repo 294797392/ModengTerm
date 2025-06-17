@@ -9,96 +9,113 @@ using System.Windows;
 
 namespace ModengTerm.OfficialAddons.Find
 {
-    /// <summary>
-    /// 搜索窗口在所有Shell类型的会话中共享。用这个类来管理搜索窗口的生命周期
-    /// </summary>
-    public static class FindWindowMgr
-    {
-        private static FindWindow findWindow;
+    ///// <summary>
+    ///// 搜索窗口在所有Shell类型的会话中共享。用这个类来管理搜索窗口的生命周期
+    ///// </summary>
+    //public static class FindWindowMgr
+    //{
+    //    private static FindWindow findWindow;
 
-        /// <summary>
-        /// 获取查找窗口是否显示
-        /// </summary>
-        public static bool WindowShown { get { return findWindow != null; } }
+    //    /// <summary>
+    //    /// 获取查找窗口是否显示
+    //    /// </summary>
+    //    public static bool WindowShown { get { return findWindow != null; } }
 
-        /// <summary>
-        /// 显示搜索窗口
-        /// 如果已经显示了搜索窗口，那么使用传入的shellSession立即进行一次搜索
-        /// </summary>
-        /// <param name="shellTab">要搜索的Shell会话</param>
-        public static void Show(IShellTab shellTab)
-        {
-            IVideoTerminal vt = shellTab.VideoTerminal;
+    //    /// <summary>
+    //    /// 显示搜索窗口
+    //    /// 如果已经显示了搜索窗口，那么使用传入的shellSession立即进行一次搜索
+    //    /// </summary>
+    //    /// <param name="shellTab">要搜索的Shell会话</param>
+    //    public static void Show(IShellTab shellTab)
+    //    {
+    //        IVideoTerminal vt = shellTab.VideoTerminal;
 
-            // 高亮背景和前景色
-            string highlightBackground = shellTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
-            string highlightForeground = shellTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FORECOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_FORECOLOR);
+    //        // 高亮背景和前景色
+    //        string highlightBackground = shellTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+    //        string highlightForeground = shellTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_FORECOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_FORECOLOR);
 
-            FindVM findVM = null;
+    //        FindVM findVM = null;
 
-            if (findWindow == null)
-            {
-                findVM = new FindVM()
-                {
-                    HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
-                    HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
-                };
+    //        if (findWindow == null)
+    //        {
+    //            findVM = new FindVM()
+    //            {
+    //                HighlightBackground = VTColor.CreateFromRgbKey(highlightBackground),
+    //                HighlightForeground = VTColor.CreateFromRgbKey(highlightForeground)
+    //            };
 
-                findWindow = new FindWindow(findVM);
-                findWindow.Owner = Application.Current.MainWindow;
-                findWindow.Closed += FindWindow_Closed;
-                findWindow.Show();
-            }
-            else
-            {
-                // 已经显示了搜索窗口
-                findVM = findWindow.DataContext as FindVM;
-                if (findWindow.Visibility == System.Windows.Visibility.Collapsed)
-                {
-                    findWindow.Visibility = System.Windows.Visibility.Visible;
-                }
-            }
+    //            findWindow = new FindWindow(findVM);
+    //            findWindow.Owner = Application.Current.MainWindow;
+    //            findWindow.Closed += FindWindow_Closed;
+    //            findWindow.Show();
+    //        }
+    //        else
+    //        {
+    //            // 已经显示了搜索窗口
+    //            findVM = findWindow.DataContext as FindVM;
+    //            if (findWindow.Visibility == System.Windows.Visibility.Collapsed)
+    //            {
+    //                findWindow.Visibility = System.Windows.Visibility.Visible;
+    //            }
+    //        }
 
-            findVM.SetVideoTerminal(vt);
-        }
+    //        findVM.SetVideoTerminal(vt);
+    //    }
 
-        /// <summary>
-        /// 隐藏窗口（不关闭）
-        /// 窗口的所有状态还在
-        /// </summary>
-        public static void Hide() 
-        {
-            if (findWindow == null) 
-            {
-                return;
-            }
+    //    /// <summary>
+    //    /// 隐藏窗口（不关闭）
+    //    /// 窗口的所有状态还在
+    //    /// </summary>
+    //    public static void Hide() 
+    //    {
+    //        if (findWindow == null) 
+    //        {
+    //            return;
+    //        }
 
-            findWindow.Visibility = System.Windows.Visibility.Collapsed;
-        }
+    //        findWindow.Visibility = System.Windows.Visibility.Collapsed;
+    //    }
 
-        private static void FindWindow_Closed(object? sender, EventArgs e)
-        {
-            findWindow.Closed -= FindWindow_Closed;
+    //    private static void FindWindow_Closed(object? sender, EventArgs e)
+    //    {
+    //        findWindow.Closed -= FindWindow_Closed;
 
-            FindVM findVM = findWindow.DataContext as FindVM;
-            findVM.Release();
+    //        FindVM findVM = findWindow.DataContext as FindVM;
+    //        findVM.Release();
 
-            findWindow = null;
-        }
-    }
+    //        findWindow = null;
+    //    }
+    //}
 
     public class FindAddon : AddonModule
     {
-        private FindWindow findWindow;
+        private IOverlayPanel findOverlayPanel;
 
         protected override void OnActive(ActiveContext e)
         {
+            this.RegisterEvent(HostEvent.HOST_TAB_OPENED, this.OnTabOpened);
             this.RegisterEvent(HostEvent.HOST_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
-            this.RegisterCommand("FindAddon.Find", this.OpenFindWindow);
+            this.RegisterCommand("FindAddon.Find", this.FindCommandExecuted);
         }
 
         protected override void OnDeactive()
         {
+        }
+
+        private void OnTabOpened(HostEvent evType, HostEventArgs evArgs) 
+        {
+            TabOpenedEventArgs tabOpened = evArgs as TabOpenedEventArgs;
+            IShellTab shellTab = tabOpened.OpenedTab as IShellTab;
+            if (shellTab == null) 
+            {
+                return;
+            }
+
+            IOverlayPanel overlayPanel = this.GetOverlayPanel("FindOverlayPanel");
+            overlayPanel.Dock = OverlayPanelDocks.RightTop;
+            shellTab.AddOverlayPanel(overlayPanel);
+
+            this.findOverlayPanel = overlayPanel;
         }
 
         private void OnActiveTabChanged(HostEvent evType, HostEventArgs evArgs)
@@ -125,14 +142,19 @@ namespace ModengTerm.OfficialAddons.Find
             //}
             //else
             //{
-                
+
             //}
         }
 
-        private void OpenFindWindow(CommandArgs e)
+        private void FindCommandExecuted(CommandArgs e)
         {
-            IShellTab shellTab = this.hostWindow.GetActiveTab<IShellTab>();
-            FindWindowMgr.Show(shellTab);
+            IShellTab shellTab = e.ActiveTab as IShellTab;
+            if (shellTab == null) 
+            {
+                return;
+            }
+
+            this.findOverlayPanel.SwitchStatus();
         }
     }
 }

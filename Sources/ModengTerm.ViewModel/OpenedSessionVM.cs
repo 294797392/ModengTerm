@@ -94,7 +94,9 @@ namespace ModengTerm.ViewModel
         /// </summary>
         public void Initialize()
         {
-            InitializePanels();
+            // init
+
+            this.OnInitialize();
         }
 
         public int Open()
@@ -135,6 +137,7 @@ namespace ModengTerm.ViewModel
 
         #region 抽象方法
 
+        protected abstract void OnInitialize();
         protected abstract int OnOpen();
         protected abstract void OnClose();
 
@@ -175,51 +178,6 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 实例方法
-
-        ///// <summary>
-        ///// 获取当前显示的PanelContent
-        ///// </summary>
-        ///// <returns></returns>
-        //private SessionPanel GetActivePanel()
-        //{
-        //    if (this.PanelContainer == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    return this.PanelContainer.SelectedItem as SessionPanel;
-        //}
-
-        private void InitializePanels()
-        {
-            //// 加载所有插件要显示的面板
-            //List<AddonContext> contexts = MTermApp.Context.AddonContexts;
-
-            //List<PanelItemDefinition> panels = new List<PanelItemDefinition>();
-
-            //foreach (AddonContext context in contexts)
-            //{
-            //    AddonDefinition definition = context.Definition;
-
-            //    foreach (PanelItemDefinition panelDefinition in definition.SessionPanels)
-            //    {
-            //        if (panelDefinition.SessionTypes.Count == 0)
-            //        {
-            //            // 如果没有过滤，那么就都可以加载
-            //            panels.Add(panelDefinition);
-            //        }
-            //        else
-            //        {
-            //            if (panelDefinition.SessionTypes.Contains(Session.Type))
-            //            {
-            //                panels.Add(panelDefinition);
-            //            }
-            //        }
-            //    }
-            //}
-
-            //PanelContainer = VTClientUtils.CreatePanelContainerVM(panels);
-        }
 
         #endregion
 

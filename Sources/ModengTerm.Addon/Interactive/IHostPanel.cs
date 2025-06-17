@@ -24,8 +24,6 @@ namespace ModengTerm.Addon.Interactive
 
     public interface IHostPanel
     {
-        SidePanelDocks Dock { get; }
-
         object ID { get; }
 
         string Name { get; }
@@ -50,5 +48,31 @@ namespace ModengTerm.Addon.Interactive
         /// 侧边栏关闭的时候，就打开
         /// </summary>
         void SwitchStatus();
+    }
+
+    public interface ISidePanel : IHostPanel
+    {
+        /// <summary>
+        /// Panel显示的位置
+        /// </summary>
+        SidePanelDocks Dock { get; }
+    }
+
+    public enum OverlayPanelDocks
+    {
+        LeftTop,
+        LeftBottom,
+        FillTop,
+        FillBottom,
+        RightTop,
+        RightBottom,
+    }
+
+    public interface IOverlayPanel : IHostPanel
+    {
+        /// <summary>
+        /// 悬浮面板的位置
+        /// </summary>
+        OverlayPanelDocks Dock { get; set; }
     }
 }

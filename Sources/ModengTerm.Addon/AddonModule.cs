@@ -30,7 +30,8 @@ namespace ModengTerm.Addons
 
         private Dictionary<HostEvent, AddonEventHandler> registeredEvent;
 
-        private List<IHostPanel> panels;
+        private List<ISidePanel> sidePanels;
+        private List<IOverlayPanel> overlayPanels;
 
         protected HostFactory factory;
         protected IHostWindow hostWindow;
@@ -61,7 +62,8 @@ namespace ModengTerm.Addons
             this.registeredEvent = new Dictionary<HostEvent, AddonEventHandler>();
 
             // 此时只是创建了HostPanel的实例，但是还没有真正加到界面上，调用AddSidePanel加到界面上
-            this.panels = this.factory.CreatePanels(context.Definition.Panels);
+            this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
+            this.overlayPanels = this.factory.CreateOverlayPanels(context.Definition.OverlayPanels);
             this.hostWindow = context.HostWindow;
             this.storageService = context.StorageService;
 
@@ -121,9 +123,14 @@ namespace ModengTerm.Addons
             this.registeredEvent[evType] = handler;
         }
 
-        protected IHostPanel GetPanel(string id)
+        protected ISidePanel GetSidePanel(string id)
         {
-            return this.panels.FirstOrDefault(v => v.ID.ToString() == id);
+            return this.sidePanels.FirstOrDefault(v => v.ID.ToString() == id);
+        }
+
+        protected IOverlayPanel GetOverlayPanel(string id) 
+        {
+            return this.overlayPanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
         protected string GetObjectId()

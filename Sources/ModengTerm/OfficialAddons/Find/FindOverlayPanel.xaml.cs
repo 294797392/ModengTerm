@@ -1,4 +1,6 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Client;
+using ModengTerm.Addon.Panel;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
@@ -17,25 +19,22 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using XTerminal;
 
 namespace ModengTerm.OfficialAddons.Find
 {
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindWindow : MdWindow
+    public partial class FindOverlayPanel : UserControl, IAddonPanel
     {
-        private static log4net.ILog logger = log4net.LogManager.GetLogger("FindWindow");
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("FindOverlayPanel");
 
         private FindVM viewModel;
         private bool finding;
 
-        public FindWindow(FindVM vm)
+        public FindOverlayPanel()
         {
             InitializeComponent();
-
-            this.InitializeWindow(vm);
         }
 
         private void InitializeWindow(FindVM vm)
@@ -91,5 +90,25 @@ namespace ModengTerm.OfficialAddons.Find
         {
 
         }
+
+        #region IAddonPanel
+
+        public void OnInitialize(PanelContext context)
+        {
+        }
+
+        public void OnRelease()
+        {
+        }
+
+        public void OnLoaded()
+        {
+        }
+
+        public void OnUnload()
+        {
+        }
+
+        #endregion
     }
 }

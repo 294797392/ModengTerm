@@ -1,10 +1,8 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
 using ModengTerm.Base.Definitions;
-using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Panel;
 using System.Collections.Generic;
-using System.Windows;
 
 namespace ModengTerm.Addon
 {
@@ -14,21 +12,38 @@ namespace ModengTerm.Addon
 
         private StorageService storageSvcImpl = new SqliteStorageService();
 
-        public override List<IHostPanel> CreatePanels(List<PanelDefinition> definitions)
+        public override List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions)
         {
-            List<IHostPanel> panels = new List<IHostPanel>();
+            List<ISidePanel> sidePanels = new List<ISidePanel>();
 
             foreach (PanelDefinition definition in definitions)
             {
-                HostPanel sidePanel = new HostPanel();
+                SidePanel sidePanel = new SidePanel();
                 sidePanel.Definition = definition;
                 sidePanel.ID = definition.ID;
                 sidePanel.Name = definition.Name;
                 sidePanel.IconURI = definition.Icon;
-                panels.Add(sidePanel);
+                sidePanels.Add(sidePanel);
             }
 
-            return panels;
+            return sidePanels;
+        }
+
+        public override List<IOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions)
+        {
+            List<IOverlayPanel> overlayPanels = new List<IOverlayPanel>();
+
+            foreach (PanelDefinition definition in definitions)
+            {
+                OverlayPanel sidePanel = new OverlayPanel(VTClientUtils.GetPanelContext());
+                sidePanel.Definition = definition;
+                sidePanel.ID = definition.ID;
+                sidePanel.Name = definition.Name;
+                sidePanel.IconURI = definition.Icon;
+                overlayPanels.Add(sidePanel);
+            }
+
+            return overlayPanels;
         }
     }
 }

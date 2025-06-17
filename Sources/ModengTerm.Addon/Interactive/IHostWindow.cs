@@ -38,8 +38,8 @@ namespace ModengTerm.Addon.Interactive
         /// <returns></returns>
         List<T> GetAllTabs<T>() where T : IHostTab;
 
-        void AddSidePanel(IHostPanel panel);
+        void AddSidePanel(ISidePanel panel);
 
-        void RemoveSidePanel(IHostPanel panel);
+        void RemoveSidePanel(ISidePanel panel);
     }
 }

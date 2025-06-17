@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
@@ -552,6 +553,56 @@ namespace ModengTerm
                 case LineTerminators.CR: return "CR";
                 case LineTerminators.LF: return "LF";
                 case LineTerminators.CRLF: return "CRLF";
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class OverlayPanelDock2HorizontalAlignmentConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            OverlayPanelDocks dock = (OverlayPanelDocks)value;
+
+            switch (dock)
+            {
+                case OverlayPanelDocks.FillBottom: return HorizontalAlignment.Stretch;
+                case OverlayPanelDocks.FillTop: return HorizontalAlignment.Stretch;
+                case OverlayPanelDocks.LeftTop: return HorizontalAlignment.Left;
+                case OverlayPanelDocks.LeftBottom: return HorizontalAlignment.Left;
+                case OverlayPanelDocks.RightBottom: return HorizontalAlignment.Right;
+                case OverlayPanelDocks.RightTop: return HorizontalAlignment.Right;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class OverlayPanelDock2VerticalAlignmentConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            OverlayPanelDocks dock = (OverlayPanelDocks)value;
+
+            switch (dock)
+            {
+                case OverlayPanelDocks.FillBottom: return VerticalAlignment.Bottom;
+                case OverlayPanelDocks.FillTop: return VerticalAlignment.Top;
+                case OverlayPanelDocks.LeftTop: return VerticalAlignment.Top;
+                case OverlayPanelDocks.LeftBottom: return VerticalAlignment.Bottom;
+                case OverlayPanelDocks.RightBottom: return VerticalAlignment.Bottom;
+                case OverlayPanelDocks.RightTop: return VerticalAlignment.Top;
                 default:
                     throw new NotImplementedException();
             }

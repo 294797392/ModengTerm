@@ -3,27 +3,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:terminal="clr-namespace:ModengTerm.Terminal"
-             xmlns:modengterm="clr-namespace:ModengTerm"
-             xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
              xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"
              xmlns:muct="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
+             xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
              xmlns:termuc="clr-namespace:ModengTerm.UserControls.Terminals"
-             xmlns:termuc2="clr-namespace:ModengTerm.UserControls.TerminalUserControls"
-             xmlns:termctrl="clr-namespace:ModengTerm.Controls"
              xmlns:termenum="clr-namespace:ModengTerm.Terminal.Enumerations;assembly=ModengTerm.Terminal"
-             xmlns:termconv="clr-namespace:ModengTerm"
+             xmlns:mterm="clr-namespace:ModengTerm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
 
         <toolkitconverter:BooleanVisibilityConverter x:Key="BooleanVisibilityConverter"/>
-        <termconv:RecordStatusVisibilityConverter x:Key="RecordStatusVisibilityConverter"/>
-        <termconv:RecordStatus2TextConverter x:Key="RecordStatus2TextConverter"/>
-        <termconv:SessionStatus2TextConverter x:Key="SessionStatus2TextConverter"/>
-        <termconv:SessionStatus2BrushConverter x:Key="SessionStatus2BrushConverter"/>
-        <termconv:SessionStatus2ImageConverter x:Key="SessionStatus2ImageConverter"/>
+        <mterm:RecordStatusVisibilityConverter x:Key="RecordStatusVisibilityConverter"/>
+        <mterm:RecordStatus2TextConverter x:Key="RecordStatus2TextConverter"/>
+        <mterm:SessionStatus2TextConverter x:Key="SessionStatus2TextConverter"/>
+        <mterm:SessionStatus2BrushConverter x:Key="SessionStatus2BrushConverter"/>
+        <mterm:SessionStatus2ImageConverter x:Key="SessionStatus2ImageConverter"/>
+        <mterm:OverlayPanelDock2HorizontalAlignmentConverter x:Key="OverlayPanelDock2HorizontalAlignmentConverter"/>
+        <mterm:OverlayPanelDock2VerticalAlignmentConverter x:Key="OverlayPanelDock2VerticalAlignmentConverter"/>
 
         <Style x:Key="StyleButtonLocal" TargetType="{x:Type Button}">
             <Setter Property="Margin" Value="3"/>
@@ -41,6 +39,30 @@
             <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES60001}"/>
             <Setter Property="Margin" Value="3,6,3,6"/>
             <Setter Property="Width" Value="2"/>
+        </Style>
+
+        <Style x:Key="StyleMdButtonLocal" TargetType="{x:Type mcsext:MdButton}" BasedOn="{StaticResource ResourceKey=StyleMdButton}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES60009E}"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource ResourceKey=RES60010E}"/>
+                </Trigger>
+            </Style.Triggers>
+            <Setter Property="Background" Value="{DynamicResource ResourceKey=RES60008E}"/>
+            <Setter Property="SVGColor" Value="{DynamicResource ResourceKey=RES501013E}"/>
+            <Setter Property="SVGMouseDownColor" Value="{DynamicResource ResourceKey=RES501017E}"/>
+            <Setter Property="SVGMargin" Value="7"/>
+            <Setter Property="OverridesDefaultStyle" Value="True"/>
+            <Setter Property="Width" Value="25"/>
+            <Setter Property="Height" Value="25"/>
+            <Setter Property="Margin" Value="0,3,3,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
         </Style>
 
     </UserControl.Resources>
@@ -150,6 +172,47 @@
             </StackPanel>
 
         </Grid>
+
+        <!-- OverlayPanel -->
+        <ItemsControl Grid.Row="0" x:Name="ItemsControlOverlayPanels" ItemsSource="{Binding Path=OverlayPanels}">
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="{x:Type ContentPresenter}">
+                    <Setter Property="Visibility" Value="{Binding Path=IsOpened, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ResourceKey=BooleanVisibilityConverter}}"/>
+                    <Setter Property="HorizontalAlignment" Value="{Binding Path=Dock, Converter={StaticResource ResourceKey=OverlayPanelDock2HorizontalAlignmentConverter}}"/>
+                    <Setter Property="VerticalAlignment" Value="{Binding Path=Dock, Converter={StaticResource ResourceKey=OverlayPanelDock2VerticalAlignmentConverter}}"/>
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="5"/>
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" Grid.RowSpan="999" Background="{DynamicResource ResourceKey=RES60005E}" BorderBrush="{DynamicResource ResourceKey=RES60004E}" BorderThickness="1,0,1,1"/>
+
+                        <TextBlock Grid.Row="0" Text="{Binding Path=Name}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0"/>
+                        <mcsext:MdButton Grid.Row="0" x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                         SVGPath="{StaticResource ResourceKey=SVGIcon6}" Click="ButtonCloseOverlayPanel_Click"
+                                         Style="{StaticResource ResourceKey=StyleMdButtonLocal}"/>
+
+                        <ContentControl Grid.Row="1" Content="{Binding Path=Content}" Margin="3"/>
+
+                        <Border Grid.Row="2" Background="{DynamicResource ResourceKey=RES60006E}"/>
+
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
 
         <!-- 自动完成下拉列表 -->
         <!--

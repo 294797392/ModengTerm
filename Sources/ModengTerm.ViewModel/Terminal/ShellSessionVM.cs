@@ -13,6 +13,7 @@ using ModengTerm.Terminal.Keyboard;
 using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
+using ModengTerm.ViewModel.Panel;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -240,6 +241,8 @@ namespace ModengTerm.ViewModel.Terminal
 
         public SessionTransport Transport { get { return sessionTransport; } }
 
+        public BindableCollection<OverlayPanel> OverlayPanels { get; private set; }
+
         #endregion
 
         #region 构造方法
@@ -252,6 +255,11 @@ namespace ModengTerm.ViewModel.Terminal
         #endregion
 
         #region OpenedSessionVM Member
+
+        protected override void OnInitialize()
+        {
+            this.OverlayPanels = new BindableCollection<OverlayPanel>();
+        }
 
         protected override int OnOpen()
         {
@@ -1008,7 +1016,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         #endregion
 
-        #region IShellPanel
+        #region IShellTab
 
         public void Send(byte[] bytes)
         { }
@@ -1064,6 +1072,16 @@ namespace ModengTerm.ViewModel.Terminal
             document.DeleteViewoprt();
             document.SetCursorLogical(0, 0);
             document.RequestInvalidate();
+        }
+
+        public void AddOverlayPanel(IOverlayPanel panel)
+        {
+            this.OverlayPanels.Add(panel as OverlayPanel);
+        }
+
+        public void RemoveOverlayPanel(IOverlayPanel panel)
+        {
+            this.OverlayPanels.Remove(panel as OverlayPanel);
         }
 
         #endregion

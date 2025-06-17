@@ -80,7 +80,7 @@ namespace ModengTerm.UserControls
         {
         }
 
-        private FrameworkElement LoadContent(HostPanel panel)
+        private FrameworkElement LoadContent(SidePanel panel)
         {
             PanelDefinition definition = panel.Definition;
             FrameworkElement content = panel.Content;
@@ -92,13 +92,7 @@ namespace ModengTerm.UserControls
                 {
                     content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
                     panel.Content = content;
-
-                    PanelContext context = new PanelContext() 
-                    {
-                        StorageService = new SqliteStorageService(),
-                        HostWindow = Application.Current.MainWindow as IHostWindow
-                    };
-                    panel.Initialize(context);
+                    panel.Initialize(VTClientUtils.GetPanelContext());
                 }
                 catch (Exception ex)
                 {
@@ -123,13 +117,13 @@ namespace ModengTerm.UserControls
 
             if (e.RemovedItems.Count > 0)
             {
-                HostPanel panel = e.RemovedItems[0] as HostPanel;
+                SidePanel panel = e.RemovedItems[0] as SidePanel;
                 panel.Unloaded();
             }
 
             PanelContainer panelContainer = base.DataContext as PanelContainer;
 
-            HostPanel selectedItem = ListBoxMenus.SelectedItem as HostPanel;
+            SidePanel selectedItem = ListBoxMenus.SelectedItem as SidePanel;
             if (selectedItem == null)
             {
                 GridContent.SetValue(Grid.VisibilityProperty, Visibility.Collapsed);
@@ -151,16 +145,16 @@ namespace ModengTerm.UserControls
 
             if (e.AddedItems.Count > 0) 
             {
-                HostPanel panel = e.AddedItems[0] as HostPanel;
+                SidePanel panel = e.AddedItems[0] as SidePanel;
                 panel.Loaded();
             }
         }
 
         private void ListBoxItem_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            HostPanel selected = ListBoxMenus.SelectedItem as HostPanel;
+            SidePanel selected = ListBoxMenus.SelectedItem as SidePanel;
 
-            HostPanel clicked = (sender as ListBoxItem).DataContext as HostPanel;
+            SidePanel clicked = (sender as ListBoxItem).DataContext as SidePanel;
 
             if (clicked == selected)
             {
@@ -174,7 +168,7 @@ namespace ModengTerm.UserControls
 
         private void ButtonClose_Click(object sender, RoutedEventArgs e)
         {
-            HostPanel selectedPanel = ListBoxMenus.SelectedItem as HostPanel;
+            SidePanel selectedPanel = ListBoxMenus.SelectedItem as SidePanel;
 
             ListBoxMenus.SelectedItem = null;
             ContentControl1.Content = null;

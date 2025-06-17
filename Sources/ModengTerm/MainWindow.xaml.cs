@@ -376,6 +376,7 @@ namespace ModengTerm
             ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
             CommandArgs.Instance.AddonId = contextMenu.AddonId;
             CommandArgs.Instance.Command = contextMenu.Command;
+            CommandArgs.Instance.ActiveTab = ListBoxOpenedSession.SelectedItem as IHostTab;
             this.RaiseAddonCommand(CommandArgs.Instance);
         }
 
@@ -601,16 +602,16 @@ namespace ModengTerm
             return this.mainWindowVM.SessionList.OfType<T>().ToList();
         }
 
-        public void AddSidePanel(IHostPanel panel)
+        public void AddSidePanel(ISidePanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Add(panel as HostPanel);
+            container.Panels.Add(panel as SidePanel);
         }
 
-        public void RemoveSidePanel(IHostPanel panel)
+        public void RemoveSidePanel(ISidePanel panel)
         {
             PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Remove(panel as HostPanel);
+            container.Panels.Remove(panel as SidePanel);
         }
 
         #endregion

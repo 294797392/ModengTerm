@@ -312,7 +312,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
 
             // DispatcherPriority.Loaded保证DrawArea不为空
-            base.Dispatcher.BeginInvoke(new Action(() => 
+            base.Dispatcher.BeginInvoke(new Action(() =>
             {
                 double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
                 DocumentAlternate.SetPadding(padding);
@@ -373,5 +373,10 @@ namespace ModengTerm.UserControls.TerminalUserControls
         }
 
         #endregion
+
+        private void ButtonCloseOverlayPanel_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

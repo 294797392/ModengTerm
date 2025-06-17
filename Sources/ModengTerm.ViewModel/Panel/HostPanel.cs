@@ -1,33 +1,44 @@
 ﻿using ModengTerm.Addon.Client;
-using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel
 {
-    /// <summary>
-    /// 提供扩展面板的接口
-    /// </summary>
-    public class HostPanel : ViewModelBase, IHostPanel
+    public abstract class HostPanel : ViewModelBase
     {
         #region 实例变量
 
         private bool isOpened;
         private string iconURI;
+        private FrameworkElement content;
 
         #endregion
 
-        #region 属性
+        #region 公开属性
+
+        public PanelDefinition Definition { get; set; }
 
         public IAddonPanel ClientPanel { get { return this.Content as IAddonPanel; } }
 
-        public FrameworkElement Content { get; set; }
-
-        public SidePanelDocks Dock { get; set; }
-
-        public PanelDefinition Definition { get; set; }
+        public FrameworkElement Content 
+        {
+            get { return this.content; }
+            set
+            {
+                if (this.content != value) 
+                {
+                    this.content = value;
+                    this.NotifyPropertyChanged("Content");
+                }
+            }
+        }
 
         /// <summary>
         /// 该面板是否打开
@@ -60,23 +71,17 @@ namespace ModengTerm.ViewModel.Panel
 
         #endregion
 
-        #region IHostPanel
+        #region 公开接口
 
         /// <summary>
         /// 打开侧边栏
         /// </summary>
-        public void Open()
-        {
-            this.IsOpened = true;
-        }
+        public abstract void Open();
 
         /// <summary>
         /// 关闭侧边栏
         /// </summary>
-        public void Close()
-        {
-            this.IsOpened = false;
-        }
+        public abstract void Close();
 
         public void Initialize(PanelContext context)
         {

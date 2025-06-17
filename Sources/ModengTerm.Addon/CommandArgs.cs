@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Base.ServiceAgents;
 using System.Collections.Generic;
 using System.Windows;
@@ -25,6 +26,11 @@ namespace ModengTerm.Addons
         /// 如果为空，则说明是AddonCommand
         /// </summary>
         public string AddonId { get; set; }
+
+        /// <summary>
+        /// 当前选中的Tab页
+        /// </summary>
+        public IHostTab ActiveTab { get; set; }
 
         private CommandArgs() 
         {
