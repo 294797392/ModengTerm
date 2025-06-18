@@ -107,7 +107,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OnTabOpened(ClientEvent evType, ClientEventArgs evArgs)
         {
-            TabOpenedEventArgs tabOpened = evArgs as TabOpenedEventArgs;
+            ClientEventTabOpened tabOpened = evArgs as ClientEventTabOpened;
 
             switch (tabOpened.SessionType)
             {

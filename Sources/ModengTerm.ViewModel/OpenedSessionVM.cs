@@ -33,7 +33,7 @@ namespace ModengTerm.ViewModel
         private SessionStatusEnum status;
         private DependencyObject content;
 
-        private StatusChangedEventArgs statusChangedEventArgs;
+        private ClientEventTabStatusChanged statusChangedEventArgs;
 
         #endregion
 
@@ -71,7 +71,7 @@ namespace ModengTerm.ViewModel
         public SessionStatusEnum Status
         {
             get { return status; }
-            private set
+            protected set
             {
                 if (status != value)
                 {
@@ -90,7 +90,7 @@ namespace ModengTerm.ViewModel
         public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
-            this.statusChangedEventArgs = new StatusChangedEventArgs();
+            this.statusChangedEventArgs = new ClientEventTabStatusChanged();
         }
 
         #endregion
@@ -161,28 +161,6 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 受保护方法
-
-        /// <summary>
-        /// 由子类调用，通知父类会话状态改变
-        /// 该方法在UI线程运行
-        /// </summary>
-        /// <param name="status"></param>
-        protected void RaiseStatusChanged(SessionStatusEnum status)
-        {
-            if (this.status == status)
-            {
-                return;
-            }
-
-            SessionStatusEnum oldStatus = this.status;
-            SessionStatusEnum newStatus = status;
-
-            this.Status = status;
-
-            this.statusChangedEventArgs.OldStatus = oldStatus;
-            this.statusChangedEventArgs.NewStatus = newStatus;
-            this.ClientEvent?.Invoke(this, this.statusChangedEventArgs);
-        }
 
         protected void RaiseClientEvent(ClientEventArgs e)
         {

@@ -89,7 +89,7 @@ namespace ModengTerm
 
             this.InitializeAddon();
 
-            ClientInitializedEventArgs clientInitialized = new ClientInitializedEventArgs();
+            ClientEventClientInitialized clientInitialized = new ClientEventClientInitialized();
             this.eventRegistory.PublishEvent(clientInitialized);
         }
 
@@ -283,7 +283,7 @@ namespace ModengTerm
             #endregion
 
             // 触发Tab选中改变事件
-            ActiveTabChangedEventArgs activeTabChanged = new ActiveTabChangedEventArgs()
+            ClientEventActiveTabChanged activeTabChanged = new ClientEventActiveTabChanged()
             {
                 AddedTab = addedSession,
                 RemovedTab = removedSession
@@ -546,7 +546,7 @@ namespace ModengTerm
             }
 
             // 触发打开事件
-            TabOpenedEventArgs tabOpened = new TabOpenedEventArgs()
+            ClientEventTabOpened tabOpened = new ClientEventTabOpened()
             {
                 SessionType = (SessionTypeEnum)session.Type,
                 OpenedTab = openedSessionVM

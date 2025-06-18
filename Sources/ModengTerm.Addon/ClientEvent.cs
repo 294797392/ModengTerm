@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 namespace ModengTerm.Addon
 {
     /// <summary>
-    /// 定义主应用程序触发的事件
+    /// 定义客户端通用事件
+    /// 所有事件在UI线程触发
     /// </summary>
     public enum ClientEvent
     {
@@ -41,12 +42,12 @@ namespace ModengTerm.Addon
         public abstract ClientEvent Type { get; }
     }
 
-    public class ClientInitializedEventArgs : ClientEventArgs
+    public class ClientEventClientInitialized : ClientEventArgs
     {
         public override ClientEvent Type => ClientEvent.CLIENT_INITIALIZED;
     }
 
-    public class StatusChangedEventArgs : ClientEventArgs
+    public class ClientEventTabStatusChanged : ClientEventArgs
     {
         public override ClientEvent Type => ClientEvent.CLIENT_TAB_STATUS_CHANGED;
 
@@ -55,7 +56,7 @@ namespace ModengTerm.Addon
         public SessionStatusEnum NewStatus { get; set; }
     }
 
-    public class TabOpenedEventArgs : ClientEventArgs
+    public class ClientEventTabOpened : ClientEventArgs
     {
         public override ClientEvent Type => ClientEvent.CLIENT_TAB_OPENED;
 
@@ -70,7 +71,7 @@ namespace ModengTerm.Addon
         public IClientTab OpenedTab { get; set; }
     }
 
-    public class ActiveTabChangedEventArgs : ClientEventArgs 
+    public class ClientEventActiveTabChanged : ClientEventArgs 
     {
         public override ClientEvent Type => ClientEvent.CLIENT_ACTIVE_TAB_CHANGED;
 

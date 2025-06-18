@@ -8,6 +8,7 @@ namespace ModengTerm.Addon
 {
     /// <summary>
     /// 定义和Tab页面相关的事件
+    /// 所有事件在UI线程触发
     /// </summary>
     public enum TabEvent
     {
@@ -24,8 +25,18 @@ namespace ModengTerm.Addon
         public abstract TabEvent Type { get; }
     }
 
-    public class ShellRenderedEventArgs : TabEventArgs
+    public class TabEventShellRendered : TabEventArgs
     {
         public override TabEvent Type => TabEvent.SHELL_RENDERED;
+
+        /// <summary>
+        /// 渲染的数据缓冲区
+        /// </summary>
+        public byte[] Buffer { get; set; }
+
+        /// <summary>
+        /// 缓冲区中的数据长度
+        /// </summary>
+        public int Length { get; set; }
     }
 }

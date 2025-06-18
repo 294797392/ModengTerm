@@ -1,4 +1,5 @@
-﻿using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -660,13 +661,13 @@ namespace ModengTerm.ViewModel.Terminal
                 {
                     matches = Regex.Matches(text, keyword, regexOptions);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     // 避免输入的正则表达式不正确导致RegexParseException异常
                     return null;
                 }
 
-                if (matches.Count == 0) 
+                if (matches.Count == 0)
                 {
                     return null;
                 }
@@ -932,6 +933,13 @@ namespace ModengTerm.ViewModel.Terminal
                     // 解决刚打开会话之后，获取不到实际窗口大小导致终端行和列不正确的问题
                     VTSize graphicsSize = videoTerminal.ActiveDocument.GraphicsInterface.DrawAreaSize;
                     videoTerminal.Resize(graphicsSize);
+
+                    TabEventShellRendered tabEvent = new TabEventShellRendered()
+                    {
+                        Buffer = buffer,
+                        Length = size
+                    };
+                    base.RaiseTabEvent(tabEvent);
                 }
                 catch (Exception ex)
                 {
@@ -981,11 +989,21 @@ namespace ModengTerm.ViewModel.Terminal
 
             System.Windows.Application.Current.Dispatcher.Invoke(() =>
             {
-                RaiseStatusChanged(status);
-
                 if (bytesDisplay != null)
                 {
                     videoTerminal.ProcessRead(bytesDisplay, bytesDisplay.Length);
+                }
+
+                if (this.Status != status)
+                {
+                    ClientEventTabStatusChanged statusChanged = new ClientEventTabStatusChanged()
+                    {
+                        OldStatus = this.Status,
+                        NewStatus = status
+                    };
+                    this.RaiseClientEvent(statusChanged);
+
+                    this.Status = status;
                 }
             });
         }
@@ -1188,14 +1206,14 @@ namespace ModengTerm.ViewModel.Terminal
             this.OverlayPanels.Remove(overlayPanel);
         }
 
-        public IOverlayPanel GetOverlayPanel(string id) 
+        public IOverlayPanel GetOverlayPanel(string id)
         {
             return this.OverlayPanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
         public List<VTextRange> FindMatches(FindOptions options)
         {
-            if (this.videoTerminal == null) 
+            if (this.videoTerminal == null)
             {
                 return null;
             }
