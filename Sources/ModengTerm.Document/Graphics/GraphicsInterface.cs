@@ -8,11 +8,12 @@ using System.Windows.Input;
 namespace ModengTerm.Document.Graphics
 {
     /// <summary>
-    /// 文档渲染对象
+    /// 定义文档的渲染接口
     /// 一个文档里包文本，光标等元素
     /// </summary>
     public interface GraphicsInterface
     {
+        // TODO：事件太多太混乱，删除这些事件
         event Action<GraphicsInterface, MouseData> GIMouseDown;
         event Action<GraphicsInterface, MouseData> GIMouseUp;
         event Action<GraphicsInterface, MouseData> GIMouseMove;

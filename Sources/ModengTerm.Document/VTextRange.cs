@@ -7,11 +7,21 @@ using System.Threading.Tasks;
 namespace ModengTerm.Document
 {
     /// <summary>
-    /// 存储一行文本里的一段文本的位置
+    /// 描述一个文本区域相对于整个文档的位置和大小
     /// </summary>
     public struct VTextRange
     {
         public static readonly VTextRange Empty = new VTextRange();
+
+        /// <summary>
+        /// 第一个字符的索引
+        /// </summary>
+        public int Index { get; set; }
+
+        /// <summary>
+        /// 文本里的字符数量
+        /// </summary>
+        public int Length { get; set; }
 
         /// <summary>
         /// 距离文档左边的X偏移量
@@ -43,12 +53,19 @@ namespace ModengTerm.Document
         /// </summary>
         public double Height { get; set; }
 
-        public VTextRange(double offsetX, double offsetY, double width, double height)
+        public VTextRange(int index, int length, double offsetX, double offsetY, double width, double height)
         {
+            this.Index = index;
+            this.Length = length;
             this.Left = offsetX;
             this.Top = offsetY;
             this.Width = width;
             this.Height = height;
+        }
+
+        public VTRect GetVTRect() 
+        {
+            return new VTRect(this.Left, this.Top, this.Width, this.Height);
         }
     }
 }

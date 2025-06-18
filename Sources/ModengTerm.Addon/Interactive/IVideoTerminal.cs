@@ -126,12 +126,5 @@ namespace ModengTerm.Addon.Interactive
         /// </summary>
         /// <param name="newSize">新的终端显示区域的大小</param>
         void Resize(VTSize newSize);
-
-        /// <summary>
-        /// 查找当前视图里的所有匹配项
-        /// </summary>
-        /// <param name="options">查找选项</param>
-        /// <returns></returns>
-        List<VTMatches> FindMatches(FindOptions options);
     }
 }

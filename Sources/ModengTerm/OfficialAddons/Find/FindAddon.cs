@@ -104,17 +104,19 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void OnTabOpened(ClientEvent evType, ClientEventArgs evArgs) 
         {
-            TabOpenedEventArgs tabOpened = evArgs as TabOpenedEventArgs;
-            IClientShellTab shellTab = tabOpened.OpenedTab as IClientShellTab;
-            if (shellTab == null) 
+        }
+
+        private void FindCommandExecuted(CommandArgs e)
+        {
+            IClientShellTab shellTab = e.ActiveTab as IClientShellTab;
+            if (shellTab == null)
             {
                 return;
             }
 
-            IOverlayPanel overlayPanel = this.GetOverlayPanel("FindOverlayPanel");
+            IOverlayPanel overlayPanel = this.EnsureOverlayPanel("FindOverlayPanel", shellTab);
             overlayPanel.Dock = OverlayPanelDocks.RightTop;
-            overlayPanel.OwnerTab = shellTab;
-            shellTab.AddOverlayPanel(overlayPanel);
+            overlayPanel.SwitchStatus();
         }
 
         private void OnActiveTabChanged(ClientEvent evType, ClientEventArgs evArgs)
@@ -143,23 +145,6 @@ namespace ModengTerm.OfficialAddons.Find
             //{
 
             //}
-        }
-
-        private void FindCommandExecuted(CommandArgs e)
-        {
-            IClientShellTab shellTab = e.ActiveTab as IClientShellTab;
-            if (shellTab == null) 
-            {
-                return;
-            }
-
-            IOverlayPanel overlayPanel = shellTab.GetOverlayPanel("FindOverlayPanel");
-            if (overlayPanel == null) 
-            {
-                return;
-            }
-
-            overlayPanel.SwitchStatus();
         }
     }
 }

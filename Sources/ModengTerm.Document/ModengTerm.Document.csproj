@@ -42,6 +42,7 @@
     <Compile Remove="VTBookmarkStates.cs" />
     <Compile Remove="VTColorTable.cs" />
     <Compile Remove="VTextBlock.cs" />
+    <Compile Remove="VTextMatches.cs" />
     <Compile Remove="VTFramedElement.cs" />
     <Compile Remove="VTPointCollection.cs" />
     <Compile Remove="VTWallpaper.cs" />

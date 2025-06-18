@@ -16,6 +16,7 @@ using ModengTerm.Terminal.Session;
 using ModengTerm.ViewModel.Panel;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using WPFToolkit.MVVM;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -139,6 +140,8 @@ namespace ModengTerm.ViewModel.Terminal
         public GraphicsInterface MainDocument { get; set; }
         public GraphicsInterface AlternateDocument { get; set; }
 
+        public IDrawingContext DrawingContext { get; set; }
+
         /// <summary>
         /// 获取或设置终端宽度
         /// </summary>
@@ -250,6 +253,7 @@ namespace ModengTerm.ViewModel.Terminal
         public ShellSessionVM(XTermSession session) :
             base(session)
         {
+            this.OverlayPanels = new BindableCollection<OverlayPanel>();
         }
 
         #endregion
@@ -258,12 +262,10 @@ namespace ModengTerm.ViewModel.Terminal
 
         protected override void OnInitialize()
         {
-            this.OverlayPanels = new BindableCollection<OverlayPanel>();
         }
 
         protected override void OnRelease()
         {
-
         }
 
         protected override int OnOpen()
@@ -350,7 +352,7 @@ namespace ModengTerm.ViewModel.Terminal
 
         protected override void OnClose()
         {
-            if (!isRunning)
+            if (!this.isRunning)
             {
                 return;
             }
@@ -382,6 +384,8 @@ namespace ModengTerm.ViewModel.Terminal
             {
                 overlayPanel.Release();
             }
+
+            this.OverlayPanels.Clear();
 
             #endregion
 
@@ -631,6 +635,88 @@ namespace ModengTerm.ViewModel.Terminal
             //modemWindow.Owner = Application.Current.MainWindow;
             //modemWindow.DataContext = viewModel;
             //modemWindow.Show();
+        }
+
+        /// <summary>
+        /// 匹配一行，如果有匹配成功则返回匹配后的数据
+        /// </summary>
+        /// <param name="textLine">要搜索的行</param>
+        /// <returns></returns>
+        private List<VTextRange> FindMatches(FindOptions options, VTextLine textLine)
+        {
+            bool regexp = options.Regexp;
+            string keyword = options.Keyword;
+            bool caseSensitive = options.CaseSensitive;
+
+            string text = VTDocUtils.CreatePlainText(textLine.Characters);
+
+            if (regexp)
+            {
+                RegexOptions regexOptions = caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+
+                // 用正则表达式搜索
+                MatchCollection matches = null;
+                try
+                {
+                    matches = Regex.Matches(text, keyword, regexOptions);
+                }
+                catch (Exception ex) 
+                {
+                    // 避免输入的正则表达式不正确导致RegexParseException异常
+                    return null;
+                }
+
+                if (matches.Count == 0) 
+                {
+                    return null;
+                }
+
+                List<VTextRange> textRanges = new List<VTextRange>();
+
+                foreach (Match match in matches)
+                {
+                    VTextRange textRange = textLine.MeasureTextRange(match.Index, match.Length);
+                    textRanges.Add(textRange);
+                }
+
+                return textRanges;
+            }
+            else
+            {
+                StringComparison stringComparison = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+                // 直接文本匹配
+                // 注意一行文本里可能会有多个地方匹配，要把所有匹配的地方都找到
+
+                int startIndex = 0;
+
+                // 存储匹配的字符索引
+                int matchedIndex = 0;
+
+                if ((matchedIndex = text.IndexOf(keyword, 0, stringComparison)) == -1)
+                {
+                    // 没找到
+                    return null;
+                }
+
+                List<VTextRange> vtMatches = new List<VTextRange>();
+
+                VTextRange textRange = textLine.MeasureTextRange(matchedIndex, keyword.Length);
+                vtMatches.Add(textRange);
+
+                startIndex = matchedIndex + keyword.Length;
+
+                // 找到了继续找
+                while ((matchedIndex = text.IndexOf(keyword, startIndex, stringComparison)) >= 0)
+                {
+                    textRange = textLine.MeasureTextRange(matchedIndex, keyword.Length);
+                    vtMatches.Add(textRange);
+
+                    startIndex = matchedIndex + keyword.Length;
+                }
+
+                return vtMatches;
+            }
         }
 
         #endregion
@@ -1091,6 +1177,8 @@ namespace ModengTerm.ViewModel.Terminal
         public void AddOverlayPanel(IOverlayPanel panel)
         {
             OverlayPanel overlayPanel = panel as OverlayPanel;
+            overlayPanel.OwnerTab = this;
+
             this.OverlayPanels.Add(overlayPanel);
         }
 
@@ -1103,6 +1191,38 @@ namespace ModengTerm.ViewModel.Terminal
         public IOverlayPanel GetOverlayPanel(string id) 
         {
             return this.OverlayPanels.FirstOrDefault(v => v.ID.ToString() == id);
+        }
+
+        public List<VTextRange> FindMatches(FindOptions options)
+        {
+            if (this.videoTerminal == null) 
+            {
+                return null;
+            }
+
+            if (string.IsNullOrEmpty(options.Keyword))
+            {
+                return null;
+            }
+
+            List<VTextRange> result = new List<VTextRange>();
+
+            VTDocument activeDocument = this.videoTerminal.ActiveDocument;
+
+            VTextLine current = activeDocument.FirstLine;
+
+            while (current != null)
+            {
+                List<VTextRange> matches = FindMatches(options, current);
+                if (matches != null)
+                {
+                    result.AddRange(matches);
+                }
+
+                current = current.NextLine;
+            }
+
+            return result;
         }
 
         #endregion

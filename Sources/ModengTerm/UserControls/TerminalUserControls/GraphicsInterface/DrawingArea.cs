@@ -1,4 +1,7 @@
-﻿using System;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Document.Graphics;
+using ModengTerm.ViewModel.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -15,7 +18,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
     /// <summary>
     /// 渲染文档的区域
     /// </summary>
-    public class DrawingArea : FrameworkElement
+    public class DrawingArea : FrameworkElement, IDrawingContext
     {
         #region 类变量
 
@@ -31,6 +34,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 属性
 
+        /// <summary>
+        /// 这个属性的意义在于可以在调试的时候设置一个背景色，看到DrawArea的位置和大小
+        /// </summary>
         public Brush Background
         {
             get { return (Brush)GetValue(BackgroundProperty); }
@@ -48,6 +54,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             get { return this.visuals.Count; }
         }
+
+        public VisualCollection Visuals { get { return this.visuals; } }
 
         #endregion
 
@@ -68,7 +76,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             return this.visuals[index];
         }
 
-        protected override void OnRender(DrawingContext drawingContext)
+        protected override void OnRender(System.Windows.Media.DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
 
@@ -77,24 +85,28 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #endregion
 
-        public void AddVisual(DrawingObject drawingObject)
+        #region IDrawingContext
+
+        /// <summary>
+        /// 创建一个绘图对象
+        /// </summary>
+        /// <returns></returns>
+        public GraphicsObject CreateGraphicsObject()
         {
+            DrawingObject drawingObject = new DrawingObject();
             this.visuals.Add(drawingObject);
+            return drawingObject;
         }
 
-        public void RemoveVisual(DrawingObject drawingObject)
+        /// <summary>
+        /// 删除一个绘图对象
+        /// </summary>
+        /// <param name="drawingObject"></param>
+        public void DeleteGraphicsObject(GraphicsObject graphicsObject)
         {
-            this.visuals.Remove(drawingObject);
+            this.visuals.Remove(graphicsObject as DrawingObject);
         }
 
-        public List<Visual> GetAllVisual()
-        {
-            return this.visuals.Cast<Visual>().ToList();
-        }
-
-        public TVisual GetVisual<TVisual>() where TVisual : DrawingObject
-        {
-            return this.visuals.OfType<TVisual>().FirstOrDefault();
-        }
+        #endregion
     }
 }

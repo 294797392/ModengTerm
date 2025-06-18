@@ -56,9 +56,9 @@
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="99" Orientation="Horizontal">
 
-            <CheckBox Content="区分大小写" Margin="5,0,0,0" IsChecked="{Binding Path=CaseSensitive, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+            <CheckBox x:Name="CheckBoxCaseSensitive" Content="区分大小写" Margin="5,0,0,0" Checked="CheckBox_CheckedChanged" Unchecked="CheckBox_CheckedChanged" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
 
-            <CheckBox Content="使用正则表达式查找" Margin="20,0,0,0" IsChecked="{Binding Path=Regexp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+            <CheckBox x:Name="CheckBoxRegexp" Content="使用正则表达式查找" Margin="20,0,0,0" Checked="CheckBox_CheckedChanged" Unchecked="CheckBox_CheckedChanged" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
 
         </StackPanel>
 

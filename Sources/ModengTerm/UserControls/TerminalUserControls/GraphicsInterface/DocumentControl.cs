@@ -166,19 +166,19 @@ namespace ModengTerm.UserControls.TerminalUserControls
         {
             DrawingObject drawingObject = new DrawingObject();
 
-            this.drawArea.AddVisual(drawingObject);
+            this.drawArea.Visuals.Add(drawingObject);
 
             return drawingObject;
         }
 
         public void DeleteDrawingObject(GraphicsObject drawingObject)
         {
-            drawArea.RemoveVisual(drawingObject as DrawingObject);
+            drawArea.Visuals.Remove(drawingObject as DrawingObject);
         }
 
         public void DeleteDrawingObjects()
         {
-            List<GraphicsObject> drawingObjects = drawArea.GetAllVisual().Cast<GraphicsObject>().ToList();
+            List<GraphicsObject> drawingObjects = drawArea.Visuals.Cast<GraphicsObject>().ToList();
 
             foreach (GraphicsObject drawingObject in drawingObjects)
             {

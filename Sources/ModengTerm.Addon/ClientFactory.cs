@@ -28,7 +28,7 @@ namespace ModengTerm.Addon
 
         public abstract List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions);
 
-        public abstract List<IOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions);
+        public abstract IOverlayPanel CreateOverlayPanel(PanelDefinition definition);
 
         public static ClientFactory GetFactory() 
         {

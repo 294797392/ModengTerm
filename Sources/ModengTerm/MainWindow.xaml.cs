@@ -139,6 +139,9 @@ namespace ModengTerm
             }
             content.Close();
 
+            session.ClientEvent -= this.OpenedSessionVM_ClientEvent;
+            session.TabEvent -= this.OpenedSessionVM_TabEvent;
+
             // 取消该会话的所有订阅的事件
             this.eventRegistory.UnsubscribeTabEvent(session);
 
@@ -209,15 +212,14 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        /// <summary>
-        /// 会话触发的所有事件
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="code"></param>
-        /// <param name="e"></param>
-        private void OpenedSessionVM_EventNotify(OpenedSessionVM session, ClientEvent evType, ClientEventArgs evArgs)
+        private void OpenedSessionVM_ClientEvent(OpenedSessionVM session, ClientEventArgs evArgs)
         {
             this.eventRegistory.PublishEvent(evArgs);
+        }
+
+        private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs evArgs)
+        {
+            this.eventRegistory.PublishTabEvent(session, evArgs);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -520,7 +522,8 @@ namespace ModengTerm
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
-            openedSessionVM.Notify += this.OpenedSessionVM_EventNotify;
+            openedSessionVM.ClientEvent += this.OpenedSessionVM_ClientEvent;
+            openedSessionVM.TabEvent += this.OpenedSessionVM_TabEvent;
             openedSessionVM.Initialize();
 
             // 先加到打开列表里，这样在打开列表里就不会重复添加会话的上下文菜单

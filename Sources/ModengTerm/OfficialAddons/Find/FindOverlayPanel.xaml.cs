@@ -2,24 +2,14 @@
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
 using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
-using ModengTerm.Controls;
 using ModengTerm.Document;
-using ModengTerm.Terminal;
-using System;
+using ModengTerm.Document.Graphics;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace ModengTerm.OfficialAddons.Find
 {
@@ -28,12 +18,27 @@ namespace ModengTerm.OfficialAddons.Find
     /// </summary>
     public partial class FindOverlayPanel : UserControl, IAddonOverlayPanel
     {
+        #region 类变量
+
         private static log4net.ILog logger = log4net.LogManager.GetLogger("FindOverlayPanel");
 
-        private FindVM viewModel;
-        private bool finding;
+        #endregion
+
+        #region 实例变量
+
         private ClientFactory factory;
         private IClientEventRegistory eventRegistory;
+
+        private IDrawingContext drawingContext;
+        /// <summary>
+        /// 用来高亮显示匹配结果的矩形
+        /// </summary>
+        private GraphicsObject highlightObject;
+        private VTColor backColor;
+
+        private Brush textBoxBorderBrush;
+
+        #endregion
 
         #region 构造方法
 
@@ -52,34 +57,30 @@ namespace ModengTerm.OfficialAddons.Find
         {
             this.factory = ClientFactory.GetFactory();
             this.eventRegistory = this.factory.GetEventRegistory();
+            this.textBoxBorderBrush = TextBoxKeyword.BorderBrush;
+            TextBoxKeyword.BorderBrush = Brushes.Red;
         }
 
-        private void FindAsync(bool findOnce)
+        private void PerformFind()
         {
-            if (this.finding)
+            FindOptions options = new FindOptions()
             {
+                CaseSensitive = CheckBoxCaseSensitive.IsChecked.Value,
+                Regexp = CheckBoxRegexp.IsChecked.Value,
+                Keyword = TextBoxKeyword.Text
+            };
+            List<VTextRange> textRanges = this.OwnerTab.FindMatches(options);
+            if (textRanges == null || textRanges.Count == 0)
+            {
+                this.highlightObject.Clear();
+                TextBoxKeyword.BorderBrush = Brushes.Red;
                 return;
             }
 
-            this.viewModel.FindAll = findOnce;
+            TextBoxKeyword.BorderBrush = this.textBoxBorderBrush;
 
-            //Task.Factory.StartNew(() =>
-            //{
-            //    this.finding = true;
-
-            //    try
-            //    {
-            //        this.viewModel.FindNext();
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        logger.Error("查找异常", ex);
-            //    }
-            //    finally
-            //    {
-            //        this.finding = false;
-            //    }
-            //});
+            List<VTRect> rectangles = textRanges.Select(v => v.GetVTRect()).ToList();
+            this.highlightObject.DrawRectangles(rectangles, null, this.backColor);
         }
 
         #endregion
@@ -88,17 +89,10 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void ButtonFind_Click(object sender, RoutedEventArgs e)
         {
-            this.FindAsync(true);
         }
 
         private void ButtonFindAll_Click(object sender, RoutedEventArgs e)
         {
-            this.FindAsync(false);
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            this.viewModel.Release();
         }
 
         private void ButtonNextMatches_Click(object sender, RoutedEventArgs e)
@@ -108,7 +102,12 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void TextBoxKeyword_TextChanged(object sender, TextChangedEventArgs e)
         {
+            this.PerformFind();
+        }
 
+        private void CheckBox_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            this.PerformFind();
         }
 
         #endregion
@@ -119,11 +118,17 @@ namespace ModengTerm.OfficialAddons.Find
 
         public void OnInitialize()
         {
+            string backColorRgbKey = this.OwnerTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
+            this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
+
+            this.drawingContext = this.OwnerTab.DrawingContext;
+            this.highlightObject = this.drawingContext.CreateGraphicsObject();
             this.eventRegistory.SubscribeTabEvent(this.OwnerTab, TabEvent.SHELL_RENDERED, this.OnShellRendered);
         }
 
         public void OnRelease()
         {
+            this.drawingContext.DeleteGraphicsObject(this.highlightObject);
             this.eventRegistory.UnsubscribeTabEvent(this.OwnerTab, TabEvent.SHELL_RENDERED, this.OnShellRendered);
         }
 
@@ -139,7 +144,10 @@ namespace ModengTerm.OfficialAddons.Find
 
         #region TabEvent
 
-        private void OnShellRendered(TabEventArgs e) { }
+        private void OnShellRendered(TabEventArgs e) 
+        {
+            this.PerformFind();
+        }
 
         #endregion
     }

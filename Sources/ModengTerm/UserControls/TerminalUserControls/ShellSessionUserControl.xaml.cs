@@ -77,12 +77,19 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void DrawArea_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (this.videoTerminal == null) 
+            if (this.videoTerminal == null)
             {
                 return;
             }
 
             this.videoTerminal.Resize(e.NewSize.ToVTSize());
+
+            // 确保DrawingArea1的大小和位置跟DocumentControl里的DrawingArea一致
+            // 插件可以通过DrawingArea1来绘图
+            DrawingArea drawingArea = sender as DrawingArea;
+            DrawingArea1.Width = e.NewSize.Width;
+            DrawingArea1.Height = e.NewSize.Height;
+            DrawingArea1.Margin = drawingArea.Margin;
         }
 
         /// <summary>
@@ -319,6 +326,9 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 ImageBackground.Opacity = this.Session.GetOption<double>(OptionKeyEnum.THEME_BACKGROUND_IMAGE_OPACITY, OptionDefaultValues.THEME_BACKGROUND_IMAGE_OPACITY);
             }
 
+            this.shellSession = sessionVM as ShellSessionVM;
+            this.shellSession.DrawingContext = DrawingArea1;
+
             // DispatcherPriority.Loaded保证DrawArea不为空
             base.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -329,12 +339,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 DocumentMain.DrawArea.SizeChanged += DrawArea_SizeChanged;
 
                 // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
-                // 手动计算终端宽度和高度
+                // 手动计算终端宽度和高度，这个高度和宽度可能也不准确。
+                // 解决方法是在每次收到服务端数据之后，重新设置一下终端高度，确保终端高度正确
                 double width = GridDocument.ActualWidth - padding * 2 - 11 - 30;  // 11是滚动条的宽度，30是右边栏的宽度
                 double height = GridDocument.ActualHeight - padding * 2;
                 //logger.InfoFormat("width = {0}, height = {1}", width, height);
 
-                this.shellSession = sessionVM as ShellSessionVM;
                 this.shellSession.MainDocument = DocumentMain;
                 this.shellSession.AlternateDocument = DocumentAlternate;
                 this.shellSession.Width = width;

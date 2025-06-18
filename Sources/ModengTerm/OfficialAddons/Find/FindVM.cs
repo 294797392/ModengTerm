@@ -42,7 +42,7 @@ namespace ModengTerm.OfficialAddons.Find
         /// <summary>
         /// 存储当前命中匹配到的行
         /// </summary>
-        private List<VTMatches> matchResult;
+        private List<VTextRange> matchResult;
 
         /// <summary>
         /// 查找提示
@@ -228,140 +228,142 @@ namespace ModengTerm.OfficialAddons.Find
         /// <returns>是否找到了至少一个匹配项</returns>
         private bool PerformFind(string keyword)
         {
-            if (string.IsNullOrEmpty(keyword))
-            {
-                matchResult = null;
-                activeRectElement.Clear();
-                return false;
-            }
+            //if (string.IsNullOrEmpty(keyword))
+            //{
+            //    matchResult = null;
+            //    activeRectElement.Clear();
+            //    return false;
+            //}
 
-            List<VTMatches> matches = FindMatches(keyword);
-            if (matches.Count == 0)
-            {
-                activeRectElement.Clear();
-                return false;
-            }
+            //List<VTextMatches> matches = FindMatches(keyword);
+            //if (matches.Count == 0)
+            //{
+            //    activeRectElement.Clear();
+            //    return false;
+            //}
 
-            HighlightMatches(matches);
+            //HighlightMatches(matches);
 
-            matchResult = matches;
+            //matchResult = matches;
 
+            //return true;
             return true;
         }
 
-        /// <summary>
-        /// 匹配一行，如果有匹配成功则返回匹配后的数据
-        /// </summary>
-        /// <param name="textLine">要搜索的行</param>
-        /// <returns></returns>
-        private List<VTMatches> FindMatches(string keyword, VTextLine textLine)
-        {
-            string text = VTDocUtils.CreatePlainText(textLine.Characters);
+        ///// <summary>
+        ///// 匹配一行，如果有匹配成功则返回匹配后的数据
+        ///// </summary>
+        ///// <param name="textLine">要搜索的行</param>
+        ///// <returns></returns>
+        //private List<VTextMatches> FindMatches(string keyword, VTextLine textLine)
+        //{
+        //    return new List<VTextMatches>();
+        //    //string text = VTDocUtils.CreatePlainText(textLine.Characters);
 
-            if (Regexp)
-            {
-                RegexOptions regexOptions = CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
+        //    //if (Regexp)
+        //    //{
+        //    //    RegexOptions regexOptions = CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
 
-                // 用正则表达式搜索
-                Match match = Regex.Match(text, keyword, regexOptions);
-                if (!match.Success)
-                {
-                    // 没有找到搜索结果
-                    return null;
-                }
+        //    //    // 用正则表达式搜索
+        //    //    Match match = Regex.Match(text, keyword, regexOptions);
+        //    //    if (!match.Success)
+        //    //    {
+        //    //        // 没有找到搜索结果
+        //    //        return null;
+        //    //    }
 
-                List<VTMatches> vtMatches = new List<VTMatches>();
+        //    //    List<VTMatches> vtMatches = new List<VTMatches>();
 
-                do
-                {
-                    vtMatches.Add(new VTMatches(textLine, match.Length, match.Index));
-                }
-                while ((match = match.NextMatch()) != null);
+        //    //    do
+        //    //    {
+        //    //        vtMatches.Add(new VTMatches(textLine, match.Length, match.Index));
+        //    //    }
+        //    //    while ((match = match.NextMatch()) != null);
 
-                return vtMatches;
-            }
-            else
-            {
-                StringComparison stringComparison = CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+        //    //    return vtMatches;
+        //    //}
+        //    //else
+        //    //{
+        //    //    StringComparison stringComparison = CaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
 
-                // 直接文本匹配
-                // 注意一行文本里可能会有多个地方匹配，要把所有匹配的地方都找到
+        //    //    // 直接文本匹配
+        //    //    // 注意一行文本里可能会有多个地方匹配，要把所有匹配的地方都找到
 
-                int startIndex = 0;
+        //    //    int startIndex = 0;
 
-                // 存储匹配的字符索引
-                int matchedIndex = 0;
+        //    //    // 存储匹配的字符索引
+        //    //    int matchedIndex = 0;
 
-                if ((matchedIndex = text.IndexOf(keyword, 0, stringComparison)) == -1)
-                {
-                    // 没找到
-                    return null;
-                }
+        //    //    if ((matchedIndex = text.IndexOf(keyword, 0, stringComparison)) == -1)
+        //    //    {
+        //    //        // 没找到
+        //    //        return null;
+        //    //    }
 
-                List<VTMatches> vtMatches = new List<VTMatches>();
+        //    //    List<VTMatches> vtMatches = new List<VTMatches>();
 
-                vtMatches.Add(new VTMatches(textLine, this.keyword.Length, matchedIndex));
+        //    //    vtMatches.Add(new VTMatches(textLine, this.keyword.Length, matchedIndex));
 
-                startIndex = matchedIndex + this.keyword.Length;
+        //    //    startIndex = matchedIndex + this.keyword.Length;
 
-                // 找到了继续找
-                while ((matchedIndex = text.IndexOf(this.keyword, startIndex, stringComparison)) >= 0)
-                {
-                    vtMatches.Add(new VTMatches(textLine, this.keyword.Length, matchedIndex));
+        //    //    // 找到了继续找
+        //    //    while ((matchedIndex = text.IndexOf(this.keyword, startIndex, stringComparison)) >= 0)
+        //    //    {
+        //    //        vtMatches.Add(new VTMatches(textLine, this.keyword.Length, matchedIndex));
 
-                    startIndex = matchedIndex + this.keyword.Length;
-                }
+        //    //        startIndex = matchedIndex + this.keyword.Length;
+        //    //    }
 
-                return vtMatches;
-            }
-        }
+        //    //    return vtMatches;
+        //    //}
+        //}
 
-        /// <summary>
-        /// 查找当前文档的所有匹配项
-        /// </summary>
-        /// <param name="keyword">要匹配的关键字</param>
-        /// <returns></returns>
-        private List<VTMatches> FindMatches(string keyword)
-        {
-            List<VTMatches> result = new List<VTMatches>();
+        ///// <summary>
+        ///// 查找当前文档的所有匹配项
+        ///// </summary>
+        ///// <param name="keyword">要匹配的关键字</param>
+        ///// <returns></returns>
+        //private List<VTextMatches> FindMatches(string keyword)
+        //{
+        //    List<VTextMatches> result = new List<VTextMatches>();
 
-            VTDocument activeDocument = videoTerminal.ActiveDocument;
+        //    VTDocument activeDocument = videoTerminal.ActiveDocument;
 
-            VTextLine current = activeDocument.FirstLine;
+        //    VTextLine current = activeDocument.FirstLine;
 
-            while (current != null)
-            {
-                List<VTMatches> matches = FindMatches(keyword, current);
-                if (matches != null)
-                {
-                    result.AddRange(matches);
-                }
+        //    while (current != null)
+        //    {
+        //        List<VTextMatches> matches = FindMatches(keyword, current);
+        //        if (matches != null)
+        //        {
+        //            result.AddRange(matches);
+        //        }
 
-                current = current.NextLine;
-            }
+        //        current = current.NextLine;
+        //    }
 
-            return result;
-        }
+        //    return result;
+        //}
 
-        /// <summary>
-        /// 高亮显示匹配的项
-        /// </summary>
-        /// <param name="matches"></param>
-        private void HighlightMatches(List<VTMatches> matchResult)
-        {
-            List<VTRect> rectangles = new List<VTRect>();
+        ///// <summary>
+        ///// 高亮显示匹配的项
+        ///// </summary>
+        ///// <param name="matches"></param>
+        //private void HighlightMatches(List<VTextMatches> matchResult)
+        //{
+        //    List<VTRect> rectangles = new List<VTRect>();
 
-            foreach (VTMatches matches in matchResult)
-            {
-                VTextLine textLine = matches.TextLine;
+        //    foreach (VTextMatches matches in matchResult)
+        //    {
+        //        //VTextLine textLine = matches.TextLine;
 
-                VTextRange textRange = textLine.MeasureTextRange(matches.Index, matches.Length);
+        //        //VTextRange textRange = textLine.MeasureTextRange(matches.Index, matches.Length);
 
-                rectangles.Add(new VTRect(textRange.Left, textRange.Top, textRange.Width, textRange.Height));
-            }
+        //        //rectangles.Add(new VTRect(textRange.Left, textRange.Top, textRange.Width, textRange.Height));
+        //    }
 
-            activeRectElement.DrawRectangles(rectangles, null, HighlightBackground);
-        }
+        //    activeRectElement.DrawRectangles(rectangles, null, HighlightBackground);
+        //}
 
         /// <summary>
         /// 当关键字改变的时候触发

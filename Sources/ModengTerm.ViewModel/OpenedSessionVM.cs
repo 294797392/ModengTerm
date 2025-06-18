@@ -17,9 +17,14 @@ namespace ModengTerm.ViewModel
         #region 公开事件
 
         /// <summary>
-        /// 所有的会话事件都通过这个事件触发
+        /// 会话触发的ClientEvent
         /// </summary>
-        public event Action<OpenedSessionVM, ClientEvent, ClientEventArgs> Notify;
+        public event Action<OpenedSessionVM, ClientEventArgs> ClientEvent;
+
+        /// <summary>
+        /// 会话触发的TabEvent
+        /// </summary>
+        public event Action<OpenedSessionVM, TabEventArgs> TabEvent;
 
         #endregion
 
@@ -176,15 +181,17 @@ namespace ModengTerm.ViewModel
 
             this.statusChangedEventArgs.OldStatus = oldStatus;
             this.statusChangedEventArgs.NewStatus = newStatus;
-            this.Notify?.Invoke(this, ClientEvent.CLIENT_TAB_STATUS_CHANGED, this.statusChangedEventArgs);
+            this.ClientEvent?.Invoke(this, this.statusChangedEventArgs);
+        }
 
-            //throw new RefactorImplementedException();
-            //// 通知所有PanelContent，会话状态改变了
-            //IEnumerable<SessionPanelContentVM> panelContents = PanelContainer.MenuItems.Where(v => v.ContentVM != null).Select(v => v.ContentVM).Cast<SessionPanelContentVM>();
-            //foreach (SessionPanelContentVM panelContent in panelContents)
-            //{
-            //    panelContent.OnSessionStatusChanged(status);
-            //}
+        protected void RaiseClientEvent(ClientEventArgs e)
+        {
+            this.ClientEvent?.Invoke(this, e);
+        }
+
+        protected void RaiseTabEvent(TabEventArgs e)
+        {
+            this.TabEvent?.Invoke(this, e);
         }
 
         #endregion

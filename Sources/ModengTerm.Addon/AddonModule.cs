@@ -1,4 +1,5 @@
-﻿using ModengTerm.Addon;
+﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Base.Definitions;
@@ -18,11 +19,19 @@ namespace ModengTerm.Addons
     /// </summary>
     public abstract class AddonModule
     {
+        #region 类变量
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("AddonModule");
+
+        #endregion
+
         #region 事件
 
         #endregion
 
         #region 实例变量
+
+        private AddonDefinition definition;
 
         private Dictionary<string, AddonCommandHandler> registerCommands;
 
@@ -54,10 +63,11 @@ namespace ModengTerm.Addons
             this.ID = context.Definition.ID;
             this.factory = context.Factory;
             this.registerCommands = new Dictionary<string, AddonCommandHandler>();
+            this.overlayPanels = new List<IOverlayPanel>();
+            this.definition = context.Definition;
 
             // 此时只是创建了HostPanel的实例，但是还没有真正加到界面上，调用AddSidePanel加到界面上
             this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
-            this.overlayPanels = this.factory.CreateOverlayPanels(context.Definition.OverlayPanels);
             this.hostWindow = this.factory.GetHostWindow();
             this.storageService = this.factory.GetStorageService();
             this.eventRegistory = this.factory.GetEventRegistory();
@@ -108,9 +118,39 @@ namespace ModengTerm.Addons
             return this.sidePanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
-        protected IOverlayPanel GetOverlayPanel(string id) 
+        protected IOverlayPanel CreateOverlayPanel(string id)
         {
-            return this.overlayPanels.FirstOrDefault(v => v.ID.ToString() == id);
+            PanelDefinition definition = this.definition.OverlayPanels.FirstOrDefault(v => v.ID == id);
+            if (definition == null)
+            {
+                logger.ErrorFormat("没找到指定的OverlayPanel, {0}", id);
+                return null;
+            }
+
+            return this.factory.CreateOverlayPanel(definition);
+        }
+
+        /// <summary>
+        /// 先查找指定的OverlayPanel是否存在，如果不存在则创建并加到指定的shellTab里
+        /// </summary>
+        /// <param name="panelId"></param>
+        /// <param name="shellTab"></param>
+        /// <returns>OverlayPanel的实例</returns>
+        protected IOverlayPanel EnsureOverlayPanel(string panelId, IClientShellTab shellTab)
+        {
+            IOverlayPanel overlayPanel = shellTab.GetOverlayPanel("FindOverlayPanel");
+            if (overlayPanel == null)
+            {
+                overlayPanel = this.CreateOverlayPanel("FindOverlayPanel");
+                if (overlayPanel == null)
+                {
+                    return null;
+                }
+
+                shellTab.AddOverlayPanel(overlayPanel);
+            }
+
+            return overlayPanel;
         }
 
         protected string GetObjectId()

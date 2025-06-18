@@ -71,14 +71,6 @@ namespace ModengTerm.Addon.Interactive
 
     public interface IOverlayPanel : IClientPanel
     {
-        /// <summary>
-        /// 悬浮面板的位置
-        /// </summary>
         OverlayPanelDocks Dock { get; set; }
-
-        /// <summary>
-        /// 悬浮面板所属的Tab页面
-        /// </summary>
-        IClientShellTab OwnerTab { get; set; }
     }
 }

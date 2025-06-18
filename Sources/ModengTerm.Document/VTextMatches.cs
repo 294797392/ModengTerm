@@ -9,7 +9,7 @@ namespace ModengTerm.Document
     /// <summary>
     /// 存储与搜索的关键字匹配的数据内容
     /// </summary>
-    public struct VTMatches
+    public struct VTextMatches
     {
         /// <summary>
         /// 关键字长度
@@ -22,15 +22,15 @@ namespace ModengTerm.Document
         public int Index { get; set; }
 
         /// <summary>
-        /// 匹配到的关键字所在的行
+        /// 文本相对于文档的位置
         /// </summary>
-        public VTextLine TextLine { get; set; }
+        public VTextRange TextRange { get; set; }
 
-        public VTMatches(VTextLine textLine, int length, int index)
+        public VTextMatches(VTextRange textRange, int length, int index)
         {
-            this.TextLine = textLine;
-            Length = length;
-            Index = index;
+            this.TextRange = textRange;
+            this.Length = length;
+            this.Index = index;
         }
     }
 }

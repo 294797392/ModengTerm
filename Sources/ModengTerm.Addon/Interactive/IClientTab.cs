@@ -1,6 +1,8 @@
 ﻿using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Graphics;
+using System.Windows.Media;
 
 namespace ModengTerm.Addon.Interactive
 {
@@ -45,9 +47,9 @@ namespace ModengTerm.Addon.Interactive
     public interface IClientShellTab : IClientTab
     {
         /// <summary>
-        /// 获取和VideoTerminal交互的接口
+        /// 提供可以在终端上绘图的接口
         /// </summary>
-        IVideoTerminal VideoTerminal { get; }
+        IDrawingContext DrawingContext { get; }
 
         void Send(byte[] bytes);
         void Send(string text);
@@ -74,6 +76,13 @@ namespace ModengTerm.Addon.Interactive
         void RemoveOverlayPanel(IOverlayPanel panel);
 
         IOverlayPanel GetOverlayPanel(string id);
+
+        /// <summary>
+        /// 对当前视图进行关键字搜索
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns>如果没搜索到，则返回null</returns>
+        List<VTextRange> FindMatches(FindOptions options);
     }
 
     /// <summary>

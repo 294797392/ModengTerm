@@ -31,6 +31,9 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 公开属性
 
+        /// <summary>
+        /// 悬浮面板所属的Tab页面
+        /// </summary>
         public IClientShellTab OwnerTab { get; set; }
 
         public ClientFactory HostFactory { get; set; }
@@ -76,20 +79,29 @@ namespace ModengTerm.ViewModel.Panel
 
                 IAddonOverlayPanel callback = this.Callback as IAddonOverlayPanel;
                 callback.OwnerTab = this.OwnerTab;
-                this.Callback.OnInitialize();
+                base.Initialize();
             }
 
             this.IsOpened = true;
 
-            this.Callback.OnLoaded();
+            base.Loaded();
         }
 
         public override void Close()
         {
             this.IsOpened = false;
 
-            this.Callback.OnUnload();
+            base.Unloaded();
         }
+
+        #endregion
+
+        #region IOverlayPanel
+
+        //public void SetOptions(OverlayPanelOptions options)
+        //{
+        //    this.Dock = options.Dock;
+        //}
 
         #endregion
     }

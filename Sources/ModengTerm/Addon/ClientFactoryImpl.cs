@@ -16,7 +16,7 @@ namespace ModengTerm.Addon
 
         public ClientFactoryImpl()
         {
-            
+
         }
 
         public override StorageService GetStorageService()
@@ -51,22 +51,15 @@ namespace ModengTerm.Addon
             return sidePanels;
         }
 
-        public override List<IOverlayPanel> CreateOverlayPanels(List<PanelDefinition> definitions)
+        public override IOverlayPanel CreateOverlayPanel(PanelDefinition definition)
         {
-            List<IOverlayPanel> overlayPanels = new List<IOverlayPanel>();
-
-            foreach (PanelDefinition definition in definitions)
-            {
-                OverlayPanel overlayPanel = new OverlayPanel();
-                overlayPanel.Definition = definition;
-                overlayPanel.ID = definition.ID;
-                overlayPanel.Name = definition.Name;
-                overlayPanel.IconURI = definition.Icon;
-                overlayPanel.HostFactory = this;
-                overlayPanels.Add(overlayPanel);
-            }
-
-            return overlayPanels;
+            OverlayPanel overlayPanel = new OverlayPanel();
+            overlayPanel.Definition = definition;
+            overlayPanel.ID = definition.ID;
+            overlayPanel.Name = definition.Name;
+            overlayPanel.IconURI = definition.Icon;
+            overlayPanel.HostFactory = this;
+            return overlayPanel;
         }
     }
 }

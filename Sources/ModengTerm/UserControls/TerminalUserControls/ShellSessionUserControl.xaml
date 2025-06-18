@@ -92,6 +92,8 @@
             <Border x:Name="BorderBackground"/>
             <Image x:Name="ImageBackground" Stretch="Fill"/>
 
+            <!-- DrawingArea1的大小和DocumentControl的DrawArea大小一致，用来模拟在DocumentControl上绘图 -->
+            <muct:DrawingArea x:Name="DrawingArea1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <muct:DocumentControl x:Name="DocumentAlternate"/>
             <muct:DocumentControl x:Name="DocumentMain"/>
         </Grid>
