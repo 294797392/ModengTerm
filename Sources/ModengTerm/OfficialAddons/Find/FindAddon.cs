@@ -91,20 +91,17 @@ namespace ModengTerm.OfficialAddons.Find
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
             this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
+            this.eventRegistory.RegisterHotkey(this, "Esc", HotkeyScopes.ClientShellTab, this.OnEscKeyDown);
+            this.eventRegistory.RegisterHotkey(this, "Alt+F", HotkeyScopes.ClientShellTab, this.OnAltFKeyDown);
             this.RegisterCommand("FindAddon.Find", this.FindCommandExecuted);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
             this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
         }
 
-        private void OnTabOpened(ClientEvent evType, ClientEventArgs evArgs) 
-        {
-        }
 
         private void FindCommandExecuted(CommandArgs e)
         {
@@ -121,30 +118,25 @@ namespace ModengTerm.OfficialAddons.Find
 
         private void OnActiveTabChanged(ClientEvent evType, ClientEventArgs evArgs)
         {
-            //throw new RefactorImplementedException();
 
-            //ActiveTabChangedEventArgs activeTabChanged = evArgs as ActiveTabChangedEventArgs;
+        }
 
-            //// 选中的不是终端类型的Tab页面，隐藏搜索窗口
-            //if (activeTabChanged.AddedTab == null || !VTBaseUtils.IsTerminal(activeTabChanged.AddedTab.Type))
-            //{
-            //    return;
-            //}
+        private void OnEscKeyDown()
+        {
+            IClientShellTab shellTab = this.client.GetActiveTab<IClientShellTab>();
+            IOverlayPanel overlayPanel = shellTab.GetOverlayPanel("FindOverlayPanel");
+            if (overlayPanel.IsOpened)
+            {
+                overlayPanel.Close();
+            }
+        }
 
-            //// 如果选中的会话是Shell会话并且显示了查找窗口，那么搜索选中的会话
-            //if (FindWindowMgr.WindowShown)
-            //{
-            //    // bug:新打开窗口之后，也会触发该事件，但是此时心打开的窗口里的会话还没初始化完，所以会导致IVideoTerminal为空的bug
-
-            //    IHostInsidePanel
-
-
-            //    //FindWindowMgr.Show(activeTabChanged.AddedTab as IShellTab);
-            //}
-            //else
-            //{
-
-            //}
+        private void OnAltFKeyDown() 
+        {
+            IClientShellTab shellTab = this.client.GetActiveTab<IClientShellTab>();
+            IOverlayPanel overlayPanel = this.EnsureOverlayPanel("FindOverlayPanel", shellTab);
+            overlayPanel.Dock = OverlayPanelDocks.RightTop;
+            overlayPanel.SwitchStatus();
         }
     }
 }

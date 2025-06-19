@@ -22,9 +22,9 @@ namespace ModengTerm.Addon
 
         public abstract StorageService GetStorageService();
 
-        public abstract IClientWindow GetHostWindow();
+        public abstract IClient GetClient();
 
-        public abstract IClientEventRegistory GetEventRegistory();
+        public abstract IClientEventRegistry GetEventRegistry();
 
         public abstract List<ISidePanel> CreateSidePanels(List<PanelDefinition> definitions);
 

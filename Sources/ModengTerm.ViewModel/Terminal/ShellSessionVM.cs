@@ -930,6 +930,7 @@ namespace ModengTerm.ViewModel.Terminal
                 {
                     videoTerminal.ProcessRead(buffer, size);
 
+                    // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG9KR
                     // 解决刚打开会话之后，获取不到实际窗口大小导致终端行和列不正确的问题
                     VTSize graphicsSize = videoTerminal.ActiveDocument.GraphicsInterface.DrawAreaSize;
                     videoTerminal.Resize(graphicsSize);

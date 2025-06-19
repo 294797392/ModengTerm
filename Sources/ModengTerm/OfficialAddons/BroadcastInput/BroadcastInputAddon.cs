@@ -42,8 +42,8 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         {
             this.broadcastSessions.Clear();
 
-            IClientShellTab activePanel = this.hostWindow.GetActiveTab<IClientShellTab>();
-            List<IClientShellTab> allPanels = this.hostWindow.GetAllTabs<IClientShellTab>();
+            IClientShellTab activePanel = this.client.GetActiveTab<IClientShellTab>();
+            List<IClientShellTab> allPanels = this.client.GetAllTabs<IClientShellTab>();
 
             List<BroadcastSession> broadcastSessions = this.storageService.GetObjects<BroadcastSession>(activePanel.ID.ToString());
 
@@ -71,8 +71,8 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            IClientShellTab activeTab = this.hostWindow.GetActiveTab<IClientShellTab>();
-            List<IClientShellTab> allTabs = this.hostWindow.GetAllTabs<IClientShellTab>();
+            IClientShellTab activeTab = this.client.GetActiveTab<IClientShellTab>();
+            List<IClientShellTab> allTabs = this.client.GetAllTabs<IClientShellTab>();
             List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
 
             BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, allTabs);

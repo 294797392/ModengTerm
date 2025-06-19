@@ -1,0 +1,248 @@
+﻿using log4net.Repository.Hierarchy;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ModengTerm.Addon
+{
+    public class ClientEventRegistryImpl : IClientEventRegistry
+    {
+        private class HotkeyEvent
+        {
+            public AddonModule Addon { get; set; }
+
+            public ClientHotkeyDelegate Delegate { get; set; }
+
+            public HotkeyScopes Scope { get; set; }
+        }
+
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientEventRegistoryImpl");
+
+        private Dictionary<ClientEvent, List<ClientEventDelegate>> eventRegistry;
+        private Dictionary<IClientTab, Dictionary<TabEvent, List<TabEventDelegate>>> tabEventRegistry;
+        private Dictionary<string, List<HotkeyEvent>> hotKeyRegistry;
+
+        public ClientEventRegistryImpl()
+        {
+            this.eventRegistry = new Dictionary<ClientEvent, List<ClientEventDelegate>>();
+            this.tabEventRegistry = new Dictionary<IClientTab, Dictionary<TabEvent, List<TabEventDelegate>>>();
+            this.hotKeyRegistry = new Dictionary<string, List<HotkeyEvent>>();
+        }
+
+        public void SubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate)
+        {
+            List<ClientEventDelegate> delegates;
+            if (!this.eventRegistry.TryGetValue(evType, out delegates))
+            {
+                delegates = new List<ClientEventDelegate>();
+                this.eventRegistry[evType] = delegates;
+            }
+
+            delegates.Add(@delegate);
+        }
+
+        public void UnsubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate)
+        {
+            List<ClientEventDelegate> delegates;
+            if (!this.eventRegistry.TryGetValue(evType, out delegates))
+            {
+                return;
+            }
+
+            delegates.Remove(@delegate);
+        }
+
+        public void PublishEvent(ClientEventArgs evArgs)
+        {
+            List<ClientEventDelegate> delegates;
+            if (!this.eventRegistry.TryGetValue(evArgs.Type, out delegates))
+            {
+                return;
+            }
+
+            foreach (ClientEventDelegate @delegate in delegates)
+            {
+                @delegate.Invoke(evArgs.Type, evArgs);
+            }
+        }
+
+
+
+        public void SubscribeTabEvent(IClientTab tab, TabEvent evType, TabEventDelegate @delegate)
+        {
+            Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
+            if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+            {
+                eventLists = new Dictionary<TabEvent, List<TabEventDelegate>>();
+                this.tabEventRegistry[tab] = eventLists;
+            }
+
+            List<TabEventDelegate> delegates;
+            if (!eventLists.TryGetValue(evType, out delegates))
+            {
+                delegates = new List<TabEventDelegate>();
+                eventLists[evType] = delegates;
+            }
+
+            delegates.Add(@delegate);
+        }
+
+        public void UnsubscribeTabEvent(IClientTab tab, TabEvent evType, TabEventDelegate @delegate)
+        {
+            Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
+            if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+            {
+                return;
+            }
+
+            if (eventLists.Count == 0)
+            {
+                this.tabEventRegistry.Remove(tab);
+                return;
+            }
+
+            List<TabEventDelegate> delegates;
+            if (!eventLists.TryGetValue(evType, out delegates))
+            {
+                return;
+            }
+
+            delegates.Remove(@delegate);
+
+            if (delegates.Count == 0)
+            {
+                eventLists.Remove(evType);
+                if (eventLists.Count == 0)
+                {
+                    this.tabEventRegistry.Remove(tab);
+                }
+            }
+        }
+
+        public void UnsubscribeTabEvent(IClientTab tab)
+        {
+            this.tabEventRegistry.Remove(tab);
+        }
+
+        public void PublishTabEvent(IClientTab tab, TabEventArgs evArgs)
+        {
+            Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
+            if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+            {
+                return;
+            }
+
+            List<TabEventDelegate> delegates;
+            if (!eventLists.TryGetValue(evArgs.Type, out delegates))
+            {
+                return;
+            }
+
+            foreach (TabEventDelegate @delegate in delegates)
+            {
+                @delegate.Invoke(evArgs);
+            }
+        }
+
+
+
+        public void RegisterHotkey(AddonModule addon, string hotkey, HotkeyScopes scope, ClientHotkeyDelegate @delegate)
+        {
+            List<HotkeyEvent> events;
+            if (!this.hotKeyRegistry.TryGetValue(hotkey, out events))
+            {
+                events = new List<HotkeyEvent>();
+                this.hotKeyRegistry[hotkey] = events;
+            }
+
+            events.Add(new HotkeyEvent()
+            {
+                Addon = addon,
+                Delegate = @delegate,
+                Scope = scope
+            });
+        }
+
+        public void UnregisterHotkey(AddonModule addon, string hotkey)
+        {
+            List<HotkeyEvent> events;
+            if (!this.hotKeyRegistry.TryGetValue(hotkey, out events))
+            {
+                return;
+            }
+
+            HotkeyEvent ev = events.FirstOrDefault(v => v.Addon == addon);
+            if (ev == null)
+            {
+                return;
+            }
+
+            events.Remove(ev);
+        }
+
+        public bool PublishHotkeyEvent(string hotkey)
+        {
+            List<HotkeyEvent> events;
+            if(!this.hotKeyRegistry.TryGetValue(hotkey, out events))
+            {
+                return false;
+            }
+
+            if (events.Count == 0) 
+            {
+                return false;
+            }
+
+            ClientFactory factory = ClientFactory.GetFactory();
+            IClient client = factory.GetClient();
+            IClientTab clientTab = client.GetActiveTab<IClientTab>();
+
+            foreach (HotkeyEvent ev in events)
+            {
+                bool canExecute = false;
+
+                switch (ev.Scope)
+                {
+                    case HotkeyScopes.Client:
+                        {
+                            canExecute = true;
+                            break;
+                        }
+
+                    case HotkeyScopes.ClientShellTab:
+                        {
+                            canExecute = clientTab is IClientShellTab;
+                            break;
+                        }
+
+                    case HotkeyScopes.ClientSftpTab:
+                        {
+                            canExecute = client is IClientSftpTab;
+                            break;
+                        }
+
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                if (canExecute)
+                {
+                    try
+                    {
+                        ev.Delegate();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error("快捷键执行异常", ex);
+                    }
+                }
+            }
+
+            return true;
+        }
+    }
+}

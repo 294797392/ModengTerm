@@ -9,6 +9,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
@@ -24,14 +25,43 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Windows.Media.Animation;
 
 namespace ModengTerm
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window, IClientWindow
+    public partial class MainWindow : Window, IClient
     {
+        #region 内部类
+
+        private enum HotkeyState
+        {
+            /// <summary>
+            /// 表示按下的第一个按键
+            /// </summary>
+            Key1,
+
+            /// <summary>
+            /// 表示按下的第二个按键
+            /// </summary>
+            Key2,
+
+            /// <summary>
+            /// 处理双快捷键的情况
+            /// Ctrl+A,B
+            /// </summary>
+            DoubleHotkey,
+
+            /// <summary>
+            /// 处理双修饰键的情况
+            /// </summary>
+            DoubleModKey,
+        }
+
+        #endregion
+
         #region 类变量
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("MainWindow");
@@ -48,7 +78,12 @@ namespace ModengTerm
         private DefaultMainUserControl defaultMainUserControl;
         private List<AddonModule> addons;
         private ClientFactory factory;
-        private IClientEventRegistory eventRegistory;
+        private IClientEventRegistry eventRegistry;
+        private HotkeyState kstat;
+        private List<Key> pressedKeys;
+        private ModifierKeys firstPressedModKeys = ModifierKeys.None;
+        private ModifierKeys secondPressedModKeys = ModifierKeys.None;
+        private Key lastPressedKey = Key.None;
 
         #endregion
 
@@ -69,7 +104,8 @@ namespace ModengTerm
         {
             this.serviceAgent = VTApp.Context.ServiceAgent;
             this.factory = ClientFactory.GetFactory();
-            this.eventRegistory = this.factory.GetEventRegistory();
+            this.eventRegistry = this.factory.GetEventRegistry();
+            this.pressedKeys = new List<Key>();
 
             this.mainWindowVM = MainWindowVM.GetInstance();
             base.DataContext = this.mainWindowVM;
@@ -90,7 +126,7 @@ namespace ModengTerm
             this.InitializeAddon();
 
             ClientEventClientInitialized clientInitialized = new ClientEventClientInitialized();
-            this.eventRegistory.PublishEvent(clientInitialized);
+            this.eventRegistry.PublishEvent(clientInitialized);
         }
 
         private void ShowSessionListWindow()
@@ -143,7 +179,7 @@ namespace ModengTerm
             session.TabEvent -= this.OpenedSessionVM_TabEvent;
 
             // 取消该会话的所有订阅的事件
-            this.eventRegistory.UnsubscribeTabEvent(session);
+            this.eventRegistry.UnsubscribeTabEvent(session);
 
             this.mainWindowVM.SessionList.Remove(session);
         }
@@ -174,14 +210,14 @@ namespace ModengTerm
                     };
 
                     addon.Active(context);
-
-                    addons.Add(addon);
                 }
                 catch (Exception ex)
                 {
                     logger.Error("创建插件实例异常", ex);
                     continue;
                 }
+
+                addons.Add(addon);
             }
 
             #endregion
@@ -198,7 +234,7 @@ namespace ModengTerm
                 return;
             }
 
-            AddonCommandHandler handler;
+            AddonCommandDelegate handler;
             if (!addon.RegisteredCommand.TryGetValue(cmdArgs.Command, out handler))
             {
                 logger.WarnFormat("插件未注册命令, {0}, {1}", addon.ID, cmdArgs.Command);
@@ -208,18 +244,201 @@ namespace ModengTerm
             handler.Invoke(cmdArgs);
         }
 
+        private void RaiseAddonHotkey(string hotKey)
+        {
+
+        }
+
+        /// <summary>
+        /// 处理快捷键
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns>如果执行了快捷键命令，返回true，否则返回false</returns>
+        /// <summary>
+        /// 1. 单快捷键
+        /// 3. 双快捷键
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        private bool ProcessHotkey(KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.None)
+            {
+                if (this.kstat != HotkeyState.Key1)
+                {
+                    this.kstat = HotkeyState.Key1;
+                }
+                return false;
+            }
+
+            Key pressedKey = VTClientUtils.GetPressedKey(e);
+            if (pressedKey == Key.ImeProcessed)
+            {
+                this.kstat = HotkeyState.Key1;
+                this.lastPressedKey = Key.None;
+                return false;
+            }
+
+            if (this.lastPressedKey == pressedKey)
+            {
+                // 只处理重复的快捷键
+                if (!VTClientUtils.IsLetter(pressedKey) && !VTClientUtils.IsNumeric(pressedKey))
+                {
+                    return false;
+                }
+            }
+
+            this.lastPressedKey = pressedKey;
+            bool execute = false;
+
+            switch (this.kstat)
+            {
+                case HotkeyState.Key1:
+                    {
+                        logger.DebugFormat("Key1");
+
+                        this.pressedKeys.Clear();
+                        this.firstPressedModKeys = Keyboard.Modifiers;
+                        this.secondPressedModKeys = ModifierKeys.None;
+                        this.kstat = HotkeyState.Key2;
+                        break;
+                    }
+
+                case HotkeyState.Key2:
+                    {
+                        if (Keyboard.Modifiers == this.firstPressedModKeys)
+                        {
+                            // 没有按其他快捷键
+
+                            // 只处理数字键和字母键
+                            if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
+                            {
+                                logger.DebugFormat("SingleKey exec");
+
+                                this.pressedKeys.Add(pressedKey);
+
+                                // 尝试执行快捷键
+                                execute = true;
+
+                                this.kstat = HotkeyState.DoubleHotkey;
+                            }
+                            else
+                            {
+                                // 此时按的不知道是什么按键...不需要处理，忽略就行，等待下次继续按键
+                            }
+                        }
+                        else
+                        {
+                            logger.DebugFormat("Key2 -> DoubleModKey");
+
+                            // 按了其他快捷键，变成双快捷键
+                            this.secondPressedModKeys = Keyboard.Modifiers;
+                            this.kstat = HotkeyState.DoubleModKey;
+                        }
+                        break;
+                    }
+
+                case HotkeyState.DoubleModKey:
+                    {
+                        // 处理类似于Ctrl+Alt+A的情况
+
+                        // 此时已经按了两个不同的修饰键了，这个按键必须按快捷键
+
+                        if (this.secondPressedModKeys != Keyboard.Modifiers)
+                        {
+                            // 此时按了第三个修饰键，直接退出，等待用户下次继续按快捷键
+                            break;
+                        }
+
+                        // 此时修饰键没变，看是否按了快捷键
+
+                        if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
+                        {
+                            logger.DebugFormat("DoubleModKey exec");
+
+                            // 按了快捷键
+                            this.pressedKeys.Add(pressedKey);
+
+                            execute = true;
+
+                            this.kstat = HotkeyState.Key1;
+                        }
+                        else
+                        {
+                            // 此时按的不知道是什么按键...不需要处理，忽略就行，等待下次继续按键
+                        }
+
+                        break;
+                    }
+
+                case HotkeyState.DoubleHotkey:
+                    {
+                        if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
+                        {
+                            execute = true;
+
+                            if (pressedKey == this.pressedKeys[0])
+                            {
+                                // 两次输入的快捷键是一样的，那么就当单快捷键执行
+                                logger.DebugFormat("SingleKey exec");
+                                this.kstat = HotkeyState.DoubleHotkey;
+                            }
+                            else
+                            {
+                                logger.DebugFormat("Doublekey exec");
+                                this.pressedKeys.Add(pressedKey);
+                                this.kstat = HotkeyState.Key1;
+                            }
+                        }
+                        else
+                        {
+                            // 此时按的不知道是什么按键...不需要处理，忽略就行，等待下次继续按键
+                        }
+
+                        break;
+                    }
+
+                default:
+                    throw new NotImplementedException();
+            }
+
+            if (!execute)
+            {
+                return false;
+            }
+
+            bool doubleModKeys = false;
+            ModifierKeys modKeys = this.firstPressedModKeys;
+            if (this.secondPressedModKeys != ModifierKeys.None)
+            {
+                doubleModKeys = true;
+                modKeys = this.secondPressedModKeys;
+            }
+
+            string hotKey = VTClientUtils.GetHotkeyName(modKeys, this.pressedKeys, doubleModKeys);
+            if (string.IsNullOrEmpty(hotKey))
+            {
+                return false;
+            }
+
+            logger.DebugFormat(hotKey);
+
+            return this.eventRegistry.PublishHotkeyEvent(hotKey);
+        }
+
         #endregion
 
         #region 事件处理器
 
         private void OpenedSessionVM_ClientEvent(OpenedSessionVM session, ClientEventArgs evArgs)
         {
-            this.eventRegistory.PublishEvent(evArgs);
+            this.eventRegistry.PublishEvent(evArgs);
         }
 
         private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs evArgs)
         {
-            this.eventRegistory.PublishTabEvent(session, evArgs);
+            this.eventRegistry.PublishTabEvent(session, evArgs);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -227,7 +446,6 @@ namespace ModengTerm
             // 直接打开Windows命令行，可以更快速的进入工作状态
             // TODO：做成可选项，可以直接打开命令行，也能打开会话列表
 
-            // 在Loaded事件里执行OpenDefaultSession会导致高度计算不正确的问题，ContentRendered事件在Loaded事件触发之后触发
             this.OpenDefaultSession();
         }
 
@@ -288,7 +506,7 @@ namespace ModengTerm
                 AddedTab = addedSession,
                 RemovedTab = removedSession
             };
-            this.eventRegistory.PublishEvent(activeTabChanged);
+            this.eventRegistry.PublishEvent(activeTabChanged);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -451,11 +669,37 @@ namespace ModengTerm
             ThemeManager.ApplyTheme(appTheme.Uri);
         }
 
+        private void MenuItemLog_CheckedChanged(object sender, RoutedEventArgs e)
+        {
+            MenuItem menuItem = sender as MenuItem;
+
+            bool isChecked = menuItem.IsChecked;
+            string loggerName = menuItem.Tag.ToString();
+
+            Hierarchy hierarchy = log4net.LogManager.GetRepository() as Hierarchy;
+            Logger logger = hierarchy.Exists(loggerName) as Logger;
+
+            if (isChecked)
+            {
+                logger.Level = Level.All;
+            }
+            else
+            {
+                logger.Level = Level.Off;
+            }
+        }
 
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             base.OnPreviewKeyDown(e);
+
+            // 快捷键拥有最高权限
+            bool executed = this.ProcessHotkey(e);
+            if (executed)
+            {
+                return;
+            }
 
             // 如果此时是TextBox在输入，那么不做处理，事件继续交给TextBox
             if (e.OriginalSource is TextBox)
@@ -479,26 +723,6 @@ namespace ModengTerm
             if (!content.SetInputFocus())
             {
                 logger.ErrorFormat("设置SessionContent焦点失败");
-            }
-        }
-
-        private void MenuItemLog_CheckedChanged(object sender, RoutedEventArgs e)
-        {
-            MenuItem menuItem = sender as MenuItem;
-
-            bool isChecked = menuItem.IsChecked;
-            string loggerName = menuItem.Tag.ToString();
-
-            Hierarchy hierarchy = log4net.LogManager.GetRepository() as Hierarchy;
-            Logger logger = hierarchy.Exists(loggerName) as Logger;
-
-            if (isChecked)
-            {
-                logger.Level = Level.All;
-            }
-            else
-            {
-                logger.Level = Level.Off;
             }
         }
 
@@ -551,7 +775,7 @@ namespace ModengTerm
                 SessionType = (SessionTypeEnum)session.Type,
                 OpenedTab = openedSessionVM
             };
-            this.eventRegistory.PublishEvent(tabOpened);
+            this.eventRegistry.PublishEvent(tabOpened);
         }
 
         /// <summary>

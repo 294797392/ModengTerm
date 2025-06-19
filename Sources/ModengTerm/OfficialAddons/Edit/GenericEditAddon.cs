@@ -26,38 +26,38 @@ namespace ModengTerm.OfficialAddons.Edit
 
         private void Paste(CommandArgs e)
         {
-            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
             string text = System.Windows.Clipboard.GetText();
             shell.Send(text);
         }
 
         private void CopySelection(CommandArgs e)
         {
-            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
             shell.CopySelection();
         }
 
         private void SaveSelection(CommandArgs e)
         {
-            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
             SaveToFile(ParagraphTypeEnum.Selected, shell);
         }
 
         private void SaveViewport(CommandArgs e)
         {
-            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
             SaveToFile(ParagraphTypeEnum.Viewport, shell);
         }
 
         private void SaveAll(CommandArgs e)
         {
-            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
             SaveToFile(ParagraphTypeEnum.AllDocument, shell);
         }
 
         private void ClearScreen(CommandArgs e)
         {
-            IClientShellTab shell = this.hostWindow.GetActiveTab<IClientShellTab>();
+            IClientShellTab shell = this.client.GetActiveTab<IClientShellTab>();
             shell.ClearScreen();
         }
 

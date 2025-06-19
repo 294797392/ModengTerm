@@ -27,7 +27,7 @@ namespace ModengTerm.OfficialAddons.Find
         #region 实例变量
 
         private ClientFactory factory;
-        private IClientEventRegistory eventRegistory;
+        private IClientEventRegistry eventRegistory;
 
         private IDrawingContext drawingContext;
         /// <summary>
@@ -56,7 +56,7 @@ namespace ModengTerm.OfficialAddons.Find
         private void InitializePanel()
         {
             this.factory = ClientFactory.GetFactory();
-            this.eventRegistory = this.factory.GetEventRegistory();
+            this.eventRegistory = this.factory.GetEventRegistry();
             this.textBoxBorderBrush = TextBoxKeyword.BorderBrush;
             TextBoxKeyword.BorderBrush = Brushes.Red;
         }
@@ -134,10 +134,14 @@ namespace ModengTerm.OfficialAddons.Find
 
         public void OnLoaded()
         {
+            TextBoxKeyword.Focus();
+
+            this.PerformFind();
         }
 
         public void OnUnload()
         {
+            this.highlightObject.Clear();
         }
 
         #endregion

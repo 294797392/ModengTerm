@@ -57,7 +57,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
             // 打开会话
             ClientFactory factory = ClientFactory.GetFactory();
-            IClientWindow hostWindow = factory.GetHostWindow();
+            IClient hostWindow = factory.GetClient();
             hostWindow.OpenSession(sessionVM.Session);
         }
 

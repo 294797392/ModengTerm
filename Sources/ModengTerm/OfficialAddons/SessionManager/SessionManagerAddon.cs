@@ -33,7 +33,7 @@ namespace ModengTerm.OfficialAddons.SessionManager
             if ((bool)sessionListWindow.ShowDialog())
             {
                 XTermSession session = sessionListWindow.SelectedSession;
-                this.hostWindow.OpenSession(session);
+                this.client.OpenSession(session);
             }
         }
 
@@ -58,7 +58,7 @@ namespace ModengTerm.OfficialAddons.SessionManager
             }
 
             // 打开会话
-            this.hostWindow.OpenSession(session);
+            this.client.OpenSession(session);
         }
 
         private void GroupManager(CommandArgs e)

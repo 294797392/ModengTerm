@@ -2,13 +2,8 @@
 using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using WPFToolkit.MVVM;
+using System.Windows.Threading;
 
 namespace ModengTerm.ViewModel.Panel
 {
@@ -84,7 +79,9 @@ namespace ModengTerm.ViewModel.Panel
 
             this.IsOpened = true;
 
-            base.Loaded();
+            // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG96L
+            // 确保控件Loaded完毕，此时设置才可以设置焦点
+            this.Content.Dispatcher.BeginInvoke(base.Loaded, DispatcherPriority.Loaded);
         }
 
         public override void Close()

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace ModengTerm.Addons
 {
-    public delegate void AddonCommandHandler(CommandArgs e);
+    public delegate void AddonCommandDelegate(CommandArgs e);
 
     /// <summary>
     /// 插件生命周期管理
@@ -33,15 +33,15 @@ namespace ModengTerm.Addons
 
         private AddonDefinition definition;
 
-        private Dictionary<string, AddonCommandHandler> registerCommands;
+        private Dictionary<string, AddonCommandDelegate> registerCommands;
 
         private List<ISidePanel> sidePanels;
         private List<IOverlayPanel> overlayPanels;
 
         protected ClientFactory factory;
-        protected IClientWindow hostWindow;
+        protected IClient client;
         protected StorageService storageService;
-        protected IClientEventRegistory eventRegistory;
+        protected IClientEventRegistry eventRegistory;
 
         #endregion
 
@@ -49,7 +49,10 @@ namespace ModengTerm.Addons
 
         public string ID { get; private set; }
 
-        public Dictionary<string, AddonCommandHandler> RegisteredCommand { get { return this.registerCommands; } }
+        /// <summary>
+        /// 插件注册的所有命令
+        /// </summary>
+        public Dictionary<string, AddonCommandDelegate> RegisteredCommand { get { return this.registerCommands; } }
 
         #endregion
 
@@ -62,15 +65,15 @@ namespace ModengTerm.Addons
         {
             this.ID = context.Definition.ID;
             this.factory = context.Factory;
-            this.registerCommands = new Dictionary<string, AddonCommandHandler>();
+            this.registerCommands = new Dictionary<string, AddonCommandDelegate>();
             this.overlayPanels = new List<IOverlayPanel>();
             this.definition = context.Definition;
 
             // 此时只是创建了HostPanel的实例，但是还没有真正加到界面上，调用AddSidePanel加到界面上
             this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
-            this.hostWindow = this.factory.GetHostWindow();
+            this.client = this.factory.GetClient();
             this.storageService = this.factory.GetStorageService();
-            this.eventRegistory = this.factory.GetEventRegistory();
+            this.eventRegistory = this.factory.GetEventRegistry();
 
             this.OnActive(context);
         }
@@ -85,7 +88,7 @@ namespace ModengTerm.Addons
 
         public void RaiseCommand(CommandArgs e)
         {
-            AddonCommandHandler handler;
+            AddonCommandDelegate handler;
             if (!this.registerCommands.TryGetValue(e.Command, out handler))
             {
                 return;
@@ -103,7 +106,7 @@ namespace ModengTerm.Addons
         /// </summary>
         /// <param name="command"></param>
         /// <param name="handler"></param>
-        protected void RegisterCommand(string command, AddonCommandHandler handler)
+        protected void RegisterCommand(string command, AddonCommandDelegate handler)
         {
             if (this.registerCommands.ContainsKey(command))
             {

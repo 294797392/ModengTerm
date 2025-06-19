@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace ModengTerm.Addon.Interactive
 {
     /// <summary>
-    /// 向插件公开应用程序主窗口的功能
+    /// 向插件公开应用程序的功能
     /// </summary>
-    public interface IClientWindow
+    public interface IClient
     {
         /// <summary>
         /// 打开会话
@@ -20,7 +20,7 @@ namespace ModengTerm.Addon.Interactive
         void OpenSession(XTermSession session, bool addToRecent = false);
 
         /// <summary>
-        /// 获取当前激活的Shell
+        /// 获取当前激活的Tab
         /// </summary>
         /// <returns></returns>
         T GetActiveTab<T>() where T : IClientTab;

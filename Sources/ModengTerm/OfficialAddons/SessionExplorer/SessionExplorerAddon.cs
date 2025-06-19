@@ -26,7 +26,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
         private void OnClientInitialized(ClientEvent evType, ClientEventArgs evArgs)
         {
             ISidePanel sidePanel = this.GetSidePanel("ResourceManagerPanel");
-            this.hostWindow.AddSidePanel(sidePanel);
+            this.client.AddSidePanel(sidePanel);
         }
     }
 }

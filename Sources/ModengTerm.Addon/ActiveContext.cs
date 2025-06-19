@@ -16,7 +16,7 @@ namespace ModengTerm.Addons
     {
         public ClientFactory Factory { get; set; }
 
-        public IClientWindow HostWindow { get; set; }
+        public IClient HostWindow { get; set; }
 
         /// <summary>
         /// 存储服务
