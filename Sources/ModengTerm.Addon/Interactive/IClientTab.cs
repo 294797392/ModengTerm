@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Addons;
+using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Graphics;
@@ -39,6 +40,23 @@ namespace ModengTerm.Addon.Interactive
         /// <param name="defaultValue">如果该选项不存在，指定默认值</param>
         /// <returns></returns>
         T GetOption<T>(OptionKeyEnum key, T defaultValue);
+
+        /// <summary>
+        /// 存储Tab相关的数据
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        void SetData(AddonModule addon, string key, object value);
+
+        /// <summary>
+        /// 获取Tab相关的数据
+        /// </summary>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="addon"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        TValue GetData<TValue>(AddonModule addon, string key);
     }
 
     /// <summary>

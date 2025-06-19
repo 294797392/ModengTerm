@@ -74,7 +74,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.BroadcasePanel.ID.ToString() }).ToList();
+            List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.BroadcastTab.ID.ToString() }).ToList();
             int code = this.StorageService.AddObjects<BroadcastSession>(addList);
             if (code != ResponseCode.SUCCESS)
             {
@@ -82,7 +82,7 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
                 return;
             }
 
-            List<string> removeList = this.removeList.Select(v => v.BroadcasePanel.ID.ToString()).ToList();
+            List<string> removeList = this.removeList.Select(v => v.BroadcastTab.ID.ToString()).ToList();
             code = this.StorageService.DeleteObjects(removeList);
             if (code != ResponseCode.SUCCESS) 
             {

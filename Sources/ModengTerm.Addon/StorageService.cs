@@ -24,7 +24,7 @@ namespace ModengTerm.Addons
     }
 
     /// <summary>
-    /// 对插件提供存储数据的服务
+    /// 对插件提供持久化数据存储服务
     /// </summary>
     public abstract class StorageService
     {

@@ -35,6 +35,11 @@ namespace ModengTerm.Addon
         /// 会话被打开之后触发的事件
         /// </summary>
         CLIENT_TAB_OPENED = 3,
+
+        /// <summary>
+        /// 会话被关闭之后触发的事件
+        /// </summary>
+        CLIENT_TAB_CLOSED = 4,
     }
 
     public abstract class ClientEventArgs

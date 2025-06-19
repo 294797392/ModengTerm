@@ -374,6 +374,8 @@ namespace ModengTerm
 
                 case HotkeyState.DoubleHotkey:
                     {
+                        // 处理类似于Ctrl+A,B的情况
+
                         if (VTClientUtils.IsLetter(pressedKey) || VTClientUtils.IsNumeric(pressedKey))
                         {
                             execute = true;
@@ -728,7 +730,7 @@ namespace ModengTerm
 
         #endregion
 
-        #region IHostWindow
+        #region IClient
 
         /// <summary>
         /// 执行打开会话动作

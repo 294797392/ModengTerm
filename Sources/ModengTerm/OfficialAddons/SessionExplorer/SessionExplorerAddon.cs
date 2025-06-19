@@ -23,7 +23,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             sidePanel.SwitchStatus();
         }
 
-        private void OnClientInitialized(ClientEvent evType, ClientEventArgs evArgs)
+        private void OnClientInitialized(ClientEventArgs evArgs)
         {
             ISidePanel sidePanel = this.GetSidePanel("ResourceManagerPanel");
             this.client.AddSidePanel(sidePanel);

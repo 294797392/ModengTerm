@@ -10,6 +10,6 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 {
     public class BroadcastSessionVM : ViewModelBase
     {
-        public IClientShellTab BroadcasePanel { get; set; }
+        public IClientShellTab BroadcastTab { get; set; }
     }
 }

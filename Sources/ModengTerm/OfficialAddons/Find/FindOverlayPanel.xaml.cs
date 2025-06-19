@@ -123,13 +123,13 @@ namespace ModengTerm.OfficialAddons.Find
 
             this.drawingContext = this.OwnerTab.DrawingContext;
             this.highlightObject = this.drawingContext.CreateGraphicsObject();
-            this.eventRegistory.SubscribeTabEvent(this.OwnerTab, TabEvent.SHELL_RENDERED, this.OnShellRendered);
+            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
         }
 
         public void OnRelease()
         {
             this.drawingContext.DeleteGraphicsObject(this.highlightObject);
-            this.eventRegistory.UnsubscribeTabEvent(this.OwnerTab, TabEvent.SHELL_RENDERED, this.OnShellRendered);
+            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
         }
 
         public void OnLoaded()

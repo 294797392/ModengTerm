@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModengTerm.Addon.Interactive;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,12 +18,22 @@ namespace ModengTerm.Addon
         /// <summary>
         /// 每次渲染完之后触发
         /// </summary>
-        SHELL_RENDERED
+        SHELL_RENDERED,
+
+        /// <summary>
+        /// 每当发送数据的时候触发
+        /// </summary>
+        SHELL_SENDDATA
     }
 
     public abstract class TabEventArgs
     {
         public abstract TabEvent Type { get; }
+
+        /// <summary>
+        /// 触发该事件的Tab
+        /// </summary>
+        public IClientTab ClientTab { get; set; }
     }
 
     public class TabEventShellRendered : TabEventArgs
@@ -38,5 +49,15 @@ namespace ModengTerm.Addon
         /// 缓冲区中的数据长度
         /// </summary>
         public int Length { get; set; }
+    }
+
+    public class TabEventShellSendData : TabEventArgs
+    {
+        public override TabEvent Type => TabEvent.SHELL_SENDDATA;
+
+        /// <summary>
+        /// 发送的数据缓冲区
+        /// </summary>
+        public byte[] Buffer { get; set; }
     }
 }

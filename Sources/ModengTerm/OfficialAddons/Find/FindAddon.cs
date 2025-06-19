@@ -91,7 +91,6 @@ namespace ModengTerm.OfficialAddons.Find
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
             this.eventRegistory.RegisterHotkey(this, "Esc", HotkeyScopes.ClientShellTab, this.OnEscKeyDown);
             this.eventRegistory.RegisterHotkey(this, "Alt+F", HotkeyScopes.ClientShellTab, this.OnAltFKeyDown);
             this.RegisterCommand("FindAddon.Find", this.FindCommandExecuted);
@@ -99,7 +98,6 @@ namespace ModengTerm.OfficialAddons.Find
 
         protected override void OnDeactive()
         {
-            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_ACTIVE_TAB_CHANGED, this.OnActiveTabChanged);
         }
 
 
@@ -114,11 +112,6 @@ namespace ModengTerm.OfficialAddons.Find
             IOverlayPanel overlayPanel = this.EnsureOverlayPanel("FindOverlayPanel", shellTab);
             overlayPanel.Dock = OverlayPanelDocks.RightTop;
             overlayPanel.SwitchStatus();
-        }
-
-        private void OnActiveTabChanged(ClientEvent evType, ClientEventArgs evArgs)
-        {
-
         }
 
         private void OnEscKeyDown()

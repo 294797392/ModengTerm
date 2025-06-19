@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addon.Interactive
 {
-    public delegate void ClientEventDelegate(ClientEvent evType, ClientEventArgs evArgs);
+    public delegate void ClientEventDelegate(ClientEventArgs e);
 
     public delegate void TabEventDelegate(TabEventArgs e);
 
@@ -44,18 +44,18 @@ namespace ModengTerm.Addon.Interactive
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="tab">要订阅的标签页</param>
         /// <param name="evType">要订阅的事件</param>
-        /// <param name="evArgs"></param>
-        void SubscribeTabEvent(IClientTab tab, TabEvent evType, TabEventDelegate @delegate);
+        /// <param name="delegate"></param>
+        /// <param name="tab">要订阅的标签页，如果为空，则订阅所有标签页的事件</param>
+        void SubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null);
 
-        void UnsubscribeTabEvent(IClientTab tab, TabEvent evType, TabEventDelegate @delegate);
+        void UnsubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null);
 
         /// <summary>
         /// 取消指定tab的所有订阅的事件
         /// </summary>
         /// <param name="tab"></param>
-        void UnsubscribeTabEvent(IClientTab tab);
+        void UnsubscribeTabEvent(IClientTab tab = null);
 
         void PublishTabEvent(IClientTab tab, TabEventArgs evArgs);
 

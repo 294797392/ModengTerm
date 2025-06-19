@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
@@ -33,7 +34,7 @@ namespace ModengTerm.ViewModel
         private SessionStatusEnum status;
         private DependencyObject content;
 
-        private ClientEventTabStatusChanged statusChangedEventArgs;
+        private Dictionary<AddonModule, Dictionary<string, object>> dataMap;
 
         #endregion
 
@@ -90,7 +91,7 @@ namespace ModengTerm.ViewModel
         public OpenedSessionVM(XTermSession session)
         {
             this.Session = session;
-            this.statusChangedEventArgs = new ClientEventTabStatusChanged();
+            this.dataMap = new Dictionary<AddonModule, Dictionary<string, object>>();
         }
 
         #endregion
@@ -142,11 +143,42 @@ namespace ModengTerm.ViewModel
 
         #endregion
 
-        #region IHostTab
+        #region IClientTab
 
         public T GetOption<T>(OptionKeyEnum key, T defaultValue)
         {
             return this.Session.GetOption<T>(key, defaultValue);
+        }
+
+        public void SetData(AddonModule addon, string key, object value)
+        {
+            Dictionary<string, object> map;
+
+            if (!this.dataMap.TryGetValue(addon, out map))
+            {
+                map = new Dictionary<string, object>();
+                this.dataMap[addon] = map;
+            }
+
+            map[key] = value;
+        }
+
+        public TValue GetData<TValue>(AddonModule addon, string key)
+        {
+            Dictionary<string, object> map;
+
+            if (!this.dataMap.TryGetValue(addon, out map))
+            {
+                return default(TValue);
+            }
+
+            object value;
+            if (!map.TryGetValue(key, out value)) 
+            {
+                return default(TValue);
+            }
+
+            return (TValue)value;
         }
 
         #endregion

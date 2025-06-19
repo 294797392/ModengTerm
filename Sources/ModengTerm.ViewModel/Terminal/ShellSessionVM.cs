@@ -81,6 +81,8 @@ namespace ModengTerm.ViewModel.Terminal
 
         private LoggerManager logMgr;
 
+        private TabEventShellSendData tabEventSendData;
+
         #endregion
 
         #region 属性
@@ -255,6 +257,7 @@ namespace ModengTerm.ViewModel.Terminal
             base(session)
         {
             this.OverlayPanels = new BindableCollection<OverlayPanel>();
+            this.tabEventSendData = new TabEventShellSendData();
         }
 
         #endregion
@@ -442,31 +445,10 @@ namespace ModengTerm.ViewModel.Terminal
         {
             VTDebug.Context.WriteInteractive(VTSendTypeEnum.UserInput, bytes);
 
-            videoTerminal.ProcessWrite(bytes);
-        }
+            this.videoTerminal.ProcessWrite(bytes);
 
-        /// <summary>
-        /// 向同步输入的会话发送数据
-        /// </summary>
-        /// <param name="bytes">要发送的数据</param>
-        private void SendSyncInput(byte[] bytes)
-        {
-            // TODO：删除
-
-            //foreach (BroadcastSessionVM syncInput in this.SyncInputSessions)
-            //{
-            //    ShellSessionVM shellSession = syncInput.ShellSessionVM;
-            //    if (shellSession == null)
-            //    {
-            //        shellSession = MTermApp.Context.MainWindowVM.ShellSessions.FirstOrDefault(v => v.ID == syncInput.ID);
-            //        syncInput.ShellSessionVM = shellSession;
-            //    }
-
-            //    if (shellSession != null && shellSession.Status == SessionStatusEnum.Connected)
-            //    {
-            //        shellSession.PerformSend(bytes);
-            //    }
-            //}
+            this.tabEventSendData.Buffer = bytes;
+            base.RaiseTabEvent(this.tabEventSendData);
         }
 
         /// <summary>
@@ -756,11 +738,9 @@ namespace ModengTerm.ViewModel.Terminal
 
             kbdInput.SendBytes = bytes;
 
-            videoTerminal.RaiseKeyboardInput(kbdInput);
+            this.videoTerminal.RaiseKeyboardInput(kbdInput);
 
-            PerformSend(bytes);
-
-            SendSyncInput(bytes);
+            this.PerformSend(bytes);
         }
 
         ///// <summary>
@@ -782,9 +762,7 @@ namespace ModengTerm.ViewModel.Terminal
         {
             byte[] bytes = writeEncoding.GetBytes(text);
 
-            PerformSend(bytes);
-
-            SendSyncInput(bytes);
+            this.PerformSend(bytes);
         }
 
         public int Control(int command, object parameter, out object result)

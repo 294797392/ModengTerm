@@ -11,6 +11,53 @@ namespace ModengTerm.Addon
 {
     public class ClientEventRegistryImpl : IClientEventRegistry
     {
+        private class Registry<TEvent, TDelegate> where TDelegate : Delegate
+        {
+            private Dictionary<TEvent, List<TDelegate>> eventRegistry;
+
+            public Registry()
+            {
+                this.eventRegistry = new Dictionary<TEvent, List<TDelegate>>();
+            }
+
+            public void Subscribe(TEvent ev, TDelegate @delegate)
+            {
+                List<TDelegate> delegates;
+                if (!this.eventRegistry.TryGetValue(ev, out delegates))
+                {
+                    delegates = new List<TDelegate>();
+                    this.eventRegistry[ev] = delegates;
+                }
+
+                delegates.Add(@delegate);
+            }
+
+            public void Unsubscribe(TEvent ev, TDelegate @delegate)
+            {
+                List<TDelegate> delegates;
+                if (!this.eventRegistry.TryGetValue(ev, out delegates))
+                {
+                    return;
+                }
+
+                delegates.Remove(@delegate);
+            }
+
+            public void Publish(TEvent ev, object e) 
+            {
+                List<TDelegate> delegates;
+                if (!this.eventRegistry.TryGetValue(ev, out delegates))
+                {
+                    return;
+                }
+
+                foreach (TDelegate @delegate in delegates)
+                {
+                    @delegate.DynamicInvoke(ev, e);
+                }
+            }
+        }
+
         private class HotkeyEvent
         {
             public AddonModule Addon { get; set; }
@@ -22,103 +69,97 @@ namespace ModengTerm.Addon
 
         private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientEventRegistoryImpl");
 
-        private Dictionary<ClientEvent, List<ClientEventDelegate>> eventRegistry;
+        private Registry<ClientEvent, ClientEventDelegate> clientRegistry;
+        private Registry<TabEvent, TabEventDelegate> tabRegistry;
         private Dictionary<IClientTab, Dictionary<TabEvent, List<TabEventDelegate>>> tabEventRegistry;
         private Dictionary<string, List<HotkeyEvent>> hotKeyRegistry;
 
         public ClientEventRegistryImpl()
         {
-            this.eventRegistry = new Dictionary<ClientEvent, List<ClientEventDelegate>>();
+            this.clientRegistry = new Registry<ClientEvent, ClientEventDelegate>();
+            this.tabRegistry = new Registry<TabEvent, TabEventDelegate>();
             this.tabEventRegistry = new Dictionary<IClientTab, Dictionary<TabEvent, List<TabEventDelegate>>>();
             this.hotKeyRegistry = new Dictionary<string, List<HotkeyEvent>>();
         }
 
         public void SubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate)
         {
-            List<ClientEventDelegate> delegates;
-            if (!this.eventRegistry.TryGetValue(evType, out delegates))
-            {
-                delegates = new List<ClientEventDelegate>();
-                this.eventRegistry[evType] = delegates;
-            }
-
-            delegates.Add(@delegate);
+            this.clientRegistry.Subscribe(evType, @delegate);
         }
 
         public void UnsubscribeEvent(ClientEvent evType, ClientEventDelegate @delegate)
         {
-            List<ClientEventDelegate> delegates;
-            if (!this.eventRegistry.TryGetValue(evType, out delegates))
-            {
-                return;
-            }
-
-            delegates.Remove(@delegate);
+            this.clientRegistry.Unsubscribe(evType, @delegate);
         }
 
         public void PublishEvent(ClientEventArgs evArgs)
         {
-            List<ClientEventDelegate> delegates;
-            if (!this.eventRegistry.TryGetValue(evArgs.Type, out delegates))
-            {
-                return;
-            }
-
-            foreach (ClientEventDelegate @delegate in delegates)
-            {
-                @delegate.Invoke(evArgs.Type, evArgs);
-            }
+            this.clientRegistry.Publish(evArgs.Type, evArgs);
         }
 
 
 
-        public void SubscribeTabEvent(IClientTab tab, TabEvent evType, TabEventDelegate @delegate)
+        public void SubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null)
         {
-            Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
-            if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+            if (tab == null)
             {
-                eventLists = new Dictionary<TabEvent, List<TabEventDelegate>>();
-                this.tabEventRegistry[tab] = eventLists;
+                this.tabRegistry.Subscribe(evType, @delegate);
             }
-
-            List<TabEventDelegate> delegates;
-            if (!eventLists.TryGetValue(evType, out delegates))
+            else
             {
-                delegates = new List<TabEventDelegate>();
-                eventLists[evType] = delegates;
-            }
+                Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
+                if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+                {
+                    eventLists = new Dictionary<TabEvent, List<TabEventDelegate>>();
+                    this.tabEventRegistry[tab] = eventLists;
+                }
 
-            delegates.Add(@delegate);
+                List<TabEventDelegate> delegates;
+                if (!eventLists.TryGetValue(evType, out delegates))
+                {
+                    delegates = new List<TabEventDelegate>();
+                    eventLists[evType] = delegates;
+                }
+
+                delegates.Add(@delegate);
+            }
         }
 
-        public void UnsubscribeTabEvent(IClientTab tab, TabEvent evType, TabEventDelegate @delegate)
+        public void UnsubscribeTabEvent(TabEvent evType, TabEventDelegate @delegate, IClientTab tab = null)
         {
-            Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
-            if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+            if (tab == null)
             {
-                return;
+                this.tabRegistry.Unsubscribe(evType, @delegate);
             }
-
-            if (eventLists.Count == 0)
+            else
             {
-                this.tabEventRegistry.Remove(tab);
-                return;
-            }
+                Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
+                if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
+                {
+                    return;
+                }
 
-            List<TabEventDelegate> delegates;
-            if (!eventLists.TryGetValue(evType, out delegates))
-            {
-                return;
-            }
-
-            delegates.Remove(@delegate);
-
-            if (delegates.Count == 0)
-            {
-                eventLists.Remove(evType);
                 if (eventLists.Count == 0)
                 {
                     this.tabEventRegistry.Remove(tab);
+                    return;
+                }
+
+                List<TabEventDelegate> delegates;
+                if (!eventLists.TryGetValue(evType, out delegates))
+                {
+                    return;
+                }
+
+                delegates.Remove(@delegate);
+
+                if (delegates.Count == 0)
+                {
+                    eventLists.Remove(evType);
+                    if (eventLists.Count == 0)
+                    {
+                        this.tabEventRegistry.Remove(tab);
+                    }
                 }
             }
         }
@@ -130,6 +171,10 @@ namespace ModengTerm.Addon
 
         public void PublishTabEvent(IClientTab tab, TabEventArgs evArgs)
         {
+            // 先发布全局Tab事件
+            this.tabRegistry.Publish(evArgs.Type, evArgs);
+
+            // 再发布针对于单个订阅的Tab事件
             Dictionary<TabEvent, List<TabEventDelegate>> eventLists;
             if (!this.tabEventRegistry.TryGetValue(tab, out eventLists))
             {
@@ -187,12 +232,12 @@ namespace ModengTerm.Addon
         public bool PublishHotkeyEvent(string hotkey)
         {
             List<HotkeyEvent> events;
-            if(!this.hotKeyRegistry.TryGetValue(hotkey, out events))
+            if (!this.hotKeyRegistry.TryGetValue(hotkey, out events))
             {
                 return false;
             }
 
-            if (events.Count == 0) 
+            if (events.Count == 0)
             {
                 return false;
             }
