@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.Addon.Interactive
 {
+    /// <summary>
+    /// 公开终端的绘图接口
+    /// </summary>
     public interface IDrawingContext
     {
         /// <summary>

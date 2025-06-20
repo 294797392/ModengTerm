@@ -92,7 +92,7 @@ namespace ModengTerm.OfficialAddons.Find
         protected override void OnActive(ActiveContext e)
         {
             this.eventRegistory.RegisterHotkey(this, "Esc", HotkeyScopes.ClientShellTab, this.OnEscKeyDown);
-            this.eventRegistory.RegisterHotkey(this, "Alt+F", HotkeyScopes.ClientShellTab, this.OnAltFKeyDown);
+            this.eventRegistory.RegisterHotkey(this, "Ctrl+F", HotkeyScopes.ClientShellTab, this.OnAltFKeyDown);
             this.RegisterCommand("FindAddon.Find", this.FindCommandExecuted);
         }
 

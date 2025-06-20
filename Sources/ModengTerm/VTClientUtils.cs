@@ -40,7 +40,14 @@ namespace ModengTerm
             }
             else
             {
-                hotKey += string.Format("{0}+", modKeys);
+                if (modKeys == ModifierKeys.Control)
+                {
+                    hotKey += string.Format("Ctrl+");
+                }
+                else
+                {
+                    hotKey += string.Format("{0}+", modKeys);
+                }
             }
 
             for (int i = 0; i < keys.Count; i++)

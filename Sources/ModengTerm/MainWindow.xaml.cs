@@ -266,6 +266,12 @@ namespace ModengTerm
                 {
                     this.kstat = HotkeyState.Key1;
                 }
+
+                if (e.Key == Key.Escape)
+                {
+                    return this.eventRegistry.PublishHotkeyEvent("Esc");
+                }
+
                 return false;
             }
 

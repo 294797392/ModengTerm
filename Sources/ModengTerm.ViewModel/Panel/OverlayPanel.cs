@@ -10,7 +10,7 @@ namespace ModengTerm.ViewModel.Panel
     /// <summary>
     /// 提供扩展悬浮面板的接口
     /// </summary>
-    public class OverlayPanel : HostPanel, IOverlayPanel
+    public class OverlayPanel : ClientPanel, IOverlayPanel
     {
         #region 类变量
 

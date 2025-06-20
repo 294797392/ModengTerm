@@ -118,18 +118,19 @@ namespace ModengTerm.OfficialAddons.Find
 
         public void OnInitialize()
         {
+            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
+
             string backColorRgbKey = this.OwnerTab.GetOption<string>(OptionKeyEnum.THEME_FIND_HIGHLIGHT_BACKCOLOR, OptionDefaultValues.THEME_FIND_HIGHLIGHT_BACKCOLOR);
             this.backColor = VTColor.CreateFromRgbKey(backColorRgbKey);
-
             this.drawingContext = this.OwnerTab.DrawingContext;
             this.highlightObject = this.drawingContext.CreateGraphicsObject();
-            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
         }
 
         public void OnRelease()
         {
-            this.drawingContext.DeleteGraphicsObject(this.highlightObject);
             this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
+
+            this.drawingContext.DeleteGraphicsObject(this.highlightObject);
         }
 
         public void OnLoaded()

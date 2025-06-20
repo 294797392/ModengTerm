@@ -11,7 +11,7 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel
 {
-    public abstract class HostPanel : ViewModelBase
+    public abstract class ClientPanel : ViewModelBase
     {
         #region 实例变量
 
