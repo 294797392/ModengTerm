@@ -36,6 +36,9 @@
   <ItemGroup>
     <Compile Remove="Addon\WindowImpl.cs" />
     <Compile Remove="Controls\MdToolPanel.cs" />
+    <Compile Remove="OfficialAddons\BroadcastInput\BroadcastSession.cs" />
+    <Compile Remove="OfficialAddons\BroadcastInput\BroadcastSessionVM.cs" />
+    <Compile Remove="OfficialAddons\BroadcastInput\Utility.cs" />
     <Compile Remove="OfficialAddons\Find\FindVM.cs" />
     <Compile Remove="OfficialAddons\SessionExplorer\SessionExplorerPanelVM.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />

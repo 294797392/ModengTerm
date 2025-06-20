@@ -43,7 +43,7 @@ namespace ModengTerm.Addon
                 delegates.Remove(@delegate);
             }
 
-            public void Publish(TEvent ev, object e) 
+            public void Publish(TEvent ev, object e)
             {
                 List<TDelegate> delegates;
                 if (!this.eventRegistry.TryGetValue(ev, out delegates))
@@ -53,7 +53,7 @@ namespace ModengTerm.Addon
 
                 foreach (TDelegate @delegate in delegates)
                 {
-                    @delegate.DynamicInvoke(ev, e);
+                    @delegate.DynamicInvoke(e);
                 }
             }
         }
@@ -169,8 +169,10 @@ namespace ModengTerm.Addon
             this.tabEventRegistry.Remove(tab);
         }
 
-        public void PublishTabEvent(IClientTab tab, TabEventArgs evArgs)
+        public void PublishTabEvent(TabEventArgs evArgs)
         {
+            IClientTab tab = evArgs.Sender;
+
             // 先发布全局Tab事件
             this.tabRegistry.Publish(evArgs.Type, evArgs);
 

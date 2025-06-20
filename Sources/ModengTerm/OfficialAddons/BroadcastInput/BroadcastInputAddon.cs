@@ -2,13 +2,15 @@
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
 using ModengTerm.Base.Enumerations;
-using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace ModengTerm.OfficialAddons.BroadcastInput
 {
     public class BroadcastInputAddon : AddonModule
     {
+        public const string KEY_BROADCAST_LIST = "broadcasts";
+
         #region 实例变量
 
         #endregion
@@ -18,14 +20,19 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         protected override void OnActive(ActiveContext context)
         {
             this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
-            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
+            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_TAB_OPENED, this.OnTabOpened);
+            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
+            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
         }
+
+        #endregion
+
+        #region 实例方法
 
         #endregion
 
@@ -33,70 +40,33 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void OpenBroadcastInputWindow(CommandArgs e)
         {
-            //IClientShellTab activeTab = this.client.GetActiveTab<IClientShellTab>();
-            //List<IClientShellTab> allTabs = this.client.GetAllTabs<IClientShellTab>();
-            //List<BroadcastSessionVM> broadcastSessions = this.broadcastSessions.ToList();
-
-            //BroadcastInputManagerWindow window = new BroadcastInputManagerWindow(broadcastSessions, allTabs);
-            //window.StorageService = this.storageService;
-            //window.Owner = Application.Current.MainWindow;
-            //if ((bool)window.ShowDialog())
-            //{
-            //    this.LoadBroadcastList();
-            //}
+            BroadcastInputManagerWindow broadcastInputManagerWindow = new BroadcastInputManagerWindow(e.ActiveTab as IClientShellTab, this);
+            broadcastInputManagerWindow.Owner = Application.Current.MainWindow;
+            if ((bool)broadcastInputManagerWindow.ShowDialog())
+            {
+                e.ActiveTab.SetData(this, KEY_BROADCAST_LIST, broadcastInputManagerWindow.BroadcastList);
+            }
         }
 
-        private void OnTabOpened(ClientEventArgs e)
+        private void OnShellOpened(TabEventArgs e)
         {
-            ClientEventTabOpened tabOpened = e as ClientEventTabOpened;
-
-            switch (tabOpened.SessionType)
-            {
-                case SessionTypeEnum.SFTP: return;
-                case SessionTypeEnum.SSH:
-                case SessionTypeEnum.Tcp:
-                case SessionTypeEnum.Localhost:
-                case SessionTypeEnum.SerialPort:
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            IClientShellTab activeTab = this.client.GetActiveTab<IClientShellTab>();
-            List<IClientShellTab> allTabs = this.client.GetAllTabs<IClientShellTab>();
-
-            List<BroadcastSession> broadcastSessions = this.storageService.GetObjects<BroadcastSession>(activeTab.ID.ToString());
-
-            List<IClientShellTab> broadcastTabs = new List<IClientShellTab>();
-
-            foreach (IClientShellTab tab in allTabs)
-            {
-                if (tab == activeTab)
-                {
-                    continue;
-                }
-
-                broadcastTabs.Add(tab);
-            }
-
-            activeTab.SetData(this, "broadcasts", broadcastTabs);
+            TabEventShellOpened tabOpened = e as TabEventShellOpened;
         }
 
         private void OnShellSendData(TabEventArgs e)
         {
             TabEventShellSendData sendData = e as TabEventShellSendData;
 
-            List<IClientShellTab> broadcastTabs = e.ClientTab.GetData<List<IClientShellTab>>(this, "broadcasts");
+            List<IClientShellTab> broadcastTabs = e.Sender.GetData<List<IClientShellTab>>(this, KEY_BROADCAST_LIST);
 
-            if (broadcastTabs == null) 
+            if (broadcastTabs == null)
             {
                 return;
             }
 
             foreach (IClientShellTab shellTab in broadcastTabs)
             {
-                if (shellTab.Status != SessionStatusEnum.Connected) 
+                if (shellTab.Status != SessionStatusEnum.Connected)
                 {
                     continue;
                 }

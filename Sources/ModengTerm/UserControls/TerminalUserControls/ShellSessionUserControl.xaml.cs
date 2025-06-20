@@ -175,7 +175,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                             return;
                         }
 
-                        this.shellSession.SendText(text);
+                        this.shellSession.Send(text);
                     }
                     else
                     {

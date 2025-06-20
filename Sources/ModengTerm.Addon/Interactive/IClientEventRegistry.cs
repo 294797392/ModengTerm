@@ -57,7 +57,11 @@ namespace ModengTerm.Addon.Interactive
         /// <param name="tab"></param>
         void UnsubscribeTabEvent(IClientTab tab = null);
 
-        void PublishTabEvent(IClientTab tab, TabEventArgs evArgs);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="evArgs"></param>
+        void PublishTabEvent(TabEventArgs evArgs);
 
         #endregion
 

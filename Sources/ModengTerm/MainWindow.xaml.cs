@@ -9,7 +9,6 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
-using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
@@ -25,7 +24,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media.Animation;
 
 namespace ModengTerm
 {
@@ -175,7 +173,6 @@ namespace ModengTerm
             }
             content.Close();
 
-            session.ClientEvent -= this.OpenedSessionVM_ClientEvent;
             session.TabEvent -= this.OpenedSessionVM_TabEvent;
 
             // 取消该会话的所有订阅的事件
@@ -433,14 +430,9 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        private void OpenedSessionVM_ClientEvent(OpenedSessionVM session, ClientEventArgs evArgs)
-        {
-            this.eventRegistry.PublishEvent(evArgs);
-        }
-
         private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs evArgs)
         {
-            this.eventRegistry.PublishTabEvent(session, evArgs);
+            this.eventRegistry.PublishTabEvent(evArgs);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -506,7 +498,7 @@ namespace ModengTerm
             ClientEventActiveTabChanged activeTabChanged = new ClientEventActiveTabChanged()
             {
                 AddedTab = addedSession,
-                RemovedTab = removedSession
+                RemovedTab = removedSession,
             };
             this.eventRegistry.PublishEvent(activeTabChanged);
         }
@@ -748,7 +740,6 @@ namespace ModengTerm
             openedSessionVM.Description = session.Description;
             openedSessionVM.Content = content as DependencyObject;
             openedSessionVM.ServiceAgent = VTApp.Context.ServiceAgent;
-            openedSessionVM.ClientEvent += this.OpenedSessionVM_ClientEvent;
             openedSessionVM.TabEvent += this.OpenedSessionVM_TabEvent;
             openedSessionVM.Initialize();
 
@@ -772,12 +763,23 @@ namespace ModengTerm
             }
 
             // 触发打开事件
-            ClientEventTabOpened tabOpened = new ClientEventTabOpened()
+            TabEventTabOpened tabOpened = new TabEventTabOpened()
             {
+                Sender = openedSessionVM,
+                OpenedTab = openedSessionVM,
                 SessionType = (SessionTypeEnum)session.Type,
-                OpenedTab = openedSessionVM
             };
-            this.eventRegistry.PublishEvent(tabOpened);
+            this.eventRegistry.PublishTabEvent(tabOpened);
+
+            if (VTBaseUtils.IsTerminal((SessionTypeEnum)session.Type))
+            {
+                TabEventShellOpened shellOpened = new TabEventShellOpened()
+                {
+                    Sender = openedSessionVM,
+                    OpenedTab = openedSessionVM as IClientShellTab,
+                };
+                this.eventRegistry.PublishTabEvent(shellOpened);
+            }
         }
 
         /// <summary>

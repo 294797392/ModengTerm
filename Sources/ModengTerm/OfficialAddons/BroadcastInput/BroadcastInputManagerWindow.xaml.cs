@@ -5,6 +5,8 @@ using ModengTerm.Base;
 using ModengTerm.Controls;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows;
 using WPFToolkit.MVVM;
 
@@ -17,27 +19,29 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
     {
         #region 实例变量
 
-        private BindableCollection<BroadcastSessionVM> broadcastSessions;
-
-        #endregion
-
-        #region 实例变量
+        private BindableCollection<IClientShellTab> broadcastTabs;
 
         /// <summary>
         /// 被删除的广播会话
         /// </summary>
-        private List<BroadcastSessionVM> removeList;
+        private List<IClientShellTab> removeList;
 
         /// <summary>
         /// 新增加的广播会话
         /// </summary>
-        private List<BroadcastSessionVM> addList;
+        private List<IClientShellTab> addList;
+
+        private ClientFactory factory;
+        private StorageService storageService;
+        private IClient client;
+        private IClientShellTab activeTab;
+        private AddonModule addonModule;
 
         #endregion
 
         #region 属性
 
-        public StorageService StorageService { get; set; }
+        public List<IClientShellTab> BroadcastList { get; private set; }
 
         #endregion
 
@@ -48,24 +52,40 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
         /// </summary>
         /// <param name="broadcastSessions"></param>
         /// <param name="shellSessions">当前打开的所有终端类型的会话</param>
-        public BroadcastInputManagerWindow(List<BroadcastSessionVM> broadcastSessions, List<IClientShellTab> shellSessions)
+        public BroadcastInputManagerWindow(IClientShellTab activeTab, AddonModule addon)
         {
             InitializeComponent();
 
-            this.InitializeWindow(broadcastSessions, shellSessions);
+            this.activeTab = activeTab;
+            this.addonModule = addon;
+
+            this.InitializeWindow();
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeWindow(List<BroadcastSessionVM> broadcastSessions, List<IClientShellTab> shellSessions)
+        private void InitializeWindow()
         {
-            this.broadcastSessions = new BindableCollection<BroadcastSessionVM>();
-            this.broadcastSessions.AddRange(broadcastSessions);
+            this.addList = new List<IClientShellTab>();
+            this.removeList = new List<IClientShellTab>();
 
-            ListBoxShellSessionList.DataContext = shellSessions;
-            ListBoxBroadcastSessions.DataContext = this.broadcastSessions;
+            this.factory = ClientFactory.GetFactory();
+            this.storageService = this.factory.GetStorageService();
+            this.client = this.factory.GetClient();
+
+            this.broadcastTabs = new BindableCollection<IClientShellTab>();
+            List<IClientShellTab> broadcastList = this.activeTab.GetData<List<IClientShellTab>>(this.addonModule, BroadcastInputAddon.KEY_BROADCAST_LIST);
+            if (broadcastList != null)
+            {
+                this.broadcastTabs.AddRange(broadcastList);
+            }
+
+            List<IClientShellTab> shellTabs = this.client.GetAllTabs<IClientShellTab>();
+            shellTabs.Remove(this.activeTab);
+            ListBoxShellSessionList.DataContext = shellTabs;
+            ListBoxBroadcastSessions.DataContext = this.broadcastTabs;
         }
 
         #endregion
@@ -74,21 +94,8 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            List<BroadcastSession> addList = this.addList.Select(v => new BroadcastSession() { SessionId = v.BroadcastTab.ID.ToString() }).ToList();
-            int code = this.StorageService.AddObjects<BroadcastSession>(addList);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MTMessageBox.Error("新建广播会话失败, {0}", code);
-                return;
-            }
-
-            List<string> removeList = this.removeList.Select(v => v.BroadcastTab.ID.ToString()).ToList();
-            code = this.StorageService.DeleteObjects(removeList);
-            if (code != ResponseCode.SUCCESS) 
-            {
-                MTMessageBox.Error("删除广播会话失败, {0}", code);
-                return;
-            }
+            this.BroadcastList = new List<IClientShellTab>();
+            this.BroadcastList.AddRange(this.broadcastTabs);
 
             base.DialogResult = true;
         }
@@ -100,46 +107,46 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         private void ButtonAddSlave_Click(object sender, RoutedEventArgs e)
         {
-            BroadcastSessionVM broadcastSession = ListBoxShellSessionList.SelectedItem as BroadcastSessionVM;
-            if (broadcastSession == null)
+            IClientShellTab shellTab = ListBoxShellSessionList.SelectedItem as IClientShellTab;
+            if (shellTab == null)
             {
                 return;
             }
 
-            if (this.broadcastSessions.Contains(broadcastSession))
+            if (this.broadcastTabs.Contains(shellTab))
             {
                 return;
             }
 
-            if (this.removeList.Contains(broadcastSession))
+            if (this.removeList.Contains(shellTab))
             {
-                this.removeList.Remove(broadcastSession);
+                this.removeList.Remove(shellTab);
             }
 
-            this.addList.Add(broadcastSession);
-            this.broadcastSessions.Add(broadcastSession);
+            this.addList.Add(shellTab);
+            this.broadcastTabs.Add(shellTab);
         }
 
         private void ButtonRemoveSlave_Click(object sender, RoutedEventArgs e)
         {
-            BroadcastSessionVM broadcastSession = ListBoxShellSessionList.SelectedItem as BroadcastSessionVM;
-            if (broadcastSession == null)
+            IClientShellTab shellTab = ListBoxShellSessionList.SelectedItem as IClientShellTab;
+            if (shellTab == null)
             {
                 return;
             }
 
-            if (!this.broadcastSessions.Contains(broadcastSession))
+            if (!this.broadcastTabs.Contains(shellTab))
             {
                 return;
             }
 
-            if (this.addList.Contains(broadcastSession))
+            if (this.addList.Contains(shellTab))
             {
-                this.addList.Remove(broadcastSession);
+                this.addList.Remove(shellTab);
             }
 
-            this.removeList.Add(broadcastSession);
-            this.broadcastSessions.Remove(broadcastSession);
+            this.removeList.Add(shellTab);
+            this.broadcastTabs.Remove(shellTab);
         }
 
         private void MenuItemClearSelected_Click(object sender, RoutedEventArgs e)
@@ -147,8 +154,8 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
             this.removeList.Clear();
             this.addList.Clear();
 
-            this.removeList.AddRange(this.broadcastSessions);
-            this.broadcastSessions.Clear();
+            this.removeList.AddRange(this.broadcastTabs);
+            this.broadcastTabs.Clear();
         }
 
         #endregion

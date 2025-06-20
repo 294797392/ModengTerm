@@ -22,24 +22,9 @@ namespace ModengTerm.Addon
         CLIENT_INITIALIZED = 0,
 
         /// <summary>
-        /// 会话状态改变事件
+        /// 
         /// </summary>
-        CLIENT_TAB_STATUS_CHANGED = 1,
-
-        /// <summary>
-        /// 选中的Tab页面改变事件
-        /// </summary>
-        CLIENT_ACTIVE_TAB_CHANGED = 2,
-
-        /// <summary>
-        /// 会话被打开之后触发的事件
-        /// </summary>
-        CLIENT_TAB_OPENED = 3,
-
-        /// <summary>
-        /// 会话被关闭之后触发的事件
-        /// </summary>
-        CLIENT_TAB_CLOSED = 4,
+        CLIENT_ACTIVE_TAB_CHANGED
     }
 
     public abstract class ClientEventArgs
@@ -52,31 +37,7 @@ namespace ModengTerm.Addon
         public override ClientEvent Type => ClientEvent.CLIENT_INITIALIZED;
     }
 
-    public class ClientEventTabStatusChanged : ClientEventArgs
-    {
-        public override ClientEvent Type => ClientEvent.CLIENT_TAB_STATUS_CHANGED;
-
-        public SessionStatusEnum OldStatus { get; set; }
-
-        public SessionStatusEnum NewStatus { get; set; }
-    }
-
-    public class ClientEventTabOpened : ClientEventArgs
-    {
-        public override ClientEvent Type => ClientEvent.CLIENT_TAB_OPENED;
-
-        /// <summary>
-        /// 会话类型
-        /// </summary>
-        public SessionTypeEnum SessionType { get; set; }
-
-        /// <summary>
-        /// 被打开的Tab页面
-        /// </summary>
-        public IClientTab OpenedTab { get; set; }
-    }
-
-    public class ClientEventActiveTabChanged : ClientEventArgs 
+    public class ClientEventActiveTabChanged : ClientEventArgs
     {
         public override ClientEvent Type => ClientEvent.CLIENT_ACTIVE_TAB_CHANGED;
 

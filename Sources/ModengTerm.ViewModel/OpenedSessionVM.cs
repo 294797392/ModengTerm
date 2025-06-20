@@ -18,11 +18,6 @@ namespace ModengTerm.ViewModel
         #region 公开事件
 
         /// <summary>
-        /// 会话触发的ClientEvent
-        /// </summary>
-        public event Action<OpenedSessionVM, ClientEventArgs> ClientEvent;
-
-        /// <summary>
         /// 会话触发的TabEvent
         /// </summary>
         public event Action<OpenedSessionVM, TabEventArgs> TabEvent;
@@ -193,11 +188,6 @@ namespace ModengTerm.ViewModel
         #endregion
 
         #region 受保护方法
-
-        protected void RaiseClientEvent(ClientEventArgs e)
-        {
-            this.ClientEvent?.Invoke(this, e);
-        }
 
         protected void RaiseTabEvent(TabEventArgs e)
         {

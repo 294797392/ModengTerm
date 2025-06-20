@@ -82,6 +82,8 @@ namespace ModengTerm.ViewModel.Terminal
         private LoggerManager logMgr;
 
         private TabEventShellSendData tabEventSendData;
+        private TabEventShellRendered tabEventShellRendered;
+        private TabEventStatusChanged tabEventStatusChanged;
 
         #endregion
 
@@ -257,7 +259,9 @@ namespace ModengTerm.ViewModel.Terminal
             base(session)
         {
             this.OverlayPanels = new BindableCollection<OverlayPanel>();
-            this.tabEventSendData = new TabEventShellSendData();
+            this.tabEventSendData = new TabEventShellSendData() { Sender = this };
+            this.tabEventShellRendered = new TabEventShellRendered() { Sender = this };
+            this.tabEventStatusChanged = new TabEventStatusChanged() { Sender = this };
         }
 
         #endregion
@@ -406,6 +410,14 @@ namespace ModengTerm.ViewModel.Terminal
 
             switch ((SessionTypeEnum)Session.Type)
             {
+                case SessionTypeEnum.Tcp:
+                    {
+                        string addr = this.Session.GetOption<string>(OptionKeyEnum.RAW_TCP_ADDRESS);
+                        string port = this.Session.GetOption<string>(OptionKeyEnum.RAW_TCP_PORT);
+                        uri = string.Format("tcp://{0}:{1}", addr, port);
+                        break;
+                    }
+
                 case SessionTypeEnum.Localhost:
                     {
                         string cmdPath = Session.GetOption<string>(OptionKeyEnum.CMD_STARTUP_PATH);
@@ -743,28 +755,6 @@ namespace ModengTerm.ViewModel.Terminal
             this.PerformSend(bytes);
         }
 
-        ///// <summary>
-        ///// 发送原始字节数据
-        ///// </summary>
-        ///// <param name="rawData"></param>
-        //public override void SendRawData(byte[] rawData)
-        //{
-        //    PerformSend(rawData);
-
-        //    SendSyncInput(rawData);
-        //}
-
-        /// <summary>
-        /// 发送纯文本数据
-        /// </summary>
-        /// <param name="text"></param>
-        public void SendText(string text)
-        {
-            byte[] bytes = writeEncoding.GetBytes(text);
-
-            this.PerformSend(bytes);
-        }
-
         public int Control(int command, object parameter, out object result)
         {
             return sessionTransport.Control(command, parameter, out result);
@@ -913,12 +903,9 @@ namespace ModengTerm.ViewModel.Terminal
                     VTSize graphicsSize = videoTerminal.ActiveDocument.GraphicsInterface.DrawAreaSize;
                     videoTerminal.Resize(graphicsSize);
 
-                    TabEventShellRendered tabEvent = new TabEventShellRendered()
-                    {
-                        Buffer = buffer,
-                        Length = size
-                    };
-                    base.RaiseTabEvent(tabEvent);
+                    this.tabEventShellRendered.Buffer = buffer;
+                    this.tabEventShellRendered.Length = size;
+                    base.RaiseTabEvent(this.tabEventShellRendered);
                 }
                 catch (Exception ex)
                 {
@@ -975,12 +962,9 @@ namespace ModengTerm.ViewModel.Terminal
 
                 if (this.Status != status)
                 {
-                    ClientEventTabStatusChanged statusChanged = new ClientEventTabStatusChanged()
-                    {
-                        OldStatus = this.Status,
-                        NewStatus = status
-                    };
-                    this.RaiseClientEvent(statusChanged);
+                    this.tabEventStatusChanged.OldStatus = this.Status;
+                    this.tabEventStatusChanged.NewStatus = status;
+                    this.RaiseTabEvent(this.tabEventStatusChanged);
 
                     this.Status = status;
                 }
@@ -1116,10 +1100,25 @@ namespace ModengTerm.ViewModel.Terminal
         #region IShellTab
 
         public void Send(byte[] bytes)
-        { }
+        {
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
 
+            this.PerformSend(bytes);
+        }
+
+        /// <summary>
+        /// 发送纯文本数据
+        /// </summary>
+        /// <param name="text"></param>
         public void Send(string text)
-        { }
+        {
+            byte[] bytes = writeEncoding.GetBytes(text);
+
+            this.PerformSend(bytes);
+        }
 
         public VTParagraph GetParagraph(VTParagraphOptions options)
         {
