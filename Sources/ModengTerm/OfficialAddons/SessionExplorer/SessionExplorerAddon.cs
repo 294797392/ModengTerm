@@ -8,13 +8,13 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     {
         protected override void OnActive(ActiveContext e)
         {
-            this.eventRegistory.SubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
+            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
             this.RegisterCommand("SessionExplorerAddon.OpenExplorerWindow", OpenExplorerWindow);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistory.UnsubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
+            this.eventRegistry.UnsubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
         }
 
         private void OpenExplorerWindow(CommandArgs e)

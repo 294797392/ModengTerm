@@ -19,15 +19,15 @@ namespace ModengTerm.OfficialAddons.BroadcastInput
 
         protected override void OnActive(ActiveContext context)
         {
-            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
-            this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
+            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
+            this.eventRegistry.SubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
             this.RegisterCommand("BroadcastInputAddon.OpenBroadcastInputWindow", this.OpenBroadcastInputWindow);
         }
 
         protected override void OnDeactive()
         {
-            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
-            this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
+            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_SENDDATA, this.OnShellSendData);
+            this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_OPENED, this.OnShellOpened);
         }
 
         #endregion

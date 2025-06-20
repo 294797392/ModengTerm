@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addons;
 using ModengTerm.Base;
+using ModengTerm.Document;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace ModengTerm.OfficialAddons.Logger
         {
         }
 
-        private void ExecuteStartLoggerCommand(CommandArgs context)
+        private void ExecuteStartLoggerCommand(CommandArgs e)
         {
             throw new RefactorImplementedException();
             //ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;
@@ -32,7 +33,7 @@ namespace ModengTerm.OfficialAddons.Logger
             //}
         }
 
-        private void ExecuteStopLoggerCommand(CommandArgs context)
+        private void ExecuteStopLoggerCommand(CommandArgs e)
         {
             throw new RefactorImplementedException();
             //ShellSessionVM shellSessionVM = context.OpenedSession as ShellSessionVM;

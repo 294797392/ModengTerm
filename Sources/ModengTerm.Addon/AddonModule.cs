@@ -41,7 +41,7 @@ namespace ModengTerm.Addons
         protected ClientFactory factory;
         protected IClient client;
         protected StorageService storageService;
-        protected IClientEventRegistry eventRegistory;
+        protected IClientEventRegistry eventRegistry;
 
         #endregion
 
@@ -73,7 +73,7 @@ namespace ModengTerm.Addons
             this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
             this.client = this.factory.GetClient();
             this.storageService = this.factory.GetStorageService();
-            this.eventRegistory = this.factory.GetEventRegistry();
+            this.eventRegistry = this.factory.GetEventRegistry();
 
             this.OnActive(context);
         }
