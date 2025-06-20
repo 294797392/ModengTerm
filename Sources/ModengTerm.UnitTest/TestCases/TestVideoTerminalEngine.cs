@@ -23,7 +23,7 @@ namespace ModengTerm.UnitTest.TestCases
 
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
             VTDocument mainDocument = terminal.MainDocument;
-            VTScrollInfo scrollInfo = mainDocument.Scrollbar;
+            VTScrollbar scrollInfo = mainDocument.Scrollbar;
             int row = mainDocument.ViewportRow;
             int col = mainDocument.ViewportColumn;
 
@@ -75,7 +75,7 @@ namespace ModengTerm.UnitTest.TestCases
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
             int totalLines = 500;
@@ -131,7 +131,7 @@ namespace ModengTerm.UnitTest.TestCases
             VTDocument document = terminal.MainDocument;
             VTCursor cursor = terminal.Cursor;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
             int totalLines = 500;

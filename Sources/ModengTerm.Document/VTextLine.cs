@@ -577,7 +577,7 @@ namespace ModengTerm.Document
             int logicalRow = 0;
 
             VTDocument document = this.OwnerDocument;
-            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTScrollbar scrollInfo = document.Scrollbar;
 
             VTextLine textLine = document.FirstLine;
 

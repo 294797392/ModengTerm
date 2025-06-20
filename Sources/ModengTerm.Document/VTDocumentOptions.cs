@@ -18,7 +18,7 @@ namespace ModengTerm.Document
         /// <summary>
         /// 文档的图形接口
         /// </summary>
-        public GraphicsInterface GraphicsInterface { get; set; }
+        public GraphicsFactory GraphicsInterface { get; set; }
 
         /// <summary>
         /// 默认的可视区域行数

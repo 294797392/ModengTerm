@@ -45,7 +45,7 @@ namespace ModengTerm.UserControls
             double width = DocumentControl.ActualWidth - padding * 2;
             double height = DocumentControl.ActualHeight - padding * 2;
 
-            DocumentControl.SetPadding(padding);
+            DocumentControl.Padding = new System.Windows.Thickness(padding);
             DocumentControl.Background = DrawingUtils.GetBrush(background);
 
             VTDocumentOptions documentOptions = VTermUtils.CreateDocumentOptions(Guid.NewGuid().ToString(), width, height, session, DocumentControl);

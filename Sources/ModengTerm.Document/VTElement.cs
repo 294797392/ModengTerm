@@ -111,7 +111,7 @@ namespace ModengTerm.Document
         /// </summary>
         public void Initialize()
         {
-            GraphicsInterface documentController = this.ownerDocument.GraphicsInterface;
+            GraphicsFactory documentController = this.ownerDocument.GFactory;
 
             this.DrawingObject = documentController.CreateDrawingObject();
 
@@ -125,7 +125,7 @@ namespace ModengTerm.Document
         {
             this.OnRelease();
 
-            GraphicsInterface documentController = this.ownerDocument.GraphicsInterface;
+            GraphicsFactory documentController = this.ownerDocument.GFactory;
 
             documentController.DeleteDrawingObject(this.DrawingObject);
         }

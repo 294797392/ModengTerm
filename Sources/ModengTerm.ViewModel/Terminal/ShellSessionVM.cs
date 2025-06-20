@@ -142,8 +142,8 @@ namespace ModengTerm.ViewModel.Terminal
             }
         }
 
-        public GraphicsInterface MainDocument { get; set; }
-        public GraphicsInterface AlternateDocument { get; set; }
+        public GraphicsFactory MainDocument { get; set; }
+        public GraphicsFactory AlternateDocument { get; set; }
 
         public IDrawingContext DrawingContext { get; set; }
 
@@ -278,8 +278,6 @@ namespace ModengTerm.ViewModel.Terminal
 
         protected override int OnOpen()
         {
-            //logMgr = MTermApp.Context.LoggerManager;
-
             scriptItems = Session.GetOption(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             HistoryCommands = new BindableCollection<string>();
 
@@ -750,8 +748,6 @@ namespace ModengTerm.ViewModel.Terminal
 
             kbdInput.SendBytes = bytes;
 
-            this.videoTerminal.RaiseKeyboardInput(kbdInput);
-
             this.PerformSend(bytes);
         }
 
@@ -896,12 +892,12 @@ namespace ModengTerm.ViewModel.Terminal
             {
                 try
                 {
-                    videoTerminal.ProcessRead(buffer, size);
+                    this.videoTerminal.ProcessRead(buffer, size);
 
                     // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG9KR
                     // 解决刚打开会话之后，获取不到实际窗口大小导致终端行和列不正确的问题
-                    VTSize graphicsSize = videoTerminal.ActiveDocument.GraphicsInterface.DrawAreaSize;
-                    videoTerminal.Resize(graphicsSize);
+                    VTSize termsize = this.videoTerminal.ActiveDocument.GFactory.TerminalSize;
+                    this.videoTerminal.Resize(termsize);
 
                     this.tabEventShellRendered.Buffer = buffer;
                     this.tabEventShellRendered.Length = size;

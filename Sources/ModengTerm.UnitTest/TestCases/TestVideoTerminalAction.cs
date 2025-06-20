@@ -19,7 +19,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -70,7 +70,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -266,7 +266,7 @@ namespace ModengTerm.UnitTest.TestCases
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal2(9, 10);
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument mainDocument = terminal.MainDocument;
-            VTScrollInfo scrollInfo = mainDocument.Scrollbar;
+            VTScrollbar scrollInfo = mainDocument.Scrollbar;
             int row = mainDocument.ViewportRow;
             int col = mainDocument.ViewportColumn;
 
@@ -533,7 +533,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -604,7 +604,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -668,7 +668,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -698,7 +698,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -731,7 +731,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -868,7 +868,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
@@ -941,7 +941,7 @@ namespace ModengTerm.UnitTest.TestCases
             TerminalInvoker invoker = new TerminalInvoker(terminal);
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             VTCursor cursor = document.Cursor;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;

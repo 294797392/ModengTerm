@@ -8,6 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <muct:DocumentControl x:Name="DocumentControl"/>
+        <muct:TerminalControl x:Name="DocumentControl"/>
     </Grid>
 </UserControl>

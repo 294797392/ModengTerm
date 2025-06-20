@@ -36,8 +36,8 @@
 
             <Border x:Name="BorderBackground"/>
 
-            <muct:DocumentControl x:Name="DocumentAlternate"/>
-            <muct:DocumentControl x:Name="DocumentMain"/>
+            <muct:TerminalControl x:Name="DocumentAlternate"/>
+            <muct:TerminalControl x:Name="DocumentMain"/>
         </Grid>
 
     </Grid>

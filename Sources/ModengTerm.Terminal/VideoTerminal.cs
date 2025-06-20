@@ -15,15 +15,15 @@ using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Windows.Input;
 
 namespace ModengTerm.Terminal
 {
     public class VTOptions
     {
-        public GraphicsInterface AlternateDocument { get; set; }
+        public GraphicsFactory AlternateDocument { get; set; }
 
-        public GraphicsInterface MainDocument { get; set; }
+        public GraphicsFactory MainDocument { get; set; }
 
         /// <summary>
         /// 该终端所对应的Session
@@ -44,6 +44,19 @@ namespace ModengTerm.Terminal
         /// 终端的高度
         /// </summary>
         public double Height { get; set; }
+    }
+
+    public enum VTDocumentTypes
+    {
+        /// <summary>
+        /// 主缓冲区
+        /// </summary>
+        MainDocument,
+
+        /// <summary>
+        /// 备用缓冲区
+        /// </summary>
+        AlternateDocument
     }
 
     /// <summary>
@@ -83,11 +96,6 @@ namespace ModengTerm.Terminal
         public event Action<IVideoTerminal, VTDocument, VTDocument> OnDocumentChanged;
 
         /// <summary>
-        /// 当用户通过键盘输入数据的时候触发
-        /// </summary>
-        public event Action<IVideoTerminal, VTKeyboardInput> OnKeyboardInput;
-
-        /// <summary>
         /// 打印一个字符的时候触发
         /// </summary>
         public event Action<IVideoTerminal> OnPrint;
@@ -97,9 +105,17 @@ namespace ModengTerm.Terminal
         /// </summary>
         public event Action<IVideoTerminal, int, int> OnViewportChanged;
 
+        public event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
+
         public event Action<IVideoTerminal, double, double> RequestChangeWindowSize;
 
-        public event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
+        /// <summary>
+        /// 请求改变终端缓冲区的显示/隐藏状态
+        /// IVideoTerminal：vt
+        /// int：0 = 主缓冲区，1 = 备用缓冲区
+        /// bool：true = 显示，false = 隐藏
+        /// </summary>
+        public event Action<IVideoTerminal, VTDocumentTypes, bool> RequestChangeVisible;
 
         #endregion
 
@@ -250,7 +266,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         public VTCursor Cursor { get { return this.activeDocument.Cursor; } }
 
-        public VTScrollInfo ScrollInfo { get { return this.activeDocument.Scrollbar; } }
+        public VTScrollbar ScrollInfo { get { return this.activeDocument.Scrollbar; } }
 
         /// <summary>
         /// 当前正在使用的缓冲区
@@ -385,18 +401,13 @@ namespace ModengTerm.Terminal
 
             VTDocumentOptions mainOptions = VTermUtils.CreateDocumentOptions("MainDocument", this.vtOptions.Width, this.vtOptions.Height, sessionInfo, options.MainDocument);
             this.mainDocument = new VTDocument(mainOptions);
-            this.mainDocument.MouseDown += MainDocument_MouseDown;
-            this.mainDocument.MouseUp += MainDocument_MouseUp;
             this.mainDocument.Initialize();
             this.mainDocument.History.Add(this.mainDocument.FirstLine.History);
 
             VTDocumentOptions alternateOptions = VTermUtils.CreateDocumentOptions("AlternateDocument", this.vtOptions.Width, this.vtOptions.Height, sessionInfo, options.AlternateDocument);
             alternateOptions.RollbackMax = 0;
             this.alternateDocument = new VTDocument(alternateOptions);
-            this.alternateDocument.MouseDown += MainDocument_MouseDown;
-            this.alternateDocument.MouseUp += MainDocument_MouseUp;
             this.alternateDocument.Initialize();
-            this.alternateDocument.SetVisible(false);
 
             this.activeDocument = this.mainDocument;
             this.Typeface = this.mainDocument.Typeface;
@@ -443,7 +454,7 @@ namespace ModengTerm.Terminal
         /// </summary>
         public void Release()
         {
-            isRunning = false;
+            this.isRunning = false;
 
             this.vtParser.OnC0Actions -= VtParser_OnC0Actions;
             this.vtParser.OnESCActions -= VtParser_OnESCActions;
@@ -453,11 +464,7 @@ namespace ModengTerm.Terminal
 
             this.renderer.Release();
 
-            this.mainDocument.MouseDown -= MainDocument_MouseDown;
-            this.mainDocument.MouseUp -= MainDocument_MouseUp;
             this.mainDocument.Release();
-            this.alternateDocument.MouseDown -= MainDocument_MouseDown;
-            this.alternateDocument.MouseUp -= MainDocument_MouseUp;
             this.alternateDocument.Release();
         }
 
@@ -671,17 +678,6 @@ namespace ModengTerm.Terminal
             // 所以这里要重新渲染当前活动的缓冲区
             VTDocument newDocument = this.activeDocument;
             newDocument.RequestInvalidate();
-
-            if (oldDocument == newDocument)
-            {
-                int newScroll = oldDocument.Scrollbar.Value;
-                if (newScroll != oldScroll)
-                {
-                    // 计算ScrollData
-                    VTScrollData scrollData = this.GetScrollData(oldDocument, oldScroll, newScroll);
-                    oldDocument.InvokeScrollChanged(scrollData);
-                }
-            }
         }
 
         /// <summary>
@@ -706,15 +702,6 @@ namespace ModengTerm.Terminal
                 logger.ErrorFormat("发送数据失败, {0}", ResponseCode.GetMessage(code));
                 return;
             }
-        }
-
-        /// <summary>
-        /// 触发OnKeyboardInput事件
-        /// </summary>
-        /// <param name="kbdInput">事件参数</param>
-        public void RaiseKeyboardInput(VTKeyboardInput kbdInput)
-        {
-            this.OnKeyboardInput?.Invoke(this, kbdInput);
         }
 
         /// <summary>
@@ -743,7 +730,7 @@ namespace ModengTerm.Terminal
 
             // 要换行的文档
             VTDocument document = this.activeDocument;
-            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTScrollbar scrollInfo = document.Scrollbar;
             VTCursor cursor = document.Cursor;
             VTHistory history = document.History;
 
@@ -1034,7 +1021,7 @@ namespace ModengTerm.Terminal
                         // 对Windows命令行做特殊处理
                         // Windows的命令行比较特殊，在窗口放大的时候，它不会把上面被隐藏的行显示出来，而是在下面增加了新的行
 
-                        VTScrollInfo scrollInfo = document.Scrollbar;
+                        VTScrollbar scrollInfo = document.Scrollbar;
 
                         // 更新滚动条信息
                         int maxRow = this.GetMaxRow(document);
@@ -1061,7 +1048,7 @@ namespace ModengTerm.Terminal
 
                 default:
                     {
-                        VTScrollInfo scrollInfo = document.Scrollbar;
+                        VTScrollbar scrollInfo = document.Scrollbar;
 
                         // 更新滚动条信息
                         int maxRow = this.GetMaxRow(document);
@@ -1509,8 +1496,8 @@ namespace ModengTerm.Terminal
                                 // 使用备用缓冲区
                                 VTDebug.Context.WriteInteractive("UseAlternateScreenBuffer", string.Empty);
 
-                                this.mainDocument.SetVisible(false);
-                                this.alternateDocument.SetVisible(true);
+                                this.RequestChangeVisible?.Invoke(this, VTDocumentTypes.MainDocument, false);
+                                this.RequestChangeVisible?.Invoke(this, VTDocumentTypes.AlternateDocument, true);
 
                                 this.activeDocument = this.alternateDocument;
 
@@ -1524,8 +1511,8 @@ namespace ModengTerm.Terminal
 
                                 VTDebug.Context.WriteInteractive("UseMainScreenBuffer", string.Empty);
 
-                                this.mainDocument.SetVisible(true);
-                                this.alternateDocument.SetVisible(false);
+                                this.RequestChangeVisible?.Invoke(this, VTDocumentTypes.MainDocument, true);
+                                this.RequestChangeVisible?.Invoke(this, VTDocumentTypes.AlternateDocument, false);
 
                                 this.alternateDocument.SetScrollMargin(0, 0);
                                 this.alternateDocument.EraseAll();
@@ -1799,74 +1786,6 @@ namespace ModengTerm.Terminal
         }
 
         /// <summary>
-        /// 根据滚动之前的值和滚动之后的值生成VTScrollData数据
-        /// </summary>
-        /// <param name="oldScroll">滚动之前滚动条的值</param>
-        /// <param name="newScroll">滚动之后滚动条的值</param>
-        /// <returns></returns>
-        private VTScrollData GetScrollData(VTDocument document, int oldScroll, int newScroll)
-        {
-            int scrolledRows = Math.Abs(newScroll - oldScroll);
-
-            int scrollValue = newScroll;
-            int viewportRow = document.ViewportRow;
-            VTHistory history = document.History;
-            VTScrollInfo scrollbar = document.Scrollbar;
-
-            List<VTHistoryLine> removedLines = new List<VTHistoryLine>();
-            List<VTHistoryLine> addedLines = new List<VTHistoryLine>();
-
-            if (scrolledRows >= viewportRow)
-            {
-                // 此时说明把所有行都滚动到屏幕外了
-
-                // 遍历显示
-                VTextLine current = document.FirstLine;
-                for (int i = 0; i < viewportRow; i++)
-                {
-                    addedLines.Add(current.History);
-                }
-
-                // 我打赌不会报异常
-                IEnumerable<VTHistoryLine> historyLines;
-                history.TryGetHistories(oldScroll, oldScroll + viewportRow, out historyLines);
-                removedLines.AddRange(historyLines);
-            }
-            else
-            {
-                // 此时说明有部分行被移动出去了
-                if (newScroll > oldScroll)
-                {
-                    // 往下滚动
-                    IEnumerable<VTHistoryLine> historyLines;
-                    history.TryGetHistories(oldScroll, oldScroll + scrolledRows, out historyLines);
-                    removedLines.AddRange(historyLines);
-
-                    history.TryGetHistories(oldScroll + viewportRow, oldScroll + viewportRow + scrolledRows - 1, out historyLines);
-                    addedLines.AddRange(historyLines);
-                }
-                else
-                {
-                    // 往上滚动,2
-                    IEnumerable<VTHistoryLine> historyLines;
-                    history.TryGetHistories(oldScroll + viewportRow - scrolledRows, oldScroll + viewportRow - 1, out historyLines);
-                    removedLines.AddRange(historyLines);
-
-                    history.TryGetHistories(newScroll, newScroll + scrolledRows, out historyLines);
-                    addedLines.AddRange(historyLines);
-                }
-            }
-
-            return new VTScrollData()
-            {
-                NewScroll = newScroll,
-                OldScroll = oldScroll,
-                AddedLines = addedLines,
-                RemovedLines = removedLines
-            };
-        }
-
-        /// <summary>
         /// 对滚动区域内的数据进行滚动
         /// </summary>
         /// <param name="delta">要滚动的行数。大于0表示往下滚动，小于0表示往上滚动</param>
@@ -1875,7 +1794,7 @@ namespace ModengTerm.Terminal
             VTDocument document = this.activeDocument;
             VTCursor cursor = document.Cursor;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTScrollbar scrollInfo = document.Scrollbar;
             VTextLine scrollRegionTopLine = document.FirstLine.FindNext(marginTop);
             VTextLine scrollRegionBottomLine = document.LastLine.FindPrevious(marginBottom);
 
@@ -1916,61 +1835,77 @@ namespace ModengTerm.Terminal
             document.SetCursorLogical(cursor.Row, cursor.Column);
         }
 
-        private void HandleVT200MouseMode(VTDocument document, MouseData mouseData, bool release)
-        {
-            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
-            {
-                return;
-            }
+        ///// <summary>
+        ///// 测试指令：top，gotop，htop
+        ///// TODO：增加协议注释
+        ///// </summary>
+        ///// <param name="document"></param>
+        ///// <param name="mouseData"></param>
+        ///// <param name="release"></param>
+        //private void HandleVT200MouseMode(VTDocument document, MouseData mouseData, bool release)
+        //{
+        //    if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+        //    {
+        //        return;
+        //    }
 
-            if (!document.HitTest(mouseData, this.textPointer))
-            {
-                return;
-            }
+        //    if (!document.HitTest(mouseData, this.textPointer))
+        //    {
+        //        return;
+        //    }
 
-            GraphicsInterface gi = document.GraphicsInterface;
-            int lowTwoBits = release ? 3 : (int)mouseData.Button;
-            int nextThreeBits = (int)gi.PressedModifierKey;
-            int cb = ((nextThreeBits << 2) + lowTwoBits) + 32;
-            int cx = this.textPointer.ColumnIndex + 1 + 32;
-            int cy = this.textPointer.LogicalRow + 1 + 32;
+        //    int modkey = 0;
+        //    switch (System.Windows.Input.Keyboard.Modifiers)
+        //    {
+        //        case ModifierKeys.None: modkey = 0; break;
+        //        case ModifierKeys.Shift: modkey = 4; break;
+        //        case ModifierKeys.Alt: modkey = 8; break;
+        //        case ModifierKeys.Control: modkey = 16; break;
+        //        default: modkey = 0; break;
+        //    }
 
-            string seq = string.Format(VT200_MOUSE_MODE_DATA, (char)cb, (char)cx, (char)cy);
-            byte[] bytes = Encoding.ASCII.GetBytes(seq);
-            int code = this.sessionTransport.Write(bytes);
-            if (code != ResponseCode.SUCCESS)
-            {
-                logger.ErrorFormat("发送VT200_MOUSE_MODE数据失败, {0}", code);
-            }
-        }
+        //    int lowTwoBits = release ? 3 : (int)mouseData.Button;
+        //    int nextThreeBits = modkey;
+        //    int cb = ((nextThreeBits << 2) + lowTwoBits) + 32;
+        //    int cx = this.textPointer.ColumnIndex + 1 + 32;
+        //    int cy = this.textPointer.LogicalRow + 1 + 32;
 
-        private void HandleClickToCursor(VTDocument document, MouseData mouseData)
-        {
-            VTScrollInfo scrollInfo = document.Scrollbar;
-            VTCursor cursor = document.Cursor;
-            VTHistory history = document.History;
+        //    string seq = string.Format(VT200_MOUSE_MODE_DATA, (char)cb, (char)cx, (char)cy);
+        //    byte[] bytes = Encoding.ASCII.GetBytes(seq);
+        //    int code = this.sessionTransport.Write(bytes);
+        //    if (code != ResponseCode.SUCCESS)
+        //    {
+        //        logger.ErrorFormat("发送VT200_MOUSE_MODE数据失败, {0}", code);
+        //    }
+        //}
 
-            if (document.HitTest(mouseData, this.textPointer))
-            {
-                int physicsRow = this.textPointer.PhysicsRow;
-                int row = physicsRow - scrollInfo.Value;
-                int col = this.textPointer.ColumnIndex;
-                document.SetCursorLogical(row, col);
-                cursor.Reposition();
+        //private void HandleClickToCursor(VTDocument document, MouseData mouseData)
+        //{
+        //    VTScrollbar scrollInfo = document.Scrollbar;
+        //    VTCursor cursor = document.Cursor;
+        //    VTHistory history = document.History;
 
-                if (physicsRow > history.Lines - 1)
-                {
-                    // 缺少的历史行数
-                    int adds = physicsRow - (history.Lines - 1);
-                    VTextLine textLine = document.ActiveLine.FindPrevious(adds - 1);
-                    for (int i = 0; i < adds; i++)
-                    {
-                        history.Add(textLine.History);
-                        textLine = textLine.NextLine;
-                    }
-                }
-            }
-        }
+        //    if (document.HitTest(mouseData, this.textPointer))
+        //    {
+        //        int physicsRow = this.textPointer.PhysicsRow;
+        //        int row = physicsRow - scrollInfo.Value;
+        //        int col = this.textPointer.ColumnIndex;
+        //        document.SetCursorLogical(row, col);
+        //        cursor.Reposition();
+
+        //        if (physicsRow > history.Lines - 1)
+        //        {
+        //            // 缺少的历史行数
+        //            int adds = physicsRow - (history.Lines - 1);
+        //            VTextLine textLine = document.ActiveLine.FindPrevious(adds - 1);
+        //            for (int i = 0; i < adds; i++)
+        //            {
+        //                history.Add(textLine.History);
+        //                textLine = textLine.NextLine;
+        //            }
+        //        }
+        //    }
+        //}
 
         private void HandleFocusEventMode(bool focused)
         {
@@ -2613,7 +2548,7 @@ namespace ModengTerm.Terminal
                             // 模拟xshell的操作，把当前行（光标所在行，就是最后一行）移动到可视区域的第一行
 
                             VTDocument document = this.activeDocument;
-                            VTScrollInfo scrollInfo = document.Scrollbar;
+                            VTScrollbar scrollInfo = document.Scrollbar;
                             VTHistory history = document.History;
 
                             // 获取当前屏幕一共显示了多少行
@@ -3160,29 +3095,29 @@ namespace ModengTerm.Terminal
 
         #region 事件处理器
 
-        private void MainDocument_MouseDown(VTDocument document, MouseData mouseData)
-        {
-            if (mouseData.Button == VTMouseButton.LeftButton)
-            {
-                if (this.clickToCursor)
-                {
-                    this.HandleClickToCursor(document, mouseData);
-                }
-            }
+        //private void MainDocument_MouseDown(VTDocument document, MouseData mouseData)
+        //{
+        //    if (mouseData.Button == VTMouseButton.LeftButton)
+        //    {
+        //        if (this.clickToCursor)
+        //        {
+        //            this.HandleClickToCursor(document, mouseData);
+        //        }
+        //    }
 
-            if (this.isVT200MouseMode)
-            {
-                this.HandleVT200MouseMode(document, mouseData, false);
-            }
-        }
+        //    if (this.isVT200MouseMode)
+        //    {
+        //        this.HandleVT200MouseMode(document, mouseData, false);
+        //    }
+        //}
 
-        private void MainDocument_MouseUp(VTDocument document, MouseData mouseData)
-        {
-            if (this.isVT200MouseMode)
-            {
-                this.HandleVT200MouseMode(document, mouseData, true);
-            }
-        }
+        //private void MainDocument_MouseUp(VTDocument document, MouseData mouseData)
+        //{
+        //    if (this.isVT200MouseMode)
+        //    {
+        //        this.HandleVT200MouseMode(document, mouseData, true);
+        //    }
+        //}
 
         #endregion
     }

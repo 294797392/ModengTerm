@@ -282,7 +282,7 @@ namespace ModengTerm.UnitTest
 
             VTDocument document = this.videoTerminal.MainDocument;
             double mouseY = document.Typeface.Height * row - 3;
-            FakeGI gi = document.GraphicsInterface as FakeGI;
+            FakeGI gi = document.GFactory as FakeGI;
             gi.RaiseMouseDown(new MouseData() { ClickCount = 1, X = 10, Y = mouseY });
         }
 

@@ -16,11 +16,11 @@
     <!-- 通用控件 -->
     <!-- 动态引用Themes里的资源来实现动态换肤功能 -->
 
-    <Style x:Key="StyleDocumentControl" TargetType="{x:Type muct:DocumentControl}">
+    <Style x:Key="StyleTerminalControl" TargetType="{x:Type muct:TerminalControl}">
         <Setter Property="Template">
             <Setter.Value>
 
-                <ControlTemplate TargetType="{x:Type muct:DocumentControl}">
+                <ControlTemplate TargetType="{x:Type muct:TerminalControl}">
 
                     <ControlTemplate.Resources>
 

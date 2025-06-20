@@ -28,7 +28,7 @@ namespace ModengTerm.UnitTest.TestCases
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTCursor cursor = document.Cursor;
-            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTScrollbar scrollInfo = document.Scrollbar;
 
             // 更新VTextLine的边界框信息，便于做命中测试
             document.RequestInvalidate();
@@ -69,7 +69,7 @@ namespace ModengTerm.UnitTest.TestCases
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
             VTCursor cursor = document.Cursor;
-            VTScrollInfo scrollInfo = document.Scrollbar;
+            VTScrollbar scrollInfo = document.Scrollbar;
 
             invoker.PrintLines(20);
             terminal.ScrollTo(5);
@@ -118,7 +118,7 @@ namespace ModengTerm.UnitTest.TestCases
             VideoTerminal terminal = UnitTestHelper.CreateVideoTerminal();
             VTDocument document = terminal.MainDocument;
             VTHistory history = document.History;
-            VTScrollInfo scrollInfo = terminal.ScrollInfo;
+            VTScrollbar scrollInfo = terminal.ScrollInfo;
             int row = document.ViewportRow;
             int col = document.ViewportColumn;
             int totalLines = document.RollbackMax + row + 100;

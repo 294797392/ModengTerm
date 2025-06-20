@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.Document.EventData;
 using ModengTerm.Terminal;
@@ -70,7 +71,8 @@ namespace ModengTerm.UserControls.Terminals
             VTDocument document = vt.ActiveDocument;
             VTCursor cursor = document.Cursor;
 
-            double drawAreaHeight = document.GraphicsInterface.DrawAreaSize.Height;
+            throw new RefactorImplementedException();
+            double drawAreaHeight = 0;// document.GraphicsInterface.DrawAreaSize.Height;
 
             // 光标下面还剩余多少高度
             double remainHeight = drawAreaHeight - cursor.Bottom;

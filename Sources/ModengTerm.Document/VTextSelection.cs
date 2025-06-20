@@ -85,7 +85,7 @@ namespace ModengTerm.Document
         public void SelectRow(VTextLine textLine, int logicalRow)
         {
             VTDocument document = this.OwnerDocument;
-            VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
+            VTScrollbar scrollInfo = this.OwnerDocument.Scrollbar;
 
             this.StartPointer.PhysicsRow = scrollInfo.Value + logicalRow;
             this.StartPointer.CharacterIndex = 0;
@@ -109,7 +109,7 @@ namespace ModengTerm.Document
         public void SelectRange(VTextLine textLine, int logicalRow, int startCharacterIndex, int characterCount)
         {
             VTDocument document = this.OwnerDocument;
-            VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
+            VTScrollbar scrollInfo = this.OwnerDocument.Scrollbar;
 
             this.StartPointer.PhysicsRow = scrollInfo.Value + logicalRow;
             this.StartPointer.CharacterIndex = startCharacterIndex;
@@ -129,7 +129,7 @@ namespace ModengTerm.Document
         public void SelectAll()
         {
             VTDocument document = this.OwnerDocument;
-            VTScrollInfo scrollInfo = this.OwnerDocument.Scrollbar;
+            VTScrollbar scrollInfo = this.OwnerDocument.Scrollbar;
             VTHistory history = document.History;
 
             VTHistoryLine startHistoryLine = history.FirstLine;
@@ -196,7 +196,7 @@ namespace ModengTerm.Document
 
             VTDocument document = this.OwnerDocument;
             double charWidth = document.Typeface.Width;
-            VTSize displaySize = document.GraphicsInterface.DrawAreaSize;
+            VTSize displaySize = document.GFactory.TerminalSize;
 
             // 单独处理选中的是同一行的情况
             if (startRow == endRow)

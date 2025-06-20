@@ -441,6 +441,11 @@ namespace ModengTerm
             this.eventRegistry.PublishTabEvent(evArgs);
         }
 
+        private void SessionContent_ExecuteCommand(CommandArgs e)
+        {
+            this.RaiseAddonCommand(e);
+        }
+
         private void Window_ContentRendered(object sender, EventArgs e)
         {
             // 直接打开Windows命令行，可以更快速的进入工作状态
@@ -885,6 +890,12 @@ namespace ModengTerm
             }
 
             this.OpenSession(session);
+        }
+
+        private void ExecuteAddonCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            CommandArgs args = e.Parameter as CommandArgs;
+            this.RaiseAddonCommand(args);
         }
 
         #endregion

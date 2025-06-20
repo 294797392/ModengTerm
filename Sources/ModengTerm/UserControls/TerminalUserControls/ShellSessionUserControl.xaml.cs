@@ -1,8 +1,11 @@
-﻿using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
+using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Panel;
@@ -10,6 +13,7 @@ using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -26,18 +30,18 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #endregion
 
-        #region 公开事件
-
-        public event Action<ISessionContent> Ready;
-
-        #endregion
-
         #region 实例变量
 
         private ShellSessionVM shellSession;
         private AutoCompletionVM autoCompleteVM;
         private VideoTerminal videoTerminal;
         private VTKeyboardInput userInput;
+        private IClientEventRegistry eventRegistry;
+
+        /// <summary>
+        /// 鼠标滚轮滚动一次，滚动几行
+        /// </summary>
+        private int scrollDelta;
 
         #endregion
 
@@ -65,10 +69,98 @@ namespace ModengTerm.UserControls.TerminalUserControls
             // https://learn.microsoft.com/zh-cn/dotnet/desktop/wpf/advanced/focus-overview?view=netframeworkdesktop-4.8
             // 必须设置Focusable=true，调用Focus才生效
             // 为使元素获得键盘焦点，必须将基元素的 Focusable 和 IsVisible 属性设置为 true。 某些类（例如 Panel 基类）默认将 Focusable 设置为 false；因此，如果要此类元素能够获得键盘焦点，必须将 Focusable 设置为 true。
-            GridDocument.Focusable = true;
+            GridTerminal.Focusable = true;
 
             this.Background = Brushes.Transparent;
             this.userInput = new VTKeyboardInput();
+
+            ClientFactory factory = ClientFactory.GetFactory();
+            this.eventRegistry = factory.GetEventRegistry();
+        }
+
+        private Point GetPositionRelativeToTerminal()
+        {
+            VTDocument document = this.videoTerminal.ActiveDocument;
+            TerminalControl terminalControl = document.GFactory as TerminalControl;
+            return Mouse.GetPosition(terminalControl.DrawArea);
+        }
+
+        private void MouseWheelScroll(MouseWheelEventArgs e)
+        {
+            VTDocument document = this.videoTerminal.ActiveDocument;
+
+            int oldScroll = document.Scrollbar.Value;
+            int scrollMax = document.Scrollbar.Maximum;
+            int newScroll = 0; // 最终要滚动到的值
+
+            if (e.Delta > 0)
+            {
+                // 向上滚动
+
+                // 先判断是不是已经滚动到顶了
+                if (document.ScrollAtTop)
+                {
+                    // 滚动到顶直接返回
+                    return;
+                }
+
+                if (oldScroll < scrollDelta)
+                {
+                    // 一次可以全部滚完并且还有剩余
+                    newScroll = document.Scrollbar.Minimum;
+                }
+                else
+                {
+                    newScroll = oldScroll - scrollDelta;
+                }
+            }
+            else
+            {
+                // 向下滚动
+
+                if (document.ScrollAtBottom)
+                {
+                    // 滚动到底直接返回
+                    return;
+                }
+
+                // 剩余可以往下滚动的行数
+                int remainScroll = scrollMax - oldScroll;
+
+                if (remainScroll >= scrollDelta)
+                {
+                    newScroll = oldScroll + scrollDelta;
+                }
+                else
+                {
+                    // 直接滚动到底
+                    newScroll = scrollMax;
+                }
+            }
+
+            VTScrollData scrollData = document.ScrollTo(newScroll);
+            if (scrollData == null)
+            {
+                return;
+            }
+
+            // 重新渲染
+            document.RequestInvalidate();
+        }
+
+        /// <summary>
+        /// 让scrollbar的值变成整数
+        /// </summary>
+        /// <param name="scrollbar"></param>
+        /// <returns></returns>
+        private int GetScrollValue(ScrollBar scrollbar)
+        {
+            var newvalue = (int)Math.Round(scrollbar.Value, 0);
+            if (newvalue > scrollbar.Maximum)
+            {
+                newvalue = (int)Math.Round(scrollbar.Maximum, 0);
+            }
+            return newvalue;
         }
 
         #endregion
@@ -105,13 +197,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
-            throw new RefactorImplementedException();
-
-            //MenuItem menuItem = e.OriginalSource as MenuItem;
-            //ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
-            //CommandArgs.Instance.AddonId = contextMenu.AddonId;
-            //CommandArgs.Instance.Command = contextMenu.Command;
-            //VTApp.Context.RaiseAddonCommand(CommandArgs.Instance);
+            MenuItem menuItem = e.OriginalSource as MenuItem;
+            ContextMenuVM contextMenu = menuItem.DataContext as ContextMenuVM;
+            CommandArgs.Instance.AddonId = contextMenu.AddonId;
+            CommandArgs.Instance.Command = contextMenu.Command;
+            CommandArgs.Instance.ActiveTab = this.shellSession;
+            MCommands.ExecuteAddonCommand.Execute(CommandArgs.Instance, Application.Current.MainWindow);
         }
 
         private void GridDocument_KeyDown(object sender, KeyEventArgs e)
@@ -150,40 +241,10 @@ namespace ModengTerm.UserControls.TerminalUserControls
             this.shellSession.SendInput(this.userInput);
         }
 
-        private void GridDocument_Loaded(object sender, RoutedEventArgs e)
+        private void GridTerminal_Loaded(object sender, RoutedEventArgs e)
         {
             // Loaded事件里让控件获取焦点，这样才能触发OnKeyDown和OnTextInput事件
-            Keyboard.Focus(GridDocument);
-        }
-
-        private void GridDocument_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            // 获取焦点，才能收到OnKeyDown和OnTextInput回调
-            Keyboard.Focus(GridDocument);
-
-            if (e.ChangedButton == MouseButton.Right)             
-            {
-                BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
-                if (brc == BehaviorRightClicks.FastCopyPaste)
-                {
-                    if (!this.videoTerminal.HasSelection)
-                    {
-                        // 粘贴剪贴板里的内容
-                        string text = Clipboard.GetText();
-                        if (string.IsNullOrEmpty(text))
-                        {
-                            return;
-                        }
-
-                        this.shellSession.Send(text);
-                    }
-                    else
-                    {
-                        this.shellSession.CopySelection();
-                        this.videoTerminal.UnSelectAll();
-                    }
-                }
-            }
+            Keyboard.Focus(GridTerminal);
         }
 
         private void GridDocument_LostFocus(object sender, RoutedEventArgs e)
@@ -201,6 +262,146 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 this.videoTerminal.FocusChanged(true);
             }
         }
+
+
+        #region Terminal事件
+
+        private void GridTerminal_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // 获取焦点，才能收到OnKeyDown和OnTextInput回调
+            if (!GridTerminal.IsKeyboardFocused)
+            {
+                Keyboard.Focus(GridTerminal);
+            }
+
+            BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
+            if (brc == BehaviorRightClicks.FastCopyPaste)
+            {
+                if (!this.videoTerminal.HasSelection)
+                {
+                    // 粘贴剪贴板里的内容
+                    string text = Clipboard.GetText();
+                    if (string.IsNullOrEmpty(text))
+                    {
+                        return;
+                    }
+
+                    this.shellSession.Send(text);
+                }
+                else
+                {
+                    this.shellSession.CopySelection();
+                    this.videoTerminal.UnSelectAll();
+                }
+            }
+        }
+
+        private void GridTerminal_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // 获取焦点，才能收到OnKeyDown和OnTextInput回调
+            if (!GridTerminal.IsKeyboardFocused)
+            {
+                Keyboard.Focus(GridTerminal);
+            }
+
+            VTDocument document = this.videoTerminal.ActiveDocument;
+            if (!document.Selection.IsEmpty)
+            {
+                document.Selection.Clear();
+                document.Selection.RequestInvalidate();
+            }
+
+            if (e.ClickCount > 1)
+            {
+                // 双击就是选中单词
+                // 三击就是选中整行内容
+
+                Point position = this.GetPositionRelativeToTerminal();
+                double x = position.X;
+                double y = position.Y;
+                int startIndex = 0, count = 0, logicalRow = 0;
+
+                VTextLine textLine = HitTestHelper.HitTestVTextLine(document, y, out logicalRow);
+                if (textLine == null)
+                {
+                    return;
+                }
+
+                switch (e.ClickCount)
+                {
+                    case 2:
+                        {
+                            // 选中单词
+                            int characterIndex;
+                            int columnIndex;
+                            VTextRange characterRange;
+                            HitTestHelper.HitTestVTCharacter(textLine, x, out characterIndex, out characterRange, out columnIndex);
+                            if (characterIndex == -1)
+                            {
+                                return;
+                            }
+                            VTDocUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
+                            document.Selection.SelectRange(textLine, logicalRow, startIndex, count);
+                            break;
+                        }
+
+                    case 3:
+                        {
+                            // 选中一整行
+                            document.Selection.SelectRow(textLine, logicalRow);
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void GridTerminal_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (GridTerminal.IsMouseCaptured)
+            {
+                GridTerminal.ReleaseMouseCapture();
+            }
+        }
+
+        private void GridTerminal_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (GridTerminal.IsMouseCaptured)
+                {
+                    GridTerminal.CaptureMouse();
+                }
+
+                Point position = this.GetPositionRelativeToTerminal();
+                VTDocument document = this.videoTerminal.ActiveDocument;
+                document.PerformSelection(position.X, position.Y);
+            }
+        }
+
+        private void GridTerminal_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            this.MouseWheelScroll(e);
+        }
+
+        private void Scrollbar_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                ScrollBar scrollbar = sender as ScrollBar;
+
+                int newscroll = this.GetScrollValue(scrollbar);
+                VTDocument document = this.videoTerminal.ActiveDocument;
+                document.ScrollTo(newscroll);
+                document.RequestInvalidate();
+
+                e.Handled = true;
+            }
+        }
+
+        #endregion
 
 
 
@@ -275,6 +476,17 @@ namespace ModengTerm.UserControls.TerminalUserControls
             logger.InfoFormat("RequestChangeWindowSize, deltaX = {0}, deltaY = {1}, width = {2}, height = {3}", deltaX, deltaY, window.Width, window.Height);
         }
 
+        private void VideoTerminal_RequestChangeVisible(IVideoTerminal arg1, VTDocumentTypes type, bool visible)
+        {
+            VTDocument document = type == VTDocumentTypes.AlternateDocument ? this.videoTerminal.AlternateDocument : this.videoTerminal.MainDocument;
+            TerminalControl terminalControl = type == VTDocumentTypes.AlternateDocument ? DocumentAlternate : DocumentMain;
+
+            terminalControl.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            if (visible)
+            {
+                VTCursorTimer.Context.SetCursor(document.Cursor);
+            }
+        }
 
 
         private void AutoCompletionUserControl_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -283,7 +495,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             if (element.Visibility == Visibility.Collapsed)
             {
                 // 重新获取焦点，以便于可以接收键盘输入
-                Keyboard.Focus(GridDocument);
+                Keyboard.Focus(GridTerminal);
             }
         }
 
@@ -306,6 +518,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         public int Open(OpenedSessionVM sessionVM)
         {
+            this.scrollDelta = this.Session.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, OptionDefaultValues.MOUSE_SCROLL_DELTA);
+
             // 背景不放在Dispatcher里渲染，不然会出现背景闪烁一下的现象
             string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
@@ -333,17 +547,20 @@ namespace ModengTerm.UserControls.TerminalUserControls
             base.Dispatcher.BeginInvoke(new Action(() =>
             {
                 double padding = this.Session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
-                DocumentAlternate.SetPadding(padding);
+                DocumentAlternate.Visibility = Visibility.Collapsed;
+                DocumentAlternate.Padding = new Thickness(padding);
                 DocumentAlternate.DrawArea.SizeChanged += DrawArea_SizeChanged;
-                DocumentMain.SetPadding(padding);
+                DocumentAlternate.Scrollbar.MouseMove += this.Scrollbar_MouseMove;
+                DocumentMain.Padding = new Thickness(padding);
                 DocumentMain.DrawArea.SizeChanged += DrawArea_SizeChanged;
+                DocumentMain.Scrollbar.MouseMove += this.Scrollbar_MouseMove;
 
+                // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG9KR
                 // 不要直接使用Document的DrawAreaSize属性，DrawAreaSize可能不准确！
                 // 手动计算终端宽度和高度，这个高度和宽度可能也不准确。
                 // 解决方法是在每次收到服务端数据之后，重新设置一下终端高度，确保终端高度正确
-                double width = GridDocument.ActualWidth - padding * 2 - 11 - 30;  // 11是滚动条的宽度，30是右边栏的宽度
-                double height = GridDocument.ActualHeight - padding * 2;
-                //logger.InfoFormat("width = {0}, height = {1}", width, height);
+                double width = GridTerminal.ActualWidth;
+                double height = GridTerminal.ActualHeight;
 
                 this.shellSession.MainDocument = DocumentMain;
                 this.shellSession.AlternateDocument = DocumentAlternate;
@@ -356,6 +573,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 this.videoTerminal = this.shellSession.VideoTerminal as VideoTerminal;
                 this.videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
                 this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
+                this.videoTerminal.RequestChangeVisible += this.VideoTerminal_RequestChangeVisible;
 
                 // 自动完成列表和文本行对齐
                 AutoCompletionUserControl.Margin = new Thickness(padding);
@@ -371,10 +589,13 @@ namespace ModengTerm.UserControls.TerminalUserControls
         public void Close()
         {
             DocumentAlternate.DrawArea.SizeChanged -= DrawArea_SizeChanged;
+            DocumentAlternate.Scrollbar.MouseMove -= this.Scrollbar_MouseMove;
             DocumentMain.DrawArea.SizeChanged -= DrawArea_SizeChanged;
+            DocumentMain.Scrollbar.MouseMove -= this.Scrollbar_MouseMove;
 
             this.videoTerminal.OnDocumentChanged -= VideoTerminal_DocumentChanged;
             this.videoTerminal.RequestChangeWindowSize -= VideoTerminal_RequestChangeWindowSize;
+            this.videoTerminal.RequestChangeVisible -= this.VideoTerminal_RequestChangeVisible;
             this.videoTerminal = null;
 
             this.shellSession.Close();
@@ -383,12 +604,12 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         public bool SetInputFocus()
         {
-            return GridDocument.Focus();
+            return GridTerminal.Focus();
         }
 
         public bool HasInputFocus()
         {
-            return GridDocument.IsFocused;
+            return GridTerminal.IsFocused;
         }
 
         #endregion

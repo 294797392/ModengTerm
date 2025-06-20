@@ -1,4 +1,4 @@
-﻿using ModengTerm.Document;
+﻿using ModengTerm.Document.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModengTerm.UnitTest.Drawing
 {
-    public class FakeScrollbar : VTScrollbar
+    public class FakeScrollbar : GraphicsScrollbar
     {
         public override bool Visible { get; set; }
         public override double Maximum { get; set; }

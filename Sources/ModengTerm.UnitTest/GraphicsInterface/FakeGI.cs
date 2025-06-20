@@ -10,15 +10,15 @@ using System.Windows.Forms;
 
 namespace ModengTerm.UnitTest.Drawing
 {
-    public class FakeGI : GraphicsInterface
+    public class FakeGI : GraphicsFactory
     {
         public string Name { get; set; }
 
-        public VTScrollbar Scrollbar { get; private set; }
+        public GraphicsScrollbar ScrollbarGraphics { get; private set; }
 
         public bool Visible { get; set; }
 
-        public VTSize DrawAreaSize 
+        public VTSize TerminalSize 
         {
             get;set;
         }
@@ -29,16 +29,16 @@ namespace ModengTerm.UnitTest.Drawing
 
         public FakeGI()
         {
-            Scrollbar = new FakeScrollbar();
-            this.DrawAreaSize = new VTSize(1000, 1000);
+            ScrollbarGraphics = new FakeScrollbar();
+            this.TerminalSize = new VTSize(1000, 1000);
         }
 
-        public event Action<GraphicsInterface, MouseData> GIMouseDown;
-        public event Action<GraphicsInterface, MouseData> GIMouseUp;
-        public event Action<GraphicsInterface, MouseData> GIMouseMove;
-        public event Action<GraphicsInterface, MouseWheelData> GIMouseWheel;
-        public event Action<GraphicsInterface> GILoaded;
-        public event Action<GraphicsInterface, ScrollChangedData> GIScrollChanged;
+        public event Action<GraphicsFactory, MouseData> GIMouseDown;
+        public event Action<GraphicsFactory, MouseData> GIMouseUp;
+        public event Action<GraphicsFactory, MouseData> GIMouseMove;
+        public event Action<GraphicsFactory, MouseWheelData> GIMouseWheel;
+        public event Action<GraphicsFactory> GILoaded;
+        public event Action<GraphicsFactory, ScrollChangedData> GIScrollChanged;
 
         public GraphicsObject CreateDrawingObject()
         {

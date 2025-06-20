@@ -176,7 +176,7 @@ namespace ModengTerm.Terminal
         /// <param name="sessionInfo"></param>
         /// <param name="graphicsInterface"></param>
         /// <returns></returns>
-        public static VTDocumentOptions CreateDocumentOptions(string name, double vpw, double vph, XTermSession sessionInfo, GraphicsInterface graphicsInterface)
+        public static VTDocumentOptions CreateDocumentOptions(string name, double vpw, double vph, XTermSession sessionInfo, GraphicsFactory graphicsInterface)
         {
             string fontFamily = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_FAMILY);
             double fontSize = sessionInfo.GetOption<double>(OptionKeyEnum.THEME_FONT_SIZE);

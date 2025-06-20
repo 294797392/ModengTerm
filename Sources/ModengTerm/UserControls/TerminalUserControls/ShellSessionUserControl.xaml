@@ -75,9 +75,12 @@
         </Grid.RowDefinitions>
 
         <!-- 显示终端内容区域 -->
-        <Grid Grid.Row="0" x:Name="GridDocument" Background="Transparent" Loaded="GridDocument_Loaded" 
-                  MouseDown="GridDocument_MouseDown" TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown"
-                  LostFocus="GridDocument_LostFocus" GotFocus="GridDocument_GotFocus">
+        <Grid Grid.Row="0" x:Name="GridTerminal" Background="Transparent" Loaded="GridTerminal_Loaded" 
+              MouseRightButtonDown="GridTerminal_MouseRightButtonDown" MouseMove="GridTerminal_MouseMove" 
+              MouseLeftButtonDown="GridTerminal_MouseLeftButtonDown" MouseLeftButtonUp="GridTerminal_MouseLeftButtonUp"
+              MouseWheel="GridTerminal_MouseWheel"
+              TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown"
+              LostFocus="GridDocument_LostFocus" GotFocus="GridDocument_GotFocus">
             <Grid.ContextMenu>
                 <ContextMenu ItemsSource="{Binding Path=ContextMenus}" MenuItem.Click="ContextMenu_Click"
                                  Visibility="{Binding Path=ContextMenuVisibility}" Style="{StaticResource ResourceKey=StyleContextMenu}">
@@ -94,8 +97,8 @@
 
             <!-- DrawingArea1的大小和DocumentControl的DrawArea大小一致，用来模拟在DocumentControl上绘图 -->
             <muct:DrawingArea x:Name="DrawingArea1" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-            <muct:DocumentControl x:Name="DocumentAlternate"/>
-            <muct:DocumentControl x:Name="DocumentMain"/>
+            <muct:TerminalControl x:Name="DocumentAlternate"/>
+            <muct:TerminalControl x:Name="DocumentMain"/>
         </Grid>
 
         <!-- 输入栏 -->

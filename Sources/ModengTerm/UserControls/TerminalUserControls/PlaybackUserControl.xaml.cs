@@ -89,9 +89,9 @@ namespace ModengTerm.UserControls.Terminals
             double width = DocumentMain.ActualWidth - padding * 2;
             double height = DocumentMain.ActualHeight - padding * 2;
 
-            DocumentAlternate.SetPadding(padding);
+            DocumentAlternate.Padding = new Thickness(padding);
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
-            DocumentMain.SetPadding(padding);
+            DocumentMain.Padding = new Thickness(padding);
             DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
 
             PlaybackOptions playbackOptions = new PlaybackOptions()

@@ -1,4 +1,5 @@
 ﻿using ModengTerm.Document;
+using ModengTerm.Document.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,20 +11,19 @@ using System.Windows.Media;
 
 namespace ModengTerm.UserControls.TerminalUserControls
 {
-    public class VTScrollbarImpl : VTScrollbar
+    public class DrawingObjectScrollbar : GraphicsScrollbar
     {
         #region 实例变量
 
         private ScrollBar scrollbar;
         private int oldValue;
         private int newValue;
-        private ScrollChangedData scrollData;
 
         #endregion
 
-        #region VTScrollbar
+        #region GraphicsScrollbar
 
-        public override double Maximum
+        public double Maximum
         {
             get { return this.scrollbar.Maximum; }
             set
@@ -35,7 +35,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
         }
 
-        public override double Value
+        public double Value
         {
             get { return this.scrollbar.Value; }
             set
@@ -47,7 +47,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
         }
 
-        public override int ViewportRow
+        public int ViewportRow
         {
             get { return (int)this.scrollbar.ViewportSize; }
             set
@@ -59,7 +59,7 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
         }
 
-        public override bool Visible
+        public bool Visible
         {
             get
             {
@@ -87,10 +87,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region 构造方法
 
-        public VTScrollbarImpl(ScrollBar scrollbar)
+        public DrawingObjectScrollbar(ScrollBar scrollbar)
         {
-            this.scrollData = new ScrollChangedData();
-
             this.scrollbar = scrollbar;
             this.scrollbar.LargeChange = 1;
             this.scrollbar.SmallChange = 1;

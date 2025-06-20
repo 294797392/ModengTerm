@@ -106,5 +106,7 @@ namespace ModengTerm.Base
         public static readonly string WATCH_ADB_PROMPT = string.Empty;
         public static readonly List<ScriptItem> WATCH_ADB_PASSWORDS = new List<ScriptItem>();
         public static readonly string WATCH_ADB_TEMP_DIR = "/tmp";
+
+        public const int MOUSE_SCROLL_DELTA = 5;
     }
 }

@@ -24,11 +24,17 @@ namespace ModengTerm
         /// </summary>
         public static RoutedUICommand OpenSessionCommand { get; private set; }
 
+        /// <summary>
+        /// 执行插件命令
+        /// </summary>
+        public static RoutedUICommand ExecuteAddonCommand { get; private set; }
+
         static MCommands()
         {
             SendCommand = new RoutedUICommand();
             ChangePanelItemVisibleCommand = new RoutedUICommand();
             OpenSessionCommand = new RoutedUICommand();
+            ExecuteAddonCommand = new RoutedUICommand();
         }
     }
 }
