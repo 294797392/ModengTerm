@@ -21,7 +21,15 @@ namespace ModengTerm.ViewModel.Panel
 
         #endregion
 
-        #region HostPanel
+        #region ClientPanel
+
+        protected override void OnInitialize()
+        {
+        }
+
+        protected override void OnRelease()
+        {
+        }
 
         public override void Open()
         {

@@ -10,7 +10,7 @@ namespace ModengTerm.Addon.Panel
     /// <summary>
     /// 插件要实现的SidePanel接口
     /// </summary>
-    public interface IAddonSidePanel : IAddonPanel
+    public abstract class SidePanelContent : PanelContent
     {
     }
 }

@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace ModengTerm.Addon.Panel
 {
-    public interface IAddonOverlayPanel : IAddonPanel
+    public abstract class OverlayPanelContent : PanelContent
     {
         /// <summary>
         /// OverlayPanel所属的Tab页面
         /// </summary>
-        IClientShellTab OwnerTab { get; set; }
+        public IClientShellTab OwnerTab { get; set; }
     }
 }

@@ -1,4 +1,7 @@
-﻿using ModengTerm.Addon;
+﻿using DotNEToolkit;
+using log4net.Repository.Hierarchy;
+using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;
 using ModengTerm.Base.Definitions;
 using System;
@@ -11,13 +14,15 @@ using WPFToolkit.MVVM;
 
 namespace ModengTerm.ViewModel.Panel
 {
-    public abstract class ClientPanel : ViewModelBase
+    public abstract class ClientPanel : ViewModelBase, IClientPanel
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("ClientPanel");
+
         #region 实例变量
 
         private bool isOpened;
         private string iconURI;
-        private FrameworkElement content;
+        private PanelContent content;
         private bool initialized;
 
         #endregion
@@ -26,12 +31,10 @@ namespace ModengTerm.ViewModel.Panel
 
         public PanelDefinition Definition { get; set; }
 
-        public IAddonPanel Callback { get { return this.Content as IAddonPanel; } }
-
-        public FrameworkElement Content
+        public PanelContent Content
         {
             get { return this.content; }
-            set
+            private set
             {
                 if (this.content != value)
                 {
@@ -74,21 +77,15 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 公开接口
 
-        /// <summary>
-        /// 打开侧边栏
-        /// </summary>
-        public abstract void Open();
-
-        /// <summary>
-        /// 关闭侧边栏
-        /// </summary>
-        public abstract void Close();
-
         public void Initialize()
         {
             this.initialized = true;
 
-            this.Callback.OnInitialize();
+            // init
+
+            this.OnInitialize();
+
+            this.content.OnInitialize();
         }
 
         /// <summary>
@@ -96,7 +93,7 @@ namespace ModengTerm.ViewModel.Panel
         /// </summary>
         public void Loaded()
         {
-            this.Callback.OnLoaded();
+            this.content.OnLoaded();
         }
 
         /// <summary>
@@ -104,7 +101,7 @@ namespace ModengTerm.ViewModel.Panel
         /// </summary>
         public void Unloaded()
         {
-            this.Callback.OnUnload();
+            this.content.OnUnload();
         }
 
         public void Release()
@@ -114,7 +111,11 @@ namespace ModengTerm.ViewModel.Panel
                 return;
             }
 
-            this.Callback.OnRelease();
+            this.content.OnRelease();
+
+            this.OnRelease();
+
+            // release
 
             this.initialized = false;
         }
@@ -130,6 +131,54 @@ namespace ModengTerm.ViewModel.Panel
                 this.Open();
             }
         }
+
+        /// <summary>
+        /// 加载内容控件
+        /// </summary>
+        /// <returns></returns>
+        public PanelContent GetOrCreateContent()
+        {
+            if (this.content != null) 
+            {
+                return this.content;
+            }
+
+            PanelContent content = null;
+
+            try
+            {
+                content = ConfigFactory<PanelContent>.CreateInstance(this.Definition.ClassName);
+                content.OwnerPanel = this;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("加载PanelContent异常", ex);
+                return null;
+            }
+
+            this.Content = content;
+
+            this.Initialize();
+
+            return content;
+        }
+
+        #endregion
+
+        #region 抽象方法
+
+        protected abstract void OnInitialize();
+        protected abstract void OnRelease();
+
+        /// <summary>
+        /// 打开侧边栏
+        /// </summary>
+        public abstract void Open();
+
+        /// <summary>
+        /// 关闭侧边栏
+        /// </summary>
+        public abstract void Close();
 
         #endregion
     }

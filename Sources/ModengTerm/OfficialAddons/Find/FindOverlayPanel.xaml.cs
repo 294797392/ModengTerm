@@ -16,7 +16,7 @@ namespace ModengTerm.OfficialAddons.Find
     /// <summary>
     /// FindWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class FindOverlayPanel : UserControl, IAddonOverlayPanel
+    public partial class FindOverlayPanel : OverlayPanelContent
     {
         #region 类变量
 
@@ -112,11 +112,9 @@ namespace ModengTerm.OfficialAddons.Find
 
         #endregion
 
-        #region IAddonOverlayPanel
+        #region OverlayPanelHost
 
-        public IClientShellTab OwnerTab { get; set; }
-
-        public void OnInitialize()
+        public override void OnInitialize()
         {
             this.eventRegistory.SubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
 
@@ -126,21 +124,21 @@ namespace ModengTerm.OfficialAddons.Find
             this.highlightObject = this.drawingContext.CreateGraphicsObject();
         }
 
-        public void OnRelease()
+        public override void OnRelease()
         {
             this.eventRegistory.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, this.OwnerTab);
 
             this.drawingContext.DeleteGraphicsObject(this.highlightObject);
         }
 
-        public void OnLoaded()
+        public override void OnLoaded()
         {
             TextBoxKeyword.Focus();
 
             this.PerformFind();
         }
 
-        public void OnUnload()
+        public override void OnUnload()
         {
             this.highlightObject.Clear();
         }
@@ -149,9 +147,12 @@ namespace ModengTerm.OfficialAddons.Find
 
         #region TabEvent
 
-        private void OnShellRendered(TabEventArgs e) 
+        private void OnShellRendered(TabEventArgs e)
         {
-            this.PerformFind();
+            if (this.OwnerPanel.IsOpened)
+            {
+                this.PerformFind();
+            }
         }
 
         #endregion

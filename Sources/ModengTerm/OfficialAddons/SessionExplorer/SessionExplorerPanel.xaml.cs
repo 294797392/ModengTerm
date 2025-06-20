@@ -10,7 +10,7 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
     /// <summary>
     /// ResourceManagerUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class SessionExplorerPanel : UserControl, IAddonSidePanel
+    public partial class SessionExplorerPanel : SidePanelContent
     {
         #region 类变量
 
@@ -63,9 +63,9 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
 
         #endregion
 
-        #region ISidePanel
+        #region SidePanelContent
 
-        public void OnInitialize()
+        public override void OnInitialize()
         {
             this.resourceManagerTreeVM = VMUtils.CreateSessionTreeVM(false, true);
             this.resourceManagerTreeVM.Roots[0].Name = "会话列表";
@@ -76,17 +76,17 @@ namespace ModengTerm.OfficialAddons.SessionExplorer
             logger.InfoFormat(string.Format("{0}, OnInitialize", this.Name));
         }
 
-        public void OnRelease()
+        public override void OnRelease()
         {
             logger.InfoFormat(string.Format("{0}, OnRelease", this.Name));
         }
 
-        public void OnLoaded()
+        public override void OnLoaded()
         {
             logger.InfoFormat(string.Format("{0}, OnLoaded", this.Name));
         }
 
-        public void OnUnload()
+        public override void OnUnload()
         {
             logger.InfoFormat(string.Format("{0}, OnUnload", this.Name));
         }

@@ -58,7 +58,6 @@ namespace ModengTerm.Addon
             overlayPanel.ID = definition.ID;
             overlayPanel.Name = definition.Name;
             overlayPanel.IconURI = definition.Icon;
-            overlayPanel.HostFactory = this;
             return overlayPanel;
         }
     }

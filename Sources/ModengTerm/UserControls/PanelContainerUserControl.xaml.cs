@@ -79,30 +79,6 @@ namespace ModengTerm.UserControls
         {
         }
 
-        private FrameworkElement LoadContent(SidePanel panel)
-        {
-            PanelDefinition definition = panel.Definition;
-            FrameworkElement content = panel.Content;
-
-            // 开始加载本次选中的菜单界面
-            if (content == null)
-            {
-                try
-                {
-                    content = ConfigFactory<FrameworkElement>.CreateInstance(definition.ClassName);
-                    panel.Content = content;
-                    panel.Initialize();
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("创建菜单内容控件异常", ex);
-                    return null;
-                }
-            }
-
-            return content;
-        }
-
         #endregion
 
         #region 事件处理器
@@ -130,7 +106,7 @@ namespace ModengTerm.UserControls
                 return;
             }
 
-            DependencyObject dependencyObject = this.LoadContent(selectedItem);
+            DependencyObject dependencyObject = selectedItem.GetOrCreateContent();
             if (dependencyObject == null)
             {
                 logger.ErrorFormat("加载页面失败, 页面为空, {0}", selectedItem.Name);

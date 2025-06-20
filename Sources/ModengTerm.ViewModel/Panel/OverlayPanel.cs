@@ -20,7 +20,9 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 实例变量
 
+        private bool firstOpen = true;
         private OverlayPanelDocks dock;
+        private ClientFactory factory;
 
         #endregion
 
@@ -30,8 +32,6 @@ namespace ModengTerm.ViewModel.Panel
         /// 悬浮面板所属的Tab页面
         /// </summary>
         public IClientShellTab OwnerTab { get; set; }
-
-        public ClientFactory HostFactory { get; set; }
 
         public OverlayPanelDocks Dock
         {
@@ -50,31 +50,35 @@ namespace ModengTerm.ViewModel.Panel
 
         #region 构造方法
 
+        public OverlayPanel() 
+        {
+            this.factory = ClientFactory.GetFactory();
+        }
+
         #endregion
 
-        #region HostPanel
+        #region ClientPanel
+
+        protected override void OnInitialize()
+        {
+            OverlayPanelContent overlayPanelContent = base.Content as OverlayPanelContent;
+            overlayPanelContent.OwnerTab = this.OwnerTab;
+        }
+
+        protected override void OnRelease()
+        {
+        }
 
         public override void Open()
         {
-            if (this.Content == null) 
+            PanelContent content = this.GetOrCreateContent();
+
+            if (this.firstOpen)
             {
-                FrameworkElement frameworkElement = null;
+                OverlayPanelContent overlayPanelContent = content as OverlayPanelContent;
+                overlayPanelContent.OwnerTab = this.OwnerTab;
 
-                try
-                {
-                    frameworkElement = ConfigFactory<FrameworkElement>.CreateInstance(this.Definition.ClassName);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("加载OverlayPanel异常", ex);
-                    return;
-                }
-
-                this.Content = frameworkElement;
-
-                IAddonOverlayPanel callback = this.Callback as IAddonOverlayPanel;
-                callback.OwnerTab = this.OwnerTab;
-                base.Initialize();
+                this.firstOpen = false;
             }
 
             this.IsOpened = true;
