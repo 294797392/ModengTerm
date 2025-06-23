@@ -3,13 +3,15 @@ using Microsoft.Win32;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal;
 using ModengTerm.Terminal.Loggering;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using WPFToolkit.MVVM;
-using SaveFileDialog = Microsoft.Win32.SaveFileDialog;
 
-namespace ModengTerm.ViewModel.Terminal
+namespace ModengTerm.OfficialAddons.Logger
 {
     public class LoggerOptionsVM : ViewModelBase
     {
@@ -128,48 +130,28 @@ namespace ModengTerm.ViewModel.Terminal
             }
         }
 
-        private FilterTypeEnum GetFilterType()
-        {
-            if (string.IsNullOrEmpty(Keyword))
-            {
-                return FilterTypeEnum.None;
-            }
-            else
-            {
-                if (Regexp)
-                {
-                    return FilterTypeEnum.Regexp;
-                }
-                else
-                {
-                    return FilterTypeEnum.PlainText;
-                }
-            }
-        }
+        //private FilterTypeEnum GetFilterType()
+        //{
+        //    if (string.IsNullOrEmpty(Keyword))
+        //    {
+        //        return FilterTypeEnum.None;
+        //    }
+        //    else
+        //    {
+        //        if (Regexp)
+        //        {
+        //            return FilterTypeEnum.Regexp;
+        //        }
+        //        else
+        //        {
+        //            return FilterTypeEnum.PlainText;
+        //        }
+        //    }
+        //}
 
         #endregion
 
         #region 公开接口
-
-        public LoggerOptions GetOptions()
-        {
-            if (string.IsNullOrEmpty(FilePath))
-            {
-                MTMessageBox.Info("请选择日志保存路径");
-                return null;
-            }
-
-            LoggerOptions loggerOptions = new LoggerOptions()
-            {
-                FilePath = FilePath,
-                FileType = FileType,
-                FilterText = Keyword,
-                IgnoreCase = IgnoreCase,
-                FilterType = GetFilterType()
-            };
-
-            return loggerOptions;
-        }
 
         /// <summary>
         /// 选择日志文件的保存路径

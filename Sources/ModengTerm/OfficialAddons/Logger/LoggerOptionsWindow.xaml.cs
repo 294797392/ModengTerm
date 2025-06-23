@@ -27,13 +27,11 @@ namespace ModengTerm.OfficialAddons.Logger
         //private LoggerOptionsVM viewModel;
         //private ShellSessionVM shellSession;
 
-        //public LoggerOptions Options { get; private set; }
+        public LoggerOptionsVM Options { get; private set; }
 
-        public LoggerOptionsWindow(/*ShellSessionVM shellSession*/)
+        public LoggerOptionsWindow()
         {
             InitializeComponent();
-
-            throw new RefactorImplementedException();
 
             //this.InitializeWindow(shellSession);
         }

@@ -11,7 +11,6 @@ using ModengTerm.Terminal;
 using ModengTerm.Terminal.DataModels;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Keyboard;
-using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Modem;
 using ModengTerm.Terminal.Session;
 using ModengTerm.ViewModel.Panel;
@@ -78,8 +77,6 @@ namespace ModengTerm.ViewModel.Terminal
         private bool modemRunning;
 
         private List<ScriptItem> scriptItems;
-
-        private LoggerManager logMgr;
 
         private TabEventShellSendData tabEventSendData;
         private TabEventShellRendered tabEventShellRendered;
@@ -364,12 +361,6 @@ namespace ModengTerm.ViewModel.Terminal
             }
 
             AutoCompletionVM.Release();
-
-            // 停止对终端的日志记录
-            StopLogger();
-
-            // 停止录制
-            StopRecord();
 
             sessionTransport.StatusChanged -= SessionTransport_StatusChanged;
             sessionTransport.DataReceived -= SessionTransport_DataReceived;
@@ -826,17 +817,6 @@ namespace ModengTerm.ViewModel.Terminal
             RecordStatus = RecordStatusEnum.Stop;
         }
 
-        public void StartLogger(IVideoTerminal videoTerminal, LoggerOptions loggerOptions)
-        {
-            logMgr.Start(videoTerminal, loggerOptions);
-        }
-
-        public void StopLogger()
-        {
-            //throw new RefactorImplementedException();
-            //logMgr.Stop(videoTerminal);
-        }
-
         #endregion
 
         #region 事件处理器
@@ -965,16 +945,6 @@ namespace ModengTerm.ViewModel.Terminal
                     this.Status = status;
                 }
             });
-        }
-
-        public void PauseLogger()
-        {
-            logMgr.Pause(videoTerminal);
-        }
-
-        public void ResumeLogger()
-        {
-            logMgr.Resume(videoTerminal);
         }
 
         private void SelectAll()

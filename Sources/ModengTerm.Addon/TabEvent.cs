@@ -1,5 +1,6 @@
 ﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Base.Enumerations;
+using ModengTerm.Document;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,11 @@ namespace ModengTerm.Addon
         /// 触发该事件的Tab
         /// </summary>
         public IClientTab Sender { get; set; }
+
+        /// <summary>
+        /// 显示出来的新行列表
+        /// </summary>
+        public List<VTHistoryLine> NewLines { get; set; }
     }
 
     public class TabEventStatusChanged : TabEventArgs

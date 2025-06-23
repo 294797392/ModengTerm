@@ -10,7 +10,6 @@ using ModengTerm.Document.Enumerations;
 using ModengTerm.Document.Graphics;
 using ModengTerm.Document.Utility;
 using ModengTerm.Terminal.Keyboard;
-using ModengTerm.Terminal.Loggering;
 using ModengTerm.Terminal.Parsing;
 using ModengTerm.Terminal.Renderer;
 using ModengTerm.Terminal.Session;
@@ -281,8 +280,6 @@ namespace ModengTerm.Terminal
         /// 主缓冲区
         /// </summary>
         public VTDocument MainDocument { get { return this.mainDocument; } }
-
-        public VTLogger Logger { get; set; }
 
         /// <summary>
         /// 电脑按键和发送的数据的映射关系

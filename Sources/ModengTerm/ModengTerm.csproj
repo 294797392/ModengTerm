@@ -40,6 +40,13 @@
     <Compile Remove="OfficialAddons\BroadcastInput\BroadcastSessionVM.cs" />
     <Compile Remove="OfficialAddons\BroadcastInput\Utility.cs" />
     <Compile Remove="OfficialAddons\Find\FindVM.cs" />
+    <Compile Remove="OfficialAddons\Logger\FilterTypeEnum.cs" />
+    <Compile Remove="OfficialAddons\Logger\KeywordFilter.cs" />
+    <Compile Remove="OfficialAddons\Logger\LoggerFilter.cs" />
+    <Compile Remove="OfficialAddons\Logger\LoggerFilterFactory.cs" />
+    <Compile Remove="OfficialAddons\Logger\LoggerManager.cs" />
+    <Compile Remove="OfficialAddons\Logger\NoneFilter.cs" />
+    <Compile Remove="OfficialAddons\Logger\RegexpFilter.cs" />
     <Compile Remove="OfficialAddons\SessionExplorer\SessionExplorerPanelVM.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />

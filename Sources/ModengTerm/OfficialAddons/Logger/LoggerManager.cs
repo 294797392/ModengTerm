@@ -2,8 +2,12 @@
 using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
+using ModengTerm.OfficialAddons.Logger;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace ModengTerm.Terminal.Loggering
 {
@@ -36,11 +40,7 @@ namespace ModengTerm.Terminal.Loggering
 
         #region 实例方法
 
-        #endregion
-
-        #region 公开接口
-
-        public int Initialize()
+        private int Initialize()
         {
             this.loggerEvent = new ManualResetEvent(false);
             this.loggerList = new List<VTLogger>();
@@ -55,11 +55,11 @@ namespace ModengTerm.Terminal.Loggering
             return ResponseCode.SUCCESS;
         }
 
-        public void Release()
-        {
-        }
+        #endregion
 
-        public void Start(IVideoTerminal vt, LoggerOptions options)
+        #region 公开接口
+
+        public void Start(IVideoTerminal vt, LoggerOptionsVM options)
         {
             throw new RefactorImplementedException();
             //VTLogger logger = vt.Logger;
