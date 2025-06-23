@@ -1,11 +1,8 @@
-﻿using log4net.Repository.Hierarchy;
-using ModengTerm.Addon.Interactive;
+﻿using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.Addon
 {
@@ -40,7 +37,10 @@ namespace ModengTerm.Addon
                     return;
                 }
 
-                delegates.Remove(@delegate);
+                // 防止在Publish事件的时候，调用了Unsubscribe方法，造成在foreach循环中删除列表里的元素的问题
+                List<TDelegate> newDelegates = delegates.ToList();
+                newDelegates.Remove(@delegate);
+                this.eventRegistry[ev] = newDelegates;
             }
 
             public void Publish(TEvent ev, object e)
@@ -151,9 +151,12 @@ namespace ModengTerm.Addon
                     return;
                 }
 
-                delegates.Remove(@delegate);
+                // 防止在Publish事件的时候，调用了Unsubscribe方法，造成在foreach循环中删除列表里的元素的问题
+                List<TabEventDelegate> newDelegates = delegates.ToList();
+                newDelegates.Remove(@delegate);
+                eventLists[evType] = newDelegates;
 
-                if (delegates.Count == 0)
+                if (newDelegates.Count == 0)
                 {
                     eventLists.Remove(evType);
                     if (eventLists.Count == 0)
@@ -228,7 +231,10 @@ namespace ModengTerm.Addon
                 return;
             }
 
-            events.Remove(ev);
+            // 防止在Publish事件的时候，调用了Unsubscribe方法，造成在foreach循环中删除列表里的元素的问题
+            List<HotkeyEvent> newevents = events.ToList();
+            newevents.Remove(ev);
+            this.hotKeyRegistry[hotkey] = newevents;
         }
 
         public bool PublishHotkeyEvent(string hotkey)
