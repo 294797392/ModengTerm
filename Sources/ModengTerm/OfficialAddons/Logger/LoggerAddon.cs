@@ -116,6 +116,13 @@ namespace ModengTerm.OfficialAddons.Logger
 
         private void ExecuteStartLoggerCommand(CommandArgs e)
         {
+            LoggerContext context = e.ActiveTab.GetData<LoggerContext>(this, KEY_LOGGER);
+            if (context != null)
+            {
+                MTMessageBox.Info("该会话已经启动了日志记录功能");
+                return;
+            }
+
             LoggerOptionsWindow window = new LoggerOptionsWindow(e.ActiveTab);
             window.Owner = Application.Current.MainWindow;
             if (!(bool)window.ShowDialog())
