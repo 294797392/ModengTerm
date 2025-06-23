@@ -4,7 +4,6 @@ using ModengTerm.Addons;
 using ModengTerm.Base;
 using ModengTerm.Document;
 using ModengTerm.Document.Utility;
-using ModengTerm.Terminal.Loggering;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,8 +34,8 @@ namespace ModengTerm.OfficialAddons.Logger
         private Thread writeThread;
         private ManualResetEvent loggerEvent;
         private bool initOnce = false;
-        private List<VTLogger> loggerList;
-        private List<VTLogger> loggerListCopy;
+        private List<LoggerContext> loggerList;
+        private List<LoggerContext> loggerListCopy;
         private bool listChanged;
         private object listLock;
 
@@ -61,8 +60,8 @@ namespace ModengTerm.OfficialAddons.Logger
         private int Initialize()
         {
             this.loggerEvent = new ManualResetEvent(false);
-            this.loggerList = new List<VTLogger>();
-            this.loggerListCopy = new List<VTLogger>();
+            this.loggerList = new List<LoggerContext>();
+            this.loggerListCopy = new List<LoggerContext>();
             this.listChanged = false;
             this.listLock = new object();
 
@@ -73,12 +72,11 @@ namespace ModengTerm.OfficialAddons.Logger
             return ResponseCode.SUCCESS;
         }
 
-        private VTLogger Start(LoggerOptionsVM options)
+        private LoggerContext Start(LoggerOptionsVM options)
         {
-            VTLogger logger = new VTLogger()
+            LoggerContext logger = new LoggerContext()
             {
                 FilePath = options.FilePath,
-                IsPaused = false
             };
 
             lock (this.listLock)
@@ -94,7 +92,7 @@ namespace ModengTerm.OfficialAddons.Logger
 
         private void Stop(IClientTab tab)
         {
-            VTLogger logger = tab.GetData<VTLogger>(this, KEY_LOGGER);
+            LoggerContext logger = tab.GetData<LoggerContext>(this, KEY_LOGGER);
             if (logger == null)
             {
                 return;
@@ -105,6 +103,8 @@ namespace ModengTerm.OfficialAddons.Logger
                 this.loggerList.Remove(logger);
                 this.listChanged = true;
             }
+
+            tab.SetData(this, KEY_LOGGER, null);
 
             this.eventRegistry.UnsubscribeTabEvent(TabEvent.TAB_CLOSED, this.OnTabClosed, tab);
             this.eventRegistry.UnsubscribeTabEvent(TabEvent.SHELL_RENDERED, this.OnShellRendered, tab);
@@ -131,7 +131,7 @@ namespace ModengTerm.OfficialAddons.Logger
 
             IClientTab activeTab = e.ActiveTab;
 
-            VTLogger logger = this.Start(window.Options);
+            LoggerContext logger = this.Start(window.Options);
             activeTab.SetData(this, KEY_LOGGER, logger);
 
             this.eventRegistry.SubscribeTabEvent(TabEvent.TAB_CLOSED, this.OnTabClosed, activeTab);
@@ -147,7 +147,7 @@ namespace ModengTerm.OfficialAddons.Logger
         private void OnShellRendered(TabEventArgs e)
         {
             TabEventShellRendered shellRendered = e as TabEventShellRendered;
-            VTLogger logger = e.Sender.GetData<VTLogger>(this, KEY_LOGGER);
+            LoggerContext logger = e.Sender.GetData<LoggerContext>(this, KEY_LOGGER);
             List<VTHistoryLine> pendingLines = logger.PendingLines;
 
             lock (pendingLines)
@@ -187,7 +187,7 @@ namespace ModengTerm.OfficialAddons.Logger
                     }
                 }
 
-                foreach (VTLogger vtLogger in this.loggerListCopy)
+                foreach (LoggerContext vtLogger in this.loggerListCopy)
                 {
                     List<VTHistoryLine> pendingLines = vtLogger.PendingLines;
                     if (pendingLines.Count == 0) 

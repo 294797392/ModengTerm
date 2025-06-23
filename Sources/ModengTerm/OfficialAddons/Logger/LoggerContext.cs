@@ -1,15 +1,16 @@
-﻿using ModengTerm.Document;
-using ModengTerm.Document.Enumerations;
-using ModengTerm.Document.Utility;
-using System;
+﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Document;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Loggering
+namespace ModengTerm.OfficialAddons.Logger
 {
-    public class VTLogger
+    public enum LoggerStates
+    {
+        Start,
+        Stop
+    }
+
+    public class LoggerContext
     {
         //public CreateLineDelegate CreateLine { get; set; }
 
@@ -26,21 +27,31 @@ namespace ModengTerm.Terminal.Loggering
         //public ParagraphFormatEnum FileType { get; set; }
 
         /// <summary>
+        /// 记录日志的状态
+        /// </summary>
+        public LoggerStates Status { get; set; }
+
+        /// <summary>
         /// 日志文件路径
         /// </summary>
         public string FilePath { get; set; }
-
-        /// <summary>
-        /// 标识该日志是否暂停记录
-        /// </summary>
-        public bool IsPaused { get; set; }
 
         /// <summary>
         /// 待写入的行
         /// </summary>
         public List<VTHistoryLine> PendingLines { get; private set; }
 
-        public VTLogger() 
+        /// <summary>
+        /// 最后一个待写入的行
+        /// </summary>
+        public VTHistoryLine PendingLastLine { get; set; }
+
+        /// <summary>
+        /// 记录的是哪个Tab页
+        /// </summary>
+        public IClientTab ClientTab { get; set; }
+
+        public LoggerContext() 
         {
             this.PendingLines = new List<VTHistoryLine>();
         }

@@ -70,24 +70,24 @@ namespace ModengTerm.ViewModel.Terminal
 
                     throw new RefactorImplementedException();
 
-                    if (value)
-                    {
-                        terminal.OnPrint += Terminal_OnPrint;
-                        terminal.OnLineFeed += Terminal_OnLineFeed;
-                        //terminal.OnKeyboardInput += Terminal_OnKeyboardInput;
-                        //terminal.OnC0ActionExecuted += Terminal_OnC0ActionExecuted;
-                        terminal.MainDocument.Rendering += VTDocument_Rendering;
-                        terminal.AlternateDocument.Rendering += VTDocument_Rendering;
-                    }
-                    else
-                    {
-                        terminal.OnPrint -= Terminal_OnPrint;
-                        terminal.OnLineFeed -= Terminal_OnLineFeed;
-                        //terminal.OnKeyboardInput -= Terminal_OnKeyboardInput;
-                        //terminal.OnC0ActionExecuted -= Terminal_OnC0ActionExecuted;
-                        terminal.MainDocument.Rendering -= VTDocument_Rendering;
-                        terminal.AlternateDocument.Rendering -= VTDocument_Rendering;
-                    }
+                    //if (value)
+                    //{
+                    //    terminal.OnPrint += Terminal_OnPrint;
+                    //    terminal.OnLineFeed += Terminal_OnLineFeed;
+                    //    //terminal.OnKeyboardInput += Terminal_OnKeyboardInput;
+                    //    //terminal.OnC0ActionExecuted += Terminal_OnC0ActionExecuted;
+                    //    terminal.MainDocument.Rendering += VTDocument_Rendering;
+                    //    terminal.AlternateDocument.Rendering += VTDocument_Rendering;
+                    //}
+                    //else
+                    //{
+                    //    terminal.OnPrint -= Terminal_OnPrint;
+                    //    terminal.OnLineFeed -= Terminal_OnLineFeed;
+                    //    //terminal.OnKeyboardInput -= Terminal_OnKeyboardInput;
+                    //    //terminal.OnC0ActionExecuted -= Terminal_OnC0ActionExecuted;
+                    //    terminal.MainDocument.Rendering -= VTDocument_Rendering;
+                    //    terminal.AlternateDocument.Rendering -= VTDocument_Rendering;
+                    //}
                 }
             }
         }

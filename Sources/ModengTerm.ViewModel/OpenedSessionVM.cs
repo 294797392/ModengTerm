@@ -173,6 +173,11 @@ namespace ModengTerm.ViewModel
                 return default(TValue);
             }
 
+            if (value == null) 
+            {
+                return default(TValue);
+            }
+
             return (TValue)value;
         }
 

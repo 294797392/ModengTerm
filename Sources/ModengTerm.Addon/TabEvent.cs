@@ -104,8 +104,8 @@ namespace ModengTerm.Addon
         public int Length { get; set; }
 
         /// <summary>
-        /// 显示出来的完整的新行列表
-        /// 该列表的最后一个元素永远是倒数第二行，因为倒数第一行有可能没打印完成
+        /// 记录主缓冲区新打印的行数
+        /// 不包含光标所在行，因为光标所在行有可能还没打印结束
         /// </summary>
         public List<VTHistoryLine> NewLines { get; private set; }
 

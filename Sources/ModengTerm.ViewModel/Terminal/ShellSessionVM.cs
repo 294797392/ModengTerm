@@ -317,8 +317,6 @@ namespace ModengTerm.ViewModel.Terminal
 
             VideoTerminal videoTerminal = new VideoTerminal();
             videoTerminal.OnViewportChanged += VideoTerminal_ViewportChanged;
-            videoTerminal.OnLineFeed += VideoTerminal_LineFeed;
-            videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
             videoTerminal.DisableBell = Session.GetOption<bool>(OptionKeyEnum.TERM_DISABLE_BELL);
             videoTerminal.Initialize(options);
             this.videoTerminal = videoTerminal;
@@ -368,8 +366,6 @@ namespace ModengTerm.ViewModel.Terminal
             sessionTransport.Release();
 
             videoTerminal.OnViewportChanged -= VideoTerminal_ViewportChanged;
-            videoTerminal.OnLineFeed -= VideoTerminal_LineFeed;
-            videoTerminal.OnDocumentChanged -= VideoTerminal_DocumentChanged;
             videoTerminal.Release();
 
             // 释放剪贴板
@@ -705,6 +701,12 @@ namespace ModengTerm.ViewModel.Terminal
 
         private IEnumerable<VTHistoryLine> GetNewLines(int firstRow, int lastRow)
         {
+            if (firstRow > lastRow)
+            {
+                // 此时说明在同一行输入了数据
+                return null;
+            }
+
             VTDocument document = this.videoTerminal.ActiveDocument;
             VTHistory history = document.History;
 
@@ -853,25 +855,6 @@ namespace ModengTerm.ViewModel.Terminal
             ViewportColumn = newColumn;
         }
 
-        private void VideoTerminal_LineFeed(IVideoTerminal vt, bool isAlternate, int oldPhysicsRow, VTHistoryLine historyLine)
-        {
-            if (isAlternate)
-            {
-                return;
-            }
-
-            int totalRows = oldPhysicsRow + 1;
-
-            if (totalRows > TotalRows)
-            {
-                TotalRows = totalRows;
-            }
-        }
-
-        private void VideoTerminal_DocumentChanged(IVideoTerminal arg1, VTDocument oldDocument, VTDocument newDocument)
-        {
-        }
-
         private void SessionTransport_DataReceived(SessionTransport transport, byte[] buffer, int size)
         {
             VTDebug.Context.WriteRawRead(buffer, size);
@@ -888,37 +871,26 @@ namespace ModengTerm.ViewModel.Terminal
             {
                 try
                 {
-                    // 渲染前和渲染后必须都是主缓冲区才有NewLines
-                    int firstRow = -1;
-                    if (!this.videoTerminal.IsAlternate)
-                    {
-                        firstRow = this.videoTerminal.ActiveDocument.Cursor.PhysicsRow;
-                    }
+                    // 渲染的新行 = 渲染之前光标物理行数和渲染之后光标物理行数之间的所有行数
+                    VTCursor mainCursor = this.videoTerminal.MainDocument.Cursor;
+                    int firstRow = mainCursor.PhysicsRow;
 
                     this.videoTerminal.ProcessRead(buffer, size);
+
+                    int lastRow = mainCursor.PhysicsRow;
 
                     // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG9KR
                     // 解决刚打开会话之后，获取不到实际窗口大小导致终端行和列不正确的问题
                     VTSize termsize = this.videoTerminal.ActiveDocument.GFactory.TerminalSize;
                     this.videoTerminal.Resize(termsize);
 
-                    this.tabEventShellRendered.NewLines.Clear();
                     this.tabEventShellRendered.Buffer = buffer;
                     this.tabEventShellRendered.Length = size;
-                    if (!this.videoTerminal.IsAlternate && firstRow != -1)
+                    this.tabEventShellRendered.NewLines.Clear();
+                    IEnumerable<VTHistoryLine> newLines = this.GetNewLines(firstRow, lastRow - 1); // lastRow - 1 不包含光标所在行，因为光标所在行有可能还没打印结束
+                    if (newLines != null) 
                     {
-                        int lastRow = this.videoTerminal.ActiveDocument.Cursor.PhysicsRow;
-                        if (lastRow != firstRow)
-                        {
-                            // 只返回主缓冲区更新的行数
-                            // 备用缓冲区的行数是固定的
-                            IEnumerable<VTHistoryLine> newLines = this.GetNewLines(firstRow, lastRow - 1);
-                            if (newLines != null)
-                            {
-                                this.tabEventShellRendered.NewLines.AddRange(newLines);
-                                logger.InfoFormat("{0}", this.tabEventShellRendered.NewLines.Count);
-                            }
-                        }
+                        this.tabEventShellRendered.NewLines.AddRange(newLines);
                     }
 
                     base.RaiseTabEvent(this.tabEventShellRendered);
@@ -928,6 +900,10 @@ namespace ModengTerm.ViewModel.Terminal
                     logger.Error("Render异常", ex);
                 }
             });
+
+            VTDocument mainDocument = this.videoTerminal.MainDocument;
+            this.TotalRows = mainDocument.History.Lines;
+
 
             HandleRecord(buffer, size);
 

@@ -3,7 +3,6 @@ using Microsoft.Win32;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Base;
 using ModengTerm.Document.Enumerations;
-using ModengTerm.Terminal.Loggering;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -62,6 +62,9 @@ namespace ModengTerm.Terminal
     /// 处理虚拟终端的所有逻辑
     /// 主缓冲区：可以滚动，保存历史记录
     /// 备用缓冲区：行和列是固定的
+    /// 
+    /// 一个终端有两个文档，分别是主文档（MainDocument）和备用文档（AlternateDocument）
+    /// 默认情况下显示主文档，VIM，Man等程序会用到备用文档
     /// </summary>
     public class VideoTerminal : IVideoTerminal
     {
@@ -81,31 +84,24 @@ namespace ModengTerm.Terminal
         #region 公开事件
 
         /// <summary>
-        /// 当某一行被完整打印之后触发
-        /// 如果同一行被多次打印（top命令），那么只会在第一次打印的时候触发
-        /// </summary>
-        public event Action<IVideoTerminal, bool, int, VTHistoryLine> OnLineFeed;
-
-        /// <summary>
-        /// 当切换显示文档之后触发
-        /// IVideoTerminal：事件触发者
-        /// VTDocument：oldDocument，切换之前显示的文档
-        /// VTDocument：newDocument，切换之后显示的文档
-        /// </summary>
-        public event Action<IVideoTerminal, VTDocument, VTDocument> OnDocumentChanged;
-
-        /// <summary>
-        /// 打印一个字符的时候触发
-        /// </summary>
-        public event Action<IVideoTerminal> OnPrint;
-
-        /// <summary>
         /// 当可视区域的行或列改变的时候触发
         /// </summary>
         public event Action<IVideoTerminal, int, int> OnViewportChanged;
 
-        public event Action<IVideoTerminal, ASCIITable> OnC0ActionExecuted;
+        /// <summary>
+        /// 不论是主缓冲区还是备用缓冲区，只要有新行打印就触发。当终端打印了新的行的时候触发
+        /// List<VTHistoryLines>：打印的新的行数
+        /// int：打印的新行的第一行的物理行号
+        /// </summary>
+        public event Action<IVideoTerminal, List<VTHistoryLine>, int> NewLines;
 
+        /// <summary>
+        /// 请求改变窗口大小
+        /// 
+        /// double：窗口宽度增量，可以是负数
+        /// double：窗口高度增量，可以是负数
+        /// 如果是负数则表示缩小窗口，正数表示扩大窗口
+        /// </summary>
         public event Action<IVideoTerminal, double, double> RequestChangeWindowSize;
 
         /// <summary>
@@ -844,9 +840,6 @@ namespace ModengTerm.Terminal
                         }
                     }
                 }
-
-                // 触发行被完全打印的事件
-                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
             }
             else
             {
@@ -878,9 +871,6 @@ namespace ModengTerm.Terminal
                         newActiveLine.SetHistory(historyLine);
                     }
                 }
-
-                // 触发行被完全打印的事件
-                this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
             }
         }
 
@@ -2036,8 +2026,6 @@ namespace ModengTerm.Terminal
                         throw new NotImplementedException(string.Format("未实现的控制字符:{0}", ascii));
                     }
             }
-
-            this.OnC0ActionExecuted?.Invoke(this, ascii);
         }
 
         private void VtParser_OnESCActions(VTParser arg1, EscActionCodes escCode, VTID vtid)
@@ -2435,30 +2423,12 @@ namespace ModengTerm.Terminal
             document.PrintCharacter(character);
             document.SetCursorLogical(cursor.Row, cursor.Column + character.ColumnSize);
 
-            this.OnPrint?.Invoke(this);
-
             // REP_RepeatCharacter会重复打印最后一个字符
             // 这里记录一下打印的最后一个字符
             if (this.lastPrintChar != ch)
             {
                 this.lastPrintChar = ch;
             }
-        }
-
-        public void CarriageReturn()
-        {
-            // CR
-            // 把光标移动到行开头
-
-            int oldRow = this.activeDocument.Cursor.Row;
-            int oldCol = this.activeDocument.Cursor.Column;
-
-            this.activeDocument.SetCursorLogical(CursorRow, 0);
-
-            int newRow = this.activeDocument.Cursor.Row;
-            int newCol = this.activeDocument.Cursor.Column;
-
-            VTDebug.Context.WriteInteractive("CarriageReturn", "{0},{1},{2},{3}", oldRow, oldCol, newRow, newCol);
         }
 
         private void RI_ReverseLineFeed()
@@ -2805,7 +2775,7 @@ namespace ModengTerm.Terminal
         #endregion
 
         // Margin
-        public void DECSTBM_SetScrollingRegion(List<int> parameters)
+        private void DECSTBM_SetScrollingRegion(List<int> parameters)
         {
             // 当前终端屏幕可显示的行数量
             int lines = this.ViewportRow;
@@ -2848,7 +2818,7 @@ namespace ModengTerm.Terminal
         /// <param name="options"></param>
         /// <param name="parameters"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public void PerformSGR(GraphicsOptions options, VTColor extColor)
+        private void PerformSGR(GraphicsOptions options, VTColor extColor)
         {
             VTDebug.Context.WriteInteractive(string.Format("SGR - {0}", options), string.Empty);
 
@@ -2857,7 +2827,7 @@ namespace ModengTerm.Terminal
                 case GraphicsOptions.Off:
                     {
                         // 重置所有文本装饰
-                        activeDocument.ClearAttribute();
+                        this.activeDocument.ClearAttribute();
                         break;
                     }
 
@@ -3026,10 +2996,6 @@ namespace ModengTerm.Terminal
                         throw new NotImplementedException();
                     }
             }
-        }
-
-        public void ASB_AlternateScreenBuffer(bool enable)
-        {
         }
 
         #region 切换字符集

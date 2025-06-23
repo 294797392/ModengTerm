@@ -492,10 +492,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
 
 
-        private void VideoTerminal_DocumentChanged(IVideoTerminal arg1, VTDocument oldDocument, VTDocument newDocument)
-        {
-        }
-
         private void VideoTerminal_RequestChangeWindowSize(IVideoTerminal arg1, double deltaX, double deltaY)
         {
             Window window = Window.GetWindow(this);
@@ -608,7 +604,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
                 this.autoCompleteVM = this.shellSession.AutoCompletionVM;
 
                 this.videoTerminal = this.shellSession.VideoTerminal as VideoTerminal;
-                this.videoTerminal.OnDocumentChanged += VideoTerminal_DocumentChanged;
                 this.videoTerminal.RequestChangeWindowSize += VideoTerminal_RequestChangeWindowSize;
                 this.videoTerminal.RequestChangeVisible += this.VideoTerminal_RequestChangeVisible;
 
@@ -630,7 +625,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
             DocumentMain.DrawArea.SizeChanged -= DrawArea_SizeChanged;
             DocumentMain.Scrollbar.MouseMove -= this.Scrollbar_MouseMove;
 
-            this.videoTerminal.OnDocumentChanged -= VideoTerminal_DocumentChanged;
             this.videoTerminal.RequestChangeWindowSize -= VideoTerminal_RequestChangeWindowSize;
             this.videoTerminal.RequestChangeVisible -= this.VideoTerminal_RequestChangeVisible;
             this.videoTerminal = null;
