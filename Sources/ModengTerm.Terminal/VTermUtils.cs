@@ -118,43 +118,6 @@ namespace ModengTerm.Terminal
             }
         }
 
-        /// <summary>
-        /// 获取回放文件的完整目录
-        /// </summary>
-        /// <param name="sessionId">回放文件所属的会话Id</param>
-        /// <param name="playbackFile">回放文件</param>
-        /// <returns></returns>
-        public static string GetPlaybackFilePath(Playback playbackFile)
-        {
-            string directory = GetPlaybackFileDirectory(playbackFile.Session.ID);
-
-            return Path.Combine(directory, playbackFile.Name);
-        }
-
-        /// <summary>
-        /// 获取某个会话对应的回放文件的存储目录
-        /// </summary>
-        /// <param name="sessionId">回放文件所属的会话Id</param>
-        /// <returns></returns>
-        public static string GetPlaybackFileDirectory(string sessionId)
-        {
-            string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "playback", sessionId);
-            if (!Directory.Exists(dir))
-            {
-                try
-                {
-                    Directory.CreateDirectory(dir);
-                }
-                catch (Exception ex)
-                {
-                    logger.ErrorFormat("创建Playback存储目录异常, {0}, {1}", ex, dir);
-                    return string.Empty;
-                }
-            }
-
-            return dir;
-        }
-
 
         public static VTPoint ToVTPoint(this Point wpfPoint)
         {

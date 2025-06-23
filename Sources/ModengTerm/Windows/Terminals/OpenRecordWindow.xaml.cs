@@ -2,6 +2,7 @@
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.ServiceAgents;
 using ModengTerm.Controls;
+using ModengTerm.OfficialAddons.Record;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.UserControls.Terminals;
 using System;
@@ -57,9 +58,9 @@ namespace ModengTerm.Terminal.Windows
         {
             this.serviceAgent = VTApp.Context.ServiceAgent;
 
-            List<Playback> playbackList = this.serviceAgent.GetPlaybacks(session.ID);
-            this.playbacks = new BindableCollection<Playback>();
-            this.playbacks.AddRange(playbackList);
+            //List<Playback> playbackList = this.serviceAgent.GetPlaybacks(session.ID);
+            //this.playbacks = new BindableCollection<Playback>();
+            //this.playbacks.AddRange(playbackList);
 
             ComboBoxPlaybackList.ItemsSource = this.playbacks;
         }
@@ -83,16 +84,18 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            string playbackFilePath = VTermUtils.GetPlaybackFilePath(playback);
-            if (!System.IO.File.Exists(playbackFilePath))
-            {
-                MTMessageBox.Info("回放文件不存在");
-                return;
-            }
+            throw new RefactorImplementedException();
 
-            this.isPlaying = true;
+            //string playbackFilePath = VTermUtils.GetPlaybackFilePath(playback);
+            //if (!System.IO.File.Exists(playbackFilePath))
+            //{
+            //    MTMessageBox.Info("回放文件不存在");
+            //    return;
+            //}
 
-            PlaybackUserControl.Open(playback);
+            //this.isPlaying = true;
+
+            //PlaybackUserControl.Open(playback);
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
@@ -109,17 +112,19 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            if (!MTMessageBox.Confirm("确定要删除{0}吗?", playback.Name))
-            {
-                return;
-            }
+            throw new RefactorImplementedException();
 
-            int code = this.serviceAgent.DeletePlayback(playback.ID);
-            if (code != ResponseCode.SUCCESS) 
-            {
-                MTMessageBox.Info("删除失败, {0}", code);
-                return;
-            }
+            //if (!MTMessageBox.Confirm("确定要删除{0}吗?", playback.Name))
+            //{
+            //    return;
+            //}
+
+            //int code = this.serviceAgent.DeletePlayback(playback.ID);
+            //if (code != ResponseCode.SUCCESS) 
+            //{
+            //    MTMessageBox.Info("删除失败, {0}", code);
+            //    return;
+            //}
 
             this.playbacks.Remove(playback);
         }

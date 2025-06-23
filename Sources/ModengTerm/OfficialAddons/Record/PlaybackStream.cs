@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal
+namespace ModengTerm.OfficialAddons.Record
 {
     /// <summary>
     /// 提供读取回放文件的功能
@@ -51,15 +52,6 @@ namespace ModengTerm.Terminal
         /// </summary>
         private FileHeader header;
 
-        /// <summary>
-        /// 用来回放的线程
-        /// </summary>
-        private Task playbackTask;
-
-        private Playback playbackFile;
-        private PlaybackStream playbackStream;
-        private AutoResetEvent playbackEvent;
-
         #endregion
 
         #region 属性
@@ -96,15 +88,13 @@ namespace ModengTerm.Terminal
         /// <summary>
         /// 打开文件以便进行写入
         /// </summary>
-        /// <param name="file">要写入的文件</param>
-        public int OpenWrite(Playback file)
+        /// <param name="filePath">要写入的文件</param>
+        public int OpenWrite(string filePath)
         {
             if (this.stream != null)
             {
                 return ResponseCode.SUCCESS;
             }
-
-            string filePath = VTermUtils.GetPlaybackFilePath(file);
 
             try
             {
@@ -133,15 +123,13 @@ namespace ModengTerm.Terminal
         /// </summary>
         /// <param name="playback">要读取的文件</param>
         /// <returns></returns>
-        public int OpenRead(Playback playback)
+        public int OpenRead(string filePath)
         {
             if (this.stream != null)
             {
                 logger.ErrorFormat("打开回放文件进行读取失败, 已经被打开了");
                 return ResponseCode.FAILED;
             }
-
-            string filePath = VTermUtils.GetPlaybackFilePath(playback);
 
             if (!File.Exists(filePath))
             {
@@ -186,7 +174,7 @@ namespace ModengTerm.Terminal
         /// 向回放文件里写入一帧
         /// </summary>
         /// <param name="frame"></param>
-        public int WriteFrame(PlaybackFrame frame)
+        public int WriteFrame(long timestamp, byte[] frameData)
         {
             // 帧头20个字节
             // 0 - 7：时间戳
@@ -198,18 +186,12 @@ namespace ModengTerm.Terminal
             byte[] frameHeader = new byte[FRAME_HEADER_SIZE];
 
             // 时间戳，8字节
-            byte[] timestampBytes = BitConverter.GetBytes(frame.Timestamp);
+            byte[] timestampBytes = BitConverter.GetBytes(timestamp);
             Buffer.BlockCopy(timestampBytes, 0, frameHeader, 0, timestampBytes.Length);
 
             // 数据大小，4字节
-            byte[] sizeBytes = BitConverter.GetBytes(frame.Data.Length);
+            byte[] sizeBytes = BitConverter.GetBytes(frameData.Length);
             Buffer.BlockCopy(sizeBytes, 0, frameHeader, 8, sizeBytes.Length);
-
-            #endregion
-
-            #region 数据包内容
-
-            byte[] frameData = frame.Data;
 
             #endregion
 

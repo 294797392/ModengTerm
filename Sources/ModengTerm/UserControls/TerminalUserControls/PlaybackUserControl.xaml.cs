@@ -1,8 +1,10 @@
 ﻿using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
 using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.OfficialAddons.Record;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Session;
 using ModengTerm.UserControls.TerminalUserControls;
@@ -32,7 +34,7 @@ namespace ModengTerm.UserControls.Terminals
         #region 实例变量
 
         private XTermSession session;
-        private PlaybackSessionVM playbackVM;
+        //private PlaybackSessionVM playbackVM;
         private IVideoTerminal videoTerminal;
 
         #endregion
@@ -94,24 +96,27 @@ namespace ModengTerm.UserControls.Terminals
             DocumentMain.Padding = new Thickness(padding);
             DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
 
-            PlaybackOptions playbackOptions = new PlaybackOptions()
-            {
-                Session = session,
-                AlternateDocument = DocumentAlternate,
-                MainDocument = DocumentMain,
-                Height = height,
-                Width = width,
-                Playback = playback
-            };
-            this.playbackVM = new PlaybackSessionVM();
-            this.playbackVM.Open(playbackOptions);
+            throw new RefactorImplementedException();
 
-            this.videoTerminal = this.playbackVM.VideoTerminal;
+            //PlaybackOptions playbackOptions = new PlaybackOptions()
+            //{
+            //    Session = session,
+            //    AlternateDocument = DocumentAlternate,
+            //    MainDocument = DocumentMain,
+            //    Height = height,
+            //    Width = width,
+            //    Playback = playback
+            //};
+            //this.playbackVM = new PlaybackSessionVM();
+            //this.playbackVM.Open(playbackOptions);
+
+            //this.videoTerminal = this.playbackVM.VideoTerminal;
         }
 
         public void Close()
         {
-            this.playbackVM.Close();
+            throw new RefactorImplementedException();
+            //this.playbackVM.Close();
 
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;
             DocumentMain.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;

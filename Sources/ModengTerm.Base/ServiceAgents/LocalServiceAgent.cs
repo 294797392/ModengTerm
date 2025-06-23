@@ -22,49 +22,6 @@ namespace ModengTerm.Base.ServiceAgents
 
         private static readonly string DefaultSessionFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "defaultSession.json");
 
-        public override int DeletePlayback(string fileId)
-        {
-            try
-            {
-                JSONDatabase.Delete<Playback>(v => v.ID == fileId);
-
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("DeletePlaybackFile异常", ex);
-                return ResponseCode.FAILED;
-            }
-        }
-
-        public override List<Playback> GetPlaybacks(string sessionId)
-        {
-            try
-            {
-                return JSONDatabase.SelectAll<Playback>();
-            }
-            catch (Exception ex)
-            {
-                logger.Error("GetPlaybackFiles异常", ex);
-                return new List<Playback>();
-            }
-        }
-
-        public override int AddPlayback(Playback file)
-        {
-            try
-            {
-                JSONDatabase.Insert<Playback>(file);
-
-                return ResponseCode.SUCCESS;
-            }
-            catch (Exception ex)
-            {
-                logger.Error("AddPlaybackFile异常", ex);
-                return ResponseCode.FAILED;
-            }
-        }
-
         #region Session管理
 
         public override XTermSession GetSession(string sessionId)

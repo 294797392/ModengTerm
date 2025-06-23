@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace ModengTerm.Terminal.Windows
+namespace ModengTerm.OfficialAddons.Record
 {
     /// <summary>
     /// RecordOptionsWindow.xaml 的交互逻辑
@@ -29,11 +29,6 @@ namespace ModengTerm.Terminal.Windows
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
             RecordOptionsVM recordOptionsVM = base.DataContext as RecordOptionsVM;
-
-            if (!recordOptionsVM.ParameterVerfication())
-            {
-                return;
-            }
 
             base.DialogResult = true;
         }

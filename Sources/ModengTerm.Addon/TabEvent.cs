@@ -109,6 +109,11 @@ namespace ModengTerm.Addon
         /// </summary>
         public List<VTHistoryLine> NewLines { get; private set; }
 
+        /// <summary>
+        /// 时间戳
+        /// </summary>
+        public long Timestamp { get; set; }
+
         public TabEventShellRendered() 
         {
             this.NewLines = new List<VTHistoryLine>();

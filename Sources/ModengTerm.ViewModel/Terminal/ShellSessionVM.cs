@@ -60,10 +60,6 @@ namespace ModengTerm.ViewModel.Terminal
         /// </summary>
         private VTClipboard clipboard;
 
-        private RecordStatusEnum recordStatus;
-        private PlaybackStatusEnum playbackStatus;
-        private PlaybackStream playbackStream;
-
         private string uri;
 
         private int totalRows;
@@ -213,22 +209,6 @@ namespace ModengTerm.ViewModel.Terminal
         }
 
         /// <summary>
-        /// 录像状态
-        /// </summary>
-        public RecordStatusEnum RecordStatus
-        {
-            get { return recordStatus; }
-            set
-            {
-                if (recordStatus != value)
-                {
-                    recordStatus = value;
-                    NotifyPropertyChanged("RecordStatus");
-                }
-            }
-        }
-
-        /// <summary>
         /// 是否显示输入栏
         /// </summary>
         public bool InputPanelVisible
@@ -278,7 +258,6 @@ namespace ModengTerm.ViewModel.Terminal
             scriptItems = Session.GetOption(OptionKeyEnum.LOGIN_SCRIPT_ITEMS, new List<ScriptItem>());
             HistoryCommands = new BindableCollection<string>();
 
-            RecordStatus = RecordStatusEnum.Stop;
             writeEncoding = Encoding.GetEncoding(Session.GetOption(OptionKeyEnum.TERM_WRITE_ENCODING, OptionDefaultValues.TERM_WRITE_ENCODING));
             readEncoding = Encoding.GetEncoding(Session.GetOption(OptionKeyEnum.TERM_READ_ENCODING, OptionDefaultValues.TERM_READ_ENCODING));
             clipboard = new VTClipboard()
@@ -446,48 +425,6 @@ namespace ModengTerm.ViewModel.Terminal
 
             this.tabEventSendData.Buffer = bytes;
             base.RaiseTabEvent(this.tabEventSendData);
-        }
-
-        /// <summary>
-        /// 处理录像
-        /// </summary>
-        /// <param name="bytes">收到的数据</param>
-        /// <param name="size">收到的数据长度</param>
-        /// <exception cref="NotImplementedException"></exception>
-        private void HandleRecord(byte[] bytes, int size)
-        {
-            switch (recordStatus)
-            {
-                case RecordStatusEnum.Pause:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Stop:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Recording:
-                    {
-                        // 拷贝回放数据
-                        byte[] frameData = new byte[size];
-                        Buffer.BlockCopy(bytes, 0, frameData, 0, frameData.Length);
-
-                        // 写入回放帧
-                        PlaybackFrame frame = new PlaybackFrame()
-                        {
-                            Timestamp = DateTime.Now.ToFileTime(),
-                            Data = frameData
-                        };
-                        playbackStream.WriteFrame(frame);
-
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         private void HandleScript()
@@ -777,64 +714,6 @@ namespace ModengTerm.ViewModel.Terminal
             return Control(code, parameter, out result);
         }
 
-
-        /// <summary>
-        /// 开始录像
-        /// </summary>
-        /// <param name="fileName">录像名称</param>
-        public void StartRecord(string fileName)
-        {
-            if (recordStatus == RecordStatusEnum.Recording)
-            {
-                logger.WarnFormat("StartRecord: 当前正在录像中");
-                return;
-            }
-
-            Playback playbackFile = new Playback()
-            {
-                ID = Guid.NewGuid().ToString(),
-                Name = fileName,
-                Session = Session
-            };
-
-            // 先打开录像文件
-            playbackStream = new PlaybackStream();
-            int code = playbackStream.OpenWrite(playbackFile);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MTMessageBox.Error("打开录像文件失败, {0}", ResponseCode.GetMessage(code));
-                return;
-            }
-
-            // 然后保存录像记录
-            code = ServiceAgent.AddPlayback(playbackFile);
-            if (code != ResponseCode.SUCCESS)
-            {
-                MTMessageBox.Error("录制失败, 保存录制记录失败, {0}", ResponseCode.GetMessage(code));
-                playbackStream.Close();
-                return;
-            }
-
-            RecordStatus = RecordStatusEnum.Recording;
-        }
-
-        /// <summary>
-        /// 停止录像
-        /// </summary>
-        public void StopRecord()
-        {
-            if (recordStatus == RecordStatusEnum.Stop)
-            {
-                return;
-            }
-
-            // TODO：此时文件可能正在被写入，playbackStream里做了异常处理，所以直接这么写
-            // 需要优化
-            playbackStream.Close();
-
-            RecordStatus = RecordStatusEnum.Stop;
-        }
-
         #endregion
 
         #region 事件处理器
@@ -886,6 +765,7 @@ namespace ModengTerm.ViewModel.Terminal
 
                     this.tabEventShellRendered.Buffer = buffer;
                     this.tabEventShellRendered.Length = size;
+                    this.tabEventShellRendered.Timestamp = DateTime.Now.ToFileTime();
                     this.tabEventShellRendered.NewLines.Clear();
                     IEnumerable<VTHistoryLine> newLines = this.GetNewLines(firstRow, lastRow - 1); // lastRow - 1 不包含光标所在行，因为光标所在行有可能还没打印结束
                     if (newLines != null) 
@@ -903,9 +783,6 @@ namespace ModengTerm.ViewModel.Terminal
 
             VTDocument mainDocument = this.videoTerminal.MainDocument;
             this.TotalRows = mainDocument.History.Lines;
-
-
-            HandleRecord(buffer, size);
 
             HandleScript();
         }
@@ -1028,53 +905,6 @@ namespace ModengTerm.ViewModel.Terminal
             //paragraphsWindow.Title = "收藏夹列表";
             //paragraphsWindow.Owner = Window.GetWindow(this.Content);
             //paragraphsWindow.Show();
-        }
-
-        /// <summary>
-        /// 暂停录像
-        /// </summary>
-        private void PauseRecord()
-        {
-            if (recordStatus == RecordStatusEnum.Pause)
-            {
-                return;
-            }
-
-            RecordStatus = RecordStatusEnum.Pause;
-        }
-
-        /// <summary>
-        /// 继续录像
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        private void ResumeRecord()
-        {
-            if (recordStatus == RecordStatusEnum.Recording)
-            {
-                return;
-            }
-
-            switch (recordStatus)
-            {
-                case RecordStatusEnum.Stop:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Recording:
-                    {
-                        break;
-                    }
-
-                case RecordStatusEnum.Pause:
-                    {
-                        RecordStatus = RecordStatusEnum.Recording;
-                        break;
-                    }
-
-                default:
-                    throw new NotImplementedException();
-            }
         }
 
         #endregion

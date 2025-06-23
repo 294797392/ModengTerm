@@ -64,14 +64,6 @@ namespace ModengTerm.Base.ServiceAgents
 
         #endregion
 
-        #region Playback管理
-
-        public abstract List<Playback> GetPlaybacks(string sessionId);
-        public abstract int AddPlayback(Playback file);
-        public abstract int DeletePlayback(string fileId);
-
-        #endregion
-
         #region ShellCommand管理
 
         public abstract List<ShellCommand> GetShellCommands(string sessionId);
