@@ -703,6 +703,22 @@ namespace ModengTerm.ViewModel.Terminal
             }
         }
 
+        private IEnumerable<VTHistoryLine> GetNewLines(int firstRow, int lastRow)
+        {
+            VTDocument document = this.videoTerminal.ActiveDocument;
+            VTHistory history = document.History;
+
+            // endPhysicalRow是倒数第二行，因为倒数第一行有可能没有打印完成
+            IEnumerable<VTHistoryLine> newLines;
+            if (!history.TryGetHistories(firstRow, lastRow, out newLines))
+            {
+                logger.ErrorFormat("查找NewLines失败");
+                return null;
+            }
+
+            return newLines;
+        }
+
         #endregion
 
         #region 公开接口
@@ -872,6 +888,13 @@ namespace ModengTerm.ViewModel.Terminal
             {
                 try
                 {
+                    // 渲染前和渲染后必须都是主缓冲区才有NewLines
+                    int firstRow = -1;
+                    if (!this.videoTerminal.IsAlternate)
+                    {
+                        firstRow = this.videoTerminal.ActiveDocument.Cursor.PhysicsRow;
+                    }
+
                     this.videoTerminal.ProcessRead(buffer, size);
 
                     // https://gitee.com/zyfalreadyexsit/terminal/issues/ICG9KR
@@ -879,8 +902,25 @@ namespace ModengTerm.ViewModel.Terminal
                     VTSize termsize = this.videoTerminal.ActiveDocument.GFactory.TerminalSize;
                     this.videoTerminal.Resize(termsize);
 
+                    this.tabEventShellRendered.NewLines.Clear();
                     this.tabEventShellRendered.Buffer = buffer;
                     this.tabEventShellRendered.Length = size;
+                    if (!this.videoTerminal.IsAlternate && firstRow != -1)
+                    {
+                        int lastRow = this.videoTerminal.ActiveDocument.Cursor.PhysicsRow;
+                        if (lastRow != firstRow)
+                        {
+                            // 只返回主缓冲区更新的行数
+                            // 备用缓冲区的行数是固定的
+                            IEnumerable<VTHistoryLine> newLines = this.GetNewLines(firstRow, lastRow - 1);
+                            if (newLines != null)
+                            {
+                                this.tabEventShellRendered.NewLines.AddRange(newLines);
+                                logger.InfoFormat("{0}", this.tabEventShellRendered.NewLines.Count);
+                            }
+                        }
+                    }
+
                     base.RaiseTabEvent(this.tabEventShellRendered);
                 }
                 catch (Exception ex)

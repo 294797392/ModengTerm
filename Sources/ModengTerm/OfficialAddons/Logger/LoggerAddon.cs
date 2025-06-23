@@ -116,7 +116,7 @@ namespace ModengTerm.OfficialAddons.Logger
 
         private void ExecuteStartLoggerCommand(CommandArgs e)
         {
-            LoggerOptionsWindow window = new LoggerOptionsWindow();
+            LoggerOptionsWindow window = new LoggerOptionsWindow(e.ActiveTab);
             window.Owner = Application.Current.MainWindow;
             if (!(bool)window.ShowDialog())
             {
@@ -203,7 +203,7 @@ namespace ModengTerm.OfficialAddons.Logger
                         pendingLines.Clear();
                     }
 
-                    foreach (VTHistoryLine historyLine in pendingLines)
+                    foreach (VTHistoryLine historyLine in toWrite)
                     {
                         string text = VTDocUtils.CreatePlainText(historyLine.Characters);
                         builder.AppendLine(text);

@@ -58,11 +58,6 @@ namespace ModengTerm.Addon
         /// 触发该事件的Tab
         /// </summary>
         public IClientTab Sender { get; set; }
-
-        /// <summary>
-        /// 显示出来的新行列表
-        /// </summary>
-        public List<VTHistoryLine> NewLines { get; set; }
     }
 
     public class TabEventStatusChanged : TabEventArgs
@@ -107,6 +102,17 @@ namespace ModengTerm.Addon
         /// 缓冲区中的数据长度
         /// </summary>
         public int Length { get; set; }
+
+        /// <summary>
+        /// 显示出来的完整的新行列表
+        /// 该列表的最后一个元素永远是倒数第二行，因为倒数第一行有可能没打印完成
+        /// </summary>
+        public List<VTHistoryLine> NewLines { get; private set; }
+
+        public TabEventShellRendered() 
+        {
+            this.NewLines = new List<VTHistoryLine>();
+        }
     }
 
     public class TabEventShellSendData : TabEventArgs

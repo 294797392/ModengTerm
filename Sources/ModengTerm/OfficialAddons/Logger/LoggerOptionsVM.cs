@@ -22,7 +22,6 @@ namespace ModengTerm.OfficialAddons.Logger
         private bool regexp;
         private string filePath;
         private ParagraphFormatEnum fileType;
-        private IVideoTerminal vt;
 
         #endregion
 
@@ -109,9 +108,8 @@ namespace ModengTerm.OfficialAddons.Logger
 
         #region 构造方法
 
-        public LoggerOptionsVM(IVideoTerminal vt)
+        public LoggerOptionsVM()
         {
-            this.vt = vt;
         }
 
         #endregion
@@ -152,23 +150,6 @@ namespace ModengTerm.OfficialAddons.Logger
         #endregion
 
         #region 公开接口
-
-        /// <summary>
-        /// 选择日志文件的保存路径
-        /// </summary>
-        public void BrowseFilePath()
-        {
-            SaveFileDialog dialog = new SaveFileDialog();
-            dialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
-            dialog.FileName = string.Format("{0}_{1}", vt.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
-            if ((bool)dialog.ShowDialog())
-            {
-                FilePath = dialog.FileName;
-
-                FileType = FilterIndex2FileType(dialog.FilterIndex);
-            }
-        }
-
         #endregion
     }
 }
