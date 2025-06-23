@@ -294,8 +294,8 @@ namespace ModengTerm.ViewModel.Terminal
             ContextMenus = new BindableCollection<ContextMenuVM>();
             ContextMenus.AddRange(VMUtils.CreateContextMenuVMs(false));
 
-            BehaviorRightClicks brc = Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
-            if (brc == BehaviorRightClicks.ContextMenu)
+            RightClickActions brc = Session.GetOption<RightClickActions>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
+            if (brc == RightClickActions.ContextMenu)
             {
                 ContextMenuVisibility = Visibility.Visible;
             }

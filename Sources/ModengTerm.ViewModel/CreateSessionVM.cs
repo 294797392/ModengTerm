@@ -433,7 +433,7 @@ namespace ModengTerm.ViewModel
 
         #region 终端 - 行为
 
-        public BindableCollection<BehaviorRightClicks> BehaviorRightClicks { get; private set; }
+        public BindableCollection<RightClickActions> BehaviorRightClicks { get; private set; }
 
         #endregion
 
@@ -618,9 +618,9 @@ namespace ModengTerm.ViewModel
 
             #region 行为
 
-            BehaviorRightClicks = new BindableCollection<BehaviorRightClicks>();
-            BehaviorRightClicks.AddRange(VTBaseUtils.GetEnumValues<BehaviorRightClicks>());
-            BehaviorRightClicks.SelectedItem = Base.Enumerations.BehaviorRightClicks.ContextMenu;
+            BehaviorRightClicks = new BindableCollection<RightClickActions>();
+            BehaviorRightClicks.AddRange(VTBaseUtils.GetEnumValues<RightClickActions>());
+            BehaviorRightClicks.SelectedItem = Base.Enumerations.RightClickActions.ContextMenu;
 
             #endregion
 
@@ -884,7 +884,7 @@ namespace ModengTerm.ViewModel
 
         private bool GetTerminalBehaviorOptions(XTermSession session)
         {
-            session.SetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, BehaviorRightClicks.SelectedItem);
+            session.SetOption<RightClickActions>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, BehaviorRightClicks.SelectedItem);
 
             return true;
         }

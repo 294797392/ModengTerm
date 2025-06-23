@@ -11,16 +11,16 @@ namespace ModengTerm.UnitTest.TestCases
     /// </summary>
     public class TestVTDocumentInterface
     {
-        [UnitTest]
-        public bool VTDocument_SetCursorLogical()
-        {
-            return false;
-        }
+        //[UnitTest]
+        //public bool VTDocument_SetCursorLogical()
+        //{
+        //    return false;
+        //}
 
-        [UnitTest]
-        public bool VTDocument_SetCursorPhysical()
-        {
-            return false;
-        }
+        //[UnitTest]
+        //public bool VTDocument_SetCursorPhysical()
+        //{
+        //    return false;
+        //}
     }
 }

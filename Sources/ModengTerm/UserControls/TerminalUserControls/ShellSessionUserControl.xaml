@@ -76,9 +76,8 @@
 
         <!-- 显示终端内容区域 -->
         <Grid Grid.Row="0" x:Name="GridTerminal" Background="Transparent" Loaded="GridTerminal_Loaded" 
-              MouseRightButtonDown="GridTerminal_MouseRightButtonDown" MouseMove="GridTerminal_MouseMove" 
-              MouseLeftButtonDown="GridTerminal_MouseLeftButtonDown" MouseLeftButtonUp="GridTerminal_MouseLeftButtonUp"
-              MouseWheel="GridTerminal_MouseWheel"
+              MouseMove="GridTerminal_MouseMove"  MouseWheel="GridTerminal_MouseWheel"
+              MouseDown="GridTerminal_MouseDown" MouseUp="GridTerminal_MouseUp"
               TextInput="GridDocument_TextInput" KeyDown="GridDocument_KeyDown"
               LostFocus="GridDocument_LostFocus" GotFocus="GridDocument_GotFocus">
             <Grid.ContextMenu>

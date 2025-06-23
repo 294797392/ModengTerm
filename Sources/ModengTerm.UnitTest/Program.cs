@@ -1,4 +1,5 @@
-﻿using ModengTerm.Document;
+﻿using ModengTerm.Base;
+using ModengTerm.Document;
 using ModengTerm.Terminal;
 using ModengTerm.UnitTest.TestCases;
 using System.Diagnostics;
@@ -41,11 +42,11 @@ namespace ModengTerm.UnitTest
                 bool result = (bool)methodInfo.Invoke(testObject, null);
                 if (result)
                 {
-                    logger.InfoFormat("{0}:{1}", testName, result);
+                    logger.InfoFormat("{0},{1}:{2}", type.Name, testName, result);
                 }
                 else
                 {
-                    logger.ErrorFormat("{0}:{1}", testName, result);
+                    logger.ErrorFormat("{0},{1}:{2}", type.Name, testName, result);
                 }
             }
         }
@@ -93,7 +94,7 @@ namespace ModengTerm.UnitTest
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             DotNEToolkit.Log4net.InitializeLog4net();
 
-            VTermApp.Context.Initialize("vtermapp.json");
+            VTApp.Context.Initialize();
 
             logger.InfoFormat("--- TestVTDocumentInterface ---");
 

@@ -195,26 +195,26 @@ namespace ModengTerm
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (!(value is BehaviorRightClicks))
+            if (!(value is RightClickActions))
             {
                 return string.Empty;
             }
 
-            BehaviorRightClicks brc = (BehaviorRightClicks)value;
+            RightClickActions brc = (RightClickActions)value;
 
             switch (brc)
             {
-                case BehaviorRightClicks.ContextMenu:
+                case RightClickActions.ContextMenu:
                     {
                         return "显示上下文菜单";
                     }
 
-                case BehaviorRightClicks.FastCopyPaste:
+                case RightClickActions.FastCopyPaste:
                     {
                         return "快速复制粘贴";
                     }
 
-                case BehaviorRightClicks.None:
+                case RightClickActions.None:
                     {
                         return "什么都不做";
                     }

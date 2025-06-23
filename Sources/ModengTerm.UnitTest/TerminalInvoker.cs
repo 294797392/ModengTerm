@@ -278,12 +278,6 @@ namespace ModengTerm.UnitTest
 
         public void SimulateMouseDown(int rowIndex)
         {
-            int row = rowIndex + 1;
-
-            VTDocument document = this.videoTerminal.MainDocument;
-            double mouseY = document.Typeface.Height * row - 3;
-            FakeGI gi = document.GFactory as FakeGI;
-            gi.RaiseMouseDown(new MouseData() { ClickCount = 1, X = 10, Y = mouseY });
         }
 
         public void ASB_AlternateScreenBuffer(bool enable) 

@@ -42,6 +42,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
         /// 鼠标滚轮滚动一次，滚动几行
         /// </summary>
         private int scrollDelta;
+        private bool clickToCursor;
+        private RightClickActions rightClickActions;
 
         #endregion
 
@@ -163,6 +165,23 @@ namespace ModengTerm.UserControls.TerminalUserControls
             return newvalue;
         }
 
+        private void ProcessVT200MouseMode(MouseButtonEventArgs e)
+        {
+            int buttonType = 0;
+            switch (e.ChangedButton)
+            {
+                case MouseButton.Left: buttonType = 0; break;
+                case MouseButton.Right: buttonType = 1; break;
+                case MouseButton.Middle: buttonType = 2; break;
+                default:
+                    return;
+            }
+
+            bool released = e.ButtonState == MouseButtonState.Released;
+            Point point = this.GetPositionRelativeToTerminal();
+            this.videoTerminal.HandleVT200MouseMode(point.X, point.Y, buttonType, released);
+        }
+
         #endregion
 
         #region 事件处理器
@@ -266,106 +285,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
 
         #region Terminal事件
 
-        private void GridTerminal_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // 获取焦点，才能收到OnKeyDown和OnTextInput回调
-            if (!GridTerminal.IsKeyboardFocused)
-            {
-                Keyboard.Focus(GridTerminal);
-            }
-
-            BehaviorRightClicks brc = this.Session.GetOption<BehaviorRightClicks>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK);
-            if (brc == BehaviorRightClicks.FastCopyPaste)
-            {
-                if (!this.videoTerminal.HasSelection)
-                {
-                    // 粘贴剪贴板里的内容
-                    string text = Clipboard.GetText();
-                    if (string.IsNullOrEmpty(text))
-                    {
-                        return;
-                    }
-
-                    this.shellSession.Send(text);
-                }
-                else
-                {
-                    this.shellSession.CopySelection();
-                    this.videoTerminal.UnSelectAll();
-                }
-            }
-        }
-
-        private void GridTerminal_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // 获取焦点，才能收到OnKeyDown和OnTextInput回调
-            if (!GridTerminal.IsKeyboardFocused)
-            {
-                Keyboard.Focus(GridTerminal);
-            }
-
-            VTDocument document = this.videoTerminal.ActiveDocument;
-            if (!document.Selection.IsEmpty)
-            {
-                document.Selection.Clear();
-                document.Selection.RequestInvalidate();
-            }
-
-            if (e.ClickCount > 1)
-            {
-                // 双击就是选中单词
-                // 三击就是选中整行内容
-
-                Point position = this.GetPositionRelativeToTerminal();
-                double x = position.X;
-                double y = position.Y;
-                int startIndex = 0, count = 0, logicalRow = 0;
-
-                VTextLine textLine = HitTestHelper.HitTestVTextLine(document, y, out logicalRow);
-                if (textLine == null)
-                {
-                    return;
-                }
-
-                switch (e.ClickCount)
-                {
-                    case 2:
-                        {
-                            // 选中单词
-                            int characterIndex;
-                            int columnIndex;
-                            VTextRange characterRange;
-                            HitTestHelper.HitTestVTCharacter(textLine, x, out characterIndex, out characterRange, out columnIndex);
-                            if (characterIndex == -1)
-                            {
-                                return;
-                            }
-                            VTDocUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
-                            document.Selection.SelectRange(textLine, logicalRow, startIndex, count);
-                            break;
-                        }
-
-                    case 3:
-                        {
-                            // 选中一整行
-                            document.Selection.SelectRow(textLine, logicalRow);
-                            break;
-                        }
-
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private void GridTerminal_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            if (GridTerminal.IsMouseCaptured)
-            {
-                GridTerminal.ReleaseMouseCapture();
-            }
-        }
-
         private void GridTerminal_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -384,6 +303,122 @@ namespace ModengTerm.UserControls.TerminalUserControls
         private void GridTerminal_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             this.MouseWheelScroll(e);
+        }
+
+        private void GridTerminal_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // 获取焦点，才能收到OnKeyDown和OnTextInput回调
+            if (!GridTerminal.IsKeyboardFocused)
+            {
+                Keyboard.Focus(GridTerminal);
+            }
+
+            if (this.videoTerminal.IsVT200MouseMode)
+            {
+                this.ProcessVT200MouseMode(e);
+            }
+
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                VTDocument document = this.videoTerminal.ActiveDocument;
+                if (!document.Selection.IsEmpty)
+                {
+                    document.Selection.Clear();
+                    document.Selection.RequestInvalidate();
+                }
+
+                if (e.ClickCount == 1)
+                {
+                    if (this.clickToCursor)
+                    {
+                        Point pos = this.GetPositionRelativeToTerminal();
+                        this.videoTerminal.HandleClickToCursor(pos.X, pos.Y);
+                    }
+                }
+                else
+                {
+                    // 双击就是选中单词
+                    // 三击就是选中整行内容
+
+                    Point position = this.GetPositionRelativeToTerminal();
+                    double x = position.X;
+                    double y = position.Y;
+                    int startIndex = 0, count = 0, logicalRow = 0;
+
+                    VTextLine textLine = HitTestHelper.HitTestVTextLine(document, y, out logicalRow);
+                    if (textLine == null)
+                    {
+                        return;
+                    }
+
+                    switch (e.ClickCount)
+                    {
+                        case 2:
+                            {
+                                // 选中单词
+                                int characterIndex;
+                                int columnIndex;
+                                VTextRange characterRange;
+                                HitTestHelper.HitTestVTCharacter(textLine, x, out characterIndex, out characterRange, out columnIndex);
+                                if (characterIndex == -1)
+                                {
+                                    return;
+                                }
+                                VTDocUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
+                                document.Selection.SelectRange(textLine, logicalRow, startIndex, count);
+                                break;
+                            }
+
+                        case 3:
+                            {
+                                // 选中一整行
+                                document.Selection.SelectRow(textLine, logicalRow);
+                                break;
+                            }
+
+                        default:
+                            break;
+                    }
+                }
+            }
+            else if (e.ChangedButton == MouseButton.Right)
+            {
+                if (this.rightClickActions == RightClickActions.FastCopyPaste)
+                {
+                    if (!this.videoTerminal.HasSelection)
+                    {
+                        // 粘贴剪贴板里的内容
+                        string text = Clipboard.GetText();
+                        if (string.IsNullOrEmpty(text))
+                        {
+                            return;
+                        }
+
+                        this.shellSession.Send(text);
+                    }
+                    else
+                    {
+                        this.shellSession.CopySelection();
+                        this.videoTerminal.UnSelectAll();
+                    }
+                }
+            }
+        }
+
+        private void GridTerminal_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (this.videoTerminal.IsVT200MouseMode)
+            {
+                this.ProcessVT200MouseMode(e);
+            }
+
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                if (GridTerminal.IsMouseCaptured)
+                {
+                    GridTerminal.ReleaseMouseCapture();
+                }
+            }
         }
 
         private void Scrollbar_MouseMove(object sender, MouseEventArgs e)
@@ -519,6 +554,8 @@ namespace ModengTerm.UserControls.TerminalUserControls
         public int Open(OpenedSessionVM sessionVM)
         {
             this.scrollDelta = this.Session.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, OptionDefaultValues.MOUSE_SCROLL_DELTA);
+            this.clickToCursor = this.Session.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, OptionDefaultValues.TERM_ADVANCE_CLICK_TO_CURSOR);
+            this.rightClickActions = this.Session.GetOption<RightClickActions>(OptionKeyEnum.BEHAVIOR_RIGHT_CLICK, OptionDefaultValues.BEHAVIOR_RIGHT_CLICK);
 
             // 背景不放在Dispatcher里渲染，不然会出现背景闪烁一下的现象
             string background = this.Session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);

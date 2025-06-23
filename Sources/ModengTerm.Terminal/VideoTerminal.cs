@@ -219,7 +219,6 @@ namespace ModengTerm.Terminal
 
         private BellPlayer bellPlayer;
 
-        private bool clickToCursor;
         private VTextPointer textPointer;
 
         /// <summary>
@@ -321,6 +320,8 @@ namespace ModengTerm.Terminal
         /// </summary>
         public bool DisableBell { get; set; }
 
+        public bool IsVT200MouseMode { get { return this.isVT200MouseMode; } }
+
         #endregion
 
         #region 构造方法
@@ -374,7 +375,6 @@ namespace ModengTerm.Terminal
             this.foregroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_FONT_COLOR);
             this.backgroundColor = sessionInfo.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             this.autoWrapMode = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_AUTO_WRAP_MODE, true); // DECAWM
-            this.clickToCursor = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_CLICK_TO_CURSOR, false);
             this.renderWrite = sessionInfo.GetOption<bool>(OptionKeyEnum.TERM_ADVANCE_RENDER_WRITE, OptionDefaultValues.TERM_ADVANCE_RENDER_WRITE);
 
             #region 初始化数据解析器
@@ -884,6 +884,87 @@ namespace ModengTerm.Terminal
 
                 // 触发行被完全打印的事件
                 this.OnLineFeed?.Invoke(this, this.IsAlternate, oldPhysicsRow, oldActiveLine.History);
+            }
+        }
+
+        /// <summary>
+        /// 测试指令：top，gotop，htop
+        /// TODO：增加协议注释
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="buttonType">
+        /// 按下的鼠标按键类型
+        /// 0：LeftButton
+        /// 1：RightButton
+        /// 2：MiddleButton
+        /// </param>
+        /// <param name="release">鼠标是否释放</param>
+        public void HandleVT200MouseMode(double x, double y, int buttonType, bool release)
+        {
+            if (this.sessionTransport.Status != SessionStatusEnum.Connected)
+            {
+                return;
+            }
+
+            VTDocument document = this.activeDocument;
+
+            if (!document.HitTest(x, y, this.textPointer))
+            {
+                return;
+            }
+
+            int modkey = 0;
+            switch (System.Windows.Input.Keyboard.Modifiers)
+            {
+                case ModifierKeys.None: modkey = 0; break;
+                case ModifierKeys.Shift: modkey = 4; break;
+                case ModifierKeys.Alt: modkey = 8; break;
+                case ModifierKeys.Control: modkey = 16; break;
+                default: modkey = 0; break;
+            }
+
+            int lowTwoBits = release ? 3 : buttonType;
+            int nextThreeBits = modkey;
+            int cb = ((nextThreeBits << 2) + lowTwoBits) + 32;
+            int cx = this.textPointer.ColumnIndex + 1 + 32;
+            int cy = this.textPointer.LogicalRow + 1 + 32;
+
+            string seq = string.Format(VT200_MOUSE_MODE_DATA, (char)cb, (char)cx, (char)cy);
+            byte[] bytes = Encoding.ASCII.GetBytes(seq);
+            int code = this.sessionTransport.Write(bytes);
+            if (code != ResponseCode.SUCCESS)
+            {
+                logger.ErrorFormat("发送VT200_MOUSE_MODE数据失败, {0}", code);
+            }
+        }
+
+        public void HandleClickToCursor(double x, double y)
+        {
+            VTDocument document = this.activeDocument;
+            VTScrollbar scrollInfo = document.Scrollbar;
+            VTCursor cursor = document.Cursor;
+            VTHistory history = document.History;
+
+            if (document.HitTest(x, y, this.textPointer))
+            {
+                int physicsRow = this.textPointer.PhysicsRow;
+                int row = physicsRow - scrollInfo.Value;
+                int col = this.textPointer.ColumnIndex;
+                document.SetCursorLogical(row, col);
+                cursor.Reposition();
+
+                if (physicsRow > history.Lines - 1)
+                {
+                    // 缺少的历史行数
+                    int adds = physicsRow - (history.Lines - 1);
+                    VTextLine textLine = document.ActiveLine.FindPrevious(adds - 1);
+                    for (int i = 0; i < adds; i++)
+                    {
+                        history.Add(textLine.History);
+                        textLine = textLine.NextLine;
+                    }
+                }
             }
         }
 
@@ -1834,78 +1915,6 @@ namespace ModengTerm.Terminal
             // 更新光标所在行
             document.SetCursorLogical(cursor.Row, cursor.Column);
         }
-
-        ///// <summary>
-        ///// 测试指令：top，gotop，htop
-        ///// TODO：增加协议注释
-        ///// </summary>
-        ///// <param name="document"></param>
-        ///// <param name="mouseData"></param>
-        ///// <param name="release"></param>
-        //private void HandleVT200MouseMode(VTDocument document, MouseData mouseData, bool release)
-        //{
-        //    if (this.sessionTransport.Status != SessionStatusEnum.Connected)
-        //    {
-        //        return;
-        //    }
-
-        //    if (!document.HitTest(mouseData, this.textPointer))
-        //    {
-        //        return;
-        //    }
-
-        //    int modkey = 0;
-        //    switch (System.Windows.Input.Keyboard.Modifiers)
-        //    {
-        //        case ModifierKeys.None: modkey = 0; break;
-        //        case ModifierKeys.Shift: modkey = 4; break;
-        //        case ModifierKeys.Alt: modkey = 8; break;
-        //        case ModifierKeys.Control: modkey = 16; break;
-        //        default: modkey = 0; break;
-        //    }
-
-        //    int lowTwoBits = release ? 3 : (int)mouseData.Button;
-        //    int nextThreeBits = modkey;
-        //    int cb = ((nextThreeBits << 2) + lowTwoBits) + 32;
-        //    int cx = this.textPointer.ColumnIndex + 1 + 32;
-        //    int cy = this.textPointer.LogicalRow + 1 + 32;
-
-        //    string seq = string.Format(VT200_MOUSE_MODE_DATA, (char)cb, (char)cx, (char)cy);
-        //    byte[] bytes = Encoding.ASCII.GetBytes(seq);
-        //    int code = this.sessionTransport.Write(bytes);
-        //    if (code != ResponseCode.SUCCESS)
-        //    {
-        //        logger.ErrorFormat("发送VT200_MOUSE_MODE数据失败, {0}", code);
-        //    }
-        //}
-
-        //private void HandleClickToCursor(VTDocument document, MouseData mouseData)
-        //{
-        //    VTScrollbar scrollInfo = document.Scrollbar;
-        //    VTCursor cursor = document.Cursor;
-        //    VTHistory history = document.History;
-
-        //    if (document.HitTest(mouseData, this.textPointer))
-        //    {
-        //        int physicsRow = this.textPointer.PhysicsRow;
-        //        int row = physicsRow - scrollInfo.Value;
-        //        int col = this.textPointer.ColumnIndex;
-        //        document.SetCursorLogical(row, col);
-        //        cursor.Reposition();
-
-        //        if (physicsRow > history.Lines - 1)
-        //        {
-        //            // 缺少的历史行数
-        //            int adds = physicsRow - (history.Lines - 1);
-        //            VTextLine textLine = document.ActiveLine.FindPrevious(adds - 1);
-        //            for (int i = 0; i < adds; i++)
-        //            {
-        //                history.Add(textLine.History);
-        //                textLine = textLine.NextLine;
-        //            }
-        //        }
-        //    }
-        //}
 
         private void HandleFocusEventMode(bool focused)
         {
@@ -3090,34 +3099,6 @@ namespace ModengTerm.Terminal
         }
 
         #endregion
-
-        #endregion
-
-        #region 事件处理器
-
-        //private void MainDocument_MouseDown(VTDocument document, MouseData mouseData)
-        //{
-        //    if (mouseData.Button == VTMouseButton.LeftButton)
-        //    {
-        //        if (this.clickToCursor)
-        //        {
-        //            this.HandleClickToCursor(document, mouseData);
-        //        }
-        //    }
-
-        //    if (this.isVT200MouseMode)
-        //    {
-        //        this.HandleVT200MouseMode(document, mouseData, false);
-        //    }
-        //}
-
-        //private void MainDocument_MouseUp(VTDocument document, MouseData mouseData)
-        //{
-        //    if (this.isVT200MouseMode)
-        //    {
-        //        this.HandleVT200MouseMode(document, mouseData, true);
-        //    }
-        //}
 
         #endregion
     }

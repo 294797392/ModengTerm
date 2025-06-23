@@ -108,5 +108,7 @@ namespace ModengTerm.Base
         public static readonly string WATCH_ADB_TEMP_DIR = "/tmp";
 
         public const int MOUSE_SCROLL_DELTA = 5;
+        public const bool TERM_ADVANCE_CLICK_TO_CURSOR = false;
+        public const RightClickActions BEHAVIOR_RIGHT_CLICK = RightClickActions.FastCopyPaste;
     }
 }

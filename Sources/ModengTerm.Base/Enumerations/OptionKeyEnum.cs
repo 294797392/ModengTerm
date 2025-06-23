@@ -9,7 +9,7 @@ using System.Windows.Interop;
 
 namespace ModengTerm.Base.Enumerations
 {
-    public enum BehaviorRightClicks
+    public enum RightClickActions
     {
         /// <summary>
         /// 右键点击的时候什么都不做
@@ -148,7 +148,7 @@ namespace ModengTerm.Base.Enumerations
         /// <summary>
         /// 当鼠标右键点击的时候的行为
         /// </summary>
-        [EnumDataType(typeof(BehaviorRightClicks))]
+        [EnumDataType(typeof(RightClickActions))]
         BEHAVIOR_RIGHT_CLICK = 1501,
 
         #endregion

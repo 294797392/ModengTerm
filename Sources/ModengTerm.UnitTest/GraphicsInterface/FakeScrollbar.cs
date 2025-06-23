@@ -9,9 +9,9 @@ namespace ModengTerm.UnitTest.Drawing
 {
     public class FakeScrollbar : GraphicsScrollbar
     {
-        public override bool Visible { get; set; }
-        public override double Maximum { get; set; }
-        public override double Value { get; set; }
-        public override int ViewportRow { get; set; }
+        public bool Visible { get; set; }
+        public double Maximum { get; set; }
+        public double Value { get; set; }
+        public int ViewportRow { get; set; }
     }
 }

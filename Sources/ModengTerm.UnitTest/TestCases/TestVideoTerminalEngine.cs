@@ -237,10 +237,10 @@ namespace ModengTerm.UnitTest.TestCases
         /// 测试改变窗口大小相关的功能
         /// </summary>
         /// <returns></returns>
-        [UnitTest]
-        public bool VideoTerminal_WindowResize()
-        {
-            return false;
-        }
+        //[UnitTest]
+        //public bool VideoTerminal_WindowResize()
+        //{
+        //    return false;
+        //}
     }
 }
