@@ -152,20 +152,15 @@
     </Style>
 
     <Style x:Key="StyleMdWindow" TargetType="{x:Type mcs:MdWindow}">
-        <Style.Triggers>
-            <Trigger Property="CanResize" Value="False">
-                <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
-            </Trigger>
-        </Style.Triggers>
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
-                <WindowChrome ResizeBorderThickness="5" GlassFrameThickness="1" NonClientFrameEdges="None" CaptionHeight="30" CornerRadius="0"/>
+                <WindowChrome ResizeBorderThickness="5" GlassFrameThickness="1" NonClientFrameEdges="None" CaptionHeight="30"/>
             </Setter.Value>
         </Setter>
+        <Setter Property="ResizeMode" Value="NoResize"/>
         <Setter Property="WindowStyle" Value="None"/>
-        <Setter Property="CanResize" Value="False"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES6001E}"/>
         <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES6001E}"/>
         <Setter Property="Background" Value="{DynamicResource ResourceKey=RES6003E}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -185,6 +180,7 @@
                             <Setter Property="Background" Value="{DynamicResource ResourceKey=RES6004E}"/>
                             <Setter Property="BorderBrush" Value="{DynamicResource ResourceKey=RES6005E}"/>
                             <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True"/>
                         </Style>
 
                     </ControlTemplate.Resources>
@@ -228,7 +224,7 @@
                     </Grid>
 
                     <ControlTemplate.Triggers>
-                        <Trigger Property="CanResize" Value="False">
+                        <Trigger Property="ResizeMode" Value="NoResize">
                             <Setter Property="Visibility" Value="Collapsed" TargetName="PART_MinButton"/>
                             <Setter Property="Visibility" Value="Collapsed" TargetName="PART_MaxButton"/>
                         </Trigger>

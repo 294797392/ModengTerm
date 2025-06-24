@@ -1,6 +1,7 @@
 ﻿using ModengTerm.Addons;
 using ModengTerm.Base.DataModels;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace ModengTerm.OfficialAddons.Record
 {
@@ -15,13 +16,6 @@ namespace ModengTerm.OfficialAddons.Record
     {
         [JsonProperty("name")]
         public string Name { get; set; }
-
-        /// <summary>
-        /// 该回放文件所属的会话信息
-        /// 保存回放文件的时候会拷贝一份会话信息
-        /// </summary>
-        [JsonProperty("session")]
-        public XTermSession Session { get; set; }
 
         /// <summary>
         /// 录像文件完整路径

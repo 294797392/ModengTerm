@@ -1,13 +1,6 @@
-﻿using DotNEToolkit.DataModels;
-using ModengTerm.Base.Enumerations;
+﻿using ModengTerm.Base.Enumerations;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using XTerminal.Base.Enumerations;
 
 namespace ModengTerm.Base.DataModels
 {
@@ -25,13 +18,5 @@ namespace ModengTerm.Base.DataModels
         /// </summary>
         [JsonProperty("value")]
         public string Value { get; set; }
-
-        public static SessionOption Create<TValue>(OptionKeyEnum key, TValue value)
-        {
-            SessionOption option = new SessionOption();
-            option.Key = (int)key;
-            option.Value = value.ToString();
-            return option;
-        }
     }
 }

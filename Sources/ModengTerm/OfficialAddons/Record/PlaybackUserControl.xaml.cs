@@ -27,7 +27,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace ModengTerm.UserControls.Terminals
+namespace ModengTerm.OfficialAddons.Record
 {
     /// <summary>
     /// PlaybackUserControl.xaml 的交互逻辑
@@ -42,7 +42,6 @@ namespace ModengTerm.UserControls.Terminals
 
         #region 实例变量
 
-        private XTermSession session;
         private VideoTerminal videoTerminal;
         private Task playbackTask;
         private AutoResetEvent playbackEvent;
@@ -159,36 +158,34 @@ namespace ModengTerm.UserControls.Terminals
 
         #region 公开接口
 
-        public void Open(Playback playback)
+        public void Open(IClientTab tab, Playback playback)
         {
-            this.session = playback.Session;
+            //string background = tab.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
+            //BorderBackground.Background = DrawingUtils.GetBrush(background);
 
-            string background = session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
-            BorderBackground.Background = DrawingUtils.GetBrush(background);
+            //double padding = tab.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
+            //double width = DocumentMain.ActualWidth;
+            //double height = DocumentMain.ActualHeight;
 
-            double padding = session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
-            double width = DocumentMain.ActualWidth;
-            double height = DocumentMain.ActualHeight;
+            //DocumentAlternate.Padding = new Thickness(padding);
+            //DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            //DocumentMain.Padding = new Thickness(padding);
+            //DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
 
-            DocumentAlternate.Padding = new Thickness(padding);
-            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
-            DocumentMain.Padding = new Thickness(padding);
-            DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            //VTOptions options = new VTOptions()
+            //{
+            //    Session = playback.Session,
+            //    AlternateDocument = DocumentAlternate,
+            //    MainDocument = DocumentMain,
+            //    Width = width,
+            //    Height = height,
+            //    SessionTransport = new SessionTransport()
+            //};
 
-            VTOptions options = new VTOptions()
-            {
-                Session = playback.Session,
-                AlternateDocument = DocumentAlternate,
-                MainDocument = DocumentMain,
-                Width = width,
-                Height = height,
-                SessionTransport = new SessionTransport()
-            };
+            //this.videoTerminal = new VideoTerminal();
+            //this.videoTerminal.Initialize(options);
 
-            this.videoTerminal = new VideoTerminal();
-            this.videoTerminal.Initialize(options);
-
-            this.playbackTask = Task.Factory.StartNew(this.PlaybackThreadProc, playback);
+            //this.playbackTask = Task.Factory.StartNew(this.PlaybackThreadProc, playback);
         }
 
         public void Close()

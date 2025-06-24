@@ -47,6 +47,7 @@
     <Compile Remove="OfficialAddons\Logger\LoggerManager.cs" />
     <Compile Remove="OfficialAddons\Logger\NoneFilter.cs" />
     <Compile Remove="OfficialAddons\Logger\RegexpFilter.cs" />
+    <Compile Remove="OfficialAddons\Record\PlaybackUserControl.xaml.cs" />
     <Compile Remove="OfficialAddons\SessionExplorer\SessionExplorerPanelVM.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
     <Compile Remove="UserControls\ViewportUserControl.xaml.cs" />
@@ -80,6 +81,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="OfficialAddons\Record\PlaybackUserControl.xaml" />
     <Page Remove="Themes\Themes.Default.xaml" />
     <Page Remove="Themes\Themes.Ubuntu.Ambiance.xaml" />
     <Page Remove="Themes\Themes.XShell.xaml" />

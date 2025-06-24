@@ -8,7 +8,7 @@
                     xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
                     mc:Ignorable="d"
                     Title="分组管理" Height="600" Width="500"
-                    WindowStartupLocation="CenterOwner" CanResize="False"
+                    WindowStartupLocation="CenterOwner" 
                     Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>

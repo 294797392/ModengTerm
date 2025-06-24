@@ -10,7 +10,7 @@
                     xmlns:converter="clr-namespace:ModengTerm"
                     mc:Ignorable="d"
                     Title="{DynamicResource ResourceKey=UIText100}" 
-                    Height="700" Width="700" CanResize="False"
+                    Height="700" Width="700"
                     WindowStartupLocation="CenterOwner"
                     Style="{StaticResource ResourceKey=StyleMdWindow}">
 
