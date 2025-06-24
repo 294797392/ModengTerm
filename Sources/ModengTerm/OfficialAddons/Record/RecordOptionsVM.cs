@@ -13,17 +13,17 @@ namespace ModengTerm.OfficialAddons.Record
     /// </summary>
     public class RecordOptionsVM : ViewModelBase
     {
-        private string fullPath;
+        private string filePath;
 
-        public string FullPath
+        public string FilePath
         {
-            get { return fullPath; }
+            get { return filePath; }
             set
             {
-                if (fullPath != value)
+                if (filePath != value)
                 {
-                    fullPath = value;
-                    NotifyPropertyChanged("FullPath");
+                    filePath = value;
+                    NotifyPropertyChanged("FilePath");
                 }
             }
         }

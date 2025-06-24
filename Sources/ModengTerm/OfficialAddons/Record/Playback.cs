@@ -1,14 +1,6 @@
-﻿using DotNEToolkit.DataModels;
-using ModengTerm.Addons;
-using ModengTerm.Base;
+﻿using ModengTerm.Addons;
 using ModengTerm.Base.DataModels;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ModengTerm.OfficialAddons.Record
 {
@@ -21,27 +13,20 @@ namespace ModengTerm.OfficialAddons.Record
     /// </summary>
     public class Playback : StorageObject
     {
-        #region 属性
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
         /// <summary>
         /// 该回放文件所属的会话信息
         /// 保存回放文件的时候会拷贝一份会话信息
         /// </summary>
+        [JsonProperty("session")]
         public XTermSession Session { get; set; }
 
         /// <summary>
         /// 录像文件完整路径
         /// </summary>
+        [JsonProperty("fullPath")]
         public string FullPath { get; set; }
-
-        #endregion
-
-        #region 构造方法
-
-        public Playback()
-        {
-        }
-
-        #endregion
     }
 }

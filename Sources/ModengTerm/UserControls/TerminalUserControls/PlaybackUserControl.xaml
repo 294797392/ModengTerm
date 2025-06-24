@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ModengTerm.UserControls.Terminals"
-             xmlns:terminal="clr-namespace:ModengTerm.Terminal"
              xmlns:modengterm="clr-namespace:ModengTerm"
              xmlns:modengtermbase="clr-namespace:ModengTerm.Base.Enumerations;assembly=ModengTerm.Base"
              xmlns:toolkitconverter="clr-namespace:WPFToolkit.Converters;assembly=WPFToolkit"

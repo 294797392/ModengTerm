@@ -40,9 +40,10 @@ namespace ModengTerm.OfficialAddons.Logger
         {
             this.activeTab = activeTab;
             this.Options = new LoggerOptionsVM();
-            //string fileName = string.Format("{0}_{1}.log", activeTab.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
-            //string fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-            //this.Options.FilePath = fullPath;
+            base.DataContext = this.Options;
+            string fileName = string.Format("{0}_{1}.log", activeTab.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            string fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            this.Options.FilePath = fullPath;
         }
 
         private void ButtonStart_Click(object sender, RoutedEventArgs e)
@@ -55,11 +56,10 @@ namespace ModengTerm.OfficialAddons.Logger
             SaveFileDialog dialog = new SaveFileDialog();
             //dialog.Filter = "文本文件(*.txt)|*.txt|html文件(*.html)|*.html";
             dialog.Filter = "文本文件(*.txt)|*.txt";
-            dialog.FileName = string.Format("{0}_{1}", this.activeTab.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            dialog.FileName = this.Options.FilePath;
             if ((bool)dialog.ShowDialog())
             {
                 this.Options.FilePath = dialog.FileName;
-                TextBoxLogPath.Text = dialog.FileName;
             }
         }
     }

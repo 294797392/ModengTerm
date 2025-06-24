@@ -1,4 +1,8 @@
-﻿using ModengTerm.Controls;
+﻿using DotNEToolkit;
+using Microsoft.Win32;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Base;
+using ModengTerm.Controls;
 using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
@@ -21,16 +25,48 @@ namespace ModengTerm.OfficialAddons.Record
     /// </summary>
     public partial class RecordOptionsWindow : MdWindow
     {
-        public RecordOptionsWindow()
+        private IClientTab tab;
+
+        public RecordOptionsVM Options { get; private set; }
+
+        public RecordOptionsWindow(IClientTab tab)
         {
             InitializeComponent();
+
+            this.InitializeWindow(tab);
         }
 
-        private void ButtonOK_Click(object sender, RoutedEventArgs e)
+        private void InitializeWindow(IClientTab tab) 
         {
-            RecordOptionsVM recordOptionsVM = base.DataContext as RecordOptionsVM;
+            this.tab = tab;
+            this.Options = new RecordOptionsVM();
+            string fileName = string.Format("{0}_{1}.mrec", tab.Name, DateTime.Now.ToString(DateTimeFormat.yyyyMMddhhmmss));
+            string fullPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
+            this.Options.FilePath = fullPath;
+
+            base.DataContext = this.Options;
+        }
+
+        private void ButtonStart_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(TextBoxLogPath.Text))
+            {
+                MTMessageBox.Info("请选择录像保存路径");
+                return;
+            }
 
             base.DialogResult = true;
+        }
+
+        private void ButtonBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new SaveFileDialog();
+            dialog.Filter = "录像文件(*.mrec)|*.mrec";
+            dialog.FileName = this.Options.FilePath;
+            if ((bool)dialog.ShowDialog())
+            {
+                this.Options.FilePath = dialog.FileName;
+            }
         }
     }
 }

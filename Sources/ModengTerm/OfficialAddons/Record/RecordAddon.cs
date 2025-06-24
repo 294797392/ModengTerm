@@ -2,9 +2,11 @@
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addons;
 using ModengTerm.Base;
-using System.Drawing;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace ModengTerm.OfficialAddons.Record
 {
@@ -54,13 +56,14 @@ namespace ModengTerm.OfficialAddons.Record
         {
             Playback playback = new Playback()
             {
+                Name = Path.GetFileNameWithoutExtension(options.FilePath),
                 Id = this.GetObjectId(),
                 SessionId = tab.ID.ToString(),
-                FullPath = options.FullPath
+                FullPath = options.FilePath
             };
 
             PlaybackStream stream = new PlaybackStream();
-            int code = stream.OpenWrite(options.FullPath);
+            int code = stream.OpenWrite(options.FilePath);
             if (code != ResponseCode.SUCCESS)
             {
                 MTMessageBox.Info("启动录制失败, {0}", code);
@@ -120,17 +123,14 @@ namespace ModengTerm.OfficialAddons.Record
                 return;
             }
 
-            RecordOptionsVM options = new RecordOptionsVM();
-
-            RecordOptionsWindow recordOptionsWindow = new RecordOptionsWindow();
+            RecordOptionsWindow recordOptionsWindow = new RecordOptionsWindow(e.ActiveTab);
             recordOptionsWindow.Owner = Application.Current.MainWindow;
-            recordOptionsWindow.DataContext = options;
             if (!(bool)recordOptionsWindow.ShowDialog())
             {
                 return;
             }
 
-            context = this.StartRecord(e.ActiveTab, options);
+            context = this.StartRecord(e.ActiveTab, recordOptionsWindow.Options);
             if (context == null)
             {
                 return;
@@ -144,11 +144,9 @@ namespace ModengTerm.OfficialAddons.Record
 
         private void ExecuteOpenRecordCommand(CommandArgs e)
         {
-            throw new RefactorImplementedException();
-            //ShellSessionVM shellSessionVM = VTApp.Context.MainWindowVM.SelectedSession as ShellSessionVM;
-            //OpenRecordWindow openRecordWindow = new OpenRecordWindow(shellSessionVM.Session);
-            //openRecordWindow.Owner = Window.GetWindow(shellSessionVM.Content);
-            //openRecordWindow.Show();
+            OpenRecordWindow openRecordWindow = new OpenRecordWindow(e.ActiveTab);
+            openRecordWindow.Owner = Application.Current.MainWindow;
+            openRecordWindow.Show();
         }
 
         private void OnShellRendered(TabEventArgs e)

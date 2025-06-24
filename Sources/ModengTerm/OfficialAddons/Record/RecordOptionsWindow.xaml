@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ModengTerm.Terminal.Windows"
         xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=UIText4501}" 
@@ -18,7 +17,8 @@
         </Style>
 
         <Style x:Key="StyleTextBoxValue" TargetType="{x:Type TextBox}" BasedOn="{StaticResource ResourceKey=StyleTextBox}">
-            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
 
         <Style x:Key="StyleCheckBoxValue" TargetType="{x:Type CheckBox}">
@@ -41,18 +41,42 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="0"/>
+            <RowDefinition Height="40"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="70"/>
+            <ColumnDefinition Width="80"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Text="名称：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
-        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=FileName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="关键字：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Path=Keyword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
 
-        <Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Content="确定" Click="ButtonOK_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="区分大小写：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding Path=IgnoreCase, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="正则表达式：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Path=Regexp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleCheckBoxValue}"/>
+
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="保存路径：" Style="{StaticResource ResourceKey=StyleTextBlockKey}"/>
+        <Grid Grid.Row="3" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox x:Name="TextBoxLogPath" Margin="3,5,3,5" Text="{Binding Path=FilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource ResourceKey=StyleTextBoxValue}"/>
+
+            <Button Grid.Column="1" Content="浏览" Click="ButtonBrowse_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+
+        </Grid>
+
+        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="启动" Click="ButtonStart_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+        </StackPanel>
 
     </Grid>
 

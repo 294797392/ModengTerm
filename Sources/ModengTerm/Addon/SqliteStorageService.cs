@@ -69,7 +69,7 @@ namespace ModengTerm.Addon
 
             dbParameters[2].DbType = System.Data.DbType.String;
             dbParameters[2].ParameterName = "type";
-            dbParameters[2].Value = typeof(T).Name;
+            dbParameters[2].Value = typeof(T).FullName;
 
             dbParameters[3].DbType = System.Data.DbType.String;
             dbParameters[3].ParameterName = "data";

@@ -1,39 +1,31 @@
-﻿using ModengTerm.Base;
-using ModengTerm.Base.DataModels;
-using ModengTerm.Base.ServiceAgents;
+﻿using ModengTerm.Addon;
+using ModengTerm.Addon.Interactive;
+using ModengTerm.Addons;
+using ModengTerm.Base;
 using ModengTerm.Controls;
-using ModengTerm.OfficialAddons.Record;
 using ModengTerm.Terminal.Enumerations;
+using ModengTerm.Terminal;
 using ModengTerm.UserControls.Terminals;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Printing;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using WPFToolkit.MVVM;
 
-namespace ModengTerm.Terminal.Windows
+namespace ModengTerm.OfficialAddons.Record
 {
     /// <summary>
     /// OpenRecordWindow.xaml 的交互逻辑
     /// </summary>
     public partial class OpenRecordWindow : MdWindow
     {
+        private static log4net.ILog logger = log4net.LogManager.GetLogger("OpenRecordWindow");
+
         #region 实例变量
 
-        private ServiceAgent serviceAgent;
         private bool isPlaying;
         private BindableCollection<Playback> playbacks;
+        private IClientTab tab;
+        private StorageService storage;
 
         #endregion
 
@@ -43,26 +35,28 @@ namespace ModengTerm.Terminal.Windows
 
         #region 构造方法
 
-        public OpenRecordWindow(XTermSession session)
+        public OpenRecordWindow(IClientTab tab)
         {
             InitializeComponent();
 
-            this.InitializeWindow(session);
+            this.InitializeWindow(tab);
         }
 
         #endregion
 
         #region 实例方法
 
-        private void InitializeWindow(XTermSession session)
+        private void InitializeWindow(IClientTab tab)
         {
-            this.serviceAgent = VTApp.Context.ServiceAgent;
+            this.tab = tab;
+            ClientFactory facory = ClientFactory.GetFactory();
+            this.storage = facory.GetStorageService();
 
-            //List<Playback> playbackList = this.serviceAgent.GetPlaybacks(session.ID);
-            //this.playbacks = new BindableCollection<Playback>();
-            //this.playbacks.AddRange(playbackList);
-
+            List<Playback> playbacks = this.storage.GetObjects<Playback>(this.tab.ID.ToString());
+            this.playbacks = new BindableCollection<Playback>();
+            this.playbacks.AddRange(playbacks);
             ComboBoxPlaybackList.ItemsSource = this.playbacks;
+            ComboBoxPlaybackList.SelectedIndex = 0;
         }
 
         #endregion
@@ -84,18 +78,15 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            throw new RefactorImplementedException();
+            if (!System.IO.File.Exists(playback.FullPath))
+            {
+                MTMessageBox.Info("回放文件不存在");
+                return;
+            }
 
-            //string playbackFilePath = VTermUtils.GetPlaybackFilePath(playback);
-            //if (!System.IO.File.Exists(playbackFilePath))
-            //{
-            //    MTMessageBox.Info("回放文件不存在");
-            //    return;
-            //}
+            this.isPlaying = true;
 
-            //this.isPlaying = true;
-
-            //PlaybackUserControl.Open(playback);
+            PlaybackUserControl.Open(playback);
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
@@ -112,19 +103,17 @@ namespace ModengTerm.Terminal.Windows
                 return;
             }
 
-            throw new RefactorImplementedException();
+            if (!MTMessageBox.Confirm("确定要删除{0}吗?", playback.Name))
+            {
+                return;
+            }
 
-            //if (!MTMessageBox.Confirm("确定要删除{0}吗?", playback.Name))
-            //{
-            //    return;
-            //}
-
-            //int code = this.serviceAgent.DeletePlayback(playback.ID);
-            //if (code != ResponseCode.SUCCESS) 
-            //{
-            //    MTMessageBox.Info("删除失败, {0}", code);
-            //    return;
-            //}
+            int code = this.storage.DeleteObject(playback.Id);
+            if (code != ResponseCode.SUCCESS)
+            {
+                MTMessageBox.Info("删除失败, {0}", code);
+                return;
+            }
 
             this.playbacks.Remove(playback);
         }
