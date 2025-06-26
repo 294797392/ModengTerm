@@ -7,6 +7,7 @@ using ModengTerm.Base.Enumerations;
 using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
+using ModengTerm.Document.Utility;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Session;
 using ModengTerm.UserControls.TerminalUserControls;
@@ -48,6 +49,8 @@ namespace ModengTerm.OfficialAddons.Record
         private VideoTerminal videoTerminal;
         private Task playTask;
         private AutoResetEvent playEvent;
+
+        private int scrollDelta;
 
         #endregion
 
@@ -91,6 +94,8 @@ namespace ModengTerm.OfficialAddons.Record
             MainWindowVM mainWindowVM = MainWindowVM.GetInstance();
             ShellSessionVM shellSession = mainWindowVM.SessionList.FirstOrDefault(v => v.ID == tab.ID) as ShellSessionVM;
             XTermSession session = shellSession.Session;
+
+            this.scrollDelta = session.GetOption<int>(OptionKeyEnum.MOUSE_SCROLL_DELTA, OptionDefaultValues.MOUSE_SCROLL_DELTA);
 
             string background = session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
@@ -183,10 +188,174 @@ namespace ModengTerm.OfficialAddons.Record
             }
             return newvalue;
         }
+        
+        private Point GetPositionRelativeToTerminal()
+        {
+            VTDocument document = this.videoTerminal.ActiveDocument;
+            TerminalControl terminalControl = document.GFactory as TerminalControl;
+            return Mouse.GetPosition(terminalControl.DrawArea);
+        }
+
+        private void MouseWheelScroll(MouseWheelEventArgs e)
+        {
+            VTDocument document = this.videoTerminal.ActiveDocument;
+
+            int oldScroll = document.Scrollbar.Value;
+            int scrollMax = document.Scrollbar.Maximum;
+            int newScroll = 0; // 最终要滚动到的值
+
+            if (e.Delta > 0)
+            {
+                // 向上滚动
+
+                // 先判断是不是已经滚动到顶了
+                if (document.ScrollAtTop)
+                {
+                    // 滚动到顶直接返回
+                    return;
+                }
+
+                if (oldScroll < scrollDelta)
+                {
+                    // 一次可以全部滚完并且还有剩余
+                    newScroll = document.Scrollbar.Minimum;
+                }
+                else
+                {
+                    newScroll = oldScroll - scrollDelta;
+                }
+            }
+            else
+            {
+                // 向下滚动
+
+                if (document.ScrollAtBottom)
+                {
+                    // 滚动到底直接返回
+                    return;
+                }
+
+                // 剩余可以往下滚动的行数
+                int remainScroll = scrollMax - oldScroll;
+
+                if (remainScroll >= scrollDelta)
+                {
+                    newScroll = oldScroll + scrollDelta;
+                }
+                else
+                {
+                    // 直接滚动到底
+                    newScroll = scrollMax;
+                }
+            }
+
+            VTScrollData scrollData = document.ScrollTo(newScroll);
+            if (scrollData == null)
+            {
+                return;
+            }
+
+            // 重新渲染
+            document.RequestInvalidate();
+        }
 
         #endregion
 
         #region 事件处理器
+
+        private void GridTerminal_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (GridTerminal.IsMouseCaptured)
+                {
+                    GridTerminal.CaptureMouse();
+                }
+
+                Point position = this.GetPositionRelativeToTerminal();
+                VTDocument document = this.videoTerminal.ActiveDocument;
+                document.PerformSelection(position.X, position.Y);
+            }
+        }
+
+        private void GridTerminal_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            this.MouseWheelScroll(e);
+        }
+
+        private void GridTerminal_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                VTDocument document = this.videoTerminal.ActiveDocument;
+                if (!document.Selection.IsEmpty)
+                {
+                    document.Selection.Clear();
+                    document.Selection.RequestInvalidate();
+                }
+
+                if (e.ClickCount == 1)
+                {
+                }
+                else
+                {
+                    // 双击就是选中单词
+                    // 三击就是选中整行内容
+
+                    Point position = this.GetPositionRelativeToTerminal();
+                    double x = position.X;
+                    double y = position.Y;
+                    int startIndex = 0, count = 0, logicalRow = 0;
+
+                    VTextLine textLine = HitTestHelper.HitTestVTextLine(document, y, out logicalRow);
+                    if (textLine == null)
+                    {
+                        return;
+                    }
+
+                    switch (e.ClickCount)
+                    {
+                        case 2:
+                            {
+                                // 选中单词
+                                int characterIndex;
+                                int columnIndex;
+                                VTextRange characterRange;
+                                HitTestHelper.HitTestVTCharacter(textLine, x, out characterIndex, out characterRange, out columnIndex);
+                                if (characterIndex == -1)
+                                {
+                                    return;
+                                }
+                                VTDocUtils.GetSegement(textLine.Characters, characterIndex, out startIndex, out count);
+                                document.Selection.SelectRange(textLine, logicalRow, startIndex, count);
+                                break;
+                            }
+
+                        case 3:
+                            {
+                                // 选中一整行
+                                document.Selection.SelectRow(textLine, logicalRow);
+                                break;
+                            }
+
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void GridTerminal_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                if (GridTerminal.IsMouseCaptured)
+                {
+                    GridTerminal.ReleaseMouseCapture();
+                }
+            }
+        }
+
 
         private void VideoTerminal_RequestChangeVisible(IVideoTerminal arg1, VTDocumentTypes type, bool visible)
         {

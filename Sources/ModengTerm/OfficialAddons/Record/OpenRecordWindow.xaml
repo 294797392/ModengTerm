@@ -80,7 +80,9 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Grid x:Name="GridTerminal" Background="Transparent" SizeChanged="GridTerminal_SizeChanged">
+                    <Grid x:Name="GridTerminal" Background="Transparent" SizeChanged="GridTerminal_SizeChanged"
+                          MouseMove="GridTerminal_MouseMove" MouseDown="GridTerminal_MouseDown" MouseUp="GridTerminal_MouseUp"
+                          MouseWheel="GridTerminal_MouseWheel">
 
                         <Border x:Name="BorderBackground"/>
 
