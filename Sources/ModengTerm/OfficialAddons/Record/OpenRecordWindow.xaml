@@ -9,7 +9,7 @@
                  mc:Ignorable="d"
                  Title="{DynamicResource ResourceKey=UIText5001}" 
                  Height="450" Width="700" WindowStartupLocation="CenterScreen" 
-                 ResizeMode="CanResize"
+                 ResizeMode="CanResize" 
                  Closing="Window_Closing" Style="{StaticResource ResourceKey=StyleMdWindow}">
 
     <Window.Resources>
@@ -65,9 +65,9 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
-                <Button Grid.Column="2" Content="播放" Click="ButtonPlay_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Grid.Column="2" x:Name="ButtonPlay" Content="播放" Click="ButtonPlay_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
-                <Button Grid.Column="3" Content="删除" Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
+                <Button Grid.Column="3" x:Name="ButtonDelete" Content="删除" Click="ButtonDelete_Click" Style="{StaticResource ResourceKey=StyleButtonLocal}"/>
 
             </Grid>
         </GroupBox>
@@ -80,7 +80,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <Grid x:Name="GridDocument" Background="Transparent">
+                    <Grid x:Name="GridTerminal" Background="Transparent" SizeChanged="GridTerminal_SizeChanged">
 
                         <Border x:Name="BorderBackground"/>
 

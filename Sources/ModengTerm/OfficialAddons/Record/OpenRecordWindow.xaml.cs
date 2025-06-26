@@ -8,17 +8,18 @@ using ModengTerm.Controls;
 using ModengTerm.Document;
 using ModengTerm.Document.Enumerations;
 using ModengTerm.Terminal;
-using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Terminal.Session;
 using ModengTerm.UserControls.TerminalUserControls;
 using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WPFToolkit.MVVM;
 
@@ -42,10 +43,11 @@ namespace ModengTerm.OfficialAddons.Record
         private IClientTab tab;
         private StorageService storage;
 
+        private object playLock = new object();
+        private Playback playback;
         private VideoTerminal videoTerminal;
-        private Task playbackTask;
-        private AutoResetEvent playbackEvent;
-        private PlaybackStatusEnum playbackStatus;
+        private Task playTask;
+        private AutoResetEvent playEvent;
 
         #endregion
 
@@ -77,85 +79,59 @@ namespace ModengTerm.OfficialAddons.Record
             this.playbacks.AddRange(playbacks);
             ComboBoxPlaybackList.ItemsSource = this.playbacks;
             ComboBoxPlaybackList.SelectedIndex = 0;
+
+            this.playEvent = new AutoResetEvent(false);
+
+            // 确保DrawArea不为空
+            Dispatcher.BeginInvoke(this.InitializeVideoTerminal, System.Windows.Threading.DispatcherPriority.Loaded);
         }
 
-        private void OpenRecord(IClientTab tab, Playback playback)
+        private void InitializeVideoTerminal()
         {
             MainWindowVM mainWindowVM = MainWindowVM.GetInstance();
             ShellSessionVM shellSession = mainWindowVM.SessionList.FirstOrDefault(v => v.ID == tab.ID) as ShellSessionVM;
             XTermSession session = shellSession.Session;
 
-            this.playbackEvent = new AutoResetEvent(false);
-
             string background = session.GetOption<string>(OptionKeyEnum.THEME_BACKGROUND_COLOR);
             BorderBackground.Background = DrawingUtils.GetBrush(background);
-
             double padding = session.GetOption<double>(OptionKeyEnum.SSH_THEME_DOCUMENT_PADDING);
-            double width = DocumentMain.ActualWidth;
-            double height = DocumentMain.ActualHeight;
-
-            DocumentAlternate.Padding = new Thickness(padding);
             DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            DocumentAlternate.Scrollbar.MouseMove += this.Scrollbar_MouseMove;
+            DocumentAlternate.Padding = new Thickness(padding);
             DocumentAlternate.Visibility = Visibility.Collapsed;
-            DocumentMain.Padding = new Thickness(padding);
             DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            DocumentMain.Scrollbar.MouseMove += this.Scrollbar_MouseMove;
+            DocumentMain.Padding = new Thickness(padding);
 
             VTOptions options = new VTOptions()
             {
                 Session = session,
                 AlternateDocument = DocumentAlternate,
                 MainDocument = DocumentMain,
-                Width = width,
-                Height = height,
+                Width = DocumentMain.ActualWidth,
+                Height = DocumentMain.ActualHeight,
                 SessionTransport = new SessionTransport()
             };
 
-            this.videoTerminal = new VideoTerminal();
-            this.videoTerminal.RequestChangeVisible += this.VideoTerminal_RequestChangeVisible;
-            this.videoTerminal.Initialize(options);
+            VideoTerminal videoTerminal = new VideoTerminal();
+            videoTerminal.RequestChangeVisible += this.VideoTerminal_RequestChangeVisible;
+            videoTerminal.Initialize(options);
 
-            this.playbackTask = Task.Factory.StartNew(this.PlaybackThreadProc, playback);
+            this.videoTerminal = videoTerminal;
         }
 
-        private void CloseRecord()
+        private void ReleaseVideoTerminal()
         {
-            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;
-            DocumentMain.DrawArea.PreviewMouseRightButtonDown -= DrawArea_PreviewMouseRightButtonDown;
-
-            this.playbackStatus = PlaybackStatusEnum.Stopped;
-            this.playbackEvent.Set();
-            this.playbackEvent.Close();
-            //Task.WaitAll(this.playbackTask); // Wait可能会导致死锁
-            this.playbackTask = null;
-
+            DocumentAlternate.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            DocumentAlternate.Scrollbar.MouseMove -= this.Scrollbar_MouseMove;
+            DocumentMain.DrawArea.PreviewMouseRightButtonDown += DrawArea_PreviewMouseRightButtonDown;
+            DocumentMain.Scrollbar.MouseMove -= this.Scrollbar_MouseMove;
             this.videoTerminal.RequestChangeVisible -= this.VideoTerminal_RequestChangeVisible;
             this.videoTerminal.Release();
         }
 
-        #endregion
-
-        #region 事件处理器
-
-        private void VideoTerminal_RequestChangeVisible(IVideoTerminal arg1, VTDocumentTypes type, bool visible)
+        private void OpenPlay()
         {
-            VTDocument document = type == VTDocumentTypes.AlternateDocument ? this.videoTerminal.AlternateDocument : this.videoTerminal.MainDocument;
-            TerminalControl terminalControl = type == VTDocumentTypes.AlternateDocument ? DocumentAlternate : DocumentMain;
-
-            terminalControl.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-            if (visible)
-            {
-                VTCursorTimer.Context.SetCursor(document.Cursor);
-            }
-        }
-
-        private void ButtonPlay_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.isPlaying)
-            {
-                this.CloseRecord();
-                this.isPlaying = false;
-            }
-
             Playback playback = ComboBoxPlaybackList.SelectedItem as Playback;
             if (playback == null)
             {
@@ -169,9 +145,89 @@ namespace ModengTerm.OfficialAddons.Record
                 return;
             }
 
+            this.videoTerminal.Reset();
+
+            this.playback = playback;
             this.isPlaying = true;
 
-            this.OpenRecord(this.tab, playback);
+            this.playTask = Task.Factory.StartNew(this.PlaybackThreadProc);
+
+            ButtonPlay.IsEnabled = true;
+        }
+
+        private void ClosePlay(Action closedCallback)
+        {
+            this.playEvent.Set();
+
+            // 确保播放线程已退出
+            Task.Factory.StartNew(() =>
+            {
+                // 在UI线程Wait会导致死锁
+                Task.WaitAll(this.playTask);
+
+                Dispatcher.Invoke(closedCallback);
+            });
+        }
+
+        /// <summary>
+        /// 让scrollbar的值变成整数
+        /// </summary>
+        /// <param name="scrollbar"></param>
+        /// <returns></returns>
+        private int GetScrollValue(ScrollBar scrollbar)
+        {
+            var newvalue = (int)Math.Round(scrollbar.Value, 0);
+            if (newvalue > scrollbar.Maximum)
+            {
+                newvalue = (int)Math.Round(scrollbar.Maximum, 0);
+            }
+            return newvalue;
+        }
+
+        #endregion
+
+        #region 事件处理器
+
+        private void VideoTerminal_RequestChangeVisible(IVideoTerminal arg1, VTDocumentTypes type, bool visible)
+        {
+            VTDocument document = type == VTDocumentTypes.AlternateDocument ? arg1.AlternateDocument : arg1.MainDocument;
+            TerminalControl terminalControl = type == VTDocumentTypes.AlternateDocument ? DocumentAlternate : DocumentMain;
+
+            terminalControl.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+            if (visible)
+            {
+                VTCursorTimer.Context.SetCursor(document.Cursor);
+            }
+        }
+
+        private void Scrollbar_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                ScrollBar scrollbar = sender as ScrollBar;
+
+                int newscroll = this.GetScrollValue(scrollbar);
+                VTDocument document = this.videoTerminal.ActiveDocument;
+                document.ScrollTo(newscroll);
+                document.RequestInvalidate();
+
+                e.Handled = true;
+            }
+        }
+
+        private void ButtonPlay_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonPlay.IsEnabled = false;
+
+            if (this.isPlaying)
+            {
+                this.isPlaying = false;
+                this.ClosePlay(this.OpenPlay);
+            }
+            else
+            {
+                this.OpenPlay();
+            }
         }
 
         private void ButtonDelete_Click(object sender, RoutedEventArgs e)
@@ -182,7 +238,7 @@ namespace ModengTerm.OfficialAddons.Record
                 return;
             }
 
-            if (this.isPlaying) 
+            if (this.isPlaying)
             {
                 MTMessageBox.Info("当前回放正在播放中, 无法删除, 请先停止当前回放");
                 return;
@@ -205,18 +261,18 @@ namespace ModengTerm.OfficialAddons.Record
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (this.isPlaying) 
+            if (this.isPlaying)
             {
-                this.CloseRecord();
-
                 this.isPlaying = false;
+
+                this.ClosePlay(this.ReleaseVideoTerminal);
             }
         }
 
         private void DrawArea_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
             // 右键直接复制选中内容
-            VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
+            VTParagraph paragraph = videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
             if (paragraph.IsEmpty)
             {
                 return;
@@ -225,15 +281,12 @@ namespace ModengTerm.OfficialAddons.Record
             // 把数据设置到Windows剪贴板里
             System.Windows.Clipboard.SetText(paragraph.Content);
 
-            this.videoTerminal.UnSelectAll();
+            videoTerminal.UnSelectAll();
         }
 
-        /// <summary>
-        /// 回放线程
-        /// </summary>
-        private void PlaybackThreadProc(object state)
+        private void PlaybackThreadProc()
         {
-            Playback playback = state as Playback;
+            Playback playback = this.playback;
 
             long prevTimestamp = 0;
 
@@ -245,13 +298,11 @@ namespace ModengTerm.OfficialAddons.Record
                 return;
             }
 
-            playbackStatus = PlaybackStatusEnum.Playing;
-
-            while (playbackStatus == PlaybackStatusEnum.Playing)
+            while (this.isPlaying)
             {
                 if (playbackStream.EndOfFile)
                 {
-                    logger.InfoFormat("回放文件播放结束");
+                    //logger.InfoFormat("回放文件播放结束");
                     break;
                 }
 
@@ -262,24 +313,24 @@ namespace ModengTerm.OfficialAddons.Record
                     if (nextFrame == null)
                     {
                         // 此时说明读取文件有异常
-                        logger.ErrorFormat("读取回放文件下一帧失败, 结束回放");
+                        logger.ErrorFormat("读取回放文件下一帧失败");
                         break;
                     }
 
                     if (prevTimestamp > 0)
                     {
                         long interval = nextFrame.Timestamp - prevTimestamp;
-                        playbackEvent.WaitOne((int)interval / 10000);
+                        playEvent.WaitOne((int)interval / 10000);
                     }
 
-                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    // 播放一帧
+                    if (this.isPlaying)
                     {
-                        // 播放一帧
-                        if (playbackStatus == PlaybackStatusEnum.Playing)
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             videoTerminal.ProcessRead(nextFrame.Data, nextFrame.Data.Length);
-                        }
-                    });
+                        });
+                    }
 
                     prevTimestamp = nextFrame.Timestamp;
                 }
@@ -289,11 +340,17 @@ namespace ModengTerm.OfficialAddons.Record
                 }
             }
 
-            logger.InfoFormat("回放线程运行结束, 关闭回放文件");
-
             playbackStream.Close();
 
-            playbackStatus = PlaybackStatusEnum.Stopped;
+            logger.InfoFormat("回放线程运行结束");
+        }
+
+        private void GridTerminal_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (this.videoTerminal != null)
+            {
+                this.videoTerminal.Resize(e.NewSize.ToVTSize());
+            }
         }
 
         #endregion

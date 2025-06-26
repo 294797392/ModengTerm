@@ -141,10 +141,10 @@ namespace ModengTerm.Addons
         /// <returns>OverlayPanel的实例</returns>
         protected IOverlayPanel EnsureOverlayPanel(string panelId, IClientShellTab shellTab)
         {
-            IOverlayPanel overlayPanel = shellTab.GetOverlayPanel("FindOverlayPanel");
+            IOverlayPanel overlayPanel = shellTab.GetOverlayPanel(panelId);
             if (overlayPanel == null)
             {
-                overlayPanel = this.CreateOverlayPanel("FindOverlayPanel");
+                overlayPanel = this.CreateOverlayPanel(panelId);
                 if (overlayPanel == null)
                 {
                     return null;

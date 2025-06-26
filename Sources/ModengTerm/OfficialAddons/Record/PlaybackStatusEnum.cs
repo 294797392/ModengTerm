@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModengTerm.Terminal.Enumerations
+namespace ModengTerm.OfficialAddons.Record
 {
     /// <summary>
     /// 定义回放状态

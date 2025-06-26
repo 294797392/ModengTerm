@@ -50,7 +50,7 @@ namespace ModengTerm.Document
         /// 初始化
         /// </summary>
         /// <returns></returns>
-        public int Initialize() 
+        public int Initialize()
         {
             this.historyList = new VTMemoryHistoryList();
             this.historyList.Initialize();
@@ -185,12 +185,12 @@ namespace ModengTerm.Document
         {
             historyLines = null;
 
-            if (this.Lines == 0) 
+            if (this.Lines == 0)
             {
                 return false;
             }
 
-            if (startPhysicsRow < 0) 
+            if (startPhysicsRow < 0)
             {
                 return false;
             }
@@ -203,6 +203,14 @@ namespace ModengTerm.Document
             historyLines = this.historyList.ElementsAt(startPhysicsRow, endPhysicsRow);
 
             return true;
+        }
+
+        public void Clear()
+        {
+            this.historyList.Clear();
+            this.FirstLine = null;
+            this.LastLine = null;
+            this.Lines = 0;
         }
 
         #endregion
@@ -238,6 +246,11 @@ namespace ModengTerm.Document
         /// <param name="historyLines">获取的行列表</param>
         /// <returns>是否获取成功</returns>
         public abstract IEnumerable<VTHistoryLine> ElementsAt(int startPhysicsRow, int endPhysicsRow);
+
+        /// <summary>
+        /// 清空所有历史记录
+        /// </summary>
+        public abstract void Clear();
 
     }
 
@@ -285,6 +298,11 @@ namespace ModengTerm.Document
             int count = endPhysicsRow - startPhysicsRow + 1;
 
             return this.historyLines.Skip(startPhysicsRow).Take(count);
+        }
+
+        public override void Clear()
+        {
+            this.historyLines.Clear();
         }
     }
 
