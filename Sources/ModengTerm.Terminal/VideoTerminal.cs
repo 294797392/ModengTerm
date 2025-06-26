@@ -955,27 +955,6 @@ namespace ModengTerm.Terminal
             }
         }
 
-        /// <summary>
-        /// 重置所有数据和历史记录，光标位置等等
-        /// </summary>
-        public void Reset() 
-        {
-            this.mainDocument.SetCursorPhysical(0);
-            this.alternateDocument.SetCursorPhysical(0);
-
-            this.mainDocument.History.Clear();
-            this.alternateDocument.History.Clear();
-
-            this.mainDocument.DeleteViewoprt();
-            this.alternateDocument.DeleteViewoprt();
-
-            this.mainDocument.Scrollbar.Value = 0;
-            this.mainDocument.Scrollbar.Maximum = 0;
-
-            this.alternateDocument.Scrollbar.Value = 0;
-            this.alternateDocument.Scrollbar.Maximum = 0;
-        }
-
         #endregion
 
         #region 实例方法
@@ -2425,8 +2404,7 @@ namespace ModengTerm.Terminal
                 // 剩余多少列可以显示
                 int left = vpcols - cursor.Column;
 
-                if (left < character.ColumnSize ||
-                    left <= 0)
+                if (left < character.ColumnSize || left <= 0)
                 {
                     // 剩余列没法容纳新字符，移动光标到下一行
                     document.SetCursorLogical(cursor.Row, 0);

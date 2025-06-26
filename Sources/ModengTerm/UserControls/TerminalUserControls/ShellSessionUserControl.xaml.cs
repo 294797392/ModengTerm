@@ -282,7 +282,6 @@ namespace ModengTerm.UserControls.TerminalUserControls
             }
         }
 
-
         #region Terminal事件
 
         private void GridTerminal_MouseMove(object sender, MouseEventArgs e)

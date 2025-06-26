@@ -15,7 +15,6 @@ using ModengTerm.ViewModel;
 using ModengTerm.ViewModel.Terminal;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -150,8 +149,6 @@ namespace ModengTerm.OfficialAddons.Record
                 return;
             }
 
-            this.videoTerminal.Reset();
-
             this.playback = playback;
             this.isPlaying = true;
 
@@ -188,7 +185,7 @@ namespace ModengTerm.OfficialAddons.Record
             }
             return newvalue;
         }
-        
+
         private Point GetPositionRelativeToTerminal()
         {
             VTDocument document = this.videoTerminal.ActiveDocument;
@@ -342,6 +339,19 @@ namespace ModengTerm.OfficialAddons.Record
                             break;
                     }
                 }
+            }
+            else
+            {
+                VTParagraph paragraph = this.videoTerminal.CreateParagraph(ParagraphTypeEnum.Selected, ParagraphFormatEnum.PlainText);
+                if (paragraph.IsEmpty)
+                {
+                    return;
+                }
+
+                // 把数据设置到Windows剪贴板里
+                System.Windows.Clipboard.SetText(paragraph.Content);
+
+                this.videoTerminal.UnSelectAll();
             }
         }
 
