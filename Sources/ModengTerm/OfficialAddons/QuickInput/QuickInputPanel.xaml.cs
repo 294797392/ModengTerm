@@ -77,22 +77,18 @@ namespace ModengTerm.OfficialAddons.QuickInput
 
         public override void OnInitialize()
         {
-            throw new System.NotImplementedException();
         }
 
         public override void OnRelease()
         {
-            throw new System.NotImplementedException();
         }
 
         public override void OnLoaded()
         {
-            throw new System.NotImplementedException();
         }
 
         public override void OnUnload()
         {
-            throw new System.NotImplementedException();
         }
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base.Definitions;
+﻿using ModengTerm.Addons;
+using ModengTerm.Base.Definitions;
 using ModengTerm.ViewModel.Panel;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,23 @@ namespace ModengTerm.Addon
 {
     public class PanelState
     {
-        public ClientPanel Panel { get; set; }
+        public SidePanel Panel { get; set; }
 
         public PanelDefinition Definition { get; private set; }
 
-        public PanelState(PanelDefinition definition) 
+        /// <summary>
+        /// 是否添加到了窗口里
+        /// </summary>
+        public bool AddToWindow { get; set; }
+
+        /// <summary>
+        /// SidePanel所属的插件
+        /// </summary>
+        public AddonModule OwnerAddon { get; set; }
+
+        public PanelState(AddonModule ownerAddon, PanelDefinition definition) 
         {
+            this.OwnerAddon = ownerAddon;
             this.Definition = definition;
         }
     }

@@ -37,9 +37,5 @@ namespace ModengTerm.Addon.Interactive
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         List<T> GetAllTabs<T>() where T : IClientTab;
-
-        void AddSidePanel(ISidePanel panel);
-
-        void RemoveSidePanel(ISidePanel panel);
     }
 }

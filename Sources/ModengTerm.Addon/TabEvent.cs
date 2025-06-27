@@ -73,6 +73,10 @@ namespace ModengTerm.Addon
 
     public class TabEventTabOpened : TabEventArgs
     {
+        public override string Name => "onTabOpened";
+
+        public override string FullName => string.Format("onTabOpened:{0}", this.SessionType.ToString().ToLower());
+
         public override TabEvent Type => TabEvent.TAB_OPENED;
 
         /// <summary>

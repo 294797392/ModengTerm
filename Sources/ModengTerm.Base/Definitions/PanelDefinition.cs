@@ -35,12 +35,16 @@ namespace ModengTerm.Base.Definitions
         /// onTabOpened:terminal - 在打开terminal类型的tab的时候显示
         /// 这些事件保持与TabEvent和ClientEvent一致
         /// </summary>
-        [JsonProperty("startupEvents")]
-        public List<string> StartupEvents { get; private set; }
+        [JsonProperty("activeEvents")]
+        public List<string> ActiveEvents { get; private set; }
+
+        [JsonProperty("deactiveEvents")]
+        public List<string> DeactiveEvents { get; private set; }
 
         public PanelDefinition()
         {
-            this.StartupEvents = new List<string>();
+            this.ActiveEvents = new List<string>();
+            this.DeactiveEvents = new List<string>();
         }
     }
 }

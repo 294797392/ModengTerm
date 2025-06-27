@@ -59,12 +59,8 @@ namespace ModengTerm
         /// <summary>
         /// 激活事件 -> 要激活的SidePanel
         /// </summary>
-        private Dictionary<string, List<PanelState>> startupEvent2SidePanels;
-
-        /// <summary>
-        /// 激活事件 -> 要激活的OverlayPanel
-        /// </summary>
-        private Dictionary<string, List<PanelDefinition>> startupEvent2OverlayPanels;
+        private Dictionary<string, List<PanelState>> activeEventPanels;
+        private Dictionary<string, List<PanelState>> deactiveEventPanels;
 
         #endregion
 
@@ -87,8 +83,8 @@ namespace ModengTerm
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
             this.pressedKeys = new List<Key>();
-            this.startupEvent2SidePanels = new Dictionary<string, List<PanelState>>();
-            this.startupEvent2OverlayPanels = new Dictionary<string, List<PanelDefinition>>();
+            this.activeEventPanels = new Dictionary<string, List<PanelState>>();
+            this.deactiveEventPanels = new Dictionary<string, List<PanelState>>();
 
             this.mainWindowVM = MainWindowVM.GetInstance();
             base.DataContext = this.mainWindowVM;
@@ -166,60 +162,117 @@ namespace ModengTerm
             this.mainWindowVM.SessionList.Remove(session);
         }
 
-        private void TryDispatchStartupEvent(EventArgsBase e)
-        {
-            List<PanelState> panelStates;
-            if (!this.startupEvent2SidePanels.TryGetValue(e.Name, out panelStates))
+        private void TryDispatchActiveEvent(EventArgsBase e)
+        { 
+            // TODO：优化Deactive和Active事件的执行逻辑
+            // 如果插件数量很大的话可能会卡顿
+
+            if (string.IsNullOrEmpty(e.Name) && string.IsNullOrEmpty(e.FullName))
             {
-                if (!this.startupEvent2SidePanels.TryGetValue(e.FullName, out panelStates))
+                return;
+            }
+
+            List<PanelState> toActives;
+            if (!this.activeEventPanels.TryGetValue(e.Name, out toActives))
+            {
+                if (!this.activeEventPanels.TryGetValue(e.FullName, out toActives))
                 {
                     return;
                 }
             }
 
-            foreach (PanelState panelState in panelStates)
+            foreach (PanelState toActive in toActives)
             {
-                if (panelState.Panel == null) 
+                if (toActive.Panel == null)
                 {
+                    PanelDefinition definition = toActive.Definition;
+
                     SidePanel sidePanel = new SidePanel();
+                    sidePanel.Definition = definition;
+                    sidePanel.ID = definition.ID;
+                    sidePanel.Name = definition.Name;
+                    sidePanel.IconURI = definition.Icon;
+                    this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
+
+                    toActive.Panel = sidePanel;
+                    toActive.AddToWindow = true;
+                    toActive.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+                }
+                else
+                {
+                    if (!toActive.AddToWindow)
+                    {
+                        SidePanel sidePanel = toActive.Panel;
+                        this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Add(sidePanel);
+                        toActive.AddToWindow = true;
+                        toActive.OwnerAddon.ActiveSidePanels.Add(sidePanel);
+                    }
                 }
             }
         }
 
-        private void InitializeSidePanels(AddonDefinition addonDefinition)
+        private void TryDispatchDeactiveEvent(EventArgsBase e)
         {
-            foreach (PanelDefinition definition in addonDefinition.SidePanels)
+            // TODO：优化Deactive和Active事件的执行逻辑
+            // 如果插件数量很大的话可能会卡顿
+
+            if (string.IsNullOrEmpty(e.Name) && string.IsNullOrEmpty(e.FullName))
             {
-                PanelState panelState = new PanelState(definition);
+                return;
+            }
 
-                foreach (string eventName in definition.StartupEvents)
+            List<PanelState> deactives;
+            if (!this.deactiveEventPanels.TryGetValue(e.Name, out deactives))
+            {
+                if (!this.deactiveEventPanels.TryGetValue(e.FullName, out deactives))
                 {
-                    List<PanelState> panelStats;
-                    if (!this.startupEvent2SidePanels.TryGetValue(eventName, out panelStats))
-                    {
-                        panelStats = new List<PanelState>();
-                        this.startupEvent2SidePanels[eventName] = panelStats;
-                    }
-
-                    panelStats.Add(panelState);
+                    return;
                 }
+            }
+
+            foreach (PanelState panelState in deactives)
+            {
+                if (!panelState.AddToWindow)
+                {
+                    return;
+                }
+
+                SidePanel sidePanel = panelState.Panel;
+                this.mainWindowVM.PanelContainers[sidePanel.Dock].Panels.Remove(sidePanel);
+
+                panelState.OwnerAddon.ActiveSidePanels.Remove(sidePanel);
+                panelState.AddToWindow = false;
             }
         }
 
-        private void InitializeOverlayPanels(AddonDefinition addonDefinition)
+        private void InitializeActiveEventPanels(AddonModule addon, AddonDefinition addonDefinition)
         {
             foreach (PanelDefinition definition in addonDefinition.SidePanels)
             {
-                foreach (string eventName in definition.StartupEvents)
+                PanelState panelState = new PanelState(addon, definition);
+
+                foreach (string eventName in definition.ActiveEvents)
                 {
-                    List<PanelDefinition> overlayPanels;
-                    if (!this.startupEvent2OverlayPanels.TryGetValue(eventName, out overlayPanels))
+                    List<PanelState> panelStates;
+                    if (!this.activeEventPanels.TryGetValue(eventName, out panelStates))
                     {
-                        overlayPanels = new List<PanelDefinition>();
-                        this.startupEvent2OverlayPanels[eventName] = overlayPanels;
+                        panelStates = new List<PanelState>();
+                        this.activeEventPanels[eventName] = panelStates;
                     }
 
-                    overlayPanels.Add(definition);
+                    panelStates.Add(panelState);
+                }
+
+                foreach (string eventName in definition.DeactiveEvents)
+                {
+                    List<PanelState> panelStates;
+                    if (!this.deactiveEventPanels.TryGetValue(eventName, out panelStates))
+                    {
+                        panelStates = new List<PanelState>();
+                        this.deactiveEventPanels[eventName] = panelStates;
+                    }
+
+                    panelStates.Add(panelState);
                 }
             }
         }
@@ -263,8 +316,7 @@ namespace ModengTerm
 
                 #endregion
 
-                this.InitializeSidePanels(definition);
-                this.InitializeOverlayPanels(definition);
+                this.InitializeActiveEventPanels(addon, definition);
             }
 
             #endregion
@@ -293,11 +345,15 @@ namespace ModengTerm
 
         private void PublishTabEvent(TabEventArgs e)
         {
+            this.TryDispatchDeactiveEvent(e);
+            this.TryDispatchActiveEvent(e);
             this.eventRegistry.PublishTabEvent(e);
         }
 
         private void PublishEvent(ClientEventArgs e)
         {
+            this.TryDispatchDeactiveEvent(e);
+            this.TryDispatchActiveEvent(e);
             this.eventRegistry.PublishEvent(e);
         }
 
@@ -874,18 +930,6 @@ namespace ModengTerm
         public List<T> GetAllTabs<T>() where T : IClientTab
         {
             return this.mainWindowVM.SessionList.OfType<T>().ToList();
-        }
-
-        public void AddSidePanel(ISidePanel panel)
-        {
-            PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Add(panel as SidePanel);
-        }
-
-        public void RemoveSidePanel(ISidePanel panel)
-        {
-            PanelContainer container = this.mainWindowVM.PanelContainers[panel.Dock];
-            container.Panels.Remove(panel as SidePanel);
         }
 
         #endregion

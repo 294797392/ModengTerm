@@ -22,16 +22,16 @@ namespace ModengTerm.Addon
         CLIENT_INITIALIZED = 0,
 
         /// <summary>
-        /// 
+        /// 当前显示的Tab变化之后触发
         /// </summary>
-        CLIENT_ACTIVE_TAB_CHANGED
+        CLIENT_TAB_CHANGED
     }
 
     public abstract class EventArgsBase
     {
-        public string Name { get; set; }
+        public virtual string Name { get { return string.Empty; } }
 
-        public string FullName { get; set; }
+        public virtual string FullName { get { return string.Empty; } }
     }
 
     public abstract class ClientEventArgs : EventArgsBase
@@ -41,12 +41,17 @@ namespace ModengTerm.Addon
 
     public class ClientEventClientInitialized : ClientEventArgs
     {
+        public override string Name => "onClientInitialized";
+
         public override ClientEvent Type => ClientEvent.CLIENT_INITIALIZED;
     }
 
     public class ClientEventActiveTabChanged : ClientEventArgs
     {
-        public override ClientEvent Type => ClientEvent.CLIENT_ACTIVE_TAB_CHANGED;
+        public override string Name => "onClientTabChanged";
+        public override string FullName => string.Format("onClientTabChanged:{0}", this.AddedTab.Type.ToString().ToLower());
+
+        public override ClientEvent Type => ClientEvent.CLIENT_TAB_CHANGED;
 
         /// <summary>
         /// 选中之前的Tab页面

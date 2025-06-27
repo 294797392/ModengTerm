@@ -35,7 +35,7 @@ namespace ModengTerm.Addons
 
         private Dictionary<string, AddonCommandDelegate> registerCommands;
 
-        private List<ISidePanel> sidePanels;
+        private List<ISidePanel> activeSidePanels;
         private List<IOverlayPanel> overlayPanels;
 
         protected ClientFactory factory;
@@ -54,6 +54,14 @@ namespace ModengTerm.Addons
         /// </summary>
         public Dictionary<string, AddonCommandDelegate> RegisteredCommand { get { return this.registerCommands; } }
 
+        /// <summary>
+        /// 获取当前已经激活了的侧边栏面板
+        /// </summary>
+        public List<ISidePanel> ActiveSidePanels
+        {
+            get { return this.activeSidePanels; }
+        }
+
         #endregion
 
         #region 公开接口
@@ -67,10 +75,9 @@ namespace ModengTerm.Addons
             this.factory = context.Factory;
             this.registerCommands = new Dictionary<string, AddonCommandDelegate>();
             this.overlayPanels = new List<IOverlayPanel>();
+            this.activeSidePanels = new List<ISidePanel>();
             this.definition = context.Definition;
 
-            // 此时只是创建了HostPanel的实例，但是还没有真正加到界面上，调用AddSidePanel加到界面上
-            this.sidePanels = this.factory.CreateSidePanels(context.Definition.SidePanels);
             this.client = this.factory.GetClient();
             this.storageService = this.factory.GetStorageService();
             this.eventRegistry = this.factory.GetEventRegistry();
@@ -86,7 +93,7 @@ namespace ModengTerm.Addons
             this.registerCommands.Clear();
         }
 
-        public void RaiseCommand(CommandArgs e)
+        public void DispatchCommand(CommandArgs e)
         {
             AddonCommandDelegate handler;
             if (!this.registerCommands.TryGetValue(e.Command, out handler))
@@ -118,7 +125,7 @@ namespace ModengTerm.Addons
 
         protected ISidePanel GetSidePanel(string id)
         {
-            return this.sidePanels.FirstOrDefault(v => v.ID.ToString() == id);
+            return this.activeSidePanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
         /// <summary>
