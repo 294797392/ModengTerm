@@ -50,7 +50,7 @@ namespace ModengTerm.Addon
         SHELL_OPENED = 303
     }
 
-    public abstract class TabEventArgs
+    public abstract class TabEventArgs : EventArgsBase
     {
         public abstract TabEvent Type { get; }
 
@@ -114,7 +114,7 @@ namespace ModengTerm.Addon
         /// </summary>
         public long Timestamp { get; set; }
 
-        public TabEventShellRendered() 
+        public TabEventShellRendered()
         {
             this.NewLines = new List<VTHistoryLine>();
         }

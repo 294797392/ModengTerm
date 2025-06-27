@@ -27,7 +27,14 @@ namespace ModengTerm.Addon
         CLIENT_ACTIVE_TAB_CHANGED
     }
 
-    public abstract class ClientEventArgs
+    public abstract class EventArgsBase
+    {
+        public string Name { get; set; }
+
+        public string FullName { get; set; }
+    }
+
+    public abstract class ClientEventArgs : EventArgsBase
     {
         public abstract ClientEvent Type { get; }
     }

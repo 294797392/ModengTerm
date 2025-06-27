@@ -1,4 +1,5 @@
-﻿using ModengTerm.Base;
+﻿using ModengTerm.Addon.Panel;
+using ModengTerm.Base;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,17 +10,15 @@ namespace ModengTerm.OfficialAddons.QuickInput
     /// <summary>
     /// QuickCommandUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class QuickInputUserControl : UserControl, IContentHook
+    public partial class QuickInputPanel : SidePanelContent
     {
         #region 实例变量
-
-        private QuickInputVM quickInputVM;
 
         #endregion
 
         #region 构造方法
 
-        public QuickInputUserControl()
+        public QuickInputPanel()
         {
             InitializeComponent();
 
@@ -74,23 +73,26 @@ namespace ModengTerm.OfficialAddons.QuickInput
 
         #endregion
 
-        #region IContentHook
+        #region SidePanelContent
 
-        public void OnInitialize()
+        public override void OnInitialize()
         {
-            this.quickInputVM = base.DataContext as QuickInputVM;
+            throw new System.NotImplementedException();
         }
 
-        public void OnRelease()
+        public override void OnRelease()
         {
+            throw new System.NotImplementedException();
         }
 
-        public void OnLoaded()
+        public override void OnLoaded()
         {
+            throw new System.NotImplementedException();
         }
 
-        public void OnUnload()
+        public override void OnUnload()
         {
+            throw new System.NotImplementedException();
         }
 
         #endregion

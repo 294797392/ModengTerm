@@ -9,6 +9,7 @@ using ModengTerm.Base.DataModels;
 using ModengTerm.Base.Definitions;
 using ModengTerm.Base.Enumerations;
 using ModengTerm.Base.ServiceAgents;
+using ModengTerm.Enumerations;
 using ModengTerm.Terminal;
 using ModengTerm.Terminal.Enumerations;
 using ModengTerm.Themes;
@@ -32,34 +33,6 @@ namespace ModengTerm
     /// </summary>
     public partial class MainWindow : Window, IClient
     {
-        #region 内部类
-
-        private enum HotkeyState
-        {
-            /// <summary>
-            /// 表示按下的第一个按键
-            /// </summary>
-            Key1,
-
-            /// <summary>
-            /// 表示按下的第二个按键
-            /// </summary>
-            Key2,
-
-            /// <summary>
-            /// 处理双快捷键的情况
-            /// Ctrl+A,B
-            /// </summary>
-            DoubleHotkey,
-
-            /// <summary>
-            /// 处理双修饰键的情况
-            /// </summary>
-            DoubleModKey,
-        }
-
-        #endregion
-
         #region 类变量
 
         private static readonly log4net.ILog logger = log4net.LogManager.GetLogger("MainWindow");
@@ -83,6 +56,16 @@ namespace ModengTerm
         private ModifierKeys secondPressedModKeys = ModifierKeys.None;
         private Key lastPressedKey = Key.None;
 
+        /// <summary>
+        /// 激活事件 -> 要激活的SidePanel
+        /// </summary>
+        private Dictionary<string, List<PanelState>> startupEvent2SidePanels;
+
+        /// <summary>
+        /// 激活事件 -> 要激活的OverlayPanel
+        /// </summary>
+        private Dictionary<string, List<PanelDefinition>> startupEvent2OverlayPanels;
+
         #endregion
 
         #region 构造方法
@@ -104,6 +87,8 @@ namespace ModengTerm
             this.factory = ClientFactory.GetFactory();
             this.eventRegistry = this.factory.GetEventRegistry();
             this.pressedKeys = new List<Key>();
+            this.startupEvent2SidePanels = new Dictionary<string, List<PanelState>>();
+            this.startupEvent2OverlayPanels = new Dictionary<string, List<PanelDefinition>>();
 
             this.mainWindowVM = MainWindowVM.GetInstance();
             base.DataContext = this.mainWindowVM;
@@ -124,7 +109,7 @@ namespace ModengTerm
             this.InitializeAddon();
 
             ClientEventClientInitialized clientInitialized = new ClientEventClientInitialized();
-            this.eventRegistry.PublishEvent(clientInitialized);
+            this.PublishEvent(clientInitialized);
         }
 
         private void ShowSessionListWindow()
@@ -181,6 +166,64 @@ namespace ModengTerm
             this.mainWindowVM.SessionList.Remove(session);
         }
 
+        private void TryDispatchStartupEvent(EventArgsBase e)
+        {
+            List<PanelState> panelStates;
+            if (!this.startupEvent2SidePanels.TryGetValue(e.Name, out panelStates))
+            {
+                if (!this.startupEvent2SidePanels.TryGetValue(e.FullName, out panelStates))
+                {
+                    return;
+                }
+            }
+
+            foreach (PanelState panelState in panelStates)
+            {
+                if (panelState.Panel == null) 
+                {
+                    SidePanel sidePanel = new SidePanel();
+                }
+            }
+        }
+
+        private void InitializeSidePanels(AddonDefinition addonDefinition)
+        {
+            foreach (PanelDefinition definition in addonDefinition.SidePanels)
+            {
+                PanelState panelState = new PanelState(definition);
+
+                foreach (string eventName in definition.StartupEvents)
+                {
+                    List<PanelState> panelStats;
+                    if (!this.startupEvent2SidePanels.TryGetValue(eventName, out panelStats))
+                    {
+                        panelStats = new List<PanelState>();
+                        this.startupEvent2SidePanels[eventName] = panelStats;
+                    }
+
+                    panelStats.Add(panelState);
+                }
+            }
+        }
+
+        private void InitializeOverlayPanels(AddonDefinition addonDefinition)
+        {
+            foreach (PanelDefinition definition in addonDefinition.SidePanels)
+            {
+                foreach (string eventName in definition.StartupEvents)
+                {
+                    List<PanelDefinition> overlayPanels;
+                    if (!this.startupEvent2OverlayPanels.TryGetValue(eventName, out overlayPanels))
+                    {
+                        overlayPanels = new List<PanelDefinition>();
+                        this.startupEvent2OverlayPanels[eventName] = overlayPanels;
+                    }
+
+                    overlayPanels.Add(definition);
+                }
+            }
+        }
+
         /// <summary>
         /// 初始化插件列表
         /// </summary>
@@ -192,6 +235,8 @@ namespace ModengTerm
 
             foreach (AddonDefinition definition in VTApp.Context.Manifest.Addons)
             {
+                #region 创建插件实例
+
                 AddonModule addon = null;
 
                 try
@@ -215,6 +260,11 @@ namespace ModengTerm
                 }
 
                 addons.Add(addon);
+
+                #endregion
+
+                this.InitializeSidePanels(definition);
+                this.InitializeOverlayPanels(definition);
             }
 
             #endregion
@@ -222,7 +272,7 @@ namespace ModengTerm
             this.addons = addons;
         }
 
-        private void RaiseAddonCommand(CommandArgs cmdArgs)
+        private void DispatchAddonCommand(CommandArgs cmdArgs)
         {
             AddonModule addon = this.addons.FirstOrDefault(v => v.ID == cmdArgs.AddonId);
             if (addon == null)
@@ -241,9 +291,14 @@ namespace ModengTerm
             handler.Invoke(cmdArgs);
         }
 
-        private void RaiseAddonHotkey(string hotKey)
+        private void PublishTabEvent(TabEventArgs e)
         {
+            this.eventRegistry.PublishTabEvent(e);
+        }
 
+        private void PublishEvent(ClientEventArgs e)
+        {
+            this.eventRegistry.PublishEvent(e);
         }
 
         /// <summary>
@@ -436,14 +491,14 @@ namespace ModengTerm
 
         #region 事件处理器
 
-        private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs evArgs)
+        private void OpenedSessionVM_TabEvent(OpenedSessionVM session, TabEventArgs e)
         {
-            this.eventRegistry.PublishTabEvent(evArgs);
+            this.PublishTabEvent(e);
         }
 
         private void SessionContent_ExecuteCommand(CommandArgs e)
         {
-            this.RaiseAddonCommand(e);
+            this.DispatchAddonCommand(e);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -511,7 +566,7 @@ namespace ModengTerm
                 AddedTab = addedSession,
                 RemovedTab = removedSession,
             };
-            this.eventRegistry.PublishEvent(activeTabChanged);
+            this.PublishEvent(activeTabChanged);
         }
 
         private void ListBoxOpenedSession_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -588,7 +643,7 @@ namespace ModengTerm
             CommandArgs.Instance.AddonId = contextMenu.AddonId;
             CommandArgs.Instance.Command = contextMenu.Command;
             CommandArgs.Instance.ActiveTab = ListBoxOpenedSession.SelectedItem as IClientTab;
-            this.RaiseAddonCommand(CommandArgs.Instance);
+            this.DispatchAddonCommand(CommandArgs.Instance);
         }
 
 
@@ -780,7 +835,7 @@ namespace ModengTerm
                 OpenedTab = openedSessionVM,
                 SessionType = (SessionTypeEnum)session.Type,
             };
-            this.eventRegistry.PublishTabEvent(tabOpened);
+            this.PublishTabEvent(tabOpened);
 
             if (VTBaseUtils.IsTerminal((SessionTypeEnum)session.Type))
             {
@@ -789,7 +844,7 @@ namespace ModengTerm
                     Sender = openedSessionVM,
                     OpenedTab = openedSessionVM as IClientShellTab,
                 };
-                this.eventRegistry.PublishTabEvent(shellOpened);
+                this.PublishTabEvent(shellOpened);
             }
         }
 
@@ -895,7 +950,7 @@ namespace ModengTerm
         private void ExecuteAddonCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             CommandArgs args = e.Parameter as CommandArgs;
-            this.RaiseAddonCommand(args);
+            this.DispatchAddonCommand(args);
         }
 
         #endregion

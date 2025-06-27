@@ -342,7 +342,8 @@
                     "id": "ResourceManagerPanel",
                     "name": "资源管理器",
                     "icon": "M850.304 375.04v-45.248c0-47.488-38.4-100.544-89.216-100.544H536.192l-6.72-12.48a62.976 62.976 0 0 0-56.32-33.92H226.688A84.672 84.672 0 0 0 143.04 268.8v467.776a84.608 84.608 0 0 0 83.648 85.824h578.56a84.608 84.608 0 0 0 83.584-85.824V449.6c0-27.136-14.72-54.208-38.4-74.56h-0.128z m-64.384-22.656H601.6l-30.72-58.752h190.976c10.24 0 24.896 19.2 24.896 36.16v22.592h-0.832z m38.4 96v286.976a21.12 21.12 0 0 1-19.2 21.504H226.56a20.48 20.48 0 0 1-19.2-21.504V267.648a21.12 21.12 0 0 1 19.2-21.44h245.248l81.344 153.6c5.76 10.24 16.512 16.64 28.288 16.96h209.92c12.48 0 32.96 20.352 32.96 31.616z",
-                    "className": "ModengTerm.OfficialAddons.SessionExplorer.SessionExplorerPanel, ModengTerm"
+                    "className": "ModengTerm.OfficialAddons.SessionExplorer.SessionExplorerPanel, ModengTerm",
+                    "startupEvents": [ "onOpen:terminal" ]
                 }
             ]
         },
@@ -452,29 +453,27 @@
                 }
             ]
         },
-        //{
-        //    "id": "E4E83F91-80A5-4F05-BDF8-F8D0D12D2FC0",
-        //    "name": "快捷输入",
-        //    "classEntry": "ModengTerm.OfficialAddons.QuickInput.QuickInputAddon, ModengTerm",
-        //    "toolbarMenus": [
-        //        {
-        //            "id": "AD6A95B1-ED61-42D7-96DF-3A55778110AE",
-        //            "name": "快捷命令",
-        //            "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
-        //            "command": "QuickInputAddon.ShowQuickInputPanel"
-        //        }
-        //    ],
-        //    "sessionPanels": [
-        //        {
-        //            "id": "0C1F6D60-F6ED-4D01-B5B6-1812EA55286A",
-        //            "name": "快速输入",
-        //            "owner": 1,
-        //            "icon": "M736.4608 161.44384l115.85536 115.85536a40.96 40.96 0 0 1 0 57.91744L427.08992 760.44288c-6.06208 6.0416-13.86496 10.0352-22.3232 11.38688-107.47904 17.48992-165.888 21.6064-175.16544 12.32896-9.27744-9.29792-5.16096-67.6864 12.32896-175.18592 1.35168-8.43776 5.3248-16.24064 11.38688-22.30272L678.54336 161.44384a40.96 40.96 0 0 1 57.91744 0z m-142.9504 128.45056L275.0464 608.3584a10.0352 10.0352 0 0 0-2.80576 5.55008c-8.6016 52.92032-13.9264 93.55264-15.89248 121.6512-0.57344 8.25344-0.86016 15.31904-0.86016 21.0944v1.59744h1.59744c4.62848 0 10.05568-0.18432 16.2816-0.55296l4.8128-0.3072c28.09856-1.98656 68.73088-7.2704 121.7536-15.91296a9.91232 9.91232 0 0 0 5.40672-2.74432l311.0912-311.0912-122.94144-137.74848z m106.74176-106.72128l-84.992 84.95104 122.96192 137.728 92.3648-92.3648a10.24 10.24 0 0 0 0-14.45888L714.752 183.17312a10.24 10.24 0 0 0-14.47936 0z",
-        //            "className": "ModengTerm.Addon.Official.QuickInput.QuickInputUserControl, ModengTerm",
-        //            "vmClassName": "ModengTerm.Addon.Official.QuickInput.QuickInputVM, ModengTerm"
-        //        }
-        //    ]
-        //},
+        {
+            "id": "E4E83F91-80A5-4F05-BDF8-F8D0D12D2FC0",
+            "name": "快捷输入",
+            "classEntry": "ModengTerm.OfficialAddons.QuickInput.QuickInputAddon, ModengTerm",
+            "toolbarMenus": [
+                {
+                    "id": "AD6A95B1-ED61-42D7-96DF-3A55778110AE",
+                    "name": "快捷命令",
+                    "pid": "05B8D545-77CD-4F4E-908B-65A5C27E842D",
+                    "command": "QuickInputAddon.ShowQuickInputPanel"
+                }
+            ],
+            "sidePanels": [
+                {
+                    "id": "QuickInputSidePanel",
+                    "name": "快速输入",
+                    "icon": "M736.4608 161.44384l115.85536 115.85536a40.96 40.96 0 0 1 0 57.91744L427.08992 760.44288c-6.06208 6.0416-13.86496 10.0352-22.3232 11.38688-107.47904 17.48992-165.888 21.6064-175.16544 12.32896-9.27744-9.29792-5.16096-67.6864 12.32896-175.18592 1.35168-8.43776 5.3248-16.24064 11.38688-22.30272L678.54336 161.44384a40.96 40.96 0 0 1 57.91744 0z m-142.9504 128.45056L275.0464 608.3584a10.0352 10.0352 0 0 0-2.80576 5.55008c-8.6016 52.92032-13.9264 93.55264-15.89248 121.6512-0.57344 8.25344-0.86016 15.31904-0.86016 21.0944v1.59744h1.59744c4.62848 0 10.05568-0.18432 16.2816-0.55296l4.8128-0.3072c28.09856-1.98656 68.73088-7.2704 121.7536-15.91296a9.91232 9.91232 0 0 0 5.40672-2.74432l311.0912-311.0912-122.94144-137.74848z m106.74176-106.72128l-84.992 84.95104 122.96192 137.728 92.3648-92.3648a10.24 10.24 0 0 0 0-14.45888L714.752 183.17312a10.24 10.24 0 0 0-14.47936 0z",
+                    "className": "ModengTerm.Addon.Official.QuickInput.QuickInputPanel, ModengTerm"
+                }
+            ]
+        },
         //{
         //    "id": "8FB10D30-714A-4502-AC8C-9477BBD7152C",
         //    "name": "系统监控",
@@ -535,35 +534,35 @@
                 }
             ]
         },
-        {
-            "id": "ADD375D1-1BF7-4354-A946-B04F3F4041EE",
-            "name": "录制",
-            "classEntry": "ModengTerm.OfficialAddons.Record.RecordAddon, ModengTerm",
-            "toolbarMenus": [
-                {
-                    "id": "8FE934FF-239F-4F99-82C1-196423D2C3B3",
-                    "name": "录制",
-                    "pid": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
-                    "child": [
-                        {
-                            "id": "7BE4A619-3658-4557-9C39-9AFB8FBFFF9D",
-                            "name": "开始",
-                            "command": "RecordAddon.StartRecord"
-                        },
-                        {
-                            "id": "97672452-A0AA-43B2-A777-100BF8D2E6D8",
-                            "name": "停止",
-                            "command": "RecordAddon.StopRecord"
-                        },
-                        {
-                            "id": "DE9676C4-AA97-4E7A-A1F6-942973C54B75",
-                            "name": "打开回放",
-                            "command": "RecordAddon.OpenRecord"
-                        }
-                    ]
-                }
-            ]
-        },
+        //{
+        //    "id": "ADD375D1-1BF7-4354-A946-B04F3F4041EE",
+        //    "name": "录制",
+        //    "classEntry": "ModengTerm.OfficialAddons.Record.RecordAddon, ModengTerm",
+        //    "toolbarMenus": [
+        //        {
+        //            "id": "8FE934FF-239F-4F99-82C1-196423D2C3B3",
+        //            "name": "录制",
+        //            "pid": "000C1900-DC7E-4710-B8B1-46CE00E35E33",
+        //            "child": [
+        //                {
+        //                    "id": "7BE4A619-3658-4557-9C39-9AFB8FBFFF9D",
+        //                    "name": "开始",
+        //                    "command": "RecordAddon.StartRecord"
+        //                },
+        //                {
+        //                    "id": "97672452-A0AA-43B2-A777-100BF8D2E6D8",
+        //                    "name": "停止",
+        //                    "command": "RecordAddon.StopRecord"
+        //                },
+        //                {
+        //                    "id": "DE9676C4-AA97-4E7A-A1F6-942973C54B75",
+        //                    "name": "打开回放",
+        //                    "command": "RecordAddon.OpenRecord"
+        //                }
+        //            ]
+        //        }
+        //    ]
+        //},
         {
             "id": "6B9269E6-F033-40AC-9B8E-2549C57C364D",
             "name": "关于",

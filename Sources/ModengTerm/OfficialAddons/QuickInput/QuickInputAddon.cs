@@ -14,18 +14,28 @@ namespace ModengTerm.OfficialAddons.QuickInput
     {
         protected override void OnActive(ActiveContext e)
         {
+            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
             this.RegisterCommand("QuickInputAddon.ShowQuickInputPanel", this.ShowQuickInputPanel);
         }
 
         protected override void OnDeactive()
         {
+            this.eventRegistry.SubscribeEvent(ClientEvent.CLIENT_INITIALIZED, this.OnClientInitialized);
         }
+
+        #region 事件处理器
 
         private void ShowQuickInputPanel(CommandArgs e)
         {
-            ObjectFactory factory = ObjectFactory.GetFactory();
-            IShellPanel shell = factory.GetActivePanel<IShellPanel>();
-            shell.VisiblePanel("0C1F6D60-F6ED-4D01-B5B6-1812EA55286A");
+            ISidePanel sidePanel = this.GetSidePanel("QuickInputSidePanel");
+            sidePanel.SwitchStatus();
         }
+
+        private void OnClientInitialized(ClientEventArgs e) 
+        {
+
+        }
+
+        #endregion
     }
 }

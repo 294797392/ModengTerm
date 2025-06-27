@@ -1,15 +1,12 @@
-﻿<UserControl x:Class="ModengTerm.OfficialAddons.QuickInput.QuickInputUserControl"
+﻿<maddpan:SidePanelContent x:Class="ModengTerm.OfficialAddons.QuickInput.QuickInputPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mcsext="clr-namespace:ModengTerm.Controls;assembly=ModengTerm.Controls"
+             xmlns:maddpan="clr-namespace:ModengTerm.Addon.Panel;assembly=ModengTerm.Addon"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="200"
-             x:Name="UserControl1">
-
-    <UserControl.Resources>
-    </UserControl.Resources>
+             d:DesignHeight="200" d:DesignWidth="200">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -69,4 +66,4 @@
         </ListBox>
 
     </Grid>
-</UserControl>
+</maddpan:SidePanelContent>

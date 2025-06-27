@@ -23,13 +23,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="OfficialAddons\QuickInput\**" />
     <Compile Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
-    <EmbeddedResource Remove="OfficialAddons\QuickInput\**" />
     <EmbeddedResource Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
-    <None Remove="OfficialAddons\QuickInput\**" />
     <None Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
-    <Page Remove="OfficialAddons\QuickInput\**" />
     <Page Remove="UserControls\OptionsUserControls\Session\AdbShell\**" />
   </ItemGroup>
 
@@ -47,6 +43,10 @@
     <Compile Remove="OfficialAddons\Logger\LoggerManager.cs" />
     <Compile Remove="OfficialAddons\Logger\NoneFilter.cs" />
     <Compile Remove="OfficialAddons\Logger\RegexpFilter.cs" />
+    <Compile Remove="OfficialAddons\QuickInput\CommandManagerWindow.xaml.cs" />
+    <Compile Remove="OfficialAddons\QuickInput\CommandVM.cs" />
+    <Compile Remove="OfficialAddons\QuickInput\Converters.cs" />
+    <Compile Remove="OfficialAddons\QuickInput\QuickInputVM.cs" />
     <Compile Remove="OfficialAddons\Record\PlaybackUserControl.xaml.cs" />
     <Compile Remove="OfficialAddons\SessionExplorer\SessionExplorerPanelVM.cs" />
     <Compile Remove="UserControls\SFTPContentUserControl.xaml.cs" />
@@ -81,6 +81,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Remove="OfficialAddons\QuickInput\CommandManagerWindow.xaml" />
     <Page Remove="OfficialAddons\Record\PlaybackUserControl.xaml" />
     <Page Remove="Themes\Themes.Default.xaml" />
     <Page Remove="Themes\Themes.Ubuntu.Ambiance.xaml" />
@@ -173,6 +174,7 @@
 
   <ItemGroup>
     <Folder Include="Controls\" />
+    <Folder Include="DataModels\" />
   </ItemGroup>
 
   <ItemGroup>

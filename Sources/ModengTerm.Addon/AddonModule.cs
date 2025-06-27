@@ -121,18 +121,6 @@ namespace ModengTerm.Addons
             return this.sidePanels.FirstOrDefault(v => v.ID.ToString() == id);
         }
 
-        protected IOverlayPanel CreateOverlayPanel(string id)
-        {
-            PanelDefinition definition = this.definition.OverlayPanels.FirstOrDefault(v => v.ID == id);
-            if (definition == null)
-            {
-                logger.ErrorFormat("没找到指定的OverlayPanel, {0}", id);
-                return null;
-            }
-
-            return this.factory.CreateOverlayPanel(definition);
-        }
-
         /// <summary>
         /// 先查找指定的OverlayPanel是否存在，如果不存在则创建并加到指定的shellTab里
         /// </summary>
@@ -178,6 +166,18 @@ namespace ModengTerm.Addons
         #endregion
 
         #region 实例方法
+
+        private IOverlayPanel CreateOverlayPanel(string id)
+        {
+            PanelDefinition definition = this.definition.OverlayPanels.FirstOrDefault(v => v.ID == id);
+            if (definition == null)
+            {
+                logger.ErrorFormat("没找到指定的OverlayPanel, {0}", id);
+                return null;
+            }
+
+            return this.factory.CreateOverlayPanel(definition);
+        }
 
         #endregion
     }

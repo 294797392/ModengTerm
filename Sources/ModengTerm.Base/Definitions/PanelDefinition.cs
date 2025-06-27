@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using WPFToolkit.MVVM;
 
 namespace ModengTerm.Base.Definitions
 {
@@ -29,8 +28,19 @@ namespace ModengTerm.Base.Definitions
         [JsonProperty("icon")]
         public string Icon { get; set; }
 
+        /// <summary>
+        /// 指定面板什么时候显示
+        /// 参考vscode的activationEvents事件
+        /// onClientInitialize - 在客户端启动之后就显示
+        /// onTabOpened:terminal - 在打开terminal类型的tab的时候显示
+        /// 这些事件保持与TabEvent和ClientEvent一致
+        /// </summary>
+        [JsonProperty("startupEvents")]
+        public List<string> StartupEvents { get; private set; }
+
         public PanelDefinition()
         {
+            this.StartupEvents = new List<string>();
         }
     }
 }

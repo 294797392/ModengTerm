@@ -1,5 +1,4 @@
 ﻿using DotNEToolkit;
-using log4net.Repository.Hierarchy;
 using ModengTerm.Addon;
 using ModengTerm.Addon.Interactive;
 using ModengTerm.Addon.Panel;

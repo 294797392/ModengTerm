@@ -74,7 +74,7 @@ namespace ModengTerm.Addon.Interactive
         RightTop,
         RightBottom,
     }
-    
+
     /// <summary>
     /// 向插件公开OverlayPanel的接口
     /// </summary>
